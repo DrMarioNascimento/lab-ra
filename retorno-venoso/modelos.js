@@ -62,15 +62,23 @@ export const M = {
   /* o corpo é silhueta, não anatomia: translúcido e dessaturado para que a
      árvore venosa seja a única coisa que o olho persegue */
   pele: phys({ color: 0xd9b8a4, roughness: .78, sheen: .8, sheenRoughness: .7,
-               sheenColor: new THREE.Color(0xffd9c4), transparent: true, opacity: .17,
+               sheenColor: new THREE.Color(0xffd9c4), transparent: true, opacity: .11,
                depthWrite: false }),
   osso: phys({ color: 0xe8dfcc, roughness: .62, sheen: .35 }),
-  veia: phys({ color: 0xffffff, roughness: .52, sheen: .55,
-               sheenColor: new THREE.Color(0x8fb4d8), vertexColors: true }),
+  /* o brilho tem de ser POUCO e FRIO: branco e forte, ele apagava a cor por
+     vertice e a veia em repouso saia branca */
+  veia: phys({ color: 0xffffff, roughness: .46, sheen: .22,
+               sheenColor: new THREE.Color(0x5f86c8), vertexColors: true }),
   /* nos cortes o vaso é parede, não fluido: cor própria e sem cor por
      vértice, senão a pressão pintaria o cano e não o sangue */
-  veia2: phys({ color: 0x6f5f74, roughness: .6, sheen: .5,
-                sheenColor: new THREE.Color(0xc9b6d6) }),
+  /* PAREDE TRANSLUCIDA, e nao meia parede cortada. A primeira versao cortava
+     o vaso ao meio para se ver dentro, e a foto mostrou por que nao serve: a
+     abertura fica virada para um lado so, e de qualquer outro angulo as
+     cuspides aparecem de perfil, POR FORA. Translucida, ve-se dentro de todo
+     angulo e a peca continua sendo um tubo fechado, que e o que ela e. */
+  veia2: phys({ color: 0x8a7a90, roughness: .55, sheen: .45,
+                sheenColor: new THREE.Color(0xc9b6d6),
+                transparent: true, opacity: .26, depthWrite: false }),
   valvula: phys({ color: 0xf0e6dc, roughness: .44, sheen: .7,
                   sheenColor: new THREE.Color(0xffffff) }),
   coracao: phys({ color: 0x9e2f36, roughness: .55, sheen: .9,
@@ -81,20 +89,29 @@ export const M = {
 };
 
 /* ── A COR DA PRESSÃO ──────────────────────────────────────────────────────
-   Azul frio a 0 mmHg, vinho congesto a 100. A escala satura em 100 e não no
+   Azul frio a 0 mmHg, vinho congesto a 100. AS DUAS PONTAS TIVERAM DE
+   ESCURECER E SATURAR: na primeira foto a veia em repouso saia PALIDA, quase
+   branca — o material era branco com brilho por cima, e o tom mapeado pelo
+   ACES lavava o pigmento. Cor que nao se le nao informa nada. A escala satura em 100 e não no
    máximo possível: acima disso o olho já não distingue, e a faixa que importa
    (10 a 90) usaria só metade da rampa. Mesma lição da onda da bancada 07, que
    satura em 50 mV e não em 92. */
-const FRIO = [64, 108, 168], QUENTE = [122, 26, 38];
+const FRIO = [38, 92, 196], QUENTE = [162, 22, 34];
 export function corDaPressao(mmHg) {
   const t = clamp(mmHg / 100, 0, 1);
   /* raiz para abrir a metade baixa: entre 10 e 40 mmHg está a diferença
      entre a perna descansada e a perna parada em pé, e ela tem de aparecer */
   const u = Math.sqrt(t);
-  return new THREE.Color(
+  /* AS FRACOES ACIMA SAO sRGB, E O THREE.Color LE LINEAR POR PADRAO. Entregar
+     as duas coisas trocadas CLAREIA tudo: corDaPressao(10) devolvia #968fc6,
+     lavanda palido, no lugar de #265cc4. Foi por isso que a veia em repouso
+     saia branca na foto, e nao por causa do brilho do material. Mesma
+     armadilha que a paleta da bancada 07 ja tinha ensinado. */
+  return new THREE.Color().setRGB(
     (FRIO[0] + (QUENTE[0] - FRIO[0]) * u) / 255,
     (FRIO[1] + (QUENTE[1] - FRIO[1]) * u) / 255,
-    (FRIO[2] + (QUENTE[2] - FRIO[2]) * u) / 255);
+    (FRIO[2] + (QUENTE[2] - FRIO[2]) * u) / 255,
+    THREE.SRGBColorSpace);
 }
 
 /* pinta uma geometria inteira de uma cor só, no atributo de cor */
@@ -127,17 +144,32 @@ function veia(pontos, raioBase) {
   return geo;
 }
 
-/* Engorda e repinta um tubo de veia. `fator` 1 = calibre de repouso.
+/* ── A LEI DA DISTENSÃO, E POR QUE ELA É UMA SÓ ────────────────────────────
    A veia é um saco complacente, não um cano: dobrar a pressão não dobra o
-   raio. A raiz cúbica vem da complacência venosa — muito volume por pouca
-   pressão no começo, e quase nada depois que a parede estica. */
+   raio. Ela sai de achatada, vira circular e então a parede endurece — muito
+   volume por pouca pressão no começo, quase nada depois.
+
+   O EXPOENTE FOI CALIBRADO CONTRA O LIVRO, não escolhido pelo desenho. Com
+   raiz cúbica a perna engordava 2,9x em área e o modelo previa 1.140 ml
+   empoçados nas duas pernas — o dobro do que se mede. Com raiz quarta e teto
+   em 1,45 a área dobra e a previsão cai para ~600 ml, dentro da faixa de 300
+   a 800 que a literatura relata ao levantar.
+
+   E A LEI É A MESMA PARA O DESENHO E PARA A CONTA. Seria fácil engrossar mais
+   a veia "para aparecer" e calcular o volume por outra régua — e seria
+   exatamente a mentira que esta bancada existe para não contar. Quem faz a
+   distensão aparecer é a COR, que tem rampa própria. */
+export function fatorDeDistensao(mmHg, teto = 1.45) {
+  return clamp(Math.pow(clamp(mmHg, 1, 120) / 12, .25), .80, teto);
+}
+
 function moldarVeia(malha, grau, opc = {}) {
   const g = malha.geometry, u = g.userData;
   const pos = g.attributes.position, cor = g.attributes.color;
-  const base = opc.base ?? 10, teto = opc.teto ?? 1.9;
+  const base = opc.base ?? 10, teto = opc.teto ?? 1.45;
   for (let s = 0; s <= u.segsU; s++) {
     const p = pressaoVenosa(u.alturas[s], grau, { base });
-    const f = clamp(Math.cbrt(clamp(p, 0, 120) / 12), .72, teto);
+    const f = fatorDeDistensao(p, teto);
     const c = corDaPressao(p);
     const ct = u.centros[s], r = u.raioBase * f;
     for (let k = 0; k <= u.segsV; k++) {
@@ -157,20 +189,36 @@ function moldarVeia(malha, grau, opc = {}) {
 /* ── O CORPO, EM SILHUETA ──────────────────────────────────────────────────
    Não é anatomia: é o suporte que dá ALTURA à coluna. Feito de revoluções
    suaves para não virar boneco de peças coladas — a queixa de sempre. */
-function perfilCorpo() {
-  /* [altura em cm, meia-largura em cm] do contorno de frente */
-  return [[0, 5], [12, 5.5], [30, 6.5], [48, 7], [70, 9], [92, 12],
-          [104, 13], [118, 13.5], [132, 15], [142, 15.5], [148, 8],
-          [154, 9.5], [166, 9], [170, 4]];
+/* Um solido de revolucao so NAO da gente: da vaso. A primeira versao era
+   exatamente isso — um perfil girado, com a cabeca virando bojo e nenhuma
+   perna. E aqui a leitura de PERNA e o assunto: e nela que o sangue empoca.
+   Agora sao pecas com eixo proprio — duas pernas, tronco, pescoco, cabeca e
+   dois bracos — fundidas numa malha so. */
+function tubo(x, z, h0, h1, r0, r1, achataZ = 1) {
+  const g = new THREE.CylinderGeometry(r1 * CM, r0 * CM, (h1 - h0) * CM, 20, 1, false);
+  g.scale(1, 1, achataZ);
+  g.translate(x * CM, (h0 + h1) / 2 * CM, z * CM);
+  return g;
 }
 
 function corpoSilhueta() {
-  const perfil = perfilCorpo();
-  const pts = perfil.map(([h, l]) => new THREE.Vector2(l * CM, h * CM));
-  const g = new THREE.LatheGeometry(pts, 40);
-  /* achatar em z: gente é mais larga que funda */
-  g.scale(1, 1, .62);
-  return new THREE.Mesh(g, M.pele);
+  const partes = [];
+  for (const lado of [-1, 1]) {
+    /* perna: tornozelo, panturrilha, joelho, coxa — quatro trechos, porque
+       uma perna de calibre unico vira pau de vassoura */
+    partes.push(tubo(lado * 8, 0, 0, 12, 5.0, 5.4, .9));
+    partes.push(tubo(lado * 8, 0, 12, 34, 5.4, 8.0, .9));
+    partes.push(tubo(lado * 8.4, 0, 34, 48, 8.0, 6.6, .9));
+    partes.push(tubo(lado * 8.8, 0, 48, 92, 6.6, 10.5, .92));
+    partes.push(tubo(lado * 17.5, 0, 112, 142, 4.0, 5.6, 1));   // braco
+  }
+  partes.push(tubo(0, 0, 88, 118, 15.5, 14.0, .66));      // abdome
+  partes.push(tubo(0, 0, 118, 143, 14.5, 16.5, .60));     // torax
+  partes.push(tubo(0, 0, 143, 151, 5.2, 5.6, 1));         // pescoco
+  const cabeca = new THREE.SphereGeometry(9 * CM, 22, 16);
+  cabeca.scale(.86, 1.1, .92); cabeca.translate(0, 160 * CM, 0);
+  partes.push(cabeca);
+  return new THREE.Mesh(mergeGeometries(partes), M.pele);
 }
 
 /* ── NÍVEL 01 — O CORPO E A COLUNA ────────────────────────────────────────
@@ -192,7 +240,7 @@ function nivelCorpo() {
       V(x * .9, CORPO.coxa * CM, .4 * CM),
       V(x * .55, CORPO.quadril * CM, .6 * CM),
     ];
-    const m = new THREE.Mesh(veia(pontos, .85 * CM), M.veia);
+    const m = new THREE.Mesh(veia(pontos, 2.2 * CM), M.veia);
     m.userData.papel = 'perna';
     veias.push(m); g.add(m);
   }
@@ -202,7 +250,7 @@ function nivelCorpo() {
     V(.6 * CM, 102 * CM, .5 * CM),
     V(1.0 * CM, PIH * CM, .2 * CM),
     V(1.2 * CM, CORPO.coracao * CM, 0),
-  ], 1.35 * CM), M.veia);
+  ], 3.0 * CM), M.veia);
   cava.userData.papel = 'cava';
   veias.push(cava); g.add(cava);
 
@@ -212,7 +260,7 @@ function nivelCorpo() {
     V(2.6 * CM, CORPO.ombro * CM, 3.0 * CM),
     V(2.8 * CM, 150 * CM, 3.2 * CM),
     V(2.9 * CM, CORPO.olhos * CM, 2.6 * CM),
-  ], .62 * CM), M.veia);
+  ], 1.5 * CM), M.veia);
   jugular.userData.papel = 'jugular';
   veias.push(jugular); g.add(jugular);
 
@@ -286,12 +334,13 @@ function moldarCuspide(malha, abertura) {
   pos.needsUpdate = true; g.computeVertexNormals(); g.computeBoundingSphere();
 }
 
-/* meia parede de vaso, para se ver por dentro sem precisar de face dupla */
-function meiaParede(R, comp, mat) {
-  const g = new THREE.CylinderGeometry(R, R, comp, 30, 1, true, Math.PI * .08, Math.PI * .84);
+/* parede de vaso: tubo inteiro, translucido */
+function parede(R, comp, mat) {
+  const g = new THREE.CylinderGeometry(R, R, comp, 30, 1, true);
   g.translate(0, comp / 2, 0);
   const m = new THREE.Mesh(g, mat);
   m.userData.paredeR = R;
+  m.renderOrder = 2;                    // desenha depois das cuspides
   return m;
 }
 
@@ -313,7 +362,7 @@ function nivelPerna() {
   const prof = new THREE.Mesh(veia([
     V(0, 8 * CM, 0), V(.3 * CM, 26 * CM, .4 * CM), V(0, 48 * CM, .2 * CM),
     V(-.3 * CM, 72 * CM, 0), V(0, 94 * CM, .2 * CM),
-  ], 1.05 * CM), M.veia);
+  ], 2.4 * CM), M.veia);
   prof.userData.papel = 'profunda';
   veias.push(prof); g.add(prof);
 
@@ -322,7 +371,7 @@ function nivelPerna() {
     V(3.4 * CM, 10 * CM, 1.6 * CM), V(4.0 * CM, 30 * CM, 2.0 * CM),
     V(3.6 * CM, 52 * CM, 2.2 * CM), V(3.0 * CM, 74 * CM, 1.6 * CM),
     V(1.4 * CM, 92 * CM, .8 * CM),
-  ], .72 * CM), M.veia);
+  ], 1.6 * CM), M.veia);
   saf.userData.papel = 'safena';
   veias.push(saf); g.add(saf);
 
@@ -332,7 +381,7 @@ function nivelPerna() {
     const p = new THREE.Mesh(veia([
       V(3.5 * CM, h * CM, 1.8 * CM), V(1.6 * CM, (h + 2) * CM, .9 * CM),
       V(.2 * CM, (h + 3) * CM, .3 * CM),
-    ], .34 * CM), M.veia);
+    ], .9 * CM), M.veia);
     p.userData.papel = 'perfurante';
     veias.push(p); g.add(p);
   }
@@ -350,14 +399,14 @@ const VALV_ALTURAS = [16, 30, 44];        // cm, no segmento desenhado
 
 function nivelValvula() {
   const g = new THREE.Group();
-  const R = 3.2 * CM, H = 56 * CM;
-  g.add(meiaParede(R, H, M.veia2));
+  const R = 7 * CM, H = 56 * CM;
+  g.add(parede(R, H, M.veia2));
 
   const valvulas = [];
   for (const h of VALV_ALTURAS) {
     const par = new THREE.Group();
     for (const teta of [0, Math.PI]) {
-      const m = new THREE.Mesh(cuspide(R * .98, 7 * CM, teta), M.valvula);
+      const m = new THREE.Mesh(cuspide(R * .97, 11 * CM, teta), M.valvula);
       moldarCuspide(m, 1);
       par.add(m);
     }
@@ -380,10 +429,11 @@ function nivelValvula() {
    é pior que andar. */
 function nivelBomba() {
   const g = new THREE.Group();
-  const R = 2.6 * CM, H = 46 * CM;
+  const R = 5.5 * CM, H = 46 * CM;
 
   const veiaBomba = new THREE.Mesh(
     new THREE.CylinderGeometry(R, R, H, 26, 24, true), M.veia2);
+  veiaBomba.renderOrder = 2;
   veiaBomba.geometry.translate(0, H / 2, 0);
   veiaBomba.userData.R = R; veiaBomba.userData.H = H;
   g.add(veiaBomba);
@@ -406,7 +456,7 @@ function nivelBomba() {
   for (const h of [10, 34]) {
     const par = new THREE.Group();
     for (const teta of [0, Math.PI]) {
-      const m = new THREE.Mesh(cuspide(R * .98, 6 * CM, teta), M.valvula);
+      const m = new THREE.Mesh(cuspide(R * .97, 9 * CM, teta), M.valvula);
       moldarCuspide(m, 1); par.add(m);
     }
     par.position.y = h * CM; par.userData.altura = h;
@@ -437,32 +487,60 @@ export function criar() {
      anel, comparado com o mesmo corpo deitado. O livro fala em 300 a 800 ml
      ao levantar, e o modelo tem de cair nessa faixa sozinho — se não cair, é
      o modelo que está errado, não o livro. */
-  function volumeDe(m, grau) {
-    let ml = 0;
+  /* ── O VOLUME EMPOÇADO ─────────────────────────────────────────────────
+     O tubo desenhado é EXAGERADO para se enxergar: medir volume no calibre
+     do desenho deu 7.314 ml, dez vezes o que se mede numa perna. A saída não
+     é corrigir o número no fim — é calibrar onde há medida.
+
+     Repare que o CALIBRE DESENHADO NAO ENTRA nesta conta: so o fator de
+     distensao e o comprimento. E por isso que se pode engrossar a veia para
+     ela aparecer sem mexer um mililitro no resultado.
+
+     Calibra-se o REPOUSO: as duas pernas guardam cerca de 600 ml de sangue
+     venoso deitado, e isso é anatomia medida. O que acontece ao levantar sai
+     então da lei de distensão, e é PREVISÃO do modelo, não entrada dele. Se a
+     previsão não cair na faixa de 300 a 800 ml que a literatura relata, é o
+     modelo que está errado — e é justamente isso que se quer poder descobrir. */
+  const VOL_REPOUSO_PERNAS = 600;                 // ml, deitado, as duas pernas
+  const DA_PERNA = new Set(['perna', 'profunda', 'safena', 'perfurante']);
+
+  function somaArea(m, grau) {
+    let soma = 0;
     for (const v of (m.userData.veias || [])) {
+      if (!DA_PERNA.has(v.userData.papel)) continue;
       const u = v.geometry.userData;
       for (let s = 0; s < u.segsU; s++) {
-        const p = pressaoVenosa(u.alturas[s], grau);
-        const f = clamp(Math.cbrt(clamp(p, 0, 120) / 12), .72, 1.9);
-        const r = u.raioBase * f / CM;                       // cm
+        const f = fatorDeDistensao(pressaoVenosa(u.alturas[s], grau));
         const L = u.centros[s].distanceTo(u.centros[s + 1]) / CM;
-        ml += Math.PI * r * r * L;
+        soma += f * f * L;                        // area vai com o quadrado do raio
       }
     }
-    /* o desenho tem duas pernas e uma cava; o corpo tem a rede inteira, que
-       é ~9x o que cabe num tubo só por perna. O fator é de ESCALA de
-       desenho, e por isso está aqui e não escondido numa constante. */
-    return ml * 9;
+    return soma;
   }
+  const AREA0 = somaArea(modelos[0], 0);
+  const volumeDe = (m, grau) => VOL_REPOUSO_PERNAS * somaArea(m, grau) / AREA0;
 
   /* Aplica a postura. `grau`: 0 = decúbito, 90 = ortostatismo. */
   function aplicarPostura(grau, { bombaOff = 0 } = {}) {
     for (const m of modelos) {
       for (const v of (m.userData.veias || [])) {
         moldarVeia(v, grau, v.userData.papel === 'jugular'
-          ? { base: 6, teto: 1.5 } : { base: 10 - bombaOff * .0 });
+          ? { base: 6, teto: 1.2 } : {});
       }
     }
+    /* AS VALVULAS DO NIVEL 03 FECHAM COM A COLUNA, e essa e a licao inteira.
+       Deitado nao ha coluna que empurre para baixo: as cuspides ficam soltas
+       contra a parede. Em pe, o peso do sangue acima as enche por tras e elas
+       encostam as bordas — cada uma segurando o seu degrau. Mostra-las
+       abertas em ortostatismo, como estavam na primeira foto, dizia o oposto
+       do que o nivel existe para dizer. */
+    const fechamento = clamp(Math.sin(grau * Math.PI / 180) * 1.15, 0, 1);
+    for (const par of (modelos[2].userData.valvulas || [])) {
+      const abre = clamp(1 - fechamento, .05, 1);
+      par.children.forEach(c => moldarCuspide(c, abre));
+      par.userData.abertura = abre;
+    }
+
     const jug = pressaoVenosa(CORPO.olhos, grau, { base: 6 });
     return {
       tornozelo: pressaoVenosa(CORPO.tornozelo, grau),

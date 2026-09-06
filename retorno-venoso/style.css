@@ -125,3 +125,18 @@
   .actions { grid-template-columns: .85fr 1.4fr; }
   .learning-strip { padding: 17px; }
 }
+
+/* ---- o que a bancada 08 acrescenta ---- */
+.permitir { font: inherit; font-weight: 700; padding: 12px 16px; border-radius: 11px; border: 0;
+            background: #f5c518; color: #131d15; width: 100%; }
+.estado { margin: 0; font-family: 'IBM Plex Mono', monospace; font-size: .78rem; color: #7f9a80; }
+.estado.vivo { color: #5fd177; }
+.leituras { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 3px;
+            font-family: 'IBM Plex Mono', monospace; font-size: .82rem; color: #b0c4ac; }
+.leituras li { display: flex; justify-content: space-between; gap: 10px; }
+.leituras b { color: #f2f7ec; font-weight: 700; }
+.degraus { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px;
+           font-family: 'IBM Plex Mono', monospace; font-size: .82rem; color: #b0c4ac; }
+.degraus li { display: flex; justify-content: space-between; gap: 8px; }
+.degraus b { color: #ffe066; }
+.degraus span { color: #f2f7ec; }
