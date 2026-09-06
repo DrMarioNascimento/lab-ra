@@ -14,12 +14,12 @@ const BANCADAS = ["musculo-sarcomero/app.js", "potencial-membrana/app.js"];
    todas têm medida por trás.
    ========================================================================== */
 
-test("as duas bancadas assam a cor antes de exportar", async () => {
+test("as duas bancadas preparam o modelo antes de exportar", async () => {
   for (const app of BANCADAS) {
     const src = await text(app);
-    assert.match(src, /import \{ corParaRA \} from '\.\.\/cores-para-ra\.js'/, app);
+    assert.match(src, /import \{ prepararParaRA \} from '\.\.\/cores-para-ra\.js'/, app);
     /* tem de acontecer no CLONE, antes do exportador ver a cena */
-    const i = src.indexOf("corParaRA(clone)");
+    const i = src.indexOf("prepararParaRA(clone)");
     const j = src.indexOf("new GLTFExporter().parseAsync");
     assert.ok(i > 0 && j > i, app);
   }
@@ -56,4 +56,46 @@ test("malha com textura própria não perde o UV para a paleta", async () => {
   const src = await text("cores-para-ra.js");
   assert.match(src, /if \(pinta && temMapa\(o\.material\)\)/);
   assert.match(src, /conta\.tingidas\+\+/);
+});
+
+/* ==========================================================================
+   A dupla face também não atravessa
+
+   O exportador de USDZ não escreve `doubleSided` uma única vez — o de glTF
+   escreve, o de USDZ não. Peça de dupla face vira face única no iPhone e SOME
+   vista do lado de trás: foi o que aconteceu com o miolo da bicamada e com a
+   parede do corte. Vale a regra que a bancada já aprendeu para o `BackSide`:
+   a face tem de estar na GEOMETRIA, não no material.
+   ========================================================================== */
+
+test("nenhuma peça sai da preparação com face que o USDZ não lê", async () => {
+  const src = await text("cores-para-ra.js");
+  assert.match(src, /o\.material\.side = THREE\.FrontSide;/);
+  assert.match(src, /if \(lado === THREE\.BackSide\)/);
+});
+
+test("a gêmea nasce fora da travessia", async () => {
+  const src = await text("cores-para-ra.js");
+  /* acrescentar filho no meio da travessia é pedir para visitar o que acabou
+     de nascer, e a gêmea ganharia gêmea */
+  assert.match(src, /const aNascer = \[\];/);
+  const iEmpurra = src.indexOf("aNascer.push(o)");
+  const iUsa = src.indexOf("for (const o of aNascer)");
+  assert.ok(iEmpurra > 0 && iUsa > iEmpurra);
+});
+
+test("pelo avesso inverte o giro E as normais", async () => {
+  const src = await text("cores-para-ra.js");
+  /* só inverter o giro deixa a peça iluminada ao contrário */
+  assert.match(src, /a\[i\] = a\[i \+ 2\]/);
+  assert.match(src, /n\.setXYZ\(i, -n\.getX\(i\), -n\.getY\(i\), -n\.getZ\(i\)\)/);
+});
+
+test("a dupla face é resolvida depois da paleta", async () => {
+  const src = await text("cores-para-ra.js");
+  /* a gêmea tem de nascer com o UV já assado, senão sai branca */
+  const iPaleta = src.indexOf("conta.assadas++");
+  /* a CHAMADA, nao a definicao: esta vem antes no arquivo */
+  const iFaces = src.lastIndexOf("duasFaces(raiz, conta)");
+  assert.ok(iPaleta > 0 && iFaces > iPaleta);
 });

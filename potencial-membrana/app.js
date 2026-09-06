@@ -27,7 +27,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { corParaRA } from '../cores-para-ra.js';
+import { prepararParaRA } from '../cores-para-ra.js';
 import { criar } from './modelos.js';
 
 const $ = id => document.getElementById(id);
@@ -616,9 +616,9 @@ function prepararRA() {
       clone.updateMatrixWorld(true);
       const b2 = new THREE.Box3().setFromObject(clone);
       clone.position.set(-(b2.min.x + b2.max.x) / 2, -b2.min.y, -(b2.min.z + b2.max.z) / 2);
-      /* a cor por vértice não atravessa o USDZ: sem assar, o iPhone recebe
-         branco no lugar do tecido, da membrana e dos íons */
-      corParaRA(clone);
+      /* nem a cor por vértice nem a dupla face atravessam o USDZ: sem isto o
+         iPhone recebe branco no lugar do tecido e um vão onde havia parede */
+      prepararParaRA(clone);
       const wrap = new THREE.Group(); wrap.add(clone);
       const buf = await new GLTFExporter().parseAsync(wrap, { binary: true, onlyVisible: true });
       if (id !== prepId) return;
