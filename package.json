@@ -5,6 +5,6 @@
   "description": "Lab RA — bancadas de realidade aumentada do projeto MOSAICO.",
   "type": "module",
   "scripts": {
-    "test": "node --test tests/pelicula-de-carga.test.mjs"
+    "test": "node --test tests/pelicula-de-carga.test.mjs tests/porta-de-acesso.test.mjs"
   }
 }
