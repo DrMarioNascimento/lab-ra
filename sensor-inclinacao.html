@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="brand/orientador.webp">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050a06">
+<title>Prova do sensor de inclinação · Laboratório do Pesquisar RA</title>
+<link rel="stylesheet" href="laboratorio.css">
+<style>
+  /* Página de prova, não de ensino: números grandes e nada mais. O que se
+     mede aqui é se a inclinação lida bate com a inclinação real do aparelho. */
+  .wrap { max-width: 560px; margin: 0 auto; padding: 22px 16px 60px; }
+  .grande { font-family: 'IBM Plex Mono', monospace; font-size: 3.6rem; font-weight: 700;
+            color: #ffe066; line-height: 1; margin: 6px 0 2px; }
+  .postura { font-size: 1.3rem; font-weight: 700; color: #5fd177; margin: 0 0 18px; }
+  .barra { height: 16px; border-radius: 8px; background: #131d15; overflow: hidden;
+           border: 1px solid #1f6b33; margin-bottom: 22px; }
+  .barra i { display: block; height: 100%; width: 0; background: linear-gradient(90deg,#2e9e4b,#f5c518); }
+  table { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mono', monospace; font-size: .92rem; }
+  td { padding: 5px 0; border-bottom: 1px solid #131d15; color: #b0c4ac; }
+  td:last-child { text-align: right; color: #f2f7ec; }
+  button { font: inherit; font-weight: 700; padding: 14px 20px; border-radius: 12px; border: 0;
+           background: #f5c518; color: #131d15; margin-bottom: 18px; }
+  .aviso { color: #ff9d2e; font-size: .9rem; line-height: 1.5; }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1 style="color:#f2f7ec;font-size:1.35rem;margin:0 0 6px">Prova do sensor de inclinação</h1>
+  <p style="color:#b0c4ac;line-height:1.5;margin:0 0 18px">
+    Deite o aparelho na mesa e depois levante-o na vertical. O número tem de ir
+    de <b style="color:#ffe066">0°</b> a <b style="color:#ffe066">90°</b>, e a
+    pressão do tornozelo de <b>10</b> a <b>90 mmHg</b>. É essa a bancada inteira
+    em uma linha.
+  </p>
+
+  <button id="permitir" type="button" hidden>Usar a inclinação do aparelho</button>
+  <p id="aviso" class="aviso"></p>
+
+  <div class="grande"><span id="grau">—</span>°</div>
+  <p class="postura" id="postura">esperando o sensor…</p>
+  <div class="barra"><i id="barra"></i></div>
+
+  <table>
+    <tr><td>pressão no tornozelo</td><td><span id="pTor">—</span> mmHg</td></tr>
+    <tr><td>pressão na jugular</td><td><span id="pJug">—</span> <span id="uJug">mmHg</span></td></tr>
+    <tr><td>beta (frente-trás)</td><td><span id="beta">—</span>°</td></tr>
+    <tr><td>gamma (esquerda-direita)</td><td><span id="gamma">—</span>°</td></tr>
+    <tr><td>eventos recebidos</td><td><span id="n">0</span></td></tr>
+  </table>
+
+  <p style="margin-top:26px"><a href="bancadas.html" style="color:#f5c518">← voltar às bancadas</a></p>
+</main>
+
+<script>
+/* A INCLINAÇÃO SAI SÓ DE BETA E GAMMA, e isso é o ponto técnico da bancada.
+   cos(theta) = cos(beta) * cos(gamma) é a componente vertical do eixo normal
+   da tela. Não entra alpha — que é rumo de bússola, o sinal que castiga o
+   iPhone (ver a Janela do Norte). Aqui só a GRAVIDADE decide, e gravidade é
+   firme nos dois sistemas. */
+const g2r = d => d * Math.PI / 180;
+function inclinacaoDe(beta, gamma) {
+  const c = Math.cos(g2r(beta)) * Math.cos(g2r(gamma));
+  const t = Math.acos(Math.max(-1, Math.min(1, c))) * 180 / Math.PI;
+  /* de bruços passa de 90 e voltaria a "deitado": espelha para 0..90 */
+  return t > 90 ? 180 - t : t;
+}
+const PIH = 118, MMHG_POR_CM = 1060 * 9.81 * 0.01 / 133.3;
+const pressao = (h, grau, base = 10) => base + (PIH - h) * MMHG_POR_CM * Math.sin(g2r(grau));
+
+const $ = id => document.getElementById(id);
+let n = 0;
+function mostrar(beta, gamma) {
+  const grau = inclinacaoDe(beta, gamma);
+  $('grau').textContent = grau.toFixed(0);
+  $('barra').style.width = (grau / 90 * 100).toFixed(1) + '%';
+  $('postura').textContent = grau < 20 ? 'decúbito — deitado'
+    : grau > 70 ? 'ortostatismo — em pé' : 'inclinado';
+  $('pTor').textContent = pressao(12, grau).toFixed(0);
+  /* VEIA NÃO SUSTENTA PRESSÃO NEGATIVA: ela COLABA. Acima do ponto
+     indiferente a conta dá número negativo, e escrevê-lo seria ensinar
+     errado — a jugular de quem está em pé está vazia, não sob sucção. */
+  const jug = pressao(160, grau, 6);
+  $('pJug').textContent = jug < 0 ? 'colabada' : jug.toFixed(0);
+  $('uJug').textContent = jug < 0 ? '' : 'mmHg';
+  $('beta').textContent = beta.toFixed(0);
+  $('gamma').textContent = gamma.toFixed(0);
+  $('n').textContent = ++n;
+}
+function ouvir() {
+  addEventListener('deviceorientation', e => {
+    if (e.beta === null || e.gamma === null) return;
+    mostrar(e.beta, e.gamma);
+  });
+  /* Se nada chegar, é preciso DIZER — senão a pessoa fica olhando um traço.
+     A espera só começa a correr agora, quando já há o que esperar: contada
+     desde o carregamento, ela dispararia enquanto a pessoa lê a permissão. */
+  setTimeout(() => { if (!n) $('aviso').textContent =
+    'Nenhum evento de inclinação chegou. Num computador isso é esperado — este teste é de telefone.'; }, 3500);
+}
+if (typeof DeviceOrientationEvent !== 'undefined'
+    && typeof DeviceOrientationEvent.requestPermission === 'function') {
+  /* iOS: a permissão só pode ser pedida DENTRO de um gesto */
+  $('permitir').hidden = false;
+  $('permitir').onclick = async () => {
+    try {
+      const r = await DeviceOrientationEvent.requestPermission();
+      $('aviso').textContent = r === 'granted' ? '' : 'Permissão negada — o iPhone não vai mandar a inclinação.';
+      if (r === 'granted') { $('permitir').hidden = true; ouvir(); }
+    } catch (e) { $('aviso').textContent = 'Não foi possível pedir a permissão: ' + e.message; }
+  };
+} else {
+  ouvir();
+}
+window.__mostrar = mostrar;   // porta para a conferência sintética
+</script>
+</body>
+</html>
