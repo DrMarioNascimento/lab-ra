@@ -127,7 +127,14 @@ h1 { margin: 9px 0 12px; font-size: clamp(2.1rem, 8vw, 4rem); line-height: 1; le
 .page-head h1 { margin-bottom: 0; font-size: clamp(1.8rem, 7vw, 3.2rem); }
 .page-note { color: var(--mist); max-width: 700px; margin: 0 0 16px; }
 
-footer { padding: 24px 0 34px; border-top: 1px solid var(--line); color: var(--mist); text-align: center; font-size: .85rem; }
+/* ── A ASSINATURA ─────────────────────────────────────────────────────────
+   A figura do notebook fica AO LADO do nome, não acima: assinatura é uma
+   linha, e empilhar transformaria o rodapé num segundo cabeçalho. No telefone
+   ela some — ali cada pixel de altura conta mais que o enfeite. */
+footer { padding: 22px 0 34px; border-top: 1px solid var(--line); color: var(--mist); font-size: .85rem;
+  display: flex; align-items: center; justify-content: center; gap: 14px; text-align: left; }
+footer img { width: 84px; height: auto; flex: none; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .5)); }
+@media (max-width: 560px) { footer img { display: none; } footer { text-align: center; } }
 
 @media (max-width: 720px) {
   .tests { grid-template-columns: 1fr; }
@@ -142,15 +149,6 @@ footer { padding: 24px 0 34px; border-top: 1px solid var(--line); color: var(--m
   .hero { padding-top: 30px; }
 }
 
-/* ── A CAPA ───────────────────────────────────────────────────────────────
-   Texto à esquerda, o Mestre à direita, e no telefone ele vai para cima do
-   texto em vez de espremer as duas colunas. A figura tem fundo transparente,
-   então não leva moldura nenhuma: qualquer caixa em volta dela devolveria o
-   recorte retangular que o PNG existe para esconder. */
-.capa { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(180px, .85fr); gap: 26px; align-items: center; padding: 40px 0 22px; }
-.capa-texto { max-width: 620px; }
-.capa img { width: 100%; max-width: 300px; height: auto; justify-self: center; filter: drop-shadow(0 18px 26px rgba(0, 0, 0, .55)); }
-
 /* ── O LEMA ───────────────────────────────────────────────────────────────
    Duas frases com pesos diferentes de propósito: a primeira é o que o
    laboratório afirma, e vai em amarelo, que é a cor de maior contraste da
@@ -160,7 +158,3 @@ footer { padding: 24px 0 34px; border-top: 1px solid var(--line); color: var(--m
 .lema b { color: var(--amarelo2); font: 700 clamp(1.15rem, 3.4vw, 1.6rem)/1.25 var(--display); letter-spacing: .03em; }
 .lema i { color: var(--verde2); font: 600 clamp(.95rem, 2.6vw, 1.15rem)/1.3 var(--body); font-style: normal; letter-spacing: .01em; }
 
-@media (max-width: 780px) {
-  .capa { grid-template-columns: 1fr; gap: 14px; padding-top: 26px; }
-  .capa img { max-width: 210px; order: -1; }
-}
