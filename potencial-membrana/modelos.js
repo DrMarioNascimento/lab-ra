@@ -198,6 +198,12 @@ const M = {
   filtro: phys({ color: 0xe6c766, roughness: .40, clearcoat: .12, clearcoatRoughness: .5 }),
   atp: phys({ color: 0x8fd47a, roughness: .42, emissive: 0x123a12, emissiveIntensity: .6 }),
   poro: phys({ color: 0xffffff, vertexColors: true, roughness: .84, clearcoat: 0 }),
+  /* A MESMA COR DO MARCADOR QUE CORRE SOBRE A CURVA. É ela que amarra o
+     gráfico à figura sem precisar de legenda: o aluno vê laranja nos dois
+     lugares e entende que são a mesma coisa. Se alguém mudar uma, tem de
+     mudar a outra — está anotado nos dois arquivos. */
+  marcador: phys({ color: 0xff9d2e, roughness: .35, clearcoat: .2, clearcoatRoughness: .4,
+    emissive: 0x7a3a02, emissiveIntensity: 1.1 }),
 
   /* ---- nível 02: a célula em corte ---- */
   /* O NÚCLEO NÃO PODE SER ROXO. Nesta página a cor diz SINAL DE CARGA — quente
@@ -1222,6 +1228,13 @@ AX.aFora = AX.centro + AX.jan + .62;
    próprio cometi ao ler a primeira foto. Deslocada para trás, a de dentro fica
    longe e alta, a de fora perto e baixa, e a perspectiva separa as duas. */
 AX.aDentro = AX.centro + Math.PI + .42;
+/* ── ONDE O OSCILOSCÓPIO ENCOSTA ──────────────────────────────────────────
+   Esta constante morava em app.js e a geometria não a conhecia: o gráfico
+   dizia "tempo no ponto de registro" e a cena não tinha ponto nenhum — o
+   rótulo apontava para um trecho vazio do tubo. Duas fontes para a mesma
+   coisa é o começo de duas verdades; agora ela nasce aqui, com a peça, e
+   app.js a recebe pronta. */
+AX.uReg = .78;
 
 const eixoAx = curvaDePontos(t => V(
   -AX.L / 2 + t * AX.L,
@@ -1344,6 +1357,29 @@ function axonio() {
     tampaAnelar(0, rDentro(0), rFora(0), a0, arco), tampaAnelar(1, rDentro(1), rFora(1), a0, arco),
   ], false), M.parede));
 
+  /* ── O ELETRODO DE REGISTRO ────────────────────────────────────────────
+     A ponta entra pela janela do corte e encosta na parede de DENTRO — que é
+     o que um registro intracelular é, e é de lá que sai o Vm do gráfico. Vai
+     como `foraDoQuadro`: é instrumento, não assunto, e sem isso ele
+     empurraria a câmera para trás e afinaria a parede. */
+  const pReg = pontoNaParede(AX.uReg, AX.aDentro, rDentro(AX.uReg) - .07);
+  const traseira = pReg.clone().add(V(.30, 2.30, 1.45));
+  const haste = (de, ate, r0, r1, mat, segs = 18) => {
+    const d = ate.clone().sub(de);
+    const m = new THREE.Mesh(new THREE.CylinderGeometry(r0, r1, d.length(), segs, 1, true), mat);
+    m.position.copy(de).add(ate).multiplyScalar(.5);
+    m.quaternion.setFromUnitVectors(V(0, 1, 0), d.clone().normalize());
+    return m;
+  };
+  const conta = new THREE.Mesh(new THREE.SphereGeometry(.058, 16, 12), M.marcador);
+  conta.position.copy(pReg);
+  for (const o of [haste(traseira, pReg, .100, .012, M.vidro),
+                   haste(traseira.clone().lerp(pReg, .07), pReg.clone().lerp(traseira, .11), .015, .005, M.metal, 10),
+                   conta]) {
+    o.userData.foraDoQuadro = true; g.add(o);
+  }
+  g.userData.pontoRegistro = pReg;
+
   /* ── as fileiras de sinal ──────────────────────────────────────────────
      Uma por face. A de fora fica logo acima da parede e por isso some sob a
      bainha quando ela é ligada — o que é a verdade: o internódio está
@@ -1440,5 +1476,5 @@ function aplicarOnda(vmDe) {
 }
 
 const modelos = [neuronio(), interior(), pelicula(), portas(), axonio()];
-return { modelos, aplicarPotencial, aplicarOnda, EM_CHEIO, MEM };
+return { modelos, aplicarPotencial, aplicarOnda, EM_CHEIO, MEM, uReg: AX.uReg };
 }

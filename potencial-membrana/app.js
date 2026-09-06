@@ -85,7 +85,7 @@ function canvasTex(w, h, draw, { repeatX = 1, repeatY = 1 } = {}) {
   t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(repeatX, repeatY);
   t.anisotropy = 8; return t;
 }
-const { modelos, aplicarPotencial, aplicarOnda } = criar(canvasTex);
+const { modelos, aplicarPotencial, aplicarOnda, uReg } = criar(canvasTex);
 
 modelos.forEach((m, i) => {
   m.visible = i === 0; root.add(m);
@@ -156,6 +156,10 @@ const br = (n, d = 0) => n.toLocaleString('pt-BR', { minimumFractionDigits: d, m
 
 /* ------------------------------------------------------------ potencial de ação */
 const REPOUSO = -70, PICO = 38, FUNDO = -82, LIMIAR = -55;
+/* A MESMA COR DA CONTA NA PONTA DO ELETRODO, em modelos.js (M.marcador). É
+   ela que amarra o gráfico à figura sem legenda nenhuma: laranja aqui e
+   laranja lá são a mesma coisa. Mudar uma sem a outra desfaz o elo. */
+const COR_MARCA = '#ff9d2e';
 const facil = t => t * t * (3 - 2 * t);
 /* Forma por trechos, com os tempos do axônio de mamífero: subida em 0,4 ms,
    repolarização em 0,9, e a pós-hiperpolarização arrastando por 3. Não é
@@ -302,7 +306,7 @@ function desenharGoldman() {
     l === -2 ? g.moveTo(x, y) : g.lineTo(x, y);
   }
   g.stroke();
-  g.fillStyle = '#ff6a18'; g.beginPath(); g.arc(px(Math.log10(alfa)), py(Em), 5, 0, Math.PI * 2); g.fill();
+  g.fillStyle = COR_MARCA; g.beginPath(); g.arc(px(Math.log10(alfa)), py(Em), 5, 0, Math.PI * 2); g.fill();
   g.fillStyle = '#c9bba3'; g.font = '600 10px "IBM Plex Mono", monospace';
   g.fillText('permeabilidade ao Na⁺ ÷ ao K⁺', 40, h - 6);
   g.fillText('E(K)', w - 38, py(eK) - 4); g.fillText('E(Na)', w - 42, py(eNa) + 11);
@@ -343,7 +347,10 @@ const travessiaMs = () => (AXONIO_MM / 1000) / VEL_AXONIO * 1000;
    axônio: é essa proporcionalidade simples que faz a inversão ANDAR */
 const tDisparo = u => u * travessiaMs();
 const vmDe = u => vmNoTempo(disparo.t - tDisparo(u));
-const U_REG = .78;                       // onde o osciloscópio está encostado
+/* Vem de modelos.js, onde o eletrodo é DESENHADO. Antes era um .78 escrito
+   aqui e a geometria não sabia dele: o gráfico prometia um ponto de registro
+   que a cena não mostrava. Uma fonte só para os dois. */
+const U_REG = uReg;
 const multLento = () => parseFloat($('lento').value);
 const janelaMs = () => travessiaMs() + 5.4;
 
@@ -362,7 +369,7 @@ function desenharDisparo() {
   for (let t = t0; t <= t1; t += .02) { const x = px(t), y = py(vmNoTempo(t)); t === t0 ? g.moveTo(x, y) : g.lineTo(x, y); }
   g.stroke();
   const tl = clamp(disparo.t - tDisparo(U_REG), t0, t1);
-  g.fillStyle = '#ff6a18'; g.beginPath(); g.arc(px(tl), py(vmNoTempo(tl)), 5, 0, Math.PI * 2); g.fill();
+  g.fillStyle = COR_MARCA; g.beginPath(); g.arc(px(tl), py(vmNoTempo(tl)), 5, 0, Math.PI * 2); g.fill();
   g.fillStyle = '#c9bba3'; g.font = '600 10px "IBM Plex Mono", monospace';
   g.fillText('tempo no ponto de registro (ms)', 40, h - 6);
   g.fillText('0', w - 20, py(0) - 4); g.fillText('limiar', w - 40, py(LIMIAR) + 11);
@@ -438,7 +445,7 @@ const ancoras = {
     ['4 · bomba', V(2.62, 1.85, -.30)], ['ATP', V(3.02, 1.38, -.10)]],
   4: () => [['axoplasma', V(-.30, -.08, .28)],
     ['película interna · sinais', V(-1.55, -.62, -.30)], ['película externa · sinais', V(1.45, .74, .52)],
-    ['ponto de registro', V((U_REG - .5) * 6.2, -.80, .26)]],
+    ['ponto de registro', modelos[4].userData.pontoRegistro.clone().add(V(.10, -.22, .16))]],
 };
 let mostrarRotulos = true;
 E.rot.onclick = () => { mostrarRotulos = !mostrarRotulos; E.rot.classList.toggle('on', mostrarRotulos); E.labels.innerHTML = ''; };
