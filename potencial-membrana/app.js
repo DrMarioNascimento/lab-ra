@@ -449,6 +449,13 @@ function irAoInstante(ms, tocar = disparo.tocando) {
   const v = vmDe(U_REG);
   E.em.textContent = `Vm ${v >= 0 ? '+' : ''}${v.toFixed(0)} mV`;
   renderer.render(scene, camera);
+  /* O modelo da RA é uma FOTO: nem o USDZ do iPhone nem o caminho do Android
+     recebem daqui animação nenhuma. Então a foto tem de ser do instante que a
+     pessoa escolheu — parado, o nível 05 vira uma série de instantes, que é o
+     mais perto de movimento que a RA alcança. Só com a onda parada: tocando,
+     isto reexportaria a cada quadro. O atraso de 350 ms de `prepararRA` já
+     absorve o arrastar do cursor. */
+  if (!disparo.tocando) prepararRA();
 }
 function ajustarJanela() {
   E.inst.max = janelaMs().toFixed(2);
@@ -458,6 +465,9 @@ $('disparar').onclick = () => irAoInstante(0, true);
 $('pausar').onclick = e => {
   disparo.tocando = !disparo.tocando;
   e.currentTarget.textContent = disparo.tocando ? 'Pausar' : 'Seguir';
+  /* parar é o que fixa o instante que vai ao ambiente */
+  if (!disparo.tocando) prepararRA();
+  else E.status.textContent = 'A onda está andando. Pause para levar um instante ao ambiente.';
 };
 E.inst.addEventListener('input', e => {
   $('pausar').textContent = 'Seguir';

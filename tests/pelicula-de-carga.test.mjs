@@ -167,3 +167,26 @@ test("o neurônio é uma árvore, e não uma bola com hastes espetadas", async (
      impede que quatro ordens levem a ponta a virar fio de cabelo */
   assert.match(modelos, /Math\.max\(\.013, raio \*/);
 });
+
+/* ==========================================================================
+   O nível 05 leva ao ambiente O INSTANTE que está na tela
+
+   A RA não anima: nem o USDZ do iPhone nem o caminho do Android recebem
+   animação daqui — conferido, `timeSamples` não existe em nenhum dos dois
+   exportadores. O modelo é sempre uma foto, então a foto tem de ser do
+   instante escolhido. Parado, o nível vira uma série de instantes; é o mais
+   perto de movimento que a RA alcança.
+   ========================================================================== */
+
+test("parar a onda refaz o modelo da RA, andar não", async () => {
+  const app = await text("potencial-membrana/app.js");
+  /* tocando, isto reexportaria a cada quadro */
+  assert.match(app, /if \(!disparo\.tocando\) prepararRA\(\);/);
+  const quantas = app.match(/if \(!disparo\.tocando\) prepararRA\(\);/g);
+  assert.equal(quantas.length, 2, "o cursor e o botão de pausa");
+});
+
+test("com a onda andando a bancada avisa que a foto não acompanha", async () => {
+  const app = await text("potencial-membrana/app.js");
+  assert.match(app, /Pause para levar um instante ao ambiente/);
+});
