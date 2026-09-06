@@ -1,4 +1,4 @@
-/* Cor fiel na realidade aumentada.
+/* O que o modelo precisa antes de virar USDZ.
    ---------------------------------------------------------------------------
    O DEFEITO QUE ISTO DESFAZ. As bancadas pintam por VÉRTICE: a sombra de
    contato, o tecido do músculo, a membrana, as nuvens de íons. O caminho do
@@ -14,6 +14,13 @@
    Quick Look escolhe como amostrar, e no centro de um bloco uniforme tanto
    faz — bilinear ou mipmap raso devolvem a mesma cor. Um texel solto ficaria
    à mercê do vizinho.
+
+   E A DUPLA FACE TAMBÉM NÃO ATRAVESSA. O exportador de USDZ não escreve
+   `doubleSided` uma única vez — o de glTF escreve, o de USDZ não. Peça de
+   dupla face vira face única no iPhone e SOME quando vista do lado de trás:
+   foi o que aconteceu com o miolo da bicamada e com a parede do corte. Vale a
+   regra que esta bancada já aprendeu para o `BackSide`: **a face tem de estar
+   na GEOMETRIA, não no material.** Aqui a peça ganha uma gêmea pelo avesso.
 
    ONDE ISTO PODE SER USADO. Só no clone que vai para a exportação, NUNCA na
    cena da tela: `clone(true)` compartilha geometria e material com o
@@ -71,11 +78,68 @@ function texturaDe(paleta) {
   return { tex, colunas, lado };
 }
 
-/* Assa a cor por vértice numa paleta e devolve o que mudou, para conferência.
-   Também joga fora UV que não serve a mapa nenhum: o exportador de USDZ
-   escreve tudo em TEXTO, então atributo morto é peso morto. */
-export function corParaRA(raiz) {
-  const conta = { assadas: 0, cores: 0, tingidas: 0, uvDescartado: 0, ignoradas: 0 };
+/* A mesma malha pelo avesso: inverte o giro de cada triângulo e as normais.
+   Serve tanto para a gêmea da dupla face quanto para trocar um BackSide. */
+function peloAvesso(geo) {
+  const g = geo.clone();
+  const idx = g.getIndex();
+  if (idx) {
+    const a = idx.array.slice();
+    for (let i = 0; i < a.length; i += 3) { const t = a[i]; a[i] = a[i + 2]; a[i + 2] = t; }
+    g.setIndex(new THREE.BufferAttribute(a, 1));
+  } else {
+    /* sem índice, o giro está na ordem dos próprios vértices: troca o 1º pelo
+       3º de cada triângulo em TODOS os atributos, senão a malha se embaralha */
+    for (const nome of Object.keys(g.attributes)) {
+      const at = g.attributes[nome], it = at.itemSize, arr = at.array;
+      for (let t = 0; t < at.count; t += 3) {
+        for (let c = 0; c < it; c++) {
+          const i = (t + 0) * it + c, j = (t + 2) * it + c;
+          const v = arr[i]; arr[i] = arr[j]; arr[j] = v;
+        }
+      }
+      at.needsUpdate = true;
+    }
+  }
+  const n = g.attributes.normal;
+  if (n) {
+    for (let i = 0; i < n.count; i++) n.setXYZ(i, -n.getX(i), -n.getY(i), -n.getZ(i));
+    n.needsUpdate = true;
+  }
+  return g;
+}
+
+/* Põe a dupla face na geometria, que é onde o USDZ consegue ler. Roda DEPOIS
+   da paleta, para a gêmea já nascer com o UV assado. */
+function duasFaces(raiz, conta) {
+  const aNascer = [];
+  raiz.traverse(o => {
+    if (!o.isMesh || Array.isArray(o.material)) return;
+    const lado = o.material.side;
+    if (lado === THREE.FrontSide) return;
+    o.material = o.material.clone();
+    o.material.side = THREE.FrontSide;
+    o.material.needsUpdate = true;
+    if (lado === THREE.BackSide) { o.geometry = peloAvesso(o.geometry); conta.viradas++; return; }
+    aNascer.push(o); // DoubleSide: precisa das duas
+  });
+  /* fora da travessia: acrescentar filho no meio dela é pedir para visitar o
+     que acabou de nascer */
+  for (const o of aNascer) {
+    const gemea = new THREE.Mesh(peloAvesso(o.geometry), o.material);
+    gemea.name = (o.name || 'malha') + '-avesso';
+    gemea.position.copy(o.position); gemea.quaternion.copy(o.quaternion); gemea.scale.copy(o.scale);
+    (o.parent || raiz).add(gemea);
+    conta.gemeas++;
+  }
+}
+
+/* Prepara o clone para virar USDZ: assa a cor por vértice numa paleta, põe a
+   dupla face na geometria, e joga fora UV que não serve a mapa nenhum — o
+   exportador escreve tudo em TEXTO, então atributo morto é peso morto.
+   Devolve o que mudou, para conferência. */
+export function prepararParaRA(raiz) {
+  const conta = { assadas: 0, cores: 0, tingidas: 0, uvDescartado: 0, ignoradas: 0, gemeas: 0, viradas: 0 };
   raiz.traverse(o => {
     if (!o.isMesh || Array.isArray(o.material)) { if (o.isMesh) conta.ignoradas++; return; }
     const cor = o.geometry.attributes.color;
@@ -127,5 +191,6 @@ export function corParaRA(raiz) {
       conta.uvDescartado++;
     }
   });
+  duasFaces(raiz, conta);
   return conta;
 }
