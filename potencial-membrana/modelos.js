@@ -423,12 +423,23 @@ function planoCurvo(mat, y0, { seg = 44, larg = MEM.x } = {}) {
    É a única escala em que desenhar fosfolipídio individual ensina alguma
    coisa — no nível 02 ele vira pontilhado, e é assim que tem de ser.
 
-   DUAS COISAS MUDARAM DEPOIS DE OLHAR A FOTO:
+   TRÊS COISAS MUDARAM DEPOIS DE OLHAR A FOTO:
    1. AS CAUDAS ERAM DOIS PALITOS RETOS, finos, e some no meio: a membrana
       lida como duas fileiras de contas sobre uma tábua. Cauda de verdade
       DOBRA — a insaturação cis põe um joelho no meio dela, e é esse joelho
       que impede o empacotamento perfeito e dá à bicamada a espessura que ela
       tem. Duas caudas por cabeça, cada uma em dois trechos com ângulo.
+   1b. E DOIS CILINDROS SOLDADOS AINDA ERAM ESPETO. Em close, no aparelho, o
+      lipídio lia como "duas pontas espetadas na esfera" — e a foto mostrou
+      por quê: os cilindros eram abertos nas pontas e desalinhados no joelho,
+      então a cauda aparecia QUEBRADA em pedaços; e com raio .034 contra uma
+      cabeça de .112 ela era um alfinete, não um corpo. Agora a cauda é UM
+      TUBO VARRIDO por uma curva — mesma troca que salvou o axônio do nível
+      05 —, nasce larga dentro da cabeça, afina até a ponta e a ponta ganha
+      calota. O joelho deixou de ser quina e virou curva.
+      A malha é a mais barata que ainda lê igual: quatro trechos por cinco
+      lados. Medido contra 7x7, sete por cauda: idêntico na tela, e o USDZ do
+      iPhone não comporta o luxo.
    2. A BORDA SAIU. Havia uma moldura de caixas em volta do retalho, e ela
       lia como bandeja. Sem moldura, quem faz o corte é a própria fileira de
       cabeças vista de lado, com o miolo escuro entre elas: é o corte de
@@ -438,8 +449,38 @@ function bicamadaDePerto({ passo = .295, rc = .112, esp = 5 * NM - 2 * .112, bur
   const cab = [], cau = [];
   const baseCab = new THREE.SphereGeometry(rc, 9, 7);
   const meio = esp / 2 - rc * .55;
-  const tSup = new THREE.CylinderGeometry(.034, .030, meio * .52, 5, 1, true);
-  const tInf = new THREE.CylinderGeometry(.030, .022, meio * .56, 5, 1, true);
+  const CAU = { colo: .054, ponta: .032, sep: .052, comp: 1.06, trechos: 4, lados: 5 };
+
+  /* A cauda: tubo varrido de raio decrescente, com calota na ponta. Sai para
+     fora ao deixar a cabeça e volta para dentro depois do joelho — é esse
+     desenho que faz as duas caudas se encontrarem no miolo em vez de descerem
+     como duas pernas. */
+  function caudaGeo(inc) {
+    const L = meio * CAU.comp, pts = [];
+    for (let i = 0; i <= 6; i++) {
+      const u = i / 6;
+      const flex = u < .42 ? u * inc * .22 : (.42 * inc * .22 - (u - .42) * inc * .80);
+      pts.push(V(flex * L, -u * L, 0));
+    }
+    const curva = new THREE.CatmullRomCurve3(pts);
+    const g = new THREE.TubeGeometry(curva, CAU.trechos, 1, CAU.lados, false);
+    /* o TubeGeometry é de raio fixo: afino anel por anel, do colo à ponta */
+    const pos = g.attributes.position;
+    for (let t = 0; t <= CAU.trechos; t++) {
+      const u = t / CAU.trechos, r = CAU.colo * (1 - u) + CAU.ponta * u, ct = curva.getPoint(u);
+      for (let k = 0; k <= CAU.lados; k++) {
+        const i = t * (CAU.lados + 1) + k;
+        pos.setXYZ(i, ct.x + (pos.getX(i) - ct.x) * r,
+                      ct.y + (pos.getY(i) - ct.y) * r,
+                      ct.z + (pos.getZ(i) - ct.z) * r);
+      }
+    }
+    pos.needsUpdate = true; g.computeVertexNormals();
+    /* sem calota a cauda é cano cortado, e foi metade da cara de espeto */
+    const f = curva.getPoint(1), cap = new THREE.SphereGeometry(CAU.ponta, CAU.lados, 3);
+    cap.translate(f.x, f.y, f.z);
+    return mergeGeometries([g, cap]);
+  }
   const nx = Math.floor(larg * 2 / passo), nz = Math.floor(MEM.z * 2 / passo);
   for (let ix = 0; ix <= nx; ix++) for (let iz = 0; iz <= nz; iz++) {
     const x = -larg + ix * passo + rnd(-.02, .02), z = -MEM.z + iz * passo + rnd(-.02, .02);
@@ -453,17 +494,14 @@ function bicamadaDePerto({ passo = .295, rc = .112, esp = 5 * NM - 2 * .112, bur
          competir com íon nenhum. */
       const c = baseCab.clone(); tintar(c, variar(lado > 0 ? 0xc9b394 : 0xbfa889, .015, .07, .06));
       c.translate(x, y, z); cab.push(c);
-      for (const dx of [-.048, .048]) {
-        const inc = rnd(.28, .48) * Math.sign(dx);
-        const yA = y - lado * (rc * .45 + meio * .26);
-        const a = tSup.clone();
-        a.rotateZ(inc * .35); a.translate(x + dx, yA, z + rnd(-.03, .03));
-        cau.push(a);
-        /* o joelho: o segundo trecho sai em ângulo, e é ele que tira da
-           membrana a cara de escova */
-        const b = tInf.clone();
-        b.rotateZ(-inc); b.translate(x + dx - inc * .05, yA - lado * meio * .54, z + rnd(-.03, .03));
-        cau.push(b);
+      for (const dx of [-CAU.sep, CAU.sep]) {
+        const g = caudaGeo(rnd(.24, .38) * Math.sign(dx));
+        /* a folha de baixo é a mesma peça de cabeça para baixo. Tem de ser
+           giro em X: em Z o eixo lateral também inverteria, e a cauda passaria
+           a abrir para o lado errado da própria cabeça. */
+        if (lado < 0) g.rotateX(Math.PI);
+        g.translate(x + dx, y - lado * rc * .58, z + rnd(-.03, .03));
+        cau.push(g);
       }
     }
   }
