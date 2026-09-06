@@ -19,8 +19,28 @@
   try { isUnlocked = sessionStorage.getItem(ACCESS_KEY) === "liberado"; }
   catch (error) { isUnlocked = false; }
 
+  const raizUrl = new URL(".", scriptUrl).href;
+
+  /* O login tem de devolver a pessoa AO ENDEREÇO QUE ELA PEDIU. Sem isto todo
+     link fundo — `bancada/?nivel=5`, o que se manda a um aluno — vira
+     bancadas.html depois de entrar, e a pessoa não descobre que perdeu o
+     endereço: ela chega numa página que existe. Só se volta para dentro do
+     próprio laboratório; destino de fora seria redirecionamento aberto, e a
+     porta não é ponte para lugar nenhum. */
+  function destinoPedido() {
+    try {
+      const bruto = new URLSearchParams(location.search).get("destino");
+      if (!bruto) return null;
+      const alvo = new URL(bruto, location.href);
+      if (!alvo.href.startsWith(raizUrl)) return null;
+      if (alvo.pathname === new URL(authUrl).pathname) return null; // laço
+      return alvo.href;
+    } catch (error) { return null; }
+  }
+
   if (isProtected && !isUnlocked) {
-    const dest = authUrl + (authUrl.includes("?") ? "&" : "?") + "laboratorio=acesso";
+    const dest = authUrl + (authUrl.includes("?") ? "&" : "?") + "laboratorio=acesso"
+      + "&destino=" + encodeURIComponent(location.href);
     window.location.replace(dest);
     return;
   }
@@ -72,7 +92,7 @@
     if (form && message) {
       // Se já liberou nesta sessão, vai direto às bancadas.
       if (isUnlocked) {
-        window.location.replace(form.dataset.destination || bancadasUrl);
+        window.location.replace(destinoPedido() || form.dataset.destination || bancadasUrl);
         return;
       }
       form.addEventListener("submit", async event => {
@@ -84,7 +104,7 @@
           await entrarComGoogle();
           try { sessionStorage.setItem(ACCESS_KEY, "liberado"); } catch (e) {}
           message.textContent = "Acesso liberado.";
-          window.location.assign(form.dataset.destination || bancadasUrl);
+          window.location.assign(destinoPedido() || form.dataset.destination || bancadasUrl);
         } catch (error) {
           message.textContent = error && error.recusado
             ? error.message
