@@ -27,6 +27,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { corParaRA } from '../cores-para-ra.js';
 import { criar } from './modelos.js';
 
 const $ = id => document.getElementById(id);
@@ -590,6 +591,18 @@ const clock = new THREE.Clock();
 
 /* ------------------------------------------------------------ RA */
 const TAM_REAL = [.62, .56, .52, .60, 1.05]; // metros, maior dimensão no ambiente
+/* O QUE O IPHONE FAZ HOJE, e por que a página precisa dizer.
+   O Quick Look abre no modo Objeto: o modelo aparece parado sobre fundo claro,
+   e a câmera só entra depois de um toque em "AR", no alto da folha. O iOS
+   antigo abria direto na câmera — a página prometia isso e a promessa quebrou
+   sozinha, sem uma linha mudar aqui. Quem lê "Toque para abrir a câmera",
+   recebe um objeto parado e não vê o seletor conclui que a RA não funciona.
+   Foi exatamente o que aconteceu. */
+const ehQuickLook = /iPad|iPhone|iPod/.test(navigator.userAgent)
+  || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const COMO_ABRIR = ehQuickLook
+  ? 'Toque, e depois em "AR" no alto da tela para ir à câmera.'
+  : 'Toque para abrir a câmera.';
 let arUrl = null, prepId = 0, timer = null;
 function prepararRA() {
   clearTimeout(timer);
@@ -603,6 +616,9 @@ function prepararRA() {
       clone.updateMatrixWorld(true);
       const b2 = new THREE.Box3().setFromObject(clone);
       clone.position.set(-(b2.min.x + b2.max.x) / 2, -b2.min.y, -(b2.min.z + b2.max.z) / 2);
+      /* a cor por vértice não atravessa o USDZ: sem assar, o iPhone recebe
+         branco no lugar do tecido, da membrana e dos íons */
+      corParaRA(clone);
       const wrap = new THREE.Group(); wrap.add(clone);
       const buf = await new GLTFExporter().parseAsync(wrap, { binary: true, onlyVisible: true });
       if (id !== prepId) return;
@@ -615,7 +631,7 @@ function prepararRA() {
 E.viewer.addEventListener('load', () => {
   if (E.viewer.canActivateAR) {
     E.ar.disabled = false;
-    E.status.textContent = `Pronto. Tamanho no ambiente: ${TAM_REAL[atual].toFixed(2)} m. Toque para abrir a câmera.`;
+    E.status.textContent = `Pronto. Tamanho no ambiente: ${TAM_REAL[atual].toFixed(2)} m. ${COMO_ABRIR}`;
   } else {
     E.ar.disabled = true;
     E.status.textContent = 'Este navegador não abre RA. Use o Safari no iPhone/iPad ou o Chrome no Android.';
