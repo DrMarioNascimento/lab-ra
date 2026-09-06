@@ -190,3 +190,38 @@ test("com a onda andando a bancada avisa que a foto não acompanha", async () =>
   const app = await text("potencial-membrana/app.js");
   assert.match(app, /Pause para levar um instante ao ambiente/);
 });
+
+/* ==========================================================================
+   A cauda do fosfolipídio
+
+   Em close, no iPhone, o lipídio lia como "duas pontas espetadas na esfera".
+   A foto mostrou três causas somadas: os cilindros eram abertos nas pontas e
+   desalinhados no joelho — a cauda aparecia QUEBRADA —, e com raio .034
+   contra uma cabeça de .112 ela era alfinete, não corpo.
+   ========================================================================== */
+
+test("a cauda é um tubo varrido, não cilindros soldados", async () => {
+  const m = await text("potencial-membrana/modelos.js");
+  assert.match(m, /function caudaGeo/);
+  assert.match(m, /new THREE\.TubeGeometry\(curva, CAU\.trechos/);
+});
+
+test("a ponta da cauda tem calota", async () => {
+  /* sem ela a cauda é cano cortado, e foi metade da cara de espeto */
+  const m = await text("potencial-membrana/modelos.js");
+  assert.match(m, /const f = curva\.getPoint\(1\), cap = new THREE\.SphereGeometry\(CAU\.ponta/);
+});
+
+test("a cauda tem corpo: o colo é ao menos metade da cabeça", async () => {
+  const m = await text("potencial-membrana/modelos.js");
+  const colo = Number(m.match(/CAU = \{ colo: (\.\d+)/)[1]);
+  const rc = Number(m.match(/rc = (\.\d+)/)[1]);
+  assert.ok(colo / rc >= .45, `colo/cabeça = ${(colo / rc).toFixed(2)}`);
+});
+
+test("a folha de baixo espelha em X, não em Z", async () => {
+  /* em Z o eixo lateral também inverteria, e a cauda abriria para o lado
+     errado da própria cabeça */
+  const m = await text("potencial-membrana/modelos.js");
+  assert.match(m, /if \(lado < 0\) g\.rotateX\(Math\.PI\);/);
+});
