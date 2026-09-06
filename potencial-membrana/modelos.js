@@ -198,6 +198,12 @@ const M = {
   filtro: phys({ color: 0xe6c766, roughness: .40, clearcoat: .12, clearcoatRoughness: .5 }),
   atp: phys({ color: 0x8fd47a, roughness: .42, emissive: 0x123a12, emissiveIntensity: .6 }),
   poro: phys({ color: 0xffffff, vertexColors: true, roughness: .84, clearcoat: 0 }),
+  /* A MESMA COR DO MARCADOR QUE CORRE SOBRE A CURVA. É ela que amarra o
+     gráfico à figura sem precisar de legenda: o aluno vê laranja nos dois
+     lugares e entende que são a mesma coisa. Se alguém mudar uma, tem de
+     mudar a outra — está anotado nos dois arquivos. */
+  marcador: phys({ color: 0xff9d2e, roughness: .35, clearcoat: .2, clearcoatRoughness: .4,
+    emissive: 0x7a3a02, emissiveIntensity: 1.1 }),
 
   /* ---- nível 02: a célula em corte ---- */
   /* O NÚCLEO NÃO PODE SER ROXO. Nesta página a cor diz SINAL DE CARGA — quente
@@ -1222,6 +1228,13 @@ AX.aFora = AX.centro + AX.jan + .62;
    próprio cometi ao ler a primeira foto. Deslocada para trás, a de dentro fica
    longe e alta, a de fora perto e baixa, e a perspectiva separa as duas. */
 AX.aDentro = AX.centro + Math.PI + .42;
+/* ── ONDE O OSCILOSCÓPIO ENCOSTA ──────────────────────────────────────────
+   Esta constante morava em app.js e a geometria não a conhecia: o gráfico
+   dizia "tempo no ponto de registro" e a cena não tinha ponto nenhum — o
+   rótulo apontava para um trecho vazio do tubo. Duas fontes para a mesma
+   coisa é o começo de duas verdades; agora ela nasce aqui, com a peça, e
+   app.js a recebe pronta. */
+AX.uReg = .78;
 
 const eixoAx = curvaDePontos(t => V(
   -AX.L / 2 + t * AX.L,
@@ -1245,13 +1258,19 @@ function pontoNaParede(u, ang, raio) {
    1,6×, e nas duas ele era a coisa mais chamativa do quadro — um alargamento
    na ponta esquerda disputando atenção com a onda, que é o assunto do nível.
    Nada do que ele mostrava é conteúdo daqui: a INICIAÇÃO do potencial de ação
-   pertence ao neurônio do nível 01, e aqui só interessa a propagação. O toco
-   de soma sozinho já diz de onde a onda vem, e diz sem cone.
+   pertence ao neurônio do nível 01, e aqui só interessa a propagação.
+
+   O TOCO DE SOMA FOI APAGADO JUNTO, e por dois motivos. Sem o cone não havia
+   mais transição: o tubo nascia dentro dele, e o que se via era um bolo rosa
+   grudado na ponta — esfera com ruído, sem núcleo e sem dendrito, nada que
+   dissesse "corpo celular". E ele existia para apontar DE ONDE a onda vem,
+   coisa que a própria onda já faz ao partir da esquerda. Origem do disparo é
+   assunto do nível 01.
    Sobra o calibre com varicosidade, que é o que impede o tubo de ser cano. */
 const raioAx = u => AX.R * (1 + .055 * Math.sin(u * 9.3 + .4) + .03 * Math.sin(u * 17.1))
-  /* e uma folga DISCRETA na ponta de onde a onda sai, de 12%. Ela não é cone:
-     é o bastante para o tubo não sair do toco de soma com um degrau, e pouco o
-     bastante para ninguém reparar nela. */
+  /* e uma folga DISCRETA de 12% na ponta de onde a onda sai. Ela não é cone:
+     é só o bastante para o tubo não terminar num corte reto de cano serrado,
+     e pouco o bastante para ninguém reparar nela. */
   * (1 + .12 * Math.exp(-Math.pow(u / .17, 2)));
 
 /* Tubo aberto varrido sobre a curva. TubeGeometry não faz ângulo parcial, e
@@ -1338,28 +1357,28 @@ function axonio() {
     tampaAnelar(0, rDentro(0), rFora(0), a0, arco), tampaAnelar(1, rDentro(1), rFora(1), a0, arco),
   ], false), M.parede));
 
-  /* ── o toco de soma ────────────────────────────────────────────────────
-     A onda partia da borda esquerda sem partir de lugar nenhum. Com o toco, o
-     nível passa a dizer DE ONDE ela vem, e amarra o 05 de volta ao 01 — sem
-     precisar do cone, que foi apagado por disputar atenção com a onda e por
-     tratar de iniciação, assunto do nível 01. Vai como `foraDoQuadro`: é
-     contexto,
-     não assunto, e sem isso ele empurraria a câmera para trás e afinaria a
-     parede — que é justamente onde a película mora. */
-  const pTronco = eixoAx.getPointAt(0);
-  const geoT = new THREE.SphereGeometry(.58, 44, 32);
-  const pt = geoT.attributes.position, nt = new THREE.Vector3();
-  for (let i = 0; i < pt.count; i++) {
-    nt.fromBufferAttribute(pt, i).normalize();
-    const d = 1 + .085 * ruido3(nt.x * 2.5, nt.y * 2.2, nt.z * 2.7) + .03 * ruido3(nt.x * 6, nt.y * 5, nt.z * 6.5)
-      + .48 * Math.pow(Math.max(0, nt.x), 6);
-    pt.setXYZ(i, nt.x * .58 * d, nt.y * .58 * d * .94, nt.z * .58 * d * .92);
+  /* ── O ELETRODO DE REGISTRO ────────────────────────────────────────────
+     A ponta entra pela janela do corte e encosta na parede de DENTRO — que é
+     o que um registro intracelular é, e é de lá que sai o Vm do gráfico. Vai
+     como `foraDoQuadro`: é instrumento, não assunto, e sem isso ele
+     empurraria a câmera para trás e afinaria a parede. */
+  const pReg = pontoNaParede(AX.uReg, AX.aDentro, rDentro(AX.uReg) - .07);
+  const traseira = pReg.clone().add(V(.30, 2.30, 1.45));
+  const haste = (de, ate, r0, r1, mat, segs = 18) => {
+    const d = ate.clone().sub(de);
+    const m = new THREE.Mesh(new THREE.CylinderGeometry(r0, r1, d.length(), segs, 1, true), mat);
+    m.position.copy(de).add(ate).multiplyScalar(.5);
+    m.quaternion.setFromUnitVectors(V(0, 1, 0), d.clone().normalize());
+    return m;
+  };
+  const conta = new THREE.Mesh(new THREE.SphereGeometry(.058, 16, 12), M.marcador);
+  conta.position.copy(pReg);
+  for (const o of [haste(traseira, pReg, .100, .012, M.vidro),
+                   haste(traseira.clone().lerp(pReg, .07), pReg.clone().lerp(traseira, .11), .015, .005, M.metal, 10),
+                   conta]) {
+    o.userData.foraDoQuadro = true; g.add(o);
   }
-  pt.needsUpdate = true; geoT.computeVertexNormals(); tintar(geoT, C(0xd9b3bd));
-  const toco = new THREE.Mesh(geoT, M.neuronio);
-  toco.position.set(pTronco.x - .40, pTronco.y - .03, pTronco.z);
-  toco.userData.foraDoQuadro = true;
-  g.add(toco);
+  g.userData.pontoRegistro = pReg;
 
   /* ── as fileiras de sinal ──────────────────────────────────────────────
      Uma por face. A de fora fica logo acima da parede e por isso some sob a
@@ -1457,5 +1476,5 @@ function aplicarOnda(vmDe) {
 }
 
 const modelos = [neuronio(), interior(), pelicula(), portas(), axonio()];
-return { modelos, aplicarPotencial, aplicarOnda, EM_CHEIO, MEM };
+return { modelos, aplicarPotencial, aplicarOnda, EM_CHEIO, MEM, uReg: AX.uReg };
 }
