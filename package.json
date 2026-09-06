@@ -1,0 +1,10 @@
+{
+  "name": "lab-ra",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Lab RA — bancadas de realidade aumentada do projeto MOSAICO.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/pelicula-de-carga.test.mjs"
+  }
+}
