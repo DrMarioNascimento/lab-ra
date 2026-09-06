@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="pt-BR" data-ra-protected>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#15100c">
+<title>A escrivaninha — cadeia · Laboratório RA</title>
+<link rel="stylesheet" href="laboratorio.css">
+<!--
+  BANCADA 05 · PRIMEIRA TELA — A ESCRIVANINHA
+  ==========================================================================
+  Card novo de propósito. A 04 já é uma coisa fechada e testada: abrir uma
+  gaveta e virar um papel. Enfiar a cadeia inteira dentro dela misturaria dois
+  testes e o playtest não saberia mais o que estava avaliando.
+
+  O QUE ESTA TELA ENTREGA são duas coisas e nenhuma resposta:
+    · a hora, na frente do papel — 21:29;
+    · os graus da escada, no verso — sete degraus, sete números.
+  E uma terceira, gravada no latão do sextante, que só aparece a quem tocar
+  nele: a frase que diz qual dos sete degraus importa.
+
+  A ORDEM É PROPOSITAL. O sextante fica inerte até o papel ter sido lido —
+  não porque a mecânica exija, mas porque uma frase sobre "cinco passos mais
+  altos" antes de existir uma escada é ruído. Pista chegando cedo demais vira
+  enigma sobre nada.
+-->
+<style>
+  .palco{position:relative;border:1px solid var(--linha,#3a2c20);border-radius:14px;overflow:hidden;background:#15100c}
+  model-viewer{width:100%;height:min(64vh,540px);display:block;--poster-color:transparent}
+  .acoes{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
+  .acoes button{min-height:48px;padding:12px 16px;border:1px solid #4a3826;border-radius:11px;
+    background:linear-gradient(#2a1f16,#1a120c);color:#f0e2c8;font-weight:700;cursor:pointer;
+    box-shadow:inset 0 1px #ffffff10,0 4px 0 #0b0705}
+  .acoes button:active{transform:translateY(2px);box-shadow:inset 0 1px #ffffff10,0 1px 0 #0b0705}
+  .acoes button[disabled]{opacity:.4;cursor:default;transform:none}
+  .acoes button.adiante{background:linear-gradient(#3a2c10,#241a08);border-color:#7d6320;color:#ffe9ae}
+  .nota-estado{margin-top:10px;color:#c9bba3;font-size:15px;min-height:2.6em;line-height:1.5}
+  .achados{margin-top:14px;display:grid;gap:8px}
+  .achado{padding:10px 13px;border:1px solid #3a2c20;border-radius:10px;background:#191209;
+    color:#8a7c66;font-size:14px;line-height:1.45}
+  .achado.tem{border-color:#7d6320;background:#1e1608;color:#e9d7ab}
+  .achado b{color:#ffe9ae;font-weight:700}
+  .aviso{margin-top:16px;padding:12px 14px;border-left:3px solid #e0b13a;background:#1b1409;
+    color:#d8c9a8;font-size:13.5px;line-height:1.5;border-radius:0 9px 9px 0}
+</style>
+</head>
+<body>
+<script src="guard.js"></script>
+<main>
+  <header>
+    <a class="brand" href="index.html">← Laboratório RA</a>
+    <h1>A escrivaninha</h1>
+    <p>Primeira das três telas. A gaveta de baixo à direita não está trancada, e há um instrumento em cima do tampo.</p>
+  </header>
+
+  <section class="palco">
+    <model-viewer id="mv" src="escrivaninha-gaveta.glb"
+      alt="Escrivaninha com uma gaveta, um papel dentro e um sextante sobre o tampo"
+      camera-controls interaction-prompt="none"
+      shadow-intensity="1.6" shadow-softness="1" exposure="0.92" tone-mapping="aces"
+      environment-image="neutral"
+      ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" ar-scale="fixed"
+      camera-orbit="24deg 72deg 2.0m" min-camera-orbit="auto auto 0.55m" max-camera-orbit="auto auto 4m">
+    </model-viewer>
+  </section>
+
+  <div class="acoes">
+    <button id="btAbrir" type="button">Abrir a gaveta</button>
+    <button id="btVirar" type="button" disabled>Virar o papel</button>
+    <button id="btSext" type="button" disabled>Olhar o sextante</button>
+    <button id="btAdiante" type="button" class="adiante" hidden>Ir até a janela</button>
+  </div>
+  <p class="nota-estado" id="estado">A gaveta de baixo, à direita. Toque nela — ou use o botão.</p>
+
+  <div class="achados">
+    <div class="achado" id="acHora">A frente do papel — <b>ainda por ler</b></div>
+    <div class="achado" id="acEscada">O verso do papel — <b>ainda por virar</b></div>
+    <div class="achado" id="acFrase">O latão do sextante — <b>ainda por olhar</b></div>
+  </div>
+
+  <p class="aviso"><strong>Nesta bancada:</strong> abrir, virar e olhar acontecem aqui, em WebGL. No modo RA do celular quem desenha é o sistema operacional e este JavaScript não roda lá — o modo RA continua servindo para conferir tamanho no ambiente, não para tocar em peça.</p>
+</main>
+
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.1.0/dist/model-viewer.min.js"></script>
+<script type="module">
+import { FRASE, HORA, marca, estado, vai } from "./cadeia.js";
+
+const mv = document.getElementById("mv");
+const estadoTxt = document.getElementById("estado");
+const btAbrir = document.getElementById("btAbrir");
+const btVirar = document.getElementById("btVirar");
+const btSext = document.getElementById("btSext");
+const btAdiante = document.getElementById("btAdiante");
+let aberta = false, virado = false, lido = false;
+
+/* UMA FAIXA, DOIS TRECHOS — a mesma lição da bancada 04, e ela custou caro
+   para ser aprendida: o model-viewer aplica uma animação por vez, e trocar de
+   faixa devolve ao repouso os nós que a anterior movia. Com "abrir" e "virar"
+   separadas, tocar no papel FECHAVA a gaveta. */
+const T_ABRE = 0.75, T_VIRA = 1.75;
+function trecho(de, ate, aoFim) {
+  mv.animationName = "gesto";
+  mv.currentTime = de;
+  mv.timeScale = 1;
+  mv.play({ repetitions: 1 });
+  clearTimeout(trecho.t);
+  trecho.t = setTimeout(() => {
+    mv.pause();
+    mv.currentTime = ate;
+    aoFim && aoFim();
+  }, (ate - de) * 1000 + 70);
+}
+
+const hh = String(HORA.h).padStart(2, "0") + ":" + String(HORA.m).padStart(2, "0");
+function acha(id, texto) {
+  const el = document.getElementById(id);
+  el.classList.add("tem");
+  el.innerHTML = texto;
+}
+function confere() {
+  if (virado && lido) {
+    btAdiante.hidden = false;
+    estadoTxt.textContent = "A hora, os graus e a frase. É o bastante para procurar no céu.";
+  }
+}
+
+function abrir() {
+  if (aberta) return;
+  aberta = true;
+  btAbrir.disabled = true;
+  estadoTxt.textContent = "A gaveta sai devagar.";
+  trecho(0, T_ABRE, () => {
+    btVirar.disabled = false;
+    btSext.disabled = false;
+    marca("hora");
+    acha("acHora", "A frente do papel — uma janela desenhada à mão, uma seta saindo de dentro e uma hora: <b>" + hh + "</b>");
+    estadoTxt.textContent = "Um papel dobrado, com a face para cima. Alguém anotou uma hora e desenhou uma janela.";
+  });
+}
+function virar() {
+  if (!aberta || virado) return;
+  virado = true;
+  btVirar.disabled = true;
+  estadoTxt.textContent = "O papel sobe e gira.";
+  trecho(T_ABRE, T_VIRA, () => {
+    marca("escada");
+    acha("acEscada", "O verso — uma escada de sete degraus, e ao lado de cada um um número: <b>4 · 9 · 14 · 20 · 26 · 32 · 39</b>");
+    estadoTxt.textContent = "No verso, uma escada. Cada degrau tem o seu número, e nenhum deles está marcado.";
+    confere();
+  });
+}
+function olharSextante() {
+  if (!aberta || lido) return;
+  lido = true;
+  btSext.disabled = true;
+  marca("frase");
+  acha("acFrase", "Gravado no limbo, em letra miúda: <b>“" + FRASE + "”</b>");
+  estadoTxt.textContent = "O latão está gasto, mas a gravação segurou.";
+  /* aproxima do instrumento: a frase é miúda, e ler exige chegar perto */
+  mv.cameraTarget = "-0.30m 0.80m -0.02m";
+  mv.cameraOrbit = "-20deg 46deg 0.42m";
+  confere();
+}
+
+btAbrir.onclick = abrir;
+btVirar.onclick = virar;
+btSext.onclick = olharSextante;
+btAdiante.onclick = () => vai("cadeia-janela.html");
+
+/* TOQUE NA PEÇA, e não só no botão. `positionAndNormalFromPoint` devolve onde
+   o raio bateu; daí é geometria — o sextante mora à esquerda e acima do tampo
+   (x < −0,18 e y > 0,77), a gaveta viva é a de baixo à direita. */
+mv.addEventListener("click", (ev) => {
+  const r = mv.positionAndNormalFromPoint(ev.clientX, ev.clientY);
+  if (!r) return;
+  const [x, y] = r.position.toString().split(",").map(Number);
+  if (x < -0.18 && y > 0.77) { olharSextante(); return; }
+  if (!aberta) { if (x > 0.15 && y < 0.34) abrir(); return; }
+  if (!virado && y < 0.42) virar();
+});
+
+mv.addEventListener("load", () => {
+  mv.animationName = "gesto";
+  mv.pause();
+  mv.currentTime = 0;
+  if (!(mv.availableAnimations || []).length) {
+    estadoTxt.textContent = "O modelo carregou sem animação — confira a geração do .glb.";
+  }
+});
+
+/* quem já passou por aqui não recomeça do zero ao voltar da janela */
+const e = estado();
+if (e.hora && e.escada && e.frase) {
+  btAdiante.hidden = false;
+  acha("acHora", "A frente do papel — uma hora: <b>" + hh + "</b>");
+  acha("acEscada", "O verso — sete degraus: <b>4 · 9 · 14 · 20 · 26 · 32 · 39</b>");
+  acha("acFrase", "Gravado no limbo: <b>“" + FRASE + "”</b>");
+}
+</script>
+</body>
+</html>

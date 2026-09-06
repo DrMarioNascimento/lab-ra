@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#070605" />
+  <title>Lab RA · Dragon Games</title>
+  <link rel="icon" href="brand/dragon-mark.webp" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=IBM+Plex+Mono:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="laboratorio.css" />
+  <script src="guard.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <nav class="nav shell" aria-label="Lab RA">
+      <a class="brand" href="index.html"><img src="brand/dragon-mark.webp" alt="" width="42" height="42" /><span class="brand-copy"><b>DRAGON GAMES</b><span>Lab RA</span></span></a>
+    </nav>
+  </header>
+  <main class="shell">
+    <section class="hero" id="laboratorio-ra">
+      <span class="eyebrow">Protótipos · realidade aumentada</span>
+      <h1>Lab RA</h1>
+      <p>Área experimental separada do hub MOSAICO: comparação sobre a câmera, escrivaninha em escala real, anamorfose sem câmera, cadeia de três telas e fisiologia em escalas.</p>
+      <div class="tags" style="display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 20px">
+        <span class="tag">Câmera</span><span class="tag">3D</span><span class="tag">iPhone · Quick Look</span>
+      </div>
+      <form class="access-form" id="ra-access-form" data-destination="bancadas.html" style="display:flex;gap:10px;align-items:center;max-width:420px">
+        <button class="launch" type="submit" style="width:100%;text-align:center">Entrar com Google</button>
+      </form>
+      <p class="access-message" id="ra-access-message" role="status" aria-live="polite" style="min-height:1.4em;margin:10px 0 0;color:#ffb095"></p>
+      <p class="notice" style="margin-top:18px"><strong>Acesso:</strong> mesma lista <code>config/mestres</code> do projeto Firebase <code>mosaico-game</code> que autoriza abrir mesas no MOSAICO. No GitHub Pages os arquivos continuam publicamente servidos — isto é barreira de acesso casual.</p>
+    </section>
+  </main>
+  <footer>Lab RA · Dragon Games · Florianópolis · SC · Brasil</footer>
+</body>
+</html>

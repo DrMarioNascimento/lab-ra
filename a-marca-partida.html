@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="pt-BR" data-ra-protected>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#04070b">
+<title>A Marca Partida — MOSAICO</title>
+<!--
+  A MARCA PARTIDA · protótipo de realidade aumentada sem câmera
+  ==========================================================================
+
+  A PERGUNTA QUE ELE RESPONDE
+  Dá para ter RA no MOSAICO — o espaço virando parte do enigma — sem câmera,
+  sem WebXR, sem modelo 3D e sem excluir metade da mesa?
+
+  Dá, e o caminho é a anamorfose. Riscos de luz espalhados pelas paredes de um
+  quarto escuro são ruído de qualquer lugar; de UM ponto de vista, e só de um,
+  eles se alinham e viram uma hora legível. A pista não está escondida atrás de
+  um objeto: está partida pelo espaço, e o que a monta é onde você se põe.
+
+  É o princípio do jogo virado mecânica — "a perspectiva muda a pergunta, não
+  muda o que aconteceu". Os riscos não mudam. O que muda é de onde se olha.
+
+  POR QUE ESTA E NÃO CÂMERA
+  A câmera seria trinta linhas. Mas esta casa é jogada NO ESCURO, de propósito,
+  e câmera de celular em quarto escuro entrega ruído preto — compraríamos uma
+  RA que só funciona destruindo a premissa da atividade. WebXR resolveria de
+  vez, e não existe no Safari do iPhone: metade da mesa fora, justo a metade
+  que já é frágil em tudo que medimos.
+
+  A MATEMÁTICA, QUE É O TRUQUE INTEIRO
+  Escolhe-se um rumo-alvo. O desenho é definido em coordenadas de TELA como ele
+  deve ser lido. Para cada ponto do desenho, lança-se do olho o raio que
+  passaria por ele SE a pessoa estivesse olhando para o alvo, e crava-se o
+  ponto 3D a uma distância qualquer ao longo desse raio — distâncias diferentes
+  por traço, para eles caírem em profundidades diferentes.
+
+  Do alvo, todos os pontos projetam de volta exatamente sobre o desenho, por
+  construção. De qualquer outro ângulo, espalham. Não há aproximação nem
+  ajuste: é exato, e é barato.
+
+  ENTRADA PELA URL — ?embed=1&s=SEMENTE&run=IDENTIFICADOR[&dev=1]
+  Mesmo contrato dos outros três módulos, e a mesma saída:
+  postMessage {mosaico:"tarefa-ok", tempoMs} pela folha TarefaSensor.
+
+  ONDE ELE MORA, E POR QUÊ. Enquanto é protótipo, dentro do laboratório, atrás
+  da mesma porta das outras duas experiências — é lá que as três propostas de RA
+  ficam lado a lado para serem comparadas.
+
+  Se um dia virar atividade de verdade, sobe para a raiz e é servido às duas
+  experiências pelo mesmo arquivo. As três atividades que existem vivem em duas
+  linhagens que derivaram 1332 linhas e três defeitos; o momento de não repetir
+  isso é antes de existir a segunda cópia.
+-->
+<style>
+:root{color-scheme:dark;--ouro:#efc878;--ink:#eef5f2;--muted:#8fa4ad}
+*{box-sizing:border-box}
+html{background:#04070b}
+body{margin:0;height:100dvh;overflow:hidden;background:transparent;color:var(--ink);
+  font-family:Inter,system-ui,sans-serif;touch-action:pan-y pinch-zoom;overscroll-behavior:none}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
+.hud{position:fixed;left:0;right:0;top:0;padding:max(12px,env(safe-area-inset-top)) 14px 10px;
+  display:flex;justify-content:space-between;align-items:flex-start;gap:12px;pointer-events:none}
+.hud b{font:800 13px/1.2 Inter,system-ui;letter-spacing:.14em;color:var(--ouro)}
+.hud small{display:block;color:var(--muted);font-size:11px;margin-top:3px;max-width:24ch}
+.rel{font:800 15px/1 ui-monospace,monospace;color:var(--ink);text-align:right}
+.firme{position:fixed;left:50%;bottom:max(86px,calc(env(safe-area-inset-bottom) + 76px));
+  transform:translateX(-50%);width:min(240px,58vw);height:5px;border-radius:5px;
+  background:#ffffff1c;overflow:hidden}
+.firme i{display:block;height:100%;width:0;background:linear-gradient(90deg,#7d6230,var(--ouro))}
+.dock{position:fixed;left:0;right:0;bottom:0;padding:12px 14px max(14px,env(safe-area-inset-bottom));
+  display:flex;gap:9px;justify-content:center}
+.btn{min-height:48px;padding:12px 16px;border:1px solid #3d5360;border-radius:11px;
+  background:linear-gradient(#17313a,#0c1c22);color:var(--ink);font-weight:700;cursor:pointer;
+  box-shadow:inset 0 1px #ffffff12,0 4px 0 #020507}
+.btn:active{transform:translateY(2px);box-shadow:inset 0 1px #ffffff12,0 1px 0 #020507}
+.btn.ouro{background:linear-gradient(#ffc266,#dd8b2e);color:#1b1005;border-color:#e8a94a}
+.veu{position:fixed;inset:0;display:grid;place-items:center;padding:22px;text-align:center;
+  background:radial-gradient(120% 80% at 50% 55%,#04070b88,#04070bf2);z-index:5}
+.veu.off{display:none}
+.cartao{width:min(460px,calc(100% - 30px));padding:20px;border:1px solid #3d5360;border-radius:14px;
+  background:linear-gradient(160deg,#13212b,#071016);box-shadow:0 8px 0 #020507,0 28px 70px #000b}
+.cartao h1{font:600 27px Georgia,serif;color:var(--ouro);margin:0 0 8px}
+.cartao p{color:#aab9c1;line-height:1.5;margin:.4rem 0}
+.achou{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:6;
+  padding:18px 22px;border:1px solid var(--ouro);border-radius:14px;background:#071016f2;
+  text-align:center;display:none}
+.achou.on{display:block}
+.achou b{display:block;font:800 34px/1 ui-monospace,monospace;color:var(--ouro)}
+.achou span{display:block;margin-top:8px;color:#b7c4ca;max-width:26ch}
+</style>
+</head>
+<body>
+<canvas id="tela"></canvas>
+<div class="hud">
+  <div><b>A MARCA PARTIDA</b><small id="dica">Varra o quarto devagar. Alguma coisa foi riscada em mais de uma parede.</small></div>
+  <div class="rel" id="rel">00:00</div>
+</div>
+<div class="firme"><i id="firmeI"></i></div>
+<div class="dock"><button class="btn" id="btDedo" hidden>Girar com o dedo</button></div>
+
+<div class="achou" id="achou"><b id="achouTxt"></b><span id="achouNota"></span></div>
+
+<div class="veu" id="veu">
+  <div class="cartao">
+    <h1>O quarto está escuro</h1>
+    <p>A lanterna alcança pouco, e o que você procura não está inteiro em lugar nenhum.</p>
+    <p id="veuNota" style="color:#8fa4ad;font-size:13px"></p>
+    <button class="btn ouro" id="btComecar">Acender a lanterna</button>
+    <button class="btn" id="btDedoVeu" style="width:100%;margin-top:9px">Prefiro girar com o dedo</button>
+  </div>
+</div>
+
+<script src="vendor/v1/js/tarefa-sensor.js?v=20260903-auditoria"></script>
+<script src="guard.js"></script>
+<script>
+"use strict";
+/* ── ENTRADA ─────────────────────────────────────────────────────────────── */
+var EMBED=false, SEMENTE_URL="", RUN_ID="", DEV=false;
+try{
+  var _q=new URLSearchParams(location.search);
+  EMBED=_q.get("embed")==="1";
+  SEMENTE_URL=(_q.get("s")||"").trim().toUpperCase();
+  RUN_ID=(_q.get("run")||"").trim();
+  DEV=_q.get("dev")==="1";
+}catch(e){}
+function ctxMesa(){ return { embed:EMBED, runId:RUN_ID }; }
+function envia(d){ if(window.TarefaSensor) TarefaSensor.enviar(d, ctxMesa()); }
+
+/* ── GEOMETRIA ───────────────────────────────────────────────────────────────
+   Mundo: x leste, y norte, z cima. Rumo 0 = norte, cresce para leste — a mesma
+   convenção da Sala às Escuras, para o dia em que os dois compartilharem
+   motor. */
+var D2R=Math.PI/180, R2D=180/Math.PI;
+var clamp=function(v,a,b){return Math.max(a,Math.min(b,v))};
+var wrap360=function(a){return ((a%360)+360)%360};
+var wrap180=function(a){a=wrap360(a); return a>180?a-360:a};
+function baseDe(bearing,elev){
+  var b=bearing*D2R, e=elev*D2R;
+  var f=[Math.sin(b)*Math.cos(e), Math.cos(b)*Math.cos(e), Math.sin(e)];
+  var r=[Math.cos(b), -Math.sin(b), 0];                       /* direita */
+  var u=[-Math.sin(b)*Math.sin(e), -Math.cos(b)*Math.sin(e), Math.cos(e)]; /* cima */
+  return {f:f,r:r,u:u};
+}
+var FOCO=1.15; /* distância focal em unidades de meia-tela */
+
+/* ── A MARCA ─────────────────────────────────────────────────────────────────
+   Segmentos de sete traços, como um mostrador. A hora é o que se lê quando os
+   riscos se alinham — e hora é o que esta casa guarda em toda parte. */
+var SEG={
+ "0":[0,1,2,3,4,5],"1":[1,2],"2":[0,1,6,4,3],"3":[0,1,6,2,3],"4":[5,6,1,2],
+ "5":[0,5,6,2,3],"6":[0,5,4,3,2,6],"7":[0,1,2],"8":[0,1,2,3,4,5,6],"9":[0,1,2,3,5,6]
+};
+/* cada traço: [x1,y1,x2,y2] em caixa de 0..1 (y para baixo) */
+var TRACO=[[0,0,1,0],[1,0,1,1],[1,1,1,2],[1,2,0,2],[0,2,0,1],[0,1,0,0],[0,1,1,1]];
+function pontosDaHora(txt){
+  var pts=[], x=0;
+  for(var i=0;i<txt.length;i++){
+    var c=txt[i];
+    if(c===":"){ pts.push([x+0.18,0.62,x+0.18,0.68]); pts.push([x+0.18,1.32,x+0.18,1.38]); x+=0.45; continue; }
+    var segs=SEG[c]||[];
+    for(var k=0;k<segs.length;k++){
+      var t=TRACO[segs[k]];
+      pts.push([x+t[0]*0.62, t[1], x+t[2]*0.62, t[3]]);
+    }
+    x+=0.85;
+  }
+  /* centraliza e normaliza para caber na tela do alvo */
+  var maxX=x-0.23, esc=1.02/Math.max(maxX,1);
+  return pts.map(function(p){
+    return [ (p[0]-maxX/2)*esc, (p[1]-1)*esc*0.86, (p[2]-maxX/2)*esc, (p[3]-1)*esc*0.86 ];
+  });
+}
+
+/* ── O ESPALHAMENTO ──────────────────────────────────────────────────────────
+   Cada traço vira um segmento 3D cravado ao longo do raio que, do rumo-alvo,
+   passa exatamente por ele. Profundidades diferentes por traço: é a
+   profundidade que faz o desenho desabar de qualquer outro ângulo. */
+function semente(str){
+  var h=2166136261>>>0;
+  for(var i=0;i<str.length;i++){h=Math.imul(h^str.charCodeAt(i),16777619)>>>0}
+  return function(){h=Math.imul(h^h>>>15,2246822507)>>>0;return ((h>>>8)/16777216)};
+}
+var OLHO=[0,0,1.55];
+function raio(base,u,v){
+  var d=[0,0,0];
+  for(var i=0;i<3;i++) d[i]=base.f[i]*FOCO + base.r[i]*u + base.u[i]*(-v);
+  var n=Math.hypot(d[0],d[1],d[2]);
+  return [d[0]/n,d[1]/n,d[2]/n];
+}
+function montarMarca(hora,alvoB,alvoE,rnd){
+  var base=baseDe(alvoB,alvoE), pts=pontosDaHora(hora), out=[];
+  for(var i=0;i<pts.length;i++){
+    var p=pts[i];
+    /* uma profundidade por TRAÇO, não por ponta: o traço continua reto no
+       mundo, e é isso que faz cada um parecer um risco de verdade numa
+       superfície, e não dois pontos soltos. */
+    var t=1.35+rnd()*2.15;
+    var a=raio(base,p[0],p[1]), b=raio(base,p[2],p[3]);
+    out.push({
+      a:[OLHO[0]+a[0]*t, OLHO[1]+a[1]*t, OLHO[2]+a[2]*t],
+      b:[OLHO[0]+b[0]*t, OLHO[1]+b[1]*t, OLHO[2]+b[2]*t],
+      t:t
+    });
+  }
+  return out;
+}
+
+/* ── PROJEÇÃO ────────────────────────────────────────────────────────────── */
+var W=0,H=0,DPR=1,CX=0,CY=0,ESC=1;
+function projeta(P,base){
+  var v=[P[0]-OLHO[0],P[1]-OLHO[1],P[2]-OLHO[2]];
+  var z=v[0]*base.f[0]+v[1]*base.f[1]+v[2]*base.f[2];
+  if(z<=0.06) return null;                       /* atrás do olho */
+  var x=v[0]*base.r[0]+v[1]*base.r[1]+v[2]*base.r[2];
+  var y=v[0]*base.u[0]+v[1]*base.u[1]+v[2]*base.u[2];
+  return [CX + (x/z)*FOCO*ESC, CY - (y/z)*FOCO*ESC, z];
+}
+
+/* ── ESTADO ──────────────────────────────────────────────────────────────── */
+var HORAS=["21:21","21:24","21:26","21:29","21:31","22:05","23:05"];
+var rnd=semente(SEMENTE_URL||("marca"+Math.floor(Math.random()*1e9)));
+var HORA=HORAS[Math.floor(rnd()*HORAS.length)];
+var ALVO_B=rnd()*360, ALVO_E=-6+rnd()*26;
+var MARCA=montarMarca(HORA,ALVO_B,ALVO_E,rnd);
+var vista={bearing:0,elev:0}, raw={bearing:0,elev:0};
+var jogando=false, concluido=false, firme=0, comecouMs=0, modoDedo=false;
+var TOL_B=13, TOL_E=9, FIRME_MS=900, DRENO=0.55;
+
+/* ── DESENHO ─────────────────────────────────────────────────────────────── */
+var cv=document.getElementById("tela"), ctx=cv.getContext("2d");
+function medir(){
+  DPR=Math.min(2,window.devicePixelRatio||1);
+  W=cv.clientWidth; H=cv.clientHeight;
+  cv.width=Math.round(W*DPR); cv.height=Math.round(H*DPR);
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  CX=W/2; CY=H/2; ESC=Math.min(W,H)/2;
+}
+addEventListener("resize",medir);
+
+function erroDoAlvo(){
+  return {
+    b:Math.abs(wrap180(vista.bearing-ALVO_B)),
+    e:Math.abs(vista.elev-ALVO_E)
+  };
+}
+function alinhado(){ var d=erroDoAlvo(); return d.b<=TOL_B && d.e<=TOL_E; }
+
+function pinta(){
+  var base=baseDe(vista.bearing,vista.elev);
+  ctx.clearRect(0,0,W,H);
+
+  /* o quarto: escuro com um respiro de luz onde a lanterna aponta */
+  var g=ctx.createRadialGradient(CX,CY,Math.min(W,H)*0.06,CX,CY,Math.max(W,H)*0.62);
+  g.addColorStop(0,"#12202b"); g.addColorStop(0.5,"#080f16"); g.addColorStop(1,"#04070b");
+  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+
+  var d=erroDoAlvo();
+  /* Quanto mais perto do alvo, mais os riscos acendem. É o único aviso que a
+     atividade dá, e é aviso de MUNDO, não de interface: a luz responde ao
+     lugar, ninguém explica nada. */
+  var perto=clamp(1-Math.max(d.b/(TOL_B*3.2), d.e/(TOL_E*3.2)),0,1);
+  /* A lanterna ABRE conforme se chega perto. Fixa, ela escondia metade da
+     marca justo no instante em que ela se formava — o feixe é o que revela,
+     não pode ser o que impede. E abrir com a proximidade é aviso de mundo:
+     ninguém explica, a luz responde ao lugar. */
+  var raio0=Math.min(W,H)*0.42*(1+1.05*perto);
+
+  for(var i=0;i<MARCA.length;i++){
+    var m=MARCA[i];
+    var A=projeta(m.a,base), B=projeta(m.b,base);
+    if(!A||!B) continue;
+    /* a lanterna: o que está longe do centro da tela quase não aparece */
+    var mx=(A[0]+B[0])/2, my=(A[1]+B[1])/2;
+    var dist=Math.hypot(mx-CX,my-CY);
+    var luz=clamp(1-dist/raio0,0,1);
+    if(luz<=0.02) continue;
+    var prof=clamp(1-(m.t-1.35)/2.15,0.35,1);
+    var alfa=(0.10+0.90*perto*perto)*luz*prof;
+    ctx.strokeStyle="rgba(239,200,120,"+alfa.toFixed(3)+")";
+    ctx.lineWidth=Math.max(1.6,(2.9-m.t*0.45)*(0.6+0.8*perto));
+    ctx.lineCap="round";
+    ctx.beginPath(); ctx.moveTo(A[0],A[1]); ctx.lineTo(B[0],B[1]); ctx.stroke();
+  }
+
+  if(DEV){
+    ctx.fillStyle="#7d95a3"; ctx.font="12px ui-monospace,monospace";
+    ctx.fillText("rumo "+vista.bearing.toFixed(1)+"  alt "+vista.elev.toFixed(1),12,H-52);
+    ctx.fillText("alvo "+ALVO_B.toFixed(1)+" / "+ALVO_E.toFixed(1)+"   erro "+d.b.toFixed(1)+" / "+d.e.toFixed(1),12,H-36);
+  }
+}
+
+/* ── LAÇO ────────────────────────────────────────────────────────────────── */
+var ultimo=0;
+function laco(ts){
+  requestAnimationFrame(laco);
+  var dt=ultimo?Math.min(0.1,(ts-ultimo)/1000):0.016; ultimo=ts;
+  if(jogando&&!concluido){
+    /* Acumula e ESCOA, nunca zera: mão tremendo é o estado normal de quem
+       segura um telefone, e um quadro fora da faixa não pode apagar o que já
+       se conquistou. Lição cara, aprendida no vidro e na sala. */
+    if(alinhado()) firme=Math.min(FIRME_MS,firme+dt*1000);
+    else firme=Math.max(0,firme-dt*1000*DRENO);
+    document.getElementById("firmeI").style.width=(firme/FIRME_MS*100)+"%";
+    if(firme>=FIRME_MS) concluir();
+    var s=Math.floor((Date.now()-comecouMs)/1000);
+    document.getElementById("rel").textContent=
+      String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
+  }
+  pinta();
+}
+
+function concluir(){
+  if(concluido) return;
+  concluido=true; jogando=false;
+  var tempoMs=Date.now()-comecouMs;
+  document.getElementById("achouTxt").textContent=HORA;
+  document.getElementById("achouNota").textContent="Os riscos são um só. Foi preciso estar aqui para ler.";
+  document.getElementById("achou").classList.add("on");
+  document.getElementById("dica").textContent="A marca está lida.";
+  envia({ mosaico:"tarefa-ok", tempoMs:tempoMs, hora:HORA });
+}
+
+/* ── ORIENTAÇÃO ──────────────────────────────────────────────────────────────
+   Atitude do giroscópio dá o rumo; a bússola vira offset lento. É o desenho
+   que a Janela do Norte levou meses para achar — não custa nada herdá-lo já
+   pronto, e evita o travamento de cardan de braço levantado. */
+var temAbsoluto=false, bussOff=null, iosHead=null, tOrient=0, rumoSuave=null;
+function eulerParaVista(alpha,beta,gamma){
+  var a=alpha*D2R,b=beta*D2R,g=gamma*D2R;
+  var cA=Math.cos(a),sA=Math.sin(a),cB=Math.cos(b),sB=Math.sin(b),cG=Math.cos(g),sG=Math.sin(g);
+  var z1=cA*sG+cG*sA*sB, z2=sA*sG-cA*cG*sB, z3=cB*cG;
+  return {
+    bearing:wrap360(Math.atan2(-z1,-z2)*R2D),
+    elev:Math.asin(clamp(-z3,-1,1))*R2D
+  };
+}
+function onOrient(e){
+  if(e.alpha===null||e.beta===null||e.gamma===null) return;
+  var iOS=(typeof e.webkitCompassHeading==="number" && !isNaN(e.webkitCompassHeading));
+  var abs=iOS || e.absolute===true || e.type==="deviceorientationabsolute";
+  if(abs) temAbsoluto=true; else if(temAbsoluto) return;
+  var v=eulerParaVista(e.alpha,e.beta,e.gamma);
+  raw.elev=v.elev;
+  if(iOS){
+    var agora=performance.now();
+    var dt=tOrient?Math.min(0.25,(agora-tOrient)/1000):0.016; tOrient=agora;
+    var mundoCru=eulerParaVista(360-e.webkitCompassHeading,e.beta,e.gamma).bearing;
+    if(iosHead==null) iosHead=mundoCru;
+    else iosHead=wrap360(iosHead+wrap180(mundoCru-iosHead)*0.26);
+    var cB=Math.cos(e.beta*D2R);
+    var peso=cB<-0.10?Math.min(1,(Math.abs(cB)-0.10)/0.35):0;
+    if(peso>0){
+      var alvoOff=wrap180(iosHead-v.bearing);
+      if(bussOff===null){ if(peso>=0.35) bussOff=alvoOff; }
+      else{
+        var err=wrap180(alvoOff-bussOff);
+        if(Math.abs(err)>40) peso*=0.15;
+        bussOff=wrap180(bussOff+err*(1-Math.pow(0.80,dt*peso)));
+      }
+    }
+    var fundido=(bussOff===null)?iosHead:wrap360(v.bearing+bussOff);
+    if(rumoSuave===null) rumoSuave=fundido;
+    else rumoSuave=wrap360(rumoSuave+wrap180(fundido-rumoSuave)*0.26);
+    raw.bearing=rumoSuave;
+  } else raw.bearing=v.bearing;
+  if(!modoDedo){ vista.bearing=raw.bearing; vista.elev=clamp(raw.elev,-40,60); }
+}
+
+/* O botão do dedo existe desde o PRIMEIRO segundo, e não depois de uma espera.
+   Contada desde o carregamento, a espera punia quem demorasse a tocar em
+   "Permitir": a bússola chegava e já era tarde. */
+function ligarDedo(){
+  modoDedo=true;
+  document.getElementById("btDedo").hidden=true;
+  document.getElementById("dica").textContent="Arraste para varrer o quarto.";
+  var px=0,py=0,ar=false;
+  cv.addEventListener("pointerdown",function(ev){ar=true;px=ev.clientX;py=ev.clientY;cv.setPointerCapture(ev.pointerId)});
+  cv.addEventListener("pointermove",function(ev){
+    if(!ar)return;
+    vista.bearing=wrap360(vista.bearing+(ev.clientX-px)*0.32);
+    vista.elev=clamp(vista.elev-(ev.clientY-py)*0.22,-40,60);
+    px=ev.clientX; py=ev.clientY;
+  });
+  addEventListener("pointerup",function(){ar=false});
+}
+
+function comecar(){
+  document.getElementById("veu").classList.add("off");
+  document.getElementById("btDedo").hidden=false;
+  jogando=true; comecouMs=Date.now();
+  if(window.TarefaSensor){
+    TarefaSensor.ativarOrientacao({
+      aoOrientar:onOrient,
+      respondeu:function(){ return raw.bearing!==0 || raw.elev!==0 },
+      aoNegar:ligarDedo, aoIndisponivel:ligarDedo, aoNaoResponder:function(){
+        document.getElementById("dica").textContent="O sensor não respondeu. Use o dedo, se preferir.";
+      }
+    });
+  } else ligarDedo();
+}
+document.getElementById("btComecar").onclick=comecar;
+document.getElementById("btDedoVeu").onclick=function(){ comecar(); ligarDedo(); };
+document.getElementById("btDedo").onclick=ligarDedo;
+if(DEV) document.getElementById("veuNota").textContent="dev · alvo "+ALVO_B.toFixed(0)+"° / "+ALVO_E.toFixed(0)+"°";
+
+medir();
+requestAnimationFrame(laco);
+</script>
+</body>
+</html>
