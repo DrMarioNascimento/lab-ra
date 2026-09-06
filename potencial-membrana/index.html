@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="pt-BR" data-ra-protected>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#070605" />
+  <title>A película de carga · Laboratório RA</title>
+  <link rel="icon" href="../brand/dragon-mark.webp" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=IBM+Plex+Mono:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../laboratorio.css" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="../guard.js"></script>
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"}}</script>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.1.0/dist/model-viewer.min.js"></script>
+</head>
+<body>
+<header class="topbar"><nav class="nav shell" aria-label="Laboratório"><a class="brand" href="../bancadas.html"><img src="../brand/dragon-mark.webp" alt="" width="42" height="42"><span class="brand-copy"><b>DRAGON GAMES</b><span>Fisiologia · Laboratório RA</span></span></a><div class="nav-actions"><a class="small-button" href="../bancadas.html">Testes</a></div></nav></header>
+<main class="page shell">
+  <div class="page-head"><div><span class="eyebrow">Teste 07 · Unidade I · potencial de membrana</span><h1>A película de carga</h1></div><a class="back-link" href="../bancadas.html">← Voltar</a></div>
+  <p class="page-note">Se a célula está a −70 mV, onde está a carga? Cinco níveis descem do neurônio inteiro até a membrana para mostrar que o citoplasma é neutro do começo ao fim, e que a separação de cargas é uma pele de cerca de um nanômetro colada nas duas faces. O controle de permeabilidade move a equação de Goldman e os íons do modelo ao mesmo tempo — quando o sódio dispara, a película inverte, e a inversão viaja.</p>
+
+  <section class="experience" aria-label="Exploração tridimensional do potencial de membrana">
+    <div id="stage" class="stage" role="img" aria-label="Modelo tridimensional interativo">
+      <canvas id="scene"></canvas>
+      <div id="labels" class="labels" aria-hidden="true"></div>
+      <div class="stage-hud"><span id="scaleLabel">Escala celular</span><span id="emLabel">Em −70 mV</span><span id="stepLabel">01 · Neurônio</span></div>
+      <div class="gesture">Arraste para girar · pinça/roda para aproximar</div>
+      <div class="stage-tools">
+        <button id="rotulos" class="ghost-control on" type="button">Rótulos</button>
+        <button id="girar" class="ghost-control on" type="button">Girar</button>
+        <button id="resetView" class="ghost-control" type="button">Recentrar</button>
+      </div>
+    </div>
+
+    <aside class="panel">
+      <div class="progress" aria-label="Níveis">
+        <button class="step active" data-step="0" type="button"><b>01</b><span>Neurônio</span></button>
+        <button class="step" data-step="1" type="button"><b>02</b><span>Interior</span></button>
+        <button class="step" data-step="2" type="button"><b>03</b><span>Película</span></button>
+        <button class="step" data-step="3" type="button"><b>04</b><span>Travessias</span></button>
+        <button class="step" data-step="4" type="button"><b>05</b><span>A onda</span></button>
+      </div>
+
+      <article class="info-card" id="infoCard">
+        <span class="eyebrow" id="infoEyebrow">A pergunta</span>
+        <h2 id="infoTitle">Onde está a carga?</h2>
+        <p id="infoText">Duas pontas medem: a micropipeta dentro do soma e o eletrodo de referência no banho.</p>
+        <div class="microtags" id="microtags"></div>
+      </article>
+
+      <div class="actions"><button id="prev" class="secondary" type="button" disabled>← Voltar</button><button id="next" class="primary" type="button">Aprofundar →</button></div>
+
+      <section id="goldmanBox" class="caixa" aria-label="Permeabilidade e potencial">
+        <div class="caixa-head"><span class="eyebrow">Equação de Goldman</span><div class="caixa-btns"><button id="repouso" type="button">Repouso</button><button id="pico" type="button">Pico</button></div></div>
+        <label class="ctrl"><span>Permeabilidade ao Na⁺ ÷ ao K⁺</span><input id="alfa" type="range" min="-2" max="1.5" step="0.01" value="-1.52" aria-label="Razão de permeabilidade do sódio sobre o potássio, em escala logarítmica" /></label>
+        <label class="ctrl"><span>[K⁺] extracelular (mM)</span><input id="ko" type="range" min="1" max="20" step="0.5" value="4" aria-label="Potássio extracelular" /></label>
+        <label class="ctrl"><span>Diâmetro da célula (µm)</span><input id="diam" type="range" min="10" max="120" step="5" value="50" aria-label="Diâmetro da célula" /></label>
+        <p id="goldmanValor" class="valor"></p>
+        <canvas id="curvaGoldman" width="330" height="160" aria-label="Potencial de membrana em função da permeabilidade ao sódio"></canvas>
+        <p id="goldmanConta" class="conta"></p>
+        <p class="nota">A conta é refeita a cada movimento, com 1 µF/cm² de capacitância de membrana e 140 mM de K⁺ interno. No nível 03 o desenho está em proporção e as réguas na cena marcam as medidas de verdade: 5 nm de bicamada, cerca de 1 nm de película de cada lado. O que não cabe em proporção é a célula — 50 000 nm contra 1 nm —, e é exatamente por isso que a página precisa de níveis.</p>
+      </section>
+
+      <section id="disparoBox" class="caixa" hidden aria-label="Potencial de ação">
+        <div class="caixa-head"><span class="eyebrow">Potencial de ação</span><div class="caixa-btns"><button id="disparar" type="button">Disparar</button><button id="pausar" type="button">Pausar</button></div></div>
+        <label class="ctrl"><span>Instante do disparo (ms)</span><input id="instante" type="range" min="0" max="8.4" step="0.02" value="0" aria-label="Instante do potencial de ação" /></label>
+        <label class="ctrl"><span>Câmera lenta adicional</span><input id="lento" type="range" min="1" max="40" step="1" value="1" aria-label="Fator de câmera lenta" /></label>
+        <p id="disparoValor" class="valor"></p>
+        <canvas id="curvaDisparo" width="330" height="160" aria-label="Curva do potencial de ação no ponto de registro"></canvas>
+        <p class="nota">A cor da parede é o sinal da película e as duas faces estão sempre em oposição: o que viaja é a inversão. Neste axônio amielínico ela avança ponto a ponto, acendendo a vizinha, e leva 3 ms para atravessar 6 mm. Use o cursor de instante para parar no pico, na repolarização ou no momento exato em que os sinais trocam de lado.</p>
+      </section>
+
+      <section class="ra-box" aria-label="Realidade aumentada">
+        <model-viewer id="arViewer" alt="Modelo do potencial de membrana em realidade aumentada" ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" ar-scale="fixed" camera-controls loading="eager" reveal="auto" shadow-intensity="1" exposure="1.1"></model-viewer>
+        <button id="launchAR" class="ra-launch" type="button" disabled>Colocar este nível no ambiente</button>
+        <p id="raStatus" class="ra-status">Preparando o modelo para a câmera…</p>
+      </section>
+    </aside>
+  </section>
+
+  <section class="learning-strip"><div><span class="eyebrow">Ideia central</span><h2>Voltagem não é propriedade do corpo da célula</h2></div><p>É uma diferença entre dois lados de uma parede. O citoplasma permanece eletricamente neutro; o que muda é a fila de íons encostada na membrana — tão fina que envolve menos de um milésimo de por cento do potássio que a célula contém. É por isso que o potencial pode inverter em menos de um milissegundo sem que a composição interna mude de forma perceptível: mover essa película é barato, e é esse preço baixo que torna o impulso nervoso possível.</p></section>
+</main>
+<footer>Simuladores interativos utilizados nas disciplinas de Fisiologia Humana do Prof. Mário César Nascimento, PhD ©</footer>
+<script type="module" src="app.js"></script>
+</body>
+</html>
