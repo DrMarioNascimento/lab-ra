@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="pt-BR" data-ra-protected>
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" href="../brand/orientador.webp" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#050a06" />
+  <title>A coluna de sangue · Laboratório do Pesquisar RA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=IBM+Plex+Mono:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../laboratorio.css" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="../guard.js"></script>
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"}}</script>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.1.0/dist/model-viewer.min.js"></script>
+</head>
+<body>
+<header class="topbar"><nav class="nav shell" aria-label="Laboratório"><a class="brand" href="../bancadas.html"><img src="../brand/orientador.webp" alt="" width="42" height="42"><span class="brand-copy"><b>LABORATÓRIO DO PESQUISAR RA</b><span>Fisiologia · Unidade IV</span></span></a><div class="nav-actions"><a class="small-button" href="../bancadas.html">Testes</a></div></nav></header>
+<main class="page shell">
+  <div class="page-head"><div><span class="eyebrow">Teste 08 · Unidade IV · retorno venoso</span><h1>A coluna de sangue</h1></div><a class="back-link" href="../bancadas.html">← Voltar</a></div>
+  <p class="page-note">O aparelho deitado é decúbito; o aparelho em pé é ortostatismo. Incline-o e a coluna de sangue nasce: cada centímetro abaixo do diafragma acrescenta 0,78 mmHg, o tornozelo vai de dez a noventa, e o sangue empoça nas pernas. Cinco níveis descem do corpo inteiro até a válvula que parte essa coluna em degraus e até o músculo que a esvazia a cada passo. É a única bancada em que o sensor é a fisiologia.</p>
+
+  <section class="experience" aria-label="Exploração tridimensional do retorno venoso">
+    <div id="stage" class="stage" role="img" aria-label="Modelo tridimensional interativo">
+      <canvas id="scene"></canvas>
+      <div class="stage-hud"><span id="posturaLabel">Decúbito · 0°</span><span id="pressaoLabel">Tornozelo 10 mmHg</span><span id="stepLabel">01 · O corpo</span></div>
+      <div class="gesture">Incline o aparelho · arraste para girar a vista</div>
+      <div class="stage-tools">
+        <button id="resetView" class="ghost-control" type="button">Recentrar</button>
+      </div>
+    </div>
+
+    <aside class="panel">
+      <div class="progress" aria-label="Níveis">
+        <button class="step active" data-step="0" type="button"><b>01</b><span>O corpo</span></button>
+        <button class="step" data-step="1" type="button"><b>02</b><span>A perna</span></button>
+        <button class="step" data-step="2" type="button"><b>03</b><span>A válvula</span></button>
+        <button class="step" data-step="3" type="button"><b>04</b><span>A bomba</span></button>
+        <button class="step" data-step="4" type="button"><b>05</b><span>O ciclo</span></button>
+      </div>
+
+      <article class="info-card" id="infoCard">
+        <span class="eyebrow" id="infoEyebrow">A pergunta</span>
+        <h2 id="infoTitle">Onde a gravidade aperta?</h2>
+        <p id="infoText"></p>
+        <div class="microtags" id="microtags"></div>
+      </article>
+
+      <div class="actions"><button id="prev" class="secondary" type="button" disabled>← Voltar</button><button id="next" class="primary" type="button">Aprofundar →</button></div>
+
+      <section class="caixa" aria-label="Postura">
+        <div class="caixa-head">
+          <span class="eyebrow">Postura do aparelho</span>
+          <div class="caixa-btns"><button id="deitar" type="button">Deitar</button><button id="levantar" type="button">Levantar</button></div>
+        </div>
+        <button id="permitir" class="permitir" type="button" hidden>Usar a inclinação do aparelho</button>
+        <p id="sensorEstado" class="estado">procurando o sensor…</p>
+        <label class="ctrl"><span>Inclinação <b id="grauValor">0°</b></span>
+          <input id="grauCursor" type="range" min="0" max="90" step="1" value="0" aria-label="Inclinação do corpo, de decúbito a ortostatismo" /></label>
+        <ul class="leituras">
+          <li>tornozelo <b><span id="lTornozelo">10</span> mmHg</b></li>
+          <li>coxa <b><span id="lCoxa">10</span> mmHg</b></li>
+          <li>coração <b><span id="lCoracao">10</span> mmHg</b></li>
+          <li>jugular <b><span id="lJugular">6</span> mmHg</b></li>
+          <li>empoçado nas pernas <b><span id="lEmpocado">0</span> ml</b></li>
+        </ul>
+        <canvas id="curvaColuna" width="330" height="190" aria-label="Pressão venosa em função da altura do corpo"></canvas>
+      </section>
+
+      <section class="caixa" id="caixaValvula" aria-label="Os degraus das válvulas" hidden>
+        <div class="caixa-head"><span class="eyebrow">O que cada válvula segura</span></div>
+        <ol id="degraus" class="degraus"></ol>
+        <p class="valor">coluna inteira no pé da série: <b><span id="colunaTotal">10</span> mmHg</b></p>
+      </section>
+
+      <section class="caixa" id="caixaBomba" aria-label="A bomba muscular" hidden>
+        <div class="caixa-head">
+          <span class="eyebrow">Bomba muscular</span>
+          <div class="caixa-btns"><button id="passo" type="button">Um passo</button><button id="andar" type="button">Andar</button></div>
+        </div>
+        <canvas id="curvaTempo" width="330" height="130" aria-label="Pressão venosa do tornozelo ao longo do tempo"></canvas>
+      </section>
+
+      <section class="ra-box" aria-label="Realidade aumentada">
+        <model-viewer id="arViewer" alt="Modelo do retorno venoso em realidade aumentada" ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" ar-scale="fixed" camera-controls loading="eager" reveal="auto" shadow-intensity="1" exposure="1.1"></model-viewer>
+        <button id="launchAR" class="ra-launch" type="button" disabled>Colocar este nível no ambiente</button>
+        <p id="raStatus" class="ra-status">Preparando o modelo para a câmera…</p>
+      </section>
+    </aside>
+  </section>
+</main>
+<footer class="rodape shell"><img src="../brand/mestre-lap.webp" alt="" width="84" height="84"><p>Simuladores interativos do Prof. Mário César Nascimento, PhD ©</p></footer>
+<script type="module" src="app.js"></script>
+</body>
+</html>
