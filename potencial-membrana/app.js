@@ -291,27 +291,39 @@ function restaurar(obj) {
 function desenharGoldman() {
   const c = E.gCanvas, g = c.getContext('2d'), w = c.width, h = c.height;
   g.clearRect(0, 0, w, h);
-  const px = l => 34 + (l + 2) / 3.5 * (w - 46), py = v => h - 24 - (v + 100) / 180 * (h - 40);
-  g.strokeStyle = 'rgba(224,177,58,.22)'; g.lineWidth = 1;
-  g.beginPath(); g.moveTo(34, py(-100)); g.lineTo(w - 10, py(-100)); g.moveTo(34, py(-100)); g.lineTo(34, 8); g.stroke();
+  /* mesma divisão do traçado ao lado: números à esquerda, nomes à direita */
+  const ESQ = 46;
+  const px = l => ESQ + (l + 2) / 3.5 * (w - ESQ - 12), py = v => h - 24 - (v + 100) / 180 * (h - 40);
+  g.strokeStyle = 'rgba(245,197,24,.22)'; g.lineWidth = 1;
+  g.beginPath(); g.moveTo(ESQ, py(-100)); g.lineTo(w - 10, py(-100)); g.moveTo(ESQ, py(-100)); g.lineTo(ESQ, 8); g.stroke();
+  g.font = '600 10px "IBM Plex Mono", monospace'; g.textAlign = 'right'; g.textBaseline = 'middle';
+  /* sem o −100: ele cai exatamente na linha de base do quadro e encostava no
+     primeiro número do eixo de baixo. Três marcas bastam para ler a altura. */
+  for (const v of [50, 0, -50]) {
+    const y = py(v);
+    g.strokeStyle = 'rgba(245,197,24,.35)';
+    g.beginPath(); g.moveTo(ESQ - 4, y); g.lineTo(ESQ, y); g.stroke();
+    g.fillStyle = '#b0c4ac'; g.fillText(v > 0 ? '+' + v : String(v), ESQ - 7, y);
+  }
+  g.textAlign = 'left'; g.textBaseline = 'alphabetic';
   const eK = nernst(1, CONC.K.i, Ko), eNa = nernst(1, CONC.Na.i, CONC.Na.o);
   g.setLineDash([4, 4]);
   [[eK, '#8fb6ff', 'E'], [eNa, '#ffb066', 'E']].forEach(([v, cor]) => {
-    g.strokeStyle = cor; g.beginPath(); g.moveTo(34, py(v)); g.lineTo(w - 10, py(v)); g.stroke();
+    g.strokeStyle = cor; g.beginPath(); g.moveTo(ESQ, py(v)); g.lineTo(w - 10, py(v)); g.stroke();
   });
   g.setLineDash([]);
-  g.strokeStyle = '#f3d078'; g.lineWidth = 2; g.beginPath();
+  g.strokeStyle = '#ffe066'; g.lineWidth = 2; g.beginPath();
   for (let l = -2; l <= 1.5; l += .02) {
     const x = px(l), y = py(goldman(Math.pow(10, l), Ko));
     l === -2 ? g.moveTo(x, y) : g.lineTo(x, y);
   }
   g.stroke();
   g.fillStyle = COR_MARCA; g.beginPath(); g.arc(px(Math.log10(alfa)), py(Em), 5, 0, Math.PI * 2); g.fill();
-  g.fillStyle = '#c9bba3'; g.font = '600 10px "IBM Plex Mono", monospace';
-  g.fillText('permeabilidade ao Na⁺ ÷ ao K⁺', 40, h - 6);
-  g.fillText('E(K)', w - 38, py(eK) - 4); g.fillText('E(Na)', w - 42, py(eNa) + 11);
-  g.save(); g.translate(11, h / 2 + 22); g.rotate(-Math.PI / 2); g.fillText('Em (mV)', 0, 0); g.restore();
-  ['0,01', '0,1', '1', '10'].forEach((t, i) => g.fillText(t, px(-2 + i) - 6, h - 12));
+  g.fillStyle = '#b0c4ac'; g.font = '600 10px "IBM Plex Mono", monospace';
+  g.fillText('permeabilidade ao Na⁺ ÷ ao K⁺', ESQ + 6, h - 3);
+  g.fillText('E(K)', w - 44, py(eK) - 4); g.fillText('E(Na)', w - 50, py(eNa) + 11);
+  g.save(); g.translate(10, h / 2 + 22); g.rotate(-Math.PI / 2); g.fillText('Em (mV)', 0, 0); g.restore();
+  ['0,01', '0,1', '1', '10'].forEach((t, i) => g.fillText(t, px(-2 + i) - 6, h - 16));
 }
 function onGoldman() {
   alfa = Math.pow(10, parseFloat(E.alfa.value));
@@ -358,23 +370,50 @@ function desenharDisparo() {
   const c = E.dCanvas, g = c.getContext('2d'), w = c.width, h = c.height;
   g.clearRect(0, 0, w, h);
   const t0 = -.3, t1 = 5.4;
-  const px = t => 34 + (t - t0) / (t1 - t0) * (w - 46), py = v => h - 24 - (v + 95) / 150 * (h - 40);
-  g.strokeStyle = 'rgba(224,177,58,.22)'; g.lineWidth = 1;
-  g.beginPath(); g.moveTo(34, py(-95)); g.lineTo(w - 10, py(-95)); g.moveTo(34, py(-95)); g.lineTo(34, 8); g.stroke();
+  /* ── A ESCALA EM mV ───────────────────────────────────────────────────
+     O eixo vertical não tinha número nenhum: dizia "Vm (mV)" e mostrava duas
+     linhas nomeadas. Quem olhasse não sabia se o pico era 20 ou 60 — e um
+     traçado de potencial de ação sem escala é desenho, não medida.
+
+     São DUAS coisas, e ficam em bordas opostas de propósito:
+     • à ESQUERDA a escala de verdade, em passos redondos de 40 mV, que
+       serve para ler qualquer altura da curva;
+     • à DIREITA os dois marcos que o aluno reconhece pelo nome, limiar e
+       repouso. Eles distam 15 mV, o que aqui são doze pixels: no mesmo lado
+       dos números virariam um amontoado. */
+  const ESQ = 46;
+  const px = t => ESQ + (t - t0) / (t1 - t0) * (w - ESQ - 12), py = v => h - 24 - (v + 95) / 150 * (h - 40);
+  g.strokeStyle = 'rgba(245,197,24,.22)'; g.lineWidth = 1;
+  g.beginPath(); g.moveTo(ESQ, py(-95)); g.lineTo(w - 10, py(-95)); g.moveTo(ESQ, py(-95)); g.lineTo(ESQ, 8); g.stroke();
+  g.font = '600 10px "IBM Plex Mono", monospace'; g.textAlign = 'right'; g.textBaseline = 'middle';
+  for (const v of [40, 0, -40, -80]) {
+    const y = py(v);
+    g.strokeStyle = 'rgba(245,197,24,.35)';
+    g.beginPath(); g.moveTo(ESQ - 4, y); g.lineTo(ESQ, y); g.stroke();
+    g.fillStyle = '#b0c4ac'; g.fillText(v > 0 ? '+' + v : String(v), ESQ - 7, y);
+  }
+  g.textAlign = 'left'; g.textBaseline = 'alphabetic';
   g.setLineDash([4, 4]);
-  g.strokeStyle = 'rgba(255,255,255,.28)'; g.beginPath(); g.moveTo(34, py(0)); g.lineTo(w - 10, py(0)); g.stroke();
-  g.strokeStyle = '#ff9c5a'; g.beginPath(); g.moveTo(34, py(LIMIAR)); g.lineTo(w - 10, py(LIMIAR)); g.stroke();
+  g.strokeStyle = 'rgba(255,255,255,.28)'; g.beginPath(); g.moveTo(ESQ, py(0)); g.lineTo(w - 10, py(0)); g.stroke();
+  g.strokeStyle = '#ff9c5a'; g.beginPath(); g.moveTo(ESQ, py(LIMIAR)); g.lineTo(w - 10, py(LIMIAR)); g.stroke();
+  g.strokeStyle = 'rgba(95,209,119,.45)'; g.beginPath(); g.moveTo(ESQ, py(REPOUSO)); g.lineTo(w - 10, py(REPOUSO)); g.stroke();
   g.setLineDash([]);
-  g.strokeStyle = '#f3d078'; g.lineWidth = 2; g.beginPath();
+  g.strokeStyle = '#ffe066'; g.lineWidth = 2; g.beginPath();
   for (let t = t0; t <= t1; t += .02) { const x = px(t), y = py(vmNoTempo(t)); t === t0 ? g.moveTo(x, y) : g.lineTo(x, y); }
   g.stroke();
   const tl = clamp(disparo.t - tDisparo(U_REG), t0, t1);
   g.fillStyle = COR_MARCA; g.beginPath(); g.arc(px(tl), py(vmNoTempo(tl)), 5, 0, Math.PI * 2); g.fill();
-  g.fillStyle = '#c9bba3'; g.font = '600 10px "IBM Plex Mono", monospace';
-  g.fillText('tempo no ponto de registro (ms)', 40, h - 6);
-  g.fillText('0', w - 20, py(0) - 4); g.fillText('limiar', w - 40, py(LIMIAR) + 11);
-  g.save(); g.translate(11, h / 2 + 22); g.rotate(-Math.PI / 2); g.fillText('Vm (mV)', 0, 0); g.restore();
-  ['0', '1', '2', '3', '4', '5'].forEach((t, i) => g.fillText(t, px(i) - 3, h - 12));
+  g.fillStyle = '#b0c4ac'; g.font = '600 10px "IBM Plex Mono", monospace';
+  g.fillText('tempo no ponto de registro (ms)', ESQ + 6, h - 3);
+  /* os marcos nomeados ficam afastados um do outro: a 15 mV de distância eles
+     se encostariam se saíssem na mesma altura dos seus traços */
+  g.fillStyle = '#ff9c5a'; g.fillText('limiar', w - 48, py(LIMIAR) - 4);
+  g.fillStyle = '#5fd177'; g.fillText('repouso', w - 54, py(REPOUSO) + 12);
+  g.fillStyle = '#b0c4ac';
+  g.save(); g.translate(10, h / 2 + 22); g.rotate(-Math.PI / 2); g.fillText('Vm (mV)', 0, 0); g.restore();
+  /* seis pixels entre o número e o título, com fonte de dez, é sobreposição:
+     os dois se encavalavam desde a primeira versão */
+  ['0', '1', '2', '3', '4', '5'].forEach((t, i) => g.fillText(t, px(i) - 3, h - 16));
 }
 function textosDisparo() {
   const T = travessiaMs();
