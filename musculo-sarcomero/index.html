@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="pt-BR" data-ra-protected>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#070605" />
+  <title>Do músculo ao sarcômero · Laboratório RA</title>
+  <link rel="icon" href="../brand/dragon-mark.webp" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=IBM+Plex+Mono:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../laboratorio.css" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="../guard.js"></script>
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"}}</script>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.1.0/dist/model-viewer.min.js"></script>
+</head>
+<body>
+<header class="topbar"><nav class="nav shell" aria-label="Laboratório"><a class="brand" href="../bancadas.html"><img src="../brand/dragon-mark.webp" alt="" width="42" height="42"><span class="brand-copy"><b>DRAGON GAMES</b><span>Fisiologia · Laboratório RA</span></span></a><div class="nav-actions"><a class="small-button" href="../bancadas.html">Testes</a></div></nav></header>
+<main class="page shell">
+  <div class="page-head"><div><span class="eyebrow">Teste 06 · fisiologia em escalas</span><h1>Do músculo ao sarcômero</h1></div><a class="back-link" href="../bancadas.html">← Voltar</a></div>
+  <p class="page-note">Explore a organização do músculo esquelético atravessando cinco níveis estruturais. Ao aprofundar, o nível atual se abre e o próximo nasce de dentro dele: músculo → fascículo → fibra muscular → miofibrila → sarcômero. No último nível, contraia o sarcômero e acompanhe a tensão.</p>
+
+  <section class="experience" aria-label="Exploração tridimensional do músculo ao sarcômero">
+    <div id="stage" class="stage" role="img" aria-label="Modelo tridimensional interativo">
+      <canvas id="scene"></canvas>
+      <div id="labels" class="labels" aria-hidden="true"></div>
+      <div class="stage-hud"><span id="scaleLabel">Escala macroscópica</span><span id="stepLabel">01 · Músculo</span></div>
+      <div class="gesture">Arraste para girar · pinça/roda para aproximar</div>
+      <div class="stage-tools">
+        <button id="rotulos" class="ghost-control on" type="button">Rótulos</button>
+        <button id="girar" class="ghost-control on" type="button">Girar</button>
+        <button id="resetView" class="ghost-control" type="button">Recentrar</button>
+      </div>
+    </div>
+
+    <aside class="panel">
+      <div class="progress" aria-label="Níveis de organização">
+        <button class="step active" data-step="0" type="button"><b>01</b><span>Músculo</span></button>
+        <button class="step" data-step="1" type="button"><b>02</b><span>Fascículo</span></button>
+        <button class="step" data-step="2" type="button"><b>03</b><span>Fibra</span></button>
+        <button class="step" data-step="3" type="button"><b>04</b><span>Miofibrila</span></button>
+        <button class="step" data-step="4" type="button"><b>05</b><span>Sarcômero</span></button>
+      </div>
+
+      <article class="info-card" id="infoCard">
+        <span class="eyebrow" id="infoEyebrow">Órgão contrátil</span>
+        <h2 id="infoTitle">Músculo esquelético</h2>
+        <p id="infoText">Ventre fusiforme envolvido pelo epimísio, com tendões nas extremidades.</p>
+        <div class="microtags" id="microtags"></div>
+      </article>
+
+      <div class="actions"><button id="prev" class="secondary" type="button" disabled>← Voltar</button><button id="next" class="primary" type="button">Aprofundar →</button></div>
+
+      <section id="contracaoBox" class="contracao" hidden aria-label="Contração do sarcômero">
+        <div class="contracao-head"><span class="eyebrow">Deslizamento dos filamentos</span><div class="contracao-btns"><button id="relaxar" type="button">Relaxar</button><button id="contrair" type="button">Contrair</button></div></div>
+        <input id="contracao" type="range" min="1.5" max="3.4" step="0.01" value="2.4" aria-label="Comprimento do sarcômero em micrômetros" />
+        <p id="contracaoValor" class="contracao-valor"></p>
+        <canvas id="tensao" width="330" height="150" aria-label="Curva comprimento–tensão"></canvas>
+        <p class="contracao-nota">A banda A tem o comprimento da miosina e não muda. O que encolhe são a banda I e a zona H: as actinas deslizam para o centro. A curva segue Gordon, Huxley &amp; Julian (1966).</p>
+      </section>
+
+      <section class="ra-box" aria-label="Realidade aumentada">
+        <model-viewer id="arViewer" alt="Modelo fisiológico em realidade aumentada" ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" ar-scale="fixed" camera-controls loading="eager" reveal="auto" shadow-intensity="1" exposure="1.1"></model-viewer>
+        <button id="launchAR" class="ra-launch" type="button" disabled>Colocar este nível no ambiente</button>
+        <p id="raStatus" class="ra-status">Preparando o modelo para a câmera…</p>
+      </section>
+    </aside>
+  </section>
+
+  <section class="learning-strip"><div><span class="eyebrow">Ideia central</span><h2>Do que vemos ao que produz força</h2></div><p>O objetivo não é apenas reconhecer estruturas. O aluno acompanha a hierarquia até chegar à unidade contrátil, onde o deslizamento entre filamentos altera o comprimento do sarcômero — e a sobreposição entre actina e miosina decide quanta força pode ser produzida.</p></section>
+</main>
+<footer>Simuladores interativos utilizados nas disciplinas de Fisiologia Humana do Prof. Mário César Nascimento, PhD ©</footer>
+<script type="module" src="app.js"></script>
+</body>
+</html>

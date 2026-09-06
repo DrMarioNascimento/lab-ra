@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="pt-BR" data-ra-protected>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#05070d">
+<title>A janela embaçada — cadeia · Laboratório RA</title>
+<link rel="stylesheet" href="laboratorio.css">
+<!--
+  BANCADA 05 · SEGUNDA TELA — A JANELA EMBAÇADA
+  ==========================================================================
+  O sextante não mede direção: mede ALTURA. Foi a primeira coisa a acertar
+  aqui, porque a versão anterior desta ideia pedia ao jogador que "apontasse"
+  o instrumento para um lado, e instrumento nenhum faz isso.
+
+  Então o que o braço do sextante diz é uma LINHA no céu — a altura de 26° —, e
+  o que o jogador faz é varrer o horizonte até que uma estrela pouse sobre essa
+  linha. A hora escolhe ONDE ela pousa: o céu gira 15° por hora, e às 21:29 ela
+  cai sobre um ponto do litoral e não sobre outro.
+
+  E A COSTA TEM VÁRIAS LUZES, de propósito. Se houvesse um farol só, a estrela
+  seria enfeite: bastava olhar o horizonte. Com nove luzes iguais, a frase "da
+  estrela do céu você acha a estrela da terra" passa a ser a única maneira de
+  saber qual delas é o farol. A pista precisa ser o caminho, não a legenda.
+
+  O VIDRO EMBAÇADO não é gate nem enfeite: é o que faz a tela pedir a mão antes
+  de pedir a cabeça. Limpar é barato, imediato e ensina sem texto que aquilo é
+  um vidro visto de dentro de uma casa.
+-->
+<style>
+  .quadro{position:relative;margin-top:6px;border-radius:10px;overflow:hidden;
+    border:12px solid #2b1f14;box-shadow:0 0 0 1px #0c0805, inset 0 0 40px #000a,0 10px 26px #0009;
+    background:#05070d;touch-action:none}
+  .quadro canvas{display:block;width:100%;height:auto}
+  .quadro canvas.vidro{position:absolute;inset:0;height:100%;cursor:grab}
+  .peitoril{height:14px;background:linear-gradient(#3a2a1a,#20150c);border-radius:0 0 8px 8px;
+    box-shadow:0 4px 10px #0008}
+  .painel{margin-top:14px;display:grid;gap:12px}
+  .ctl{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;
+    padding:10px 12px;border:1px solid #3a2c20;border-radius:11px;background:#171009}
+  .ctl label{color:#c9bba3;font-size:14px;font-weight:600}
+  .ctl output{color:#ffe9ae;font-weight:700;font-variant-numeric:tabular-nums;min-width:5.4em;text-align:right}
+  .ctl input[type=range]{width:100%;accent-color:#c79b3a;height:32px}
+  .nota-estado{margin-top:12px;color:#c9bba3;font-size:15px;min-height:3em;line-height:1.5}
+  .acoes{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
+  .acoes button{min-height:48px;padding:12px 16px;border:1px solid #4a3826;border-radius:11px;
+    background:linear-gradient(#2a1f16,#1a120c);color:#f0e2c8;font-weight:700;cursor:pointer;
+    box-shadow:inset 0 1px #ffffff10,0 4px 0 #0b0705}
+  .acoes button.adiante{background:linear-gradient(#3a2c10,#241a08);border-color:#7d6320;color:#ffe9ae}
+  .aviso{margin-top:16px;padding:12px 14px;border-left:3px solid #e0b13a;background:#1b1409;
+    color:#d8c9a8;font-size:13.5px;line-height:1.5;border-radius:0 9px 9px 0}
+</style>
+</head>
+<body>
+<script src="guard.js"></script>
+<main>
+  <header>
+    <a class="brand" href="cadeia-escrivaninha.html">← A escrivaninha</a>
+    <h1>A janela embaçada</h1>
+    <p>O vidro está fechado desde cedo e a noite está limpa do outro lado. Passe a mão nele.</p>
+  </header>
+
+  <div class="quadro" id="quadro">
+    <canvas id="ceu"></canvas>
+    <canvas id="vidro" class="vidro"></canvas>
+  </div>
+  <div class="peitoril"></div>
+
+  <div class="painel">
+    <div class="ctl">
+      <label for="hora">Hora</label>
+      <input id="hora" type="range" min="1200" max="1380" step="1" value="1260">
+      <output id="oHora">21:00</output>
+    </div>
+    <div class="ctl">
+      <label for="az">Para onde se olha</label>
+      <input id="az" type="range" min="0" max="359" step="1" value="180">
+      <output id="oAz">180° S</output>
+    </div>
+    <div class="ctl">
+      <label for="grau">Braço do sextante</label>
+      <input id="grau" type="range" min="0" max="45" step="1" value="12">
+      <output id="oGrau">12°</output>
+    </div>
+  </div>
+
+  <p class="nota-estado" id="estado">O vidro está branco de vapor.</p>
+
+  <div class="acoes">
+    <button id="btAdiante" type="button" class="adiante" hidden>Ir até a parede</button>
+  </div>
+
+  <p class="aviso"><strong>Nesta bancada:</strong> o céu é desenhado, não fotografado, e gira 15° por hora como o de verdade. A altura de cada estrela não muda com a hora — é simplificação assumida, e é o que mantém a linha do sextante fazendo sentido durante a partida inteira.</p>
+</main>
+
+<script type="module">
+import { AZIMUTE, GRAU, HORA, DEV, marca, estado, vai, exige } from "./cadeia.js";
+
+if (exige("frase", "cadeia-escrivaninha.html")) arranca();
+
+function arranca() {
+const quadro = document.getElementById("quadro");
+const ceu = document.getElementById("ceu"), vidro = document.getElementById("vidro");
+const g = ceu.getContext("2d"), v = vidro.getContext("2d");
+const estadoTxt = document.getElementById("estado");
+const btAdiante = document.getElementById("btAdiante");
+const inHora = document.getElementById("hora"), inAz = document.getElementById("az"), inGrau = document.getElementById("grau");
+
+const FOV = 74;              /* graus de horizonte que cabem na janela */
+const ALT_MAX = 46;          /* graus de altura até o topo do vidro */
+const T0 = HORA.h * 60 + HORA.m;
+let W = 0, H = 0, ceuH = 0, limpo = 0, achado = false;
+
+/* ── O CÉU ───────────────────────────────────────────────────────────────────
+   Estrelas sorteadas por um gerador próprio, para o mesmo céu sair igual duas
+   vezes. Nenhuma delas pousa perto de 26°: com duas estrelas na mesma linha o
+   quebra-cabeça teria duas respostas, e a segunda seria a errada. */
+function rng(s) { let h = s >>> 0; return () => ((h = Math.imul(h ^ (h >>> 15), 2246822507) >>> 0) >>> 8) / 16777216; }
+const r = rng(0x51a17);
+/* A ALVO NÃO BRILHA MAIS QUE AS OUTRAS. Na primeira volta ela tinha halo
+   próprio e era a única com halo: dava para achá-la sem hora, sem grau e sem
+   entender nada — bastava procurar a estrela diferente. Agora o halo é de
+   todas as claras, e o que distingue a certa é estar sobre a linha. */
+const ESTRELAS = [{ az: AZIMUTE, alt: GRAU, brilho: 0.9, alvo: true }];
+for (let i = 0; i < 90; i++) {
+  let alt = 2 + r() * (ALT_MAX - 4);
+  if (Math.abs(alt - GRAU) < 4.5) alt += alt < GRAU ? -5 : 5;
+  ESTRELAS.push({ az: r() * 360, alt, brilho: 0.25 + r() * 0.75 });
+}
+
+/* ── AS LUZES DA COSTA ───────────────────────────────────────────────────────
+   Nove, iguais entre si. Uma é o farol; as outras são casa, boia, barco. */
+const LUZES = [{ az: AZIMUTE, farol: true }];
+for (const d of [-138, -96, -61, -34, 29, 57, 92, 141]) LUZES.push({ az: (AZIMUTE + d + 360) % 360, farol: false });
+
+const norm = (a) => { a = ((a + 180) % 360 + 360) % 360 - 180; return a; };
+const paraX = (az, centro) => W / 2 + (norm(az - centro) / FOV) * W;
+const paraY = (alt) => ceuH - (alt / ALT_MAX) * ceuH;
+const azDe = (e, min) => e.az + (min - T0) * 0.25;   /* o céu gira 15°/h = 0,25°/min */
+
+function rosa(a) {
+  const nomes = ["N", "NNE", "NE", "ENE", "L", "ESE", "SE", "SSE", "S", "SSO", "SO", "OSO", "O", "ONO", "NO", "NNO"];
+  return nomes[Math.round(a / 22.5) % 16];
+}
+
+function desenha() {
+  const min = +inHora.value, centro = +inAz.value, grau = +inGrau.value;
+  g.clearRect(0, 0, W, H);
+
+  /* céu: mais claro perto do horizonte, como noite de mar */
+  const cg = g.createLinearGradient(0, 0, 0, ceuH);
+  cg.addColorStop(0, "#03050c"); cg.addColorStop(0.72, "#080e1c"); cg.addColorStop(1, "#16223a");
+  g.fillStyle = cg; g.fillRect(0, 0, W, ceuH);
+
+  for (const e of ESTRELAS) {
+    const x = paraX(azDe(e, min), centro);
+    if (x < -6 || x > W + 6) continue;
+    const y = paraY(e.alt);
+    const raio = 1.0 + e.brilho * 1.6;
+    g.globalAlpha = 0.35 + e.brilho * 0.65;
+    g.fillStyle = "#e6ecff";
+    g.beginPath(); g.arc(x, y, raio, 0, 7); g.fill();
+    if (e.brilho > 0.85) { g.globalAlpha = 0.13; g.beginPath(); g.arc(x, y, raio * 4.2, 0, 7); g.fill(); }
+  }
+  g.globalAlpha = 1;
+
+  /* o mar e a linha da costa */
+  const mg = g.createLinearGradient(0, ceuH, 0, H);
+  mg.addColorStop(0, "#0b1526"); mg.addColorStop(1, "#050a12");
+  g.fillStyle = mg; g.fillRect(0, ceuH, W, H - ceuH);
+  g.strokeStyle = "#1d2c46"; g.lineWidth = 1.5;
+  g.beginPath(); g.moveTo(0, ceuH); g.lineTo(W, ceuH); g.stroke();
+
+  for (const l of LUZES) {
+    const x = paraX(l.az, centro);
+    if (x < -10 || x > W + 10) continue;
+    const y = ceuH + 2;
+    const piscando = l.farol && achado && (Date.now() % 4000 < 900);
+    g.globalAlpha = piscando ? 1 : 0.85;
+    g.fillStyle = piscando ? "#ffe9b0" : "#e8c98a";
+    g.beginPath(); g.arc(x, y, piscando ? 4.2 : 2.6, 0, 7); g.fill();
+    g.globalAlpha = piscando ? 0.30 : 0.10;
+    g.beginPath(); g.arc(x, y, piscando ? 22 : 10, 0, 7); g.fill();
+  }
+  g.globalAlpha = 1;
+
+  /* A LINHA DO SEXTANTE: a altura que o braço está marcando, atravessando o
+     vidro. É o instrumento posto sobre o céu, e não uma mira. */
+  const y = paraY(grau);
+  g.strokeStyle = "rgba(206,164,72,0.55)"; g.lineWidth = 1.2;
+  g.setLineDash([7, 6]); g.beginPath(); g.moveTo(0, y); g.lineTo(W, y); g.stroke();
+  g.setLineDash([]);
+  g.fillStyle = "rgba(226,190,110,0.92)";
+  g.font = "600 13px system-ui,sans-serif";
+  g.fillText(grau + "°", 8, y - 6);
+
+  requestAnimationFrame(desenha);
+}
+
+/* ── O VIDRO ─────────────────────────────────────────────────────────────────
+   Vapor por cima, apagado a dedo. A fração limpa é medida por amostragem numa
+   grade grossa: ler o canvas inteiro a cada movimento custaria caro e mediria
+   a mesma coisa. */
+function embaça() {
+  v.globalCompositeOperation = "source-over";
+  v.fillStyle = "#c9d6e4";
+  v.fillRect(0, 0, W, H);
+  v.globalAlpha = 1;
+  limpo = 0;
+}
+function limpa(x, y) {
+  v.globalCompositeOperation = "destination-out";
+  const grad = v.createRadialGradient(x, y, 0, x, y, 34);
+  grad.addColorStop(0, "rgba(0,0,0,1)"); grad.addColorStop(0.7, "rgba(0,0,0,0.85)"); grad.addColorStop(1, "rgba(0,0,0,0)");
+  v.fillStyle = grad;
+  v.beginPath(); v.arc(x, y, 34, 0, 7); v.fill();
+}
+/* getImageData ignora a transformação do contexto e devolve pixel de
+   dispositivo — então a grade é medida em vidro.width, e não em W. Medir em
+   coordenadas de CSS num canvas com dpr 2 leria só o quarto superior esquerdo,
+   e o vidro pareceria limpo cedo demais. */
+function medeLimpo() {
+  const lw = vidro.width, lh = vidro.height, passo = Math.max(8, Math.round(lw / 48));
+  let total = 0, vazio = 0;
+  const d = v.getImageData(0, 0, lw, lh).data;
+  for (let y = 0; y < lh; y += passo) for (let x = 0; x < lw; x += passo) {
+    total++;
+    if (d[(y * lw + x) * 4 + 3] < 90) vazio++;
+  }
+  limpo = vazio / Math.max(1, total);
+}
+
+let arrastando = false, medindo = 0;
+function ponto(ev) {
+  const r = vidro.getBoundingClientRect();
+  return [(ev.clientX - r.left) * (W / r.width), (ev.clientY - r.top) * (H / r.height)];
+}
+vidro.addEventListener("pointerdown", (ev) => {
+  try { vidro.setPointerCapture(ev.pointerId); } catch (e) {}
+  arrastando = true;
+  const [x, y] = ponto(ev);
+  limpa(x, y);
+  toca(x, y);
+});
+vidro.addEventListener("pointermove", (ev) => {
+  if (!arrastando) return;
+  const [x, y] = ponto(ev);
+  limpa(x, y);
+  clearTimeout(medindo);
+  medindo = setTimeout(() => { medeLimpo(); conta(); }, 140);
+});
+addEventListener("pointerup", () => { arrastando = false; medeLimpo(); conta(); });
+
+/* ── O ACERTO ────────────────────────────────────────────────────────────────
+   Tocar na luz certa não basta: sem a hora e sem o grau, qualquer uma daquelas
+   nove luzes seria um palpite tão bom quanto. A conferência é da CADEIA, não
+   do toque — é isso que impede o jogador de resolver por tentativa. */
+function toca(x, y) {
+  if (achado || limpo < 0.42) return;
+  if (Math.abs(y - ceuH) > 30) return;
+  const centro = +inAz.value, min = +inHora.value, grau = +inGrau.value;
+  let perto = null, dist = 26;
+  for (const l of LUZES) {
+    const d = Math.abs(paraX(l.az, centro) - x);
+    if (d < dist) { dist = d; perto = l; }
+  }
+  if (!perto) return;
+  if (!perto.farol) {
+    estadoTxt.textContent = "Uma luz qualquer da costa — casa, boia, barco parado. Não é essa.";
+    return;
+  }
+  const horaOk = Math.abs(min - T0) <= 1;
+  const grauOk = grau === GRAU;
+  if (!horaOk || !grauOk) {
+    estadoTxt.textContent = "É uma luz como as outras oito. Sem saber a que altura procurar, e a que hora, não dá para dizer qual delas é o farol.";
+    return;
+  }
+  achado = true;
+  marca("farol");
+  btAdiante.hidden = false;
+  estadoTxt.textContent = "A estrela pousou na linha, e logo abaixo dela a luz responde: um lampejo longo a cada quatro segundos. É o farol — e ele fica a sudoeste.";
+}
+
+function conta() {
+  if (achado) return;
+  if (limpo < 0.42) { estadoTxt.textContent = "O vapor vai saindo. Ainda dá para ver pouca coisa."; return; }
+  estadoTxt.textContent = "Céu limpo, e a costa cheia de luzes pequenas — nove, dez. Uma delas é o farol.";
+}
+
+/* ── LIGA ────────────────────────────────────────────────────────────────── */
+function mostra() {
+  const min = +inHora.value;
+  document.getElementById("oHora").textContent =
+    String(Math.floor(min / 60)).padStart(2, "0") + ":" + String(min % 60).padStart(2, "0");
+  document.getElementById("oAz").textContent = inAz.value + "° " + rosa(+inAz.value);
+  document.getElementById("oGrau").textContent = inGrau.value + "°";
+}
+for (const el of [inHora, inAz, inGrau]) el.addEventListener("input", mostra);
+
+function dimensiona() {
+  const larg = quadro.clientWidth;
+  const dpr = Math.min(2, devicePixelRatio || 1);
+  const alt = Math.round(Math.min(larg * 0.72, innerHeight * 0.52));
+  for (const c of [ceu, vidro]) {
+    c.width = Math.round(larg * dpr); c.height = Math.round(alt * dpr);
+    c.style.height = alt + "px";
+    c.getContext("2d").setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  W = larg; H = alt; ceuH = Math.round(alt * 0.76);
+  embaça();
+}
+addEventListener("resize", dimensiona);
+dimensiona();
+mostra();
+desenha();
+
+btAdiante.onclick = () => vai("cadeia-parede.html");
+if (estado().farol) { achado = true; btAdiante.hidden = false; }
+if (DEV) estadoTxt.textContent += " · dev: hora " + T0 + ", grau " + GRAU + ", azimute " + AZIMUTE;
+}
+</script>
+</body>
+</html>

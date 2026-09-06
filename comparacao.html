@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="pt-BR" data-ra-protected>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#070605" />
+  <title>Escala e imprecisão · Laboratório RA</title>
+  <link rel="icon" href="brand/dragon-mark.webp" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=IBM+Plex+Mono:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="laboratorio.css" />
+  <script src="guard.js"></script>
+  <style>
+    .mra-shell { overflow: hidden; border: 1px solid var(--line); border-radius: 18px; background: #17130f; box-shadow: 0 18px 55px #0009; }
+    .mra-head { padding: 13px 16px; background: #211a13; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .mra-title { font: 700 .78rem var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+    .mra-status { color: var(--gold2); font-size: .75rem; text-align: right; }
+    .mra-view { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: linear-gradient(#746b60 0 58%, #4e4031 58%); touch-action: none; cursor: crosshair; }
+    .mra-view video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: none; }
+    .mra-room { position: absolute; inset: 0; background: linear-gradient(165deg, transparent 0 54%, #0002 54% 55%, transparent 55%), linear-gradient(#81796f 0 58%, #4b3c2f 58%); }
+    .mra-room::before { content: ""; position: absolute; left: 15%; top: 12%; width: 26%; height: 37%; background: #342c25; border: 8px solid #584636; box-shadow: inset 0 0 0 2px #ad895b55; }
+    .mra-room::after { content: "CENÁRIO DEMONSTRATIVO — toque onde estaria o assento"; position: absolute; left: 12px; bottom: 10px; color: #fff9; font: 500 .68rem var(--mono); letter-spacing: .04em; text-shadow: 0 1px 3px #000; }
+    .mra-chair { position: absolute; left: 50%; top: 57%; width: 120px; height: 110px; transform: translate(-50%, -50%); opacity: .82; }
+    .mra-chair i { position: absolute; background: #30251d; }
+    .mra-chair .chair-back { left: 24px; top: 0; width: 72px; height: 50px; border-radius: 8px 8px 3px 3px; }
+    .mra-chair .seat { left: 15px; top: 48px; width: 90px; height: 19px; transform: skewX(-14deg); border-radius: 3px; }
+    .mra-chair .leg-one { left: 22px; top: 62px; width: 8px; height: 48px; transform: rotate(5deg); }
+    .mra-chair .leg-two { right: 22px; top: 62px; width: 8px; height: 48px; transform: rotate(-5deg); }
+    .mra-target { position: absolute; width: 72px; height: 72px; border: 1px solid #eac879; border-radius: 50%; transform: translate(-50%, -50%); display: none; box-shadow: 0 0 24px #f2c96988; }
+    .mra-target::before, .mra-target::after { content: ""; position: absolute; background: #eac879; }
+    .mra-target::before { width: 88px; height: 1px; left: -8px; top: 35px; }
+    .mra-target::after { height: 88px; width: 1px; top: -8px; left: 35px; }
+    .mra-overlay { position: absolute; left: 50%; top: 57%; transform: translate(-50%, -50%); pointer-events: none; display: none; }
+    .mra-overlay.show { display: block; animation: mra-build 1.5s ease-out both; }
+    @keyframes mra-build { 0% { opacity: 0; filter: blur(8px); transform: translate(-50%, -40%) scale(.72); } 55% { opacity: .75; } 100% { opacity: 1; filter: none; transform: translate(-50%, -50%) scale(1); } }
+    .desk { width: 350px; height: 210px; }
+    .desk .top { position: absolute; left: 0; top: 55px; width: 350px; height: 30px; background: #714829cc; border: 1px solid #e4b36c; transform: skewX(-10deg); box-shadow: 0 0 30px #d6924688; }
+    .desk .side { position: absolute; top: 85px; width: 72px; height: 120px; background: #51321fe8; border: 1px solid #dba35c; }
+    .desk .side.a { left: 22px; }
+    .desk .side.b { right: 22px; }
+    .desk .drawer { position: absolute; left: 112px; top: 88px; width: 126px; height: 45px; background: #624027dd; border: 1px solid #e0a961; box-shadow: inset 0 0 15px #0008; }
+    .desk .drawer::after { content: ""; position: absolute; left: 54px; top: 16px; width: 18px; height: 6px; border: 2px solid #d6ae71; border-radius: 8px; }
+    .projector { width: 240px; height: 190px; }
+    .projector .machine { position: absolute; left: 78px; bottom: 20px; width: 84px; height: 48px; background: #282621e8; border: 1px solid #e3c77f; border-radius: 5px; box-shadow: 0 0 24px #ffd66b88; }
+    .projector .reel { position: absolute; top: -34px; width: 61px; height: 61px; border: 5px dotted #e7d29b; border-radius: 50%; animation: mra-spin 4s linear infinite; }
+    .projector .r1 { left: 1px; }
+    .projector .r2 { right: 1px; }
+    .projector .beam { position: absolute; left: 118px; bottom: 62px; width: 0; height: 0; border-left: 75px solid transparent; border-right: 75px solid transparent; border-bottom: 105px solid #ffe39a2c; filter: drop-shadow(0 0 8px #ffd66b); transform: translateX(-50%); }
+    .projector .film { position: absolute; left: 30px; top: -54px; width: 180px; height: 100px; display: grid; place-items: center; background: #e8d6ab22; border: 1px solid #f4d990; box-shadow: 0 0 28px #ffd66b66; color: #ffecc2; font: 500 .75rem Georgia, serif; text-align: center; text-shadow: 0 1px 3px #000; }
+    @keyframes mra-spin { to { transform: rotate(360deg); } }
+    .mra-scan { position: absolute; left: 0; right: 0; height: 2px; top: 10%; display: none; background: #efd07b; box-shadow: 0 0 16px #ffe49a; animation: mra-scan 1.4s ease-in-out 2; }
+    @keyframes mra-scan { to { top: 90%; } }
+    .mra-message { position: absolute; left: 50%; top: 12px; transform: translateX(-50%); max-width: 90%; overflow: hidden; padding: 8px 12px; border: 1px solid #cba35c; border-radius: 999px; background: #17130fdd; font-size: .75rem; white-space: nowrap; text-overflow: ellipsis; }
+    .mra-controls { padding: 14px 16px 16px; display: grid; gap: 12px; background: #211a13; }
+    .mra-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .mra-controls button { min-height: 44px; border: 1px solid #796346; border-radius: 10px; background: #33281d; color: var(--cream); padding: 9px 12px; cursor: pointer; }
+    .mra-controls button.active, .mra-controls button.primary { background: var(--gold); border-color: var(--gold2); color: #1a1209; font-weight: 700; }
+    .mra-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .mra-actions button { flex: 1 1 160px; }
+    .mra-controls label { display: grid; gap: 5px; color: #d9c4a1; font-size: .78rem; }
+    .mra-controls input[type="range"] { width: 100%; accent-color: var(--gold); }
+    .mra-note { color: #baa98d; font-size: .78rem; }
+    @media (max-width: 520px) { .mra-view { aspect-ratio: 3 / 4; } .desk { scale: .78; } .mra-message { font-size: .68rem; } }
+    @media (prefers-reduced-motion: reduce) { .mra-shell * { animation: none !important; } }
+  </style>
+</head>
+<body>
+  <header class="topbar"><nav class="nav shell" aria-label="Laboratório"><a class="brand" href="bancadas.html"><img src="brand/dragon-mark.webp" alt="" width="42" height="42" /><span class="brand-copy"><b>DRAGON GAMES</b><span>Lab RA</span></span></a><div class="nav-actions"><a class="small-button" href="index.html">Testes</a></div></nav></header>
+  <main class="page shell">
+    <div class="page-head"><div><span class="eyebrow">Teste 01 · câmera</span><h1>Escala e imprecisão</h1></div><a class="back-link" href="index.html">← Voltar</a></div>
+    <p class="page-note">Este teste compara duas representações sobre a imagem da câmera. O toque marca manualmente o assento; ainda não há reconhecimento automático da cadeira.</p>
+    <section class="mra-shell" aria-label="Comparação das duas representações de realidade aumentada">
+      <header class="mra-head"><span class="mra-title">MOSAICO · Reconstrução</span><span class="mra-status" id="mra-status">À procura do objeto-chave</span></header>
+      <div class="mra-view" id="mra-view">
+        <video id="mra-video" playsinline muted></video>
+        <div class="mra-room" id="mra-room"></div>
+        <div class="mra-chair" id="mra-chair" aria-hidden="true"><i class="chair-back"></i><i class="seat"></i><i class="leg-one"></i><i class="leg-two"></i></div>
+        <div class="mra-scan" id="mra-scan"></div>
+        <div class="mra-target" id="mra-target"></div>
+        <div class="mra-overlay desk" id="mra-desk" aria-label="Escrivaninha virtual grande"><div class="top"></div><div class="side a"></div><div class="side b"></div><div class="drawer"></div></div>
+        <div class="mra-overlay projector" id="mra-projector" aria-label="Projetor pequeno sobre o assento"><div class="beam"></div><div class="film">REGISTRO 08<br />22h17 · SALA NORTE</div><div class="machine"><div class="reel r1"></div><div class="reel r2"></div></div></div>
+        <div class="mra-message" id="mra-message">Enquadre uma cadeira e toque sobre o assento</div>
+      </div>
+      <div class="mra-controls">
+        <div class="mra-tabs" role="group" aria-label="Tamanho da reconstrução"><button type="button" id="mra-large">Escrivaninha grande</button><button type="button" id="mra-small" class="active">Projetor e filme menores</button></div>
+        <label>Imprecisão simulada: <span id="mra-offset-label">20 cm</span><input id="mra-offset" type="range" min="0" max="60" value="20" step="5" /></label>
+        <div class="mra-actions"><button type="button" id="mra-camera">Usar minha câmera</button><button type="button" id="mra-run" class="primary">Simular reconhecimento</button></div>
+        <div class="mra-note" id="mra-note" aria-live="polite">Compare quanto o desalinhamento incomoda em cada escala. Toque na imagem para reposicionar a marca.</div>
+      </div>
+    </section>
+  </main>
+  <footer>Simuladores interativos do projeto MOSAICO do Prof. Mário César Nascimento, PhD ©</footer>
+  <script>
+    (() => {
+      const root = document.querySelector(".mra-shell");
+      const view = root.querySelector("#mra-view");
+      const video = root.querySelector("#mra-video");
+      const room = root.querySelector("#mra-room");
+      const chair = root.querySelector("#mra-chair");
+      const desk = root.querySelector("#mra-desk");
+      const projector = root.querySelector("#mra-projector");
+      const target = root.querySelector("#mra-target");
+      const status = root.querySelector("#mra-status");
+      const message = root.querySelector("#mra-message");
+      const scan = root.querySelector("#mra-scan");
+      const note = root.querySelector("#mra-note");
+      const range = root.querySelector("#mra-offset");
+      const rangeLabel = root.querySelector("#mra-offset-label");
+      let mode = "small";
+      let anchor = { x: 50, y: 57 };
+      let cameraStream = null;
+
+      function select(next) {
+        mode = next;
+        root.querySelector("#mra-large").classList.toggle("active", next === "large");
+        root.querySelector("#mra-small").classList.toggle("active", next === "small");
+        desk.classList.remove("show");
+        projector.classList.remove("show");
+        message.textContent = "Enquadre uma cadeira e toque sobre o assento";
+        status.textContent = "À procura do objeto-chave";
+      }
+
+      function place(x, y) {
+        anchor = { x, y };
+        target.style.left = x + "%";
+        target.style.top = y + "%";
+        target.style.display = "block";
+        chair.style.left = x + "%";
+        chair.style.top = y + "%";
+        message.textContent = "Assento marcado. Execute a simulação.";
+      }
+
+      view.addEventListener("pointerdown", event => {
+        const rect = view.getBoundingClientRect();
+        place((event.clientX - rect.left) / rect.width * 100, (event.clientY - rect.top) / rect.height * 100);
+      });
+
+      function run() {
+        desk.classList.remove("show");
+        projector.classList.remove("show");
+        scan.style.display = "block";
+        status.textContent = "Analisando estrutura…";
+        message.textContent = "Quatro apoios · encosto · carga estática";
+        window.setTimeout(() => {
+          scan.style.display = "none";
+          const centimeters = Number(range.value);
+          const pixels = centimeters * .28;
+          const angle = Math.PI * .68;
+          const dx = Math.cos(angle) * pixels;
+          const dy = Math.sin(angle) * pixels;
+          const element = mode === "large" ? desk : projector;
+          element.style.left = `calc(${anchor.x}% + ${dx}px)`;
+          element.style.top = `calc(${anchor.y}% + ${dy}px)`;
+          element.classList.add("show");
+          status.textContent = "Correspondência simulada";
+          message.textContent = mode === "large" ? "Reconstruindo a escrivaninha original…" : "Recuperando a película encontrada…";
+          note.textContent = mode === "large" ? "Observe quanto a cadeira real atravessa a reconstrução maior." : "Observe como o feixe e a projeção absorvem o mesmo desalinhamento.";
+        }, 1800);
+      }
+
+      root.querySelector("#mra-large").addEventListener("click", () => select("large"));
+      root.querySelector("#mra-small").addEventListener("click", () => select("small"));
+      root.querySelector("#mra-run").addEventListener("click", run);
+      range.addEventListener("input", () => { rangeLabel.textContent = range.value + " cm"; });
+      root.querySelector("#mra-camera").addEventListener("click", async () => {
+        try {
+          if (!navigator.mediaDevices?.getUserMedia) throw new Error("camera-unavailable");
+          cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } }, audio: false });
+          video.srcObject = cameraStream;
+          await video.play();
+          video.style.display = "block";
+          room.style.display = "none";
+          chair.style.display = "none";
+          message.textContent = "Aponte para uma cadeira e toque sobre o assento";
+          note.textContent = "A câmera está ativa somente nesta página e a imagem não é enviada pelo laboratório.";
+        } catch (error) {
+          message.textContent = "Câmera indisponível; use o cenário demonstrativo.";
+        }
+      });
+      window.addEventListener("pagehide", () => cameraStream?.getTracks().forEach(track => track.stop()));
+    })();
+  </script>
+</body>
+</html>

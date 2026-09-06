@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="pt-BR" data-ra-protected>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050403">
+<title>A parede — cadeia · Laboratório RA</title>
+<link rel="stylesheet" href="laboratorio.css">
+<!--
+  BANCADA 05 · TERCEIRA TELA — A PAREDE
+  ==========================================================================
+  ESTA TELA NÃO É model-viewer, e a escolha é o assunto todo. O model-viewer
+  POSICIONA coisas — ele põe um móvel no seu chão e deixa você andar em volta.
+  Ele não põe você DENTRO de um lugar. E a última pista é sobre estar dentro:
+  "na altura do que seus olhos veem" só quer dizer alguma coisa para quem está
+  parado num quarto, olhando para uma parede.
+
+  Então aqui é o motor da Sala às Escuras: quarto em perspectiva de um ponto,
+  visto da altura dos olhos. E é isso que resolve o enigma sem número nenhum —
+  a LINHA DO HORIZONTE de uma perspectiva de um ponto fica exatamente na altura
+  do olho de quem vê. O compartimento está onde o facho cruza essa linha.
+
+  POR QUE NÃO UM CONTROLE EM METROS: porque "1,55 m" seria a resposta escrita
+  no enunciado. A pista do jogador diz "a altura do que seus olhos veem", e a
+  tela devolve exatamente isso — uma altura que se enxerga, não um número que
+  se digita.
+
+  O FACHO PISCA DE QUATRO EM QUATRO SEGUNDOS, a mesma assinatura que o farol
+  deu na janela. É a continuidade que diz, sem texto, que a luz que entra aqui
+  é aquela luz de lá.
+-->
+<style>
+  .quarto{position:relative;margin-top:6px;border-radius:12px;overflow:hidden;
+    border:1px solid #241a12;background:#030303;touch-action:none;
+    box-shadow:0 12px 30px #000a}
+  .quarto canvas{display:block;width:100%;height:auto;cursor:ns-resize}
+  .acoes{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
+  .acoes button{min-height:48px;padding:12px 16px;border:1px solid #4a3826;border-radius:11px;
+    background:linear-gradient(#2a1f16,#1a120c);color:#f0e2c8;font-weight:700;cursor:pointer;
+    box-shadow:inset 0 1px #ffffff10,0 4px 0 #0b0705}
+  .acoes button:active{transform:translateY(2px);box-shadow:inset 0 1px #ffffff10,0 1px 0 #0b0705}
+  .nota-estado{margin-top:12px;color:#c9bba3;font-size:15px;min-height:3em;line-height:1.5}
+  .documento{margin-top:16px;padding:18px 20px;border:1px solid #7d6320;border-radius:12px;
+    background:linear-gradient(#1e1608,#140f06);color:#f0e2c8;line-height:1.65;font-size:15.5px}
+  .documento h2{margin:0 0 10px;font-size:17px;color:#ffe9ae;letter-spacing:.02em}
+  .documento p{margin:0 0 10px}
+  .documento p:last-child{margin:0;color:#c9bba3;font-size:14px}
+  .aviso{margin-top:16px;padding:12px 14px;border-left:3px solid #e0b13a;background:#1b1409;
+    color:#d8c9a8;font-size:13.5px;line-height:1.5;border-radius:0 9px 9px 0}
+</style>
+</head>
+<body>
+<script src="guard.js"></script>
+<main>
+  <header>
+    <a class="brand" href="cadeia-janela.html">← A janela</a>
+    <h1>A parede</h1>
+    <p>Terceira e última tela. O quarto está no escuro; a cada quatro segundos o farol passa por ele.</p>
+  </header>
+
+  <div class="quarto" id="quarto"><canvas id="cv"></canvas></div>
+
+  <div class="acoes">
+    <button id="btApertar" type="button">Apertar aqui</button>
+  </div>
+  <p class="nota-estado" id="estado">Escuro. Espere o facho passar.</p>
+
+  <section class="documento" id="doc" hidden>
+    <h2>O que estava atrás da parede</h2>
+    <p id="docTexto"></p>
+    <p>Três telas, três lugares: uma mesa que se roda, um vidro que se limpa e um quarto onde se está dentro.</p>
+  </section>
+
+  <p class="aviso"><strong>Nesta bancada:</strong> não há câmera nem modelo 3D — o quarto é desenhado, e funciona no escuro, que é como a Casa é jogada. A altura certa não é um número: é a linha para onde as arestas do quarto convergem.</p>
+</main>
+
+<script type="module">
+import { ALTURA_OLHOS, DEV, marca, estado, exige } from "./cadeia.js";
+
+if (exige("farol", "cadeia-janela.html")) arranca();
+
+function arranca() {
+const quarto = document.getElementById("quarto");
+const cv = document.getElementById("cv"), g = cv.getContext("2d");
+const estadoTxt = document.getElementById("estado");
+const btApertar = document.getElementById("btApertar");
+
+let W = 0, H = 0, VPy = 0, marcaY = 0, aberto = false, jaViu = false;
+const PERIODO = 4000, PULSO = 1100;
+const FACHO = 0.38;              /* onde o facho cruza a parede do fundo */
+
+/* ── A GEOMETRIA DO QUARTO ───────────────────────────────────────────────────
+   Perspectiva de um ponto: a parede do fundo é um retângulo em volta do ponto
+   de fuga, e as quinas do quarto são as retas que vão dele até os cantos da
+   tela. O ponto de fuga fica na altura do olho — é isso, e só isso, que dá
+   sentido à pista. */
+function fundo() {
+  const lw = W * 0.46, lh = H * 0.50;
+  return { x1: W / 2 - lw / 2, x2: W / 2 + lw / 2, y1: VPy - lh * 0.52, y2: VPy + lh * 0.48 };
+}
+
+/* `forcado` desenha UM quadro num instante escolhido, sem reagendar. Existe
+   porque o requestAnimationFrame para quando a aba não está à vista — o que é
+   certo para o jogador e péssimo para quem confere: sem isso não há como olhar
+   o quarto no meio do lampejo. Só vale em dev. */
+function desenha(forcado) {
+  const t = (forcado === undefined ? Date.now() : forcado) % PERIODO;
+  const brilho = t < PULSO ? Math.sin((t / PULSO) * Math.PI) ** 0.7 : 0;
+  const f = fundo();
+
+  g.fillStyle = "#040404"; g.fillRect(0, 0, W, H);
+
+  /* o quarto só existe enquanto a luz passa */
+  if (brilho > 0.02) {
+    g.save();
+    g.globalAlpha = Math.min(1, brilho);
+    /* parede do fundo */
+    g.fillStyle = "#2a2622"; g.fillRect(f.x1, f.y1, f.x2 - f.x1, f.y2 - f.y1);
+    /* paredes laterais, teto e chão, por gradiente para escurecer ao se afastar */
+    const lados = [
+      [[0, 0], [f.x1, f.y1], [f.x1, f.y2], [0, H], "#1d1a17"],
+      [[W, 0], [f.x2, f.y1], [f.x2, f.y2], [W, H], "#211d1a"],
+      [[0, 0], [f.x1, f.y1], [f.x2, f.y1], [W, 0], "#171512"],
+      [[0, H], [f.x1, f.y2], [f.x2, f.y2], [W, H], "#241f19"],
+    ];
+    for (const [a, b, c, d, cor] of lados) {
+      g.fillStyle = cor;
+      g.beginPath(); g.moveTo(...a); g.lineTo(...b); g.lineTo(...c); g.lineTo(...d); g.closePath(); g.fill();
+    }
+    /* as quinas: são elas que denunciam para onde tudo converge */
+    g.strokeStyle = "rgba(255,236,200,0.20)"; g.lineWidth = 1;
+    g.beginPath();
+    for (const [x, y] of [[0, 0], [W, 0], [0, H], [W, H]]) {
+      g.moveTo(x, y);
+      g.lineTo(x < W / 2 ? f.x1 : f.x2, y < H / 2 ? f.y1 : f.y2);
+    }
+    g.rect(f.x1, f.y1, f.x2 - f.x1, f.y2 - f.y1);
+    g.stroke();
+
+    /* AS TÁBUAS DO ASSOALHO, e as do forro. Elas são o enunciado da última
+       pista: numa perspectiva de um ponto, toda reta que corre para o fundo
+       aponta para a altura do olho de quem olha. Sem elas o quarto tinha só
+       quatro quinas, e "a altura do que seus olhos veem" virava adivinhação —
+       a pista existe, mas nada na tela deixava lê-la. */
+    g.strokeStyle = "rgba(255,236,200,0.13)";
+    g.beginPath();
+    const ate = (px, py, yAlvo) => {
+      const t = (yAlvo - py) / (VPy - py);
+      return [px + (W / 2 - px) * t, yAlvo];
+    };
+    for (let i = -2; i <= 8; i++) {
+      const x = (i / 6) * W;
+      g.moveTo(x, H); g.lineTo(...ate(x, H, f.y2));
+      if (i % 2 === 0) { g.moveTo(x, 0); g.lineTo(...ate(x, 0, f.y1)); }
+    }
+    g.stroke();
+    g.restore();
+  }
+
+  /* O FACHO: uma coluna vertical na parede do fundo, e o rasgo da janela na
+     parede da esquerda por onde ela entra. */
+  const fx = f.x1 + (f.x2 - f.x1) * FACHO;
+  const larg = Math.max(10, (f.x2 - f.x1) * 0.075);
+  const col = g.createLinearGradient(fx - larg, 0, fx + larg, 0);
+  col.addColorStop(0, "rgba(255,238,196,0)");
+  col.addColorStop(0.5, "rgba(255,238,196," + (0.10 + brilho * 0.55).toFixed(3) + ")");
+  col.addColorStop(1, "rgba(255,238,196,0)");
+  g.fillStyle = col;
+  g.fillRect(fx - larg, f.y1, larg * 2, f.y2 - f.y1);
+
+  g.globalAlpha = 0.12 + brilho * 0.5;
+  g.fillStyle = "#ffeec4";
+  g.beginPath();
+  g.moveTo(W * 0.055, H * 0.30); g.lineTo(f.x1 * 0.72, VPy - H * 0.14);
+  g.lineTo(f.x1 * 0.72, VPy + H * 0.10); g.lineTo(W * 0.055, H * 0.78);
+  g.closePath(); g.fill();
+  g.globalAlpha = 1;
+
+  /* A MARCA que o jogador desliza. Anda só na vertical: a coluna já resolveu a
+     horizontal, e deixar as duas soltas transformaria uma leitura numa
+     varredura. */
+  g.strokeStyle = aberto ? "rgba(255,233,174,0.95)" : "rgba(226,190,110,0.85)";
+  g.lineWidth = 2;
+  g.beginPath();
+  g.moveTo(fx - larg * 1.5, marcaY); g.lineTo(fx + larg * 1.5, marcaY);
+  g.stroke();
+  g.beginPath(); g.arc(fx, marcaY, 4.5, 0, 7); g.stroke();
+
+  if (aberto) {
+    /* o compartimento, escancarado */
+    const h = Math.max(26, (f.y2 - f.y1) * 0.20), w = larg * 2.6;
+    g.fillStyle = "#0a0806";
+    g.fillRect(fx - w / 2, marcaY - h / 2, w, h);
+    g.strokeStyle = "rgba(255,233,174,0.9)"; g.lineWidth = 1.5;
+    g.strokeRect(fx - w / 2, marcaY - h / 2, w, h);
+    g.fillStyle = "rgba(224,208,176,0.92)";
+    g.fillRect(fx - w * 0.32, marcaY - h * 0.28, w * 0.64, h * 0.56);
+  }
+
+  /* rAF entrega o carimbo de tempo como primeiro argumento — passar `desenha`
+     direto faria o próprio agendador virar o "forçado" e o lampejo pararia. */
+  if (forcado === undefined) requestAnimationFrame(() => desenha());
+}
+if (DEV) window.__quadro = desenha;
+
+/* arrastar a marca */
+function mexe(ev) {
+  if (aberto) return;
+  const r = cv.getBoundingClientRect();
+  marcaY = Math.max(20, Math.min(H - 20, (ev.clientY - r.top) * (H / r.height)));
+}
+cv.addEventListener("pointerdown", (ev) => {
+  try { cv.setPointerCapture(ev.pointerId); } catch (e) {}
+  mexe(ev);
+});
+cv.addEventListener("pointermove", (ev) => { if (ev.buttons) mexe(ev); });
+
+btApertar.onclick = () => {
+  if (aberto) return;
+  const erro = Math.abs(marcaY - VPy);
+  const tol = Math.max(9, H * 0.022);
+  if (erro > tol) {
+    estadoTxt.textContent = erro > H * 0.14
+      ? "Parede maciça. O som é curto, sem vazio atrás."
+      : "Quase. A parede aqui ainda é cheia — falta pouco.";
+    return;
+  }
+  aberto = true;
+  marcaY = VPy;
+  marca("documento");
+  estadoTxt.textContent = "A um palmo do lugar onde o facho cruza a altura dos olhos, a parede cede para dentro.";
+  document.getElementById("doc").hidden = false;
+  document.getElementById("docTexto").textContent =
+    "Um envelope de papel encerado, guardado a " + ALTURA_OLHOS.toFixed(2).replace(".", ",") +
+    " m do assoalho — a altura de quem o escondeu de pé, sem se abaixar nem esticar. " +
+    "Dentro, três folhas presas por um clipe enferrujado, e no alto da primeira uma data riscada e escrita de novo.";
+  document.getElementById("doc").scrollIntoView({ behavior: "smooth", block: "nearest" });
+};
+
+function dimensiona() {
+  const larg = quarto.clientWidth;
+  const dpr = Math.min(2, devicePixelRatio || 1);
+  const alt = Math.round(Math.min(larg * 0.70, innerHeight * 0.56));
+  cv.width = Math.round(larg * dpr); cv.height = Math.round(alt * dpr);
+  cv.style.height = alt + "px";
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const antes = VPy;
+  W = larg; H = alt; VPy = Math.round(alt * 0.52);
+  marcaY = antes ? marcaY * (VPy / antes) : Math.round(alt * 0.30);
+}
+addEventListener("resize", dimensiona);
+dimensiona();
+desenha();
+
+setTimeout(() => {
+  if (!jaViu) { jaViu = true; estadoTxt.textContent = "O facho varre a parede do fundo e deixa uma coluna de luz. Alguma coisa foi escondida nela — resta a altura."; }
+}, PERIODO);
+
+/* quem já abriu não precisa procurar de novo ao voltar */
+if (estado().documento) { marcaY = VPy; btApertar.click(); }
+if (DEV) estadoTxt.textContent += " · dev: a linha do horizonte está em y=" + VPy;
+}
+</script>
+</body>
+</html>
