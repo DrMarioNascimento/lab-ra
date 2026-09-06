@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prova de RA no iPhone · Laboratório do Pesquisar RA</title>
+<meta name="theme-color" content="#050a06">
+<link rel="stylesheet" href="laboratorio.css">
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.1.0/dist/model-viewer.min.js"></script>
+<style>
+  /* Página de diagnóstico, não de ensino: três casos iguais em tudo menos
+     no arquivo que o botão de RA recebe. É essa a variável em teste. */
+  .caso { border:1px solid #1f6b33; border-radius:14px; padding:14px; margin:0 0 18px; background:#0b120c; }
+  .caso h2 { margin:0 0 4px; font-size:1.05rem; color:#ffe066; }
+  .caso p  { margin:0 0 10px; color:#b0c4ac; font-size:.92rem; line-height:1.45; }
+  .caso model-viewer { width:100%; height:230px; background:#131d15; border-radius:10px; }
+  .caso .veredito { margin:8px 0 0; font-size:.86rem; color:#5fd177; font-family:'IBM Plex Mono',monospace; }
+  .entrega { display:inline-block; margin-top:8px; padding:2px 8px; border-radius:6px; background:#131d15;
+             color:#f5c518; font-family:'IBM Plex Mono',monospace; font-size:.8rem; }
+</style>
+</head>
+<body>
+<main class="wrap" style="max-width:640px;margin:0 auto;padding:22px 16px 60px">
+  <h1 style="color:#f2f7ec;font-size:1.4rem;margin:0 0 6px">Prova de RA no iPhone</h1>
+  <p style="color:#b0c4ac;line-height:1.5;margin:0 0 22px">
+    Os três blocos abaixo mostram <strong style="color:#ffe066">o mesmo móvel</strong>, com o mesmo
+    visualizador e as mesmas opções. Muda só uma coisa: o arquivo que o botão de RA entrega ao
+    sistema. Toque no botão de cada um e anote o que aconteceu — abriu a câmera ou baixou arquivo.
+  </p>
+
+  <section class="caso">
+    <h2>A · arquivo .usdz de verdade</h2>
+    <p>O iPhone recebe um endereço https que termina em <code>.usdz</code>.</p>
+    <model-viewer src="escrivaninha.glb" ios-src="escrivaninha.usdz" alt="Escrivaninha"
+      ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" ar-scale="fixed"
+      camera-controls loading="eager" reveal="auto" exposure="0.92" shadow-intensity="1.2"></model-viewer>
+    <span class="entrega">ios-src=escrivaninha.usdz</span>
+    <p class="veredito">Se só este abrir a câmera, o defeito está identificado.</p>
+  </section>
+
+  <section class="caso">
+    <h2>B · arquivo .glb, sem .usdz</h2>
+    <p>É o que as bancadas 03 e 04 fazem hoje: o visualizador converte na hora e entrega um <code>blob:</code>.</p>
+    <model-viewer src="escrivaninha.glb" alt="Escrivaninha"
+      ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" ar-scale="fixed"
+      camera-controls loading="eager" reveal="auto" exposure="0.92" shadow-intensity="1.2"></model-viewer>
+    <span class="entrega">src=escrivaninha.glb</span>
+  </section>
+
+  <section class="caso">
+    <h2>C · modelo gerado no navegador</h2>
+    <p>É o que as bancadas 06 e 07 fazem hoje: nem o <code>.glb</code> é arquivo, é <code>blob:</code> também.</p>
+    <model-viewer id="mvC" alt="Escrivaninha"
+      ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" ar-scale="fixed"
+      camera-controls loading="eager" reveal="auto" exposure="0.92" shadow-intensity="1.2"></model-viewer>
+    <span class="entrega" id="entregaC">preparando…</span>
+  </section>
+
+  <p style="color:#b0c4ac;font-size:.9rem;line-height:1.5">
+    <a href="bancadas.html" style="color:#f5c518">← voltar às bancadas</a>
+  </p>
+</main>
+
+<script type="module">
+  /* O caso C precisa nascer blob para valer como controle: buscar o arquivo e
+     reembrulhar reproduz exatamente a entrega das bancadas 06 e 07. */
+  const buf = await fetch('escrivaninha.glb').then(r => r.arrayBuffer());
+  const url = URL.createObjectURL(new Blob([buf], { type: 'model/gltf-binary' }));
+  document.getElementById('mvC').src = url;
+  document.getElementById('entregaC').textContent = 'src=blob: (' + (buf.byteLength / 1048576).toFixed(2) + ' MB)';
+</script>
+</body>
+</html>
