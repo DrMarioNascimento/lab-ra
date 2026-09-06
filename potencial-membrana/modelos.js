@@ -173,7 +173,7 @@ const M = {
   mielina: phys({ color: 0x9c8a6e, map: TEX.mielina, roughness: .56, sheen: .30,
     sheenColor: 0xf4e3c8, clearcoat: .10, clearcoatRoughness: .58 }),
   /* vidro de micropipeta: aqui clearcoat alto é a verdade do material */
-  vidro: phys({ color: 0xbcd6e4, roughness: .06, transmission: .0, transparent: true, opacity: .22,
+  vidro: phys({ color: 0xbcd6e4, roughness: .22, transmission: .0, transparent: true, opacity: .30,
     side: THREE.FrontSide, clearcoat: .9, clearcoatRoughness: .08, depthWrite: false }),
   metal: phys({ color: 0x9fa6ad, roughness: .32, metalness: .85 }),
 
@@ -202,8 +202,25 @@ const M = {
      gráfico à figura sem precisar de legenda: o aluno vê laranja nos dois
      lugares e entende que são a mesma coisa. Se alguém mudar uma, tem de
      mudar a outra — está anotado nos dois arquivos. */
-  marcador: phys({ color: 0xff9d2e, roughness: .35, clearcoat: .2, clearcoatRoughness: .4,
-    emissive: 0x7a3a02, emissiveIntensity: 1.1 }),
+  /* ── O MARCADOR É VIOLETA, E NÃO LARANJA ───────────────────────────
+     Duas descobertas, na ordem em que doeram:
+
+     1. O EMISSIVO FORTE LAVAVA A COR. Em 0xb35c05 a 1,5 a cinta saía cor de
+        creme: a cena usa mapeamento de tons ACES, que dessatura o que passa
+        do topo da faixa, e cor saturada mais emissivo forte estoura para o
+        branco. Ficou brasa fraca.
+     2. E MESMO CORRIGIDO, O LARANJA SUMIA — porque laranja é a cor que a
+        PELÍCULA usa para o lado positivo. Um marcador da mesma cor do que
+        ele deveria marcar não marca nada: em repouso a parede de fora é
+        âmbar, e a cinta desaparecia dentro dela.
+
+     Violeta resolve porque está fora do eixo âmbar↔azul do filme, então
+     contrasta nos dois estados. E não é escolha ao acaso: o valor de Vm no
+     alto da cena já é violeta. Instrumento de medida passa a ter uma cor
+     só, separada da cor do fenômeno. O ponto que corre sobre a curva mudou
+     junto — o elo é a igualdade, não o tom. */
+  marcador: phys({ color: 0xc9a3ff, roughness: .42, clearcoat: .12, clearcoatRoughness: .55,
+    emissive: 0x2a1a4a, emissiveIntensity: .6 }),
 
   /* ---- nível 02: a célula em corte ---- */
   /* O NÚCLEO NÃO PODE SER ROXO. Nesta página a cor diz SINAL DE CARGA — quente
@@ -1359,25 +1376,46 @@ function axonio() {
 
   /* ── O ELETRODO DE REGISTRO ────────────────────────────────────────────
      A ponta entra pela janela do corte e encosta na parede de DENTRO — que é
-     o que um registro intracelular é, e é de lá que sai o Vm do gráfico. Vai
-     como `foraDoQuadro`: é instrumento, não assunto, e sem isso ele
-     empurraria a câmera para trás e afinaria a parede. */
+     o que um registro intracelular é, e é de lá que sai o Vm do gráfico.
+
+     A PRIMEIRA VERSÃO NÃO LIA COMO INSTRUMENTO, e por três defeitos somados:
+
+     1. COMPRIMENTO. A haste media 2,73 no mundo, contra 0,62 de raio do
+        tubo — quatro vezes e meia. Era a coisa mais comprida do quadro, e
+        num nível cujo assunto é a parede do axônio.
+     2. LISTRAS. Havia um fio de metal com dez faces dentro de um vidro de
+        rugosidade 0,06, quase transparente e sem escrever profundidade. As
+        facetas do fio apareciam através do vidro lustroso como um hachurado,
+        e o conjunto lia como espeto listrado. O fio saiu: nesta escala ele
+        não mostra nada que o vidro já não mostre.
+     3. A CONTA SUMIA. Com 0,058 de raio, dentro do tubo e atrás da própria
+        haste, ela desaparecia em quase todo ângulo — e era ela que carregava
+        o elo com o marcador do gráfico.
+
+     Agora a haste é curta e grossa, o vidro é menos lustroso, a conta é
+     maior, e a estação ganhou uma CINTA na parede de fora: bolinha se
+     esconde quando o modelo gira, cinta se vê de qualquer lado. */
   const pReg = pontoNaParede(AX.uReg, AX.aDentro, rDentro(AX.uReg) - .07);
-  const traseira = pReg.clone().add(V(.30, 2.30, 1.45));
-  const haste = (de, ate, r0, r1, mat, segs = 18) => {
+  const traseira = pReg.clone().add(V(.16, 1.05, .66));
+  const haste = (de, ate, r0, r1, mat, segs = 20) => {
     const d = ate.clone().sub(de);
     const m = new THREE.Mesh(new THREE.CylinderGeometry(r0, r1, d.length(), segs, 1, true), mat);
     m.position.copy(de).add(ate).multiplyScalar(.5);
     m.quaternion.setFromUnitVectors(V(0, 1, 0), d.clone().normalize());
     return m;
   };
-  const conta = new THREE.Mesh(new THREE.SphereGeometry(.058, 16, 12), M.marcador);
+  const conta = new THREE.Mesh(new THREE.SphereGeometry(.082, 18, 14), M.marcador);
   conta.position.copy(pReg);
-  for (const o of [haste(traseira, pReg, .100, .012, M.vidro),
-                   haste(traseira.clone().lerp(pReg, .07), pReg.clone().lerp(traseira, .11), .015, .005, M.metal, 10),
-                   conta]) {
+  for (const o of [haste(traseira, pReg, .105, .026, M.vidro), conta]) {
     o.userData.foraDoQuadro = true; g.add(o);
   }
+  /* NÃO HÁ CINTA EM VOLTA DO TUBO, e houve uma. Ela existia para resolver
+     "a conta some quando o modelo gira" — mas o que fazia a conta sumir era
+     ela ser pequena e ter a cor da parede. Corrigidos os dois, a premissa da
+     cinta caiu: quem marca a estação de longe e de qualquer ângulo é a
+     HASTE, que fica fora do tubo e nunca é encoberta; a conta marca o ponto
+     exato. Uma faixa a mais só disputaria leitura com a cor da película, que
+     neste nível é o conteúdo. */
   g.userData.pontoRegistro = pReg;
 
   /* ── as fileiras de sinal ──────────────────────────────────────────────
