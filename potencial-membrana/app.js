@@ -156,10 +156,15 @@ const br = (n, d = 0) => n.toLocaleString('pt-BR', { minimumFractionDigits: d, m
 
 /* ------------------------------------------------------------ potencial de ação */
 const REPOUSO = -70, PICO = 38, FUNDO = -82, LIMIAR = -55;
-/* A MESMA COR DA CONTA NA PONTA DO ELETRODO, em modelos.js (M.marcador). É
-   ela que amarra o gráfico à figura sem legenda nenhuma: laranja aqui e
-   laranja lá são a mesma coisa. Mudar uma sem a outra desfaz o elo. */
-const COR_MARCA = '#ff9d2e';
+/* A MESMA COR DO MARCADOR NO 3D, em modelos.js (M.marcador). É ela que
+   amarra o gráfico à figura sem legenda: cor igual nos dois lugares é a
+   mesma coisa, e mudar uma sem a outra desfaz o elo.
+
+   Era laranja e virou violeta porque laranja é a cor que a PELÍCULA usa para
+   o lado positivo — o marcador sumia dentro da parede que devia marcar.
+   Violeta está fora do eixo âmbar↔azul do filme e é a cor que o valor de Vm
+   já usa no alto da cena: medida com cor própria, separada do fenômeno. */
+const COR_MARCA = '#c9a3ff';
 const facil = t => t * t * (3 - 2 * t);
 /* Forma por trechos, com os tempos do axônio de mamífero: subida em 0,4 ms,
    repolarização em 0,9, e a pós-hiperpolarização arrastando por 3. Não é
