@@ -1,14 +1,29 @@
+/* ── VERDE E AMARELO SOBRE FUNDO ESCURO ───────────────────────────────────
+   O fundo continua quase preto, e isso não é apego: as bancadas são palcos 3D
+   escuros, com iluminação própria. Um tema claro brigaria com todas elas e
+   obrigaria a refazer a folha de cada uma — e ainda por cima apagaria o
+   contraste que faz o tecido e os íons se lerem.
+
+   A REGRA DE CONTRASTE, medida contra o fundo (#050a06):
+   • amarelo (11,6:1) e verde CLARO (9,9:1) podem carregar TEXTO;
+   • verde ESCURO (5,3:1) só carrega superfície, borda e área grande —
+     nunca texto pequeno. É a única armadilha desta paleta: verde bonito e
+     saturado engana, porque parece legível e não é.
+   O creme e a névoa continuam sendo a massa de leitura, agora com um leve
+   viés verde para não parecerem manchas quentes sobre fundo frio.          */
 :root {
-  --void: #070605;
-  --coal: #110e0c;
-  --plate: #1a1512;
-  --cream: #f4ead0;
-  --mist: #c9bba3;
-  --gold: #e0b13a;
-  --gold2: #f3d078;
-  --lip: #7a4e0e;
-  --ember: #ff6a18;
-  --line: rgba(224, 177, 58, .24);
+  --void: #050a06;
+  --coal: #0b120c;
+  --plate: #131d15;
+  --cream: #f2f7ec;
+  --mist: #b0c4ac;
+  --amarelo: #f5c518;
+  --amarelo2: #ffe066;
+  --verde: #2e9e4b;
+  --verde2: #5fd177;
+  --lip: #1f6b33;
+  --ember: #ff9d2e;
+  --line: rgba(95, 209, 119, .26);
   --display: Cinzel, "Times New Roman", serif;
   --body: Inter, system-ui, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, monospace;
@@ -21,8 +36,8 @@ html, body { margin: 0; min-height: 100%; }
 
 body {
   background:
-    radial-gradient(900px 520px at 50% -10%, #3a1408 0%, transparent 60%),
-    radial-gradient(700px 360px at 90% 110%, #2a0c08 0%, transparent 55%),
+    radial-gradient(900px 520px at 50% -10%, #10381d 0%, transparent 60%),
+    radial-gradient(700px 360px at 90% 110%, #2d3a0b 0%, transparent 55%),
     var(--void);
   color: var(--cream);
   font: 16px/1.55 var(--body);
@@ -36,7 +51,7 @@ button, input { font: inherit; }
   position: sticky;
   top: 0;
   z-index: 20;
-  background: rgba(7, 6, 5, .84);
+  background: rgba(5, 10, 6, .86);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--line);
 }
@@ -45,7 +60,9 @@ button, input { font: inherit; }
 .brand { display: flex; align-items: center; gap: 11px; text-decoration: none; }
 .brand img { width: 42px; height: 42px; border-radius: 50%; box-shadow: 0 0 0 1px var(--line), 0 4px 0 var(--lip); }
 .brand-copy { display: grid; line-height: 1.18; }
-.brand-copy b { color: var(--gold2); font: 700 1rem var(--display); letter-spacing: .12em; }
+/* o nome novo é longo: cai de 1rem para .78 e pode quebrar em duas linhas
+   no telefone, em vez de estourar a barra */
+.brand-copy b { color: var(--amarelo2); font: 700 .78rem var(--display); letter-spacing: .10em; line-height: 1.15; }
 .brand-copy span { color: var(--mist); font-size: .75rem; }
 .nav-actions { display: flex; align-items: center; gap: 10px; }
 
@@ -57,14 +74,14 @@ button, input { font: inherit; }
   padding: 9px 13px;
   border: 1px solid var(--line);
   border-radius: 9px;
-  background: #17120d;
-  color: var(--gold2);
+  background: #101a12;
+  color: var(--amarelo2);
   text-decoration: none;
   cursor: pointer;
 }
 
 .hero { padding: 46px 0 26px; max-width: 760px; }
-.eyebrow { color: var(--gold); font: 700 .75rem var(--mono); letter-spacing: .18em; text-transform: uppercase; }
+.eyebrow { color: var(--amarelo); font: 700 .75rem var(--mono); letter-spacing: .18em; text-transform: uppercase; }
 h1, h2, h3 { font-family: var(--display); }
 h1 { margin: 9px 0 12px; font-size: clamp(2.1rem, 8vw, 4rem); line-height: 1; letter-spacing: .08em; }
 .hero p { margin: 0; color: var(--mist); font-size: 1.1rem; }
@@ -79,10 +96,10 @@ h1 { margin: 9px 0 12px; font-size: clamp(2.1rem, 8vw, 4rem); line-height: 1; le
   padding: 24px;
   border: 1px solid var(--line);
   border-radius: 18px;
-  background: linear-gradient(160deg, #241b13, var(--coal) 62%, #0b0907);
-  box-shadow: inset 0 1px rgba(243, 208, 120, .12), 0 6px 0 #050403, 0 18px 40px rgba(0, 0, 0, .45);
+  background: linear-gradient(160deg, #16261a, var(--coal) 62%, #070d08);
+  box-shadow: inset 0 1px rgba(255, 224, 102, .12), 0 6px 0 #030603, 0 18px 40px rgba(0, 0, 0, .45);
 }
-.test-card::after { content: attr(data-number); position: absolute; right: 17px; top: 12px; color: rgba(224, 177, 58, .14); font: 800 3rem var(--display); }
+.test-card::after { content: attr(data-number); position: absolute; right: 17px; top: 12px; color: rgba(95, 209, 119, .16); font: 800 3rem var(--display); }
 .test-card h2 { margin: 16px 0 8px; font-size: 1.7rem; line-height: 1.15; letter-spacing: .04em; }
 .test-card p { color: var(--mist); margin: 0 0 18px; }
 .tags { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 20px; }
@@ -95,15 +112,15 @@ h1 { margin: 9px 0 12px; font-size: clamp(2.1rem, 8vw, 4rem); line-height: 1; le
   justify-content: center;
   padding: 12px 16px;
   border-radius: 9px;
-  background: linear-gradient(180deg, var(--gold2), var(--gold));
-  color: #1a1206;
+  background: linear-gradient(180deg, var(--amarelo2), var(--amarelo));
+  color: #08240f;
   text-decoration: none;
   font: 700 .85rem var(--mono);
   letter-spacing: .04em;
   text-transform: uppercase;
   box-shadow: 0 5px 0 var(--lip);
 }
-.notice { margin: 0 0 40px; padding: 14px 16px; border-left: 3px solid var(--gold); background: rgba(224, 177, 58, .08); color: var(--mist); font-size: .85rem; }
+.notice { margin: 0 0 40px; padding: 14px 16px; border-left: 3px solid var(--verde2); background: rgba(95, 209, 119, .08); color: var(--mist); font-size: .85rem; }
 
 .page { padding: 24px 0 44px; }
 .page-head { display: flex; justify-content: space-between; align-items: end; gap: 18px; margin-bottom: 16px; }
@@ -123,4 +140,27 @@ footer { padding: 24px 0 34px; border-top: 1px solid var(--line); color: var(--m
   .brand-copy span { display: none; }
   .small-button { font-size: .8rem; padding-inline: 10px; }
   .hero { padding-top: 30px; }
+}
+
+/* ── A CAPA ───────────────────────────────────────────────────────────────
+   Texto à esquerda, o Mestre à direita, e no telefone ele vai para cima do
+   texto em vez de espremer as duas colunas. A figura tem fundo transparente,
+   então não leva moldura nenhuma: qualquer caixa em volta dela devolveria o
+   recorte retangular que o PNG existe para esconder. */
+.capa { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(180px, .85fr); gap: 26px; align-items: center; padding: 40px 0 22px; }
+.capa-texto { max-width: 620px; }
+.capa img { width: 100%; max-width: 300px; height: auto; justify-self: center; filter: drop-shadow(0 18px 26px rgba(0, 0, 0, .55)); }
+
+/* ── O LEMA ───────────────────────────────────────────────────────────────
+   Duas frases com pesos diferentes de propósito: a primeira é o que o
+   laboratório afirma, e vai em amarelo, que é a cor de maior contraste da
+   paleta; a segunda é o convite, e vai em verde claro. Verde ESCURO aqui
+   seria bonito e ilegível — 5,3:1 não sustenta texto. */
+.lema { margin: 14px 0 18px; display: grid; gap: 4px; }
+.lema b { color: var(--amarelo2); font: 700 clamp(1.15rem, 3.4vw, 1.6rem)/1.25 var(--display); letter-spacing: .03em; }
+.lema i { color: var(--verde2); font: 600 clamp(.95rem, 2.6vw, 1.15rem)/1.3 var(--body); font-style: normal; letter-spacing: .01em; }
+
+@media (max-width: 780px) {
+  .capa { grid-template-columns: 1fr; gap: 14px; padding-top: 26px; }
+  .capa img { max-width: 210px; order: -1; }
 }
