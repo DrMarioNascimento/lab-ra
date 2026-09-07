@@ -366,6 +366,7 @@ function prepararRA() {
       clone.visible = true;
       clone.traverse(o => {
         if (o.isMesh && o.geometry?.userData?.nu) o.geometry = o.geometry.clone();
+        if (o.isMesh && o.userData?.papelParede === 'selo') o.geometry = o.geometry.clone();
       });
       const spec = NIVEIS[atual].faseRA;
       if (spec) {

@@ -22,14 +22,14 @@
 
    Banda nova (coordenadas locais do corpo, antes da inclinação):
      teto VE          78
-     teto VD          71   (ALTURA_VD + VD_Y)
+     teto VD          76   (ALTURA_VD + VD_Y) — encontra a pulmonar
      mitral           74
      tricúspide       71
      aórtica          78   (via de saída, no teto do VE)
-     pulmonar         76   (via de saída, um pouco acima do VD)
+     pulmonar         76   (via de saída, no teto do VD)
    Tolerância do teste: |y_anel − y_teto do ventrículo| ≤ 8 mm. */
 export const ALTURA_VE = 78;
-export const ALTURA_VD = 68;
+export const ALTURA_VD = 73;
 export const VD_Y = 3;
 export const TOPO_VE = ALTURA_VE;
 export const TOPO_VD = ALTURA_VD + VD_Y;
