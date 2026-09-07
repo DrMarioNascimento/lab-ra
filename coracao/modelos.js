@@ -293,6 +293,7 @@ function perfilVentriculo(raio, altura, pontudo = 1) {
    uma meia-lua abraçada nele, e o septo pertence ao esquerdo. */
 function ventriculoEsquerdo(corte) {
   const g = camaraDupla(perfilVentriculo(26, ALTURA_VE), 10, M.miocardio, null, 30, corte);
+  g.add(manguitoDoOstio(ALTURA_VE, 10, 28, 18, M.miocardio));
   g.userData.papel = 've';
   return g;
 }
@@ -311,6 +312,7 @@ function ventriculoDireito(corte) {
   gg.scale.set(1, 1, 1);
   gg.position.set(-13.4, VD_Y, 9.4);
   gg.rotation.y = -.30;
+  gg.add(manguitoDoOstio(ALTURA_VD, 8.6, 26, 18, M.miocardioFino));
   gg.userData.papel = 'vd';
   return gg;
 }
@@ -330,6 +332,23 @@ function soldaSepto() {
     new THREE.CatmullRomCurve3(pts.map(p => V(...p))), 24, 7.2, 10, false);
   g.add(new THREE.Mesh(geo, M.miocardio),
         new THREE.Mesh(peloAvesso(geo), M.miocardio));
+  return g;
+}
+
+/* O VD é meia-lua: o óstio do lathe é um ARCO, não um anel. O tubo é
+   redondo. O que falta do arco, visto de lado, é o cresce da foto.
+   Este manguito é 2π no eixo da câmara, independente do recorte em theta. */
+function manguitoDoOstio(y, rIn, rOut, h, mat) {
+  const g = new THREE.Group();
+  const geo = new THREE.LatheGeometry([
+    new THREE.Vector2(rIn, y - h * 0.35),
+    new THREE.Vector2(rOut, y - h * 0.35),
+    new THREE.Vector2(rOut, y + h * 0.65),
+    new THREE.Vector2(rIn, y + h * 0.65),
+  ], 32);
+  geo.computeVertexNormals();
+  g.add(new THREE.Mesh(geo, mat),
+        new THREE.Mesh(peloAvesso(geo), mat));
   return g;
 }
 
