@@ -88,10 +88,18 @@ function alvoDaCamera(n) {
 
 function enquadrar(n) {
   const alvo = alvoDaCamera(n);
-  const zoom = NIVEIS[n].foco === 'valvas' ? .58 : 1.12;
+  /* o plano valvar pede um recorte, não um mergulho: zoom 0,58 deixava a
+     câmera dentro da parede e as quatro cúspides sumiam num close-up */
+  const valvas = NIVEIS[n].foco === 'valvas';
+  const zoom = valvas ? .88 : 1.12;
   const d = raio[n] / Math.tan(camera.fov * Math.PI / 360) * zoom;
-  camera.position.set(alvo.x + d * .22, alvo.y + d * .14, alvo.z + d * .94);
-  controls.target.copy(alvo);
+  if (valvas) {
+    controls.target.set(alvo.x, alvo.y - 2, alvo.z + 10);
+    camera.position.set(alvo.x + d * .10, alvo.y + d * .20, alvo.z + d * 1.02);
+  } else {
+    controls.target.copy(alvo);
+    camera.position.set(alvo.x + d * .22, alvo.y + d * .14, alvo.z + d * .94);
+  }
   controls.minDistance = d * .28; controls.maxDistance = d * 2.6;
   controls.update();
 }
@@ -330,11 +338,23 @@ function prepararRA() {
     $('launchAR').disabled = true;
     $('raStatus').textContent = 'Preparando o modelo para a câmera…';
     try {
-      const clone = modelos[atual].clone(true);
+      /* `clone(true)` faz JSON.stringify do userData. No sangue isso
+         serializa a CatmullRom das gotas — e no miolo do three.js o
+         toJSON do grupo inteiro é pesado demais. Tira o sangue (é
+         animação, não anatomia), esvazia o userData da raiz, clona,
+         devolve. As cúspides ganham geometria própria só então. */
+      const vivo = modelos[atual];
+      const sangue = vivo.userData.sangue;
+      if (sangue) vivo.remove(sangue);
+      const udRaiz = vivo.userData;
+      vivo.userData = {};
+      const clone = vivo.clone(true);
+      vivo.userData = udRaiz;
+      if (sangue) vivo.add(sangue);
       clone.visible = true;
-      /* o clone compartilha geometria com a cena viva: descola antes de
-         moldar as válvulas no instante pedagógico, senão o 3D treme */
-      clone.traverse(o => { if (o.isMesh && o.geometry) o.geometry = o.geometry.clone(); });
+      clone.traverse(o => {
+        if (o.isMesh && o.geometry?.userData?.nu) o.geometry = o.geometry.clone();
+      });
       const spec = NIVEIS[atual].faseRA;
       if (spec) {
         const faseSnap = faseDeSnapshotRA(sim, spec);

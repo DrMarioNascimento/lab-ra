@@ -625,12 +625,14 @@ export function criar() {
         const entrada = esq ? fluxos.mitral : fluxos.tricuspide;
         const saida = esq ? fluxos.aortica : fluxos.pulmonar;
         /* a velocidade é a vazão do trecho em que a gota está */
-        const vazao = d.u < d.uAV ? entrada.q : saida.q;
+        if (!entrada || !saida || typeof d.curva?.getPoint !== 'function') continue;
+        const vazao = Number(d.u < d.uAV ? entrada.q : saida.q) || 0;
         let novo = d.u + vazao * dt * 0.0016 + dt * .012;
         /* AS PORTEIRAS: a gota não passa por uma valva fechada */
         if (d.u < d.uAV && novo >= d.uAV && !entrada.aberta) novo = d.uAV - 1e-4;
         if (d.u < d.uSL && novo >= d.uSL && !saida.aberta) novo = d.uSL - 1e-4;
-        d.u = novo >= 1 ? 0 : novo;
+        if (!Number.isFinite(novo)) continue;
+        d.u = novo >= 1 ? 0 : novo < 0 ? 0 : novo;
         const p = d.curva.getPoint(d.u);
         gota.position.set(p.x + d.desvio.x, p.y, p.z + d.desvio.z);
       }

@@ -118,10 +118,15 @@ export function ecg(t, rr = 1) {
   const r = 1.00 * gauss(t, 0.190, 0.014);
   const s = -0.22 * gauss(t, 0.215, 0.013);
   const escala = Math.sqrt(Math.max(rr, 1e-6));
-  /* QT do início do QRS ao pico da T: 0,225 s quando RR = 1 s */
-  const tT = 0.165 + 0.225 * escala;
-  const wT = 0.052 * escala;
-  const onda = 0.28 * gauss(t, tT, wT);
+  /* QT do início do QRS ao pico da T: 0,225 s quando RR = 1 s (60 bpm).
+     Em taquicardia o pico cru sem teto encosta no fim do ciclo e a T some
+     da faixa — por isso ela também não pode passar de RR menos a própria
+     largura. */
+  let wT = 0.052 * escala;
+  let tT = 0.165 + 0.225 * escala;
+  if (tT > rr - 2.2 * wT) tT = Math.max(0.222, rr - 2.2 * wT);
+  wT = Math.min(wT, Math.max(0.018, (rr - tT) * 0.40));
+  const onda = 0.28 * (gauss(t, tT, wT) + gauss(t - rr, tT, wT) + gauss(t + rr, tT, wT));
   return p + q + r + s + onda;
 }
 
