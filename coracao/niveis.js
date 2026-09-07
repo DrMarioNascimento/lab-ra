@@ -10,8 +10,40 @@
 
    `nivelRevelaValvas(i)` é a régua: o nome promete válvulas só se a config
    as expõe de verdade (as tem, E corta / torna o músculo transparente /
-   enquadra o plano valvar).
+   enquadra o plano valvar). No nível das válvulas os grandes vasos entram
+   no mesmo vidro — aorta e tronco opacos tapavam as cúspides por cima.
    ========================================================================== */
+
+/* ── PLANO VALVAR (1 unidade = 1 mm, y = 0 na ponta do VE) ───────────────
+   O cone do VE chega a ALTURA_VE; as valvas viviam em y≈53–60, 18–25 mm
+   abaixo da junção, e o miocárdio cobria cúspides e átrios. O nível 03
+   só funcionava no vidro. SUBIR_PLANO sobe anéis, átrios e a origem dos
+   vasos até o teto da massa ventricular — o vidro deixa de ser muleta.
+
+   Banda nova (coordenadas locais do corpo, antes da inclinação):
+     teto VE          78
+     teto VD          71   (ALTURA_VD + VD_Y)
+     mitral           74
+     tricúspide       71
+     aórtica          78   (via de saída, no teto do VE)
+     pulmonar         76   (via de saída, um pouco acima do VD)
+   Tolerância do teste: |y_anel − y_teto do ventrículo| ≤ 8 mm. */
+export const ALTURA_VE = 78;
+export const ALTURA_VD = 68;
+export const VD_Y = 3;
+export const TOPO_VE = ALTURA_VE;
+export const TOPO_VD = ALTURA_VD + VD_Y;
+export const SUBIR_PLANO = 18;
+export const TOLERANCIA_JUNCAO_MM = 8;
+export const PLANO_VALVAR = {
+  mitral:     [6,  56 + SUBIR_PLANO, -2],   // 74
+  tricuspide: [-16, 53 + SUBIR_PLANO,  6],  // 71
+  aortica:    [4,  60 + SUBIR_PLANO, -4],   // 78
+  pulmonar:   [-12, 58 + SUBIR_PLANO, 16],  // 76
+};
+export const VENTRICULO_DA_VALVA = {
+  mitral: 've', tricuspide: 'vd', aortica: 've', pulmonar: 'vd',
+};
 
 export const NIVEIS = [
   {
@@ -41,6 +73,9 @@ export const NIVEIS = [
     comConducao: false,
     corte: true,
     revelarValvas: true,
+    /* aorta e tronco pulmonar no mesmo vidro: opacos, sentam na frente
+       das cúspides e o corte não as salva — não é ângulo, é oclusão */
+    vidrarGrandesVasos: true,
     foco: 'valvas',
     /* diástole média: atrioventriculares abertas, semilunares fechadas —
        o par que o nível existe para ensinar, não um instante ao acaso */

@@ -204,6 +204,15 @@ export function simular(fc, { passos = 900, ciclos = 14 } = {}) {
   let mitral = true, aortica = false, tricuspide = true, pulmonar = false;
   const decide = (aberta, gradiente) =>
     gradiente > P.limiarValva ? true : gradiente < -P.limiarValva ? false : aberta;
+  /* A AV precisa de histerese que ATRAVESSE o relaxamento atrial. O dip
+     depois da onda a inverte o gradiente por frações de mmHg, o folheto
+     coapta cedo e o Wiggers marca um B1 falso — ou, a 60 bpm, a valva
+     nem reabre e some o B1 verdadeiro. Sem contração ventricular o anel
+     não fecha: B1 é o coaptar quando o ventrículo vira bomba. */
+  const decideAV = (aberta, gradiente, aVent) => {
+    if (aVent > 0) return decide(aberta, gradiente);
+    return gradiente > P.limiarValva ? true : aberta;
+  };
 
   const quadro = [];
   for (let ciclo = 0; ciclo < ciclos; ciclo++) {
@@ -231,14 +240,17 @@ export function simular(fc, { passos = 900, ciclos = 14 } = {}) {
 
       /* AS VÁLVULAS SÃO COMPARAÇÕES, NÃO UM ROTEIRO — com a folga da inércia
          do folheto, que é o que impede o tremor numérico na diástase. */
-      mitral = decide(mitral, pAE - pVE);
+      mitral = decideAV(mitral, pAE - pVE, aVent);
       aortica = decide(aortica, pVE - pAo);
-      tricuspide = decide(tricuspide, pAD - pVD);
+      tricuspide = decideAV(tricuspide, pAD - pVD, aVent);
       pulmonar = decide(pulmonar, pVD - pAP);
 
-      const qMitral = mitral ? (pAE - pVE) / P.rMitral : 0;
+      /* AV aberta com dip de relaxamento atrial: o folheto não coapta (não
+         é B1) e o jato de enchimento tem inércia — não regurgita por
+         frações de mmHg. */
+      const qMitral = mitral ? Math.max(0, (pAE - pVE) / P.rMitral) : 0;
       const qAortica = aortica ? (pVE - pAo) / P.rAortica : 0;
-      const qTri = tricuspide ? (pAD - pVD) / P.rTricuspide : 0;
+      const qTri = tricuspide ? Math.max(0, (pAD - pVD) / P.rTricuspide) : 0;
       const qPulm = pulmonar ? (pVD - pAP) / P.rPulmonar : 0;
       /* as veias enchem o átrio o tempo todo, inclusive com a valva fechada —
          é isso que produz a onda v durante a sístole ventricular */
@@ -292,7 +304,14 @@ export function em(sim, fase) {
    a frequência muda. */
 export function faseDe(q, anterior) {
   if (q.aortica) return 'ejecao';
-  if (q.mitral) return q.ativacaoAtrio > .15 ? 'sistole atrial' : 'enchimento';
+  if (q.mitral) {
+    if (q.ativacaoAtrio > .15) return 'sistole atrial';
+    /* diástase de verdade: câmaras moles, mitral aberta, FIM da diástole
+       (depois da onda E, antes de voltar a A no wrap). Não é mais o
+       fechamento fantasma depois da sístole atrial — aquele era chatter. */
+    if ((q.ativacao ?? 0) <= 0.002 && (q.fase ?? 0) > 0.68) return 'diastase';
+    return 'enchimento';
+  }
   /* AS DUAS FECHADAS: isovolumétrica. Qual delas, decide o SINAL DA VARIAÇÃO
      DE PRESSÃO — subindo é contração, caindo é relaxamento.
 
@@ -345,4 +364,44 @@ export function faseDeSnapshotRA(sim, spec) {
   }
   if (!bons.length) return null;
   return bons[Math.floor(bons.length / 2)].fase;
+}
+
+/* ── AS BULHAS ────────────────────────────────────────────────────────────
+   B1 e B2 não são desenhadas por tempo: saem dos fechamentos das valvas,
+   com o laço DANDO A VOLTA no ciclo. Sem a emenda, a 150 bpm a aórtica
+   fecha entre o último quadro e o primeiro e o B2 some.
+
+   B1 é o ÚLTIMO fechamento da mitral antes da ejeção. O chatter depois
+   da sístole atrial, se ainda existir, não é a primeira bulha. */
+export function fechamentos(quadro, nome) {
+  const n = quadro.length, out = [];
+  for (let i = 0; i < n; i++) {
+    const ant = quadro[(i - 1 + n) % n];
+    if (!(ant[nome] && !quadro[i][nome])) continue;
+    const wrap = i === 0;
+    out.push({
+      i, wrap, t: quadro[i].t,
+      fase: wrap ? 1 : i / Math.max(1, n - 1),
+    });
+  }
+  return out;
+}
+
+export function bulhas(quadro) {
+  const n = quadro.length;
+  let iAbreAo = 0;
+  for (let i = 0; i < n; i++) {
+    const ant = quadro[(i - 1 + n) % n];
+    if (!ant.aortica && quadro[i].aortica) iAbreAo = i;
+  }
+  const mitrais = fechamentos(quadro, 'mitral');
+  const aorticas = fechamentos(quadro, 'aortica');
+  const ordem = f => (f.wrap ? n : f.i);
+  const limite = iAbreAo === 0 ? n : iAbreAo;
+  const b1 = mitrais.filter(f => ordem(f) <= limite).at(-1) || mitrais.at(-1) || null;
+  const b2 = aorticas.at(-1) || null;
+  const todas = [];
+  if (b1) todas.push({ nome: 'B1', ...b1 });
+  if (b2) todas.push({ nome: 'B2', ...b2 });
+  return { b1, b2, todas };
 }
