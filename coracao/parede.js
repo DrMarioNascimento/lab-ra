@@ -58,6 +58,30 @@ export function pontoNoLathe(r, y, angulo) {
   return { x: r * Math.sin(angulo), y, z: r * Math.cos(angulo) };
 }
 
+/* O anel plano do óstio, visto de lado, vira LINHA: o vão em cresce entre
+   epicárdio e endocárdio. O lábio tem altura, e recolhe um pouco para dentro
+   — o lúmen continua aberto (não vai ao eixo). */
+export const LABIO_DY = 3.2;
+export function perfilDoLabio(pDentro, pFora, dy = LABIO_DY) {
+  const recolher = Math.max(pDentro.x * 0.58, pDentro.x - 7);
+  return [
+    { x: pDentro.x, y: pDentro.y },
+    { x: recolher, y: pDentro.y + dy },
+    { x: pFora.x, y: pFora.y + dy },
+    { x: pFora.x, y: pFora.y },
+  ];
+}
+
+/* Colar da raiz: rBase tem de cobrir o vão em cresce entre o teto da câmara
+   e o tubo. O lúmen do vaso (rTubo) continua patente. */
+export const JUNTAS_VASO = {
+  aorta:    { rTubo: 12,   rBase: 23 },
+  pulmonar: { rTubo: 10.5, rBase: 24 },
+  cava:     { rTubo: 9.5,  rBase: 16 },
+  cavaInf:  { rTubo: 10.5, rBase: 16 },
+  veiaPulm: { rTubo: 4.6,  rBase: 9 },
+};
+
 export function verticesDaFaceDoCorte(dentro, fora, angulo) {
   const pos = [];
   for (let i = 0; i < dentro.length; i++) {
@@ -97,6 +121,8 @@ export function provaSelosDaParede({ alturaVE, alturaVD }) {
     const errada = { x: r * Math.cos(phi), z: r * Math.sin(phi) };
     return Math.hypot(certa.x - errada.x, certa.z - errada.z);
   })();
+  const labioVE = perfilDoLabio(ve.dentro[ve.dentro.length - 1], ve.fora[ve.fora.length - 1]);
+  const ys = labioVE.map(p => p.y);
   return {
     ve: medida(ve),
     vd: medida(vd),
@@ -104,5 +130,8 @@ export function provaSelosDaParede({ alturaVE, alturaVD }) {
     faceCoincideComLathe: Math.hypot(
       noFace.x - lathe.x, noFace.y - lathe.y, noFace.z - lathe.z) < 1e-9,
     vaoDaConvencaoAntigaMm: vaoAntigo,
+    labioAltura: Math.max(...ys) - Math.min(...ys),
+    labioNaoTampona: labioVE[1].x > 8,
+    juntas: JUNTAS_VASO,
   };
 }

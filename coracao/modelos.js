@@ -34,6 +34,8 @@ import {
   perfilAtrio as perfilAtrioXY,
   prepararPerfis,
   pontoNoLathe,
+  perfilDoLabio,
+  JUNTAS_VASO,
 } from './parede.js';
 
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
@@ -138,9 +140,16 @@ function anelEntre(a, b, t0, tL, segs) {
   return g;
 }
 
+function labioDoOstio(dentro, fora, t0, tL, segs) {
+  const pts = perfilDoLabio(dentro[dentro.length - 1], fora[fora.length - 1]).map(xy);
+  const g = new THREE.LatheGeometry(pts, segs, t0, tL);
+  g.computeVertexNormals();
+  return g;
+}
+
 function geometriaDosSelos(dentro, fora, t0, tL, segs) {
   const partes = [];
-  const ostio = anelEntre(dentro[dentro.length - 1], fora[fora.length - 1], t0, tL, segs);
+  const ostio = labioDoOstio(dentro, fora, t0, tL, segs);
   if (ostio) {
     partes.push(ostio);
     partes.push(peloAvesso(ostio));
@@ -259,9 +268,10 @@ function ventriculoDireito(corte) {
   const t0 = corte ? Math.max(corte[0], -Math.PI * .58) : -Math.PI * .58;
   const tL = corte ? Math.min(corte[1], Math.PI * 1.16) : Math.PI * 1.16;
   const gg = camaraDupla(perfil, 3.4, M.miocardioFino, null, 26, [t0, tL]);
-  /* achatado contra o esquerdo, e deslocado para a frente e para a direita */
-  gg.scale.set(1, 1, .62);
-  gg.position.set(-16, VD_Y, 12);
+  /* achatado contra o esquerdo, e um pouco mais encostado: a junta septal
+     era um vão entre dois sólidos. A meia-lua continua meia-lua. */
+  gg.scale.set(1, 1, .72);
+  gg.position.set(-14.2, VD_Y, 10.5);
   gg.rotation.y = -.34;
   gg.userData.papel = 'vd';
   return gg;
@@ -364,24 +374,53 @@ function vasoTubo(pontos, raio, mat, segs = 28) {
     new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pontos.map(p => V(...p))), segs, raio, 16, false), mat);
 }
 
+/* Cone + anel na origem do vaso: o tubo de raio constante deixa um cresce
+   entre o teto da câmara e a parede do vaso. rBase cobre o vão; rTubo é o
+   lúmen. Gêmeas pelo avesso — o material.clone() do vidrar isola o nível. */
+function colarDaRaiz(p0, p1, rTubo, rBase, mat) {
+  const a = V(...p0), b = V(...p1);
+  const dir = b.clone().sub(a);
+  if (dir.lengthSq() < 1e-8) dir.set(0, 1, 0);
+  else dir.normalize();
+  const len = Math.max(12, (rBase - rTubo) * 1.1);
+  const cone = new THREE.CylinderGeometry(rTubo, rBase, len, 22, 1, true);
+  cone.translate(0, len / 2, 0);
+  cone.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(V(0, 1, 0), dir));
+  cone.translate(a.x, a.y, a.z);
+  const anel = new THREE.RingGeometry(rTubo * 0.9, rBase, 22, 2);
+  anel.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(V(0, 0, 1), dir));
+  anel.translate(a.x, a.y, a.z);
+  const partes = [cone, anel, peloAvesso(cone), peloAvesso(anel)];
+  for (const p of partes) p.deleteAttribute('uv');
+  return new THREE.Mesh(mergeGeometries(partes), mat);
+}
+
 function grandesVasos() {
   const g = new THREE.Group();
+  const põe = (pts, mat, junta, matParede) => {
+    g.add(vasoTubo(pts, junta.rTubo, mat));
+    g.add(colarDaRaiz(pts[0], pts[1], junta.rTubo, junta.rBase, mat));
+    /* arruela de miocárdio por fora do colar: o cresce da foto era o
+       epicárdio cortando no ar, sem chegar no vaso */
+    if (matParede)
+      g.add(colarDaRaiz(pts[0], pts[1], junta.rTubo * 1.05, junta.rBase * 1.18, matParede));
+  };
   /* aorta: sai do centro, sobe por trás e faz a crossa para a direita */
-  /* a origem entra uns milímetros no teto da câmara: com SUBIR_PLANO o
-     primeiro ponto antigo (y=62 / 60) ficava pairando acima do miocárdio */
-  g.add(vasoTubo([[4, 58, -4], [5, 82, -2], [4, 104, 2], [-8, 118, 4], [-26, 112, 2], [-32, 92, -2]],
-                 12, M.aorta));
+  põe([[4, 56, -4], [5, 82, -2], [4, 104, 2], [-8, 118, 4], [-26, 112, 2], [-32, 92, -2]],
+      M.aorta, JUNTAS_VASO.aorta, M.miocardio);
   /* tronco pulmonar: sai à FRENTE e cruza para a esquerda, por cima */
-  g.add(vasoTubo([[-12, 52, 16], [-10, 80, 14], [-4, 98, 8], [10, 106, 2]], 10.5, M.pulmonar));
+  põe([[-12, 50, 16], [-10, 80, 14], [-4, 98, 8], [10, 106, 2]],
+      M.pulmonar, JUNTAS_VASO.pulmonar, M.miocardioFino);
   /* os dois ramos pulmonares */
   g.add(vasoTubo([[10, 106, 2], [26, 104, -4], [38, 96, -10]], 6.4, M.pulmonar));
   g.add(vasoTubo([[10, 106, 2], [0, 100, -14], [-12, 92, -22]], 6.0, M.pulmonar));
   /* cavas: entram no átrio direito por cima e por baixo */
-  g.add(vasoTubo([[-30, 96, -10], [-30, 76, -6], [-26, 60, -2]], 9.5, M.cava));
-  g.add(vasoTubo([[-24, 18, -10], [-26, 34, -8], [-25, 50, -4]], 10.5, M.cava));
+  põe([[-30, 96, -10], [-30, 76, -6], [-26, 60, -2]], M.cava, JUNTAS_VASO.cava, M.atrio);
+  põe([[-24, 18, -10], [-26, 34, -8], [-25, 50, -4]], M.cava, JUNTAS_VASO.cavaInf, M.atrio);
   /* veias pulmonares: quatro, entrando no átrio esquerdo por trás */
   for (const [x, z] of [[30, -18], [34, -6], [18, -24], [12, -26]])
-    g.add(vasoTubo([[x, 72 + z * .2, z - 8], [x * .7, 66, z * .5], [x * .35, 60, -4]], 4.6, M.veiaPulmonar));
+    põe([[x, 72 + z * .2, z - 8], [x * .7, 66, z * .5], [x * .35, 60, -4]],
+        M.veiaPulmonar, JUNTAS_VASO.veiaPulm, M.atrio);
   return g;
 }
 

@@ -490,11 +490,20 @@ test("a parede fecha no polo e no anel do corte, sem tamponar o lúmen", async (
     "o anel do esquerdo tem de ser mais grosso que o do direito");
   assert.ok(p.ae.polo1Dentro < 0.2, `teto do átrio aberto r=${p.ae.polo1Dentro}`);
   assert.ok(p.ae.polo0Dentro > 5, `óstio AV tamponado r=${p.ae.polo0Dentro}`);
+  assert.ok(p.labioAltura >= 3, `lábio do óstio plano (altura ${p.labioAltura} mm) some de lado`);
+  assert.ok(p.labioNaoTampona, "o lábio não pode tampar o lúmen");
+  for (const [nome, j] of Object.entries(p.juntas)) {
+    assert.ok(j.rBase > j.rTubo + 3,
+      `${nome}: rBase ${j.rBase} não cobre o cresce em volta do tubo ${j.rTubo}`);
+  }
 
   const m = await texto("coracao/modelos.js");
   assert.ok(m.includes("faceDoCorte(dentro, fora, t0)"), "a face liga o perfil interno ao externo");
   assert.ok(m.includes("camaraDupla(perfil, 3.4"), "o direito usa a mesma câmara selada");
   assert.ok(m.includes("papelParede = 'selo'"), "o selo acompanha o volume, senão a sístole abre o corte");
+  assert.ok(m.includes("function colarDaRaiz"), "a raiz do vaso ganha colar contra a câmara");
+  assert.ok(m.includes("labioDoOstio"), "o óstio tem lábio com altura, não anel plano");
+  assert.ok(m.includes("o.material = o.material.clone()"), "o vidro continua isolado por clone");
   const semComentario = m.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
   assert.ok(!/dentro\[i\]\.x \* cos,\s*dentro\[i\]\.y,\s*dentro\[i\]\.x \* sin/.test(semComentario),
     "voltou a convenção (cos, sin), 90° fora do lathe");
