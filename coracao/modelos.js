@@ -334,10 +334,14 @@ function valva(nCuspides, R, comp) {
 
 /* cordas tendíneas: elas existem para a valva atrioventricular não VIRAR do
    avesso na sístole, e sem elas o desenho sugere que a pressão não faz força */
-function cordas(R, deY, ateY, n = 10) {
+/* No esquema elas ficam na METADE DE TRÁS, a mesma do corte: uma corda que
+   caísse na metade removida ficaria pendurada no vazio, que foi exatamente
+   como elas apareceram na primeira foto — um feixe branco flutuando no vão
+   entre as duas colunas, preso a nada. */
+function cordas(R, deY, ateY, n = 10, a0 = 0, aL = Math.PI * 2) {
   const gs = [];
   for (let i = 0; i < n; i++) {
-    const a = (i / n) * Math.PI * 2;
+    const a = a0 + (i / Math.max(1, n - 1)) * aL;
     const pts = [V(Math.cos(a) * R * .82, deY, Math.sin(a) * R * .82),
                  V(Math.cos(a) * R * .55, (deY + ateY) / 2, Math.sin(a) * R * .55),
                  V(Math.cos(a) * R * .34, ateY, Math.sin(a) * R * .34)];
@@ -486,20 +490,29 @@ function conducao() {
    comparações de pressão que abrem as válvulas.
 
    Vermelho é oxigenado, azul é venoso: a convenção que o aluno já traz. */
+/* ── O CAMINHO DO SANGUE NO ESQUEMA ───────────────────────────────────────
+   Cada gota faz o circuito de UMA coluna: chega pela veia, atravessa a
+   atrioventricular, desce até a ponta do ventrículo, sobe pela via de saída,
+   atravessa a semilunar e vai embora pela artéria. Sempre no mesmo sentido,
+   sempre dentro da própria coluna — é isso que faz o aluno ver DOIS
+   circuitos em série e não um emaranhado.
+
+   `uAV` e `uSL` marcam, ao longo do caminho, onde estão as duas portas. As
+   gotas não passam por valva fechada, e é daí que sai o acúmulo no átrio
+   durante a sístole e a parada na fase isovolumétrica — sem que nada disso
+   tenha sido escrito. */
 const CAMINHOS = {
   direito: {
-    pontos: [[-25, 16, -8], [-24, 38, -6], [-21, 52, -2], [-18, 56, 2],
-             [-16, 53, 6], [-16, 40, 11], [-15, 22, 12], [-14, 40, 15],
-             [-12, 56, 16], [-11, 74, 15], [-6, 96, 9], [10, 106, 2]]
-      .map(noSulco),
-    uAV: .33, uSL: .70, mat: 'sanguePobre',
+    pontos: [[-58, 96, -26], [-44, 90, -16], [-34, 84, -6], [-30, 76, 0],
+             [-30, 68, 0], [-30, 52, 0], [-30, 32, 0], [-28, 16, 0],
+             [-24, 40, 6], [-20, 62, 16], [-18, 72, 26], [-18, 102, 30]],
+    uAV: .36, uSL: .88, mat: 'sanguePobre',
   },
   esquerdo: {
-    pontos: [[28, 64, -14], [20, 60, -9], [12, 58, -5], [8, 57, -3],
-             [6, 54, -1], [4, 38, 0], [3, 20, 1], [4, 40, -2],
-             [4, 58, -4], [5, 82, -2], [0, 112, 3], [-26, 112, 2]]
-      .map(noSulco),
-    uAV: .35, uSL: .70, mat: 'sangueRico',
+    pontos: [[58, 92, -26], [46, 88, -16], [34, 84, -6], [22, 79, 0],
+             [22, 74, 0], [22, 58, 0], [22, 36, 0], [20, 14, 0],
+             [16, 40, 6], [12, 66, 16], [10, 79, 26], [10, 108, 30]],
+    uAV: .36, uSL: .88, mat: 'sangueRico',
   },
 };
 
@@ -587,7 +600,16 @@ function corpo({
     põe('tricuspide', valva(3, 15, 10), PLANO_VALVAR.tricuspide, [Math.PI, 0, -.16]);
     põe('aortica', valva(3, 11, 8), PLANO_VALVAR.aortica);
     põe('pulmonar', valva(3, 10, 7.5), PLANO_VALVAR.pulmonar);
-    g.add(cordas(14, 46 + SUBIR_PLANO, 22 + SUBIR_PLANO, 10));
+    /* UM FEIXE POR COLUNA, dentro do seu ventrículo. Antes havia um só,
+       centrado na origem do modelo — que no esquema é o vão ENTRE as duas
+       colunas, e por isso as cordas apareciam penduradas no vazio. Elas
+       existem para a atrioventricular não virar do avesso na sístole; se
+       não estiverem presas ao ventrículo certo, não dizem nada. */
+    const meia = [Math.PI / 2, Math.PI];
+    const cm = cordas(12, ALTURA_VE - 6, ALTURA_VE - 32, 7, ...meia);
+    cm.position.x = VE_X; g.add(cm);
+    const ct = cordas(11, VD_Y + ALTURA_VD - 6, VD_Y + ALTURA_VD - 28, 7, ...meia);
+    ct.position.x = VD_X; g.add(ct);
   }
   if (comCoronarias) g.add(coronarias());
   let cond = null;
