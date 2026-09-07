@@ -26,6 +26,7 @@
    ========================================================================== */
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { NIVEIS } from './niveis.js';
 
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
 const rnd = (a, b) => a + Math.random() * (b - a);
@@ -133,6 +134,8 @@ function camaraDupla(perfilInterno, espessura, mat, matInterno, segs = 30, corte
 
   const externa = new THREE.Mesh(new THREE.LatheGeometry(fora, segs, t0, tL), mat);
   const interna = new THREE.Mesh(new THREE.LatheGeometry(dentro, segs, t0, tL), matInterno || M.endocardio);
+  externa.userData.papelParede = 'externa';
+  interna.userData.papelParede = 'interna';
   /* a cavidade é vista POR DENTRO: a face tem de estar invertida na
      GEOMETRIA, nunca em `side` — o glTF descarta o material e o USDZ do
      iPhone descarta até o `doubleSided` */
@@ -199,6 +202,8 @@ function ventriculoDireito(corte) {
     }), 26, t0, tL);
   const externa = new THREE.Mesh(fora, M.miocardioFino);
   const interna = new THREE.Mesh(peloAvesso(dentro), M.endocardio);
+  externa.userData.papelParede = 'externa';
+  interna.userData.papelParede = 'interna';
   gg.add(externa, interna);
   /* achatado contra o esquerdo, e deslocado para a frente e para a direita */
   gg.scale.set(1, 1, .62);
@@ -456,7 +461,18 @@ function gotasDeSangue(n = 26) {
 /* ── MONTAGEM ─────────────────────────────────────────────────────────────
    O coração pende inclinado, com a ponta para a esquerda e para a frente,
    que é como ele fica no tórax — de pé e simétrico ele vira enfeite. */
-function corpo({ comValvas = true, comCoronarias = true, comConducao = false, corte = false } = {}) {
+function vidrar(grupo, opacidade) {
+  grupo.traverse(o => {
+    if (!o.isMesh || !o.material) return;
+    o.material = o.material.clone();
+    o.material.transparent = true;
+    o.material.opacity = opacidade;
+    o.material.depthWrite = opacidade >= .85;
+    o.material.needsUpdate = true;
+  });
+}
+
+function corpo({ comValvas = true, comCoronarias = true, comConducao = false, corte = false, revelarValvas = false } = {}) {
   const g = new THREE.Group();
 
   /* O CORTE ABRE UMA CUNHA VOLTADA PARA A FRENTE — é por onde se olha. Antes
@@ -471,12 +487,20 @@ function corpo({ comValvas = true, comCoronarias = true, comConducao = false, co
   const ae = atrio(1, janela); ae.position.set(14, 58, -6); ae.rotation.z = -.16; g.add(ae);
   const ad = atrio(-1, janela); ad.position.set(-20, 56, 0); ad.rotation.z = .18; ad.scale.setScalar(.94); g.add(ad);
 
+  /* o nível das válvulas não pode ser o coração opaco visto de longe: o
+     miocárdio vira vidro para as cúspides lerem por cima do corte */
+  if (revelarValvas) {
+    vidrar(ve, .38); vidrar(vd, .38);
+    vidrar(ae, .32); vidrar(ad, .32);
+  }
+
   const valvas = {};
   if (comValvas) {
     /* as quatro, cada uma no seu anel. A mitral tem duas cúspides, as
        semilunares têm três — e a tricúspide, três, que é de onde vem o nome. */
     const põe = (nome, v, pos, rot) => {
       v.position.set(...pos); if (rot) v.rotation.set(...rot);
+      v.userData.nomeValva = nome;
       valvas[nome] = v; g.add(v);
     };
     põe('mitral', valva(2, 14, 11), [6, 56, -2], [Math.PI, 0, .12]);
@@ -498,15 +522,45 @@ function corpo({ comValvas = true, comCoronarias = true, comConducao = false, co
   return g;
 }
 
+/* Aplica um quadro do motor numa árvore — inclusive num clone de RA, cujos
+   `userData.ve` / `userData.valvas` ainda apontam para as malhas VIVAS.
+   Por isso as peças se identificam por `papel`, `papelParede` e `nomeValva`
+   na própria árvore, e as geometrias do clone já têm de estar descoladas. */
+export function aplicarQuadro(raiz, q) {
+  const vol = { ve: [q.vVE, 120], vd: [q.vVD, 120], ae: [q.vAE, 60], ad: [q.vAD, 60] };
+  raiz.traverse(o => {
+    const par = o.userData?.papel;
+    if (par && vol[par]) {
+      const [volume, referencia] = vol[par];
+      const e = Math.cbrt(clamp(volume / referencia, .25, 2));
+      const ef = 1 - (1 - e) * .34;
+      for (const filho of o.children) {
+        if (filho.userData?.papelParede === 'interna')
+          filho.scale.set(e, 1 - (1 - e) * .35, e);
+        if (filho.userData?.papelParede === 'externa')
+          filho.scale.set(ef, 1 - (1 - ef) * .4, ef);
+      }
+    }
+    const nome = o.userData?.nomeValva;
+    if (!nome || q[nome] === undefined) return;
+    const alvo = q[nome] ? 1 : .06;
+    o.userData.abertura = alvo;
+    for (const c of o.children) if (c.geometry?.userData?.nu) moldarCuspide(c, alvo);
+  });
+}
+
 /* ========================================================================= */
 export function criar() {
-  const modelos = [
-    corpo(),                                    // 01 o coração inteiro
-    corpo({ corte: true }),                     // 02 por dentro
-    corpo({ comCoronarias: false }),            // 03 as válvulas
-    corpo({ comConducao: true, comValvas: false, comCoronarias: false }), // 04 a condução
-    corpo({ comConducao: true }),               // 05 o ciclo
-  ];
+  /* a receita de cada nível vem de `niveis.js`: o nome e o que a cena
+     constrói ficam na mesma tabela, e o teste lê essa tabela — não um
+     comentário ao lado de um `corpo()` que já mentiu uma vez. */
+  const modelos = NIVEIS.map(n => corpo({
+    comValvas: n.comValvas,
+    comCoronarias: n.comCoronarias,
+    comConducao: n.comConducao,
+    corte: n.corte,
+    revelarValvas: n.revelarValvas,
+  }));
   modelos.forEach((m, i) => { m.visible = i === 0; });
 
   /* ── O VOLUME MOVE A CÂMARA ────────────────────────────────────────────

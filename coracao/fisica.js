@@ -104,16 +104,24 @@ export function estruturaAtiva(t) {
 }
 
 /* ── O ELETROCARDIOGRAMA ──────────────────────────────────────────────────
-   Soma de ondas, cada uma no seu tempo. Não é um traçado decorativo: as
-   ondas caem exatamente onde a condução está passando, porque usam os mesmos
-   tempos da tabela acima. */
+   Soma de gaussianas. P e QRS caem PERTO da tabela de condução, mas não a
+   leem: os centros são números desta função. A onda T — repolarização —
+   nem está na tabela. Cravá-la em 0,390 s a apaga quando o ciclo fica
+   menor que isso (180 bpm = 0,333 s). A T encolhe com √RR, à la Bazett,
+   o mesmo princípio que `duracoes()` já usa para a sístole mecânica.
+
+   `rr` em segundos; omissão = 1 s (60 bpm), que é o traçado histórico. */
 const gauss = (t, centro, largura) => Math.exp(-Math.pow((t - centro) / largura, 2));
-export function ecg(t) {
+export function ecg(t, rr = 1) {
   const p = 0.13 * gauss(t, 0.050, 0.028);
   const q = -0.10 * gauss(t, 0.165, 0.010);
   const r = 1.00 * gauss(t, 0.190, 0.014);
   const s = -0.22 * gauss(t, 0.215, 0.013);
-  const onda = 0.28 * gauss(t, 0.390, 0.052);
+  const escala = Math.sqrt(Math.max(rr, 1e-6));
+  /* QT do início do QRS ao pico da T: 0,225 s quando RR = 1 s */
+  const tT = 0.165 + 0.225 * escala;
+  const wT = 0.052 * escala;
+  const onda = 0.28 * gauss(t, tT, wT);
   return p + q + r + s + onda;
 }
 
@@ -235,7 +243,8 @@ export function simular(fc, { passos = 900, ciclos = 14 } = {}) {
       if (guardar) {
         quadro.push({ t, fase: t / d.rr, pVE, pAo, pAE, pVD, pAP, pAD,
                       vVE, vVD, vAE, vAD, mitral, aortica, tricuspide, pulmonar,
-                      qMitral, qAortica, ecg: ecg(t), ativacao: aVent, ativacaoAtrio: aAtrio });
+                      qMitral, qAortica, qTri, qPulm, ecg: ecg(t, d.rr),
+                      ativacao: aVent, ativacaoAtrio: aAtrio });
       }
 
       vVE += (qMitral - qAortica) * dt;
@@ -314,4 +323,21 @@ export function tempoPorFase(sim) {
    o tempo de perfusão do coração, e é o primeiro a sumir na taquicardia. */
 export function tempoDiastolicoPorMinuto(fc) {
   return duracoes(fc).diastole * fc;      // segundos de diástole por minuto
+}
+
+/* Fase pedagógica para o snapshot de RA. `enchimento` = diástole média,
+   atrioventriculares abertas e semilunares fechadas — o par que o nível
+   das válvulas precisa mostrar, em vez do instante ao acaso da entrada. */
+export function faseDeSnapshotRA(sim, spec) {
+  if (spec !== 'enchimento') return null;
+  const bons = [];
+  const n = sim.quadro.length;
+  for (let i = 0; i < n; i++) {
+    const q = sim.quadro[i];
+    const ant = sim.quadro[i ? i - 1 : n - 1];
+    if (faseDe(q, ant) !== 'enchimento') continue;
+    if (q.mitral && q.tricuspide && !q.aortica && !q.pulmonar) bons.push(q);
+  }
+  if (!bons.length) return null;
+  return bons[Math.floor(bons.length / 2)].fase;
 }
