@@ -4,7 +4,9 @@ import { readFile } from "node:fs/promises";
 import {
   P, CONDUCAO, ATRASO_ELETROMECANICO, duracoes, simular, em, ecg,
   faseDe, tempoPorFase, tempoDiastolicoPorMinuto, estruturaAtiva,
+  faseDeSnapshotRA,
 } from "../coracao/fisica.js";
+import { NIVEIS, nivelRevelaValvas } from "../coracao/niveis.js";
 
 const texto = p => readFile(new URL(`../${p}`, import.meta.url), "utf8");
 const perto = (v, alvo, folga, oq) =>
@@ -182,6 +184,13 @@ test("a bancada está protegida e traz o caminho de RA das irmãs", async () => 
   const page = await texto("coracao/index.html");
   assert.ok(page.includes("data-ra-protected"));
   assert.ok(page.includes('ar-modes="webxr scene-viewer quick-look"'));
+  assert.ok(!page.includes("Onde a gravidade aperta?"),
+    "o título padrão não é o da bancada da ortostase");
+  assert.ok(page.includes("O que acontece entre duas batidas?"));
+  assert.ok(page.includes('id="lentoValor">0.35×'),
+    "o rótulo da câmera lenta nasce igual ao value do input");
+  assert.ok(!/id="stage"[^>]*role="img"/.test(page),
+    "role=img no #stage esconde o Recentrar do leitor de tela");
 });
 
 test("A GEOMETRIA NÃO IMPORTA A FÍSICA", async () => {
@@ -274,4 +283,102 @@ test("O SANGUE NÃO ATRAVESSA VALVA FECHADA", async () => {
   const app = await texto("coracao/app.js");
   assert.ok(app.includes("mitral: { q: q.qMitral, aberta: q.mitral }"),
     "a vazão da gota é a vazão que o motor calculou");
+});
+
+/* ==========================================================================
+   O que a revisão encontrou — e que não pode regressar em silêncio
+   ========================================================================== */
+
+test("o nível chamado 'As válvulas' de fato revela as válvulas", async () => {
+  /* nome ↔ o que a cena constrói. O nível 03 já se chamava "As válvulas" e
+     montava o coração opaco inteiro: cúspides a y≈53–60, raio 10–15 mm,
+     engolidas pelo miocárdio. Se o rótulo promete válvulas, a config tem de
+     cortar / tornar o músculo transparente / enquadrar o plano valvar. */
+  const i = NIVEIS.findIndex(n => /v[áa]lvulas/i.test(n.rotulo));
+  assert.ok(i >= 0, "existe um nível cujo nome fala de válvulas");
+  assert.equal(i, 2, "é o nível 03 (índice 2)");
+  assert.notEqual(NIVEIS[i].comValvas, false, "as valvas estão na cena");
+  assert.ok(nivelRevelaValvas(i), "a config expõe as valvas, não só as nomeia");
+  assert.ok(NIVEIS[i].corte, "o corte abre a cunha até o plano valvar");
+  assert.ok(NIVEIS[i].revelarValvas, "o miocárdio não pode ficar opaco por cima");
+  assert.equal(NIVEIS[i].foco, "valvas", "a câmera enquadra o plano valvar");
+
+  const m = await texto("coracao/modelos.js");
+  assert.ok(m.includes("NIVEIS.map"), "criar() monta a cena a partir da tabela");
+  assert.ok(m.includes("revelarValvas: n.revelarValvas"), "e passa o revelar");
+  const app = await texto("coracao/app.js");
+  assert.ok(app.includes("foco === 'valvas'") || app.includes('foco === "valvas"'),
+    "enquadrar() trata o foco das válvulas");
+  assert.ok(app.includes("alvoDaCamera"), "a câmera deixa de apontar sempre à origem");
+});
+
+test("o lado direito tem vazão própria, e não copia o esquerdo", async () => {
+  /* qTri e qPulm já se integravam no volume, mas o quadro só guardava
+     qMitral/qAortica. O app improvisava: gotas direitas andavam com o
+     relógio da mitral. A tricúspide abre antes e fecha depois — ensinar
+     o contrário é o erro. */
+  for (const q of s75.quadro) {
+    assert.ok("qTri" in q && "qPulm" in q, "o quadro traz qTri e qPulm");
+    if (!q.tricuspide) assert.equal(q.qTri, 0, "tricúspide fechada ⇒ qTri = 0");
+    if (!q.pulmonar) assert.equal(q.qPulm, 0, "pulmonar fechada ⇒ qPulm = 0");
+    if (!q.mitral) assert.equal(q.qMitral, 0, "mitral fechada ⇒ qMitral = 0");
+    if (!q.aortica) assert.equal(q.qAortica, 0, "aórtica fechada ⇒ qAortica = 0");
+  }
+  const divergemAV = s75.quadro.filter(q => q.mitral !== q.tricuspide);
+  assert.ok(divergemAV.length > 10,
+    `tricúspide e mitral têm de divergir (divergiram ${divergemAV.length} quadros)`);
+  for (const q of divergemAV) {
+    /* valva aberta pode ter vazão quase nula na diástase (inércia do folheto);
+       o que não pode é o lado fechado herdar a vazão do outro */
+    if (!q.tricuspide) assert.equal(q.qTri, 0);
+    if (!q.mitral) assert.equal(q.qMitral, 0);
+    assert.ok(q.qTri !== q.qMitral || q.qTri === 0,
+      "qTri não pode ser uma cópia de qMitral quando as valvas divergem");
+  }
+  const divergemSL = s75.quadro.filter(q => q.aortica !== q.pulmonar);
+  assert.ok(divergemSL.length > 0, "pulmonar e aórtica também divergem");
+
+  const app = await texto("coracao/app.js");
+  assert.ok(app.includes("q: q.qTri"), "o app liga a tricúspide a qTri");
+  assert.ok(app.includes("q: q.qPulm"), "o app liga a pulmonar a qPulm");
+  assert.ok(!app.includes("q.mitral ? q.qMitral"),
+    "sumiu a improvisação que copiava o fluxo esquerdo");
+  assert.ok(!app.includes("q.aortica ? q.qAortica"),
+    "e a que copiava a aórtica para a pulmonar");
+});
+
+test("a onda T sobrevive à taquicardia", async () => {
+  /* cravada em 0,390 s, a T some do ciclo a 180 bpm (RR = 0,333 s). Com
+     Bazett ela encolhe com √RR e continua depois do QRS, dentro do ciclo. */
+  for (const fc of [180, 200]) {
+    const rr = 60 / fc;
+    let pico = -9, tPico = 0;
+    for (let t = 0.22; t < rr; t += 0.001) {
+      const v = ecg(t, rr);
+      if (v > pico) { pico = v; tPico = t; }
+    }
+    assert.ok(pico > 0.10, `T ausente a ${fc} bpm (pico ${pico.toFixed(3)} em t=${tPico.toFixed(3)})`);
+    assert.ok(tPico > 0.215, `T tem de vir depois do QRS (a ${fc} bpm caiu em ${tPico.toFixed(3)}s)`);
+    assert.ok(tPico < rr, `T tem de caber no ciclo de ${rr.toFixed(3)}s`);
+  }
+  /* e o quadro simulado guarda essa T, não um traçado com o centro antigo */
+  const s180 = simular(180, { passos: 500, ciclos: 8 });
+  const aposQrs = s180.quadro.filter(q => q.t > 0.22 && q.t < s180.duracoes.rr);
+  const maxT = Math.max(...aposQrs.map(q => q.ecg));
+  assert.ok(maxT > 0.10, `o quadro a 180 bpm perdeu a T (pico ${maxT.toFixed(3)})`);
+});
+
+test("o snapshot de RA do nível das válvulas escolhe a diástole, não um acaso", async () => {
+  const i = NIVEIS.findIndex(n => /v[áa]lvulas/i.test(n.rotulo));
+  assert.equal(NIVEIS[i].faseRA, "enchimento");
+  const fase = faseDeSnapshotRA(s75, NIVEIS[i].faseRA);
+  assert.ok(fase != null, "há um instante de enchimento no ciclo");
+  const q = em(s75, fase);
+  assert.equal(q.mitral, true, "mitral aberta");
+  assert.equal(q.tricuspide, true, "tricúspide aberta");
+  assert.equal(q.aortica, false, "aórtica fechada");
+  assert.equal(q.pulmonar, false, "pulmonar fechada");
+  const app = await texto("coracao/app.js");
+  assert.ok(app.includes("faseDeSnapshotRA"), "prepararRA usa a fase pedagógica");
+  assert.ok(app.includes("aplicarQuadro"), "e aplica o quadro no clone, não na cena viva");
 });
