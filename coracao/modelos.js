@@ -51,10 +51,15 @@ export const M = {
      têm brilho ALTO porque são lisos e molhados de verdade; e a diferença
      entre fosco e lustroso passa a separar as peças sozinha, sem depender de
      matiz — que é o que sobra quando o ACES comprime a saturação. */
-  miocardio: phys({ color: 0x8f2f33, roughness: .74, sheen: .35,
-                    sheenColor: cor(210, 96, 84), sheenRoughness: .8 }),
-  miocardioFino: phys({ color: 0xa03f42, roughness: .72, sheen: .34,
-                        sheenColor: cor(220, 110, 96), sheenRoughness: .8 }),
+  /* PARDO, E NÃO VERMELHO-SANGUE. A regra está escrita no cabeçalho deste
+     arquivo desde o começo — "o miocárdio não usa nenhum dos dois" — e o
+     valor a desrespeitava: 0x8f2f33 tem o mesmo matiz do sangue arterial.
+     Contra a cavidade azul a parede lia; contra a vermelha, sumia. Músculo é
+     carne: pardo quente, e aí a faixa se destaca dos DOIS lados. */
+  miocardio: phys({ color: 0x7a4038, roughness: .78, sheen: .30,
+                    sheenColor: cor(200, 130, 105), sheenRoughness: .85 }),
+  miocardioFino: phys({ color: 0x8d5046, roughness: .76, sheen: .30,
+                        sheenColor: cor(210, 145, 118), sheenRoughness: .85 }),
   atrio: phys({ color: 0x6f3140, roughness: .80, sheen: .28,
                 sheenColor: cor(190, 100, 110), sheenRoughness: .85 }),
   endocardio: phys({ color: 0xd9b6b8, roughness: .30, sheen: .7,
@@ -154,6 +159,22 @@ function camaraDupla(perfilInterno, espessura, mat, matInterno, segs = 30, corte
   interna.geometry = peloAvesso(interna.geometry);
   g.add(externa, interna);
   if (corte) {
+    /* ── O MÚSCULO PRECISA DE GÊMEA ────────────────────────────────────────
+       Com o corte pela METADE, quem olha está DENTRO da metade que ficou — e
+       a face visível da casca externa aponta para fora, de costas para a
+       câmera. O backface culling a descarta, e o miocárdio simplesmente não
+       aparece: cada câmara vira um bloco liso da cor da cavidade, e a lição
+       número um da bancada — parede esquerda três vezes a direita — some.
+
+       No cunho estreito antigo isso não incomodava, porque quase sempre se
+       via o modelo por fora. Num corte frontal passa a ser o defeito
+       principal. A gêmea de winding invertido resolve, e é o mesmo truque
+       que `cores-para-ra.js` usa: `side: DoubleSide` não serve, porque o
+       glTF descarta o material e o USDZ do iPhone descarta o `doubleSided`. */
+    const gemea = new THREE.Mesh(peloAvesso(externa.geometry), mat);
+    gemea.userData.papelParede = 'externa';
+    g.add(gemea);
+
     const a = faceDoCorte(dentro, fora, t0);
     const b = peloAvesso(faceDoCorte(dentro, fora, t0 + tL));
     g.add(new THREE.Mesh(mergeGeometries([a, b]), mat));
