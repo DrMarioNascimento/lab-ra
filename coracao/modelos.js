@@ -147,12 +147,34 @@ function labioDoOstio(dentro, fora, t0, tL, segs) {
   return g;
 }
 
+/* Torus no teto: o lábio plano-alto ainda deixa um cresce quando o vaso
+   não é coaxial com a câmara. A coroa tem volume de verdade no anel. */
+function coroaDoOstio(dentro, fora, t0, tL, segs) {
+  const i = dentro[dentro.length - 1], f = fora[fora.length - 1];
+  const rMeio = (i.x + f.x) / 2;
+  const tubo = Math.max(3.2, (f.x - i.x) * 0.55 + 2.4);
+  const y = (i.y + f.y) / 2;
+  const pts = [];
+  for (let k = 0; k <= 10; k++) {
+    const a = (k / 10) * Math.PI * 2;
+    pts.push(new THREE.Vector2(rMeio + tubo * Math.cos(a), y + tubo * Math.sin(a)));
+  }
+  const g = new THREE.LatheGeometry(pts, segs, t0, tL);
+  g.computeVertexNormals();
+  return g;
+}
+
 function geometriaDosSelos(dentro, fora, t0, tL, segs) {
   const partes = [];
   const ostio = labioDoOstio(dentro, fora, t0, tL, segs);
   if (ostio) {
     partes.push(ostio);
     partes.push(peloAvesso(ostio));
+  }
+  const coroa = coroaDoOstio(dentro, fora, t0, tL, segs);
+  if (coroa) {
+    partes.push(coroa);
+    partes.push(peloAvesso(coroa));
   }
   const polo = anelEntre(fora[0], dentro[0], t0, tL, segs);
   if (polo) {
@@ -374,25 +396,35 @@ function vasoTubo(pontos, raio, mat, segs = 28) {
     new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pontos.map(p => V(...p))), segs, raio, 16, false), mat);
 }
 
-/* Cone + anel na origem do vaso: o tubo de raio constante deixa um cresce
-   entre o teto da câmara e a parede do vaso. rBase cobre o vão; rTubo é o
-   lúmen. Gêmeas pelo avesso — o material.clone() do vidrar isola o nível. */
+/* Cone + anel + calota na SAÍDA do vaso pela parede (não na ponta interna
+   do tubo: lá o colar fica escondido na cavidade e o cresce continua fora). */
 function colarDaRaiz(p0, p1, rTubo, rBase, mat) {
   const a = V(...p0), b = V(...p1);
   const dir = b.clone().sub(a);
-  if (dir.lengthSq() < 1e-8) dir.set(0, 1, 0);
-  else dir.normalize();
-  const len = Math.max(12, (rBase - rTubo) * 1.1);
+  const span = dir.length() || 1;
+  dir.multiplyScalar(1 / span);
+  /* 0.38 do primeiro segmento ≈ teto da câmara depois do SUBIR_PLANO */
+  const saida = a.clone().add(dir.clone().multiplyScalar(span * 0.38));
+  const g = new THREE.Group();
+  const len = Math.max(14, (rBase - rTubo) * 1.2);
   const cone = new THREE.CylinderGeometry(rTubo, rBase, len, 22, 1, true);
-  cone.translate(0, len / 2, 0);
-  cone.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(V(0, 1, 0), dir));
-  cone.translate(a.x, a.y, a.z);
-  const anel = new THREE.RingGeometry(rTubo * 0.9, rBase, 22, 2);
-  anel.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(V(0, 0, 1), dir));
-  anel.translate(a.x, a.y, a.z);
-  const partes = [cone, anel, peloAvesso(cone), peloAvesso(anel)];
-  for (const p of partes) p.deleteAttribute('uv');
-  return new THREE.Mesh(mergeGeometries(partes), mat);
+  const mCone = new THREE.Mesh(cone, mat);
+  mCone.position.copy(saida).add(dir.clone().multiplyScalar(len * 0.15));
+  mCone.quaternion.setFromUnitVectors(V(0, 1, 0), dir);
+  const anel = new THREE.Mesh(new THREE.RingGeometry(rTubo * 0.85, rBase, 22, 2), mat);
+  anel.position.copy(saida);
+  anel.quaternion.setFromUnitVectors(V(0, 0, 1), dir);
+  const calota = new THREE.Mesh(new THREE.SphereGeometry(rBase * 0.62, 16, 12), mat);
+  calota.position.copy(saida);
+  const avesso = (mesh) => {
+    const m = new THREE.Mesh(peloAvesso(mesh.geometry), mesh.material);
+    m.position.copy(mesh.position);
+    m.quaternion.copy(mesh.quaternion);
+    m.scale.copy(mesh.scale);
+    return m;
+  };
+  g.add(mCone, anel, calota, avesso(mCone), avesso(anel), avesso(calota));
+  return g;
 }
 
 function grandesVasos() {

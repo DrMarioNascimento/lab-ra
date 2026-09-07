@@ -503,6 +503,7 @@ test("a parede fecha no polo e no anel do corte, sem tamponar o lúmen", async (
   assert.ok(m.includes("papelParede = 'selo'"), "o selo acompanha o volume, senão a sístole abre o corte");
   assert.ok(m.includes("function colarDaRaiz"), "a raiz do vaso ganha colar contra a câmara");
   assert.ok(m.includes("labioDoOstio"), "o óstio tem lábio com altura, não anel plano");
+  assert.ok(m.includes("coroaDoOstio"), "a coroa dá volume no teto, visível de lado");
   assert.ok(m.includes("o.material = o.material.clone()"), "o vidro continua isolado por clone");
   const semComentario = m.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
   assert.ok(!/dentro\[i\]\.x \* cos,\s*dentro\[i\]\.y,\s*dentro\[i\]\.x \* sin/.test(semComentario),

@@ -75,8 +75,8 @@ export function perfilDoLabio(pDentro, pFora, dy = LABIO_DY) {
 /* Colar da raiz: rBase tem de cobrir o vão em cresce entre o teto da câmara
    e o tubo. O lúmen do vaso (rTubo) continua patente. */
 export const JUNTAS_VASO = {
-  aorta:    { rTubo: 12,   rBase: 23 },
-  pulmonar: { rTubo: 10.5, rBase: 24 },
+  aorta:    { rTubo: 12,   rBase: 26 },
+  pulmonar: { rTubo: 10.5, rBase: 28 },
   cava:     { rTubo: 9.5,  rBase: 16 },
   cavaInf:  { rTubo: 10.5, rBase: 16 },
   veiaPulm: { rTubo: 4.6,  rBase: 9 },
