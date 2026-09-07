@@ -59,6 +59,16 @@ export const M = {
                 sheenColor: cor(190, 100, 110), sheenRoughness: .85 }),
   endocardio: phys({ color: 0xd9b6b8, roughness: .30, sheen: .7,
                      sheenColor: cor(255, 235, 235) }),
+  /* ── A CAVIDADE TEM A COR DO QUE HÁ DENTRO DELA ──────────────────────────
+     No desenho anatômico as quatro cavidades eram forradas do mesmo rosa
+     pálido, e o resultado com o corte aberto era um bicho branco: nada
+     dizia de que lado se estava. Num esquema a cavidade é SANGUE, e o aluno
+     já chega sabendo ler vermelho e azul. É a etiqueta mais barata que
+     existe — não custa rótulo, não custa legenda, não custa girar. */
+  interiorRico: phys({ color: 0xb8323a, roughness: .42, sheen: .55,
+                       sheenColor: cor(255, 190, 180) }),
+  interiorPobre: phys({ color: 0x3b4a94, roughness: .42, sheen: .55,
+                        sheenColor: cor(185, 195, 255) }),
   valva: phys({ color: 0xf4ece6, roughness: .26, sheen: .9,
                 sheenColor: cor(255, 255, 255),
                 transparent: true, opacity: .94 }),
@@ -179,40 +189,46 @@ function perfilVentriculo(raio, altura, pontudo = 1) {
   return pts;
 }
 
-/* ── OS VENTRÍCULOS ───────────────────────────────────────────────────────
-   O esquerdo é um cone de parede grossa. O direito NÃO é um segundo cone: é
-   uma meia-lua abraçada nele, e o septo pertence ao esquerdo. */
+/* ── OS VENTRÍCULOS, EM CORTE FRONTAL ─────────────────────────────────────
+   A ANATOMIA FIEL NÃO ENSINAVA AQUI. No corpo o ventrículo direito é uma
+   meia-lua abraçada no esquerdo — está certo, e é ilegível: nunca se vê as
+   quatro câmaras ao mesmo tempo, e foi por isso que esta bancada precisou de
+   VIDRO para mostrar as próprias válvulas. Vidro é remendo de composição.
+
+   O esquema do livro põe os dois LADO A LADO, separados pelo septo, e corta
+   o coração no plano frontal: a metade da frente sai e as quatro cavidades
+   ficam abertas para quem olha. Perde-se a forma do órgão; ganha-se a lição,
+   que é ver a parede esquerda ao lado da direita e poder COMPARAR as duas.
+
+   O SEPTO NÃO É PEÇA SEPARADA: é a parede esquerda do ventrículo esquerdo, e
+   a cavidade direita termina exatamente onde ela começa. Isso é verdade na
+   anatomia, e é o que evita desenhar duas paredes onde existe uma. */
+const VE_X = 22, VD_X = -30;
+export const PAREDE_VE = 10, PAREDE_VD = 3.4;
+
+/* A METADE DA FRENTE É A QUE SAI. O LatheGeometry começa em +Z, então
+   desenhar de π/2 com comprimento π deixa a abertura centrada em zero — de
+   frente para quem olha, que é de onde o esquema tem de ser lido. */
+const METADE = [Math.PI / 2, Math.PI];
+
 function ventriculoEsquerdo(corte) {
-  const g = camaraDupla(perfilVentriculo(26, ALTURA_VE), 10, M.miocardio, null, 30, corte);
+  const g = camaraDupla(perfilVentriculo(22, ALTURA_VE), PAREDE_VE,
+                        M.miocardio, M.interiorRico, 34, corte ? METADE : null);
+  g.position.x = VE_X;
   g.userData.papel = 've';
   return g;
 }
 
 function ventriculoDireito(corte) {
-  /* a meia-lua: um perfil próprio, achatado e recortado em theta, encostado
-     na frente e à direita do esquerdo */
-  const perfil = perfilVentriculo(23, ALTURA_VD, 1.15);
-  const gg = new THREE.Group();
-  const t0 = corte ? Math.max(corte[0], -Math.PI * .58) : -Math.PI * .58;
-  const tL = corte ? Math.min(corte[1], Math.PI * 1.16) : Math.PI * 1.16;
-  const dentro = new THREE.LatheGeometry(perfil, 26, t0, tL);
-  const fora = new THREE.LatheGeometry(
-    perfil.map((p, i, a) => {
-      const ant = a[Math.max(0, i - 1)], pro = a[Math.min(a.length - 1, i + 1)];
-      const tx = pro.x - ant.x, ty = pro.y - ant.y, n = Math.hypot(tx, ty) || 1;
-      return new THREE.Vector2(p.x + ty / n * 3.4, p.y - tx / n * 3.4);
-    }), 26, t0, tL);
-  const externa = new THREE.Mesh(fora, M.miocardioFino);
-  const interna = new THREE.Mesh(peloAvesso(dentro), M.endocardio);
-  externa.userData.papelParede = 'externa';
-  interna.userData.papelParede = 'interna';
-  gg.add(externa, interna);
-  /* achatado contra o esquerdo, e deslocado para a frente e para a direita */
-  gg.scale.set(1, 1, .62);
-  gg.position.set(-16, VD_Y, 12);
-  gg.rotation.y = -.34;
-  gg.userData = { externa, interna, papel: 'vd', espessura: 3.4 };
-  return gg;
+  /* Mesma construção do esquerdo, e é isso que permite comparar: a única
+     coisa que muda entre os dois é a ESPESSURA — 3,4 mm contra 10. Se cada
+     um fosse feito de um jeito, a diferença na tela poderia ser do desenho.
+     Assim ela só pode ser do número. */
+  const g = camaraDupla(perfilVentriculo(20, ALTURA_VD), PAREDE_VD,
+                        M.miocardioFino, M.interiorPobre, 34, corte ? METADE : null);
+  g.position.set(VD_X, VD_Y, 0);
+  g.userData.papel = 'vd';
+  return g;
 }
 
 /* ── OS ÁTRIOS ────────────────────────────────────────────────────────────
@@ -224,18 +240,12 @@ function atrio(lado, corte) {
     const u = i / 14;
     perfil.push(new THREE.Vector2(Math.max(.4, 21 * Math.sin(Math.PI * (.12 + .82 * u))), u * 34));
   }
-  const g = camaraDupla(perfil, 2.6, M.atrio, M.endocardio, 26, corte);
-  /* a aurícula: uma bolsa curva pendurada na frente */
-  const pts = [];
-  for (let i = 0; i <= 6; i++) {
-    const t = i / 6;
-    pts.push(V(lado * (10 + 14 * t), 16 + 8 * Math.sin(Math.PI * t), 12 + 9 * t - 5 * t * t));
-  }
-  const aur = new THREE.Mesh(
-    new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 16, 6.2, 12, false), M.atrio);
-  const ponta = new THREE.Mesh(new THREE.SphereGeometry(6.2, 12, 9), M.atrio);
-  ponta.position.copy(pts[pts.length - 1]);
-  g.add(aur, ponta);
+  /* A AURÍCULA SAIU. Ela é a orelhinha que todo mundo reconhece, e no
+     desenho anatômico ela estava certa — mas pendurada na frente de um
+     átrio meio enterrado, virava um caroço escuro grudado por fora, e foi
+     o primeiro defeito que o professor apontou na foto. Num esquema ela não
+     paga o que custa: não participa de nenhuma das quatro lições. */
+  const g = camaraDupla(perfil, 2.6, M.atrio, lado > 0 ? M.interiorRico : M.interiorPobre, 30, corte ? METADE : null);
   g.userData.papel = lado > 0 ? 'ae' : 'ad';
   return g;
 }
@@ -492,12 +502,14 @@ function corpo({
      "por dentro" e mostrava o mesmo exterior dos outros. */
   /* a cunha fica simétrica em torno de 180 graus para que a ABERTURA caia
      em theta zero, que no LatheGeometry é o +Z — de frente para a câmera */
-  const janela = corte ? [Math.PI * .306, Math.PI * 1.389] : null;
-  const ve = ventriculoEsquerdo(janela); g.add(ve);
-  const vd = ventriculoDireito(janela); g.add(vd);
+  const ve = ventriculoEsquerdo(corte); g.add(ve);
+  const vd = ventriculoDireito(corte); g.add(vd);
 
-  const ae = atrio(1, janela); ae.position.set(14, 58 + SUBIR_PLANO, -6); ae.rotation.z = -.16; g.add(ae);
-  const ad = atrio(-1, janela); ad.position.set(-20, 56 + SUBIR_PLANO, 0); ad.rotation.z = .18; ad.scale.setScalar(.94); g.add(ad);
+  /* CADA ÁTRIO SENTA NO TOPO DO SEU VENTRÍCULO, no mesmo eixo — é o que faz
+     as quatro câmaras se lerem como duas colunas, direita e esquerda, com o
+     sangue subindo por uma e descendo pela outra. */
+  const ae = atrio(1, corte); ae.position.set(VE_X, ALTURA_VE, 0); g.add(ae);
+  const ad = atrio(-1, corte); ad.position.set(VD_X, VD_Y + ALTURA_VD, 0); g.add(ad);
 
   const vasos = grandesVasos();
   vasos.userData.papel = 'vasos';
@@ -535,9 +547,12 @@ function corpo({
   const sangue = gotasDeSangue(); g.add(sangue);
   g.add(vasos);
 
-  /* a inclinação anatômica */
-  g.rotation.set(.16, 0, .30);
-  g.position.y = -46;
+  /* A INCLINAÇÃO ANATÔMICA SAIU. No tórax o coração pende torto, com a ponta
+     para a esquerda e para a frente, e o desenho anterior copiava isso. Num
+     ESQUEMA a inclinação só atrapalha: ela desalinha as duas colunas, tira a
+     simetria que faz a comparação direita/esquerda ser imediata, e faz o
+     corte frontal deixar de ser frontal. Diagrama se lê aprumado. */
+  g.position.y = -52;
   g.userData = { ve, vd, ae, ad, valvas, vasos, conducao: cond, sangue };
   return g;
 }

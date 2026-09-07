@@ -109,7 +109,11 @@ function enquadrar(n) {
        fica ainda mais larga, mas aí se perde o que há dentro — e o nível se
        chama "por dentro". */
     controls.target.copy(alvo);
-    camera.position.set(alvo.x - d * .36, alvo.y + d * .14, alvo.z + d * .90);
+    /* DE FRENTE, E QUASE SEM AZIMUTE. O corte agora é FRONTAL e o coração
+       está aprumado: as quatro cavidades abrem para quem olha e as duas
+       colunas — direita e esquerda — só se comparam se estiverem lado a
+       lado na tela. Qualquer giro desalinha a comparação, que é a lição. */
+    camera.position.set(alvo.x + d * .02, alvo.y + d * .06, alvo.z + d * .998);
   } else {
     controls.target.copy(alvo);
     camera.position.set(alvo.x + d * .22, alvo.y + d * .14, alvo.z + d * .94);
