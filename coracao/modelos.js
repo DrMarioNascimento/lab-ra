@@ -308,7 +308,7 @@ function ventriculoDireito(corte) {
   const gg = camaraDupla(perfil, 3.4, M.miocardioFino, null, 26, [t0, tL]);
   /* achatado contra o esquerdo, e encostado: a junta septal era um vão
      entre dois sólidos. A meia-lua continua meia-lua. */
-  gg.scale.set(1, 1, .78);
+  gg.scale.set(1, 1, 1);
   gg.position.set(-13.4, VD_Y, 9.4);
   gg.rotation.y = -.30;
   gg.userData.papel = 'vd';
@@ -490,11 +490,12 @@ function grandesVasos() {
     if (matParede)
       g.add(colarDaRaiz(p, q, junta.rTubo * 1.05, junta.rBase * 1.22, matParede));
   };
-  /* aorta: sai do centro, sobe por trás e faz a crossa para a direita */
-  põe([[4, 56, -4], [5, 82, -2], [4, 104, 2], [-8, 118, 4], [-26, 112, 2], [-32, 92, -2]],
+  /* aorta: sai no EIXO do VE (senão o tubo fura a parede ao lado do óstio
+     e o cresce da foto volta), sobe e faz a crossa para a direita */
+  põe([[0, 52, 0], [0, 68, 0], [6, 90, -12], [4, 104, 2], [-8, 118, 4], [-26, 112, 2], [-32, 92, -2]],
       M.aorta, JUNTAS_VASO.aorta, M.miocardio);
-  /* tronco pulmonar: sai à FRENTE e cruza para a esquerda, por cima */
-  põe([[-12, 50, 16], [-10, 80, 14], [-4, 98, 8], [10, 106, 2]],
+  /* tronco pulmonar: sai no eixo do VD e cruza para a esquerda, por cima */
+  põe([[-13.4, 46, 9.4], [-13.4, 64, 9.4], [-6, 88, 10], [4, 102, 4], [10, 106, 2]],
       M.pulmonar, JUNTAS_VASO.pulmonar, M.miocardioFino);
   /* os dois ramos pulmonares */
   g.add(vasoTubo([[10, 106, 2], [26, 104, -4], [38, 96, -10]], 6.4, M.pulmonar));
@@ -612,14 +613,14 @@ const CAMINHOS = {
   direito: {
     pontos: [[-25, 16, -8], [-24, 38, -6], [-21, 52, -2], [-18, 56, 2],
              [-16, 53, 6], [-16, 40, 11], [-15, 22, 12], [-14, 40, 15],
-             [-12, 56, 16], [-11, 74, 15], [-6, 96, 9], [10, 106, 2]]
+             [-13.4, 56, 9.4], [-13.4, 64, 9.4], [-6, 88, 10], [10, 106, 2]]
       .map(noSulco),
     uAV: .33, uSL: .70, mat: 'sanguePobre',
   },
   esquerdo: {
     pontos: [[28, 64, -14], [20, 60, -9], [12, 58, -5], [8, 57, -3],
              [6, 54, -1], [4, 38, 0], [3, 20, 1], [4, 40, -2],
-             [4, 58, -4], [5, 82, -2], [0, 112, 3], [-26, 112, 2]]
+             [0, 58, 0], [0, 82, 0], [-8, 118, 4], [-26, 112, 2]]
       .map(noSulco),
     uAV: .35, uSL: .70, mat: 'sangueRico',
   },

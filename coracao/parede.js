@@ -18,7 +18,7 @@ export function raioPerfilVentriculo(u, raio, pontudo = 1) {
   if (u > 0.84) {
     const t = (u - 0.84) / 0.16;
     const s2 = t * t * (3 - 2 * t);
-    const rVaso = Math.max(9.5, raio * 0.44);
+    const rVaso = Math.max(9.2, raio * 0.42);
     r = r * (1 - s2) + rVaso * s2;
   }
   return r;
@@ -183,11 +183,12 @@ export function provaSelosDaParede({ alturaVE, alturaVD }) {
   const ys = labioVE.map(p => p.y);
   const tampoVE = perfilDoTampo(ve.dentro[ve.dentro.length - 1], ve.fora[ve.fora.length - 1]);
   const tampoVD = perfilDoTampo(vd.dentro[vd.dentro.length - 1], vd.fora[vd.fora.length - 1]);
-  const aortaPts = [[4, 56, -4], [5, 82, -2], [4, 104, 2]];
-  const pulPts = [[-12, 50, 16], [-10, 80, 14], [-4, 98, 8]];
+  const aortaPts = [[0, 52, 0], [0, 68, 0], [4, 104, 2]];
+  const pulPts = [[-13.4, 46, 9.4], [-13.4, 64, 9.4], [-6, 88, 10]];
   const saidaAorta = saidaDaParede(aortaPts, JUNTAS_VASO.aorta.ySaida);
   const saidaPul = saidaDaParede(pulPts, JUNTAS_VASO.pulmonar.ySaida);
-  const colarAntigoAorta = pontoNoSegmento(aortaPts[0], aortaPts[1], 0.38);
+  const caminhoAntigoAorta = [[4, 56, -4], [5, 82, -2]];
+  const colarAntigoAorta = pontoNoSegmento(caminhoAntigoAorta[0], caminhoAntigoAorta[1], 0.38);
   return {
     ve: medida(ve),
     vd: medida(vd),

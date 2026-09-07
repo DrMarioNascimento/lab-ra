@@ -521,7 +521,8 @@ test("a parede fecha no polo e no anel do corte, sem tamponar o lúmen", async (
   assert.ok(m.includes("coroaDoOstio"), "a coroa dá volume no teto, visível de lado");
   assert.ok(m.includes("saidaDaParede(pts, junta.ySaida)"), "o colar senta no plano do teto, não no ar");
   assert.ok(m.includes("function soldaSepto"), "a junta RV–LV ganha cordão, senão o vão lê como furo");
-  assert.ok(m.includes("tampoDoOstio"), "o teto ganha anel gordo, visível de lado");
+  assert.ok(m.includes("[-13.4, 46, 9.4]"), "a pulmonar atravessa o óstio do VD, não a parede ao lado");
+  assert.ok(m.includes("[0, 52, 0]"), "a aorta atravessa o óstio do VE, não a parede ao lado");
   assert.ok(m.includes("TorusGeometry"), "o colar tem torus com volume, não só anel plano");
   assert.ok(m.includes("o.material = o.material.clone()"), "o vidro continua isolado por clone");
   const semComentario = m.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");

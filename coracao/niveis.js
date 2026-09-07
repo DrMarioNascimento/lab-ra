@@ -38,8 +38,8 @@ export const TOLERANCIA_JUNCAO_MM = 8;
 export const PLANO_VALVAR = {
   mitral:     [6,  56 + SUBIR_PLANO, -2],   // 74
   tricuspide: [-16, 53 + SUBIR_PLANO,  6],  // 71
-  aortica:    [4,  60 + SUBIR_PLANO, -4],   // 78
-  pulmonar:   [-12, 58 + SUBIR_PLANO, 16],  // 76
+  aortica:    [0,  60 + SUBIR_PLANO,  0],   // 78, no eixo do VE
+  pulmonar:   [-13.4, 58 + SUBIR_PLANO, 9.4], // 76, no eixo do VD
 };
 export const VENTRICULO_DA_VALVA = {
   mitral: 've', tricuspide: 'vd', aortica: 've', pulmonar: 'vd',
