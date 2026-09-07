@@ -1,9 +1,9 @@
 {
   "arquivo": "export\\coracao-bancada11-WIP.glb",
   "wip": true,
-  "triangulos": 101650,
+  "triangulos": 95854,
   "orcamento_60k": false,
-  "nos_com_malha": 84,
+  "nos_com_malha": 79,
   "apice_nativo_mm": [
     55.6279,
     -130.931,

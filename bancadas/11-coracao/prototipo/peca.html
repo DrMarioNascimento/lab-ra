@@ -89,7 +89,7 @@ let malhas = [], alturaTotal = 1, escondido = false;
 
 new GLTFLoader().load('modelos/B-bodyparts3d.glb', g => {
   g.scene.updateMatrixWorld(true);
-  g.scene.traverse(o => { if (o.isMesh) malhas.push(o); });
+  g.scene.traverse(o => { if (o.isMesh) { o.userData.matOriginal = o.material; malhas.push(o); } });
   const caixa = new THREE.Box3().setFromObject(g.scene);
   const tam = caixa.getSize(new THREE.Vector3()), cen = caixa.getCenter(new THREE.Vector3());
   alturaTotal = tam.y;
@@ -100,10 +100,14 @@ new GLTFLoader().load('modelos/B-bodyparts3d.glb', g => {
   ctl.target.set(0, 0, 0); ctl.update();
 
   const sel = $('peca');
+  /* a peça inteira, com os materiais do próprio arquivo */
+  const tudo = document.createElement('option');
+  tudo.value = '*'; tudo.textContent = '— a peça inteira —';
+  sel.appendChild(tudo);
   malhas.slice().sort((a, b) => (a.name || '').localeCompare(b.name || ''))
     .forEach(m => { const o = document.createElement('option');
       o.value = m.name; o.textContent = m.name; sel.appendChild(o); });
-  sel.value = malhas.some(m => m.name === 'parede_ad') ? 'parede_ad' : malhas[0].name;
+  sel.value = '*';
   sel.addEventListener('change', pintar);
   pintar();
   medir(); r.render(cena, cam);
@@ -111,10 +115,11 @@ new GLTFLoader().load('modelos/B-bodyparts3d.glb', g => {
 
 function pintar() {
   const alvo = $('peca').value;
+  const inteira = alvo === '*';
   let tri = 0, caixa = new THREE.Box3();
   for (const m of malhas) {
-    const eu = m.name === alvo;
-    m.material = eu ? destaque : apagado;
+    const eu = inteira || m.name === alvo;
+    m.material = inteira ? m.userData.matOriginal : (eu ? destaque : apagado);
     m.visible = eu || !escondido;
     if (eu) {
       const g = m.geometry;

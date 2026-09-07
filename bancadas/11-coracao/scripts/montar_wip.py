@@ -107,18 +107,45 @@ def transformar(v, apice):
 # Sao pecas NOMEADAS que saem, e por nome: nada de apagar por cor ou por
 # tamanho, que amanha pega outra coisa.
 REMOVER = {
+    # OS TUBOS AZUIS -- material `vaso_venoso`. Saltavam do modelo e dobravam
+    # a largura; a cava inferior sozinha descia 23 cm ate a bifurcacao iliaca.
     "tronco_pulmonar",
     "veia_cava_superior",
     "veia_cava_inferior",
+    # O ARCO, que sai no ENCAIXE. Aorta ascendente e arco sao pecas separadas,
+    # entao apagar o arco corta a aorta exatamente na juncao entre as duas --
+    # o anel que se ve no modelo. Aparar por altura nao servia: o arco corre
+    # na horizontal e o corte o fatiava no comprimento, virando fita chata.
     "arco_aortico",
-    # As CAVIDADES ficaram. Chegamos a remove-las para ver o esqueleto por
-    # dentro, e o exercicio valeu -- foi ele que revelou que a parede
-    # ventricular existe, arquivada com nome de atrio. Mas isso e assunto de
-    # outra rodada; aqui elas voltam.
+    # O SANGUE. As cavidades do BodyParts3D nao sao o revestimento da camara:
+    # sao o MOLDE MACICO do volume de sangue. Com elas dentro, as coronarias
+    # aparecem correndo em cima do sangue, sem musculo entre.
+    #
+    # O proprio mapeamento ja as marcava como papel "debug": nunca foram
+    # pecas de ensino.
+    "cavidade_ve",
+    "cavidade_vd",
+    "cavidade_ae",
+    "cavidade_ad",
+    # AS QUATRO VEIAS PULMONARES. Sao os tubos claros e grossos que saem pelos
+    # lados e dobram a largura do modelo -- mesmo material da aorta, dai
+    # parecerem a mesma coisa. Saem elas; a aorta ascendente FICA, porque e
+    # ela que termina no encaixe.
+    "veia_pulmonar_superior_direita",
+    "veia_pulmonar_inferior_direita",
+    "veia_pulmonar_superior_esquerda",
+    "veia_pulmonar_inferior_esquerda",
+    # A AORTA ASCENDENTE, para a valva aparecer. As tres cuspides aorticas
+    # vivem entre y 49 e 71, DENTRO da faixa do tubo (50 a 98): a aorta era
+    # exatamente o que as tapava. Tirando-a, a semilunar fica a vista.
+    #
+    # Custo assumido: some o "encaixe", o anel que marcava onde a via de
+    # saida termina, e com ele a referencia de para onde o sangue vai.
+    "aorta_ascendente",
 }
 
-APARAR_ABAIXO = -4.0     # mm; so o coto de entrada da cava, nada de iliaca
-APARAR_ACIMA = 120.0     # mm; a altura do scan, para os dois se enquadrarem igual
+APARAR_ABAIXO = -1e9     # mm; so o coto de entrada da cava, nada de iliaca
+APARAR_ACIMA = 1e9     # mm; a altura do scan, para os dois se enquadrarem igual
 
 
 def aparar(verts, faces):

@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<title>Coloração dos dois</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; background: #0a0d0a; color: #dbe6d8;
+         font: 13.5px/1.5 "IBM Plex Mono", ui-monospace, monospace; }
+  h1 { font-size: 15px; letter-spacing: .16em; text-transform: uppercase;
+       color: #9ec49a; margin: 14px 18px 4px; font-weight: 600; }
+  p.nota { margin: 0 18px 12px; max-width: 96ch; color: #93a691; font-size: 12.5px; }
+  .tudo { display: grid; grid-template-columns: 1fr 1fr 300px; gap: 12px; padding: 0 14px 18px; }
+  @media (max-width: 1100px) { .tudo { grid-template-columns: 1fr 1fr; } .painel { grid-column: 1 / -1; } }
+  canvas { display: block; width: 100%; height: 560px;
+           border: 1px solid #24331f; border-radius: 12px; background: #10150f; }
+  .painel { border: 1px solid #24331f; border-radius: 12px; background: #10150f;
+            padding: 12px 14px; max-height: 560px; overflow-y: auto; }
+  h2 { font-size: 11.5px; letter-spacing: .14em; text-transform: uppercase;
+       color: #9ec49a; margin: 14px 0 6px; font-weight: 600;
+       border-top: 1px solid #24331f; padding-top: 10px; }
+  h2:first-child { border-top: 0; padding-top: 0; margin-top: 0; }
+  .lin { display: flex; align-items: center; gap: 8px; margin: 5px 0; }
+  .lin span { flex: 1; font-size: 12px; color: #b9ccb6; }
+  .lin b { color: #f2f7ec; font-weight: 600; min-width: 42px; text-align: right; font-size: 12px; }
+  input[type=color] { width: 34px; height: 24px; border: 1px solid #35492c;
+                      border-radius: 5px; background: #0a0d0a; padding: 1px; cursor: pointer; }
+  input[type=range] { width: 100%; accent-color: #d8c53a; }
+  button { width: 100%; background: #1c2718; color: #e8f2e4; border: 1px solid #35492c;
+           border-radius: 8px; padding: 6px 10px; font: inherit; cursor: pointer; margin-top: 8px; }
+  button:hover { background: #26351f; }
+  .saida { white-space: pre-wrap; font-size: 11px; color: #8fa38c;
+           background: #0c110b; border: 1px solid #24331f; border-radius: 8px;
+           padding: 8px; margin-top: 8px; }
+</style>
+</head>
+<body>
+<h1>Coloração · A e B lado a lado</h1>
+<p class="nota">As cores do B <b>já estão no arquivo</b> e são distintas — miocárdio vinho, coronária
+escarlate, valva creme. Se tudo aparece rosa uniforme, o problema é a LUZ lavando o pigmento, não a
+tinta. Por isso os controles de luz vêm primeiro: mexa neles antes de mexer nas cores.</p>
+
+<div class="tudo">
+  <canvas id="ca"></canvas>
+  <canvas id="cb"></canvas>
+  <div class="painel">
+    <h2>Luz · vale para os dois</h2>
+    <div class="lin"><span>exposição</span><b id="vexp">1.10</b></div>
+    <input id="exp" type="range" min="0.3" max="2" step="0.02" value="1.1" />
+    <div class="lin"><span>ambiente</span><b id="vamb">0.75</b></div>
+    <input id="amb" type="range" min="0" max="1.5" step="0.02" value="0.75" />
+    <div class="lin"><span>luz principal</span><b id="vkey">2.40</b></div>
+    <input id="key" type="range" min="0" max="5" step="0.05" value="2.4" />
+    <div class="lin"><span>preenchimento</span><b id="vfill">0.60</b></div>
+    <input id="fill" type="range" min="0" max="3" step="0.05" value="0.6" />
+    <div class="lin"><span>contraluz</span><b id="vrim">1.00</b></div>
+    <input id="rim" type="range" min="0" max="4" step="0.05" value="1" />
+
+    <h2>B · cor por material</h2>
+    <div id="mats"></div>
+
+    <h2>A · o scan</h2>
+    <div class="lin"><span>tingir</span><input id="tint" type="color" value="#ffffff" /></div>
+    <div class="lin"><span>aspereza</span><b id="vrou">—</b></div>
+    <input id="rou" type="range" min="0" max="1" step="0.02" value="0.5" />
+
+    <button id="copiar" type="button">Copiar os valores</button>
+    <div class="saida" id="saida">—</div>
+  </div>
+</div>
+
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const $ = id => document.getElementById(id);
+
+function palco(id) {
+  const canvas = $(id);
+  const r = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  r.setPixelRatio(Math.min(devicePixelRatio, 2));
+  r.outputColorSpace = THREE.SRGBColorSpace;
+  r.toneMapping = THREE.ACESFilmicToneMapping;
+  const cena = new THREE.Scene();
+  cena.environment = new THREE.PMREMGenerator(r).fromScene(new RoomEnvironment(), .04).texture;
+  cena.add(new THREE.HemisphereLight(0xffeede, 0x181016, 1.0));
+  const key = new THREE.DirectionalLight(0xfff2e6, 2.4); key.position.set(120, 180, 160);
+  const fill = new THREE.DirectionalLight(0xffcfc4, .6); fill.position.set(-140, 60, 100);
+  const rim = new THREE.DirectionalLight(0x9fb8ff, 1.0); rim.position.set(-80, 90, -180);
+  cena.add(key, fill, rim);
+  const cam = new THREE.PerspectiveCamera(32, 1, .1, 5000);
+  const ctl = new OrbitControls(cam, canvas); ctl.enableDamping = true;
+  function medir() { const w = canvas.clientWidth, h = canvas.clientHeight;
+    r.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }
+  addEventListener('resize', medir); medir();
+  return { r, cena, cam, ctl, key, fill, rim, medir };
+}
+
+const A = palco('ca'), B = palco('cb');
+const palcos = [A, B];
+
+function encaixar(p, raiz) {
+  const caixa = new THREE.Box3().setFromObject(raiz);
+  const tam = caixa.getSize(new THREE.Vector3()), cen = caixa.getCenter(new THREE.Vector3());
+  const k = 120 / Math.max(tam.x, tam.y, tam.z, 1e-6);
+  raiz.scale.multiplyScalar(k);
+  raiz.position.sub(cen.multiplyScalar(k));
+  p.cena.add(raiz);
+  const d = 120 / Math.tan(p.cam.fov * Math.PI / 360) * 1.15;
+  p.cam.position.set(d * .18, d * .10, d * .95);
+  p.ctl.target.set(0, 0, 0); p.ctl.update();
+  p.medir();
+}
+
+const carregador = new GLTFLoader();
+let matA = null, matsB = new Map();
+
+carregador.load('modelos/A-scan-realista.glb', g => {
+  g.scene.traverse(o => { if (o.isMesh && !matA) matA = o.material; });
+  encaixar(A, g.scene);
+  $('vrou').textContent = (matA.roughness ?? 0.5).toFixed(2);
+  $('rou').value = matA.roughness ?? 0.5;
+  luz();
+});
+
+carregador.load('modelos/B-bodyparts3d.glb', g => {
+  g.scene.traverse(o => { if (o.isMesh && o.material?.name) matsB.set(o.material.name, o.material); });
+  encaixar(B, g.scene);
+  const cx = $('mats');
+  for (const [nome, m] of [...matsB].sort()) {
+    const lin = document.createElement('div'); lin.className = 'lin';
+    const rot = document.createElement('span'); rot.textContent = nome;
+    const cor = document.createElement('input'); cor.type = 'color';
+    cor.value = '#' + m.color.getHexString();
+    cor.addEventListener('input', () => { m.color.set(cor.value); pintar(); });
+    lin.append(rot, cor); cx.appendChild(lin);
+  }
+  luz();
+});
+
+function pintar() { for (const p of palcos) p.r.render(p.cena, p.cam); }
+
+function luz() {
+  const exp = +$('exp').value, amb = +$('amb').value;
+  const k = +$('key').value, f = +$('fill').value, rm = +$('rim').value;
+  $('vexp').textContent = exp.toFixed(2); $('vamb').textContent = amb.toFixed(2);
+  $('vkey').textContent = k.toFixed(2); $('vfill').textContent = f.toFixed(2);
+  $('vrim').textContent = rm.toFixed(2);
+  for (const p of palcos) {
+    p.r.toneMappingExposure = exp;
+    p.cena.environmentIntensity = amb;
+    p.key.intensity = k; p.fill.intensity = f; p.rim.intensity = rm;
+  }
+  pintar();
+}
+for (const id of ['exp', 'amb', 'key', 'fill', 'rim']) $(id).addEventListener('input', luz);
+
+$('tint').addEventListener('input', e => { if (matA) { matA.color.set(e.target.value); pintar(); } });
+$('rou').addEventListener('input', e => {
+  if (!matA) return; matA.roughness = +e.target.value;
+  $('vrou').textContent = (+e.target.value).toFixed(2); pintar();
+});
+
+$('copiar').onclick = () => {
+  const linhas = ['luz:',
+    `  exposicao ${$('exp').value}   ambiente ${$('amb').value}`,
+    `  key ${$('key').value}   fill ${$('fill').value}   rim ${$('rim').value}`,
+    'B, cor por material:'];
+  for (const [nome, m] of [...matsB].sort()) linhas.push(`  ${nome.padEnd(14)} #${m.color.getHexString()}`);
+  if (matA) linhas.push('A:', `  tingir #${matA.color.getHexString()}   aspereza ${matA.roughness.toFixed(2)}`);
+  const txt = linhas.join('\n');
+  $('saida').textContent = txt;
+  navigator.clipboard?.writeText(txt).catch(() => {});
+};
+
+/* o painel do navegador congela o rAF: cada controle desenha por conta própria */
+for (const p of palcos) p.r.setAnimationLoop(() => { p.ctl.update(); p.r.render(p.cena, p.cam); });
+</script>
+</body>
+</html>

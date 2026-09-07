@@ -6,6 +6,12 @@ import { readFileSync } from "node:fs";
 const texto = p => readFile(new URL(`../${p}`, import.meta.url), "utf8");
 const bin = p => readFile(new URL(`../${p}`, import.meta.url));
 
+/* o glb do WIP, lido uma vez por teste — helper para as regras de baixo */
+async function lerGlb() {
+  const buf = await bin("bancadas/11-coracao/export/coracao-bancada11-WIP.glb");
+  return { gltf: glbJson(buf) };
+}
+
 function glbJson(buf) {
   assert.equal(buf.toString("ascii", 0, 4), "glTF");
   const jsonLen = buf.readUInt32LE(12);
@@ -119,4 +125,71 @@ test("a bancada 11 ao vivo não foi trocada pelo glb WIP", async () => {
   assert.ok(!hub.includes("coracao-bancada11-WIP.glb"));
   const page = await texto("coracao/index.html");
   assert.ok(!page.includes("coracao-bancada11-WIP.glb"));
+});
+
+/* ══════════════════════════════════════════════════════════════════════════
+   O QUE FICOU DECIDIDO OLHANDO A TELA, e que não pode voltar sozinho.
+
+   Estas três regras não vêm de anatomia nem de livro: vieram de horas de
+   professor olhando o modelo e dizendo o que atrapalhava. É justamente o
+   tipo de decisão que ninguém recupera lendo o código depois — por isso
+   fica travada aqui.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+test("O MODELO NÃO ESTÁ ESPELHADO: o ventrículo direito é a câmara ANTERIOR", async () => {
+  /* `transformar()` trocava dois eixos SEM inverter sinal — determinante -1,
+     sistema canhoto. O VD aparecia ATRÁS do esquerdo quando é ele que encosta
+     no esterno. Um sinal de menos conserta; este teste impede que volte. */
+  const { gltf } = await lerGlb();
+  const centroZ = nome => {
+    const no = gltf.nodes.find(n => n.name === nome);
+    assert.ok(no && no.mesh !== undefined, `falta ${nome}`);
+    let mn = Infinity, mx = -Infinity;
+    for (const pr of gltf.meshes[no.mesh].primitives) {
+      const a = gltf.accessors[pr.attributes.POSITION];
+      mn = Math.min(mn, a.min[2]); mx = Math.max(mx, a.max[2]);
+    }
+    return (mn + mx) / 2;
+  };
+  const vd = centroZ("parede_ad"), ve = centroZ("parede_ae");
+  assert.ok(vd > ve,
+    `o lado direito (z ${vd.toFixed(1)}) tem de estar À FRENTE do esquerdo (z ${ve.toFixed(1)})`);
+});
+
+test("AS PEÇAS QUE SAÍRAM CONTINUAM FORA", async () => {
+  /* Decidido na tela: os tubos venosos e as veias pulmonares saltavam do
+     modelo e dobravam a largura; o arco aórtico sai no ENCAIXE, que é a
+     junção com a aorta ascendente — e ele não podia ser aparado por altura,
+     porque corre na horizontal e o corte o fatiava no comprimento.
+     As cavidades são o molde do SANGUE, não a câmara. */
+  const { gltf } = await lerGlb();
+  const comMalha = new Set(gltf.nodes.filter(n => n.mesh !== undefined).map(n => n.name));
+  for (const fora of [
+    "tronco_pulmonar", "veia_cava_superior", "veia_cava_inferior", "arco_aortico",
+    "cavidade_ve", "cavidade_vd", "cavidade_ae", "cavidade_ad",
+    "veia_pulmonar_superior_direita", "veia_pulmonar_inferior_direita",
+    "veia_pulmonar_superior_esquerda", "veia_pulmonar_inferior_esquerda",
+    /* a aorta ascendente saiu por último, e por um motivo que se vê: as três
+       cúspides aórticas vivem entre y 49 e 71, DENTRO da faixa do tubo
+       (50 a 98). A aorta era exatamente o que as tapava. */
+    "aorta_ascendente",
+  ]) assert.ok(!comMalha.has(fora), `${fora} voltou para a cena`);
+
+  /* E O QUE ELA DESTAPOU TEM DE CONTINUAR À VISTA. Esta é a razão de a aorta
+     ter saído; se as cúspides sumirem, o corte perdeu o sentido. */
+  for (const c of ["cuspide_anterior_aortica", "cuspide_posterior_direita_aortica",
+                   "cuspide_posterior_esquerda_aortica"])
+    assert.ok(comMalha.has(c), `${c} sumiu — a valva aórtica é o que a aorta destapava`);
+});
+
+test("REMOVER POR NOME NÃO PODE VAZAR PELO CÓDIGO DO ARQUIVO", async () => {
+  /* O defeito que quase passou: o laço principal pulava a peça mas não
+     marcava os FJ dela como usados, e o laço dos órfãos readicionava os
+     MESMOS arquivos com nome de FJ####. A contagem de triângulos não mudava
+     um dígito. Por isso a régua é o TOTAL de malhas, e não a ausência de
+     nomes: o vazamento reentra com outro nome, mas não consegue esconder o
+     tamanho. */
+  const { gltf } = await lerGlb();
+  const n = gltf.nodes.filter(x => x.mesh !== undefined).length;
+  assert.equal(n, 79, `o modelo fechou em 79 malhas; hoje tem ${n}`);
 });
