@@ -513,7 +513,12 @@ function corpo({ comValvas = true, comCoronarias = true, comConducao = false, co
   let cond = null;
   if (comConducao) { cond = conducao(); g.add(cond); }
   const sangue = gotasDeSangue(); g.add(sangue);
-  g.add(grandesVasos());
+  const vasos = grandesVasos(); g.add(vasos);
+  /* OS GRANDES VASOS SÃO OS MAIORES OCLUSORES DA CENA. Vidrar só as câmaras
+     não bastou: a aorta e o tronco pulmonar cruzam bem na frente do plano
+     valvar e, opacos, escondiam justamente o que este nível promete — na
+     foto eram eles, e não o miocárdio, que tapavam as cúspides. */
+  if (revelarValvas) vidrar(vasos, .26);
 
   /* a inclinação anatômica */
   g.rotation.set(.16, 0, .30);

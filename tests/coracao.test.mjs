@@ -312,6 +312,23 @@ test("o nível chamado 'As válvulas' de fato revela as válvulas", async () => 
   assert.ok(app.includes("alvoDaCamera"), "a câmera deixa de apontar sempre à origem");
 });
 
+test("no nível das válvulas os GRANDES VASOS também viram vidro", async () => {
+  /* vidrar só as câmaras não bastou. Na foto do nível 03 quem tapava as
+     cúspides não era o miocárdio — era a aorta e o tronco pulmonar, que
+     cruzam bem na frente do plano valvar e são as duas maiores peças da
+     cena. E têm de ficar MAIS transparentes que o músculo, justamente
+     porque estão na frente dele. */
+  const m = await texto("coracao/modelos.js");
+  assert.ok(/const vasos = grandesVasos\(\)/.test(m),
+    "os vasos precisam de nome para poder ser vidrados");
+  const vaso = m.match(/if \(revelarValvas\) vidrar\(vasos, ([\d.]+)\)/);
+  assert.ok(vaso, "e são vidrados quando o nível revela as válvulas");
+  const camara = m.match(/vidrar\(ve, ([\d.]+)\)/);
+  assert.ok(camara, "as câmaras continuam vidradas");
+  assert.ok(Number(vaso[1]) < Number(camara[1]),
+    `o vaso (${vaso[1]}) tem de ser mais transparente que a câmara (${camara[1]})`);
+});
+
 test("o lado direito tem vazão própria, e não copia o esquerdo", async () => {
   /* qTri e qPulm já se integravam no volume, mas o quadro só guardava
      qMitral/qAortica. O app improvisava: gotas direitas andavam com o
