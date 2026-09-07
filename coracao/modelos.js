@@ -36,6 +36,7 @@ import {
   pontoNoLathe,
   perfilDoLabio,
   JUNTAS_VASO,
+  saidaDaParede,
 } from './parede.js';
 
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
@@ -148,11 +149,12 @@ function labioDoOstio(dentro, fora, t0, tL, segs) {
 }
 
 /* Torus no teto: o lábio plano-alto ainda deixa um cresce quando o vaso
-   não é coaxial com a câmara. A coroa tem volume de verdade no anel. */
+   não é coaxial com a câmara. A coroa tem de chegar perto do tubo, senão
+   o vão em cresce da foto continua entre o anel e o vaso. */
 function coroaDoOstio(dentro, fora, t0, tL, segs) {
   const i = dentro[dentro.length - 1], f = fora[fora.length - 1];
   const rMeio = (i.x + f.x) / 2;
-  const tubo = Math.max(3.2, (f.x - i.x) * 0.55 + 2.4);
+  const tubo = Math.max(7.2, (f.x - i.x) * 0.7 + 4);
   const y = (i.y + f.y) / 2;
   const pts = [];
   for (let k = 0; k <= 10; k++) {
@@ -290,13 +292,31 @@ function ventriculoDireito(corte) {
   const t0 = corte ? Math.max(corte[0], -Math.PI * .58) : -Math.PI * .58;
   const tL = corte ? Math.min(corte[1], Math.PI * 1.16) : Math.PI * 1.16;
   const gg = camaraDupla(perfil, 3.4, M.miocardioFino, null, 26, [t0, tL]);
-  /* achatado contra o esquerdo, e um pouco mais encostado: a junta septal
-     era um vão entre dois sólidos. A meia-lua continua meia-lua. */
-  gg.scale.set(1, 1, .72);
-  gg.position.set(-14.2, VD_Y, 10.5);
-  gg.rotation.y = -.34;
+  /* achatado contra o esquerdo, e encostado: a junta septal era um vão
+     entre dois sólidos. A meia-lua continua meia-lua. */
+  gg.scale.set(1, 1, .78);
+  gg.position.set(-13.4, VD_Y, 9.4);
+  gg.rotation.y = -.30;
   gg.userData.papel = 'vd';
   return gg;
+}
+
+/* Cordão de miocárdio no sulco interventricular: a meia-lua e o cone do
+   esquerdo não compartilham vértices, e o vão entre os dois lia como furo. */
+function soldaSepto() {
+  const g = new THREE.Group();
+  const pts = [
+    [-6, 10, 20],
+    [-8, 28, 24],
+    [-11, 48, 22],
+    [-13, 66, 16],
+    [-13.2, 76, 11],
+  ];
+  const geo = new THREE.TubeGeometry(
+    new THREE.CatmullRomCurve3(pts.map(p => V(...p))), 24, 7.2, 10, false);
+  g.add(new THREE.Mesh(geo, M.miocardio),
+        new THREE.Mesh(peloAvesso(geo), M.miocardio));
+  return g;
 }
 
 /* ── OS ÁTRIOS ────────────────────────────────────────────────────────────
@@ -396,26 +416,32 @@ function vasoTubo(pontos, raio, mat, segs = 28) {
     new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pontos.map(p => V(...p))), segs, raio, 16, false), mat);
 }
 
-/* Cone + anel + calota na SAÍDA do vaso pela parede (não na ponta interna
-   do tubo: lá o colar fica escondido na cavidade e o cresce continua fora). */
+/* Cone + anel + torus no PLANO do teto (ySaida), não a uma fração fixa do
+   primeiro segmento: essa fração punha o colar acima do furo e o cresce
+   da foto — miocárdio cortando no vaso — seguia visível. Sem esfera maciça:
+   ela tamponava o lúmen. O torus tem volume visto de lado. */
 function colarDaRaiz(p0, p1, rTubo, rBase, mat) {
   const a = V(...p0), b = V(...p1);
   const dir = b.clone().sub(a);
   const span = dir.length() || 1;
   dir.multiplyScalar(1 / span);
-  /* 0.38 do primeiro segmento ≈ teto da câmara depois do SUBIR_PLANO */
-  const saida = a.clone().add(dir.clone().multiplyScalar(span * 0.38));
+  const saida = a.clone();
   const g = new THREE.Group();
-  const len = Math.max(14, (rBase - rTubo) * 1.2);
-  const cone = new THREE.CylinderGeometry(rTubo, rBase, len, 22, 1, true);
+  const len = Math.max(16, (rBase - rTubo) * 1.15);
+  const cone = new THREE.CylinderGeometry(rTubo * 1.02, rBase, len, 24, 1, true);
   const mCone = new THREE.Mesh(cone, mat);
-  mCone.position.copy(saida).add(dir.clone().multiplyScalar(len * 0.15));
+  mCone.position.copy(saida);
   mCone.quaternion.setFromUnitVectors(V(0, 1, 0), dir);
-  const anel = new THREE.Mesh(new THREE.RingGeometry(rTubo * 0.85, rBase, 22, 2), mat);
+  const anel = new THREE.Mesh(new THREE.RingGeometry(rTubo * 0.92, rBase, 24, 2), mat);
   anel.position.copy(saida);
   anel.quaternion.setFromUnitVectors(V(0, 0, 1), dir);
-  const calota = new THREE.Mesh(new THREE.SphereGeometry(rBase * 0.62, 16, 12), mat);
-  calota.position.copy(saida);
+  const rTorus = (rTubo + rBase) * 0.5;
+  const tuboTorus = Math.max(4.8, (rBase - rTubo) * 0.42);
+  const torus = new THREE.Mesh(new THREE.TorusGeometry(rTorus, tuboTorus, 14, 28), mat);
+  torus.position.copy(saida);
+  torus.quaternion.setFromUnitVectors(V(0, 0, 1), dir);
+  const torusAlto = torus.clone();
+  torusAlto.position.copy(saida).add(dir.clone().multiplyScalar(7));
   const avesso = (mesh) => {
     const m = new THREE.Mesh(peloAvesso(mesh.geometry), mesh.material);
     m.position.copy(mesh.position);
@@ -423,7 +449,8 @@ function colarDaRaiz(p0, p1, rTubo, rBase, mat) {
     m.scale.copy(mesh.scale);
     return m;
   };
-  g.add(mCone, anel, calota, avesso(mCone), avesso(anel), avesso(calota));
+  g.add(mCone, anel, torus, torusAlto,
+        avesso(mCone), avesso(anel), avesso(torus), avesso(torusAlto));
   return g;
 }
 
@@ -431,11 +458,12 @@ function grandesVasos() {
   const g = new THREE.Group();
   const põe = (pts, mat, junta, matParede) => {
     g.add(vasoTubo(pts, junta.rTubo, mat));
-    g.add(colarDaRaiz(pts[0], pts[1], junta.rTubo, junta.rBase, mat));
+    const { p, q } = saidaDaParede(pts, junta.ySaida);
+    g.add(colarDaRaiz(p, q, junta.rTubo, junta.rBase, mat));
     /* arruela de miocárdio por fora do colar: o cresce da foto era o
        epicárdio cortando no ar, sem chegar no vaso */
     if (matParede)
-      g.add(colarDaRaiz(pts[0], pts[1], junta.rTubo * 1.05, junta.rBase * 1.18, matParede));
+      g.add(colarDaRaiz(p, q, junta.rTubo * 1.05, junta.rBase * 1.22, matParede));
   };
   /* aorta: sai do centro, sobe por trás e faz a crossa para a direita */
   põe([[4, 56, -4], [5, 82, -2], [4, 104, 2], [-8, 118, 4], [-26, 112, 2], [-32, 92, -2]],
@@ -617,6 +645,7 @@ function corpo({
   const janela = corte ? [Math.PI * .306, Math.PI * 1.389] : null;
   const ve = ventriculoEsquerdo(janela); g.add(ve);
   const vd = ventriculoDireito(janela); g.add(vd);
+  g.add(soldaSepto());
 
   const ae = atrio(1, janela); ae.position.set(14, 58 + SUBIR_PLANO, -6); ae.rotation.z = -.16; g.add(ae);
   const ad = atrio(-1, janela); ad.position.set(-20, 56 + SUBIR_PLANO, 0); ad.rotation.z = .18; ad.scale.setScalar(.94); g.add(ad);

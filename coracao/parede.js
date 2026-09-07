@@ -61,9 +61,10 @@ export function pontoNoLathe(r, y, angulo) {
 /* O anel plano do óstio, visto de lado, vira LINHA: o vão em cresce entre
    epicárdio e endocárdio. O lábio tem altura, e recolhe um pouco para dentro
    — o lúmen continua aberto (não vai ao eixo). */
-export const LABIO_DY = 3.2;
+export const LABIO_DY = 4.4;
 export function perfilDoLabio(pDentro, pFora, dy = LABIO_DY) {
-  const recolher = Math.max(pDentro.x * 0.58, pDentro.x - 7);
+  /* chega perto do raio do vaso, sem ir ao eixo (senão tampa a cavidade) */
+  const recolher = Math.max(pDentro.x * 0.42, pDentro.x - 10);
   return [
     { x: pDentro.x, y: pDentro.y },
     { x: recolher, y: pDentro.y + dy },
@@ -73,14 +74,45 @@ export function perfilDoLabio(pDentro, pFora, dy = LABIO_DY) {
 }
 
 /* Colar da raiz: rBase tem de cobrir o vão em cresce entre o teto da câmara
-   e o tubo. O lúmen do vaso (rTubo) continua patente. */
+   e o tubo. O lúmen do vaso (rTubo) continua patente.
+   ySaida é o Y do teto no grupo dos vasos (teto da câmara − SUBIR_PLANO).
+   Um t fixo no primeiro segmento punha o colar ACIMA do furo. */
 export const JUNTAS_VASO = {
-  aorta:    { rTubo: 12,   rBase: 26 },
-  pulmonar: { rTubo: 10.5, rBase: 28 },
-  cava:     { rTubo: 9.5,  rBase: 16 },
-  cavaInf:  { rTubo: 10.5, rBase: 16 },
-  veiaPulm: { rTubo: 4.6,  rBase: 9 },
+  aorta:    { rTubo: 12,   rBase: 32, ySaida: 60 },
+  pulmonar: { rTubo: 10.5, rBase: 36, ySaida: 58 },
+  cava:     { rTubo: 9.5,  rBase: 20, ySaida: 90 },
+  cavaInf:  { rTubo: 10.5, rBase: 20, ySaida: 50 },
+  veiaPulm: { rTubo: 4.6,  rBase: 12, ySaida: 66 },
 };
+
+export function pontoNoSegmento(p0, p1, t) {
+  return [
+    p0[0] + (p1[0] - p0[0]) * t,
+    p0[1] + (p1[1] - p0[1]) * t,
+    p0[2] + (p1[2] - p0[2]) * t,
+  ];
+}
+
+/* Cruza o polígono no plano y do teto. Sem isso o colar flutua no ar e o
+   cresce da foto — miocárdio cortando no vaso — continua no anel. */
+export function saidaDaParede(pts, yPlano) {
+  if (yPlano != null) {
+    for (let i = 0; i < pts.length - 1; i++) {
+      const y0 = pts[i][1], y1 = pts[i + 1][1];
+      const dy = y1 - y0;
+      if (Math.abs(dy) < 1e-6) continue;
+      const t = (yPlano - y0) / dy;
+      if (t >= -0.02 && t <= 1.02) {
+        const tt = Math.min(1, Math.max(0, t));
+        const p = pontoNoSegmento(pts[i], pts[i + 1], tt);
+        const q = tt < 0.97 ? pts[i + 1] : (pts[i + 2] || pts[i + 1]);
+        return { p, q, t: tt, i };
+      }
+    }
+  }
+  const p = pontoNoSegmento(pts[0], pts[1], 0.38);
+  return { p, q: pts[1], t: 0.38, i: 0 };
+}
 
 export function verticesDaFaceDoCorte(dentro, fora, angulo) {
   const pos = [];
@@ -123,6 +155,11 @@ export function provaSelosDaParede({ alturaVE, alturaVD }) {
   })();
   const labioVE = perfilDoLabio(ve.dentro[ve.dentro.length - 1], ve.fora[ve.fora.length - 1]);
   const ys = labioVE.map(p => p.y);
+  const aortaPts = [[4, 56, -4], [5, 82, -2], [4, 104, 2]];
+  const pulPts = [[-12, 50, 16], [-10, 80, 14], [-4, 98, 8]];
+  const saidaAorta = saidaDaParede(aortaPts, JUNTAS_VASO.aorta.ySaida);
+  const saidaPul = saidaDaParede(pulPts, JUNTAS_VASO.pulmonar.ySaida);
+  const colarAntigoAorta = pontoNoSegmento(aortaPts[0], aortaPts[1], 0.38);
   return {
     ve: medida(ve),
     vd: medida(vd),
@@ -133,5 +170,8 @@ export function provaSelosDaParede({ alturaVE, alturaVD }) {
     labioAltura: Math.max(...ys) - Math.min(...ys),
     labioNaoTampona: labioVE[1].x > 8,
     juntas: JUNTAS_VASO,
+    saidaAortaY: saidaAorta.p[1],
+    saidaPulY: saidaPul.p[1],
+    colarAntigoAcimaDoOstioMm: Math.abs(colarAntigoAorta[1] - JUNTAS_VASO.aorta.ySaida),
   };
 }

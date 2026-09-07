@@ -495,7 +495,16 @@ test("a parede fecha no polo e no anel do corte, sem tamponar o lúmen", async (
   for (const [nome, j] of Object.entries(p.juntas)) {
     assert.ok(j.rBase > j.rTubo + 3,
       `${nome}: rBase ${j.rBase} não cobre o cresce em volta do tubo ${j.rTubo}`);
+    assert.ok(Number.isFinite(j.ySaida), `${nome}: colar sem plano y do teto`);
   }
+  perto(p.saidaAortaY, p.juntas.aorta.ySaida, 0.6, "colar da aorta no teto do VE");
+  perto(p.saidaPulY, p.juntas.pulmonar.ySaida, 0.6, "colar da pulmonar no teto do VD");
+  assert.equal(p.juntas.aorta.ySaida, ALTURA_VE - SUBIR_PLANO,
+    "ySaida da aorta é o teto do VE no grupo dos vasos");
+  assert.equal(p.juntas.pulmonar.ySaida, TOPO_VD - SUBIR_PLANO,
+    "ySaida da pulmonar é o teto do VD no grupo dos vasos");
+  assert.ok(p.colarAntigoAcimaDoOstioMm > 4,
+    `o colar a 38% do segmento ficava ${p.colarAntigoAcimaDoOstioMm.toFixed(1)} mm acima do óstio`);
 
   const m = await texto("coracao/modelos.js");
   assert.ok(m.includes("faceDoCorte(dentro, fora, t0)"), "a face liga o perfil interno ao externo");
@@ -504,6 +513,9 @@ test("a parede fecha no polo e no anel do corte, sem tamponar o lúmen", async (
   assert.ok(m.includes("function colarDaRaiz"), "a raiz do vaso ganha colar contra a câmara");
   assert.ok(m.includes("labioDoOstio"), "o óstio tem lábio com altura, não anel plano");
   assert.ok(m.includes("coroaDoOstio"), "a coroa dá volume no teto, visível de lado");
+  assert.ok(m.includes("saidaDaParede(pts, junta.ySaida)"), "o colar senta no plano do teto, não no ar");
+  assert.ok(m.includes("function soldaSepto"), "a junta RV–LV ganha cordão, senão o vão lê como furo");
+  assert.ok(m.includes("TorusGeometry"), "o colar tem torus com volume, não só anel plano");
   assert.ok(m.includes("o.material = o.material.clone()"), "o vidro continua isolado por clone");
   const semComentario = m.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
   assert.ok(!/dentro\[i\]\.x \* cos,\s*dentro\[i\]\.y,\s*dentro\[i\]\.x \* sin/.test(semComentario),
