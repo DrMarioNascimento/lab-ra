@@ -35,6 +35,7 @@ import {
   prepararPerfis,
   pontoNoLathe,
   perfilDoLabio,
+  perfilDoTampo,
   JUNTAS_VASO,
   saidaDaParede,
 } from './parede.js';
@@ -166,6 +167,14 @@ function coroaDoOstio(dentro, fora, t0, tL, segs) {
   return g;
 }
 
+function tampoDoOstio(dentro, fora, t0, tL, segs) {
+  const pts = perfilDoTampo(dentro[dentro.length - 1], fora[fora.length - 1]);
+  if (!pts) return null;
+  const g = new THREE.LatheGeometry(pts.map(xy), segs, t0, tL);
+  g.computeVertexNormals();
+  return g;
+}
+
 function geometriaDosSelos(dentro, fora, t0, tL, segs) {
   const partes = [];
   const ostio = labioDoOstio(dentro, fora, t0, tL, segs);
@@ -177,6 +186,11 @@ function geometriaDosSelos(dentro, fora, t0, tL, segs) {
   if (coroa) {
     partes.push(coroa);
     partes.push(peloAvesso(coroa));
+  }
+  const tampo = tampoDoOstio(dentro, fora, t0, tL, segs);
+  if (tampo) {
+    partes.push(tampo);
+    partes.push(peloAvesso(tampo));
   }
   const polo = anelEntre(fora[0], dentro[0], t0, tL, segs);
   if (polo) {
@@ -442,6 +456,17 @@ function colarDaRaiz(p0, p1, rTubo, rBase, mat) {
   torus.quaternion.setFromUnitVectors(V(0, 0, 1), dir);
   const torusAlto = torus.clone();
   torusAlto.position.copy(saida).add(dir.clone().multiplyScalar(7));
+  /* arruela com VOLUME (retângulo revolvido): anel/torus vistos de lado
+     viram linha e o cresce da foto volta */
+  const grosso = new THREE.LatheGeometry([
+    new THREE.Vector2(rTubo * 0.98, -9),
+    new THREE.Vector2(rBase, -9),
+    new THREE.Vector2(rBase, 9),
+    new THREE.Vector2(rTubo * 0.98, 9),
+  ], 28);
+  const mGrosso = new THREE.Mesh(grosso, mat);
+  mGrosso.position.copy(saida);
+  mGrosso.quaternion.setFromUnitVectors(V(0, 1, 0), dir);
   const avesso = (mesh) => {
     const m = new THREE.Mesh(peloAvesso(mesh.geometry), mesh.material);
     m.position.copy(mesh.position);
@@ -449,8 +474,8 @@ function colarDaRaiz(p0, p1, rTubo, rBase, mat) {
     m.scale.copy(mesh.scale);
     return m;
   };
-  g.add(mCone, anel, torus, torusAlto,
-        avesso(mCone), avesso(anel), avesso(torus), avesso(torusAlto));
+  g.add(mCone, anel, torus, torusAlto, mGrosso,
+        avesso(mCone), avesso(anel), avesso(torus), avesso(torusAlto), avesso(mGrosso));
   return g;
 }
 

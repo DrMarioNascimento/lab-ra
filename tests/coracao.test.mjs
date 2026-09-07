@@ -492,6 +492,12 @@ test("a parede fecha no polo e no anel do corte, sem tamponar o lúmen", async (
   assert.ok(p.ae.polo0Dentro > 5, `óstio AV tamponado r=${p.ae.polo0Dentro}`);
   assert.ok(p.labioAltura >= 3, `lábio do óstio plano (altura ${p.labioAltura} mm) some de lado`);
   assert.ok(p.labioNaoTampona, "o lábio não pode tampar o lúmen");
+  assert.ok(p.tampoLumenVE > 8, `tampo do VE tamponou o lúmen r=${p.tampoLumenVE}`);
+  assert.ok(p.tampoLumenVD > 8, `tampo do VD tamponou o lúmen r=${p.tampoLumenVD}`);
+  assert.ok(p.tampoCobreVE > 0, "o tampo tem de passar da parede externa");
+  assert.ok(p.tampoAltura >= 8, `tampo plano (altura ${p.tampoAltura} mm) some de lado`);
+  assert.ok(p.ve.polo1Dentro < 14, `óstio do VE ainda largo r=${p.ve.polo1Dentro}, cresce em volta do vaso`);
+  assert.ok(p.vd.polo1Dentro < 13, `óstio do VD ainda largo r=${p.vd.polo1Dentro}, cresce em volta do vaso`);
   for (const [nome, j] of Object.entries(p.juntas)) {
     assert.ok(j.rBase > j.rTubo + 3,
       `${nome}: rBase ${j.rBase} não cobre o cresce em volta do tubo ${j.rTubo}`);
@@ -515,6 +521,7 @@ test("a parede fecha no polo e no anel do corte, sem tamponar o lúmen", async (
   assert.ok(m.includes("coroaDoOstio"), "a coroa dá volume no teto, visível de lado");
   assert.ok(m.includes("saidaDaParede(pts, junta.ySaida)"), "o colar senta no plano do teto, não no ar");
   assert.ok(m.includes("function soldaSepto"), "a junta RV–LV ganha cordão, senão o vão lê como furo");
+  assert.ok(m.includes("tampoDoOstio"), "o teto ganha anel gordo, visível de lado");
   assert.ok(m.includes("TorusGeometry"), "o colar tem torus com volume, não só anel plano");
   assert.ok(m.includes("o.material = o.material.clone()"), "o vidro continua isolado por clone");
   const semComentario = m.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");

@@ -11,8 +11,17 @@ export function raioPerfilVentriculo(u, raio, pontudo = 1) {
      eixo — senão o lathe deixa um furo na ponta. */
   const s = Math.sin(Math.PI * (.82 * u));
   if (s <= 0) return 0;
-  return raio * Math.pow(s, .40 * pontudo)
+  let r = raio * Math.pow(s, .40 * pontudo)
     * (u < .12 ? .55 + u / .12 * .45 : 1);
+  /* o teto aperta no vaso: um óstio largo deixa um cresce em volta do
+     tubo, visível de lado mesmo com colar plano */
+  if (u > 0.84) {
+    const t = (u - 0.84) / 0.16;
+    const s2 = t * t * (3 - 2 * t);
+    const rVaso = Math.max(9.5, raio * 0.44);
+    r = r * (1 - s2) + rVaso * s2;
+  }
+  return r;
 }
 
 export function perfilVentriculo(raio, altura, pontudo = 1) {
@@ -63,13 +72,30 @@ export function pontoNoLathe(r, y, angulo) {
    — o lúmen continua aberto (não vai ao eixo). */
 export const LABIO_DY = 4.4;
 export function perfilDoLabio(pDentro, pFora, dy = LABIO_DY) {
-  /* chega perto do raio do vaso, sem ir ao eixo (senão tampa a cavidade) */
-  const recolher = Math.max(pDentro.x * 0.42, pDentro.x - 10);
+  /* o óstio já aperta no vaso; o lábio só arremata a espessura, sem
+     ir ao eixo (senão tampa a cavidade) */
+  const recolher = Math.max(8.2, pDentro.x - 2.4);
   return [
     { x: pDentro.x, y: pDentro.y },
     { x: recolher, y: pDentro.y + dy },
     { x: pFora.x, y: pFora.y + dy },
     { x: pFora.x, y: pFora.y },
+  ];
+}
+
+/* Anel GORDO no teto: retângulo revolvido, de rLúmen até fora da parede.
+   Colar/coroa de superfície, vistos de lado, viram linha e o cresce volta. */
+export const TAMPO_DY = 10;
+export function perfilDoTampo(pDentro, pFora, dy = TAMPO_DY) {
+  if (pDentro.x < 5) return null;
+  const r0 = Math.max(8, pDentro.x * 0.96);
+  const r1 = pFora.x + 5;
+  const y = (pDentro.y + pFora.y) / 2;
+  return [
+    { x: r0, y: y - 2 },
+    { x: r1, y: y - 2 },
+    { x: r1, y: y + dy },
+    { x: r0, y: y + dy },
   ];
 }
 
@@ -155,6 +181,8 @@ export function provaSelosDaParede({ alturaVE, alturaVD }) {
   })();
   const labioVE = perfilDoLabio(ve.dentro[ve.dentro.length - 1], ve.fora[ve.fora.length - 1]);
   const ys = labioVE.map(p => p.y);
+  const tampoVE = perfilDoTampo(ve.dentro[ve.dentro.length - 1], ve.fora[ve.fora.length - 1]);
+  const tampoVD = perfilDoTampo(vd.dentro[vd.dentro.length - 1], vd.fora[vd.fora.length - 1]);
   const aortaPts = [[4, 56, -4], [5, 82, -2], [4, 104, 2]];
   const pulPts = [[-12, 50, 16], [-10, 80, 14], [-4, 98, 8]];
   const saidaAorta = saidaDaParede(aortaPts, JUNTAS_VASO.aorta.ySaida);
@@ -169,6 +197,10 @@ export function provaSelosDaParede({ alturaVE, alturaVD }) {
     vaoDaConvencaoAntigaMm: vaoAntigo,
     labioAltura: Math.max(...ys) - Math.min(...ys),
     labioNaoTampona: labioVE[1].x > 8,
+    tampoLumenVE: tampoVE[0].x,
+    tampoLumenVD: tampoVD[0].x,
+    tampoCobreVE: tampoVE[1].x - ve.fora[ve.fora.length - 1].x,
+    tampoAltura: Math.max(...tampoVE.map(p => p.y)) - Math.min(...tampoVE.map(p => p.y)),
     juntas: JUNTAS_VASO,
     saidaAortaY: saidaAorta.p[1],
     saidaPulY: saidaPul.p[1],
