@@ -95,9 +95,12 @@ export const NIVEIS = [
     comValvas: false,
     comCoronarias: false,
     comConducao: true,
-    corte: false,
+    /* O CAMINHO DO SINAL CORRE POR DENTRO. Com o coração fechado ele ficava
+       atrás do miocárdio e não se seguia com o olho — o nível prometia a
+       condução e mostrava a parede, o mesmo defeito que o nível 03 tinha. */
+    corte: true,
     revelarValvas: false,
-    foco: 'inteiro',
+    foco: 'corte',
     faseRA: null,
   },
   {

@@ -442,41 +442,63 @@ function conducao() {
   const g = new THREE.Group();
   const põe = (id, malha) => { malha.userData.conducao = id; g.add(malha); return malha; };
 
+  /* ── A CONDUÇÃO NO ESQUEMA ─────────────────────────────────────────────
+     O trajeto é o argumento: o sinal NASCE no alto do átrio direito,
+     atravessa os átrios, ENCALHA no nó atrioventricular — os cem
+     milissegundos que deixam o átrio terminar de encher — e só então desce
+     pelo septo e se abre nos dois ramos. Desenhado no esquema, esse caminho
+     vira uma linha que se lê de cima para baixo, de uma coluna para a
+     outra e de volta. Na anatomia ele existia, mas passava por trás do
+     miocárdio e ninguém o seguia com o olho.
+
+     Tudo um pouco atrás do plano do corte (z ≈ −5) para correr contra a
+     parede de trás, e não flutuar no vão. */
+  const Z = -5;
+
   const no = new THREE.Mesh(new THREE.SphereGeometry(4.4, 12, 9), M.conducao);
-  no.position.set(-26, 74 + SUBIR_PLANO, -2); no.scale.set(1, 1.5, .7);
+  no.position.set(VD_X - 15, 90, Z); no.scale.set(1, 1.4, .8);
   põe('sinusal', no);
 
-  /* as vias internodais: três fitas do sinusal ao AV */
-  for (const dz of [-8, 0, 8]) {
+  /* as vias internodais: três fitas descendo o átrio direito até o nó AV */
+  for (const dz of [-5, 0, 5]) {
     const t = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(
-      [V(-26, 72 + SUBIR_PLANO, -2), V(-20, 66 + SUBIR_PLANO, dz * .6),
-       V(-10, 60 + SUBIR_PLANO, dz * .4), V(-2, 56 + SUBIR_PLANO, 0)]), 16, 1.5, 6, false);
+      [V(VD_X - 14, 88, Z), V(VD_X - 8, 80, Z + dz * .5),
+       V(VD_X + 8, 73, Z + dz * .4), V(-11, 69, Z)]), 16, 1.5, 6, false);
     põe('atrios', new THREE.Mesh(t, M.conducao));
   }
 
-  const av = new THREE.Mesh(new THREE.SphereGeometry(3.8, 12, 9), M.conducao);
-  av.position.set(-2, 55 + SUBIR_PLANO, -2); av.scale.set(1.3, .9, .8);
+  const av = new THREE.Mesh(new THREE.SphereGeometry(3.9, 12, 9), M.conducao);
+  av.position.set(-10, 68, Z); av.scale.set(1.3, .9, .9);
   põe('av', av);
 
+  /* o feixe de His desce DENTRO DO SEPTO, que aqui é a parede esquerda do
+     ventrículo esquerdo — a faixa entre x = −10 e x = 0 */
   põe('his', new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(
-    [V(-2, 54 + SUBIR_PLANO, -2), V(-1, 48, 0), V(0, 43, 1)]), 10, 2.0, 8, false), M.conducao));
+    [V(-10, 66, Z), V(-7, 60, Z), V(-5, 54, Z)]), 10, 2.0, 8, false), M.conducao));
 
-  /* dois ramos, e o esquerdo se divide — é ele que dá o hemibloqueio */
+  /* os dois ramos se abrem para as duas colunas, cada um pela face do septo
+     que olha para o seu ventrículo */
   põe('ramos', new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(
-    [V(0, 43, 1), V(6, 34, 3), V(10, 22, 4), V(8, 12, 3)]), 18, 1.5, 6, false), M.conducao));
+    [V(-5, 54, Z), V(-12, 44, Z), V(-20, 30, Z), V(-26, 18, Z)]), 18, 1.5, 6, false), M.conducao));
   põe('ramos', new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(
-    [V(0, 43, 1), V(-8, 33, 4), V(-13, 21, 5), V(-11, 11, 4)]), 18, 1.4, 6, false), M.conducao));
+    [V(-5, 54, Z), V(2, 44, Z), V(11, 30, Z), V(18, 18, Z)]), 18, 1.5, 6, false), M.conducao));
 
-  /* Purkinje: a rede que espalha pela parede, e ela precisa parecer REDE */
-  const fios = [];
-  for (let i = 0; i < 16; i++) {
-    const a = (i / 16) * Math.PI * 2, r0 = 9 + rnd(-2, 2);
-    fios.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(
-      [V(Math.cos(a) * r0 * .5, 12, Math.sin(a) * r0 * .5),
-       V(Math.cos(a) * r0 * 1.4, 18 + rnd(-3, 6), Math.sin(a) * r0 * 1.4),
-       V(Math.cos(a) * r0 * 2.1, 30 + rnd(-4, 10), Math.sin(a) * r0 * 2.0)]), 12, .9, 5, false));
-  }
-  põe('purkinje', new THREE.Mesh(mergeGeometries(fios), M.conducao));
+  /* Purkinje: UMA REDE POR VENTRÍCULO, abrindo da ponta para a parede. Antes
+     era um anel só em torno da origem do modelo — que no esquema é o vão
+     ENTRE as colunas, e a rede saía espalhada no nada. */
+  const rede = (cx, deX, deY, apice, raio, n = 9) => {
+    const fios = [];
+    for (let i = 0; i < n; i++) {
+      const lado = -1 + 2 * (i / (n - 1));
+      fios.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(
+        [V(deX, deY, Z),
+         V(cx + lado * raio * .45, apice + 12 + rnd(-2, 4), Z + rnd(-2, 2)),
+         V(cx + lado * raio, apice + 3 + rnd(0, 8), Z + rnd(-3, 3))]), 12, .9, 5, false));
+    }
+    return new THREE.Mesh(mergeGeometries(fios), M.conducao);
+  };
+  põe('purkinje', rede(VD_X, -26, 18, 6, 17));
+  põe('purkinje', rede(VE_X, 18, 18, 3, 19));
   return g;
 }
 
