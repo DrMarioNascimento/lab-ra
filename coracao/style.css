@@ -1,0 +1,153 @@
+/* A película de carga — folha própria.
+   Herda os tokens de ../laboratorio.css (--gold, --mist, --mono…) e repete a
+   estrutura do teste 06 de propósito: quem já usou "Do músculo ao sarcômero"
+   não deve ter de reaprender onde ficam as coisas.
+
+   DUAS COISAS FORAM APRENDIDAS LÁ E ESTÃO CORRIGIDAS AQUI DESDE O PRIMEIRO DIA:
+   • a grade esticava o .stage até a altura do painel lateral, e uma peça
+     deitada acabava desenhada num retrato quase 1:2, cortada nas beiras. Por
+     isso `align-items:start` e altura própria em clamp();
+   • `[hidden]` não vale nada contra `display:grid` — as caixas de controle
+     precisam de `.caixa[hidden]{display:none}`, senão a curva de Goldman
+     aparece no nível do axônio, onde ela não tem o que dizer. */
+
+.experience { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(310px, .78fr); gap: 18px; align-items: start; }
+
+.stage {
+  position: relative; overflow: hidden; height: clamp(440px, 64vh, 700px);
+  border: 1px solid #4b3f60; border-radius: 20px;
+  background: radial-gradient(circle at 50% 42%, #241a33 0%, #120e18 56%, #070609 100%);
+  box-shadow: inset 0 1px rgba(255, 224, 102, .08), 0 18px 55px #0009;
+}
+.stage canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+
+.stage-hud { position: absolute; left: 16px; right: 16px; top: 14px; display: flex; justify-content: space-between; gap: 8px; pointer-events: none; }
+.stage-hud span, .gesture {
+  background: #0a120cd9; border: 1px solid #3a6242; border-radius: 999px;
+  padding: 7px 10px; color: #e6f2e0; font: 700 .68rem var(--mono); letter-spacing: .06em;
+}
+/* o valor de Em é o fio que costura os cinco níveis: fica no centro e em
+   destaque, porque é ele que muda quando o aluno mexe em qualquer coisa */
+#emLabel { border-color: #a07ae0; color: #dcc6ff; background: #1a1226e6; }
+.gesture { position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); font-weight: 500; white-space: nowrap; }
+
+.labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.lbl {
+  position: absolute; left: 0; top: 0; transform: translate(-9999px, -9999px);
+  margin: -11px 0 0 -6px; padding: 4px 8px;
+  border: 1px solid rgba(245, 197, 24, .45); border-radius: 999px;
+  background: #0a120ce6; color: #ffe066; font: 600 .66rem var(--mono);
+  letter-spacing: .03em; white-space: nowrap; transition: opacity .2s;
+}
+.lbl::before { content: ""; position: absolute; left: -1px; top: 50%; width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%; background: #ff9d2e; box-shadow: 0 0 0 2px #0a120c; }
+
+.stage-tools { position: absolute; right: 16px; bottom: 16px; display: flex; gap: 8px; }
+.ghost-control { border: 1px solid #3d6b45; border-radius: 999px; background: #101a12dd; color: #ffe066; padding: 8px 11px; cursor: pointer; font: 600 .72rem var(--mono); }
+.ghost-control.on { border-color: #f5c518; color: #ffe066; background: #1c3320; }
+
+.panel { display: flex; flex-direction: column; gap: 14px; }
+.progress { display: grid; grid-template-columns: 1fr; gap: 7px; }
+.step {
+  display: grid; grid-template-columns: 42px 1fr; align-items: center; text-align: left;
+  min-height: 51px; padding: 6px 12px; border: 1px solid rgba(245, 197, 24, .18);
+  border-radius: 12px; background: #101a12; color: #9db09a; cursor: pointer; transition: .2s ease;
+}
+.step b { font: 700 .72rem var(--mono); color: #57895f; }
+.step span { font-weight: 650; }
+.step:hover, .step.active { transform: translateX(3px); border-color: #48a85e; background: linear-gradient(90deg, #173322, #101a12); color: #eafbe6; }
+.step.active b { color: #ffe066; }
+
+.info-card { padding: 20px; border: 1px solid rgba(245, 197, 24, .22); border-radius: 16px; background: linear-gradient(155deg, #14231a, #0a120c); box-shadow: 0 10px 28px #0005; }
+.info-card h2 { margin: 8px 0 8px; font-size: 1.55rem; line-height: 1.12; }
+.info-card p { margin: 0; color: var(--mist); font-size: .94rem; }
+.microtags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+.microtags span { border: 1px solid rgba(245, 197, 24, .2); border-radius: 999px; padding: 4px 8px; color: #cfe0cb; font: 500 .69rem var(--mono); }
+
+.actions { display: grid; grid-template-columns: 1fr 1.35fr; gap: 9px; }
+.actions button { min-height: 48px; border-radius: 10px; cursor: pointer; font: 700 .78rem var(--mono); letter-spacing: .03em; }
+.primary { border: 1px solid #ffe066; background: linear-gradient(180deg, #ffe066, #f5c518); color: #08240f; box-shadow: 0 4px 0 #1f6b33; }
+.secondary { border: 1px solid #375f3f; background: #121c14; color: #d7ecd2; }
+.actions button:disabled { opacity: .35; cursor: default; box-shadow: none; }
+
+/* ---- as caixas de controle ---- */
+.caixa { display: grid; gap: 9px; padding: 14px; border: 1px solid rgba(245, 197, 24, .28); border-radius: 14px; background: #101a12; }
+.caixa[hidden] { display: none; }
+.caixa-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+.caixa-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.caixa-btns button { min-height: 32px; padding: 4px 10px; border: 1px solid #3d6b45; border-radius: 999px; background: #16231a; color: #ffe066; font: 600 .7rem var(--mono); cursor: pointer; }
+.caixa-btns button.on { border-color: #f5c518; background: #23401f; color: #eafbe6; }
+.ctrl { display: grid; gap: 3px; }
+.ctrl span { color: #9db09a; font: 600 .67rem var(--mono); letter-spacing: .04em; }
+.ctrl input[type=range] { width: 100%; accent-color: #f5c518; }
+.valor { margin: 0; color: #e6f2e0; font: 600 .68rem var(--mono); line-height: 1.55; }
+.caixa canvas { width: 100%; height: auto; border-radius: 8px; background: #08100a; }
+/* a conta é o coração da página: ela ganha moldura para não ser lida como
+   legenda de gráfico */
+.conta { margin: 0; padding: 10px 12px; border-left: 3px solid #a07ae0; background: rgba(160, 122, 224, .08); color: #d8cbe8; font-size: .81rem; line-height: 1.5; }
+.conta b { color: #eafbe6; }
+.conta sup { font-size: .72em; }
+.nota { margin: 0; color: var(--mist); font-size: .79rem; line-height: 1.45; }
+
+.ra-box { display: grid; gap: 8px; }
+.ra-box model-viewer { width: 100%; height: 150px; border: 1px solid rgba(245, 197, 24, .24); border-radius: 12px; background: radial-gradient(circle at 50% 40%, #22182e, #0a0810 75%); }
+
+.learning-strip { margin: 22px 0 4px; padding: 22px; border: 1px solid rgba(245, 197, 24, .18); border-radius: 16px; background: #0b120c; display: grid; grid-template-columns: minmax(220px, .62fr) 1.38fr; gap: 25px; align-items: center; }
+.learning-strip h2 { margin: 7px 0 0; font-size: 1.45rem; }
+.learning-strip p { margin: 0; color: var(--mist); }
+
+@media (max-width: 900px) {
+  .experience { grid-template-columns: 1fr; }
+  .stage { height: clamp(360px, 56vh, 540px); }
+  .progress { grid-template-columns: repeat(5, 1fr); }
+  .step { grid-template-columns: 1fr; text-align: center; padding: 7px 4px; min-height: 56px; }
+  .step span { font-size: .68rem; }
+  .step:hover, .step.active { transform: translateY(-2px); }
+  .learning-strip { grid-template-columns: 1fr; gap: 8px; }
+}
+@media (max-width: 520px) {
+  .page-note { font-size: .92rem; }
+  .stage { height: clamp(340px, 52vh, 480px); }
+  .stage-hud { left: 9px; right: 9px; gap: 5px; }
+  .stage-hud span { font-size: .55rem; padding: 5px 7px; }
+  /* No telefone a dica de gesto passava POR BAIXO dos três botões e o palco
+     ganhava uma faixa de texto embaralhado. Some: quem está no toque não
+     precisa que lhe digam para arrastar. */
+  .gesture { display: none; }
+  .lbl { font-size: .58rem; padding: 3px 6px; }
+  .stage-tools { right: 10px; bottom: 10px; gap: 6px; }
+  .ghost-control { font-size: .62rem; padding: 7px 9px; }
+  .panel { gap: 10px; }
+  .progress { gap: 4px; }
+  .step { min-height: 51px; }
+  .step span { font-size: .57rem; }
+  .info-card { padding: 16px; }
+  .info-card h2 { font-size: 1.32rem; }
+  .actions { grid-template-columns: .85fr 1.4fr; }
+  .learning-strip { padding: 17px; }
+}
+
+/* ---- o que a bancada 08 acrescenta ---- */
+.permitir { font: inherit; font-weight: 700; padding: 12px 16px; border-radius: 11px; border: 0;
+            background: #f5c518; color: #131d15; width: 100%; }
+.estado { margin: 0; font-family: 'IBM Plex Mono', monospace; font-size: .78rem; color: #7f9a80; }
+.estado.vivo { color: #5fd177; }
+.leituras { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 3px;
+            font-family: 'IBM Plex Mono', monospace; font-size: .82rem; color: #b0c4ac; }
+.leituras li { display: flex; justify-content: space-between; gap: 10px; }
+.leituras b { color: #f2f7ec; font-weight: 700; }
+.degraus { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px;
+           font-family: 'IBM Plex Mono', monospace; font-size: .82rem; color: #b0c4ac; }
+.degraus li { display: flex; justify-content: space-between; gap: 8px; }
+.degraus b { color: #ffe066; }
+.degraus span { color: #f2f7ec; }
+
+/* ---- o que a bancada 09 acrescenta ---- */
+.causas { display: flex; flex-wrap: wrap; gap: 6px; }
+.causas button { font: inherit; font-size: .78rem; font-weight: 600; padding: 7px 11px;
+                 border-radius: 999px; border: 1px solid #1f6b33; background: #101a12; color: #b0c4ac; }
+.causas button.on { background: #f5c518; color: #131d15; border-color: #f5c518; }
+.barra { height: 14px; border-radius: 7px; background: #131d15; overflow: hidden; border: 1px solid #1f6b33; }
+.barra i { display: block; height: 100%; width: 0; background: linear-gradient(90deg,#4684d6,#9fd8f2); }
+
+/* a leitura que precisa gritar quando o retorno venoso cai */
+.leituras li.alerta b { color: #ff9d2e; }
