@@ -35,11 +35,17 @@ export const TOPO_VE = ALTURA_VE;
 export const TOPO_VD = ALTURA_VD + VD_Y;
 export const SUBIR_PLANO = 18;
 export const TOLERANCIA_JUNCAO_MM = 8;
+/* NO ESQUEMA O PLANO VALVAR É UMA LINHA, e não quatro pontos espalhados no
+   espaço. Cada coluna tem as suas duas: a atrioventricular na boca do
+   ventrículo, por onde o átrio despeja, e a semilunar ao lado dela, por onde
+   a artéria sai. Tudo em z = 0, porque o corte é frontal e o que sai do plano
+   deixa de ser lido. */
+const VE_X_VALVA = 22, VD_X_VALVA = -30;
 export const PLANO_VALVAR = {
-  mitral:     [6,  56 + SUBIR_PLANO, -2],   // 74
-  tricuspide: [-16, 53 + SUBIR_PLANO,  6],  // 71
-  aortica:    [4,  60 + SUBIR_PLANO, -4],   // 78
-  pulmonar:   [-12, 58 + SUBIR_PLANO, 16],  // 76
+  mitral:     [ VE_X_VALVA, ALTURA_VE - 3, 0],
+  aortica:    [ 10, ALTURA_VE + 1, 18],
+  tricuspide: [ VD_X_VALVA, VD_Y + ALTURA_VD - 3, 0],
+  pulmonar:   [-18, VD_Y + ALTURA_VD + 1, 18],
 };
 export const VENTRICULO_DA_VALVA = {
   mitral: 've', tricuspide: 'vd', aortica: 've', pulmonar: 'vd',

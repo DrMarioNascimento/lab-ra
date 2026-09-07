@@ -204,6 +204,15 @@ function perfilVentriculo(raio, altura, pontudo = 1) {
    a cavidade direita termina exatamente onde ela começa. Isso é verdade na
    anatomia, e é o que evita desenhar duas paredes onde existe uma. */
 const VE_X = 22, VD_X = -30;
+/* os átrios saem para fora para abrir o corredor das artérias */
+/* O ÁTRIO VOLTA PARA CIMA DO SEU VENTRÍCULO. Empurrá-lo para fora abria o
+   corredor da artéria, mas soltava a câmara do resto: ficava um caroço
+   flutuando. A saída certa é a que o corpo já usa — a via de saída é
+   ANTERIOR, e a artéria passa NA FRENTE do átrio, não ao lado dele. Num
+   diagrama isso é o normal: desenha-se a aorta por cima do átrio. */
+const AE_X = VE_X, AD_X = VD_X;
+/* z de quem passa na frente e de quem chega por trás */
+const Z_FRENTE = 30, Z_FUNDO = -26;
 export const PAREDE_VE = 10, PAREDE_VD = 3.4;
 
 /* A METADE DA FRENTE É A QUE SAI. O LatheGeometry começa em +Z, então
@@ -327,20 +336,33 @@ function vasoTubo(pontos, raio, mat, segs = 28) {
 
 function grandesVasos() {
   const g = new THREE.Group();
-  /* aorta: sai do centro, sobe por trás e faz a crossa para a direita */
-  g.add(vasoTubo([[4, 62, -4], [5, 82, -2], [4, 104, 2], [-8, 118, 4], [-26, 112, 2], [-32, 92, -2]],
-                 12, M.aorta));
-  /* tronco pulmonar: sai à FRENTE e cruza para a esquerda, por cima */
-  g.add(vasoTubo([[-12, 60, 16], [-10, 80, 14], [-4, 98, 8], [10, 106, 2]], 10.5, M.pulmonar));
-  /* os dois ramos pulmonares */
-  g.add(vasoTubo([[10, 106, 2], [26, 104, -4], [38, 96, -10]], 6.4, M.pulmonar));
-  g.add(vasoTubo([[10, 106, 2], [0, 100, -14], [-12, 92, -22]], 6.0, M.pulmonar));
-  /* cavas: entram no átrio direito por cima e por baixo */
-  g.add(vasoTubo([[-30, 96, -10], [-30, 76, -6], [-26, 60, -2]], 9.5, M.cava));
-  g.add(vasoTubo([[-24, 18, -10], [-26, 34, -8], [-25, 50, -4]], 10.5, M.cava));
-  /* veias pulmonares: quatro, entrando no átrio esquerdo por trás */
-  for (const [x, z] of [[30, -18], [34, -6], [18, -24], [12, -26]])
-    g.add(vasoTubo([[x, 72 + z * .2, z - 8], [x * .7, 66, z * .5], [x * .35, 60, -4]], 4.6, M.veiaPulmonar));
+  /* ── OS VASOS NO ESQUEMA, E UM CRUZAMENTO QUE SAI ──────────────────────
+     No corpo a aorta e o tronco pulmonar SE CRUZAM, e isso é lição de
+     verdade: é o que explica a artéria pulmonar tapar a aorta na
+     radiografia. Mas num corte frontal achatado o cruzamento vira NÓ — foi
+     ele que embaralhou a primeira foto deste esquema, com dois canos
+     arqueando por cima de tudo.
+
+     Aqui cada saída sobe do SEU ventrículo, pelo lado de dentro da coluna,
+     e arqueia para fora. O cruzamento fica para o nível 01, que mostra o
+     coração fechado e é onde ele de facto se vê. Um esquema escolhe o que
+     conta; quem tenta contar tudo não conta nada.
+
+     Tudo em z = 0: o corte é frontal, e o que sai do plano deixa de ser
+     lido de frente. */
+  /* aorta: sobe do ventrículo esquerdo junto ao septo e arqueia para fora */
+  g.add(vasoTubo([[10, 74, Z_FRENTE], [10, 104, Z_FRENTE], [20, 128, Z_FRENTE], [46, 140, Z_FRENTE], [68, 130, Z_FRENTE]],
+                 11, M.aorta));
+  /* tronco pulmonar: o espelho, saindo do direito */
+  g.add(vasoTubo([[-18, 68, Z_FRENTE], [-18, 100, Z_FRENTE], [-28, 122, Z_FRENTE], [-54, 133, Z_FRENTE], [-76, 123, Z_FRENTE]],
+                 9.5, M.pulmonar));
+  /* as cavas chegam ao átrio direito pela borda de fora, uma por cima e
+     outra por baixo — é o que faz o sangue do corpo inteiro convergir */
+  g.add(vasoTubo([[-88, 122, Z_FUNDO], [-70, 108, Z_FUNDO], [-46, 96, Z_FUNDO]], 8.5, M.cava));
+  g.add(vasoTubo([[-88, 48, Z_FUNDO], [-70, 64, Z_FUNDO], [-46, 78, Z_FUNDO]], 9.5, M.cava));
+  /* as veias pulmonares chegam ao átrio esquerdo pela outra borda */
+  g.add(vasoTubo([[88, 120, Z_FUNDO], [68, 108, Z_FUNDO], [40, 96, Z_FUNDO]], 5.4, M.veiaPulmonar));
+  g.add(vasoTubo([[88, 86, Z_FUNDO], [68, 84, Z_FUNDO], [40, 82, Z_FUNDO]], 5.4, M.veiaPulmonar));
   return g;
 }
 
@@ -508,8 +530,13 @@ function corpo({
   /* CADA ÁTRIO SENTA NO TOPO DO SEU VENTRÍCULO, no mesmo eixo — é o que faz
      as quatro câmaras se lerem como duas colunas, direita e esquerda, com o
      sangue subindo por uma e descendo pela outra. */
-  const ae = atrio(1, corte); ae.position.set(VE_X, ALTURA_VE, 0); g.add(ae);
-  const ad = atrio(-1, corte); ad.position.set(VD_X, VD_Y + ALTURA_VD, 0); g.add(ad);
+  /* O ÁTRIO SAI PARA FORA, e não fica em cima do ventrículo. Se ele senta
+     no mesmo eixo, a artéria não tem por onde subir sem atravessá-lo — foi
+     exatamente o que apertou o desenho na etapa anterior. Deslocado, sobra
+     o corredor de dentro para a saída, e a valva atrioventricular fica na
+     sobreposição das duas peças, que é onde ela está de verdade. */
+  const ae = atrio(1, corte); ae.position.set(AE_X, ALTURA_VE - 4, 0); g.add(ae);
+  const ad = atrio(-1, corte); ad.position.set(AD_X, VD_Y + ALTURA_VD - 4, 0); g.add(ad);
 
   const vasos = grandesVasos();
   vasos.userData.papel = 'vasos';
