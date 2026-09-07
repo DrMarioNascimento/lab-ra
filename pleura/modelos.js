@@ -68,22 +68,40 @@ export const M = {
    pneumotórax a caixa ABRE, e sem costela ninguém vê que ela abriu. É a
    parte que surpreende — todo mundo espera o pulmão colapsar, ninguém espera
    a parede saltar para fora. */
+/* UMA COSTELA É UM TUBO VARRIDO POR UMA ELIPSE, e não um toro espremido.
+   A primeira versão escalava `TorusGeometry(1, .52, ...)` por (rx, rz) — e o
+   tubo é escalado junto com o anel, então ele virava FITA. Na foto a caixa
+   lia como pratos empilhados, um abajur, e o pulmão sumia entre eles.
+
+   Com tubo varrido o calibre fica constante, e ainda cabem duas coisas que a
+   silhueta pedia: a costela ABRE ATRÁS, onde ela se articula na coluna, e
+   CAI PARA A FRENTE, porque costela de gente não é horizontal — é essa queda
+   que faz o gradil parecer tórax e não gaiola. */
+function costela(y, rx, rz, queda, raio) {
+  const pts = [];
+  const a0 = -Math.PI / 2 + .30, a1 = 3 * Math.PI / 2 - .30;
+  for (let i = 0; i <= 44; i++) {
+    const a = a0 + (a1 - a0) * i / 44;
+    const frente = (1 + Math.sin(a)) / 2;          // 1 no esterno, 0 na coluna
+    pts.push(V(Math.cos(a) * rx, y - queda * frente, Math.sin(a) * rz));
+  }
+  return new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 44, raio, 7, false);
+}
+
 function caixaToracica() {
   const g = new THREE.Group();
   const arcos = [];
   for (let i = 0; i < 8; i++) {
-    const y = 3 + i * 3.1;
-    const rx = TORAX.largura / 2 * (0.62 + 0.38 * Math.sin(Math.PI * (i + 1.2) / 10));
-    const rz = TORAX.fundo / 2 * (0.62 + 0.38 * Math.sin(Math.PI * (i + 1.2) / 10));
-    const a = new THREE.TorusGeometry(1, .52, 7, 34, Math.PI * 1.72);
-    a.scale(rx, rz, 1);
-    a.rotateX(Math.PI / 2); a.rotateY(Math.PI * .14);
-    a.translate(0, y, 0);
-    arcos.push(a);
+    const y = 5 + i * 2.9;
+    const t = (i + 1.2) / 10;
+    const rx = TORAX.largura / 2 * (0.60 + 0.40 * Math.sin(Math.PI * t));
+    const rz = TORAX.fundo / 2 * (0.60 + 0.40 * Math.sin(Math.PI * t));
+    /* as de baixo caem mais: é o que dá o formato de sino ao gradil */
+    arcos.push(costela(y, rx, rz, 1.6 + i * .42, .52));
   }
   /* esterno e coluna: sem eles os arcos ficam soltos no ar */
-  const est = new THREE.BoxGeometry(3.4, 17, 1.5); est.translate(0, 15, TORAX.fundo / 2 * .74);
-  const col = new THREE.CylinderGeometry(1.7, 1.9, 28, 12); col.translate(0, 15, -TORAX.fundo / 2 * .84);
+  const est = new THREE.BoxGeometry(3.0, 16, 1.4); est.translate(0, 13.5, TORAX.fundo / 2 * .70);
+  const col = new THREE.CylinderGeometry(1.7, 1.9, 28, 12); col.translate(0, 15, -TORAX.fundo / 2 * .86);
   arcos.push(est, col);
   g.add(new THREE.Mesh(mergeGeometries(arcos), M.costela));
 
@@ -91,7 +109,8 @@ function caixaToracica() {
   const pele = new THREE.CylinderGeometry(TORAX.largura / 2, TORAX.largura / 2 * .88, 27, 30, 1, true);
   pele.scale(1, 1, TORAX.fundo / TORAX.largura);
   pele.translate(0, 15, 0);
-  g.add(new THREE.Mesh(pele, M.parede));
+  const mp = new THREE.Mesh(pele, M.parede); mp.renderOrder = 6;
+  g.add(mp);
   return g;
 }
 
