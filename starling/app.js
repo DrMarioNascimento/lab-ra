@@ -35,7 +35,11 @@ renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.14;
 const scene = new THREE.Scene();
-scene.fog = new THREE.FogExp2(0x0a0d10, .0035);
+/* A NEVOA TEM DE CABER NOS DOIS TAMANHOS DESTA BANCADA. Calibrada para o
+   capilar de 60 um, ela comia 62% do nivel 01, que a camera olha de 280 de
+   distancia — o leito virava neblina roxa. Fraca aqui, e o nivel 01 ainda
+   ganha profundidade sem perder o desenho. */
+scene.fog = new THREE.FogExp2(0x0a0d10, .0008);
 scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), .04).texture;
 scene.environmentIntensity = .74;
 
@@ -65,8 +69,13 @@ const raio = modelos.map(m => {
   });
   return r;
 });
+/* O QUADRO TEM DE CABER O TECIDO INCHADO, e não o em repouso. O gel cresce
+   até 1,55x com o edema, e medido parado o modelo saía pela beira justamente
+   no estado que a bancada existe para mostrar. A rede do nível 01 não incha e
+   não paga essa margem. */
+const FOLGA_EDEMA = 1.5;
 function enquadrar(n) {
-  const d = raio[n] / Math.tan(camera.fov * Math.PI / 360) * 1.15;
+  const d = raio[n] * (n === 0 ? 1 : FOLGA_EDEMA) / Math.tan(camera.fov * Math.PI / 360) * 1.15;
   camera.position.set(d * .18, d * .34, d * .92);
   controls.target.set(0, 0, 0);
   controls.minDistance = d * .3; controls.maxDistance = d * 3;
