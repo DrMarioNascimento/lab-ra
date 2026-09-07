@@ -1,0 +1,1167 @@
+{
+  "fonte_bp3d": {
+    "pacote": "partof_BP3D_4.0_obj_99.zip",
+    "url": "https://dbarchive.biosciencedbc.jp/data/bodyparts3d/LATEST/partof_BP3D_4.0_obj_99.zip",
+    "catalogo": "https://dbarchive.biosciencedbc.jp/data/bodyparts3d/LATEST/partof_parts_list_e.txt",
+    "versao": "4.0"
+  },
+  "fonte_z_anatomy": {
+    "repo": "https://github.com/Z-Anatomy/Models-of-human-anatomy",
+    "licenca": "CC-BY-SA 4.0",
+    "nota": "Atlas Blender (~86 MB). Este PR NÃO extrai o .blend; só usa TA2.csv para saber o que a nomenclatura nomeia."
+  },
+  "contagem": {
+    "presente": 30,
+    "parcial": 7,
+    "ausente": 13,
+    "grupo": 12
+  },
+  "pecas": [
+    {
+      "nome": "coracao_WIP",
+      "pai": null,
+      "papel": "grupo",
+      "en": "heart (WIP root)",
+      "fma": "FMA7088",
+      "bp": "BP9305",
+      "ta2": "3932",
+      "fj": [
+        "FJ2417",
+        "FJ2418",
+        "FJ2419",
+        "FJ2420",
+        "FJ2421",
+        "FJ2422",
+        "FJ2423",
+        "FJ2424",
+        "FJ2425",
+        "FJ2426",
+        "FJ2427",
+        "FJ2429",
+        "FJ2430",
+        "FJ2431",
+        "FJ2432",
+        "FJ2433",
+        "FJ2434",
+        "FJ2435",
+        "FJ2436",
+        "FJ2437",
+        "FJ2438",
+        "FJ2439",
+        "FJ2631",
+        "FJ2632",
+        "FJ2633",
+        "FJ2634",
+        "FJ2635",
+        "FJ2636",
+        "FJ2637",
+        "FJ2638",
+        "FJ2639",
+        "FJ2640",
+        "FJ2641",
+        "FJ2642",
+        "FJ2643",
+        "FJ2644",
+        "FJ2645",
+        "FJ2646",
+        "FJ2647",
+        "FJ2648",
+        "FJ2649",
+        "FJ2650",
+        "FJ2651",
+        "FJ2652",
+        "FJ2653",
+        "FJ2654",
+        "FJ2655",
+        "FJ2656",
+        "FJ2667",
+        "FJ2668",
+        "FJ2670",
+        "FJ2671",
+        "FJ2672",
+        "FJ2673",
+        "FJ2674",
+        "FJ2675",
+        "FJ2676",
+        "FJ2677",
+        "FJ2692",
+        "FJ2693",
+        "FJ2694",
+        "FJ2695",
+        "FJ2696",
+        "FJ2697",
+        "FJ2698",
+        "FJ2699",
+        "FJ2700",
+        "FJ2714",
+        "FJ2715",
+        "FJ2716",
+        "FJ2717",
+        "FJ2718",
+        "FJ2719",
+        "FJ2720",
+        "FJ2721",
+        "FJ2722",
+        "FJ2723",
+        "FJ2724",
+        "FJ2727",
+        "FJ2728",
+        "FJ2729",
+        "FJ2731",
+        "FJ2737"
+      ],
+      "status": "grupo",
+      "detalhe": "nó de hierarquia",
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "ventriculo_esquerdo",
+      "pai": "coracao_WIP",
+      "papel": "grupo",
+      "en": "left ventricle",
+      "fma": "FMA7101",
+      "bp": "BP9448",
+      "ta2": "4056",
+      "fj": [
+        "FJ2418",
+        "FJ2420",
+        "FJ2422",
+        "FJ2426",
+        "FJ2429",
+        "FJ2431",
+        "FJ2432",
+        "FJ2435"
+      ],
+      "status": "grupo",
+      "detalhe": "nó de hierarquia",
+      "nota": "No PART-OF o composto do VE inclui cúspides aórticas e folheto mitral — não usar o composto inteiro como malha da câmara.",
+      "z_anatomy": null
+    },
+    {
+      "nome": "parede_externa_ve",
+      "pai": "ventriculo_esquerdo",
+      "papel": "ausente",
+      "en": "epicardial surface of LV wall",
+      "fma": null,
+      "bp": null,
+      "ta2": null,
+      "fj": [],
+      "status": "ausente",
+      "detalhe": "A spec pede DUAS superfícies. O BP3D entrega segmento sólido de miocárdio, não epicárdio separado.",
+      "nota": "A spec pede DUAS superfícies. O BP3D entrega segmento sólido de miocárdio, não epicárdio separado.",
+      "z_anatomy": null
+    },
+    {
+      "nome": "parede_interna_ve",
+      "pai": "ventriculo_esquerdo",
+      "papel": "ausente",
+      "en": "endocardial surface of LV wall",
+      "fma": null,
+      "bp": null,
+      "ta2": null,
+      "fj": [],
+      "status": "ausente",
+      "detalhe": "Idem: não há malha de endocárdio. A cavidade sólida (FJ2422) é o volume, não a face interna.",
+      "nota": "Idem: não há malha de endocárdio. A cavidade sólida (FJ2422) é o volume, não a face interna.",
+      "z_anatomy": null
+    },
+    {
+      "nome": "miocardio_ve",
+      "pai": "ventriculo_esquerdo",
+      "papel": "malha",
+      "en": "myocardium of left ventricle (remaining ELEMENT)",
+      "fma": "FMA9558",
+      "bp": "BP9851",
+      "ta2": null,
+      "fj": [
+        "FJ2418",
+        "FJ2429",
+        "FJ2432"
+      ],
+      "status": "parcial",
+      "detalhe": "⚠️ composto mistura zona/papilar/folheto. Exportamos só FJ que não forem já uma cúspide ou cavidade.",
+      "nota": "⚠️ composto mistura zona/papilar/folheto. Exportamos só FJ que não forem já uma cúspide ou cavidade.",
+      "z_anatomy": null
+    },
+    {
+      "nome": "cavidade_ve",
+      "pai": "ventriculo_esquerdo",
+      "papel": "debug",
+      "en": "cavity of left ventricle",
+      "fma": "FMA9466",
+      "bp": "BP10057",
+      "ta2": null,
+      "fj": [
+        "FJ2422"
+      ],
+      "status": "presente",
+      "detalhe": "cavidade sólida (volume). Não é parede de duas superfícies.",
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "musculo_papilar_anterolateral_ve",
+      "pai": "ventriculo_esquerdo",
+      "papel": "malha",
+      "en": "anterolateral head of lateral papillary muscle of left ventricle",
+      "fma": "FMA7265",
+      "bp": "BP9842",
+      "ta2": null,
+      "fj": [
+        "FJ2418"
+      ],
+      "status": "presente",
+      "detalhe": null,
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "ventriculo_direito",
+      "pai": "coracao_WIP",
+      "papel": "grupo",
+      "en": "right ventricle",
+      "fma": "FMA7098",
+      "bp": "BP9598",
+      "ta2": "4038",
+      "fj": [
+        "FJ2417",
+        "FJ2419",
+        "FJ2421",
+        "FJ2423",
+        "FJ2427",
+        "FJ2430",
+        "FJ2433",
+        "FJ2434",
+        "FJ2436",
+        "FJ2437"
+      ],
+      "status": "grupo",
+      "detalhe": "nó de hierarquia",
+      "nota": "Composto PART-OF inclui folhetos da tricúspide e cúspides pulmonares.",
+      "z_anatomy": null
+    },
+    {
+      "nome": "parede_externa_vd",
+      "pai": "ventriculo_direito",
+      "papel": "ausente",
+      "en": "epicardial surface of RV wall",
+      "fma": null,
+      "bp": null,
+      "ta2": null,
+      "fj": [],
+      "status": "ausente",
+      "detalhe": "sem malha no BodyParts3D 4.0 PART-OF/IS-A",
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "parede_interna_vd",
+      "pai": "ventriculo_direito",
+      "papel": "ausente",
+      "en": "endocardial surface of RV wall",
+      "fma": null,
+      "bp": null,
+      "ta2": null,
+      "fj": [],
+      "status": "ausente",
+      "detalhe": "sem malha no BodyParts3D 4.0 PART-OF/IS-A",
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "miocardio_vd",
+      "pai": "ventriculo_direito",
+      "papel": "malha",
+      "en": "myocardium of right ventricle",
+      "fma": "FMA9535",
+      "bp": "BP9603",
+      "ta2": null,
+      "fj": [
+        "FJ2419",
+        "FJ2430",
+        "FJ2437"
+      ],
+      "status": "parcial",
+      "detalhe": "3/3 FJ no disco; composto PART-OF pode misturar peças",
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "cavidade_vd",
+      "pai": "ventriculo_direito",
+      "papel": "debug",
+      "en": "cavity of right ventricle",
+      "fma": "FMA9291",
+      "bp": "BP10208",
+      "ta2": null,
+      "fj": [
+        "FJ2423"
+      ],
+      "status": "presente",
+      "detalhe": "cavidade sólida (volume). Não é parede de duas superfícies.",
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "musculo_papilar_anterior_vd",
+      "pai": "ventriculo_direito",
+      "papel": "malha",
+      "en": "anterior papillary muscle of right ventricle",
+      "fma": "FMA7260",
+      "bp": "BP10231",
+      "ta2": null,
+      "fj": [
+        "FJ2419"
+      ],
+      "status": "presente",
+      "detalhe": null,
+      "nota": "O mesmo FJ2419 também é listado como «anterior wall of right ventricle» — não separamos o que o voxel não separa.",
+      "z_anatomy": null
+    },
+    {
+      "nome": "musculo_papilar_posterior_vd",
+      "pai": "ventriculo_direito",
+      "papel": "malha",
+      "en": "posterior papillary muscle of right ventricle",
+      "fma": "FMA7261",
+      "bp": "BP9637",
+      "ta2": null,
+      "fj": [
+        "FJ2430"
+      ],
+      "status": "presente",
+      "detalhe": null,
+      "nota": "Mesmo FJ2430 = inferior wall of right ventricle no catálogo.",
+      "z_anatomy": null
+    },
+    {
+      "nome": "musculo_papilar_septal_vd",
+      "pai": "ventriculo_direito",
+      "papel": "malha",
+      "en": "septal papillary muscle of right ventricle",
+      "fma": "FMA7262",
+      "bp": "BP9594",
+      "ta2": null,
+      "fj": [
+        "FJ2437"
+      ],
+      "status": "presente",
+      "detalhe": null,
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "atrio_esquerdo",
+      "pai": "coracao_WIP",
+      "papel": "grupo",
+      "en": "left atrium",
+      "fma": "FMA7097",
+      "bp": "BP9454",
+      "ta2": "4054",
+      "fj": [
+        "FJ2420",
+        "FJ2425",
+        "FJ2426",
+        "FJ2431",
+        "FJ2432",
+        "FJ2438"
+      ],
+      "status": "grupo",
+      "detalhe": "nó de hierarquia",
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "parede_ae",
+      "pai": "atrio_esquerdo",
+      "papel": "malha",
+      "en": "wall of left atrium",
+      "fma": "FMA9531",
+      "bp": "BP10221",
+      "ta2": null,
+      "fj": [
+        "FJ2438"
+      ],
+      "status": "presente",
+      "detalhe": null,
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "cavidade_ae",
+      "pai": "atrio_esquerdo",
+      "papel": "debug",
+      "en": "cavity of left atrium",
+      "fma": "FMA9465",
+      "bp": "BP9925",
+      "ta2": null,
+      "fj": [
+        "FJ2425"
+      ],
+      "status": "presente",
+      "detalhe": "cavidade sólida (volume). Não é parede de duas superfícies.",
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "auricula_esquerda",
+      "pai": "atrio_esquerdo",
+      "papel": "ausente",
+      "en": "left auricle of heart",
+      "fma": null,
+      "bp": null,
+      "ta2": "4055",
+      "fj": [],
+      "status": "ausente",
+      "detalhe": "TA2 nomeia; BodyParts3D PART-OF/IS-A 4.0 não tem malha de aurícula. Não inventar a orelhinha.",
+      "nota": "TA2 nomeia; BodyParts3D PART-OF/IS-A 4.0 não tem malha de aurícula. Não inventar a orelhinha.",
+      "z_anatomy": "TA2 nomeia; malha do blend Z-Anatomy não extraída neste PR"
+    },
+    {
+      "nome": "atrio_direito",
+      "pai": "coracao_WIP",
+      "papel": "grupo",
+      "en": "right atrium",
+      "fma": "FMA7096",
+      "bp": "BP9831",
+      "ta2": "4022",
+      "fj": [
+        "FJ2421",
+        "FJ2424",
+        "FJ2433",
+        "FJ2436",
+        "FJ2439"
+      ],
+      "status": "grupo",
+      "detalhe": "nó de hierarquia",
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "parede_ad",
+      "pai": "atrio_direito",
+      "papel": "malha",
+      "en": "wall of right atrium",
+      "fma": "FMA9457",
+      "bp": "BP9921",
+      "ta2": null,
+      "fj": [
+        "FJ2439"
+      ],
+      "status": "presente",
+      "detalhe": null,
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "cavidade_ad",
+      "pai": "atrio_direito",
+      "papel": "debug",
+      "en": "cavity of right atrium",
+      "fma": "FMA11359",
+      "bp": "BP9906",
+      "ta2": null,
+      "fj": [
+        "FJ2424"
+      ],
+      "status": "presente",
+      "detalhe": "cavidade sólida (volume). Não é parede de duas superfícies.",
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "auricula_direita",
+      "pai": "atrio_direito",
+      "papel": "ausente",
+      "en": "right auricle of heart",
+      "fma": null,
+      "bp": null,
+      "ta2": "4023",
+      "fj": [],
+      "status": "ausente",
+      "detalhe": "Ausente no BP3D 4.0. Z-Anatomy/TA2 nomeia; malha do blend não foi extraída neste PR.",
+      "nota": "Ausente no BP3D 4.0. Z-Anatomy/TA2 nomeia; malha do blend não foi extraída neste PR.",
+      "z_anatomy": "TA2 nomeia; malha do blend Z-Anatomy não extraída neste PR"
+    },
+    {
+      "nome": "valva_mitral",
+      "pai": "coracao_WIP",
+      "papel": "grupo",
+      "en": "mitral valve",
+      "fma": "FMA7235",
+      "bp": "BP9455",
+      "ta2": "3987",
+      "fj": [
+        "FJ2420",
+        "FJ2426",
+        "FJ2431",
+        "FJ2432"
+      ],
+      "status": "grupo",
+      "detalhe": "nó de hierarquia",
+      "nota": "O composto PART-OF lista também cúspides aórticas — ignoramos o composto e usamos folheto a folheto.",
+      "z_anatomy": null
+    },
+    {
+      "nome": "cuspide_anterior_mitral",
+      "pai": "valva_mitral",
+      "papel": "malha",
+      "en": "anterior leaflet of mitral valve",
+      "fma": "FMA7242",
+      "bp": "BP9874",
+      "ta2": null,
+      "fj": [
+        "FJ2420"
+      ],
+      "status": "presente",
+      "detalhe": null,
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "cuspide_posterior_mitral",
+      "pai": "valva_mitral",
+      "papel": "malha",
+      "en": "posterior leaflet of mitral valve",
+      "fma": "FMA7243",
+      "bp": "BP9998",
+      "ta2": null,
+      "fj": [
+        "FJ2432"
+      ],
+      "status": "parcial",
+      "detalhe": "⚠️ O mesmo FJ2432 é também «inferior wall of left ventricle» / zona 4. Não fatiamos o voxel.",
+      "nota": "⚠️ O mesmo FJ2432 é também «inferior wall of left ventricle» / zona 4. Não fatiamos o voxel.",
+      "z_anatomy": null
+    },
+    {
+      "nome": "valva_tricuspide",
+      "pai": "coracao_WIP",
+      "papel": "grupo",
+      "en": "tricuspid valve",
+      "fma": "FMA7234",
+      "bp": "BP9830",
+      "ta2": "3982",
+      "fj": [
+        "FJ2421",
+        "FJ2433",
+        "FJ2436"
+      ],
+      "status": "grupo",
+      "detalhe": "nó de hierarquia",
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "cuspide_anterior_tricuspide",
+      "pai": "valva_tricuspide",
+      "papel": "malha",
+      "en": "anterior leaflet of tricuspid valve",
+      "fma": "FMA7238",
+      "bp": "BP9920",
+      "ta2": null,
+      "fj": [
+        "FJ2421"
+      ],
+      "status": "presente",
+      "detalhe": null,
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "cuspide_posterior_tricuspide",
+      "pai": "valva_tricuspide",
+      "papel": "malha",
+      "en": "posterior leaflet of tricuspid valve",
+      "fma": "FMA7239",
+      "bp": "BP9829",
+      "ta2": null,
+      "fj": [
+        "FJ2433"
+      ],
+      "status": "presente",
+      "detalhe": null,
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "cuspide_septal_tricuspide",
+      "pai": "valva_tricuspide",
+      "papel": "malha",
+      "en": "septal leaflet of tricuspid valve",
+      "fma": "FMA7240",
+      "bp": "BP9887",
+      "ta2": null,
+      "fj": [
+        "FJ2436"
+      ],
+      "status": "presente",
+      "detalhe": null,
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "valva_aortica",
+      "pai": "coracao_WIP",
+      "papel": "grupo",
+      "en": "aortic valve",
+      "fma": "FMA7236",
+      "bp": "BP9447",
+      "ta2": "3993",
+      "fj": [
+        "FJ2426",
+        "FJ2431",
+        "FJ2435"
+      ],
+      "status": "grupo",
+      "detalhe": "nó de hierarquia",
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "cuspide_anterior_aortica",
+      "pai": "valva_aortica",
+      "papel": "malha",
+      "en": "anterior cusp of aortic valve",
+      "fma": "FMA7253",
+      "bp": "BP9760",
+      "ta2": null,
+      "fj": [
+        "FJ2435"
+      ],
+      "status": "presente",
+      "detalhe": null,
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "cuspide_posterior_direita_aortica",
+      "pai": "valva_aortica",
+      "papel": "malha",
+      "en": "right posterior cusp of aortic valve",
+      "fma": "FMA7252",
+      "bp": "BP9446",
+      "ta2": null,
+      "fj": [
+        "FJ2431"
+      ],
+      "status": "presente",
+      "detalhe": null,
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "cuspide_posterior_esquerda_aortica",
+      "pai": "valva_aortica",
+      "papel": "malha",
+      "en": "left posterior cusp of aortic valve",
+      "fma": "FMA7254",
+      "bp": "BP9993",
+      "ta2": null,
+      "fj": [
+        "FJ2426"
+      ],
+      "status": "presente",
+      "detalhe": null,
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "valva_pulmonar",
+      "pai": "coracao_WIP",
+      "papel": "grupo",
+      "en": "pulmonary valve",
+      "fma": "FMA7246",
+      "bp": "BP9868",
+      "ta2": "4008",
+      "fj": [
+        "FJ2417",
+        "FJ2427",
+        "FJ2434"
+      ],
+      "status": "grupo",
+      "detalhe": "nó de hierarquia",
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "cuspide_anterior_esquerda_pulmonar",
+      "pai": "valva_pulmonar",
+      "papel": "malha",
+      "en": "left anterior cusp of pulmonary valve",
+      "fma": "FMA7247",
+      "bp": "BP10131",
+      "ta2": null,
+      "fj": [
+        "FJ2417"
+      ],
+      "status": "presente",
+      "detalhe": null,
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "cuspide_anterior_direita_pulmonar",
+      "pai": "valva_pulmonar",
+      "papel": "malha",
+      "en": "right anterior cusp of pulmonary valve",
+      "fma": "FMA7249",
+      "bp": "BP10108",
+      "ta2": null,
+      "fj": [
+        "FJ2434"
+      ],
+      "status": "presente",
+      "detalhe": null,
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "cuspide_posterior_pulmonar",
+      "pai": "valva_pulmonar",
+      "papel": "malha",
+      "en": "posterior cusp of pulmonary valve",
+      "fma": "FMA7250",
+      "bp": "BP9867",
+      "ta2": null,
+      "fj": [
+        "FJ2427"
+      ],
+      "status": "presente",
+      "detalhe": null,
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "vasos",
+      "pai": "coracao_WIP",
+      "papel": "grupo",
+      "en": "great vessels",
+      "fma": null,
+      "bp": null,
+      "ta2": null,
+      "fj": [],
+      "status": "grupo",
+      "detalhe": "nó de hierarquia",
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "aorta_ascendente",
+      "pai": "vasos",
+      "papel": "malha",
+      "en": "ascending aorta",
+      "fma": "FMA3736",
+      "bp": "BP10408",
+      "ta2": null,
+      "fj": [
+        "FJ3413"
+      ],
+      "status": "presente",
+      "detalhe": null,
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "arco_aortico",
+      "pai": "vasos",
+      "papel": "malha",
+      "en": "arch of aorta",
+      "fma": "FMA3768",
+      "bp": "BP10404",
+      "ta2": null,
+      "fj": [
+        "FJ3411"
+      ],
+      "status": "presente",
+      "detalhe": null,
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "tronco_pulmonar",
+      "pai": "vasos",
+      "papel": "malha",
+      "en": "pulmonary trunk",
+      "fma": "FMA8612",
+      "bp": "BP9912",
+      "ta2": null,
+      "fj": [
+        "FJ2966"
+      ],
+      "status": "presente",
+      "detalhe": null,
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "veia_cava_superior",
+      "pai": "vasos",
+      "papel": "malha",
+      "en": "superior vena cava",
+      "fma": "FMA4720",
+      "bp": "BP10386",
+      "ta2": null,
+      "fj": [
+        "FJ3645"
+      ],
+      "status": "presente",
+      "detalhe": null,
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "veia_cava_inferior",
+      "pai": "vasos",
+      "papel": "malha",
+      "en": "inferior vena cava",
+      "fma": "FMA10951",
+      "bp": "BP10397",
+      "ta2": null,
+      "fj": [
+        "FJ3441",
+        "FJ3659"
+      ],
+      "status": "parcial",
+      "detalhe": "2/2 FJ no disco; composto PART-OF pode misturar peças",
+      "nota": "O composto tem 2 FJ e desce pelo abdome — não é só o coto atrial.",
+      "z_anatomy": null
+    },
+    {
+      "nome": "veia_pulmonar_superior_direita",
+      "pai": "vasos",
+      "papel": "malha",
+      "en": "right superior pulmonary vein (extrapulmonary FJ only)",
+      "fma": "FMA49914",
+      "bp": "BP9365",
+      "ta2": null,
+      "fj": [
+        "FJ3020"
+      ],
+      "status": "presente",
+      "detalhe": null,
+      "nota": "Só os FJ que não estão no composto intrapulmonar.",
+      "z_anatomy": null
+    },
+    {
+      "nome": "veia_pulmonar_inferior_direita",
+      "pai": "vasos",
+      "papel": "malha",
+      "en": "right inferior pulmonary vein (extrapulmonary FJ only)",
+      "fma": "FMA49911",
+      "bp": "BP9407",
+      "ta2": null,
+      "fj": [
+        "FJ3040"
+      ],
+      "status": "presente",
+      "detalhe": null,
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "veia_pulmonar_superior_esquerda",
+      "pai": "vasos",
+      "papel": "malha",
+      "en": "left superior pulmonary vein (extrapulmonary FJ only)",
+      "fma": "FMA49916",
+      "bp": "BP9499",
+      "ta2": null,
+      "fj": [
+        "FJ2925",
+        "FJ2933"
+      ],
+      "status": "parcial",
+      "detalhe": "2/2 FJ no disco; composto PART-OF pode misturar peças",
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "veia_pulmonar_inferior_esquerda",
+      "pai": "vasos",
+      "papel": "malha",
+      "en": "left inferior pulmonary vein (extrapulmonary FJ only)",
+      "fma": "FMA49913",
+      "bp": "BP9712",
+      "ta2": null,
+      "fj": [
+        "FJ2944",
+        "FJ2950",
+        "FJ2955"
+      ],
+      "status": "parcial",
+      "detalhe": "3/3 FJ no disco; composto PART-OF pode misturar peças",
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "coronarias",
+      "pai": "coracao_WIP",
+      "papel": "grupo",
+      "en": "coronary arteries and cardiac veins",
+      "fma": null,
+      "bp": null,
+      "ta2": null,
+      "fj": [],
+      "status": "grupo",
+      "detalhe": "nó de hierarquia",
+      "nota": "Malhas do mesmo corpo; se correm NA superfície é coincidência do voxel, não modelagem de sulco. Verificar interseção com o miocárdio.",
+      "z_anatomy": null
+    },
+    {
+      "nome": "tronco_coronaria_esquerda",
+      "pai": "coronarias",
+      "papel": "malha",
+      "en": "trunk of left coronary artery",
+      "fma": "FMA3855",
+      "bp": "BP10074",
+      "ta2": null,
+      "fj": [
+        "FJ2737"
+      ],
+      "status": "presente",
+      "detalhe": null,
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "tronco_descendente_anterior",
+      "pai": "coronarias",
+      "papel": "malha",
+      "en": "trunk of anterior interventricular branch of left coronary artery",
+      "fma": "FMA74912",
+      "bp": "BP10078",
+      "ta2": null,
+      "fj": [
+        "FJ2631"
+      ],
+      "status": "presente",
+      "detalhe": null,
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "tronco_coronaria_direita",
+      "pai": "coronarias",
+      "papel": "malha",
+      "en": "trunk of right coronary artery",
+      "fma": "FMA3802",
+      "bp": "BP9674",
+      "ta2": null,
+      "fj": [
+        "FJ2723"
+      ],
+      "status": "presente",
+      "detalhe": null,
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "seio_coronario",
+      "pai": "coronarias",
+      "papel": "malha",
+      "en": "coronary sinus",
+      "fma": "FMA4706",
+      "bp": "BP10136",
+      "ta2": null,
+      "fj": [
+        "FJ2655"
+      ],
+      "status": "presente",
+      "detalhe": null,
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "ramos_coronarios_nao_nomeados_um_a_um",
+      "pai": "coronarias",
+      "papel": "malha",
+      "en": "remaining heart ELEMENT files of the coronary/cardiac-vein trees",
+      "fma": "FMA50040",
+      "bp": "BP9549",
+      "ta2": null,
+      "fj": [
+        "FJ2631",
+        "FJ2632",
+        "FJ2633",
+        "FJ2634",
+        "FJ2635",
+        "FJ2636",
+        "FJ2637",
+        "FJ2638",
+        "FJ2639",
+        "FJ2640",
+        "FJ2641",
+        "FJ2642",
+        "FJ2643",
+        "FJ2644",
+        "FJ2645",
+        "FJ2646",
+        "FJ2647",
+        "FJ2648",
+        "FJ2649",
+        "FJ2650",
+        "FJ2651",
+        "FJ2652",
+        "FJ2653",
+        "FJ2654",
+        "FJ2737"
+      ],
+      "status": "parcial",
+      "detalhe": "25/25 FJ no disco; composto PART-OF pode misturar peças",
+      "nota": "Exportados como filhos FJ#### com o menor nome PART-OF disponível — sem batizar ramo que o catálogo não batiza.",
+      "z_anatomy": null
+    },
+    {
+      "nome": "conducao",
+      "pai": "coracao_WIP",
+      "papel": "grupo",
+      "en": "conducting system of heart",
+      "fma": null,
+      "bp": null,
+      "ta2": "3952",
+      "fj": [],
+      "status": "grupo",
+      "detalhe": "nó de hierarquia",
+      "nota": null,
+      "z_anatomy": null
+    },
+    {
+      "nome": "no_sinusal",
+      "pai": "conducao",
+      "papel": "ausente",
+      "en": "sinu-atrial node",
+      "fma": null,
+      "bp": null,
+      "ta2": "3953",
+      "fj": [],
+      "status": "ausente",
+      "detalhe": "sem malha no BodyParts3D 4.0 PART-OF/IS-A",
+      "nota": null,
+      "z_anatomy": "TA2 nomeia; malha do blend Z-Anatomy não extraída neste PR"
+    },
+    {
+      "nome": "no_atrioventricular",
+      "pai": "conducao",
+      "papel": "ausente",
+      "en": "atrioventricular node",
+      "fma": null,
+      "bp": null,
+      "ta2": "3954",
+      "fj": [],
+      "status": "ausente",
+      "detalhe": "sem malha no BodyParts3D 4.0 PART-OF/IS-A",
+      "nota": null,
+      "z_anatomy": "TA2 nomeia; malha do blend Z-Anatomy não extraída neste PR"
+    },
+    {
+      "nome": "feixe_de_his",
+      "pai": "conducao",
+      "papel": "ausente",
+      "en": "atrioventricular bundle",
+      "fma": null,
+      "bp": null,
+      "ta2": "3955",
+      "fj": [],
+      "status": "ausente",
+      "detalhe": "sem malha no BodyParts3D 4.0 PART-OF/IS-A",
+      "nota": null,
+      "z_anatomy": "TA2 nomeia; malha do blend Z-Anatomy não extraída neste PR"
+    },
+    {
+      "nome": "ramos_de_his",
+      "pai": "conducao",
+      "papel": "ausente",
+      "en": "bundle branches",
+      "fma": null,
+      "bp": null,
+      "ta2": "3956",
+      "fj": [],
+      "status": "ausente",
+      "detalhe": "sem malha no BodyParts3D 4.0 PART-OF/IS-A",
+      "nota": null,
+      "z_anatomy": "TA2 nomeia; malha do blend Z-Anatomy não extraída neste PR"
+    },
+    {
+      "nome": "purkinje",
+      "pai": "conducao",
+      "papel": "ausente",
+      "en": "subendocardial branches",
+      "fma": null,
+      "bp": null,
+      "ta2": "3961",
+      "fj": [],
+      "status": "ausente",
+      "detalhe": "sem malha no BodyParts3D 4.0 PART-OF/IS-A",
+      "nota": null,
+      "z_anatomy": "TA2 nomeia; malha do blend Z-Anatomy não extraída neste PR"
+    },
+    {
+      "nome": "cordas_tendineas_mitral",
+      "pai": "valva_mitral",
+      "papel": "ausente",
+      "en": "chordae tendineae of left atrioventricular valve",
+      "fma": null,
+      "bp": null,
+      "ta2": "4069",
+      "fj": [],
+      "status": "ausente",
+      "detalhe": "sem malha no BodyParts3D 4.0 PART-OF/IS-A",
+      "nota": null,
+      "z_anatomy": "TA2 nomeia; malha do blend Z-Anatomy não extraída neste PR"
+    },
+    {
+      "nome": "cordas_tendineas_tricuspide",
+      "pai": "valva_tricuspide",
+      "papel": "ausente",
+      "en": "chordae tendineae of right atrioventricular valve",
+      "fma": null,
+      "bp": null,
+      "ta2": "4047",
+      "fj": [],
+      "status": "ausente",
+      "detalhe": "sem malha no BodyParts3D 4.0 PART-OF/IS-A",
+      "nota": null,
+      "z_anatomy": "TA2 nomeia; malha do blend Z-Anatomy não extraída neste PR"
+    }
+  ],
+  "isa_buscas_ausentes": [
+    {
+      "busca": "auricle of heart",
+      "hits_isa": []
+    },
+    {
+      "busca": "left auricle",
+      "hits_isa": []
+    },
+    {
+      "busca": "right auricle",
+      "hits_isa": []
+    },
+    {
+      "busca": "sinuatrial",
+      "hits_isa": []
+    },
+    {
+      "busca": "sinu-atrial",
+      "hits_isa": []
+    },
+    {
+      "busca": "atrioventricular node",
+      "hits_isa": []
+    },
+    {
+      "busca": "bundle of His",
+      "hits_isa": []
+    },
+    {
+      "busca": "Purkinje",
+      "hits_isa": []
+    },
+    {
+      "busca": "chordae tendineae",
+      "hits_isa": []
+    }
+  ]
+}

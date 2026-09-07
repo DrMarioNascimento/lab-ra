@@ -1,0 +1,24 @@
+{
+  "arquivo": "export/coracao-bancada11-WIP.glb",
+  "wip": true,
+  "triangulos": 111446,
+  "orcamento_60k": false,
+  "nos_com_malha": 92,
+  "apice_nativo_mm": [
+    55.6279,
+    -130.931,
+    1184.07
+  ],
+  "transformacao": {
+    "status": "proposta_wip_nao_validada",
+    "apice_fonte": "min_Z_nativo de FJ2422 (cavity of left ventricle)",
+    "matriz_conceito": "X'=X-ax; Y'=Z-az; Z'=Y-ay",
+    "faltando": [
+      "confirmar o ápice no miocárdio (não só na cavidade sólida)",
+      "conferir se +Z' posterior é a convenção de visualização da bancada",
+      "glTF oficial é metro; esta bancada usa milímetro, como coracao/modelos.js",
+      "decimar para ≤60k triângulos sem fundir peças nomeadas"
+    ]
+  },
+  "aviso": "WIP. Não usar como coração de ensino acabado."
+}

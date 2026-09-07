@@ -19,6 +19,8 @@ Conteúdo migrado de `DrMarioNascimento/Dragon/laboratorio-ra`:
 | Cadeia · três telas | `cadeia-*.html` + `cadeia.js` |
 | Do músculo ao sarcômero | `musculo-sarcomero/` |
 | A película de carga (potencial de membrana) | `potencial-membrana/` |
+| Coração em ação (esquemático, ao vivo) | `coracao/` |
+| Coração 3D · pipeline WIP (não é o de ensino) | `bancadas/11-coracao/` |
 
 A porta de entrada (`index.html`) autentica com Google contra `config/mestres` no projeto Firebase **mosaico-game**. As bancadas ficam em `bancadas.html` (protegidas por `guard.js` + `sessionStorage`).
 
