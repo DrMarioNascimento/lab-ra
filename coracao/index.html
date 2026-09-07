@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="pt-BR" data-ra-protected>
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" href="../brand/orientador.webp" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#050a06" />
+  <title>Coração em ação · Laboratório do Pesquisar RA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=IBM+Plex+Mono:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../laboratorio.css" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="../guard.js"></script>
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"}}</script>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.1.0/dist/model-viewer.min.js"></script>
+</head>
+<body>
+<header class="topbar"><nav class="nav shell" aria-label="Laboratório"><a class="brand" href="../bancadas.html"><img src="../brand/orientador.webp" alt="" width="42" height="42"><span class="brand-copy"><b>LABORATÓRIO DO PESQUISAR RA</b><span>Fisiologia · Unidade IV</span></span></a><div class="nav-actions"><a class="small-button" href="../bancadas.html">Testes</a></div></nav></header>
+<main class="page shell">
+  <div class="page-head"><div><span class="eyebrow">Teste 11 · Unidade IV · ciclo cardíaco</span><h1>Coração em ação</h1></div><a class="back-link" href="../bancadas.html">← Voltar</a></div>
+  <p class="page-note">Do impulso elétrico ao bombeamento, com as três leituras no mesmo relógio: a condução acendendo, as válvulas abrindo e o sangue passando. As válvulas não são animadas — elas obedecem às pressões, e por isso as fases isovolumétricas aparecem sozinhas, sem ninguém as escrever. Mexa na frequência e veja o que ela come: de 60 para 180 bpm o ciclo perde 669 ms, e 519 saem da diástole.</p>
+
+  <section class="experience" aria-label="Exploração tridimensional do coração">
+    <div id="stage" class="stage" role="img" aria-label="Modelo tridimensional interativo">
+      <canvas id="scene"></canvas>
+      <div class="stage-hud"><span id="fcLabel">75 bpm</span><span id="faseLabel">enchimento</span><span id="valvasLabel">M·T·</span><span id="stepLabel">01 · O coração</span></div>
+      <div class="gesture">Arraste para girar · pinça/roda para aproximar</div>
+      <div class="stage-tools">
+        <button id="resetView" class="ghost-control" type="button">Recentrar</button>
+      </div>
+    </div>
+
+    <aside class="panel">
+      <div class="progress" aria-label="Níveis"><button class="step active" data-step="0" type="button"><b>01</b><span>O coração</span></button><button class="step" data-step="1" type="button"><b>02</b><span>Por dentro</span></button><button class="step" data-step="2" type="button"><b>03</b><span>As válvulas</span></button><button class="step" data-step="3" type="button"><b>04</b><span>A condução</span></button><button class="step" data-step="4" type="button"><b>05</b><span>O ciclo</span></button></div>
+
+      <article class="info-card" id="infoCard">
+        <span class="eyebrow" id="infoEyebrow">A pergunta</span>
+        <h2 id="infoTitle">Onde a gravidade aperta?</h2>
+        <p id="infoText"></p>
+        <div class="microtags" id="microtags"></div>
+      </article>
+
+      <div class="actions"><button id="prev" class="secondary" type="button" disabled>← Voltar</button><button id="next" class="primary" type="button">Aprofundar →</button></div>
+
+      <section class="caixa" aria-label="O relógio">
+        <div class="caixa-head">
+          <span class="eyebrow">O relógio</span>
+          <div class="caixa-btns"><button id="bater" type="button">Parar</button></div>
+        </div>
+        <div class="causas" id="ritmos">
+          <button id="repouso" type="button">Repouso 60</button>
+          <button id="normal" type="button" class="on">Normal 75</button>
+          <button id="esforco" type="button">Esforço 150</button>
+        </div>
+        <label class="ctrl"><span>Frequência <b><span id="fcValor">75</span> bpm</b></span>
+          <input id="fcCursor" type="range" min="40" max="200" step="1" value="75" aria-label="Frequência cardíaca" /></label>
+        <label class="ctrl"><span>Instante do ciclo</span>
+          <input id="faseCursor" type="range" min="0" max="0.999" step="0.002" value="0" aria-label="Instante do ciclo" /></label>
+        <label class="ctrl"><span>Câmera lenta <b id="lentoValor">1.00×</b></span>
+          <input id="lento" type="range" min="0.08" max="1" step="0.02" value="0.35" aria-label="Câmera lenta" /></label>
+        <p class="estado" id="lEletrico">em repouso</p>
+      </section>
+
+      <section class="caixa" aria-label="O ciclo no tempo">
+        <div class="caixa-head"><span class="eyebrow">As três leituras, um relógio</span></div>
+        <canvas id="wiggers" width="330" height="290" aria-label="Diagrama de Wiggers: pressões, volume, traçado elétrico e bulhas"></canvas>
+        <ul class="leituras">
+          <li>ventrículo esquerdo <b><span id="lPVE">8</span> mmHg</b></li>
+          <li>aorta <b><span id="lPAo">80</span> mmHg</b></li>
+          <li>átrio esquerdo <b><span id="lPAE">8</span> mmHg</b></li>
+          <li>volume no ventrículo <b><span id="lVVE">120</span> ml</b></li>
+        </ul>
+      </section>
+
+      <section class="caixa" aria-label="O que a frequência muda">
+        <div class="caixa-head"><span class="eyebrow">O que a frequência muda</span></div>
+        <ul class="leituras">
+          <li>pressão arterial <b><span id="lPA">120/80</span> mmHg</b></li>
+          <li>volume ejetado <b><span id="lSV">70</span> ml</b></li>
+          <li>fração de ejeção <b><span id="lFE">58</span>%</b></li>
+          <li>débito cardíaco <b><span id="lDC">5.2</span> L/min</b></li>
+          <li>sístole <b><span id="lSistole">313</span> ms</b> · diástole <b><span id="lDiastole">487</span> ms</b></li>
+          <li>diástole por minuto <b><span id="lCoronaria">37</span> s</b></li>
+        </ul>
+      </section>
+
+      <section class="ra-box" aria-label="Realidade aumentada">
+        <model-viewer id="arViewer" alt="Coração em realidade aumentada" ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" ar-scale="fixed" camera-controls loading="eager" reveal="auto" shadow-intensity="1" exposure="1.1"></model-viewer>
+        <button id="launchAR" class="ra-launch" type="button" disabled>Colocar este nível no ambiente</button>
+        <p id="raStatus" class="ra-status">Preparando o modelo para a câmera…</p>
+      </section>
+    </aside>
+  </section>
+</main>
+<footer class="rodape shell"><img src="../brand/mestre-lap.webp" alt="" width="84" height="84"><p>Simuladores interativos do Prof. Mário César Nascimento, PhD ©</p></footer>
+<script type="module" src="app.js"></script>
+</body>
+</html>

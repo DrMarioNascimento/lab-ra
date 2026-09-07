@@ -1,0 +1,482 @@
+/* ============================================================================
+   TESTE 11 — CORAÇÃO EM AÇÃO · geometria e materiais. Nada de DOM.
+   O motor mora em `fisica.js` e NÃO é importado aqui: geometria não decide
+   número. Quem junta os dois é o app — e é essa separação que permitiu afinar
+   o ciclo contra o livro sem abrir navegador nenhum.
+
+   ── O QUE ESTE DESENHO PRECISA DIZER, e que uma figura bonita não diz ─────
+   1. A PAREDE DO VENTRÍCULO ESQUERDO É TRÊS VEZES A DO DIREITO. Não é
+      detalhe de ilustrador: é a resposta inteira à pergunta "por que a
+      pressão da aorta é cinco vezes a da artéria pulmonar". Por isso as
+      câmaras são construídas com parede EXTERNA e INTERNA separadas, e não
+      como cascas de espessura decorativa.
+   2. O DIREITO ABRAÇA O ESQUERDO. Ele não é um segundo cone ao lado — é uma
+      meia-lua colada na frente, e o septo é parede do esquerdo trabalhando
+      para os dois. Desenhá-los como gêmeos é o erro mais comum.
+   3. OS VASOS SE CRUZAM. O tronco pulmonar sai à frente e vai para a
+      esquerda; a aorta sai atrás dele e curva para a direita. Se saírem
+      paralelos, some a razão de a artéria pulmonar tapar a aorta na radiografia.
+   4. AS CÚSPIDES SÃO BOLSAS, NÃO TAMPAS. Mesma regra da bancada 08: a valva
+      se enche por trás e encosta as bordas. Tampa é o modelo errado.
+
+   ── COR ──────────────────────────────────────────────────────────────────
+   Vermelho é sangue oxigenado, azul é venoso — a convenção que o aluno já
+   traz. O MIOCÁRDIO não usa nenhum dos dois: é pardo-avermelhado de músculo,
+   porque se ele fosse vermelho-sangue as câmaras sumiriam dentro dele.
+   ========================================================================== */
+import * as THREE from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+
+const V = (x, y, z) => new THREE.Vector3(x, y, z);
+const rnd = (a, b) => a + Math.random() * (b - a);
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const cor = (r, g, b) => new THREE.Color().setRGB(r / 255, g / 255, b / 255, THREE.SRGBColorSpace);
+
+/* 1 unidade = 1 mm. O coração tem uns 120 de comprimento. */
+export const CORACAO = { comprimento: 118, largura: 96, eixo: 26 };
+
+const phys = o => new THREE.MeshPhysicalMaterial(o);
+export const M = {
+  /* ── O BRILHO ESTAVA LAVANDO TUDO ────────────────────────────────────────
+     Na primeira foto o coração inteiro era um salmão só: músculo, átrio,
+     aorta e coronária na mesma tinta, e nada se separava. A culpa não era da
+     escolha das cores — era do `sheen` alto com cor quase branca por cima,
+     que puxa todo pigmento para o claro. É o mesmo defeito que branqueou a
+     veia na bancada 08.
+
+     Agora o MIOCÁRDIO é fundo e fosco, com brilho baixo e quente; os vasos
+     têm brilho ALTO porque são lisos e molhados de verdade; e a diferença
+     entre fosco e lustroso passa a separar as peças sozinha, sem depender de
+     matiz — que é o que sobra quando o ACES comprime a saturação. */
+  miocardio: phys({ color: 0x8f2f33, roughness: .74, sheen: .35,
+                    sheenColor: cor(210, 96, 84), sheenRoughness: .8 }),
+  miocardioFino: phys({ color: 0xa03f42, roughness: .72, sheen: .34,
+                        sheenColor: cor(220, 110, 96), sheenRoughness: .8 }),
+  atrio: phys({ color: 0x6f3140, roughness: .80, sheen: .28,
+                sheenColor: cor(190, 100, 110), sheenRoughness: .85 }),
+  endocardio: phys({ color: 0xd9b6b8, roughness: .30, sheen: .7,
+                     sheenColor: cor(255, 235, 235) }),
+  valva: phys({ color: 0xf4ece6, roughness: .26, sheen: .9,
+                sheenColor: cor(255, 255, 255),
+                transparent: true, opacity: .94 }),
+  corda: phys({ color: 0xd8c9bd, roughness: .48, sheen: .5 }),
+  /* os grandes vasos são LISOS: brilho alto, e é ele que os separa do
+     músculo mesmo quando a cor é parecida */
+  aorta: phys({ color: 0xe4736b, roughness: .28, sheen: .95,
+                sheenColor: cor(255, 210, 190) }),
+  pulmonar: phys({ color: 0x6b79c8, roughness: .30, sheen: .95,
+                   sheenColor: cor(200, 210, 255) }),
+  cava: phys({ color: 0x4a55a0, roughness: .34, sheen: .85,
+               sheenColor: cor(180, 195, 255) }),
+  veiaPulmonar: phys({ color: 0xc85f60, roughness: .32, sheen: .9,
+                       sheenColor: cor(255, 200, 190) }),
+  /* a coronária precisa LER POR CIMA do músculo: quase escarlate, lustrosa,
+     com um resto de emissiva. Sem isso ela some no próprio órgão que irriga. */
+  coronaria: phys({ color: 0xf0454a, roughness: .24, sheen: 1,
+                    sheenColor: cor(255, 190, 180),
+                    emissive: cor(70, 8, 10).getHex(), emissiveIntensity: .55 }),
+  gordura: phys({ color: 0xe3cf94, roughness: .82, sheen: .35 }),
+  conducao: phys({ color: 0x33301c, roughness: .5,
+                   emissive: cor(60, 52, 12).getHex(), emissiveIntensity: .5 }),
+  sangueRico: phys({ color: 0xd83a3f, roughness: .3, sheen: .9,
+                     sheenColor: cor(255, 190, 180), transparent: true, opacity: .88 }),
+  sanguePobre: phys({ color: 0x4a56a8, roughness: .3, sheen: .9,
+                      sheenColor: cor(180, 190, 255), transparent: true, opacity: .88 }),
+};
+
+export const ACESA = cor(255, 214, 88);
+
+/* ── CÂMARA DE PAREDE DUPLA ───────────────────────────────────────────────
+   Duas revoluções concêntricas: a externa é o epicárdio, a interna é a
+   cavidade. A ESPESSURA É A INFORMAÇÃO — o esquerdo tem 10 mm de parede e o
+   direito 3, e é daí que sai toda a diferença de pressão entre os dois lados.
+
+   O grupo guarda as duas malhas para que a física possa mudar o VOLUME sem
+   mudar a espessura: contrair é a cavidade encolher e a parede engrossar,
+   não a peça inteira encolher. */
+function camaraDupla(perfilInterno, espessura, mat, matInterno, segs = 30) {
+  const g = new THREE.Group();
+  const dentro = perfilInterno.map(p => new THREE.Vector2(p.x, p.y));
+  const fora = perfilInterno.map((p, i, a) => {
+    /* a normal do perfil, para engrossar para fora sem deformar a ponta */
+    const ant = a[Math.max(0, i - 1)], pro = a[Math.min(a.length - 1, i + 1)];
+    const tx = pro.x - ant.x, ty = pro.y - ant.y;
+    const n = Math.hypot(tx, ty) || 1;
+    return new THREE.Vector2(p.x + ty / n * espessura, p.y - tx / n * espessura);
+  });
+  const externa = new THREE.Mesh(new THREE.LatheGeometry(fora, segs), mat);
+  const interna = new THREE.Mesh(new THREE.LatheGeometry(dentro, segs), matInterno || M.endocardio);
+  /* a cavidade é vista POR DENTRO: a face tem de estar invertida na
+     GEOMETRIA, nunca em `side` — o glTF descarta o material e o USDZ do
+     iPhone descarta até o `doubleSided` */
+  interna.geometry = peloAvesso(interna.geometry);
+  g.add(externa, interna);
+  g.userData = { externa, interna, espessura };
+  return g;
+}
+
+function peloAvesso(geo) {
+  const g = geo.clone(), idx = g.getIndex();
+  if (idx) {
+    const a = idx.array.slice();
+    for (let i = 0; i < a.length; i += 3) { const t = a[i]; a[i] = a[i + 2]; a[i + 2] = t; }
+    g.setIndex(new THREE.BufferAttribute(a, 1));
+  }
+  const n = g.attributes.normal;
+  if (n) { for (let i = 0; i < n.count; i++) n.setXYZ(i, -n.getX(i), -n.getY(i), -n.getZ(i)); n.needsUpdate = true; }
+  return g;
+}
+
+/* perfil de um ventrículo: bala alongada, mais estreita na ponta */
+function perfilVentriculo(raio, altura, pontudo = 1) {
+  const pts = [];
+  for (let i = 0; i <= 20; i++) {
+    const u = i / 20;
+    /* O VENTRÍCULO É CONE, NÃO OVO. Com expoente alto o perfil engorda no
+       meio e a peça vira bola; a ponta tem de afinar de verdade, porque é a
+       ponta que dá ao coração a silhueta que todo mundo reconhece. */
+    const r = raio * Math.pow(Math.sin(Math.PI * (.04 + .78 * u)), .40 * pontudo)
+                   * (u < .12 ? .55 + u / .12 * .45 : 1);
+    pts.push(new THREE.Vector2(Math.max(.4, r), u * altura));
+  }
+  return pts;
+}
+
+/* ── OS VENTRÍCULOS ───────────────────────────────────────────────────────
+   O esquerdo é um cone de parede grossa. O direito NÃO é um segundo cone: é
+   uma meia-lua abraçada nele, e o septo pertence ao esquerdo. */
+function ventriculoEsquerdo() {
+  const g = camaraDupla(perfilVentriculo(26, 78), 10, M.miocardio);
+  g.userData.papel = 've';
+  return g;
+}
+
+function ventriculoDireito() {
+  /* a meia-lua: um perfil próprio, achatado e recortado em theta, encostado
+     na frente e à direita do esquerdo */
+  const perfil = perfilVentriculo(23, 68, 1.15);
+  const gg = new THREE.Group();
+  const dentro = new THREE.LatheGeometry(perfil, 26, -Math.PI * .58, Math.PI * 1.16);
+  const fora = new THREE.LatheGeometry(
+    perfil.map((p, i, a) => {
+      const ant = a[Math.max(0, i - 1)], pro = a[Math.min(a.length - 1, i + 1)];
+      const tx = pro.x - ant.x, ty = pro.y - ant.y, n = Math.hypot(tx, ty) || 1;
+      return new THREE.Vector2(p.x + ty / n * 3.4, p.y - tx / n * 3.4);
+    }), 26, -Math.PI * .58, Math.PI * 1.16);
+  const externa = new THREE.Mesh(fora, M.miocardioFino);
+  const interna = new THREE.Mesh(peloAvesso(dentro), M.endocardio);
+  gg.add(externa, interna);
+  /* achatado contra o esquerdo, e deslocado para a frente e para a direita */
+  gg.scale.set(1, 1, .62);
+  gg.position.set(-16, 3, 12);
+  gg.rotation.y = -.34;
+  gg.userData = { externa, interna, papel: 'vd', espessura: 3.4 };
+  return gg;
+}
+
+/* ── OS ÁTRIOS ────────────────────────────────────────────────────────────
+   Sacos de parede fina em cima dos ventrículos, cada um com a sua aurícula —
+   que é a orelhinha que todo mundo reconhece e quase nenhum desenho põe. */
+function atrio(lado) {
+  const perfil = [];
+  for (let i = 0; i <= 14; i++) {
+    const u = i / 14;
+    perfil.push(new THREE.Vector2(Math.max(.4, 21 * Math.sin(Math.PI * (.12 + .82 * u))), u * 34));
+  }
+  const g = camaraDupla(perfil, 2.6, M.atrio, M.endocardio, 26);
+  /* a aurícula: uma bolsa curva pendurada na frente */
+  const pts = [];
+  for (let i = 0; i <= 6; i++) {
+    const t = i / 6;
+    pts.push(V(lado * (10 + 14 * t), 16 + 8 * Math.sin(Math.PI * t), 12 + 9 * t - 5 * t * t));
+  }
+  const aur = new THREE.Mesh(
+    new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 16, 6.2, 12, false), M.atrio);
+  const ponta = new THREE.Mesh(new THREE.SphereGeometry(6.2, 12, 9), M.atrio);
+  ponta.position.copy(pts[pts.length - 1]);
+  g.add(aur, ponta);
+  g.userData.papel = lado > 0 ? 'ae' : 'ad';
+  return g;
+}
+
+/* ── AS VÁLVULAS ──────────────────────────────────────────────────────────
+   Cúspides como BOLSAS, com a mesma construção que a bancada 08 usou para a
+   válvula venosa: presa ao anel na base, solta na borda, e o que abre e fecha
+   é o raio da borda livre. Semilunares têm três; a mitral, duas. */
+const NU = 8, NV = 12;
+function cuspide(R, comp, tetaInicio, tetaLargura) {
+  const g = new THREE.BufferGeometry();
+  const pos = new Float32Array((NU + 1) * (NV + 1) * 3), idx = [];
+  for (let i = 0; i <= NU; i++) for (let j = 0; j <= NV; j++) {
+    if (i < NU && j < NV) {
+      const a = i * (NV + 1) + j, b = a + 1, c = a + NV + 1, d = c + 1;
+      idx.push(a, c, b, b, c, d);
+    }
+  }
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  g.setIndex(idx);
+  g.userData = { R, comp, tetaInicio, tetaLargura, nu: NU, nv: NV };
+  return g;
+}
+
+export function moldarCuspide(malha, abertura) {
+  const g = malha.geometry, u = g.userData, pos = g.attributes.position;
+  const rLivre = u.R * (0.07 + 0.85 * abertura);
+  for (let i = 0; i <= u.nu; i++) {
+    const s = i / u.nu, t = s * s * (3 - 2 * s);
+    const r = u.R * (1 - t) + rLivre * t;
+    const bojo = (1 - abertura) * .26 * Math.sin(Math.PI * s);
+    for (let j = 0; j <= u.nv; j++) {
+      const teta = u.tetaInicio + (j / u.nv) * u.tetaLargura;
+      const rr = r + u.R * bojo * Math.sin((j / u.nv) * Math.PI);
+      pos.setXYZ(i * (u.nv + 1) + j, Math.cos(teta) * rr, s * u.comp, Math.sin(teta) * rr);
+    }
+  }
+  pos.needsUpdate = true; g.computeVertexNormals(); g.computeBoundingSphere();
+}
+
+function valva(nCuspides, R, comp) {
+  const g = new THREE.Group();
+  const passo = Math.PI * 2 / nCuspides;
+  for (let k = 0; k < nCuspides; k++) {
+    const m = new THREE.Mesh(cuspide(R, comp, k * passo, passo), M.valva);
+    moldarCuspide(m, 1);
+    g.add(m);
+  }
+  /* o anel: sem ele a valva parece flutuar no vão */
+  const anel = new THREE.Mesh(new THREE.TorusGeometry(R * 1.02, R * .09, 8, 26), M.corda);
+  anel.rotation.x = Math.PI / 2;
+  g.add(anel);
+  g.userData = { nCuspides, R };
+  return g;
+}
+
+/* cordas tendíneas: elas existem para a valva atrioventricular não VIRAR do
+   avesso na sístole, e sem elas o desenho sugere que a pressão não faz força */
+function cordas(R, deY, ateY, n = 10) {
+  const gs = [];
+  for (let i = 0; i < n; i++) {
+    const a = (i / n) * Math.PI * 2;
+    const pts = [V(Math.cos(a) * R * .82, deY, Math.sin(a) * R * .82),
+                 V(Math.cos(a) * R * .55, (deY + ateY) / 2, Math.sin(a) * R * .55),
+                 V(Math.cos(a) * R * .34, ateY, Math.sin(a) * R * .34)];
+    gs.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 8, .5, 5, false));
+  }
+  return new THREE.Mesh(mergeGeometries(gs), M.corda);
+}
+
+/* ── OS GRANDES VASOS ─────────────────────────────────────────────────────
+   E ELES SE CRUZAM. O tronco pulmonar sai à frente do coração e vai para a
+   ESQUERDA; a aorta sai atrás dele e curva para a DIREITA. Desenhá-los
+   paralelos apaga a razão de a pulmonar cobrir a aorta na radiografia. */
+function vasoTubo(pontos, raio, mat, segs = 28) {
+  return new THREE.Mesh(
+    new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pontos.map(p => V(...p))), segs, raio, 16, false), mat);
+}
+
+function grandesVasos() {
+  const g = new THREE.Group();
+  /* aorta: sai do centro, sobe por trás e faz a crossa para a direita */
+  g.add(vasoTubo([[4, 62, -4], [5, 82, -2], [4, 104, 2], [-8, 118, 4], [-26, 112, 2], [-32, 92, -2]],
+                 12, M.aorta));
+  /* tronco pulmonar: sai à FRENTE e cruza para a esquerda, por cima */
+  g.add(vasoTubo([[-12, 60, 16], [-10, 80, 14], [-4, 98, 8], [10, 106, 2]], 10.5, M.pulmonar));
+  /* os dois ramos pulmonares */
+  g.add(vasoTubo([[10, 106, 2], [26, 104, -4], [38, 96, -10]], 6.4, M.pulmonar));
+  g.add(vasoTubo([[10, 106, 2], [0, 100, -14], [-12, 92, -22]], 6.0, M.pulmonar));
+  /* cavas: entram no átrio direito por cima e por baixo */
+  g.add(vasoTubo([[-30, 96, -10], [-30, 76, -6], [-26, 60, -2]], 9.5, M.cava));
+  g.add(vasoTubo([[-24, 18, -10], [-26, 34, -8], [-25, 50, -4]], 10.5, M.cava));
+  /* veias pulmonares: quatro, entrando no átrio esquerdo por trás */
+  for (const [x, z] of [[30, -18], [34, -6], [18, -24], [12, -26]])
+    g.add(vasoTubo([[x, 72 + z * .2, z - 8], [x * .7, 66, z * .5], [x * .35, 60, -4]], 4.6, M.veiaPulmonar));
+  return g;
+}
+
+/* ── AS CORONÁRIAS ────────────────────────────────────────────────────────
+   Elas correm nos SULCOS: a descendente anterior no sulco interventricular,
+   a circunflexa e a direita no sulco atrioventricular. Pô-las em qualquer
+   lugar da superfície é desenhar cano, não artéria — o sulco é o que explica
+   por que uma oclusão mata um território e não outro. */
+/* O raio EXTERNO do ventrículo esquerdo numa dada altura. É com ele que a
+   coronária é assentada na superfície: na primeira foto elas simplesmente não
+   apareciam, porque eu as desenhei em coordenadas soltas e o miocárdio as
+   engoliu. Artéria epicárdica corre POR CIMA do músculo — se ela não estiver
+   na superfície, não é coronária, é um cano dentro da carne. */
+const PERFIL_VE = perfilVentriculo(26, 78);
+function raioExterno(y) {
+  let melhor = PERFIL_VE[0];
+  for (const p of PERFIL_VE) if (Math.abs(p.y - y) < Math.abs(melhor.y - y)) melhor = p;
+  return melhor.x + 10;                       // + a espessura da parede
+}
+/* assenta um caminho na superfície, mantendo o azimute de cada ponto */
+function naSuperficie(pontos, folga = 2.2) {
+  return pontos.map(([x, y, z]) => {
+    const a = Math.atan2(z, x), r = raioExterno(y) + folga;
+    return V(Math.cos(a) * r, y, Math.sin(a) * r);
+  });
+}
+
+function coronarias() {
+  const gs = [];
+  const fio = (pontos, raio, segs = 30) => gs.push(new THREE.TubeGeometry(
+    new THREE.CatmullRomCurve3(naSuperficie(pontos)), segs, raio, 8, false));
+
+  /* descendente anterior: desce pelo sulco interventricular, na frente */
+  fio([[4, 60, 16], [0, 48, 20], [-4, 34, 20], [-4, 18, 14], [-2, 7, 6]], 2.2);
+  /* circunflexa: contorna para a esquerda pelo sulco atrioventricular */
+  fio([[4, 60, 16], [16, 58, 10], [22, 56, -6], [16, 54, -18]], 2.0, 24);
+  /* coronária direita: contorna para a direita e desce por trás */
+  fio([[-2, 60, 16], [-16, 57, 10], [-22, 55, -6], [-16, 48, -18], [-6, 30, -20]], 2.1);
+  /* dois marginais, para não parecer um circuito de três fios */
+  fio([[-4, 34, 20], [-14, 28, 12], [-18, 18, 6]], 1.4, 14);
+  fio([[20, 55, 2], [22, 42, 4], [16, 26, 5]], 1.4, 14);
+  return new THREE.Mesh(mergeGeometries(gs), M.coronaria);
+}
+
+/* ── O SISTEMA DE CONDUÇÃO ────────────────────────────────────────────────
+   Cada peça é um objeto SEPARADO, porque cada uma acende na sua vez — é essa
+   a vista elétrica que o pedido nomeia. Nó sinusal, átrios, nó AV, His,
+   ramos, Purkinje. */
+function conducao() {
+  const g = new THREE.Group();
+  const põe = (id, malha) => { malha.userData.conducao = id; g.add(malha); return malha; };
+
+  const no = new THREE.Mesh(new THREE.SphereGeometry(4.4, 12, 9), M.conducao);
+  no.position.set(-26, 74, -2); no.scale.set(1, 1.5, .7);
+  põe('sinusal', no);
+
+  /* as vias internodais: três fitas do sinusal ao AV */
+  for (const dz of [-8, 0, 8]) {
+    const t = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(
+      [V(-26, 72, -2), V(-20, 66, dz * .6), V(-10, 60, dz * .4), V(-2, 56, 0)]), 16, 1.5, 6, false);
+    põe('atrios', new THREE.Mesh(t, M.conducao));
+  }
+
+  const av = new THREE.Mesh(new THREE.SphereGeometry(3.8, 12, 9), M.conducao);
+  av.position.set(-2, 55, -2); av.scale.set(1.3, .9, .8);
+  põe('av', av);
+
+  põe('his', new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(
+    [V(-2, 54, -2), V(-1, 48, 0), V(0, 43, 1)]), 10, 2.0, 8, false), M.conducao));
+
+  /* dois ramos, e o esquerdo se divide — é ele que dá o hemibloqueio */
+  põe('ramos', new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(
+    [V(0, 43, 1), V(6, 34, 3), V(10, 22, 4), V(8, 12, 3)]), 18, 1.5, 6, false), M.conducao));
+  põe('ramos', new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(
+    [V(0, 43, 1), V(-8, 33, 4), V(-13, 21, 5), V(-11, 11, 4)]), 18, 1.4, 6, false), M.conducao));
+
+  /* Purkinje: a rede que espalha pela parede, e ela precisa parecer REDE */
+  const fios = [];
+  for (let i = 0; i < 16; i++) {
+    const a = (i / 16) * Math.PI * 2, r0 = 9 + rnd(-2, 2);
+    fios.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(
+      [V(Math.cos(a) * r0 * .5, 12, Math.sin(a) * r0 * .5),
+       V(Math.cos(a) * r0 * 1.4, 18 + rnd(-3, 6), Math.sin(a) * r0 * 1.4),
+       V(Math.cos(a) * r0 * 2.1, 30 + rnd(-4, 10), Math.sin(a) * r0 * 2.0)]), 12, .9, 5, false));
+  }
+  põe('purkinje', new THREE.Mesh(mergeGeometries(fios), M.conducao));
+  return g;
+}
+
+/* ── MONTAGEM ─────────────────────────────────────────────────────────────
+   O coração pende inclinado, com a ponta para a esquerda e para a frente,
+   que é como ele fica no tórax — de pé e simétrico ele vira enfeite. */
+function corpo({ comValvas = true, comCoronarias = true, comConducao = false, corte = false } = {}) {
+  const g = new THREE.Group();
+
+  const ve = ventriculoEsquerdo(); g.add(ve);
+  const vd = ventriculoDireito(); g.add(vd);
+
+  const ae = atrio(1); ae.position.set(14, 58, -6); ae.rotation.z = -.16; g.add(ae);
+  const ad = atrio(-1); ad.position.set(-20, 56, 0); ad.rotation.z = .18; ad.scale.setScalar(.94); g.add(ad);
+
+  const valvas = {};
+  if (comValvas) {
+    /* as quatro, cada uma no seu anel. A mitral tem duas cúspides, as
+       semilunares têm três — e a tricúspide, três, que é de onde vem o nome. */
+    const põe = (nome, v, pos, rot) => {
+      v.position.set(...pos); if (rot) v.rotation.set(...rot);
+      valvas[nome] = v; g.add(v);
+    };
+    põe('mitral', valva(2, 14, 11), [6, 56, -2], [Math.PI, 0, .12]);
+    põe('tricuspide', valva(3, 15, 10), [-16, 53, 6], [Math.PI, 0, -.16]);
+    põe('aortica', valva(3, 11, 8), [4, 60, -4]);
+    põe('pulmonar', valva(3, 10, 7.5), [-12, 58, 16]);
+    g.add(cordas(14, 46, 22, 10));
+  }
+  if (comCoronarias) g.add(coronarias());
+  let cond = null;
+  if (comConducao) { cond = conducao(); g.add(cond); }
+  g.add(grandesVasos());
+
+  /* a inclinação anatômica */
+  g.rotation.set(.16, 0, .30);
+  g.position.y = -46;
+  g.userData = { ve, vd, ae, ad, valvas, conducao: cond };
+  return g;
+}
+
+/* ========================================================================= */
+export function criar() {
+  const modelos = [
+    corpo(),                                    // 01 o coração inteiro
+    corpo({ corte: true }),                     // 02 por dentro
+    corpo({ comCoronarias: false }),            // 03 as válvulas
+    corpo({ comConducao: true, comValvas: false, comCoronarias: false }), // 04 a condução
+    corpo({ comConducao: true }),               // 05 o ciclo
+  ];
+  modelos.forEach((m, i) => { m.visible = i === 0; });
+
+  /* ── O VOLUME MOVE A CÂMARA ────────────────────────────────────────────
+     Contrair é a CAVIDADE encolher, não a peça inteira. O volume vai com o
+     cubo do raio, então a escala é a raiz cúbica — ignorar isso faria a
+     sístole parecer branda. A parede externa encolhe menos que a interna, e
+     é por isso que ela ENGROSSA ao contrair, que é o que se vê no eco. */
+  function aplicarVolumes(vVE, vVD, vAE, vAD) {
+    for (const m of modelos) {
+      const d = m.userData;
+      const põe = (grupo, volume, referencia) => {
+        if (!grupo) return;
+        const e = Math.cbrt(clamp(volume / referencia, .25, 2));
+        grupo.userData.interna.scale.set(e, 1 - (1 - e) * .35, e);
+        /* a externa acompanha só um terço: o resto vira espessura de parede */
+        const ef = 1 - (1 - e) * .34;
+        grupo.userData.externa.scale.set(ef, 1 - (1 - ef) * .4, ef);
+      };
+      põe(d.ve, vVE, 120); põe(d.vd, vVD, 120);
+      põe(d.ae, vAE, 60); põe(d.ad, vAD, 60);
+    }
+  }
+
+  /* as quatro válvulas, cada uma com a sua abertura vinda das pressões */
+  function aplicarValvas(estado) {
+    for (const m of modelos) {
+      const vs = m.userData.valvas;
+      if (!vs) continue;
+      for (const [nome, aberta] of Object.entries(estado)) {
+        const v = vs[nome];
+        if (!v) continue;
+        const alvo = aberta ? 1 : .06;
+        v.userData.abertura = (v.userData.abertura ?? alvo) * .72 + alvo * .28;
+        for (const c of v.children) if (c.geometry.userData.nu) moldarCuspide(c, v.userData.abertura);
+      }
+    }
+  }
+
+  /* a condução acende: quem está despolarizado fica emissivo */
+  function aplicarConducao(ativos) {
+    for (const m of modelos) {
+      const c = m.userData.conducao;
+      if (!c) continue;
+      for (const peça of c.children) {
+        const on = ativos.includes(peça.userData.conducao);
+        if (!peça.material.__clonado) { peça.material = peça.material.clone(); peça.material.__clonado = true; }
+        peça.material.emissiveIntensity = on ? 3.2 : .35;
+        peça.material.emissive.copy(on ? ACESA : cor(60, 52, 12));
+      }
+    }
+  }
+
+  return { modelos, aplicarVolumes, aplicarValvas, aplicarConducao };
+}
