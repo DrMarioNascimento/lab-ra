@@ -29,6 +29,16 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import {
   NIVEIS, ALTURA_VE, ALTURA_VD, VD_Y, SUBIR_PLANO, PLANO_VALVAR,
 } from './niveis.js';
+import {
+  perfilVentriculo as perfilVentriculoXY,
+  perfilAtrio as perfilAtrioXY,
+  prepararPerfis,
+  pontoNoLathe,
+  perfilDoLabio,
+  perfilDoTampo,
+  JUNTAS_VASO,
+  saidaDaParede,
+} from './parede.js';
 
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
 const rnd = (a, b) => a + Math.random() * (b - a);
@@ -97,29 +107,25 @@ export const ACESA = cor(255, 214, 88);
    O grupo guarda as duas malhas para que a física possa mudar o VOLUME sem
    mudar a espessura: contrair é a cavidade encolher e a parede engrossar,
    não a peça inteira encolher. */
-function perfilExterno(perfil, espessura) {
-  return perfil.map((p, i, a) => {
-    /* a normal do perfil, para engrossar para fora sem deformar a ponta */
-    const ant = a[Math.max(0, i - 1)], pro = a[Math.min(a.length - 1, i + 1)];
-    const tx = pro.x - ant.x, ty = pro.y - ant.y;
-    const n = Math.hypot(tx, ty) || 1;
-    return new THREE.Vector2(p.x + ty / n * espessura, p.y - tx / n * espessura);
-  });
-}
+function xy(p) { return new THREE.Vector2(p.x, p.y); }
 
 /* A FACE DO CORTE é a peça mais importante do nível "por dentro": é ela, e
    só ela, que mostra a ESPESSURA da parede. Sem ela o corte revela a cavidade
    mas a parede vira uma linha, e a diferença entre 10 mm e 3 mm — que é a
-   resposta inteira à diferença de pressão entre os dois lados — desaparece. */
-function faceDoCorte(dentro, fora, angulo) {
+   resposta inteira à diferença de pressão entre os dois lados — desaparece.
+
+   LatheGeometry gera (r·sin φ, y, r·cos φ). A face TEM de usar a mesma
+   conta — com (r·cos, y, r·sin) ela nascia 90° ao lado do corte, e o anel
+   do lathe ficava um vão aberto. */
+function faceDoCorte(dentro, fora, t0) {
   const pos = [], idx = [];
-  const cos = Math.cos(angulo), sin = Math.sin(angulo);
   for (let i = 0; i < dentro.length; i++) {
-    pos.push(dentro[i].x * cos, dentro[i].y, dentro[i].x * sin);
-    pos.push(fora[i].x * cos, fora[i].y, fora[i].x * sin);
+    const a = pontoNoLathe(dentro[i].x, dentro[i].y, t0);
+    const b = pontoNoLathe(fora[i].x, fora[i].y, t0);
+    pos.push(a.x, a.y, a.z, b.x, b.y, b.z);
     if (i < dentro.length - 1) {
-      const a = i * 2;
-      idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
+      const k = i * 2;
+      idx.push(k, k + 1, k + 2, k + 1, k + 3, k + 2);
     }
   }
   const g = new THREE.BufferGeometry();
@@ -128,10 +134,83 @@ function faceDoCorte(dentro, fora, angulo) {
   return g;
 }
 
+function anelEntre(a, b, t0, tL, segs) {
+  if (Math.hypot(a.x - b.x, a.y - b.y) < .08) return null;
+  if (a.x < .25 && b.x < .25) return null;
+  const g = new THREE.LatheGeometry([xy(a), xy(b)], segs, t0, tL);
+  g.computeVertexNormals();
+  return g;
+}
+
+function labioDoOstio(dentro, fora, t0, tL, segs) {
+  const pts = perfilDoLabio(dentro[dentro.length - 1], fora[fora.length - 1]).map(xy);
+  const g = new THREE.LatheGeometry(pts, segs, t0, tL);
+  g.computeVertexNormals();
+  return g;
+}
+
+/* Torus no teto: o lábio plano-alto ainda deixa um cresce quando o vaso
+   não é coaxial com a câmara. A coroa tem de chegar perto do tubo, senão
+   o vão em cresce da foto continua entre o anel e o vaso. */
+function coroaDoOstio(dentro, fora, t0, tL, segs) {
+  const i = dentro[dentro.length - 1], f = fora[fora.length - 1];
+  const rMeio = (i.x + f.x) / 2;
+  const tubo = Math.max(7.2, (f.x - i.x) * 0.7 + 4);
+  const y = (i.y + f.y) / 2;
+  const pts = [];
+  for (let k = 0; k <= 10; k++) {
+    const a = (k / 10) * Math.PI * 2;
+    pts.push(new THREE.Vector2(rMeio + tubo * Math.cos(a), y + tubo * Math.sin(a)));
+  }
+  const g = new THREE.LatheGeometry(pts, segs, t0, tL);
+  g.computeVertexNormals();
+  return g;
+}
+
+function tampoDoOstio(dentro, fora, t0, tL, segs) {
+  const pts = perfilDoTampo(dentro[dentro.length - 1], fora[fora.length - 1]);
+  if (!pts) return null;
+  const g = new THREE.LatheGeometry(pts.map(xy), segs, t0, tL);
+  g.computeVertexNormals();
+  return g;
+}
+
+function geometriaDosSelos(dentro, fora, t0, tL, segs) {
+  const partes = [];
+  const ostio = labioDoOstio(dentro, fora, t0, tL, segs);
+  if (ostio) {
+    partes.push(ostio);
+    partes.push(peloAvesso(ostio));
+  }
+  const coroa = coroaDoOstio(dentro, fora, t0, tL, segs);
+  if (coroa) {
+    partes.push(coroa);
+    partes.push(peloAvesso(coroa));
+  }
+  const tampo = tampoDoOstio(dentro, fora, t0, tL, segs);
+  if (tampo) {
+    partes.push(tampo);
+    partes.push(peloAvesso(tampo));
+  }
+  const polo = anelEntre(fora[0], dentro[0], t0, tL, segs);
+  if (polo) {
+    partes.push(polo);
+    partes.push(peloAvesso(polo));
+  }
+  if (tL < Math.PI * 2 - 1e-3) {
+    partes.push(faceDoCorte(dentro, fora, t0));
+    partes.push(peloAvesso(faceDoCorte(dentro, fora, t0 + tL)));
+  }
+  /* o lathe traz uv; a face do corte não. Sem apagar, o merge devolve null
+     e o selo some — o vão volta. */
+  for (const p of partes) p.deleteAttribute('uv');
+  return partes.length ? mergeGeometries(partes) : null;
+}
+
 function camaraDupla(perfilInterno, espessura, mat, matInterno, segs = 30, corte = null) {
   const g = new THREE.Group();
-  const dentro = perfilInterno.map(p => new THREE.Vector2(p.x, p.y));
-  const fora = perfilExterno(perfilInterno, espessura);
+  const { dentro: d0, fora: f0 } = prepararPerfis(perfilInterno, espessura);
+  const dentro = d0.map(xy), fora = f0.map(xy);
   const t0 = corte ? corte[0] : 0, tL = corte ? corte[1] : Math.PI * 2;
 
   const externa = new THREE.Mesh(new THREE.LatheGeometry(fora, segs, t0, tL), mat);
@@ -143,13 +222,51 @@ function camaraDupla(perfilInterno, espessura, mat, matInterno, segs = 30, corte
      iPhone descarta até o `doubleSided` */
   interna.geometry = peloAvesso(interna.geometry);
   g.add(externa, interna);
-  if (corte) {
-    const a = faceDoCorte(dentro, fora, t0);
-    const b = peloAvesso(faceDoCorte(dentro, fora, t0 + tL));
-    g.add(new THREE.Mesh(mergeGeometries([a, b]), mat));
+  const geoSelo = geometriaDosSelos(dentro, fora, t0, tL, segs);
+  let selo = null;
+  if (geoSelo) {
+    selo = new THREE.Mesh(geoSelo, mat);
+    selo.userData.papelParede = 'selo';
+    g.add(selo);
   }
   g.userData = { externa, interna, espessura };
+  g.userData.selo = selo;
+  g.userData.perfilDentro = d0;
+  g.userData.perfilFora = f0;
+  g.userData.phi0 = t0;
+  g.userData.phiL = tL;
+  g.userData.segsLathe = segs;
   return g;
+}
+
+function escalarCamara(grupo, volume, referencia) {
+  const e = Math.cbrt(clamp(volume / referencia, .25, 2));
+  /* a externa acompanha só um terço: o resto vira espessura de parede */
+  const ef = 1 - (1 - e) * .34;
+  const yIn = 1 - (1 - e) * .35;
+  const yOut = 1 - (1 - ef) * .4;
+  const interna = grupo.userData?.interna?.isMesh
+    ? grupo.userData.interna
+    : grupo.children.find(c => c.userData?.papelParede === 'interna');
+  const externa = grupo.userData?.externa?.isMesh
+    ? grupo.userData.externa
+    : grupo.children.find(c => c.userData?.papelParede === 'externa');
+  const selo = grupo.userData?.selo?.isMesh
+    ? grupo.userData.selo
+    : grupo.children.find(c => c.userData?.papelParede === 'selo');
+  if (interna) interna.scale.set(e, yIn, e);
+  if (externa) externa.scale.set(ef, yOut, ef);
+  const d0 = grupo.userData?.perfilDentro, f0 = grupo.userData?.perfilFora;
+  if (selo && d0 && f0) {
+    const d = d0.map(p => new THREE.Vector2(p.x * e, p.y * yIn));
+    const f = f0.map(p => new THREE.Vector2(p.x * ef, p.y * yOut));
+    const geo = geometriaDosSelos(d, f, grupo.userData.phi0, grupo.userData.phiL, grupo.userData.segsLathe);
+    if (geo) {
+      const antiga = selo.geometry;
+      selo.geometry = geo;
+      if (antiga && antiga !== geo) antiga.dispose();
+    }
+  }
 }
 
 function peloAvesso(geo) {
@@ -164,19 +281,11 @@ function peloAvesso(geo) {
   return g;
 }
 
-/* perfil de um ventrículo: bala alongada, mais estreita na ponta */
+/* perfil de um ventrículo: bala alongada, mais estreita na ponta.
+   O polo vai ao eixo (senão o lathe deixa um furo na ponta) e o óstio
+   fica aberto — o lúmen é a passagem; quem fecha a PAREDE é o anel do selo. */
 function perfilVentriculo(raio, altura, pontudo = 1) {
-  const pts = [];
-  for (let i = 0; i <= 20; i++) {
-    const u = i / 20;
-    /* O VENTRÍCULO É CONE, NÃO OVO. Com expoente alto o perfil engorda no
-       meio e a peça vira bola; a ponta tem de afinar de verdade, porque é a
-       ponta que dá ao coração a silhueta que todo mundo reconhece. */
-    const r = raio * Math.pow(Math.sin(Math.PI * (.04 + .78 * u)), .40 * pontudo)
-                   * (u < .12 ? .55 + u / .12 * .45 : 1);
-    pts.push(new THREE.Vector2(Math.max(.4, r), u * altura));
-  }
-  return pts;
+  return perfilVentriculoXY(raio, altura, pontudo);
 }
 
 /* ── OS VENTRÍCULOS ───────────────────────────────────────────────────────
@@ -184,47 +293,70 @@ function perfilVentriculo(raio, altura, pontudo = 1) {
    uma meia-lua abraçada nele, e o septo pertence ao esquerdo. */
 function ventriculoEsquerdo(corte) {
   const g = camaraDupla(perfilVentriculo(26, ALTURA_VE), 10, M.miocardio, null, 30, corte);
+  g.add(manguitoDoOstio(ALTURA_VE, 10, 28, 18, M.miocardio));
   g.userData.papel = 've';
   return g;
 }
 
 function ventriculoDireito(corte) {
   /* a meia-lua: um perfil próprio, achatado e recortado em theta, encostado
-     na frente e à direita do esquerdo */
+     na frente e à direita do esquerdo. As duas faces em theta — o corte da
+     frente e a junta septal — passam por camaraDupla, senão a parede do
+     direito é um cano aberto. */
   const perfil = perfilVentriculo(23, ALTURA_VD, 1.15);
-  const gg = new THREE.Group();
   const t0 = corte ? Math.max(corte[0], -Math.PI * .58) : -Math.PI * .58;
   const tL = corte ? Math.min(corte[1], Math.PI * 1.16) : Math.PI * 1.16;
-  const dentro = new THREE.LatheGeometry(perfil, 26, t0, tL);
-  const fora = new THREE.LatheGeometry(
-    perfil.map((p, i, a) => {
-      const ant = a[Math.max(0, i - 1)], pro = a[Math.min(a.length - 1, i + 1)];
-      const tx = pro.x - ant.x, ty = pro.y - ant.y, n = Math.hypot(tx, ty) || 1;
-      return new THREE.Vector2(p.x + ty / n * 3.4, p.y - tx / n * 3.4);
-    }), 26, t0, tL);
-  const externa = new THREE.Mesh(fora, M.miocardioFino);
-  const interna = new THREE.Mesh(peloAvesso(dentro), M.endocardio);
-  externa.userData.papelParede = 'externa';
-  interna.userData.papelParede = 'interna';
-  gg.add(externa, interna);
-  /* achatado contra o esquerdo, e deslocado para a frente e para a direita */
-  gg.scale.set(1, 1, .62);
-  gg.position.set(-16, VD_Y, 12);
-  gg.rotation.y = -.34;
-  gg.userData = { externa, interna, papel: 'vd', espessura: 3.4 };
+  const gg = camaraDupla(perfil, 3.4, M.miocardioFino, null, 26, [t0, tL]);
+  /* achatado contra o esquerdo, e encostado: a junta septal era um vão
+     entre dois sólidos. A meia-lua continua meia-lua. */
+  gg.scale.set(1, 1, 1);
+  gg.position.set(-13.4, VD_Y, 9.4);
+  gg.rotation.y = -.30;
+  gg.add(manguitoDoOstio(ALTURA_VD, 8.6, 26, 18, M.miocardioFino));
+  gg.userData.papel = 'vd';
   return gg;
+}
+
+/* Cordão de miocárdio no sulco interventricular: a meia-lua e o cone do
+   esquerdo não compartilham vértices, e o vão entre os dois lia como furo. */
+function soldaSepto() {
+  const g = new THREE.Group();
+  const pts = [
+    [-6, 10, 20],
+    [-8, 28, 24],
+    [-11, 48, 22],
+    [-13, 66, 16],
+    [-13.2, 76, 11],
+  ];
+  const geo = new THREE.TubeGeometry(
+    new THREE.CatmullRomCurve3(pts.map(p => V(...p))), 24, 7.2, 10, false);
+  g.add(new THREE.Mesh(geo, M.miocardio),
+        new THREE.Mesh(peloAvesso(geo), M.miocardio));
+  return g;
+}
+
+/* O VD é meia-lua: o óstio do lathe é um ARCO, não um anel. O tubo é
+   redondo. O que falta do arco, visto de lado, é o cresce da foto.
+   Este manguito é 2π no eixo da câmara, independente do recorte em theta. */
+function manguitoDoOstio(y, rIn, rOut, h, mat) {
+  const g = new THREE.Group();
+  const geo = new THREE.LatheGeometry([
+    new THREE.Vector2(rIn, y - h * 0.35),
+    new THREE.Vector2(rOut, y - h * 0.35),
+    new THREE.Vector2(rOut, y + h * 0.65),
+    new THREE.Vector2(rIn, y + h * 0.65),
+  ], 32);
+  geo.computeVertexNormals();
+  g.add(new THREE.Mesh(geo, mat),
+        new THREE.Mesh(peloAvesso(geo), mat));
+  return g;
 }
 
 /* ── OS ÁTRIOS ────────────────────────────────────────────────────────────
    Sacos de parede fina em cima dos ventrículos, cada um com a sua aurícula —
    que é a orelhinha que todo mundo reconhece e quase nenhum desenho põe. */
 function atrio(lado, corte) {
-  const perfil = [];
-  for (let i = 0; i <= 14; i++) {
-    const u = i / 14;
-    perfil.push(new THREE.Vector2(Math.max(.4, 21 * Math.sin(Math.PI * (.12 + .82 * u))), u * 34));
-  }
-  const g = camaraDupla(perfil, 2.6, M.atrio, M.endocardio, 26, corte);
+  const g = camaraDupla(perfilAtrioXY(), 2.6, M.atrio, M.endocardio, 26, corte);
   /* a aurícula: uma bolsa curva pendurada na frente */
   const pts = [];
   for (let i = 0; i <= 6; i++) {
@@ -233,9 +365,11 @@ function atrio(lado, corte) {
   }
   const aur = new THREE.Mesh(
     new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 16, 6.2, 12, false), M.atrio);
+  const raiz = new THREE.Mesh(new THREE.SphereGeometry(6.2, 12, 9), M.atrio);
+  raiz.position.copy(pts[0]);
   const ponta = new THREE.Mesh(new THREE.SphereGeometry(6.2, 12, 9), M.atrio);
   ponta.position.copy(pts[pts.length - 1]);
-  g.add(aur, ponta);
+  g.add(aur, raiz, ponta);
   g.userData.papel = lado > 0 ? 'ae' : 'ad';
   return g;
 }
@@ -315,22 +449,83 @@ function vasoTubo(pontos, raio, mat, segs = 28) {
     new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pontos.map(p => V(...p))), segs, raio, 16, false), mat);
 }
 
+/* Cone + anel + torus no PLANO do teto (ySaida), não a uma fração fixa do
+   primeiro segmento: essa fração punha o colar acima do furo e o cresce
+   da foto — miocárdio cortando no vaso — seguia visível. Sem esfera maciça:
+   ela tamponava o lúmen. O torus tem volume visto de lado. */
+function colarDaRaiz(p0, p1, rTubo, rBase, mat) {
+  const a = V(...p0), b = V(...p1);
+  const dir = b.clone().sub(a);
+  const span = dir.length() || 1;
+  dir.multiplyScalar(1 / span);
+  const saida = a.clone();
+  const g = new THREE.Group();
+  const len = Math.max(16, (rBase - rTubo) * 1.15);
+  const cone = new THREE.CylinderGeometry(rTubo * 1.02, rBase, len, 24, 1, true);
+  const mCone = new THREE.Mesh(cone, mat);
+  mCone.position.copy(saida);
+  mCone.quaternion.setFromUnitVectors(V(0, 1, 0), dir);
+  const anel = new THREE.Mesh(new THREE.RingGeometry(rTubo * 0.92, rBase, 24, 2), mat);
+  anel.position.copy(saida);
+  anel.quaternion.setFromUnitVectors(V(0, 0, 1), dir);
+  const rTorus = (rTubo + rBase) * 0.5;
+  const tuboTorus = Math.max(4.8, (rBase - rTubo) * 0.42);
+  const torus = new THREE.Mesh(new THREE.TorusGeometry(rTorus, tuboTorus, 14, 28), mat);
+  torus.position.copy(saida);
+  torus.quaternion.setFromUnitVectors(V(0, 0, 1), dir);
+  const torusAlto = torus.clone();
+  torusAlto.position.copy(saida).add(dir.clone().multiplyScalar(7));
+  /* arruela com VOLUME (retângulo revolvido): anel/torus vistos de lado
+     viram linha e o cresce da foto volta */
+  const grosso = new THREE.LatheGeometry([
+    new THREE.Vector2(rTubo * 0.98, -9),
+    new THREE.Vector2(rBase, -9),
+    new THREE.Vector2(rBase, 9),
+    new THREE.Vector2(rTubo * 0.98, 9),
+  ], 28);
+  const mGrosso = new THREE.Mesh(grosso, mat);
+  mGrosso.position.copy(saida);
+  mGrosso.quaternion.setFromUnitVectors(V(0, 1, 0), dir);
+  const avesso = (mesh) => {
+    const m = new THREE.Mesh(peloAvesso(mesh.geometry), mesh.material);
+    m.position.copy(mesh.position);
+    m.quaternion.copy(mesh.quaternion);
+    m.scale.copy(mesh.scale);
+    return m;
+  };
+  g.add(mCone, anel, torus, torusAlto, mGrosso,
+        avesso(mCone), avesso(anel), avesso(torus), avesso(torusAlto), avesso(mGrosso));
+  return g;
+}
+
 function grandesVasos() {
   const g = new THREE.Group();
-  /* aorta: sai do centro, sobe por trás e faz a crossa para a direita */
-  g.add(vasoTubo([[4, 62, -4], [5, 82, -2], [4, 104, 2], [-8, 118, 4], [-26, 112, 2], [-32, 92, -2]],
-                 12, M.aorta));
-  /* tronco pulmonar: sai à FRENTE e cruza para a esquerda, por cima */
-  g.add(vasoTubo([[-12, 60, 16], [-10, 80, 14], [-4, 98, 8], [10, 106, 2]], 10.5, M.pulmonar));
+  const põe = (pts, mat, junta, matParede) => {
+    g.add(vasoTubo(pts, junta.rTubo, mat));
+    const { p, q } = saidaDaParede(pts, junta.ySaida);
+    g.add(colarDaRaiz(p, q, junta.rTubo, junta.rBase, mat));
+    /* arruela de miocárdio por fora do colar: o cresce da foto era o
+       epicárdio cortando no ar, sem chegar no vaso */
+    if (matParede)
+      g.add(colarDaRaiz(p, q, junta.rTubo * 1.05, junta.rBase * 1.22, matParede));
+  };
+  /* aorta: sai no EIXO do VE (senão o tubo fura a parede ao lado do óstio
+     e o cresce da foto volta), sobe e faz a crossa para a direita */
+  põe([[0, 52, 0], [0, 68, 0], [6, 90, -12], [4, 104, 2], [-8, 118, 4], [-26, 112, 2], [-32, 92, -2]],
+      M.aorta, JUNTAS_VASO.aorta, M.miocardio);
+  /* tronco pulmonar: sai no eixo do VD e cruza para a esquerda, por cima */
+  põe([[-13.4, 46, 9.4], [-13.4, 64, 9.4], [-6, 88, 10], [4, 102, 4], [10, 106, 2]],
+      M.pulmonar, JUNTAS_VASO.pulmonar, M.miocardioFino);
   /* os dois ramos pulmonares */
   g.add(vasoTubo([[10, 106, 2], [26, 104, -4], [38, 96, -10]], 6.4, M.pulmonar));
   g.add(vasoTubo([[10, 106, 2], [0, 100, -14], [-12, 92, -22]], 6.0, M.pulmonar));
   /* cavas: entram no átrio direito por cima e por baixo */
-  g.add(vasoTubo([[-30, 96, -10], [-30, 76, -6], [-26, 60, -2]], 9.5, M.cava));
-  g.add(vasoTubo([[-24, 18, -10], [-26, 34, -8], [-25, 50, -4]], 10.5, M.cava));
+  põe([[-30, 96, -10], [-30, 76, -6], [-26, 60, -2]], M.cava, JUNTAS_VASO.cava, M.atrio);
+  põe([[-24, 18, -10], [-26, 34, -8], [-25, 50, -4]], M.cava, JUNTAS_VASO.cavaInf, M.atrio);
   /* veias pulmonares: quatro, entrando no átrio esquerdo por trás */
   for (const [x, z] of [[30, -18], [34, -6], [18, -24], [12, -26]])
-    g.add(vasoTubo([[x, 72 + z * .2, z - 8], [x * .7, 66, z * .5], [x * .35, 60, -4]], 4.6, M.veiaPulmonar));
+    põe([[x, 72 + z * .2, z - 8], [x * .7, 66, z * .5], [x * .35, 60, -4]],
+        M.veiaPulmonar, JUNTAS_VASO.veiaPulm, M.atrio);
   return g;
 }
 
@@ -437,14 +632,14 @@ const CAMINHOS = {
   direito: {
     pontos: [[-25, 16, -8], [-24, 38, -6], [-21, 52, -2], [-18, 56, 2],
              [-16, 53, 6], [-16, 40, 11], [-15, 22, 12], [-14, 40, 15],
-             [-12, 56, 16], [-11, 74, 15], [-6, 96, 9], [10, 106, 2]]
+             [-13.4, 56, 9.4], [-13.4, 64, 9.4], [-6, 88, 10], [10, 106, 2]]
       .map(noSulco),
     uAV: .33, uSL: .70, mat: 'sanguePobre',
   },
   esquerdo: {
     pontos: [[28, 64, -14], [20, 60, -9], [12, 58, -5], [8, 57, -3],
              [6, 54, -1], [4, 38, 0], [3, 20, 1], [4, 40, -2],
-             [4, 58, -4], [5, 82, -2], [0, 112, 3], [-26, 112, 2]]
+             [0, 58, 0], [0, 82, 0], [-8, 118, 4], [-26, 112, 2]]
       .map(noSulco),
     uAV: .35, uSL: .70, mat: 'sangueRico',
   },
@@ -458,7 +653,7 @@ function gotasDeSangue(n = 26) {
     for (let i = 0; i < n; i++) {
       const m = new THREE.Mesh(base, M[c.mat]);
       m.userData = { lado, u: i / n, curva, uAV: c.uAV, uSL: c.uSL,
-                     desvio: V(rnd(-2.4, 2.4), 0, rnd(-2.4, 2.4)) };
+                     desvio: V(rnd(-1.1, 1.1), 0, rnd(-1.1, 1.1)) };
       g.add(m);
     }
   }
@@ -495,6 +690,7 @@ function corpo({
   const janela = corte ? [Math.PI * .306, Math.PI * 1.389] : null;
   const ve = ventriculoEsquerdo(janela); g.add(ve);
   const vd = ventriculoDireito(janela); g.add(vd);
+  g.add(soldaSepto());
 
   const ae = atrio(1, janela); ae.position.set(14, 58 + SUBIR_PLANO, -6); ae.rotation.z = -.16; g.add(ae);
   const ad = atrio(-1, janela); ad.position.set(-20, 56 + SUBIR_PLANO, 0); ad.rotation.z = .18; ad.scale.setScalar(.94); g.add(ad);
@@ -552,14 +748,7 @@ export function aplicarQuadro(raiz, q) {
     const par = o.userData?.papel;
     if (par && vol[par]) {
       const [volume, referencia] = vol[par];
-      const e = Math.cbrt(clamp(volume / referencia, .25, 2));
-      const ef = 1 - (1 - e) * .34;
-      for (const filho of o.children) {
-        if (filho.userData?.papelParede === 'interna')
-          filho.scale.set(e, 1 - (1 - e) * .35, e);
-        if (filho.userData?.papelParede === 'externa')
-          filho.scale.set(ef, 1 - (1 - ef) * .4, ef);
-      }
+      escalarCamara(o, volume, referencia);
     }
     const nome = o.userData?.nomeValva;
     if (!nome || q[nome] === undefined) return;
@@ -594,11 +783,7 @@ export function criar() {
       const d = m.userData;
       const põe = (grupo, volume, referencia) => {
         if (!grupo) return;
-        const e = Math.cbrt(clamp(volume / referencia, .25, 2));
-        grupo.userData.interna.scale.set(e, 1 - (1 - e) * .35, e);
-        /* a externa acompanha só um terço: o resto vira espessura de parede */
-        const ef = 1 - (1 - e) * .34;
-        grupo.userData.externa.scale.set(ef, 1 - (1 - ef) * .4, ef);
+        escalarCamara(grupo, volume, referencia);
       };
       põe(d.ve, vVE, 120); põe(d.vd, vVD, 120);
       põe(d.ae, vAE, 60); põe(d.ad, vAD, 60);

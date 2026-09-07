@@ -9,7 +9,9 @@ import {
 import {
   NIVEIS, nivelRevelaValvas, PLANO_VALVAR, TOPO_VE, TOPO_VD,
   TOLERANCIA_JUNCAO_MM, SUBIR_PLANO, VENTRICULO_DA_VALVA,
+  ALTURA_VE, ALTURA_VD,
 } from "../coracao/niveis.js";
+import { provaSelosDaParede } from "../coracao/parede.js";
 
 const texto = p => readFile(new URL(`../${p}`, import.meta.url), "utf8");
 const perto = (v, alvo, folga, oq) =>
@@ -463,4 +465,67 @@ test("há exatamente um B1 e um B2 por ciclo, de 40 a 200 bpm", async () => {
   assert.ok(app.includes("bulhas(q)"), "o Wiggers lê as bulhas da função, não reimplementa o laço");
   const src = await texto("coracao/fisica.js");
   assert.ok(src.includes("(i - 1 + n) % n"), "o laço de fechamento dá a volta no ciclo");
+});
+
+test("a parede fecha no polo e no anel do corte, sem tamponar o lúmen", async () => {
+  /* Três furos reais, medidos no perfil — não em pixel:
+     1. o polo do lathe começava em r≈6 mm (Math.max(.4, r) com seno de 0,04π)
+     2. a face do corte usava (r cos φ, r sin φ) e o LatheGeometry usa
+        (r sin φ, r cos φ): o selo nascia longe da abertura
+     3. o VD era meia-lua sem face nas bordas
+     O óstio tem de continuar ABERTO: fechar a parede não é tampar a cavidade. */
+  const p = provaSelosDaParede({ alturaVE: ALTURA_VE, alturaVD: ALTURA_VD });
+  assert.equal(p.faceCoincideComLathe, true, "a face do corte tem de sentar no anel do lathe");
+  assert.ok(p.vaoDaConvencaoAntigaMm > 8,
+    `o defeito antigo era um vão; medido ${p.vaoDaConvencaoAntigaMm.toFixed(1)} mm`);
+
+  for (const [nome, c] of [["VE", p.ve], ["VD", p.vd]]) {
+    assert.equal(c.nIguais, true, `${nome}: interno e externo com o mesmo número de pontos`);
+    assert.ok(c.polo0Dentro < 0.2, `${nome} polo interno aberto r=${c.polo0Dentro}`);
+    assert.ok(c.polo0Fora < 0.2, `${nome} polo externo aberto r=${c.polo0Fora}`);
+    assert.ok(c.polo1Dentro > 8, `${nome} óstio tamponado r=${c.polo1Dentro}`);
+    assert.ok(c.espessura1 > 2, `${nome} anel do óstio sumiu (${c.espessura1} mm)`);
+  }
+  assert.ok(p.ve.espessura1 > p.vd.espessura1,
+    "o anel do esquerdo tem de ser mais grosso que o do direito");
+  assert.ok(p.ae.polo1Dentro < 0.2, `teto do átrio aberto r=${p.ae.polo1Dentro}`);
+  assert.ok(p.ae.polo0Dentro > 5, `óstio AV tamponado r=${p.ae.polo0Dentro}`);
+  assert.ok(p.labioAltura >= 3, `lábio do óstio plano (altura ${p.labioAltura} mm) some de lado`);
+  assert.ok(p.labioNaoTampona, "o lábio não pode tampar o lúmen");
+  assert.ok(p.tampoLumenVE > 8, `tampo do VE tamponou o lúmen r=${p.tampoLumenVE}`);
+  assert.ok(p.tampoLumenVD > 8, `tampo do VD tamponou o lúmen r=${p.tampoLumenVD}`);
+  assert.ok(p.tampoCobreVE > 0, "o tampo tem de passar da parede externa");
+  assert.ok(p.tampoAltura >= 8, `tampo plano (altura ${p.tampoAltura} mm) some de lado`);
+  assert.ok(p.ve.polo1Dentro < 14, `óstio do VE ainda largo r=${p.ve.polo1Dentro}, cresce em volta do vaso`);
+  assert.ok(p.vd.polo1Dentro < 13, `óstio do VD ainda largo r=${p.vd.polo1Dentro}, cresce em volta do vaso`);
+  for (const [nome, j] of Object.entries(p.juntas)) {
+    assert.ok(j.rBase > j.rTubo + 3,
+      `${nome}: rBase ${j.rBase} não cobre o cresce em volta do tubo ${j.rTubo}`);
+    assert.ok(Number.isFinite(j.ySaida), `${nome}: colar sem plano y do teto`);
+  }
+  perto(p.saidaAortaY, p.juntas.aorta.ySaida, 0.6, "colar da aorta no teto do VE");
+  perto(p.saidaPulY, p.juntas.pulmonar.ySaida, 0.6, "colar da pulmonar no teto do VD");
+  assert.equal(p.juntas.aorta.ySaida, ALTURA_VE - SUBIR_PLANO,
+    "ySaida da aorta é o teto do VE no grupo dos vasos");
+  assert.equal(p.juntas.pulmonar.ySaida, TOPO_VD - SUBIR_PLANO,
+    "ySaida da pulmonar é o teto do VD no grupo dos vasos");
+  assert.ok(p.colarAntigoAcimaDoOstioMm > 4,
+    `o colar a 38% do segmento ficava ${p.colarAntigoAcimaDoOstioMm.toFixed(1)} mm acima do óstio`);
+
+  const m = await texto("coracao/modelos.js");
+  assert.ok(m.includes("faceDoCorte(dentro, fora, t0)"), "a face liga o perfil interno ao externo");
+  assert.ok(m.includes("camaraDupla(perfil, 3.4"), "o direito usa a mesma câmara selada");
+  assert.ok(m.includes("papelParede = 'selo'"), "o selo acompanha o volume, senão a sístole abre o corte");
+  assert.ok(m.includes("function colarDaRaiz"), "a raiz do vaso ganha colar contra a câmara");
+  assert.ok(m.includes("labioDoOstio"), "o óstio tem lábio com altura, não anel plano");
+  assert.ok(m.includes("coroaDoOstio"), "a coroa dá volume no teto, visível de lado");
+  assert.ok(m.includes("saidaDaParede(pts, junta.ySaida)"), "o colar senta no plano do teto, não no ar");
+  assert.ok(m.includes("function manguitoDoOstio"), "manguito 2π no óstio: a meia-lua não fecha o tubo sozinha");
+  assert.ok(m.includes("[-13.4, 46, 9.4]"), "a pulmonar atravessa o óstio do VD, não a parede ao lado");
+  assert.ok(m.includes("[0, 52, 0]"), "a aorta atravessa o óstio do VE, não a parede ao lado");
+  assert.ok(m.includes("TorusGeometry"), "o colar tem torus com volume, não só anel plano");
+  assert.ok(m.includes("o.material = o.material.clone()"), "o vidro continua isolado por clone");
+  const semComentario = m.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
+  assert.ok(!/dentro\[i\]\.x \* cos,\s*dentro\[i\]\.y,\s*dentro\[i\]\.x \* sin/.test(semComentario),
+    "voltou a convenção (cos, sin), 90° fora do lathe");
 });
