@@ -240,3 +240,38 @@ test("a bancada abre parada, pelo endereço", async () => {
     assert.ok(app.includes(`busca.get('${chave}')`), `falta ?${chave}=`);
   }
 });
+
+/* ==========================================================================
+   O corte e o sangue
+   ========================================================================== */
+
+test("o corte tem FACE, e é ela que mostra a espessura", async () => {
+  /* sem a face o corte revela a cavidade mas a parede vira uma linha, e a
+     diferença entre 10 mm e 3 mm — que é a resposta inteira à diferença de
+     pressão entre os dois lados — desaparece */
+  const m = await texto("coracao/modelos.js");
+  assert.ok(m.includes("function faceDoCorte"));
+  assert.ok(m.includes("faceDoCorte(dentro, fora, t0)"), "a face liga o perfil interno ao externo");
+});
+
+test("o sinalizador de corte não pode ser ignorado", async () => {
+  /* ele era: o nível 02 dizia "por dentro" e mostrava o mesmo exterior dos
+     outros níveis, porque `corpo()` recebia `corte` e nunca o usava */
+  const m = await texto("coracao/modelos.js");
+  const corpo = m.slice(m.indexOf("function corpo("), m.indexOf("export function criar"));
+  assert.ok(corpo.includes("const janela = corte ?"), "o corpo tem de usar o corte");
+  assert.ok(corpo.includes("ventriculoEsquerdo(janela)"), "e repassá-lo às câmaras");
+});
+
+test("O SANGUE NÃO ATRAVESSA VALVA FECHADA", async () => {
+  /* é a terceira leitura do pedido, e ela não é uma animação à parte: as
+     gotas param nas porteiras, e por isso se acumulam no átrio durante a
+     sístole e disparam quando a semilunar abre */
+  const m = await texto("coracao/modelos.js");
+  assert.ok(m.includes("if (d.u < d.uAV && novo >= d.uAV && !entrada.aberta)"), "porteira atrioventricular");
+  assert.ok(m.includes("if (d.u < d.uSL && novo >= d.uSL && !saida.aberta)"), "porteira semilunar");
+  /* e a vazão vem do motor, não de um número de desenho */
+  const app = await texto("coracao/app.js");
+  assert.ok(app.includes("mitral: { q: q.qMitral, aberta: q.mitral }"),
+    "a vazão da gota é a vazão que o motor calculou");
+});
