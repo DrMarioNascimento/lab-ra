@@ -115,3 +115,49 @@ test("o fluxo é integrado ao longo do capilar, não tirado das duas pontas", as
   assert.ok(f.filtrado > 0 && f.reabsorvido > 0, "tem de haver os dois");
   perto(f.liquido, PADRAO.kf * 3, .01, "o líquido é Kf vezes a média");
 });
+
+/* ==========================================================================
+   O desenho, e as duas coisas que ele já mentiu
+   ========================================================================== */
+
+import { readFile } from "node:fs/promises";
+const texto = p => readFile(new URL(`../${p}`, import.meta.url), "utf8");
+
+test("o card 09 leva às forças de Starling", async () => {
+  const hub = await texto("bancadas.html");
+  assert.match(hub, /data-number="09"/);
+  assert.match(hub, /href="starling\/"/);
+});
+
+test("a bancada está protegida e traz o caminho de RA das irmãs", async () => {
+  const page = await texto("starling/index.html");
+  assert.match(page, /data-ra-protected/);
+  assert.match(page, /ar-modes="webxr scene-viewer quick-look"/);
+});
+
+test("a cor da seta segue o SINAL, não a espécie da força", async () => {
+  /* Pi é NEGATIVA em tecido normal: ela suga para fora. Presa à espécie, a
+     cor punha uma seta azul apontando para fora — o contrário do que ocorre. */
+  const m = await texto("starling/modelos.js");
+  assert.match(m, /const mat = mmHg >= 0 \? M\.setaFora : M\.setaDentro;/);
+});
+
+test("as setas atravessam a parede, e não correm ao longo do tubo", async () => {
+  const m = await texto("starling/modelos.js");
+  assert.match(m, /quaternion\.setFromUnitVectors\(EIXO_X, alvo\)/);
+});
+
+test("a bancada abre parada, pelo endereço", async () => {
+  /* Sem regex de propósito: a contrabarra não sobrevive à ida e volta pelo
+     shell, e um teste que compara o padrão errado passa achando que confere. */
+  const app = await texto("starling/app.js");
+  for (const chave of ["nivel", "onc", "causa"]) {
+    assert.ok(app.includes(`busca.get('${chave}')`), `falta ?${chave}=`);
+  }
+});
+
+test("a geometria não importa a física", async () => {
+  /* geometria não decide número: quem junta as duas é o app */
+  const m = await texto("starling/modelos.js");
+  assert.ok(!/from '\.\/fisica\.js'/.test(m));
+});
