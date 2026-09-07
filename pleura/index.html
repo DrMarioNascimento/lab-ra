@@ -53,13 +53,14 @@
         <ul class="leituras">
           <li>pulmão <b><span id="lPulmao">40</span>% da capacidade</b></li>
           <li>caixa torácica <b><span id="lCaixa">40</span>% da capacidade</b></li>
+          <li>retorno venoso <b><span id="lRetorno">106</span>% do normal</b></li>
         </ul>
       </section>
 
       <section class="caixa" id="caixaPostura" aria-label="Postura" hidden>
         <div class="caixa-head">
           <span class="eyebrow">Postura do aparelho</span>
-          <div class="caixa-btns"><button id="deitar" type="button">Deitar</button><button id="levantar" type="button">Levantar</button></div>
+          <div class="caixa-btns"><button id="respirar" type="button">Respirar</button><button id="deitar" type="button">Deitar</button><button id="levantar" type="button">Levantar</button></div>
         </div>
         <button id="permitir" class="permitir" type="button" hidden>Usar a inclinação do aparelho</button>
         <p id="sensorEstado" class="estado">procurando o sensor…</p>
@@ -71,6 +72,8 @@
           <li>altura que a gravidade vê <b><span id="lAltura">30</span> cm</b></li>
           <li>alvéolo do ápice <b><span id="lVolApice">63</span>%</b> · base <b><span id="lVolBase">22</span>%</b></li>
           <li>a base ventila <b><span id="lVent">2.12×</span></b> o ápice</li>
+          <li>pressão alveolar <b><span id="lPalv">0.00</span> cmH₂O</b></li>
+          <li>o ciclo <b><span id="lFase">parado no fim da expiração</span></b></li>
         </ul>
         <canvas id="curvaPerfil" width="330" height="180" aria-label="Ventilação e perfusão do ápice à base"></canvas>
       </section>

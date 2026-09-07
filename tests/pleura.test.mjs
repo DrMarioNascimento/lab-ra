@@ -5,6 +5,7 @@ import {
   PULMAO, PPL_MEDIA_FRC, GRADIENTE_PLEURAL, CMH2O_EM_MMHG, VOLUMES, VASOS,
   alturaEfetiva, pressaoPleural, transpulmonar, volumeRelativo, ventilacaoRelativa,
   pressoesEm, zonaEm, fluxoEm, perfilDeZonas, estadoDoPneumotorax, comCenario, CENARIOS, eixoDependente,
+  cicloPleural, cicloAlveolar, retornoVenosoRelativo, AMPLITUDE_PPL, FRACAO_INSPIRATORIA,
 } from "../pleura/fisica.js";
 
 const texto = p => readFile(new URL(`../${p}`, import.meta.url), "utf8");
@@ -158,4 +159,61 @@ test("a bancada abre parada, e o card existe", async () => {
   const hub = await texto("bancadas.html");
   assert.ok(hub.includes('data-number="10"'));
   assert.ok(hub.includes('href="pleura/"'));
+});
+
+/* ==========================================================================
+   O ciclo respiratório, e a pleura que aperta o retorno venoso
+   ========================================================================== */
+
+test("o ciclo comeca e acaba no fim da expiracao, sem fluxo", async () => {
+  /* é o único instante em que a transpulmonar é o simétrico da pleural, e é
+     por isso que todos os números clássicos são medidos ali */
+  perto(cicloPleural(0), 0, .001, "deslocamento no início");
+  perto(cicloPleural(1), 0, .001, "deslocamento no fim");
+  perto(cicloAlveolar(0), 0, .02, "fluxo no fim da expiração");
+  perto(cicloAlveolar(FRACAO_INSPIRATORIA), 0, .02, "fluxo no fim da inspiração");
+});
+
+test("a pleural desce ate a amplitude e volta", async () => {
+  perto(cicloPleural(FRACAO_INSPIRATORIA), -AMPLITUDE_PPL, .01, "o fundo da inspiração");
+  /* a amplitude não é escolha de desenho: na respiração tranquila a pleural
+     vai de -5 a -8, e são esses 3 */
+  assert.equal(AMPLITUDE_PPL, 3);
+});
+
+test("expirar em repouso e PASSIVO, e a curva tem de dizer isso", async () => {
+  /* inspiração ocupa 40% do ciclo e expiração 60%: com uma senoide simétrica
+     o desenho diria que expirar custa o mesmo, e não custa */
+  assert.ok(FRACAO_INSPIRATORIA < .5);
+  const picoInsp = Math.min(...[...Array(40)].map((_, i) => cicloAlveolar(i / 100)));
+  const picoExp = Math.max(...[...Array(60)].map((_, i) => cicloAlveolar(.4 + i / 150)));
+  assert.ok(Math.abs(picoInsp) > picoExp,
+    `o fluxo inspiratório (${picoInsp.toFixed(2)}) tem de ser maior que o expiratório (${picoExp.toFixed(2)})`);
+});
+
+test("NUMA RESPIRACAO A BASE GANHA O DOBRO DO APICE", async () => {
+  /* o paradoxo agora ANIMADO: é o mesmo achado do teste estático, mas medido
+     no ciclo em vez de num delta escolhido a dedo */
+  const vol = (f, fase) => volumeRelativo(transpulmonar(f, 90) - cicloPleural(fase));
+  const ganhoBase = vol(0, FRACAO_INSPIRATORIA) - vol(0, 0);
+  const ganhoApice = vol(1, FRACAO_INSPIRATORIA) - vol(1, 0);
+  assert.ok(ganhoBase > ganhoApice, "a base tem de ganhar mais");
+  perto(ganhoBase / ganhoApice, 2.1, .3, "quantas vezes a base ganha mais");
+});
+
+test("pleura positiva ESMAGA o retorno venoso, negativa ajuda", async () => {
+  /* a correção que o simulador de ventilação do Mario trouxe: o hipertensivo
+     mata por choque obstrutivo, e o desvio do mediastino é o sinal */
+  const normal = estadoDoPneumotorax("nenhum").retorno;
+  const aberto = estadoDoPneumotorax("aberto").retorno;
+  const tenso = estadoDoPneumotorax("hipertensivo").retorno;
+  assert.ok(tenso < .7, `hipertensivo devolve ${(tenso * 100).toFixed(0)}%, tinha de ser bem menos que o normal`);
+  assert.ok(aberto < normal, "furado perde a ajuda da pleura negativa");
+  assert.ok(retornoVenosoRelativo(-12) > 1.2, "inspiração profunda tem de ajudar o retorno");
+  assert.ok(retornoVenosoRelativo(0) === 1, "pleural zero é a referência");
+});
+
+test("a bancada abre parada tambem no meio do ciclo", async () => {
+  const app = await texto("pleura/app.js");
+  assert.ok(app.includes("busca.get('fase')"), "falta ?fase=");
 });

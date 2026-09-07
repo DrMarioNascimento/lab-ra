@@ -112,7 +112,7 @@ export function volumeRelativo(pl) {
 
 /* Quanto AR ENTRA num alvéolo quando a pressão pleural varia de `delta`.
    É a inclinação da curva no ponto — a complacência local. */
-export function ventilacaoRelativa(f, grau, { delta = 3, ...opc } = {}) {
+export function ventilacaoRelativa(f, grau, { delta = AMPLITUDE_PPL, ...opc } = {}) {
   const pl = transpulmonar(f, grau, opc);
   return volumeRelativo(pl + delta) - volumeRelativo(pl);
 }
@@ -160,6 +160,64 @@ export function fluxoEm(f, grau, e = {}) {
   return Math.max(0, motriz);
 }
 
+/* ── O CICLO RESPIRATÓRIO ─────────────────────────────────────────────────
+   Até aqui a bancada estava congelada na CRF: pressão alveolar zero e um
+   delta de pressão pleural CHUMBADO em 3 cmH2O para calcular ventilação. O
+   número estava certo por acaso — na respiração tranquila a pleural vai de
+   −5 a −8, e são esses 3 —, mas ele era uma escolha minha, não uma conta.
+   Agora ele vem do ciclo, e o ciclo se pode ver.
+
+   A FORMA É ASSIMÉTRICA de propósito: inspiração ocupa 40% do ciclo e
+   expiração 60%, que é a relação I:E de quem respira em repouso. Com uma
+   senoide simétrica o desenho ficaria bonito e diria que expirar custa o
+   mesmo que inspirar — e expirar em repouso é PASSIVO, não custa nada.
+
+   A pressão alveolar é a DERIVADA disso, e não uma segunda curva inventada:
+   ela é negativa enquanto o pulmão enche, positiva enquanto esvazia, e passa
+   por zero nos dois extremos, que é quando não há fluxo. É por isso que a
+   transpulmonar em repouso é o simétrico da pleural: naquele instante, e só
+   nele, a alveolar vale zero. */
+export const AMPLITUDE_PPL = 3;      // cmH2O, de -5 a -8 na respiração tranquila
+export const FRACAO_INSPIRATORIA = 0.4;
+
+function formaDoCiclo(fase) {
+  const f = ((fase % 1) + 1) % 1, FI = FRACAO_INSPIRATORIA;
+  return f < FI
+    ? .5 - .5 * Math.cos(Math.PI * f / FI)
+    : .5 + .5 * Math.cos(Math.PI * (f - FI) / (1 - FI));
+}
+
+/* quanto a pleural fica MAIS negativa neste ponto do ciclo */
+export function cicloPleural(fase, amplitude = AMPLITUDE_PPL) {
+  return -amplitude * formaDoCiclo(fase);
+}
+
+/* a alveolar: proporcional à velocidade de encher, com sinal trocado */
+export function cicloAlveolar(fase, pico = 1) {
+  const h = .004;
+  const d = (formaDoCiclo(fase + h) - formaDoCiclo(fase - h)) / (2 * h);
+  /* o pico da derivada da forma vale pi/(2·FI) na inspiração; normalizar por
+     ele deixa `pico` significar mesmo o pico em cmH2O */
+  return -pico * d / (Math.PI / (2 * FRACAO_INSPIRATORIA));
+}
+
+/* ── A PLEURA E O RETORNO VENOSO ──────────────────────────────────────────
+   O nível 03 dizia que no pneumotórax hipertensivo "o mediastino desvia, e é
+   isso que mata". O desvio é o SINAL; a causa é outra, e é hemodinâmica:
+   PRESSÃO PLEURAL POSITIVA ESMAGA O RETORNO VENOSO. Choque obstrutivo.
+
+   E o outro lado da mesma moeda: pleural mais negativa AJUDA o retorno — é a
+   bomba torácica, e é por isso que quem inspira fundo enche mais o coração
+   direito. As duas metades saem da mesma conta, com sinais opostos.
+
+   Os coeficientes vêm do simulador de ventilação do Mario, onde estão
+   calibrados contra o comportamento de quem está em ventilação mecânica.
+   Isto liga esta bancada à 08 do mesmo jeito que a 09 já se liga. */
+export function retornoVenosoRelativo(ppl) {
+  if (ppl <= 0) return Math.min(1.35, 1 + Math.max(0, -ppl - 5) * 0.045);
+  return Math.max(0.42, 1 - ppl * 0.030);
+}
+
 /* ── O PNEUMOTÓRAX ────────────────────────────────────────────────────────
    As duas molas: o pulmão puxa para dentro, a caixa torácica empurra para
    fora, e no repouso elas se anulam — é ESSE empate que deixa a pressão entre
@@ -173,15 +231,18 @@ export const VOLUMES = { crf: .40, pulmaoSozinho: .10, caixaSozinha: .60 };
 
 export function estadoDoPneumotorax(pneumo) {
   if (pneumo === 'nenhum') {
-    return { pulmao: VOLUMES.crf, caixa: VOLUMES.crf, ppl: PPL_MEDIA_FRC, desvio: 0 };
+    return { pulmao: VOLUMES.crf, caixa: VOLUMES.crf, ppl: PPL_MEDIA_FRC, desvio: 0,
+             retorno: retornoVenosoRelativo(PPL_MEDIA_FRC) };
   }
   if (pneumo === 'aberto') {
-    return { pulmao: VOLUMES.pulmaoSozinho, caixa: VOLUMES.caixaSozinha, ppl: 0, desvio: 0 };
+    return { pulmao: VOLUMES.pulmaoSozinho, caixa: VOLUMES.caixaSozinha, ppl: 0, desvio: 0,
+             retorno: retornoVenosoRelativo(0) };
   }
   /* hipertensivo: o ar entra e não sai, a pressão passa de zero e o
      mediastino é EMPURRADO para o lado bom — é isso que mata, e não o
      colapso do pulmão de um lado só */
-  return { pulmao: VOLUMES.pulmaoSozinho * .6, caixa: VOLUMES.caixaSozinha * 1.08, ppl: 12, desvio: 1 };
+  return { pulmao: VOLUMES.pulmaoSozinho * .6, caixa: VOLUMES.caixaSozinha * 1.08, ppl: 12, desvio: 1,
+           retorno: retornoVenosoRelativo(12) };
 }
 
 /* ── OS CENÁRIOS ──────────────────────────────────────────────────────────
