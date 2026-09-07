@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<title>Quatro candidatos, lado a lado</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; background: #0a0d0a; color: #dbe6d8;
+         font: 14px/1.5 "IBM Plex Mono", ui-monospace, monospace; }
+  h1 { font-size: 15px; letter-spacing: .16em; text-transform: uppercase;
+       color: #9ec49a; margin: 18px 20px 4px; font-weight: 600; }
+  p.nota { margin: 0 20px 16px; max-width: 90ch; color: #93a691; }
+  .grade { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; padding: 0 14px 20px; }
+  .cartao { border: 1px solid #24331f; border-radius: 12px; overflow: hidden; background: #10150f; }
+  .cartao header { padding: 9px 12px; border-bottom: 1px solid #24331f; }
+  .cartao b { color: #f2f7ec; font-size: 14px; }
+  .cartao small { display: block; color: #8fa38c; font-size: 12px; margin-top: 3px; }
+  canvas { display: block; width: 100%; height: 560px; }
+  .medida { padding: 8px 12px; border-top: 1px solid #24331f; color: #9db89a; font-size: 12px; }
+  .aviso { margin: 0 20px 20px; padding: 10px 14px; border-left: 3px solid #d8a23a;
+           background: #1a1509; color: #e8d8b0; max-width: 90ch; }
+</style>
+</head>
+<body>
+<h1>Os dois arquivos, lado a lado</h1>
+<p class="nota">Arraste para girar, roda para aproximar. A e B normalizados para a mesma altura,
+para que a comparação seja de FORMA e de LEGIBILIDADE, e não de escala.</p>
+<div class="aviso"><b>Os três <code>.usdz</code> não estão aqui.</b> USDZ só é desenhado pelo Quick Look do
+iPhone — nenhum navegador de computador o renderiza. Deles, o <code>heart.usdz</code> é o único que talvez
+valha um toque no seu telefone: ele declara esqueleto, e pode ser que bata.</div>
+
+<div class="grade">
+  <div class="cartao"><header><b>A · Scan realista (Sketchfab)</b>
+    <small>malha única fechada, texturizada — sem cavidade, sem câmara, sem valva</small></header>
+    <canvas id="a"></canvas><div class="medida" id="ma">…</div></div>
+
+  <div class="cartao"><header><b>B · Montagem BodyParts3D</b>
+    <small>92 peças nomeadas: cavidades, 11 cúspides, papilares, coronárias — sem parede ventricular</small></header>
+    <canvas id="b"></canvas><div class="medida" id="mb">…</div></div>
+
+</div>
+
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+function palco(id) {
+  const canvas = document.getElementById(id);
+  const r = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  r.setPixelRatio(Math.min(devicePixelRatio, 2));
+  r.outputColorSpace = THREE.SRGBColorSpace;
+  r.toneMapping = THREE.ACESFilmicToneMapping;
+  r.toneMappingExposure = 1.1;
+  const cena = new THREE.Scene();
+  cena.environment = new THREE.PMREMGenerator(r).fromScene(new RoomEnvironment(), .04).texture;
+  cena.environmentIntensity = .7;
+  cena.add(new THREE.HemisphereLight(0xffeede, 0x181016, 1.0));
+  const key = new THREE.DirectionalLight(0xfff2e6, 2.4); key.position.set(120, 180, 160); cena.add(key);
+  const fill = new THREE.DirectionalLight(0xffcfc4, .6); fill.position.set(-140, 60, 100); cena.add(fill);
+  const rim = new THREE.DirectionalLight(0x9fb8ff, 1.0); rim.position.set(-80, 90, -180); cena.add(rim);
+  const cam = new THREE.PerspectiveCamera(32, 1, .1, 5000);
+  const ctl = new OrbitControls(cam, canvas);
+  ctl.enableDamping = true;
+  function medir() {
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    r.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix();
+  }
+  addEventListener('resize', medir); medir();
+  return { cena, cam, ctl, r, medir };
+}
+
+/* enquadra a raiz e normaliza para 120 mm de altura */
+function encaixar(p, raiz, rotulo) {
+  /* A CAVA INFERIOR DO B DESCE 23 cm e sozinha triplica a caixa do modelo:
+     enquadrar por ela deixava o coração minúsculo num canto. Ela fica na
+     cena — é dado que você está julgando —, mas sai do CÁLCULO do
+     enquadramento, senão a comparação de tamanho entre A e B mente. */
+  const caixa = new THREE.Box3();
+  raiz.traverse(o => {
+    if (!o.isMesh) return;
+    if (/cava_inferior/i.test(o.name || '')) return;
+    caixa.expandByObject(o);
+  });
+  if (caixa.isEmpty()) caixa.setFromObject(raiz);
+  const tam = caixa.getSize(new THREE.Vector3());
+  const centro = caixa.getCenter(new THREE.Vector3());
+  /* normaliza pela MAIOR dimensão, não pela altura: depois de remover o arco
+     e as cavas, o B ficou mais largo que alto e transbordava do quadro —
+     comparar por altura passava a mentir sobre o tamanho. */
+  const k = 120 / Math.max(tam.x, tam.y, tam.z, 1e-6);
+  raiz.scale.multiplyScalar(k);
+  raiz.position.sub(centro.multiplyScalar(k));
+  p.cena.add(raiz);
+  const d = 120 / Math.tan(p.cam.fov * Math.PI / 360) * 1.15;
+  p.cam.position.set(d * .18, d * .10, d * .95);
+  p.ctl.target.set(0, 0, 0); p.ctl.update();
+  let tri = 0, malhas = 0;
+  raiz.traverse(o => { if (o.isMesh) { malhas++;
+    const g = o.geometry; tri += (g.index ? g.index.count : g.attributes.position.count) / 3; } });
+  document.getElementById(rotulo).textContent =
+    `${malhas} malhas · ${Math.round(tri).toLocaleString('pt-BR')} triângulos · ` +
+    `${tam.x.toFixed(0)} × ${tam.y.toFixed(0)} × ${tam.z.toFixed(0)} na unidade do arquivo`;
+  (function laco() { requestAnimationFrame(laco); p.ctl.update(); p.r.render(p.cena, p.cam); })();
+}
+
+const carregador = new GLTFLoader();
+for (const [id, arquivo, rotulo] of [['a', 'modelos/A-scan-realista.glb', 'ma'],
+                                     ['b', 'modelos/B-bodyparts3d.glb', 'mb']]) {
+  const p = palco(id);
+  carregador.load(arquivo, g => encaixar(p, g.scene, rotulo),
+    undefined, e => { document.getElementById(rotulo).textContent = 'falhou: ' + e; });
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<title>O scan batendo com o nosso motor</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; background: #0a0d0a; color: #dbe6d8;
+         font: 14px/1.55 "IBM Plex Mono", ui-monospace, monospace; }
+  h1 { font-size: 15px; letter-spacing: .16em; text-transform: uppercase;
+       color: #9ec49a; margin: 18px 20px 4px; font-weight: 600; }
+  p.nota { margin: 0 20px 14px; max-width: 92ch; color: #93a691; }
+  .caixa { display: grid; grid-template-columns: 1fr 320px; gap: 16px; padding: 0 16px 24px; }
+  @media (max-width: 900px) { .caixa { grid-template-columns: 1fr; } }
+  #palco { width: 100%; height: 620px; display: block;
+           border: 1px solid #24331f; border-radius: 12px; background: #10150f; }
+  .painel { border: 1px solid #24331f; border-radius: 12px; background: #10150f; padding: 14px 16px; }
+  label { display: block; margin: 14px 0 6px; color: #9ec49a; font-size: 12px;
+          letter-spacing: .1em; text-transform: uppercase; }
+  input[type=range] { width: 100%; accent-color: #d8c53a; }
+  button { background: #1c2718; color: #e8f2e4; border: 1px solid #35492c;
+           border-radius: 8px; padding: 7px 14px; font: inherit; cursor: pointer; }
+  button:hover { background: #26351f; }
+  .linhas { margin-top: 16px; border-top: 1px solid #24331f; padding-top: 12px; }
+  .linhas div { display: flex; justify-content: space-between; gap: 10px; padding: 3px 0; }
+  .linhas b { color: #f2f7ec; font-weight: 600; }
+  .fase { color: #d8c53a; }
+  .aviso { margin: 0 20px 16px; padding: 10px 14px; border-left: 3px solid #d8a23a;
+           background: #1a1509; color: #e8d8b0; max-width: 92ch; }
+</style>
+</head>
+<body>
+<h1>O scan realista batendo com o nosso motor</h1>
+<p class="nota">A malha é o arquivo A, sem nenhuma animação embutida — 12.013 vértices, uma peça só.
+O movimento vem inteiro de <code>fisica.js</code>: cada vértice é deslocado por um peso que depende de
+ONDE ele está, e a intensidade é o volume que o motor calcula naquele instante.</p>
+<div class="aviso"><b>O que olhar:</b> mexa a frequência. Não é o mesmo batimento tocado mais rápido —
+a sístole encurta com √RR e a diástole desaba, e a amplitude cai junto porque a fração de ejeção cai.
+Compare os números do painel com o que a imagem faz.</div>
+
+<div class="caixa">
+  <canvas id="palco"></canvas>
+  <div class="painel">
+    <label>Frequência · <b id="vbpm">75</b> bpm</label>
+    <input id="bpm" type="range" min="40" max="200" step="1" value="75" />
+
+    <label>Câmera lenta · <b id="vlento">0.40</b>×</label>
+    <input id="lento" type="range" min="0.08" max="1" step="0.02" value="0.4" />
+
+    <label>Amplitude do encurtamento · <b id="vamp">1.00</b>×</label>
+    <input id="amp" type="range" min="0" max="2" step="0.05" value="1" />
+
+    <label>Impulso da ponta · <b id="vimp">1.00</b>×</label>
+    <input id="imp" type="range" min="0" max="2.5" step="0.05" value="1" />
+
+    <label>Onda ápice → base · <b id="vonda">85</b> ms</label>
+    <input id="onda" type="range" min="0" max="260" step="5" value="85" />
+
+    <label>Onde o coração se prende · <b id="vanc">10</b>% da altura</label>
+    <input id="anc" type="range" min="0" max="55" step="1" value="10" />
+    <div style="color:#8fa38c;font-size:11.5px;margin-top:-2px">
+      0% = ponta pregada, o movimento sobe para a base (é o fiel).<br>
+      Mais alto = a base desce E a ponta sobe, movimento repartido.</div>
+
+    <div style="margin-top:14px"><button id="parar" type="button">Parar</button></div>
+
+    <div class="linhas">
+      <div><span>fase</span><b class="fase" id="lfase">—</b></div>
+      <div><span>volume no VE</span><b id="lvol">—</b></div>
+      <div><span>volume no AE</span><b id="lvae">—</b></div>
+      <div><span>VDF / VSF</span><b id="lvdf">—</b></div>
+      <div><span>fração de ejeção</span><b id="lfe">—</b></div>
+      <div><span>pressão arterial</span><b id="lpa">—</b></div>
+      <div><span>sístole / diástole</span><b id="ldur">—</b></div>
+      <div><span>encurtamento do eixo</span><b id="lenc">—</b></div>
+      <div><span>choque da ponta</span><b id="lict">—</b></div>
+    </div>
+  </div>
+</div>
+
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { simular, em, duracoes, faseDe } from '/coracao/fisica.js';
+
+const $ = id => document.getElementById(id);
+const canvas = $('palco');
+const r = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+r.setPixelRatio(Math.min(devicePixelRatio, 2));
+r.outputColorSpace = THREE.SRGBColorSpace;
+r.toneMapping = THREE.ACESFilmicToneMapping;
+r.toneMappingExposure = 1.12;
+const cena = new THREE.Scene();
+cena.environment = new THREE.PMREMGenerator(r).fromScene(new RoomEnvironment(), .04).texture;
+cena.environmentIntensity = .75;
+cena.add(new THREE.HemisphereLight(0xffeede, 0x181016, 1.0));
+const key = new THREE.DirectionalLight(0xfff2e6, 2.5); key.position.set(120, 180, 160); cena.add(key);
+const fill = new THREE.DirectionalLight(0xffcfc4, .6); fill.position.set(-140, 60, 100); cena.add(fill);
+const rim = new THREE.DirectionalLight(0x9fb8ff, 1.0); rim.position.set(-80, 90, -180); cena.add(rim);
+const cam = new THREE.PerspectiveCamera(32, 1, .1, 5000);
+const ctl = new OrbitControls(cam, canvas); ctl.enableDamping = true;
+function medir() { const w = canvas.clientWidth, h = canvas.clientHeight;
+  r.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }
+addEventListener('resize', medir); medir();
+
+/* ── suavizador: 0 antes de a, 1 depois de b, com transição macia ── */
+const passo = (t, a, b) => { const u = Math.min(1, Math.max(0, (t - a) / (b - a)));
+  return u * u * (3 - 2 * u); };
+
+let malha = null, base = null, pesoV = null, pesoA = null, pesoP = null, yApice = 0, eixoY = 1, cx = 0;
+
+new GLTFLoader().load('modelos/A-scan-realista.glb', g => {
+  g.scene.updateMatrixWorld(true);
+  g.scene.traverse(o => { if (o.isMesh && !malha) malha = o; });
+  /* assa a transformação do nó na geometria: local passa a ser mundo, e aí
+     dá para mexer nos vértices sem pensar em matriz */
+  malha.geometry = malha.geometry.clone();
+  malha.geometry.applyMatrix4(malha.matrixWorld);
+  malha.position.set(0, 0, 0); malha.rotation.set(0, 0, 0); malha.scale.set(1, 1, 1);
+  malha.updateMatrixWorld(true);
+
+  const pos = malha.geometry.attributes.position;
+  base = new Float32Array(pos.array);            // as posições de repouso
+  const n = pos.count;
+
+  /* mede a própria malha: eixo longo, ápice e centro */
+  let mn = [1e9, 1e9, 1e9], mx = [-1e9, -1e9, -1e9], soma = [0, 0, 0];
+  for (let i = 0; i < n; i++) for (let c = 0; c < 3; c++) {
+    const v = base[i * 3 + c];
+    if (v < mn[c]) mn[c] = v; if (v > mx[c]) mx[c] = v; soma[c] += v;
+  }
+  const ext = mx.map((v, c) => v - mn[c]);
+  const eixo = ext.indexOf(Math.max(...ext));    // deve dar Y
+  eixoY = ext[eixo]; yApice = mn[eixo]; cx = soma[0] / n;
+  const ESC = 120 / eixoY;                       // milímetros por unidade
+
+  /* ── OS PESOS ────────────────────────────────────────────────────────────
+     t = 0 no ápice, 1 no topo. A massa ventricular ocupa a metade de baixo;
+     a base e os átrios, a faixa seguinte; os grandes vasos, o topo — e esses
+     ficam PARADOS, senão a aorta dança e denuncia o truque. */
+  pesoV = new Float32Array(n);
+  pesoA = new Float32Array(n);
+  pesoP = new Float32Array(n);   // a ponta, que avança e torce
+  /* AS FAIXAS DESCERAM. A atrial ia até 94% da altura, ou seja, mexia DENTRO
+     dos grandes vasos — e como o encurtamento também cresce com a altura, o
+     movimento inteiro se acumulava na extremidade de cima. Agora a massa
+     ventricular manda até ~63% — que é onde fica o sulco atrioventricular —,
+     o átrio ocupa a faixa 56–88% e para antes da aorta, e a ponta pesa até
+     45%. Descer demais tinha efeito colateral: o peso ventricular acabava
+     ANTES da base, e a base parava de descer (1,9 mm quando devia fazer 12
+     a 15). O movimento embaixo vem do soco da ponta, não de tirar o de cima. */
+  /* ── OS PESOS SE REPARTEM, NÃO SE SOMAM ────────────────────────────────
+     O peso ventricular ia até 72% e o atrial começava em 56%: dezesseis por
+     cento de altura em que o MESMO vértice obedecia às duas câmaras — e como
+     elas apertam em momentos diferentes, aquele anel se contraía DUAS VEZES
+     por ciclo. Na tela isso é uma extra-sístole atrial, e foi o professor
+     quem a viu antes de mim.
+
+     Agora `subir` é uma partilha: o que é do átrio o ventrículo não tem. A
+     passagem é estreita — 8% da altura, uns 10 mm — porque é a espessura do
+     sulco atrioventricular, e porque faixa larga é faixa que bate duas
+     vezes com meia força cada. */
+  for (let i = 0; i < n; i++) {
+    const t = (base[i * 3 + eixo] - yApice) / eixoY;
+    const subir = passo(t, .58, .66);          // 0 no ventrículo, 1 no átrio
+    const vaso  = passo(t, .80, .90);          // 1 já dentro dos grandes vasos
+    pesoV[i] = 1 - subir;
+    pesoA[i] = subir * (1 - vaso);
+    /* A PONTA ESTREITOU. Ia até 45% da altura, e nessa faixa toda o soco
+       brigava com o aperto radial: o ictus empurra o raio para fora
+       enquanto a contração o puxa para dentro, e o mínimo medido saía
+       atrasado. Agora é a ponta de verdade — até uns 26%. */
+    pesoP[i] = 1 - passo(t, .06, .26);
+  }
+  cena.add(malha);
+
+  const d = 120 / Math.tan(cam.fov * Math.PI / 360) * 1.12;
+  malha.geometry.computeBoundingBox();
+  const cen = malha.geometry.boundingBox.getCenter(new THREE.Vector3());
+  malha.geometry.translate(-cen.x, -cen.y, -cen.z);
+  base.set(malha.geometry.attributes.position.array);
+  yApice -= cen.y; cx -= cen.x;
+  malha.scale.setScalar(ESC);
+  cam.position.set(d * .16, d * .10, d * .96);
+  ctl.target.set(0, 0, 0); ctl.update();
+
+  /* DESENHA UMA VEZ À MÃO. O painel do navegador congela o requestAnimationFrame,
+     e se a única atualização estiver dentro do laço a página parece morta —
+     é a regra da casa, e eu já caí nela antes. */
+  medir();            // a proporção do canvas só existe depois do layout
+  aplicar(em(sim, fase));
+  r.render(cena, cam);
+}, undefined, e => {
+  document.getElementById('lfase').textContent = 'falhou ao carregar';
+  console.error('GLB não carregou', e);
+});
+
+/* ── o relógio, o mesmo da bancada ────────────────────────────────────── */
+let fc = 75, fase = 0, batendo = true, sim = simular(75);
+/* a faixa de volume do átrio, tirada do próprio ciclo — assim o topo obedece
+   ao motor em vez de a um número meu */
+let vaeMax = 1, vaeMin = 0;
+function medeAtrio() {
+  let a = -1e9, b = 1e9;
+  for (const q of sim.quadro) { if (q.vAE > a) a = q.vAE; if (q.vAE < b) b = q.vAE; }
+  vaeMax = a; vaeMin = b;
+}
+medeAtrio();
+const NOMES = { 'sistole atrial': 'sístole atrial', 'contracao isovolumetrica': 'contração isovolumétrica',
+  'ejecao': 'ejeção', 'relaxamento isovolumetrico': 'relaxamento isovolumétrico',
+  'enchimento': 'enchimento', 'diastase': 'diástase' };
+
+function aplicar(q) {
+  if (!malha) return;
+
+  /* ══════════════════════════════════════════════════════════════════════
+     ZERADO. Nenhum efeito atua sobre a malha: ela recebe as posições de
+     repouso, verbatim.
+
+     Isto é de propósito. A pergunta que motivou a limpeza foi boa: com sete
+     efeitos, três relógios e pesos que se cobriam, já não dava para dizer o
+     que estava sobreposto ao quê. Então a base volta a ser o repouso, e cada
+     efeito da tabela temporal entra UM DE CADA VEZ, medido antes do
+     seguinte. O que não estiver escrito abaixo desta linha não existe.
+     ══════════════════════════════════════════════════════════════════════ */
+  const pos = malha.geometry.attributes.position, a = pos.array;
+  a.set(base);
+
+  const amp = parseFloat($('amp').value);
+  const fA = (vaeMax - q.vAE) / Math.max(1e-6, vaeMax - vaeMin);   // 0 cheio, 1 vazio
+
+  /* ══ EFEITO 1 · A CONTRAÇÃO ATRIAL ══════════════════════════════════════
+     PESO: a faixa do átrio, que é a partilha `subir × (1 − vaso)` — o que é
+     do átrio o ventrículo não tem, e acima de 90% da altura já são os
+     grandes vasos, que não se mexem.
+     RELÓGIO: o volume atrial do motor, `vAE`, e mais nada. O átrio encolhe
+     quando esvazia e volta ao tamanho quando enche.
+     Sem atraso, sem torção, sem arrasto. Só isto. */
+  const apertaA = .17 * fA * amp;
+  for (let i = 0; i < pos.count; i++) {
+    const wa = pesoA[i];
+    if (wa < 1e-4) continue;
+    const j = i * 3, k = 1 - wa * apertaA;
+    a[j]     = cx + (base[j] - cx) * k;
+    a[j + 1] = base[j + 1] - wa * apertaA * eixoY * .05;
+    a[j + 2] = base[j + 2] * k;
+  }
+
+  /* ══ EFEITO 2 · A CONTRAÇÃO VENTRICULAR ═════════════════════════════════
+     PESO: a faixa do ventrículo, `1 − subir`.
+     RELÓGIO: o volume ventricular do motor, `vVE`, e SEM atraso — a onda
+     ápice→base é o efeito 3 e entra depois, medida sozinha.
+
+     Duas componentes da mesma contração, no mesmo relógio: o aperto radial
+     e o encurtamento do eixo longo, este ancorado dentro do ventrículo para
+     que a base desça e a ponta suba um pouco.
+
+     Enquanto o efeito 4 não entrar, o átrio vai ficar PENDURADO e a faixa do
+     sulco vai esticar. É o defeito que o arrasto do plano valvar conserta, e
+     é bom que ele apareça agora, sozinho e identificado, em vez de ser
+     descoberto depois no meio de sete coisas. */
+  /* ══ EFEITO 3 · A ONDA SOBE DA PONTA PARA A BASE ════════════════════════
+     Não é um efeito novo por cima do 2: é o RELÓGIO do efeito 2 deixando de
+     ser um só. Até aqui a massa ventricular inteira lia o mesmo instante e
+     apertava junta. Agora cada altura lê o seu.
+
+     O sinal DESCE — septo, His (150–170 ms), ramos (170–195) — mas o
+     Purkinje entrega primeiro na PONTA (195–215), e a contração se espalha
+     dali para cima (ventrículos 205–290 ms). O caminho elétrico desce; a
+     contração mecânica SOBE, porque tem de espremer o sangue para as valvas
+     de saída, que estão em cima. Contrair de cima para baixo empurraria
+     contra o ápice, que é fundo cego.
+
+     A ponta lê o instante de agora; a base lê o que a ponta fazia uns 85 ms
+     atrás. Cada vértice interpola entre as amostras pela sua altura. */
+  /* VINTE E QUATRO amostras, não seis. Com seis, a onda saía quantizada em
+     degraus: uma faixa que atravessasse vários deles marcava um mínimo local
+     em cada degrau, e a medida acusava quatro "contrações" onde havia uma.
+     Era artefato de amostragem, e ia acabar confundido com fisiologia. */
+  const ATRASOS = 24, SULCO = .62;
+  const atrasoBase = parseFloat($('onda').value) / 1000;
+  const rr = duracoes(fc).rr;
+  const ondaF = new Float64Array(ATRASOS), ondaG = new Float64Array(ATRASOS);
+  for (let k = 0; k < ATRASOS; k++) {
+    const atras = (k / (ATRASOS - 1)) * atrasoBase;
+    const qk = atras === 0 ? q : em(sim, (((fase - atras / rr) % 1) + 1) % 1);
+    ondaF[k] = Math.min(1.2, Math.max(0, (sim.vdf - qk.vVE) / Math.max(1, sim.vdf - sim.vsf)));
+    ondaG[k] = Math.min(1, Math.max(0, qk.ativacao));
+  }
+  const yAncora = yApice + eixoY * (parseFloat($('anc').value) / 100);
+  for (let i = 0; i < pos.count; i++) {
+    const wv = pesoV[i];
+    if (wv < 1e-4) continue;
+    const j = i * 3;
+    /* onde este vértice está na onda: 0 na ponta, 1 no sulco */
+    const u = Math.min(1, Math.max(0, ((base[j + 1] - yApice) / eixoY) / SULCO));
+    const kf = u * (ATRASOS - 1), k0 = Math.floor(kf), k1 = Math.min(ATRASOS - 1, k0 + 1);
+    const fv = ondaF[k0] + (ondaF[k1] - ondaF[k0]) * (kf - k0);
+    const aperta  = .075 * fv * amp;
+    const encurta = .13 * fv * amp;
+    const k = 1 - wv * aperta;
+    a[j]     = cx + (a[j] - cx) * k;
+    a[j + 1] = yAncora + (a[j + 1] - yAncora) * (1 - wv * encurta);
+    a[j + 2] = a[j + 2] * k;
+  }
+
+  /* ══ EFEITO 4 · O PLANO VALVAR DESCE E ARRASTA O ÁTRIO ══════════════════
+     PESO: a faixa do átrio.
+     RELÓGIO: o VENTRICULAR, na defasagem do sulco — porque quem puxa é a
+     base do ventrículo, não o átrio.
+
+     Aqui o átrio fica com dois relógios, e é correto: ele CONTRAI pelo
+     próprio músculo (relógio atrial, efeito 1) e é ARRASTADO pelo vizinho
+     (relógio ventricular, este). Duas causas, dois tempos.
+
+     E é translação, não contração — o raio do átrio não muda com isto. É
+     justamente esse estiramento que ajuda a enchê-lo com a mitral fechada:
+     o átrio é puxado para baixo e se abre. Sem o arrasto, a base descia e o
+     átrio ficava pendurado, esticando a faixa do sulco. */
+  const descida = (yApice + eixoY * SULCO - yAncora) * (.13 * ondaF[ATRASOS - 1] * amp);
+  for (let i = 0; i < pos.count; i++) {
+    const wa = pesoA[i];
+    if (wa < 1e-4) continue;
+    a[i * 3 + 1] -= wa * descida;
+  }
+
+  /* ══ EFEITO 5 · O CHOQUE DA PONTA ═══════════════════════════════════════
+     PESO: só a ponta, até ~26% da altura.
+     RELÓGIO: a ATIVAÇÃO, não o volume — e essa distinção é o ponto.
+
+     Na contração isovolumétrica o volume não muda por definição; se o soco
+     viesse do volume, ele daria zero exatamente na fase em que acontece. O
+     ventrículo fica tenso e mais esférico sem ejetar nada, e é esse instante
+     que se palpa no quinto espaço intercostal. O músculo gerando rigidez é
+     `ativacao`; o sangue saindo é o volume. O ápice obedece à primeira.
+
+     Direção: para a FRENTE (+Z), contra a parede do tórax. */
+  const impulso = parseFloat($('imp').value);
+  const ictus = .055 * eixoY * Math.min(1, Math.max(0, q.ativacao)) * amp * impulso;
+  for (let i = 0; i < pos.count; i++) {
+    const wp = pesoP[i];
+    if (wp < 1e-4) continue;
+    a[i * 3 + 2] += wp * ictus;
+  }
+
+  /* ══ EFEITO 6 · A TORÇÃO ════════════════════════════════════════════════
+     PESO: o ventrículo, e SÓ o ventrículo. Na versão anterior eu punha o
+     átrio a contra-girar com um termo `− wa·0,6`, comandado pela ativação
+     VENTRICULAR — não há razão fisiológica para o átrio torcer no compasso
+     do vizinho, e era uma das sobreposições que a auditoria apanhou.
+     RELÓGIO: a ativação, com o atraso da onda, como o resto do ventrículo.
+
+     O ventrículo se torce como quem espreme um pano: visto da ponta, o ápice
+     gira num sentido e a base no outro, e o zero fica no meio. É essa torção
+     que guarda energia na sístole e a devolve na diástole, ajudando a sucção
+     do enchimento rápido.
+
+     Rotação em torno do eixo longo NÃO muda o tamanho de faixa nenhuma — o
+     `raioFaixa` tem de sair idêntico. Se subir, este efeito está errado. */
+  const torcaoK = .10 * amp * impulso;
+  for (let i = 0; i < pos.count; i++) {
+    const wv = pesoV[i];
+    if (wv < 1e-4) continue;
+    const j = i * 3;
+    const u = Math.min(1, Math.max(0, ((base[j + 1] - yApice) / eixoY) / SULCO));
+    const kf = u * (ATRASOS - 1), k0 = Math.floor(kf), k1 = Math.min(ATRASOS - 1, k0 + 1);
+    const gv = ondaG[k0] + (ondaG[k1] - ondaG[k0]) * (kf - k0);
+    /* +1 na ponta, −1 no sulco: os dois extremos giram ao contrário */
+    const ang = torcaoK * gv * wv * (1 - 2 * u);
+    const c = Math.cos(ang), sn = Math.sin(ang);
+    const xr = a[j] - cx, zr = a[j + 2];
+    a[j]     = cx + xr * c - zr * sn;
+    a[j + 2] = xr * sn + zr * c;
+  }
+
+  pos.needsUpdate = true;
+  malha.geometry.computeVertexNormals();
+
+  /* o painel continua lendo o MOTOR, não a malha: os números abaixo são a
+     fisiologia, e ela não parou — quem parou foi o desenho. */
+  $('lfase').textContent = NOMES[faseDe(q, em(sim, (fase - .004 + 1) % 1))] || '—';
+  $('lvol').textContent = q.vVE.toFixed(0) + ' ml';
+  $('lvae').textContent = q.vAE.toFixed(0) + ' ml  (' + (fA * 100).toFixed(0) + '% esvaziado)';
+  $('lvdf').textContent = sim.vdf.toFixed(0) + ' / ' + sim.vsf.toFixed(0) + ' ml';
+  $('lfe').textContent = (sim.fracao * 100).toFixed(0) + '%';
+  $('lpa').textContent = sim.sistolica.toFixed(0) + '/' + sim.diastolica.toFixed(0) + ' mmHg';
+  const d = duracoes(fc);
+  $('ldur').textContent = (d.sistole * 1000).toFixed(0) + ' / ' + (d.diastole * 1000).toFixed(0) + ' ms';
+  $('lenc').textContent = (.13 * ondaF[0] * amp * 120).toFixed(1) + ' mm (na ponta)';
+  $('lict').textContent = (ictus / eixoY * 120).toFixed(1) + ' mm para a frente';
+}
+
+$('bpm').addEventListener('input', e => {
+  fc = parseInt(e.currentTarget.value, 10);
+  $('vbpm').textContent = fc;
+  sim = simular(fc);
+  medeAtrio();
+  desenhaAgora();
+});
+$('lento').addEventListener('input', e => { $('vlento').textContent = (+e.currentTarget.value).toFixed(2); });
+$('amp').addEventListener('input', e => { $('vamp').textContent = (+e.currentTarget.value).toFixed(2); });
+$('imp').addEventListener('input', e => { $('vimp').textContent = (+e.currentTarget.value).toFixed(2); desenhaAgora(); });
+$('amp').addEventListener('input', () => desenhaAgora());
+$('onda').addEventListener('input', e => { $('vonda').textContent = e.currentTarget.value; desenhaAgora(); });
+$('anc').addEventListener('input', e => { $('vanc').textContent = e.currentTarget.value; desenhaAgora(); });
+$('parar').onclick = e => { batendo = !batendo; e.currentTarget.textContent = batendo ? 'Parar' : 'Bater'; };
+
+/* o painel do navegador congela o rAF: todo controle desenha por conta propria */
+function desenhaAgora() { aplicar(em(sim, fase)); r.render(cena, cam); }
+window.desenhaAgora = desenhaAgora;
+window.poeFase = f => { fase = f; desenhaAgora(); };
+/* diagnóstico: quanto cada faixa de altura anda, em mm, na fase atual */
+/* o RAIO de cada faixa: muda quando a peça CONTRAI, e não muda quando ela
+   apenas desce. É a medida que separa contração de translação — e é a que
+   diz se um anel está batendo duas vezes. */
+window.raioFaixa = () => {
+  const pos = malha.geometry.attributes.position, a = pos.array, N = 10;
+  const ESC = 120 / eixoY;
+  /* DUAS PASSAGENS, e a primeira é o conserto. Medir o raio contra o eixo do
+     MODELO confunde translação com contração: o ictus empurra a ponta para a
+     frente e a distância ao eixo muda sem a peça mudar de tamanho — o
+     instrumento acusava três contrações onde havia uma. Agora cada faixa é
+     medida contra o SEU PRÓPRIO centro, que anda com ela. Assim a medida
+     responde só a tamanho, que é o que ela promete. */
+  const sx = new Array(N).fill(0), sz = new Array(N).fill(0), conta = new Array(N).fill(0);
+  const faixa = new Int32Array(pos.count);
+  for (let i = 0; i < pos.count; i++) {
+    const j = i * 3;
+    const k = Math.min(N - 1, Math.max(0, Math.floor(((base[j + 1] - yApice) / eixoY) * N)));
+    faixa[i] = k; sx[k] += a[j]; sz[k] += a[j + 2]; conta[k]++;
+  }
+  const soma = new Array(N).fill(0);
+  for (let i = 0; i < pos.count; i++) {
+    const j = i * 3, k = faixa[i];
+    soma[k] += Math.hypot(a[j] - sx[k] / conta[k], a[j + 2] - sz[k] / conta[k]) * ESC;
+  }
+  return soma.map((v, k) => conta[k] ? +(v / conta[k]).toFixed(2) : 0);
+};
+window.perfilMovimento = () => {
+  const pos = malha.geometry.attributes.position, a = pos.array, N = 10;
+  const soma = new Array(N).fill(0), conta = new Array(N).fill(0);
+  const ESC = 120 / eixoY;
+  for (let i = 0; i < pos.count; i++) {
+    const j = i * 3;
+    const t = (base[j + 1] - yApice) / eixoY;
+    const k = Math.min(N - 1, Math.max(0, Math.floor(t * N)));
+    soma[k] += Math.hypot(a[j] - base[j], a[j+1] - base[j+1], a[j+2] - base[j+2]) * ESC;
+    conta[k]++;
+  }
+  return soma.map((v, k) => ({ faixa: (k*10) + '-' + (k*10+10) + '%',
+    mm: conta[k] ? +(v / conta[k]).toFixed(1) : 0 }));
+};
+
+let antes = performance.now();
+r.setAnimationLoop(agora => {
+  const dt = Math.min(.1, (agora - antes) / 1000); antes = agora;
+  if (batendo) fase = (fase + dt / duracoes(fc).rr * parseFloat($('lento').value)) % 1;
+  aplicar(em(sim, fase));
+  ctl.update();
+  r.render(cena, cam);
+});
+</script>
+</body>
+</html>

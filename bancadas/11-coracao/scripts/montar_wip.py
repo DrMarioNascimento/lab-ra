@@ -54,9 +54,92 @@ def ler_obj(path: Path):
 
 
 def transformar(v, apice):
+    """BodyParts3D nativo e LPS: x = esquerda do paciente, y = posterior,
+    z = superior. LPS e DESTRO.
+
+    A spec da bancada pede (x = esquerda, y = superior, z = ANTERIOR), que
+    tambem e destro. A versao anterior devolvia (x, z, y): trocava dois eixos
+    SEM inverter sinal, o que da determinante -1 -- sistema CANHOTO. O modelo
+    saia espelhado, com frente e fundo trocados, e o ventriculo direito
+    aparecia ATRAS do esquerdo quando ele e a camara ANTERIOR.
+
+    O sinal de menos no terceiro termo conserta as duas coisas de uma vez:
+    restaura a destreza e poe +Z na frente, que e o que a spec pede.
+    """
     ax, ay, az = apice
     x, y, z = v
-    return (x - ax, z - az, y - ay)
+    return (x - ax, z - az, ay - y)
+
+
+# ---------------------------------------------------------------- aparar
+# O QUE E DEMAIS. O BodyParts3D entrega o vaso INTEIRO: a cava inferior desce
+# ate a bifurcacao iliaca, 23 cm abaixo do apice, e sozinha triplicava a caixa
+# do modelo -- qualquer enquadramento automatico deixava o coracao minusculo
+# num canto. O arco aortico e a cava superior tambem sobem alem do que a
+# bancada mostra.
+#
+# Corta-se pelo CENTROIDE do triangulo, nao pelos vertices: assim a borda sai
+# limpa, sem lascas de triangulos meio dentro e meio fora. Os vasos ja sao
+# tubos abertos, entao a ponta aparada nao precisa de tampa.
+#
+# Os dois numeros ficam aqui em cima, com nome, para serem ajustados olhando
+# a tela em vez de cacados no meio do codigo.
+# Os limites saem da MEDIDA do outro modelo, o scan realista, que e a
+# referencia de proporcao: ele tem 120 mm do apice ao topo e nao tem nada
+# abaixo do apice. Entao a cava inferior fica so com o coto de entrada, e o
+# arco para na mesma altura em que o scan termina.
+#
+# Nao precisa ser cirurgico: e para reuniao didatica. O que precisa e caber
+# no mesmo enquadramento do outro sem parecer outra escala.
+# ---------------------------------------------------------------- remover
+# PECAS QUE SAEM DA CENA. Nao e escolha anatomica, e de enquadramento: estes
+# vasos saltavam do modelo e o desequilibravam ao lado do scan realista.
+#
+#   tronco_pulmonar, cava superior e cava inferior -- os tubos azuis, que
+#   partiam para fora e dobravam a largura do modelo;
+#
+#   arco_aortico -- e este tem um motivo a mais. O arco corre na HORIZONTAL,
+#   e aparar por altura o fatiava no comprimento em vez de corta-lo atraves:
+#   virava uma fita chata em vez de um tubo. Como a aorta ascendente e o arco
+#   sao pecas separadas, apagar o arco corta a aorta exatamente na juncao --
+#   o "encaixe" que se ve no modelo.
+#
+# Sao pecas NOMEADAS que saem, e por nome: nada de apagar por cor ou por
+# tamanho, que amanha pega outra coisa.
+REMOVER = {
+    "tronco_pulmonar",
+    "veia_cava_superior",
+    "veia_cava_inferior",
+    "arco_aortico",
+    # As CAVIDADES ficaram. Chegamos a remove-las para ver o esqueleto por
+    # dentro, e o exercicio valeu -- foi ele que revelou que a parede
+    # ventricular existe, arquivada com nome de atrio. Mas isso e assunto de
+    # outra rodada; aqui elas voltam.
+}
+
+APARAR_ABAIXO = -4.0     # mm; so o coto de entrada da cava, nada de iliaca
+APARAR_ACIMA = 120.0     # mm; a altura do scan, para os dois se enquadrarem igual
+
+
+def aparar(verts, faces):
+    """Remove os triangulos cujo centroide caia fora da caixa, e compacta."""
+    # POR VERTICE, e nao pelo centroide. As malhas do BodyParts3D vem reduzidas
+    # a 99%: os triangulos sao enormes, e um triangulo com centroide dentro do
+    # limite podia ter vertice 26 mm fora dele. Cortando por vertice o limite
+    # e garantido; a borda fica um pouco irregular, mas os vasos sao tubos de
+    # secao quase circular, entao o corte cai perto de um anel.
+    manter = []
+    for f in faces:
+        ys = (verts[f[0]][1], verts[f[1]][1], verts[f[2]][1])
+        if APARAR_ABAIXO <= min(ys) and max(ys) <= APARAR_ACIMA:
+            manter.append(f)
+    if len(manter) == len(faces):
+        return verts, faces, 0
+    usados = sorted({i for f in manter for i in f})
+    novo = {v: k for k, v in enumerate(usados)}
+    return ([verts[i] for i in usados],
+            [(novo[a], novo[b], novo[c]) for a, b, c in manter],
+            len(faces) - len(manter))
 
 
 def apice_ve(verts_cavidade):
@@ -133,6 +216,7 @@ def montar():
     cav_path = OBJ / "FJ2422.obj"
     if not cav_path.exists():
         raise SystemExit(f"falta {cav_path} — rode baixar_bodyparts3d.py")
+    aparados = []
     cav_v, _, cav_meta = ler_obj(cav_path)
     apice = apice_ve(cav_v)
 
@@ -147,6 +231,15 @@ def montar():
     for peca in ordem:
         if peca["nome"] == "ramos_coronarios_nao_nomeados_um_a_um":
             continue
+        if peca["nome"] in REMOVER:
+            # MARCAR COMO USADOS, senao a peca volta pela porta dos fundos: o
+            # laco seguinte varre os FJ orfaos do coracao e readiciona os
+            # arquivos que ninguem reclamou, com nome de FJ####. Removida por
+            # nome, a cavidade reentrava por codigo -- e a contagem de
+            # triangulos nao mudava um digito, o que quase passou batido.
+            for fj in fjs_da_peca(peca, elems):
+                usados.add(fj)
+            continue
         for fj in fjs_da_peca(peca, elems):
             if fj in usados:
                 continue
@@ -154,7 +247,13 @@ def montar():
             if not got:
                 continue
             usados.add(fj)
-            malhas.append((peca["nome"], peca, fj, *got))
+            v2, f2, m2 = got
+            v2, f2, cortados = aparar(v2, f2)
+            if not f2:
+                continue
+            if cortados:
+                aparados.append((peca["nome"], fj, cortados))
+            malhas.append((peca["nome"], peca, fj, v2, f2, m2))
 
     # ramos coronários restantes do coração
     resto = [fj for fj in elems.get("FMA7088", []) if fj not in usados]
@@ -163,6 +262,11 @@ def montar():
         got = pega(fj)
         if not got:
             continue
+        gv, gf, gm = got
+        gv, gf, gcort = aparar(gv, gf)
+        if not gf:
+            continue
+        got = (gv, gf, gm)
         bn = menor_nome(fj, fjmap) or {"en": "unlisted element", "fma": "", "n": 99}
         en = bn["en"].lower()
         if any(k in en for k in ("coronary", "cardiac vein", "circumflex", "interventricular", "marginal", "diagonal", "conus", "sinus")):
