@@ -167,3 +167,76 @@ test("as ondas do traçado caem onde a condução está passando", async () => {
   assert.ok(tR >= vent.de - .02 && tR <= vent.ate, `R em ${tR.toFixed(3)}s, ventrículos de ${vent.de} a ${vent.ate}`);
   assert.ok(estruturaAtiva(.005).includes("sinusal"), "o nó sinusal começa o ciclo");
 });
+
+/* ==========================================================================
+   O desenho, e as três coisas que ele já mentiu
+   ========================================================================== */
+
+test("o card 11 leva ao coração", async () => {
+  const hub = await texto("bancadas.html");
+  assert.ok(hub.includes('data-number="11"'));
+  assert.ok(hub.includes('href="coracao/"'));
+});
+
+test("a bancada está protegida e traz o caminho de RA das irmãs", async () => {
+  const page = await texto("coracao/index.html");
+  assert.ok(page.includes("data-ra-protected"));
+  assert.ok(page.includes('ar-modes="webxr scene-viewer quick-look"'));
+});
+
+test("A GEOMETRIA NÃO IMPORTA A FÍSICA", async () => {
+  /* geometria não decide número: é essa separação que permitiu afinar o ciclo
+     contra o livro sem abrir navegador nenhum */
+  const m = await texto("coracao/modelos.js");
+  assert.ok(!m.includes("from './fisica.js'"));
+});
+
+test("a câmara tem parede EXTERNA e INTERNA separadas", async () => {
+  /* a espessura é a informação: 10 mm no esquerdo contra 3 no direito é a
+     resposta inteira à diferença de pressão entre os dois lados */
+  const m = await texto("coracao/modelos.js");
+  assert.ok(m.includes("function camaraDupla"));
+  assert.ok(m.includes("g.userData = { externa, interna, espessura }"));
+  assert.ok(m.includes("camaraDupla(perfilVentriculo(26, 78), 10"), "esquerdo com 10 mm");
+  assert.ok(m.includes("3.4"), "direito bem mais fino");
+});
+
+test("a cavidade é invertida na GEOMETRIA, e não no material", async () => {
+  /* o glTF descarta `side` e o USDZ do iPhone descarta até o `doubleSided` */
+  const m = await texto("coracao/modelos.js");
+  assert.ok(m.includes("interna.geometry = peloAvesso(interna.geometry)"));
+  const semComentario = m.replace(/\/\*[\s\S]*?\*\//g, "");
+  assert.ok(!/side:\s*THREE\.(Back|Double)Side/.test(semComentario));
+});
+
+test("A CORONÁRIA CORRE NA SUPERFÍCIE, e não dentro da carne", async () => {
+  /* na primeira foto elas simplesmente não apareciam: desenhadas em
+     coordenadas soltas, o miocárdio as engoliu */
+  const m = await texto("coracao/modelos.js");
+  assert.ok(m.includes("function naSuperficie"));
+  assert.ok(m.includes("raioExterno(y) + folga"));
+});
+
+test("o relógio é UM SÓ: nenhuma vista guarda tempo próprio", async () => {
+  /* É o pedido inteiro. Se houvesse um segundo contador, a sincronia entre
+     condução, válvulas e fluxo seria encenação — três animações combinadas
+     por mim — em vez de três leituras do mesmo instante.
+
+     Eu procurava `^let fase` e a fase é declarada junto com outras variáveis:
+     o padrão estava errado, não o código. O que importa medir é quantos
+     lugares ADIANTAM o relógio. */
+  const app = await texto("coracao/app.js");
+  const avanca = (app.match(/fase = \(fase \+/g) || []).length;
+  assert.equal(avanca, 1, `o relógio é adiantado em ${avanca} lugares`);
+  assert.ok(app.includes("const q = em(sim, fase)"), "as três leituras saem do mesmo quadro");
+  /* e o quadro é um só: volumes, válvulas e condução leem o mesmo `q` */
+  for (const chamada of ["aplicarVolumes(q.vVE", "aplicarValvas({ mitral: q.mitral", "aplicarConducao(estruturaAtiva(q.t))"])
+    assert.ok(app.includes(chamada), `falta ${chamada}`);
+});
+
+test("a bancada abre parada, pelo endereço", async () => {
+  const app = await texto("coracao/app.js");
+  for (const chave of ["nivel", "fc", "fase"]) {
+    assert.ok(app.includes(`busca.get('${chave}')`), `falta ?${chave}=`);
+  }
+});
