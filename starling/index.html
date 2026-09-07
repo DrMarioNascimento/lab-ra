@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="pt-BR" data-ra-protected>
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" href="../brand/orientador.webp" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#050a06" />
+  <title>Forças de Starling · Laboratório do Pesquisar RA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=IBM+Plex+Mono:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../laboratorio.css" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="../guard.js"></script>
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"}}</script>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.1.0/dist/model-viewer.min.js"></script>
+</head>
+<body>
+<header class="topbar"><nav class="nav shell" aria-label="Laboratório"><a class="brand" href="../bancadas.html"><img src="../brand/orientador.webp" alt="" width="42" height="42"><span class="brand-copy"><b>LABORATÓRIO DO PESQUISAR RA</b><span>Fisiologia · Unidade IV</span></span></a><div class="nav-actions"><a class="small-button" href="../bancadas.html">Testes</a></div></nav></header>
+<main class="page shell">
+  <div class="page-head"><div><span class="eyebrow">Teste 09 · Unidade IV · microcirculação</span><h1>Forças de Starling</h1></div><a class="back-link" href="../bancadas.html">← Voltar</a></div>
+  <p class="page-note">Quatro forças decidem se a água sai do capilar ou volta para ele, e o que decide não é nenhuma delas: é a soma. Ela dá +13 mmHg na ponta arteriolar, −​7 na venular, e troca de sinal a 65% do caminho. Puxe a albumina para baixo e veja o ponto de virada correr até sair do capilar — a partir daí filtra do começo ao fim, e o interstício encharca. Edema não é filtrar demais: é filtrar mais do que a linfa dá conta de levar.</p>
+
+  <section class="experience" aria-label="Exploração tridimensional da microcirculação">
+    <div id="stage" class="stage" role="img" aria-label="Modelo tridimensional interativo">
+      <canvas id="scene"></canvas>
+      <div class="stage-hud"><span id="estadoLabel">Normal</span><span id="somaLabel">vira a 65% do capilar</span><span id="stepLabel">01 · A rede</span></div>
+      <div class="gesture">Arraste para girar · pinça/roda para aproximar</div>
+      <div class="stage-tools">
+        <button id="resetView" class="ghost-control" type="button">Recentrar</button>
+      </div>
+    </div>
+
+    <aside class="panel">
+      <div class="progress" aria-label="Níveis"><button class="step active" data-step="0" type="button"><b>01</b><span>A rede</span></button><button class="step" data-step="1" type="button"><b>02</b><span>O capilar</span></button><button class="step" data-step="2" type="button"><b>03</b><span>As forças</span></button><button class="step" data-step="3" type="button"><b>04</b><span>A alavanca</span></button><button class="step" data-step="4" type="button"><b>05</b><span>O edema</span></button></div>
+
+      <article class="info-card" id="infoCard">
+        <span class="eyebrow" id="infoEyebrow">A pergunta</span>
+        <h2 id="infoTitle">Onde a gravidade aperta?</h2>
+        <p id="infoText"></p>
+        <div class="microtags" id="microtags"></div>
+      </article>
+
+      <div class="actions"><button id="prev" class="secondary" type="button" disabled>← Voltar</button><button id="next" class="primary" type="button">Aprofundar →</button></div>
+
+      <section class="caixa" aria-label="Causas">
+        <div class="caixa-head"><span class="eyebrow">O que empurra o equilíbrio</span></div>
+        <div class="causas" id="causas"></div>
+      </section>
+
+      <section class="caixa" id="caixaForcas" aria-label="As quatro forças" hidden>
+        <div class="caixa-head">
+          <span class="eyebrow">A soma ao longo do capilar</span>
+          <div class="caixa-btns"><button id="reporOnc" type="button">Repor albumina</button></div>
+        </div>
+        <label class="ctrl"><span>Oncótica do plasma <b><span id="lOnc">28</span> mmHg</b></span>
+          <input id="oncCursor" type="range" min="4" max="34" step="1" value="28" aria-label="Pressão oncótica do plasma" /></label>
+        <ul class="leituras">
+          <li>ponta arteriolar <b><span id="lArterial">+13</span> mmHg</b></li>
+          <li>ponta venular <b><span id="lVenular">-7</span> mmHg</b></li>
+          <li>média no capilar <b><span id="lMedia">+3.0</span> mmHg</b></li>
+          <li>ponto de virada <b><span id="lVirada">65%</span></b></li>
+        </ul>
+        <canvas id="curvaSoma" width="330" height="180" aria-label="Pressão líquida ao longo do capilar"></canvas>
+      </section>
+
+      <section class="caixa" id="caixaEdema" aria-label="O edema" hidden>
+        <div class="caixa-head">
+          <span class="eyebrow">Linfa e acúmulo</span>
+          <div class="caixa-btns"><button id="zerar" type="button">Zerar</button><button id="correr" type="button">Correr o relógio</button></div>
+        </div>
+        <ul class="leituras">
+          <li>a linfa leva <b><span id="lLinfa">3.6 ml/h</span></b></li>
+          <li>sobra e acumula <b><span id="lAcumula">nada</span></b></li>
+          <li>no interstício, após <b><span id="lMinutos">0</span> min</b> <b><span id="lEdema">0.0</span> ml</b></li>
+        </ul>
+        <div class="barra"><i id="barraEdema"></i></div>
+      </section>
+
+      <section class="ra-box" aria-label="Realidade aumentada">
+        <model-viewer id="arViewer" alt="Modelo da microcirculação em realidade aumentada" ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" ar-scale="fixed" camera-controls loading="eager" reveal="auto" shadow-intensity="1" exposure="1.1"></model-viewer>
+        <button id="launchAR" class="ra-launch" type="button" disabled>Colocar este nível no ambiente</button>
+        <p id="raStatus" class="ra-status">Preparando o modelo para a câmera…</p>
+      </section>
+    </aside>
+  </section>
+</main>
+<footer class="rodape shell"><img src="../brand/mestre-lap.webp" alt="" width="84" height="84"><p>Simuladores interativos do Prof. Mário César Nascimento, PhD ©</p></footer>
+<script type="module" src="app.js"></script>
+</body>
+</html>

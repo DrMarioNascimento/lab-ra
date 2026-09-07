@@ -140,3 +140,11 @@
 .degraus li { display: flex; justify-content: space-between; gap: 8px; }
 .degraus b { color: #ffe066; }
 .degraus span { color: #f2f7ec; }
+
+/* ---- o que a bancada 09 acrescenta ---- */
+.causas { display: flex; flex-wrap: wrap; gap: 6px; }
+.causas button { font: inherit; font-size: .78rem; font-weight: 600; padding: 7px 11px;
+                 border-radius: 999px; border: 1px solid #1f6b33; background: #101a12; color: #b0c4ac; }
+.causas button.on { background: #f5c518; color: #131d15; border-color: #f5c518; }
+.barra { height: 14px; border-radius: 7px; background: #131d15; overflow: hidden; border: 1px solid #1f6b33; }
+.barra i { display: block; height: 100%; width: 0; background: linear-gradient(90deg,#4684d6,#9fd8f2); }
