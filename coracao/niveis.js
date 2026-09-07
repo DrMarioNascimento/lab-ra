@@ -59,11 +59,14 @@ export const NIVEIS = [
   {
     rotulo: 'Por dentro',
     comValvas: true,
-    comCoronarias: true,
+    /* as coronárias correm POR FORA e, com o cunho aberto, cruzavam a
+       abertura como grades por cima da cavidade. Elas já têm o nível 01
+       inteiro para si; aqui o assunto é o que há dentro. */
+    comCoronarias: false,
     comConducao: false,
     corte: true,
     revelarValvas: false,
-    foco: 'inteiro',
+    foco: 'corte',
     faseRA: null,
   },
   {

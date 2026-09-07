@@ -326,6 +326,30 @@ test("o nível chamado 'As válvulas' de fato revela as válvulas", async () => 
   assert.ok(app.includes("alvoDaCamera"), "a câmera deixa de apontar sempre à origem");
 });
 
+test("o nível do corte olha a face de FRENTE, e não de perfil", async () => {
+  /* A face do corte SEMPRE esteve desenhada: pintada de verde numa cópia
+     descartável, ela aparece como faixa larga e sólida. O que a escondia era
+     o ângulo — em +13° de azimute a câmera olhava quase dentro do plano do
+     cunho, e uma superfície vista de perfil vira linha. Os 10 mm contra 3,4,
+     que são a lição inteira do nível, encolhiam a três pixels. Era óptica, e
+     não geometria; por isso a regra aqui é sobre o SINAL do azimute, e não
+     sobre a face existir. */
+  const i = NIVEIS.findIndex(n => n.foco === "corte");
+  assert.ok(i >= 0, "existe um nível cujo foco é o corte");
+  assert.equal(i, 1, "é o nível 02 (índice 1)");
+  assert.ok(NIVEIS[i].corte, "e ele de facto abre a cunha");
+  assert.equal(NIVEIS[i].comCoronarias, false,
+    "as coronárias correm por fora e cruzavam a abertura como grades");
+
+  const app = await texto("coracao/app.js");
+  assert.ok(app.includes("foco === 'corte'") || app.includes('foco === "corte"'),
+    "enquadrar() trata o foco do corte");
+  assert.ok(/camera\.position\.set\(alvo\.x \+ d \* \.22/.test(app),
+    "o enquadramento padrão continua do lado positivo");
+  assert.ok(/camera\.position\.set\(alvo\.x - d \* \.\d+/.test(app),
+    "e o do corte vai para o lado OPOSTO — senão a face volta a ser linha");
+});
+
 test("o lado direito tem vazão própria, e não copia o esquerdo", async () => {
   /* qTri e qPulm já se integravam no volume, mas o quadro só guardava
      qMitral/qAortica. O app improvisava: gotas direitas andavam com o

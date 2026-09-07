@@ -91,11 +91,25 @@ function enquadrar(n) {
   /* o plano valvar pede um recorte, não um mergulho: zoom 0,58 deixava a
      câmera dentro da parede e as quatro cúspides sumiam num close-up */
   const valvas = NIVEIS[n].foco === 'valvas';
+  const corte = NIVEIS[n].foco === 'corte';
   const zoom = valvas ? .88 : 1.12;
   const d = raio[n] / Math.tan(camera.fov * Math.PI / 360) * zoom;
   if (valvas) {
     controls.target.set(alvo.x, alvo.y - 2, alvo.z + 10);
     camera.position.set(alvo.x + d * .10, alvo.y + d * .20, alvo.z + d * 1.02);
+  } else if (corte) {
+    /* UMA SUPERFÍCIE VISTA DE PERFIL VIRA LINHA. A face do corte sempre
+       esteve desenhada — pintei-a de verde numa cópia para conferir —, mas o
+       ângulo padrão (azimute +13°) olhava quase dentro do plano do cunho e a
+       faixa da espessura encolhia a três pixels. Os 10 mm contra 3,4, que são
+       a lição inteira deste nível, estavam sendo jogados fora pela óptica e
+       não pela geometria.
+
+       Em −22° a faixa abre E a cavidade continua à vista. Em −40° a faixa
+       fica ainda mais larga, mas aí se perde o que há dentro — e o nível se
+       chama "por dentro". */
+    controls.target.copy(alvo);
+    camera.position.set(alvo.x - d * .36, alvo.y + d * .14, alvo.z + d * .90);
   } else {
     controls.target.copy(alvo);
     camera.position.set(alvo.x + d * .22, alvo.y + d * .14, alvo.z + d * .94);
