@@ -4,9 +4,12 @@ import { readFile } from "node:fs/promises";
 import {
   P, CONDUCAO, ATRASO_ELETROMECANICO, duracoes, simular, em, ecg,
   faseDe, tempoPorFase, tempoDiastolicoPorMinuto, estruturaAtiva,
-  faseDeSnapshotRA,
+  faseDeSnapshotRA, bulhas,
 } from "../coracao/fisica.js";
-import { NIVEIS, nivelRevelaValvas } from "../coracao/niveis.js";
+import {
+  NIVEIS, nivelRevelaValvas, PLANO_VALVAR, TOPO_VE, TOPO_VD,
+  TOLERANCIA_JUNCAO_MM, SUBIR_PLANO, VENTRICULO_DA_VALVA,
+} from "../coracao/niveis.js";
 
 const texto = p => readFile(new URL(`../${p}`, import.meta.url), "utf8");
 const perto = (v, alvo, folga, oq) =>
@@ -49,7 +52,8 @@ test("as fases duram o que o livro diz", async () => {
   perto(ms("contracao isovolumetrica"), 50, 12, "contração isovolumétrica");
   perto(ms("ejecao"), 220, 25, "ejeção");
   perto(ms("sistole atrial"), 85, 20, "sístole atrial");
-  assert.ok(ms("enchimento") > 250, "o enchimento é a fase mais longa");
+  assert.ok(ms("enchimento") + ms("diastase") > 250,
+    "o enchimento (com a diástase) é a fase mais longa");
 });
 
 test("AS FASES ISOVOLUMÉTRICAS EMERGEM: o volume não muda nelas", async () => {
@@ -70,12 +74,14 @@ test("AS FASES ISOVOLUMÉTRICAS EMERGEM: o volume não muda nelas", async () => 
 
 test("as válvulas são comparação de pressão, e não roteiro", async () => {
   const src = await texto("coracao/fisica.js");
-  assert.ok(src.includes("decide(mitral, pAE - pVE)"), "a mitral compara átrio com ventrículo");
+  assert.ok(src.includes("decideAV(mitral, pAE - pVE, aVent)"), "a mitral compara átrio com ventrículo");
   assert.ok(src.includes("decide(aortica, pVE - pAo)"), "a aórtica compara ventrículo com aorta");
   /* e no ciclo inteiro isso tem de valer, quadro a quadro, com a folga da
-     inércia do folheto */
+     inércia do folheto. Durante o relaxamento atrial a AV pode ficar aberta
+     com gradiente invertido miúdo — é a histerese que impede o B1 falso. */
   for (const q of s75.quadro) {
-    if (q.mitral) assert.ok(q.pAE > q.pVE - P.limiarValva - 1e-6, "mitral aberta com gradiente invertido");
+    if (q.mitral && q.ativacao > 0)
+      assert.ok(q.pAE > q.pVE - P.limiarValva - 1e-6, "mitral aberta com gradiente invertido na sístole");
     if (q.aortica) assert.ok(q.pVE > q.pAo - P.limiarValva - 1e-6, "aórtica aberta com gradiente invertido");
   }
 });
@@ -206,7 +212,7 @@ test("a câmara tem parede EXTERNA e INTERNA separadas", async () => {
   const m = await texto("coracao/modelos.js");
   assert.ok(m.includes("function camaraDupla"));
   assert.ok(m.includes("g.userData = { externa, interna, espessura }"));
-  assert.ok(m.includes("camaraDupla(perfilVentriculo(26, 78), 10"), "esquerdo com 10 mm");
+  assert.ok(m.includes("camaraDupla(perfilVentriculo(26, ALTURA_VE), 10"), "esquerdo com 10 mm");
   assert.ok(m.includes("3.4"), "direito bem mais fino");
 });
 
@@ -291,9 +297,9 @@ test("O SANGUE NÃO ATRAVESSA VALVA FECHADA", async () => {
 
 test("o nível chamado 'As válvulas' de fato revela as válvulas", async () => {
   /* nome ↔ o que a cena constrói. O nível 03 já se chamava "As válvulas" e
-     montava o coração opaco inteiro: cúspides a y≈53–60, raio 10–15 mm,
-     engolidas pelo miocárdio. Se o rótulo promete válvulas, a config tem de
-     cortar / tornar o músculo transparente / enquadrar o plano valvar. */
+     montava o coração opaco inteiro: cúspides no meio do cone, engolidas
+     pelo miocárdio. Se o rótulo promete válvulas, a config tem de cortar /
+     tornar o músculo transparente / enquadrar o plano valvar. */
   const i = NIVEIS.findIndex(n => /v[áa]lvulas/i.test(n.rotulo));
   assert.ok(i >= 0, "existe um nível cujo nome fala de válvulas");
   assert.equal(i, 2, "é o nível 03 (índice 2)");
@@ -301,11 +307,19 @@ test("o nível chamado 'As válvulas' de fato revela as válvulas", async () => 
   assert.ok(nivelRevelaValvas(i), "a config expõe as valvas, não só as nomeia");
   assert.ok(NIVEIS[i].corte, "o corte abre a cunha até o plano valvar");
   assert.ok(NIVEIS[i].revelarValvas, "o miocárdio não pode ficar opaco por cima");
+  assert.ok(NIVEIS[i].vidrarGrandesVasos,
+    "aorta e tronco pulmonar entram no vidro — opacos, tapam as cúspides");
   assert.equal(NIVEIS[i].foco, "valvas", "a câmera enquadra o plano valvar");
 
   const m = await texto("coracao/modelos.js");
   assert.ok(m.includes("NIVEIS.map"), "criar() monta a cena a partir da tabela");
   assert.ok(m.includes("revelarValvas: n.revelarValvas"), "e passa o revelar");
+  assert.ok(m.includes("vidrarGrandesVasos: n.vidrarGrandesVasos"),
+    "e passa o vidro dos grandes vasos");
+  assert.ok(m.includes("vidrar(vasos"),
+    "os grandes vasos estão no conjunto translúcido daquele nível");
+  assert.ok(m.includes("o.material = o.material.clone()"),
+    "vidrar clona o material — o vidro não vaza para os outros níveis");
   const app = await texto("coracao/app.js");
   assert.ok(app.includes("foco === 'valvas'") || app.includes('foco === "valvas"'),
     "enquadrar() trata o foco das válvulas");
@@ -381,4 +395,48 @@ test("o snapshot de RA do nível das válvulas escolhe a diástole, não um acas
   const app = await texto("coracao/app.js");
   assert.ok(app.includes("faseDeSnapshotRA"), "prepararRA usa a fase pedagógica");
   assert.ok(app.includes("aplicarQuadro"), "e aplica o quadro no clone, não na cena viva");
+});
+
+test("o plano valvar senta no teto da massa ventricular", async () => {
+  /* raiz: o cone ia a y=78 e os anéis a y≈53–60. SUBIR_PLANO = 18 mm põe
+     as valvas na junção. Tolerância documentada: 8 mm. */
+  assert.equal(SUBIR_PLANO, 18);
+  for (const [nome, pos] of Object.entries(PLANO_VALVAR)) {
+    const topo = VENTRICULO_DA_VALVA[nome] === "vd" ? TOPO_VD : TOPO_VE;
+    const folga = Math.abs(pos[1] - topo);
+    assert.ok(folga <= TOLERANCIA_JUNCAO_MM,
+      `${nome} em y=${pos[1]}, teto ${VENTRICULO_DA_VALVA[nome]}=${topo}, folga ${folga} > ${TOLERANCIA_JUNCAO_MM}`);
+  }
+  const ys = Object.values(PLANO_VALVAR).map(p => p[1]);
+  assert.ok(Math.min(...ys) >= 71 && Math.max(...ys) <= 78,
+    `banda dos anéis ${Math.min(...ys)}–${Math.max(...ys)}, documentada 71–78`);
+  const m = await texto("coracao/modelos.js");
+  assert.ok(m.includes("PLANO_VALVAR.mitral"), "o corpo lê o plano da tabela, não números soltos");
+  assert.ok(m.includes("vasos.position.y = SUBIR_PLANO"), "a origem dos vasos sobe com o plano");
+});
+
+test("há exatamente um B1 e um B2 por ciclo, de 40 a 200 bpm", async () => {
+  /* Dois defeitos velhos: B1 falso no relaxamento atrial, e B2 sumindo a
+     150 bpm porque o fechamento aórtico caía na emenda do ciclo. */
+  for (const fc of [40, 60, 75, 120, 150, 180, 200]) {
+    const s = simular(fc, { passos: 900, ciclos: 14 });
+    const { b1, b2, todas } = bulhas(s.quadro);
+    assert.ok(b1, `faltou B1 a ${fc} bpm`);
+    assert.ok(b2, `faltou B2 a ${fc} bpm`);
+    assert.equal(todas.length, 2, `a ${fc} bpm saíram ${todas.map(b => b.nome).join(",")} `);
+    assert.equal(todas.filter(b => b.nome === "B1").length, 1);
+    assert.equal(todas.filter(b => b.nome === "B2").length, 1);
+    /* B1 cai quando o ventrículo começa a contrair, não no dip da onda a */
+    const qB1 = s.quadro[b1.wrap ? 0 : b1.i];
+    assert.ok(qB1.ativacao > 0 || qB1.t >= 0.20,
+      `B1 falso a ${fc} bpm: t=${b1.t.toFixed(3)} ativ=${qB1.ativacao.toFixed(3)}`);
+    /* B2 vem depois de B1; a 40 bpm a sístole é fração menor do RR, a 150
+       o fechamento pode cair na emenda (fase 1) */
+    assert.ok(b2.wrap || b2.t > b1.t,
+      `B2 antes de B1 a ${fc} bpm (B1 t=${b1.t.toFixed(3)}, B2 t=${b2.t.toFixed(3)})`);
+  }
+  const app = await texto("coracao/app.js");
+  assert.ok(app.includes("bulhas(q)"), "o Wiggers lê as bulhas da função, não reimplementa o laço");
+  const src = await texto("coracao/fisica.js");
+  assert.ok(src.includes("(i - 1 + n) % n"), "o laço de fechamento dá a volta no ciclo");
 });

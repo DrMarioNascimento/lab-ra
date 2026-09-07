@@ -26,7 +26,9 @@
    ========================================================================== */
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { NIVEIS } from './niveis.js';
+import {
+  NIVEIS, ALTURA_VE, ALTURA_VD, VD_Y, SUBIR_PLANO, PLANO_VALVAR,
+} from './niveis.js';
 
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
 const rnd = (a, b) => a + Math.random() * (b - a);
@@ -181,7 +183,7 @@ function perfilVentriculo(raio, altura, pontudo = 1) {
    O esquerdo é um cone de parede grossa. O direito NÃO é um segundo cone: é
    uma meia-lua abraçada nele, e o septo pertence ao esquerdo. */
 function ventriculoEsquerdo(corte) {
-  const g = camaraDupla(perfilVentriculo(26, 78), 10, M.miocardio, null, 30, corte);
+  const g = camaraDupla(perfilVentriculo(26, ALTURA_VE), 10, M.miocardio, null, 30, corte);
   g.userData.papel = 've';
   return g;
 }
@@ -189,7 +191,7 @@ function ventriculoEsquerdo(corte) {
 function ventriculoDireito(corte) {
   /* a meia-lua: um perfil próprio, achatado e recortado em theta, encostado
      na frente e à direita do esquerdo */
-  const perfil = perfilVentriculo(23, 68, 1.15);
+  const perfil = perfilVentriculo(23, ALTURA_VD, 1.15);
   const gg = new THREE.Group();
   const t0 = corte ? Math.max(corte[0], -Math.PI * .58) : -Math.PI * .58;
   const tL = corte ? Math.min(corte[1], Math.PI * 1.16) : Math.PI * 1.16;
@@ -207,7 +209,7 @@ function ventriculoDireito(corte) {
   gg.add(externa, interna);
   /* achatado contra o esquerdo, e deslocado para a frente e para a direita */
   gg.scale.set(1, 1, .62);
-  gg.position.set(-16, 3, 12);
+  gg.position.set(-16, VD_Y, 12);
   gg.rotation.y = -.34;
   gg.userData = { externa, interna, papel: 'vd', espessura: 3.4 };
   return gg;
@@ -342,7 +344,9 @@ function grandesVasos() {
    apareciam, porque eu as desenhei em coordenadas soltas e o miocárdio as
    engoliu. Artéria epicárdica corre POR CIMA do músculo — se ela não estiver
    na superfície, não é coronária, é um cano dentro da carne. */
-const PERFIL_VE = perfilVentriculo(26, 78);
+const PERFIL_VE = perfilVentriculo(26, ALTURA_VE);
+/* pontos do sulco AV e da base sobem com o plano valvar; a ponta fica */
+const noSulco = ([x, y, z]) => [x, y >= 48 ? y + SUBIR_PLANO : y, z];
 function raioExterno(y) {
   let melhor = PERFIL_VE[0];
   for (const p of PERFIL_VE) if (Math.abs(p.y - y) < Math.abs(melhor.y - y)) melhor = p;
@@ -362,14 +366,14 @@ function coronarias() {
     new THREE.CatmullRomCurve3(naSuperficie(pontos)), segs, raio, 8, false));
 
   /* descendente anterior: desce pelo sulco interventricular, na frente */
-  fio([[4, 60, 16], [0, 48, 20], [-4, 34, 20], [-4, 18, 14], [-2, 7, 6]], 2.2);
+  fio([[4, 60, 16], [0, 48, 20], [-4, 34, 20], [-4, 18, 14], [-2, 7, 6]].map(noSulco), 2.2);
   /* circunflexa: contorna para a esquerda pelo sulco atrioventricular */
-  fio([[4, 60, 16], [16, 58, 10], [22, 56, -6], [16, 54, -18]], 2.0, 24);
+  fio([[4, 60, 16], [16, 58, 10], [22, 56, -6], [16, 54, -18]].map(noSulco), 2.0, 24);
   /* coronária direita: contorna para a direita e desce por trás */
-  fio([[-2, 60, 16], [-16, 57, 10], [-22, 55, -6], [-16, 48, -18], [-6, 30, -20]], 2.1);
+  fio([[-2, 60, 16], [-16, 57, 10], [-22, 55, -6], [-16, 48, -18], [-6, 30, -20]].map(noSulco), 2.1);
   /* dois marginais, para não parecer um circuito de três fios */
-  fio([[-4, 34, 20], [-14, 28, 12], [-18, 18, 6]], 1.4, 14);
-  fio([[20, 55, 2], [22, 42, 4], [16, 26, 5]], 1.4, 14);
+  fio([[-4, 34, 20], [-14, 28, 12], [-18, 18, 6]].map(noSulco), 1.4, 14);
+  fio([[20, 55, 2], [22, 42, 4], [16, 26, 5]].map(noSulco), 1.4, 14);
   return new THREE.Mesh(mergeGeometries(gs), M.coronaria);
 }
 
@@ -382,22 +386,23 @@ function conducao() {
   const põe = (id, malha) => { malha.userData.conducao = id; g.add(malha); return malha; };
 
   const no = new THREE.Mesh(new THREE.SphereGeometry(4.4, 12, 9), M.conducao);
-  no.position.set(-26, 74, -2); no.scale.set(1, 1.5, .7);
+  no.position.set(-26, 74 + SUBIR_PLANO, -2); no.scale.set(1, 1.5, .7);
   põe('sinusal', no);
 
   /* as vias internodais: três fitas do sinusal ao AV */
   for (const dz of [-8, 0, 8]) {
     const t = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(
-      [V(-26, 72, -2), V(-20, 66, dz * .6), V(-10, 60, dz * .4), V(-2, 56, 0)]), 16, 1.5, 6, false);
+      [V(-26, 72 + SUBIR_PLANO, -2), V(-20, 66 + SUBIR_PLANO, dz * .6),
+       V(-10, 60 + SUBIR_PLANO, dz * .4), V(-2, 56 + SUBIR_PLANO, 0)]), 16, 1.5, 6, false);
     põe('atrios', new THREE.Mesh(t, M.conducao));
   }
 
   const av = new THREE.Mesh(new THREE.SphereGeometry(3.8, 12, 9), M.conducao);
-  av.position.set(-2, 55, -2); av.scale.set(1.3, .9, .8);
+  av.position.set(-2, 55 + SUBIR_PLANO, -2); av.scale.set(1.3, .9, .8);
   põe('av', av);
 
   põe('his', new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(
-    [V(-2, 54, -2), V(-1, 48, 0), V(0, 43, 1)]), 10, 2.0, 8, false), M.conducao));
+    [V(-2, 54 + SUBIR_PLANO, -2), V(-1, 48, 0), V(0, 43, 1)]), 10, 2.0, 8, false), M.conducao));
 
   /* dois ramos, e o esquerdo se divide — é ele que dá o hemibloqueio */
   põe('ramos', new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(
@@ -432,13 +437,15 @@ const CAMINHOS = {
   direito: {
     pontos: [[-25, 16, -8], [-24, 38, -6], [-21, 52, -2], [-18, 56, 2],
              [-16, 53, 6], [-16, 40, 11], [-15, 22, 12], [-14, 40, 15],
-             [-12, 56, 16], [-11, 74, 15], [-6, 96, 9], [10, 106, 2]],
+             [-12, 56, 16], [-11, 74, 15], [-6, 96, 9], [10, 106, 2]]
+      .map(noSulco),
     uAV: .33, uSL: .70, mat: 'sanguePobre',
   },
   esquerdo: {
     pontos: [[28, 64, -14], [20, 60, -9], [12, 58, -5], [8, 57, -3],
              [6, 54, -1], [4, 38, 0], [3, 20, 1], [4, 40, -2],
-             [4, 58, -4], [5, 82, -2], [0, 112, 3], [-26, 112, 2]],
+             [4, 58, -4], [5, 82, -2], [0, 112, 3], [-26, 112, 2]]
+      .map(noSulco),
     uAV: .35, uSL: .70, mat: 'sangueRico',
   },
 };
@@ -464,6 +471,8 @@ function gotasDeSangue(n = 26) {
 function vidrar(grupo, opacidade) {
   grupo.traverse(o => {
     if (!o.isMesh || !o.material) return;
+    /* clone: o miocárdio / a aorta são materiais COMPARTILHADOS. Sem
+       clone o vidro do nível 03 vaza para o coração inteiro. */
     o.material = o.material.clone();
     o.material.transparent = true;
     o.material.opacity = opacidade;
@@ -472,7 +481,10 @@ function vidrar(grupo, opacidade) {
   });
 }
 
-function corpo({ comValvas = true, comCoronarias = true, comConducao = false, corte = false, revelarValvas = false } = {}) {
+function corpo({
+  comValvas = true, comCoronarias = true, comConducao = false,
+  corte = false, revelarValvas = false, vidrarGrandesVasos = false,
+} = {}) {
   const g = new THREE.Group();
 
   /* O CORTE ABRE UMA CUNHA VOLTADA PARA A FRENTE — é por onde se olha. Antes
@@ -484,15 +496,23 @@ function corpo({ comValvas = true, comCoronarias = true, comConducao = false, co
   const ve = ventriculoEsquerdo(janela); g.add(ve);
   const vd = ventriculoDireito(janela); g.add(vd);
 
-  const ae = atrio(1, janela); ae.position.set(14, 58, -6); ae.rotation.z = -.16; g.add(ae);
-  const ad = atrio(-1, janela); ad.position.set(-20, 56, 0); ad.rotation.z = .18; ad.scale.setScalar(.94); g.add(ad);
+  const ae = atrio(1, janela); ae.position.set(14, 58 + SUBIR_PLANO, -6); ae.rotation.z = -.16; g.add(ae);
+  const ad = atrio(-1, janela); ad.position.set(-20, 56 + SUBIR_PLANO, 0); ad.rotation.z = .18; ad.scale.setScalar(.94); g.add(ad);
+
+  const vasos = grandesVasos();
+  vasos.userData.papel = 'vasos';
+  /* a origem dos vasos acompanha o plano valvar; o grupo inteiro sobe, e
+     a relação cava/átrio e aorta/semilunar se mantém */
+  vasos.position.y = SUBIR_PLANO;
 
   /* o nível das válvulas não pode ser o coração opaco visto de longe: o
-     miocárdio vira vidro para as cúspides lerem por cima do corte */
+     miocárdio vira vidro para as cúspides lerem por cima do corte. Aorta e
+     tronco pulmonar também — opacos, sentam NA FRENTE das cúspides. */
   if (revelarValvas) {
     vidrar(ve, .38); vidrar(vd, .38);
     vidrar(ae, .32); vidrar(ad, .32);
   }
+  if (vidrarGrandesVasos) vidrar(vasos, .34);
 
   const valvas = {};
   if (comValvas) {
@@ -503,22 +523,22 @@ function corpo({ comValvas = true, comCoronarias = true, comConducao = false, co
       v.userData.nomeValva = nome;
       valvas[nome] = v; g.add(v);
     };
-    põe('mitral', valva(2, 14, 11), [6, 56, -2], [Math.PI, 0, .12]);
-    põe('tricuspide', valva(3, 15, 10), [-16, 53, 6], [Math.PI, 0, -.16]);
-    põe('aortica', valva(3, 11, 8), [4, 60, -4]);
-    põe('pulmonar', valva(3, 10, 7.5), [-12, 58, 16]);
-    g.add(cordas(14, 46, 22, 10));
+    põe('mitral', valva(2, 14, 11), PLANO_VALVAR.mitral, [Math.PI, 0, .12]);
+    põe('tricuspide', valva(3, 15, 10), PLANO_VALVAR.tricuspide, [Math.PI, 0, -.16]);
+    põe('aortica', valva(3, 11, 8), PLANO_VALVAR.aortica);
+    põe('pulmonar', valva(3, 10, 7.5), PLANO_VALVAR.pulmonar);
+    g.add(cordas(14, 46 + SUBIR_PLANO, 22 + SUBIR_PLANO, 10));
   }
   if (comCoronarias) g.add(coronarias());
   let cond = null;
   if (comConducao) { cond = conducao(); g.add(cond); }
   const sangue = gotasDeSangue(); g.add(sangue);
-  g.add(grandesVasos());
+  g.add(vasos);
 
   /* a inclinação anatômica */
   g.rotation.set(.16, 0, .30);
   g.position.y = -46;
-  g.userData = { ve, vd, ae, ad, valvas, conducao: cond, sangue };
+  g.userData = { ve, vd, ae, ad, valvas, vasos, conducao: cond, sangue };
   return g;
 }
 
@@ -560,6 +580,7 @@ export function criar() {
     comConducao: n.comConducao,
     corte: n.corte,
     revelarValvas: n.revelarValvas,
+    vidrarGrandesVasos: n.vidrarGrandesVasos,
   }));
   modelos.forEach((m, i) => { m.visible = i === 0; });
 

@@ -26,7 +26,7 @@ import { criar, aplicarQuadro } from './modelos.js';
 import { NIVEIS } from './niveis.js';
 import {
   simular, em, faseDe, duracoes, estruturaAtiva,
-  tempoDiastolicoPorMinuto, CONDUCAO, faseDeSnapshotRA,
+  tempoDiastolicoPorMinuto, CONDUCAO, faseDeSnapshotRA, bulhas,
 } from './fisica.js';
 
 const $ = id => document.getElementById(id);
@@ -257,17 +257,15 @@ function desenharTracosWiggers() {
 
   /* 4 · as bulhas: a primeira no fechamento da mitral, a segunda no da
      aórtica. Elas não são desenhadas por tempo — são achadas percorrendo as
-     válvulas, então caem sozinhas no lugar certo. */
+     válvulas, então caem sozinhas no lugar certo. O laço dá a volta: a 150
+     bpm o B2 cai na emenda do ciclo. */
   fx = faixa(3, 4);
   fw.fillStyle = '#7f9a80'; fw.fillText('bulhas', 2, fx.topo + 9);
-  for (let i = 1; i < q.length; i++) {
-    const fecha = (a, b) => q[i - 1][a] && !q[i][a];
-    if (fecha('mitral') || fecha('aortica')) {
-      const x = px(i / q.length);
-      fw.beginPath(); fw.moveTo(x, fx.topo + fx.alt); fw.lineTo(x, fx.topo + 2);
-      fw.strokeStyle = '#ff9d2e'; fw.lineWidth = 2; fw.stroke();
-      fw.fillStyle = '#ff9d2e'; fw.fillText(fecha('mitral') ? 'B1' : 'B2', x + 3, fx.topo + 9);
-    }
+  for (const b of bulhas(q).todas) {
+    const x = px(b.fase);
+    fw.beginPath(); fw.moveTo(x, fx.topo + fx.alt); fw.lineTo(x, fx.topo + 2);
+    fw.strokeStyle = '#ff9d2e'; fw.lineWidth = 2; fw.stroke();
+    fw.fillStyle = '#ff9d2e'; fw.fillText(b.nome, x + 3, fx.topo + 9);
   }
   wiggersQuadro = q;
 }
