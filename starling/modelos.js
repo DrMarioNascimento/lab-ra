@@ -46,13 +46,23 @@ export const M = {
               transparent: true, opacity: .13, depthWrite: false }),
   fibra: phys({ color: 0x9a9384, roughness: .85, sheen: .2,
                 transparent: true, opacity: .55, depthWrite: false }),
-  linfa: phys({ color: 0xbfe3c8, roughness: .48, sheen: .5,
-                sheenColor: cor(230, 255, 235),
-                transparent: true, opacity: .34, depthWrite: false }),
-  arteriola: phys({ color: 0xb8323a, roughness: .55, sheen: .8,
-                    sheenColor: cor(255, 150, 140) }),
-  venula: phys({ color: 0x5a4f96, roughness: .55, sheen: .7,
-                 sheenColor: cor(170, 170, 255) }),
+  /* A 34% ele saia cinzento e lia como cano. O linfatico tem de se distinguir
+     do capilar a primeira vista: e a peca que RESOLVE, e o nivel 05 existe
+     para dizer que o edema aparece quando ela nao da conta. */
+  linfa: phys({ color: 0x86d6a2, roughness: .42, sheen: .6,
+                sheenColor: cor(220, 255, 232),
+                transparent: true, opacity: .62 }),
+  /* No nivel 01 o capilar precisa ser VISTO, nao adivinhado: o endotelio a
+     30% sumia no meio do leito. Aqui ele e opaco o bastante para desenhar a
+     rede, e a translucidez fica para os niveis de perto, onde ela serve para
+     mostrar o que ha dentro. */
+  capilar: phys({ color: 0xd9a8b6, roughness: .5, sheen: .6,
+                  sheenColor: cor(255, 210, 220),
+                  transparent: true, opacity: .82 }),
+  arteriola: phys({ color: 0xd2434c, roughness: .5, sheen: .85,
+                    sheenColor: cor(255, 165, 150) }),
+  venula: phys({ color: 0x6f62b4, roughness: .5, sheen: .75,
+                 sheenColor: cor(185, 185, 255) }),
   setaFora: phys({ color: FORA.getHex(), roughness: .42, sheen: .5,
                    emissive: cor(90, 46, 0).getHex(), emissiveIntensity: .5 }),
   setaDentro: phys({ color: DENTRO.getHex(), roughness: .42, sheen: .5,
@@ -179,7 +189,9 @@ function gotas(n = 90, comp = CAP.comp) {
   const base = new THREE.SphereGeometry(.62, 8, 6);
   for (let i = 0; i < n; i++) {
     const m = new THREE.Mesh(base, M.agua);
-    m.userData = { u: Math.random(), teta: rnd(0, 6.3), t: Math.random() };
+    m.userData = { u: Math.random(), teta: rnd(0, 6.3), t: Math.random(),
+                   /* limiar e endereco de quando ela FICA no tecido */
+                   parque: Math.random(), rParque: rnd(CAP.luz + 5, 19) };
     grupo.add(m);
   }
   grupo.userData.comp = comp;
@@ -207,10 +219,10 @@ function albuminas(n = 26, comp = CAP.comp) {
 function nivelRede() {
   const g = new THREE.Group();
   const L = 150, R = 9;
-  const art = new THREE.Mesh(new THREE.CylinderGeometry(R, R * .7, 46, 20, 1, true), M.arteriola);
+  const art = new THREE.Mesh(new THREE.CylinderGeometry(R, R * .7, 46, 20, 1, false), M.arteriola);
   art.geometry.rotateZ(Math.PI / 2); art.geometry.translate(-L / 2 + 23, 0, 0);
   g.add(art);
-  const ven = new THREE.Mesh(new THREE.CylinderGeometry(R * .95, R * 1.35, 46, 20, 1, true), M.venula);
+  const ven = new THREE.Mesh(new THREE.CylinderGeometry(R * .95, R * 1.35, 46, 20, 1, false), M.venula);
   ven.geometry.rotateZ(Math.PI / 2); ven.geometry.translate(L / 2 - 23, 0, 0);
   g.add(ven);
 
@@ -223,7 +235,7 @@ function nivelRede() {
                  V(0, y, z), V(L / 2 - 62, y * .7, z * .6), V(L / 2 - 44, 0, 0)];
     caps.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 26, rnd(2.1, 3.0), 7, false));
   }
-  g.add(new THREE.Mesh(mergeGeometries(caps), M.endotelio));
+  g.add(new THREE.Mesh(mergeGeometries(caps), M.capilar));
   g.add(intersticio(L, 34).children[1]);          // só as fibras, sem o gel
   g.position.x = 0;
   return g;
@@ -236,7 +248,8 @@ function nivelRede() {
 function nivelCapilar({ comSetas = false, comLinfa = false } = {}) {
   const g = new THREE.Group();
   const comp = CAP.comp;
-  g.add(intersticio(comp));
+  const gel = intersticio(comp);
+  g.add(gel);
   g.add(tuboCapilar());
   g.add(nucleosEndoteliais());
 
@@ -282,7 +295,7 @@ function nivelCapilar({ comSetas = false, comLinfa = false } = {}) {
     g.add(linfa, tampa);
   }
 
-  g.userData = { hem, gotas: gt, albuminas: alb, setas, linfa, comp };
+  g.userData = { hem, gotas: gt, albuminas: alb, setas, linfa, gel, comp };
   g.position.x = -comp / 2;
   return g;
 }
@@ -301,26 +314,52 @@ export function criar() {
   /* Move hemácias, gotas e albumina. `liquidaEm(u)` vem da física: a gota sai
      onde a soma é positiva e volta onde é negativa, então o desenho não
      decide nada — ele obedece. */
+  /* ── O ENCHARCAMENTO ───────────────────────────────────────────────────
+     Antes, `encharcado` só empurrava as gotas um pouco para longe, e o tecido
+     ficava igual: o número dizia 52 ml e a imagem não dizia nada. Edema é
+     VOLUME, e volume se vê. Agora ele faz três coisas ao mesmo tempo, porque
+     nenhuma das três sozinha convence:
+
+     • o gel INCHA — é a única pista que se lê na silhueta, e é a que sobra
+       quando o modelo vai para a realidade aumentada e encolhe na mesa;
+     • o gel ESCURECE DE ÁGUA — de névoa cinzenta para azul denso, porque
+       tecido encharcado não fica só maior, fica opaco;
+     • as gotas PARAM DE VOLTAR. Cada uma tem o seu limiar: conforme o edema
+       sobe, mais delas ficam estacionadas no tecido em vez de circularem. É a
+       diferença entre "está passando água" e "ficou água aqui". */
+  const CORSECO = new THREE.Color().setRGB(127 / 255, 143 / 255, 160 / 255, THREE.SRGBColorSpace);
+  const CORMOLHADO = new THREE.Color().setRGB(96 / 255, 168 / 255, 214 / 255, THREE.SRGBColorSpace);
+
   function animar(t, liquidaEm, { encharcado = 0 } = {}) {
+    M.gel.opacity = .13 + encharcado * .30;
+    M.gel.color.copy(CORSECO).lerp(CORMOLHADO, encharcado);
     for (const m of modelos) {
       const d = m.userData;
       if (!d || !d.hem) continue;
+      if (d.gel) {
+        const e = 1 + encharcado * .55;
+        d.gel.scale.set(1, e, e);
+      }
       for (const h of d.hem.children) {
         h.userData.u = (h.userData.u + .0016) % 1;
         h.position.set(h.userData.u * d.comp, 0, 0);
       }
       for (const gt of d.gotas.children) {
         const u = gt.userData;
+        if (u.parque < encharcado) {
+          /* esta gota ficou: o tecido reteve. Ela acompanha o inchaço em vez
+             de voltar ao capilar. */
+          const r = u.rParque * (1 + encharcado * .4);
+          gt.position.set(u.u * d.comp, Math.cos(u.teta) * r, Math.sin(u.teta) * r);
+          continue;
+        }
         const p = liquidaEm(u.u);
-        /* fora do capilar quando a soma manda para fora, e o quanto ela
-           manda decide a que distância a gota chega */
         u.t = (u.t + .004 + Math.abs(p) * .00035) % 1;
         const alcance = clamp(Math.abs(p) / 26, 0, 1);
         const r = p >= 0
           ? CAP.luz * (1 - u.t) + (CAP.luz + 3 + alcance * 13) * u.t
           : (CAP.luz + 3 + alcance * 13) * (1 - u.t) + CAP.luz * u.t;
-        const rr = r + encharcado * 6 * (r > CAP.luz + 1 ? 1 : 0);
-        gt.position.set(u.u * d.comp, Math.cos(u.teta) * rr, Math.sin(u.teta) * rr);
+        gt.position.set(u.u * d.comp, Math.cos(u.teta) * r, Math.sin(u.teta) * r);
       }
       for (const a of d.albuminas.children) {
         a.userData.u = (a.userData.u + .0011) % 1;

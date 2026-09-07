@@ -161,3 +161,35 @@ test("a geometria não importa a física", async () => {
   const m = await texto("starling/modelos.js");
   assert.ok(!/from '\.\/fisica\.js'/.test(m));
 });
+
+test("o edema se ve em TRES pistas, e nao so nas gotas", async () => {
+  /* Antes, `encharcado` so empurrava as gotas um pouco: o numero dizia 52 ml e
+     a imagem nao dizia nada. Edema e VOLUME, e volume se ve. */
+  const m = await texto("starling/modelos.js");
+  assert.ok(m.includes("d.gel.scale.set(1, e, e)"), "o gel tem de inchar");
+  assert.ok(m.includes("M.gel.opacity = .13 + encharcado"), "o gel tem de escurecer de agua");
+  assert.ok(m.includes("if (u.parque < encharcado)"), "as gotas tem de FICAR no tecido");
+});
+
+test("o quadro cabe o tecido inchado, e nao o em repouso", async () => {
+  /* medido parado, o modelo saia pela beira justamente no estado que a
+     bancada existe para mostrar */
+  const app = await texto("starling/app.js");
+  assert.ok(app.includes("const FOLGA_EDEMA = 1.5"));
+  assert.ok(app.includes("raio[n] * (n === 0 ? 1 : FOLGA_EDEMA)"));
+});
+
+test("o leito capilar do nivel 01 e visivel, e a nevoa cabe nos dois tamanhos", async () => {
+  /* a nevoa calibrada para o capilar de 60 um comia 62% do nivel 01, que a
+     camera olha de 280 de distancia — o leito virava neblina roxa */
+  const app = await texto("starling/app.js");
+  assert.ok(app.includes("FogExp2(0x0a0d10, .0008)"));
+  const m = await texto("starling/modelos.js");
+  assert.ok(m.includes("mergeGeometries(caps), M.capilar"), "o leito nao pode usar o endotelio a 30%");
+});
+
+test("o linfatico se distingue do capilar a primeira vista", async () => {
+  const m = await texto("starling/modelos.js");
+  const bloco = m.slice(m.indexOf("linfa: phys("), m.indexOf("arteriola: phys("));
+  assert.ok(/opacity: \.6/.test(bloco) || /opacity: \.62/.test(bloco), "a 34% ele lia como cano cinzento");
+});
