@@ -53,7 +53,7 @@ const fill = new THREE.DirectionalLight(0xffcfc4, .62); fill.position.set(-140, 
 const rim = new THREE.DirectionalLight(0x9fb8ff, 1.1); rim.position.set(-80, 90, -180); scene.add(rim);
 
 const root = new THREE.Group(); scene.add(root);
-const { modelos, aplicarVolumes, aplicarValvas, aplicarConducao } = criar();
+const { modelos, aplicarVolumes, aplicarValvas, aplicarConducao, aplicarSangue } = criar();
 modelos.forEach((m, i) => { m.visible = i === 0; root.add(m); });
 
 const raio = modelos.map(m => {
@@ -134,7 +134,7 @@ const NOMES = {
   'enchimento': 'enchimento', 'diastase': 'diástase',
 };
 
-function atualizar() {
+function atualizar(dt = 0) {
   const q = em(sim, fase);
   const i = Math.floor(((fase % 1) + 1) % 1 * sim.quadro.length);
   const ant = sim.quadro[(i - 1 + sim.quadro.length) % sim.quadro.length];
@@ -142,6 +142,14 @@ function atualizar() {
   aplicarVolumes(q.vVE, q.vVD, q.vAE, q.vAD);
   aplicarValvas({ mitral: q.mitral, aortica: q.aortica, tricuspide: q.tricuspide, pulmonar: q.pulmonar });
   aplicarConducao(estruturaAtiva(q.t));
+  /* o sangue anda com a MESMA vazão que o motor calculou para este instante,
+     e não passa por valva fechada */
+  aplicarSangue({
+    mitral: { q: q.qMitral, aberta: q.mitral },
+    aortica: { q: q.qAortica, aberta: q.aortica },
+    tricuspide: { q: q.mitral ? q.qMitral : 0, aberta: q.tricuspide },
+    pulmonar: { q: q.aortica ? q.qAortica : 0, aberta: q.pulmonar },
+  }, dt);
 
   const f = faseDe(q, ant);
   $('faseLabel').textContent = NOMES[f] || f;
@@ -250,7 +258,7 @@ renderer.setAnimationLoop(agora => {
   const dt = Math.min(.10, (agora - anterior) / 1000); anterior = agora;
   if (batendo) {
     fase = (fase + dt / duracoes(fc).rr * lentidao()) % 1;
-    atualizar();
+    atualizar(dt * lentidao());
   }
   controls.update();
   renderer.render(scene, camera);
