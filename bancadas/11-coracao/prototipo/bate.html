@@ -86,6 +86,34 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { simular, em, duracoes, faseDe } from '/coracao/fisica.js';
 
+/* ── ONDE MORAM OS MODELOS ──────────────────────────────────────────────
+   O B é o EXPORT DA ESTEIRA, versionado neste repositório — a mesma peça de
+   79 malhas que os testes travam. Antes estas páginas pediam
+   `modelos/B-bodyparts3d.glb`, um diretório que só existia na máquina de
+   quem escreveu: commitadas, elas nasceram quebradas e ninguém percebeu,
+   porque quem abria já tinha o arquivo ao lado.
+
+   O A é o scan de referência e NÃO está no repositório: a licença dele é
+   desconhecida e isso bloqueia publicação. A página o procura em
+   `fontes/scan/` (que o .gitignore mantém de fora) e SEGUE SEM ELE se não
+   achar — o A só serviu de referência de cor, e referência não se publica. */
+const MODELO_B = '../export/coracao-bancada11-WIP.glb';
+const MODELO_A = '../fontes/scan/A-scan-realista.glb';
+
+/* Sem o A a página não pode ficar em silêncio: uma tela pela metade sem
+   explicação é o tipo de coisa que faz alguém procurar defeito no código. */
+THREE.DefaultLoadingManager.onError = url => {
+  if (document.getElementById('faltou')) return;
+  const d = document.createElement('div');
+  d.id = 'faltou';
+  d.style.cssText = 'margin:0 18px 12px;padding:9px 13px;border-left:3px solid #d8a23a;' +
+    'background:#1a1509;color:#e8d8b0;font-size:12.5px;max-width:96ch';
+  d.textContent = 'Falta ' + url.split('/').pop() + ' — o scan de referência não está no ' +
+    'repositório (licença desconhecida). Ponha-o em bancadas/11-coracao/fontes/scan/ ' +
+    'para ver os dois; sem ele o resto da página funciona.';
+  document.body.insertBefore(d, document.body.children[2] || null);
+};
+
 const $ = id => document.getElementById(id);
 const canvas = $('palco');
 const r = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
@@ -112,7 +140,7 @@ const passo = (t, a, b) => { const u = Math.min(1, Math.max(0, (t - a) / (b - a)
 
 let malha = null, base = null, pesoV = null, pesoA = null, pesoP = null, yApice = 0, eixoY = 1, cx = 0;
 
-new GLTFLoader().load('modelos/A-scan-realista.glb', g => {
+new GLTFLoader().load(MODELO_A, g => {
   g.scene.updateMatrixWorld(true);
   g.scene.traverse(o => { if (o.isMesh && !malha) malha = o; });
   /* assa a transformação do nó na geometria: local passa a ser mundo, e aí

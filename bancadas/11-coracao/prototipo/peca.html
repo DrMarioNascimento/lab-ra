@@ -50,6 +50,16 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
+/* ── ONDE MORAM OS MODELOS ──────────────────────────────────────────────
+   O B é o EXPORT DA ESTEIRA, versionado neste repositório — a mesma peça de
+   79 malhas que os testes travam. Antes estas páginas pediam
+   `modelos/B-bodyparts3d.glb`, um diretório que só existia na máquina de
+   quem escreveu: commitadas, elas nasceram quebradas e ninguém percebeu,
+   porque quem abria já tinha o arquivo ao lado.
+
+   Esta página não usa o scan de referência: só a peça da esteira. */
+const MODELO_B = '../export/coracao-bancada11-WIP.glb';
+
 const $ = id => document.getElementById(id);
 const canvas = $('palco');
 const r = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
@@ -87,7 +97,7 @@ const apagado = new THREE.MeshPhysicalMaterial({ color: 0x9fb0a0, roughness: .8,
 
 let malhas = [], alturaTotal = 1, escondido = false;
 
-new GLTFLoader().load('modelos/B-bodyparts3d.glb', g => {
+new GLTFLoader().load(MODELO_B, g => {
   g.scene.updateMatrixWorld(true);
   g.scene.traverse(o => { if (o.isMesh) { o.userData.matOriginal = o.material; malhas.push(o); } });
   const caixa = new THREE.Box3().setFromObject(g.scene);

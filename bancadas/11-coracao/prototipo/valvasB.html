@@ -1,0 +1,815 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<title>O B por dentro, movido pelo motor</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; background: #0a0d0a; color: #dbe6d8;
+         font: 13.5px/1.55 "IBM Plex Mono", ui-monospace, monospace; }
+  h1 { font-size: 15px; letter-spacing: .16em; text-transform: uppercase;
+       color: #9ec49a; margin: 14px 18px 4px; font-weight: 600; }
+  p.nota { margin: 0 18px 12px; max-width: 96ch; color: #93a691; font-size: 12.5px; }
+  .caixa { display: grid; grid-template-columns: 1fr 320px; gap: 14px; padding: 0 16px 20px; }
+  @media (max-width: 900px) { .caixa { grid-template-columns: 1fr; } }
+  #palco { width: 100%; height: 640px; display: block;
+           border: 1px solid #24331f; border-radius: 12px; background: #10150f; }
+  .painel { border: 1px solid #24331f; border-radius: 12px; background: #10150f;
+            padding: 13px 15px; max-height: 640px; overflow-y: auto; }
+  label { display: block; margin: 12px 0 5px; color: #9ec49a; font-size: 11.5px;
+          letter-spacing: .1em; text-transform: uppercase; }
+  input[type=range] { width: 100%; accent-color: #d8c53a; }
+  button { width: 100%; background: #1c2718; color: #e8f2e4; border: 1px solid #35492c;
+           border-radius: 8px; padding: 7px 10px; font: inherit; cursor: pointer; margin-top: 8px; }
+  button:hover { background: #26351f; }
+  .lin { display: flex; justify-content: space-between; gap: 10px; padding: 3px 0; font-size: 12.5px; }
+  .lin b { color: #f2f7ec; }
+  .aberta { color: #6ed07a; } .fechada { color: #c8737a; }
+  .grupo { margin-top: 12px; border-top: 1px solid #24331f; padding-top: 9px; }
+  .so { display: flex; gap: 6px; margin-top: 8px; }
+  .so button { margin-top: 0; font-size: 11.5px; padding: 5px 4px; }
+</style>
+</head>
+<body>
+<h1>O B por dentro · movido pelo motor</h1>
+<p class="nota">Dois efeitos, cada um com o seu cursor, para poderem ser medidos <b>sozinhos</b>.
+<b>1 · as valvas</b>: as onze cúspides obedecem ao estado que <code>fisica.js</code> deriva das PRESSÕES.
+<b>2 · o átrio esquerdo</b>: contrai no relógio do volume atrial <code>vAE</code>. O átrio não é movido
+peça por peça — é um <b>campo em coordenadas de mundo</b>: o vértice se desloca por <i>onde ele está</i>,
+não por que peça ele é. Assim a coronária esquerda, que está encostada na parede, acompanha sem rasgar
+a costura.</p>
+
+<div class="caixa">
+  <canvas id="palco"></canvas>
+  <div class="painel">
+    <label>Frequência · <b id="vbpm">75</b> bpm</label>
+    <input id="bpm" type="range" min="40" max="200" step="1" value="75" />
+    <label>Câmera lenta · <b id="vlento">0.30</b>×</label>
+    <input id="lento" type="range" min="0.05" max="1" step="0.01" value="0.3" />
+
+    <label>1 · curso da cúspide · <b id="vcurso">1.00</b>×</label>
+    <input id="curso" type="range" min="0" max="3" step="0.05" value="1" />
+    <label>2 · contração dos átrios · <b id="vcursoA">0.12</b></label>
+    <input id="cursoA" type="range" min="0" max="0.4" step="0.005" value="0.12" />
+    <label>3 · ventrículo, aperto radial · <b id="vcursoV">0.00</b></label>
+    <input id="cursoV" type="range" min="0" max="0.4" step="0.005" value="0" />
+    <label>4 · ventrículo, encurtamento longo · <b id="vcursoL">0.00</b></label>
+    <input id="cursoL" type="range" min="0" max="0.3" step="0.005" value="0" />
+
+    <div class="so">
+      <button id="soValvas" type="button">só as valvas</button>
+      <button id="soAtrio" type="button">só os átrios</button>
+      <button id="zerar" type="button">zerar</button>
+    </div>
+    <div class="so">
+      <button id="soRadial" type="button">só o aperto</button>
+      <button id="soLongo" type="button">só o encurtar</button>
+      <button id="tudo" type="button">tudo junto</button>
+    </div>
+    <div class="so">
+      <button id="mirar" type="button">olhar os átrios</button>
+      <button id="pintar" type="button">pintar o campo</button>
+    </div>
+    <button id="parar" type="button">Parar</button>
+
+    <div class="grupo">
+      <div class="lin"><span>fase</span><b id="lfase">—</b></div>
+      <div class="lin"><span>ventrículo esq.</span><b id="lpve">—</b></div>
+      <div class="lin"><span>átrio esq.</span><b id="lpae">—</b></div>
+      <div class="lin"><span>aorta</span><b id="lpao">—</b></div>
+      <div class="lin"><span>volume AE / AD</span><b id="lvae">—</b></div>
+      <div class="lin"><span>volume VE</span><b id="lvve">—</b></div>
+    </div>
+    <div class="grupo" id="estado"></div>
+    <div class="grupo">
+      <div class="lin"><span>campos atriais</span><b id="lcampo">—</b></div>
+    </div>
+  </div>
+</div>
+
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { simular, em, duracoes, faseDe } from '/coracao/fisica.js';
+
+/* ── ONDE MORAM OS MODELOS ──────────────────────────────────────────────
+   O B é o EXPORT DA ESTEIRA, versionado neste repositório — a mesma peça de
+   79 malhas que os testes travam. Antes estas páginas pediam
+   `modelos/B-bodyparts3d.glb`, um diretório que só existia na máquina de
+   quem escreveu: commitadas, elas nasceram quebradas e ninguém percebeu,
+   porque quem abria já tinha o arquivo ao lado.
+
+   Esta página não usa o scan de referência: só a peça da esteira. */
+const MODELO_B = '../export/coracao-bancada11-WIP.glb';
+
+const $ = id => document.getElementById(id);
+const canvas = $('palco');
+const r = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+r.setPixelRatio(Math.min(devicePixelRatio, 2));
+r.outputColorSpace = THREE.SRGBColorSpace;
+r.toneMapping = THREE.ACESFilmicToneMapping;
+r.toneMappingExposure = 1.35;
+const cena = new THREE.Scene();
+cena.environment = new THREE.PMREMGenerator(r).fromScene(new RoomEnvironment(), .04).texture;
+cena.environmentIntensity = .8;
+cena.add(new THREE.HemisphereLight(0xffeede, 0x181016, 1.0));
+const key = new THREE.DirectionalLight(0xfff2e6, 2.2); key.position.set(120, 180, 160);
+const fill = new THREE.DirectionalLight(0xffcfc4, 1.3); fill.position.set(-140, 60, 100);
+const rim = new THREE.DirectionalLight(0x9fb8ff, .45); rim.position.set(-80, 90, -180);
+cena.add(key, fill, rim);
+const cam = new THREE.PerspectiveCamera(32, 1, .1, 5000);
+const ctl = new OrbitControls(cam, canvas); ctl.enableDamping = true;
+function medir() { const w = canvas.clientWidth, h = canvas.clientHeight;
+  r.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }
+addEventListener('resize', medir); medir();
+
+/* ── AS QUATRO VALVAS, MONTADAS A PARTIR DOS NOMES DAS PEÇAS ──────────────
+   O arquivo traz onze cúspides soltas. Agrupá-las pela valva a que pertencem
+   é o que permite calcular o CENTRO de cada uma — e é contra esse centro que
+   a cúspide recua para abrir e converge para fechar. */
+const VALVAS = {
+  mitral:     ['cuspide_anterior_mitral', 'cuspide_posterior_mitral'],
+  tricuspide: ['cuspide_anterior_tricuspide', 'cuspide_posterior_tricuspide',
+               'cuspide_septal_tricuspide'],
+  aortica:    ['cuspide_anterior_aortica', 'cuspide_posterior_direita_aortica',
+               'cuspide_posterior_esquerda_aortica'],
+  pulmonar:   ['cuspide_anterior_esquerda_pulmonar', 'cuspide_anterior_direita_pulmonar',
+               'cuspide_posterior_pulmonar'],
+};
+const NOMES = { mitral: 'mitral', tricuspide: 'tricúspide', aortica: 'aórtica', pulmonar: 'pulmonar' };
+const EH_CUSPIDE = new Set(Object.values(VALVAS).flat());
+
+const suave = t => { t = t < 0 ? 0 : t > 1 ? 1 : t; return t * t * (3 - 2 * t); };
+
+/* pecas: { malha, base, cusp?, dE?, dD? } — uma lista só, um laço por quadro */
+const pecas = [];
+let pronto = false, atrio = null, mirar = () => {}, pintar = () => {};
+let apiceG = null, eixoG = null, compEixoG = 1;   /* o eixo longo, para a régua */
+
+new GLTFLoader().load(MODELO_B, g => {
+  g.scene.updateMatrixWorld(true);
+  /* Nenhum nó do GLB tem translation/rotation/scale/matrix — conferido no
+     arquivo. Logo a coordenada do buffer JÁ É a coordenada de mundo, e o
+     campo pode ser lido direto do vetor de posições. Se algum dia a esteira
+     passar a emitir transformações, isto tem de virar matrixWorld. */
+  const malhas = [];
+  g.scene.traverse(o => { if (o.isMesh && o.name) {
+    o.geometry = o.geometry.clone(); malhas.push(o); } });
+
+  const caixa = new THREE.Box3().setFromObject(g.scene);
+  const tam = caixa.getSize(new THREE.Vector3()), cen = caixa.getCenter(new THREE.Vector3());
+  g.scene.position.sub(cen);
+  cena.add(g.scene);
+  const d = Math.max(tam.x, tam.y, tam.z) / Math.tan(cam.fov * Math.PI / 360) * 1.05;
+  cam.position.set(d * .20, d * .10, d * .95);
+  ctl.target.set(0, 0, 0); ctl.update();
+
+  const porNome = new Map(malhas.map(m => [m.name, m]));
+  const cuspDe = new Map();
+
+  /* ── EFEITO 1 · as valvas ───────────────────────────────────────────── */
+  for (const [valva, lista] of Object.entries(VALVAS)) {
+    const centros = [];
+    for (const nome of lista) {
+      const m = porNome.get(nome); if (!m) continue;
+      const pos = m.geometry.attributes.position;
+      const c = new THREE.Vector3();
+      for (let i = 0; i < pos.count; i++) c.add(new THREE.Vector3().fromBufferAttribute(pos, i));
+      c.multiplyScalar(1 / pos.count);
+      centros.push({ m, c });
+    }
+    if (!centros.length) continue;
+    const cv = new THREE.Vector3();
+    for (const x of centros) cv.add(x.c);
+    cv.multiplyScalar(1 / centros.length);
+    for (const x of centros) {
+      const dir = x.c.clone().sub(cv);
+      const dist = dir.length() || 1;
+      cuspDe.set(x.m.name, { dir: dir.normalize(), dist, valva });
+    }
+  }
+
+  /* ── EFEITO 2 · OS CAMPOS ATRIAIS ───────────────────────────────────────
+     O relógio de cada átrio é o volume atrial do motor — `vAE` e `vAD`. O
+     que falta é o LUGAR: onde, no espaço, esse relógio manda. Três medidas
+     do próprio arquivo definem cada região — nenhum número escolhido a olho:
+
+     1. O ANEL é o topo das cúspides da valva AV daquele lado (mitral à
+        esquerda, tricúspide à direita). É o chão do átrio, e o chão não
+        contrai junto: é contra ele que o átrio se aperta.
+     2. A NUVEM são os vértices da parede ACIMA do anel.
+     3. O PESO de um vértice qualquer do modelo é a sua DISTÂNCIA a essa
+        nuvem, não a peça a que ele pertence. Cheio até 2 mm, some aos 12.
+
+     ISTO DISSOLVE O PROBLEMA DO `parede_ad`. Aquela peça é um arquivo só
+     (FJ2439) que o catálogo lista como "wall of right atrium" E como "wall
+     of right side of heart" — 96 mm, forma de coração inteiro. Enquanto o
+     movimento fosse por PEÇA, ela era um bloqueio: uma malha, duas câmaras,
+     dois relógios. Num campo posicional a pergunta "de que peça é este
+     vértice?" nunca é feita. O anel tricúspide corta a peça pela GEOMETRIA,
+     e a parte de cima obedece ao átrio enquanto a de baixo fica livre para
+     obedecer ao ventrículo. O nome errado deixa de atrapalhar o MOVIMENTO;
+     continua atrapalhando só a LEGENDA, que é outro problema.
+
+     UMA EXCEÇÃO DECLARADA: as onze cúspides ficam FORA dos campos. Medido, a
+     cúspide posterior direita da aórtica encosta na parede do átrio esquerdo
+     a 0,2 mm — é a continuidade mitro-aórtica, anatomia de verdade —, e por
+     distância ela seria arrastada pela sístole atrial. Só que a cúspide não
+     obedece à parede que toca: obedece à PRESSÃO. Deixá-la ao campo apagaria
+     justo a lição do efeito 1. */
+  const CEL = 3, DENTRO = 2, FORA = 12;
+
+  function anelDe(nomes) {
+    let y = -1e9;
+    for (const nome of nomes) {
+      const m = porNome.get(nome); if (!m) continue;
+      const pos = m.geometry.attributes.position;
+      for (let i = 0; i < pos.count; i++) y = Math.max(y, pos.getY(i));
+    }
+    return y;
+  }
+
+  /* GRADE DE DISTÂNCIA por salpico. Percorrer milhares de pontos da nuvem
+     para cada um dos ~60 mil vértices seriam centenas de milhões de contas.
+     Em vez disso cada ponto da nuvem "salpica" a sua distância nas células
+     vizinhas até 12 mm, e o vértice lê a grade por interpolação trilinear.
+     A interpolação é o que dá um campo LISO; um campo em degraus rasgaria a
+     malha nas bordas das células. */
+  function fazerCampo(nomeParede, yAnel) {
+    const pw = porNome.get(nomeParede);
+    const nuvem = [], centro = new THREE.Vector3();
+    if (pw) {
+      const pos = pw.geometry.attributes.position;
+      for (let i = 0; i < pos.count; i++) {
+        const y = pos.getY(i);
+        if (y > yAnel) { const v = [pos.getX(i), y, pos.getZ(i)];
+          nuvem.push(v); centro.add(new THREE.Vector3(v[0], v[1], v[2])); }
+      }
+      centro.multiplyScalar(1 / Math.max(1, nuvem.length));
+    }
+    const gmin = new THREE.Vector3(1e9, 1e9, 1e9), gmax = new THREE.Vector3(-1e9, -1e9, -1e9);
+    for (const v of nuvem) {
+      gmin.x = Math.min(gmin.x, v[0]); gmax.x = Math.max(gmax.x, v[0]);
+      gmin.y = Math.min(gmin.y, v[1]); gmax.y = Math.max(gmax.y, v[1]);
+      gmin.z = Math.min(gmin.z, v[2]); gmax.z = Math.max(gmax.z, v[2]);
+    }
+    gmin.subScalar(FORA + CEL); gmax.addScalar(FORA + CEL);
+    const nx = Math.ceil((gmax.x - gmin.x) / CEL) + 1,
+          ny = Math.ceil((gmax.y - gmin.y) / CEL) + 1,
+          nz = Math.ceil((gmax.z - gmin.z) / CEL) + 1;
+    const grade = new Float32Array(nx * ny * nz).fill(1e9);
+    const rc = Math.ceil(FORA / CEL);
+    const t0 = performance.now();
+    for (const v of nuvem) {
+      const ix = Math.round((v[0] - gmin.x) / CEL), iy = Math.round((v[1] - gmin.y) / CEL),
+            iz = Math.round((v[2] - gmin.z) / CEL);
+      for (let a = Math.max(0, ix - rc); a <= Math.min(nx - 1, ix + rc); a++)
+        for (let b = Math.max(0, iy - rc); b <= Math.min(ny - 1, iy + rc); b++)
+          for (let c = Math.max(0, iz - rc); c <= Math.min(nz - 1, iz + rc); c++) {
+            const dx = gmin.x + a * CEL - v[0], dy = gmin.y + b * CEL - v[1],
+                  dz = gmin.z + c * CEL - v[2];
+            const dd = Math.sqrt(dx * dx + dy * dy + dz * dz);
+            const k = (a * ny + b) * nz + c;
+            if (dd < grade[k]) grade[k] = dd;
+          }
+    }
+    const custo = performance.now() - t0;
+    const raio = nuvem.length ? Math.max(...nuvem.map(v =>
+      Math.hypot(v[0] - centro.x, v[1] - centro.y, v[2] - centro.z))) : 1;
+
+    function distancia(x, y, z) {
+      const fx = (x - gmin.x) / CEL, fy = (y - gmin.y) / CEL, fz = (z - gmin.z) / CEL;
+      if (fx < 0 || fy < 0 || fz < 0 || fx > nx - 1 || fy > ny - 1 || fz > nz - 1) return 1e9;
+      const a = Math.floor(fx), b = Math.floor(fy), c = Math.floor(fz);
+      const a1 = Math.min(a + 1, nx - 1), b1 = Math.min(b + 1, ny - 1), c1 = Math.min(c + 1, nz - 1);
+      const tx = fx - a, ty = fy - b, tz = fz - c;
+      const G = (i, j, k) => grade[(i * ny + j) * nz + k];
+      const l = (p, q, t) => p + (q - p) * t;
+      return l(l(l(G(a,b,c), G(a1,b,c), tx), l(G(a,b1,c), G(a1,b1,c), tx), ty),
+               l(l(G(a,b,c1), G(a1,b,c1), tx), l(G(a,b1,c1), G(a1,b1,c1), tx), ty), tz);
+    }
+    /* peso = perto da parede do átrio E acima do anel. A porta vertical é o
+       que impede o campo de descer pela junção AV: no anel vale ~0, e só
+       18 mm acima vale 1. */
+    const peso = (x, y, z) =>
+      (1 - suave((distancia(x, y, z) - DENTRO) / (FORA - DENTRO))) * suave((y - yAnel) / 18);
+    return { peso, centro, raio, custo, nuvem: nuvem.length, yAnel };
+  }
+
+  const campoE = fazerCampo('parede_ae', anelDe(VALVAS.mitral));
+  const campoD = fazerCampo('parede_ad', anelDe(VALVAS.tricuspide));
+
+  /* ── EFEITOS 3 e 4 · O CAMPO VENTRICULAR ────────────────────────────────
+     Relógio: `vVE`, o volume ventricular do motor. Região: TUDO abaixo do
+     plano valvar — e aqui, ao contrário dos átrios, não é preciso portão de
+     distância nenhum, porque abaixo do plano não existe nada que não seja
+     território ventricular. O que existe lá é parede, papilar, folheto AV e
+     a árvore coronária, e todos devem acompanhar.
+
+     A REPARTIÇÃO, que é a lição que o Mario me ensinou apanhando a
+     "extra-sístole atrial": os pesos se REPARTEM, não se somam. O portão
+     ventricular é literalmente `1 − portão atrial`, então em qualquer altura
+     os dois valem 1 juntos. No sulco AV a fatia é dividida; acima dele o
+     ventrículo não tem nada; abaixo, o átrio não tem nada.
+
+     AS CÚSPIDES ENTRAM NESTE CAMPO — e ficaram fora dos atriais. Não é
+     inconsistência: nos átrios a cúspide aórtica seria arrastada por uma
+     parede que ela só TOCA; aqui o anel que a segura é que desce, e descer
+     com o anel é exatamente a física do pistão. O deslocamento se soma ao
+     movimento de abrir, que é rígido, então os dois compõem sem brigar.
+
+     DUAS COMPONENTES, dois cursores, porque são dois fenômenos:
+     · RADIAL — o vértice se aproxima do EIXO LONGO (ápice→base). É o aperto.
+     · LONGITUDINAL — o vértice desce ao longo do eixo, com força
+       proporcional à distância do ápice: o ápice fica quase parado e a BASE
+       desce. É daqui que sai o plano valvar descendo, sem precisar ser
+       roteirizado à parte. */
+  const yPlano = Math.min(anelDe(VALVAS.mitral), anelDe(VALVAS.tricuspide));
+  const portaoVent = y => 1 - suave((y - yPlano) / 18);
+
+  /* O ÁPICE NÃO É O PONTO MAIS BAIXO DE UMA PEÇA — é o ponto mais baixo do
+     TECIDO. Medi-lo num vértice só entrega ao ruído de uma malha reduzida a
+     99%, então é o centroide dos 2% mais baixos de tudo que está abaixo do
+     plano. E o CENTRO DA BASE é o anel, não o meio do folheto: os folhetos
+     pendem para dentro do ventrículo, e o centroide deles fica 20 mm abaixo
+     do anel que os prende. */
+  const abaixo = [];
+  for (const m of malhas) {
+    const pos = m.geometry.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      const y = pos.getY(i);
+      if (y < yPlano) abaixo.push([pos.getX(i), y, pos.getZ(i)]);
+    }
+  }
+  abaixo.sort((a, b) => a[1] - b[1]);
+  const nApice = Math.max(1, Math.round(abaixo.length * .02));
+  const apice = new THREE.Vector3();
+  for (let i = 0; i < nApice; i++) apice.add(new THREE.Vector3(...abaixo[i]));
+  apice.multiplyScalar(1 / nApice);
+
+  const base = new THREE.Vector3(); let nb = 0;
+  for (const nome of [...VALVAS.mitral, ...VALVAS.tricuspide]) {
+    const m = porNome.get(nome); if (!m) continue;
+    const pos = m.geometry.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      const y = pos.getY(i);
+      if (y > yPlano - 8) { base.add(new THREE.Vector3(pos.getX(i), y, pos.getZ(i))); nb++; }
+    }
+  }
+  base.multiplyScalar(1 / Math.max(1, nb));
+  const eixo = base.clone().sub(apice);
+  const compEixo = eixo.length() || 1;
+  eixo.normalize();
+  apiceG = apice; eixoG = eixo; compEixoG = compEixo;
+
+  /* ── montagem das peças ─────────────────────────────────────────────── */
+  const conta = { E: { pecas: 0, vert: 0, nomes: [] }, D: { pecas: 0, vert: 0, nomes: [] },
+                  V: { pecas: 0, vert: 0, nomes: [] } };
+  const rad = new THREE.Vector3(), rel = new THREE.Vector3();
+  for (const m of malhas) {
+    const pos = m.geometry.attributes.position;
+    const base0 = new Float32Array(pos.array);
+    const cusp = cuspDe.get(m.name) || null;
+    const campos = {};
+    if (!EH_CUSPIDE.has(m.name)) {
+      for (const par of [['E', campoE], ['D', campoD]]) {
+        const id = par[0], campo = par[1];
+        let algum = 0;
+        const tmp = new Float32Array(pos.count * 3);
+        for (let i = 0; i < pos.count; i++) {
+          const j = i * 3, x = base0[j], y = base0[j + 1], z = base0[j + 2];
+          const w = campo.peso(x, y, z);
+          if (w > .002) {
+            algum++;
+            tmp[j]     = -(x - campo.centro.x) * w;
+            tmp[j + 1] = -(y - campo.centro.y) * w;
+            tmp[j + 2] = -(z - campo.centro.z) * w;
+          }
+        }
+        if (algum) { campos[id] = tmp;
+          conta[id].pecas++; conta[id].vert += algum; conta[id].nomes.push(m.name); }
+      }
+    }
+    /* o campo ventricular vale para TODAS as malhas, cúspides inclusive */
+    let dV = null, dL = null, pesoV = null, algumV = 0;
+    {
+      const tv = new Float32Array(pos.count * 3), tl = new Float32Array(pos.count * 3);
+      var wv = new Float32Array(pos.count);
+      for (let i = 0; i < pos.count; i++) {
+        const j = i * 3;
+        const w = portaoVent(base0[j + 1]);
+        if (w <= .002) continue;
+        wv[i] = w; algumV++;
+        rel.set(base0[j] - apice.x, base0[j + 1] - apice.y, base0[j + 2] - apice.z);
+        const s = rel.dot(eixo);                       // 0 no ápice, cresce até a base
+        rad.copy(rel).addScaledVector(eixo, -s);       // o braço perpendicular ao eixo
+        tv[j] = -rad.x * w; tv[j + 1] = -rad.y * w; tv[j + 2] = -rad.z * w;
+        tl[j] = -eixo.x * s * w; tl[j + 1] = -eixo.y * s * w; tl[j + 2] = -eixo.z * s * w;
+      }
+      if (algumV) { dV = tv; dL = tl; pesoV = wv;
+        conta.V.pecas++; conta.V.vert += algumV; conta.V.nomes.push(m.name); }
+    }
+    if (cusp || campos.E || campos.D || dV)
+      pecas.push({ malha: m, base: base0, cusp,
+                   dE: campos.E || null, dD: campos.D || null, dV, dL, pesoV });
+  }
+
+  /* ── DOIS OLHOS SOBRE OS CAMPOS ────────────────────────────────────────
+     Um campo posicional é invisível: não há peça para selecionar, não há
+     lista para conferir. Estes dois botões são o único jeito de olhar para
+     ele. "Pintar" tinge cada vértice pela FORÇA com que o campo o pega —
+     QUENTE para o átrio esquerdo, FRIO para o direito, escuro onde os dois
+     já morreram. É assim que se vê que a coronária esquerda acompanha, que a
+     aórtica ficou de fora, e sobretudo que o `parede_ad` foi cortado pelo
+     anel: a metade de cima acende, a de baixo fica apagada. */
+  const alvoAtrios = campoE.centro.clone().add(campoD.centro).multiplyScalar(.5).sub(cen);
+  const raioAtrios = Math.max(campoE.raio, campoD.raio,
+    campoE.centro.distanceTo(campoD.centro) * .5 + 10);
+  mirar = () => {
+    const d = raioAtrios / Math.tan(cam.fov * Math.PI / 360) * 1.25;
+    ctl.target.copy(alvoAtrios);
+    cam.position.set(alvoAtrios.x + d * .30, alvoAtrios.y + d * .28, alvoAtrios.z - d * .91);
+    ctl.update(); desenhaAgora();
+  };
+
+  /* o peso volta a aparecer dividindo o deslocamento pelo braço que o gerou */
+  const pesoDe = new Map();   // malha → { E: Float32Array, D: Float32Array }
+  for (const p of pecas) {
+    if (!p.dE && !p.dD) continue;
+    const n = p.malha.geometry.attributes.position.count;
+    const w = { E: new Float32Array(n), D: new Float32Array(n) };
+    for (const par of [['E', campoE, p.dE], ['D', campoD, p.dD]]) {
+      const id = par[0], campo = par[1], d = par[2];
+      if (!d) continue;
+      for (let i = 0; i < n; i++) {
+        const j = i * 3;
+        const braco = Math.hypot(p.base[j] - campo.centro.x,
+                                 p.base[j+1] - campo.centro.y,
+                                 p.base[j+2] - campo.centro.z) || 1;
+        w[id][i] = Math.hypot(d[j], d[j+1], d[j+2]) / braco;
+      }
+    }
+    pesoDe.set(p.malha, w);
+  }
+  let pintado = false;
+  pintar = () => {
+    pintado = !pintado;
+    for (const m of malhas) {
+      if (!pintado) { m.material = m.userData.matOriginal || m.material;
+        m.geometry.deleteAttribute('color'); continue; }
+      if (!m.userData.matOriginal) m.userData.matOriginal = m.material;
+      const n = m.geometry.attributes.position.count;
+      const w = pesoDe.get(m);
+      const cor = new Float32Array(n * 3);
+      for (let i = 0; i < n; i++) {
+        const e = w ? w.E[i] : 0, d = w ? w.D[i] : 0;
+        cor[i*3]     = .07 + e * .93 + d * .10;
+        cor[i*3 + 1] = .09 + e * .60 + d * .55;
+        cor[i*3 + 2] = .11 + e * .28 + d * .95;
+      }
+      m.geometry.setAttribute('color', new THREE.BufferAttribute(cor, 3));
+      m.material = new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.DoubleSide });
+    }
+    desenhaAgora();
+    return pintado ? 'campo à vista' : 'cores do arquivo';
+  };
+
+  window.varrerNaN = () => {
+    const maus = [];
+    for (const m of malhas) {
+      const a = m.geometry.attributes.position.array;
+      let n = 0;
+      for (let i = 0; i < a.length; i++) if (!Number.isFinite(a[i])) n++;
+      if (n) maus.push({ nome: m.name, nans: n, de: a.length,
+                         noPecas: pecas.some(p => p.malha === m) });
+    }
+    return maus;
+  };
+
+  atrio = {
+    esquerdo: { anel: +campoE.yAnel.toFixed(1), nuvem: campoE.nuvem, custoMs: +campoE.custo.toFixed(1),
+                centro: campoE.centro.toArray().map(v => +v.toFixed(1)),
+                pecas: conta.E.pecas, vertices: conta.E.vert, nomes: conta.E.nomes },
+    direito:  { anel: +campoD.yAnel.toFixed(1), nuvem: campoD.nuvem, custoMs: +campoD.custo.toFixed(1),
+                centro: campoD.centro.toArray().map(v => +v.toFixed(1)),
+                pecas: conta.D.pecas, vertices: conta.D.vert, nomes: conta.D.nomes },
+  };
+  atrio.ventriculo = { plano: +yPlano.toFixed(1),
+    apice: apice.toArray().map(v => +v.toFixed(1)),
+    base: base.toArray().map(v => +v.toFixed(1)),
+    eixoLongoMm: +compEixo.toFixed(1),
+    direcao: eixo.toArray().map(v => +v.toFixed(3)),
+    pecas: conta.V.pecas, vertices: conta.V.vert };
+  $('lcampo').textContent = 'AE ' + conta.E.vert.toLocaleString('pt-BR') +
+    ' · AD ' + conta.D.vert.toLocaleString('pt-BR') +
+    ' · V ' + conta.V.vert.toLocaleString('pt-BR');
+
+  const cx = $('estado');
+  for (const v of Object.keys(VALVAS)) {
+    const l = document.createElement('div'); l.className = 'lin';
+    l.innerHTML = `<span>${NOMES[v]}</span><b id="e_${v}">—</b>`;
+    cx.appendChild(l);
+  }
+  pronto = true;
+  medir(); desenhaAgora();
+});
+
+/* ── O RELÓGIO, o mesmo da bancada ─────────────────────────────────────── */
+let fc = 75, fase = 0, batendo = true, sim = simular(75);
+let vaeMax = 1, vaeMin = 0, vadMax = 1, vadMin = 0, vveMax = 1, vveMin = 0;
+function escalaAtrial() {
+  let a = -1e9, b = 1e9, c = -1e9, d = 1e9, e = -1e9, f = 1e9;
+  for (const q of sim.quadro) {
+    if (q.vAE > a) a = q.vAE; if (q.vAE < b) b = q.vAE;
+    if (q.vAD > c) c = q.vAD; if (q.vAD < d) d = q.vAD;
+    if (q.vVE > e) e = q.vVE; if (q.vVE < f) f = q.vVE;
+  }
+  vaeMax = a; vaeMin = b; vadMax = c; vadMin = d; vveMax = e; vveMin = f;
+}
+escalaAtrial();
+
+const abertura = { mitral: 1, tricuspide: 1, aortica: 0, pulmonar: 0 };
+/* multiplicador por LADO, para a régua poder calar um campo e medir o outro
+   sozinho. Fora da medição vale 1 nos dois. */
+const ganho = { E: 1, D: 1, V: 1, L: 1 };
+const FASE = { 'sistole atrial': 'sístole atrial', 'contracao isovolumetrica': 'contração isovolumétrica',
+  'ejecao': 'ejeção', 'relaxamento isovolumetrico': 'relaxamento isovolumétrico',
+  'enchimento': 'enchimento', 'diastase': 'diástase' };
+
+function aplicar(q, dt) {
+  if (!pronto) return;
+  const curso = parseFloat($('curso').value);
+  const cursoA = parseFloat($('cursoA').value);
+
+  /* o estado vem do motor, DERIVADO DAS PRESSÕES. A cúspide não salta entre
+     aberta e fechada: o folheto tem inércia, então a abertura persegue o
+     estado com uma constante de tempo. */
+  for (const v of Object.keys(VALVAS)) {
+    const alvo = q[v] ? 1 : 0;
+    const k = Math.min(1, (dt || .016) * 26);
+    abertura[v] += (alvo - abertura[v]) * k;
+    const el = $('e_' + v);
+    if (el) { el.textContent = q[v] ? 'aberta' : 'fechada';
+      el.className = q[v] ? 'aberta' : 'fechada'; }
+  }
+
+  /* 0 com o átrio cheio, 1 com o átrio vazio. Mesmo relógio do efeito 1 do
+     `bate.html`: o volume atrial do motor, e mais nada. CADA LADO TEM O SEU —
+     o direito não é cópia do esquerdo com atraso, é `vAD`, e o motor já dá a
+     diferença de tempo entre os dois. */
+  const fE = (vaeMax - q.vAE) / Math.max(1e-6, vaeMax - vaeMin);
+  const fD = (vadMax - q.vAD) / Math.max(1e-6, vadMax - vadMin);
+  const gE = cursoA * fE * ganho.E, gD = cursoA * fD * ganho.D;
+
+  /* 0 no fim da diástole (cheio), 1 no fim da sístole (vazio). Relógio do
+     VOLUME, e mais nada — o ictus, que a isovolumétrica exige e o volume não
+     dá, é efeito à parte e ainda não entrou. */
+  const fV = (vveMax - q.vVE) / Math.max(1e-6, vveMax - vveMin);
+  const gV = parseFloat($('cursoV').value) * fV * ganho.V;
+  const gL = parseFloat($('cursoL').value) * fV * ganho.L;
+
+  for (const p of pecas) {
+    const pos = p.malha.geometry.attributes.position, arr = pos.array;
+    const base = p.base, dE = p.dE, dD = p.dD, dV = p.dV, dL = p.dL, c = p.cusp;
+    let cx = 0, cy = 0, cz = 0;
+    if (c) {
+      /* ABERTA = recuada contra a parede; FECHADA = convergida no centro.
+         Refinar para o folheto DOBRAR em vez de deslizar é passo seguinte. */
+      const k = c.dist * 0.55 * abertura[c.valva] * curso;
+      cx = c.dir.x * k; cy = c.dir.y * k; cz = c.dir.z * k;
+    }
+    for (let i = 0; i < pos.count; i++) {
+      const j = i * 3;
+      arr[j]     = base[j]     + cx + (dE ? dE[j]     * gE : 0) + (dD ? dD[j]     * gD : 0)
+                                     + (dV ? dV[j]     * gV : 0) + (dL ? dL[j]     * gL : 0);
+      arr[j + 1] = base[j + 1] + cy + (dE ? dE[j + 1] * gE : 0) + (dD ? dD[j + 1] * gD : 0)
+                                     + (dV ? dV[j + 1] * gV : 0) + (dL ? dL[j + 1] * gL : 0);
+      arr[j + 2] = base[j + 2] + cz + (dE ? dE[j + 2] * gE : 0) + (dD ? dD[j + 2] * gD : 0)
+                                     + (dV ? dV[j + 2] * gV : 0) + (dL ? dL[j + 2] * gL : 0);
+    }
+    pos.needsUpdate = true;
+  }
+
+  $('lfase').textContent = FASE[faseDe(q, em(sim, (fase - .004 + 1) % 1))] || '—';
+  $('lpve').textContent = q.pVE.toFixed(0) + ' mmHg';
+  $('lpae').textContent = q.pAE.toFixed(0) + ' mmHg';
+  $('lpao').textContent = q.pAo.toFixed(0) + ' mmHg';
+  $('lvae').textContent = q.vAE.toFixed(0) + ' / ' + q.vAD.toFixed(0) + ' ml  (' +
+    (fE * 100).toFixed(0) + '% / ' + (fD * 100).toFixed(0) + '% esvaziado)';
+  $('lvve').textContent = q.vVE.toFixed(0) + ' ml  (' + (fV * 100).toFixed(0) + '% esvaziado)';
+}
+
+function desenhaAgora() { aplicar(em(sim, fase), .016); r.render(cena, cam); }
+window.poeFase = f => { fase = f; desenhaAgora(); };
+window.aberturas = () => ({ ...abertura });
+window.campoAtrio = () => atrio;
+
+/* ── A RÉGUA ────────────────────────────────────────────────────────────
+   Mede o efeito do átrio SOZINHO, e mede TAMANHO, não posição: o raio de
+   cada vértice do campo contra o centroide dos próprios vértices do campo,
+   recalculado a cada instante. Medir contra o eixo do modelo já acusou três
+   contrações onde havia uma — foi o erro do ictus, e não se repete aqui.
+   Um vale por ciclo = uma contração por ciclo. */
+window.perfilAtrio = (lado = 'E', n = 80) => {
+  const guardaC = $('curso').value, guardaA = $('cursoA').value, guardaF = fase;
+  $('curso').value = 0;                      // as valvas caladas
+  const meu = p => lado === 'E' ? p.dE : p.dD;
+  ganho.E = lado === 'E' ? 1 : 0;            // o outro átrio, calado
+  ganho.D = lado === 'D' ? 1 : 0;
+  const alvo = pecas.filter(p => meu(p));
+  const fora = pecas.filter(p => !meu(p));   // TUDO que não é deste campo
+  const linha = [];
+  let mexeuFora = 0, maiorDesloc = 0;
+  for (let k = 0; k < n; k++) {
+    fase = k / n; aplicar(em(sim, fase), .016);
+    let cx = 0, cy = 0, cz = 0, m = 0;
+    for (const p of alvo) {
+      const arr = p.malha.geometry.attributes.position.array;
+      for (let i = 0; i < arr.length; i += 3) {
+        const d = meu(p);
+        if (!d[i] && !d[i+1] && !d[i+2]) continue;
+        cx += arr[i]; cy += arr[i+1]; cz += arr[i+2]; m++;
+      }
+    }
+    cx /= m; cy /= m; cz /= m;
+    let raio = 0;
+    for (const p of alvo) {
+      const arr = p.malha.geometry.attributes.position.array;
+      for (let i = 0; i < arr.length; i += 3) {
+        const d = meu(p);
+        if (!d[i] && !d[i+1] && !d[i+2]) continue;
+        raio += Math.hypot(arr[i] - cx, arr[i+1] - cy, arr[i+2] - cz);
+      }
+    }
+    linha.push(raio / m);
+    /* o quanto o vértice mais empurrado do campo anda, em mm — a régua do
+       raio médio dilui o núcleo do átrio na borda do campo, e o olho julga
+       pelo núcleo */
+    for (const p of alvo) {
+      const arr = p.malha.geometry.attributes.position.array;
+      for (let i = 0; i < arr.length; i += 3) {
+        const dd = Math.hypot(arr[i] - p.base[i], arr[i+1] - p.base[i+1], arr[i+2] - p.base[i+2]);
+        if (dd > maiorDesloc) maiorDesloc = dd;
+      }
+    }
+    for (const p of fora) {
+      const arr = p.malha.geometry.attributes.position.array;
+      for (let i = 0; i < arr.length; i++)
+        mexeuFora = Math.max(mexeuFora, Math.abs(arr[i] - p.base[i]));
+    }
+  }
+  ganho.E = ganho.D = 1;
+  $('curso').value = guardaC; $('cursoA').value = guardaA; fase = guardaF; desenhaAgora();
+  const mn = Math.min(...linha), mx = Math.max(...linha), faixa = mx - mn;
+
+  /* CONTAR VALE PEDE PROFUNDIDADE. A primeira versão desta régua acusou DOIS
+     vales e o segundo tinha 0,003 mm — está dentro do próprio `vAE`, é o
+     ponto em que o átrio deixa de esvaziar como conduto e volta a encher na
+     diástase. Mínimo matemático de verdade, invisível na tela. A régua que
+     não pergunta "dá para ver?" mente para o lado da desconfiança, e já é a
+     terceira vez que este instrumento erra. Agora cada vale traz a sua
+     PROEMINÊNCIA — quanto ele desce abaixo do menor pico que o cerca — e só
+     conta o que passa de 5% da excursão total. Os brutos ficam à vista. */
+  const achados = [];
+  for (let i = 0; i < n; i++) {
+    const a = linha[(i - 1 + n) % n], b = linha[i], c = linha[(i + 1) % n];
+    if (!(b < a && b <= c)) continue;
+    let e = b, d = b;
+    for (let k = 1; k < n; k++) { const v = linha[(i - k + n) % n]; if (v < e) break; e = v; }
+    for (let k = 1; k < n; k++) { const v = linha[(i + k) % n]; if (v < d) break; d = v; }
+    achados.push({ fase: +(i / n).toFixed(3), raio: +b.toFixed(3),
+                   proeminencia: +(Math.min(e, d) - b).toFixed(4),
+                   proemPct: +((Math.min(e, d) - b) / (faixa || 1) * 100).toFixed(1) });
+  }
+  const contam = achados.filter(v => v.proemPct >= 5);
+  return { lado, vales: contam.length, valesBrutos: achados.length, vale: contam, todosOsVales: achados,
+           raioMin: +mn.toFixed(3), raioMax: +mx.toFixed(3),
+           amplitudePct: +(faixa / mx * 100).toFixed(2),
+           encolheMm: +faixa.toFixed(2),
+           maiorDeslocMm: +maiorDesloc.toFixed(2),
+           mexeuForaDoCampo: +mexeuFora.toFixed(6),
+           traco: linha.map(v => +v.toFixed(3)) };
+};
+
+/* ── A RÉGUA DO VENTRÍCULO ──────────────────────────────────────────────
+   Duas componentes exigem DUAS medidas independentes, senão uma se disfarça
+   na outra — foi assim que o ictus e a descida me enganaram, cada um medindo
+   posição quando prometia tamanho. Aqui:
+
+   · RAIO = distância média ao EIXO LONGO. Só o aperto radial mexe nisto.
+   · COMPRIMENTO = extensão AO LONGO do eixo, do vértice mais baixo ao mais
+     alto do campo. Só o encurtamento longitudinal mexe nisto.
+
+   O teste que vale é CRUZADO: ligando só o aperto, o comprimento tem de
+   ficar parado; ligando só o encurtamento, o raio tem de ficar parado. Se as
+   duas medidas se mexem com um cursor só, o campo está misturando os
+   fenômenos e eu não teria como saber qual estou afinando. */
+window.perfilVent = (qual = 'R', n = 80) => {
+  const g = ['curso', 'cursoA', 'cursoV', 'cursoL'].map(id => $(id).value);
+  const guardaF = fase;
+  $('curso').value = 0; $('cursoA').value = 0;
+  $('cursoV').value = qual === 'R' || qual === 'RL' ? .18 : 0;
+  $('cursoL').value = qual === 'L' || qual === 'RL' ? .14 : 0;
+  const alvo = pecas.filter(p => p.dV);
+  const raios = [], comps = [];
+  let maiorDesloc = 0;
+  const v = new THREE.Vector3();
+  for (let k = 0; k < n; k++) {
+    fase = k / n; aplicar(em(sim, fase), .016);
+    /* SÓ O NÚCLEO DO CAMPO, peso > 0,5. A franja tem peso 0,002 e não se
+       mexe; deixá-la entrar prendia o extremo do comprimento num vértice
+       parado, e o encurtamento aparecia 6× menor do que é. Extremo é um
+       vértice só — por isso o comprimento sai de PERCENTIL, não de mín/máx. */
+    let somaR = 0, m = 0;
+    const eixos = [];
+    for (const p of alvo) {
+      const arr = p.malha.geometry.attributes.position.array;
+      for (let i = 0, k = 0; i < arr.length; i += 3, k++) {
+        if (p.pesoV[k] <= .5) continue;
+        v.set(arr[i] - apiceG.x, arr[i + 1] - apiceG.y, arr[i + 2] - apiceG.z);
+        const s = v.dot(eixoG);
+        eixos.push(s);
+        somaR += Math.sqrt(Math.max(0, v.lengthSq() - s * s));
+        m++;
+        const dd = Math.hypot(arr[i] - p.base[i], arr[i+1] - p.base[i+1], arr[i+2] - p.base[i+2]);
+        if (dd > maiorDesloc) maiorDesloc = dd;
+      }
+    }
+    eixos.sort((a, b) => a - b);
+    const pc = q => eixos[Math.floor(q * (eixos.length - 1))];
+    raios.push(somaR / m); comps.push(pc(.95) - pc(.05));
+  }
+  ['curso', 'cursoA', 'cursoV', 'cursoL'].forEach((id, i) => { $(id).value = g[i]; });
+  fase = guardaF; desenhaAgora();
+
+  const resumo = linha => {
+    const mn = Math.min(...linha), mx = Math.max(...linha), faixa = mx - mn;
+    /* LINHA RETA NÃO TEM VALE. Sem isto, um traço constante devolvia 24
+       "vales" de empate numérico e a régua gritava defeito onde havia
+       imobilidade perfeita — que era justo o que o teste queria provar. O
+       limiar é 5 micrômetros: o aperto radial é perpendicular ao eixo, então
+       não muda o comprimento a não ser pelo arredondamento do float. */
+    if (faixa < 5e-3) return { vales: 0, valesBrutos: 0, vale: [], parado: true,
+      min: +mn.toFixed(3), max: +mx.toFixed(3), variouPct: 0, variouMm: 0 };
+    const achados = [];
+    for (let i = 0; i < n; i++) {
+      const a = linha[(i - 1 + n) % n], b = linha[i], c = linha[(i + 1) % n];
+      if (!(b < a && b <= c)) continue;
+      let e = b, d = b;
+      for (let k = 1; k < n; k++) { const x = linha[(i - k + n) % n]; if (x < e) break; e = x; }
+      for (let k = 1; k < n; k++) { const x = linha[(i + k) % n]; if (x < d) break; d = x; }
+      achados.push({ fase: +(i / n).toFixed(3),
+                     proemPct: +((Math.min(e, d) - b) / (faixa || 1) * 100).toFixed(1) });
+    }
+    const contam = achados.filter(x => x.proemPct >= 5);
+    return { vales: contam.length, valesBrutos: achados.length, vale: contam,
+             min: +mn.toFixed(3), max: +mx.toFixed(3),
+             variouPct: +(faixa / mx * 100).toFixed(2), variouMm: +faixa.toFixed(3) };
+  };
+  return { qual, raio: resumo(raios), comprimento: resumo(comps),
+           maiorDeslocMm: +maiorDesloc.toFixed(2),
+           tracoRaio: raios.map(v => +v.toFixed(3)),
+           tracoComp: comps.map(v => +v.toFixed(3)) };
+};
+
+$('bpm').addEventListener('input', e => {
+  fc = parseInt(e.currentTarget.value, 10); $('vbpm').textContent = fc;
+  sim = simular(fc); escalaAtrial(); desenhaAgora();
+});
+$('lento').addEventListener('input', e => { $('vlento').textContent = (+e.currentTarget.value).toFixed(2); });
+$('curso').addEventListener('input', e => { $('vcurso').textContent = (+e.currentTarget.value).toFixed(2); desenhaAgora(); });
+$('cursoA').addEventListener('input', e => { $('vcursoA').textContent = (+e.currentTarget.value).toFixed(3); desenhaAgora(); });
+$('cursoV').addEventListener('input', e => { $('vcursoV').textContent = (+e.currentTarget.value).toFixed(3); desenhaAgora(); });
+$('cursoL').addEventListener('input', e => { $('vcursoL').textContent = (+e.currentTarget.value).toFixed(3); desenhaAgora(); });
+function poe(c, a, v, l) {
+  $('curso').value = c;  $('vcurso').textContent  = c.toFixed(2);
+  $('cursoA').value = a; $('vcursoA').textContent = a.toFixed(3);
+  $('cursoV').value = v; $('vcursoV').textContent = v.toFixed(3);
+  $('cursoL').value = l; $('vcursoL').textContent = l.toFixed(3);
+  desenhaAgora();
+}
+$('soValvas').onclick = () => poe(1, 0, 0, 0);
+$('soAtrio').onclick  = () => poe(0, .12, 0, 0);
+$('zerar').onclick    = () => poe(0, 0, 0, 0);
+$('soRadial').onclick = () => poe(0, 0, .18, 0);
+$('soLongo').onclick  = () => poe(0, 0, 0, .14);
+$('tudo').onclick     = () => poe(1, .12, .18, .14);
+$('mirar').onclick = () => mirar();
+$('pintar').onclick = e => { e.currentTarget.textContent = pintar() === 'campo à vista' ? 'cor do arquivo' : 'pintar o campo'; };
+$('parar').onclick = e => { batendo = !batendo; e.currentTarget.textContent = batendo ? 'Parar' : 'Bater'; };
+
+let antes = performance.now();
+r.setAnimationLoop(agora => {
+  const dt = Math.min(.1, (agora - antes) / 1000); antes = agora;
+  if (batendo) {
+    fase = (fase + dt / duracoes(fc).rr * parseFloat($('lento').value)) % 1;
+    aplicar(em(sim, fase), dt);
+  }
+  ctl.update(); r.render(cena, cam);
+});
+</script>
+</body>
+</html>
