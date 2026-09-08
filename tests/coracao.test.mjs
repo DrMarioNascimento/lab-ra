@@ -194,20 +194,24 @@ test("o botão grande do card 11 entrega o que o card promete", async () => {
 
   const card = hub.split('data-number="11"')[1].split("</article>")[0];
   const primario = card.split('class="launch" href="')[1].split('"')[0];
-  assert.equal(primario, "coracao/",
-    "o botão grande abre a bancada do ciclo, não um protótipo");
 
-  const bancada = await texto(primario + "index.html");
+  /* QUAL das duas páginas está no botão grande é decisão do professor, e ela
+     JÁ MUDOU DUAS VEZES em 08/09/2026 — o que este teste guarda não é a
+     escolha, é a COERÊNCIA. Enquanto a peça anatômica não tinha as leituras,
+     o botão grande tinha de abrir a esquemática; assim que ela passou a ter,
+     a escolha voltou a ser livre. Por isso aqui não se crava o endereço: abre
+     o que estiver no botão e confere que ele cumpre o parágrafo. */
+  const pagina = primario.endsWith("/") ? primario + "index.html" : primario;
+  const aberta = await texto(pagina);
   for (const promessa of ["Wiggers", "bulha", "traçado"]) {
-    assert.ok(bancada.includes(promessa),
-      `o card promete ${promessa} e a página que ele abre não tem`);
+    assert.ok(aberta.includes(promessa),
+      `o card promete ${promessa} e ${pagina}, que é o que o botão grande abre, não tem`);
   }
 
-  /* a peça anatômica continua alcançável — e dizendo que está em obra */
-  assert.ok(card.includes("bancadas/11-coracao/prototipo/duas-pecas.html"),
-    "o caminho para a peça anatômica não pode sumir do card");
-  assert.ok(card.includes("em construção"),
-    "o link da peça não pode se anunciar como bancada pronta");
+  /* e a outra continua alcançável do card, seja ela qual for */
+  const outra = primario.includes("duas-pecas") ? 'href="coracao/"' : "duas-pecas.html";
+  assert.ok(card.includes(outra),
+    "o card tem de levar às DUAS: quem entra por uma precisa achar a outra");
 });
 
 test("a bancada está protegida e traz o caminho de RA das irmãs", async () => {
