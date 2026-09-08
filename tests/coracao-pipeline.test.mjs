@@ -194,6 +194,37 @@ test("REMOVER POR NOME NÃO PODE VAZAR PELO CÓDIGO DO ARQUIVO", async () => {
   assert.equal(n, 79, `o modelo fechou em 79 malhas; hoje tem ${n}`);
 });
 
+/* ── A PEÇA ESTÁ CONGELADA EM COMPONENTES (07/09/2026) ───────────────────
+   Decisão do professor, dita assim: *"a peça também não vai acrescentar e nem
+   tirar nada além da legenda, fica fixa em componentes"*.
+
+   Isto FECHA um assunto que estava aberto e que eu reabri três vezes: o vazio
+   do ápice. A peça não tem parede ventricular esquerda na ponta — abaixo de
+   y≈4 só existe coronária, porque `parede_ae` para em y=15 e o `miocardio_ve`
+   tem 780 triângulos. A saída que eu propunha era trazer de volta a
+   `cavidade_ve`, o molde do sangue, pintada como músculo. Está DESCARTADA.
+
+   O que pode mudar daqui para a frente: cor, material, movimento, legenda,
+   decimação. O que NÃO pode: quais peças estão dentro. Se um dia a decimação
+   precisar fundir malhas, este teste vai cair — e cair é o comportamento
+   certo, porque fundir malha é mexer em componente e exige decisão de quem
+   ensina, não do script. */
+test("a composição está congelada: nem entra nem sai peça", async () => {
+  const { gltf } = await lerGlb();
+  const nomes = gltf.nodes.filter(x => x.mesh !== undefined).map(x => x.name).sort();
+  /* as três paredes e o remanescente do miocárdio continuam dentro, mesmo sem
+     legenda — não ter rótulo não é o mesmo que não estar na peça */
+  for (const obrigatoria of ['parede_ae', 'parede_ad', 'miocardio_ve']) {
+    assert.ok(nomes.includes(obrigatoria), `${obrigatoria} saiu da peça`);
+  }
+  /* e o molde do sangue continua FORA: foi apagado de propósito, e a decisão
+     de não o trazer de volta é do professor */
+  for (const proibida of ['cavidade_ve', 'cavidade_vd', 'cavidade_ae', 'cavidade_ad']) {
+    assert.ok(!nomes.includes(proibida), `${proibida} voltou; ela foi apagada de propósito`);
+  }
+  assert.equal(new Set(nomes).size, nomes.length, 'nenhum nome de malha repetido');
+});
+
 /* ── OS PROTÓTIPOS TÊM DE ACHAR O MODELO ────────────────────────────────
    Cinco páginas foram commitadas pedindo `modelos/B-bodyparts3d.glb`, um
    diretório que só existia na máquina de quem escreveu. Elas nasceram
