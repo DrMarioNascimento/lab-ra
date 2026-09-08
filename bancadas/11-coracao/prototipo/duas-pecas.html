@@ -67,17 +67,18 @@
 <body>
 <h1>As duas peças · paradas, e batendo</h1>
 <p class="nota">A mesma física move as duas: <code>fisica.js</code> corre o ciclo e cada peça lê dele o
-que sabe usar. <b>A</b> é o scan — uma casca fechada, sem peças por dentro, que se deforma inteira.
-<b>B</b> é a montagem BodyParts3D — 79 malhas, e por isso as valvas abrem de verdade. A página
-<b>abre parada</b>: o botão faz bater, e o cursor de fase pára em qualquer instante do ciclo.</p>
+que sabe usar. <b>Por fora</b> é o scan realista — uma casca fechada, sem nenhuma peça dentro, que se
+deforma inteira. <b>Por dentro</b> são 79 malhas separadas, e é por isso que ali as valvas abrem de
+verdade. A página <b>abre parada</b>: o botão faz bater, e o cursor de fase pára em qualquer instante
+do ciclo.</p>
 
 <div class="caixa">
   <canvas id="palco"></canvas>
   <div class="painel">
     <label>Peça</label>
     <div class="pecas">
-      <button id="pA" type="button" aria-pressed="false">A · scan</button>
-      <button id="pB" type="button" aria-pressed="true">B · montagem</button>
+      <button id="pA" type="button" aria-pressed="false">Por fora</button>
+      <button id="pB" type="button" aria-pressed="true">Por dentro</button>
     </div>
     <button id="bater" type="button" data-batendo="nao">Bater</button>
 
@@ -118,7 +119,7 @@ que sabe usar. <b>A</b> é o scan — uma casca fechada, sem peças por dentro, 
     </div>
 
     <details id="avA" hidden>
-      <summary>Cursores do A</summary>
+      <summary>Cursores do “por fora”</summary>
       <label>1 · contração atrial · <b id="vaA1">1.00</b></label>
       <input id="aA1" type="range" min="0" max="2" step="0.05" value="1" />
       <label>2 · contração ventricular · <b id="vaA2">1.00</b></label>
@@ -134,7 +135,7 @@ que sabe usar. <b>A</b> é o scan — uma casca fechada, sem peças por dentro, 
     </details>
 
     <details id="avB" hidden>
-      <summary>Cursores do B</summary>
+      <summary>Cursores do “por dentro”</summary>
       <label>1 · curso da cúspide · <b id="vbB1">1.00</b></label>
       <input id="bB1" type="range" min="0" max="3" step="0.05" value="1" />
       <label>2 · contração dos átrios · <b id="vbB2">0.120</b></label>
@@ -186,7 +187,7 @@ THREE.DefaultLoadingManager.onError = url => {
     'bancadas/11-coracao/fontes/scan/. Sem ele a peça B funciona inteira.';
   document.body.insertBefore(d, document.body.children[2] || null);
   $('pA').disabled = true;
-  $('pA').textContent = 'A · ausente';
+  $('pA').textContent = 'Por fora · ausente';
 };
 
 /* ── PALCO ──────────────────────────────────────────────────────────────
@@ -783,9 +784,16 @@ function trocar(qual) {
   $('pB').setAttribute('aria-pressed', qual === 'B');
   $('avA').hidden = qual !== 'A';
   $('avB').hidden = qual !== 'B';
+  /* CADA PEÇA CREDITA A SUA FONTE, e só quando está à vista. É mais correto
+     que um rodapé fixo: a CC BY pede atribuição de QUEM está sendo mostrado,
+     e crédito de peça escondida polui sem informar. O bloco continua no HTML
+     nos dois casos — só a exibição muda —, então quem inspeciona a página
+     encontra os dois. */
+  $('creditoA').hidden = qual !== 'A';
+  $('creditoB').hidden = qual !== 'B';
   $('notaValvas').textContent = qual === 'B'
-    ? 'O B desenha as onze cúspides: elas obedecem a estes estados, que o motor deriva das PRESSÕES.'
-    : 'O A é casca fechada e não tem cúspides para desenhar. Os estados abaixo continuam sendo os do motor.';
+    ? 'Aqui as onze cúspides estão desenhadas: elas obedecem a estes estados, que o motor deriva das PRESSÕES.'
+    : 'A peça de fora é casca fechada e não tem cúspides para desenhar. Os estados abaixo continuam sendo os do motor.';
   desenhaAgora();
 }
 
@@ -1038,11 +1046,14 @@ r.setAnimationLoop(agora => {
   ctl.update(); r.render(cena, cam);
 });
 </script>
-<p class="credito">Peça A · <b>Realistic Human Heart</b>, de
+<p class="credito" id="creditoA" hidden>Peça <b>por fora</b> · <b>Realistic Human Heart</b>, de
 <a href="https://sketchfab.com/neshallads" target="_blank" rel="noopener">neshallads</a>
 (<a href="https://sketchfab.com/3d-models/realistic-human-heart-3f8072336ce94d18b3d0d055a1ece089" target="_blank" rel="noopener">Sketchfab</a>),
 sob <a href="https://creativecommons.org/licenses/by/4.0/deed.pt-br" target="_blank" rel="noopener">CC BY 4.0</a>.
 Alterações para este simulador: ajuste de escala, materiais e animação — descritas em
-<code>ATTRIBUTION.md</code>. Peça B derivada do BodyParts3D, CC-BY-SA 2.1 JP.</p>
+<code>ATTRIBUTION.md</code>.</p>
+<p class="credito" id="creditoB">Peça <b>por dentro</b> · derivada do
+<b>BodyParts3D</b> (© The Database Center for Life Science), sob CC-BY-SA 2.1 JP.
+Composição, cor e movimento próprios desta bancada.</p>
 </body>
 </html>
