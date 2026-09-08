@@ -54,6 +54,20 @@
   .lin { display: flex; justify-content: space-between; gap: 10px; padding: 3px 0; font-size: 12.5px; }
   .lin b { color: #f2f7ec; }
   .aberta { color: #6ed07a; } .fechada { color: #c8737a; }
+  /* O CANVAS TEM TAMANHO DE DESENHO E TAMANHO DE CAIXA, e eles são coisas
+     diferentes: os 290x240 do atributo são a grade em que o Wiggers desenha,
+     e o `width:100%` é o quanto disso cabe no painel. Mexer só no CSS estica
+     a imagem; mexer só no atributo muda a régua.
+
+     O `max-width` é POR CAUSA DISSO, e foi medido: abaixo de 900px o painel
+     deixa de ser a coluna de 320 e passa a ocupar a largura toda — o canvas
+     ia a 555px e o desenho de 290 subia quase ao dobro, borrando um diagrama
+     cujo texto tem 9px. Nunca ampliar acima da própria grade; encolher pode,
+     que só perde detalhe, não inventa. */
+  #wiggers { display: block; width: 100%; max-width: 290px; height: auto; margin-bottom: 6px; }
+  .eletrico { margin: 0 0 6px; padding: 4px 7px; border-radius: 6px;
+              background: #131d15; color: #9fd8f2; font-size: 11.5px;
+              letter-spacing: .06em; min-height: 1.4em; }
   .grupo { margin-top: 12px; border-top: 1px solid #24331f; padding-top: 9px; }
   .grupo h3 { margin: 0 0 6px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
               color: #7f9a7c; font-weight: 600; }
@@ -197,6 +211,14 @@ do ciclo.</p>
     </div>
 
     <div class="grupo">
+      <h3>as três leituras, um relógio</h3>
+      <canvas id="wiggers" width="290" height="240" aria-label="Diagrama de Wiggers: pressões, volume, traçado elétrico e bulhas"></canvas>
+      <p class="eletrico" id="leletrico">em repouso</p>
+      <div class="lin"><span>sístole / diástole</span><b id="lsisdia">—</b></div>
+      <div class="lin"><span>diástole por minuto</span><b id="lcoronaria">—</b></div>
+    </div>
+
+    <div class="grupo">
       <h3>valvas · estado do motor</h3>
       <div id="estado"></div>
       <p class="nota" style="margin:6px 0 0;padding:0;font-size:11.5px" id="notaValvas"></p>
@@ -241,7 +263,18 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
-import { simular, em, duracoes, faseDe } from '../../../coracao/fisica.js';
+/* AS DUAS PEÇAS ENSINAM FISIOLOGIA — decisão do professor, e é o que traz
+   estas quatro linhas para cá. O motor já era o mesmo; o que faltava eram as
+   LEITURAS. Nada disto foi escrito aqui: `estruturaAtiva`, `CONDUCAO` e
+   `tempoDiastolicoPorMinuto` já estavam em `fisica.js`, afinados contra o
+   livro, e o Wiggers saiu de dentro da bancada esquemática para um módulo
+   que as duas páginas leem. Duas réguas para a mesma medida é como uma delas
+   passa a mentir sem que ninguém veja. */
+import {
+  simular, em, duracoes, faseDe,
+  estruturaAtiva, CONDUCAO, tempoDiastolicoPorMinuto,
+} from '../../../coracao/fisica.js';
+import { criarWiggers } from '../../../coracao/wiggers.js';
 import { prepararParaRA } from '../../../cores-para-ra.js';
 import { LEGENDAS } from './legendas-b.js';
 import { MARCAS_EXTERNAS, RESSALVA_EXTERNA } from './legendas-a.js';
@@ -406,6 +439,10 @@ const passo = (t, a, b) => suave((t - a) / (b - a));
 
 /* ══ O RELÓGIO, UM SÓ PARA AS DUAS PEÇAS ═══════════════════════════════ */
 let fc = 75, fase = .30, batendo = false, sim = simular(75);
+/* declarado JUNTO do relógio, e não lá embaixo: `aplicar()` usa-o, e um
+   `const` só existe depois que a linha dele corre — pendurá-lo no fim do
+   arquivo deixaria a primeira pintura tropeçando na zona morta. */
+const desenharWiggers = criarWiggers($('wiggers'));
 let vaeMax = 1, vaeMin = 0, vadMax = 1, vadMin = 0, vveMax = 1, vveMin = 0;
 
 /* ── O IMPULSO: dP/dt, e por que não os outros dois ─────────────────────
@@ -1211,6 +1248,20 @@ function aplicar(dt) {
   $('limp').textContent = (impulso[indiceDe(fase)] * 100).toFixed(0) + '%';
   $('vfase').textContent = fase.toFixed(3);
   $('fase').value = fase.toFixed(3);
+
+  /* AS TRÊS LEITURAS NO MESMO RELÓGIO. O cursor do Wiggers é a MESMA `fase`
+     que move a peça — não há um segundo tempo onde guardar um desencontro. */
+  desenharWiggers(sim, fase);
+  $('leletrico').textContent = estruturaAtiva(q.t)
+    .map(id => (CONDUCAO.find(c => c.id === id) || {}).nome)
+    .filter(Boolean).join(' · ') || 'em repouso';
+  const d = duracoes(fc);
+  $('lsisdia').textContent =
+    (d.sistole * 1000).toFixed(0) + ' / ' + (d.diastole * 1000).toFixed(0) + ' ms';
+  /* a coronária esquerda só enche na diástole: é esta linha que mostra o que
+     a taquicardia come. Medido na própria função, e não de memória: 39,0 s
+     por minuto a 60 bpm contra 23,6 s a 180. */
+  $('lcoronaria').textContent = tempoDiastolicoPorMinuto(fc).toFixed(0) + ' s';
 }
 
 /* DESENHA POR CONTA PRÓPRIA. O painel do navegador congela o

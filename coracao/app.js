@@ -24,9 +24,10 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { prepararParaRA } from '../cores-para-ra.js';
 import { criar, aplicarQuadro } from './modelos.js';
 import { NIVEIS } from './niveis.js';
+import { criarWiggers } from './wiggers.js';
 import {
   simular, em, faseDe, duracoes, estruturaAtiva,
-  tempoDiastolicoPorMinuto, CONDUCAO, faseDeSnapshotRA, bulhas,
+  tempoDiastolicoPorMinuto, CONDUCAO, faseDeSnapshotRA,
 } from './fisica.js';
 
 const $ = id => document.getElementById(id);
@@ -213,88 +214,13 @@ function atualizar(dt = 0) {
   $('lEletrico').textContent = estruturaAtiva(q.t).map(id =>
     (CONDUCAO.find(c => c.id === id) || {}).nome).filter(Boolean).join(' · ') || 'em repouso';
 
-  desenharWiggers();
+  desenharWiggers(sim, fase);
 }
 
-/* ── O DIAGRAMA DE WIGGERS ────────────────────────────────────────────────
-   Quatro faixas num eixo de tempo só: pressões, volume, traçado elétrico e as
-   bulhas. O cursor é a MESMA `fase` que move o coração em 3D — é aqui que a
-   sincronia deixa de ser promessa e vira coisa que se confere. */
-const gw = $('wiggers'), cw = gw.getContext('2d');
-const fundoWiggers = document.createElement('canvas');
-let wiggersQuadro = null;
-
-function desenharTracosWiggers() {
-  const W = gw.width, H = gw.height;
-  if (fundoWiggers.width !== W || fundoWiggers.height !== H) {
-    fundoWiggers.width = W;
-    fundoWiggers.height = H;
-  }
-  const fw = fundoWiggers.getContext('2d');
-  fw.clearRect(0, 0, W, H);
-  const m = { e: 30, d: 8, t: 8, b: 14 };
-  const px = f => m.e + f * (W - m.e - m.d);
-  const faixa = (i, n) => {
-    const alt = (H - m.t - m.b) / n;
-    return { topo: m.t + i * alt, alt: alt - 6 };
-  };
-  const linha = (dados, y0, alt, min, max, tinta, largura = 1.8) => {
-    fw.beginPath();
-    dados.forEach((v, i) => {
-      const x = px(i / (dados.length - 1));
-      const y = y0 + alt - (clamp(v, min, max) - min) / (max - min) * alt;
-      i ? fw.lineTo(x, y) : fw.moveTo(x, y);
-    });
-    fw.strokeStyle = tinta; fw.lineWidth = largura; fw.stroke();
-  };
-  const q = sim.quadro;
-  fw.font = '9px "IBM Plex Mono", monospace';
-
-  /* 1 · pressões: ventrículo, aorta e átrio no mesmo eixo — é o cruzamento
-     delas que ABRE e FECHA as válvulas, e por isso têm de ficar juntas */
-  let fx = faixa(0, 4);
-  linha(q.map(x => x.pAo), fx.topo, fx.alt, 0, 140, '#c8363e');
-  linha(q.map(x => x.pVE), fx.topo, fx.alt, 0, 140, '#f2f7ec', 2.1);
-  linha(q.map(x => x.pAE), fx.topo, fx.alt, 0, 140, '#5fd177', 1.4);
-  fw.fillStyle = '#7f9a80'; fw.fillText('mmHg', 2, fx.topo + 9);
-
-  /* 2 · volume do ventrículo: os patamares são as fases isovolumétricas, e
-     eles são o argumento visual de que as válvulas não foram roteirizadas */
-  fx = faixa(1, 4);
-  linha(q.map(x => x.vVE), fx.topo, fx.alt, 30, 140, '#f5c518', 2.1);
-  fw.fillStyle = '#7f9a80'; fw.fillText('ml', 2, fx.topo + 9);
-
-  /* 3 · o traçado elétrico */
-  fx = faixa(2, 4);
-  linha(q.map(x => x.ecg), fx.topo, fx.alt, -.35, 1.1, '#9fd8f2', 1.8);
-  fw.fillStyle = '#7f9a80'; fw.fillText('ECG', 2, fx.topo + 9);
-
-  /* 4 · as bulhas: a primeira no fechamento da mitral, a segunda no da
-     aórtica. Elas não são desenhadas por tempo — são achadas percorrendo as
-     válvulas, então caem sozinhas no lugar certo. O laço dá a volta: a 150
-     bpm o B2 cai na emenda do ciclo. */
-  fx = faixa(3, 4);
-  fw.fillStyle = '#7f9a80'; fw.fillText('bulhas', 2, fx.topo + 9);
-  for (const b of bulhas(q).todas) {
-    const x = px(b.fase);
-    fw.beginPath(); fw.moveTo(x, fx.topo + fx.alt); fw.lineTo(x, fx.topo + 2);
-    fw.strokeStyle = '#ff9d2e'; fw.lineWidth = 2; fw.stroke();
-    fw.fillStyle = '#ff9d2e'; fw.fillText(b.nome, x + 3, fx.topo + 9);
-  }
-  wiggersQuadro = q;
-}
-
-function desenharWiggers() {
-  /* os traços só mudam quando o ciclo é recalculado; o cursor anda sozinho */
-  if (wiggersQuadro !== sim.quadro) desenharTracosWiggers();
-  const W = gw.width, H = gw.height;
-  cw.clearRect(0, 0, W, H);
-  cw.drawImage(fundoWiggers, 0, 0);
-  const m = { e: 30, d: 8, t: 8, b: 14 };
-  const x = m.e + ((fase % 1) + 1) % 1 * (W - m.e - m.d);
-  cw.beginPath(); cw.moveTo(x, m.t); cw.lineTo(x, H - m.b);
-  cw.strokeStyle = 'rgba(245,197,24,.85)'; cw.lineWidth = 1.5; cw.stroke();
-}
+/* O DIAGRAMA DE WIGGERS SAIU DAQUI para `wiggers.js`, porque a peça anatômica
+   também ensina o ciclo e as duas têm de ler a MESMA régua. Ver o cabeçalho
+   do módulo. */
+const desenharWiggers = criarWiggers($('wiggers'));
 
 /* ------------------------------------------------------------ laço */
 function ajustar() {
@@ -304,7 +230,7 @@ function ajustar() {
   desenhar();
 }
 addEventListener('resize', ajustar);
-function desenhar() { desenharWiggers(); renderer.render(scene, camera); }
+function desenhar() { desenharWiggers(sim, fase); renderer.render(scene, camera); }
 
 let anterior = performance.now();
 renderer.setAnimationLoop(agora => {

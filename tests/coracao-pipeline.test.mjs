@@ -119,6 +119,44 @@ test("o glb WIP existe, declara WIP, e não põe malha em peça ausente", async 
   assert.equal(meta.orcamento_60k, false);
 });
 
+test("AS DUAS PEÇAS ENSINAM FISIOLOGIA, e leem a MESMA régua", async () => {
+  /* Decisão do professor: a peça anatômica não é vitrine de anatomia ao lado
+     de uma bancada de fisiologia — as duas ensinam o ciclo. O risco de
+     cumprir isso por cópia é o que este teste existe para impedir: duas
+     implementações do mesmo diagrama divergem no dia em que uma é corrigida,
+     e a outra passa a mentir em silêncio, sem ninguém reabrir.
+
+     Por isso o Wiggers virou módulo. Aqui se confere que NENHUMA das duas
+     páginas tem desenho próprio, e que as duas chamam o mesmo. */
+  const peca = await texto("bancadas/11-coracao/prototipo/duas-pecas.html");
+  const app = await texto("coracao/app.js");
+  const modulo = await texto("coracao/wiggers.js");
+
+  /* o laço que percorre os fechamentos e crava as bulhas no eixo é a parte
+     que uma cópia teria de repetir — então é ele o que se procura */
+  for (const [onde, src] of [["a peça anatômica", peca], ["a bancada esquemática", app]]) {
+    assert.ok(/criarWiggers\(/.test(src), `${onde} não desenha o Wiggers`);
+    assert.ok(!src.includes("bulhas(q).todas"),
+      `${onde} tem desenho PRÓPRIO do diagrama — é a cópia que este teste impede`);
+  }
+  assert.ok(modulo.includes("bulhas(q).todas"), "o módulo é quem crava as bulhas no eixo");
+
+  /* e as duas leem o mesmo motor: a física nunca foi duplicada, e as leituras
+     que faltavam na peça também não foram reescritas — vieram de lá */
+  for (const nome of ["estruturaAtiva", "CONDUCAO", "tempoDiastolicoPorMinuto"]) {
+    assert.ok(peca.includes(nome), `a peça devia importar ${nome} de fisica.js`);
+  }
+  assert.ok(/from '\.\.\/\.\.\/\.\.\/coracao\/fisica\.js'/.test(peca),
+    "a peça lê a física da bancada, e não uma cópia sua");
+
+  /* O CURSOR DO WIGGERS É A MESMA `fase` QUE MOVE A PEÇA, e é essa frase que
+     a bancada existe para provar. Conferido na tela: fase 0, 0,25, 0,50,
+     0,75 e 0,99 puseram o cursor em 30, 93, 156, 219 e 279 px de um canvas
+     de 290 — reta, sem segundo relógio onde guardar um desencontro. */
+  assert.ok(/desenharWiggers\(sim, fase\)/.test(peca),
+    "o Wiggers da peça tem de receber a MESMA fase, não um tempo próprio");
+});
+
 test("A PEÇA ANATÔMICA ESTÁ VESTIDA DE BANCADA, e trancada como as irmãs", async () => {
   /* Ela nasceu protótipo, aberta no navegador por caminho de arquivo, e um dia
      virou destino de link do portal — sem tranca, sem marca e sem saída. Era a
