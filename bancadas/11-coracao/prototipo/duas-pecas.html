@@ -65,6 +65,16 @@
      cujo texto tem 9px. Nunca ampliar acima da própria grade; encolher pode,
      que só perde detalhe, não inventa. */
   #wiggers { display: block; width: 100%; max-width: 290px; height: auto; margin-bottom: 6px; }
+  /* A caixa de falha fica DENTRO da moldura do palco, no lugar exato onde o
+     coração deveria estar — é ali que o olho já está quando não vê nada. */
+  .falha { position: absolute; inset: 0; display: flex; flex-direction: column;
+           justify-content: center; gap: 8px; padding: 22px 26px;
+           background: #10150f; border-radius: 12px; overflow-y: auto; }
+  .falha b { color: #f5c518; font-size: 13.5px; letter-spacing: .04em; }
+  .falha p { margin: 0; color: #b0c4ac; font-size: 12.5px; max-width: 62ch; }
+  .falha code { display: block; color: #ff9d2e; font-size: 11.5px;
+                white-space: pre-wrap; word-break: break-all; max-width: 74ch; }
+  .falha .pedido { color: #7f9a80; font-size: 11.5px; margin-top: 4px; }
   .nota-ausencia { margin: 0 0 8px; color: #93a691; font-size: 11.5px; line-height: 1.5; }
   /* verde CLARO, e não o escuro da marca: a regra de contraste do
      `laboratorio.css` é que o verde escuro só carrega superfície, nunca
@@ -146,6 +156,79 @@
   }
 </style>
 <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.1.0/dist/model-viewer.min.js"></script>
+<!-- ── A PÁGINA TEM DE DIZER QUE QUEBROU ────────────────────────────────
+     Em 08/09/2026 o professor abriu esta bancada e recebeu o PALCO VAZIO:
+     a moldura, o painel e o rodapé desenhados, e nada dentro. Sem nenhuma
+     linha de erro, nem para ele nem para mim — e eu passei três rodadas
+     adivinhando entre cache, peso e login, quando o navegador dele sabia a
+     resposta desde o primeiro segundo.
+
+     A causa não importa para este bloco: importa que ele **não é módulo**.
+     Um `try/catch` dentro do módulo não pega falha de IMPORTAÇÃO — se o
+     `three` não chega, o módulo inteiro nem começa a correr, e é
+     justamente esse o caso que mais acontece (rede de universidade que
+     bloqueia CDN, por exemplo). Só um ouvinte de `error` instalado ANTES,
+     em script clássico, vê isso.
+
+     Também há um vigia de tempo: se nenhum quadro foi desenhado em 20 s,
+     a página assume que travou e diz. Quem espera olhando tela preta não
+     sabe se deve continuar esperando. -->
+<script>
+(() => {
+  "use strict";
+  const $f = () => document.getElementById('falha');
+  let jaMostrou = false;
+  window.__vivo = false;   /* o laço de desenho põe true no primeiro quadro */
+
+  function mostrar(titulo, detalhe, dica) {
+    if (jaMostrou) return;
+    const el = $f();
+    if (!el) return;
+    jaMostrou = true;
+    el.hidden = false;
+    el.innerHTML =
+      '<b>' + titulo + '</b>' +
+      (dica ? '<p>' + dica + '</p>' : '') +
+      (detalhe ? '<code>' + String(detalhe).replace(/[<&]/g, c => c === '<' ? '&lt;' : '&amp;') + '</code>' : '') +
+      '<p class="pedido">Copie esta caixa inteira ao relatar — é ela que diz onde quebrou.</p>';
+  }
+
+  /* Falha ao CARREGAR um recurso (script, módulo, modelo). Vem na fase de
+     captura porque erro de recurso não borbulha. */
+  addEventListener('error', ev => {
+    const alvo = ev.target;
+    if (alvo && alvo !== window && (alvo.src || alvo.href)) {
+      const url = alvo.src || alvo.href;
+      const deFora = !url.startsWith(location.origin);
+      mostrar('Um arquivo não carregou.',
+        url,
+        deFora
+          ? 'Ele vem de fora deste site (CDN). Redes de instituição às vezes bloqueiam esse endereço — vale testar noutra rede ou no 4G.'
+          : 'É um arquivo deste próprio laboratório. Se o endereço acima estiver certo, pode ser falha momentânea do GitHub Pages.');
+      return;
+    }
+    mostrar('O código parou com um erro.',
+      (ev.message || '') + (ev.filename ? '\n' + ev.filename + ':' + ev.lineno : ''),
+      'A moldura da página carregou, mas o palco não chegou a ser desenhado.');
+  }, true);
+
+  addEventListener('unhandledrejection', ev => {
+    mostrar('Uma etapa da carga falhou.',
+      (ev.reason && (ev.reason.stack || ev.reason.message)) || String(ev.reason),
+      'Costuma ser o modelo 3D não ter chegado inteiro.');
+  });
+
+  addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      if (!window.__vivo) {
+        mostrar('O palco não desenhou nada em 20 segundos.',
+          '',
+          'Os dois modelos somam cerca de 4,5 MB. Em rede lenta isso demora — mas se esta caixa apareceu, já passou do razoável.');
+      }
+    }, 20000);
+  });
+})();
+</script>
 </head>
 <body>
 <header class="topbar"><nav class="nav shell" aria-label="Laboratório"><a class="brand" href="../../../bancadas.html"><img src="../../../brand/orientador.webp" alt="" width="42" height="42"><span class="brand-copy"><b>LABORATÓRIO DO PESQUISAR RA</b><span>Fisiologia · Unidade IV</span></span></a><div class="nav-actions"><a class="small-button" href="../../../bancadas.html">Testes</a></div></nav></header>
@@ -166,6 +249,7 @@ do ciclo.</p>
   <div class="cena">
     <canvas id="palco"></canvas>
     <div class="camadaLegendas" id="legendas"><svg class="fios" id="fios"></svg></div>
+    <div class="falha" id="falha" hidden></div>
   </div>
   <div class="painel">
     <label>Peça</label>
@@ -1282,7 +1366,9 @@ function aplicar(dt) {
 /* DESENHA POR CONTA PRÓPRIA. O painel do navegador congela o
    requestAnimationFrame, e se a única atualização estiver dentro do laço a
    página parece morta — é a regra da casa, e já custou caro antes. */
-function desenhaAgora() { aplicar(.016); r.render(cena, cam); desenharLegendas(); prepararRA(); }
+/* `__vivo` avisa ao vigia lá de cima que o palco chegou a desenhar. Sem
+   isto, os 20 s disparariam mesmo com a página inteira funcionando. */
+function desenhaAgora() { window.__vivo = true; aplicar(.016); r.render(cena, cam); desenharLegendas(); prepararRA(); }
 window.poeFase = f => { fase = ((f % 1) + 1) % 1; desenhaAgora(); };
 window.trocaPeca = trocar;
 window.pecaAtual = () => atual;
@@ -1535,6 +1621,7 @@ $('launchAR').addEventListener('click', () => {
 
 let antes = performance.now();
 r.setAnimationLoop(agora => {
+  window.__vivo = true;
   const dt = Math.min(.1, (agora - antes) / 1000); antes = agora;
   if (batendo) {
     fase = (fase + dt / duracoes(fc).rr * (+$('lento').value)) % 1;
