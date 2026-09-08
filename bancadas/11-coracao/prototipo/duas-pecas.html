@@ -1,15 +1,38 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-ra-protected>
 <head>
 <meta charset="utf-8" />
+<link rel="icon" href="../../../brand/orientador.webp" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Vista Externa e Vista Interna, paradas e batendo</title>
+<meta name="theme-color" content="#050a06" />
+<title>A peça anatômica · Laboratório do Pesquisar RA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=IBM+Plex+Mono:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<!-- A FOLHA DO LABORATÓRIO VEM ANTES DA DESTA PÁGINA, e a ordem é o acordo:
+     ela traz a barra, o "Voltar" e o rodapé com as medidas das irmãs, e a
+     folha daqui continua mandando no que é desta bancada — o palco, o painel
+     e as legendas —, porque vence por vir depois com a mesma especificidade. -->
+<link rel="stylesheet" href="../../../laboratorio.css" />
+<!-- A TRANCA RESOLVE TUDO PELO ENDEREÇO DO PRÓPRIO SCRIPT, e é por isso que
+     ela funciona a três pastas de fundura sem nenhum ajuste: `authUrl` e
+     `bancadasUrl` saem de `new URL(..., scriptUrl)`. Sem esta linha, esta era
+     a única porta do laboratório aberta sem conta. -->
+<script src="../../../guard.js"></script>
 <style>
   :root { color-scheme: dark; }
   body { margin: 0; background: #0a0d0a; color: #dbe6d8;
          font: 13.5px/1.55 "IBM Plex Mono", ui-monospace, monospace; }
+  /* O TÍTULO FICA NA GRAMÁTICA DA BANCADA — 15px, versalete, mono — e não na
+     do laboratório, que o poria em Cinzel a 4rem. Quem veste esta página é a
+     barra, o "Voltar" e o rodapé; o miolo continua sendo bancada de trabalho,
+     e anunciá-la pronta pela tipografia seria a mesma mentira que o card
+     acabou de parar de contar. */
+  .cabeca { display: flex; justify-content: space-between; align-items: flex-end;
+            gap: 14px; margin: 16px 18px 6px; }
+  .cabeca .eyebrow { font-size: 10.5px; letter-spacing: .16em; }
   h1 { font-size: 15px; letter-spacing: .16em; text-transform: uppercase;
-       color: #9ec49a; margin: 14px 18px 4px; font-weight: 600; }
+       color: #9ec49a; margin: 4px 0 0; font-weight: 600; }
   p.nota { margin: 0 18px 12px; max-width: 96ch; color: #93a691; font-size: 12.5px; }
   .caixa { display: grid; grid-template-columns: 1fr 320px; gap: 14px; padding: 0 16px 20px; }
   #palco { width: 100%; height: 660px; display: block;
@@ -94,11 +117,26 @@
     .painel { max-height: none; overflow-y: visible; }
     #palco { height: 62vh; }
   }
+  /* MESMO JOELHO DAS IRMÃS, 720px: é onde o `.page-head` do laboratório vira
+     coluna. Em linha, a 375px, o "Voltar" ficava com 77px e quebrava em duas
+     linhas — a seta em cima e a palavra embaixo. E esta regra tem de ser a
+     ÚLTIMA da folha: `@media` não aumenta especificidade, e a `.cabeca` de
+     cima ganharia dela por ordem. */
+  @media (max-width: 720px) {
+    .cabeca { flex-direction: column; align-items: flex-start; gap: 8px; }
+  }
 </style>
 <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.1.0/dist/model-viewer.min.js"></script>
 </head>
 <body>
-<h1>Vista Externa e Vista Interna · paradas, e batendo</h1>
+<header class="topbar"><nav class="nav shell" aria-label="Laboratório"><a class="brand" href="../../../bancadas.html"><img src="../../../brand/orientador.webp" alt="" width="42" height="42"><span class="brand-copy"><b>LABORATÓRIO DO PESQUISAR RA</b><span>Fisiologia · Unidade IV</span></span></a><div class="nav-actions"><a class="small-button" href="../../../bancadas.html">Testes</a></div></nav></header>
+<div class="cabeca">
+  <div>
+    <span class="eyebrow">Teste 11 · Unidade IV · a peça anatômica, em construção</span>
+    <h1>Vista Externa e Vista Interna · paradas, e batendo</h1>
+  </div>
+  <a class="back-link" href="../../../bancadas.html">← Voltar</a>
+</div>
 <p class="nota">A mesma física move as duas: <code>fisica.js</code> corre o ciclo e cada peça lê dele o
 que sabe usar. <b>Vista Externa</b> é o scan realista — uma casca fechada, sem nenhuma peça dentro, que se
 deforma inteira. <b>Vista Interna</b> são 79 malhas separadas, e é por isso que ali as valvas abrem de
@@ -1448,5 +1486,6 @@ Alterações para este simulador: ajuste de escala, materiais e animação — d
 <p class="credito" id="creditoB"><b>Vista Interna</b> · derivada do
 <b>BodyParts3D</b> (© The Database Center for Life Science), sob CC-BY-SA 2.1 JP.
 Composição, cor e movimento próprios desta bancada.</p>
+<footer class="rodape shell"><img src="../../../brand/mestre-lap.webp" alt="" width="84" height="84"><p>Simuladores interativos do Prof. Mário César Nascimento, PhD ©</p></footer>
 </body>
 </html>
