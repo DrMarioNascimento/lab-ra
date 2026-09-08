@@ -45,16 +45,16 @@ tinta. Por isso os controles de luz vêm primeiro: mexa neles antes de mexer nas
   <canvas id="cb"></canvas>
   <div class="painel">
     <h2>Luz · vale para os dois</h2>
-    <div class="lin"><span>exposição</span><b id="vexp">1.10</b></div>
-    <input id="exp" type="range" min="0.3" max="2" step="0.02" value="1.1" />
-    <div class="lin"><span>ambiente</span><b id="vamb">0.75</b></div>
-    <input id="amb" type="range" min="0" max="1.5" step="0.02" value="0.75" />
-    <div class="lin"><span>luz principal</span><b id="vkey">2.40</b></div>
-    <input id="key" type="range" min="0" max="5" step="0.05" value="2.4" />
-    <div class="lin"><span>preenchimento</span><b id="vfill">0.60</b></div>
-    <input id="fill" type="range" min="0" max="3" step="0.05" value="0.6" />
-    <div class="lin"><span>contraluz</span><b id="vrim">1.00</b></div>
-    <input id="rim" type="range" min="0" max="4" step="0.05" value="1" />
+    <div class="lin"><span>exposição</span><b id="vexp">1.35</b></div>
+    <input id="exp" type="range" min="0.3" max="2" step="0.02" value="1.35" />
+    <div class="lin"><span>ambiente</span><b id="vamb">0.80</b></div>
+    <input id="amb" type="range" min="0" max="1.5" step="0.02" value="0.80" />
+    <div class="lin"><span>luz principal</span><b id="vkey">2.20</b></div>
+    <input id="key" type="range" min="0" max="5" step="0.05" value="2.2" />
+    <div class="lin"><span>preenchimento</span><b id="vfill">1.30</b></div>
+    <input id="fill" type="range" min="0" max="3" step="0.05" value="1.3" />
+    <div class="lin"><span>contraluz</span><b id="vrim">0.45</b></div>
+    <input id="rim" type="range" min="0" max="4" step="0.05" value="0.45" />
 
     <h2>B · cor por material</h2>
     <div id="mats"></div>
@@ -62,7 +62,15 @@ tinta. Por isso os controles de luz vêm primeiro: mexa neles antes de mexer nas
     <h2>A · o scan</h2>
     <div class="lin"><span>tingir</span><input id="tint" type="color" value="#ffffff" /></div>
     <div class="lin"><span>aspereza</span><b id="vrou">—</b></div>
-    <input id="rou" type="range" min="0" max="1" step="0.02" value="0.5" />
+    <input id="rou" type="range" min="0" max="1" step="0.02" value="0.55" />
+    <div class="lin"><span>metálico</span><b id="vmet">0.00</b></div>
+    <input id="met" type="range" min="0" max="1" step="0.02" value="0" />
+    <div class="lin"><span>usar o mapa de aspereza</span>
+      <input id="mapa" type="checkbox" /></div>
+    <div class="lin"><span>levantar as sombras</span><b id="vlev">0.16</b></div>
+    <input id="lev" type="range" min="0" max="0.6" step="0.01" value="0.16" />
+    <div class="lin"><span>cor de quem levanta</span>
+      <input id="levcor" type="color" value="#a8494a" /></div>
 
     <button id="copiar" type="button">Copiar os valores</button>
     <div class="saida" id="saida">—</div>
@@ -87,9 +95,9 @@ function palco(id) {
   const cena = new THREE.Scene();
   cena.environment = new THREE.PMREMGenerator(r).fromScene(new RoomEnvironment(), .04).texture;
   cena.add(new THREE.HemisphereLight(0xffeede, 0x181016, 1.0));
-  const key = new THREE.DirectionalLight(0xfff2e6, 2.4); key.position.set(120, 180, 160);
-  const fill = new THREE.DirectionalLight(0xffcfc4, .6); fill.position.set(-140, 60, 100);
-  const rim = new THREE.DirectionalLight(0x9fb8ff, 1.0); rim.position.set(-80, 90, -180);
+  const key = new THREE.DirectionalLight(0xfff2e6, 2.2); key.position.set(120, 180, 160);
+  const fill = new THREE.DirectionalLight(0xffcfc4, 1.3); fill.position.set(-140, 60, 100);
+  const rim = new THREE.DirectionalLight(0x9fb8ff, .45); rim.position.set(-80, 90, -180);
   cena.add(key, fill, rim);
   const cam = new THREE.PerspectiveCamera(32, 1, .1, 5000);
   const ctl = new OrbitControls(cam, canvas); ctl.enableDamping = true;
@@ -121,8 +129,42 @@ let matA = null, matsB = new Map();
 carregador.load('modelos/A-scan-realista.glb', g => {
   g.scene.traverse(o => { if (o.isMesh && !matA) matA = o.material; });
   encaixar(A, g.scene);
-  $('vrou').textContent = (matA.roughness ?? 0.5).toFixed(2);
-  $('rou').value = matA.roughness ?? 0.5;
+  /* O BRILHO DO A ERA MOLHADO DEMAIS. O scan vem com aspereza baixa e, com
+     luz forte, o realce especular cobria o relevo e a cor. Subindo a aspereza
+     o pigmento reaparece; a foto continua sendo a mesma textura. */
+  /* ── DUAS CAUSAS, E A PRIMEIRA ANULAVA O MEU AJUSTE ────────────────────
+     1. O material tem MAPA de aspereza, e no three.js o valor escalar é
+        MULTIPLICADO por ele. O mapa é quase preto — aspereza baixa em toda
+        parte —, então 0,78 x quase-zero continuava quase-zero, e subir o
+        cursor não fazia quase nada. Desligando o mapa, o escalar passa a
+        mandar de facto. O relevo continua vindo do mapa de NORMAIS, que
+        fica; some só o falso "molhado".
+     2. O glTF não declara metallicFactor, e o padrão do formato é 1,0 —
+        o coração estava sendo iluminado como METAL. Daí o realce branco
+        e duro em vez do brilho macio de carne.
+
+     E uma lição do primeiro ajuste: matar o brilho E baixar a luz ao mesmo
+     tempo deixou o modelo escuro e sem forma. Superfície FOSCA precisa de
+     MAIS luz, não de menos — o brilho estava fazendo parte do trabalho de
+     revelar o relevo, e quem o substitui é a iluminação. */
+  matA.userData.mapaOriginal = matA.roughnessMap;
+  matA.roughnessMap = null;
+  matA.metalness = 0;
+  matA.roughness = 0.55;
+  /* ── LEVANTAR O ÁPICE ──────────────────────────────────────────────────
+     O escuro do ápice está ASSADO na textura de cor: não é sombra, é
+     pigmento. Tingir não resolve, porque cor multiplica, e multiplicar só
+     escurece.
+
+     Quem levanta é a EMISSIVA CHAPADA: ela soma um valor igual em toda a
+     superfície, o que ergue muito o que está escuro e quase nada o que já
+     está claro — reduz o contraste por baixo, sem lavar os claros. E,
+     tingida com o vermelho do miocárdio do B, puxa o A para a paleta dele
+     no mesmo gesto. Duas coisas, um controle. */
+  matA.emissive = new THREE.Color('#a8494a');
+  matA.emissiveIntensity = 0.16;
+  matA.needsUpdate = true;
+  $('vrou').textContent = '0.55'; $('rou').value = 0.55;
   luz();
 });
 
@@ -137,6 +179,26 @@ carregador.load('modelos/B-bodyparts3d.glb', g => {
     cor.value = '#' + m.color.getHexString();
     cor.addEventListener('input', () => { m.color.set(cor.value); pintar(); });
     lin.append(rot, cor); cx.appendChild(lin);
+  }
+  /* ── APROXIMAR O B DA PALETA DO A ────────────────────────────────────────
+     No A o músculo é VINHO ESCURO e as coronárias são CLARAS, quase creme —
+     gordura e adventícia por cima do músculo. O B estava ao contrário:
+     coronária escarlate sobre corpo rosa-claro. Invertida a relação, os dois
+     passam a se ler como a mesma coisa. */
+  const PALETA = {
+    miocardio:   '#7e2b2f',   // vinho de músculo, não vermelho de sangue
+    coronaria:   '#e0a89c',   // clara POR CIMA do músculo, como no scan
+    valva:       '#f2e9df',   // creme
+    vaso:        '#c9615c',
+    vaso_venoso: '#5d63a4',
+    endocardio:  '#d9b5b8',
+    cavidade:    '#c33540',
+  };
+  for (const [nome, m] of matsB) if (PALETA[nome]) m.color.set(PALETA[nome]);
+  for (const [nome, m] of matsB) {
+    const inp = [...document.querySelectorAll('#mats input[type=color]')]
+      .find(i => i.previousSibling && i.previousSibling.textContent === nome);
+    if (inp) inp.value = '#' + m.color.getHexString();
   }
   luz();
 });
@@ -159,6 +221,22 @@ function luz() {
 for (const id of ['exp', 'amb', 'key', 'fill', 'rim']) $(id).addEventListener('input', luz);
 
 $('tint').addEventListener('input', e => { if (matA) { matA.color.set(e.target.value); pintar(); } });
+$('lev').addEventListener('input', e => {
+  if (!matA) return; matA.emissiveIntensity = +e.target.value;
+  $('vlev').textContent = (+e.target.value).toFixed(2); matA.needsUpdate = true; pintar();
+});
+$('levcor').addEventListener('input', e => {
+  if (!matA) return; matA.emissive.set(e.target.value); matA.needsUpdate = true; pintar();
+});
+$('met').addEventListener('input', e => {
+  if (!matA) return; matA.metalness = +e.target.value;
+  $('vmet').textContent = (+e.target.value).toFixed(2); matA.needsUpdate = true; pintar();
+});
+$('mapa').addEventListener('change', e => {
+  if (!matA) return;
+  matA.roughnessMap = e.target.checked ? matA.userData.mapaOriginal : null;
+  matA.needsUpdate = true; pintar();
+});
 $('rou').addEventListener('input', e => {
   if (!matA) return; matA.roughness = +e.target.value;
   $('vrou').textContent = (+e.target.value).toFixed(2); pintar();
