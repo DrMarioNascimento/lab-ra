@@ -1,0 +1,5 @@
+# O `launch.json` é COMPARTILHADO de propósito: é ele que põe o repositório
+# no ar para conferir uma bancada na tela, e serve a quem sentar aqui depois.
+# Já o `settings.local.json` é da máquina de quem senta — permissões e
+# preferências pessoais — e não tem por que viajar no repositório.
+.claude/settings.local.json
