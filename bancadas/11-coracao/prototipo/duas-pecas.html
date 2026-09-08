@@ -235,6 +235,25 @@
           'Os dois modelos somam cerca de 4,5 MB. Em rede lenta isso demora — mas se esta caixa apareceu, já passou do razoável.');
       }
     }, 20000);
+
+    /* O PALCO PODE ESTAR VIVO E MESMO ASSIM PRETO, e este é o caso que
+       custou uma rodada inteira: o laço desenha, a RA exporta o modelo, o
+       painel enche — e o canvas continua preto porque o BUFFER DE DESENHO
+       ficou do tamanho errado. Acontece quando o layout não estava pronto na
+       hora de medir. Aqui se compara o buffer com a caixa: se a caixa é
+       grande e o buffer não, o defeito é de MEDIDA, e a página diz isso em
+       vez de deixar o professor olhando preto. */
+    setTimeout(() => {
+      const c = document.getElementById('palco');
+      if (!c) return;
+      const caixa = c.getBoundingClientRect();
+      if (caixa.height > 120 && c.height < caixa.height * 0.5) {
+        mostrar('O palco tem tamanho, mas o desenho saiu noutro tamanho.',
+          'caixa ' + Math.round(caixa.width) + 'x' + Math.round(caixa.height) +
+          '  ·  buffer ' + c.width + 'x' + c.height,
+          'É falha de MEDIDA, não de modelo: redimensionar a janela costuma corrigir na hora. Relate estes dois números.');
+      }
+    }, 6000);
   });
 })();
 </script>
@@ -437,9 +456,32 @@ const rim = new THREE.DirectionalLight(0x9fb8ff, .45); rim.position.set(-80, 90,
 cena.add(key, fill, rim);
 const cam = new THREE.PerspectiveCamera(32, 1, .1, 5000);
 const ctl = new OrbitControls(cam, canvas); ctl.enableDamping = true;
-function medir() { const w = canvas.clientWidth, h = canvas.clientHeight;
-  r.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }
-addEventListener('resize', medir); medir();
+/* ── MEDIR UMA VEZ NÃO BASTA, e isto deixou o palco PRETO ─────────────
+   A versão anterior chamava `medir()` uma única vez, na avaliação do módulo,
+   e depois só no `resize` da janela. Basta o layout não estar pronto naquele
+   instante para o canvas medir 0 — e aí `cam.aspect = w / 0` vira Infinity,
+   a matriz de projeção sai inútil e NADA é desenhado. Como nada mais chama
+   `medir()`, fica preto até alguém redimensionar a janela na mão.
+
+   O gatilho foi meu: esta página ganhou `laboratorio.css` e as fontes do
+   Google quando virou bancada de verdade. Folha externa ainda pendente adia
+   o layout, e o módulo (que é `defer` por natureza) pode correr antes dele.
+   Em Chromium o layout chegava a tempo; na máquina do professor, não.
+
+   Agora quem manda é o ResizeObserver, que dispara quando a CAIXA muda —
+   inclusive na primeira vez que ela deixa de ser zero. A guarda contra
+   tamanho nulo fica junto, para nunca mais existir um aspect Infinity. */
+function medir() {
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  if (!w || !h) return;                 /* ainda sem layout: não estraga a câmera */
+  r.setSize(w, h, false);
+  cam.aspect = w / h;
+  cam.updateProjectionMatrix();
+}
+addEventListener('resize', medir);
+new ResizeObserver(() => { medir(); if (typeof desenhaAgora === 'function') desenhaAgora(); })
+  .observe(canvas);
+medir();
 {
   const d = ALTURA / Math.tan(cam.fov * Math.PI / 360) * 1.12;
   cam.position.set(d * .18, d * .10, d * .95);
