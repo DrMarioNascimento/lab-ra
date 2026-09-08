@@ -38,6 +38,22 @@
             letter-spacing: .1em; text-transform: uppercase; }
   details[hidden] { display: none; }
   .fasebar { font-size: 12px; color: #cfe0cb; }
+  /* A CAMADA DAS LEGENDAS fica POR CIMA do canvas e não recebe toque: o
+     rótulo não pode roubar o arrasto de quem gira a peça. */
+  .cena { position: relative; }
+  .camadaLegendas { position: absolute; inset: 0; overflow: hidden;
+                    pointer-events: none; border-radius: 12px; }
+  .rotulo { position: absolute; transform: translate(-50%, -50%);
+            font: 11px/1.25 "IBM Plex Mono", ui-monospace, monospace;
+            color: #f2f7ec; background: rgba(10,14,10,.82);
+            border: 1px solid #4b6b3f; border-radius: 6px;
+            padding: 2px 6px; white-space: nowrap; letter-spacing: .01em;
+            text-shadow: 0 1px 2px #000; }
+  .rotulo.valva { border-color: #8a7f3f; }
+  .rotulo::before { content: ''; position: absolute; left: -5px; top: 50%;
+                    width: 4px; height: 4px; margin-top: -2px; border-radius: 50%;
+                    background: #9ec49a; }
+  .rotulo.valva::before { background: #d8c53a; }
   .ra { margin-top: 12px; border-top: 1px solid #24331f; padding-top: 10px; }
   model-viewer { width: 100%; height: 190px; display: block; border-radius: 10px;
                  background: #0c110b; border: 1px solid #24331f; }
@@ -73,7 +89,10 @@ verdade. A página <b>abre parada</b>: o botão faz bater, e o cursor de fase p�
 do ciclo.</p>
 
 <div class="caixa">
-  <canvas id="palco"></canvas>
+  <div class="cena">
+    <canvas id="palco"></canvas>
+    <div class="camadaLegendas" id="legendas"></div>
+  </div>
   <div class="painel">
     <label>Peça</label>
     <div class="pecas">
@@ -81,6 +100,12 @@ do ciclo.</p>
       <button id="pB" type="button" aria-pressed="true">Vista Interna</button>
     </div>
     <button id="bater" type="button" data-batendo="nao">Bater</button>
+    <label>Legendas</label>
+    <div class="pecas">
+      <button id="legValvas" type="button" aria-pressed="false">Valvas</button>
+      <button id="legVasos" type="button" aria-pressed="false">Vasos</button>
+    </div>
+    <p class="ra-status" id="notaLegendas">—</p>
 
     <div class="ra">
       <h3 style="margin:0 0 6px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#7f9a7c;font-weight:600">na sua mesa</h3>
@@ -159,6 +184,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { simular, em, duracoes, faseDe } from '/coracao/fisica.js';
 import { prepararParaRA } from '/cores-para-ra.js';
+import { LEGENDAS } from './legendas-b.js';
 
 /* ── ONDE MORAM OS MODELOS ──────────────────────────────────────────────
    O B é o EXPORT DA ESTEIRA, versionado neste repositório — a mesma peça de
@@ -742,6 +768,149 @@ function montarB(raiz, malhas) {
   };
 }
 
+/* ══ AS LEGENDAS TRIDIMENSIONAIS ═══════════════════════════════════════
+   O rótulo é HTML posicionado por projeção, não sprite dentro da cena. Duas
+   razões: texto de sprite fica borrado ou custa uma textura por rótulo, e
+   aqui o texto precisa continuar legível com o coração do tamanho de um
+   coração. A camada não recebe toque, senão o rótulo rouba o arrasto de quem
+   gira a peça.
+
+   A ÂNCORA É UM VÉRTICE, não um centroide fixo. Se fosse ponto congelado, o
+   rótulo descolaria da peça assim que ela começasse a bater — e é justamente
+   batendo que alguém vai querer ler "cúspide anterior da mitral". Escolho na
+   carga o vértice mais próximo do centro do grupo e passo a ler a posição
+   DELE a cada quadro: a legenda acompanha a contração de graça, pelo mesmo
+   campo que move a malha.
+
+   Peça repetida é fragmento do mesmo vaso: dez malhas podem ser um ramo só,
+   e a legenda é do GRUPO. Por isso a âncora se escolhe sobre a união das
+   malhas do grupo, não sobre uma delas. */
+const grupoAtivo = { valvas: false, vasos: false };
+let ancoras = [];          // { el, malha, indice, grupo }
+
+function montarLegendas(porNome, camada) {
+  const v = new THREE.Vector3(), c = new THREE.Vector3();
+  for (const grupo of ['valvas', 'vasos']) {
+    for (const [rotulo, nomes] of LEGENDAS[grupo]) {
+      const malhas = nomes.map(n => porNome.get(n)).filter(Boolean);
+      if (!malhas.length) continue;
+
+      /* centro do GRUPO, ponderado por número de vértices — assim um
+         fragmento de 100 vértices não puxa a legenda tanto quanto um de
+         2.000, e o rótulo cai onde o vaso realmente tem massa */
+      c.set(0, 0, 0); let total = 0;
+      for (const m of malhas) {
+        const pos = m.geometry.attributes.position;
+        for (let i = 0; i < pos.count; i++) { c.x += pos.getX(i); c.y += pos.getY(i); c.z += pos.getZ(i); }
+        total += pos.count;
+      }
+      c.multiplyScalar(1 / Math.max(1, total));
+
+      let melhor = null, dist = Infinity;
+      for (const m of malhas) {
+        const pos = m.geometry.attributes.position;
+        for (let i = 0; i < pos.count; i++) {
+          v.set(pos.getX(i), pos.getY(i), pos.getZ(i));
+          const d = v.distanceToSquared(c);
+          if (d < dist) { dist = d; melhor = { malha: m, indice: i }; }
+        }
+      }
+      const el = document.createElement('div');
+      el.className = 'rotulo' + (grupo === 'valvas' ? ' valva' : '');
+      el.textContent = rotulo;
+      el.hidden = true;
+      camada.appendChild(el);
+      ancoras.push({ el, malha: melhor.malha, indice: melhor.indice, grupo });
+    }
+  }
+}
+
+const _p = new THREE.Vector3(), _pw = new THREE.Vector3();
+function desenharLegendas() {
+  const ligadas = atual === 'B' && (grupoAtivo.valvas || grupoAtivo.vasos);
+  const camada = $('legendas');
+  if (!ligadas) { for (const a of ancoras) a.el.hidden = true; return; }
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  const postos = [];
+  for (const a of ancoras) {
+    if (!grupoAtivo[a.grupo]) { a.el.hidden = true; continue; }
+    const pos = a.malha.geometry.attributes.position;
+    _p.set(pos.getX(a.indice), pos.getY(a.indice), pos.getZ(a.indice));
+    a.malha.localToWorld(_p);
+    _pw.copy(_p);                       // guarda o mundo ANTES de projetar
+    _p.project(cam);
+    /* ATRÁS DA CÂMERA O PROJETADO VIRA ESPELHO: sem esta guarda, o rótulo de
+       uma peça que está atrás do observador aparece do lado oposto da tela,
+       apontando para o nada. */
+    if (_p.z > 1 || _p.z < -1) { a.el.hidden = true; continue; }
+    a.el.hidden = false;
+    /* PROFUNDIDADE EM DISTÂNCIA, não no z da projeção. O z normalizado é
+       não-linear e, com `near 0.1` contra `far 5000`, cola em 1 para tudo que
+       está na cena: medido, os dez rótulos saíam com a MESMA profundidade, a
+       opacidade ficava toda no mínimo e a ordenação do desamontoador era
+       sorteio. A distância à câmera separa de verdade. */
+    postos.push({ a, x: (_p.x * .5 + .5) * w, y: (-_p.y * .5 + .5) * h,
+                  d: cam.position.distanceTo(_pw) });
+  }
+
+  /* ── DESAMONTOAR ────────────────────────────────────────────────────
+     Onze rótulos já não fazem muro, mas a aórtica e a pulmonar nascem a
+     centímetros uma da outra e ainda se cobrem. A regra é a mais simples que
+     funciona: quem está MAIS PERTO da câmera coloca primeiro e fica onde
+     quer; quem chega depois e esbarra desce até caber. Se não couber em
+     lugar nenhum, some — melhor um rótulo a menos que dois ilegíveis.
+
+     O tamanho é medido UMA VEZ e guardado. Ler `offsetWidth` a cada quadro,
+     com o laço de animação rodando, força o navegador a recalcular o layout
+     inteiro sessenta vezes por segundo — e o texto do rótulo não muda. */
+  postos.sort((p, q) => p.d - q.d);      // o mais perto escolhe lugar primeiro
+  const dCentro = cam.position.length(), raio = ALTURA * .6;
+  const caixas = [];
+  for (const t of postos) {
+    const el = t.a.el;
+    if (!el.dataset.larg) {
+      el.dataset.larg = el.offsetWidth || 120;
+      el.dataset.alt = el.offsetHeight || 18;
+    }
+    const lw = +el.dataset.larg, lh = +el.dataset.alt + 3;
+    let y = t.y, coube = false;
+    for (let tent = 0; tent < 14; tent++) {
+      const yy = y + (tent % 2 ? 1 : -1) * Math.ceil(tent / 2) * lh;
+      const bate = caixas.some(c =>
+        Math.abs(c.x - t.x) < (c.w + lw) / 2 && Math.abs(c.y - yy) < (c.h + lh) / 2);
+      if (!bate) { y = yy; coube = true; break; }
+    }
+    if (!coube) { el.hidden = true; continue; }
+    /* PRESO DENTRO DO QUADRO. A camada corta o que passa da borda, e o
+       desamontoador empurra para baixo — juntos, mandavam um rótulo para
+       fora e ele aparecia cortado pela metade, que é pior que não aparecer:
+       o aluno lê meia palavra e acha que é outra coisa. */
+    const x = Math.max(lw / 2 + 2, Math.min(w - lw / 2 - 2, t.x));
+    y = Math.max(lh / 2 + 2, Math.min(h - lh / 2 - 2, y));
+    caixas.push({ x, y, w: lw, h: lh });
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+    /* quem está do outro lado da peça fica mais apagado, para o aluno saber
+       o que está na frente */
+    const frente = Math.max(0, Math.min(1, (dCentro + raio - t.d) / (2 * raio)));
+    el.style.opacity = (.42 + frente * .58).toFixed(2);
+  }
+}
+
+function pintarBotoesLegenda() {
+  $('legValvas').setAttribute('aria-pressed', grupoAtivo.valvas);
+  $('legVasos').setAttribute('aria-pressed', grupoAtivo.vasos);
+  const ehInterna = atual === 'B';
+  $('legValvas').disabled = $('legVasos').disabled = !ehInterna;
+  const n = ancoras.filter(a => grupoAtivo[a.grupo]).length;
+  $('notaLegendas').textContent = !ehInterna
+    ? 'A Vista Externa é uma casca só, sem peças nomeadas para rotular.'
+    : (n ? n + ' de ' + ancoras.length + ' rótulos à vista. As três paredes não recebem legenda — nenhuma delas é parede de átrio.'
+         : 'Dois interruptores independentes: uma, a outra, ou as duas.');
+}
+window.legendas = () => ({ ...grupoAtivo, rotulos: ancoras.length,
+  visiveis: ancoras.filter(a => !a.el.hidden).length });
+
 /* ══ CARGA DAS DUAS PEÇAS ══════════════════════════════════════════════ */
 const pecaA = { raiz: null, aplicar: null }, pecaB = { raiz: null, aplicar: null };
 let atual = 'B';
@@ -758,6 +927,7 @@ carregador.load(MODELO_B, g => {
   pecaB.raiz = g.scene;
   corDoB(malhas);
   pecaB.aplicar = montarB(g.scene, malhas);
+  montarLegendas(new Map(malhas.map(m => [m.name, m])), $('legendas'));
   cena.add(g.scene);
   trocar('B');
 });
@@ -791,6 +961,7 @@ function trocar(qual) {
      encontra os dois. */
   $('creditoA').hidden = qual !== 'A';
   $('creditoB').hidden = qual !== 'B';
+  pintarBotoesLegenda();
   $('notaValvas').textContent = qual === 'B'
     ? 'Aqui as onze cúspides estão desenhadas: elas obedecem a estes estados, que o motor deriva das PRESSÕES.'
     : 'A Vista Externa é casca fechada e não tem cúspides para desenhar. Os estados abaixo continuam sendo os do motor.';
@@ -824,7 +995,7 @@ function aplicar(dt) {
 /* DESENHA POR CONTA PRÓPRIA. O painel do navegador congela o
    requestAnimationFrame, e se a única atualização estiver dentro do laço a
    página parece morta — é a regra da casa, e já custou caro antes. */
-function desenhaAgora() { aplicar(.016); r.render(cena, cam); prepararRA(); }
+function desenhaAgora() { aplicar(.016); r.render(cena, cam); desenharLegendas(); prepararRA(); }
 window.poeFase = f => { fase = ((f % 1) + 1) % 1; desenhaAgora(); };
 window.trocaPeca = trocar;
 window.pecaAtual = () => atual;
@@ -888,6 +1059,15 @@ window.excursao = (qual = atual, n = 40) => {
            faseDoPico: +(maxPorQuadro.indexOf(pico) / n).toFixed(3),
            traco: maxPorQuadro.map(v => +v.toFixed(1)) };
 };
+
+for (const [id, grupo] of [['legValvas', 'valvas'], ['legVasos', 'vasos']]) {
+  $(id).onclick = () => {
+    grupoAtivo[grupo] = !grupoAtivo[grupo];
+    pintarBotoesLegenda();
+    desenhaAgora();
+  };
+}
+pintarBotoesLegenda();
 
 $('pA').onclick = () => trocar('A');
 $('pB').onclick = () => trocar('B');
@@ -1043,7 +1223,7 @@ r.setAnimationLoop(agora => {
     fase = (fase + dt / duracoes(fc).rr * (+$('lento').value)) % 1;
     aplicar(dt);
   }
-  ctl.update(); r.render(cena, cam);
+  ctl.update(); r.render(cena, cam); desenharLegendas();
 });
 </script>
 <p class="credito" id="creditoA" hidden><b>Vista Externa</b> · <b>Realistic Human Heart</b>, de
