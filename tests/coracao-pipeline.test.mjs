@@ -197,6 +197,44 @@ test("A CONDUÇÃO NÃO É INVENTADA NA PEÇA: o glb declara ausência, e a pág
     "o nível 04 deixou de ser o da condução, e o ponteiro ficou para trás");
 });
 
+test("O IMPORTMAP VEM ANTES DE TODO SCRIPT DE MÓDULO, em TODA página do laboratório", async () => {
+  /* ISTO CUSTOU UMA TARDE, e o modo de falhar é o que faz valer o teste.
+     Em `duas-pecas.html` o importmap estava lá embaixo, junto do código —
+     DEPOIS do `<script type="module">` do model-viewer. A especificação
+     exige que o mapa exista antes de qualquer resolução de módulo. O Chrome
+     tolerava e desenhava normalmente; o FIREFOX recusa o mapa e o módulo
+     morre com "o especificador 'three' não foi remapeado para nada".
+
+     Resultado: a bancada funcionava em toda máquina que eu testei e ficava
+     com o PALCO VAZIO na do professor — e sem nenhuma mensagem, porque erro
+     de importação não é pego por try/catch dentro do próprio módulo.
+
+     Das doze páginas com importmap, ONZE sempre estiveram certas. A que
+     estava fora era justamente a que o card abre. */
+  const arquivos = [];
+  async function varrer(rel) {
+    for (const nome of await readdir(new URL(`../${rel}`, import.meta.url), { withFileTypes: true })) {
+      if (nome.name.startsWith(".") || nome.name === "vendor" || nome.name === "node_modules") continue;
+      const filho = rel ? `${rel}/${nome.name}` : nome.name;
+      if (nome.isDirectory()) await varrer(filho);
+      else if (nome.name.endsWith(".html")) arquivos.push(filho);
+    }
+  }
+  await varrer("");
+
+  let comMapa = 0;
+  for (const f of arquivos) {
+    const src = await texto(f);
+    const mapa = src.indexOf('type="importmap"');
+    if (mapa < 0) continue;
+    comMapa++;
+    const modulo = src.indexOf('type="module"');
+    assert.ok(modulo < 0 || mapa < modulo,
+      `${f}: o importmap aparece depois do primeiro script de módulo — no Firefox isso deixa o palco VAZIO`);
+  }
+  assert.ok(comMapa >= 12, `só ${comMapa} páginas com importmap; a varredura deve estar errada`);
+});
+
 test("A PEÇA ANATÔMICA ESTÁ VESTIDA DE BANCADA, e trancada como as irmãs", async () => {
   /* Ela nasceu protótipo, aberta no navegador por caminho de arquivo, e um dia
      virou destino de link do portal — sem tranca, sem marca e sem saída. Era a
