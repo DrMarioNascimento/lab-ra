@@ -915,11 +915,14 @@ function desenharLegendas() {
         /* O MIOLO PRETO marca o ponto EXATO. O halo diz "é por aqui" e o
            miolo diz "é aqui": um chama o olho de longe, o outro dá a
            precisão de perto. Ele vem DEPOIS do ponto no grupo, para ficar
-           por cima, e sem o filtro — se levasse o glow junto, brilharia
-           preto e sumiria dentro da própria luz. */
+           por cima, e sem o filtro — se levasse o glow junto, brilharia e
+           sumiria dentro da própria luz.
+
+           CINZA, não preto: contra o halo aceso, o preto abria um poço e
+           puxava demais; o cinza marca sem furar. */
         const miolo = document.createElementNS(SVGNS, 'circle');
         miolo.setAttribute('r', 1.8);
-        miolo.setAttribute('fill', '#0a120c');
+        miolo.setAttribute('fill', '#909490');
         /* O PONTO PRECISA SER MAIOR — pedido do professor, e ele tem razão:
            com 2,5 px ele sumia dentro da textura da peça e a chamada parecia
            terminar no nada.
