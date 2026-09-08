@@ -157,6 +157,46 @@ test("AS DUAS PEÇAS ENSINAM FISIOLOGIA, e leem a MESMA régua", async () => {
     "o Wiggers da peça tem de receber a MESMA fase, não um tempo próprio");
 });
 
+test("A CONDUÇÃO NÃO É INVENTADA NA PEÇA: o glb declara ausência, e a página diz isso", async () => {
+  /* EU QUASE ERREI ISTO, e o modo do erro é o que vale guardar. Vi
+     `no_sinusal`, `feixe_de_his` e `purkinje` entre os nomes do glb e concluí
+     que a geometria estava lá — faltaria só um mapa de nomes. Os cinco nós
+     são VAZIOS: sem malha, sem filhos, sem sequer uma posição. O nome não é
+     geometria; ali ele é DECLARAÇÃO DE AUSÊNCIA, e o `INVENTORY.md` já a
+     marcava com ❌ ("zero hits no PART-OF e no IS-A 4.0" do BodyParts3D).
+
+     A regra vem da SPEC, e é do professor: "Sem malha anatômica, a bancada
+     usa o esquema. NÃO INVENTAR nó sinusal 'no lugar certo'". Um ponto posto
+     a olho na parede do átrio ensina uma localização errada com a autoridade
+     de um modelo anatômico — o pior lugar para um palpite.
+
+     Este teste guarda os dois lados: que o glb continua declarando a
+     ausência, e que a página não a esconde. */
+  const { gltf } = await lerGlb();
+  const porNome = Object.fromEntries(gltf.nodes.map(n => [n.name, n]));
+  for (const nome of ["no_sinusal", "no_atrioventricular", "feixe_de_his",
+                      "ramos_de_his", "purkinje"]) {
+    const nó = porNome[nome];
+    assert.ok(nó, `${nome} sumiu do glb — o nome é o que registra a ausência`);
+    assert.equal(nó.mesh, undefined,
+      `${nome} ganhou malha: se veio de fonte com procedência, atualizar INVENTORY.md e este teste; se foi desenhada a olho, é o que a SPEC proíbe`);
+    assert.ok(!(nó.children || []).length, `${nome} ganhou filhos`);
+  }
+
+  const peca = await texto("bancadas/11-coracao/prototipo/duas-pecas.html");
+  assert.ok(peca.includes("não traz malha do nó sinusal"),
+    "a página tem de DIZER que não desenha o trajeto, e por quê");
+  assert.ok(peca.includes('href="../../../coracao/?nivel=4"'),
+    "e mandar quem quer o trajeto para onde ele existe desenhado");
+
+  /* o nível 04 da bancada esquemática é mesmo o da condução — sem isto o
+     ponteiro acima manda o aluno para a página certa no lugar errado */
+  const app = await texto("coracao/app.js");
+  const quarto = app.split("olho: 'Nível 04'")[1] || "";
+  assert.ok(quarto.slice(0, 400).includes("nó sinusal"),
+    "o nível 04 deixou de ser o da condução, e o ponteiro ficou para trás");
+});
+
 test("A PEÇA ANATÔMICA ESTÁ VESTIDA DE BANCADA, e trancada como as irmãs", async () => {
   /* Ela nasceu protótipo, aberta no navegador por caminho de arquivo, e um dia
      virou destino de link do portal — sem tranca, sem marca e sem saída. Era a

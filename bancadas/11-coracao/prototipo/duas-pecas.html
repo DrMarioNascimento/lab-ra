@@ -65,6 +65,11 @@
      cujo texto tem 9px. Nunca ampliar acima da própria grade; encolher pode,
      que só perde detalhe, não inventa. */
   #wiggers { display: block; width: 100%; max-width: 290px; height: auto; margin-bottom: 6px; }
+  .nota-ausencia { margin: 0 0 8px; color: #93a691; font-size: 11.5px; line-height: 1.5; }
+  /* verde CLARO, e não o escuro da marca: a regra de contraste do
+     `laboratorio.css` é que o verde escuro só carrega superfície, nunca
+     texto — parece legível e não é. */
+  .nota-ausencia a { color: #9ec49a; display: inline-block; margin-top: 3px; }
   .eletrico { margin: 0 0 6px; padding: 4px 7px; border-radius: 6px;
               background: #131d15; color: #9fd8f2; font-size: 11.5px;
               letter-spacing: .06em; min-height: 1.4em; }
@@ -214,6 +219,16 @@ do ciclo.</p>
       <h3>as três leituras, um relógio</h3>
       <canvas id="wiggers" width="290" height="240" aria-label="Diagrama de Wiggers: pressões, volume, traçado elétrico e bulhas"></canvas>
       <p class="eletrico" id="leletrico">em repouso</p>
+      <!-- A AUSÊNCIA É DITA, E NÃO DISFARÇADA. Precedente da casa: é o mesmo
+           que a nota das valvas faz na Vista Externa. Quem lê "Nó
+           atrioventricular" acima e não vê nada acender na peça tem direito
+           de saber que a peça não sabe onde ele fica — e para onde ir. -->
+      <p class="nota-ausencia">Nenhuma das duas peças desenha o trajeto: o
+        BodyParts3D não traz malha do nó sinusal, do His nem do Purkinje, e pôr
+        um ponto onde ele “deve ficar” ensinaria uma localização que ninguém
+        mediu. O estado acima é o do motor.
+        <a href="../../../coracao/?nivel=4">O caminho, desenhado, está na
+        bancada esquemática →</a></p>
       <div class="lin"><span>sístole / diástole</span><b id="lsisdia">—</b></div>
       <div class="lin"><span>diástole por minuto</span><b id="lcoronaria">—</b></div>
     </div>
