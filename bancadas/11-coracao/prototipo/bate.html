@@ -27,6 +27,9 @@
   .fase { color: #d8c53a; }
   .aviso { margin: 0 20px 16px; padding: 10px 14px; border-left: 3px solid #d8a23a;
            background: #1a1509; color: #e8d8b0; max-width: 92ch; }
+  p.credito { margin: 0 18px 14px; max-width: 96ch; color: #7f9a7c; font-size: 11.5px;
+              border-top: 1px solid #1c2718; padding-top: 8px; }
+  p.credito a { color: #9ec49a; }
 </style>
 </head>
 <body>
@@ -93,10 +96,12 @@ import { simular, em, duracoes, faseDe } from '/coracao/fisica.js';
    quem escreveu: commitadas, elas nasceram quebradas e ninguém percebeu,
    porque quem abria já tinha o arquivo ao lado.
 
-   O A é o scan de referência e NÃO está no repositório: a licença dele é
-   desconhecida e isso bloqueia publicação. A página o procura em
-   `fontes/scan/` (que o .gitignore mantém de fora) e SEGUE SEM ELE se não
-   achar — o A só serviu de referência de cor, e referência não se publica. */
+   O A é *Realistic Human Heart*, de neshallads, do Sketchfab, sob CC BY 4.0.
+   A licença permite redistribuir e modificar COM ATRIBUIÇÃO e indicação das
+   alterações — por isso o arquivo está versionado aqui, e por isso o crédito
+   aparece NA PRÓPRIA PÁGINA, que é onde o aluno o vê. Ver ATTRIBUTION.md
+   para as alterações em detalhe. O carregamento continua tolerante: se o
+   arquivo faltar, a página diz o que falta em vez de mostrar tela preta. */
 const MODELO_B = '../export/coracao-bancada11-WIP.glb';
 const MODELO_A = '../fontes/scan/A-scan-realista.glb';
 
@@ -108,9 +113,8 @@ THREE.DefaultLoadingManager.onError = url => {
   d.id = 'faltou';
   d.style.cssText = 'margin:0 18px 12px;padding:9px 13px;border-left:3px solid #d8a23a;' +
     'background:#1a1509;color:#e8d8b0;font-size:12.5px;max-width:96ch';
-  d.textContent = 'Falta ' + url.split('/').pop() + ' — o scan de referência não está no ' +
-    'repositório (licença desconhecida). Ponha-o em bancadas/11-coracao/fontes/scan/ ' +
-    'para ver os dois; sem ele o resto da página funciona.';
+  d.textContent = 'Falta ' + url.split('/').pop() + ' — o arquivo devia estar em ' +
+    'bancadas/11-coracao/fontes/scan/. Sem ele a peça B funciona inteira.';
   document.body.insertBefore(d, document.body.children[2] || null);
 };
 
@@ -491,5 +495,11 @@ r.setAnimationLoop(agora => {
   r.render(cena, cam);
 });
 </script>
+<p class="credito">Peça A · <b>Realistic Human Heart</b>, de
+<a href="https://sketchfab.com/neshallads" target="_blank" rel="noopener">neshallads</a>
+(<a href="https://sketchfab.com/3d-models/realistic-human-heart-3f8072336ce94d18b3d0d055a1ece089" target="_blank" rel="noopener">Sketchfab</a>),
+sob <a href="https://creativecommons.org/licenses/by/4.0/deed.pt-br" target="_blank" rel="noopener">CC BY 4.0</a>.
+Alterações para este simulador: ajuste de escala, materiais e animação — descritas em
+<code>ATTRIBUTION.md</code>. Peça B derivada do BodyParts3D, CC-BY-SA 2.1 JP.</p>
 </body>
 </html>

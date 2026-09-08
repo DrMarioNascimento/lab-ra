@@ -3,7 +3,3 @@ fontes/bodyparts3d/_pack/
 *.zip
 __pycache__/
 *.pyc
-
-# O scan de referência (candidato A). NÃO vai para o repositório: a licença é
-# desconhecida e bloquearia publicação. Serviu só de referência de cor.
-fontes/scan/

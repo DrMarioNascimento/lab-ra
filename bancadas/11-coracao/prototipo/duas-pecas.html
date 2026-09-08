@@ -39,7 +39,17 @@
             letter-spacing: .1em; text-transform: uppercase; }
   details[hidden] { display: none; }
   .fasebar { font-size: 12px; color: #cfe0cb; }
+  .ra { margin-top: 12px; border-top: 1px solid #24331f; padding-top: 10px; }
+  model-viewer { width: 100%; height: 190px; display: block; border-radius: 10px;
+                 background: #0c110b; border: 1px solid #24331f; }
+  #launchAR { width: 100%; margin-top: 8px; }
+  #launchAR:disabled { opacity: .5; cursor: default; }
+  .ra-status { margin: 7px 0 0; font-size: 11.5px; color: #93a691; }
+  p.credito { margin: 0 18px 14px; max-width: 96ch; color: #7f9a7c; font-size: 11.5px;
+              border-top: 1px solid #1c2718; padding-top: 8px; }
+  p.credito a { color: #9ec49a; }
 </style>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.1.0/dist/model-viewer.min.js"></script>
 </head>
 <body>
 <h1>As duas peças · paradas, e batendo</h1>
@@ -84,6 +94,15 @@ que sabe usar. <b>A</b> é o scan — uma casca fechada, sem peças por dentro, 
       <p class="nota" style="margin:6px 0 0;padding:0;font-size:11.5px" id="notaValvas"></p>
     </div>
 
+    <div class="ra">
+      <h3 style="margin:0 0 6px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#7f9a7c;font-weight:600">na sua mesa</h3>
+      <model-viewer id="arViewer" alt="Coração em realidade aumentada"
+        ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" ar-scale="fixed"
+        camera-controls loading="eager" reveal="auto" shadow-intensity="1" exposure="1.1"></model-viewer>
+      <button id="launchAR" type="button" disabled>Colocar no ambiente</button>
+      <p id="raStatus" class="ra-status">—</p>
+    </div>
+
     <details id="avA" hidden>
       <summary>Cursores do A</summary>
       <label>1 · contração atrial · <b id="vaA1">1.00</b></label>
@@ -122,16 +141,20 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { simular, em, duracoes, faseDe } from '/coracao/fisica.js';
+import { prepararParaRA } from '/cores-para-ra.js';
 
 /* ── ONDE MORAM OS MODELOS ──────────────────────────────────────────────
    O B é o EXPORT DA ESTEIRA, versionado neste repositório — a mesma peça de
    79 malhas que os testes travam.
 
-   O A é o scan de referência e NÃO está no repositório: a licença dele é
-   desconhecida e isso bloqueia publicação. A página o procura em
-   `fontes/scan/` (que o .gitignore mantém de fora) e SEGUE SEM ELE se não
-   achar — o botão do A avisa em vez de mostrar tela preta. */
+   O A é *Realistic Human Heart*, de neshallads, do Sketchfab, sob CC BY 4.0.
+   A licença permite redistribuir e modificar COM ATRIBUIÇÃO e indicação das
+   alterações — por isso o arquivo está versionado aqui, e por isso o crédito
+   aparece NA PRÓPRIA PÁGINA, que é onde o aluno o vê. Ver ATTRIBUTION.md
+   para as alterações em detalhe. O carregamento continua tolerante: se o
+   arquivo faltar, a página diz o que falta em vez de mostrar tela preta. */
 const MODELO_B = '../export/coracao-bancada11-WIP.glb';
 const MODELO_A = '../fontes/scan/A-scan-realista.glb';
 
@@ -145,9 +168,8 @@ THREE.DefaultLoadingManager.onError = url => {
   d.id = 'faltou';
   d.style.cssText = 'margin:0 18px 12px;padding:9px 13px;border-left:3px solid #d8a23a;' +
     'background:#1a1509;color:#e8d8b0;font-size:12.5px;max-width:96ch';
-  d.textContent = 'Falta ' + url.split('/').pop() + ' — o scan de referência não está no ' +
-    'repositório (licença desconhecida). Ponha-o em bancadas/11-coracao/fontes/scan/ ' +
-    'para ver a peça A; sem ele o B funciona inteiro.';
+  d.textContent = 'Falta ' + url.split('/').pop() + ' — o arquivo devia estar em ' +
+    'bancadas/11-coracao/fontes/scan/. Sem ele a peça B funciona inteira.';
   document.body.insertBefore(d, document.body.children[2] || null);
   $('pA').disabled = true;
   $('pA').textContent = 'A · ausente';
@@ -433,6 +455,11 @@ function montarA(raiz, malha) {
    que faz a coronária acompanhar a parede sem rasgar a costura.
    ══════════════════════════════════════════════════════════════════════ */
 function montarB(raiz, malhas) {
+  {
+    raiz.updateMatrixWorld(true);
+    const mm = new THREE.Box3().setFromObject(raiz).getSize(new THREE.Vector3());
+    if (mm.y > 1) alturaRealM = mm.y / 1000;      // o arquivo está em milímetros
+  }
   const porNome = new Map(malhas.map(m => [m.name, m]));
   const cuspDe = new Map();
   const pecas = [];
@@ -683,6 +710,10 @@ function montarB(raiz, malhas) {
 /* ══ CARGA DAS DUAS PEÇAS ══════════════════════════════════════════════ */
 const pecaA = { raiz: null, aplicar: null }, pecaB = { raiz: null, aplicar: null };
 let atual = 'B';
+/* O TAMANHO NA MESA sai do arquivo: o BodyParts3D é milimétrico, então a
+   caixa do B mede a própria altura anatômica. Fica aqui um valor de partida
+   caso o B não carregue; `montarB` o substitui pelo medido. */
+let alturaRealM = .105;
 
 const carregador = new GLTFLoader();
 carregador.load(MODELO_B, g => {
@@ -751,7 +782,7 @@ function aplicar(dt) {
 /* DESENHA POR CONTA PRÓPRIA. O painel do navegador congela o
    requestAnimationFrame, e se a única atualização estiver dentro do laço a
    página parece morta — é a regra da casa, e já custou caro antes. */
-function desenhaAgora() { aplicar(.016); r.render(cena, cam); }
+function desenhaAgora() { aplicar(.016); r.render(cena, cam); prepararRA(); }
 window.poeFase = f => { fase = ((f % 1) + 1) % 1; desenhaAgora(); };
 window.trocaPeca = trocar;
 window.pecaAtual = () => atual;
@@ -822,6 +853,7 @@ $('bater').onclick = e => {
   batendo = !batendo;
   e.currentTarget.dataset.batendo = batendo ? 'sim' : 'nao';
   e.currentTarget.textContent = batendo ? 'Parar' : 'Bater';
+  prepararRA();
 };
 $('fase').addEventListener('input', e => { fase = +e.currentTarget.value; desenhaAgora(); });
 $('bpm').addEventListener('input', e => {
@@ -837,6 +869,107 @@ for (const [id, alvo, casas] of [['amp','vamp',2],
   });
 }
 
+/* ══ A RA · UM INSTANTE, PORQUE O FORMATO NÃO CARREGA MAIS QUE ISSO ═════
+   Conferido no arquivo vivo, não de memória: o `USDZExporter` do three.js
+   r0.180 tem ZERO ocorrências de `timeSamples`, `animation`, `skel` e
+   `morph`. O modelo que chega ao iPhone é sempre uma FOTO. Não há contorno
+   por código nosso, e fingir batimento em RA seria mentir para o aluno.
+
+   Então a RA recebe O INSTANTE QUE ESTÁ NA TELA. A página abre parada na
+   fase 0,300 — ventrículo cheio, 120 ml, as quatro valvas fechadas —, que é
+   o instante fixo da mesa e a pose que os atlas usam. Mas como o cursor de
+   fase pára em qualquer ponto, sai de graça a lição melhor: pare na sístole
+   final, mande para a mesa, pare na diástole, mande de novo, e ponha os dois
+   lado a lado. Dois instantes do mesmo coração, do tamanho de verdade.
+
+   BATENDO NÃO SE MANDA. Não é limitação de código — é que um instante só faz
+   sentido se alguém o escolheu. Com a peça batendo o botão desliga e diz por
+   quê.
+
+   O TAMANHO SAI DO ARQUIVO. O BodyParts3D é milimétrico, e a caixa do B mede
+   a própria altura anatômica; é ela que vira metro. O A não tem escala
+   própria (é scan), então herda a mesma altura — que é justamente o que
+   torna as duas comparáveis quando ficam lado a lado na mesa. */
+let arUrl = null, prepId = 0, temporizador = null;
+const ehQuickLook = /iPad|iPhone|iPod/.test(navigator.userAgent)
+  || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+/* O QUICK LOOK ABRE NO MODO OBJETO, não na câmera. O iOS antigo abria direto,
+   e a frase "toque para abrir a câmera" virou mentira sozinha — custou um
+   diagnóstico inteiro, com o professor tocando e recebendo objeto parado. */
+const COMO_ABRIR = ehQuickLook
+  ? 'Toque, e depois em "AR" no alto da tela para ir à câmera.'
+  : 'Toque para abrir a câmera.';
+
+function prepararRA() {
+  clearTimeout(temporizador);
+  if (batendo) {
+    $('launchAR').disabled = true;
+    $('raStatus').textContent = 'A peça está batendo. Pare em um instante para mandá-lo à mesa.';
+    return;
+  }
+  $('launchAR').disabled = true;
+  $('raStatus').textContent = 'Preparando o instante para a câmera…';
+  temporizador = setTimeout(async () => {
+    const id = ++prepId;
+    try {
+      const peca = atual === 'A' ? pecaA : pecaB;
+      if (!peca.raiz) return;
+      /* clone(true) COMPARTILHA geometria e material com a cena da tela — e é
+         o que se quer aqui, porque a geometria já está deformada no instante
+         escolhido. Quem precisar mexer (a paleta, as gêmeas) clona por conta
+         própria dentro de `prepararParaRA`. */
+      const clone = peca.raiz.clone(true);
+      clone.visible = true;
+      clone.traverse(o => { o.visible = true; });
+      clone.updateMatrixWorld(true);
+      const caixa = new THREE.Box3().setFromObject(clone);
+      const tam = caixa.getSize(new THREE.Vector3());
+      clone.scale.multiplyScalar(alturaRealM / (tam.y || 1));
+      clone.updateMatrixWorld(true);
+      /* de pé no chão: centrado em x e z, e a BASE em y = 0 — senão o Quick
+         Look afunda metade da peça no piso */
+      const c2 = new THREE.Box3().setFromObject(clone);
+      clone.position.set(clone.position.x - (c2.min.x + c2.max.x) / 2,
+                         clone.position.y - c2.min.y,
+                         clone.position.z - (c2.min.z + c2.max.z) / 2);
+      const conta = prepararParaRA(clone);
+      const wrap = new THREE.Group(); wrap.add(clone);
+      const buf = await new GLTFExporter().parseAsync(wrap, { binary: true, onlyVisible: true });
+      if (id !== prepId) return;
+      if (arUrl) URL.revokeObjectURL(arUrl);
+      arUrl = URL.createObjectURL(new Blob([buf], { type: 'model/gltf-binary' }));
+      ultimoPacote = { bytes: buf.byteLength, conta, peca: atual, fase: +fase.toFixed(3),
+                       alturaM: alturaRealM };
+      $('arViewer').src = arUrl;
+    } catch (err) {
+      console.error(err);
+      $('raStatus').textContent = 'Não foi possível preparar o instante para RA.';
+    }
+  }, 350);
+}
+let ultimoPacote = null;
+window.pacoteRA = () => ultimoPacote;
+
+$('arViewer').addEventListener('load', () => {
+  const mb = ultimoPacote ? (ultimoPacote.bytes / 1048576).toFixed(1) : '?';
+  if ($('arViewer').canActivateAR) {
+    $('launchAR').disabled = false;
+    $('raStatus').textContent = `Pronto · fase ${fase.toFixed(3)} · ${alturaRealM.toFixed(3)} m ` +
+      `· ${mb} MB. ${COMO_ABRIR}`;
+  } else {
+    $('launchAR').disabled = true;
+    $('raStatus').textContent = `Instante pronto (${mb} MB), mas este navegador não abre RA. ` +
+      'Use o Safari no iPhone/iPad ou o Chrome no Android.';
+  }
+});
+$('arViewer').addEventListener('error', () => {
+  $('raStatus').textContent = 'O instante não carregou no visualizador de RA.';
+});
+$('launchAR').addEventListener('click', () => {
+  try { $('arViewer').activateAR(); }
+  catch (err) { $('raStatus').textContent = 'A câmera não abriu. Verifique a permissão do navegador.'; }
+});
+
 let antes = performance.now();
 r.setAnimationLoop(agora => {
   const dt = Math.min(.1, (agora - antes) / 1000); antes = agora;
@@ -847,5 +980,11 @@ r.setAnimationLoop(agora => {
   ctl.update(); r.render(cena, cam);
 });
 </script>
+<p class="credito">Peça A · <b>Realistic Human Heart</b>, de
+<a href="https://sketchfab.com/neshallads" target="_blank" rel="noopener">neshallads</a>
+(<a href="https://sketchfab.com/3d-models/realistic-human-heart-3f8072336ce94d18b3d0d055a1ece089" target="_blank" rel="noopener">Sketchfab</a>),
+sob <a href="https://creativecommons.org/licenses/by/4.0/deed.pt-br" target="_blank" rel="noopener">CC BY 4.0</a>.
+Alterações para este simulador: ajuste de escala, materiais e animação — descritas em
+<code>ATTRIBUTION.md</code>. Peça B derivada do BodyParts3D, CC-BY-SA 2.1 JP.</p>
 </body>
 </html>

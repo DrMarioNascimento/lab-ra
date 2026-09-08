@@ -200,37 +200,65 @@ test("REMOVER POR NOME NÃO PODE VAZAR PELO CÓDIGO DO ARQUIVO", async () => {
    quebradas e ninguém percebeu, porque quem abria já tinha o arquivo ao
    lado. A régua aqui não é "o texto está bonito": é que o caminho que a
    página carrega EXISTE no repositório. */
-test("os protótipos da bancada 11 carregam o export versionado, não um diretório fantasma", async () => {
+test("os protótipos da bancada 11 carregam modelos que existem no repositório", async () => {
   const dir = new URL("../bancadas/11-coracao/prototipo/", import.meta.url);
   const paginas = (await readdir(dir)).filter(f => f.endsWith(".html"));
-  assert.ok(paginas.length >= 5, "as páginas de diagnóstico continuam lá");
+  assert.ok(paginas.length >= 6, "as páginas de diagnóstico continuam lá");
 
   for (const nome of paginas) {
     const html = await readFile(new URL(nome, dir), "utf8");
-
     assert.ok(!html.includes("'modelos/"),
       `${nome} ainda pede o diretório fantasma 'modelos/'`);
-
-    /* todo .glb citado ou é o export versionado, ou é o scan declarado
-       ausente — não há terceira opção silenciosa */
     for (const m of html.matchAll(/'(\.\.[^']*\.glb)'/g)) {
-      const alvo = m[1];
-      if (alvo.includes("fontes/scan/")) {
-        assert.ok(html.includes("licença") || html.includes("licenca"),
-          `${nome} cita o scan sem dizer por que ele não está aqui`);
-        assert.ok(html.includes("DefaultLoadingManager.onError"),
-          `${nome} carrega o scan sem avisar na tela quando ele falta`);
-        continue;
-      }
       await assert.doesNotReject(
-        readFile(new URL(alvo, dir)),
-        `${nome} carrega ${alvo}, que não existe no repositório`);
+        readFile(new URL(m[1], dir)),
+        `${nome} carrega ${m[1]}, que não existe no repositório`);
     }
   }
 });
 
-test("o scan de referência fica fora do versionamento", async () => {
+/* ── A CC BY PEDE CRÉDITO ONDE A PEÇA APARECE ───────────────────────────
+   O scan é *Realistic Human Heart*, de neshallads, sob CC BY 4.0 — licença
+   que permite redistribuir e modificar, e EXIGE atribuição e indicação das
+   alterações. Antes de saber disso, o arquivo ficava fora do repositório e o
+   código dizia "licença desconhecida" em quatro páginas. Sabendo, a regra
+   inverte: o arquivo entra, e o que passa a ser obrigatório é o CRÉDITO na
+   página, porque atribuição escondida num arquivo que ninguém abre não é
+   atribuição.
+
+   O teste é por PÁGINA e não pelo ATTRIBUTION.md, de propósito: o arquivo de
+   créditos nunca vai faltar, quem falta é o crédito na tela. */
+test("toda página que mostra o scan traz o crédito da CC BY na própria tela", async () => {
+  const dir = new URL("../bancadas/11-coracao/prototipo/", import.meta.url);
+  const paginas = (await readdir(dir)).filter(f => f.endsWith(".html"));
+  let mostram = 0;
+  for (const nome of paginas) {
+    const html = await readFile(new URL(nome, dir), "utf8");
+    if (!html.includes("fontes/scan/")) continue;
+    mostram++;
+    /* o crédito tem de estar no CORPO, visível — não só em comentário */
+    const corpo = html.slice(html.indexOf("<body"));
+    assert.match(corpo, /neshallads/, `${nome} não nomeia o autor na tela`);
+    assert.match(corpo, /CC BY 4\.0/, `${nome} não nomeia a licença na tela`);
+    assert.match(corpo, /creativecommons\.org\/licenses\/by\/4\.0/,
+      `${nome} não traz o link da licença`);
+    assert.match(corpo, /[Aa]lteraç(ões|oes)/,
+      `${nome} não indica que houve alterações, que a CC BY exige`);
+  }
+  assert.ok(mostram >= 3, "as páginas que mostram o scan continuam lá");
+
+  const attr = await texto("bancadas/11-coracao/ATTRIBUTION.md");
+  assert.match(attr, /neshallads/);
+  assert.match(attr, /CC BY 4\.0/);
+  assert.match(attr, /escala/, "as alterações estão descritas, não só citadas");
+  assert.match(attr, /materiais/);
+  assert.match(attr, /anima/);
+});
+
+test("o scan está versionado, agora que a licença permite", async () => {
+  const glb = await bin("bancadas/11-coracao/fontes/scan/A-scan-realista.glb");
+  assert.equal(glb.toString("ascii", 0, 4), "glTF", "é um glb de verdade");
   const ignore = await texto("bancadas/11-coracao/.gitignore");
-  assert.match(ignore, /fontes\/scan\//, "o .gitignore mantém o scan de fora");
-  assert.ok(/licen/i.test(ignore), "e diz por quê: a licença é desconhecida");
+  assert.ok(!/fontes\/scan\//.test(ignore),
+    "o .gitignore não pode mais excluir o scan: a CC BY permite redistribuir");
 });
