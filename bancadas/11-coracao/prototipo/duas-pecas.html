@@ -43,17 +43,17 @@
   .cena { position: relative; }
   .camadaLegendas { position: absolute; inset: 0; overflow: hidden;
                     pointer-events: none; border-radius: 12px; }
-  .rotulo { position: absolute; transform: translate(-50%, -50%);
+  .fios { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .rotulo { position: absolute;
             font: 11px/1.25 "IBM Plex Mono", ui-monospace, monospace;
-            color: #f2f7ec; background: rgba(10,14,10,.82);
+            color: #f2f7ec; background: rgba(10,14,10,.86);
             border: 1px solid #4b6b3f; border-radius: 6px;
-            padding: 2px 6px; white-space: nowrap; letter-spacing: .01em;
+            padding: 2px 7px; white-space: nowrap; letter-spacing: .01em;
             text-shadow: 0 1px 2px #000; }
+  /* o rótulo encosta na margem pelo lado de fora e cresce para dentro */
+  .rotulo.esq { transform: translate(0, -50%); }
+  .rotulo.dir { transform: translate(-100%, -50%); }
   .rotulo.valva { border-color: #8a7f3f; }
-  .rotulo::before { content: ''; position: absolute; left: -5px; top: 50%;
-                    width: 4px; height: 4px; margin-top: -2px; border-radius: 50%;
-                    background: #9ec49a; }
-  .rotulo.valva::before { background: #d8c53a; }
   .ra { margin-top: 12px; border-top: 1px solid #24331f; padding-top: 10px; }
   model-viewer { width: 100%; height: 190px; display: block; border-radius: 10px;
                  background: #0c110b; border: 1px solid #24331f; }
@@ -91,7 +91,7 @@ do ciclo.</p>
 <div class="caixa">
   <div class="cena">
     <canvas id="palco"></canvas>
-    <div class="camadaLegendas" id="legendas"></div>
+    <div class="camadaLegendas" id="legendas"><svg class="fios" id="fios"></svg></div>
   </div>
   <div class="painel">
     <label>Peça</label>
@@ -826,74 +826,105 @@ function montarLegendas(porNome, camada) {
 }
 
 const _p = new THREE.Vector3(), _pw = new THREE.Vector3();
+const SVGNS = 'http://www.w3.org/2000/svg';
+const MARGEM = 6;          // do rótulo à borda do quadro
+const RESPIRO = 4;         // entre dois rótulos da mesma coluna
+
+/* ── O FIO GUARDA A VERDADE ─────────────────────────────────────────────
+   A versão anterior empurrava o rótulo para não bater no vizinho e não dizia
+   nada: "Coronária direita" descia vinte pixels e passava a apontar para um
+   lugar onde ela não está. Mentira silenciosa, e das piores, porque parece
+   informação.
+
+   Com fio, o rótulo pode ir para ONDE COUBER — a margem —, porque quem
+   aponta é a linha, e a linha chega ao vértice exato. Foi ideia do professor,
+   e é como os atlas fazem: legenda na borda, chamada até a peça.
+
+   E resolve o "passando por trás": o ponto atrás da peça continua sendo o
+   ponto certo. O fio só muda de traço — TRACEJADO quando o ponto está do
+   outro lado —, então o aluno sabe que aquilo está oculto sem perder onde é. */
 function desenharLegendas() {
+  const camada = $('legendas'), svg = $('fios');
   const ligadas = atual === 'B' && (grupoAtivo.valvas || grupoAtivo.vasos);
-  const camada = $('legendas');
-  if (!ligadas) { for (const a of ancoras) a.el.hidden = true; return; }
+  if (!ligadas) {
+    for (const a of ancoras) { a.el.hidden = true; if (a.fio) a.fio.style.display = 'none'; }
+    return;
+  }
   const w = canvas.clientWidth, h = canvas.clientHeight;
+  svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+
   const postos = [];
   for (const a of ancoras) {
-    if (!grupoAtivo[a.grupo]) { a.el.hidden = true; continue; }
+    if (!grupoAtivo[a.grupo]) { a.el.hidden = true; if (a.fio) a.fio.style.display = 'none'; continue; }
     const pos = a.malha.geometry.attributes.position;
     _p.set(pos.getX(a.indice), pos.getY(a.indice), pos.getZ(a.indice));
     a.malha.localToWorld(_p);
     _pw.copy(_p);                       // guarda o mundo ANTES de projetar
     _p.project(cam);
-    /* ATRÁS DA CÂMERA O PROJETADO VIRA ESPELHO: sem esta guarda, o rótulo de
-       uma peça que está atrás do observador aparece do lado oposto da tela,
-       apontando para o nada. */
-    if (_p.z > 1 || _p.z < -1) { a.el.hidden = true; continue; }
-    a.el.hidden = false;
-    /* PROFUNDIDADE EM DISTÂNCIA, não no z da projeção. O z normalizado é
-       não-linear e, com `near 0.1` contra `far 5000`, cola em 1 para tudo que
-       está na cena: medido, os dez rótulos saíam com a MESMA profundidade, a
-       opacidade ficava toda no mínimo e a ordenação do desamontoador era
-       sorteio. A distância à câmera separa de verdade. */
-    postos.push({ a, x: (_p.x * .5 + .5) * w, y: (-_p.y * .5 + .5) * h,
+    /* ATRÁS DA CÂMERA O PROJETADO VIRA ESPELHO: sem esta guarda o rótulo de
+       uma peça que ficou às costas do observador aparece do lado oposto da
+       tela, apontando para o nada. */
+    if (_p.z > 1 || _p.z < -1) { a.el.hidden = true; if (a.fio) a.fio.style.display = 'none'; continue; }
+    postos.push({ a, ax: (_p.x * .5 + .5) * w, ay: (-_p.y * .5 + .5) * h,
                   d: cam.position.distanceTo(_pw) });
   }
 
-  /* ── DESAMONTOAR ────────────────────────────────────────────────────
-     Onze rótulos já não fazem muro, mas a aórtica e a pulmonar nascem a
-     centímetros uma da outra e ainda se cobrem. A regra é a mais simples que
-     funciona: quem está MAIS PERTO da câmera coloca primeiro e fica onde
-     quer; quem chega depois e esbarra desce até caber. Se não couber em
-     lugar nenhum, some — melhor um rótulo a menos que dois ilegíveis.
-
-     O tamanho é medido UMA VEZ e guardado. Ler `offsetWidth` a cada quadro,
-     com o laço de animação rodando, força o navegador a recalcular o layout
-     inteiro sessenta vezes por segundo — e o texto do rótulo não muda. */
-  postos.sort((p, q) => p.d - q.d);      // o mais perto escolhe lugar primeiro
+  /* ── DUAS COLUNAS ────────────────────────────────────────────────────
+     O rótulo vai para a margem do lado em que o ponto está, e lá dentro só
+     desliza na vertical. Assim o fio nunca atravessa a peça inteira para
+     buscar legenda do outro lado, que era o risco de mandar tudo para uma
+     coluna só. */
   const dCentro = cam.position.length(), raio = ALTURA * .6;
-  const caixas = [];
-  for (const t of postos) {
-    const el = t.a.el;
-    if (!el.dataset.larg) {
-      el.dataset.larg = el.offsetWidth || 120;
-      el.dataset.alt = el.offsetHeight || 18;
+  for (const lado of ['esq', 'dir']) {
+    const meus = postos.filter(t => (t.ax < w / 2) === (lado === 'esq'))
+                       .sort((p, q) => p.ay - q.ay);
+    let ultimo = -Infinity;
+    for (const t of meus) {
+      const el = t.a.el;
+      el.hidden = false;
+      el.classList.toggle('esq', lado === 'esq');
+      el.classList.toggle('dir', lado === 'dir');
+      if (!el.dataset.alt) { el.dataset.larg = el.offsetWidth || 120;
+                             el.dataset.alt = el.offsetHeight || 18; }
+      const lh = +el.dataset.alt, lw = +el.dataset.larg;
+      /* empilha de cima para baixo respeitando a ordem vertical dos PONTOS:
+         assim os fios não se cruzam, que é o que embaralha a leitura */
+      let y = Math.max(t.ay, ultimo + lh + RESPIRO);
+      y = Math.min(y, h - lh / 2 - 2);
+      ultimo = y;
+      const x = lado === 'esq' ? MARGEM : w - MARGEM;
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+
+      const frente = Math.max(0, Math.min(1, (dCentro + raio - t.d) / (2 * raio)));
+      const atras = frente < .5;
+      el.style.opacity = (.5 + frente * .5).toFixed(2);
+
+      if (!t.a.fio) {
+        const g = document.createElementNS(SVGNS, 'g');
+        const linha = document.createElementNS(SVGNS, 'polyline');
+        const ponto = document.createElementNS(SVGNS, 'circle');
+        ponto.setAttribute('r', 2.5);
+        g.append(linha, ponto); svg.appendChild(g);
+        t.a.fio = g; t.a.linha = linha; t.a.ponto = ponto;
+      }
+      const cor = t.a.grupo === 'valvas' ? '#d8c53a' : '#9ec49a';
+      /* COTOVELO: um trecho horizontal curto saindo do rótulo antes de
+         seguir para o ponto. Sem ele a linha nasce em diagonal colada no
+         texto e parece rabisco; com ele, lê-se como chamada de atlas. */
+      const xr = lado === 'esq' ? x + lw : x - lw;
+      const xc = lado === 'esq' ? xr + 14 : xr - 14;
+      t.a.linha.setAttribute('points', `${xr},${y} ${xc},${y} ${t.ax},${t.ay}`);
+      t.a.linha.setAttribute('fill', 'none');
+      t.a.linha.setAttribute('stroke', cor);
+      t.a.linha.setAttribute('stroke-width', '1');
+      t.a.linha.setAttribute('stroke-dasharray', atras ? '3 3' : 'none');
+      t.a.ponto.setAttribute('cx', t.ax);
+      t.a.ponto.setAttribute('cy', t.ay);
+      t.a.ponto.setAttribute('fill', cor);
+      t.a.fio.style.display = '';
+      t.a.fio.style.opacity = (atras ? .42 : .85).toFixed(2);
     }
-    const lw = +el.dataset.larg, lh = +el.dataset.alt + 3;
-    let y = t.y, coube = false;
-    for (let tent = 0; tent < 14; tent++) {
-      const yy = y + (tent % 2 ? 1 : -1) * Math.ceil(tent / 2) * lh;
-      const bate = caixas.some(c =>
-        Math.abs(c.x - t.x) < (c.w + lw) / 2 && Math.abs(c.y - yy) < (c.h + lh) / 2);
-      if (!bate) { y = yy; coube = true; break; }
-    }
-    if (!coube) { el.hidden = true; continue; }
-    /* PRESO DENTRO DO QUADRO. A camada corta o que passa da borda, e o
-       desamontoador empurra para baixo — juntos, mandavam um rótulo para
-       fora e ele aparecia cortado pela metade, que é pior que não aparecer:
-       o aluno lê meia palavra e acha que é outra coisa. */
-    const x = Math.max(lw / 2 + 2, Math.min(w - lw / 2 - 2, t.x));
-    y = Math.max(lh / 2 + 2, Math.min(h - lh / 2 - 2, y));
-    caixas.push({ x, y, w: lw, h: lh });
-    el.style.left = x + 'px';
-    el.style.top = y + 'px';
-    /* quem está do outro lado da peça fica mais apagado, para o aluno saber
-       o que está na frente */
-    const frente = Math.max(0, Math.min(1, (dCentro + raio - t.d) / (2 * raio)));
-    el.style.opacity = (.42 + frente * .58).toFixed(2);
   }
 }
 
