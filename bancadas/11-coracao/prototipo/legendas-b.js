@@ -18,6 +18,20 @@
 
    As três paredes e os papilares ficam sem rótulo; o resto está coberto.
 
+   OS VASOS SÃO QUATRO, e são as artérias. Cheguei a montar seis, com o seio
+   coronário e as veias cardíacas, e a esboçar um sistema de prioridade para
+   elas sumirem quando faltasse espaço — o professor tinha dito "talvez nem,
+   dependendo do volume de informação". Ele então decidiu: quatro. A
+   prioridade saiu junto, porque maquinaria que não serve a nenhuma decisão é
+   peso morto que o próximo leitor vai tentar entender.
+
+   As veias e o seio continuam desenhados, e o azul-violeta do material já os
+   distingue das artérias sem precisar de nome.
+
+   E os nomes são os DELE: "descendente anterior" e "circunflexa", como se
+   fala na clínica. A Terminologia Anatômica diria "ramo interventricular
+   anterior" e "ramo circunflexo"; quem ensina escolhe o registro.
+
    O nível de dissecção continua existindo e está em
    `bancadas/11-coracao/LEGENDAS-CORACAO-B.md`, com os 33 nomes e a
    correspondência de cada código FJ. Se um dia fizer sentido um interruptor
@@ -50,7 +64,7 @@ export const LEGENDAS = {
   ],
   vasos: [
     ['Coronária esquerda', ['tronco_coronaria_esquerda']],
-    ['Interventricular anterior', [
+    ['Descendente anterior', [
       'tronco_descendente_anterior',
       'FJ2632',
       'FJ2633',
@@ -70,7 +84,7 @@ export const LEGENDAS = {
       'FJ2647',
       'FJ2648',
     ]],
-    ['Artéria circunflexa', ['FJ2649', 'FJ2650', 'FJ2651', 'FJ2652', 'FJ2653', 'FJ2654']],
+    ['Circunflexa', ['FJ2649', 'FJ2650', 'FJ2651', 'FJ2652', 'FJ2653', 'FJ2654']],
     ['Coronária direita', [
       'tronco_coronaria_direita',
       'FJ2667',
@@ -102,7 +116,5 @@ export const LEGENDAS = {
       'FJ2721',
       'FJ2722',
     ]],
-    ['Seio coronário', ['seio_coronario']],
-    ['Veias cardíacas', ['FJ2656', 'FJ2724', 'FJ2727', 'FJ2728', 'FJ2729', 'FJ2731']],
   ],
 };
