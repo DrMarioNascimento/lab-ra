@@ -13,6 +13,18 @@
    2. O DIREITO ABRAÇA O ESQUERDO. Ele não é um segundo cone ao lado — é uma
       meia-lua colada na frente, e o septo é parede do esquerdo trabalhando
       para os dois. Desenhá-los como gêmeos é o erro mais comum.
+
+      ESTE PONTO TEM UM CONTRAPONTO, e ele foi tentado. A meia-lua está
+      certa e é ILEGÍVEL: nunca se veem as quatro câmaras ao mesmo tempo, e
+      foi por isso que esta bancada precisou de VIDRO para mostrar as
+      próprias válvulas — vidro é remendo de composição. Chegou a existir um
+      esqueleto com os dois ventrículos LADO A LADO, mesma construção,
+      mudando só a espessura, para a diferença na tela vir do número e não
+      do jeito de desenhar. Foi abandonado em 08/09/2026: mirava esta
+      página, que no mesmo dia deixou de ser a única porta da bancada 11.
+      O trabalho está na etiqueta `ideia/coracao-esquema` — `git log
+      ideia/coracao-esquema` traz o raciocínio inteiro. Quem for mexer na
+      legibilidade das câmaras lê aquilo antes de recomeçar do zero.
    3. OS VASOS SE CRUZAM. O tronco pulmonar sai à frente e vai para a
       esquerda; a aorta sai atrás dele e curva para a direita. Se saírem
       paralelos, some a razão de a artéria pulmonar tapar a aorta na radiografia.
