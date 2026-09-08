@@ -11,7 +11,6 @@
        color: #9ec49a; margin: 14px 18px 4px; font-weight: 600; }
   p.nota { margin: 0 18px 12px; max-width: 96ch; color: #93a691; font-size: 12.5px; }
   .caixa { display: grid; grid-template-columns: 1fr 320px; gap: 14px; padding: 0 16px 20px; }
-  @media (max-width: 900px) { .caixa { grid-template-columns: 1fr; } }
   #palco { width: 100%; height: 660px; display: block;
            border: 1px solid #24331f; border-radius: 12px; background: #10150f; }
   .painel { border: 1px solid #24331f; border-radius: 12px; background: #10150f;
@@ -48,6 +47,20 @@
   p.credito { margin: 0 18px 14px; max-width: 96ch; color: #7f9a7c; font-size: 11.5px;
               border-top: 1px solid #1c2718; padding-top: 8px; }
   p.credito a { color: #9ec49a; }
+  /* NO TELEFONE O PAINEL NÃO PODE TER ROLAGEM PRÓPRIA. Com `max-height` e
+     `overflow-y`, ele vira uma caixa de 660 px dentro de uma página que já
+     rola — e o que estiver no fundo dela fica invisível para quem rola a
+     PÁGINA. Foi assim que o botão de RA sumiu no iPhone: existia, respondia,
+     e ninguém o alcançava.
+
+     E ela precisa vir NO FIM da folha: eu a escrevi antes da regra
+     `.painel` e a de baixo ganhava, porque a especificidade é a mesma.
+     A media query não aumenta especificidade — só a ordem decide. */
+  @media (max-width: 900px) {
+    .caixa { grid-template-columns: 1fr; }
+    .painel { max-height: none; overflow-y: visible; }
+    #palco { height: 62vh; }
+  }
 </style>
 <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.1.0/dist/model-viewer.min.js"></script>
 </head>
@@ -67,6 +80,16 @@ que sabe usar. <b>A</b> é o scan — uma casca fechada, sem peças por dentro, 
       <button id="pB" type="button" aria-pressed="true">B · montagem</button>
     </div>
     <button id="bater" type="button" data-batendo="nao">Bater</button>
+
+    <div class="ra">
+      <h3 style="margin:0 0 6px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#7f9a7c;font-weight:600">na sua mesa</h3>
+      <model-viewer id="arViewer" alt="Coração em realidade aumentada"
+        ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" ar-scale="fixed"
+        camera-controls loading="eager" reveal="auto" shadow-intensity="1" exposure="1.1"></model-viewer>
+      <button id="launchAR" type="button" disabled>Colocar no ambiente</button>
+      <p id="raStatus" class="ra-status">—</p>
+    </div>
+
 
     <label>Instante do ciclo · <b id="vfase" class="fasebar">0.300</b></label>
     <input id="fase" type="range" min="0" max="0.999" step="0.001" value="0.3" />
@@ -92,15 +115,6 @@ que sabe usar. <b>A</b> é o scan — uma casca fechada, sem peças por dentro, 
       <h3>valvas · estado do motor</h3>
       <div id="estado"></div>
       <p class="nota" style="margin:6px 0 0;padding:0;font-size:11.5px" id="notaValvas"></p>
-    </div>
-
-    <div class="ra">
-      <h3 style="margin:0 0 6px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#7f9a7c;font-weight:600">na sua mesa</h3>
-      <model-viewer id="arViewer" alt="Coração em realidade aumentada"
-        ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" ar-scale="fixed"
-        camera-controls loading="eager" reveal="auto" shadow-intensity="1" exposure="1.1"></model-viewer>
-      <button id="launchAR" type="button" disabled>Colocar no ambiente</button>
-      <p id="raStatus" class="ra-status">—</p>
     </div>
 
     <details id="avA" hidden>
@@ -240,22 +254,42 @@ function corDoA(malha) {
    gordura e adventícia por cima do músculo. O B nascia ao contrário:
    coronária escarlate sobre corpo rosa-claro. Invertida a relação, os dois
    se leem como a mesma coisa. */
+/* ── COR **E** ASPEREZA ──────────────────────────────────────────────────
+   A calibração anterior mexeu só na COR, e a aspereza ficou como a esteira a
+   deixou — ninguém nunca olhou para ela. Na tela isso passou; na mesa, não.
+   Medido no pacote que foi ao iPhone: a valva saía com aspereza 0,28 e a
+   coronária com 0,24, que é superfície POLIDA. Branco quase puro e polido é
+   plástico, e foi assim que ele chegou.
+
+   E o miocárdio tinha luminância 0,064 — escuro de verdade. Na tela, com luz
+   que eu escolhi, ele lia como vinho; no Quick Look, que estima a luz do
+   cômodo, um quarto com pouca luz não tem o que revelar num vermelho desses.
+   A RA cobra o que a tela perdoa: lá a iluminação é minha, aqui é do mundo. */
 const PALETA_B = {
-  miocardio:   '#7e2b2f',   // vinho de músculo, não vermelho de sangue
-  coronaria:   '#e0a89c',   // clara POR CIMA do músculo, como no scan
-  valva:       '#f2e9df',   // creme
-  vaso:        '#c9615c',
-  vaso_venoso: '#5d63a4',
-  endocardio:  '#d9b5b8',
-  cavidade:    '#c33540',
+  //             cor         aspereza   por quê
+  miocardio:   ['#a34240',   .82],   // músculo: fosco. Clareado de 0,064 para
+                                     // ~0,12 de luminância, quase o dobro, para
+                                     // sobreviver a um cômodo mal iluminado
+  coronaria:   ['#e0a89c',   .62],   // gordura e adventícia por cima do músculo:
+                                     // clara como no scan, e NADA polida
+  valva:       ['#e9ded2',   .84],   // folheto: úmido, não envernizado. Sai do
+                                     // branco quase puro para um creme de tecido
+  vaso:        ['#c9615c',   .70],
+  vaso_venoso: ['#6a70b0',   .72],
+  endocardio:  ['#d9b5b8',   .78],
+  cavidade:    ['#c33540',   .80],
 };
 function corDoB(malhas) {
   const vistos = new Set();
   for (const m of malhas) {
     const mat = m.material;
-    if (!mat || !mat.name || vistos.has(mat)) continue;
+    if (!mat || !mat.name || vistos.has(mat) || !PALETA_B[mat.name]) continue;
     vistos.add(mat);
-    if (PALETA_B[mat.name]) { mat.color.set(PALETA_B[mat.name]); mat.needsUpdate = true; }
+    const [cor, aspereza] = PALETA_B[mat.name];
+    mat.color.set(cor);
+    mat.roughness = aspereza;
+    mat.metalness = 0;      // nenhuma destas superfícies é metal
+    mat.needsUpdate = true;
   }
 }
 
@@ -932,7 +966,31 @@ function prepararRA() {
       clone.position.set(clone.position.x - (c2.min.x + c2.max.x) / 2,
                          clone.position.y - c2.min.y,
                          clone.position.z - (c2.min.z + c2.max.z) / 2);
+      /* ── SEM NORMAL NÃO HÁ SOMBRA ────────────────────────────────────
+         O GLB do BodyParts3D traz só POSITION. Na tela isso não aparece
+         porque o GLTFLoader compensa marcando `flatShading`, e o shader
+         calcula a normal por derivada — muleta que existe no three.js e NÃO
+         existe no USDZ. Medido no pacote exportado: 79 de 79 malhas saíam sem
+         NORMAL, e o coração chegava ao iPhone CHAPADO, como recorte de papel.
+         A cor estava certa o tempo todo; o que faltava era com o que sombrear.
+
+         A geometria é clonada antes, porque `clone(true)` COMPARTILHA a
+         geometria com a cena da tela — calcular normal direto nela mudaria o
+         que está sendo mostrado, e o que se manda para a mesa tem de ser o
+         que se vê, sem efeito colateral no sentido contrário.
+
+         Normal SUAVE, não plana: a malha é indexada, então a média por
+         vértice sai contínua, e um coração é superfície orgânica. O facetado
+         da tela é artefato de arquivo, não escolha de desenho. */
+      let semNormal = 0;
+      clone.traverse(o => {
+        if (!o.isMesh || o.geometry.attributes.normal) return;
+        o.geometry = o.geometry.clone();
+        o.geometry.computeVertexNormals();
+        semNormal++;
+      });
       const conta = prepararParaRA(clone);
+      conta.normaisCalculadas = semNormal;
       const wrap = new THREE.Group(); wrap.add(clone);
       const buf = await new GLTFExporter().parseAsync(wrap, { binary: true, onlyVisible: true });
       if (id !== prepId) return;

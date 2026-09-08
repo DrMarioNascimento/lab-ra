@@ -217,16 +217,36 @@ carregador.load(MODELO_B, g => {
      gordura e adventícia por cima do músculo. O B estava ao contrário:
      coronária escarlate sobre corpo rosa-claro. Invertida a relação, os dois
      passam a se ler como a mesma coisa. */
+  /* ── COR **E** ASPEREZA ────────────────────────────────────────────────
+     Esta página nasceu mexendo só na COR, e a aspereza ficou como a esteira a
+     deixou — ninguém olhou para ela. Sob a luz daqui, que eu escolho, isso
+     passou. Na RA não passou: medido no pacote que foi ao iPhone, a valva
+     saía com aspereza 0,28 e a coronária com 0,24, que é superfície POLIDA,
+     e o branco quase puro chegou lá como PLÁSTICO. O miocárdio tinha
+     luminância 0,064 e sumia num cômodo mal iluminado.
+
+     A lição, que vale para toda calibração deste repositório: **a RA cobra o
+     que a tela perdoa**. Aqui a iluminação é minha; lá o Quick Look estima a
+     do mundo. Calibrar só a cor é calibrar metade do material.
+
+     FICA EM ABERTO: esta página precisa de cursores de ASPEREZA por material,
+     não só de cor — senão a próxima calibração reintroduz o verniz. */
   const PALETA = {
-    miocardio:   '#7e2b2f',   // vinho de músculo, não vermelho de sangue
-    coronaria:   '#e0a89c',   // clara POR CIMA do músculo, como no scan
-    valva:       '#f2e9df',   // creme
-    vaso:        '#c9615c',
-    vaso_venoso: '#5d63a4',
-    endocardio:  '#d9b5b8',
-    cavidade:    '#c33540',
+    //             cor         aspereza
+    miocardio:   ['#a34240',   .82],   // músculo fosco, clareado ~2x para a RA
+    coronaria:   ['#e0a89c',   .62],   // gordura e adventícia, clara e NADA polida
+    valva:       ['#e9ded2',   .84],   // folheto úmido, não envernizado
+    vaso:        ['#c9615c',   .70],
+    vaso_venoso: ['#6a70b0',   .72],
+    endocardio:  ['#d9b5b8',   .78],
+    cavidade:    ['#c33540',   .80],
   };
-  for (const [nome, m] of matsB) if (PALETA[nome]) m.color.set(PALETA[nome]);
+  for (const [nome, m] of matsB) if (PALETA[nome]) {
+    m.color.set(PALETA[nome][0]);
+    m.roughness = PALETA[nome][1];
+    m.metalness = 0;
+    m.needsUpdate = true;
+  }
   for (const [nome, m] of matsB) {
     const inp = [...document.querySelectorAll('#mats input[type=color]')]
       .find(i => i.previousSibling && i.previousSibling.textContent === nome);
