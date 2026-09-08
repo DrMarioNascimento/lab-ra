@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8" />
-<title>As duas peças, paradas e batendo</title>
+<title>Vista Externa e Vista Interna, paradas e batendo</title>
 <style>
   :root { color-scheme: dark; }
   body { margin: 0; background: #0a0d0a; color: #dbe6d8;
@@ -65,10 +65,10 @@
 <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.1.0/dist/model-viewer.min.js"></script>
 </head>
 <body>
-<h1>As duas peças · paradas, e batendo</h1>
+<h1>Vista Externa e Vista Interna · paradas, e batendo</h1>
 <p class="nota">A mesma física move as duas: <code>fisica.js</code> corre o ciclo e cada peça lê dele o
-que sabe usar. <b>Por fora</b> é o scan realista — uma casca fechada, sem nenhuma peça dentro, que se
-deforma inteira. <b>Por dentro</b> são 79 malhas separadas, e é por isso que ali as valvas abrem de
+que sabe usar. <b>Vista Externa</b> é o scan realista — uma casca fechada, sem nenhuma peça dentro, que se
+deforma inteira. <b>Vista Interna</b> são 79 malhas separadas, e é por isso que ali as valvas abrem de
 verdade. A página <b>abre parada</b>: o botão faz bater, e o cursor de fase pára em qualquer instante
 do ciclo.</p>
 
@@ -77,8 +77,8 @@ do ciclo.</p>
   <div class="painel">
     <label>Peça</label>
     <div class="pecas">
-      <button id="pA" type="button" aria-pressed="false">Por fora</button>
-      <button id="pB" type="button" aria-pressed="true">Por dentro</button>
+      <button id="pA" type="button" aria-pressed="false">Vista Externa</button>
+      <button id="pB" type="button" aria-pressed="true">Vista Interna</button>
     </div>
     <button id="bater" type="button" data-batendo="nao">Bater</button>
 
@@ -119,7 +119,7 @@ do ciclo.</p>
     </div>
 
     <details id="avA" hidden>
-      <summary>Cursores do “por fora”</summary>
+      <summary>Cursores da Vista Externa</summary>
       <label>1 · contração atrial · <b id="vaA1">1.00</b></label>
       <input id="aA1" type="range" min="0" max="2" step="0.05" value="1" />
       <label>2 · contração ventricular · <b id="vaA2">1.00</b></label>
@@ -135,7 +135,7 @@ do ciclo.</p>
     </details>
 
     <details id="avB" hidden>
-      <summary>Cursores do “por dentro”</summary>
+      <summary>Cursores da Vista Interna</summary>
       <label>1 · curso da cúspide · <b id="vbB1">1.00</b></label>
       <input id="bB1" type="range" min="0" max="3" step="0.05" value="1" />
       <label>2 · contração dos átrios · <b id="vbB2">0.120</b></label>
@@ -187,7 +187,7 @@ THREE.DefaultLoadingManager.onError = url => {
     'bancadas/11-coracao/fontes/scan/. Sem ele a peça B funciona inteira.';
   document.body.insertBefore(d, document.body.children[2] || null);
   $('pA').disabled = true;
-  $('pA').textContent = 'Por fora · ausente';
+  $('pA').textContent = 'Vista Externa · ausente';
 };
 
 /* ── PALCO ──────────────────────────────────────────────────────────────
@@ -793,7 +793,7 @@ function trocar(qual) {
   $('creditoB').hidden = qual !== 'B';
   $('notaValvas').textContent = qual === 'B'
     ? 'Aqui as onze cúspides estão desenhadas: elas obedecem a estes estados, que o motor deriva das PRESSÕES.'
-    : 'A peça de fora é casca fechada e não tem cúspides para desenhar. Os estados abaixo continuam sendo os do motor.';
+    : 'A Vista Externa é casca fechada e não tem cúspides para desenhar. Os estados abaixo continuam sendo os do motor.';
   desenhaAgora();
 }
 
@@ -1046,13 +1046,13 @@ r.setAnimationLoop(agora => {
   ctl.update(); r.render(cena, cam);
 });
 </script>
-<p class="credito" id="creditoA" hidden>Peça <b>por fora</b> · <b>Realistic Human Heart</b>, de
+<p class="credito" id="creditoA" hidden><b>Vista Externa</b> · <b>Realistic Human Heart</b>, de
 <a href="https://sketchfab.com/neshallads" target="_blank" rel="noopener">neshallads</a>
 (<a href="https://sketchfab.com/3d-models/realistic-human-heart-3f8072336ce94d18b3d0d055a1ece089" target="_blank" rel="noopener">Sketchfab</a>),
 sob <a href="https://creativecommons.org/licenses/by/4.0/deed.pt-br" target="_blank" rel="noopener">CC BY 4.0</a>.
 Alterações para este simulador: ajuste de escala, materiais e animação — descritas em
 <code>ATTRIBUTION.md</code>.</p>
-<p class="credito" id="creditoB">Peça <b>por dentro</b> · derivada do
+<p class="credito" id="creditoB"><b>Vista Interna</b> · derivada do
 <b>BodyParts3D</b> (© The Database Center for Life Science), sob CC-BY-SA 2.1 JP.
 Composição, cor e movimento próprios desta bancada.</p>
 </body>
