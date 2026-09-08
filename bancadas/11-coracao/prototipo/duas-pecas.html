@@ -936,6 +936,14 @@ function desenharLegendas() {
       t.a.ponto.setAttribute('cx', t.ax);
       t.a.ponto.setAttribute('cy', t.ay);
       t.a.ponto.setAttribute('fill', cor);
+      /* GLOW, a pedido — e ele trabalha, não só enfeita: dois halos, um
+         apertado e um largo, na COR do grupo. O ponto passa a se destacar de
+         qualquer carne embaixo sem precisar crescer mais, e o halo largo
+         puxa o olho para a extremidade da chamada, que é onde a informação
+         está. Mais apagado quando o ponto está atrás, pela opacidade do
+         grupo, então o brilho não desmente o tracejado. */
+      t.a.ponto.style.filter =
+        `drop-shadow(0 0 3px ${cor}) drop-shadow(0 0 8px ${cor})`;
       t.a.fio.style.display = '';
       t.a.fio.style.opacity = (atras ? .5 : 1).toFixed(2);
     }
