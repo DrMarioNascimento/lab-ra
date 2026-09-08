@@ -351,6 +351,12 @@ do ciclo.</p>
       <p class="nota" style="margin:6px 0 0;padding:0;font-size:11.5px" id="notaValvas"></p>
     </div>
 
+    <div class="grupo">
+      <h3>diagnóstico</h3>
+      <button id="diag" type="button">O que está acontecendo no palco?</button>
+      <p class="nota" style="margin:6px 0 0;padding:0;font-size:11.5px">Só para relatar problema: escreve na moldura o estado real do desenho.</p>
+    </div>
+
     <details id="avA" hidden>
       <summary>Cursores da Vista Externa</summary>
       <label>1 · contração atrial · <b id="vaA1">1.00</b></label>
@@ -1311,6 +1317,88 @@ window.girar = (h, v) => {   /* h e v em graus, em torno do alvo */
   cam.position.copy(ctl.target).add(new THREE.Vector3().setFromSpherical(e));
   cam.lookAt(ctl.target); ctl.update(); desenhaAgora();
 };
+/* ── O RELATÓRIO DE PALCO ─────────────────────────────────────────────
+   Escrito porque eu passei cinco rodadas adivinhando a causa de um palco
+   preto na máquina do professor, com o navegador dele sabendo a resposta o
+   tempo todo. Isto não pede console: escreve na moldura, e ele fotografa.
+
+   Mede as cinco coisas que separam as causas possíveis — tamanho do desenho,
+   onde está a câmera, o que está VISÍVEL na cena (e não só carregado), onde
+   aquilo está no mundo, e se o WebGL entregou pixels. */
+function relatorioDoPalco() {
+  const caixa = canvas.getBoundingClientRect();
+  const linhas = [];
+  const diz = (k, v) => linhas.push(k + ': ' + v);
+
+  diz('caixa na tela', Math.round(caixa.width) + ' x ' + Math.round(caixa.height));
+  diz('buffer de desenho', canvas.width + ' x ' + canvas.height);
+  diz('devicePixelRatio', devicePixelRatio);
+  diz('camera', cam.position.toArray().map(v => v.toFixed(1)).join(', ')
+      + '  aspect ' + (isFinite(cam.aspect) ? cam.aspect.toFixed(2) : String(cam.aspect)));
+  diz('alvo', ctl.target.toArray().map(v => v.toFixed(1)).join(', '));
+
+  /* VISÍVEL não é o mesmo que CARREGADO — e foi essa confusão que me custou
+     uma rodada: o caminho da RA força `visible = true` num clone, então ele
+     funciona mesmo com a cena inteira invisível. */
+  let malhas = 0, visiveis = 0;
+  const bb = new THREE.Box3();
+  cena.traverse(o => {
+    if (!o.isMesh) return;
+    malhas++;
+    let v = o, ok = true;
+    while (v) { if (!v.visible) { ok = false; break; } v = v.parent; }
+    if (!ok) return;
+    visiveis++;
+    bb.expandByObject(o);
+  });
+  diz('malhas na cena', malhas + ', visíveis ' + visiveis);
+  diz('peça atual', atual + '  (A carregada: ' + !!pecaA.raiz + ', B carregada: ' + !!pecaB.raiz + ')');
+  if (visiveis && !bb.isEmpty()) {
+    const t = bb.getSize(new THREE.Vector3()), c = bb.getCenter(new THREE.Vector3());
+    diz('caixa do que se vê', t.toArray().map(v => v.toFixed(1)).join(' x '));
+    diz('centro dela', c.toArray().map(v => v.toFixed(1)).join(', '));
+    diz('distância da câmera', cam.position.distanceTo(c).toFixed(1));
+  } else {
+    diz('caixa do que se vê', 'NADA VISÍVEL');
+  }
+
+  /* o teste final: o WebGL entregou pixel com cor? Precisa de leitura logo
+     após um desenho, senão o buffer já foi limpo. */
+  let pintados = 'não medido';
+  try {
+    r.render(cena, cam);
+    const gl = r.getContext();
+    const w = Math.min(canvas.width, 400), h = Math.min(canvas.height, 400);
+    const buf = new Uint8Array(w * h * 4);
+    gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, buf);
+    let n = 0;
+    for (let i = 0; i < buf.length; i += 4)
+      if (buf[i] > 12 || buf[i + 1] > 12 || buf[i + 2] > 12) n++;
+    pintados = n + ' de ' + (w * h);
+  } catch (e) { pintados = 'erro: ' + e.message; }
+  diz('pixels com cor', pintados);
+
+  try {
+    const gl = r.getContext();
+    const ext = gl.getExtension('WEBGL_debug_renderer_info');
+    diz('webgl', (gl.getParameter(gl.VERSION) || '') + (ext ? ' · ' + gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : ''));
+    diz('contexto perdido', gl.isContextLost());
+  } catch (e) { diz('webgl', 'não consegui ler: ' + e.message); }
+
+  diz('navegador', navigator.userAgent);
+
+  const el = $('falha');
+  el.hidden = false;
+  /* `String.fromCharCode(10)` e não uma quebra escrita à mão: este arquivo já
+     foi editado por script duas vezes, e nas duas a contrabarra não
+     sobreviveu — virou quebra de linha DENTRO da string e derrubou a página
+     inteira com "Invalid or unexpected token". */
+  el.innerHTML = '<b>Relatório do palco</b><code>' + linhas.join(String.fromCharCode(10)) + '</code>' +
+    '<p class="pedido">Fotografe esta caixa inteira — é ela que diz onde quebrou.</p>';
+}
+$('diag').addEventListener('click', relatorioDoPalco);
+window.relatorioDoPalco = relatorioDoPalco;
+
 window.camAtual = () => ({ pos: cam.position.toArray().map(v=>+v.toFixed(1)),
                            alvo: ctl.target.toArray().map(v=>+v.toFixed(1)) });
 
