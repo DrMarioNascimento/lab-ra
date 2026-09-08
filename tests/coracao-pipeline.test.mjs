@@ -293,3 +293,30 @@ test("o scan está versionado, agora que a licença permite", async () => {
   assert.ok(!/fontes\/scan\//.test(ignore),
     "o .gitignore não pode mais excluir o scan: a CC BY permite redistribuir");
 });
+
+/* ── CAMINHO ABSOLUTO MENTE QUANDO A RAIZ MUDA ──────────────────────────
+   As páginas importavam `/coracao/fisica.js`. No servidor de conferência a
+   raiz é `lab-ra/`, então funcionava; no GitHub Pages a raiz é o domínio, e
+   o mesmo caminho vira `drmarionascimento.github.io/coracao/...` — 404. A
+   página subiu, abriu, mostrou o título e ficou MUDA: o módulo nunca rodou.
+
+   É a segunda vez no mesmo dia que um caminho só quebra depois de publicado.
+   A primeira foi `modelos/B-bodyparts3d.glb`, um diretório que só existia na
+   máquina de quem escreveu. Os dois passam em qualquer conferência local, e é
+   por isso que a regra tem de ser mecânica: import de página que vive num
+   subdiretório é RELATIVO, e o alvo tem de existir a partir dali. */
+test("os protótipos importam por caminho relativo, que sobrevive à publicação", async () => {
+  const dir = new URL("../bancadas/11-coracao/prototipo/", import.meta.url);
+  const paginas = (await readdir(dir)).filter(f => f.endsWith(".html"));
+  for (const nome of paginas) {
+    const html = await readFile(new URL(nome, dir), "utf8");
+    for (const m of html.matchAll(/from\s+['"]([^'"]+)['"]/g)) {
+      const alvo = m[1];
+      if (/^(three|https?:)/.test(alvo)) continue;      // CDN e importmap
+      assert.ok(!alvo.startsWith("/"),
+        `${nome} importa ${alvo} com barra na frente: quebra no Pages`);
+      await assert.doesNotReject(readFile(new URL(alvo, dir)),
+        `${nome} importa ${alvo}, que não existe a partir dali`);
+    }
+  }
+});
