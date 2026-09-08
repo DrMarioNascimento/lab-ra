@@ -67,6 +67,14 @@
   #wiggers { display: block; width: 100%; max-width: 290px; height: auto; margin-bottom: 6px; }
   /* A caixa de falha fica DENTRO da moldura do palco, no lugar exato onde o
      coração deveria estar — é ali que o olho já está quando não vê nada. */
+  /* ESTA LINHA É A MAIS IMPORTANTE DO BLOCO, e a falta dela apagou o coração.
+     `hidden` não é mágica: ele funciona por uma regra do NAVEGADOR,
+     `[hidden] { display: none }`. Qualquer regra de AUTOR que declare
+     `display` no mesmo elemento vence — e a de baixo declara `flex`. Com o
+     atributo posto e tudo, a caixa continuava calculando `display: flex`,
+     719x660, opaca, POR CIMA do palco. O coração desenhava atrás dela.
+     Conferido com `elementFromPoint` no centro do palco: devolvia "falha". */
+  .falha[hidden] { display: none; }
   .falha { position: absolute; inset: 0; display: flex; flex-direction: column;
            justify-content: center; gap: 8px; padding: 22px 26px;
            background: #10150f; border-radius: 12px; overflow-y: auto; }
