@@ -119,6 +119,38 @@ test("o glb WIP existe, declara WIP, e não põe malha em peça ausente", async 
   assert.equal(meta.orcamento_60k, false);
 });
 
+test("A PEÇA ANATÔMICA ESTÁ VESTIDA DE BANCADA, e trancada como as irmãs", async () => {
+  /* Ela nasceu protótipo, aberta no navegador por caminho de arquivo, e um dia
+     virou destino de link do portal — sem tranca, sem marca e sem saída. Era a
+     ÚNICA porta do laboratório que se abria sem conta.
+
+     A tranca funciona a três pastas de fundura porque o `guard.js` resolve
+     `authUrl` e `bancadasUrl` a partir do endereço do PRÓPRIO script, e não do
+     da página. Conferido no navegador: sem a chave de sessão, a página devolve
+     para `index.html?laboratorio=acesso&destino=<ela mesma>` — com o destino
+     preservado, que é o que faz o aluno voltar À PEÇA depois de entrar, e não
+     ao índice. */
+  const peca = await texto("bancadas/11-coracao/prototipo/duas-pecas.html");
+
+  assert.ok(/<html[^>]*data-ra-protected/.test(peca), "sem o sinalizador a tranca nem roda");
+  assert.ok(peca.includes('src="../../../guard.js"'), "três níveis: prototipo, 11-coracao, bancadas");
+  assert.ok(peca.includes('href="../../../laboratorio.css"'), "a folha do laboratório veste a barra");
+
+  /* saída: quem entra tem de conseguir voltar sem o botão do navegador */
+  assert.ok(peca.includes('class="back-link" href="../../../bancadas.html"'), "falta o Voltar");
+  assert.ok(peca.includes('class="brand" href="../../../bancadas.html"'), "falta a marca que leva ao portal");
+  assert.ok(peca.includes("brand/mestre-lap.webp"), "falta a assinatura no rodapé");
+
+  /* A FOLHA DO LABORATÓRIO TEM DE VIR ANTES DA DA PÁGINA. Invertidas, o
+     `body` e o `h1` do laboratório ganhariam por ordem, e o palco escuro desta
+     bancada viraria o fundo do portal com um título em Cinzel a 4rem. */
+  assert.ok(peca.indexOf("laboratorio.css") < peca.indexOf("<style>"),
+    "a folha do laboratório tem de vir ANTES do <style> da página");
+
+  /* e o título continua dizendo que é obra */
+  assert.ok(peca.includes("em construção"), "a página não pode se anunciar pronta");
+});
+
 test("a bancada 11 ao vivo não foi trocada pelo glb WIP", async () => {
   const hub = await texto("bancadas.html");
   assert.ok(hub.includes('href="coracao/"'));
