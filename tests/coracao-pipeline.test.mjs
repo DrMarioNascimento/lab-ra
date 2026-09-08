@@ -320,3 +320,28 @@ test("os protótipos importam por caminho relativo, que sobrevive à publicaçã
     }
   }
 });
+
+/* ── SEM VIEWPORT O TELEFONE MENTE A LARGURA ────────────────────────────
+   Nenhuma das seis páginas de protótipo declarava `viewport`. Sem essa
+   linha o navegador do celular finge ter 980 px e encolhe a página inteira:
+   a regra `@media (max-width: 900px)` NUNCA dispara, o painel continua com
+   rolagem própria, o texto sai ilegível e sobra um vazio embaixo.
+
+   O engano é cruel porque no computador está tudo certo, e no emulador de
+   telefone também parece "só pequeno" — não parece defeito, parece zoom. As
+   bancadas de verdade sempre tiveram a linha; eu escrevi os protótipos do
+   zero e não copiei.
+
+   É a terceira armadilha do mesmo feitio num dia: o caminho `modelos/` que
+   só existia na minha máquina, o import com barra que só quebra publicado, e
+   agora a largura que só mente no telefone. Todas passam em conferência
+   local. Por isso viram teste, e não anotação. */
+test("toda página de protótipo declara viewport, senão o telefone finge 980 px", async () => {
+  const dir = new URL("../bancadas/11-coracao/prototipo/", import.meta.url);
+  const paginas = (await readdir(dir)).filter(f => f.endsWith(".html"));
+  for (const nome of paginas) {
+    const html = await readFile(new URL(nome, dir), "utf8");
+    assert.match(html, /<meta\s+name="viewport"[^>]*width=device-width/,
+      `${nome} não declara viewport: no celular ela renderiza como se tivesse 980 px`);
+  }
+});
