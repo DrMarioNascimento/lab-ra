@@ -483,8 +483,16 @@ test("há exatamente um B1 e um B2 por ciclo, de 40 a 200 bpm", async () => {
     assert.ok(b2.wrap || b2.t > b1.t,
       `B2 antes de B1 a ${fc} bpm (B1 t=${b1.t.toFixed(3)}, B2 t=${b2.t.toFixed(3)})`);
   }
+  /* O WIGGERS SAIU DE `app.js` PARA `wiggers.js` quando a peça anatômica
+     passou a ensinar o ciclo também: as duas páginas desenham a mesma régua,
+     e por isso a régua tem de ser uma. A exigência não mudou de força, mudou
+     de endereço — o desenho continua LENDO as bulhas da função, em vez de
+     reimplementar o laço de fechamento com outros olhos. */
+  const w = await texto("coracao/wiggers.js");
+  assert.ok(w.includes("bulhas(q)"), "o Wiggers lê as bulhas da função, não reimplementa o laço");
   const app = await texto("coracao/app.js");
-  assert.ok(app.includes("bulhas(q)"), "o Wiggers lê as bulhas da função, não reimplementa o laço");
+  assert.ok(!/function desenharTracosWiggers/.test(app),
+    "o desenho não pode voltar a morar dentro de uma das duas páginas");
   const src = await texto("coracao/fisica.js");
   assert.ok(src.includes("(i - 1 + n) % n"), "o laço de fechamento dá a volta no ciclo");
 });
