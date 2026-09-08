@@ -128,6 +128,10 @@ do ciclo.</p>
       <model-viewer id="arViewer" alt="Coração em realidade aumentada"
         ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" ar-scale="auto"
         camera-controls loading="eager" reveal="auto" shadow-intensity="1" exposure="1.1"></model-viewer>
+      <div class="so" style="margin-bottom:2px">
+        <button id="arEnche" type="button">Enchimento</button>
+        <button id="arEjeta" type="button">Ejeção</button>
+      </div>
       <button id="launchAR" type="button" disabled>Colocar no ambiente</button>
       <p id="raStatus" class="ra-status">—</p>
     </div>
@@ -1246,6 +1250,27 @@ for (const [id, grupo] of [['legValvas', 'valvas'], ['legVasos', 'vasos']]) {
   };
 }
 pintarBotoesLegenda();
+
+/* ── DOIS INSTANTES QUE VALEM UMA AULA ──────────────────────────────────
+   A RA manda uma FOTO — o USDZ não carrega animação. Mas o professor viu o
+   que fazer com isso: se dá para ampliar, o aluno põe as DUAS fotos na mesa e
+   anda entre elas. Não é a valva batendo; é a valva em dois estados, do
+   tamanho real, com o corpo em volta.
+
+   As fases não foram escolhidas a olho: varri o ciclo procurando o instante
+   em que cada par de valvas está aberto COM O VENTRÍCULO O MAIS CHEIO
+   POSSÍVEL. Isso importa porque, se um dos instantes fosse de coração vazio,
+   o aluno atribuiria à valva uma diferença que é de VOLUME — assim os dois
+   vão à mesa praticamente do mesmo tamanho (119 e 113 ml) e a única coisa que
+   muda é qual par está aberto. Medido: enchimento em 0,250, ejeção em 0,367.
+
+   E param a peça antes, porque batendo não se manda. */
+function instante(f) {
+  if (batendo) $('bater').click();
+  window.poeFase(f);
+}
+$('arEnche').onclick = () => instante(0.250);
+$('arEjeta').onclick = () => instante(0.367);
 
 $('pA').onclick = () => trocar('A');
 $('pB').onclick = () => trocar('B');
