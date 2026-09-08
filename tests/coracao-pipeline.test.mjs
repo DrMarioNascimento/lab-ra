@@ -235,6 +235,49 @@ test("O IMPORTMAP VEM ANTES DE TODO SCRIPT DE MÓDULO, em TODA página do labora
   assert.ok(comMapa >= 12, `só ${comMapa} páginas com importmap; a varredura deve estar errada`);
 });
 
+test("NENHUM `hidden` É DESFEITO POR REGRA DE AUTOR — o que estava escondido tem de sumir", async () => {
+  /* ESTE FOI O DEFEITO MAIS CARO DO DIA, e eu o criei no commit que existia
+     para revelar defeitos. A caixa de falha nasceu com o atributo `hidden`
+     e com `.falha { display: flex }` na folha da página.
+
+     `hidden` não é mágica: funciona por uma regra do NAVEGADOR,
+     `[hidden] { display: none }`. Qualquer regra de AUTOR que declare
+     `display` no mesmo elemento VENCE. Com o atributo posto e tudo, a caixa
+     computava `display: flex`, 719x660, opaca, POR CIMA do palco — e o
+     coração desenhava atrás dela.
+
+     E os meus testes não pegaram porque eu conferia `f.hidden === true` (o
+     atributo, que estava certo) e lia pixels DIRETO do canvas (que também
+     estavam certos). As duas medidas passam ao largo do DOM. É de novo a
+     lição do card: asserte no que DECIDE, não no que existe — aqui, quem
+     decide é o `display` calculado, não o atributo.
+
+     A regra geral, e é ela que este teste guarda: toda classe que aparece
+     num elemento com `hidden` e que declare `display` na folha precisa de
+     um `[hidden]` que a desfaça. */
+  for (const pagina of ["bancadas/11-coracao/prototipo/duas-pecas.html"]) {
+    const src = await texto(pagina);
+    const estilo = (src.match(/<style>([\s\S]*?)<\/style>/) || [, ""])[1];
+
+    /* classes usadas em elementos que nascem com `hidden` */
+    const escondidos = new Set();
+    for (const m of src.matchAll(/<[a-z]+[^>]*\bclass="([^"]+)"[^>]*\bhidden\b[^>]*>/g))
+      m[1].split(/\s+/).forEach(c => c && escondidos.add(c));
+    for (const m of src.matchAll(/<[a-z]+[^>]*\bhidden\b[^>]*\bclass="([^"]+)"[^>]*>/g))
+      m[1].split(/\s+/).forEach(c => c && escondidos.add(c));
+
+    assert.ok(escondidos.size, `${pagina}: a varredura não achou elemento com hidden — o teste perdeu o alvo`);
+
+    for (const classe of escondidos) {
+      const declaraDisplay = new RegExp("\\." + classe + "\\s*\\{[^}]*display\\s*:", "");
+      if (!declaraDisplay.test(estilo)) continue;
+      const desfaz = new RegExp("\\." + classe + "\\[hidden\\]\\s*\\{[^}]*display\\s*:\\s*none", "");
+      assert.ok(desfaz.test(estilo),
+        `${pagina}: .${classe} declara display e é usada com hidden, mas não há regra .${classe}[hidden]{display:none} — o elemento fica VISÍVEL por cima do que estiver atrás`);
+    }
+  }
+});
+
 test("A PEÇA ANATÔMICA ESTÁ VESTIDA DE BANCADA, e trancada como as irmãs", async () => {
   /* Ela nasceu protótipo, aberta no navegador por caminho de arquivo, e um dia
      virou destino de link do portal — sem tranca, sem marca e sem saída. Era a
