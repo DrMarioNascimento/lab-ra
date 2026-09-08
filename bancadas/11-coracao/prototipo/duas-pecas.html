@@ -126,7 +126,7 @@ do ciclo.</p>
     <div class="ra">
       <h3 style="margin:0 0 6px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#7f9a7c;font-weight:600">na sua mesa</h3>
       <model-viewer id="arViewer" alt="Coração em realidade aumentada"
-        ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" ar-scale="fixed"
+        ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" ar-scale="auto"
         camera-controls loading="eager" reveal="auto" shadow-intensity="1" exposure="1.1"></model-viewer>
       <button id="launchAR" type="button" disabled>Colocar no ambiente</button>
       <p id="raStatus" class="ra-status">—</p>
@@ -1289,7 +1289,16 @@ for (const [id, alvo, casas] of [['amp','vamp',2],
    O TAMANHO SAI DO ARQUIVO. O BodyParts3D é milimétrico, e a caixa do B mede
    a própria altura anatômica; é ela que vira metro. O A não tem escala
    própria (é scan), então herda a mesma altura — que é justamente o que
-   torna as duas comparáveis quando ficam lado a lado na mesa. */
+   torna as duas comparáveis quando ficam lado a lado na mesa. Conferido no
+   pacote exportado: matriz do nó raiz com escala 0,001, caixa final de
+   0,116 x 0,103 x 0,106 m, base a 0,3 mm do chão.
+
+   `ar-scale="auto"`, e não "fixed". Eu tinha travado a escala com um
+   argumento que era estético disfarçado de pedagógico — "um coração que se
+   estica com pinça vira brinquedo". O professor derrubou: *"aprender é
+   brincar e se aprende assim"*, e ampliar até a valva, no ponto exato, é uma
+   experiência que só a RA dá. O modelo NASCE em 10 cm, que é a escala
+   verdadeira e é o que ensina; a partir dali o aluno estica se quiser. */
 let arUrl = null, prepId = 0, temporizador = null;
 const ehQuickLook = /iPad|iPhone|iPod/.test(navigator.userAgent)
   || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
