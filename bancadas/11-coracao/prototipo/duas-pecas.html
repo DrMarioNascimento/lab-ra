@@ -912,6 +912,14 @@ function desenharLegendas() {
         const g = document.createElementNS(SVGNS, 'g');
         const linha = document.createElementNS(SVGNS, 'polyline');
         const ponto = document.createElementNS(SVGNS, 'circle');
+        /* O MIOLO PRETO marca o ponto EXATO. O halo diz "é por aqui" e o
+           miolo diz "é aqui": um chama o olho de longe, o outro dá a
+           precisão de perto. Ele vem DEPOIS do ponto no grupo, para ficar
+           por cima, e sem o filtro — se levasse o glow junto, brilharia
+           preto e sumiria dentro da própria luz. */
+        const miolo = document.createElementNS(SVGNS, 'circle');
+        miolo.setAttribute('r', 1.8);
+        miolo.setAttribute('fill', '#0a120c');
         /* O PONTO PRECISA SER MAIOR — pedido do professor, e ele tem razão:
            com 2,5 px ele sumia dentro da textura da peça e a chamada parecia
            terminar no nada.
@@ -921,8 +929,8 @@ function desenharLegendas() {
            O anel, com o brilho por cima, ficava um vazio escuro no meio da
            luz — lia como furo, não como marca. */
         ponto.setAttribute('r', 5);
-        g.append(linha, ponto); svg.appendChild(g);
-        t.a.fio = g; t.a.linha = linha; t.a.ponto = ponto;
+        g.append(linha, ponto, miolo); svg.appendChild(g);
+        t.a.fio = g; t.a.linha = linha; t.a.ponto = ponto; t.a.miolo = miolo;
       }
       const cor = t.a.grupo === 'valvas' ? '#86efac' : '#ff9c8f';
       /* COTOVELO: um trecho horizontal curto saindo do rótulo antes de
@@ -938,6 +946,8 @@ function desenharLegendas() {
       t.a.ponto.setAttribute('cx', t.ax);
       t.a.ponto.setAttribute('cy', t.ay);
       t.a.ponto.setAttribute('fill', cor);
+      t.a.miolo.setAttribute('cx', t.ax);
+      t.a.miolo.setAttribute('cy', t.ay);
       /* GLOW, a pedido — e ele trabalha, não só enfeita: dois halos, um
          apertado e um largo, na COR do grupo. O ponto passa a se destacar de
          qualquer carne embaixo sem precisar crescer mais, e o halo largo
