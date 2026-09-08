@@ -24,7 +24,22 @@ test("a bancada está protegida e traz o mesmo caminho de RA das irmãs", async 
   assert.match(page, /data-ra-protected/);
   assert.match(page, /\.\.\/guard\.js/);
   assert.match(page, /ar-modes="webxr scene-viewer quick-look"/);
-  assert.match(page, /ar-scale="fixed"/);
+  /* ── A ESCALA NA RA É LIVRE, e este teste já travou o contrário ───────
+     Ele exigia `ar-scale="fixed"` — a convenção antiga da casa — e ficou
+     VERMELHO quando ela mudou. Fez o trabalho dele: a regra estava travada e
+     alguém a mexeu.
+
+     A regra nova, e o porquê, na frase do professor: *"aprender é brincar e
+     se aprende assim"*. O argumento que fecha é que o TAMANHO EXATO é
+     justamente o que a aula de anatomia já entrega — o aluno já viu a peça
+     real. O que ele não consegue lá é ampliar, olhar dentro sem cortar e
+     parar o tempo. Travar o máximo protegia o que a anatomia já dá e abria
+     mão do que só a RA dá.
+
+     O que continua travado é o MÍNIMO: o modelo nasce no tamanho real,
+     porque é dele que se parte. `auto` não é ausência de escala — é escala
+     verdadeira com liberdade a partir dela. */
+  assert.match(page, /ar-scale="auto"/);
 });
 
 test("a inclinação sai só de beta e gamma, nunca de alpha", async () => {
