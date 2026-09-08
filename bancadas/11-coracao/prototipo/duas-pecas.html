@@ -201,6 +201,7 @@ import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { simular, em, duracoes, faseDe } from '/coracao/fisica.js';
 import { prepararParaRA } from '/cores-para-ra.js';
 import { LEGENDAS } from './legendas-b.js';
+import { MARCAS_EXTERNAS, RESSALVA_EXTERNA } from './legendas-a.js';
 
 /* ── ONDE MORAM OS MODELOS ──────────────────────────────────────────────
    O B é o EXPORT DA ESTEIRA, versionado neste repositório — a mesma peça de
@@ -836,8 +837,32 @@ function montarLegendas(porNome, camada) {
       el.textContent = rotulo;
       el.hidden = true;
       camada.appendChild(el);
-      ancoras.push({ el, malha: melhor.malha, indice: melhor.indice, grupo });
+      ancoras.push({ el, malha: melhor.malha, indice: melhor.indice, grupo, peca: 'B' });
     }
+  }
+}
+
+/* A VISTA EXTERNA USA O MESMO APARELHO. Nada aqui é próprio dela a não ser
+   de onde vem a coordenada: lá o ponto é o vértice mais próximo do centro de
+   um GRUPO de malhas nomeadas; aqui é o vértice mais próximo de uma
+   coordenada escolhida a olho. Daí para a frente — caixinha, fio, cotovelo,
+   coluna, brilho, ancoragem — é a mesma função, e é isso que faz as duas
+   peças falarem a mesma língua. */
+function montarMarcacoesExternas(malha, camada) {
+  const pos = malha.geometry.attributes.position;
+  for (const [rotulo, grupo, alvo] of MARCAS_EXTERNAS) {
+    let indice = 0, menor = Infinity;
+    for (let i = 0; i < pos.count; i++) {
+      const dx = pos.getX(i) - alvo[0], dy = pos.getY(i) - alvo[1], dz = pos.getZ(i) - alvo[2];
+      const d = dx * dx + dy * dy + dz * dz;
+      if (d < menor) { menor = d; indice = i; }
+    }
+    const el = document.createElement('div');
+    el.className = 'rotulo ' + (grupo === 'valvas' ? 'valva' : 'vaso');
+    el.textContent = rotulo;
+    el.hidden = true;
+    camada.appendChild(el);
+    ancoras.push({ el, malha, indice, grupo, peca: 'A' });
   }
 }
 
@@ -861,7 +886,7 @@ const RESPIRO = 4;         // entre dois rótulos da mesma coluna
    outro lado —, então o aluno sabe que aquilo está oculto sem perder onde é. */
 function desenharLegendas() {
   const camada = $('legendas'), svg = $('fios');
-  const ligadas = atual === 'B' && (grupoAtivo.valvas || grupoAtivo.vasos);
+  const ligadas = grupoAtivo.valvas || grupoAtivo.vasos;
   if (!ligadas) {
     for (const a of ancoras) { a.el.hidden = true; if (a.fio) a.fio.style.display = 'none'; }
     return;
@@ -871,7 +896,8 @@ function desenharLegendas() {
 
   const postos = [];
   for (const a of ancoras) {
-    if (!grupoAtivo[a.grupo]) { a.el.hidden = true; if (a.fio) a.fio.style.display = 'none'; continue; }
+    if (a.peca !== atual || !grupoAtivo[a.grupo]) {
+      a.el.hidden = true; if (a.fio) a.fio.style.display = 'none'; continue; }
     const pos = a.malha.geometry.attributes.position;
     _p.set(pos.getX(a.indice), pos.getY(a.indice), pos.getZ(a.indice));
     a.malha.localToWorld(_p);
@@ -992,12 +1018,17 @@ function pintarBotoesLegenda() {
   $('legValvas').setAttribute('aria-pressed', grupoAtivo.valvas);
   $('legVasos').setAttribute('aria-pressed', grupoAtivo.vasos);
   const ehInterna = atual === 'B';
-  $('legValvas').disabled = $('legVasos').disabled = !ehInterna;
-  const n = ancoras.filter(a => grupoAtivo[a.grupo]).length;
-  $('notaLegendas').textContent = !ehInterna
-    ? 'A Vista Externa é uma casca só, sem peças nomeadas para rotular.'
-    : (n ? n + ' de ' + ancoras.length + ' rótulos à vista. As três paredes não recebem legenda — nenhuma delas é parede de átrio.'
-         : 'Dois interruptores independentes: uma, a outra, ou as duas.');
+  $('legValvas').disabled = $('legVasos').disabled = false;
+  /* POR DENTRO É A VALVA, POR FORA É A SAÍDA. Mesmo interruptor, mesma cor,
+     mesmo traço — muda o que se pode ver de cada lado da parede. */
+  $('legValvas').textContent = ehInterna ? 'Valvas' : 'Saídas';
+  const meus = ancoras.filter(a => a.peca === atual);
+  const n = meus.filter(a => grupoAtivo[a.grupo]).length;
+  $('notaLegendas').textContent = !n
+    ? 'Dois interruptores independentes: um, o outro, ou os dois.'
+    : n + ' de ' + meus.length + ' rótulos à vista. ' + (ehInterna
+        ? 'As três paredes não recebem legenda — nenhuma delas é parede de átrio.'
+        : RESSALVA_EXTERNA);
 }
 /* mede o quanto o teste por PROFUNDIDADE discorda da oclusão de verdade */
 window.__oculto = () => {
@@ -1026,6 +1057,33 @@ window.__oculto = () => {
   return { ms: +(performance.now() - t0).toFixed(1), n: linhas.length,
            discordam: linhas.filter(l => l.discorda).length, linhas };
 };
+
+/* Ferramenta de marcação da Vista Externa: recebe um ponto da TELA em
+   fração (0..1) e devolve onde ele cai na malha, em coordenada LOCAL — que é
+   a que sobrevive a girar a câmera. Sem isto eu estaria escolhendo âncora por
+   palpite; com ela, escolho olhando e o número sai medido. */
+window.pegarPonto = (fx, fy) => {
+  if (!pecaA.raiz) return null;
+  const raio = new THREE.Raycaster();
+  raio.setFromCamera(new THREE.Vector2(fx * 2 - 1, -(fy * 2 - 1)), cam);
+  const hits = raio.intersectObject(pecaA.raiz, true);
+  if (!hits.length) return null;
+  const h = hits[0];
+  const local = h.object.worldToLocal(h.point.clone());
+  return { malha: h.object.name || '(sem nome)',
+           local: [local.x, local.y, local.z].map(v => +v.toFixed(3)),
+           dist: +h.distance.toFixed(1) };
+};
+window.aproximar = k => { cam.position.multiplyScalar(k); ctl.update(); desenhaAgora(); };
+window.girar = (h, v) => {   /* h e v em graus, em torno do alvo */
+  const p = cam.position.clone().sub(ctl.target);
+  const e = new THREE.Spherical().setFromVector3(p);
+  e.theta += h * Math.PI / 180; e.phi = Math.max(.05, Math.min(Math.PI - .05, e.phi + v * Math.PI / 180));
+  cam.position.copy(ctl.target).add(new THREE.Vector3().setFromSpherical(e));
+  cam.lookAt(ctl.target); ctl.update(); desenhaAgora();
+};
+window.camAtual = () => ({ pos: cam.position.toArray().map(v=>+v.toFixed(1)),
+                           alvo: ctl.target.toArray().map(v=>+v.toFixed(1)) });
 
 window.legendas = () => ({ ...grupoAtivo, rotulos: ancoras.length,
   visiveis: ancoras.filter(a => !a.el.hidden).length });
@@ -1057,6 +1115,7 @@ carregador.load(MODELO_A, g => {
   pecaA.raiz = g.scene;
   corDoA(malha);
   pecaA.aplicar = montarA(g.scene, malha);
+  montarMarcacoesExternas(malha, $('legendas'));
   g.scene.visible = false;
   cena.add(g.scene);
   $('pA').disabled = false;
