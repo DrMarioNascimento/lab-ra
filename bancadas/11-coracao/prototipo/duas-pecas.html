@@ -914,11 +914,13 @@ function desenharLegendas() {
         const ponto = document.createElementNS(SVGNS, 'circle');
         /* O PONTO PRECISA SER MAIOR — pedido do professor, e ele tem razão:
            com 2,5 px ele sumia dentro da textura da peça e a chamada parecia
-           terminar no nada. O anel escuro em volta é o que o separa do fundo,
-           qualquer que seja a cor da carne embaixo. */
+           terminar no nada.
+
+           SEM ANEL PRETO. Ele existia para separar o ponto do fundo, e o glow
+           passou a fazer isso melhor: o halo separa por LUZ, não por buraco.
+           O anel, com o brilho por cima, ficava um vazio escuro no meio da
+           luz — lia como furo, não como marca. */
         ponto.setAttribute('r', 5);
-        ponto.setAttribute('stroke', '#0a120c');
-        ponto.setAttribute('stroke-width', '2');
         g.append(linha, ponto); svg.appendChild(g);
         t.a.fio = g; t.a.linha = linha; t.a.ponto = ponto;
       }
