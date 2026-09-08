@@ -905,7 +905,8 @@ function desenharLegendas() {
       el.style.top = y + 'px';
 
       const frente = Math.max(0, Math.min(1, (dCentro + raio - t.d) / (2 * raio)));
-      const atras = frente < .5;
+      /* a profundidade continua no BRILHO, que é pista honesta: mais perto,
+         mais aceso. Só saiu de cima do traço. */
       el.style.opacity = (.5 + frente * .5).toFixed(2);
 
       if (!t.a.fio) {
@@ -945,7 +946,21 @@ function desenharLegendas() {
       t.a.linha.setAttribute('fill', 'none');
       t.a.linha.setAttribute('stroke', cor);
       t.a.linha.setAttribute('stroke-width', '2');    // fio mais marcado, a pedido
-      t.a.linha.setAttribute('stroke-dasharray', atras ? '3 3' : 'none');
+      /* ── O TRAÇO PASSOU A SER DO GRUPO, NÃO DA PROFUNDIDADE ──────────
+         Antes o tracejado dizia "está atrás", e MEDIDO ele errava em 5 de 8:
+         ele testava se o ponto estava na metade de trás da peça, que não é a
+         mesma pergunta que "tem carne na frente". Trocar por oclusão de
+         verdade seria pior — no mesmo instante, 7 dos 8 pontos estavam
+         realmente ocultos, então quase toda linha ficaria tracejada e a
+         distinção deixaria de distinguir. E custava 21,8 ms para oito raios,
+         o que sozinho derrubaria a taxa de quadros.
+
+         Agora o traço marca a FAMÍLIA, junto com a cor: valva verde e
+         tracejada, vaso vermelho e contínuo. Deixa de prometer o que não
+         cumpria, e de quebra a leitura para de depender só de cor — quem não
+         distingue verde de vermelho continua distinguindo valva de vaso. */
+      t.a.linha.setAttribute('stroke-dasharray',
+        t.a.grupo === 'valvas' ? '4 3' : 'none');
       t.a.ponto.setAttribute('cx', t.ax);
       t.a.ponto.setAttribute('cy', t.ay);
       t.a.ponto.setAttribute('fill', cor);
@@ -960,7 +975,7 @@ function desenharLegendas() {
       t.a.ponto.style.filter =
         `drop-shadow(0 0 3px ${cor}) drop-shadow(0 0 8px ${cor})`;
       t.a.fio.style.display = '';
-      t.a.fio.style.opacity = (atras ? .5 : 1).toFixed(2);
+      t.a.fio.style.opacity = (.55 + frente * .45).toFixed(2);
     }
   }
 }
@@ -976,6 +991,34 @@ function pintarBotoesLegenda() {
     : (n ? n + ' de ' + ancoras.length + ' rótulos à vista. As três paredes não recebem legenda — nenhuma delas é parede de átrio.'
          : 'Dois interruptores independentes: uma, a outra, ou as duas.');
 }
+/* mede o quanto o teste por PROFUNDIDADE discorda da oclusão de verdade */
+window.__oculto = () => {
+  const raio = new THREE.Raycaster();
+  const alvos = pecaB.raiz ? [pecaB.raiz] : [];
+  const dCentro = cam.position.length(), R = ALTURA * .6;
+  const dir = new THREE.Vector3(), pw = new THREE.Vector3();
+  const t0 = performance.now();
+  const linhas = [];
+  for (const a of ancoras) {
+    if (!grupoAtivo[a.grupo]) continue;
+    const pos = a.malha.geometry.attributes.position;
+    pw.set(pos.getX(a.indice), pos.getY(a.indice), pos.getZ(a.indice));
+    a.malha.localToWorld(pw);
+    const d = cam.position.distanceTo(pw);
+    const porProfundidade = ((dCentro + R - d) / (2 * R)) < .5;
+    dir.copy(pw).sub(cam.position).normalize();
+    raio.set(cam.position, dir);
+    const hits = raio.intersectObjects(alvos, true);
+    const primeiro = hits.length ? hits[0].distance : Infinity;
+    const porOclusao = primeiro < d - 1.5;
+    linhas.push({ rotulo: a.el.textContent, dist: +d.toFixed(1),
+                  profundidade: porProfundidade, oclusao: porOclusao,
+                  discorda: porProfundidade !== porOclusao });
+  }
+  return { ms: +(performance.now() - t0).toFixed(1), n: linhas.length,
+           discordam: linhas.filter(l => l.discorda).length, linhas };
+};
+
 window.legendas = () => ({ ...grupoAtivo, rotulos: ancoras.length,
   visiveis: ancoras.filter(a => !a.el.hidden).length });
 
