@@ -182,10 +182,32 @@ test("as ondas do traçado caem onde a condução está passando", async () => {
    O desenho, e as três coisas que ele já mentiu
    ========================================================================== */
 
-test("o card 11 leva ao coração", async () => {
+test("o botão grande do card 11 entrega o que o card promete", async () => {
+  /* O card anuncia as três leituras no mesmo relógio, o diagrama de Wiggers e
+     a frequência ao vivo. Houve um dia em que o botão principal passou a
+     abrir o protótipo da peça anatômica, que não tem nada disso — e o card
+     virou promessa falsa, com a letra miúda embaixo confessando a troca. Não
+     basta o link existir na página: o que o BOTÃO GRANDE abre tem de cumprir
+     o que o PARÁGRAFO diz. */
   const hub = await texto("bancadas.html");
   assert.ok(hub.includes('data-number="11"'));
-  assert.ok(hub.includes('href="coracao/"'));
+
+  const card = hub.split('data-number="11"')[1].split("</article>")[0];
+  const primario = card.split('class="launch" href="')[1].split('"')[0];
+  assert.equal(primario, "coracao/",
+    "o botão grande abre a bancada do ciclo, não um protótipo");
+
+  const bancada = await texto(primario + "index.html");
+  for (const promessa of ["Wiggers", "bulha", "traçado"]) {
+    assert.ok(bancada.includes(promessa),
+      `o card promete ${promessa} e a página que ele abre não tem`);
+  }
+
+  /* a peça anatômica continua alcançável — e dizendo que está em obra */
+  assert.ok(card.includes("bancadas/11-coracao/prototipo/duas-pecas.html"),
+    "o caminho para a peça anatômica não pode sumir do card");
+  assert.ok(card.includes("em construção"),
+    "o link da peça não pode se anunciar como bancada pronta");
 });
 
 test("a bancada está protegida e traz o caminho de RA das irmãs", async () => {
