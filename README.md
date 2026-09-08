@@ -24,6 +24,8 @@ Conteúdo migrado de `DrMarioNascimento/Dragon/laboratorio-ra`:
 
 A porta de entrada (`index.html`) autentica com Google contra `config/mestres` no projeto Firebase **mosaico-game**. As bancadas ficam em `bancadas.html` (protegidas por `guard.js` + `sessionStorage`).
 
+> **[ACESSO.md](ACESSO.md) — leia antes de mexer em qualquer coisa de login.** Aquele documento do Firestore é a única peça de que o laboratório inteiro depende e que **não está neste repositório**. Se ele se perder, todas as bancadas fecham ao mesmo tempo e todo mundo — inclusive o dono — recebe a mesma mensagem de "conta não autorizada", que parece problema da conta e não é.
+
 ## GitHub Pages
 
 1. Settings → Pages → Source: **Deploy from a branch**
@@ -55,3 +57,14 @@ leitura do que a bancada existe para mostrar.
 ## Testes
 
 `npm test` — sem dependência nenhuma, roda com `node --test`.
+
+Rodam sozinhos a cada PR e a cada push no `main`, pelo workflow
+`.github/workflows/testes.yml`. Vale saber **por que** existe essa porteira:
+estes testes não guardam só código, guardam o que ficou decidido olhando a
+tela — e com mais de uma pessoa (ou IA) trabalhando no mesmo repositório, uma
+régua quebrada ficava vermelha sem ninguém ver até alguém lembrar de rodar à
+mão.
+
+O CI roda em **Linux**, e as bancadas são escritas no **Windows**. Isso é
+recurso, não incômodo: caminho com maiúscula errada passa no Windows e quebra
+no Linux, e essa é a única régua que apanha essa classe de defeito.

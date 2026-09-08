@@ -1,0 +1,46 @@
+# OS TESTES DESTE REPOSITÓRIO SÃO MEMÓRIA DE DECISÃO, e é por isso que este
+# arquivo existe.
+#
+# Eles não guardam só código: guardam o que ficou decidido OLHANDO A TELA. O
+# próprio `coracao-pipeline.test.mjs` diz — "estas três regras não vêm de
+# anatomia nem de livro: vieram de horas de professor olhando o modelo e
+# dizendo o que atrapalhava; é justamente o tipo de decisão que ninguém
+# recupera lendo o código depois".
+#
+# Até 08/09/2026 nada os executava sozinho: o único workflow do repositório
+# era o deploy automático do Pages, e os 139 testes só rodavam quando alguém
+# lembrava de digitar `npm test`. Com DUAS IAs trabalhando no mesmo
+# repositório e PRs entrando sem nenhuma porteira, uma régua quebrada podia
+# ficar vermelha por vinte commits sem ninguém ver. Teste que ninguém roda é
+# pior que teste que não existe: dá a sensação de estar guardado.
+#
+# SEM DEPENDÊNCIA NENHUMA, de propósito: o `package.json` do lab-ra tem seis
+# linhas e nenhum pacote, então não há `npm ci`, lockfile nem cache a fazer.
+# Se um dia houver dependência, é aqui que entra — e aí sim com lockfile.
+name: testes
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  node-test:
+    name: node --test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # O runner do Ubuntu já traz Node, mas a versão dele muda sem aviso.
+      # Fixada em 22 (LTS) porque o `--test` só aceita PADRÃO DE ARQUIVO a
+      # partir do 21, e o `npm test` daqui passa "tests/*.test.mjs".
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # LINUX DISTINGUE MAIÚSCULA DE MINÚSCULA, e a máquina onde estas
+      # bancadas são escritas é Windows, que não. Um caminho com a caixa
+      # errada passa lá e quebra aqui — `coracao-bancada11-WIP.glb` é o
+      # candidato óbvio. Isso é recurso, não risco: é a única régua que
+      # apanha essa classe de defeito.
+      - run: npm test
