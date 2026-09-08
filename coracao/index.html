@@ -22,8 +22,8 @@
   <p class="page-note">Do impulso elétrico ao bombeamento, com as três leituras no mesmo relógio: a condução acendendo, as válvulas abrindo e o sangue passando. As válvulas não são animadas — elas obedecem às pressões, e por isso as fases isovolumétricas aparecem sozinhas, sem ninguém as escrever. Mexa na frequência e veja o que ela come: de 60 para 180 bpm o ciclo perde 669 ms, e 519 saem da diástole.</p>
 
   <section class="experience" aria-label="Exploração tridimensional do coração">
-    <div id="stage" class="stage" role="img" aria-label="Modelo tridimensional interativo">
-      <canvas id="scene"></canvas>
+    <div id="stage" class="stage">
+      <canvas id="scene" role="img" aria-label="Modelo tridimensional interativo"></canvas>
       <div class="stage-hud"><span id="fcLabel">75 bpm</span><span id="faseLabel">enchimento</span><span id="valvasLabel">M·T·</span><span id="stepLabel">01 · O coração</span></div>
       <div class="gesture">Arraste para girar · pinça/roda para aproximar</div>
       <div class="stage-tools">
@@ -36,7 +36,7 @@
 
       <article class="info-card" id="infoCard">
         <span class="eyebrow" id="infoEyebrow">A pergunta</span>
-        <h2 id="infoTitle">Onde a gravidade aperta?</h2>
+        <h2 id="infoTitle">O que acontece entre duas batidas?</h2>
         <p id="infoText"></p>
         <div class="microtags" id="microtags"></div>
       </article>
@@ -57,7 +57,7 @@
           <input id="fcCursor" type="range" min="40" max="200" step="1" value="75" aria-label="Frequência cardíaca" /></label>
         <label class="ctrl"><span>Instante do ciclo</span>
           <input id="faseCursor" type="range" min="0" max="0.999" step="0.002" value="0" aria-label="Instante do ciclo" /></label>
-        <label class="ctrl"><span>Câmera lenta <b id="lentoValor">1.00×</b></span>
+        <label class="ctrl"><span>Câmera lenta <b id="lentoValor">0.35×</b></span>
           <input id="lento" type="range" min="0.08" max="1" step="0.02" value="0.35" aria-label="Câmera lenta" /></label>
         <p class="estado" id="lEletrico">em repouso</p>
       </section>

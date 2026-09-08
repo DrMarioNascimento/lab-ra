@@ -22,10 +22,11 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { prepararParaRA } from '../cores-para-ra.js';
-import { criar } from './modelos.js';
+import { criar, aplicarQuadro } from './modelos.js';
+import { NIVEIS } from './niveis.js';
 import {
   simular, em, faseDe, duracoes, estruturaAtiva,
-  tempoDiastolicoPorMinuto, CONDUCAO,
+  tempoDiastolicoPorMinuto, CONDUCAO, faseDeSnapshotRA, bulhas,
 } from './fisica.js';
 
 const $ = id => document.getElementById(id);
@@ -69,10 +70,50 @@ const raio = modelos.map(m => {
   });
   return r;
 });
+function alvoDaCamera(n) {
+  if (NIVEIS[n].foco !== 'valvas') return new THREE.Vector3(0, 0, 0);
+  const vs = modelos[n].userData.valvas;
+  if (!vs) return new THREE.Vector3(0, 8, 0);
+  modelos[n].updateWorldMatrix(true, true);
+  const c = new THREE.Vector3();
+  let k = 0;
+  for (const v of Object.values(vs)) {
+    const p = new THREE.Vector3();
+    v.getWorldPosition(p);
+    c.add(p);
+    k++;
+  }
+  return k ? c.multiplyScalar(1 / k) : new THREE.Vector3(0, 8, 0);
+}
+
 function enquadrar(n) {
-  const d = raio[n] / Math.tan(camera.fov * Math.PI / 360) * 1.12;
-  camera.position.set(d * .22, d * .14, d * .94);
-  controls.target.set(0, 0, 0);
+  const alvo = alvoDaCamera(n);
+  /* o plano valvar pede um recorte, não um mergulho: zoom 0,58 deixava a
+     câmera dentro da parede e as quatro cúspides sumiam num close-up */
+  const valvas = NIVEIS[n].foco === 'valvas';
+  const corte = NIVEIS[n].foco === 'corte';
+  const zoom = valvas ? .88 : 1.12;
+  const d = raio[n] / Math.tan(camera.fov * Math.PI / 360) * zoom;
+  if (valvas) {
+    controls.target.set(alvo.x, alvo.y - 2, alvo.z + 10);
+    camera.position.set(alvo.x + d * .10, alvo.y + d * .20, alvo.z + d * 1.02);
+  } else if (corte) {
+    /* UMA SUPERFÍCIE VISTA DE PERFIL VIRA LINHA. A face do corte sempre
+       esteve desenhada — pintei-a de verde numa cópia para conferir —, mas o
+       ângulo padrão (azimute +13°) olhava quase dentro do plano do cunho e a
+       faixa da espessura encolhia a três pixels. Os 10 mm contra 3,4, que são
+       a lição inteira deste nível, estavam sendo jogados fora pela óptica e
+       não pela geometria.
+
+       Em −22° a faixa abre E a cavidade continua à vista. Em −40° a faixa
+       fica ainda mais larga, mas aí se perde o que há dentro — e o nível se
+       chama "por dentro". */
+    controls.target.copy(alvo);
+    camera.position.set(alvo.x - d * .36, alvo.y + d * .14, alvo.z + d * .90);
+  } else {
+    controls.target.copy(alvo);
+    camera.position.set(alvo.x + d * .22, alvo.y + d * .14, alvo.z + d * .94);
+  }
   controls.minDistance = d * .28; controls.maxDistance = d * 2.6;
   controls.update();
 }
@@ -108,7 +149,7 @@ const TEXTOS = [
     texto: 'As três leituras num instante só. Mexa na frequência e veja o que ela come: de 60 para 180 o ciclo perde 669 ms, e 519 saem da diástole. A diástase some primeiro, o enchimento encurta, o volume ejetado cai — e a coronária esquerda, que só enche na diástole, perde o tempo dela.',
     tags: ['a taquicardia come a diástole', 'a coronária perde tempo'] },
 ];
-const ROTULO = ['O coração', 'Por dentro', 'As válvulas', 'A condução', 'O ciclo'];
+const ROTULO = NIVEIS.map(n => n.rotulo);
 const TAM_REAL = [.26, .26, .22, .26, .26];
 
 let atual = 0;
@@ -147,8 +188,8 @@ function atualizar(dt = 0) {
   aplicarSangue({
     mitral: { q: q.qMitral, aberta: q.mitral },
     aortica: { q: q.qAortica, aberta: q.aortica },
-    tricuspide: { q: q.mitral ? q.qMitral : 0, aberta: q.tricuspide },
-    pulmonar: { q: q.aortica ? q.qAortica : 0, aberta: q.pulmonar },
+    tricuspide: { q: q.qTri, aberta: q.tricuspide },
+    pulmonar: { q: q.qPulm, aberta: q.pulmonar },
   }, dt);
 
   const f = faseDe(q, ant);
@@ -180,9 +221,17 @@ function atualizar(dt = 0) {
    bulhas. O cursor é a MESMA `fase` que move o coração em 3D — é aqui que a
    sincronia deixa de ser promessa e vira coisa que se confere. */
 const gw = $('wiggers'), cw = gw.getContext('2d');
-function desenharWiggers() {
+const fundoWiggers = document.createElement('canvas');
+let wiggersQuadro = null;
+
+function desenharTracosWiggers() {
   const W = gw.width, H = gw.height;
-  cw.clearRect(0, 0, W, H);
+  if (fundoWiggers.width !== W || fundoWiggers.height !== H) {
+    fundoWiggers.width = W;
+    fundoWiggers.height = H;
+  }
+  const fw = fundoWiggers.getContext('2d');
+  fw.clearRect(0, 0, W, H);
   const m = { e: 30, d: 8, t: 8, b: 14 };
   const px = f => m.e + f * (W - m.e - m.d);
   const faixa = (i, n) => {
@@ -190,16 +239,16 @@ function desenharWiggers() {
     return { topo: m.t + i * alt, alt: alt - 6 };
   };
   const linha = (dados, y0, alt, min, max, tinta, largura = 1.8) => {
-    cw.beginPath();
+    fw.beginPath();
     dados.forEach((v, i) => {
       const x = px(i / (dados.length - 1));
       const y = y0 + alt - (clamp(v, min, max) - min) / (max - min) * alt;
-      i ? cw.lineTo(x, y) : cw.moveTo(x, y);
+      i ? fw.lineTo(x, y) : fw.moveTo(x, y);
     });
-    cw.strokeStyle = tinta; cw.lineWidth = largura; cw.stroke();
+    fw.strokeStyle = tinta; fw.lineWidth = largura; fw.stroke();
   };
   const q = sim.quadro;
-  cw.font = '9px "IBM Plex Mono", monospace';
+  fw.font = '9px "IBM Plex Mono", monospace';
 
   /* 1 · pressões: ventrículo, aorta e átrio no mesmo eixo — é o cruzamento
      delas que ABRE e FECHA as válvulas, e por isso têm de ficar juntas */
@@ -207,36 +256,42 @@ function desenharWiggers() {
   linha(q.map(x => x.pAo), fx.topo, fx.alt, 0, 140, '#c8363e');
   linha(q.map(x => x.pVE), fx.topo, fx.alt, 0, 140, '#f2f7ec', 2.1);
   linha(q.map(x => x.pAE), fx.topo, fx.alt, 0, 140, '#5fd177', 1.4);
-  cw.fillStyle = '#7f9a80'; cw.fillText('mmHg', 2, fx.topo + 9);
+  fw.fillStyle = '#7f9a80'; fw.fillText('mmHg', 2, fx.topo + 9);
 
   /* 2 · volume do ventrículo: os patamares são as fases isovolumétricas, e
      eles são o argumento visual de que as válvulas não foram roteirizadas */
   fx = faixa(1, 4);
   linha(q.map(x => x.vVE), fx.topo, fx.alt, 30, 140, '#f5c518', 2.1);
-  cw.fillStyle = '#7f9a80'; cw.fillText('ml', 2, fx.topo + 9);
+  fw.fillStyle = '#7f9a80'; fw.fillText('ml', 2, fx.topo + 9);
 
   /* 3 · o traçado elétrico */
   fx = faixa(2, 4);
   linha(q.map(x => x.ecg), fx.topo, fx.alt, -.35, 1.1, '#9fd8f2', 1.8);
-  cw.fillStyle = '#7f9a80'; cw.fillText('ECG', 2, fx.topo + 9);
+  fw.fillStyle = '#7f9a80'; fw.fillText('ECG', 2, fx.topo + 9);
 
   /* 4 · as bulhas: a primeira no fechamento da mitral, a segunda no da
      aórtica. Elas não são desenhadas por tempo — são achadas percorrendo as
-     válvulas, então caem sozinhas no lugar certo. */
+     válvulas, então caem sozinhas no lugar certo. O laço dá a volta: a 150
+     bpm o B2 cai na emenda do ciclo. */
   fx = faixa(3, 4);
-  cw.fillStyle = '#7f9a80'; cw.fillText('bulhas', 2, fx.topo + 9);
-  for (let i = 1; i < q.length; i++) {
-    const fecha = (a, b) => q[i - 1][a] && !q[i][a];
-    if (fecha('mitral') || fecha('aortica')) {
-      const x = px(i / q.length);
-      cw.beginPath(); cw.moveTo(x, fx.topo + fx.alt); cw.lineTo(x, fx.topo + 2);
-      cw.strokeStyle = '#ff9d2e'; cw.lineWidth = 2; cw.stroke();
-      cw.fillStyle = '#ff9d2e'; cw.fillText(fecha('mitral') ? 'B1' : 'B2', x + 3, fx.topo + 9);
-    }
+  fw.fillStyle = '#7f9a80'; fw.fillText('bulhas', 2, fx.topo + 9);
+  for (const b of bulhas(q).todas) {
+    const x = px(b.fase);
+    fw.beginPath(); fw.moveTo(x, fx.topo + fx.alt); fw.lineTo(x, fx.topo + 2);
+    fw.strokeStyle = '#ff9d2e'; fw.lineWidth = 2; fw.stroke();
+    fw.fillStyle = '#ff9d2e'; fw.fillText(b.nome, x + 3, fx.topo + 9);
   }
+  wiggersQuadro = q;
+}
 
-  /* o cursor: a mesma fase do 3D */
-  const x = px(((fase % 1) + 1) % 1);
+function desenharWiggers() {
+  /* os traços só mudam quando o ciclo é recalculado; o cursor anda sozinho */
+  if (wiggersQuadro !== sim.quadro) desenharTracosWiggers();
+  const W = gw.width, H = gw.height;
+  cw.clearRect(0, 0, W, H);
+  cw.drawImage(fundoWiggers, 0, 0);
+  const m = { e: 30, d: 8, t: 8, b: 14 };
+  const x = m.e + ((fase % 1) + 1) % 1 * (W - m.e - m.d);
   cw.beginPath(); cw.moveTo(x, m.t); cw.lineTo(x, H - m.b);
   cw.strokeStyle = 'rgba(245,197,24,.85)'; cw.lineWidth = 1.5; cw.stroke();
 }
@@ -264,6 +319,8 @@ renderer.setAnimationLoop(agora => {
   renderer.render(scene, camera);
 });
 const lentidao = () => parseFloat($('lento').value);
+const syncLento = () => { $('lentoValor').textContent = lentidao().toFixed(2) + '×'; };
+syncLento();
 
 /* ------------------------------------------------------------ controles */
 $('fcCursor').addEventListener('input', e => trocarFrequencia(parseFloat(e.currentTarget.value)));
@@ -275,7 +332,7 @@ $('bater').onclick = e => {
   batendo = !batendo;
   e.currentTarget.textContent = batendo ? 'Parar' : 'Bater';
 };
-$('lento').addEventListener('input', () => { $('lentoValor').textContent = lentidao().toFixed(2) + '×'; });
+$('lento').addEventListener('input', syncLento);
 for (const [id, v] of [['repouso', 60], ['normal', 75], ['esforco', 150]])
   $(id).onclick = () => trocarFrequencia(v);
 
@@ -293,8 +350,30 @@ function prepararRA() {
     $('launchAR').disabled = true;
     $('raStatus').textContent = 'Preparando o modelo para a câmera…';
     try {
-      const clone = modelos[atual].clone(true);
-      clone.visible = true; clone.updateMatrixWorld(true);
+      /* `clone(true)` faz JSON.stringify do userData. No sangue isso
+         serializa a CatmullRom das gotas — e no miolo do three.js o
+         toJSON do grupo inteiro é pesado demais. Tira o sangue (é
+         animação, não anatomia), esvazia o userData da raiz, clona,
+         devolve. As cúspides ganham geometria própria só então. */
+      const vivo = modelos[atual];
+      const sangue = vivo.userData.sangue;
+      if (sangue) vivo.remove(sangue);
+      const udRaiz = vivo.userData;
+      vivo.userData = {};
+      const clone = vivo.clone(true);
+      vivo.userData = udRaiz;
+      if (sangue) vivo.add(sangue);
+      clone.visible = true;
+      clone.traverse(o => {
+        if (o.isMesh && o.geometry?.userData?.nu) o.geometry = o.geometry.clone();
+        if (o.isMesh && o.userData?.papelParede === 'selo') o.geometry = o.geometry.clone();
+      });
+      const spec = NIVEIS[atual].faseRA;
+      if (spec) {
+        const faseSnap = faseDeSnapshotRA(sim, spec);
+        if (faseSnap != null) aplicarQuadro(clone, em(sim, faseSnap));
+      }
+      clone.updateMatrixWorld(true);
       const caixa = new THREE.Box3().setFromObject(clone), tam = caixa.getSize(new THREE.Vector3());
       clone.scale.setScalar(TAM_REAL[atual] / Math.max(tam.x, tam.y, tam.z));
       clone.updateMatrixWorld(true);

@@ -104,16 +104,29 @@ export function estruturaAtiva(t) {
 }
 
 /* ── O ELETROCARDIOGRAMA ──────────────────────────────────────────────────
-   Soma de ondas, cada uma no seu tempo. Não é um traçado decorativo: as
-   ondas caem exatamente onde a condução está passando, porque usam os mesmos
-   tempos da tabela acima. */
+   Soma de gaussianas. P e QRS caem PERTO da tabela de condução, mas não a
+   leem: os centros são números desta função. A onda T — repolarização —
+   nem está na tabela. Cravá-la em 0,390 s a apaga quando o ciclo fica
+   menor que isso (180 bpm = 0,333 s). A T encolhe com √RR, à la Bazett,
+   o mesmo princípio que `duracoes()` já usa para a sístole mecânica.
+
+   `rr` em segundos; omissão = 1 s (60 bpm), que é o traçado histórico. */
 const gauss = (t, centro, largura) => Math.exp(-Math.pow((t - centro) / largura, 2));
-export function ecg(t) {
+export function ecg(t, rr = 1) {
   const p = 0.13 * gauss(t, 0.050, 0.028);
   const q = -0.10 * gauss(t, 0.165, 0.010);
   const r = 1.00 * gauss(t, 0.190, 0.014);
   const s = -0.22 * gauss(t, 0.215, 0.013);
-  const onda = 0.28 * gauss(t, 0.390, 0.052);
+  const escala = Math.sqrt(Math.max(rr, 1e-6));
+  /* QT do início do QRS ao pico da T: 0,225 s quando RR = 1 s (60 bpm).
+     Em taquicardia o pico cru sem teto encosta no fim do ciclo e a T some
+     da faixa — por isso ela também não pode passar de RR menos a própria
+     largura. */
+  let wT = 0.052 * escala;
+  let tT = 0.165 + 0.225 * escala;
+  if (tT > rr - 2.2 * wT) tT = Math.max(0.222, rr - 2.2 * wT);
+  wT = Math.min(wT, Math.max(0.018, (rr - tT) * 0.40));
+  const onda = 0.28 * (gauss(t, tT, wT) + gauss(t - rr, tT, wT) + gauss(t + rr, tT, wT));
   return p + q + r + s + onda;
 }
 
@@ -191,6 +204,15 @@ export function simular(fc, { passos = 900, ciclos = 14 } = {}) {
   let mitral = true, aortica = false, tricuspide = true, pulmonar = false;
   const decide = (aberta, gradiente) =>
     gradiente > P.limiarValva ? true : gradiente < -P.limiarValva ? false : aberta;
+  /* A AV precisa de histerese que ATRAVESSE o relaxamento atrial. O dip
+     depois da onda a inverte o gradiente por frações de mmHg, o folheto
+     coapta cedo e o Wiggers marca um B1 falso — ou, a 60 bpm, a valva
+     nem reabre e some o B1 verdadeiro. Sem contração ventricular o anel
+     não fecha: B1 é o coaptar quando o ventrículo vira bomba. */
+  const decideAV = (aberta, gradiente, aVent) => {
+    if (aVent > 0) return decide(aberta, gradiente);
+    return gradiente > P.limiarValva ? true : aberta;
+  };
 
   const quadro = [];
   for (let ciclo = 0; ciclo < ciclos; ciclo++) {
@@ -218,14 +240,17 @@ export function simular(fc, { passos = 900, ciclos = 14 } = {}) {
 
       /* AS VÁLVULAS SÃO COMPARAÇÕES, NÃO UM ROTEIRO — com a folga da inércia
          do folheto, que é o que impede o tremor numérico na diástase. */
-      mitral = decide(mitral, pAE - pVE);
+      mitral = decideAV(mitral, pAE - pVE, aVent);
       aortica = decide(aortica, pVE - pAo);
-      tricuspide = decide(tricuspide, pAD - pVD);
+      tricuspide = decideAV(tricuspide, pAD - pVD, aVent);
       pulmonar = decide(pulmonar, pVD - pAP);
 
-      const qMitral = mitral ? (pAE - pVE) / P.rMitral : 0;
+      /* AV aberta com dip de relaxamento atrial: o folheto não coapta (não
+         é B1) e o jato de enchimento tem inércia — não regurgita por
+         frações de mmHg. */
+      const qMitral = mitral ? Math.max(0, (pAE - pVE) / P.rMitral) : 0;
       const qAortica = aortica ? (pVE - pAo) / P.rAortica : 0;
-      const qTri = tricuspide ? (pAD - pVD) / P.rTricuspide : 0;
+      const qTri = tricuspide ? Math.max(0, (pAD - pVD) / P.rTricuspide) : 0;
       const qPulm = pulmonar ? (pVD - pAP) / P.rPulmonar : 0;
       /* as veias enchem o átrio o tempo todo, inclusive com a valva fechada —
          é isso que produz a onda v durante a sístole ventricular */
@@ -235,7 +260,8 @@ export function simular(fc, { passos = 900, ciclos = 14 } = {}) {
       if (guardar) {
         quadro.push({ t, fase: t / d.rr, pVE, pAo, pAE, pVD, pAP, pAD,
                       vVE, vVD, vAE, vAD, mitral, aortica, tricuspide, pulmonar,
-                      qMitral, qAortica, ecg: ecg(t), ativacao: aVent, ativacaoAtrio: aAtrio });
+                      qMitral, qAortica, qTri, qPulm, ecg: ecg(t, d.rr),
+                      ativacao: aVent, ativacaoAtrio: aAtrio });
       }
 
       vVE += (qMitral - qAortica) * dt;
@@ -278,7 +304,14 @@ export function em(sim, fase) {
    a frequência muda. */
 export function faseDe(q, anterior) {
   if (q.aortica) return 'ejecao';
-  if (q.mitral) return q.ativacaoAtrio > .15 ? 'sistole atrial' : 'enchimento';
+  if (q.mitral) {
+    if (q.ativacaoAtrio > .15) return 'sistole atrial';
+    /* diástase de verdade: câmaras moles, mitral aberta, FIM da diástole
+       (depois da onda E, antes de voltar a A no wrap). Não é mais o
+       fechamento fantasma depois da sístole atrial — aquele era chatter. */
+    if ((q.ativacao ?? 0) <= 0.002 && (q.fase ?? 0) > 0.68) return 'diastase';
+    return 'enchimento';
+  }
   /* AS DUAS FECHADAS: isovolumétrica. Qual delas, decide o SINAL DA VARIAÇÃO
      DE PRESSÃO — subindo é contração, caindo é relaxamento.
 
@@ -314,4 +347,61 @@ export function tempoPorFase(sim) {
    o tempo de perfusão do coração, e é o primeiro a sumir na taquicardia. */
 export function tempoDiastolicoPorMinuto(fc) {
   return duracoes(fc).diastole * fc;      // segundos de diástole por minuto
+}
+
+/* Fase pedagógica para o snapshot de RA. `enchimento` = diástole média,
+   atrioventriculares abertas e semilunares fechadas — o par que o nível
+   das válvulas precisa mostrar, em vez do instante ao acaso da entrada. */
+export function faseDeSnapshotRA(sim, spec) {
+  if (spec !== 'enchimento') return null;
+  const bons = [];
+  const n = sim.quadro.length;
+  for (let i = 0; i < n; i++) {
+    const q = sim.quadro[i];
+    const ant = sim.quadro[i ? i - 1 : n - 1];
+    if (faseDe(q, ant) !== 'enchimento') continue;
+    if (q.mitral && q.tricuspide && !q.aortica && !q.pulmonar) bons.push(q);
+  }
+  if (!bons.length) return null;
+  return bons[Math.floor(bons.length / 2)].fase;
+}
+
+/* ── AS BULHAS ────────────────────────────────────────────────────────────
+   B1 e B2 não são desenhadas por tempo: saem dos fechamentos das valvas,
+   com o laço DANDO A VOLTA no ciclo. Sem a emenda, a 150 bpm a aórtica
+   fecha entre o último quadro e o primeiro e o B2 some.
+
+   B1 é o ÚLTIMO fechamento da mitral antes da ejeção. O chatter depois
+   da sístole atrial, se ainda existir, não é a primeira bulha. */
+export function fechamentos(quadro, nome) {
+  const n = quadro.length, out = [];
+  for (let i = 0; i < n; i++) {
+    const ant = quadro[(i - 1 + n) % n];
+    if (!(ant[nome] && !quadro[i][nome])) continue;
+    const wrap = i === 0;
+    out.push({
+      i, wrap, t: quadro[i].t,
+      fase: wrap ? 1 : i / Math.max(1, n - 1),
+    });
+  }
+  return out;
+}
+
+export function bulhas(quadro) {
+  const n = quadro.length;
+  let iAbreAo = 0;
+  for (let i = 0; i < n; i++) {
+    const ant = quadro[(i - 1 + n) % n];
+    if (!ant.aortica && quadro[i].aortica) iAbreAo = i;
+  }
+  const mitrais = fechamentos(quadro, 'mitral');
+  const aorticas = fechamentos(quadro, 'aortica');
+  const ordem = f => (f.wrap ? n : f.i);
+  const limite = iAbreAo === 0 ? n : iAbreAo;
+  const b1 = mitrais.filter(f => ordem(f) <= limite).at(-1) || mitrais.at(-1) || null;
+  const b2 = aorticas.at(-1) || null;
+  const todas = [];
+  if (b1) todas.push({ nome: 'B1', ...b1 });
+  if (b2) todas.push({ nome: 'B2', ...b2 });
+  return { b1, b2, todas };
 }
