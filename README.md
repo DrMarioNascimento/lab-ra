@@ -68,3 +68,9 @@ mão.
 O CI roda em **Linux**, e as bancadas são escritas no **Windows**. Isso é
 recurso, não incômodo: caminho com maiúscula errada passa no Windows e quebra
 no Linux, e essa é a única régua que apanha essa classe de defeito.
+
+## Licença e uso
+
+Este repositório é público para consulta e acesso à experiência no GitHub Pages, mas não é código aberto. O uso educacional permitido e as restrições de cópia, adaptação, redistribuição e exploração comercial estão descritos em [LICENSE.md](LICENSE.md).
+
+**Autor:** Mário César Nascimento, PhD.
