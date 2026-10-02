@@ -20,7 +20,7 @@ import * as THREE from 'three';
 import {
   DIR, ESQ, mk, loft, tuboGeo, construirCaixa, construirColuna, construirDiafragma,
   construirMediastino, geoPulmao, secaoPulmao, HILO, fragmentoGeo, tecidoGeo,
-  amostraPulmao, unidadeAcinar, redeCapilar, yDiafragmaToracico, raioDiafragma, limiteCardiaco, wT, dT,
+  amostraPulmao, unidadeAcinar, redeCapilar, yDiafragmaToracico, raioDiafragma, limiteCardiaco, wT, dT, geoLobos,
 } from './anatomia.js';
 
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
@@ -51,9 +51,9 @@ export const M = {
   pulmaoColapso: phys('pulmao_colapsado', { color: 0x783747, roughness: .76, sheen: .28, vertexColors: true, sheenColor: cor(182, 112, 126) }),
   pulmaoVidro: phys('pulmao_translucido', { color: 0x749fae, roughness: .56, sheen: .25,
                  transparent: true, opacity: .14, depthWrite: false, side: THREE.DoubleSide }),
-  pleuraP:    phys('pleura_parietal', { color: CORES.negativa.getHex(), roughness: .15, transparent: true, opacity: .12, depthWrite: false, side: THREE.DoubleSide }),
-  pleuraAr:   phys('espaco_pleural_ar', { color: CORES.positiva.getHex(), roughness: .3, emissive: cor(70, 34, 0).getHex(), emissiveIntensity: .6,
-                 transparent: true, opacity: .26, depthWrite: false, side: THREE.DoubleSide }),
+  pleuraP:    phys('pleura_parietal', { color: CORES.negativa.getHex(), roughness: .15, transparent: true, opacity: .025, depthWrite: false, side: THREE.DoubleSide }),
+  pleuraAr:   phys('espaco_pleural_ar', { color: 0xf2d45c, roughness: .6, emissive: cor(115, 92, 15).getHex(), emissiveIntensity: .35,
+                 transparent: true, opacity: .30, depthWrite: false, side: THREE.DoubleSide }),
   diafragma:  phys('diafragma',  { color: 0x8e404a, roughness: .78, sheen: .26, sheenColor: cor(214, 115, 123), side: THREE.DoubleSide }),
   tendao:     phys('tendao', { color: 0xd6c9af, roughness: .75, side: THREE.DoubleSide }),
   fibra:      phys('fibra', { color: 0xb26868, roughness: .85 }),
@@ -75,6 +75,60 @@ export const M = {
   frestaPos:  phys('fresta_positiva', { color: CORES.positiva.getHex(), roughness: .4, emissive: cor(70, 34, 0).getHex(), emissiveIntensity: .7, transparent: true, opacity: .5 }),
 };
 
+const cacheLobos=new Map();
+function materiaisLobos(s,colapso) {
+  const key=`${s}:${colapso}`;
+  if(!cacheLobos.has(key)) {
+    const names=s===DIR?['superior','medio','inferior']:['superior','inferior'];
+    const colors=s===DIR?[0xbc8998,0xcb9b88,0x997d9b]:[0xbc8998,0x997d9b];
+    cacheLobos.set(key,names.map((nome,i)=>{
+      const m=(colapso?M.pulmaoColapso:M.pulmao).clone();m.name=`lobo_${nome}_${s===DIR?'D':'E'}`;
+      if(!colapso)m.color.setHex(colors[i]);return m;
+    }));
+  }
+  return cacheLobos.get(key);
+}
+// Contraste didático normalizado: contínuo, crescente, zero continua zero.
+// A física e os volumes exibidos no painel permanecem independentes.
+export function escalaAlveolarVisual(volume) {
+  const v=clamp(volume,0,1),sig=x=>1/(1+Math.exp(-7*(x-.46)));
+  return Math.pow(clamp((sig(v)-sig(0))/(sig(1)-sig(0)),0,1),.60);
+}
+const elevarEsterno=(p,ec,inspiracao)=>V(p.x*ec,p.y+.005*inspiracao,p.z*ec+.004*inspiracao);
+function moverCostelas(costal,ec,inspiracao) {
+  for(const rib of costal.children) {
+    if(!rib.isGroup) {
+      if(!rib.isMesh)continue;
+      const pos=rib.geometry.attributes.position,base=rib.userData.repouso;
+      for(let i=0;i<pos.count;i++) {
+        const v=elevarEsterno(V(base[i*3],base[i*3+1],base[i*3+2]),ec,inspiracao);
+        pos.setXYZ(i,v.x/ec,v.y,v.z/ec);
+      }
+      pos.needsUpdate=true;rib.geometry.computeVertexNormals();rib.geometry.computeBoundingSphere();continue;
+    }
+    const {lado:s,numero,articulacao}=rib.userData;
+    const origin=articulacao.cabeca,axis=articulacao.tuberculo.clone().sub(origin).normalize();
+    const graus=(5-3*clamp((numero-3)/7,0,1))*inspiracao;
+    rib.userData.angulo=graus;
+    for(const m of rib.children) {
+      const pos=m.geometry.attributes.position,base=m.userData.repouso,cart=m.material===M.cartilagem;
+      for(let i=0;i<pos.count;i++) {
+        const original=V(base[i*3],base[i*3+1],base[i*3+2]),radial=original.clone().sub(origin);
+        const off=radial.clone().addScaledVector(axis,-radial.dot(axis)).length();
+        const t=clamp((off-.012)/.038,0,1),peso=t*t*(3-2*t);
+        const v=original.clone();v.x*=1+(ec-1)*peso;v.z*=1+(ec-1)*peso;
+        v.sub(origin).applyAxisAngle(axis,-s*graus*Math.PI/180).add(origin);
+        if(cart) {
+          const anterior=clamp((original.z+.018)/.092,0,1),medial=clamp(1-Math.abs(original.x)/.115,0,1);
+          const blend=anterior*medial;
+          v.lerp(elevarEsterno(original,ec,inspiracao),blend*blend*(3-2*blend));
+        }
+        pos.setXYZ(i,v.x/ec,v.y,v.z/ec);
+      }
+      pos.needsUpdate=true;m.geometry.computeVertexNormals();m.geometry.computeBoundingSphere();
+    }
+  }
+}
 const emCm = () => { const g = new THREE.Group(); g.name = 'cm'; g.scale.setScalar(100); return g; };
 
 /* ── NÍVEL 01 — A FRESTA ──────────────────────────────────────────────────
@@ -134,7 +188,9 @@ function nivelTorax() {
   const cm = emCm(); g.add(cm);
 
   const caixa = new THREE.Group(); caixa.name = 'caixa';
-  caixa.add(construirCaixa(M), construirColuna(M));
+  const costal=construirCaixa(M),coluna=construirColuna(M);
+  caixa.add(costal);
+  costal.traverse(o=>{if(o.isMesh)o.userData.repouso=o.geometry.attributes.position.array.slice();});
   const pleuras = {};
   for (const s of [DIR, ESQ]) {
     const m = mk(`pleura_parietal_${s === DIR ? 'D' : 'E'}`, geoPulmao(s, { inflate: .003, fissuras: false, toracico: true }), M.pleuraP);
@@ -144,13 +200,13 @@ function nivelTorax() {
   const med = construirMediastino(M);
   const diafragma=construirDiafragma(M);
   diafragma.traverse(o=>{if(o.isMesh)o.userData.repouso=o.geometry.attributes.position.array.slice();});
-  cm.add(caixa, diafragma, med);
+  cm.add(caixa, coluna, diafragma, med);
 
   /* ordem [esquerdo, direito]: o doente é o direito, como na física */
   const pulmoes = [ESQ, DIR].map(s => {
     const p = new THREE.Group(); p.name = `pulmao_${s === DIR ? 'D' : 'E'}`;
     const h = HILO(s); p.position.copy(h);
-    const malha = mk(`pulmao_${s === DIR ? 'D' : 'E'}_malha`, geoPulmao(s,{toracico:true}), M.pulmao);
+    const malha = mk(`pulmao_${s === DIR ? 'D' : 'E'}_malha`, geoLobos(s), materiaisLobos(s,false));
     malha.position.copy(h).negate();
     p.add(malha);
     malha.userData.repouso=malha.geometry.attributes.position.array.slice();
@@ -159,7 +215,7 @@ function nivelTorax() {
     return p;
   });
 
-  g.userData = { caixa, pulmoes, med, pleuras, diafragma };
+  g.userData = { caixa, costal, coluna, pulmoes, med, pleuras, diafragma };
   g.position.y = -15;
   return g;
 }
@@ -182,7 +238,7 @@ function nivelGradiente() {
   const cm = pulmaoDeVidro(); g.add(cm);
   const alveolos = [];
   const amostras=Array.from({length:N_ALV},(_,i)=>amostraPulmao(DIR,.25+.70*i/(N_ALV-1)));
-  const r=Math.min(.030,...amostras.map(a=>a.folga*.88));
+  const r=Math.min(.030,...amostras.map(a=>a.folga*.94));
   for (let i = 0; i < N_ALV; i++) {
     const f = i / (N_ALV - 1);
     const a=amostras[i];
@@ -270,7 +326,7 @@ export function criar() {
       const doente = p.userData.lado === DIR;
       const e = doente ? ep : escalaDe(0.40)*ciclo;
       p.scale.setScalar(e);
-      p.userData.malha.material = (doente && pulmao < .2) ? M.pulmaoColapso : M.pulmao;
+      p.userData.malha.material = materiaisLobos(p.userData.lado,doente && pulmao < .2);
       /* o mediastino empurrado: o pulmão bom é deslocado PARA LONGE do lado
          doente — para a esquerda do paciente (+x) */
       p.position.x = p.userData.base.x + (doente ? 0 : ESQ * desvio * 0.026);
@@ -296,6 +352,7 @@ export function criar() {
       p.userData.malha.geometry.computeBoundingSphere();
     });
     d.caixa.scale.set(ec, 1, ec);
+    moverCostelas(d.costal,ec,inspiracao);
     d.diafragma.scale.set(ec,1,ec);
     d.med.position.x = ESQ * desvio * 0.016;
     for(const s of [DIR,ESQ]) {
@@ -308,7 +365,7 @@ export function criar() {
         }
         for(let k=0;k<3;k++) {
           y=Math.max(y,yDiafragmaToracico(x/ec,z/ec,inspiracao)+.0007);
-          x=s*Math.max(s*x,limiteCardiaco(s,y,z)-.0015+s*desvio*.016);
+          x=s*Math.max(s*x,limiteCardiaco(s,y,z)-.002+s*desvio*.016);
           const q=Math.hypot(x/(wT(y)*ec),z/(dT(y)*ec));
           if(q>.985&&y<.283){x*=.985/q;z*=.985/q;}
         }
@@ -338,7 +395,7 @@ export function criar() {
   function aplicarAlveolos(volumeEm) {
     for (const m of modelos[3].userData.alveolos) {
       const v = volumeEm(m.userData.f);
-      m.scale.setScalar(Math.cbrt(clamp(v, 0, 1)));
+      m.scale.setScalar(escalaAlveolarVisual(v));
     }
   }
 
