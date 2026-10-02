@@ -1,10 +1,16 @@
 import * as THREE from 'three';
 const V=(x=0,y=0,z=0)=>new THREE.Vector3(x,y,z),clamp=THREE.MathUtils.clamp;
 const protecoes=new WeakMap();
+let carregamento;
+// Encaixe previamente calculado para esta malha e estes trajetos; evita sondagens
+// repetidas na abertura. Recalcular o JSON ao editar os trajetos dos pés.
+export function carregarAjustePes(){return carregamento??=fetch(new URL('./pes-anatomicos.json?v=encaixe-1',import.meta.url)).then(r=>{if(!r.ok)throw Error('Encaixe dos pés indisponível');return r.json()}).catch(()=>null)}
+export function assinaturaCorpo(geo){let hash=2166136261;for(const arr of [new Uint32Array(geo.attributes.position.array.buffer,geo.attributes.position.array.byteOffset,geo.attributes.position.array.length),geo.index.array])for(const x of arr)hash=Math.imul(hash^x,16777619)>>>0;return geo.attributes.position.count+':'+geo.index.count+':'+hash}
 const suave=t=>{t=clamp(t,0,1);return t*t*(3-2*t)};
 
 // A pele serve somente como sonda: sua geometria e seu material nunca são alterados.
-export function prepararPes(geo,S) {
+export function prepararPes(geo,S,dados) {
+  const pronto=dados?.version===1&&dados.S===S&&dados.signature===assinaturaCorpo(geo)&&Object.keys(dados.paths||{}).length===4?dados:null;
   const recorte=new THREE.BufferGeometry(),pos=geo.attributes.position,indices=[];
   for(let i=0;i<(geo.index?.count||pos.count);i+=3){const a=geo.index?geo.index.getX(i):i,b=geo.index?geo.index.getX(i+1):i+1,c=geo.index?geo.index.getX(i+2):i+2;if(Math.max(pos.getY(a),pos.getY(b),pos.getY(c))<.26*S)indices.push(a,b,c)}
   recorte.setAttribute('position',pos);recorte.setIndex(indices);
@@ -21,7 +27,7 @@ export function prepararPes(geo,S) {
     zs=limites(V(x,p.y,-S),V(0,0,1),2);if(zs)z=clamp(z,zs[0]+(zs[1]-zs[0])*.25,zs[1]-(zs[1]-zs[0])*.25);
     return V(x,p.y,z);
   };
-  const locais=new Map();
+  const locais=new Map(pronto?Object.entries(pronto.locais).map(([lado,local])=>[Number(lado),Object.fromEntries(Object.entries(local).map(([k,a])=>[k,V(...a)]))]):[]);
   return {
     ligar(mesh,original,S,inicio=false) {
       const lado=(inicio?original.getPoint(0):original.getPoint(1)).x<0?-1:1;
@@ -35,10 +41,11 @@ export function prepararPes(geo,S) {
         if(!melhor)throw Error('Não foi possível encaixar a microcirculação no pé');locais.set(lado,melhor);
       }
       const local=locais.get(lado),ponta=inicio?local.v:local.a;
-      let corte=inicio?0:1;for(let i=0;i<=2048;i++){const t=i/2048;if(original.getPoint(t).y<.22*S){if(inicio)corte=t;else{corte=t;break}}}
+      const registro=pronto?.paths[mesh.name];
+      let corte=registro?.corte??(inicio?0:1);if(!registro)for(let i=0;i<=2048;i++){const t=i/2048;if(original.getPoint(t).y<.22*S){if(inicio)corte=t;else{corte=t;break}}}
       const junta=original.getPoint(corte),tan=original.getTangent(corte),d=junta.distanceTo(ponta),direcao=V(0,0,inicio?-1:1);
       const bez=inicio?new THREE.CubicBezierCurve3(ponta,ponta.clone().addScaledVector(direcao,d*.22),junta.clone().addScaledVector(tan,-d*.22),junta):new THREE.CubicBezierCurve3(junta,junta.clone().addScaledVector(tan,d*.22),ponta.clone().addScaledVector(direcao,-d*.22),ponta);
-      const amostras=Array.from({length:257},(_,i)=>i===0||i===256?bez.getPoint(i/256):encaixar(bez.getPoint(i/256),lado));
+      const amostras=registro?registro.amostras.map(p=>V(...p)):Array.from({length:257},(_,i)=>i===0||i===256?bez.getPoint(i/256):encaixar(bez.getPoint(i/256),lado));
       const pontoLocal=(t,target)=>{const x=clamp(t,0,1)*256,i=Math.min(255,Math.floor(x));return target.copy(amostras[i]).lerp(amostras[i+1],x-i)};
       class Distal extends THREE.Curve {
         getPoint(t,target=V()){if(inicio?t>=corte:t<=corte)return original.getPoint(t,target);return pontoLocal(inicio?t/corte:(t-corte)/(1-corte),target)}
@@ -48,7 +55,7 @@ export function prepararPes(geo,S) {
       originalGeo.userData={...u,centros:u.centros?.map(p=>p.clone()),alturas:u.alturas?.slice()};
       const segmentos=u.segsU||mesh.geometry.parameters.tubularSegments,radiais=u.segsV||mesh.geometry.parameters.radialSegments,q=new THREE.Quaternion(),fatores=[];
       // Cache do calibre: sondagem só na construção, nunca no laço da animação.
-      for(let i=0;i<=256;i++)fatores.push(curva.calibreNoPonto(i/256));curva.calibreNoPonto=t=>{const x=clamp(t,0,1)*256,i=Math.min(255,Math.floor(x));return THREE.MathUtils.lerp(fatores[i],fatores[i+1],x-i)};
+      if(registro)fatores.push(...registro.fatores);else for(let i=0;i<=256;i++)fatores.push(curva.calibreNoPonto(i/256));curva.calibreNoPonto=t=>{const x=clamp(t,0,1)*256,i=Math.min(255,Math.floor(x));return THREE.MathUtils.lerp(fatores[i],fatores[i+1],x-i)};
       if(u.centros)u.calibreDistal=Array(segmentos+1).fill(1);
       for(let s=0;s<=segmentos;s++){
         const t=u.centros?s/segmentos:original.getUtoTmapping(s/segmentos);if(inicio?t>=corte:t<=corte)continue;
