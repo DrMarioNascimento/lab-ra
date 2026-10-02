@@ -23,6 +23,9 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { carregarCoracaoAnatomico, instalarCoracao, ligarVaso, ajustarTrechoCardiaco, moldarOriginalCardiaca, restaurarNormaisProtegidas } from './coracao.js?v=cardiaco-20261002';
+import {prepararPes,centrosParaVolume,moldarOriginalDistal,restaurarNormaisDistais} from './pes.js?v=pes-bomba-20261002';
+import {pressaoComBomba,contracaoNaFase} from './bomba.js?v=pes-bomba-20261002';
+import {tecidosDaPanturrilha} from './panturrilha.js?v=pes-bomba-20261002';
 
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
 const rnd = (a, b) => a + Math.random() * (b - a);
@@ -167,13 +170,14 @@ export function fatorDeDistensao(mmHg, teto = 1.45) {
 function moldarVeia(malha, grau, opc = {}) {
   const g = malha.geometry, u = g.userData;
   moldarOriginalCardiaca(g,grau,opc,moldarVeia);
+  moldarOriginalDistal(g,grau,opc,moldarVeia);
   const pos = g.attributes.position, cor = g.attributes.color;
   const base = opc.base ?? 10, teto = opc.teto ?? 1.45;
   for (let s = 0; s <= u.segsU; s++) {
     const p = pressaoVenosa(u.alturas[s], grau, { base });
     const f = fatorDeDistensao(p, teto);
     const c = corDaPressao(p);
-    const ct = u.centros[s], r = u.raioBase * f * (u.calibreCardiaco?.[s] ?? 1);
+    const ct = u.centros[s], r = u.raioBase * f * (u.calibreCardiaco?.[s] ?? 1) * (u.calibreDistal?.[s] ?? 1);
     for (let k = 0; k <= u.segsV; k++) {
       const i = s * (u.segsV + 1) + k;
       /* o anel original tem raio 1 em torno do centro: escalar o vetor
@@ -187,6 +191,7 @@ function moldarVeia(malha, grau, opc = {}) {
   pos.needsUpdate = true; cor.needsUpdate = true;
   g.computeVertexNormals();
   restaurarNormaisProtegidas(g);
+  restaurarNormaisDistais(g);
 }
 
 /* ── O CORPO, EM SILHUETA ──────────────────────────────────────────────────
@@ -414,6 +419,7 @@ function nivelCorpoMalha(bodyGeo, scan) {
   const fluxo = [];
   const veias = [];
   const aneis = [];
+  const pes=prepararPes(geo,S);
   const valveMat = new THREE.MeshStandardMaterial({
     name: 'valvula_venosa', color: 0xbfd4ff, emissive: 0x6f8fff, emissiveIntensity: 0.9, roughness: 0.3,
   });
@@ -423,6 +429,7 @@ function nivelCorpoMalha(bodyGeo, scan) {
     let curve = new THREE.CatmullRomCurve3(pts, false, 'centripetal', 0.5);
     const mesh = new THREE.Mesh(new THREE.TubeGeometry(curve, 80, d.r, 10, false), artMat);
     mesh.name = d.n;
+    if(d.n.startsWith('femoral_'))curve=pes.ligar(mesh,curve,S);
     if(d.n==='aorta') {
       const ligada=ligarVaso(curve,ligacoes.aorta,1.21*S,true,V(0,-.35,-1).normalize());
       curve=ajustarTrechoCardiaco(mesh,curve,ligada,80,10,true,.62);
@@ -439,6 +446,8 @@ function nivelCorpoMalha(bodyGeo, scan) {
     veias.push(mesh);
     g.add(mesh);
     let curve = new THREE.CatmullRomCurve3(pts, false, 'centripetal', 0.5);
+    const original=curve;
+    if(d.n.startsWith('femoral_safena'))curve=pes.ligar(mesh,curve,S,true);
     if(d.n==='veia_cava_inferior'||d.papel==='jugular') {
       const inferior=d.n==='veia_cava_inferior';
       const ligada=ligarVaso(curve,inferior?ligacoes.inferior:confluencia,(inferior?1.21:1.44)*S,false,inferior?V(0,1,0):V(0,-1,0));
@@ -446,15 +455,17 @@ function nivelCorpoMalha(bodyGeo, scan) {
     }
     fluxo.push({ curve, r: d.r, kind: 'v', len: curve.getLength(), name: d.n });
     if (!d.n.startsWith('femoral_safena')) continue;
-    const n = Math.max(4, Math.floor(curve.getLength() / (0.09 * S)));
+    const n = Math.max(4, Math.floor(original.getLength() / (0.09 * S)));
     for (let k = 1; k <= n; k++) {
       const t = k / (n + 1);
-      const pt = curve.getPointAt(t), tg = curve.getTangentAt(t);
+      const parametro=original.getUtoTmapping(t),pt=curve.getPoint(parametro),tg=curve.getTangent(parametro),calibre=curve.calibreNoPonto?.(parametro)??1;
       const ring = new THREE.Mesh(new THREE.TorusGeometry(d.r * 1.25, d.r * 0.28, 8, 18), valveMat.clone());
       ring.name = 'valvula_' + d.n + '_' + k;
       ring.position.copy(pt);
       ring.quaternion.setFromUnitVectors(V(0, 0, 1), tg);
       ring.userData.altura = pt.y / CM;
+      ring.userData.calibreDistal=calibre;
+      ring.scale.setScalar(calibre);
       g.add(ring);
       aneis.push(ring);
     }
@@ -464,13 +475,22 @@ function nivelCorpoMalha(bodyGeo, scan) {
   superior.name='conexao_cardiaca_cava_superior';superior.userData.papel='cava';g.add(superior);veias.push(superior);
   const curvaSuperior=new THREE.CatmullRomCurve3([confluencia,confluencia.clone().lerp(ligacoes.superior,.5),ligacoes.superior]);
   fluxo.push({curve:curvaSuperior,r:.009*S,kind:'v',len:curvaSuperior.getLength(),name:superior.name});
+  for(const lado of [-1,1]){
+    const L=lado<0?'dir':'esq',a=fluxo.find(p=>p.name==='femoral_'+L),v=fluxo.find(p=>p.name==='femoral_safena_'+L),micro=pes.micro(lado);
+    const mesh=new THREE.Mesh(new THREE.TubeGeometry(micro.curve,28,micro.r,10,false),artMat.clone());mesh.name='microcirculacao_pe_'+L;mesh.material.color.set(0x8b467f);g.add(mesh);
+    const path={...micro,kind:'m',len:micro.curve.getLength(),name:mesh.name};
+    // A ligação do fluxo não integra os metadados serializados pelo glTF.
+    for(const [de,para] of [[a,path],[path,v],[v,a]])Object.defineProperty(de,'next',{value:para,enumerable:false});
+    fluxo.push(path);
+  }
+  pes.dispose();
   const bolha = texturaBolha(), faisca = texturaFaisca();
   const particulas = [];
   const tmp0 = new THREE.Vector3();
   const camada = (name, size, tex, color, density, speedMul, opacity, kind) => {
     const data = [];
     for (const path of fluxo) {
-      if (path.kind !== kind) continue;
+      if (path.kind !== kind && !(path.kind==='m'&&kind==='v')) continue;
       const n = Math.max(8, Math.round(path.len / S * density));
       for (let i = 0; i < n; i++) {
         const a = Math.random() * Math.PI * 2, rr = Math.sqrt(Math.random()) * path.r * 0.75;
@@ -481,10 +501,12 @@ function nivelCorpoMalha(bodyGeo, scan) {
     const pos = new Float32Array(data.length * 3);
     const pg = new THREE.BufferGeometry();
     pg.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    prepararParticulas(pg,data);
     const mat = new THREE.PointsMaterial({
       name, size, map: tex, color, transparent: true, opacity,
       depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending, sizeAttenuation: true,
     });
+    materialParticulas(mat);
     data.forEach((d, i) => {
       d.path.curve.getPointAt(d.t, tmp0);
       pos[i * 3] = tmp0.x; pos[i * 3 + 1] = tmp0.y; pos[i * 3 + 2] = tmp0.z;
@@ -716,6 +738,15 @@ function aneisDaSafena(g, curve, r, S) {
   return aneis;
 }
 
+function prepararParticulas(geo,data){
+  geo.setAttribute('calibreParticula',new THREE.BufferAttribute(new Float32Array(data.length).fill(1),1));
+  geo.setAttribute('color',new THREE.BufferAttribute(new Float32Array(data.length*3).fill(1),3));
+}
+function materialParticulas(mat){
+  mat.userData.corOriginal=mat.color.clone();mat.color.set(0xffffff);mat.vertexColors=true;
+  mat.onBeforeCompile=shader=>{shader.vertexShader='attribute float calibreParticula;\n'+shader.vertexShader;shader.vertexShader=shader.vertexShader.replace('gl_PointSize = size;','gl_PointSize = size * calibreParticula;')};
+  mat.customProgramCacheKey=()=> 'calibre-particulas-20261002';
+}
 function sangueNoGrupo(g, fluxo, S) {
   const bolha = texturaBolha(), faisca = texturaFaisca();
   const particulas = [];
@@ -734,6 +765,7 @@ function sangueNoGrupo(g, fluxo, S) {
     const pos = new Float32Array(data.length * 3);
     const pg = new THREE.BufferGeometry();
     pg.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    prepararParticulas(pg,data);
     data.forEach((d, i) => {
       d.path.curve.getPointAt(d.t, tmp0);
       pos[i * 3] = tmp0.x; pos[i * 3 + 1] = tmp0.y; pos[i * 3 + 2] = tmp0.z;
@@ -742,6 +774,7 @@ function sangueNoGrupo(g, fluxo, S) {
       name, size, map: tex, color, transparent: true, opacity,
       depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending, sizeAttenuation: true,
     }));
+    materialParticulas(pts.material);
     pts.renderOrder = 8;
     pts.frustumCulled = false;
     pts.userData.foraDoQuadro = true;
@@ -992,8 +1025,8 @@ function nivelValvula() {
   g.add(parede(R, H, vidro));
 
   const cuspideMat = new THREE.MeshStandardMaterial({
-    name: 'valvula_venosa', color: 0xf7f9ff, emissive: 0x8eabff, emissiveIntensity: 0.85,
-    roughness: 0.28, side: THREE.DoubleSide,
+    name: 'valvula_venosa', color: 0x596c88, emissive: 0x101827, emissiveIntensity: 0.05,
+    roughness: 0.85, side: THREE.DoubleSide,
   });
   const valvulas = [];
   for (const h of VALV_ALTURAS) {
@@ -1024,8 +1057,9 @@ function nivelValvula() {
    é pior que andar. */
 function nivelBomba(geo) {
   const g = new THREE.Group();
-  const R = 5.5 * CM, H = 46 * CM;
+  const R = 1.75 * CM, H = 46 * CM;
   const S = CORPO.altura / 1.75;
+  let peleInterna;
   if (geo) {
     const fatia = casca(geo, (x, y) => x > 0.02 * S && y > 0.05 * S && y < 0.5 * S);
     if (fatia) {
@@ -1038,54 +1072,39 @@ function nivelBomba(geo) {
       fatia.prepass.geometry = fatia.geo;
       g.add(fatia.prepass);
       g.add(fatia.malha);
+      peleInterna=fatia.geo;
     }
   }
 
   const vidro = peleRaioX();
   vidro.uniforms.uColor.value.set(0xc9b6ff);
   vidro.uniforms.uIntensity.value = 0.7;
-  const veiaBomba = new THREE.Mesh(
-    new THREE.CylinderGeometry(R, R, H, 26, 24, true), vidro);
-  veiaBomba.renderOrder = 2;
-  veiaBomba.geometry.translate(0, H / 2, 0);
-  veiaBomba.userData.R = R; veiaBomba.userData.H = H;
-  g.add(veiaBomba);
-
-  /* duas barrigas de gastrocnêmio, uma de cada lado */
   const musc = new THREE.MeshPhysicalMaterial({
-    color: 0xa33a3a, roughness: 0.55, sheen: 0.9, sheenColor: new THREE.Color(0xff8f7a),
-    sheenRoughness: 0.45, emissive: 0x3a1010, emissiveIntensity: 0.35,
+    color: 0x7e2b31, roughness: 0.78, sheen: 0.35, sheenColor: new THREE.Color(0xb85851),
+    sheenRoughness: 0.75, emissive: 0x160707, emissiveIntensity: 0.06,
   });
-  const barrigas = [];
-  for (const lado of [-1, 1]) {
-    const perfil = [];
-    for (let i = 0; i <= 16; i++) {
-      const s = i / 16;
-      perfil.push(new THREE.Vector2((2.6 + 5.2 * Math.sin(Math.PI * s)) * CM, s * H));
-    }
-    const m = new THREE.Mesh(new THREE.LatheGeometry(perfil, 28), musc.clone());
-    m.position.x = lado * 7.4 * CM;
-    m.userData.lado = lado; m.userData.x0 = m.position.x;
-    barrigas.push(m); g.add(m);
-  }
+  const tecidos=tecidosDaPanturrilha(peleInterna,H,R,musc),{barrigas}=tecidos;
+  const veiaBomba=new THREE.Mesh(tecidos.veiaGeo,vidro);veiaBomba.name='veia_profunda_bomba';veiaBomba.renderOrder=2;
+  g.add(veiaBomba,...barrigas,tecidos.tendao);
 
   const cuspideMat = new THREE.MeshStandardMaterial({
-    name: 'valvula_venosa', color: 0xf7f9ff, emissive: 0x8eabff, emissiveIntensity: 0.85,
-    roughness: 0.28, side: THREE.DoubleSide,
+    name: 'valvula_venosa', color: 0x596c88, emissive: 0x101827, emissiveIntensity: 0.05,
+    roughness: 0.85, side: THREE.DoubleSide,
   });
   const valvulas = [];
   for (const h of [10, 34]) {
     const par = new THREE.Group();
     for (const teta of [0, Math.PI]) {
-      const m = new THREE.Mesh(cuspide(R * .97, 9 * CM, teta), cuspideMat.clone());
+      const m = new THREE.Mesh(cuspide(tecidos.raio(h*CM) * .97, 3.5 * CM, teta), cuspideMat.clone());
       moldarCuspide(m, 1); par.add(m);
     }
-    par.position.y = h * CM; par.userData.altura = h;
+    const ponto=tecidos.curva.getPoint((h*CM)/H);par.position.copy(ponto);par.quaternion.setFromUnitVectors(V(0,1,0),tecidos.curva.getTangent((h*CM)/H));par.userData.altura = h;
     valvulas.push(par); g.add(par);
   }
-  const curva = new THREE.CatmullRomCurve3([V(0, 1 * CM, 0), V(0, H - 1 * CM, 0)]);
+  const curva=tecidos.curva;
   sangueNoGrupo(g, [{ curve: curva, r: R * 0.45, kind: 'v', len: curva.getLength(), name: 'bomba' }], S);
-  g.userData = { veiaBomba, barrigas, valvulas, R, H, particulas: g.userData.particulas };
+  g.userData = { veiaBomba, barrigas, valvulas, R, H, aperto:0, deformarVeia:tecidos.deformarVeia,particulas: g.userData.particulas };
+  curva.calibreNoPonto=t=>{const y=curva.getPoint(t).y,s=clamp((y-10*CM)/(24*CM),0,1);return (tecidos.raio(y)/R)*(1-.78*g.userData.aperto*Math.pow(Math.sin(Math.PI*s),2))};
   g.position.y = -H / 2;
   return g;
 }
@@ -1142,8 +1161,9 @@ export async function criar() {
       if (!DA_PERNA.has(v.userData.papel)) continue;
       const u = v.geometry.userData;
       for (let s = 0; s < u.segsU; s++) {
-        const f = fatorDeDistensao(pressaoVenosa(u.alturas[s], grau));
-        const L = u.centros[s].distanceTo(u.centros[s + 1]) / CM;
+        const centros=centrosParaVolume(v.geometry);
+        const f = fatorDeDistensao(pressaoVenosa(centros[s].y/CM, grau));
+        const L = centros[s].distanceTo(centros[s + 1]) / CM;
         soma += f * f * L;                        // area vai com o quadrado do raio
       }
     }
@@ -1190,28 +1210,16 @@ export async function criar() {
      músculo aperta (senão o sangue voltaria ao pé) e a de CIMA abre. Na
      soltura o par troca de papel. Nunca as duas abertas ao mesmo tempo com o
      músculo apertando: isso seria um cano, e cano não bombeia. */
-  function aplicarBomba(fase, grau) {
-    const aperto = Math.max(0, Math.sin(fase * Math.PI * 2));
+  function aplicarBomba(fase, grau, atividade=0) {
+    const aperto = contracaoNaFase(fase);
     const b = modelos[3].userData;
-    for (const m of b.barrigas) {
-      const e = 1 + .30 * aperto;
-      m.scale.set(e, 1 - .12 * aperto, e);
-      m.position.x = m.userData.x0 * (1 - .30 * aperto);
-    }
-    /* a veia entre as barrigas colaba onde o músculo aperta */
-    const g = b.veiaBomba.geometry, pos = g.attributes.position;
-    for (let i = 0; i < pos.count; i++) {
-      const y = pos.getY(i), s = clamp(y / b.H, 0, 1);
-      const janela = Math.sin(Math.PI * s);
-      const f = 1 - .82 * aperto * janela;
-      const x = pos.getX(i), z = pos.getZ(i), d = Math.hypot(x, z) || 1;
-      pos.setXYZ(i, x / d * b.R * f, y, z / d * b.R * f);
-    }
-    pos.needsUpdate = true; g.computeVertexNormals();
+    b.aperto=aperto;
+    for (const m of b.barrigas)m.userData.contrair(aperto);
+    b.deformarVeia(aperto);
 
     b.valvulas.forEach((par, k) => {
       /* k=0 é a de baixo. Apertando: baixo fecha, cima abre. */
-      const abre = k === 0 ? 1 - aperto : aperto;
+      const abre = k === 0 ? 1-clamp(aperto/.16,0,1) : clamp((aperto-.04)/.22,0,1);
       par.children.forEach(c => moldarCuspide(c, clamp(abre, .04, 1)));
       par.userData.abertura = abre;
     });
@@ -1219,9 +1227,8 @@ export async function criar() {
     /* A PRESSÃO DO TORNOZELO CAI COM O BOMBEAMENTO, e é esse o número que
        fecha a bancada: parado em pé são ~90 mmHg; andando, a coluna se parte
        nos segmentos e cai para perto de 25. */
-    const eficacia = clamp(fase >= 0 ? 1 : 0, 0, 1);
     const parado = pressaoVenosa(CORPO.tornozelo, grau);
-    return { aperto, parado, bombeando: parado - (parado - 25) * eficacia };
+    return { aperto, parado, bombeando: pressaoComBomba(parado,atividade) };
   }
 
   /* as válvulas do nível 03 seguram cada uma o seu degrau, e só ele */
@@ -1242,6 +1249,7 @@ export async function criar() {
      a veia desacelera (o volume empoça); a bomba muscular devolve o fluxo.
      A artéria não espera a postura — ela pulsa. */
   const tmp = new THREE.Vector3(), nrm = new THREE.Vector3(), bin = new THREE.Vector3(), tan = new THREE.Vector3(), up = V(0, 1, 0);
+  const coresFluxo={a:new THREE.Color(0xff4040),m:new THREE.Color(0xa64d9a),v:new THREE.Color(0x6a5cff)};
   function animarCirculacao(dt, grau, andando) {
     const sen = Math.sin(grau * Math.PI / 180);
     const time = performance.now() / 1000;
@@ -1259,17 +1267,22 @@ export async function criar() {
       }
       for (const ring of (m.userData.aneis || [])) {
         const e = 1.12 - 0.4 * fecha;
-        ring.scale.setScalar(e);
+        ring.scale.setScalar(e*(ring.userData.calibreDistal??1));
         ring.material.emissiveIntensity = 0.3 + fecha * 1.15;
       }
       for (const layer of (m.userData.particulas || [])) {
         const { pos, data } = layer;
+        const atributos=layer.pts.geometry.attributes,corBase=layer.pts.material.userData.corOriginal;
         for (let i = 0; i < data.length; i++) {
           const d = data[i];
-          const venoso = d.path.kind === 'v';
-          const pulso = venoso ? (andando ? 2.8 : Math.max(0.18, 1 - 0.78 * sen)) : (1 + beat * 2.2);
+          const venoso = d.path.kind !== 'a';
+          const pulso = d.path.name==='bomba'?(m.userData.aperto>.01?.6+4*m.userData.aperto:.8):venoso ? (andando ? 2.8 : Math.max(0.18, 1 - 0.78 * sen)) : (1 + beat * 2.2);
+          const anterior=d.t;
           d.t += d.speed * pulso * dt;
-          if (d.t > 1) d.t -= 1;
+          if(d.path.name==='bomba'||d.path.name==='coluna'){
+            for(const par of m.userData.valvulas||[]){const ponto=d.path.curve.getPointAt(clamp(anterior,0,1));if(par.userData.abertura<.18&&ponto.y<par.position.y&&d.path.curve.getPointAt(clamp(d.t,0,1)).y>=par.position.y){d.t=anterior;break}}
+          }
+          while(d.t>1){const excesso=(d.t-1)*d.path.len;if(d.path.next){const antiga=d.path;d.path=d.path.next;d.speed*=antiga.len/d.path.len;d.off=d.off.map(x=>x*d.path.r/antiga.r);d.t=excesso/d.path.len;}else d.t%=1;}
           d.path.curve.getPointAt(d.t, tmp);
           d.path.curve.getTangentAt(d.t, tan);
           nrm.crossVectors(tan, up);
@@ -1280,8 +1293,13 @@ export async function criar() {
           const calibre=d.path.curve.calibreNoPonto?.(d.path.curve.getUtoTmapping(d.t)) ?? 1;
           tmp.addScaledVector(nrm, (d.off[0] + w)*calibre).addScaledVector(bin, (d.off[1] - w)*calibre);
           pos[i * 3] = tmp.x; pos[i * 3 + 1] = tmp.y; pos[i * 3 + 2] = tmp.z;
+          atributos.calibreParticula?.setX(i,Math.max(.035,Math.min(1,calibre*(d.path.kind==='m'?.12:1))));
+          const cor=d.path.next?coresFluxo[d.path.kind]:corBase;
+          if(cor)atributos.color?.setXYZ(i,cor.r,cor.g,cor.b);
         }
         layer.pts.geometry.attributes.position.needsUpdate = true;
+        if(atributos.color)atributos.color.needsUpdate=true;
+        if(atributos.calibreParticula)atributos.calibreParticula.needsUpdate=true;
       }
     }
   }

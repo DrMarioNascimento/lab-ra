@@ -34,7 +34,8 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { prepararParaRA } from '../cores-para-ra.js';
-import { criar, CM, CORPO, PIH, MMHG_POR_CM, pressaoVenosa, corDaPressao } from './modelos.js?v=cardiaco-20261002b';
+import { criar, CM, CORPO, PIH, MMHG_POR_CM, pressaoVenosa, corDaPressao } from './modelos.js?v=pes-bomba-20261002';
+import {criarEstadoBomba,avancarBomba} from './bomba.js?v=pes-bomba-20261002';
 
 const $ = id => document.getElementById(id);
 const canvas = $('scene'), stage = $('stage');
@@ -139,7 +140,7 @@ function definirGrau(g, imediato = false) {
 const TEXTOS = [
   { olho: 'A pergunta', titulo: 'Onde a gravidade aperta?',
     texto: 'Deitado, a coluna de sangue não tem altura: do tornozelo ao pescoço a pressão venosa é quase a mesma. Em pé, cada centímetro abaixo do diafragma acrescenta 0,78 mmHg — e o tornozelo chega a noventa. Incline o aparelho e veja a árvore mudar de calibre e de cor.',
-    tags: ['0,78 mmHg/cm', 'ponto indiferente no diafragma'] },
+    tags: ['0,78 mmHg/cm', 'ponto indiferente no diafragma', 'U nos pés: microcirculação simplificada'] },
   { olho: 'Nível 02', titulo: 'Meio litro sai de circulação',
     texto: 'A veia é um saco complacente, não um cano: recebe muito volume com pouca pressão. Ao levantar, algumas centenas de mililitros descem para as pernas e deixam de voltar ao coração — e é essa a conta que decide se alguém desmaia na formatura.',
     tags: ['safena e profunda', 'perfurantes'] },
@@ -151,7 +152,7 @@ const TEXTOS = [
     tags: ['bomba muscular', 'fluxo de mão única'] },
   { olho: 'Nível 05', titulo: 'Parado em pé é pior que andar',
     texto: 'De pé e imóvel, a coluna é inteira e o tornozelo fica em noventa. Bastam alguns passos para a bomba partir essa coluna e derrubar a pressão para perto de vinte e cinco. Quem desmaia em posição de sentido não desmaia por estar em pé: desmaia por estar parado.',
-    tags: ['pressão venosa ambulatorial', 'retorno ao coração'] },
+    tags: ['pressão venosa ambulatorial', 'retorno ao coração', 'U nos pés: microcirculação simplificada'] },
 ];
 const ROTULO = ['O corpo', 'A perna', 'A válvula', 'A bomba', 'O ciclo'];
 const TAM_REAL = [1.60, .82, .34, .40, 1.60];   // metros, maior dimensão na RA
@@ -176,6 +177,8 @@ function irAoNivel(n) {
 
 /* ------------------------------------------------------------ a bomba */
 let bombaAndando = false, faseBomba = 0, ultimaAmostra = 0;
+let passoRestante=0;
+const estadoBomba=criarEstadoBomba();
 const historico = [];                     // pressão do tornozelo no tempo
 const JANELA_S = 12;
 
@@ -187,8 +190,8 @@ function aplicarTudo() {
   const p = aplicarPostura(grau);
   ultimo = p;
 
-  const b = aplicarBomba(faseBomba, grau);
-  const tornozelo = bombaAndando ? b.bombeando : p.tornozelo;
+  const b = aplicarBomba(faseBomba, grau,estadoBomba.atividade);
+  const tornozelo = b.bombeando;
 
   $('posturaLabel').textContent =
     grau < 20 ? `Decúbito · ${grau.toFixed(0)}°`
@@ -289,13 +292,16 @@ renderer.setAnimationLoop(() => {
 
   const antes = grau;
   grau += (grauAlvo - grau) * SUAVE;
-  if (bombaAndando) faseBomba = (faseBomba + dt / 1.15) % 1;
-  if (Math.abs(grau - antes) > .02 || bombaAndando) aplicarTudo();
-  animarCirculacao(dt, grau, bombaAndando);
+  const ativo=bombaAndando||passoRestante>0,atividadeAntes=estadoBomba.atividade;
+  if (ativo) faseBomba = (faseBomba + Math.min(dt,passoRestante||dt) / 1.15) % 1;
+  avancarBomba(estadoBomba,dt,ativo);
+  if(passoRestante>0){passoRestante=Math.max(0,passoRestante-dt);if(!passoRestante){faseBomba=0;$('passo').disabled=false}}
+  if (Math.abs(grau - antes) > .02 || ativo || Math.abs(estadoBomba.atividade-atividadeAntes)>.00001) aplicarTudo();
+  animarCirculacao(dt, grau, ativo);
 
-  if (bombaAndando && agora - ultimaAmostra > 120) {
+  if ((ativo||estadoBomba.atividade>.001) && agora - ultimaAmostra > 120) {
     ultimaAmostra = agora;
-    const b = aplicarBomba(faseBomba, grau);
+    const b = aplicarBomba(faseBomba, grau,estadoBomba.atividade);
     historico.push(b.bombeando);
     while (historico.length > JANELA_S * 8) historico.shift();
     desenharTempo();
@@ -344,12 +350,12 @@ $('levantar').onclick = () => definirGrau(90, true);
 
 $('andar').onclick = e => {
   bombaAndando = !bombaAndando;
+  passoRestante=0;$('passo').disabled=false;
   e.currentTarget.textContent = bombaAndando ? 'Parar' : 'Andar';
-  if (!bombaAndando) { historico.length = 0; desenharTempo(); }
+  if (!bombaAndando){faseBomba=0;aplicarTudo();desenhar()}
 };
 $('passo').onclick = () => {
-  /* um passo só, para quem quiser ver a coreografia parada */
-  faseBomba = (faseBomba + .5) % 1; aplicarTudo(); desenhar();
+  bombaAndando=false;$('andar').textContent='Andar';faseBomba=0;passoRestante=1.15;$('passo').disabled=true;aplicarTudo();desenhar();
 };
 
 $('prev').onclick = () => irAoNivel(atual - 1);
