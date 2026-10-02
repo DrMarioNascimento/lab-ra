@@ -105,12 +105,12 @@ function ligarSensor() {
   addEventListener('deviceorientation', e => {
     if (e.beta === null || e.gamma === null) return;
     eventos++;
-    $('sensorEstado').textContent = 'sensor ligado';
+    $('sensorEstado').textContent = 'Sensor de inclinação ativo';
     $('sensorEstado').classList.add('vivo');
     definirGrau(inclinacaoDe(e.beta, e.gamma));
   });
   /* a espera só começa a correr agora, quando já há o que esperar */
-  setTimeout(() => { if (!eventos) $('sensorEstado').textContent = 'sem sensor — use o cursor'; }, 3500);
+  setTimeout(() => { if (!eventos) $('sensorEstado').textContent = 'Sensor indisponível · use o controle de inclinação'; }, 3500);
 }
 if (typeof DeviceOrientationEvent !== 'undefined'
     && typeof DeviceOrientationEvent.requestPermission === 'function') {
@@ -119,8 +119,8 @@ if (typeof DeviceOrientationEvent !== 'undefined'
     try {
       const r = await DeviceOrientationEvent.requestPermission();
       if (r === 'granted') { $('permitir').hidden = true; ligarSensor(); }
-      else $('sensorEstado').textContent = 'permissão negada — use o cursor';
-    } catch (err) { $('sensorEstado').textContent = 'não deu para pedir a permissão'; }
+      else $('sensorEstado').textContent = 'Sensor não autorizado · use o controle de inclinação';
+    } catch (err) { $('sensorEstado').textContent = 'Não foi possível ativar o sensor de inclinação'; }
   };
 } else { ligarSensor(); }
 
@@ -137,20 +137,20 @@ const TEXTOS = [
   { olho: 'A pergunta', titulo: 'Camadas da parede ao pulmão',
     texto: 'Entre as duas pleuras não há vão: há um filme de líquido e pressão negativa segurando as duas encostadas, como dois vidros molhados que deslizam mas não se separam. O espaço pleural só vira espaço de verdade quando alguém fura a parede.',
     tags: ['poucos mililitros', 'deslizam, não separam'] },
-  { olho: 'Nível 02', titulo: 'Duas molas em empate',
+  { olho: 'Nível 02', titulo: 'Equilíbrio elástico do tórax',
     texto: 'O pulmão puxa para dentro, a caixa torácica empurra para fora, e no repouso elas se anulam a 40% da capacidade total. É esse empate que deixa a pressão entre as duas negativa — a pressão pleural não é uma bomba, é o resultado de um cabo de guerra.',
     tags: ['recolhe × abre', 'CRF a 40%'] },
   { olho: 'Nível 03', titulo: 'O pneumotórax',
     texto: 'Fura a parede e o empate acaba: cada mola vai para o seu volume de repouso. O pulmão colapsa a 10% e — a parte que ninguém espera — a caixa ABRE até 60%. No hipertensivo a pressão passa de zero — e o que mata não é o desvio do mediastino, que é o sinal: é a pressão positiva ESMAGANDO O RETORNO VENOSO. Choque obstrutivo. Pela mesma conta, com sinal trocado, pleura mais negativa ajuda o retorno: é a bomba torácica.',
     tags: ['pulmão 10% · caixa 60%', 'retorno venoso a 64%'] },
   { olho: 'Nível 04', titulo: 'O ápice é maior e ventila menos',
-    texto: 'A pressão pleural não é um número, é um gradiente: −10 no ápice, −2,5 na base. O alvéolo de cima já está esticado e senta na parte plana da curva; o de baixo senta no joelho, onde a mesma pressão enche muito mais. Ao deitar, os tamanhos ao longo do eixo ápice–base se aproximam; o gradiente passa para o eixo esterno–dorso. Respire com o botão e veja: numa respiração a base vai de 22% a 42% do volume e o ápice, de 63% a 73%. A base ganha o dobro sendo menor. O contraste visual dos tamanhos está ampliado para facilitar a leitura; os valores do painel mantêm os volumes calculados.',
+    texto: 'A pressão pleural não é um número, é um gradiente: −10 no ápice, −2,5 na base. O alvéolo de cima já está esticado e senta na parte plana da curva; o de baixo senta no joelho, onde a mesma pressão enche muito mais. Ao deitar, os tamanhos ao longo do eixo ápice–base se aproximam; o gradiente passa para o eixo esterno–dorso. Selecione Iniciar e observe: numa respiração a base vai de 22% a 42% do volume e o ápice, de 63% a 73%. A base ganha o dobro sendo menor. O contraste visual dos tamanhos está ampliado para facilitar a leitura; os valores do painel mantêm os volumes calculados.',
     tags: ['−10 no ápice, −2,5 na base', 'contraste de tamanho ampliado'] },
   { olho: 'Nível 05', titulo: 'As zonas de West',
     texto: 'Três pressões disputam o capilar: a arterial, a venosa e a alveolar, que aperta por fora. Em pé, a coluna de sangue faz o ápice receber pouco. Deitado, o pulmão inteiro vira zona 3. É a mesma gravidade do gradiente pleural, agora do lado da perfusão.',
     tags: ['zona 1 não existe em repouso', 'a cachoeira da zona 2'] },
 ];
-const ROTULO = ['Camadas', 'As molas', 'Pneumotórax', 'O gradiente', 'As zonas'];
+const ROTULO = ['Camadas', 'Mecânica', 'Pneumotórax', 'Gradiente', 'Zonas de West'];
 const TAM_REAL = [.34, .58, .58, .55, .55];
 const CONTEXTO = [
   'Corte da parede costal · camadas ampliadas',
@@ -189,11 +189,16 @@ function irAoNivel(n) {
   $('infoTitle').textContent = t.titulo;
   $('infoText').textContent = t.texto;
   $('microtags').innerHTML = t.tags.map(x => `<span>${x}</span>`).join('');
-  document.querySelectorAll('.step').forEach((b, i) => b.classList.toggle('active', i === atual));
+  document.querySelectorAll('.step').forEach((b, i) => {
+    b.classList.toggle('active', i === atual);
+    if (i === atual) b.setAttribute('aria-current', 'step');
+    else b.removeAttribute('aria-current');
+  });
   $('stepLabel').textContent = `0${atual + 1} · ${ROTULO[atual]}`;
   $('prev').disabled = atual === 0; $('next').disabled = atual === 4;
   $('caixaPneumo').hidden = atual > 2;
   $('caixaPostura').hidden = atual === 0;
+  $('cicloControls').hidden = atual === 0;
   $('caixaZonas').hidden = atual !== 4;
   $('legendaFresta').hidden = atual !== 0;
   $('frestaPontos').hidden = atual !== 0;
@@ -204,8 +209,9 @@ function irAoNivel(n) {
 
 /* ------------------------------------------------------------ atualizar */
 function atualizar() {
-  const dPpl = respirando ? cicloPleural(fase) : 0;
-  const pAlv = respirando ? cicloAlveolar(fase) : 0;
+  /* A pausa congela a fase: pressões, geometria e leituras permanecem nela. */
+  const dPpl = cicloPleural(fase);
+  const pAlv = cicloAlveolar(fase);
   const e = { ...ajuste(), pneumo, palveolar: pAlv, deslocaPleural: dPpl };
   const pn = estadoDoPneumotorax(pneumo);
 
@@ -254,9 +260,12 @@ function atualizar() {
   $('lVent').textContent = vA > 0 ? `${(vB / vA).toFixed(2)}×` : '—';
   $('lVolApice').textContent = (volumeRelativo(plEm(1)) * 100).toFixed(0);
   $('lVolBase').textContent = (volumeRelativo(plEm(0)) * 100).toFixed(0);
-  $('lFase').textContent = !respirando ? 'parado no fim da expiração'
-    : (pAlv < -.05 ? 'inspirando' : pAlv > .05 ? 'expirando' : 'sem fluxo');
-  $('lPalv').textContent = pAlv.toFixed(2);
+  const faseNome = pAlv < -.05 ? 'Inspiração' : pAlv > .05 ? 'Expiração' : 'Sem fluxo';
+  const estadoCiclo = respirando ? faseNome : fase === 0
+    ? 'Fim da expiração' : `Pausado · ${faseNome.toLowerCase()}`;
+  $('lFase').textContent = estadoCiclo;
+  if ($('cicloEstado').textContent !== estadoCiclo) $('cicloEstado').textContent = estadoCiclo;
+  $('lPalv').textContent = pAlv.toFixed(2).replace('-0.00', '0.00');
 
   const perfil = perfilDeZonas(grau, e, 9);
   $('lZonas').textContent = perfil.map(l => l.zona).join('');
@@ -280,9 +289,9 @@ function desenharCurva() {
   const m = { e: 30, d: 12, t: 12, b: 24 };
   const py = f => H - m.b - f * (H - m.t - m.b);
   const px = v => m.e + clamp(v, 0, 1) * (W - m.e - m.d);
-  ctx.strokeStyle = '#1f6b33'; ctx.lineWidth = 1;
+  ctx.strokeStyle = '#395b6c'; ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(m.e, m.t); ctx.lineTo(m.e, H - m.b); ctx.stroke();
-  ctx.fillStyle = '#7f9a80'; ctx.font = '10px "IBM Plex Mono", monospace';
+  ctx.fillStyle = '#aec6d5'; ctx.font = '10px "IBM Plex Mono", monospace';
   ctx.fillText('ápice', 2, py(1) + 8); ctx.fillText('base', 2, py(0) - 2);
 
   /* duas curvas no mesmo eixo: ventilação e perfusão. É o encontro delas que
@@ -295,7 +304,7 @@ function desenharCurva() {
   }
   const maxV = Math.max(.0001, ...vs.map(x => x[1]));
   const maxF = Math.max(.0001, ...fs.map(x => x[1]));
-  for (const [dados, maxi, tinta, nome] of [[vs, maxV, '#5fd177', 'ventilação'], [fs, maxF, '#c8363e', 'perfusão']]) {
+  for (const [dados, maxi, tinta, nome] of [[vs, maxV, '#80c4ff', 'ventilação'], [fs, maxF, '#ff8990', 'perfusão']]) {
     ctx.beginPath();
     dados.forEach(([f, v], i) => { const x = px(v / maxi), y = py(f); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
     ctx.strokeStyle = tinta; ctx.lineWidth = 2.2; ctx.stroke();
@@ -353,11 +362,23 @@ $('cenarios').addEventListener('click', ev => {
   atualizar(); prepararRA();
 });
 
-$('respirar').onclick = ev => {
-  respirando = !respirando;
-  ev.currentTarget.textContent = respirando ? 'Parar' : 'Respirar';
-  if (!respirando) fase = 0;                       // volta ao fim da expiração
-  atualizar(); desenhar();
+function sincronizarCiclo() {
+  $('respirar').disabled = respirando;
+  $('pausar').disabled = !respirando;
+  $('respirar').textContent = !respirando && fase > 0 ? 'Retomar' : 'Iniciar';
+}
+$('respirar').onclick = () => {
+  respirando = true;
+  anterior = performance.now();
+  sincronizarCiclo(); atualizar(); desenhar();
+};
+$('pausar').onclick = () => {
+  respirando = false;
+  sincronizarCiclo(); atualizar(); desenhar(); prepararRA();
+};
+$('reiniciar').onclick = () => {
+  respirando = false; fase = 0;
+  sincronizarCiclo(); atualizar(); desenhar(); prepararRA();
 };
 
 $('prev').onclick = () => irAoNivel(atual - 1);
@@ -434,7 +455,8 @@ if (ce && CENARIOS.some(c => c.id === ce)) {
 }
 if (Number.isFinite(grauPedido)) { grau = grauAlvo = clamp(grauPedido, 0, 90); }
 const faseP = parseFloat(busca.get('fase'));
-if (Number.isFinite(faseP)) { fase = clamp(faseP, 0, 1); respirando = true; }
+if (Number.isFinite(faseP)) { fase = clamp(faseP, 0, 1); }
+sincronizarCiclo();
 irAoNivel(Number.isFinite(nivel) ? nivel - 1 : 0);
 /* desenha uma vez à mão: o laço pode estar congelado no painel do navegador */
 desenhar();
