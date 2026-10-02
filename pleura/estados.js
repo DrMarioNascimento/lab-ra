@@ -1,7 +1,7 @@
 /* Adulto virtual: parâmetros ilustrativos, sem classificação de gravidade clínica.
    O RC expiratório calcula o aprisionamento em regime periódico; a CVF é uma
    manobra isolada e não deve voltar abruptamente ao volume inicial. */
-import {estadoRespiratorio, volumeRelativo, transpulmonar, PPL_MEDIA_FRC} from './fisica.js?v=estados-20261002';
+import {estadoRespiratorio, volumeRelativo, transpulmonar, PPL_MEDIA_FRC} from './fisica.js?v=encaixes-20261002';
 import {duracoes} from '../coracao/fisica.js';
 export const CAPACIDADE_MODELO = 6; // L, referência explícita do adulto virtual
 // Curva global calibrada: CRF 40% em P_L=6,25; CPT em P_L=30 cmH₂O.
@@ -12,9 +12,8 @@ const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
 export const ESTADOS = [
   {id:'repouso',nome:'Repouso',fr:15,fc:75,fi:.4,amplitude:3,k:.1,pl:6.25,nota:'Respiração tranquila. Inspiração ativa e expiração passiva.'},
   {id:'exercicio',nome:'Exercício',fr:30,fc:120,fi:.4,amplitude:5,k:.1,pl:6.25,vascular:{pa:25,pv:9},nota:'Respiração mais rápida e profunda, com maior frequência cardíaca e perfusão.'},
-  {id:'bronquite',nome:'DPOC · vias aéreas',fr:12,fc:85,fi:.3,amplitude:3,k:.1,pl:6.25,tau:1.8,nota:'Exemplo com maior resistência nas pequenas vias aéreas: esvaziamento lento e ar retido ao fim da expiração.'},
-  {id:'enfisema',nome:'DPOC · enfisema',fr:12,fc:90,fi:.3,amplitude:2.5,k:.16,pl:5,tau:2.4,nota:'Exemplo com menor recuo elástico e maior complacência: pulmão mais insuflado e menor reserva inspiratória.'},
-  {id:'dpoc-exercicio',nome:'DPOC · exercício',fr:30,fc:120,fi:.3,amplitude:2.5,k:.16,pl:5,tau:2.4,vascular:{pa:25,pv:9},nota:'O tempo expiratório menor aumenta o aprisionamento no modelo RC e a hiperinsuflação dinâmica.'},
+  {id:'enfisema',nome:'Enfisema',fr:12,fc:90,fi:.3,amplitude:2.5,k:.16,pl:5,tau:2.4,nota:'Exemplo com menor recuo elástico e maior complacência: pulmão mais insuflado e menor reserva inspiratória.'},
+  {id:'fibrose',nome:'Fibrose',fr:24,fc:90,fi:.4,amplitude:4,k:.045,pl:6.25,excursao:.5,nota:'Exemplo restritivo: menor complacência, volumes reduzidos e respiração mais rápida. Maior esforço de pressão produz menor expansão, sem aprisionamento obstrutivo.'},
   {id:'cvf',nome:'Capacidade vital forçada',fr:0,fc:75,fi:.25,amplitude:3,k:.1,pl:6.25,duracao:8,nota:'Manobra única: inspiração máxima por 2 s e expiração forçada por 6 s. CVF e VEF₁ são exemplos do adulto virtual de 6 L, sem interpretação diagnóstica.'},
 ];
 export const comEstado = id=>ESTADOS.find(e=>e.id===id)||ESTADOS[0];
@@ -59,6 +58,7 @@ export function estadoDoPerfil(fase,id='repouso',opc={}) {
     e={...opc,palveolar:(opc.palveolar??0)+palv,deslocaPleural:normal?(-pl-PPL_MEDIA_FRC)+palv:0,expansao:r.inspiracao};
   }
   e.kComplacencia=p.k;
+  e.expansao*=p.excursao??1;
   const pl=transpulmonar(.5,90,{...e,pneumo:'nenhum'}),volume=r?.volume??volumeGlobal(pl,p.k);
   let fluxo=r.fluxo??K_GLOBAL*(p.k/.1)*Math.exp(-K_GLOBAL*(p.k/.1)*Math.max(0,pl))*r.derivada*CAPACIDADE_MODELO/DENOM_GLOBAL;
   if(fase===0||fase===1||Math.abs(fase-p.fi)<1e-12||volume<=0||volume>=1)fluxo=0;

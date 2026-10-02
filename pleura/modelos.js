@@ -17,11 +17,12 @@
    zonas de West a cor é categórica: cinza, âmbar, vermelho.
    ========================================================================== */
 import * as THREE from 'three';
+import {pontoCostal,pontoEsternal} from './movimento-costal.js?v=encaixes-20261002';
 import {
   DIR, ESQ, mk, loft, tuboGeo, construirCaixa, construirColuna, construirDiafragma,
   construirMediastino, geoPulmao, secaoPulmao, HILO, fragmentoGeo, tecidoGeo,
   amostraPulmao, unidadeAcinar, redeCapilar, yDiafragmaToracico, raioDiafragma, limiteCardiaco, wT, dT, geoLobos,
-} from './anatomia.js?v=estados-20261002';
+} from './anatomia.js?v=encaixes-20261002';
 
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
@@ -94,35 +95,21 @@ export function escalaAlveolarVisual(volume) {
   const v=clamp(volume,0,1),sig=x=>1/(1+Math.exp(-7*(x-.46)));
   return Math.pow(clamp((sig(v)-sig(0))/(sig(1)-sig(0)),0,1),.60);
 }
-const elevarEsterno=(p,ec,inspiracao)=>V(p.x*ec,p.y+.005*inspiracao,p.z*ec+.004*inspiracao);
-function moverCostelas(costal,ec,inspiracao) {
+export function moverCostelas(costal,ec,inspiracao) {
   for(const rib of costal.children) {
-    if(!rib.isGroup) {
-      if(!rib.isMesh)continue;
-      const pos=rib.geometry.attributes.position,base=rib.userData.repouso;
-      for(let i=0;i<pos.count;i++) {
-        const v=elevarEsterno(V(base[i*3],base[i*3+1],base[i*3+2]),ec,inspiracao);
-        pos.setXYZ(i,v.x/ec,v.y,v.z/ec);
-      }
-      pos.needsUpdate=true;rib.geometry.computeVertexNormals();rib.geometry.computeBoundingSphere();continue;
+    const meshes=rib.isGroup?rib.children:[rib];
+    let articulada;
+    if(rib.isGroup) {
+      const {articulacao,...dados}=rib.userData;
+      articulada={...dados,origem:articulacao.cabeca,eixo:articulacao.tuberculo.clone().sub(articulacao.cabeca).normalize()};
+      rib.userData.angulo=(5-3*clamp((dados.numero-3)/7,0,1))*inspiracao;
     }
-    const {lado:s,numero,articulacao}=rib.userData;
-    const origin=articulacao.cabeca,axis=articulacao.tuberculo.clone().sub(origin).normalize();
-    const graus=(5-3*clamp((numero-3)/7,0,1))*inspiracao;
-    rib.userData.angulo=graus;
-    for(const m of rib.children) {
-      const pos=m.geometry.attributes.position,base=m.userData.repouso,cart=m.material===M.cartilagem;
+    for(const m of meshes) {
+      if(!m.isMesh)continue;
+      const pos=m.geometry.attributes.position,base=m.userData.repouso;
       for(let i=0;i<pos.count;i++) {
-        const original=V(base[i*3],base[i*3+1],base[i*3+2]),radial=original.clone().sub(origin);
-        const off=radial.clone().addScaledVector(axis,-radial.dot(axis)).length();
-        const t=clamp((off-.012)/.038,0,1),peso=t*t*(3-2*t);
-        const v=original.clone();v.x*=1+(ec-1)*peso;v.z*=1+(ec-1)*peso;
-        v.sub(origin).applyAxisAngle(axis,-s*graus*Math.PI/180).add(origin);
-        if(cart) {
-          const anterior=clamp((original.z+.018)/.092,0,1),medial=clamp(1-Math.abs(original.x)/.115,0,1);
-          const blend=anterior*medial;
-          v.lerp(elevarEsterno(original,ec,inspiracao),blend*blend*(3-2*blend));
-        }
+        const original={x:base[i*3],y:base[i*3+1],z:base[i*3+2]};
+        const v=articulada?pontoCostal(original,articulada,ec,inspiracao):pontoEsternal(original,ec,inspiracao);
         pos.setXYZ(i,v.x/ec,v.y,v.z/ec);
       }
       pos.needsUpdate=true;m.geometry.computeVertexNormals();m.geometry.computeBoundingSphere();

@@ -17,18 +17,18 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { prepararParaRA } from '../cores-para-ra.js';
-import { criar } from './modelos.js?v=estados-20261002';
+import { criar } from './modelos.js?v=encaixes-20261002';
 import { clonarVisual } from './ra.js';
-import { carregarCoracao } from './anatomia.js?v=estados-20261002';
+import { carregarCoracao } from './anatomia.js?v=encaixes-20261002';
 import {
   VOLUMES, alturaEfetiva, pressaoPleural, transpulmonar,
   zonaEm, fluxoEm, perfilDeZonas, estadoDoPneumotorax, eixoDependente,
   retornoVenosoRelativo,
   comCenario, CENARIOS, pressoesEm, CMH2O_EM_MMHG, PPL_MEDIA_FRC,
-} from './fisica.js?v=estados-20261002';
+} from './fisica.js?v=encaixes-20261002';
 
-import {ESTADOS,comEstado,estadoDoPerfil,volumeRegional,ventilacaoDoPerfil,duracaoEstado,contracaoCardiaca,indicesCVF,CAPACIDADE_MODELO} from './estados.js?v=estados-20261002';
-import {desenharGrafico} from './grafico.js?v=estados-20261002';
+import {ESTADOS,comEstado,estadoDoPerfil,volumeRegional,ventilacaoDoPerfil,duracaoEstado,contracaoCardiaca,indicesCVF,CAPACIDADE_MODELO} from './estados.js?v=encaixes-20261002';
+import {desenharGrafico} from './grafico.js?v=encaixes-20261002';
 
 const $ = id => document.getElementById(id);
 const valorPressao = (valor, casas=1) => valor.toFixed(casas).replace(/^-0(?:\.0+)?$/, v=>v.slice(1));

@@ -1,5 +1,5 @@
-import {fluxoEm} from './fisica.js?v=estados-20261002';
-import {estadoDoPerfil,comEstado,ventilacaoDoPerfil,CAPACIDADE_MODELO,duracaoEstado} from './estados.js?v=estados-20261002';
+import {fluxoEm} from './fisica.js?v=encaixes-20261002';
+import {estadoDoPerfil,comEstado,ventilacaoDoPerfil,CAPACIDADE_MODELO,duracaoEstado} from './estados.js?v=encaixes-20261002';
 const azul='#88c5ff',verde='#8bdbc0',rosa='#f2a9a4',cinza='#aec6d5';
 export function desenharGrafico(ctx,{modo,estado,fase,grau,ajuste,e}) {
   const W=ctx.canvas.width,H=ctx.canvas.height;
