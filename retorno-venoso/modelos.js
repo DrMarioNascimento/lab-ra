@@ -23,9 +23,9 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { carregarCoracaoAnatomico, instalarCoracao, ligarVaso, ajustarTrechoCardiaco, moldarOriginalCardiaca, restaurarNormaisProtegidas } from './coracao.js?v=cardiaco-20261002';
-import {prepararPes,centrosParaVolume,moldarOriginalDistal,restaurarNormaisDistais} from './pes.js?v=pes-bomba-20261002';
+import {prepararPes,carregarAjustePes,centrosParaVolume,moldarOriginalDistal,restaurarNormaisDistais} from './pes.js?v=carregamento-tendoes-20261002';
 import {pressaoComBomba,contracaoNaFase} from './bomba.js?v=pes-bomba-20261002';
-import {tecidosDaPanturrilha} from './panturrilha.js?v=pes-bomba-20261002';
+import {tecidosDaPanturrilha} from './panturrilha.js?v=carregamento-tendoes-20261002';
 
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
 const rnd = (a, b) => a + Math.random() * (b - a);
@@ -350,7 +350,7 @@ function texturaFaisca() {
 
 /* Nível 01 com a malha. A veia continua tubo moldável: a pressão pinta e
    engrossa, como antes. Artéria é caminho, não coluna. */
-function nivelCorpoMalha(bodyGeo, scan) {
+function nivelCorpoMalha(bodyGeo, scan,ajustePes) {
   const g = new THREE.Group();
   const geo = bodyGeo.clone();
   const pele = new THREE.Mesh(geo, peleRaioX());
@@ -419,7 +419,7 @@ function nivelCorpoMalha(bodyGeo, scan) {
   const fluxo = [];
   const veias = [];
   const aneis = [];
-  const pes=prepararPes(geo,S);
+  const pes=prepararPes(geo,S,ajustePes);
   const valveMat = new THREE.MeshStandardMaterial({
     name: 'valvula_venosa', color: 0xbfd4ff, emissive: 0x6f8fff, emissiveIntensity: 0.9, roughness: 0.3,
   });
@@ -1113,23 +1113,22 @@ function nivelBomba(geo) {
    O corpo do nível 01 de volta, agora com a bomba trabalhando. O arco fecha
    onde começou, e a pergunta muda: não é mais "onde a coluna aperta", é
    "quanto volta ao coração". */
-function nivelCiclo(geo,scan) {
-  const g = geo ? nivelCorpoMalha(geo,scan) : nivelCorpoSilhueta(scan);
+function nivelCiclo(geo,scan,ajustePes) {
+  const g = geo ? nivelCorpoMalha(geo,scan,ajustePes) : nivelCorpoSilhueta(scan);
   g.userData.comBomba = true;
   return g;
 }
 
 /* ========================================================================= */
 export async function criar() {
-  let geo = null;
-  let scan = null;
-  try { scan = await carregarCoracaoAnatomico(); }
-  catch (err) { console.error('coração anatômico não entrou; segue a âncora de segurança', err); }
-  try { geo = await carregarCorpo(); }
-  catch (err) { console.error('corpo.glb não entrou; segue a silhueta', err); }
+  const [scan,geo,ajustePes]=await Promise.all([
+    carregarCoracaoAnatomico().catch(err=>{console.error('coração anatômico não entrou; segue a âncora de segurança',err);return null}),
+    carregarCorpo().catch(err=>{console.error('corpo.glb não entrou; segue a silhueta',err);return null}),
+    carregarAjustePes(),
+  ]);
   const modelos = [
-    geo ? nivelCorpoMalha(geo,scan) : nivelCorpoSilhueta(scan),
-    nivelPerna(geo), nivelValvula(), nivelBomba(geo), nivelCiclo(geo,scan),
+    geo ? nivelCorpoMalha(geo,scan,ajustePes) : nivelCorpoSilhueta(scan),
+    nivelPerna(geo), nivelValvula(), nivelBomba(geo), nivelCiclo(geo,scan,ajustePes),
   ];
   modelos.forEach((m, i) => { m.visible = i === 0; });
 
