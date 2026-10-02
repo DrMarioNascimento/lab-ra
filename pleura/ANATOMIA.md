@@ -31,3 +31,5 @@ Referências para as relações anatômicas (sem cópia de malhas ou ilustraçõ
 Crédito da malha cardíaca: [Realistic Human Heart](https://sketchfab.com/3d-models/realistic-human-heart-3f8072336ce94d18b3d0d055a1ece089), neshallads, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Adaptação: escala, posicionamento e material para a bancada de pleura.
 
 As leituras de pressão mostram cmH₂O e mmHg simultaneamente: pleural e alveolar conservam cmH₂O como unidade principal, e arterial/venosa conservam mmHg. A apresentação converte pelas unidades convencionais (98,0665 Pa por cmH₂O e 133,3224 Pa por mmHg, portanto 1 cmH₂O ≈ 0,73556 mmHg); os cálculos do motor não mudam. Referência das unidades convencionais: [NIST, SP 811, tabela de pressão](https://www.nist.gov/pml/special-publication-811/nist-guide-si-appendix-b-conversion-factors/nist-guide-si-appendix-b9).
+
+A revisão integrada de pressões, volume, perfusão, reprodução e limites didáticos está em [AUDITORIA-FISIOLOGIA.md](AUDITORIA-FISIOLOGIA.md).

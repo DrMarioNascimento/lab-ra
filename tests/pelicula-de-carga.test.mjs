@@ -18,9 +18,9 @@ test("o card 07 leva à película de carga", async () => {
   assert.match(hub, /A película de carga/);
 });
 
-test("a bancada da película está protegida como as outras", async () => {
+test("a bancada da película abre livremente como as outras", async () => {
   const page = await text("potencial-membrana/index.html");
-  assert.match(page, /data-ra-protected/);
+  assert.doesNotMatch(page, /data-ra-protected/);
   assert.match(page, /\.\.\/guard\.js/);
   assert.match(page, /ar-modes="webxr scene-viewer quick-look"/);
   /* ── A ESCALA NA RA É LIVRE, e este teste já travou o contrário ───────

@@ -214,9 +214,9 @@ test("o botão grande do card 11 entrega o que o card promete", async () => {
     "o card tem de levar às DUAS: quem entra por uma precisa achar a outra");
 });
 
-test("a bancada está protegida e traz o caminho de RA das irmãs", async () => {
+test("a bancada tem acesso livre e traz o caminho de RA das irmãs", async () => {
   const page = await texto("coracao/index.html");
-  assert.ok(page.includes("data-ra-protected"));
+  assert.ok(!page.includes("data-ra-protected"));
   assert.ok(page.includes('ar-modes="webxr scene-viewer quick-look"'));
   assert.ok(!page.includes("Onde a gravidade aperta?"),
     "o título padrão não é o da bancada da ortostase");

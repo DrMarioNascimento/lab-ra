@@ -19,9 +19,9 @@ test("o card 08 leva à coluna de sangue", async () => {
   assert.match(hub, /A coluna de sangue/);
 });
 
-test("a bancada está protegida e traz o mesmo caminho de RA das irmãs", async () => {
+test("a bancada tem acesso livre e traz o mesmo caminho de RA das irmãs", async () => {
   const page = await text("retorno-venoso/index.html");
-  assert.match(page, /data-ra-protected/);
+  assert.doesNotMatch(page, /data-ra-protected/);
   assert.match(page, /\.\.\/guard\.js/);
   assert.match(page, /ar-modes="webxr scene-viewer quick-look"/);
   /* ── A ESCALA NA RA É LIVRE, e este teste já travou o contrário ───────

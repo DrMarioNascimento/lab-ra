@@ -278,21 +278,13 @@ test("NENHUM `hidden` É DESFEITO POR REGRA DE AUTOR — o que estava escondido 
   }
 });
 
-test("A PEÇA ANATÔMICA ESTÁ VESTIDA DE BANCADA, e trancada como as irmãs", async () => {
-  /* Ela nasceu protótipo, aberta no navegador por caminho de arquivo, e um dia
-     virou destino de link do portal — sem tranca, sem marca e sem saída. Era a
-     ÚNICA porta do laboratório que se abria sem conta.
-
-     A tranca funciona a três pastas de fundura porque o `guard.js` resolve
-     `authUrl` e `bancadasUrl` a partir do endereço do PRÓPRIO script, e não do
-     da página. Conferido no navegador: sem a chave de sessão, a página devolve
-     para `index.html?laboratorio=acesso&destino=<ela mesma>` — com o destino
-     preservado, que é o que faz o aluno voltar À PEÇA depois de entrar, e não
-     ao índice. */
+test("A PEÇA ANATÔMICA ESTÁ VESTIDA DE BANCADA, com acesso livre como as irmãs", async () => {
+  /* A página conserva marca, assinatura e saída para o catálogo.
+     O acesso é livre, também nos três níveis de pastas do protótipo. */
   const peca = await texto("bancadas/11-coracao/prototipo/duas-pecas.html");
 
-  assert.ok(/<html[^>]*data-ra-protected/.test(peca), "sem o sinalizador a tranca nem roda");
-  assert.ok(peca.includes('src="../../../guard.js"'), "três níveis: prototipo, 11-coracao, bancadas");
+  assert.ok(!/<html[^>]*data-ra-protected/.test(peca), "a peça deve abrir diretamente");
+  assert.ok(peca.includes('src="../../../guard.js?v=livre-20261002"'), "três níveis: prototipo, 11-coracao, bancadas");
   assert.ok(peca.includes('href="../../../laboratorio.css"'), "a folha do laboratório veste a barra");
 
   /* saída: quem entra tem de conseguir voltar sem o botão do navegador */
