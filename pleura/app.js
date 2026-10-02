@@ -214,6 +214,7 @@ function atualizar() {
   const pAlv = cicloAlveolar(fase);
   const e = { ...ajuste(), pneumo, palveolar: pAlv, deslocaPleural: dPpl };
   const pn = estadoDoPneumotorax(pneumo);
+  const pplAtual = f => pressaoPleural(f, grau, e) + (pneumo === 'nenhum' ? dPpl : 0);
 
   /* o corpo pende: 90 graus = em pé = giro zero */
   root.rotation.z = g2r(90 - grau);
@@ -241,13 +242,13 @@ function atualizar() {
   $('posturaLabel').textContent = grau < 20 ? `Decúbito · ${grau.toFixed(0)}°`
     : grau > 70 ? `Ortostatismo · ${grau.toFixed(0)}°` : `Inclinado · ${grau.toFixed(0)}°`;
   $('pplLabel').textContent = pneumo === 'nenhum'
-    ? `Pleural ${pressaoPleural(.5, grau).toFixed(1)} cmH₂O`
+    ? `Pleural ${pplAtual(.5).toFixed(1)} cmH₂O`
     : `Pleural ${pn.ppl >= 0 ? '+' : ''}${pn.ppl.toFixed(0)} cmH₂O`;
   $('grauValor').textContent = `${grau.toFixed(0)}°`;
   if (!arrastando) $('grauCursor').value = grau.toFixed(0);
 
-  $('lApice').textContent = pressaoPleural(1, grau, e).toFixed(1);
-  $('lBase').textContent = pressaoPleural(0, grau, e).toFixed(1);
+  $('lApice').textContent = pplAtual(1).toFixed(1);
+  $('lBase').textContent = pplAtual(0).toFixed(1);
   /* Deitado a queda ao longo do eixo ápice-base é ZERO, e o gradiente não
      sumiu: mudou para o esterno-dorso, que esta bancada não desenha. Dizer
      isso em palavras é honesto; enfiar os dois eixos num número só foi o erro
