@@ -889,12 +889,39 @@ function nivelPerna(geo) {
   const g = new THREE.Group();
   g.add(fatia.malha);
   g.add(fatia.prepass);
+  acabarPerna(fatia, geo, S);
   const P = fatia.geo.attributes.position.array;
-  const leg = (x, y) => x > 0.02 * S && y < 1.02 * S;
-  const ys = [0.08, 0.16, 0.26, 0.36, 0.46, 0.56, 0.66, 0.76, 0.86].map(y => y * S);
-  const rota = (dx, dz) => ys.map(y => centroid(P, y - 0.04 * S, y + 0.04 * S, leg)).filter(Boolean).map(p => p.clone().add(V(dx, 0, dz)));
-  const profPts = rota(0.01 * S, 0.01 * S);
-  const safPts = rota(0.035 * S, -0.01 * S);
+  // A fatia também contém braço/mão: eles nunca entram no trajeto da perna.
+  const leg = (x, y) => x > 0.02 * S && x < .29 * S && y < 1.02 * S;
+  const sonda = new THREE.Mesh(fatia.malha.geometry, new THREE.MeshBasicMaterial({ side: THREE.DoubleSide }));
+  const raio = new THREE.Raycaster(), eixoX = V(1, 0, 0), eixoZ = V(0, 0, 1);
+  const limites = (origem, direcao, eixo) => {
+    raio.set(origem, direcao);
+    const hits = raio.intersectObject(sonda, false).filter(h => leg(h.point.x, h.point.y));
+    if (hits.length < 2) return null;
+    return [hits[0].point.getComponent(eixo), hits[hits.length - 1].point.getComponent(eixo)];
+  };
+  const secao = y => {
+    const c = centroid(P, y - .008 * S, y + .008 * S, leg);
+    if (!c) return null;
+    const xs = limites(V(-S, y, c.z), eixoX, 0);
+    if (!xs) return null;
+    const x = (xs[0] + xs[1]) / 2;
+    const zs = limites(V(x, y, -S), eixoZ, 2);
+    if (!zs) return null;
+    const profunda = V(x, y, (zs[0] + zs[1]) / 2);
+    // Margem para a distensão máxima e as válvulas, inclusive no tornozelo.
+    const medial = xs[0] + (xs[1] - xs[0]) * .32;
+    const supZ = limites(V(medial, y, -S), eixoZ, 2);
+    const superficial = supZ ? V(medial, y, supZ[0] + (supZ[1] - supZ[0]) * .65) : profunda.clone();
+    return { profunda, superficial };
+  };
+  const secoes = [];
+  for (let h = .08; h <= .961; h += .04) {
+    const s = secao(h * S);
+    if (s) secoes.push(s);
+  }
+  const profPts = secoes.map(s => s.profunda), safPts = secoes.map(s => s.superficial);
   const veias = [];
   const fluxo = [];
   const por = (nome, papel, pts, r) => {
@@ -908,23 +935,21 @@ function nivelPerna(geo) {
     fluxo.push({ curve, r, kind: 'v', len: curve.getLength(), name: nome });
     return curve;
   };
-  const curvaSaf = por('safena', 'safena', safPts, 0.009 * S);
-  por('profunda', 'profunda', profPts, 0.011 * S);
+  const curvaSaf = por('safena', 'safena', safPts, 0.0055 * S);
+  por('profunda', 'profunda', profPts, 0.007 * S);
   for (const h of [0.24, 0.46, 0.68]) {
     const y = h * S;
-    const a = centroid(P, y - 0.03 * S, y + 0.03 * S, leg);
-    if (!a) continue;
-    const sup = a.clone().add(V(0.035 * S, 0, -0.01 * S));
-    const prof = a.clone().add(V(0.01 * S, 0.02 * S, 0.01 * S));
-    por('perfurante', 'perfurante', [sup, a.clone().add(V(0.02 * S, 0.01 * S, 0)), prof], 0.0045 * S);
+    const s = secao(y);
+    if (!s) continue;
+    por('perfurante', 'perfurante', [s.superficial, s.superficial.clone().lerp(s.profunda, .5), s.profunda], 0.003 * S);
   }
-  const aneis = curvaSaf ? aneisDaSafena(g, curvaSaf, 0.009 * S, S) : [];
+  sonda.material.dispose();
+  const aneis = curvaSaf ? aneisDaSafena(g, curvaSaf, 0.0055 * S, S) : [];
   sangueNoGrupo(g, fluxo, S);
   g.userData.veias = veias;
   g.userData.aneis = aneis;
   const bb = fatia.geo.boundingBox;
   g.position.set(-(bb.min.x + bb.max.x) / 2, -(bb.min.y + bb.max.y) / 2, -(bb.min.z + bb.max.z) / 2);
-  acabarPerna(fatia, geo, S);
   return g;
 }
 
