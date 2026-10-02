@@ -18,6 +18,7 @@ import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { prepararParaRA } from '../cores-para-ra.js';
 import { criar } from './modelos.js';
+import { clonarVisual } from './ra.js';
 import {
   PULMAO, VOLUMES, alturaEfetiva, pressaoPleural, transpulmonar, volumeRelativo,
   ventilacaoRelativa, zonaEm, fluxoEm, perfilDeZonas, estadoDoPneumotorax, eixoDependente,
@@ -34,17 +35,17 @@ const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true,
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.16;
+renderer.toneMappingExposure = .88;
 const scene = new THREE.Scene();
 scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), .04).texture;
-scene.environmentIntensity = .74;
+scene.environmentIntensity = .50;
 
 const camera = new THREE.PerspectiveCamera(34, 1, .1, 900);
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true; controls.dampingFactor = .06;
 
-scene.add(new THREE.HemisphereLight(0xe9f0ff, 0x161018, 1.0));
-const key = new THREE.DirectionalLight(0xfff4e8, 2.5); key.position.set(30, 46, 40); scene.add(key);
+scene.add(new THREE.HemisphereLight(0xe9f0ff, 0x161018, .75));
+const key = new THREE.DirectionalLight(0xfff4e8, 1.65); key.position.set(30, 46, 40); scene.add(key);
 const fill = new THREE.DirectionalLight(0xffd0c4, .6); fill.position.set(-34, 12, 26); scene.add(fill);
 const rim = new THREE.DirectionalLight(0x8fb8ff, 1.05); rim.position.set(-20, 16, -44); scene.add(rim);
 
@@ -142,12 +143,20 @@ const TEXTOS = [
 ];
 const ROTULO = ['A fresta', 'As molas', 'Pneumotórax', 'O gradiente', 'As zonas'];
 const TAM_REAL = [.34, .58, .58, .55, .55];
+const CONTEXTO = [
+  'Corte da parede costal · camadas ampliadas',
+  'Costelas anteriores direitas translúcidas · pulmão direito à sua esquerda',
+  'Costelas anteriores direitas translúcidas · pneumotórax direito',
+  'Unidades acinares ampliadas · posição representativa',
+  'Redes capilares ampliadas · cor indica a zona',
+];
 
 let atual = 0;
 function irAoNivel(n) {
   atual = clamp(n, 0, 4);
   modelos.forEach((m, i) => { m.visible = i === atual; });
   const t = TEXTOS[atual];
+  $('anatomiaLegenda').textContent=CONTEXTO[atual];
   $('infoEyebrow').textContent = t.olho;
   $('infoTitle').textContent = t.titulo;
   $('infoText').textContent = t.texto;
@@ -156,7 +165,7 @@ function irAoNivel(n) {
   $('stepLabel').textContent = `0${atual + 1} · ${ROTULO[atual]}`;
   $('prev').disabled = atual === 0; $('next').disabled = atual === 4;
   $('caixaPneumo').hidden = atual > 2;
-  $('caixaPostura').hidden = atual < 3;
+  $('caixaPostura').hidden = atual === 0;
   $('caixaZonas').hidden = atual !== 4;
   enquadrar(atual);
   atualizar(); prepararRA();
@@ -174,8 +183,12 @@ function atualizar() {
 
   aplicarFresta(pn.ppl);
   const forcas = { pulmao: pneumo === 'nenhum' ? 5 : 1.6, caixa: pneumo === 'nenhum' ? 5 : 3.6 };
-  aplicarTorax(1, { pulmao: VOLUMES.crf, caixa: VOLUMES.crf, forcas });
-  aplicarTorax(2, { pulmao: pn.pulmao, caixa: pn.caixa, desvio: pn.desvio });
+  const repouso=volumeRelativo(transpulmonar(.5,grau,{...ajuste(),pneumo:'nenhum'}));
+  const inspirado=volumeRelativo(transpulmonar(.5,grau,{...ajuste(),pneumo:'nenhum'})-dPpl);
+  const ciclo=repouso>0?Math.cbrt(inspirado/repouso):1;
+  const inspiracao=clamp(-dPpl/AMPLITUDE_PPL,0,1);
+  aplicarTorax(1, { pulmao: VOLUMES.crf, caixa: VOLUMES.crf, forcas, ciclo, inspiracao });
+  aplicarTorax(2, { pulmao: pn.pulmao, caixa: pn.caixa, desvio: pn.desvio, ciclo, inspiracao });
   /* o ciclo desloca a pleural inteira: a física entrega o gradiente parado e
      o app soma a respiração por cima, que é o que a musculatura faz */
   const plEm = f => transpulmonar(f, grau, e) - dPpl;
@@ -317,13 +330,13 @@ $('resetView').onclick = () => enquadrar(atual);
 /* ------------------------------------------------------------ RA */
 let arUrl = null, prepId = 0, temporizador = null;
 function prepararRA() {
+  const id = ++prepId;
   clearTimeout(temporizador);
   temporizador = setTimeout(async () => {
-    const id = ++prepId;
     $('launchAR').disabled = true;
     $('raStatus').textContent = 'Preparando o modelo para a câmera…';
     try {
-      const clone = modelos[atual].clone(true);
+      const clone = clonarVisual(modelos[atual]);
       clone.visible = true;
       /* a RA leva a postura e o estado que estão na tela: é uma foto */
       clone.rotation.z = g2r(90 - grau);
