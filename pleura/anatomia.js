@@ -4,6 +4,8 @@
    esquerda de quem olha, como numa radiografia. Nada de DOM, nada de física.
    ========================================================================== */
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { criar as criarCoracao } from '../coracao/modelos.js';
 
 export const DIR = -1, ESQ = 1;
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
@@ -12,6 +14,24 @@ const gauss = (v, c, s) => Math.exp(-(((v - c) / s) ** 2));
 const lado = s => (s === DIR ? 'D' : 'E');
 
 export const mk = (name, geo, mat) => { const m = new THREE.Mesh(geo, mat); m.name = name; m.castShadow = m.receiveShadow = true; return m; };
+
+// Agrupa por tecido para manter a anatomia detalhada leve no celular.
+function compactar(g) {
+  const buckets=new Map();g.updateMatrixWorld(true);
+  for(const m of g.children) {
+    if(!m.isMesh)continue;
+    const geo=m.geometry.clone().applyMatrix4(m.matrix);geo.deleteAttribute('uv');
+    if(!buckets.has(m.material))buckets.set(m.material,{geos:[],nomes:[]});
+    buckets.get(m.material).geos.push(geo);buckets.get(m.material).nomes.push(m.name);
+  }
+  const children=[...g.children];g.clear();
+  for(const [mat,{geos,nomes}] of buckets) {
+    const m=mk(`${g.name}_${mat.name}`,mergeGeometries(geos),mat);m.userData.partes=nomes;g.add(m);
+    geos.forEach(geo=>geo.dispose());
+  }
+  children.forEach(m=>{if(m.isMesh)m.geometry.dispose();else g.add(m)});
+  return g;
+}
 
 /* ── O envelope do tórax: meia-largura e meio-fundo por altura ─────────── */
 const tabela = pts => y => {
@@ -65,73 +85,149 @@ function fita(curve, t0, t1, perfil, n = 40, k = 12) {
 }
 export const tuboGeo = (pts, r, seg = 24) => new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), seg, r, 14, false);
 
+/* Superfícies de tecido com variação suave, sem facetas ou esferas perfeitas.
+   A deformação é determinística e permanece na geometria exportada para RA. */
+export function tecidoGeo(rx, ry, rz, detalhe = .018) {
+  const g = new THREE.SphereGeometry(1, 28, 20), p = g.attributes.position;
+  for (let i = 0; i < p.count; i++) {
+    const x = p.getX(i), y = p.getY(i), z = p.getZ(i);
+    const k = 1 + detalhe * Math.sin(x * 8 + y * 5) * Math.sin(z * 7 - y * 4);
+    p.setXYZ(i, x * rx * k, y * ry * k, z * rz * k);
+  }
+  g.computeVertexNormals(); return g;
+}
+
+/* Um fragmento curvo da parede costal, com espessura e faces de corte reais. */
+export function fragmentoGeo(z0, z1, largura = 24, altura = 18, centroX = 0) {
+  const p = [], idx = [], nx = 48, ny = 30;
+  const curvatura = (x, y) => -.013 * x * x - .004 * y * y;
+  for (const z of [z0, z1]) for (let j = 0; j <= ny; j++) for (let i = 0; i <= nx; i++) {
+    const y = (j / ny - .5) * altura;
+    const organic = .88 + .12 * Math.sin(Math.PI*j/ny)**.7;
+    const x = (centroX + (i / nx - .5) * largura)*organic+.10*Math.sin(y*.53);
+    p.push(x, y, z + curvatura(x, y));
+  }
+  const n = (nx + 1) * (ny + 1), at = (i, j) => j * (nx + 1) + i;
+  for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) {
+    const a = at(i, j), b = a + 1, c = at(i, j + 1), d = c + 1;
+    idx.push(a, c, b, b, c, d, a + n, b + n, c + n, b + n, d + n, c + n);
+  }
+  const borda = [];
+  for (let i = 0; i <= nx; i++) borda.push(at(i, 0));
+  for (let j = 1; j <= ny; j++) borda.push(at(nx, j));
+  for (let i = nx - 1; i >= 0; i--) borda.push(at(i, ny));
+  for (let j = ny - 1; j > 0; j--) borda.push(at(0, j));
+  for (let i = 0; i < borda.length; i++) {
+    const a = borda[i], b = borda[(i + 1) % borda.length];
+    idx.push(a, b, a + n, b, b + n, a + n);
+  }
+  const g = new THREE.BufferGeometry();g.setAttribute('position', new THREE.Float32BufferAttribute(p, 3));g.setIndex(idx);g.computeVertexNormals();return g;
+}
+
 /* ── Coluna: C7, T1–T12, L1–L2 ──────────────────────────────────────────── */
 export const yPost = j => 0.283 - j * 0.0205;     // altura posterior da costela j (0 = 1ª)
 export function construirColuna(M) {
   const g = new THREE.Group(); g.name = 'coluna';
   const vertebras = [['C7', 0.3035, 0.012, 0.014]];
-  for (let j = 0; j < 12; j++) vertebras.push([`T${j + 1}`, yPost(j), 0.013 + j * 0.0006, 0.016]);
-  vertebras.push(['L1', 0.025, 0.0205, 0.02], ['L2', 0.0015, 0.021, 0.02]);
-  for (const [n, y, r, h] of vertebras) {
+  for (let j = 0; j < 12; j++) vertebras.push([`T${j + 1}`, yPost(j), 0.013 + j * 0.0006, 0.0155+j*.00027]);
+  vertebras.push(['L1', 0.0345, 0.0205, 0.0195], ['L2', 0.0105, 0.021, 0.02]);
+  for (let v=0;v<vertebras.length;v++) {
+    const [n, y, r, h] = vertebras[v];
     const z = zS(y);
-    const corpo = mk(`corpo_${n}`, new THREE.CylinderGeometry(r, r * 1.04, h, 24), M.osso);
-    corpo.geometry.scale(1, 1, .86); corpo.position.set(0, y, z);
-    const disco = mk(`disco_${n}`, new THREE.CylinderGeometry(r * .96, r * .96, 0.0045, 24), M.disco);
-    disco.geometry.scale(1, 1, .86); disco.position.set(0, y - h / 2 - 0.0022, z);
+    const rings = [];
+    for (let i = 0; i <= 10; i++) {
+      const t = i / 10, cintura = 1 - .10 * Math.sin(Math.PI * t), ring = [];
+      for (let k = 0; k < 32; k++) {
+        const a = k / 32 * Math.PI * 2, c = Math.cos(a), sn = Math.sin(a);
+        ring.push(V(Math.sign(c) * Math.abs(c) ** .65 * r * cintura, (t - .5) * h,
+          Math.sign(sn) * Math.abs(sn) ** .75 * r * .82 * cintura));
+      }
+      rings.push(ring);
+    }
+    const corpo = mk(`corpo_${n}`, loft(rings), M.osso); corpo.position.set(0, y, z);
+    if(v+1<vertebras.length) {
+      const [,yn,rn,hn]=vertebras[v+1],superior=y-h/2,inferior=yn+hn/2;
+      const discos=[];
+      for(let k=0;k<=6;k++) {
+        const t=k/6,yy=inferior+(superior-inferior)*t,rr=(rn+(r-rn)*t)*(.96+.035*Math.sin(Math.PI*t));
+        discos.push(Array.from({length:32},(_,a)=>{const th=a/32*Math.PI*2;return V(Math.sign(Math.cos(th))*Math.abs(Math.cos(th))**.65*rr,yy,zS(yy)+Math.sign(Math.sin(th))*Math.abs(Math.sin(th))**.75*rr*.82);}));
+      }
+      g.add(mk(`disco_${n}_${vertebras[v+1][0]}`,loft(discos),M.disco));
+    }
     const arco = mk(`arco_${n}`, new THREE.TorusGeometry(0.011, 0.0032, 8, 18, Math.PI), M.osso);
     arco.rotation.x = Math.PI / 2; arco.rotation.z = Math.PI; arco.position.set(0, y, z - r * .55);
-    const esp = mk(`espinhosa_${n}`, new THREE.CylinderGeometry(0.0022, 0.0038, 0.03, 10), M.osso);
-    esp.rotation.x = 1.05; esp.position.set(0, y - 0.011, z - r * .55 - 0.022);
+    const esp = mk(`espinhosa_${n}`, tuboGeo([V(0,y,z-r*.8),V(0,y-.007,z-r-.010),V(0,y-.017,z-r-.021)], .003, 16), M.osso);
     const tpE = mk(`transverso_E_${n}`, new THREE.CylinderGeometry(0.0032, 0.0042, 0.026, 10), M.osso);
     tpE.rotation.z = Math.PI / 2; tpE.rotation.y = -0.35; tpE.position.set(0.016, y, z - r * .55 - 0.004);
     const tpD = tpE.clone(); tpD.name = `transverso_D_${n}`; tpD.rotation.y = 0.35; tpD.position.x = -0.016;
-    g.add(corpo, disco, arco, esp, tpE, tpD);
+    g.add(corpo, arco, esp, tpE, tpD);
   }
-  return g;
+  return compactar(g);
 }
 
 /* ── Caixa torácica: costelas em fita, cartilagens, esterno, clavículas ──── */
 const ESTERNAL = [0.268, 0.246, 0.224, 0.202, 0.182, 0.164, 0.148];   // onde 1–7 chegam ao esterno
 const MARGEM = [[0.045, 0.138], [0.075, 0.116], [0.1, 0.092]];        // 8–10 na margem costal
 const DIP = [0.004, 0.009, 0.015, 0.021, 0.027, 0.033, 0.038, 0.044, 0.046, 0.04];
+const ESTERNO = [[.118,.0015],[.128,.004],[.142,.009],[.16,.010],[.18,.012],[.20,.012],[.22,.014],[.236,.013],[.244,.013],[.251,.014],[.268,.020],[.279,.023],[.287,.019]];
+const larguraEsterno=tabela(ESTERNO);
+const insercaoEsternal=(s,y)=>V(s*(larguraEsterno(y)-.0012),y,dT(y)-.0055);
+// Margem cartilaginosa contínua: 8–10 encontram a cartilagem acima,
+// que finalmente alcança a 7ª inserção no esterno.
+const arcoCostal=s=>[insercaoEsternal(s,ESTERNAL[6]),...MARGEM.map(([x,y])=>V(s*x,y,dT(y)*Math.sqrt(1-(x/wT(y))**2)))];
 function costela(g, M, s, j) {
   const yP = yPost(j), flutuante = j >= 10;
   let xEnd, yA;
-  if (j < 7) { yA = ESTERNAL[j]; xEnd = 0.019; }
+  if (j < 7) { yA = ESTERNAL[j]; xEnd = larguraEsterno(yA)-.0012; }
   else if (j < 10) { [xEnd, yA] = MARGEM[j - 7]; }
   else { yA = yP - (j === 10 ? 0.03 : 0.018); }
-  const theta1 = flutuante ? (j === 10 ? 0.58 : 0.42) * Math.PI : Math.PI - Math.asin(xEnd / wT(yA));
+  const theta1 = flutuante ? (j === 10 ? 0.46 : 0.31) * Math.PI : Math.PI - Math.asin(xEnd / wT(yA));
   const theta0 = Math.asin(0.03 / wT(yP)) + 0.15;
   const tj = flutuante ? 1 : 0.88 - j * 0.018;
   const dip = flutuante ? 0 : DIP[j];
-  const pts = [V(s * 0.028, yP, zS(yP) - 0.007)];
+  const rv=.013+j*.0006;
+  const pts = [V(s*rv*.93,yP,zS(yP)-.002),V(s*.028,yP-.001,zS(yP)-rv*.55-.004)];
   for (let i = 0; i <= 16; i++) {
     const t = i / 16, th = theta0 + (theta1 - theta0) * t;
     const y = yP + (yA - yP) * Math.pow(t, 1.35) - dip * gauss(t, tj, 0.2);
     pts.push(V(s * wT(y) * Math.sin(th), y, -dT(y) * Math.cos(th)));
   }
+  if(j<7)pts[pts.length-1]=insercaoEsternal(s,yA);
+  else if(!flutuante)pts[pts.length-1]=arcoCostal(s)[j-6].clone();
   const curva = new THREE.CatmullRomCurve3(pts, false, 'centripetal');
-  const hb = j === 0 ? 0.0038 : j === 1 ? 0.006 : flutuante ? 0.0048 : 0.0072;
+  const hb = j === 0 ? 0.0034 : j === 1 ? 0.0046 : flutuante ? 0.0028 : 0.0046;
   const wb = j === 0 ? 0.0068 : j === 1 ? 0.0038 : flutuante ? 0.0026 : 0.0029;
-  const perfil = t => { const k = flutuante ? Math.pow(1 - t * .999, .3) : 1; const q = 0.6 + 0.4 * Math.pow(Math.sin(Math.PI * clamp(t / tj, 0, 1)), .4); return { h: hb * q * k, w: wb * (0.8 + 0.2 * q) * k }; };
-  g.add(mk(`costela_${lado(s)}_${j + 1}`, fita(curva, 0, tj, perfil, flutuante ? 30 : 44), M.osso));
-  if (!flutuante) g.add(mk(`cartilagem_${lado(s)}_${j + 1}`, fita(curva, tj - 0.01, 1, () => ({ h: 0.0052, w: 0.0036 }), 16), M.cartilagem));
+  const perfil = t => { const k = flutuante ? .10+.90*Math.pow(1-t,.65) : 1; const q = 0.6 + 0.4 * Math.pow(Math.sin(Math.PI * clamp(t / tj, 0, 1)), .4); return { h: hb * q * k, w: wb * (0.8 + 0.2 * q) * k }; };
+  // A frente direita fica translúcida, mantendo todas as articulações.
+  // Os segmentos posteriores continuam opacos para delimitar o pulmão.
+  const janela=s===DIR&&j>=2&&j<=7;
+  const janelaOsso=M.ossoJanela||M.osso,janelaCart=M.cartilagemJanela||M.cartilagem;
+  const corte=janela?Math.min(.60,tj):tj;
+  g.add(mk(`costela_${lado(s)}_${j+1}_posterior`,fita(curva,0,corte,perfil,48),M.osso));
+  if(janela)g.add(mk(`costela_${lado(s)}_${j+1}_anterior`,fita(curva,corte,tj,perfil,24),janelaOsso));
+  if (!flutuante) g.add(mk(`cartilagem_${lado(s)}_${j + 1}`, fita(curva, tj - 0.01, 1, () => ({ h: 0.0038, w: 0.0030 }), 28), janela?janelaCart:M.cartilagem));
 }
 export function construirCaixa(M) {
   const g = new THREE.Group(); g.name = 'caixa_toracica';
   for (let j = 0; j < 12; j++) { costela(g, M, DIR, j); costela(g, M, ESQ, j); }
-  const perfil = [[0.287, 0.026], [0.272, 0.024], [0.248, 0.017], [0.236, 0.015], [0.2, 0.014], [0.16, 0.013], [0.142, 0.011], [0.128, 0.007], [0.112, 0.003]];
+  for(const s of [DIR,ESQ])g.add(mk(`margem_costal_${lado(s)}`,tuboGeo(arcoCostal(s),.0033,48),M.cartilagem));
+  const perfil = [...ESTERNO].reverse();
   const rings = perfil.map(([y, hw]) => {
     const z0 = dT(y) - 0.0055, r = [];
     for (let j = 0; j < 20; j++) {
       const a = j / 20 * Math.PI * 2, c = Math.cos(a), sn = Math.sin(a);
-      r.push(V(Math.sign(c) * Math.pow(Math.abs(c), .5) * hw, y, z0 + Math.sign(sn) * Math.pow(Math.abs(sn), .5) * 0.0055));
+      r.push(V(Math.sign(c) * Math.pow(Math.abs(c), .65) * hw, y, z0 + Math.sign(sn) * Math.pow(Math.abs(sn), .65) * 0.0038));
     }
     return r;
   });
   g.add(mk('esterno', loft(rings), M.osso));
-  for (const s of [DIR, ESQ]) g.add(mk(`clavicula_${lado(s)}`, tuboGeo([V(s * 0.028, 0.286, 0.038), V(s * 0.065, 0.292, 0.047), V(s * 0.105, 0.296, 0.034), V(s * 0.138, 0.3, 0.01)], 0.0058), M.osso));
-  return g;
+  for (const s of [DIR, ESQ]) {
+    const raiz=insercaoEsternal(s,.283);
+    g.add(mk(`articulacao_esternoclavicular_${lado(s)}`,tecidoGeo(.0045,.005,.0045),M.cartilagem));
+    g.children[g.children.length-1].position.copy(raiz);
+    g.add(mk(`clavicula_${lado(s)}`,tuboGeo([raiz,V(s*.041,.288,.052),V(s*.072,.291,.052),V(s*.101,.292,.038),V(s*.128,.285,.028)],.0043,40),M.osso));
+  }
+  return compactar(g);
 }
 
 /* ── Diafragma: duas cúpulas, a direita mais alta (fígado); rebordo baixo
@@ -155,7 +251,27 @@ export function construirDiafragma(M) {
     }
     rings.push(r);
   }
-  return mk('diafragma', loft(rings, [true, false]), M.diafragma);
+  const grupo = new THREE.Group(); grupo.name = 'diafragma';
+  grupo.add(mk('musculo_diafragmatico', loft(rings, [true, false]), M.diafragma));
+  const tendon = [];
+  for (let i = 1; i <= 14; i++) {
+    const r = [], rho = i / 14;
+    for (let j = 0; j < 64; j++) {
+      const t = j / 64 * Math.PI * 2, x = rho * .051 * Math.sin(t), z = .006 + rho * .032 * Math.cos(t);
+      r.push(V(x, yDiafragma(x,z)+.0006,z));
+    }
+    tendon.push(r);
+  }
+  grupo.add(mk('tendao_central', loft(tendon,[true,false]), M.tendao || M.cartilagem));
+  for (let j = 0; j < 32; j++) {
+    const t = j / 32 * Math.PI * 2, pts = [];
+    for (let i = 0; i <= 12; i++) {
+      const r = .46 + i / 12 * .52, x = r * W_r * Math.sin(t), z = ZD-r*D_r*Math.cos(t);
+      pts.push(V(x,yDiafragma(x,z)+.0009,z));
+    }
+    grupo.add(mk(`fibra_diafragma_${j}`,tuboGeo(pts,.00038,20),M.fibra || M.diafragma));
+  }
+  return compactar(grupo);
 }
 
 /* ── Pulmão: superfície paramétrica — base côncava sobre o diafragma, face
@@ -169,15 +285,22 @@ export function secaoPulmao(s, y) {
   return { xc: s * (m + a), a };
 }
 export function geoPulmao(s, { inflate = 0, fissuras = true, assoalho = 0.012 } = {}) {
-  const yApex = (s === DIR ? 0.306 : 0.299) + inflate, K = 80, NB = 10, NW = 50, ZC = -0.008;
+  const yApex = (s === DIR ? 0.306 : 0.299) + inflate, K = 96, NB = 14, NW = 76, ZC = -0.008;
   const med = medias(s);
   const ponto = (y, phi, R) => {
     const m = med(y), a = Math.max(0.004, (wIn(y) - m) / 2 + inflate), xc = m + a - inflate;
     const dI = dIn(y) + inflate, bAnt = dI * .74, bPost = dI * .92;
     const c = Math.cos(phi), sn = Math.sin(phi), nx = c > 0 ? 2 : 3.4;
     let px = Math.sign(c) * Math.pow(Math.abs(c), 2 / nx) * a * R;
-    const pz = Math.sign(sn) * Math.pow(Math.abs(sn), 2 / 2.3) * (sn > 0 ? bAnt : bPost) * R;
+    let pz = Math.sign(sn) * Math.pow(Math.abs(sn), 2 / 2.3) * (sn > 0 ? bAnt : bPost) * R;
     if (s === ESQ) px += 0.022 * gauss(y, 0.172, 0.03) * clamp((sn - .2) / .6, 0, 1) * clamp(-c * 1.5, 0, 1) * R;
+    // A parede costal é elíptica, não um retângulo arredondado. Restringe
+    // a face posterior/lateral e reserva espaço para corpos vertebrais.
+    const x=s*(xc+px),w=wT(y)-.007+inflate,d=dT(y)-.007+inflate;
+    const alcance=d*Math.sqrt(Math.max(.002,1-(x/w)**2));
+    const posterior=Math.max(-alcance+.002,zS(y)+.016*gauss(x,0,.029));
+    const z=clamp(ZC+pz,posterior,alcance-.002);
+    pz=z-ZC;
     return { x: s * (xc + px), z: ZC + pz, xc: s * xc, pz };
   };
   const yBase = [];
@@ -198,26 +321,55 @@ export function geoPulmao(s, { inflate = 0, fissuras = true, assoalho = 0.012 } 
   }
   for (let i = 1; i < NW; i++) {
     const v = i / NW, r = [];
-    const R = v < .7 ? 1 : Math.sqrt(Math.max(0, 1 - ((v - .7) / .3) ** 2));
+    const R = v < .62 ? 1 : Math.sqrt(Math.max(0, 1 - ((v - .62) / .38) ** 2));
     for (let j = 0; j < K; j++) {
       const y = yBase[j] + (yApex - yBase[j]) * v;
       const p = ponto(y, j / K * Math.PI * 2, R);
       let x = p.x, z = p.z;
       if (fissuras && R > .3) {
         const f = (y - 0.18) + 0.8 * (z - ZC);
-        let g = gauss(f, 0, 0.009);
-        if (s === DIR && f > 0.012) g = Math.max(g, gauss(y, 0.2, 0.008));
-        const k = 1 - 0.11 * g;
+        let g = gauss(f, 0, 0.0025);
+        if (s === DIR && f > 0.004 && z > -.025) g = Math.max(g, gauss(y, 0.207, 0.0022));
+        const k = 1 - 0.045 * g;
         x = p.xc + (x - p.xc) * k; z = ZC + (z - ZC) * k;
       }
       r.push(V(x, y, z));
     }
     rings.push(r);
   }
-  return loft(rings);
+  const geo = loft(rings), pos = geo.attributes.position, colors = [];
+  for (let i=0;i<pos.count;i++) {
+    const x=pos.getX(i),y=pos.getY(i),z=pos.getZ(i);
+    const grain = .93 + .055*Math.sin(x*680+y*410)*Math.sin(z*720-y*370);
+    const fissure = fissuras ? gauss((y-.18)+.8*(z-ZC),0,.002) : 0;
+    const inferior=(y-.18)+.8*(z-ZC)<0;
+    const medio=s===DIR&&!inferior&&y<.207&&z>-.025;
+    colors.push((grain-.17*fissure)*(inferior?.87:1),(grain-.22*fissure)*(medio?.88:1),(grain-.19*fissure)*(inferior?1:medio?.94:.98));
+  }
+  geo.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));
+  return geo;
 }
 
 /* ── Mediastino: traqueia anelada, brônquios, coração, aorta, cava, tronco pulmonar ── */
+let matrizCardiaca;
+function coracaoDoRepositorio() {
+  if(!matrizCardiaca) {
+    // Reutiliza integralmente a geometria da bancada cardíaca, sem editar
+    // seus arquivos nem acoplar o ciclo cardíaco à física pleural.
+    const {modelos}=criarCoracao(),origem=modelos[0];
+    origem.remove(origem.userData.sangue,...Object.values(origem.userData.valvas));
+    origem.updateMatrixWorld(true);
+    const g=new THREE.Group();g.name='coracao_do_repositorio';
+    origem.traverse(o=>{
+      if(!o.isMesh||o.userData.papelParede==='interna')return;
+      const geo=o.geometry.clone().applyMatrix4(o.matrixWorld);geo.scale(.001,.001,.001);
+      const m=mk(o.name||'tecido_cardiaco',geo,o.material);g.add(m);
+    });
+    matrizCardiaca=compactar(g);
+    const disposed=new Set();for(const model of modelos)model.traverse(o=>{if(o.geometry&&!disposed.has(o.geometry)){disposed.add(o.geometry);o.geometry.dispose();}});
+  }
+  return matrizCardiaca.clone();
+}
 export function construirMediastino(M) {
   const g = new THREE.Group(); g.name = 'mediastino';
   g.add(mk('traqueia', tuboGeo([V(0, 0.345, -0.004), V(0, 0.29, -0.009), V(0, 0.24, -0.014)], 0.0085, 12), M.traqueia));
@@ -230,11 +382,70 @@ export function construirMediastino(M) {
   /* o brônquio direito é mais largo e mais vertical */
   g.add(mk('bronquio_D', tuboGeo([V(0, 0.242, -0.014), V(DIR * 0.018, 0.228, -0.013), V(DIR * 0.042, 0.212, -0.01)], 0.0066, 12), M.traqueia));
   g.add(mk('bronquio_E', tuboGeo([V(0, 0.242, -0.014), V(ESQ * 0.022, 0.232, -0.014), V(ESQ * 0.05, 0.218, -0.012)], 0.0058, 12), M.traqueia));
-  const cg = new THREE.SphereGeometry(1, 48, 36); cg.scale(0.043, 0.056, 0.04);
-  const c = mk('coracao', cg, M.coracao); c.position.set(ESQ * 0.012, 0.192, 0.024); c.rotation.set(-0.3, 0, ESQ * 0.5);
-  g.add(c);
-  g.add(mk('aorta', tuboGeo([V(DIR * 0.012, 0.232, 0.022), V(DIR * 0.014, 0.256, 0.014), V(ESQ * 0.02, 0.267, -0.002), V(ESQ * 0.034, 0.255, -0.028), V(ESQ * 0.03, 0.22, -0.046), V(ESQ * 0.024, 0.16, -0.05), V(ESQ * 0.02, 0.105, -0.052)], 0.0105, 40), M.arteria));
-  g.add(mk('veia_cava_superior', tuboGeo([V(DIR * 0.024, 0.215, 0.016), V(DIR * 0.024, 0.272, 0.008)], 0.0082, 8), M.veia));
-  g.add(mk('tronco_pulmonar', tuboGeo([V(ESQ * 0.006, 0.222, 0.036), V(ESQ * 0.024, 0.244, 0.022), V(ESQ * 0.036, 0.246, 0.0)], 0.0088, 12), M.veia));
+  const coracao=coracaoDoRepositorio();
+  coracao.position.set(.012,.177,.014);
+  coracao.scale.setScalar(.84);
+  g.add(coracao);
   return g;
+}
+
+/* Amostras dentro da MESMA superfície pulmonar usada nos níveis macroscópicos.
+   O centro vem da secção real; a margem limita os exemplos ampliados. */
+const amostras = new Map();
+export function amostraPulmao(s,f) {
+  if(!amostras.has(s)) {
+    const geo=geoPulmao(s),mesh=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({side:THREE.DoubleSide}));
+    geo.computeBoundingBox();amostras.set(s,{geo,mesh,cache:new Map()});
+  }
+  const {geo,mesh,cache}=amostras.get(s);
+  if(cache.has(f))return cache.get(f);
+  const p=geo.attributes.position,idx=geo.index;
+  const bb=geo.boundingBox,y=bb.min.y+(bb.max.y-bb.min.y)*(.23+.61*f),pts=[];
+  for(let i=0;i<idx.count;i+=3) for(let j=0;j<3;j++) {
+    const a=idx.getX(i+j),b=idx.getX(i+(j+1)%3),ya=p.getY(a),yb=p.getY(b);
+    if((ya<y)===(yb<y))continue;
+    const t=(y-ya)/(yb-ya);pts.push(V(p.getX(a)+(p.getX(b)-p.getX(a))*t,y,p.getZ(a)+(p.getZ(b)-p.getZ(a))*t));
+  }
+  const c=V(0,y,0);for(const p of pts){c.x+=p.x;c.z+=p.z;}c.x/=pts.length;c.z/=pts.length;
+  const ray=new THREE.Raycaster();
+  const span=(from,d,axis)=>{ray.set(from,d);const h=ray.intersectObject(mesh);return [h[0].point.getComponent(axis),h[h.length-1].point.getComponent(axis)];};
+  const xs=span(V(-1,y,c.z),V(1,0,0),0);c.x=(xs[0]+xs[1])/2;
+  const zs=span(V(c.x,y,-1),V(0,0,1),2);c.z=(zs[0]+zs[1])/2;
+  const tri=new THREE.Triangle(),near=new THREE.Vector3();let folga=Infinity;
+  for(let i=0;i<idx.count;i+=3) {
+    tri.a.fromBufferAttribute(p,idx.getX(i));tri.b.fromBufferAttribute(p,idx.getX(i+1));tri.c.fromBufferAttribute(p,idx.getX(i+2));
+    tri.closestPointToPoint(c,near);folga=Math.min(folga,c.distanceTo(near));
+  }
+  const result={centro:c,rx:(xs[1]-xs[0])/2,rz:(zs[1]-zs[0])/2,folga};cache.set(f,result);return result;
+}
+
+export function unidadeAcinar(M,r=.01) {
+  const g=new THREE.Group();g.name='unidade_acinar';
+  g.add(mk('ducto_alveolar',tuboGeo([V(0,r*.72,-r*.1),V(0,r*.18,0),V(0,-r*.65,0)],r*.12,16),M.traqueia));
+  const centers=[V(-.40,.36,0),V(.40,.36,0),V(-.48,-.20,0),V(.48,-.20,0),V(0,-.65,0)];
+  centers.forEach((c,i)=>{
+    c.multiplyScalar(r);
+    g.add(mk(`saco_alveolar_${i}`,tecidoGeo(r*.36,r*.39,r*.30,.055),M.alveolo));g.children[g.children.length-1].position.copy(c);
+    g.add(mk(`abertura_alveolar_${i}`,tuboGeo([V(0,c.y,0),c],r*.10,12),M.traqueia));
+  });
+  return compactar(g);
+}
+
+/* Rede ramificada, com anastomoses; não uma barra atravessando o órgão. */
+export function redeCapilar(rx,rz) {
+  const geos=[],r=Math.min(.00065,rx*.045),dy=rx*.060;
+  for(let row=-2;row<=2;row++) {
+    const pts=[];
+    for(let i=0;i<=22;i++) {const u=i/22*2-1;pts.push(V(u*rx,row*dy+Math.sin(u*Math.PI*3+row)*rx*.025,Math.sin(u*Math.PI)*rz*.32));}
+    geos.push(tuboGeo(pts,r,30));
+  }
+  for(let j=-3;j<=3;j++) {
+    const pts=[];
+    for(let i=0;i<=8;i++) {const v=i/8*2-1;pts.push(V(j/3*rx*.88+Math.sin(v*Math.PI)*rx*.045,v*dy*2,Math.sin((j/3)*Math.PI)*rz*.32));}
+    geos.push(tuboGeo(pts,r*.74,16));
+  }
+  // Concatena as malhas sem dependência extra, preservando normais e índices.
+  const p=[],n=[],idx=[];
+  for(const geo of geos){const off=p.length/3;p.push(...geo.attributes.position.array);n.push(...geo.attributes.normal.array);idx.push(...Array.from(geo.index.array,i=>i+off));geo.dispose();}
+  const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(p,3));geo.setAttribute('normal',new THREE.Float32BufferAttribute(n,3));geo.setIndex(idx);return geo;
 }

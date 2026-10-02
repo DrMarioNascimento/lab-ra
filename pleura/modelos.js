@@ -19,7 +19,8 @@
 import * as THREE from 'three';
 import {
   DIR, ESQ, mk, loft, tuboGeo, construirCaixa, construirColuna, construirDiafragma,
-  construirMediastino, geoPulmao, secaoPulmao, HILO,
+  construirMediastino, geoPulmao, secaoPulmao, HILO, fragmentoGeo, tecidoGeo,
+  amostraPulmao, unidadeAcinar, redeCapilar,
 } from './anatomia.js';
 
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
@@ -41,22 +42,26 @@ export const CORES = {
 
 const phys = (name, o) => Object.assign(new THREE.MeshPhysicalMaterial(o), { name });
 export const M = {
-  osso:       phys('osso',       { color: 0xe9e1cf, roughness: .58, sheen: .3, sheenColor: cor(255, 250, 240) }),
-  cartilagem: phys('cartilagem', { color: 0xd3dedb, roughness: .42, sheen: .4 }),
+  osso:       phys('osso',       { color: 0xc6b89e, roughness: .76, sheen: .16, sheenColor: cor(230, 216, 187) }),
+  cartilagem: phys('cartilagem', { color: 0x9ab2b0, roughness: .62, sheen: .24 }),
+  ossoJanela: phys('osso_janela', { color: 0xc6b89e, roughness: .76, transparent:true,opacity:.26,depthWrite:false }),
+  cartilagemJanela: phys('cartilagem_janela', { color:0x9ab2b0,roughness:.62,transparent:true,opacity:.35,depthWrite:false }),
   disco:      phys('disco',      { color: 0xc8b5a2, roughness: .82 }),
-  pulmao:     phys('pulmao',     { color: 0xd49aa2, roughness: .68, sheen: .85, sheenColor: cor(255, 190, 200) }),
-  pulmaoColapso: phys('pulmao_colapsado', { color: 0x8a4452, roughness: .6, sheen: .7, sheenColor: cor(255, 170, 180) }),
-  pulmaoVidro: phys('pulmao_translucido', { color: 0xf0dfe4, roughness: .3, sheen: .9, sheenColor: cor(255, 255, 255),
-                 transparent: true, opacity: .34, depthWrite: false }),
+  pulmao:     phys('pulmao',     { color: 0xb77383, roughness: .77, sheen: .36, vertexColors: true, sheenColor: cor(232, 151, 165) }),
+  pulmaoColapso: phys('pulmao_colapsado', { color: 0x783747, roughness: .76, sheen: .28, vertexColors: true, sheenColor: cor(182, 112, 126) }),
+  pulmaoVidro: phys('pulmao_translucido', { color: 0x749fae, roughness: .56, sheen: .25,
+                 transparent: true, opacity: .14, depthWrite: false, side: THREE.DoubleSide }),
   pleuraP:    phys('pleura_parietal', { color: CORES.negativa.getHex(), roughness: .15, transparent: true, opacity: .12, depthWrite: false, side: THREE.DoubleSide }),
   pleuraAr:   phys('espaco_pleural_ar', { color: CORES.positiva.getHex(), roughness: .3, emissive: cor(70, 34, 0).getHex(), emissiveIntensity: .6,
                  transparent: true, opacity: .26, depthWrite: false, side: THREE.DoubleSide }),
-  diafragma:  phys('diafragma',  { color: 0xb8626b, roughness: .72, sheen: .6, sheenColor: cor(255, 160, 150), side: THREE.DoubleSide }),
-  coracao:    phys('coracao',    { color: 0xa8434e, roughness: .55, sheen: .5 }),
+  diafragma:  phys('diafragma',  { color: 0x8e404a, roughness: .78, sheen: .26, sheenColor: cor(214, 115, 123), side: THREE.DoubleSide }),
+  tendao:     phys('tendao', { color: 0xd6c9af, roughness: .75, side: THREE.DoubleSide }),
+  fibra:      phys('fibra', { color: 0xb26868, roughness: .85 }),
+  coracao:    phys('coracao',    { color: 0x963b46, roughness: .74, sheen: .28 }),
   arteria:    phys('arteria',    { color: 0xc44b53, roughness: .5 }),
   veia:       phys('veia',       { color: 0x5c6fae, roughness: .5 }),
   traqueia:   phys('traqueia',   { color: 0xe8ded8, roughness: .55 }),
-  alveolo:    phys('alveolo',    { color: 0xe4a9b0, roughness: .55, sheen: .8, sheenColor: cor(255, 220, 225) }),
+  alveolo:    phys('alveolo',    { color: 0xc88798, roughness: .69, sheen: .3, sheenColor: cor(237, 171, 185) }),
   zona1:      phys('zona1',      { color: CORES.zona1.getHex(), roughness: .5 }),
   zona2:      phys('zona2',      { color: CORES.zona2.getHex(), roughness: .5 }),
   zona3:      phys('zona3',      { color: CORES.zona3.getHex(), roughness: .5 }),
@@ -79,55 +84,45 @@ const emCm = () => { const g = new THREE.Group(); g.name = 'cm'; g.scale.setScal
    filme de líquido, a pleura visceral, e o pulmão por dentro. A fresta é a
    lâmina azul; no pneumotórax ela engorda e vira âmbar. */
 function nivelFresta() {
-  const g = new THREE.Group();
-  const L = 26, R = 9, a0 = -Math.PI * .55, a1 = Math.PI * .55;
-  const casca = (nome, raio, mat, ordem) => {
-    const m = mk(nome, new THREE.CylinderGeometry(raio, raio, L, 48, 1, true, a0, a1 - a0), mat);
-    m.renderOrder = ordem; m.castShadow = false; return m;
-  };
-  const visceral = casca('pleura_visceral', R, M.pleuraV, 3);
-  const filme = casca('filme_liquido', R + .7, M.liquido, 2);
-  const fresta = casca('fresta', R + .7, M.frestaNeg, 1);
-  const parietal = casca('pleura_parietal', R + 1.4, M.pleuraPc, 3);
-  g.add(visceral, filme, fresta, parietal);
-
-  /* a parede: um setor anular sólido — a face de corte mostra a espessura */
-  const setor = (ri, ro) => {
-    const s = new THREE.Shape();
-    s.absarc(0, 0, ro, a0, a1, false); s.absarc(0, 0, ri, a1, a0, true); s.closePath();
-    const geo = new THREE.ExtrudeGeometry(s, { depth: L, bevelEnabled: false, curveSegments: 40 });
-    geo.rotateX(Math.PI / 2); geo.translate(0, L / 2, 0);
-    /* o cilindro das cascas começa o arco em +z e o Shape em +x: alinha */
-    geo.rotateY(-Math.PI / 2);
-    return geo;
-  };
-  const musculo = mk('intercostal', setor(R + 1.5, R + 3.4), M.musculo); musculo.renderOrder = 4;
-  const pele = mk('parede', setor(R + 3.4, R + 4.6), M.parede); pele.renderOrder = 5;
-  g.add(musculo, pele);
-  /* duas costelas no meio do músculo, correndo ao longo do corte — depois do
-     giro do grupo elas ficam horizontais, uma acima e outra abaixo */
-  for (const [nome, th] of [['costela_a', -0.22 * Math.PI], ['costela_b', 0.22 * Math.PI]]) {
-    const geo = new THREE.CylinderGeometry(.85, .85, L * .98, 16); geo.scale(1.35, 1, .7);
-    const c = mk(nome, geo, M.osso); const r = R + 2.45;
-    c.position.set(r * Math.sin(th), 0, r * Math.cos(th)); c.rotation.y = th;
-    g.add(c);
+  const g = new THREE.Group(); g.name = 'corte_costopleural';
+  const parede = new THREE.Group(); parede.name = 'parede_costal';
+  // Ordem contínua de fora para dentro: pele, gordura, músculo, parietal,
+  // filme seroso, visceral e parênquima. Espessuras ampliadas para leitura.
+  const camada = (nome,a,b,mat,w=24,h=18) => mk(nome,fragmentoGeo(a,b,w,h,(24-w)/2),mat);
+  const peleMat=phys('pele_corte',{color:0xc7987c,roughness:.86});
+  const gorduraMat=phys('tecido_subcutaneo',{color:0xd2b56d,roughness:.82});
+  const muscMat=phys('intercostais',{color:0x984757,roughness:.78,sheen:.2});
+  const pleuraMat=phys('membrana_parietal',{color:0x8db7ca,roughness:.36,transparent:true,opacity:.72});
+  const visceralMat=phys('membrana_visceral',{color:0xd9a1b2,roughness:.36,transparent:true,opacity:.68});
+  const parietal=camada('pleura_parietal',.55,.64,pleuraMat,15);
+  parede.add(parietal,camada('intercostais',.64,1.65,muscMat,12),
+    camada('gordura',1.65,2.25,gorduraMat,9),camada('pele',2.25,2.65,peleMat,6));
+  for(const y of [-4.8,4.8]) {
+    const pts=[];for(let i=0;i<=24;i++){const x=i/2;pts.push(V(x,y-.07*x,1.22-.013*x*x-.004*y*y));}
+    const osso=mk(`costela_${y}`,tuboGeo(pts,.50,48),M.osso);parede.add(osso);
   }
-
-  /* o pulmão por dentro, com a superfície lobulada */
-  const pulGeo = new THREE.CylinderGeometry(R - .9, R - .9, L * .98, 64, 24);
-  { const p = pulGeo.attributes.position, n = new THREE.Vector3();
-    for (let i = 0; i < p.count; i++) {
-      const x = p.getX(i), y = p.getY(i), z = p.getZ(i), rr = Math.hypot(x, z);
-      if (rr < R - 1) continue;
-      const k = 1 + .035 * (Math.sin(y * 1.9 + x * 2.3) * Math.cos(z * 2.1 - y * 1.3) + .5 * Math.sin((x + z) * 4.1 + y * 2.7));
-      n.set(x, 0, z).multiplyScalar(k); p.setXYZ(i, n.x, y, n.z);
-    }
-    pulGeo.computeVertexNormals(); }
-  const dentro = mk('pulmao', pulGeo, M.pulmao);
-  g.add(dentro);
-
-  g.rotation.z = Math.PI / 2;
-  g.userData = { fresta, filme, visceral, parietal, dentro, R };
+  const filme=camada('filme_seroso',.40,.55,M.liquido,18);
+  const fresta=camada('espaco_pleural',.40,.55,M.frestaNeg,18);
+  fresta.userData.repouso=fresta.geometry.attributes.position.array.slice();
+  const visceral=camada('pleura_visceral',.30,.40,visceralMat,21,17.8);
+  const dentro=new THREE.Group();dentro.name='parenquima_pulmonar';
+  const tecidoMat=phys('parenquima_corte',{color:0xb77285,roughness:.81,sheen:.28});
+  dentro.add(camada('tecido_pulmonar',-3.4,.30,tecidoMat,23.8,17.8));
+  // Microestrutura visível na face seccionada, ligada a um bronquíolo.
+  const alvMat=phys('alveolos_corte',{color:0x9c526c,roughness:.72});
+  const arMat=phys('luz_alveolar',{color:0x392a37,roughness:1});
+  for(let j=0;j<9;j++)for(let i=0;i<3;i++) {
+    const x=-10.9+i*.65,y=-7.4+j*1.8,z=.24-.013*x*x-.004*y*y;
+    const ring=new THREE.TorusGeometry(.23,.06,10,28),p=ring.attributes.position;
+    for(let k=0;k<p.count;k++){const xx=p.getX(k),yy=p.getY(k),f=1+.12*Math.sin(Math.atan2(yy,xx)*5+i+j);p.setXYZ(k,xx*f,yy*f*.85,p.getZ(k));}ring.computeVertexNormals();
+    const a=mk(`septo_alveolar_${i}_${j}`,ring,alvMat);a.position.set(x,y,z+.15);dentro.add(a);
+    const luz=mk(`luz_alveolar_${i}_${j}`,new THREE.CircleGeometry(.21,28),arMat);luz.scale.y=.85;luz.position.set(x,y,z+.08);dentro.add(luz);
+  }
+  const bron=mk('bronquiolo_corte',tuboGeo([V(-9,-5,-2.6),V(-4,-1,-2.1),V(1,2,-1.6),V(7,5,-2)],.30,40),M.traqueia);
+  dentro.add(bron);
+  // Vista oblíqua de uma secção, com a borda de cada camada exposta.
+  g.add(dentro,visceral,filme,fresta,parede);g.rotation.y=-.48;g.rotation.x=.16;
+  g.userData={fresta,filme,visceral,parietal,dentro,parede};
   return g;
 }
 
@@ -143,11 +138,13 @@ function nivelTorax({ comSetas = false } = {}) {
   caixa.add(construirCaixa(M), construirColuna(M));
   const pleuras = {};
   for (const s of [DIR, ESQ]) {
-    const m = mk(`pleura_parietal_${s === DIR ? 'D' : 'E'}`, geoPulmao(s, { inflate: .0045, fissuras: false, assoalho: .003 }), M.pleuraP);
+    const m = mk(`pleura_parietal_${s === DIR ? 'D' : 'E'}`, geoPulmao(s, { inflate: .0015, fissuras: false, assoalho: .0105 }), M.pleuraP);
     m.renderOrder = 4; m.castShadow = false; caixa.add(m); pleuras[s] = m;
   }
   const med = construirMediastino(M);
-  cm.add(caixa, construirDiafragma(M), med);
+  const diafragma=construirDiafragma(M);
+  diafragma.traverse(o=>{if(o.isMesh)o.userData.repouso=o.geometry.attributes.position.array.slice();});
+  cm.add(caixa, diafragma, med);
 
   /* ordem [esquerdo, direito]: o doente é o direito, como na física */
   const pulmoes = [ESQ, DIR].map(s => {
@@ -180,7 +177,7 @@ function nivelTorax({ comSetas = false } = {}) {
     }
     cm.add(setas);
   }
-  g.userData = { caixa, pulmoes, setas, med, pleuras };
+  g.userData = { caixa, pulmoes, setas, med, pleuras, diafragma };
   g.position.y = -15;
   return g;
 }
@@ -204,12 +201,13 @@ function nivelGradiente() {
   const alveolos = [];
   for (let i = 0; i < N_ALV; i++) {
     const f = i / (N_ALV - 1);
-    const m = mk(`alveolo_${i + 1}`, new THREE.SphereGeometry(.01, 24, 18), M.alveolo);
-    const y = 0.1 + f * 0.175;
-    m.position.set(secaoPulmao(DIR, y).xc, y, -0.068 + f * 0.044);
+    const a=amostraPulmao(DIR,f),r=Math.min(.011,a.rx*.30,a.rz*.30);
+    const m=unidadeAcinar(M,r);m.name=`unidade_alveolar_${i+1}`;
+    m.position.copy(a.centro);
     m.userData.f = f;
     alveolos.push(m); cm.add(m);
   }
+  cm.add(mk('bronquiolo_terminal',tuboGeo(alveolos.map(m=>m.position.clone()),.00115,64),M.traqueia));
   g.userData = { alveolos };
   g.position.y = -15;
   return g;
@@ -225,14 +223,17 @@ function nivelZonas() {
   const faixas = [];
   for (let i = 0; i < N_FAIXA; i++) {
     const f = i / (N_FAIXA - 1);
-    const y = 0.11 + f * 0.16;
-    const { xc, a } = secaoPulmao(DIR, y);
-    const geo = new THREE.CapsuleGeometry(.0075, Math.max(.01, 2 * a * .8 - .015), 6, 16);
-    geo.rotateZ(Math.PI / 2);
+    const a=amostraPulmao(DIR,f);
+    const rx=Math.min(a.rx*.68,a.folga*.72),rz=Math.min(a.rz*.55,rx*.6);
+    const geo=redeCapilar(rx,rz);
     const m = mk(`capilar_${i + 1}`, geo, M.zona3);
-    m.position.set(xc, y, -0.062 + f * 0.04);
-    m.userData.f = f;
+    m.position.copy(a.centro);
+    m.userData.f = f; m.userData.rx=rx;
     faixas.push(m); cm.add(m);
+  }
+  for(const side of [-1,1]) {
+    const pts=faixas.map(m=>m.position.clone().add(V(side*m.userData.rx,0,0)));
+    cm.add(mk(side<0?'arteriola_pulmonar':'venula_pulmonar',tuboGeo(pts,.0007,64),side<0?M.arteria:M.veia));
   }
   g.userData = { faixas };
   g.position.y = -15;
@@ -251,24 +252,34 @@ export function criar() {
     const d = modelos[0].userData;
     const positiva = ppl >= 0;
     d.fresta.material = positiva ? M.frestaPos : M.frestaNeg;
-    const abre = 1 + clamp(positiva ? .6 + ppl * .07 : 0, 0, 1.4);
-    d.fresta.scale.set(abre, 1, abre);
-    d.parietal.scale.set(abre * .96 + .04, 1, abre * .96 + .04);
+    const separacao = positiva ? 2.0 + clamp(ppl,0,12)*.15 : 0;
+    d.parede.position.z=separacao;
+    const p=d.fresta.geometry.attributes.position,base=d.fresta.userData.repouso;
+    for(let i=0;i<p.count;i++) {
+      const x=base[i*3],y=base[i*3+1],z=base[i*3+2],curva=-.013*x*x-.004*y*y;
+      const t=clamp((z-curva-.40)/.15,0,1);
+      p.setZ(i,z+(positiva?separacao+1.4:0)*t);
+    }
+    p.needsUpdate=true;d.fresta.geometry.computeVertexNormals();
+    d.fresta.position.z=positiva?-1.4:0;
+    // O espaço expande normal à parede, sem deslocar a membrana visceral.
+    d.fresta.visible=positiva;
     d.filme.visible = !positiva;
-    d.dentro.scale.set(positiva ? .72 : 1, positiva ? .96 : 1, positiva ? .72 : 1);
+    d.dentro.position.z=positiva ? -1.4 : 0;
+    d.visceral.position.z=d.dentro.position.z;
   }
 
   /* fração da capacidade total → escala linear: volume vai com o cubo */
   const escalaDe = fracao => Math.cbrt(clamp(fracao, .02, 1.2) / .40);
 
-  function aplicarTorax(nivel, { pulmao, caixa, desvio = 0, forcas = null }) {
+  function aplicarTorax(nivel, { pulmao, caixa, desvio = 0, forcas = null, ciclo = 1, inspiracao = 0 }) {
     const d = modelos[nivel].userData;
     if (!d || !d.pulmoes) return;
-    const ep = escalaDe(pulmao), ec = escalaDe(caixa);
+    const ep = escalaDe(pulmao)*(pulmao>=.3?ciclo:1), ec = escalaDe(caixa)*(pulmao>=.3?ciclo:1);
     d.pulmoes.forEach(p => {
       /* só o direito adoece: pneumotórax é de um lado só */
       const doente = p.userData.lado === DIR;
-      const e = doente ? ep : escalaDe(0.40);
+      const e = doente ? ep : escalaDe(0.40)*ciclo;
       p.scale.setScalar(e);
       p.userData.malha.material = (doente && pulmao < .2) ? M.pulmaoColapso : M.pulmao;
       /* o mediastino empurrado: o pulmão bom é deslocado PARA LONGE do lado
@@ -277,6 +288,15 @@ export function criar() {
     });
     d.caixa.scale.set(ec, 1, ec);
     d.med.position.x = ESQ * desvio * 0.016;
+    d.diafragma.traverse(o=>{
+      if(!o.isMesh)return;
+      const p=o.geometry.attributes.position,base=o.userData.repouso;
+      for(let i=0;i<p.count;i++){
+        const x=base[i*3],z=base[i*3+2],rho=Math.min(1,Math.hypot(x/.128,(z+.004)/.088));
+        p.setY(i,base[i*3+1]-.014*inspiracao*(1-rho*rho));
+      }
+      p.needsUpdate=true;o.geometry.computeVertexNormals();
+    });
     /* a pleura parietal ficou com a parede; o que sobra entre ela e o pulmão
        recolhido é o espaço — e ele é âmbar porque a pressão virou positiva */
     d.pleuras[DIR].material = pulmao < .3 ? M.pleuraAr : M.pleuraP;

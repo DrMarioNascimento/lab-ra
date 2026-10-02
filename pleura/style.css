@@ -151,3 +151,5 @@
 
 /* a leitura que precisa gritar quando o retorno venoso cai */
 .leituras li.alerta b { color: #ff9d2e; }
+/* Orientação anatômica e escala dos cortes/microestruturas didáticas. */
+.anatomia-legenda { position:absolute;left:16px;right:16px;top:58px;z-index:2;text-align:center;pointer-events:none;color:#b8c8ba;font:10px/1.5 'IBM Plex Mono',monospace;letter-spacing:.02em; }
