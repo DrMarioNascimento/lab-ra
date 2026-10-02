@@ -76,10 +76,14 @@ const rim = new THREE.DirectionalLight(0x8fb8ff, 1.05); rim.position.set(-3.2, 2
    postura é o corpo, não quem olha. */
 const root = new THREE.Group(); scene.add(root);
 
-const { modelos, aplicarPostura, aplicarBomba, degrausDaValvula } = criar();
+const { modelos, aplicarPostura, aplicarBomba, degrausDaValvula, animarCirculacao } = await criar();
 modelos.forEach((m, i) => {
   m.visible = i === 0; root.add(m);
-  m.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  m.traverse(o => {
+    if (!o.isMesh) return;
+    const viva = !(o.userData.semSombra || (o.material && o.material.transparent));
+    o.castShadow = viva; o.receiveShadow = viva;
+  });
 });
 
 /* ── ENQUADRAMENTO: o raio do giro medido nos vértices ──────────────────────
@@ -287,6 +291,7 @@ renderer.setAnimationLoop(() => {
   grau += (grauAlvo - grau) * SUAVE;
   if (bombaAndando) faseBomba = (faseBomba + dt / 1.15) % 1;
   if (Math.abs(grau - antes) > .02 || bombaAndando) aplicarTudo();
+  animarCirculacao(dt, grau, bombaAndando);
 
   if (bombaAndando && agora - ultimaAmostra > 120) {
     ultimaAmostra = agora;
@@ -372,6 +377,18 @@ function prepararRA() {
       clone.updateMatrixWorld(true);
       const c2 = new THREE.Box3().setFromObject(clone);
       clone.position.set(-(c2.min.x + c2.max.x) / 2, -c2.min.y, -(c2.min.z + c2.max.z) / 2);
+      /* shader e pontos não atravessam o USDZ: a pele vira vidro, o sangue sai */
+      const fora = [];
+      clone.traverse(o => {
+        if (o.userData.naoExportar || o.isPoints) { fora.push(o); return; }
+        if (o.isMesh && o.material && o.material.isShaderMaterial) {
+          o.material = new THREE.MeshPhysicalMaterial({
+            color: 0xa9dcff, transparent: true, opacity: .22, roughness: .35,
+            depthWrite: false, side: THREE.FrontSide,
+          });
+        }
+      });
+      fora.forEach(o => o.parent && o.parent.remove(o));
       /* nem a cor por vértice nem a dupla face atravessam o USDZ */
       prepararParaRA(clone);
       const wrap = new THREE.Group(); wrap.add(clone);

@@ -224,7 +224,278 @@ function corpoSilhueta() {
 /* ── NÍVEL 01 — O CORPO E A COLUNA ────────────────────────────────────────
    A árvore venosa inteira, do tornozelo ao coração, com a pressão de cada
    altura escrita na própria espessura e na própria cor. */
-function nivelCorpo() {
+/* ── O CORPO DE VERDADE ──────────────────────────────────────────────────
+   A silhueta de revolução saía vaso. corpo.glb é um corpo, e os vasos nascem
+   dos centróides dele — o desenho que se lê no visor, com a coluna de pressão
+   por cima. A silhueta fica de reserva: se o arquivo não vier, a bancada
+   ainda abre. */
+function peleRaioX() {
+  return new THREE.ShaderMaterial({
+    name: 'pele_raio_x',
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    side: THREE.FrontSide,
+    uniforms: {
+      uColor: { value: new THREE.Color(0xa9dcff) },
+      uCore: { value: new THREE.Color(0x2a5a7c) },
+      uPower: { value: 2.0 },
+      uIntensity: { value: 1.15 },
+    },
+    vertexShader: `
+      varying vec3 vN; varying vec3 vV;
+      void main(){
+        vN = normalize(normalMatrix * normal);
+        vec4 mv = modelViewMatrix * vec4(position, 1.0);
+        vV = normalize(-mv.xyz);
+        gl_Position = projectionMatrix * mv;
+      }`,
+    fragmentShader: `
+      uniform vec3 uColor; uniform vec3 uCore; uniform float uPower; uniform float uIntensity;
+      varying vec3 vN; varying vec3 vV;
+      void main(){
+        float d = abs(dot(normalize(vN), normalize(vV)));
+        float f = pow(1.0 - d, uPower);
+        vec3 c = uCore * 0.45 + uColor * f * uIntensity;
+        gl_FragColor = vec4(c, 0.9);
+      }`,
+  });
+}
+
+function geometriaDoGlb(buf) {
+  const dv = new DataView(buf);
+  const jl = dv.getUint32(12, true);
+  const json = JSON.parse(new TextDecoder().decode(new Uint8Array(buf, 20, jl)));
+  const binOff = 20 + jl + 8;
+  const acc = k => {
+    const a = json.accessors[k], bv = json.bufferViews[a.bufferView];
+    const off = binOff + (bv.byteOffset || 0) + (a.byteOffset || 0);
+    const n = a.count * ({ SCALAR: 1, VEC3: 3 }[a.type]);
+    if (a.componentType === 5126) return new Float32Array(buf, off, n);
+    if (a.componentType === 5125) return new Uint32Array(buf, off, n);
+    return new Uint16Array(buf, off, n);
+  };
+  const prim = json.meshes[0].primitives[0];
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(acc(prim.attributes.POSITION).slice(), 3));
+  if (prim.indices !== undefined) geo.setIndex(new THREE.BufferAttribute(acc(prim.indices).slice(), 1));
+  geo.computeVertexNormals();
+  return geo;
+}
+
+/* Pé no chão, eixo no meio, altura da bancada (1,70 m em unidades de mundo).
+   Os limiares do visor estão em metros de malha crua; S leva-os para cá. */
+async function carregarCorpo() {
+  const buf = await (await fetch(new URL('./corpo.glb', import.meta.url))).arrayBuffer();
+  const geo = geometriaDoGlb(buf);
+  geo.computeBoundingBox();
+  const bb = geo.boundingBox;
+  const k = CORPO.altura / (bb.max.y - bb.min.y);
+  geo.translate(-(bb.max.x + bb.min.x) / 2, -bb.min.y, -(bb.max.z + bb.min.z) / 2);
+  geo.scale(k, k, k);
+  geo.computeVertexNormals();
+  geo.computeBoundingBox();
+  return geo;
+}
+
+function centrar(P, y0, y1, f) {
+  let sx = 0, sy = 0, sz = 0, n = 0;
+  for (let k = 0; k < P.length; k += 3) {
+    const x = P[k], y = P[k + 1], z = P[k + 2];
+    if (y < y0 || y > y1 || !f(x, y, z)) continue;
+    sx += x; sy += y; sz += z; n++;
+  }
+  return n ? V(sx / n, sy / n, sz / n) : null;
+}
+function centroid(P, y0, y1, f) {
+  for (let w = 0; w < 0.6; w += 0.06) {
+    const c = centrar(P, y0 - w, y1 + w, f);
+    if (c) return c;
+  }
+  return null;
+}
+
+function texturaBolha() {
+  const c = document.createElement('canvas'); c.width = c.height = 128;
+  const x = c.getContext('2d');
+  const gr = x.createRadialGradient(64, 64, 0, 64, 64, 64);
+  gr.addColorStop(0, 'rgba(255,255,255,0.95)');
+  gr.addColorStop(0.18, 'rgba(255,255,255,0.45)');
+  gr.addColorStop(0.55, 'rgba(255,255,255,0.3)');
+  gr.addColorStop(0.82, 'rgba(255,255,255,0.9)');
+  gr.addColorStop(1, 'rgba(255,255,255,0)');
+  x.fillStyle = gr; x.fillRect(0, 0, 128, 128);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+function texturaFaisca() {
+  const c = document.createElement('canvas'); c.width = c.height = 64;
+  const x = c.getContext('2d');
+  const gr = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+  gr.addColorStop(0, 'rgba(255,255,255,1)');
+  gr.addColorStop(0.3, 'rgba(255,230,230,0.6)');
+  gr.addColorStop(1, 'rgba(255,255,255,0)');
+  x.fillStyle = gr; x.fillRect(0, 0, 64, 64);
+  return new THREE.CanvasTexture(c);
+}
+
+/* Nível 01 com a malha. A veia continua tubo moldável: a pressão pinta e
+   engrossa, como antes. Artéria é caminho, não coluna. */
+function nivelCorpoMalha(bodyGeo) {
+  const g = new THREE.Group();
+  const geo = bodyGeo.clone();
+  const pele = new THREE.Mesh(geo, peleRaioX());
+  pele.name = 'corpo_translucido';
+  pele.renderOrder = 5;
+  pele.userData.semSombra = true;
+  g.add(pele);
+  /* prepass opaco, desenhado DEPOIS dos vasos: segura o fundo da casca sem
+     apagar o que já foi pintado dentro. Não vai para a RA. */
+  const prepass = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: true }));
+  prepass.name = 'prepass';
+  prepass.renderOrder = 4;
+  prepass.userData.foraDoQuadro = true;
+  prepass.userData.naoExportar = true;
+  prepass.userData.semSombra = true;
+  g.add(prepass);
+
+  const S = CORPO.altura / 1.75;
+  const P = geo.attributes.position.array;
+  const torsoF = x => Math.abs(x) < 0.16 * S;
+  const legF = s => (x, y) => y < 0.86 * S && x * s > 0.005 * S && Math.abs(x) < 0.3 * S;
+  const neckF = x => Math.abs(x) < 0.09 * S;
+  const footF = s => (x, y, z) => x * s > 0.005 * S && Math.abs(x) < 0.3 * S && z > 0.02 * S;
+  const route = (ys, f, dx = 0, dz = 0) => ys
+    .map(y => centroid(P, y - 0.03 * S, y + 0.03 * S, f))
+    .filter(Boolean)
+    .map(p => p.clone().add(V(dx, 0, dz)));
+  const footPt = (s, dx, dy) => {
+    const c = centroid(P, 0, 0.05 * S, footF(s));
+    return c ? c.clone().add(V(dx, dy, 0)) : null;
+  };
+  const anklePt = (s, dx, dz) => {
+    const c = centroid(P, 0.05 * S, 0.09 * S, legF(s));
+    return c ? c.clone().add(V(dx, 0, dz)) : null;
+  };
+  const legY = [0.1, 0.16, 0.26, 0.36, 0.46, 0.56, 0.66, 0.76, 0.84].map(y => y * S);
+  const torsoY = [0.9, 0.98, 1.06, 1.14, 1.22, 1.3].map(y => y * S);
+  const neckY = [1.46, 1.5, 1.53].map(y => y * S);
+  const heartC = (centroid(P, 1.24 * S, 1.36 * S, torsoF) || V(0, CORPO.coracao * CM, 0)).add(V(-0.03 * S, 0, 0.03 * S));
+  const bif = centroid(P, 0.84 * S, 0.92 * S, torsoF) || V(0, CORPO.quadril * CM, 0);
+
+  const heart = new THREE.Mesh(new THREE.SphereGeometry(0.055 * S, 32, 24), M.coracao.clone());
+  heart.name = 'coracao';
+  heart.position.copy(heartC);
+  heart.scale.set(0.95, 1.15, 0.85);
+  heart.rotation.z = 0.35;
+  g.add(heart);
+
+  const artMat = new THREE.MeshStandardMaterial({
+    name: 'arteria', color: 0xc81e1e, emissive: 0x5a0a0a, roughness: 0.35, metalness: 0.05,
+  });
+  const arteries = [
+    { n: 'aorta', r: 0.013 * S, p: [heartC.clone(), heartC.clone().add(V(0.03 * S, 0.08 * S, -0.02 * S)), ...route(torsoY.slice().reverse(), torsoF, -0.022 * S, -0.035 * S), bif.clone().add(V(-0.012 * S, 0, -0.025 * S))] },
+  ];
+  const veinDefs = [
+    { n: 'veia_cava_inferior', papel: 'cava', r: 0.016 * S, p: [bif.clone().add(V(0.022 * S, 0, 0.012 * S)), ...route(torsoY, torsoF, 0.03 * S, 0.012 * S), heartC.clone().add(V(0.03 * S, 0.02 * S, 0.02 * S))] },
+  ];
+  for (const s of [-1, 1]) {
+    const L = s < 0 ? 'dir' : 'esq';
+    arteries.push({ n: 'femoral_' + L, r: 0.008 * S, p: [bif.clone().add(V(0, 0, -0.02 * S)), ...route(legY.slice().reverse(), legF(s), s * 0.012 * S, 0.012 * S), anklePt(s, s * 0.006 * S, 0.016 * S), footPt(s, s * 0.004 * S, 0.012 * S)] });
+    veinDefs.push({ n: 'femoral_safena_' + L, papel: 'perna', r: 0.009 * S, p: [footPt(s, s * 0.016 * S, 0.012 * S), anklePt(s, s * 0.024 * S, -0.002 * S), ...route(legY, legF(s), s * 0.03 * S, -0.004 * S), bif.clone().add(V(0.02 * S, 0, 0.01 * S))] });
+    veinDefs.push({ n: 'jugular_' + L, papel: 'jugular', r: 0.007 * S, p: [...route(neckY.slice().reverse(), neckF, s * 0.035 * S, -0.012 * S), heartC.clone().add(V(0.03 * S, 0.02 * S, 0.02 * S))] });
+  }
+
+  const fluxo = [];
+  const veias = [];
+  const aneis = [];
+  const valveMat = new THREE.MeshStandardMaterial({
+    name: 'valvula_venosa', color: 0xbfd4ff, emissive: 0x6f8fff, emissiveIntensity: 0.9, roughness: 0.3,
+  });
+  for (const d of arteries) {
+    const pts = d.p.filter(pt => pt && isFinite(pt.x));
+    if (pts.length < 2) continue;
+    const curve = new THREE.CatmullRomCurve3(pts, false, 'centripetal', 0.5);
+    const mesh = new THREE.Mesh(new THREE.TubeGeometry(curve, 80, d.r, 10, false), artMat);
+    mesh.name = d.n;
+    g.add(mesh);
+    fluxo.push({ curve, r: d.r, kind: 'a', len: curve.getLength(), name: d.n });
+  }
+  for (const d of veinDefs) {
+    const pts = d.p.filter(pt => pt && isFinite(pt.x));
+    if (pts.length < 2) continue;
+    const mesh = new THREE.Mesh(veia(pts, d.r), M.veia);
+    mesh.name = d.n;
+    mesh.userData.papel = d.papel;
+    veias.push(mesh);
+    g.add(mesh);
+    const curve = new THREE.CatmullRomCurve3(pts, false, 'centripetal', 0.5);
+    fluxo.push({ curve, r: d.r, kind: 'v', len: curve.getLength(), name: d.n });
+    if (!d.n.startsWith('femoral_safena')) continue;
+    const n = Math.max(4, Math.floor(curve.getLength() / (0.09 * S)));
+    for (let k = 1; k <= n; k++) {
+      const t = k / (n + 1);
+      const pt = curve.getPointAt(t), tg = curve.getTangentAt(t);
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(d.r * 1.25, d.r * 0.28, 8, 18), valveMat.clone());
+      ring.name = 'valvula_' + d.n + '_' + k;
+      ring.position.copy(pt);
+      ring.quaternion.setFromUnitVectors(V(0, 0, 1), tg);
+      ring.userData.altura = pt.y / CM;
+      g.add(ring);
+      aneis.push(ring);
+    }
+  }
+
+  const bolha = texturaBolha(), faisca = texturaFaisca();
+  const particulas = [];
+  const tmp0 = new THREE.Vector3();
+  const camada = (name, size, tex, color, density, speedMul, opacity, kind) => {
+    const data = [];
+    for (const path of fluxo) {
+      if (path.kind !== kind) continue;
+      const n = Math.max(8, Math.round(path.len / S * density));
+      for (let i = 0; i < n; i++) {
+        const a = Math.random() * Math.PI * 2, rr = Math.sqrt(Math.random()) * path.r * 0.75;
+        data.push({ path, t: Math.random(), off: [Math.cos(a) * rr, Math.sin(a) * rr], speed: (0.05 + Math.random() * 0.05) * speedMul / path.len, wob: Math.random() * Math.PI * 2 });
+      }
+    }
+    if (!data.length) return;
+    const pos = new Float32Array(data.length * 3);
+    const pg = new THREE.BufferGeometry();
+    pg.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    const mat = new THREE.PointsMaterial({
+      name, size, map: tex, color, transparent: true, opacity,
+      depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending, sizeAttenuation: true,
+    });
+    data.forEach((d, i) => {
+      d.path.curve.getPointAt(d.t, tmp0);
+      pos[i * 3] = tmp0.x; pos[i * 3 + 1] = tmp0.y; pos[i * 3 + 2] = tmp0.z;
+    });
+    const pts = new THREE.Points(pg, mat);
+    pts.name = name;
+    pts.renderOrder = 8;
+    pts.frustumCulled = false;
+    pts.userData.foraDoQuadro = true;
+    pts.userData.naoExportar = true;
+    g.add(pts);
+    particulas.push({ pts, pos, data });
+  };
+  camada('sangue_arterial_bolhas', 0.022 * S, bolha, 0xff4040, 90, 1, 0.7, 'a');
+  camada('sangue_arterial_gas', 0.008 * S, faisca, 0xffb0a0, 120, 1.8, 0.6, 'a');
+  camada('sangue_venoso_bolhas', 0.022 * S, bolha, 0x6a5cff, 90, 0.8, 0.55, 'v');
+  camada('sangue_venoso_gas', 0.008 * S, faisca, 0xa8b4ff, 120, 1.4, 0.5, 'v');
+
+  g.userData.veias = veias;
+  g.userData.aneis = aneis;
+  g.userData.particulas = particulas;
+  g.userData.coracao = heart;
+  g.position.y = -PIH * CM;
+  return g;
+}
+
+function nivelCorpoSilhueta() {
+
   const g = new THREE.Group();
   g.add(corpoSilhueta());
 
@@ -471,15 +742,21 @@ function nivelBomba() {
    O corpo do nível 01 de volta, agora com a bomba trabalhando. O arco fecha
    onde começou, e a pergunta muda: não é mais "onde a coluna aperta", é
    "quanto volta ao coração". */
-function nivelCiclo() {
-  const g = nivelCorpo();
+function nivelCiclo(geo) {
+  const g = geo ? nivelCorpoMalha(geo) : nivelCorpoSilhueta();
   g.userData.comBomba = true;
   return g;
 }
 
 /* ========================================================================= */
-export function criar() {
-  const modelos = [nivelCorpo(), nivelPerna(), nivelValvula(), nivelBomba(), nivelCiclo()];
+export async function criar() {
+  let geo = null;
+  try { geo = await carregarCorpo(); }
+  catch (err) { console.error('corpo.glb não entrou; segue a silhueta', err); }
+  const modelos = [
+    geo ? nivelCorpoMalha(geo) : nivelCorpoSilhueta(),
+    nivelPerna(), nivelValvula(), nivelBomba(), nivelCiclo(geo),
+  ];
   modelos.forEach((m, i) => { m.visible = i === 0; });
 
   /* ── VOLUME EMPOÇADO ───────────────────────────────────────────────────
@@ -606,7 +883,51 @@ export function criar() {
     return { passos, coluna: pressaoVenosa(base, grau) };
   }
 
+  /* O sangue anda no desenho, e a velocidade é a fisiologia: em pé e parado
+     a veia desacelera (o volume empoça); a bomba muscular devolve o fluxo.
+     A artéria não espera a postura — ela pulsa. */
+  const tmp = new THREE.Vector3(), nrm = new THREE.Vector3(), bin = new THREE.Vector3(), tan = new THREE.Vector3(), up = V(0, 1, 0);
+  function animarCirculacao(dt, grau, andando) {
+    const sen = Math.sin(grau * Math.PI / 180);
+    const time = performance.now() / 1000;
+    const beat = Math.pow(Math.max(0, Math.sin(time * 2 * Math.PI * 1.1)), 6);
+    const fecha = clamp(sen * 1.15, 0, 1);
+    for (const m of modelos) {
+      if (!m.visible) continue;
+      const h = m.userData.coracao;
+      if (h) {
+        h.scale.set(0.95 + 0.08 * beat, 1.15 + 0.1 * beat, 0.85 + 0.08 * beat);
+        h.material.emissiveIntensity = 0.45 + beat * 1.4;
+      }
+      for (const ring of (m.userData.aneis || [])) {
+        const e = 1.12 - 0.4 * fecha;
+        ring.scale.setScalar(e);
+        ring.material.emissiveIntensity = 0.3 + fecha * 1.15;
+      }
+      for (const layer of (m.userData.particulas || [])) {
+        const { pos, data } = layer;
+        for (let i = 0; i < data.length; i++) {
+          const d = data[i];
+          const venoso = d.path.kind === 'v';
+          const pulso = venoso ? (andando ? 2.8 : Math.max(0.18, 1 - 0.78 * sen)) : (1 + beat * 2.2);
+          d.t += d.speed * pulso * dt;
+          if (d.t > 1) d.t -= 1;
+          d.path.curve.getPointAt(d.t, tmp);
+          d.path.curve.getTangentAt(d.t, tan);
+          nrm.crossVectors(tan, up);
+          if (nrm.lengthSq() < 1e-6) nrm.set(1, 0, 0);
+          nrm.normalize();
+          bin.crossVectors(tan, nrm).normalize();
+          const w = Math.sin(time * 3 + d.wob) * d.path.r * 0.12;
+          tmp.addScaledVector(nrm, d.off[0] + w).addScaledVector(bin, d.off[1] - w);
+          pos[i * 3] = tmp.x; pos[i * 3 + 1] = tmp.y; pos[i * 3 + 2] = tmp.z;
+        }
+        layer.pts.geometry.attributes.position.needsUpdate = true;
+      }
+    }
+  }
+
   aplicarPostura(0);
   aplicarBomba(0, 0);
-  return { modelos, aplicarPostura, aplicarBomba, degrausDaValvula };
+  return { modelos, aplicarPostura, aplicarBomba, degrausDaValvula, animarCirculacao };
 }
