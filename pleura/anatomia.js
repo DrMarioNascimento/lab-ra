@@ -479,29 +479,30 @@ export function limiteCardiaco(s,y,z) {
     ty*((1-tz)*c[(iy+1)*nz+iz]+tz*c[(iy+1)*nz+iz+1]);
 }
 function geoPulmaoToracico(s,{inflate=0,fissuras=true}={}) {
-  const K=112,NB=18,NW=96,ZC=-.008,apice=s===DIR?.308:.303;
+  const K=112,NB=18,NW=96,ZC=-.008,apice=(s===DIR?.308:.303)+inflate;
+  const assoalho=Math.max(.0007,.0022-inflate);
   const ponto=(y,phi,R=1)=> {
     const c=Math.cos(phi),sn=Math.sin(phi),w=wT(y)-.010+inflate,d=dT(y)-.010+inflate;
-    const medial=s===ESQ?.017:.013,xc=(w+medial)/2;
+    const medial=(s===ESQ?.017:.013)-inflate,xc=(w+medial)/2;
     let x=xc+(w-medial)/2*c*R,z=ZC+sn*(sn>0?d*.85:d*.90)*R;
     // Face costal convexa, sem a antiga parede posterior recortada em plano.
     const q=Math.hypot(x/w,z/d);if(q>.96){x*=.96/q;z*=.96/q;}
-    const impressao=limiteCardiaco(s,y,z)+inflate;
+    const impressao=limiteCardiaco(s,y,z)-inflate;
     x=Math.max(x,impressao);
-    const recuo=zS(y)+.014*gauss(x,0,.027);
+    const recuo=zS(y)+.014*gauss(x,0,.027)-inflate;
     z=Math.max(z,recuo);
     return {x:s*x,z,xc:s*xc};
   };
   const base=Array.from({length:K},(_,j)=>{
-    let y=.10;for(let i=0;i<12;i++){const p=ponto(y,j/K*Math.PI*2);y=yDiafragmaToracico(p.x,p.z)+.0022;}
+    let y=.10;for(let i=0;i<12;i++){const p=ponto(y,j/K*Math.PI*2);y=yDiafragmaToracico(p.x,p.z)+assoalho;}
     return y;
   });
   const rings=[];
   for(let i=1;i<=NB;i++)rings.push(Array.from({length:K},(_,j)=>{
     const p=ponto(base[j],j/K*Math.PI*2),r=i/NB;
-    let x=p.xc+(p.x-p.xc)*r,z=ZC+(p.z-ZC)*r,y=yDiafragmaToracico(x,z)+.0022;
-    x=s*Math.max(s*x,limiteCardiaco(s,y,z)+inflate);
-    y=yDiafragmaToracico(x,z)+.0022;return V(x,y,z);
+    let x=p.xc+(p.x-p.xc)*r,z=ZC+(p.z-ZC)*r,y=yDiafragmaToracico(x,z)+assoalho;
+    x=s*Math.max(s*x,limiteCardiaco(s,y,z)-inflate);
+    y=yDiafragmaToracico(x,z)+assoalho;return V(x,y,z);
   }));
   for(let i=1;i<NW;i++)rings.push(Array.from({length:K},(_,j)=>{
     const v=i/NW,y=base[j]+(apice-base[j])*v;
@@ -513,8 +514,8 @@ function geoPulmaoToracico(s,{inflate=0,fissuras=true}={}) {
       if(s===DIR&&z>-.025&&y-.184+.85*(z-ZC)>.005)f=Math.max(f,gauss(y,.211,.002));
       const k=1-.035*f;x=p.xc+(x-p.xc)*k;z=ZC+(z-ZC)*k;
     }
-    x=s*Math.max(s*x,limiteCardiaco(s,y,z)+inflate);
-    return V(x,Math.max(y,yDiafragmaToracico(x,z)+.0022),z);
+    x=s*Math.max(s*x,limiteCardiaco(s,y,z)-inflate);
+    return V(x,Math.max(y,yDiafragmaToracico(x,z)+assoalho),z);
   }));
   const g=loft(rings),p=g.attributes.position,colors=[];
   for(let i=0;i<p.count;i++) {
