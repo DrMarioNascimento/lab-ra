@@ -30,20 +30,24 @@ Parâmetros ilustrativos do adulto virtual; não são graus GOLD, valores previs
 | --- | --- | --- |
 | Repouso | 15/min / 75 bpm | P_L central de repouso 6,25 cmH₂O; amplitude elástica 3 cmH₂O. |
 | Exercício | 30/min / 120 bpm | Amplitude 5 cmH₂O; pressão vascular no hilo 25/9 mmHg. |
-| DPOC · vias aéreas | 12/min / 85 bpm | Complacência regional mantida; constante de tempo expiratória 1,8 s. |
-| DPOC · enfisema | 12/min / 90 bpm | Coeficiente de complacência 0,16 versus 0,10; P_L central basal 5 cmH₂O; constante de tempo 2,4 s. |
-| DPOC · exercício | 30/min / 120 bpm | Mesma mecânica do exemplo de enfisema com menor tempo expiratório, elevando o volume retido. |
-| CVF | Manobra 8 s / 75 bpm | Inspiração máxima até 6 L em 2 s; expiração forçada até 1,2 L em 6 s. CVF=4,80 L; VEF₁≈4,02 L; VEF₁/CVF≈83,8%. Exemplo sem obstrução; os exemplos de DPOC acima são ciclos espontâneos, não espirometrias. |
+| Enfisema | 12/min / 90 bpm | Coeficiente de complacência 0,16 versus 0,10; P_L central basal 5 cmH₂O; constante de tempo 2,4 s. |
+| Fibrose | 24/min / 90 bpm | Coeficiente de complacência 0,045; amplitude elástica 4 cmH₂O, excursão visual reduzida à metade, volumes menores e ausência de retenção obstrutiva. |
+| CVF | Manobra 8 s / 75 bpm | Inspiração máxima até 6 L em 2 s; expiração forçada até 1,2 L em 6 s. CVF=4,80 L; VEF₁≈4,02 L; VEF₁/CVF≈83,8%. Exemplo sem obstrução; Enfisema e Fibrose são exemplos de ciclos espontâneos, não espirometrias. |
 
-Na DPOC, q=exp(−T_exp/τ) e pressão elástica retida=A·q/(1−q): regime periódico de um compartimento com incremento inspiratório A e esvaziamento exponencial. A progressão temporal é suavizada, preservando q nos extremos. Aumentar a frequência encurta T_exp e eleva a retenção; o volume global deriva da mesma pressão elástica. Não resolve heterogeneidade, compressão dinâmica de vias aéreas ou adaptação transitória de vários ciclos. A resistência prescrita gera a pressão alveolar a partir do fluxo; não representa a resistência clínica medida de cada indivíduo.
+No Enfisema, q=exp(−T_exp/τ) e pressão elástica retida=A·q/(1−q): regime periódico de um compartimento com incremento inspiratório A e esvaziamento exponencial. A progressão temporal é suavizada, preservando q nos extremos. Aumentar a frequência encurta T_exp e eleva a retenção; o volume global deriva da mesma pressão elástica. Não resolve heterogeneidade, compressão dinâmica de vias aéreas ou adaptação transitória de vários ciclos. A resistência prescrita gera a pressão alveolar a partir do fluxo; não representa a resistência clínica medida de cada indivíduo.
+
+Na Fibrose, a curva pressão-volume tem menor complacência: sob a mesma pressão transpulmonar, resulta em menor volume. A pressão inspiratória prescrita é maior, mas seu ganho de volume e excursão visual são menores; a frequência é aumentada. Não há constante de tempo obstrutiva nem aprisionamento. Os coeficientes ilustram tendências, sem prever valores de um paciente.
 
 Na CVF, volume expirado=CVF·[1−exp(−t/0,55)]/[1−exp(−6/0,55)]. Fluxo é sua derivada com sinal expiratório negativo; há esforço expiratório positivo. Os 6 segundos são a duração escolhida deste exemplo, não um requisito universal de aceitabilidade ATS/ERS. A curva prescrita não modela limitação de fluxo por compressão dinâmica.
 
 O coração conserva o scan externo do protótipo. Um relógio próprio usa a duração sistólica de `coracao/fisica.js`; a contração visual encurta e comprime suavemente a região ventricular, mantendo base e grandes vasos ancorados. Não estima débito cardíaco nem movimentos valvares. Iniciar, Pausar, Reiniciar, velocidade e restauração controlam ambos os relógios. A exportação em RA continua uma fotografia do estado, sem prometer batimento em RA.
 
+Costelas e cartilagens usam o mesmo campo contínuo de deformação. As inserções de 1–7 seguem o esterno; 8–10 seguem o arco costal. A transição atravessa suavemente a junção entre tecidos, preservando as articulações posteriores e as pontas livres de 11–12.
+
 ## Referências
 
 - [ATS/ERS, Standardization of Spirometry 2019 Update](https://pmc.ncbi.nlm.nih.gov/articles/PMC6794117/): definição de CVF e VEF₁, sequência e aceitabilidade da manobra.
+- [Lung Parenchymal Mechanics](https://pmc.ncbi.nlm.nih.gov/articles/PMC3929318/): perda de recuo elástico no enfisema e aumento de rigidez na fibrose.
 - [GOLD 2026](https://goldcopd.org/wp-content/uploads/2026/01/GOLD-REPORT-2026-v1.3-8Dec2025_WMV2.pdf): obstrução das pequenas vias aéreas, perda de recuo elástico e hiperinsuflação estática/dinâmica.
 - [O’Donnell et al., Dynamic hyperinflation and exercise intolerance in COPD](https://pubmed.ncbi.nlm.nih.gov/11549531/): investigação de hiperinsuflação durante exercício.
 

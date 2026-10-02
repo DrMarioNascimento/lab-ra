@@ -31,11 +31,15 @@ test('exercício eleva frequência, volume corrente e perfusão',()=>{
  const ganho=p=>estadoDoPerfil(p.fi,p.id).volume-estadoDoPerfil(0,p.id).volume;
  assert(ganho(x)>ganho(r));assert(fluxoEm(0,90,x.vascular)>fluxoEm(0,90));
 });
-test('RC mais lento e expiração mais curta elevam o volume retido',()=>{
- const b=estadoDoPerfil(0,'bronquite'),en=estadoDoPerfil(0,'enfisema'),ex=estadoDoPerfil(0,'dpoc-exercicio');
- assert(b.arRetido>0&&b.volume>.4);assert(en.volume>b.volume);
- assert(ex.arRetido>en.arRetido&&ex.volume>en.volume);
- assert(estadoDoPerfil(.3,'dpoc-exercicio').volume-ex.volume<estadoDoPerfil(.3,'enfisema').volume-en.volume);
+test('Enfisema e Fibrose têm complacência, volumes e esvaziamento distintos',()=>{
+ assert.deepEqual(ESTADOS.map(e=>e.id),['repouso','exercicio','enfisema','fibrose','cvf']);
+ const normal=estadoDoPerfil(0),en=estadoDoPerfil(0,'enfisema'),fi=estadoDoPerfil(0,'fibrose');
+ assert(en.arRetido>0&&en.volume>normal.volume);assert.equal(fi.arRetido,0);assert(fi.volume<normal.volume);
+ for(const pl of [3,6,10])assert(volumeRegional(.5,0,{palveolar:pl-6.25,kComplacencia:fi.kComplacencia})<volumeRegional(.5,0,{palveolar:pl-6.25,kComplacencia:en.kComplacencia}));
+ const pico=estadoDoPerfil(.4,'fibrose'),basePico=estadoDoPerfil(.4);
+ assert(pico.volume-fi.volume<basePico.volume-normal.volume);
+ assert(Math.abs(pico.deslocaPleural)>Math.abs(basePico.deslocaPleural));assert(pico.expansao<basePico.expansao);
+ assert(comEstado('fibrose').fr>comEstado('repouso').fr);
 });
 test('CVF tem inspiração máxima, expiração forçada e volume residual distinto',()=>{
  const max=estadoDoPerfil(.25,'cvf'),fim=estadoDoPerfil(1,'cvf'),exp=estadoDoPerfil(.3,'cvf'),q=indicesCVF();

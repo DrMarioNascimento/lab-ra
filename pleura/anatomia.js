@@ -251,6 +251,7 @@ function costela(g, M, s, j) {
   }
   if(j<7)pts[pts.length-1]=insercaoEsternal(s,yA);
   else if(!flutuante)pts[pts.length-1]=arcoCostal(s)[j-6].clone();
+  g.userData.insercao=flutuante?null:pts.at(-1).clone();
   const curva = new THREE.CatmullRomCurve3(pts, false, 'centripetal');
   const hb = j === 0 ? 0.0034 : j === 1 ? 0.0046 : flutuante ? 0.0028 : 0.0046;
   const wb = j === 0 ? 0.0068 : j === 1 ? 0.0038 : flutuante ? 0.0026 : 0.0029;
@@ -269,7 +270,7 @@ export function construirCaixa(M) {
   for (let j = 0; j < 12; j++) for(const sign of [DIR,ESQ]) {
     const rib=new THREE.Group();rib.name=`costela_articulada_${lado(sign)}_${j+1}`;
     costela(rib,M,sign,j);compactar(rib);
-    rib.userData={lado:sign,numero:j+1,articulacao:articulacaoCostal(sign,j)};
+    rib.userData={...rib.userData,lado:sign,numero:j+1,articulacao:articulacaoCostal(sign,j)};
     g.add(rib);
   }
   for(const s of [DIR,ESQ])g.add(mk(`margem_costal_${lado(s)}`,tuboGeo(arcoCostal(s),.0033,48),M.cartilagem));

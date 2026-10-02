@@ -35,3 +35,5 @@ As leituras de pressão mostram cmH₂O e mmHg simultaneamente: pleural e alveol
 A revisão integrada de pressões, volume, perfusão, reprodução e limites didáticos está em [AUDITORIA-FISIOLOGIA.md](AUDITORIA-FISIOLOGIA.md).
 
 O coração externo agora apresenta contração visual durante a execução, com base e grandes vasos ancorados. Os controles pausam os dois relógios; a RA conserva a pose exportada. Os estados rápidos alteram volumes, pressões e o movimento respiratório conforme a auditoria de fisiologia.
+
+Movimento costal: osso e cartilagem compartilham a deformação contínua, com encaixe anterior que segue integralmente o esterno ou arco costal. As articulações posteriores ficam ancoradas e as costelas flutuantes mantêm a ponta livre.
