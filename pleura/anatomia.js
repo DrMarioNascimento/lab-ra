@@ -484,7 +484,7 @@ export function limiteCardiaco(s,y,z) {
     ty*((1-tz)*c[(iy+1)*nz+iz]+tz*c[(iy+1)*nz+iz+1]);
 }
 function geoPulmaoToracico(s,{inflate=0,fissuras=true}={}) {
-  const K=112,NB=18,NW=96,ZC=-.008,apice=(s===DIR?.308:.303)+inflate;
+  const K=112,NB=18,NW=96,ZC=-.008,apice=(s===DIR?.301:.308)+inflate;
   const assoalho=Math.max(.0007,.0022-inflate);
   const ponto=(y,phi,R=1)=> {
     const c=Math.cos(phi),sn=Math.sin(phi),w=wT(y)-.010+inflate,d=dT(y)-.010+inflate;
