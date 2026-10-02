@@ -262,7 +262,7 @@ function atualizar() {
   $('posturaLabel').textContent = grau < 20 ? `Decúbito · ${grau.toFixed(0)}°`
     : grau > 70 ? `Ortostatismo · ${grau.toFixed(0)}°` : `Inclinado · ${grau.toFixed(0)}°`;
   const pleural=pplAtual(.5);
-  $('pplLabel').firstChild.nodeValue=`Pleural média ${valorPressao(pleural)} cmH₂O`;
+  $('pplLabel').firstChild.nodeValue=`Pleural · centro ${valorPressao(pleural)} cmH₂O`;
   $('pplMmHg').textContent=`${valorPressao(pleural*CMH2O_EM_MMHG)} mmHg`;
   $('grauValor').textContent = `${grau.toFixed(0)}°`;
   if (!arrastando) $('grauCursor').value = grau.toFixed(0);

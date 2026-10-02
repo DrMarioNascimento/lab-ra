@@ -16,7 +16,7 @@ export function desenharGrafico(ctx,{modo,estado,fase,grau,ajuste,e}) {
       vs.forEach((v,j)=>{const x=L[j],w=Math.min(1,v/max[j])*largura;ctx.fillStyle=j===0?azul:rosa;ctx.fillRect(x,ys[i]-8,Math.max(1,w),16);
         texto(j===0?`${(v*100).toFixed(1)}%`:v.toFixed(1),L[j]+largura+7,ys[i]+5);});
     });
-    texto('Pontos percentuais por inspiração',65,322);texto('Escala fixa: 0 a 16',350,322);
+    texto('Δvolume regional (p.p.)',65,322);texto('Escala fixa: 0 a 16',350,322);
     const a=ventilacaoDoPerfil(1,grau,estado,ajuste)*100,b=ventilacaoDoPerfil(0,grau,estado,ajuste)*100;
     return `Ventilação: ápice +${a.toFixed(1)} e base +${b.toFixed(1)} pontos percentuais. Perfusão: ápice ${fluxoEm(1,grau,e).toFixed(1)} e base ${fluxoEm(0,grau,e).toFixed(1)}, em escala relativa fixa.`;
   }
