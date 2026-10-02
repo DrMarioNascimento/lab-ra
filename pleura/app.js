@@ -17,15 +17,18 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { prepararParaRA } from '../cores-para-ra.js';
-import { criar } from './modelos.js?v=revisao-20261002';
+import { criar } from './modelos.js?v=estados-20261002';
 import { clonarVisual } from './ra.js';
-import { carregarCoracao } from './anatomia.js';
+import { carregarCoracao } from './anatomia.js?v=estados-20261002';
 import {
-  PULMAO, VOLUMES, alturaEfetiva, pressaoPleural, transpulmonar, volumeRelativo,
-  ventilacaoRelativa, zonaEm, fluxoEm, perfilDeZonas, estadoDoPneumotorax, eixoDependente,
-  cicloAlveolar, retornoVenosoRelativo,
-  comCenario, CENARIOS, pressoesEm, estadoRespiratorio, CMH2O_EM_MMHG, PPL_MEDIA_FRC,
-} from './fisica.js?v=revisao-20261002';
+  VOLUMES, alturaEfetiva, pressaoPleural, transpulmonar,
+  zonaEm, fluxoEm, perfilDeZonas, estadoDoPneumotorax, eixoDependente,
+  retornoVenosoRelativo,
+  comCenario, CENARIOS, pressoesEm, CMH2O_EM_MMHG, PPL_MEDIA_FRC,
+} from './fisica.js?v=estados-20261002';
+
+import {ESTADOS,comEstado,estadoDoPerfil,volumeRegional,ventilacaoDoPerfil,duracaoEstado,contracaoCardiaca,indicesCVF,CAPACIDADE_MODELO} from './estados.js?v=estados-20261002';
+import {desenharGrafico} from './grafico.js?v=estados-20261002';
 
 const $ = id => document.getElementById(id);
 const valorPressao = (valor, casas=1) => valor.toFixed(casas).replace(/^-0(?:\.0+)?$/, v=>v.slice(1));
@@ -66,7 +69,7 @@ try {
   $('modeloStatus').textContent='O coração anatômico não carregou. Recarregue a página para tentar novamente.';
   console.error(err);
 }
-const { modelos, aplicarFresta, aplicarTorax, aplicarAlveolos, aplicarZonas } = criar();
+const { modelos, aplicarFresta, aplicarTorax, aplicarAlveolos, aplicarZonas, aplicarCoracao } = criar();
 modelos.forEach((m, i) => { m.visible = i === 0; root.add(m); });
 
 const raio = modelos.map(m => {
@@ -134,6 +137,7 @@ if (typeof DeviceOrientationEvent !== 'undefined'
 let pneumo = 'nenhum', cenario = 'repouso';
 /* fase 0 é o fim da expiração; o cenário abre parado nesse ponto. */
 let fase = 0, respirando = false, velocidade = 1;
+let estadoRapido='repouso',tempoCardiaco=0,modoGrafico='perfil';
 const ajuste = () => comCenario(cenario).ajuste;
 const FLUXO_REFERENCIA=Math.max(...CENARIOS.map(c=>fluxoEm(0,0,c.ajuste)));
 
@@ -143,7 +147,7 @@ const TEXTOS = [
     texto: 'Entre as duas pleuras há um espaço potencial com um filme de líquido e pressão negativa segurando as duas encostadas, como dois vidros molhados que deslizam mas não se separam. Quando ar entra no espaço pleural, as superfícies podem se separar e o pulmão perde expansão.',
     tags: ['poucos mililitros', 'deslizam, não separam'] },
   { olho: 'Nível 02', titulo: 'Equilíbrio elástico do tórax',
-    texto: 'O pulmão puxa para dentro, a caixa torácica empurra para fora, e no repouso elas se equilibram na CRF, representada por 40% da capacidade total neste modelo. É esse empate que deixa a pressão entre as duas negativa — a pressão pleural não é uma bomba, é o resultado de um cabo de guerra.',
+    texto: 'O pulmão puxa para dentro, a caixa torácica empurra para fora; no repouso saudável elas se equilibram na CRF, representada por 40% da capacidade total neste modelo. É esse empate que deixa a pressão entre as duas negativa — a pressão pleural não é uma bomba, é o resultado de um cabo de guerra.',
     tags: ['recolhe × abre', 'CRF a 40%'] },
   { olho: 'Nível 03', titulo: 'O pneumotórax',
     texto: 'Quando entra ar, a ligação mecânica entre pulmão e parede se perde. O pulmão direito perde volume, enquanto a parede tende a se expandir. Os volumes de 10% e 60% representam estados ilustrativos de equilíbrio do modelo. No hipertensivo, a pressão pleural pode ficar positiva e comprometer o retorno venoso, causando choque obstrutivo. O desvio do mediastino acompanha a alteração. Na respiração espontânea, a pressão pleural mais negativa favorece o retorno dentro dos limites do modelo.',
@@ -166,9 +170,9 @@ const CONTEXTO = [
 ];
 
 let atual = 0;
-const ajusteAtivo=()=>atual===4?ajuste():{};
+const ajusteAtivo=()=>atual===4?ajuste():(comEstado(estadoRapido).vascular??{});
 const pneumoAtivo=()=>atual===0||atual===2?pneumo:'nenhum';
-const estadoAtual=()=>estadoRespiratorio(fase,{...ajusteAtivo(),pneumo:pneumoAtivo()});
+const estadoAtual=()=>estadoDoPerfil(fase,estadoRapido,{...ajusteAtivo(),pneumo:pneumoAtivo()});
 const pontosFresta=[
   [9,5,2.65,'#c7987c'],[6.5,4,2.25,'#d2b56d'],[3.5,3,1.65,'#984757'],
   [0,2,.64,'#8db7ca'],[-2,1,.55,'#a8dcf0'],[-4.5,0,.40,'#d9a1b2'],[-8,-2,.30,'#b77285'],
@@ -200,7 +204,6 @@ function posicionarPerfil() {
 }
 function irAoNivel(n) {
   atual = clamp(n, 0, 4);
-  if(atual===0){respirando=false;sincronizarCiclo();}
   modelos.forEach((m, i) => { m.visible = i === atual; });
   const t = TEXTOS[atual];
   $('anatomiaLegenda').textContent=CONTEXTO[atual];
@@ -216,8 +219,9 @@ function irAoNivel(n) {
   $('stepLabel').textContent = `0${atual + 1} · ${ROTULO[atual]}`;
   $('prev').disabled = atual === 0; $('next').disabled = atual === 4;
   $('caixaPneumo').hidden = atual!==0&&atual!==2;
-  $('caixaPostura').hidden = atual === 0;
-  $('cicloControls').hidden = atual === 0;
+  $('caixaPostura').hidden = false;
+  $('cicloControls').hidden = false;
+  $('leiturasTorax').hidden = atual !== 1 && atual !== 2;
   $('perfilPontos').hidden = atual!==3&&atual!==4;
   $('caixaZonas').hidden = atual !== 4;
   $('legendaFresta').hidden = atual !== 0;
@@ -230,7 +234,7 @@ function irAoNivel(n) {
 /* ------------------------------------------------------------ atualizar */
 function atualizar() {
   /* A pausa congela a fase: pressões, geometria e leituras permanecem nela. */
-  const pAlv=cicloAlveolar(fase),e=estadoAtual();
+  const e=estadoAtual();
   const pn=estadoDoPneumotorax(e.pneumo);
   const pplAtual=f=>pressaoPleural(f,grau,e);
 
@@ -238,9 +242,8 @@ function atualizar() {
   root.rotation.z = g2r(90 - grau);
 
   aplicarFresta(pn.ppl);
-  const repouso=volumeRelativo(transpulmonar(.5,grau));
-  const inspirado=volumeRelativo(transpulmonar(.5,grau,estadoRespiratorio(fase)));
-  const ganhoVolume=repouso>0?inspirado/repouso:1;
+  const inspirado=estadoDoPerfil(fase,estadoRapido);
+  const ganhoVolume=inspirado.volume/.4;
   const ciclo=Math.cbrt(ganhoVolume),inspiracao=e.expansao;
   aplicarTorax(1, { pulmao: VOLUMES.crf, caixa: VOLUMES.crf, ciclo, inspiracao });
   aplicarTorax(2, { pulmao: pn.pulmao, caixa: pn.caixa, desvio: pn.desvio, ciclo, inspiracao });
@@ -249,7 +252,7 @@ function atualizar() {
     : 'Amarelo: ar no espaço pleural direito · pulmão recolhido';
   /* O estado do motor já reúne as pressões do ciclo e da postura. */
   const plEm = f => transpulmonar(f, grau, e);
-  aplicarAlveolos(f => volumeRelativo(plEm(f)));
+  aplicarAlveolos(f => volumeRegional(f,grau,e));
   if(atual===3)$('anatomiaLegenda').textContent=grau<20
     ? 'Volume alveolar · deitado: tamanhos semelhantes · escala ampliada'
     : grau>70?'Volume maior no ápice · maior expansão inspiratória na base'
@@ -259,13 +262,16 @@ function atualizar() {
   $('posturaLabel').textContent = grau < 20 ? `Decúbito · ${grau.toFixed(0)}°`
     : grau > 70 ? `Ortostatismo · ${grau.toFixed(0)}°` : `Inclinado · ${grau.toFixed(0)}°`;
   const pleural=pplAtual(.5);
-  $('pplLabel').firstChild.nodeValue=`Pleural ${valorPressao(pleural)} cmH₂O`;
+  $('pplLabel').firstChild.nodeValue=`Pleural · centro ${valorPressao(pleural)} cmH₂O`;
   $('pplMmHg').textContent=`${valorPressao(pleural*CMH2O_EM_MMHG)} mmHg`;
   $('grauValor').textContent = `${grau.toFixed(0)}°`;
   if (!arrastando) $('grauCursor').value = grau.toFixed(0);
 
   mostrarPressao('lApice',pplAtual(1));
   mostrarPressao('lBase',pplAtual(0));
+  mostrarPressao('lPlApice',plEm(1));mostrarPressao('lPlBase',plEm(0));
+  $('lVolumeTotal').textContent=`${(e.volume*CAPACIDADE_MODELO).toFixed(2)} L · ${(e.volume*100).toFixed(0)}% da capacidade total`;
+  $('notaExecucao').textContent=estadoRapido==='cvf'?'A velocidade altera apenas a reprodução. Manobra de 8 s · coração: 75 bpm.':`A velocidade altera apenas a reprodução. Referência: ${comEstado(estadoRapido).fr} respirações/min · coração: ${comEstado(estadoRapido).fc} bpm.`;
   /* Deitado a queda ao longo do eixo ápice-base é ZERO, e o gradiente não
      sumiu: mudou para o esterno-dorso, que esta bancada não desenha. Dizer
      isso em palavras é honesto; enfiar os dois eixos num número só foi o erro
@@ -274,10 +280,10 @@ function atualizar() {
   $('lAltura').textContent = alturaEfetiva(grau) < 3
     ? `0 cm — o gradiente passou ${eixo.nome} (${eixo.atravessando.toFixed(0)} cm)`
     : `${alturaEfetiva(grau).toFixed(0)} cm, ${eixo.nome}`;
-  const vA = ventilacaoRelativa(1, grau, ajusteAtivo()), vB = ventilacaoRelativa(0, grau, ajusteAtivo());
+  const vA = ventilacaoDoPerfil(1, grau, estadoRapido, ajusteAtivo()), vB = ventilacaoDoPerfil(0, grau, estadoRapido, ajusteAtivo());
   $('lVent').textContent = vA > 0 ? `${(vB / vA).toFixed(2)}×` : '—';
-  $('lVolApice').textContent = (volumeRelativo(plEm(1)) * 100).toFixed(0);
-  $('lVolBase').textContent = (volumeRelativo(plEm(0)) * 100).toFixed(0);
+  $('lVolApice').textContent = (volumeRegional(1,grau,e) * 100).toFixed(0);
+  $('lVolBase').textContent = (volumeRegional(0,grau,e) * 100).toFixed(0);
   if(atual===3) {
     $('perfilApice').textContent=`Ápice · ${$('lVolApice').textContent}%`;
     $('perfilBase').textContent=`Base · ${$('lVolBase').textContent}%`;
@@ -285,8 +291,9 @@ function atualizar() {
     $('perfilApice').textContent=`Ápice · zona ${zonaEm(1,grau,e)}`;
     $('perfilBase').textContent=`Base · zona ${zonaEm(0,grau,e)}`;
   }
-  const faseNome = pAlv < -.05 ? 'Inspiração' : pAlv > .05 ? 'Expiração' : 'Sem fluxo';
-  const instante=fase===0?'Fim da expiração':Math.abs(fase-.4)<1e-6?'Fim da inspiração':faseNome;
+  const fi=comEstado(estadoRapido).fi;
+  const faseNome=fase<fi?'Inspiração':estadoRapido==='cvf'?'Expiração forçada':'Expiração';
+  const instante=fase===0?'Fim da expiração':fase===1?'Fim da manobra':Math.abs(fase-fi)<1e-6?'Fim da inspiração':faseNome;
   const estadoCiclo=respirando||fase===0?instante:`Pausado · ${instante.toLowerCase()}`;
   $('lFase').textContent = estadoCiclo;
   if ($('cicloEstado').textContent !== estadoCiclo) $('cicloEstado').textContent = estadoCiclo;
@@ -307,41 +314,22 @@ function atualizar() {
   $('lCaixa').textContent = (pn.caixa * (e.pneumo==='nenhum'?ganhoVolume:1) * 100).toFixed(0);
   const retorno=retornoVenosoRelativo(pleural)/retornoVenosoRelativo(PPL_MEDIA_FRC);
   $('lRetorno').textContent = (retorno * 100).toFixed(0);
-  $('lRetorno').parentElement.classList.toggle('alerta', retorno < .8);
+  $('lRetorno').closest('li').classList.toggle('alerta', retorno < .8);
 
+  aplicarCoracao(atual,contracaoCardiaca(tempoCardiaco,comEstado(estadoRapido).fc));
   desenharCurva();
 }
 
 /* ------------------------------------------------------------ a curva */
 const gr = $('curvaPerfil'), ctx = gr.getContext('2d');
 function desenharCurva() {
-  const e=estadoAtual(), W=gr.width, H=gr.height;
-  ctx.clearRect(0, 0, W, H);
-  const m = { e: 30, d: 12, t: 12, b: 24 };
-  const py = f => H - m.b - f * (H - m.t - m.b);
-  const px = v => m.e + clamp(v, 0, 1) * (W - m.e - m.d);
-  ctx.strokeStyle = '#395b6c'; ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(m.e, m.t); ctx.lineTo(m.e, H - m.b); ctx.stroke();
-  ctx.fillStyle = '#aec6d5'; ctx.font = '10px "IBM Plex Mono", monospace';
-  ctx.fillText('ápice', 2, py(1) + 8); ctx.fillText('base', 2, py(0) - 2);
-
-  /* duas curvas no mesmo eixo: ventilação e perfusão. É o encontro delas que
-     é a relação V/Q, e vê-las juntas é o ponto do nível 05. */
-  const vs = [], fs = [];
-  for (let i = 0; i <= 40; i++) {
-    const f = i / 40;
-    vs.push([f, ventilacaoRelativa(f, grau, ajusteAtivo())]);
-    fs.push([f, fluxoEm(f, grau, e)]);
-  }
-  const maxV = Math.max(.0001, ...vs.map(x => x[1]));
-  const maxF = Math.max(.0001, ...fs.map(x => x[1]));
-  for (const [dados, maxi, tinta, nome] of [[vs, maxV, '#80c4ff', 'ventilação'], [fs, maxF, '#ff8990', 'perfusão']]) {
-    ctx.beginPath();
-    dados.forEach(([f, v], i) => { const x = px(v / maxi), y = py(f); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
-    ctx.strokeStyle = tinta; ctx.lineWidth = 2.2; ctx.stroke();
-    ctx.fillStyle = tinta;
-    ctx.fillText(nome, nome === 'ventilação' ? m.e + 4 : W - m.d - 52, H - 8);
-  }
+  const e=estadoAtual();
+  const resumo=desenharGrafico(ctx,{modo:modoGrafico,estado:estadoRapido,fase,grau,ajuste:ajusteAtivo(),e});
+  $('notaGrafico').textContent=modoGrafico==='perfil'?'Mesmo eixo ápice–base, escalas separadas. Ventilação: ganho de volume por inspiração. Perfusão: índice relativo em escala fixa; não é V/Q.':estadoRapido==='cvf'?'Volume expirado desde a inspiração máxima, ao longo da expiração forçada. A linha marca o primeiro segundo.':'Volume pulmonar e fluxo em painéis separados, no mesmo tempo. Fluxo positivo: inspiração; negativo: expiração. O ponto marca a fase atual.';
+  $('resumoGrafico').textContent=resumo;
+  gr.setAttribute('aria-label',resumo);
+  $('indicesCVF').hidden=estadoRapido!=='cvf';
+  if(estadoRapido==='cvf'){const q=indicesCVF();$('indicesCVF').textContent=`Adulto virtual: CVF ${q.cvf.toFixed(2)} L · VEF₁ ${q.vef1.toFixed(2)} L · VEF₁/CVF ${(q.razao*100).toFixed(0)}%. Valores ilustrativos.`;}
 }
 
 /* ------------------------------------------------------------ laço */
@@ -362,8 +350,9 @@ renderer.setAnimationLoop(agora => {
   const antes = grau;
   grau += (grauAlvo - grau) * SUAVE;
   if (respirando) {
-    const proxima=fase+dt*velocidade/4;
-    if(proxima>=1&&!$('loopContinuo').checked) { fase=0;respirando=false;sincronizarCiclo();atualizar();prepararRA(); }
+    tempoCardiaco+=dt*velocidade;
+    const proxima=fase+dt*velocidade/duracaoEstado(estadoRapido);
+    if(proxima>=1&&(!$('loopContinuo').checked||estadoRapido==='cvf')) { fase=estadoRapido==='cvf'?1:0;respirando=false;sincronizarCiclo();atualizar();prepararRA(); }
     else fase=proxima%1;
   }
   if (respirando || Math.abs(grau - antes) > .02) atualizar();
@@ -384,6 +373,7 @@ $('levantar').onclick = () => definirGrau(90, true);
 $('pneumos').addEventListener('click', ev => {
   const b = ev.target.closest('button[data-pneumo]');
   if (!b) return;
+  if(estadoRapido==='cvf')selecionarEstado('repouso');
   pneumo = b.dataset.pneumo;
   $('pneumos').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
   atualizar(); prepararRA();
@@ -394,16 +384,35 @@ $('cenarios').addEventListener('click', ev => {
   const b = ev.target.closest('button[data-cenario]');
   if (!b) return;
   cenario = b.dataset.cenario;
+  if(cenario==='exercicio')selecionarEstado('exercicio',false);
+  else selecionarEstado('repouso',false);
   $('cenarios').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
   atualizar(); prepararRA();
 });
 
+$('estadosRapidos').innerHTML=ESTADOS.map(p=>`<button type="button" data-estado="${p.id}" aria-pressed="${p.id==='repouso'}"${p.id==='repouso'?' class="on"':''}>${p.nome}</button>`).join('');
+function selecionarEstado(id,limpar=true) {
+  estadoRapido=comEstado(id).id;fase=0;tempoCardiaco=0;respirando=false;
+  if(limpar){pneumo='nenhum';cenario=comEstado(id).vascular?'exercicio':'repouso';
+    $('pneumos').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.pneumo==='nenhum'));
+    $('cenarios').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.cenario===cenario));}
+  $('estadosRapidos').querySelectorAll('button').forEach(b=>{const on=b.dataset.estado===estadoRapido;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)});
+  $('notaEstado').textContent=comEstado(id).nota;
+  $('loopContinuo').disabled=estadoRapido==='cvf';
+  if(estadoRapido==='cvf')$('loopContinuo').checked=false;
+  sincronizarCiclo();sincronizarGrafico();
+}
+$('estadosRapidos').onclick=ev=>{const b=ev.target.closest('button[data-estado]');if(!b)return;selecionarEstado(b.dataset.estado);modoGrafico=estadoRapido==='repouso'?'perfil':'ciclo';sincronizarGrafico();atualizar();desenhar();prepararRA();};
+function sincronizarGrafico(){$('modosGrafico').querySelector('[data-grafico="ciclo"]').textContent=estadoRapido==='cvf'?'CVF · volume-tempo':'Volume e fluxo';$('modosGrafico').querySelectorAll('button').forEach(b=>{const on=b.dataset.grafico===modoGrafico;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)});}
+$('modosGrafico').onclick=ev=>{const b=ev.target.closest('button[data-grafico]');if(b){modoGrafico=b.dataset.grafico;sincronizarGrafico();desenharCurva();}};
+
 function sincronizarCiclo() {
   $('respirar').disabled = respirando;
   $('pausar').disabled = !respirando;
-  $('respirar').textContent = !respirando && fase > 0 ? 'Retomar' : 'Iniciar';
+  $('respirar').textContent = estadoRapido==='cvf'&&fase===1?'Repetir manobra':!respirando&&fase>0?'Retomar':estadoRapido==='cvf'?'Iniciar manobra':'Iniciar';
 }
 $('respirar').onclick = () => {
+  if(fase===1)fase=0;
   respirando = true;
   anterior = performance.now();
   sincronizarCiclo(); atualizar(); desenhar();
@@ -413,18 +422,19 @@ $('pausar').onclick = () => {
   sincronizarCiclo(); atualizar(); desenhar(); prepararRA();
 };
 $('reiniciar').onclick = () => {
-  respirando = false; fase = 0;
+  respirando = false; fase = 0;tempoCardiaco=0;
   sincronizarCiclo(); atualizar(); desenhar(); prepararRA();
 };
 
 $('velocidade').addEventListener('input',()=>{velocidade=parseFloat($('velocidade').value);$('velocidadeValor').textContent=`${velocidade.toFixed(2).replace('.',',')}×`;});
 $('avancarFase').onclick=()=>{
   respirando=false;
-  fase=([.2,.4,.7,1].find(p=>p>fase+1e-6)??1)%1;
+  const fi=comEstado(estadoRapido).fi,proxima=[fi/2,fi,(1+fi)/2,1].find(p=>p>fase+1e-6)??1;
+  fase=estadoRapido==='cvf'?proxima:proxima%1;tempoCardiaco=fase*duracaoEstado(estadoRapido);
   sincronizarCiclo();atualizar();desenhar();prepararRA();
 };
 $('restaurarParametros').onclick=()=>{
-  respirando=false;fase=0;velocidade=1;grau=grauAlvo=90;pneumo='nenhum';cenario='repouso';
+  respirando=false;fase=0;velocidade=1;grau=grauAlvo=90;pneumo='nenhum';cenario='repouso';estadoRapido='repouso';tempoCardiaco=0;selecionarEstado('repouso',false);modoGrafico='perfil';sincronizarGrafico();
   $('velocidade').value='1';$('velocidadeValor').textContent='1,00×';$('loopContinuo').checked=true;
   $('pneumos').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.pneumo==='nenhum'));
   $('cenarios').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.cenario==='repouso'));
@@ -499,12 +509,16 @@ const nivel = parseInt(busca.get('nivel'), 10);
 const grauPedido = parseFloat(busca.get('grau'));
 const pn = busca.get('pneumo');
 const ce = busca.get('cenario');
+const pedidoEstado=busca.get('estado');
+if(pedidoEstado&&ESTADOS.some(p=>p.id===pedidoEstado))selecionarEstado(pedidoEstado);
+else selecionarEstado('repouso',false);
 if (pn && ['nenhum', 'aberto', 'hipertensivo'].includes(pn)) {
   pneumo = pn;
   $('pneumos').querySelectorAll('button').forEach(x => x.classList.toggle('on', x.dataset.pneumo === pn));
 }
 if (ce && CENARIOS.some(c => c.id === ce)) {
   cenario = ce;
+  if(ce==='exercicio'&&!pedidoEstado)selecionarEstado('exercicio',false);
   $('cenarios').querySelectorAll('button').forEach(x => x.classList.toggle('on', x.dataset.cenario === ce));
 }
 if (Number.isFinite(grauPedido)) { grau = grauAlvo = clamp(grauPedido, 0, 90); }
