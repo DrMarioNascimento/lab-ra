@@ -256,28 +256,34 @@ function nivelGradiente() {
 }
 
 /* ── NÍVEL 05 — AS ZONAS ─────────────────────────────────────────────────
-   Faixas horizontais de capilar atravessando o pulmão, uma por altura,
-   pintadas pela zona. A cor é CATEGÓRICA de propósito. */
+   Redes com a mesma geometria de referência: o contorno do pulmão não pode
+   produzir uma falsa diferença de perfusão. A cor identifica a zona. */
 const N_FAIXA = 9;
 function nivelZonas() {
   const g = new THREE.Group();
   const cm = pulmaoDeVidro(); g.add(cm);
   const faixas = [];
+  const amostras=Array.from({length:N_FAIXA},(_,i)=>amostraPulmao(DIR,.25+.70*i/(N_FAIXA-1)));
+  // A maior escala é 2; a margem esférica contém toda a rede nesse extremo.
+  const rx=Math.min(.022,...amostras.map(a=>a.folga*.44)),rz=rx*.6;
+  const referencia=redeCapilar(rx,rz);
   for (let i = 0; i < N_FAIXA; i++) {
     const f = i / (N_FAIXA - 1);
-    const a=amostraPulmao(DIR,f);
-    const rx=Math.min(a.rx*.68,a.folga*.72),rz=Math.min(a.rz*.55,rx*.6);
-    const geo=redeCapilar(rx,rz);
+    const a=amostras[i];
+    const geo=referencia.clone();
     const m = mk(`capilar_${i + 1}`, geo, M.zona3);
     m.position.copy(a.centro);
     m.userData.f = f; m.userData.rx=rx;
     faixas.push(m); cm.add(m);
   }
+  referencia.dispose();
+  const vasos=[];
   for(const side of [-1,1]) {
     const pts=faixas.map(m=>m.position.clone().add(V(side*m.userData.rx,0,0)));
-    cm.add(mk(side<0?'arteriola_pulmonar':'venula_pulmonar',tuboGeo(pts,.0007,64),side<0?M.arteria:M.veia));
+    const vaso=mk(side<0?'arteriola_pulmonar':'venula_pulmonar',tuboGeo(pts,.0007,64),side<0?M.arteria:M.veia);
+    vaso.userData.side=side;vasos.push(vaso);cm.add(vaso);
   }
-  g.userData = { faixas };
+  g.userData = { faixas,vasos };
   g.position.y = -15;
   return g;
 }
@@ -399,17 +405,23 @@ export function criar() {
     }
   }
 
-  /* As faixas do nível 05: cor pela zona, espessura pelo fluxo. */
-  function aplicarZonas(zonaEm, fluxoEm) {
-    const faixas = modelos[4].userData.faixas;
+  /* Cor pela zona; tamanho pelo fluxo, numa referência fixa entre cenários. */
+  function aplicarZonas(zonaEm, fluxoEm, fluxoReferencia=1) {
+    const {faixas,vasos} = modelos[4].userData;
     const fluxos = faixas.map(m => fluxoEm(m.userData.f));
-    const maior = Math.max(.001, ...fluxos);
+    const referencia=Math.max(.001,fluxoReferencia);
+    let mudou=false;
     faixas.forEach((m, i) => {
       const z = zonaEm(m.userData.f);
       m.material = z === 1 ? M.zona1 : z === 2 ? M.zona2 : M.zona3;
-      const e = .45 + 1.5 * (fluxos[i] / maior);
-      m.scale.set(1, e, e);
+      const e = .35 + 1.65 * clamp(fluxos[i] / referencia,0,1);
+      mudou ||= m.scale.x!==e;
+      m.scale.setScalar(e);
     });
+    if(mudou)for(const vaso of vasos) {
+      const pts=faixas.map(m=>m.position.clone().add(V(vaso.userData.side*m.userData.rx*m.scale.x,0,0)));
+      vaso.geometry.dispose();vaso.geometry=tuboGeo(pts,.0007,64);
+    }
   }
 
   return { modelos, aplicarFresta, aplicarTorax, aplicarAlveolos, aplicarZonas, N_ALV, N_FAIXA };
