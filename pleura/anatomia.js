@@ -126,6 +126,27 @@ export function fragmentoGeo(z0, z1, largura = 24, altura = 18, centroX = 0) {
 
 /* ── Coluna: C7, T1–T12, L1–L2 ──────────────────────────────────────────── */
 export const yPost = j => 0.283 - j * 0.0205;     // altura posterior da costela j (0 = 1ª)
+// Cabeça, colo e tubérculo usam os mesmos pontos que as facetas vertebrais.
+export function articulacaoCostal(s,j) {
+  const y=yPost(j),r=.013+j*.0006,h=.0155+j*.00027;
+  const yy=j>0&&j<9?y+h/2+.001:y;
+  return {cabeca:V(s*r*.94,yy,zS(yy)-r*.22),
+    tuberculo:V(s*(j<10?.029:.022),y+.001,zS(y)-r*.55-.005)};
+}
+// Seção óssea achatada, afilada nas pontas; eixo contínuo e sem cilindros.
+function processoGeo(pts,largura,altura) {
+  const curve=new THREE.CatmullRomCurve3(pts),rings=[];
+  for(let i=0;i<=20;i++) {
+    const t=i/20,p=curve.getPoint(t),T=curve.getTangent(t);
+    const N=V(1,0,0);N.addScaledVector(T,-N.dot(T)).normalize();
+    if(N.lengthSq()<.01)N.set(0,1,0);
+    const B=new THREE.Vector3().crossVectors(T,N).normalize();
+    const k=.22+.78*Math.sin(Math.PI*(.16+.84*t))**.65;
+    rings.push(Array.from({length:16},(_,j)=>{const a=j/16*Math.PI*2;
+      return p.clone().addScaledVector(N,largura*k*Math.cos(a)).addScaledVector(B,altura*k*Math.sin(a));}));
+  }
+  return loft(rings);
+}
 export function construirColuna(M) {
   const g = new THREE.Group(); g.name = 'coluna';
   const vertebras = [['C7', 0.3035, 0.012, 0.014]];
@@ -154,13 +175,45 @@ export function construirColuna(M) {
       }
       g.add(mk(`disco_${n}_${vertebras[v+1][0]}`,loft(discos),M.disco));
     }
-    const arco = mk(`arco_${n}`, new THREE.TorusGeometry(0.011, 0.0032, 8, 18, Math.PI), M.osso);
-    arco.rotation.x = Math.PI / 2; arco.rotation.z = Math.PI; arco.position.set(0, y, z - r * .55);
-    const esp = mk(`espinhosa_${n}`, tuboGeo([V(0,y,z-r*.8),V(0,y-.007,z-r-.010),V(0,y-.017,z-r-.021)], .003, 16), M.osso);
-    const tpE = mk(`transverso_E_${n}`, new THREE.CylinderGeometry(0.0032, 0.0042, 0.026, 10), M.osso);
-    tpE.rotation.z = Math.PI / 2; tpE.rotation.y = -0.35; tpE.position.set(0.016, y, z - r * .55 - 0.004);
-    const tpD = tpE.clone(); tpD.name = `transverso_D_${n}`; tpD.rotation.y = 0.35; tpD.position.x = -0.016;
-    g.add(corpo, arco, esp, tpE, tpD);
+    g.add(corpo);
+    const toracica=n.startsWith('T'),j=toracica?Number(n.slice(1))-1:-1;
+    const meio=toracica?gauss(j,5.5,3.4):0;
+    const base=V(0,y-.002,z-r*.80-.018);
+    // Pedículos e lâminas delimitam o canal, em vez de um meio-toro isolado.
+    for(const sign of [DIR,ESQ]) {
+      const ped=V(sign*r*.66,y+.002,z-r*.68);
+      const jun=V(sign*.012,y+.001,z-r*.80-.012);
+      g.add(mk(`pediculo_${lado(sign)}_${n}`,processoGeo([
+        V(sign*r*.62,y,z-r*.45),ped,jun],.004,.0038),M.osso));
+      g.add(mk(`lamina_${lado(sign)}_${n}`,processoGeo([jun,
+        V(sign*.006,y,z-r*.80-.018),base],.0045,.003),M.osso));
+      const ponta=toracica?articulacaoCostal(sign,j).tuberculo.clone():V(sign*.029,y,z-r*.72-.005);
+      // A faceta fica na face anterior do processo, encostada ao tubérculo.
+      const osso=ponta.clone();osso.z-=.0025;
+      g.add(mk(`transverso_${lado(sign)}_${n}`,processoGeo([jun,
+        V(sign*.019,y+.002,z-r*.65-.009),osso],.0042,.0034),M.osso));
+      for(const sup of [-1,1]) {
+        const art=mk(`articular_${sup>0?'superior':'inferior'}_${lado(sign)}_${n}`,
+          tecidoGeo(.004,.0045,.0028,.01),M.osso);
+        art.position.set(sign*.010,y+sup*h*.43,z-r*.80-.012);g.add(art);
+      }
+      if(toracica) {
+        const {cabeca,tuberculo}=articulacaoCostal(sign,j);
+        const faceta=mk(`faceta_costovertebral_${lado(sign)}_${n}`,tecidoGeo(.0015,.004,.003),M.cartilagem);
+        faceta.position.copy(cabeca);g.add(faceta);
+        if(j<10) {
+          const ft=mk(`faceta_costotransversa_${lado(sign)}_${n}`,tecidoGeo(.0037,.003,.0012),M.cartilagem);
+          ft.position.copy(tuberculo).add(V(0,0,-.0009));g.add(ft);
+        }
+      }
+    }
+    // T4–T8: longa lâmina inclinada caudalmente; extremidades de transição
+    // menos oblíquas. A base larga se continua com ambas as lâminas.
+    const comprimento=toracica?.018+.006*meio:n==='C7'?.022:.016;
+    const queda=toracica?.007+.012*meio:n==='C7'?.006:.003;
+    g.add(mk(`espinhosa_${n}`,processoGeo([base,
+      V(0,y-.003-queda*.35,base.z-comprimento*.43),
+      V(0,y-queda,base.z-comprimento)],toracica?.004:.0055,toracica?.0045:.005),M.osso));
   }
   return compactar(g);
 }
@@ -185,8 +238,12 @@ function costela(g, M, s, j) {
   const theta0 = Math.asin(0.03 / wT(yP)) + 0.15;
   const tj = flutuante ? 1 : 0.88 - j * 0.018;
   const dip = flutuante ? 0 : DIP[j];
-  const rv=.013+j*.0006;
-  const pts = [V(s*rv*.93,yP,zS(yP)-.002),V(s*.028,yP-.001,zS(yP)-rv*.55-.004)];
+  const {cabeca,tuberculo}=articulacaoCostal(s,j);
+  const pts = [cabeca,cabeca.clone().lerp(tuberculo,.52),tuberculo];
+  const head=mk(`cabeca_costela_${lado(s)}_${j+1}`,tecidoGeo(.0028,.0038,.0032,.01),M.osso);
+  head.position.copy(cabeca).add(V(s*.001,0,.001));g.add(head);
+  if(!flutuante){const tub=mk(`tuberculo_costela_${lado(s)}_${j+1}`,tecidoGeo(.0035,.003,.0026,.01),M.osso);
+    tub.position.copy(tuberculo).add(V(0,0,.0012));g.add(tub);}
   for (let i = 0; i <= 16; i++) {
     const t = i / 16, th = theta0 + (theta1 - theta0) * t;
     const y = yP + (yA - yP) * Math.pow(t, 1.35) - dip * gauss(t, tj, 0.2);
@@ -241,35 +298,53 @@ export function yDiafragma(x, z) {
   const rim = 0.045 + 0.085 * (1 - cosT) / 2;
   return rim + (apexY(x) - rim) * (1 - Math.pow(rho, 2.6));
 }
+// Superfície macroscópica: margem costal variável, duas cúpulas e sela
+// central. O perfil didático do gradiente permanece independente e intacto.
+const rimDia=th=>.042+.078*(1-Math.cos(th))/2;
+function pontoDia(rho,th) {
+  const rim=rimDia(th),w=wT(rim)-.011,d=dT(rim)-.010;
+  return V(rho*w*Math.sin(th),0,ZD-rho*d*Math.cos(th));
+}
+export function raioDiafragma(x,z) {
+  let th=Math.atan2(x/.128,-(z-ZD)/.088);
+  for(let i=0;i<3;i++){const rim=rimDia(th);th=Math.atan2(x/(wT(rim)-.011),-(z-ZD)/(dT(rim)-.010));}
+  const rim=rimDia(th);
+  return {rho:Math.min(1,Math.hypot(x/(wT(rim)-.011),(z-ZD)/(dT(rim)-.010))),th,rim};
+}
+export function yDiafragmaToracico(x,z,inspiracao=0) {
+  const {rho,rim}=raioDiafragma(x,z);
+  const sela=.011*gauss(x,.006,.024)*gauss(z,.012,.043);
+  const teto=.119+.055*gauss(x,-.059,.062)+.043*gauss(x,.066,.06)-sela;
+  return rim+(teto-rim)*(1-rho**2.4)-.014*inspiracao*(1-rho*rho);
+}
 export function construirDiafragma(M) {
-  const rings = [];
-  for (let i = 1; i <= 24; i++) {
-    const rho = i / 24, r = [];
-    for (let j = 0; j < 72; j++) {
-      const th = j / 72 * Math.PI * 2, x = rho * W_r * Math.sin(th), z = ZD - rho * D_r * Math.cos(th);
-      r.push(V(x, yDiafragma(x, z), z));
-    }
-    rings.push(r);
+  const rings=[];
+  for(let i=1;i<=32;i++)rings.push(Array.from({length:96},(_,j)=>{
+    const p=pontoDia(i/32,j/96*Math.PI*2);p.y=yDiafragmaToracico(p.x,p.z);return p;}));
+  const grupo=new THREE.Group();grupo.name='diafragma';
+  grupo.add(mk('musculo_diafragmatico',loft(rings,[true,false]),M.diafragma));
+  const inferior=rings.map(r=>r.map(p=>p.clone().add(V(0,-.0018,0))));
+  grupo.add(mk('face_abdominal_diafragma',loft(inferior,[true,false]),M.diafragma));
+  grupo.add(mk('rebordo_diafragmatico',loft([rings.at(-1),inferior.at(-1)],[false,false]),M.diafragma));
+  const tendon=[];
+  for(let i=1;i<=18;i++)tendon.push(Array.from({length:96},(_,j)=>{
+    const t=j/96*Math.PI*2,r=i/18,trevo=1+.20*Math.cos(3*t-.35);
+    const x=r*.043*trevo*Math.sin(t),z=.010+r*.027*trevo*Math.cos(t);
+    return V(x,yDiafragmaToracico(x,z)+.0005,z);}));
+  grupo.add(mk('tendao_central_trilobado',loft(tendon,[true,false]),M.tendao||M.cartilagem));
+  for(let j=0;j<48;j++) {
+    const th=j/48*Math.PI*2,pts=[];
+    for(let i=0;i<=18;i++){const p=pontoDia(.37+i/18*.60,th+.07*Math.sin(i/18*Math.PI));
+      p.y=yDiafragmaToracico(p.x,p.z)+.0005;pts.push(p);}
+    grupo.add(mk(`fibra_diafragma_${j}`,tuboGeo(pts,.00022,26),M.fibra||M.diafragma));
   }
-  const grupo = new THREE.Group(); grupo.name = 'diafragma';
-  grupo.add(mk('musculo_diafragmatico', loft(rings, [true, false]), M.diafragma));
-  const tendon = [];
-  for (let i = 1; i <= 14; i++) {
-    const r = [], rho = i / 14;
-    for (let j = 0; j < 64; j++) {
-      const t = j / 64 * Math.PI * 2, x = rho * .051 * Math.sin(t), z = .006 + rho * .032 * Math.cos(t);
-      r.push(V(x, yDiafragma(x,z)+.0006,z));
-    }
-    tendon.push(r);
-  }
-  grupo.add(mk('tendao_central', loft(tendon,[true,false]), M.tendao || M.cartilagem));
-  for (let j = 0; j < 32; j++) {
-    const t = j / 32 * Math.PI * 2, pts = [];
-    for (let i = 0; i <= 12; i++) {
-      const r = .46 + i / 12 * .52, x = r * W_r * Math.sin(t), z = ZD-r*D_r*Math.cos(t);
-      pts.push(V(x,yDiafragma(x,z)+.0009,z));
-    }
-    grupo.add(mk(`fibra_diafragma_${j}`,tuboGeo(pts,.00038,20),M.fibra || M.diafragma));
+  // Pilares posteriores descendo até os corpos lombares, sem falsos tubos.
+  for(const sign of [DIR,ESQ]) {
+    const yy=sign===DIR?.019:.035;
+    const p=V(sign*.017,.073,-.064);
+    p.y=yDiafragmaToracico(p.x,p.z)-.002;
+    grupo.add(mk(`pilar_diafragma_${lado(sign)}`,processoGeo([
+      V(sign*.016,yy,zS(yy)+.013),V(sign*.020,.068,-.059),p],.0045,.0035),M.diafragma));
   }
   return compactar(grupo);
 }
@@ -284,7 +359,8 @@ export function secaoPulmao(s, y) {
   const m = medias(s)(y), a = Math.max(0.004, (wIn(y) - m) / 2);
   return { xc: s * (m + a), a };
 }
-export function geoPulmao(s, { inflate = 0, fissuras = true, assoalho = 0.012 } = {}) {
+export function geoPulmao(s, { inflate = 0, fissuras = true, assoalho = 0.012, toracico = false } = {}) {
+  if(toracico)return geoPulmaoToracico(s,{inflate,fissuras});
   const yApex = (s === DIR ? 0.306 : 0.299) + inflate, K = 96, NB = 14, NW = 76, ZC = -0.008;
   const med = medias(s);
   const ponto = (y, phi, R) => {
@@ -350,6 +426,106 @@ export function geoPulmao(s, { inflate = 0, fissuras = true, assoalho = 0.012 } 
   return geo;
 }
 
+// Impressão cardíaca derivada da superfície do scan, em secções y/z.
+let envelopeCardiaco;
+function indexarCoracao(g) {
+  const passo=.0015,bb=new THREE.Box3().setFromObject(g);
+  const y0=bb.min.y-.007,z0=bb.min.z-.007;
+  const ny=Math.ceil((bb.max.y-y0+.007)/passo)+1,nz=Math.ceil((bb.max.z-z0+.007)/passo)+1;
+  const min=new Float32Array(ny*nz).fill(Infinity),max=new Float32Array(ny*nz).fill(-Infinity);
+  g.updateMatrixWorld(true);
+  for(const m of g.children){const p=m.geometry.attributes.position,idx=m.geometry.index;
+    const a=V(0,0,0),b=V(0,0,0),c=V(0,0,0);
+    for(let k=0;k<(idx?.count||p.count);k+=3) {
+      a.fromBufferAttribute(p,idx?idx.getX(k):k).applyMatrix4(m.matrixWorld);
+      b.fromBufferAttribute(p,idx?idx.getX(k+1):k+1).applyMatrix4(m.matrixWorld);
+      c.fromBufferAttribute(p,idx?idx.getX(k+2):k+2).applyMatrix4(m.matrixWorld);
+      const det=(b.y-c.y)*(a.z-c.z)+(c.z-b.z)*(a.y-c.y);if(Math.abs(det)<1e-12)continue;
+      const iy0=Math.max(0,Math.floor((Math.min(a.y,b.y,c.y)-y0)/passo)),iy1=Math.min(ny-1,Math.ceil((Math.max(a.y,b.y,c.y)-y0)/passo));
+      const iz0=Math.max(0,Math.floor((Math.min(a.z,b.z,c.z)-z0)/passo)),iz1=Math.min(nz-1,Math.ceil((Math.max(a.z,b.z,c.z)-z0)/passo));
+      for(let iy=iy0;iy<=iy1;iy++)for(let iz=iz0;iz<=iz1;iz++) {
+        const y=y0+iy*passo,z=z0+iz*passo;
+        const u=((b.y-c.y)*(z-c.z)+(c.z-b.z)*(y-c.y))/det;
+        const v=((c.y-a.y)*(z-c.z)+(a.z-c.z)*(y-c.y))/det;
+        if(u<0||v<0||u+v>1)continue;
+        const x=u*a.x+v*b.x+(1-u-v)*c.x,t=iy*nz+iz;
+        min[t]=Math.min(min[t],x);max[t]=Math.max(max[t],x);
+      }
+    }
+  }
+  const campos=[DIR,ESQ].map(s=>{
+    const campo=new Float32Array(ny*nz);
+    for(let iy=0;iy<ny;iy++)for(let iz=0;iz<nz;iz++) {
+      let limite=s===ESQ?.017:.013;
+      for(let dy=-4;dy<=4;dy++)for(let dz=-4;dz<=4;dz++) {
+        const yy=iy+dy,zz=iz+dz;if(yy<0||yy>=ny||zz<0||zz>=nz)continue;
+        const v=s===ESQ?max[yy*nz+zz]:-min[yy*nz+zz];
+        limite=Math.max(limite,v+.004-(dy*dy+dz*dz)*passo*passo/.004);
+      }
+      campo[iy*nz+iz]=limite;
+    }
+    return campo;
+  });
+  envelopeCardiaco={passo,y0,z0,ny,nz,campos};
+}
+export function limiteCardiaco(s,y,z) {
+  let limite=s===ESQ?.017:.013;
+  if(!envelopeCardiaco)return limite;
+  const {passo,y0,z0,ny,nz,campos}=envelopeCardiaco;
+  const fy=(y-y0)/passo,fz=(z-z0)/passo,iy=Math.floor(fy),iz=Math.floor(fz);
+  if(iy<0||iy>=ny-1||iz<0||iz>=nz-1)return limite;
+  const c=campos[s===DIR?0:1],ty=fy-iy,tz=fz-iz;
+  return (1-ty)*((1-tz)*c[iy*nz+iz]+tz*c[iy*nz+iz+1])+
+    ty*((1-tz)*c[(iy+1)*nz+iz]+tz*c[(iy+1)*nz+iz+1]);
+}
+function geoPulmaoToracico(s,{inflate=0,fissuras=true}={}) {
+  const K=112,NB=18,NW=96,ZC=-.008,apice=s===DIR?.308:.303;
+  const ponto=(y,phi,R=1)=> {
+    const c=Math.cos(phi),sn=Math.sin(phi),w=wT(y)-.010+inflate,d=dT(y)-.010+inflate;
+    const medial=s===ESQ?.017:.013,xc=(w+medial)/2;
+    let x=xc+(w-medial)/2*c*R,z=ZC+sn*(sn>0?d*.85:d*.90)*R;
+    // Face costal convexa, sem a antiga parede posterior recortada em plano.
+    const q=Math.hypot(x/w,z/d);if(q>.96){x*=.96/q;z*=.96/q;}
+    const impressao=limiteCardiaco(s,y,z)+inflate;
+    x=Math.max(x,impressao);
+    const recuo=zS(y)+.014*gauss(x,0,.027);
+    z=Math.max(z,recuo);
+    return {x:s*x,z,xc:s*xc};
+  };
+  const base=Array.from({length:K},(_,j)=>{
+    let y=.10;for(let i=0;i<12;i++){const p=ponto(y,j/K*Math.PI*2);y=yDiafragmaToracico(p.x,p.z)+.0022;}
+    return y;
+  });
+  const rings=[];
+  for(let i=1;i<=NB;i++)rings.push(Array.from({length:K},(_,j)=>{
+    const p=ponto(base[j],j/K*Math.PI*2),r=i/NB;
+    let x=p.xc+(p.x-p.xc)*r,z=ZC+(p.z-ZC)*r,y=yDiafragmaToracico(x,z)+.0022;
+    x=s*Math.max(s*x,limiteCardiaco(s,y,z)+inflate);
+    y=yDiafragmaToracico(x,z)+.0022;return V(x,y,z);
+  }));
+  for(let i=1;i<NW;i++)rings.push(Array.from({length:K},(_,j)=>{
+    const v=i/NW,y=base[j]+(apice-base[j])*v;
+    const t=clamp((y-.277)/(apice-.277),0,1),R=Math.sqrt(Math.max(.0001,1-t*t));
+    const p=ponto(y,j/K*Math.PI*2,R);
+    let x=p.x,z=p.z;
+    if(fissuras&&R>.25) {
+      let f=gauss(y-.184+.85*(z-ZC),0,.0022);
+      if(s===DIR&&z>-.025&&y-.184+.85*(z-ZC)>.005)f=Math.max(f,gauss(y,.211,.002));
+      const k=1-.035*f;x=p.xc+(x-p.xc)*k;z=ZC+(z-ZC)*k;
+    }
+    x=s*Math.max(s*x,limiteCardiaco(s,y,z)+inflate);
+    return V(x,Math.max(y,yDiafragmaToracico(x,z)+.0022),z);
+  }));
+  const g=loft(rings),p=g.attributes.position,colors=[];
+  for(let i=0;i<p.count;i++) {
+    const x=p.getX(i),y=p.getY(i),z=p.getZ(i),f=y-.184+.85*(z-ZC);
+    const grain=.96+.025*Math.sin(x*620+y*420)*Math.sin(z*700-y*370);
+    const sulco=fissuras?Math.max(gauss(f,0,.002),s===DIR&&z>-.025&&f>.005?gauss(y,.211,.0017):0):0;
+    colors.push(grain-.17*sulco,(grain-.20*sulco)*(f<0?.94:1),(grain-.18*sulco)*(f<0?1:.97));
+  }
+  g.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));return g;
+}
+
 /* ── Mediastino: traqueia anelada, brônquios, coração, aorta, cava, tronco pulmonar ── */
 let matrizCardiaca,carregamentoCardiaco;
 export function carregarCoracao() {
@@ -377,11 +553,11 @@ export function carregarCoracao() {
     for(const m of g.children){const p=m.geometry.attributes.position;
       for(let i=0;i<p.count;i++){
         const x=p.getX(i)+g.position.x,y=p.getY(i)+g.position.y,z=p.getZ(i)+g.position.z;
-        elevar=Math.max(elevar,yDiafragma(x,z)+.001-y);
+        elevar=Math.max(elevar,yDiafragmaToracico(x,z)+.001-y);
       }
     }
     g.position.y+=elevar;
-    matrizCardiaca=g;return g;
+    indexarCoracao(g);matrizCardiaca=g;return g;
   });
   return carregamentoCardiaco;
 }

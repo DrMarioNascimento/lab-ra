@@ -20,7 +20,7 @@ import * as THREE from 'three';
 import {
   DIR, ESQ, mk, loft, tuboGeo, construirCaixa, construirColuna, construirDiafragma,
   construirMediastino, geoPulmao, secaoPulmao, HILO, fragmentoGeo, tecidoGeo,
-  amostraPulmao, unidadeAcinar, redeCapilar,
+  amostraPulmao, unidadeAcinar, redeCapilar, yDiafragmaToracico, raioDiafragma, limiteCardiaco, wT, dT,
 } from './anatomia.js';
 
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
@@ -137,7 +137,8 @@ function nivelTorax() {
   caixa.add(construirCaixa(M), construirColuna(M));
   const pleuras = {};
   for (const s of [DIR, ESQ]) {
-    const m = mk(`pleura_parietal_${s === DIR ? 'D' : 'E'}`, geoPulmao(s, { inflate: .0015, fissuras: false, assoalho: .0105 }), M.pleuraP);
+    const m = mk(`pleura_parietal_${s === DIR ? 'D' : 'E'}`, geoPulmao(s, { inflate: .0015, fissuras: false, toracico: true }), M.pleuraP);
+    m.userData.repouso=m.geometry.attributes.position.array.slice();
     m.renderOrder = 4; m.castShadow = false; caixa.add(m); pleuras[s] = m;
   }
   const med = construirMediastino(M);
@@ -149,9 +150,10 @@ function nivelTorax() {
   const pulmoes = [ESQ, DIR].map(s => {
     const p = new THREE.Group(); p.name = `pulmao_${s === DIR ? 'D' : 'E'}`;
     const h = HILO(s); p.position.copy(h);
-    const malha = mk(`pulmao_${s === DIR ? 'D' : 'E'}_malha`, geoPulmao(s), M.pulmao);
+    const malha = mk(`pulmao_${s === DIR ? 'D' : 'E'}_malha`, geoPulmao(s,{toracico:true}), M.pulmao);
     malha.position.copy(h).negate();
     p.add(malha);
+    malha.userData.repouso=malha.geometry.attributes.position.array.slice();
     p.userData = { malha, lado: s, base: h.clone() };
     cm.add(p);
     return p;
@@ -269,14 +271,44 @@ export function criar() {
       /* o mediastino empurrado: o pulmão bom é deslocado PARA LONGE do lado
          doente — para a esquerda do paciente (+x) */
       p.position.x = p.userData.base.x + (doente ? 0 : ESQ * desvio * 0.026);
+      const pos=p.userData.malha.geometry.attributes.position,base=p.userData.malha.userData.repouso,h=p.userData.base;
+      for(let i=0;i<pos.count;i++) {
+        let x=p.position.x+(base[i*3]-h.x)*e,y=h.y+(base[i*3+1]-h.y)*e,z=h.z+(base[i*3+2]-h.z)*e;
+        if((!doente||pulmao>=.3)&&base[i*3+1]>h.y) {
+          const t=clamp((base[i*3+1]-.25)/.055,0,1),peso=1-t*t*(3-2*t);
+          y=base[i*3+1]+(base[i*3+1]-h.y)*(e-1)*peso;
+        }
+        // A expansão continua derivada do volume, mas as bases acompanham
+        // a cúpula e a face mediastinal respeita o coração do scan.
+        if(!doente||pulmao>=.3)for(let k=0;k<3;k++) {
+          y=Math.max(y,yDiafragmaToracico(x/ec,z/ec,inspiracao)+.0022);
+          const limite=limiteCardiaco(p.userData.lado,y,z);
+          x=p.userData.lado*Math.max(p.userData.lado*x,limite+p.userData.lado*desvio*.016);
+          const q=Math.hypot(x/(wT(y)*ec),z/(dT(y)*ec));
+          if(q>.97&&y<.283){x*=.97/q;z*=.97/q;}
+        }
+        pos.setXYZ(i,h.x+(x-p.position.x)/e,h.y+(y-h.y)/e,h.z+(z-h.z)/e);
+      }
+      pos.needsUpdate=true;p.userData.malha.geometry.computeVertexNormals();
+      p.userData.malha.geometry.computeBoundingSphere();
     });
     d.caixa.scale.set(ec, 1, ec);
+    d.diafragma.scale.set(ec,1,ec);
     d.med.position.x = ESQ * desvio * 0.016;
+    for(const m of Object.values(d.pleuras)) {
+      const p=m.geometry.attributes.position,base=m.userData.repouso;
+      for(let i=0;i<p.count;i++) {
+        const x=base[i*3],y=base[i*3+1],z=base[i*3+2],altura=y-yDiafragmaToracico(x,z);
+        const peso=clamp(1-altura/.045,0,1),rho=raioDiafragma(x,z).rho;
+        p.setY(i,y-.014*inspiracao*(1-rho*rho)*peso*peso*(3-2*peso));
+      }
+      p.needsUpdate=true;m.geometry.computeVertexNormals();m.geometry.computeBoundingSphere();
+    }
     d.diafragma.traverse(o=>{
       if(!o.isMesh)return;
       const p=o.geometry.attributes.position,base=o.userData.repouso;
       for(let i=0;i<p.count;i++){
-        const x=base[i*3],z=base[i*3+2],rho=Math.min(1,Math.hypot(x/.128,(z+.004)/.088));
+        const x=base[i*3],z=base[i*3+2],rho=raioDiafragma(x,z).rho;
         p.setY(i,base[i*3+1]-.014*inspiracao*(1-rho*rho));
       }
       p.needsUpdate=true;o.geometry.computeVertexNormals();
