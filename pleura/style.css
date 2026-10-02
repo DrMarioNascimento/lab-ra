@@ -153,3 +153,12 @@
 .leituras li.alerta b { color: #ff9d2e; }
 /* Orientação anatômica e escala dos cortes/microestruturas didáticas. */
 .anatomia-legenda { position:absolute;left:16px;right:16px;top:58px;z-index:2;text-align:center;pointer-events:none;color:#b8c8ba;font:10px/1.5 'IBM Plex Mono',monospace;letter-spacing:.02em; }
+.modelo-status { position:absolute;top:44%;left:12%;right:12%;padding:12px;text-align:center;background:#111c15e8;color:#dae6d2;font:.75rem var(--mono);border:1px solid #577557;border-radius:10px; }
+.fresta-pontos { position:absolute;inset:0;pointer-events:none; }
+.fresta-pontos span,.legenda-fresta li b { display:inline-flex;align-items:center;justify-content:center;width:23px;height:23px;border-radius:50%;border:1px solid var(--tecido,#c4d7b8);background:#10150fea;color:#eef2e9;font:700 11px var(--mono);flex-shrink:0; }
+.fresta-pontos span { position:absolute;transform:translate(-50%,-50%);box-shadow:0 1px 5px #0008; }
+.legenda-fresta ol { list-style:none;padding:0;margin:8px 0 12px;display:grid;gap:8px; }
+.legenda-fresta li { display:flex;align-items:center;gap:9px;font:.72rem var(--mono);line-height:1.4; }
+.legenda-fresta li b { box-shadow:inset 0 0 0 3px var(--tecido); }
+.credito-coracao { font:.66rem/1.55 var(--mono);color:#b7c7b0;margin:0; }
+.credito-coracao a { color:#d8e7ca;text-underline-offset:3px; }

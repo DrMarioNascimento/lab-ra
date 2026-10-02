@@ -25,6 +25,8 @@
     <div id="stage" class="stage" role="img" aria-label="Modelo tridimensional interativo">
       <canvas id="scene"></canvas>
       <div id="anatomiaLegenda" class="anatomia-legenda" aria-live="polite"></div>
+      <p id="modeloStatus" class="modelo-status" role="status">Carregando o coração anatômico…</p>
+      <div id="frestaPontos" class="fresta-pontos" aria-hidden="true" hidden></div>
       <div class="stage-hud"><span id="posturaLabel">Ortostatismo · 90°</span><span id="pplLabel">Pleural −6,2 cmH₂O</span><span id="stepLabel">01 · A fresta</span></div>
       <div class="gesture">Incline o aparelho · arraste para girar a vista</div>
       <div class="stage-tools">
@@ -43,6 +45,22 @@
       </article>
 
       <div class="actions"><button id="prev" class="secondary" type="button" disabled>← Voltar</button><button id="next" class="primary" type="button">Aprofundar →</button></div>
+
+      <section id="legendaFresta" class="caixa legenda-fresta" aria-label="Legenda das camadas da fresta">
+        <div class="caixa-head"><span class="eyebrow">Da parede ao pulmão</span></div>
+        <ol>
+          <li style="--tecido:#c7987c"><b>1</b> Pele</li>
+          <li style="--tecido:#d2b56d"><b>2</b> Tecido subcutâneo</li>
+          <li style="--tecido:#984757"><b>3</b> Músculos intercostais e costelas</li>
+          <li style="--tecido:#8db7ca"><b>4</b> Pleura parietal · ligada à parede</li>
+          <li style="--tecido:#a8dcf0"><b>5</b> Filme de líquido pleural</li>
+          <li style="--tecido:#d9a1b2"><b>6</b> Pleura visceral · ligada ao pulmão</li>
+          <li style="--tecido:#b77285"><b>7</b> Parênquima pulmonar</li>
+        </ol>
+        <p class="nota">Números sobre a peça. Camadas ampliadas para leitura. Ao furar a parede, o filme líquido dá lugar à separação por ar, em âmbar.</p>
+      </section>
+
+      <p id="creditoCoracao" class="credito-coracao" hidden>Coração: vista externa do protótipo · <a href="https://sketchfab.com/3d-models/realistic-human-heart-3f8072336ce94d18b3d0d055a1ece089" target="_blank" rel="noopener noreferrer">Realistic Human Heart</a>, de neshallads · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>. Escala, posição e acabamento ajustados ao tórax.</p>
 
       <section class="caixa" id="caixaPneumo" aria-label="Pneumotórax">
         <div class="caixa-head"><span class="eyebrow">A parede</span></div>

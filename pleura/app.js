@@ -19,6 +19,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { prepararParaRA } from '../cores-para-ra.js';
 import { criar } from './modelos.js';
 import { clonarVisual } from './ra.js';
+import { carregarCoracao } from './anatomia.js';
 import {
   PULMAO, VOLUMES, alturaEfetiva, pressaoPleural, transpulmonar, volumeRelativo,
   ventilacaoRelativa, zonaEm, fluxoEm, perfilDeZonas, estadoDoPneumotorax, eixoDependente,
@@ -52,6 +53,13 @@ const rim = new THREE.DirectionalLight(0x8fb8ff, 1.05); rim.position.set(-20, 16
 /* O corpo pende deste grupo, e é ele que a inclinação gira — girar a câmera
    daria a mesma imagem e a conta errada: quem tem postura é o corpo. */
 const root = new THREE.Group(); scene.add(root);
+try {
+  await carregarCoracao();
+  $('modeloStatus').hidden=true;
+} catch(err) {
+  $('modeloStatus').textContent='O coração anatômico não carregou. Recarregue a página para tentar novamente.';
+  console.error(err);
+}
 const { modelos, aplicarFresta, aplicarTorax, aplicarAlveolos, aplicarZonas } = criar();
 modelos.forEach((m, i) => { m.visible = i === 0; root.add(m); });
 
@@ -72,7 +80,8 @@ const raio = modelos.map(m => {
    o modelo sairia pela beira justamente nos dois estados que a bancada mostra */
 const FOLGA = 1.35;
 function enquadrar(n) {
-  const d = raio[n] * FOLGA / Math.tan(camera.fov * Math.PI / 360) * 1.1;
+  const folga=n===3?1.08:FOLGA;
+  const d = raio[n] * folga / Math.tan(camera.fov * Math.PI / 360) * 1.1;
   camera.position.set(d * .22, d * .12, d * .95);
   controls.target.set(0, 0, 0);
   controls.minDistance = d * .3; controls.maxDistance = d * 2.6;
@@ -135,7 +144,7 @@ const TEXTOS = [
     texto: 'Fura a parede e o empate acaba: cada mola vai para o seu volume de repouso. O pulmão colapsa a 10% e — a parte que ninguém espera — a caixa ABRE até 60%. No hipertensivo a pressão passa de zero — e o que mata não é o desvio do mediastino, que é o sinal: é a pressão positiva ESMAGANDO O RETORNO VENOSO. Choque obstrutivo. Pela mesma conta, com sinal trocado, pleura mais negativa ajuda o retorno: é a bomba torácica.',
     tags: ['pulmão 10% · caixa 60%', 'retorno venoso a 64%'] },
   { olho: 'Nível 04', titulo: 'O ápice é maior e ventila menos',
-    texto: 'A pressão pleural não é um número, é um gradiente: −10 no ápice, −2,5 na base. O alvéolo de cima já está esticado e senta na parte plana da curva; o de baixo senta no joelho, onde a mesma pressão enche muito mais. Respire com o botão e veja: numa respiração a base vai de 22% a 42% do volume e o ápice, de 63% a 73%. A base ganha o dobro sendo menor.',
+    texto: 'A pressão pleural não é um número, é um gradiente: −10 no ápice, −2,5 na base. O alvéolo de cima já está esticado e senta na parte plana da curva; o de baixo senta no joelho, onde a mesma pressão enche muito mais. Ao deitar, os tamanhos ao longo do eixo ápice–base se aproximam; o gradiente passa para o eixo esterno–dorso. Respire com o botão e veja: numa respiração a base vai de 22% a 42% do volume e o ápice, de 63% a 73%. A base ganha o dobro sendo menor.',
     tags: ['−10 no ápice, −2,5 na base', 'a base ganha o dobro'] },
   { olho: 'Nível 05', titulo: 'As zonas de West',
     texto: 'Três pressões disputam o capilar: a arterial, a venosa e a alveolar, que aperta por fora. Em pé, a coluna de sangue faz o ápice receber pouco. Deitado, o pulmão inteiro vira zona 3. É a mesma gravidade do gradiente pleural, agora do lado da perfusão.',
@@ -152,6 +161,25 @@ const CONTEXTO = [
 ];
 
 let atual = 0;
+const pontosFresta=[
+  [9,5,2.65,'#c7987c'],[6.5,4,2.25,'#d2b56d'],[3.5,3,1.65,'#984757'],
+  [0,2,.64,'#8db7ca'],[-2,1,.55,'#a8dcf0'],[-4.5,0,.40,'#d9a1b2'],[-8,-2,.30,'#b77285'],
+].map(([x,y,z,cor],i)=>{
+  const marcador=document.createElement('span');marcador.textContent=i+1;marcador.style.setProperty('--tecido',cor);
+  $('frestaPontos').appendChild(marcador);
+  return {marcador,ponto:new THREE.Vector3(x,y,z-.013*x*x-.004*y*y),camada:i<4?'parede':i===4?'filme':i===5?'visceral':'dentro'};
+});
+function posicionarLegendaFresta() {
+  if(atual!==0)return;
+  modelos[0].updateWorldMatrix(true,true);
+  for(const {marcador,ponto,camada} of pontosFresta) {
+    const p=ponto.clone();p.z+=modelos[0].userData[camada].position.z;
+    p.applyMatrix4(modelos[0].matrixWorld).project(camera);
+    marcador.style.left=`${(p.x+1)*.5*stage.clientWidth}px`;
+    marcador.style.top=`${(1-p.y)*.5*stage.clientHeight}px`;
+    marcador.hidden=p.z>1||p.z< -1;
+  }
+}
 function irAoNivel(n) {
   atual = clamp(n, 0, 4);
   modelos.forEach((m, i) => { m.visible = i === atual; });
@@ -167,6 +195,9 @@ function irAoNivel(n) {
   $('caixaPneumo').hidden = atual > 2;
   $('caixaPostura').hidden = atual === 0;
   $('caixaZonas').hidden = atual !== 4;
+  $('legendaFresta').hidden = atual !== 0;
+  $('frestaPontos').hidden = atual !== 0;
+  $('creditoCoracao').hidden = atual !== 1 && atual !== 2;
   enquadrar(atual);
   atualizar(); prepararRA();
 }
@@ -182,17 +213,20 @@ function atualizar() {
   root.rotation.z = g2r(90 - grau);
 
   aplicarFresta(pn.ppl);
-  const forcas = { pulmao: pneumo === 'nenhum' ? 5 : 1.6, caixa: pneumo === 'nenhum' ? 5 : 3.6 };
   const repouso=volumeRelativo(transpulmonar(.5,grau,{...ajuste(),pneumo:'nenhum'}));
   const inspirado=volumeRelativo(transpulmonar(.5,grau,{...ajuste(),pneumo:'nenhum'})-dPpl);
   const ciclo=repouso>0?Math.cbrt(inspirado/repouso):1;
   const inspiracao=clamp(-dPpl/AMPLITUDE_PPL,0,1);
-  aplicarTorax(1, { pulmao: VOLUMES.crf, caixa: VOLUMES.crf, forcas, ciclo, inspiracao });
+  aplicarTorax(1, { pulmao: VOLUMES.crf, caixa: VOLUMES.crf, ciclo, inspiracao });
   aplicarTorax(2, { pulmao: pn.pulmao, caixa: pn.caixa, desvio: pn.desvio, ciclo, inspiracao });
   /* o ciclo desloca a pleural inteira: a física entrega o gradiente parado e
      o app soma a respiração por cima, que é o que a musculatura faz */
   const plEm = f => transpulmonar(f, grau, e) - dPpl;
   aplicarAlveolos(f => volumeRelativo(plEm(f)));
+  if(atual===3)$('anatomiaLegenda').textContent=grau<20
+    ? 'Unidades ampliadas · deitado, tamanhos semelhantes no eixo ápice–base'
+    : grau>70?'Unidades ampliadas · em pé, maiores no ápice e menores na base'
+    : 'Unidades ampliadas · inclinado, a diferença entre ápice e base diminui';
   aplicarZonas(f => zonaEm(f, grau, e), f => fluxoEm(f, grau, e));
 
   $('posturaLabel').textContent = grau < 20 ? `Decúbito · ${grau.toFixed(0)}°`
@@ -275,7 +309,7 @@ function ajustar() {
   desenhar();
 }
 addEventListener('resize', ajustar);
-function desenhar() { desenharCurva(); renderer.render(scene, camera); }
+function desenhar() { desenharCurva(); renderer.render(scene, camera); posicionarLegendaFresta(); }
 
 let anterior = performance.now();
 renderer.setAnimationLoop(agora => {
@@ -288,6 +322,7 @@ renderer.setAnimationLoop(agora => {
   if (respirando || Math.abs(grau - antes) > .02) atualizar();
   controls.update();
   renderer.render(scene, camera);
+  posicionarLegendaFresta();
 });
 
 /* ------------------------------------------------------------ controles */

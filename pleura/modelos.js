@@ -65,7 +65,6 @@ export const M = {
   zona1:      phys('zona1',      { color: CORES.zona1.getHex(), roughness: .5 }),
   zona2:      phys('zona2',      { color: CORES.zona2.getHex(), roughness: .5 }),
   zona3:      phys('zona3',      { color: CORES.zona3.getHex(), roughness: .5 }),
-  seta:       phys('seta',       { color: 0xf5c518, roughness: .4, emissive: cor(70, 52, 0).getHex(), emissiveIntensity: .5, depthTest: false }),
   /* nível 01, o corte */
   parede:     phys('parede',     { color: 0xd8b9a6, roughness: .74, sheen: .8, sheenColor: cor(255, 214, 190), transparent: true, opacity: .16, depthWrite: false }),
   musculo:    phys('musculo',    { color: 0xa84f5a, roughness: .7, transparent: true, opacity: .3, depthWrite: false }),
@@ -130,7 +129,7 @@ function nivelFresta() {
    As duas molas e o pneumotórax usam a MESMA peça: é o mesmo tórax, com e
    sem furo. A caixa (costelas, esterno, coluna e a pleura PARIETAL, que é da
    parede) escala em x e z; cada pulmão escala em torno do seu hilo. */
-function nivelTorax({ comSetas = false } = {}) {
+function nivelTorax() {
   const g = new THREE.Group();
   const cm = emCm(); g.add(cm);
 
@@ -158,26 +157,7 @@ function nivelTorax({ comSetas = false } = {}) {
     return p;
   });
 
-  let setas = null;
-  if (comSetas) {
-    /* uma seta para dentro (o pulmão recolhe) e uma para fora (a caixa
-       empurra), na mesma altura, na parede lateral direita: é o EMPATE delas
-       que faz a pressão negativa. Geometria em metros, dentro do `cm`. */
-    setas = new THREE.Group(); setas.name = 'setas';
-    for (const [nome, sinal] of [['pulmao', -1], ['caixa', 1]]) {
-      const s = new THREE.Group(); s.name = `seta_${nome}`;
-      const haste = mk(`haste_${nome}`, new THREE.CylinderGeometry(.0042, .0042, .01, 12), M.seta);
-      haste.geometry.rotateZ(-Math.PI / 2); haste.geometry.translate(.005, 0, 0);   // 1 cm, esticado por scale.x
-      const ponta = mk(`ponta_${nome}`, new THREE.ConeGeometry(.0105, .02, 14), M.seta);
-      ponta.geometry.rotateZ(-Math.PI / 2); ponta.geometry.translate(.01, 0, 0);
-      haste.renderOrder = ponta.renderOrder = 20;   // a seta se vê através do pulmão
-      s.add(haste, ponta);
-      s.userData = { nome, sinal, haste, ponta };
-      setas.add(s);
-    }
-    cm.add(setas);
-  }
-  g.userData = { caixa, pulmoes, setas, med, pleuras, diafragma };
+  g.userData = { caixa, pulmoes, med, pleuras, diafragma };
   g.position.y = -15;
   return g;
 }
@@ -186,7 +166,7 @@ function nivelTorax({ comSetas = false } = {}) {
    O pulmão direito em vidro, centrado no eixo, e uma coluna de alvéolos do
    ápice à base na parte posterior — onde o pulmão é mais alto. O raio de
    cada um vem da física. */
-const N_ALV = 9;
+const N_ALV = 7;
 function pulmaoDeVidro() {
   const cm = emCm();
   cm.position.x = -secaoPulmao(DIR, 0.18).xc * 100;   // centra o pulmão no eixo de rotação
@@ -199,9 +179,11 @@ function nivelGradiente() {
   const g = new THREE.Group();
   const cm = pulmaoDeVidro(); g.add(cm);
   const alveolos = [];
+  const amostras=Array.from({length:N_ALV},(_,i)=>amostraPulmao(DIR,.25+.70*i/(N_ALV-1)));
+  const r=Math.min(.030,...amostras.map(a=>a.folga*.88));
   for (let i = 0; i < N_ALV; i++) {
     const f = i / (N_ALV - 1);
-    const a=amostraPulmao(DIR,f),r=Math.min(.011,a.rx*.30,a.rz*.30);
+    const a=amostras[i];
     const m=unidadeAcinar(M,r);m.name=`unidade_alveolar_${i+1}`;
     m.position.copy(a.centro);
     m.userData.f = f;
@@ -209,7 +191,9 @@ function nivelGradiente() {
   }
   cm.add(mk('bronquiolo_terminal',tuboGeo(alveolos.map(m=>m.position.clone()),.00115,64),M.traqueia));
   g.userData = { alveolos };
-  g.position.y = -15;
+  const envelope=cm.children[0].geometry;
+  envelope.computeBoundingBox();
+  g.position.y=-(envelope.boundingBox.min.y+envelope.boundingBox.max.y)*50;
   return g;
 }
 
@@ -242,7 +226,7 @@ function nivelZonas() {
 
 /* ========================================================================= */
 export function criar() {
-  const modelos = [nivelFresta(), nivelTorax({ comSetas: true }), nivelTorax(),
+  const modelos = [nivelFresta(), nivelTorax(), nivelTorax(),
                    nivelGradiente(), nivelZonas()];
   modelos.forEach((m, i) => { m.visible = i === 0; });
 
@@ -272,7 +256,7 @@ export function criar() {
   /* fração da capacidade total → escala linear: volume vai com o cubo */
   const escalaDe = fracao => Math.cbrt(clamp(fracao, .02, 1.2) / .40);
 
-  function aplicarTorax(nivel, { pulmao, caixa, desvio = 0, forcas = null, ciclo = 1, inspiracao = 0 }) {
+  function aplicarTorax(nivel, { pulmao, caixa, desvio = 0, ciclo = 1, inspiracao = 0 }) {
     const d = modelos[nivel].userData;
     if (!d || !d.pulmoes) return;
     const ep = escalaDe(pulmao)*(pulmao>=.3?ciclo:1), ec = escalaDe(caixa)*(pulmao>=.3?ciclo:1);
@@ -301,25 +285,13 @@ export function criar() {
        recolhido é o espaço — e ele é âmbar porque a pressão virou positiva */
     d.pleuras[DIR].material = pulmao < .3 ? M.pleuraAr : M.pleuraP;
 
-    if (d.setas && forcas) {
-      /* na parede lateral direita, à altura do 5º espaço, em metros */
-      const xParede = DIR * 0.128 * ec, y = 0.17, z = 0.03;
-      for (const s of d.setas.children) {
-        const v = Math.abs(forcas[s.userData.nome]) * .55 * 0.01;
-        s.userData.haste.scale.x = Math.max(.01, v / .01);
-        s.userData.ponta.position.x = Math.max(0, v - .02);
-        if (s.userData.sinal < 0) { s.position.set(xParede + 0.012, y + 0.009, z); s.rotation.z = 0; }   // pulmão recolhe: para o centro
-        else { s.position.set(xParede - 0.008, y - 0.009, z); s.rotation.z = Math.PI; }                 // caixa empurra: para fora
-        s.visible = v > .002;
-      }
-    }
   }
 
   /* Os alvéolos do nível 04: o raio sai do volume relativo (cubo). Em cm. */
   function aplicarAlveolos(volumeEm) {
     for (const m of modelos[3].userData.alveolos) {
       const v = volumeEm(m.userData.f);
-      m.scale.setScalar(.6 + 1.1 * Math.cbrt(clamp(v, 0, 1)));
+      m.scale.setScalar(Math.cbrt(clamp(v, 0, 1)));
     }
   }
 

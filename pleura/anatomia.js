@@ -5,7 +5,7 @@
    ========================================================================== */
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { criar as criarCoracao } from '../coracao/modelos.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 export const DIR = -1, ESQ = 1;
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
@@ -351,24 +351,42 @@ export function geoPulmao(s, { inflate = 0, fissuras = true, assoalho = 0.012 } 
 }
 
 /* ── Mediastino: traqueia anelada, brônquios, coração, aorta, cava, tronco pulmonar ── */
-let matrizCardiaca;
-function coracaoDoRepositorio() {
-  if(!matrizCardiaca) {
-    // Reutiliza integralmente a geometria da bancada cardíaca, sem editar
-    // seus arquivos nem acoplar o ciclo cardíaco à física pleural.
-    const {modelos}=criarCoracao(),origem=modelos[0];
-    origem.remove(origem.userData.sangue,...Object.values(origem.userData.valvas));
-    origem.updateMatrixWorld(true);
-    const g=new THREE.Group();g.name='coracao_do_repositorio';
-    origem.traverse(o=>{
-      if(!o.isMesh||o.userData.papelParede==='interna')return;
-      const geo=o.geometry.clone().applyMatrix4(o.matrixWorld);geo.scale(.001,.001,.001);
-      const m=mk(o.name||'tecido_cardiaco',geo,o.material);g.add(m);
+let matrizCardiaca,carregamentoCardiaco;
+export function carregarCoracao() {
+  if(!carregamentoCardiaco)carregamentoCardiaco=new GLTFLoader().loadAsync(
+    new URL('../bancadas/11-coracao/fontes/scan/A-scan-realista.glb',import.meta.url).href
+  ).then(({scene})=>{
+    scene.updateMatrixWorld(true);
+    const bb=new THREE.Box3().setFromObject(scene),centro=bb.getCenter(new THREE.Vector3());
+    const escala=.105/bb.getSize(new THREE.Vector3()).y;
+    const g=new THREE.Group();g.name='coracao_scan_prototipo';
+    scene.traverse(o=>{
+      if(!o.isMesh)return;
+      const geo=o.geometry.clone().applyMatrix4(o.matrixWorld);
+      geo.translate(-centro.x,-centro.y,-centro.z);geo.scale(escala,escala,escala);
+      const mat=o.material.clone();
+      // Mesmo acabamento da Vista Externa do protótipo; textura preservada.
+      mat.roughnessMap=null;mat.metalness=0;mat.roughness=.55;
+      mat.emissive=new THREE.Color('#a8494a');mat.emissiveIntensity=.16;
+      mat.userData={};
+      g.add(mk('coracao_scan_realista',geo,mat));
     });
-    matrizCardiaca=compactar(g);
-    const disposed=new Set();for(const model of modelos)model.traverse(o=>{if(o.geometry&&!disposed.has(o.geometry)){disposed.add(o.geometry);o.geometry.dispose();}});
-  }
-  return matrizCardiaca.clone();
+    g.position.set(.012,.207,.018);
+    // Assenta a face diafragmática sem atravessar a cúpula.
+    let elevar=0;
+    for(const m of g.children){const p=m.geometry.attributes.position;
+      for(let i=0;i<p.count;i++){
+        const x=p.getX(i)+g.position.x,y=p.getY(i)+g.position.y,z=p.getZ(i)+g.position.z;
+        elevar=Math.max(elevar,yDiafragma(x,z)+.001-y);
+      }
+    }
+    g.position.y+=elevar;
+    matrizCardiaca=g;return g;
+  });
+  return carregamentoCardiaco;
+}
+function coracaoDoRepositorio() {
+  return matrizCardiaca?matrizCardiaca.clone():new THREE.Group();
 }
 export function construirMediastino(M) {
   const g = new THREE.Group(); g.name = 'mediastino';
@@ -383,8 +401,6 @@ export function construirMediastino(M) {
   g.add(mk('bronquio_D', tuboGeo([V(0, 0.242, -0.014), V(DIR * 0.018, 0.228, -0.013), V(DIR * 0.042, 0.212, -0.01)], 0.0066, 12), M.traqueia));
   g.add(mk('bronquio_E', tuboGeo([V(0, 0.242, -0.014), V(ESQ * 0.022, 0.232, -0.014), V(ESQ * 0.05, 0.218, -0.012)], 0.0058, 12), M.traqueia));
   const coracao=coracaoDoRepositorio();
-  coracao.position.set(.012,.177,.014);
-  coracao.scale.setScalar(.84);
   g.add(coracao);
   return g;
 }
