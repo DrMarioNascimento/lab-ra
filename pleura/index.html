@@ -4,11 +4,11 @@
   <meta charset="utf-8" />
   <link rel="icon" href="../brand/orientador.webp" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#050a06" />
+  <meta name="theme-color" content="#091923" />
   <title>O espaço pleural · Laboratório do Pesquisar RA</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=IBM+Plex+Mono:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../laboratorio.css" />
   <link rel="stylesheet" href="style.css" />
   <script src="../guard.js"></script>
@@ -16,13 +16,21 @@
   <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.1.0/dist/model-viewer.min.js"></script>
 </head>
 <body>
-<header class="topbar"><nav class="nav shell" aria-label="Laboratório"><a class="brand" href="../bancadas.html"><img src="../brand/orientador.webp" alt="" width="42" height="42"><span class="brand-copy"><b>LABORATÓRIO DO PESQUISAR RA</b><span>Fisiologia · Unidade V</span></span></a><div class="nav-actions"><a class="small-button" href="../bancadas.html">Testes</a></div></nav></header>
+<header class="topbar"><nav class="nav shell" aria-label="Laboratório"><a class="brand" href="../bancadas.html"><img src="../brand/orientador.webp" alt="" width="42" height="42"><span class="brand-copy"><b>LABORATÓRIO DO PESQUISAR RA</b><span>Fisiologia · Unidade V</span></span></a><div class="nav-actions"><a class="small-button" href="../bancadas.html">Bancadas</a></div></nav></header>
 <main class="page shell">
-  <div class="page-head"><div><span class="eyebrow">Teste 10 · Unidade V · pleura e West</span><h1>O espaço pleural</h1></div><a class="back-link" href="../bancadas.html">← Voltar</a></div>
-  <p class="page-note">Entre as duas pleuras não há vão: há um filme de líquido e pressão negativa segurando as duas encostadas. O espaço pleural só vira espaço de verdade quando alguém fura a parede — e aí o pulmão colapsa a 10% e a caixa torácica ABRE até 60%, que é a parte que ninguém espera. Nos dois últimos níveis o aparelho vira o corpo outra vez: em pé, o peso do pulmão abre o gradiente pleural e a coluna de sangue abre as zonas de West; deitado, as duas achatam. É a relação V/Q num sensor só.</p>
+  <div class="page-head"><div><span class="eyebrow">Bancada 10 · Unidade V · Pleura e West</span><h1>O espaço pleural</h1></div><a class="back-link" href="../bancadas.html">← Voltar</a></div>
+  <p class="page-note">Explore as camadas pleurais, a mecânica respiratória, o pneumotórax, o gradiente pleural e as zonas de West. Mude a postura e acompanhe a relação entre pressão, ventilação e perfusão.</p>
+
+  <section id="cicloControls" class="ciclo-controls" aria-label="Ciclo respiratório" hidden>
+    <div class="playback"><span class="eyebrow">Ciclo respiratório</span><button id="respirar" class="primary" type="button">Iniciar</button><button id="pausar" type="button" disabled>Pausar</button><button id="reiniciar" type="button" title="Voltar ao fim da expiração">Reiniciar</button></div>
+    <p id="cicloEstado" role="status">Fim da expiração</p>
+  </section>
+
+  <div class="progress" aria-label="Níveis"><button class="step active" data-step="0" type="button"><b>01</b><span>Camadas</span></button><button class="step" data-step="1" type="button"><b>02</b><span>Mecânica</span></button><button class="step" data-step="2" type="button"><b>03</b><span>Pneumotórax</span></button><button class="step" data-step="3" type="button"><b>04</b><span>Gradiente</span></button><button class="step" data-step="4" type="button"><b>05</b><span>Zonas de West</span></button></div>
 
   <section class="experience" aria-label="Exploração tridimensional da pleura e das zonas de West">
-    <div id="stage" class="stage" role="img" aria-label="Modelo tridimensional interativo">
+    <div class="viewer-column">
+      <div id="stage" class="stage" role="img" aria-label="Modelo tridimensional interativo">
       <canvas id="scene"></canvas>
       <div id="anatomiaLegenda" class="anatomia-legenda" aria-live="polite"></div>
       <p id="modeloStatus" class="modelo-status" role="status">Carregando o coração anatômico…</p>
@@ -30,12 +38,9 @@
       <div class="stage-hud"><span id="posturaLabel">Ortostatismo · 90°</span><span id="pplLabel">Pleural −6,2 cmH₂O</span><span id="stepLabel">01 · Camadas</span></div>
       <div class="gesture">Incline o aparelho · arraste para girar a vista</div>
       <div class="stage-tools">
-        <button id="resetView" class="ghost-control" type="button">Recentrar</button>
+        <button id="resetView" class="ghost-control" type="button">Restaurar vista</button>
       </div>
     </div>
-
-    <aside class="panel">
-      <div class="progress" aria-label="Níveis"><button class="step active" data-step="0" type="button"><b>01</b><span>Camadas</span></button><button class="step" data-step="1" type="button"><b>02</b><span>As molas</span></button><button class="step" data-step="2" type="button"><b>03</b><span>Pneumotórax</span></button><button class="step" data-step="3" type="button"><b>04</b><span>O gradiente</span></button><button class="step" data-step="4" type="button"><b>05</b><span>As zonas</span></button></div>
 
       <article class="info-card" id="infoCard">
         <span class="eyebrow" id="infoEyebrow">A pergunta</span>
@@ -44,8 +49,10 @@
         <div class="microtags" id="microtags"></div>
       </article>
 
-      <div class="actions"><button id="prev" class="secondary" type="button" disabled>← Voltar</button><button id="next" class="primary" type="button">Aprofundar →</button></div>
+      <div class="actions"><button id="prev" class="secondary" type="button" disabled>← Anterior</button><button id="next" class="primary" type="button">Próximo →</button></div>
+    </div>
 
+    <aside class="panel" aria-label="Controles e leituras">
       <section id="legendaFresta" class="caixa legenda-fresta" aria-label="Legenda das camadas da parede ao pulmão">
         <div class="caixa-head"><span class="eyebrow">Da parede ao pulmão</span></div>
         <ol>
@@ -63,10 +70,10 @@
       <p id="creditoCoracao" class="credito-coracao" hidden>Coração: vista externa do protótipo · <a href="https://sketchfab.com/3d-models/realistic-human-heart-3f8072336ce94d18b3d0d055a1ece089" target="_blank" rel="noopener noreferrer">Realistic Human Heart</a>, de neshallads · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>. Escala, posição e acabamento ajustados ao tórax.</p>
 
       <section class="caixa" id="caixaPneumo" aria-label="Pneumotórax">
-        <div class="caixa-head"><span class="eyebrow">A parede</span></div>
+        <div class="caixa-head"><span class="eyebrow">Estado pleural</span></div>
         <div class="causas" id="pneumos">
-          <button type="button" data-pneumo="nenhum" class="on">Fechada</button>
-          <button type="button" data-pneumo="aberto">Furada</button>
+          <button type="button" data-pneumo="nenhum" class="on">Normal</button>
+          <button type="button" data-pneumo="aberto">Aberto</button>
           <button type="button" data-pneumo="hipertensivo">Hipertensivo</button>
         </div>
         <ul class="leituras">
@@ -78,21 +85,22 @@
 
       <section class="caixa" id="caixaPostura" aria-label="Postura" hidden>
         <div class="caixa-head">
-          <span class="eyebrow">Postura do aparelho</span>
-          <div class="caixa-btns"><button id="respirar" type="button">Respirar</button><button id="deitar" type="button">Deitar</button><button id="levantar" type="button">Levantar</button></div>
+          <span class="eyebrow">Postura do corpo</span>
+          <div class="caixa-btns"><button id="deitar" type="button">Deitado</button><button id="levantar" type="button">Em pé</button></div>
         </div>
         <button id="permitir" class="permitir" type="button" hidden>Usar a inclinação do aparelho</button>
-        <p id="sensorEstado" class="estado">procurando o sensor…</p>
+        <p id="sensorEstado" class="estado">Verificando sensor de inclinação…</p>
         <label class="ctrl"><span>Inclinação <b id="grauValor">90°</b></span>
           <input id="grauCursor" type="range" min="0" max="90" step="1" value="90" aria-label="Inclinação do corpo" /></label>
         <ul class="leituras">
           <li>pressão pleural no ápice <b><span id="lApice">−10.0</span> cmH₂O</b></li>
           <li>na base <b><span id="lBase">−2.5</span> cmH₂O</b></li>
-          <li>altura que a gravidade vê <b><span id="lAltura">30</span> cm</b></li>
-          <li>alvéolo do ápice <b><span id="lVolApice">63</span>%</b> · base <b><span id="lVolBase">22</span>%</b></li>
-          <li>a base ventila <b><span id="lVent">2.12×</span></b> o ápice</li>
+          <li>altura que efetiva do eixo gravitacional <b><span id="lAltura">30</span> cm</b></li>
+          <li>Volume alveolar no ápice <b><span id="lVolApice">63</span>%</b></li>
+          <li>Volume alveolar na base <b><span id="lVolBase">22</span>%</b></li>
+          <li>Ventilação base/ápice <b><span id="lVent">2.12×</span></b></li>
           <li>pressão alveolar <b><span id="lPalv">0.00</span> cmH₂O</b></li>
-          <li>o ciclo <b><span id="lFase">parado no fim da expiração</span></b></li>
+          <li>Fase respiratória <b><span id="lFase">parado no fim da expiração</span></b></li>
         </ul>
         <canvas id="curvaPerfil" width="330" height="180" aria-label="Ventilação e perfusão do ápice à base"></canvas>
       </section>
@@ -103,13 +111,13 @@
         <p id="notaCenario" class="estado"></p>
         <ul class="leituras">
           <li>do ápice à base <b><span id="lZonas">223333333</span></b></li>
-          <li>a base recebe <b><span id="lFluxo">2.24×</span></b> o ápice</li>
+          <li>Perfusão base/ápice <b><span id="lFluxo">2.24×</span></b></li>
         </ul>
       </section>
 
       <section class="ra-box" aria-label="Realidade aumentada">
         <model-viewer id="arViewer" alt="Modelo do tórax em realidade aumentada" ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" ar-scale="auto" camera-controls loading="eager" reveal="auto" shadow-intensity="1" exposure="1.1"></model-viewer>
-        <button id="launchAR" class="ra-launch" type="button" disabled>Colocar este nível no ambiente</button>
+        <button id="launchAR" class="ra-launch" type="button" disabled>Abrir em realidade aumentada</button>
         <p id="raStatus" class="ra-status">Preparando o modelo para a câmera…</p>
       </section>
     </aside>
