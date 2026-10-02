@@ -4,7 +4,7 @@
    esquerda de quem olha, como numa radiografia. Nada de DOM, nada de física.
    ========================================================================== */
 import * as THREE from 'three';
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { mergeGeometries, mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 export const DIR = -1, ESQ = 1;
@@ -257,7 +257,7 @@ function costela(g, M, s, j) {
   const perfil = t => { const k = flutuante ? .10+.90*Math.pow(1-t,.65) : 1; const q = 0.6 + 0.4 * Math.pow(Math.sin(Math.PI * clamp(t / tj, 0, 1)), .4); return { h: hb * q * k, w: wb * (0.8 + 0.2 * q) * k }; };
   // A frente direita fica translúcida, mantendo todas as articulações.
   // Os segmentos posteriores continuam opacos para delimitar o pulmão.
-  const janela=s===DIR&&j>=2&&j<=7;
+  const janela=false;
   const janelaOsso=M.ossoJanela||M.osso,janelaCart=M.cartilagemJanela||M.cartilagem;
   const corte=janela?Math.min(.60,tj):tj;
   g.add(mk(`costela_${lado(s)}_${j+1}_posterior`,fita(curva,0,corte,perfil,48),M.osso));
@@ -266,7 +266,12 @@ function costela(g, M, s, j) {
 }
 export function construirCaixa(M) {
   const g = new THREE.Group(); g.name = 'caixa_toracica';
-  for (let j = 0; j < 12; j++) { costela(g, M, DIR, j); costela(g, M, ESQ, j); }
+  for (let j = 0; j < 12; j++) for(const sign of [DIR,ESQ]) {
+    const rib=new THREE.Group();rib.name=`costela_articulada_${lado(sign)}_${j+1}`;
+    costela(rib,M,sign,j);compactar(rib);
+    rib.userData={lado:sign,numero:j+1,articulacao:articulacaoCostal(sign,j)};
+    g.add(rib);
+  }
   for(const s of [DIR,ESQ])g.add(mk(`margem_costal_${lado(s)}`,tuboGeo(arcoCostal(s),.0033,48),M.cartilagem));
   const perfil = [...ESTERNO].reverse();
   const rings = perfil.map(([y, hw]) => {
@@ -479,12 +484,18 @@ export function limiteCardiaco(s,y,z) {
     ty*((1-tz)*c[(iy+1)*nz+iz]+tz*c[(iy+1)*nz+iz+1]);
 }
 function geoPulmaoToracico(s,{inflate=0,fissuras=true}={}) {
-  const K=112,NB=18,NW=96,ZC=-.008,apice=(s===DIR?.308:.303)+inflate;
+  const K=112,NB=18,NW=96,ZC=-.008,apice=(s===DIR?.301:.308)+inflate;
   const assoalho=Math.max(.0007,.0022-inflate);
   const ponto=(y,phi,R=1)=> {
     const c=Math.cos(phi),sn=Math.sin(phi),w=wT(y)-.010+inflate,d=dT(y)-.010+inflate;
     const medial=(s===ESQ?.017:.013)-inflate,xc=(w+medial)/2;
     let x=xc+(w-medial)/2*c*R,z=ZC+sn*(sn>0?d*.85:d*.90)*R;
+    if(s===ESQ) {
+      const anterior=clamp((sn-.10)/.75,0,1)*clamp(-c*1.8,0,1);
+      // Incisura sobre a projeção lingular do lobo superior esquerdo.
+      x+=.009*gauss(y,.202,.026)*anterior;
+      z+=.004*gauss(y,.167,.013)*anterior;
+    }
     // Face costal convexa, sem a antiga parede posterior recortada em plano.
     const q=Math.hypot(x/w,z/d);if(q>.96){x*=.96/q;z*=.96/q;}
     const impressao=limiteCardiaco(s,y,z)-inflate;
@@ -525,6 +536,64 @@ function geoPulmaoToracico(s,{inflate=0,fissuras=true}={}) {
     colors.push(grain-.17*sulco,(grain-.20*sulco)*(f<0?.94:1),(grain-.18*sulco)*(f<0?1:.97));
   }
   g.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));return g;
+}
+
+function recortarLobo(geo,normal,constant) {
+  const pos=geo.attributes.position,col=geo.attributes.color,norm=geo.attributes.normal,idx=geo.index;
+  const vertices=[],colors=[],normals=[],segments=[];
+  const distance=p=>normal.dot(p)+constant;
+  const emit=v=>{vertices.push(...v.p.toArray());colors.push(...v.c.toArray());normals.push(...v.n.toArray());};
+  for(let i=0;i<idx.count;i+=3) {
+    const original=Array.from({length:3},(_,j)=>{const k=idx.getX(i+j);return {p:V(pos.getX(k),pos.getY(k),pos.getZ(k)),c:V(col.getX(k),col.getY(k),col.getZ(k)),n:V(norm.getX(k),norm.getY(k),norm.getZ(k))};});
+    const out=[],cut=[];
+    for(let j=0;j<3;j++) {
+      const a=original[j],b=original[(j+1)%3],da=distance(a.p),db=distance(b.p);
+      if(da>=0)out.push(a);
+      if((da>=0)!==(db>=0)) {
+        const t=da/(da-db),v={p:a.p.clone().lerp(b.p,t),c:a.c.clone().lerp(b.c,t),n:a.n.clone().lerp(b.n,t).normalize()};
+        out.push(v);cut.push(v.p);
+      }
+    }
+    for(let k=1;k<out.length-1;k++){emit(out[0]);emit(out[k]);emit(out[k+1]);}
+    if(cut.length===2)segments.push(cut);
+  }
+  const points=[],edges=[],lookup=new Map(),key=p=>p.toArray().map(v=>Math.round(v*1e8)).join(',');
+  const add=p=>{const k=key(p);if(!lookup.has(k)){lookup.set(k,points.length);points.push(p);}return lookup.get(k);};
+  segments.forEach(([a,b])=>edges.push([add(a),add(b)]));
+  const links=new Map();edges.forEach(([a,b],i)=>{for(const v of [a,b]){if(!links.has(v))links.set(v,[]);links.get(v).push(i);}});
+  const used=new Set(),N=normal.clone().normalize(),U=V(1,0,0),W=new THREE.Vector3().crossVectors(N,U).normalize();
+  for(let e=0;e<edges.length;e++) {
+    if(used.has(e))continue;
+    const loop=[edges[e][0]],start=loop[0];let at=edges[e][1];used.add(e);
+    while(at!==start&&loop.length<=edges.length+1) {
+      loop.push(at);const next=(links.get(at)||[]).find(k=>!used.has(k));
+      if(next===undefined)break;used.add(next);const edge=edges[next];at=edge[0]===at?edge[1]:edge[0];
+    }
+    if(at!==start||loop.length<3)continue;
+    const contour=loop.map(k=>new THREE.Vector2(points[k].dot(U),points[k].dot(W)));
+    for(const face of THREE.ShapeUtils.triangulateShape(contour,[])) {
+      const tri=face.map(k=>points[loop[k]]),cross=new THREE.Vector3().crossVectors(tri[1].clone().sub(tri[0]),tri[2].clone().sub(tri[0]));
+      if(cross.dot(N)>0)[tri[1],tri[2]]=[tri[2],tri[1]];
+      tri.forEach(p=>emit({p,c:V(.78,.75,.78),n:N.clone().negate()}));
+    }
+  }
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));
+  g.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));
+  g.setAttribute('normal',new THREE.Float32BufferAttribute(normals,3));
+  // Compartilha vértices da superfície lisa; mantém normais distintas nos
+  // cortes. Evita deformar a mesma posição uma vez por triângulo ao respirar.
+  const welded=mergeVertices(g,1e-7);g.dispose();return welded;
+}
+export function geoLobos(s) {
+  const original=geoPulmao(s,{toracico:true,fissuras:false});
+  const n=V(0,1,1.18).normalize(),c=-.199/Math.hypot(1,1.18),gap=.00065;
+  const inferior=recortarLobo(original,n.clone().negate(),-c-gap);
+  const anterior=recortarLobo(original,n,c-gap);
+  const lobos=s===DIR?
+    [recortarLobo(anterior,V(0,1,0),-.218-gap),recortarLobo(anterior,V(0,-1,0),.218-gap),inferior]:[anterior,inferior];
+  const combined=mergeGeometries(lobos,true);
+  lobos.forEach(g=>g.dispose());if(s===DIR)anterior.dispose();original.dispose();
+  return combined;
 }
 
 /* ── Mediastino: traqueia anelada, brônquios, coração, aorta, cava, tronco pulmonar ── */

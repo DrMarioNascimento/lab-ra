@@ -134,7 +134,7 @@ const ajuste = () => comCenario(cenario).ajuste;
 
 /* ------------------------------------------------------------ níveis */
 const TEXTOS = [
-  { olho: 'A pergunta', titulo: 'Um espaço que não é espaço',
+  { olho: 'A pergunta', titulo: 'Camadas da parede ao pulmão',
     texto: 'Entre as duas pleuras não há vão: há um filme de líquido e pressão negativa segurando as duas encostadas, como dois vidros molhados que deslizam mas não se separam. O espaço pleural só vira espaço de verdade quando alguém fura a parede.',
     tags: ['poucos mililitros', 'deslizam, não separam'] },
   { olho: 'Nível 02', titulo: 'Duas molas em empate',
@@ -144,18 +144,18 @@ const TEXTOS = [
     texto: 'Fura a parede e o empate acaba: cada mola vai para o seu volume de repouso. O pulmão colapsa a 10% e — a parte que ninguém espera — a caixa ABRE até 60%. No hipertensivo a pressão passa de zero — e o que mata não é o desvio do mediastino, que é o sinal: é a pressão positiva ESMAGANDO O RETORNO VENOSO. Choque obstrutivo. Pela mesma conta, com sinal trocado, pleura mais negativa ajuda o retorno: é a bomba torácica.',
     tags: ['pulmão 10% · caixa 60%', 'retorno venoso a 64%'] },
   { olho: 'Nível 04', titulo: 'O ápice é maior e ventila menos',
-    texto: 'A pressão pleural não é um número, é um gradiente: −10 no ápice, −2,5 na base. O alvéolo de cima já está esticado e senta na parte plana da curva; o de baixo senta no joelho, onde a mesma pressão enche muito mais. Ao deitar, os tamanhos ao longo do eixo ápice–base se aproximam; o gradiente passa para o eixo esterno–dorso. Respire com o botão e veja: numa respiração a base vai de 22% a 42% do volume e o ápice, de 63% a 73%. A base ganha o dobro sendo menor.',
-    tags: ['−10 no ápice, −2,5 na base', 'a base ganha o dobro'] },
+    texto: 'A pressão pleural não é um número, é um gradiente: −10 no ápice, −2,5 na base. O alvéolo de cima já está esticado e senta na parte plana da curva; o de baixo senta no joelho, onde a mesma pressão enche muito mais. Ao deitar, os tamanhos ao longo do eixo ápice–base se aproximam; o gradiente passa para o eixo esterno–dorso. Respire com o botão e veja: numa respiração a base vai de 22% a 42% do volume e o ápice, de 63% a 73%. A base ganha o dobro sendo menor. O contraste visual dos tamanhos está ampliado para facilitar a leitura; os valores do painel mantêm os volumes calculados.',
+    tags: ['−10 no ápice, −2,5 na base', 'contraste de tamanho ampliado'] },
   { olho: 'Nível 05', titulo: 'As zonas de West',
     texto: 'Três pressões disputam o capilar: a arterial, a venosa e a alveolar, que aperta por fora. Em pé, a coluna de sangue faz o ápice receber pouco. Deitado, o pulmão inteiro vira zona 3. É a mesma gravidade do gradiente pleural, agora do lado da perfusão.',
     tags: ['zona 1 não existe em repouso', 'a cachoeira da zona 2'] },
 ];
-const ROTULO = ['A fresta', 'As molas', 'Pneumotórax', 'O gradiente', 'As zonas'];
+const ROTULO = ['Camadas', 'As molas', 'Pneumotórax', 'O gradiente', 'As zonas'];
 const TAM_REAL = [.34, .58, .58, .55, .55];
 const CONTEXTO = [
   'Corte da parede costal · camadas ampliadas',
-  'Costelas anteriores direitas translúcidas · pulmão direito à sua esquerda',
-  'Costelas anteriores direitas translúcidas · pneumotórax direito',
+  'Direito: 3 lobos · esquerdo: 2 lobos · costelas opacas',
+  'Amarelo: ar no espaço pleural direito · pulmão recolhido',
   'Unidades acinares ampliadas · posição representativa',
   'Redes capilares ampliadas · cor indica a zona',
 ];
@@ -219,14 +219,17 @@ function atualizar() {
   const inspiracao=clamp(-dPpl/AMPLITUDE_PPL,0,1);
   aplicarTorax(1, { pulmao: VOLUMES.crf, caixa: VOLUMES.crf, ciclo, inspiracao });
   aplicarTorax(2, { pulmao: pn.pulmao, caixa: pn.caixa, desvio: pn.desvio, ciclo, inspiracao });
+  if(atual===2)$('anatomiaLegenda').textContent=pneumo==='nenhum'
+    ? 'Pleuras em contato · pulmões expandidos'
+    : 'Amarelo: ar no espaço pleural direito · pulmão recolhido';
   /* o ciclo desloca a pleural inteira: a física entrega o gradiente parado e
      o app soma a respiração por cima, que é o que a musculatura faz */
   const plEm = f => transpulmonar(f, grau, e) - dPpl;
   aplicarAlveolos(f => volumeRelativo(plEm(f)));
   if(atual===3)$('anatomiaLegenda').textContent=grau<20
-    ? 'Unidades ampliadas · deitado, tamanhos semelhantes no eixo ápice–base'
-    : grau>70?'Unidades ampliadas · em pé, maiores no ápice e menores na base'
-    : 'Unidades ampliadas · inclinado, a diferença entre ápice e base diminui';
+    ? 'Contraste ampliado · deitado: tamanhos semelhantes'
+    : grau>70?'Contraste ampliado · em pé: ápice maior, base menor'
+    : 'Contraste ampliado · a diferença diminui ao inclinar';
   aplicarZonas(f => zonaEm(f, grau, e), f => fluxoEm(f, grau, e));
 
   $('posturaLabel').textContent = grau < 20 ? `Decúbito · ${grau.toFixed(0)}°`
