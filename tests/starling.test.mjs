@@ -129,9 +129,9 @@ test("o card 09 leva às forças de Starling", async () => {
   assert.match(hub, /href="starling\/"/);
 });
 
-test("a bancada está protegida e traz o caminho de RA das irmãs", async () => {
+test("a bancada tem acesso livre e traz o caminho de RA das irmãs", async () => {
   const page = await texto("starling/index.html");
-  assert.match(page, /data-ra-protected/);
+  assert.doesNotMatch(page, /data-ra-protected/);
   assert.match(page, /ar-modes="webxr scene-viewer quick-look"/);
 });
 

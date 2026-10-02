@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=IBM+Plex+Mono:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="laboratorio.css" />
-  <script src="guard.js"></script>
+  <script src="guard.js?v=livre-20261002"></script>
 </head>
 <body>
   <header class="topbar">
@@ -27,11 +27,8 @@
       <div class="tags" style="display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 20px">
         <span class="tag">Câmera</span><span class="tag">3D</span><span class="tag">iPhone · Quick Look</span>
       </div>
-      <form class="access-form" id="ra-access-form" data-destination="bancadas.html" style="display:flex;gap:10px;align-items:center;max-width:420px">
-        <button class="launch" type="submit" style="width:100%;text-align:center">Entrar com Google</button>
-      </form>
-      <p class="access-message" id="ra-access-message" role="status" aria-live="polite" style="min-height:1.4em;margin:10px 0 0;color:#ffb095"></p>
-      <p class="notice" style="margin-top:18px"><strong>Acesso:</strong> mesma lista <code>config/mestres</code> do projeto Firebase <code>mosaico-game</code> que autoriza abrir mesas no MOSAICO. No GitHub Pages os arquivos continuam publicamente servidos — isto é barreira de acesso casual.</p>
+      <a class="launch" href="bancadas.html">Abrir bancadas</a>
+      <p class="notice" style="margin-top:18px">Acesso livre aos modelos e simuladores do laboratório.</p>
     </section>
   </main>
   <footer><img src="brand/mestre-lap.webp" alt="" width="84" height="78" /><span>Simuladores interativos do Prof. Mário César Nascimento, PhD ©</span></footer>

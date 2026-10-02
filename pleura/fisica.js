@@ -21,7 +21,7 @@
    Misturar as duas caladamente erra as zonas por uns 30%.
    ========================================================================== */
 
-export const CMH2O_EM_MMHG = 0.7355;
+export const CMH2O_EM_MMHG = 98.0665 / 133.3224;
 
 /* ── GEOMETRIA DO PULMÃO, em cm ─────────────────────────────────────────── */
 export const PULMAO = {
@@ -69,11 +69,11 @@ export function eixoDependente(grau) {
 }
 
 /* Pressão pleural em cmH2O na fração `f` de altura (0 = base, 1 = ápice). */
-export function pressaoPleural(f, grau, { pneumo = 'nenhum' } = {}) {
+export function pressaoPleural(f, grau, { pneumo = 'nenhum', deslocaPleural = 0 } = {}) {
   if (pneumo === 'aberto') return 0;            // a fresta virou espaço
   if (pneumo === 'hipertensivo') return 12;     // e o espaço passou a empurrar
   const h = alturaEfetiva(grau);
-  return PPL_MEDIA_FRC - (f - .5) * h * GRADIENTE_PLEURAL;
+  return PPL_MEDIA_FRC - (f - .5) * h * GRADIENTE_PLEURAL + deslocaPleural;
 }
 
 /* Pressão TRANSPULMONAR: é ela que mantém o alvéolo aberto, e é a diferença
@@ -170,13 +170,13 @@ export function fluxoEm(f, grau, e = {}) {
    A FORMA É ASSIMÉTRICA de propósito: inspiração ocupa 40% do ciclo e
    expiração 60%, que é a relação I:E de quem respira em repouso. Com uma
    senoide simétrica o desenho ficaria bonito e diria que expirar custa o
-   mesmo que inspirar — e expirar em repouso é PASSIVO, não custa nada.
+   mesmo que inspirar — e expirar em repouso é predominantemente passivo, sustentado pelo recuo elástico.
 
-   A pressão alveolar é a DERIVADA disso, e não uma segunda curva inventada:
+   A pressão alveolar resistiva é proporcional à DERIVADA disso, e não uma segunda curva inventada:
    ela é negativa enquanto o pulmão enche, positiva enquanto esvazia, e passa
    por zero nos dois extremos, que é quando não há fluxo. É por isso que a
-   transpulmonar em repouso é o simétrico da pleural: naquele instante, e só
-   nele, a alveolar vale zero. */
+   transpulmonar em repouso é o simétrico da pleural: nos extremos de inspiração e
+   expiração, a parcela alveolar resistiva vale zero. */
 export const AMPLITUDE_PPL = 3;      // cmH2O, de -5 a -8 na respiração tranquila
 export const FRACAO_INSPIRATORIA = 0.4;
 
@@ -187,18 +187,29 @@ function formaDoCiclo(fase) {
     : .5 + .5 * Math.cos(Math.PI * (f - FI) / (1 - FI));
 }
 
-/* quanto a pleural fica MAIS negativa neste ponto do ciclo */
+/* Parcela elástica do deslocamento pleural; estadoRespiratorio soma a resistiva. */
 export function cicloPleural(fase, amplitude = AMPLITUDE_PPL) {
   return -amplitude * formaDoCiclo(fase);
 }
 
 /* a alveolar: proporcional à velocidade de encher, com sinal trocado */
 export function cicloAlveolar(fase, pico = 1) {
-  const h = .004;
-  const d = (formaDoCiclo(fase + h) - formaDoCiclo(fase - h)) / (2 * h);
-  /* o pico da derivada da forma vale pi/(2·FI) na inspiração; normalizar por
-     ele deixa `pico` significar mesmo o pico em cmH2O */
-  return -pico * d / (Math.PI / (2 * FRACAO_INSPIRATORIA));
+  const f=((fase%1)+1)%1,FI=FRACAO_INSPIRATORIA;
+  if(f===0||Math.abs(f-FI)<1e-12)return 0;
+  return f<FI?-pico*Math.sin(Math.PI*f/FI)
+    :pico*FI/(1-FI)*Math.sin(Math.PI*(f-FI)/(1-FI));
+}
+
+/* Estado único para leituras, gráfico e geometria.
+   A parcela resistiva alveolar também compõe a pleural: P_L=P_alv-P_pl.
+   Assim o volume cresce durante toda a inspiração e decresce na expiração;
+   somar P_alv apenas ao volume causava uma contração inicial falsa. */
+export function estadoRespiratorio(fase, opc={}) {
+  const normal=!opc.pneumo||opc.pneumo==='nenhum';
+  const resistiva=normal?cicloAlveolar(fase):0;
+  return {...opc,palveolar:(opc.palveolar??0)+resistiva,
+    deslocaPleural:normal?cicloPleural(fase)+resistiva:0,
+    expansao:formaDoCiclo(fase)};
 }
 
 /* ── A PLEURA E O RETORNO VENOSO ──────────────────────────────────────────
@@ -254,7 +265,7 @@ export const CENARIOS = [
   { id: 'ventilacao', nome: 'Ventilação com pressão', ajuste: { palveolar: 12 },
     nota: 'a alveolar sobe e aperta o capilar por fora: zona 1 sem perder sangue' },
   { id: 'exercicio', nome: 'Exercício', ajuste: { pa: 25, pv: 9 },
-    nota: 'a arterial sobe e o pulmão inteiro vira zona 3' },
+    nota: 'a pressão arterial aumenta e a perfusão cresce; a zona em cada altura depende das três pressões' },
 ];
 
 export function comCenario(id) {

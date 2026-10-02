@@ -22,9 +22,7 @@ Conteúdo migrado de `DrMarioNascimento/Dragon/laboratorio-ra`:
 | Coração em ação (esquemático, ao vivo) | `coracao/` |
 | Coração 3D · pipeline WIP (não é o de ensino) | `bancadas/11-coracao/` |
 
-A porta de entrada (`index.html`) autentica com Google contra `config/mestres` no projeto Firebase **mosaico-game**. As bancadas ficam em `bancadas.html` (protegidas por `guard.js` + `sessionStorage`).
-
-> **[ACESSO.md](ACESSO.md) — leia antes de mexer em qualquer coisa de login.** Aquele documento do Firestore é a única peça de que o laboratório inteiro depende e que **não está neste repositório**. Se ele se perder, todas as bancadas fecham ao mesmo tempo e todo mundo — inclusive o dono — recebe a mesma mensagem de "conta não autorizada", que parece problema da conta e não é.
+A entrada (`index.html`) e todas as bancadas têm acesso livre. O `guard.js` apenas mantém links antigos com `destino`, preservando os parâmetros da bancada e recusando redirecionamento externo. [ACESSO.md](ACESSO.md) descreve esse percurso.
 
 ## GitHub Pages
 
@@ -32,7 +30,7 @@ A porta de entrada (`index.html`) autentica com Google contra `config/mestres` n
 2. Branch: `main` / folder: `/ (root)`
 3. O arquivo `.nojekyll` evita o processamento Jekyll dos assets.
 
-Domínio autorizado no Firebase Auth (mosaico-game): `drmarionascimento.github.io`.
+O laboratório não depende de Firebase Auth para abrir as páginas.
 
 ## Dependências mínimas copiadas
 
