@@ -284,7 +284,7 @@ test("A PEÇA ANATÔMICA ESTÁ VESTIDA DE BANCADA, com acesso livre como as irm�
   const peca = await texto("bancadas/11-coracao/prototipo/duas-pecas.html");
 
   assert.ok(!/<html[^>]*data-ra-protected/.test(peca), "a peça deve abrir diretamente");
-  assert.ok(peca.includes('src="../../../guard.js?v=livre-20261002"'), "três níveis: prototipo, 11-coracao, bancadas");
+  assert.ok(peca.includes('src="../../../guard.js?v=livre-20261002b"'), "três níveis: prototipo, 11-coracao, bancadas");
   assert.ok(peca.includes('href="../../../laboratorio.css"'), "a folha do laboratório veste a barra");
 
   /* saída: quem entra tem de conseguir voltar sem o botão do navegador */
