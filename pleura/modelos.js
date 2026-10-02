@@ -137,7 +137,7 @@ function nivelTorax() {
   caixa.add(construirCaixa(M), construirColuna(M));
   const pleuras = {};
   for (const s of [DIR, ESQ]) {
-    const m = mk(`pleura_parietal_${s === DIR ? 'D' : 'E'}`, geoPulmao(s, { inflate: .0015, fissuras: false, toracico: true }), M.pleuraP);
+    const m = mk(`pleura_parietal_${s === DIR ? 'D' : 'E'}`, geoPulmao(s, { inflate: .003, fissuras: false, toracico: true }), M.pleuraP);
     m.userData.repouso=m.geometry.attributes.position.array.slice();
     m.renderOrder = 4; m.castShadow = false; caixa.add(m); pleuras[s] = m;
   }
@@ -261,6 +261,9 @@ export function criar() {
   function aplicarTorax(nivel, { pulmao, caixa, desvio = 0, ciclo = 1, inspiracao = 0 }) {
     const d = modelos[nivel].userData;
     if (!d || !d.pulmoes) return;
+    // Entrar no nível chama atualizar() antes de desenhar e exportar.
+    // Fora da cena (análises de geometria), a função continua disponível.
+    if(modelos[nivel].parent&&!modelos[nivel].visible)return;
     const ep = escalaDe(pulmao)*(pulmao>=.3?ciclo:1), ec = escalaDe(caixa)*(pulmao>=.3?ciclo:1);
     d.pulmoes.forEach(p => {
       /* só o direito adoece: pneumotórax é de um lado só */
@@ -295,12 +298,24 @@ export function criar() {
     d.caixa.scale.set(ec, 1, ec);
     d.diafragma.scale.set(ec,1,ec);
     d.med.position.x = ESQ * desvio * 0.016;
-    for(const m of Object.values(d.pleuras)) {
-      const p=m.geometry.attributes.position,base=m.userData.repouso;
+    for(const s of [DIR,ESQ]) {
+      const m=d.pleuras[s],p=m.geometry.attributes.position,base=m.userData.repouso,h=HILO(s);
       for(let i=0;i<p.count;i++) {
-        const x=base[i*3],y=base[i*3+1],z=base[i*3+2],altura=y-yDiafragmaToracico(x,z);
-        const peso=clamp(1-altura/.045,0,1),rho=raioDiafragma(x,z).rho;
-        p.setY(i,y-.014*inspiracao*(1-rho*rho)*peso*peso*(3-2*peso));
+        let x=h.x+(base[i*3]-h.x)*ec,y=h.y+(base[i*3+1]-h.y)*ec,z=h.z+(base[i*3+2]-h.z)*ec;
+        if(base[i*3+1]>h.y) {
+          const t=clamp((base[i*3+1]-.25)/.055,0,1),peso=1-t*t*(3-2*t);
+          y=base[i*3+1]+(base[i*3+1]-h.y)*(ec-1)*peso;
+        }
+        for(let k=0;k<3;k++) {
+          y=Math.max(y,yDiafragmaToracico(x/ec,z/ec,inspiracao)+.0007);
+          x=s*Math.max(s*x,limiteCardiaco(s,y,z)-.0015+s*desvio*.016);
+          const q=Math.hypot(x/(wT(y)*ec),z/(dT(y)*ec));
+          if(q>.985&&y<.283){x*=.985/q;z*=.985/q;}
+        }
+        if(i<18*112||i===p.count-2)y=yDiafragmaToracico(x/ec,z/ec,inspiracao)+.0007;
+        // A caixa já fornece a escala ec. Compensa-a para manter o limite
+        // mediastinal no lado externo do pulmão também durante a inspiração.
+        p.setXYZ(i,x/ec,y,z/ec);
       }
       p.needsUpdate=true;m.geometry.computeVertexNormals();m.geometry.computeBoundingSphere();
     }
