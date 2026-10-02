@@ -281,6 +281,8 @@ function nivelZonas() {
   for(const side of [-1,1]) {
     const pts=faixas.map(m=>m.position.clone().add(V(side*m.userData.rx,0,0)));
     const vaso=mk(side<0?'arteriola_pulmonar':'venula_pulmonar',tuboGeo(pts,.0007,64),side<0?M.arteria:M.veia);
+    vaso.geometry.attributes.position.setUsage(THREE.DynamicDrawUsage);
+    vaso.geometry.attributes.normal.setUsage(THREE.DynamicDrawUsage);
     vaso.userData.side=side;vasos.push(vaso);cm.add(vaso);
   }
   g.userData = { faixas,vasos };
@@ -419,8 +421,24 @@ export function criar() {
       m.scale.setScalar(e);
     });
     if(mudou)for(const vaso of vasos) {
-      const pts=faixas.map(m=>m.position.clone().add(V(vaso.userData.side*m.userData.rx*m.scale.x,0,0)));
-      vaso.geometry.dispose();vaso.geometry=tuboGeo(pts,.0007,64);
+      // Mantém a geometria e os buffers GPU durante a respiração.
+      const geo=vaso.geometry,{path,tubularSegments,radius,radialSegments}=geo.parameters;
+      path.points.forEach((p,i)=>{const m=faixas[i];p.copy(m.position);p.x+=vaso.userData.side*m.userData.rx*m.scale.x;});
+      path.updateArcLengths();
+      const frames=path.computeFrenetFrames(tubularSegments,false);
+      const pos=geo.attributes.position,norm=geo.attributes.normal,ponto=V(),normal=V();
+      for(let i=0;i<=tubularSegments;i++) {
+        path.getPointAt(i/tubularSegments,ponto);
+        for(let j=0;j<=radialSegments;j++) {
+          const ang=j/radialSegments*Math.PI*2,k=i*(radialSegments+1)+j;
+          normal.copy(frames.normals[i]).multiplyScalar(-Math.cos(ang)).addScaledVector(frames.binormals[i],Math.sin(ang)).normalize();
+          norm.setXYZ(k,normal.x,normal.y,normal.z);
+          pos.setXYZ(k,ponto.x+radius*normal.x,ponto.y+radius*normal.y,ponto.z+radius*normal.z);
+        }
+      }
+      geo.tangents=frames.tangents;geo.normals=frames.normals;geo.binormals=frames.binormals;
+      pos.needsUpdate=true;norm.needsUpdate=true;
+      geo.computeBoundingBox();geo.computeBoundingSphere();
     }
   }
 
