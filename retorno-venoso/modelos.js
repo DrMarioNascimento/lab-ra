@@ -22,6 +22,7 @@
    ========================================================================== */
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { carregarCoracaoAnatomico, instalarCoracao, ligarVaso, ajustarTrechoCardiaco, moldarOriginalCardiaca, restaurarNormaisProtegidas } from './coracao.js?v=cardiaco-20261002';
 
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
 const rnd = (a, b) => a + Math.random() * (b - a);
@@ -165,13 +166,14 @@ export function fatorDeDistensao(mmHg, teto = 1.45) {
 
 function moldarVeia(malha, grau, opc = {}) {
   const g = malha.geometry, u = g.userData;
+  moldarOriginalCardiaca(g,grau,opc,moldarVeia);
   const pos = g.attributes.position, cor = g.attributes.color;
   const base = opc.base ?? 10, teto = opc.teto ?? 1.45;
   for (let s = 0; s <= u.segsU; s++) {
     const p = pressaoVenosa(u.alturas[s], grau, { base });
     const f = fatorDeDistensao(p, teto);
     const c = corDaPressao(p);
-    const ct = u.centros[s], r = u.raioBase * f;
+    const ct = u.centros[s], r = u.raioBase * f * (u.calibreCardiaco?.[s] ?? 1);
     for (let k = 0; k <= u.segsV; k++) {
       const i = s * (u.segsV + 1) + k;
       /* o anel original tem raio 1 em torno do centro: escalar o vetor
@@ -184,6 +186,7 @@ function moldarVeia(malha, grau, opc = {}) {
   }
   pos.needsUpdate = true; cor.needsUpdate = true;
   g.computeVertexNormals();
+  restaurarNormaisProtegidas(g);
 }
 
 /* ── O CORPO, EM SILHUETA ──────────────────────────────────────────────────
@@ -342,7 +345,7 @@ function texturaFaisca() {
 
 /* Nível 01 com a malha. A veia continua tubo moldável: a pressão pinta e
    engrossa, como antes. Artéria é caminho, não coluna. */
-function nivelCorpoMalha(bodyGeo) {
+function nivelCorpoMalha(bodyGeo, scan) {
   const g = new THREE.Group();
   const geo = bodyGeo.clone();
   const pele = new THREE.Mesh(geo, peleRaioX());
@@ -386,15 +389,10 @@ function nivelCorpoMalha(bodyGeo) {
   const heartC = (centroid(P, 1.24 * S, 1.36 * S, torsoF) || V(0, CORPO.coracao * CM, 0)).add(V(0.082 * S, -0.012 * S, 0.042 * S));
   const bif = centroid(P, 0.84 * S, 0.92 * S, torsoF) || V(0, CORPO.quadril * CM, 0);
 
-  const heart = new THREE.Mesh(new THREE.SphereGeometry(0.055 * S, 32, 24), M.coracao.clone());
-  heart.name = 'coracao';
-  heart.position.copy(heartC);
-  heart.scale.set(0.95, 1.15, 0.85);
-  heart.rotation.z = 0.72;
-  const apice = new THREE.Mesh(new THREE.SphereGeometry(0.032 * S, 20, 14), heart.material);
-  apice.position.set(0.046 * S, -0.028 * S, 0.012 * S);
-  apice.scale.set(1, 1.25, 0.8);
-  heart.add(apice);
+  const centroToracico=centroid(P,1.24*S,1.36*S,torsoF)||V(0,CORPO.coracao*CM,0);
+  const heart=instalarCoracao(scan,V(centroToracico.x+.025*S,CORPO.coracao*CM,centroToracico.z+.012*S),M.coracao);
+  const ligacoes=heart.userData.ligacoes;
+  const confluencia=ligacoes.superior.clone().add(V(0,.065,-.004));
   g.add(heart);
 
   const artMat = new THREE.MeshStandardMaterial({
@@ -422,9 +420,13 @@ function nivelCorpoMalha(bodyGeo) {
   for (const d of arteries) {
     const pts = d.p.filter(pt => pt && isFinite(pt.x));
     if (pts.length < 2) continue;
-    const curve = new THREE.CatmullRomCurve3(pts, false, 'centripetal', 0.5);
+    let curve = new THREE.CatmullRomCurve3(pts, false, 'centripetal', 0.5);
     const mesh = new THREE.Mesh(new THREE.TubeGeometry(curve, 80, d.r, 10, false), artMat);
     mesh.name = d.n;
+    if(d.n==='aorta') {
+      const ligada=ligarVaso(curve,ligacoes.aorta,1.21*S,true,V(0,-.35,-1).normalize());
+      curve=ajustarTrechoCardiaco(mesh,curve,ligada,80,10,true,.62);
+    }
     g.add(mesh);
     fluxo.push({ curve, r: d.r, kind: 'a', len: curve.getLength(), name: d.n });
   }
@@ -436,7 +438,12 @@ function nivelCorpoMalha(bodyGeo) {
     mesh.userData.papel = d.papel;
     veias.push(mesh);
     g.add(mesh);
-    const curve = new THREE.CatmullRomCurve3(pts, false, 'centripetal', 0.5);
+    let curve = new THREE.CatmullRomCurve3(pts, false, 'centripetal', 0.5);
+    if(d.n==='veia_cava_inferior'||d.papel==='jugular') {
+      const inferior=d.n==='veia_cava_inferior';
+      const ligada=ligarVaso(curve,inferior?ligacoes.inferior:confluencia,(inferior?1.21:1.44)*S,false,inferior?V(0,1,0):V(0,-1,0));
+      curve=ajustarTrechoCardiaco(mesh,curve,ligada,SEGS_U,SEGS_V,false,inferior?.70:1);
+    }
     fluxo.push({ curve, r: d.r, kind: 'v', len: curve.getLength(), name: d.n });
     if (!d.n.startsWith('femoral_safena')) continue;
     const n = Math.max(4, Math.floor(curve.getLength() / (0.09 * S)));
@@ -453,6 +460,10 @@ function nivelCorpoMalha(bodyGeo) {
     }
   }
 
+  const superior=new THREE.Mesh(veia([confluencia,confluencia.clone().lerp(ligacoes.superior,.5),ligacoes.superior],.009*S),M.veia);
+  superior.name='conexao_cardiaca_cava_superior';superior.userData.papel='cava';g.add(superior);veias.push(superior);
+  const curvaSuperior=new THREE.CatmullRomCurve3([confluencia,confluencia.clone().lerp(ligacoes.superior,.5),ligacoes.superior]);
+  fluxo.push({curve:curvaSuperior,r:.009*S,kind:'v',len:curvaSuperior.getLength(),name:superior.name});
   const bolha = texturaBolha(), faisca = texturaFaisca();
   const particulas = [];
   const tmp0 = new THREE.Vector3();
@@ -1072,8 +1083,8 @@ function nivelBomba(geo) {
    O corpo do nível 01 de volta, agora com a bomba trabalhando. O arco fecha
    onde começou, e a pergunta muda: não é mais "onde a coluna aperta", é
    "quanto volta ao coração". */
-function nivelCiclo(geo) {
-  const g = geo ? nivelCorpoMalha(geo) : nivelCorpoSilhueta();
+function nivelCiclo(geo,scan) {
+  const g = geo ? nivelCorpoMalha(geo,scan) : nivelCorpoSilhueta();
   g.userData.comBomba = true;
   return g;
 }
@@ -1081,11 +1092,14 @@ function nivelCiclo(geo) {
 /* ========================================================================= */
 export async function criar() {
   let geo = null;
+  let scan = null;
+  try { scan = await carregarCoracaoAnatomico(); }
+  catch (err) { console.error('coração anatômico não entrou; segue a âncora de segurança', err); }
   try { geo = await carregarCorpo(); }
   catch (err) { console.error('corpo.glb não entrou; segue a silhueta', err); }
   const modelos = [
-    geo ? nivelCorpoMalha(geo) : nivelCorpoSilhueta(),
-    nivelPerna(geo), nivelValvula(), nivelBomba(geo), nivelCiclo(geo),
+    geo ? nivelCorpoMalha(geo,scan) : nivelCorpoSilhueta(),
+    nivelPerna(geo), nivelValvula(), nivelBomba(geo), nivelCiclo(geo,scan),
   ];
   modelos.forEach((m, i) => { m.visible = i === 0; });
 
@@ -1226,8 +1240,11 @@ export async function criar() {
       if (!m.visible) continue;
       const h = m.userData.coracao;
       if (h) {
+        if(h.userData.animar)h.userData.animar(beat);
+        else {
         h.scale.set(0.95 + 0.08 * beat, 1.15 + 0.1 * beat, 0.85 + 0.08 * beat);
         h.material.emissiveIntensity = 0.45 + beat * 1.4;
+        }
       }
       for (const ring of (m.userData.aneis || [])) {
         const e = 1.12 - 0.4 * fecha;
@@ -1249,7 +1266,8 @@ export async function criar() {
           nrm.normalize();
           bin.crossVectors(tan, nrm).normalize();
           const w = Math.sin(time * 3 + d.wob) * d.path.r * 0.12;
-          tmp.addScaledVector(nrm, d.off[0] + w).addScaledVector(bin, d.off[1] - w);
+          const calibre=d.path.curve.calibreNoPonto?.(d.path.curve.getUtoTmapping(d.t)) ?? 1;
+          tmp.addScaledVector(nrm, (d.off[0] + w)*calibre).addScaledVector(bin, (d.off[1] - w)*calibre);
           pos[i * 3] = tmp.x; pos[i * 3 + 1] = tmp.y; pos[i * 3 + 2] = tmp.z;
         }
         layer.pts.geometry.attributes.position.needsUpdate = true;

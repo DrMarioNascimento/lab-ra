@@ -34,7 +34,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { prepararParaRA } from '../cores-para-ra.js';
-import { criar, CM, CORPO, PIH, MMHG_POR_CM, pressaoVenosa, corDaPressao } from './modelos.js';
+import { criar, CM, CORPO, PIH, MMHG_POR_CM, pressaoVenosa, corDaPressao } from './modelos.js?v=cardiaco-20261002';
 
 const $ = id => document.getElementById(id);
 const canvas = $('scene'), stage = $('stage');
