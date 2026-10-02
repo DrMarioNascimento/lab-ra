@@ -777,6 +777,110 @@ function nivelPernaSilhueta() {
 
 /* A perna de verdade, do mesmo corpo. Profunda, safena e perfurantes continuam
    tubos moldáveis: a conta de volume e a cor de pressão não mudam de lei. */
+function acabarPerna(fatia, corpo, S) {
+  const origem = fatia.geo, p = origem.attributes.position, n = origem.attributes.normal;
+  // Mantém os vértices originais para conservar exatamente o enquadramento.
+  const pontos = Array.from(p.array), normais = Array.from(n.array), indices = [];
+  const mascara = Array(p.count).fill(0);
+  const planos = [[0, .02 * S, 1], [1, 1.02 * S, -1], [1, .01 * S, 1]];
+  const bordas = planos.map(() => []), eps = 1e-6 * S;
+  const adicionar = v => {
+    const i = pontos.length / 3;
+    pontos.push(...v.p.toArray()); normais.push(...v.n.toArray()); mascara.push(1);
+    return i;
+  };
+  const braco = [], perna = [];
+  for (let t = 0; t < origem.index.count; t += 3) {
+    const ids = [0, 1, 2].map(k => origem.index.getX(t + k));
+    // O braço e a mão são o componente lateral, separado da perna.
+    if (ids.reduce((s, i) => s + p.getX(i), 0) / 3 > .29 * S) {
+      braco.push(...ids);
+    }
+  }
+  const cp = corpo.attributes.position, cn = corpo.attributes.normal;
+  for (let t = 0; t < corpo.index.count; t += 3) {
+    const ids = [0, 1, 2].map(k => corpo.index.getX(t + k));
+    if (ids.reduce((s, i) => s + cp.getX(i), 0) / 3 > .29 * S) continue;
+    let poligono = ids.map(i => ({ p: V(cp.getX(i), cp.getY(i), cp.getZ(i)), n: V(cn.getX(i), cn.getY(i), cn.getZ(i)) }));
+    for (const [eixo, limite, sinal] of planos) {
+      const saida = [], coord = v => v.p.getComponent(eixo);
+      for (let k = 0; k < poligono.length; k++) {
+        const a = poligono[k], b = poligono[(k + 1) % poligono.length];
+        const da = sinal * (coord(a) - limite), db = sinal * (coord(b) - limite);
+        if (da >= 0) saida.push(a);
+        if ((da >= 0) !== (db >= 0)) {
+          const u = da / (da - db);
+          saida.push({ p: a.p.clone().lerp(b.p, u), n: a.n.clone().lerp(b.n, u).normalize() });
+        }
+      }
+      poligono = saida;
+    }
+    if (poligono.length < 3) continue;
+    const novos = poligono.map(adicionar);
+    for (let k = 1; k < novos.length - 1; k++) perna.push(novos[0], novos[k], novos[k + 1]);
+    planos.forEach(([eixo, limite], j) => {
+      for (let k = 0; k < poligono.length; k++) {
+        const a = poligono[k].p, b = poligono[(k + 1) % poligono.length].p;
+        if (Math.abs(a.getComponent(eixo) - limite) < eps && Math.abs(b.getComponent(eixo) - limite) < eps)
+          bordas[j].push([a, b]);
+      }
+    });
+  }
+  // Fecha apenas os cortes da perna; a casca deixa de parecer uma lâmina aberta.
+  bordas.forEach((arestas, j) => {
+    if (!arestas.length) return;
+    const normal = V(0, 0, 0);
+    normal.setComponent(planos[j][0], -planos[j][2]);
+    const chave = v => v.toArray().map(c => Math.round(c / eps)).join(',');
+    const vizinhos = new Map(), vertices = new Map();
+    for (const [a, b] of arestas) {
+      const ka = chave(a), kb = chave(b);
+      if (ka === kb) continue;
+      vertices.set(ka, a); vertices.set(kb, b);
+      if (!vizinhos.has(ka)) vizinhos.set(ka, new Set());
+      if (!vizinhos.has(kb)) vizinhos.set(kb, new Set());
+      vizinhos.get(ka).add(kb); vizinhos.get(kb).add(ka);
+    }
+    const visitados = new Set(), eixo = planos[j][0];
+    const eixos = [0, 1, 2].filter(k => k !== eixo);
+    const inicios = [...vizinhos.keys()].sort((a, b) => vizinhos.get(a).size - vizinhos.get(b).size);
+    for (const inicio of inicios) {
+      if (visitados.has(inicio)) continue;
+      const contorno = [];
+      let atual = inicio;
+      while (atual && !visitados.has(atual)) {
+        visitados.add(atual); contorno.push(vertices.get(atual));
+        atual = [...vizinhos.get(atual)].find(k => !visitados.has(k));
+      }
+      if (contorno.length < 3) continue;
+      const uv = contorno.map(v => new THREE.Vector2(v.getComponent(eixos[0]), v.getComponent(eixos[1])));
+      const ids = contorno.map(p => adicionar({ p, n: normal }));
+      for (const face of THREE.ShapeUtils.triangulateShape(uv, [])) {
+        const [a, b, c] = face.map(k => contorno[k]);
+        const frente = b.clone().sub(a).cross(c.clone().sub(a)).dot(normal) > 0;
+        const [ia, ib, ic] = face.map(k => ids[k]);
+        perna.push(ia, frente ? ib : ic, frente ? ic : ib);
+      }
+    }
+  });
+  indices.push(...braco, ...perna);
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(pontos, 3));
+  geo.setAttribute('normal', new THREE.Float32BufferAttribute(normais, 3));
+  geo.setAttribute('perna', new THREE.Float32BufferAttribute(mascara, 1));
+  geo.setIndex(indices);
+  geo.computeBoundingBox();
+  const material = peleRaioX();
+  material.vertexShader = 'attribute float perna; varying float vPerna;\n' +
+    material.vertexShader.replace('void main(){', 'void main(){ vPerna = perna;');
+  material.fragmentShader = 'varying float vPerna;\n' + material.fragmentShader;
+  material.fragmentShader = material.fragmentShader.replace('vec3 c = uCore * 0.45',
+    'float relevo = 0.65 + 0.65 * max(0.0, dot(normalize(vN), normalize(vec3(-0.4, 0.6, 1.0))));\n        vec3 c = uCore * mix(0.45, relevo, vPerna)');
+  fatia.malha.geometry = geo;
+  fatia.malha.material = material;
+  fatia.prepass.geometry = geo;
+}
+
 function nivelPerna(geo) {
   if (!geo) return nivelPernaSilhueta();
   const S = CORPO.altura / 1.75;
@@ -820,6 +924,7 @@ function nivelPerna(geo) {
   g.userData.aneis = aneis;
   const bb = fatia.geo.boundingBox;
   g.position.set(-(bb.min.x + bb.max.x) / 2, -(bb.min.y + bb.max.y) / 2, -(bb.min.z + bb.max.z) / 2);
+  acabarPerna(fatia, geo, S);
   return g;
 }
 
