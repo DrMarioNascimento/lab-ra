@@ -33,3 +33,5 @@ Crédito da malha cardíaca: [Realistic Human Heart](https://sketchfab.com/3d-mo
 As leituras de pressão mostram cmH₂O e mmHg simultaneamente: pleural e alveolar conservam cmH₂O como unidade principal, e arterial/venosa conservam mmHg. A apresentação converte pelas unidades convencionais (98,0665 Pa por cmH₂O e 133,3224 Pa por mmHg, portanto 1 cmH₂O ≈ 0,73556 mmHg); os cálculos do motor não mudam. Referência das unidades convencionais: [NIST, SP 811, tabela de pressão](https://www.nist.gov/pml/special-publication-811/nist-guide-si-appendix-b-conversion-factors/nist-guide-si-appendix-b9).
 
 A revisão integrada de pressões, volume, perfusão, reprodução e limites didáticos está em [AUDITORIA-FISIOLOGIA.md](AUDITORIA-FISIOLOGIA.md).
+
+O coração externo agora apresenta contração visual durante a execução, com base e grandes vasos ancorados. Os controles pausam os dois relógios; a RA conserva a pose exportada. Os estados rápidos alteram volumes, pressões e o movimento respiratório conforme a auditoria de fisiologia.

@@ -632,7 +632,11 @@ export function carregarCoracao() {
   return carregamentoCardiaco;
 }
 function coracaoDoRepositorio() {
-  return matrizCardiaca?matrizCardiaca.clone():new THREE.Group();
+  if(!matrizCardiaca)return new THREE.Group();
+  const g=matrizCardiaca.clone();
+  // Cada tórax tem seus buffers. Contrair um não deforma a outra vista.
+  g.traverse(o=>{if(o.isMesh){o.geometry=o.geometry.clone();o.userData.repousoCardiaco=o.geometry.attributes.position.array.slice();}});
+  return g;
 }
 export function construirMediastino(M) {
   const g = new THREE.Group(); g.name = 'mediastino';

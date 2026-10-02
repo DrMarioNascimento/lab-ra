@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../laboratorio.css" />
-  <link rel="stylesheet" href="style.css?v=revisao-20261002" />
+  <link rel="stylesheet" href="style.css?v=estados-20261002" />
   <script src="../guard.js?v=livre-20261002b"></script>
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"}}</script>
   <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.1.0/dist/model-viewer.min.js"></script>
@@ -21,15 +21,21 @@
   <div class="page-head"><div><span class="eyebrow">Bancada 10 · Unidade V · Pleura e West</span><h1>O espaço pleural</h1></div><a class="back-link" href="../bancadas.html">← Voltar</a></div>
   <p class="page-note">Explore as camadas pleurais, a mecânica respiratória, o pneumotórax, o gradiente pleural e as zonas de West. Mude a postura e acompanhe a relação entre pressão, ventilação e perfusão.</p>
 
-  <section id="cicloControls" class="ciclo-controls" aria-label="Ciclo respiratório" hidden>
+  <section id="cicloControls" class="ciclo-controls" aria-label="Ciclo respiratório">
     <div class="playback"><span class="eyebrow">Ciclo respiratório</span><button id="respirar" class="primary" type="button">Iniciar</button><button id="pausar" type="button" disabled>Pausar</button><button id="avancarFase" type="button">Próxima fase</button><button id="reiniciar" type="button" title="Voltar ao fim da expiração">Reiniciar</button></div>
     <div class="execution-settings">
       <label class="ctrl speed-control"><span>Velocidade de execução <b id="velocidadeValor">1,00×</b></span><input id="velocidade" type="range" min="0.25" max="2" step="0.25" value="1" aria-label="Velocidade de execução" /></label>
       <label class="loop-control"><input id="loopContinuo" type="checkbox" checked /> Execução contínua</label>
       <button id="restaurarParametros" type="button">Restaurar parâmetros</button>
     </div>
-    <p class="execution-note">A velocidade altera apenas a reprodução. O ciclo de referência permanece em 15 respirações/min.</p>
+    <p id="notaExecucao" class="execution-note">A velocidade altera apenas a reprodução. Referência: 15 respirações/min · coração: 75 bpm.</p>
     <p id="cicloEstado" role="status">Fim da expiração</p>
+  </section>
+
+  <section class="estados-rapidos caixa" aria-label="Estados rápidos">
+    <div class="caixa-head"><span class="eyebrow">Estados rápidos</span></div>
+    <div id="estadosRapidos" class="causas"></div>
+    <p id="notaEstado" class="estado" aria-live="polite"></p>
   </section>
 
   <div class="progress" aria-label="Níveis"><button class="step active" data-step="0" type="button"><b>01</b><span>Camadas</span></button><button class="step" data-step="1" type="button"><b>02</b><span>Mecânica</span></button><button class="step" data-step="2" type="button"><b>03</b><span>Pneumotórax</span></button><button class="step" data-step="3" type="button"><b>04</b><span>Gradiente</span></button><button class="step" data-step="4" type="button"><b>05</b><span>Zonas de West</span></button></div>
@@ -42,7 +48,7 @@
       <p id="modeloStatus" class="modelo-status" role="status">Carregando o coração anatômico…</p>
       <div id="frestaPontos" class="fresta-pontos" aria-hidden="true" hidden></div>
       <div id="perfilPontos" class="perfil-pontos" aria-hidden="true" hidden><span id="perfilApice">Ápice</span><span id="perfilBase">Base</span></div>
-      <div class="stage-hud"><span id="posturaLabel">Ortostatismo · 90°</span><span id="pplLabel">Pleural −6,2 cmH₂O<small id="pplMmHg" class="pressao-equivalente">−4,6 mmHg</small></span><span id="stepLabel">01 · Camadas</span></div>
+      <div class="stage-hud"><span id="posturaLabel">Ortostatismo · 90°</span><span id="pplLabel">Pleural média −6,2 cmH₂O<small id="pplMmHg" class="pressao-equivalente">−4,6 mmHg</small></span><span id="stepLabel">01 · Camadas</span></div>
       <div class="gesture">Incline o aparelho · arraste para girar a vista</div>
       <div class="stage-tools">
         <button id="telaCheia" class="ghost-control" type="button">Ampliar</button>
@@ -56,6 +62,18 @@
         <p id="infoText"></p>
         <div class="microtags" id="microtags"></div>
       </article>
+
+      <section class="caixa grafico-box" aria-label="Gráficos fisiológicos">
+        <div class="caixa-head"><span class="eyebrow">Gráficos</span></div>
+        <div id="modosGrafico" class="causas" aria-label="Tipo de gráfico">
+          <button type="button" data-grafico="perfil" class="on" aria-pressed="true">Perfil regional</button>
+          <button type="button" data-grafico="ciclo" aria-pressed="false">Volume e fluxo</button>
+        </div>
+        <p id="notaGrafico" class="nota"></p>
+        <canvas id="curvaPerfil" width="600" height="330" role="img" aria-label="Ventilação e perfusão regionais, com escalas separadas"></canvas>
+        <p id="resumoGrafico" class="grafico-resumo"></p>
+        <p id="indicesCVF" class="nota" hidden></p>
+      </section>
 
       <div class="actions"><button id="prev" class="secondary" type="button" disabled>← Anterior</button><button id="next" class="primary" type="button">Próximo →</button></div>
     </div>
@@ -84,14 +102,10 @@
           <button type="button" data-pneumo="aberto">Aberto</button>
           <button type="button" data-pneumo="hipertensivo">Hipertensivo</button>
         </div>
-        <ul class="leituras">
-          <li style="--card-color:#8bdbc0">Pulmão direito <b><span id="lPulmao">40</span>% da capacidade</b></li>
-          <li style="--card-color:#9fd0e8">caixa torácica <b><span id="lCaixa">40</span>% da capacidade</b></li>
-          <li style="--card-color:#eaa2c8">Retorno venoso estimado <b><span id="lRetorno">100</span>% da referência do modelo</b></li>
-        </ul>
+        <p class="nota">Alteração pleural à direita. Os valores de volume e retorno aparecem abaixo, junto às demais leituras.</p>
       </section>
 
-      <section class="caixa" id="caixaPostura" aria-label="Postura" hidden>
+      <section class="caixa" id="caixaPostura" aria-label="Postura e leituras respiratórias">
         <div class="caixa-head">
           <span class="eyebrow">Postura do corpo</span>
           <div class="caixa-btns"><button id="deitar" type="button">Deitado</button><button id="levantar" type="button">Em pé</button></div>
@@ -100,30 +114,25 @@
         <p id="sensorEstado" class="estado">Verificando sensor de inclinação…</p>
         <label class="ctrl"><span>Inclinação <b id="grauValor">90°</b></span>
           <input id="grauCursor" type="range" min="0" max="90" step="1" value="90" aria-label="Inclinação do corpo" /></label>
-        <ul class="leituras">
-          <li style="--card-color:#88c5ff">pressão pleural no ápice <b><span id="lApice">−10.0</span> cmH₂O<small id="lApiceEquiv" class="pressao-equivalente">−7.4 mmHg</small></b></li>
-          <li style="--card-color:#88c5ff">na base <b><span id="lBase">−2.5</span> cmH₂O<small id="lBaseEquiv" class="pressao-equivalente">−1.8 mmHg</small></b></li>
-          <li style="--card-color:#aebed3">Altura efetiva do eixo gravitacional <b><span id="lAltura">30 cm</span></b></li>
-          <li style="--card-color:#8bdbc0">Volume alveolar no ápice <b><span id="lVolApice">63</span>%</b></li>
-          <li style="--card-color:#8bdbc0">Volume alveolar na base <b><span id="lVolBase">22</span>%</b></li>
-          <li style="--card-color:#7ad3c7">Ventilação base/ápice <b><span id="lVent">2.12×</span></b></li>
-          <li style="--card-color:#f0c895">pressão alveolar <b><span id="lPalv">0.00</span> cmH₂O<small id="lPalvEquiv" class="pressao-equivalente">0.00 mmHg</small></b></li>
-          <li style="--card-color:#9fd0e8">Fase respiratória <b><span id="lFase">parado no fim da expiração</span></b></li>
-        </ul>
-        <p class="nota perfil-nota">Perfis normalizados separadamente: ventilação por ciclo e perfusão relativa.</p>
-        <canvas id="curvaPerfil" width="330" height="180" aria-label="Ventilação e perfusão do ápice à base"></canvas>
+<div class="reading-group" ><h3>Contexto da leitura</h3><ul class="leituras"><li style="--card-color:#9fd0e8">Fase respiratória <b><span id="lFase">parado no fim da expiração</span></b></li><li style="--card-color:#aebed3">Altura efetiva do eixo gravitacional <b><span id="lAltura">30 cm</span></b></li></ul></div>
+<div class="reading-group" ><h3>1 · Pressões respiratórias</h3><ul class="leituras"><li class="leitura-comum" style="--card-color:#f0c895">pressão alveolar <b><span id="lPalv">0.00</span> cmH₂O<small id="lPalvEquiv" class="pressao-equivalente">0.00 mmHg</small></b></li><li style="--card-color:#88c5ff">Pleural · ápice <b><span id="lApice">−10.0</span> cmH₂O<small id="lApiceEquiv" class="pressao-equivalente">−7.4 mmHg</small></b></li><li style="--card-color:#88c5ff">Pleural · base <b><span id="lBase">−2.5</span> cmH₂O<small id="lBaseEquiv" class="pressao-equivalente">−1.8 mmHg</small></b></li><li style="--card-color:#90ddcf">Transpulmonar · ápice <b><span id="lPlApice"></span> cmH₂O<small id="lPlApiceEquiv" class="pressao-equivalente"></small></b></li><li style="--card-color:#90ddcf">Transpulmonar · base <b><span id="lPlBase"></span> cmH₂O<small id="lPlBaseEquiv" class="pressao-equivalente"></small></b></li></ul></div>
+        <p class="nota">Alveolar: referência atmosférica = 0. Transpulmonar = alveolar − pleural. Ápice à esquerda, base à direita em cada par.</p>
+<div class="reading-group" ><h3>2 · Volume e ventilação</h3><ul class="leituras"><li style="--card-color:#8bdbc0">Volume alveolar no ápice <b><span id="lVolApice">63</span>%</b></li><li style="--card-color:#8bdbc0">Volume alveolar na base <b><span id="lVolBase">22</span>%</b></li><li class="leitura-comum" style="--card-color:#8bdbc0">Volume pulmonar do modelo <b><span id="lVolumeTotal"></span></b></li><li style="--card-color:#7ad3c7">Ventilação base/ápice <b><span id="lVent">2.12×</span></b></li></ul></div>
+<div class="reading-group" id="leiturasTorax"><h3>Pulmão direito e parede torácica</h3><ul class="leituras"><li style="--card-color:#8bdbc0">Pulmão direito <b><span id="lPulmao">40</span>% da capacidade</b></li><li style="--card-color:#9fd0e8">caixa torácica <b><span id="lCaixa">40</span>% da capacidade</b></li></ul></div>
+<div class="reading-group" ><h3>Efeito da pressão intratorácica</h3><ul class="leituras"><li style="--card-color:#eaa2c8">Retorno venoso estimado <b><span id="lRetorno">100</span>% da referência do modelo</b></li></ul></div>
+        <p class="nota">Adulto virtual: capacidade pulmonar total de 6 L. Volumes regionais relativos; retorno venoso é um índice ilustrativo.</p>
       </section>
 
       <section class="caixa" id="caixaZonas" aria-label="Zonas de West" hidden>
-        <div class="caixa-head"><span class="eyebrow">O que muda as zonas</span></div>
+        <div class="caixa-head"><span class="eyebrow">3 · Perfusão e zonas de West</span></div>
         <div class="causas" id="cenarios"></div>
         <p id="notaCenario" class="estado"></p>
         <ul class="leituras">
-          <li style="--card-color:#f2a9a4">Arterial no ápice <b><span id="lPaApice">4.5</span> mmHg<small id="lPaApiceEquiv" class="pressao-equivalente">6.1 cmH₂O</small></b></li>
-          <li style="--card-color:#c7adfa">Venosa no ápice <b><span id="lPvApice">−5.5</span> mmHg<small id="lPvApiceEquiv" class="pressao-equivalente">−7.5 cmH₂O</small></b></li>
-          <li style="--card-color:#f2a9a4">Arterial na base <b><span id="lPaBase">27.9</span> mmHg<small id="lPaBaseEquiv" class="pressao-equivalente">38.0 cmH₂O</small></b></li>
-          <li style="--card-color:#c7adfa">Venosa na base <b><span id="lPvBase">17.9</span> mmHg<small id="lPvBaseEquiv" class="pressao-equivalente">24.4 cmH₂O</small></b></li>
-          <li style="--card-color:#c7adfa">do ápice à base <b><span id="lZonas">223333333</span></b></li>
+          <li style="--card-color:#f2a9a4">Arterial · ápice <b><span id="lPaApice">4.5</span> mmHg<small id="lPaApiceEquiv" class="pressao-equivalente">6.1 cmH₂O</small></b></li>
+          <li style="--card-color:#c7adfa">Venosa · ápice <b><span id="lPvApice">−5.5</span> mmHg<small id="lPvApiceEquiv" class="pressao-equivalente">−7.5 cmH₂O</small></b></li>
+          <li style="--card-color:#f2a9a4">Arterial · base <b><span id="lPaBase">27.9</span> mmHg<small id="lPaBaseEquiv" class="pressao-equivalente">38.0 cmH₂O</small></b></li>
+          <li style="--card-color:#c7adfa">Venosa · base <b><span id="lPvBase">17.9</span> mmHg<small id="lPvBaseEquiv" class="pressao-equivalente">24.4 cmH₂O</small></b></li>
+          <li style="--card-color:#c7adfa">Zonas do ápice à base <b><span id="lZonas">223333333</span></b></li>
           <li style="--card-color:#eaa2c8">Perfusão base/ápice <b><span id="lFluxo">2.24×</span></b></li>
         </ul>
       </section>
@@ -137,6 +146,6 @@
   </section>
 </main>
 <footer class="rodape shell"><img src="../brand/mestre-lap.webp" alt="" width="84" height="84"><p class="signature">Simuladores interativos utilizados nas disciplinas de Fisiologia Humana do Prof. Mário César Nascimento, PhD ©</p></footer>
-<script type="module" src="app.js?v=revisao-20261002"></script>
+<script type="module" src="app.js?v=estados-20261002"></script>
 </body>
 </html>

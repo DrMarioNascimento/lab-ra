@@ -105,9 +105,9 @@ export function transpulmonar(f, grau, opc = {}) {
    no pneumotórax, e por isso a conta tem de dar zero e não um número pequeno. */
 export const K_COMPLACENCIA = 0.10;
 
-export function volumeRelativo(pl) {
+export function volumeRelativo(pl, k = K_COMPLACENCIA) {
   if (pl <= 0) return 0;
-  return 1 - Math.exp(-K_COMPLACENCIA * pl);
+  return 1 - Math.exp(-k * pl);
 }
 
 /* Quanto AR ENTRA num alvéolo quando a pressão pleural varia de `delta`.

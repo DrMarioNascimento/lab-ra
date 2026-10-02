@@ -21,7 +21,7 @@ import {
   DIR, ESQ, mk, loft, tuboGeo, construirCaixa, construirColuna, construirDiafragma,
   construirMediastino, geoPulmao, secaoPulmao, HILO, fragmentoGeo, tecidoGeo,
   amostraPulmao, unidadeAcinar, redeCapilar, yDiafragmaToracico, raioDiafragma, limiteCardiaco, wT, dT, geoLobos,
-} from './anatomia.js';
+} from './anatomia.js?v=estados-20261002';
 
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
@@ -442,5 +442,21 @@ export function criar() {
     }
   }
 
-  return { modelos, aplicarFresta, aplicarTorax, aplicarAlveolos, aplicarZonas, N_ALV, N_FAIXA };
+  function aplicarCoracao(nivel, contracao) {
+    const med=modelos[nivel]?.userData.med;
+    if(!med)return;
+    med.traverse(m=>{
+      const base=m.userData.repousoCardiaco;
+      if(!base)return;
+      const pos=m.geometry.attributes.position;
+      for(let i=0;i<pos.count;i++) {
+        const j=i*3,x=base[j],y=base[j+1],z=base[j+2];
+        // Contração ventricular discreta; a base e os grandes vasos permanecem ancorados.
+        const peso=clamp((.020-y)/.045,0,1),q=contracao*peso;
+        pos.setXYZ(i,x*(1-.075*q),.018+(y-.018)*(1-.10*q),z*(1-.075*q));
+      }
+      pos.needsUpdate=true;m.geometry.computeVertexNormals();m.geometry.computeBoundingSphere();
+    });
+  }
+  return { modelos, aplicarFresta, aplicarTorax, aplicarAlveolos, aplicarZonas, aplicarCoracao, N_ALV, N_FAIXA };
 }
