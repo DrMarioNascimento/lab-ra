@@ -362,24 +362,29 @@ function nivelCorpoMalha(bodyGeo) {
 
   const S = CORPO.altura / 1.75;
   const P = geo.attributes.position.array;
-  const m = v => v * S;
-  /* Braço aberto na altura do quadril (|x|~0,38 m, y 0,70–0,90). Sem este
-     corte o centróide da perna cai na mão: é o U da pelve e o braço no close. */
-  const noBraco = (x, y) => !(y > m(0.66) && y < m(0.96) && Math.abs(x) > m(0.26));
-  const torsoF = (x, y) => Math.abs(x) < m(0.12) && y > m(0.72) && noBraco(x, y);
-  const legF = s => (x, y) => y > m(0.02) && y < m(0.68) && x * s > m(0.05) && Math.abs(x) < m(0.26);
-  const neckF = (x, y) => Math.abs(x) < m(0.08) && y > m(1.38);
-  const estrito = (y0, y1, f) => centrar(P, y0, y1, f);
+  const torsoF = x => Math.abs(x) < 0.16 * S;
+  const legF = s => (x, y) => y < 0.86 * S && x * s > 0.005 * S && Math.abs(x) < 0.3 * S;
+  const neckF = x => Math.abs(x) < 0.09 * S;
+  const footF = s => (x, y, z) => x * s > 0.005 * S && Math.abs(x) < 0.3 * S && z > 0.02 * S;
   const route = (ys, f, dx = 0, dz = 0) => ys
-    .map(y => estrito(y - m(0.025), y + m(0.025), f))
+    .map(y => centroid(P, y - 0.03 * S, y + 0.03 * S, f))
     .filter(Boolean)
-    .map(pt => pt.clone().add(V(dx, 0, dz)));
-  const legY = [0.06, 0.14, 0.22, 0.30, 0.38, 0.46, 0.54, 0.62].map(m);
-  const torsoY = [0.78, 0.90, 1.02, 1.14, 1.26].map(m);
-  const neckY = [1.42, 1.50, 1.56].map(m);
-  /* De frente, +X é a direita de quem olha — lado esquerdo de quem está de pé. */
-  const heartC = (estrito(m(1.22), m(1.34), torsoF) || V(0, CORPO.coracao * CM, 0)).add(V(m(0.055), -m(0.01), m(0.03)));
-  const bif = estrito(m(0.66), m(0.74), (x, y) => Math.abs(x) < m(0.1) && noBraco(x, y)) || V(0, m(0.70), -m(0.02));
+    .map(p => p.clone().add(V(dx, 0, dz)));
+  const footPt = (s, dx, dy) => {
+    const c = centroid(P, 0, 0.05 * S, footF(s));
+    return c ? c.clone().add(V(dx, dy, 0)) : null;
+  };
+  const anklePt = (s, dx, dz) => {
+    const c = centroid(P, 0.05 * S, 0.09 * S, legF(s));
+    return c ? c.clone().add(V(dx, 0, dz)) : null;
+  };
+  const legY = [0.1, 0.16, 0.26, 0.36, 0.46, 0.56, 0.66, 0.76, 0.84].map(y => y * S);
+  const torsoY = [0.9, 0.98, 1.06, 1.14, 1.22, 1.3].map(y => y * S);
+  const neckY = [1.46, 1.5, 1.53].map(y => y * S);
+  /* De frente, +X é a direita de quem olha — e é o lado esquerdo de quem
+     está de pé. O ápice aponta para lá. */
+  const heartC = (centroid(P, 1.24 * S, 1.36 * S, torsoF) || V(0, CORPO.coracao * CM, 0)).add(V(0.082 * S, -0.012 * S, 0.042 * S));
+  const bif = centroid(P, 0.84 * S, 0.92 * S, torsoF) || V(0, CORPO.quadril * CM, 0);
 
   const heart = new THREE.Mesh(new THREE.SphereGeometry(0.055 * S, 32, 24), M.coracao.clone());
   heart.name = 'coracao';
@@ -396,16 +401,16 @@ function nivelCorpoMalha(bodyGeo) {
     name: 'arteria', color: 0xc81e1e, emissive: 0x5a0a0a, roughness: 0.35, metalness: 0.05,
   });
   const arteries = [
-    { n: 'aorta', r: 0.012 * S, p: [heartC.clone(), heartC.clone().add(V(-m(0.01), m(0.06), -m(0.02))), ...route(torsoY.slice().reverse(), torsoF, -m(0.012), -m(0.02)), bif.clone().add(V(-m(0.01), 0, -m(0.015)))] },
+    { n: 'aorta', r: 0.013 * S, p: [heartC.clone(), heartC.clone().add(V(0.03 * S, 0.08 * S, -0.02 * S)), ...route(torsoY.slice().reverse(), torsoF, -0.022 * S, -0.035 * S), bif.clone().add(V(-0.012 * S, 0, -0.025 * S))] },
   ];
   const veinDefs = [
-    { n: 'veia_cava_inferior', papel: 'cava', r: 0.014 * S, p: [bif.clone().add(V(m(0.012), 0, m(0.01))), ...route(torsoY, torsoF, m(0.018), m(0.012)), heartC.clone().add(V(-m(0.02), m(0.01), m(0.01)))] },
+    { n: 'veia_cava_inferior', papel: 'cava', r: 0.016 * S, p: [bif.clone().add(V(0.022 * S, 0, 0.012 * S)), ...route(torsoY, torsoF, 0.03 * S, 0.012 * S), heartC.clone().add(V(0.03 * S, 0.02 * S, 0.02 * S))] },
   ];
   for (const s of [-1, 1]) {
     const L = s < 0 ? 'dir' : 'esq';
-    arteries.push({ n: 'femoral_' + L, r: 0.007 * S, p: [bif.clone().add(V(s * m(0.012), 0, -m(0.01))), ...route(legY.slice().reverse(), legF(s), s * m(0.006), m(0.006))] });
-    veinDefs.push({ n: 'femoral_safena_' + L, papel: 'perna', r: 0.008 * S, p: [...route(legY, legF(s), s * m(0.01), -m(0.004)), bif.clone().add(V(s * m(0.014), 0, m(0.008)))] });
-    veinDefs.push({ n: 'jugular_' + L, papel: 'jugular', r: 0.006 * S, p: [...route(neckY.slice().reverse(), neckF, s * m(0.028), -m(0.006)), heartC.clone().add(V(s * m(0.008), m(0.02), m(0.008)))] });
+    arteries.push({ n: 'femoral_' + L, r: 0.008 * S, p: [bif.clone().add(V(0, 0, -0.02 * S)), ...route(legY.slice().reverse(), legF(s), s * 0.012 * S, 0.012 * S), anklePt(s, s * 0.006 * S, 0.016 * S), footPt(s, s * 0.004 * S, 0.012 * S)] });
+    veinDefs.push({ n: 'femoral_safena_' + L, papel: 'perna', r: 0.009 * S, p: [footPt(s, s * 0.016 * S, 0.012 * S), anklePt(s, s * 0.024 * S, -0.002 * S), ...route(legY, legF(s), s * 0.03 * S, -0.004 * S), bif.clone().add(V(0.02 * S, 0, 0.01 * S))] });
+    veinDefs.push({ n: 'jugular_' + L, papel: 'jugular', r: 0.007 * S, p: [...route(neckY.slice().reverse(), neckF, s * 0.035 * S, -0.012 * S), heartC.clone().add(V(0.03 * S, 0.02 * S, 0.02 * S))] });
   }
 
   const fluxo = [];
@@ -775,14 +780,14 @@ function nivelPernaSilhueta() {
 function nivelPerna(geo) {
   if (!geo) return nivelPernaSilhueta();
   const S = CORPO.altura / 1.75;
-  const fatia = casca(geo, (x, y) => x > 0.05 * S && x < 0.28 * S && y > 0.02 * S && y < 0.68 * S);
+  const fatia = casca(geo, (x, y) => x > 0.02 * S && y < 1.02 * S && y > 0.01 * S);
   if (!fatia) return nivelPernaSilhueta();
   const g = new THREE.Group();
   g.add(fatia.malha);
   g.add(fatia.prepass);
   const P = fatia.geo.attributes.position.array;
-  const leg = (x, y) => x > 0.05 * S && x < 0.28 * S && y > 0.02 * S && y < 0.68 * S;
-  const ys = [0.06, 0.14, 0.22, 0.30, 0.38, 0.46, 0.54, 0.62].map(y => y * S);
+  const leg = (x, y) => x > 0.02 * S && y < 1.02 * S;
+  const ys = [0.08, 0.16, 0.26, 0.36, 0.46, 0.56, 0.66, 0.76, 0.86].map(y => y * S);
   const rota = (dx, dz) => ys.map(y => centroid(P, y - 0.04 * S, y + 0.04 * S, leg)).filter(Boolean).map(p => p.clone().add(V(dx, 0, dz)));
   const profPts = rota(0.01 * S, 0.01 * S);
   const safPts = rota(0.035 * S, -0.01 * S);
@@ -870,7 +875,7 @@ function nivelBomba(geo) {
   const R = 5.5 * CM, H = 46 * CM;
   const S = CORPO.altura / 1.75;
   if (geo) {
-    const fatia = casca(geo, (x, y) => x > 0.06 * S && x < 0.26 * S && y > 0.12 * S && y < 0.48 * S);
+    const fatia = casca(geo, (x, y) => x > 0.02 * S && y > 0.05 * S && y < 0.5 * S);
     if (fatia) {
       const bb = fatia.geo.boundingBox;
       const h = bb.max.y - bb.min.y || 1;
