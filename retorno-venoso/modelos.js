@@ -511,12 +511,13 @@ function nivelCorpoMalha(bodyGeo, scan) {
   return g;
 }
 
-function nivelCorpoSilhueta() {
+function nivelCorpoSilhueta(scan) {
 
   const g = new THREE.Group();
   g.add(corpoSilhueta());
 
   const veias = [];
+  const corAnatomico=scan?instalarCoracao(scan,V(2.4*CM,CORPO.coracao*CM,1.2*CM),M.coracao):null;
   /* perna direita e esquerda: tibial -> poplítea -> femoral -> ilíaca */
   for (const lado of [-1, 1]) {
     const x = lado * 4.2 * CM;
@@ -533,12 +534,17 @@ function nivelCorpoSilhueta() {
     veias.push(m); g.add(m);
   }
   /* cava inferior: do cruzamento das ilíacas ao átrio direito */
-  const cava = new THREE.Mesh(veia([
+  const pontosCava=[
     V(0, CORPO.quadril * CM, .6 * CM),
     V(.6 * CM, 102 * CM, .5 * CM),
     V(1.0 * CM, PIH * CM, .2 * CM),
     V(1.2 * CM, CORPO.coracao * CM, 0),
-  ], 3.0 * CM), M.veia);
+  ];
+  const cava = new THREE.Mesh(veia(pontosCava, 3.0 * CM), M.veia);
+  if(corAnatomico){
+    const original=new THREE.CatmullRomCurve3(pontosCava),ligada=ligarVaso(original,corAnatomico.userData.ligacoes.inferior,PIH*CM+.003);
+    ajustarTrechoCardiaco(cava,original,ligada,SEGS_U,SEGS_V,false,.32);
+  }
   cava.userData.papel = 'cava';
   veias.push(cava); g.add(cava);
 
@@ -553,10 +559,15 @@ function nivelCorpoSilhueta() {
   veias.push(jugular); g.add(jugular);
 
   /* o coração, só como âncora do desenho */
-  const cor = new THREE.Mesh(new THREE.SphereGeometry(3.4 * CM, 22, 16), M.coracao);
-  cor.geometry.scale(1, 1.18, .8);
-  cor.position.set(1.0 * CM, CORPO.coracao * CM, .6 * CM);
+  const cor = corAnatomico||new THREE.Mesh(new THREE.SphereGeometry(3.4 * CM, 22, 16), M.coracao);
+  if(!corAnatomico){cor.geometry.scale(1, 1.18, .8);cor.position.set(1.0 * CM, CORPO.coracao * CM, .6 * CM)}
   g.add(cor);
+  if(corAnatomico){
+    const entrada=jugular.geometry.userData.centros[0].clone(),saida=cor.userData.ligacoes.superior;
+    const superior=new THREE.Mesh(veia([entrada,entrada.clone().lerp(saida,.5),saida],.9*CM),M.veia);
+    superior.name='conexao_cardiaca_cava_superior';superior.userData.papel='cava';g.add(superior);veias.push(superior);
+    g.userData.coracao=cor;
+  }
 
   g.userData.veias = veias;
   /* A GEOMETRIA FICA EM ALTURA ABSOLUTA — `veia()` guarda `p.y / CM` como
@@ -1084,7 +1095,7 @@ function nivelBomba(geo) {
    onde começou, e a pergunta muda: não é mais "onde a coluna aperta", é
    "quanto volta ao coração". */
 function nivelCiclo(geo,scan) {
-  const g = geo ? nivelCorpoMalha(geo,scan) : nivelCorpoSilhueta();
+  const g = geo ? nivelCorpoMalha(geo,scan) : nivelCorpoSilhueta(scan);
   g.userData.comBomba = true;
   return g;
 }
@@ -1098,7 +1109,7 @@ export async function criar() {
   try { geo = await carregarCorpo(); }
   catch (err) { console.error('corpo.glb não entrou; segue a silhueta', err); }
   const modelos = [
-    geo ? nivelCorpoMalha(geo,scan) : nivelCorpoSilhueta(),
+    geo ? nivelCorpoMalha(geo,scan) : nivelCorpoSilhueta(scan),
     nivelPerna(geo), nivelValvula(), nivelBomba(geo), nivelCiclo(geo,scan),
   ];
   modelos.forEach((m, i) => { m.visible = i === 0; });
