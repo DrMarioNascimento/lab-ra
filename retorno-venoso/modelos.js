@@ -381,14 +381,20 @@ function nivelCorpoMalha(bodyGeo) {
   const legY = [0.1, 0.16, 0.26, 0.36, 0.46, 0.56, 0.66, 0.76, 0.84].map(y => y * S);
   const torsoY = [0.9, 0.98, 1.06, 1.14, 1.22, 1.3].map(y => y * S);
   const neckY = [1.46, 1.5, 1.53].map(y => y * S);
-  const heartC = (centroid(P, 1.24 * S, 1.36 * S, torsoF) || V(0, CORPO.coracao * CM, 0)).add(V(-0.03 * S, 0, 0.03 * S));
+  /* De frente, +X é a direita de quem olha — e é o lado esquerdo de quem
+     está de pé. O ápice aponta para lá. */
+  const heartC = (centroid(P, 1.24 * S, 1.36 * S, torsoF) || V(0, CORPO.coracao * CM, 0)).add(V(0.082 * S, -0.012 * S, 0.042 * S));
   const bif = centroid(P, 0.84 * S, 0.92 * S, torsoF) || V(0, CORPO.quadril * CM, 0);
 
   const heart = new THREE.Mesh(new THREE.SphereGeometry(0.055 * S, 32, 24), M.coracao.clone());
   heart.name = 'coracao';
   heart.position.copy(heartC);
   heart.scale.set(0.95, 1.15, 0.85);
-  heart.rotation.z = 0.35;
+  heart.rotation.z = 0.72;
+  const apice = new THREE.Mesh(new THREE.SphereGeometry(0.032 * S, 20, 14), heart.material);
+  apice.position.set(0.046 * S, -0.028 * S, 0.012 * S);
+  apice.scale.set(1, 1.25, 0.8);
+  heart.add(apice);
   g.add(heart);
 
   const artMat = new THREE.MeshStandardMaterial({
@@ -618,7 +624,115 @@ function parede(R, comp, mat) {
 /* ── NÍVEL 02 — A PERNA QUE ENCHE ─────────────────────────────────────────
    O mesmo tubo do nível 01, agora sozinho e grande. O que se lê aqui é
    VOLUME: quanto sangue sai da circulação central e fica parado na perna. */
-function nivelPerna() {
+
+function recortar(geo, pred) {
+  const pos = geo.attributes.position.array;
+  const idx = geo.index ? geo.index.array : null;
+  const dentro = (a, b, c) => pred(
+    (pos[a * 3] + pos[b * 3] + pos[c * 3]) / 3,
+    (pos[a * 3 + 1] + pos[b * 3 + 1] + pos[c * 3 + 1]) / 3,
+    (pos[a * 3 + 2] + pos[b * 3 + 2] + pos[c * 3 + 2]) / 3);
+  const mapa = new Map();
+  const nv = []; const ni = [];
+  const add = i => {
+    let k = mapa.get(i);
+    if (k === undefined) {
+      k = nv.length / 3;
+      mapa.set(i, k);
+      nv.push(pos[i * 3], pos[i * 3 + 1], pos[i * 3 + 2]);
+    }
+    return k;
+  };
+  if (idx) {
+    for (let t = 0; t < idx.length; t += 3) {
+      const a = idx[t], b = idx[t + 1], c = idx[t + 2];
+      if (!dentro(a, b, c)) continue;
+      ni.push(add(a), add(b), add(c));
+    }
+  }
+  if (ni.length < 12) return null;
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(nv, 3));
+  g.setIndex(ni);
+  g.computeVertexNormals();
+  g.computeBoundingBox();
+  return g;
+}
+
+function casca(geo, pred) {
+  const fatia = recortar(geo, pred);
+  if (!fatia) return null;
+  const m = new THREE.Mesh(fatia, peleRaioX());
+  m.name = 'casca';
+  m.renderOrder = 5;
+  m.userData.semSombra = true;
+  const pre = new THREE.Mesh(fatia, new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: true }));
+  pre.name = 'prepass';
+  pre.renderOrder = 4;
+  pre.userData.foraDoQuadro = true;
+  pre.userData.naoExportar = true;
+  pre.userData.semSombra = true;
+  return { malha: m, prepass: pre, geo: fatia };
+}
+
+function aneisDaSafena(g, curve, r, S) {
+  const mat = new THREE.MeshStandardMaterial({
+    name: 'valvula_venosa', color: 0xbfd4ff, emissive: 0x6f8fff, emissiveIntensity: 0.9, roughness: 0.3,
+  });
+  const aneis = [];
+  const n = Math.max(4, Math.floor(curve.getLength() / (0.09 * S)));
+  for (let k = 1; k <= n; k++) {
+    const tt = k / (n + 1);
+    const pt = curve.getPointAt(tt), tg = curve.getTangentAt(tt);
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(r * 1.25, r * 0.28, 8, 18), mat.clone());
+    ring.position.copy(pt);
+    ring.quaternion.setFromUnitVectors(V(0, 0, 1), tg);
+    ring.userData.altura = pt.y / CM;
+    g.add(ring);
+    aneis.push(ring);
+  }
+  return aneis;
+}
+
+function sangueNoGrupo(g, fluxo, S) {
+  const bolha = texturaBolha(), faisca = texturaFaisca();
+  const particulas = [];
+  const tmp0 = new THREE.Vector3();
+  const camada = (name, size, tex, color, density, speedMul, opacity, kind) => {
+    const data = [];
+    for (const path of fluxo) {
+      if (path.kind !== kind) continue;
+      const n = Math.max(6, Math.round(path.len / S * density));
+      for (let i = 0; i < n; i++) {
+        const a = Math.random() * Math.PI * 2, rr = Math.sqrt(Math.random()) * path.r * 0.7;
+        data.push({ path, t: Math.random(), off: [Math.cos(a) * rr, Math.sin(a) * rr], speed: (0.05 + Math.random() * 0.05) * speedMul / path.len, wob: Math.random() * Math.PI * 2 });
+      }
+    }
+    if (!data.length) return;
+    const pos = new Float32Array(data.length * 3);
+    const pg = new THREE.BufferGeometry();
+    pg.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    data.forEach((d, i) => {
+      d.path.curve.getPointAt(d.t, tmp0);
+      pos[i * 3] = tmp0.x; pos[i * 3 + 1] = tmp0.y; pos[i * 3 + 2] = tmp0.z;
+    });
+    const pts = new THREE.Points(pg, new THREE.PointsMaterial({
+      name, size, map: tex, color, transparent: true, opacity,
+      depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending, sizeAttenuation: true,
+    }));
+    pts.renderOrder = 8;
+    pts.frustumCulled = false;
+    pts.userData.foraDoQuadro = true;
+    pts.userData.naoExportar = true;
+    g.add(pts);
+    particulas.push({ pts, pos, data });
+  };
+  camada('bolhas_v', 0.02 * S, bolha, 0x6a5cff, 70, 0.8, 0.55, 'v');
+  camada('gas_v', 0.008 * S, faisca, 0xa8b4ff, 90, 1.3, 0.5, 'v');
+  g.userData.particulas = particulas;
+}
+
+function nivelPernaSilhueta() {
   const g = new THREE.Group();
   /* a perna em silhueta, do quadril ao pé */
   const perfil = [[0, 4.6], [12, 5.2], [22, 6.4], [34, 5.4], [48, 5.6],
@@ -661,6 +775,54 @@ function nivelPerna() {
   return g;
 }
 
+/* A perna de verdade, do mesmo corpo. Profunda, safena e perfurantes continuam
+   tubos moldáveis: a conta de volume e a cor de pressão não mudam de lei. */
+function nivelPerna(geo) {
+  if (!geo) return nivelPernaSilhueta();
+  const S = CORPO.altura / 1.75;
+  const fatia = casca(geo, (x, y) => x > 0.02 * S && y < 1.02 * S && y > 0.01 * S);
+  if (!fatia) return nivelPernaSilhueta();
+  const g = new THREE.Group();
+  g.add(fatia.malha);
+  g.add(fatia.prepass);
+  const P = fatia.geo.attributes.position.array;
+  const leg = (x, y) => x > 0.02 * S && y < 1.02 * S;
+  const ys = [0.08, 0.16, 0.26, 0.36, 0.46, 0.56, 0.66, 0.76, 0.86].map(y => y * S);
+  const rota = (dx, dz) => ys.map(y => centroid(P, y - 0.04 * S, y + 0.04 * S, leg)).filter(Boolean).map(p => p.clone().add(V(dx, 0, dz)));
+  const profPts = rota(0.01 * S, 0.01 * S);
+  const safPts = rota(0.035 * S, -0.01 * S);
+  const veias = [];
+  const fluxo = [];
+  const por = (nome, papel, pts, r) => {
+    if (pts.length < 2) return null;
+    const mesh = new THREE.Mesh(veia(pts, r), M.veia);
+    mesh.name = nome;
+    mesh.userData.papel = papel;
+    veias.push(mesh);
+    g.add(mesh);
+    const curve = new THREE.CatmullRomCurve3(pts, false, 'centripetal', 0.5);
+    fluxo.push({ curve, r, kind: 'v', len: curve.getLength(), name: nome });
+    return curve;
+  };
+  const curvaSaf = por('safena', 'safena', safPts, 0.009 * S);
+  por('profunda', 'profunda', profPts, 0.011 * S);
+  for (const h of [0.24, 0.46, 0.68]) {
+    const y = h * S;
+    const a = centroid(P, y - 0.03 * S, y + 0.03 * S, leg);
+    if (!a) continue;
+    const sup = a.clone().add(V(0.035 * S, 0, -0.01 * S));
+    const prof = a.clone().add(V(0.01 * S, 0.02 * S, 0.01 * S));
+    por('perfurante', 'perfurante', [sup, a.clone().add(V(0.02 * S, 0.01 * S, 0)), prof], 0.0045 * S);
+  }
+  const aneis = curvaSaf ? aneisDaSafena(g, curvaSaf, 0.009 * S, S) : [];
+  sangueNoGrupo(g, fluxo, S);
+  g.userData.veias = veias;
+  g.userData.aneis = aneis;
+  const bb = fatia.geo.boundingBox;
+  g.position.set(-(bb.min.x + bb.max.x) / 2, -(bb.min.y + bb.max.y) / 2, -(bb.min.z + bb.max.z) / 2);
+  return g;
+}
+
 /* ── NÍVEL 03 — A VÁLVULA, E O QUE ELA REALMENTE SEGURA ───────────────────
    Um segmento com três válvulas. A lição está na SOMA: nenhuma delas segura
    os 90 mmHg do tornozelo. Cada uma segura a diferença até a de cima —
@@ -671,13 +833,21 @@ const VALV_ALTURAS = [16, 30, 44];        // cm, no segmento desenhado
 function nivelValvula() {
   const g = new THREE.Group();
   const R = 7 * CM, H = 56 * CM;
-  g.add(parede(R, H, M.veia2));
+  const vidro = peleRaioX();
+  vidro.uniforms.uColor.value.set(0xb7c8ff);
+  vidro.uniforms.uCore.value.set(0x24365c);
+  vidro.uniforms.uIntensity.value = 1.05;
+  g.add(parede(R, H, vidro));
 
+  const cuspideMat = new THREE.MeshStandardMaterial({
+    name: 'valvula_venosa', color: 0xf7f9ff, emissive: 0x8eabff, emissiveIntensity: 0.85,
+    roughness: 0.28, side: THREE.DoubleSide,
+  });
   const valvulas = [];
   for (const h of VALV_ALTURAS) {
     const par = new THREE.Group();
     for (const teta of [0, Math.PI]) {
-      const m = new THREE.Mesh(cuspide(R * .97, 11 * CM, teta), M.valvula);
+      const m = new THREE.Mesh(cuspide(R * .97, 11 * CM, teta), cuspideMat.clone());
       moldarCuspide(m, 1);
       par.add(m);
     }
@@ -685,6 +855,8 @@ function nivelValvula() {
     par.userData.altura = h;
     valvulas.push(par); g.add(par);
   }
+  const curva = new THREE.CatmullRomCurve3([V(0, 2 * CM, 0), V(0, H - 2 * CM, 0)]);
+  sangueNoGrupo(g, [{ curve: curva, r: R * 0.55, kind: 'v', len: curva.getLength(), name: 'coluna' }], CORPO.altura / 1.75);
   g.userData.valvulas = valvulas;
   g.userData.alturaBase = 12;             // o segmento começa no tornozelo
   g.position.y = -H / 2;
@@ -698,42 +870,70 @@ function nivelValvula() {
    de baixo fecha e a de cima abre. É a soma dos passos que derruba a pressão
    do tornozelo de 90 para perto de 25 — e é por isso que ficar PARADO em pé
    é pior que andar. */
-function nivelBomba() {
+function nivelBomba(geo) {
   const g = new THREE.Group();
   const R = 5.5 * CM, H = 46 * CM;
+  const S = CORPO.altura / 1.75;
+  if (geo) {
+    const fatia = casca(geo, (x, y) => x > 0.02 * S && y > 0.05 * S && y < 0.5 * S);
+    if (fatia) {
+      const bb = fatia.geo.boundingBox;
+      const h = bb.max.y - bb.min.y || 1;
+      const k = H / h;
+      fatia.malha.geometry = fatia.geo;
+      fatia.geo.translate(-(bb.min.x + bb.max.x) / 2, -bb.min.y, -(bb.min.z + bb.max.z) / 2);
+      fatia.geo.scale(k, k, k * 0.85);
+      fatia.prepass.geometry = fatia.geo;
+      g.add(fatia.prepass);
+      g.add(fatia.malha);
+    }
+  }
 
+  const vidro = peleRaioX();
+  vidro.uniforms.uColor.value.set(0xc9b6ff);
+  vidro.uniforms.uIntensity.value = 0.7;
   const veiaBomba = new THREE.Mesh(
-    new THREE.CylinderGeometry(R, R, H, 26, 24, true), M.veia2);
+    new THREE.CylinderGeometry(R, R, H, 26, 24, true), vidro);
   veiaBomba.renderOrder = 2;
   veiaBomba.geometry.translate(0, H / 2, 0);
   veiaBomba.userData.R = R; veiaBomba.userData.H = H;
   g.add(veiaBomba);
 
   /* duas barrigas de gastrocnêmio, uma de cada lado */
+  const musc = new THREE.MeshPhysicalMaterial({
+    color: 0xa33a3a, roughness: 0.55, sheen: 0.9, sheenColor: new THREE.Color(0xff8f7a),
+    sheenRoughness: 0.45, emissive: 0x3a1010, emissiveIntensity: 0.35,
+  });
   const barrigas = [];
   for (const lado of [-1, 1]) {
     const perfil = [];
-    for (let i = 0; i <= 12; i++) {
-      const s = i / 12;
-      perfil.push(new THREE.Vector2((3.0 + 4.6 * Math.sin(Math.PI * s)) * CM, s * H));
+    for (let i = 0; i <= 16; i++) {
+      const s = i / 16;
+      perfil.push(new THREE.Vector2((2.6 + 5.2 * Math.sin(Math.PI * s)) * CM, s * H));
     }
-    const m = new THREE.Mesh(new THREE.LatheGeometry(perfil, 26), M.musculo);
+    const m = new THREE.Mesh(new THREE.LatheGeometry(perfil, 28), musc.clone());
     m.position.x = lado * 7.4 * CM;
     m.userData.lado = lado; m.userData.x0 = m.position.x;
     barrigas.push(m); g.add(m);
   }
 
+  const cuspideMat = new THREE.MeshStandardMaterial({
+    name: 'valvula_venosa', color: 0xf7f9ff, emissive: 0x8eabff, emissiveIntensity: 0.85,
+    roughness: 0.28, side: THREE.DoubleSide,
+  });
   const valvulas = [];
   for (const h of [10, 34]) {
     const par = new THREE.Group();
     for (const teta of [0, Math.PI]) {
-      const m = new THREE.Mesh(cuspide(R * .97, 9 * CM, teta), M.valvula);
+      const m = new THREE.Mesh(cuspide(R * .97, 9 * CM, teta), cuspideMat.clone());
       moldarCuspide(m, 1); par.add(m);
     }
     par.position.y = h * CM; par.userData.altura = h;
     valvulas.push(par); g.add(par);
   }
-  g.userData = { veiaBomba, barrigas, valvulas, R, H };
+  const curva = new THREE.CatmullRomCurve3([V(0, 1 * CM, 0), V(0, H - 1 * CM, 0)]);
+  sangueNoGrupo(g, [{ curve: curva, r: R * 0.45, kind: 'v', len: curva.getLength(), name: 'bomba' }], S);
+  g.userData = { veiaBomba, barrigas, valvulas, R, H, particulas: g.userData.particulas };
   g.position.y = -H / 2;
   return g;
 }
@@ -755,7 +955,7 @@ export async function criar() {
   catch (err) { console.error('corpo.glb não entrou; segue a silhueta', err); }
   const modelos = [
     geo ? nivelCorpoMalha(geo) : nivelCorpoSilhueta(),
-    nivelPerna(), nivelValvula(), nivelBomba(), nivelCiclo(geo),
+    nivelPerna(geo), nivelValvula(), nivelBomba(geo), nivelCiclo(geo),
   ];
   modelos.forEach((m, i) => { m.visible = i === 0; });
 
