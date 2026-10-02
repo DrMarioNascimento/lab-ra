@@ -14,11 +14,9 @@
      folha daqui continua mandando no que é desta bancada — o palco, o painel
      e as legendas —, porque vence por vir depois com a mesma especificidade. -->
 <link rel="stylesheet" href="../../../laboratorio.css" />
-<!-- A TRANCA RESOLVE TUDO PELO ENDEREÇO DO PRÓPRIO SCRIPT, e é por isso que
-     ela funciona a três pastas de fundura sem nenhum ajuste: `authUrl` e
-     `bancadasUrl` saem de `new URL(..., scriptUrl)`. Sem esta linha, esta era
-     a única porta do laboratório aberta sem conta. -->
-<script src="../../../guard.js?v=livre-20261002"></script>
+<!-- Acesso público: o script mantém a compatibilidade com os links antigos
+     da entrada e encontra o catálogo a partir do próprio endereço. -->
+<script src="../../../guard.js?v=livre-20261002b"></script>
 <style>
   :root { color-scheme: dark; }
   body { margin: 0; background: #0a0d0a; color: #dbe6d8;

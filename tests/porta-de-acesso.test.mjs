@@ -17,7 +17,7 @@ test('links antigos conservam bancada, nível e postura',async()=>{
  assert.deepEqual(await abrir('https://example.test/lab-ra/index.html?laboratorio=acesso&destino='+encodeURIComponent(alvo)),[alvo]);
 });
 test('destinos externos, caminhos irmãos e laços abrem somente o catálogo',async()=>{
- for(const alvo of ['https://evil.test/lab-ra/pleura/','https://example.test/lab-ra-outro/','https://example.test/lab-ra/index.html?laboratorio=acesso','https://example.test/lab-ra/../privado/','http://example.test/lab-ra/pleura/'])assert.deepEqual(await abrir('https://example.test/lab-ra/index.html?destino='+encodeURIComponent(alvo)),['https://example.test/lab-ra/bancadas.html']);
+ for(const alvo of ['https://example.test/lab-ra/','https://example.test/lab-ra/?laboratorio=acesso','https://evil.test/lab-ra/pleura/','https://example.test/lab-ra-outro/','https://example.test/lab-ra/index.html?laboratorio=acesso','https://example.test/lab-ra/../privado/','http://example.test/lab-ra/pleura/'])assert.deepEqual(await abrir('https://example.test/lab-ra/index.html?destino='+encodeURIComponent(alvo)),['https://example.test/lab-ra/bancadas.html']);
 });
 test('entrada oferece acesso direto e não carrega autenticação',async()=>{
  assert.match(await text('index.html'),/href="bancadas.html">Abrir bancadas/);

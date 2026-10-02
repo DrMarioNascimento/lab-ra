@@ -9,7 +9,7 @@
     try {
       const bruto=busca.get("destino");if(!bruto)return null;
       const alvo=new URL(bruto,location.href);
-      if(alvo.origin!==raiz.origin||!alvo.pathname.startsWith(raiz.pathname)||alvo.pathname===entrada.pathname)return null;
+      if(alvo.origin!==raiz.origin||!alvo.pathname.startsWith(raiz.pathname)||alvo.pathname===raiz.pathname||alvo.pathname===entrada.pathname)return null;
       return alvo.href;
     } catch { return null; }
   }
