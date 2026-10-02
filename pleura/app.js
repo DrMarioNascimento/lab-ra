@@ -17,17 +17,25 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { prepararParaRA } from '../cores-para-ra.js';
-import { criar } from './modelos.js';
+import { criar } from './modelos.js?v=west-20261002';
 import { clonarVisual } from './ra.js';
 import { carregarCoracao } from './anatomia.js';
 import {
   PULMAO, VOLUMES, alturaEfetiva, pressaoPleural, transpulmonar, volumeRelativo,
   ventilacaoRelativa, zonaEm, fluxoEm, perfilDeZonas, estadoDoPneumotorax, eixoDependente,
   cicloPleural, cicloAlveolar, retornoVenosoRelativo, AMPLITUDE_PPL,
-  comCenario, CENARIOS,
+  comCenario, CENARIOS, pressoesEm,
 } from './fisica.js';
 
 const $ = id => document.getElementById(id);
+// Unidades convencionais: NIST SP 811. Apenas apresentação, sem alterar o motor.
+const CMH2O_EM_MMHG = 98.0665 / 133.3224;
+const valorPressao = (valor, casas=1) => valor.toFixed(casas).replace(/^-0(?:\.0+)?$/, v=>v.slice(1));
+function mostrarPressao(id, valor, unidade='cmH₂O', casas=1) {
+  $(id).textContent=valorPressao(valor,casas);
+  const equivalente=unidade==='cmH₂O'?valor*CMH2O_EM_MMHG:valor/CMH2O_EM_MMHG;
+  $(`${id}Equiv`).textContent=`${valorPressao(equivalente,casas)} ${unidade==='cmH₂O'?'mmHg':'cmH₂O'}`;
+}
 const canvas = $('scene'), stage = $('stage');
 const clamp = THREE.MathUtils.clamp;
 
@@ -131,6 +139,7 @@ let pneumo = 'nenhum', cenario = 'repouso';
    todos os números clássicos são medidos ali. */
 let fase = 0, respirando = false;
 const ajuste = () => comCenario(cenario).ajuste;
+const FLUXO_REFERENCIA=Math.max(...CENARIOS.map(c=>fluxoEm(0,0,c.ajuste)));
 
 /* ------------------------------------------------------------ níveis */
 const TEXTOS = [
@@ -144,7 +153,7 @@ const TEXTOS = [
     texto: 'Fura a parede e o empate acaba: cada mola vai para o seu volume de repouso. O pulmão colapsa a 10% e — a parte que ninguém espera — a caixa ABRE até 60%. No hipertensivo a pressão passa de zero — e o que mata não é o desvio do mediastino, que é o sinal: é a pressão positiva ESMAGANDO O RETORNO VENOSO. Choque obstrutivo. Pela mesma conta, com sinal trocado, pleura mais negativa ajuda o retorno: é a bomba torácica.',
     tags: ['pulmão 10% · caixa 60%', 'retorno venoso a 64%'] },
   { olho: 'Nível 04', titulo: 'O ápice é maior e ventila menos',
-    texto: 'A pressão pleural não é um número, é um gradiente: −10 no ápice, −2,5 na base. O alvéolo de cima já está esticado e senta na parte plana da curva; o de baixo senta no joelho, onde a mesma pressão enche muito mais. Ao deitar, os tamanhos ao longo do eixo ápice–base se aproximam; o gradiente passa para o eixo esterno–dorso. Selecione Iniciar e observe: numa respiração a base vai de 22% a 42% do volume e o ápice, de 63% a 73%. A base ganha o dobro sendo menor. O contraste visual dos tamanhos está ampliado para facilitar a leitura; os valores do painel mantêm os volumes calculados.',
+    texto: 'A pressão pleural não é um número, é um gradiente: −10 cmH₂O (−7,4 mmHg) no ápice, −2,5 cmH₂O (−1,8 mmHg) na base. O alvéolo de cima já está esticado e senta na parte plana da curva; o de baixo senta no joelho, onde a mesma pressão enche muito mais. Ao deitar, os tamanhos ao longo do eixo ápice–base se aproximam; o gradiente passa para o eixo esterno–dorso. Selecione Iniciar e observe: numa respiração a base vai de 22% a 42% do volume e o ápice, de 63% a 73%. A base ganha o dobro sendo menor. O contraste visual dos tamanhos está ampliado para facilitar a leitura; os valores do painel mantêm os volumes calculados.',
     tags: ['−10 no ápice, −2,5 na base', 'contraste de tamanho ampliado'] },
   { olho: 'Nível 05', titulo: 'As zonas de West',
     texto: 'Três pressões disputam o capilar: a arterial, a venosa e a alveolar, que aperta por fora. Em pé, a coluna de sangue faz o ápice receber pouco. Deitado, o pulmão inteiro vira zona 3. É a mesma gravidade do gradiente pleural, agora do lado da perfusão.',
@@ -157,7 +166,7 @@ const CONTEXTO = [
   'Direito: 3 lobos · esquerdo: 2 lobos · costelas opacas',
   'Amarelo: ar no espaço pleural direito · pulmão recolhido',
   'Unidades acinares ampliadas · posição representativa',
-  'Redes capilares ampliadas · cor indica a zona',
+  'Cor: zona de West · tamanho: perfusão relativa',
 ];
 
 let atual = 0;
@@ -180,6 +189,16 @@ function posicionarLegendaFresta() {
     marcador.hidden=p.z>1||p.z< -1;
   }
 }
+function posicionarPerfil() {
+  if(atual!==3&&atual!==4)return;
+  const unidades=atual===3?modelos[3].userData.alveolos:modelos[4].userData.faixas;
+  for(const [id,m] of [['perfilApice',unidades.at(-1)],['perfilBase',unidades[0]]]) {
+    const marcador=$(id),p=m.getWorldPosition(new THREE.Vector3()).project(camera);
+    marcador.style.left=`${clamp((p.x+1)*.5*stage.clientWidth-28,marcador.offsetWidth+10,stage.clientWidth-10)}px`;
+    marcador.style.top=`${clamp((1-p.y)*.5*stage.clientHeight,96,stage.clientHeight-66)}px`;
+    marcador.hidden=p.z>1||p.z< -1;
+  }
+}
 function irAoNivel(n) {
   atual = clamp(n, 0, 4);
   modelos.forEach((m, i) => { m.visible = i === atual; });
@@ -199,6 +218,7 @@ function irAoNivel(n) {
   $('caixaPneumo').hidden = atual > 2;
   $('caixaPostura').hidden = atual === 0;
   $('cicloControls').hidden = atual === 0;
+  $('perfilPontos').hidden = atual!==3&&atual!==4;
   $('caixaZonas').hidden = atual !== 4;
   $('legendaFresta').hidden = atual !== 0;
   $('frestaPontos').hidden = atual !== 0;
@@ -212,7 +232,7 @@ function atualizar() {
   /* A pausa congela a fase: pressões, geometria e leituras permanecem nela. */
   const dPpl = cicloPleural(fase);
   const pAlv = cicloAlveolar(fase);
-  const e = { ...ajuste(), pneumo, palveolar: pAlv, deslocaPleural: dPpl };
+  const e = { ...ajuste(), pneumo, palveolar: (ajuste().palveolar??0)+pAlv, deslocaPleural: dPpl };
   const pn = estadoDoPneumotorax(pneumo);
   const pplAtual = f => pressaoPleural(f, grau, e) + (pneumo === 'nenhum' ? dPpl : 0);
 
@@ -234,21 +254,21 @@ function atualizar() {
   const plEm = f => transpulmonar(f, grau, e) - dPpl;
   aplicarAlveolos(f => volumeRelativo(plEm(f)));
   if(atual===3)$('anatomiaLegenda').textContent=grau<20
-    ? 'Contraste ampliado · deitado: tamanhos semelhantes'
-    : grau>70?'Contraste ampliado · em pé: ápice maior, base menor'
-    : 'Contraste ampliado · a diferença diminui ao inclinar';
-  aplicarZonas(f => zonaEm(f, grau, e), f => fluxoEm(f, grau, e));
+    ? 'Volume alveolar · deitado: tamanhos semelhantes · escala ampliada'
+    : grau>70?'Volume maior no ápice · maior expansão inspiratória na base'
+    : 'Volume alveolar · a diferença diminui ao inclinar · escala ampliada';
+  aplicarZonas(f => zonaEm(f, grau, e), f => fluxoEm(f, grau, e),FLUXO_REFERENCIA);
 
   $('posturaLabel').textContent = grau < 20 ? `Decúbito · ${grau.toFixed(0)}°`
     : grau > 70 ? `Ortostatismo · ${grau.toFixed(0)}°` : `Inclinado · ${grau.toFixed(0)}°`;
-  $('pplLabel').textContent = pneumo === 'nenhum'
-    ? `Pleural ${pplAtual(.5).toFixed(1)} cmH₂O`
-    : `Pleural ${pn.ppl >= 0 ? '+' : ''}${pn.ppl.toFixed(0)} cmH₂O`;
+  const pleural=pneumo==='nenhum'?pplAtual(.5):pn.ppl;
+  $('pplLabel').firstChild.nodeValue=`Pleural ${valorPressao(pleural)} cmH₂O`;
+  $('pplMmHg').textContent=`${valorPressao(pleural*CMH2O_EM_MMHG)} mmHg`;
   $('grauValor').textContent = `${grau.toFixed(0)}°`;
   if (!arrastando) $('grauCursor').value = grau.toFixed(0);
 
-  $('lApice').textContent = pplAtual(1).toFixed(1);
-  $('lBase').textContent = pplAtual(0).toFixed(1);
+  mostrarPressao('lApice',pplAtual(1));
+  mostrarPressao('lBase',pplAtual(0));
   /* Deitado a queda ao longo do eixo ápice-base é ZERO, e o gradiente não
      sumiu: mudou para o esterno-dorso, que esta bancada não desenha. Dizer
      isso em palavras é honesto; enfiar os dois eixos num número só foi o erro
@@ -261,12 +281,24 @@ function atualizar() {
   $('lVent').textContent = vA > 0 ? `${(vB / vA).toFixed(2)}×` : '—';
   $('lVolApice').textContent = (volumeRelativo(plEm(1)) * 100).toFixed(0);
   $('lVolBase').textContent = (volumeRelativo(plEm(0)) * 100).toFixed(0);
+  if(atual===3) {
+    $('perfilApice').textContent=`Ápice · ${$('lVolApice').textContent}%`;
+    $('perfilBase').textContent=`Base · ${$('lVolBase').textContent}%`;
+  } else if(atual===4) {
+    $('perfilApice').textContent=`Ápice · zona ${zonaEm(1,grau,e)}`;
+    $('perfilBase').textContent=`Base · zona ${zonaEm(0,grau,e)}`;
+  }
   const faseNome = pAlv < -.05 ? 'Inspiração' : pAlv > .05 ? 'Expiração' : 'Sem fluxo';
   const estadoCiclo = respirando ? faseNome : fase === 0
     ? 'Fim da expiração' : `Pausado · ${faseNome.toLowerCase()}`;
   $('lFase').textContent = estadoCiclo;
   if ($('cicloEstado').textContent !== estadoCiclo) $('cicloEstado').textContent = estadoCiclo;
-  $('lPalv').textContent = pAlv.toFixed(2).replace('-0.00', '0.00');
+  mostrarPressao('lPalv',e.palveolar,'cmH₂O',2);
+  for(const [local,f] of [['Apice',1],['Base',0]]) {
+    const p=pressoesEm(f,grau,e);
+    mostrarPressao(`lPa${local}`,p.pa,'mmHg');
+    mostrarPressao(`lPv${local}`,p.pv,'mmHg');
+  }
 
   const perfil = perfilDeZonas(grau, e, 9);
   $('lZonas').textContent = perfil.map(l => l.zona).join('');
@@ -322,7 +354,7 @@ function ajustar() {
   desenhar();
 }
 addEventListener('resize', ajustar);
-function desenhar() { desenharCurva(); renderer.render(scene, camera); posicionarLegendaFresta(); }
+function desenhar() { desenharCurva(); renderer.render(scene, camera); posicionarLegendaFresta(); posicionarPerfil(); }
 
 let anterior = performance.now();
 renderer.setAnimationLoop(agora => {
@@ -336,6 +368,7 @@ renderer.setAnimationLoop(agora => {
   controls.update();
   renderer.render(scene, camera);
   posicionarLegendaFresta();
+  posicionarPerfil();
 });
 
 /* ------------------------------------------------------------ controles */

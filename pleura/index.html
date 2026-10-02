@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../laboratorio.css" />
-  <link rel="stylesheet" href="style.css?v=simuladores-20261002" />
+  <link rel="stylesheet" href="style.css?v=west-20261002" />
   <script src="../guard.js"></script>
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"}}</script>
   <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.1.0/dist/model-viewer.min.js"></script>
@@ -35,7 +35,8 @@
       <div id="anatomiaLegenda" class="anatomia-legenda" aria-live="polite"></div>
       <p id="modeloStatus" class="modelo-status" role="status">Carregando o coração anatômico…</p>
       <div id="frestaPontos" class="fresta-pontos" aria-hidden="true" hidden></div>
-      <div class="stage-hud"><span id="posturaLabel">Ortostatismo · 90°</span><span id="pplLabel">Pleural −6,2 cmH₂O</span><span id="stepLabel">01 · Camadas</span></div>
+      <div id="perfilPontos" class="perfil-pontos" aria-hidden="true" hidden><span id="perfilApice">Ápice</span><span id="perfilBase">Base</span></div>
+      <div class="stage-hud"><span id="posturaLabel">Ortostatismo · 90°</span><span id="pplLabel">Pleural −6,2 cmH₂O<small id="pplMmHg" class="pressao-equivalente">−4,6 mmHg</small></span><span id="stepLabel">01 · Camadas</span></div>
       <div class="gesture">Incline o aparelho · arraste para girar a vista</div>
       <div class="stage-tools">
         <button id="resetView" class="ghost-control" type="button">Restaurar vista</button>
@@ -93,13 +94,13 @@
         <label class="ctrl"><span>Inclinação <b id="grauValor">90°</b></span>
           <input id="grauCursor" type="range" min="0" max="90" step="1" value="90" aria-label="Inclinação do corpo" /></label>
         <ul class="leituras">
-          <li>pressão pleural no ápice <b><span id="lApice">−10.0</span> cmH₂O</b></li>
-          <li>na base <b><span id="lBase">−2.5</span> cmH₂O</b></li>
+          <li>pressão pleural no ápice <b><span id="lApice">−10.0</span> cmH₂O<small id="lApiceEquiv" class="pressao-equivalente">−7.4 mmHg</small></b></li>
+          <li>na base <b><span id="lBase">−2.5</span> cmH₂O<small id="lBaseEquiv" class="pressao-equivalente">−1.8 mmHg</small></b></li>
           <li>Altura efetiva do eixo gravitacional <b><span id="lAltura">30 cm</span></b></li>
           <li>Volume alveolar no ápice <b><span id="lVolApice">63</span>%</b></li>
           <li>Volume alveolar na base <b><span id="lVolBase">22</span>%</b></li>
           <li>Ventilação base/ápice <b><span id="lVent">2.12×</span></b></li>
-          <li>pressão alveolar <b><span id="lPalv">0.00</span> cmH₂O</b></li>
+          <li>pressão alveolar <b><span id="lPalv">0.00</span> cmH₂O<small id="lPalvEquiv" class="pressao-equivalente">0.00 mmHg</small></b></li>
           <li>Fase respiratória <b><span id="lFase">parado no fim da expiração</span></b></li>
         </ul>
         <canvas id="curvaPerfil" width="330" height="180" aria-label="Ventilação e perfusão do ápice à base"></canvas>
@@ -110,6 +111,10 @@
         <div class="causas" id="cenarios"></div>
         <p id="notaCenario" class="estado"></p>
         <ul class="leituras">
+          <li>Arterial no ápice <b><span id="lPaApice">4.5</span> mmHg<small id="lPaApiceEquiv" class="pressao-equivalente">6.1 cmH₂O</small></b></li>
+          <li>Venosa no ápice <b><span id="lPvApice">−5.5</span> mmHg<small id="lPvApiceEquiv" class="pressao-equivalente">−7.5 cmH₂O</small></b></li>
+          <li>Arterial na base <b><span id="lPaBase">27.9</span> mmHg<small id="lPaBaseEquiv" class="pressao-equivalente">38.0 cmH₂O</small></b></li>
+          <li>Venosa na base <b><span id="lPvBase">17.9</span> mmHg<small id="lPvBaseEquiv" class="pressao-equivalente">24.4 cmH₂O</small></b></li>
           <li>do ápice à base <b><span id="lZonas">223333333</span></b></li>
           <li>Perfusão base/ápice <b><span id="lFluxo">2.24×</span></b></li>
         </ul>
@@ -124,6 +129,6 @@
   </section>
 </main>
 <footer class="rodape shell"><img src="../brand/mestre-lap.webp" alt="" width="84" height="84"><p>Simuladores interativos do Prof. Mário César Nascimento, PhD ©</p></footer>
-<script type="module" src="app.js?v=simuladores-20261002"></script>
+<script type="module" src="app.js?v=west-20261002"></script>
 </body>
 </html>
