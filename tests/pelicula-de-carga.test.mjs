@@ -173,7 +173,8 @@ test("o neurônio é uma árvore, e não uma bola com hastes espetadas", async (
         dois filhos iguais é a assinatura de um gerador */
   assert.match(modelos, /Math\.pow\(f, 2 \/ 3\)/);
   assert.match(modelos, /Math\.pow\(1 - f, 2 \/ 3\)/);
-  assert.match(modelos, /ramo\(fim, tan\.clone\(\)\.applyAxisAngle/);
+  // A filha começa ligeiramente dentro da bifurcação e herda a tangente do pai.
+  assert.match(modelos, /ramo\(fim(?:\.clone\(\)\.addScaledVector\(tan,[^)]+\))?, tan\.clone\(\)\.applyAxisAngle/);
 
   /* 3. e há espinhas nos ramos distais, que é onde elas existem */
   assert.match(modelos, /function espinha/);

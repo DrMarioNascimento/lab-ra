@@ -177,10 +177,10 @@ const M = {
     side: THREE.FrontSide, clearcoat: .9, clearcoatRoughness: .08, depthWrite: false }),
   metal: phys({ color: 0x9fa6ad, roughness: .32, metalness: .85 }),
 
-  cabeca: phys({ color: 0xffffff, vertexColors: true, roughness: .44, clearcoat: 0,
-    sheen: .35, sheenRoughness: .7, sheenColor: 0xffe6c0 }),
+  cabeca: phys({ color: 0xffffff, vertexColors: true, roughness: .64, clearcoat: 0,
+    sheen: .18, sheenRoughness: .7, sheenColor: 0xffe6c0 }),
   cauda: phys({ color: 0x6a564a, roughness: .82, clearcoat: 0 }),
-  bicamadaLonge: phys({ color: 0xcbb69c, map: TEX.bicamadaLonge, roughness: .62, clearcoat: 0,
+  bicamadaLonge: phys({ color: 0xcbb69c, map: TEX.bicamadaLonge, roughness: .76, clearcoat: 0,
     sheen: .3, sheenColor: 0xffe0bb }),
   /* corte da bicamada: o miolo hidrofóbico visto de lado */
   miolo: phys({ color: 0x4b3a33, roughness: .78, side: THREE.DoubleSide }),
@@ -188,12 +188,12 @@ const M = {
   /* Os íons são ESQUEMA, não carne: aqui um pouco de brilho ajuda, porque o
      que se lê é o contraste entre os dois sinais. Mas o volume vem do
      emissivo, não da laca — em .5 de clearcoat viravam confeito. */
-  cargaPos: phys({ color: 0xffffff, vertexColors: true, roughness: .38, clearcoat: .10,
+  cargaPos: phys({ color: 0xffffff, vertexColors: true, roughness: .52, clearcoat: .03,
     clearcoatRoughness: .5, emissive: 0x612a05, emissiveIntensity: .55 }),
   cargaNeg: phys({ color: 0xffffff, vertexColors: true, roughness: .38, clearcoat: .10,
     clearcoatRoughness: .5, emissive: 0x0b2a5c, emissiveIntensity: .55 }),
 
-  proteina: vivo({ color: 0xffffff, vertexColors: true, roughness: .58, sheenColor: 0xbfe6d8,
+  proteina: vivo({ color: 0xffffff, vertexColors: true, roughness: .71, sheenColor: 0xbfe6d8,
     emissive: 0x0b2b26, emissiveIntensity: .42 }),
   filtro: phys({ color: 0xe6c766, roughness: .40, clearcoat: .12, clearcoatRoughness: .5 }),
   atp: phys({ color: 0x8fd47a, roughness: .42, emissive: 0x123a12, emissiveIntensity: .6 }),
@@ -447,9 +447,9 @@ function planoCurvo(mat, y0, { seg = 44, larg = MEM.x } = {}) {
 function bicamadaDePerto({ passo = .295, rc = .112, esp = 5 * NM - 2 * .112, buracos = [], larg = MEM.x } = {}) {
   const g = new THREE.Group();
   const cab = [], cau = [];
-  const baseCab = new THREE.SphereGeometry(rc, 9, 7);
+  const baseCab = new THREE.SphereGeometry(rc, 10, 8);
   const meio = esp / 2 - rc * .55;
-  const CAU = { colo: .054, ponta: .032, sep: .052, comp: 1.06, trechos: 4, lados: 5 };
+  const CAU = { colo: .054, ponta: .032, sep: .052, comp: 1.06, trechos: 5, lados: 6 };
 
   /* A cauda: tubo varrido de raio decrescente, com calota na ponta. Sai para
      fora ao deixar a cabeça e volta para dentro depois do joelho — é esse
@@ -557,7 +557,31 @@ function ocluirPorCentro(geo, cor, centro, raio, piso = .40) {
   return geo;
 }
 const COR_NEURO = 0xd9b3bd;
-const SOMA = { R: .60 };
+const SOMA = { R: .78 };
+// Morfologia multipolar estável: a mesma referência orienta o soma e seu corte.
+const PRIMARIOS = [
+  [-.46, .88, .13, 1.35, .170], [-.96, .20, -.17, 1.50, .150],
+  [-.68, -.67, .20, 1.24, .140], [-.12, -.94, -.28, 1.08, .120],
+  [-.64, .23, .72, 1.08, .130], [-.45, .50, -.72, .95, .112],
+].map(([x,y,z,comp,r]) => ({d:V(x,y,z).normalize(),comp,r}));
+const DIR_AXO = V(.99,-.10,.05).normalize();
+function flareSoma(n) {
+  let f = 0;
+  for (const p of PRIMARIOS) f += (p.r/.170)*Math.pow(Math.max(0,n.dot(p.d)),12);
+  return .19*f + .13*Math.pow(Math.max(0,n.dot(DIR_AXO)),14);
+}
+function formaSoma(n) {
+  const ruido = 1 + .023*ruido3(n.x*2.4,n.y*2.1,n.z*2.6);
+  return ruido*(1+flareSoma(n));
+}
+function moldarSoma(geo) {
+  const pos = geo.attributes.position;
+  for (let i=0;i<pos.count;i++) {
+    const n=V().fromBufferAttribute(pos,i).normalize(), f=formaSoma(n);
+    pos.setXYZ(i,pos.getX(i)*f,pos.getY(i)*f*1.08,pos.getZ(i)*f*.93);
+  }
+  pos.needsUpdate=true; geo.computeVertexNormals(); return geo;
+}
 
 /* Uma espinha dendrítica: pescoço fino e cabeça. Construída deitada no eixo Y
    e depois posta no lugar por matriz — orientar cada uma por rotação de malha
@@ -579,154 +603,88 @@ function espinha(ponto, dir, comp, esc = 1) {
 function neuronio() {
   const g = new THREE.Group(), R = SOMA.R;
 
-  /* primários DESIGUAIS: um dominante, os outros escalonando. Seis iguais em
-     torno de uma bola é um jaque, e nenhum ajuste de superfície conserta
-     simetria de arranjo. */
-  const prim = [
-    [-.52, .88, .22, 2.05, .128],
-    [-.96, .18, -.20, 1.72, .110],
-    [-.68, -.60, .48, 1.52, .096],
-    [-.28, -.92, -.32, 1.28, .085],
-    [-.56, .24, .82, 1.40, .091],
-    [-.44, -.26, -.88, 1.16, .080],
-  ].map(([x, y, z, comp, r]) => ({ d: V(x, y, z).normalize(), comp, r }));
-  const dirAxo = V(.97, -.10, .12).normalize();
-
-  /* o soma se estica na direção de cada saída: é isto que apaga a costura */
-  const flareEm = n => {
-    let f = 0;
-    for (const p of prim) f += (p.r / .128) * Math.pow(Math.max(0, n.dot(p.d)), 5);
-    f += 1.15 * Math.pow(Math.max(0, n.dot(dirAxo)), 7);
-    return f * .40;
-  };
+  // Aleatoriedade local com semente fixa: encaixes e rótulos não mudam ao recarregar.
+  let seed=7307;
+  const random=(a,b)=>{seed=(1664525*seed+1013904223)>>>0;return a+(b-a)*seed/4294967296;};
+  const prim=PRIMARIOS;
+  const flareEm = n => { return flareSoma(n); };
   const raioSoma = n => {
-    const ruido = 1 + .080 * ruido3(n.x * 2.4, n.y * 2.1, n.z * 2.6)
-      + .032 * ruido3(n.x * 5.7, n.y * 4.9, n.z * 6.3)
-      + .013 * ruido3(n.x * 11.3, n.y * 9.5, n.z * 12.1);
+    const ruido=1+.023*ruido3(n.x*2.4,n.y*2.1,n.z*2.6);
     return R * ruido * (1 + flareEm(n));
   };
-  const geoS = new THREE.SphereGeometry(1, 92, 64);
-  const ps = geoS.attributes.position, nn = new THREE.Vector3();
-  for (let i = 0; i < ps.count; i++) {
-    nn.fromBufferAttribute(ps, i).normalize();
-    const r = raioSoma(nn);
-    ps.setXYZ(i, nn.x * r, nn.y * r * .97, nn.z * r * .93);
-  }
-  ps.needsUpdate = true; geoS.computeVertexNormals();
-  tintar(geoS, C(COR_NEURO));
-  g.add(new THREE.Mesh(geoS, M.neuronio));
+  const geoS=moldarSoma(new THREE.SphereGeometry(R,72,48));
+  tintar(geoS,C(COR_NEURO));
+  const soma=new THREE.Mesh(geoS,M.neuronio); soma.name='soma'; g.add(soma);
 
-  /* ── a árvore ────────────────────────────────────────────────────────── */
-  const galhos = [], espinhos = [];
-  let semente = 0;
-  function ramo(base, dir, raio, comp, ordem, alarga) {
-    const s = ++semente;
-    const up = Math.abs(dir.y) < .9 ? V(0, 1, 0) : V(1, 0, 0);
-    const n1 = V().crossVectors(dir, up).normalize();
-    const n2 = V().crossVectors(dir, n1).normalize();
-    const torto = rnd(.30, .62) * (ordem >= 2 ? .65 : 1);
-    const curva = curvaDePontos(t => base.clone()
-      .addScaledVector(dir, t * comp)
-      .addScaledVector(n1, Math.sin(t * 2.2 + s) * torto * t * comp * .34)
-      .addScaledVector(n2, Math.sin(t * 1.6 + s * 1.7) * torto * t * comp * .28), 20);
-    /* O AFINAMENTO COMPOSTO SECAVA A ÁRVORE. Com 0,62 por trecho e mais a
-       repartição de Rall a cada bifurcação, quatro ordens levavam a ponta a
-       seis milésimos — um arbusto seco, não um dendrito. O trecho afina
-       menos, e o perfil tem piso: ramo distal é fino, não é fio. */
-    const rFim = Math.max(.013, raio * (ordem === 0 ? .55 : .76));
-    /* alarga: só o trecho primário nasce inchado, do tamanho da saliência do
-       soma, e afina depressa — é a continuação da carne, não um encaixe */
-    const perfil = u => {
-      const base = raio + (rFim - raio) * u;
-      const boca = alarga ? 1 + 1.05 * Math.exp(-Math.pow(u / .17, 2)) : 1;
-      /* varicosidade: dendrito engrossa e afina, não é cone de torno */
-      return Math.max(.011, base * boca * (1 + .095 * Math.sin(u * 12 + s) + .055 * Math.sin(u * 26 + s * 2.1)));
+  const galhos=[],espinhos=[];
+  let numero=0;
+  function ramo(base,dir,raio,comp,ordem,alarga,entrada=dir) {
+    const s=++numero;
+    const n1=V().crossVectors(dir,Math.abs(dir.y)<.9?V(0,1,0):V(1,0,0)).normalize();
+    const n2=V().crossVectors(dir,n1).normalize();
+    const curva=curvaDePontos(t=>base.clone().addScaledVector(dir,t*comp)
+      .addScaledVector(entrada.clone().sub(dir),comp*.24*(1-Math.exp(-t/.24)))
+      .addScaledVector(n1,Math.sin(t*2.4+s)*t*comp*.12)
+      .addScaledVector(n2,Math.sin(t*2.1+s*1.7)*t*comp*.085),22);
+    const rFim = Math.max(.013, raio * (ordem===0?.69:.72));
+    const perfil=u=>{
+      const estreita=raio+(rFim-raio)*suave(u);
+      const boca=alarga?1+.70*Math.exp(-Math.pow(u/.25,2)):1;
+      const ponta=ordem===2?1-.85*suave(clamp((u-.82)/.18,0,1)):1;
+      return estreita*boca*ponta*(1+.025*Math.sin(u*9+s));
     };
-    galhos.push(ocluirPorCentro(
-      tuboPerfil(curva, perfil, { segsU: ordem === 0 ? 34 : ordem === 3 ? 14 : 20, segsV: ordem === 0 ? 12 : ordem === 3 ? 7 : 9 }),
-      variar(COR_NEURO, .012, .07, .04 + ordem * .02), V(0, 0, 0), R));
-
-    if (ordem >= 2) {
-      const quantas = ordem === 2 ? 6 : 9;
-      for (let i = 0; i < quantas; i++) {
-        const u = rnd(.14, .96);
-        const p = curva.getPointAt(u), tan = curva.getTangentAt(u).normalize();
-        const e1 = V().crossVectors(tan, Math.abs(tan.y) < .9 ? V(0, 1, 0) : V(1, 0, 0)).normalize();
-        const e2 = V().crossVectors(tan, e1).normalize();
-        const a = rnd(0, Math.PI * 2);
-        const fora = e1.multiplyScalar(Math.cos(a)).addScaledVector(e2, Math.sin(a)).normalize();
-        const rLocal = perfil(u);
-        espinhos.push(espinha(p.addScaledVector(fora, rLocal * .72), fora,
-          rnd(.040, .080) * clamp(rLocal / .040, .6, 1.25), clamp(rLocal / .040, .55, 1.3)));
-      }
+    galhos.push(ocluirPorCentro(tuboPerfil(curva,perfil,{segsU:28,segsV:12}),
+      C(COR_NEURO),V(),R,.72));
+    if(ordem>=1) for(let i=0;i<(ordem===1?4:5);i++) {
+      const u=random(.22,.82),p=curva.getPointAt(u),tan=curva.getTangentAt(u);
+      const e1=V().crossVectors(tan,V(0,0,1)).normalize(), e2=V().crossVectors(tan,e1).normalize();
+      const a=random(0,Math.PI*2),fora=e1.multiplyScalar(Math.cos(a)).addScaledVector(e2,Math.sin(a)).normalize();
+      espinhos.push(espinha(p.addScaledVector(fora,perfil(u)*.85),fora,random(.055,.085),1.1));
     }
-    if (ordem >= 3) return;
-
-    /* Lei de Rall: d(pai)^1.5 = d(f1)^1.5 + d(f2)^1.5. A repartição é
-       DESIGUAL de propósito — dois filhos iguais é a assinatura do gerador */
-    const fim = curva.getPointAt(1), tan = curva.getTangentAt(1).normalize();
-    const eixo = V(rnd(-1, 1), rnd(-1, 1), rnd(-1, 1)).cross(tan).normalize();
-    const f = rnd(.56, .74);
-    const filhos = [
-      { r: Math.max(.013, rFim * Math.pow(f, 2 / 3)), ang: rnd(.26, .48), esc: rnd(.62, .84) },
-      { r: Math.max(.012, rFim * Math.pow(1 - f, 2 / 3)), ang: -rnd(.34, .62), esc: rnd(.44, .68) },
-    ];
-    for (const c of filhos) {
-      ramo(fim, tan.clone().applyAxisAngle(eixo, c.ang).normalize(), c.r, comp * c.esc, ordem + 1, false);
+    if(ordem>=2) return;
+    const fim=curva.getPointAt(1),tan=curva.getTangentAt(1).normalize();
+    // Filhas desiguais, com repartição de Rall e bifurcação suave.
+    const eixo=V(random(-.4,.4),random(-.4,.4),1).cross(tan).normalize(),f=random(.57,.68);
+    for(const c of [{r:rFim*Math.pow(f, 2 / 3),ang:random(.35,.53),esc:.78},
+      {r:rFim*Math.pow(1 - f, 2 / 3),ang:-random(.43,.66),esc:.61}]) {
+      ramo(fim.clone().addScaledVector(tan,-.024), tan.clone().applyAxisAngle(eixo,c.ang).normalize(),c.r,comp*c.esc,ordem+1,false,tan);
     }
   }
-  for (const p of prim) {
-    const nrm = p.d.clone();
-    ramo(nrm.clone().multiplyScalar(raioSoma(nrm) * .82), p.d, p.r, p.comp, 0, true);
+  for(const p of prim) {
+    const base=p.d.clone().multiplyScalar(raioSoma(p.d)*.86);base.y*=1.08;base.z*=.93;
+    ramo(base,p.d,p.r,p.comp,0,true);
   }
-  g.add(new THREE.Mesh(mergeGeometries(galhos), M.neuronio));
-  g.add(new THREE.Mesh(mergeGeometries(espinhos), M.neuronio));
+  const dendritos=new THREE.Mesh(mergeGeometries(galhos),M.neuronio);dendritos.name='dendritos';g.add(dendritos);
+  const sp=new THREE.Mesh(tintar(mergeGeometries(espinhos),C(COR_NEURO)),M.neuronio);sp.name='espinhas';g.add(sp);
 
-  /* ── cone de implantação e axônio ────────────────────────────────────── */
-  const eixo = curvaDePontos(t => V(R * .50 + t * 3.15, Math.sin(t * 2.4) * .11 - t * .07, Math.sin(t * 1.5) * .08), 28);
-  g.add(new THREE.Mesh(ocluirPorCentro(
-    tuboPerfil(eixo, u => .094 + .165 * Math.exp(-Math.pow(u / .11, 2)), { segsU: 74, segsV: 14 }),
-    C(COR_NEURO), V(0, 0, 0), R), M.neuronio));
-
-  /* ── BAINHAS DE MIELINA ────────────────────────────────────────────────
-     ESTAS ERAM CÁPSULAS, LITERALMENTE. Quatro CapsuleGeometry de mesmo
-     comprimento, mesmo raio e pontas hemisféricas, enfileiradas com vão
-     igual: a definição de comprimido em cartela. O conserto é de FORMA:
-     internódio real AFINA para o nó, os quatro não têm o mesmo comprimento,
-     e a bainha segue a curva do axônio em vez de ser um segmento reto. */
-  const bainhas = [];
-  /* AS BAINHAS AINDA ERAM CONTAS DE ROSÁRIO. Não pelo formato — esse já
-     afinava — mas pela PROPORÇÃO: bainha de 0,168 sobre axônio de 0,078 é
-     mais que o dobro, e o que se via era uma fieira de bolas num cordão. A
-     bainha de verdade é uma casca sobre o axônio, não um bulbo em volta
-     dele. Com o axônio mais grosso e a bainha menos inchada a razão cai para
-     um e meio, e os vãos — desiguais agora — passam a ser o que chama
-     atenção, que é o certo: o nó é o assunto. */
-  const trechos = [[.175, .335], [.372, .560], [.594, .726], [.762, .955]];
-  trechos.forEach(([u0, u1], i) => {
-    const sub = curvaDePontos(t => eixo.getPointAt(u0 + t * (u1 - u0)), 16);
-    const grossura = .148 - i * .006;
-    bainhas.push(tuboPerfil(sub, u => {
-      const ponta = clamp(Math.min(u, 1 - u) / .19, 0, 1);
-      return .098 + (grossura - .098) * suave(ponta);
-    }, { segsU: 34, segsV: 20 }));
+  // Cone contínuo, segmento inicial exposto e axônio de menor calibre que os dendritos.
+  const eixo=curvaDePontos(t=>V(R*.72+t*4.1,-.06-Math.sin(t*2.5)*.18,Math.sin(t*3.2)*.12),40);
+  const ax=new THREE.Mesh(ocluirPorCentro(tuboPerfil(eixo,u=>.071+.19*Math.exp(-Math.pow(u/.075,2)),
+    {segsU:104,segsV:16}),C(COR_NEURO),V(),R,.74),M.neuronio);ax.name='axonio';g.add(ax);
+  const trechos=[[.22,.38],[.397,.57],[.587,.76],[.777,.936]];
+  const bainhas=[];
+  trechos.forEach(([u0,u1],i)=>{
+    const sub=curvaDePontos(t=>eixo.getPointAt(u0+t*(u1-u0)),24);
+    bainhas.push(tuboPerfil(sub,u=>.078+(.106-i*.001-.078)*suave(clamp(Math.min(u,1-u)/.09,0,1)),
+      {segsU:40,segsV:20}));
   });
-  g.add(new THREE.Mesh(mergeGeometries(bainhas), M.mielina));
+  const mielina=new THREE.Mesh(mergeGeometries(bainhas),M.mielina);mielina.name='mielina';g.add(mielina);
 
-  /* terminais: cinco, desiguais, com botões de tamanhos diferentes */
-  const fim = eixo.getPointAt(1), term = [];
-  for (let i = 0; i < 5; i++) {
-    const d = V(.85 + rnd(-.1, .2), (i - 2) * .34 + rnd(-.08, .08), rnd(-.45, .45)).normalize();
-    const len = rnd(.38, .68);
-    const c = curvaDePontos(t => fim.clone().addScaledVector(d, t * len)
-      .addScaledVector(V(0, 1, 0), Math.sin(t * 2.4 + i) * .05), 10);
-    term.push(tintar(tuboPerfil(c, u => .048 - u * .014, { segsU: 14, segsV: 8 }), variar(COR_NEURO, .01, .06, .05)));
-    const rb = rnd(.062, .098);
-    const b = new THREE.SphereGeometry(rb, 14, 10);
-    b.translate(fim.x + d.x * (len + rb * .5), fim.y + d.y * (len + rb * .5) + Math.sin(2.4 + i) * .05, fim.z + d.z * (len + rb * .5));
-    term.push(tintar(b, variar(COR_NEURO, .01, .06, .05)));
-  }
-  g.add(new THREE.Mesh(mergeGeometries(term), M.neuronio));
+  // Arborização terminal aberta, com botões nas pontas reais das curvas.
+  const fim=eixo.getPointAt(1),term=[];
+  const destinos=[V(.9,.78,.16),V(1.18,.30,-.18),V(1.08,-.28,.28),V(.83,-.81,-.12)];
+  destinos.forEach((d,i)=>{
+    const c=curvaDePontos(t=>fim.clone().addScaledVector(d,t).add(V(0,Math.sin(t*Math.PI)*.12*(i%2?1:-1),0)),22);
+    term.push(tintar(tuboPerfil(c,u=>.047-.023*u,{segsU:24,segsV:10}),C(COR_NEURO)));
+    const b=new THREE.SphereGeometry(.062,16,12);b.scale(1.25,.92,1);b.translate(...c.getPointAt(1).toArray());
+    term.push(tintar(b,C(COR_NEURO)));
+  });
+  const terminais=new THREE.Mesh(mergeGeometries(term),M.neuronio);terminais.name='terminais';g.add(terminais);
+  g.userData.ancoras=[['soma',V(-.12,.38,.63)],['dendritos',V(-1.65,1.25,.13)],
+    ['cone axonal',eixo.getPointAt(.035)],['segmento inicial',eixo.getPointAt(.15)],
+    ['axônio',eixo.getPointAt(.95)],['mielina',eixo.getPointAt(.48)],
+    ['nó de Ranvier',eixo.getPointAt(.5785)],['terminais',fim.clone().add(destinos[0])],
+    ['micropipeta',V(-1.20,1.50,.92)],['referência externa',V(2.10,-1.75,1.18)]];
 
   /* ── contexto: as duas pontas que medem ──────────────────────────────
      A micropipeta furando o soma e o eletrodo de referência no banho. Sem as
@@ -856,9 +814,9 @@ function interior() {
   const g = new THREE.Group();
   const { R, par, ini, arco, rNuc } = CEL, Rin = R - par;
 
-  g.add(new THREE.Mesh(new THREE.SphereGeometry(R, 76, 48, ini, arco), M.bicamadaLonge));
-  g.add(peloAvesso(new THREE.Mesh(new THREE.SphereGeometry(Rin, 76, 48, ini, arco), M.bicamadaLonge)));
-  g.add(new THREE.Mesh(mergeGeometries([faceDoCorte(ini, Rin, R), faceDoCorte(ini + arco, Rin, R)]), M.corte));
+  g.add(new THREE.Mesh(moldarSoma(new THREE.SphereGeometry(R, 76, 48, ini, arco)), M.bicamadaLonge));
+  g.add(peloAvesso(new THREE.Mesh(moldarSoma(new THREE.SphereGeometry(Rin, 76, 48, ini, arco)), M.bicamadaLonge)));
+  g.add(new THREE.Mesh(moldarSoma(mergeGeometries([faceDoCorte(ini, Rin, R), faceDoCorte(ini + arco, Rin, R)])), M.corte));
 
   /* núcleo deslocado por ruído: esfera lisa aqui seria pérola dentro de bola,
      e a página inteira existe para não parecer drágea */
@@ -877,10 +835,10 @@ function interior() {
   /* três tocos de dendrito: são eles que dizem que este corpo é o MESMO do
      nível 01, e é isso que faz o mergulho ser mergulho e não troca de assunto */
   const tocos = [];
-  for (const d0 of [[-.86, .40, -.30], [-.62, -.66, .42], [-.30, .90, -.28]]) {
-    const dir = V(...d0).normalize();
-    const curva = curvaDePontos(t => dir.clone().multiplyScalar(R * .93 + t * .62), 10);
-    tocos.push(tintar(tuboPerfil(curva, u => .17 * (1 - u * .45), { segsU: 16, segsV: 12 }), variar(0xc7a898, .01, .06, .05)));
+  for (const p of PRIMARIOS.filter(p=>p.d.z<.25)) {
+    const dir = p.d.clone();
+    const curva = curvaDePontos(t => dir.clone().multiplyScalar(R * formaSoma(dir) * .90 + t * .68), 10);
+    tocos.push(tintar(tuboPerfil(curva, u => .30 * (1 - u * .56), { segsU: 16, segsV: 12 }), variar(0xc7a898, .01, .06, .05)));
   }
   g.add(new THREE.Mesh(mergeGeometries(tocos), M.neuronio));
 
@@ -908,7 +866,12 @@ function interior() {
   ];
   fixar(parado);
   const todas = dentro.concat(fora, parado);
-  todas.forEach(c => { c.r *= .92; });
+  todas.forEach(c => {
+    c.r *= .84;
+    for(const p of new Set([c.bulk,c.filme])) {
+      const f=formaSoma(p.clone().normalize());p.multiplyScalar(f);p.y*=1.08;p.z*=.93;
+    }
+  });
   g.add(inscrever(nuvem(todas.filter(c => c.z > 0), M.cargaPos)));
   g.add(inscrever(nuvem(todas.filter(c => c.z < 0), M.cargaNeg)));
 
@@ -1049,10 +1012,11 @@ function canalDeHelices({ y0, y1, raio, poro, nH = 6, rh = .085, torcao = .6, co
       const y = y0 + (y1 - y0) * t;
       const a = a0 + torcao * t + Math.sin(t * 3.1 + i) * .06 + fase;
       const r = raio(y);
-      return V(Math.cos(a) * r, y, Math.sin(a) * r);
-    }, 24);
+      const coil=t*Math.PI*14+i, amp=.018*Math.sin(t*Math.PI);
+      return V(Math.cos(a)*r+Math.cos(coil)*amp,y,Math.sin(a)*r+Math.sin(coil)*amp);
+    }, 72);
     geos.push(ocluirNoAnel(
-      tuboPerfil(curva, u => rh * (.80 + .32 * Math.sin(u * Math.PI) + .06 * Math.sin(u * 9 + i)), { segsU: 42, segsV: 10 }),
+      tuboPerfil(curva, u => rh * (.80 + .32 * Math.sin(u * Math.PI) + .06 * Math.sin(u * 9 + i)), { segsU: 76, segsV: 12 }),
       variar(cor, .02, .09, .075), raio((y0 + y1) / 2) + rh));
   }
   g.add(new THREE.Mesh(mergeGeometries(geos), M.proteina));
