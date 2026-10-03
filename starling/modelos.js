@@ -21,8 +21,8 @@ const v = (x,y,z) => new THREE.Vector3(x,y,z);
 let seed = 19;
 const rnd = () => { seed = (Math.imul(seed,1664525) + 1013904223) >>> 0; return seed / 4294967296; };
 function esfera(r = 1) { return new THREE.SphereGeometry(r, 20, 12); }
-function organico(r, along = 1) {
-  const geo = esfera(r), p = geo.attributes.position;
+function organico(r, along = 1, smooth = false) {
+  const geo = smooth ? new THREE.SphereGeometry(r,48,32) : esfera(r), p = geo.attributes.position;
   for (let i=0;i<p.count;i++) {
     const x=p.getX(i), y=p.getY(i), z=p.getZ(i);
     const f=1+.045*Math.sin(x*2.1+y*1.7)*Math.cos(z*2.4);
@@ -202,7 +202,7 @@ function closeup(n,motion) {
     }
   }
   if(n===4) {
-    const gel=mesh(organico(1),phys('#83afbb',{transparent:true,opacity:.09,depthWrite:false}),[0,-1,-4],[L*.52,16,10]);
+    const gel=mesh(organico(1,1,true),phys('#83afbb',{transparent:true,opacity:.09,depthWrite:false}),[0,-1,-4],[L*.52,16,10]);
     g.add(gel); motion.gel=gel; linfatico(g,motion);
   }
   g.userData.rotulos=[
@@ -210,7 +210,9 @@ function closeup(n,motion) {
     {nome:'Endotélio',p:[18,4.7,1],cor:'parede'},
     {nome:'Glicocálix',p:[2,3.5,3],cor:'glicocalix'},
     {nome:n===4?'Linfa':'Interstício',p:n===4?[12,-15,0]:[-6,13,-12],cor:n===4?'linfa':'tecido'},
-  ]; return g;
+  ];
+  if(n===4)g.userData.rotulos.push({nome:'Interstício · volume',p:[6,16,-4],cor:'tecido'});
+  return g;
 }
 function barreira(motion) {
   const g=new THREE.Group(), geos=[], basal=[], brushes=[];
