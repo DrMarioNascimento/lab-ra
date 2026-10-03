@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=IBM+Plex+Mono:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../laboratorio.css" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=valvulas-20261002" />
   <script src="../guard.js?v=livre-20261002b"></script>
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"}}</script>
   <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.1.0/dist/model-viewer.min.js"></script>
@@ -25,6 +25,11 @@
     <div id="stage" class="stage" role="img" aria-label="Modelo tridimensional interativo">
       <canvas id="scene"></canvas>
       <div class="stage-hud"><span id="posturaLabel">Decúbito · 0°</span><span id="pressaoLabel">Tornozelo 10 mmHg</span><span id="stepLabel">01 · O corpo</span></div>
+      <div id="valveLabels" class="valve-labels" hidden>
+        <svg aria-hidden="true"><defs><marker id="venousArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#d6c684" /></marker></defs><path id="valveLeader0" class="valve-leader" /><path id="valveLeader1" class="valve-leader" /><path id="valveFlow" class="valve-flow" marker-end="url(#venousArrow)" /></svg>
+        <span id="valveLabel0" class="valve-label"><b>Válvula distal</b><span></span></span>
+        <span id="valveLabel1" class="valve-label"><b>Válvula proximal</b><span></span></span>
+      </div>
       <div class="gesture">Incline o aparelho · arraste para girar a vista</div>
       <div class="stage-tools">
         <button id="resetView" class="ghost-control" type="button">Recentrar</button>
@@ -92,6 +97,6 @@
   </section>
 </main>
 <footer class="rodape shell"><img src="../brand/mestre-lap.webp" alt="" width="84" height="84"><p>Simuladores interativos do Prof. Mário César Nascimento, PhD ©</p></footer>
-<script type="module" src="app.js?v=carregamento-tendoes-20261002"></script>
+<script type="module" src="app.js?v=valvulas-20261002"></script>
 </body>
 </html>

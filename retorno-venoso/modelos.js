@@ -25,7 +25,7 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { carregarCoracaoAnatomico, instalarCoracao, ligarVaso, ajustarTrechoCardiaco, moldarOriginalCardiaca, restaurarNormaisProtegidas } from './coracao.js?v=cardiaco-20261002';
 import {prepararPes,carregarAjustePes,centrosParaVolume,moldarOriginalDistal,restaurarNormaisDistais} from './pes.js?v=carregamento-tendoes-20261002';
 import {pressaoComBomba,contracaoNaFase} from './bomba.js?v=pes-bomba-20261002';
-import {tecidosDaPanturrilha} from './panturrilha.js?v=carregamento-tendoes-20261002';
+import {tecidosDaPanturrilha} from './panturrilha.js?v=valvulas-20261002';
 
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
 const rnd = (a, b) => a + Math.random() * (b - a);
@@ -605,13 +605,21 @@ function nivelCorpoSilhueta(scan) {
 /* ── A VÁLVULA ─────────────────────────────────────────────────────────────
    Duas cúspides — a válvula venosa é BICÚSPIDE, e isso não é detalhe: são
    duas bolsas que se encostam pelas bordas livres. Cada cúspide é uma
-   superfície paramétrica: presa à parede na base, solta na borda de cima. O
-   que abre e fecha é o RAIO DA BORDA LIVRE, e é ele que `moldarValvula` move.
+   superfície paramétrica: presa à parede por uma inserção em U, com duas
+   comissuras fixas e borda livre que encontra a do outro folheto.
 
    Por que não uma tampa: tampa é o modelo errado que esta bancada existe para
    desfazer. A válvula não veda um cano — ela se enche por trás e encosta as
    bordas, e por isso segura coluna, não vazão. */
-const NU = 10, NV = 14;
+const NU = 18, NV = 32;
+
+function materialValvula() {
+  return new THREE.MeshPhysicalMaterial({
+    name:'valvula_venosa',color:0xaaa99f,roughness:.65,metalness:0,
+    sheen:.12,sheenColor:new THREE.Color(0xe3ddd1),sheenRoughness:.7,
+    transparent:true,opacity:.78,depthWrite:false,side:THREE.DoubleSide,
+  });
+}
 
 function cuspide(R, comp, tetaInicio) {
   const g = new THREE.BufferGeometry();
@@ -622,7 +630,8 @@ function cuspide(R, comp, tetaInicio) {
     pos[n * 3] = pos[n * 3 + 1] = pos[n * 3 + 2] = 0;
     if (i < NU && j < NV) {
       const a = i * (NV + 1) + j, b = a + 1, c = a + NV + 1, d = c + 1;
-      idx.push(a, c, b, b, c, d);
+      if(tetaInicio===Math.PI)idx.push(a,b,c,b,d,c);
+      else idx.push(a,c,b,b,c,d);
     }
   }
   g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
@@ -631,28 +640,23 @@ function cuspide(R, comp, tetaInicio) {
   return g;
 }
 
-/* `abertura` 1 = escancarada contra a parede, 0 = bordas encostadas */
+/* As comissuras não se deslocam. Fechada, a borda livre dos dois folhetos
+   coincide numa linha; aberta, cada folheto se aproxima da sua parede. */
 function moldarCuspide(malha, abertura) {
-  const g = malha.geometry, u = g.userData, pos = g.attributes.position;
-  const rLivre = u.R * (0.06 + 0.86 * abertura);
+  const g = malha.geometry, u = g.userData, pos = g.attributes.position,lado=Math.cos(u.tetaInicio),p=V(0,0,0);
   for (let i = 0; i <= u.nu; i++) {
-    const s = i / u.nu;
-    /* perfil em S: sai da parede devagar e chega à borda livre depressa,
-       que é o formato de bolsa e não de funil */
-    const t = s * s * (3 - 2 * s);
-    const r = u.R * (1 - t) + rLivre * t;
-    /* a bolsa incha para trás quando fechada: é o sangue retido nela */
-    const bojo = (1 - abertura) * 0.22 * Math.sin(Math.PI * s);
+    const s=i/u.nu,t=s*s*(3-2*s);
     for (let j = 0; j <= u.nv; j++) {
-      const teta = u.tetaInicio + (j / u.nv) * Math.PI;
-      const n = i * (u.nv + 1) + j;
-      /* o seno em teta afasta o meio da cúspide e mantém as pontas na
-         parede: sem isso a cúspide descola do vaso nas bordas */
-      const rr = r + u.R * bojo * Math.sin((j / u.nv) * Math.PI);
-      pos.setXYZ(n, Math.cos(teta) * rr, s * u.comp, Math.sin(teta) * rr);
+      const theta=-Math.PI/2+j/u.nv*Math.PI,c=j===0||j===u.nv?0:Math.cos(theta);
+      const raiz=u.comp*(1-.85*c),x=u.R*Math.sin(theta);
+      const y=raiz+(u.comp-raiz)*s-.10*u.comp*(1-abertura)*Math.sin(Math.PI*s)*c;
+      const z=lado*u.R*c*(1-(1-.92*abertura)*t);
+      if(malha.userData.mapear)malha.userData.mapear(x/u.R,y,z/u.R,p);
+      else p.set(x,y,z);
+      pos.setXYZ(i*(u.nv+1)+j,p.x,p.y,p.z);
     }
   }
-  pos.needsUpdate = true; g.computeVertexNormals(); g.computeBoundingSphere();
+  pos.needsUpdate = true; g.computeVertexNormals(); g.computeBoundingBox();g.computeBoundingSphere();
 }
 
 /* parede de vaso: tubo inteiro, translucido */
@@ -1024,15 +1028,13 @@ function nivelValvula() {
   vidro.uniforms.uIntensity.value = 1.05;
   g.add(parede(R, H, vidro));
 
-  const cuspideMat = new THREE.MeshStandardMaterial({
-    name: 'valvula_venosa', color: 0x596c88, emissive: 0x101827, emissiveIntensity: 0.05,
-    roughness: 0.85, side: THREE.DoubleSide,
-  });
+  const cuspideMat = materialValvula();
   const valvulas = [];
   for (const h of VALV_ALTURAS) {
     const par = new THREE.Group();
     for (const teta of [0, Math.PI]) {
       const m = new THREE.Mesh(cuspide(R * .97, 11 * CM, teta), cuspideMat.clone());
+      m.name=teta===0?'folheto_venoso_anterior':'folheto_venoso_posterior';m.renderOrder=3;
       moldarCuspide(m, 1);
       par.add(m);
     }
@@ -1087,18 +1089,23 @@ function nivelBomba(geo) {
   const veiaBomba=new THREE.Mesh(tecidos.veiaGeo,vidro);veiaBomba.name='veia_profunda_bomba';veiaBomba.renderOrder=2;
   g.add(veiaBomba,...barrigas,tecidos.tendao);
 
-  const cuspideMat = new THREE.MeshStandardMaterial({
-    name: 'valvula_venosa', color: 0x596c88, emissive: 0x101827, emissiveIntensity: 0.05,
-    roughness: 0.85, side: THREE.DoubleSide,
-  });
+  const cuspideMat = materialValvula();
   const valvulas = [];
   for (const h of [10, 34]) {
     const par = new THREE.Group();
+    par.name=h===10?'valvula_distal':'valvula_proximal';
+    par.position.copy(tecidos.mapearNaVeia(h*CM,0,0,V(0,0,0)));
     for (const teta of [0, Math.PI]) {
       const m = new THREE.Mesh(cuspide(tecidos.raio(h*CM) * .97, 3.5 * CM, teta), cuspideMat.clone());
+      m.name=teta===0?'folheto_venoso_anterior':'folheto_venoso_posterior';
+      // A vista interna destaca as válvulas, como já faz com o sangue. Mantém
+      // suas posições dentro do vaso sem mudar músculos ou silhueta.
+      m.material.depthTest=false;m.renderOrder=6;
+      // A inserção lê a parede já deformada: nenhuma modificação no vaso.
+      m.userData.mapear=(x,y,z,p)=>tecidos.mapearNaVeia(h*CM+y,-z*.97,x*.97,p).sub(par.position);
       moldarCuspide(m, 1); par.add(m);
     }
-    const ponto=tecidos.curva.getPoint((h*CM)/H);par.position.copy(ponto);par.quaternion.setFromUnitVectors(V(0,1,0),tecidos.curva.getTangent((h*CM)/H));par.userData.altura = h;
+    par.userData.altura = h;
     valvulas.push(par); g.add(par);
   }
   const curva=tecidos.curva;
@@ -1187,7 +1194,7 @@ export async function criar() {
        do que o nivel existe para dizer. */
     const fechamento = clamp(Math.sin(grau * Math.PI / 180) * 1.15, 0, 1);
     for (const par of (modelos[2].userData.valvulas || [])) {
-      const abre = clamp(1 - fechamento, .05, 1);
+      const abre = clamp(1 - fechamento, 0, 1);
       par.children.forEach(c => moldarCuspide(c, abre));
       par.userData.abertura = abre;
     }
@@ -1219,7 +1226,7 @@ export async function criar() {
     b.valvulas.forEach((par, k) => {
       /* k=0 é a de baixo. Apertando: baixo fecha, cima abre. */
       const abre = k === 0 ? 1-clamp(aperto/.16,0,1) : clamp((aperto-.04)/.22,0,1);
-      par.children.forEach(c => moldarCuspide(c, clamp(abre, .04, 1)));
+      par.children.forEach(c => moldarCuspide(c, abre));
       par.userData.abertura = abre;
     });
 
