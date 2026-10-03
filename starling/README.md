@@ -69,3 +69,15 @@ venosa distal em ortostatismo com uma pressão capilar universal.
 Os testes em tests/starling.test.mjs conferem equações, áreas de filtração e
 absorção, conversão de unidades, balanço de massa, integração, resposta às
 causas e drenagem após reversão dos parâmetros.
+
+## Leitura para os alunos
+
+Os cinco níveis ficam visíveis em uma grade, sem depender de rolagem horizontal.
+A seção de RA tem seu próprio seletor das cinco peças, sincronizado com a cena.
+Há uma prévia por vez, identificada pelo nome da peça selecionada.
+
+Como interpretar aparece antes de Modelo e referências. Define todas as variáveis
+e unidades da interface. A paleta única está em variaveis.js: uma cor por variável
+em controles, equações, contribuições, gráficos, guia e setas 3D. A cor identifica
+a variável; sinais e pontas das setas continuam indicando a direção. O balanço
+também explicita Jv (filtração menos absorção), antes de descontar QL (linfa).

@@ -1,0 +1,20 @@
+// Única paleta para controles, leituras, equações, gráficos e forças 3D.
+export const VARIAVEIS = Object.freeze({
+ pc: {simbolo:'Pc', nome:'Pressão hidrostática capilar', cor:'#f3a083', unidade:'mmHg · cmH₂O', descricao:'Pressão do sangue dentro do capilar. Sua contribuição favorece a saída de água para o tecido. Diminui do início arteriolar ao fim venular.'},
+ pi: {simbolo:'Pi', nome:'Pressão hidrostática intersticial', cor:'#81bdfa', unidade:'mmHg · cmH₂O', descricao:'Pressão do líquido entre as células. Entra na equação como −Pi: uma pressão positiva se opõe à saída; uma pressão negativa favorece a saída. O controle ajusta o basal; o valor atual sobe quando o líquido se acumula.'},
+ oncPlasma: {simbolo:'πc', nome:'Pressão oncótica plasmática', cor:'#e9cb72', unidade:'mmHg · cmH₂O', descricao:'Efeito osmótico das proteínas do plasma, sobretudo da albumina. Sua contribuição −σπc se opõe à saída de água do sangue.'},
+ oncInter: {simbolo:'πi', nome:'Pressão oncótica intersticial', cor:'#cbb0f6', unidade:'mmHg · cmH₂O', descricao:'Efeito osmótico das proteínas no líquido intersticial. É o termo externo usado no modelo clássico, com contribuição +σπi.'},
+ oncSub: {simbolo:'πsg', nome:'Pressão oncótica do líquido subglicocálix', cor:'#74dfd0', unidade:'mmHg · cmH₂O', descricao:'Efeito osmótico das proteínas no líquido imediatamente abaixo do glicocálix. É o termo externo do modelo revisado, com contribuição +σπsg. Aqui é especificado pelo aluno, sem cálculo de sua adaptação por transporte de proteínas.'},
+ sigma: {simbolo:'σ', nome:'Coeficiente de reflexão de proteínas', cor:'#f09ab8', unidade:'Sem unidade · de 0 a 1', descricao:'Indica quanto a barreira restringe as proteínas responsáveis pelo gradiente oncótico. Em 1, a reflexão é completa; em 0, esse gradiente não contribui para o fluxo de água. Multiplica os dois termos oncóticos.'},
+ kf: {simbolo:'Kf', nome:'Coeficiente de filtração microvascular', cor:'#7dd1e8', unidade:'mL/min/mmHg', descricao:'Produto da condutividade hidráulica da parede pela área de troca. Converte a pressão efetiva em fluxo de água. Neste exercício pertence ao leito didático inteiro, não a um único capilar.'},
+ jv: {simbolo:'Jv', nome:'Fluxo líquido de água através da parede microvascular', cor:'#eff2ff', unidade:'mL/min', descricao:'Resultado de Kf multiplicado pela pressão efetiva média ao longo do leito. É a filtração menos a absorção do leito: positivo indica saída para o tecido; negativo indica entrada no sangue. Ainda não desconta a drenagem linfática.'},
+ efetiva: {simbolo:'ΔPef', nome:'Pressão efetiva de filtração', cor:'#f3cca7', unidade:'mmHg · cmH₂O', descricao:'Soma das quatro contribuições no ponto escolhido: Pc − Pi − σπc, somada a +σπsg no revisado ou +σπi no clássico. É a pressão mostrada no gráfico ao longo do capilar. Um valor negativo no modelo revisado indica tendência sob as pressões fixadas, não absorção venosa sustentada.'},
+ volume: {simbolo:'V', nome:'Volume excedente de líquido intersticial', cor:'#a8bdfb', unidade:'mL', descricao:'Quantidade acumulada acima do basal. Aumenta quando a filtração supera a absorção e a drenagem linfática; diminui quando as saídas superam a entrada. Não fica negativo neste modelo.'},
+ tempo: {simbolo:'t', nome:'Tempo simulado', cor:'#b6c4d2', unidade:'min', descricao:'Tempo fisiológico representado pela simulação. Na velocidade 1×, cada segundo real corresponde a dois minutos simulados.'},
+ linfa: {simbolo:'QL', nome:'Fluxo de drenagem linfática', cor:'#90d7a4', unidade:'mL/min', descricao:'Líquido retirado do interstício pelos vasos linfáticos. Cresce com o excesso de volume até a capacidade definida no exercício e fica zero na obstrução.'},
+});
+export const simboloHTML = key => '<span class="var-token" data-var="'+key+'">'+VARIAVEIS[key].simbolo+'</span>';
+export function notacaoHTML(texto) {
+ const tokens={'πsg':'oncSub','πc':'oncPlasma','πi':'oncInter','Pc':'pc','Pi':'pi','σ':'sigma','Kf':'kf','Jv':'jv','ΔPef':'efetiva','QL':'linfa'};
+ return texto.replace(/πsg|πc|πi|ΔPef|Kf|Jv|QL|Pc|Pi|σ/g, token=>simboloHTML(tokens[token]));
+}

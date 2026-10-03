@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { VARIAVEIS } from './variaveis.js?v=starling-guia-20261003';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 // Geometria independente da física. A aplicação fornece o sinal dos fluxos.
 export const FORA = new THREE.Color('#f4ac68');
@@ -17,6 +18,7 @@ const M = {
   pericito: phys('#b897b9'), linfa: phys('#5fb7a0', { transparent: true, opacity: .6, depthWrite: false, side: THREE.DoubleSide }),
   setaFora: phys('#f4ac68'), setaDentro: phys('#76b9ee'),
 };
+const forceMaterials=Object.fromEntries(['pc','pi','oncPlasma','oncInter','oncSub'].map(key=>[key,phys(VARIAVEIS[key].cor,{roughness:.55})]));
 const v = (x,y,z) => new THREE.Vector3(x,y,z);
 let seed = 19;
 const rnd = () => { seed = (Math.imul(seed,1664525) + 1013904223) >>> 0; return seed / 4294967296; };
@@ -311,7 +313,7 @@ export function criar() {
       const outward=p>=0, dir=side*(outward?1:-1);
       o.position.set(x,side*(outward?5:5+length),4.5);
       o.rotation.z=dir>0?0:Math.PI;
-      const shaft=o.children[0],tip=o.children[1],mat=outward?M.setaFora:M.setaDentro;
+      const shaft=o.children[0],tip=o.children[1],mat=forceMaterials[key==='oncExterna'?(e.modelo==='classico'?'oncInter':'oncSub'):key];
       shaft.material=tip.material=mat;
       const head=Math.min(1.3,length*.6);
       shaft.scale.y=Math.max(.001,length-head); shaft.position.y=(length-head)/2;
