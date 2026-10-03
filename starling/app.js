@@ -3,9 +3,9 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { prepararParaRA } from '../cores-para-ra.js';
-import { criar } from './modelos.js?v=starling-20261003b';
+import { criar } from './modelos.js?v=starling-20261003c';
 import { pressaoCapilar, pressaoLiquida, oncExterna, pontoDeVirada,
-  balanco, avancar, comCausa, CAUSAS, cmH2O, estadoDoTecido } from './fisica.js?v=starling-20261003b';
+  balanco, avancar, comCausa, CAUSAS, cmH2O, estadoDoTecido } from './fisica.js?v=starling-20261003c';
 const $ = id => document.getElementById(id), clamp=THREE.MathUtils.clamp;
 const fmt=(v,n=1)=>v.toLocaleString('pt-BR',{minimumFractionDigits:n,maximumFractionDigits:n});
 const pressure=(v,signed=false)=> (signed&&v>0?'+':'')+fmt(v)+' mmHg · '+(signed&&v>0?'+':'')+fmt(cmH2O(v))+' cmH₂O';
