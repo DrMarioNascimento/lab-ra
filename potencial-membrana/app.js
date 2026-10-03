@@ -28,7 +28,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { prepararParaRA } from '../cores-para-ra.js';
-import { criar } from './modelos.js?v=20261003-organelas';
+import { criar } from './modelos.js?v=20261003-organico';
 
 const $ = id => document.getElementById(id);
 const canvas = $('scene'), stage = $('stage');
@@ -188,8 +188,8 @@ const LENTIDAO = 260;                    // câmera lenta: 1 s de tela ≈ 3,8 m
 /* ------------------------------------------------------------ estado e textos */
 const dados = [
   ['Escala celular', '01 · Neurônio', 'A pergunta', 'Onde está a carga?',
-   'Explore um neurônio multipolar mielinizado em três dimensões: do soma aos dendritos e ao axônio. O potencial é uma diferença entre o interior e o exterior da membrana. Aprofunde para entrar na célula, reconhecer suas organelas e chegar à bicamada.',
-   'soma,dendritos,espinhas dendríticas,cone de implantação,axônio,mielina'],
+   'Explore um neurônio multipolar mielinizado em três dimensões: do soma aos dendritos e ao axônio. O trecho mielinizado representa um axônio periférico, com uma célula de Schwann por internódio e seu núcleo na camada citoplasmática externa. A translucidez é um recurso didático de visualização. O potencial é uma diferença entre o interior e o exterior da membrana. Aprofunde para entrar na célula, reconhecer suas organelas e chegar à bicamada.',
+   'soma,dendritos,espinhas dendríticas,cone de implantação,axônio,mielina,células de Schwann'],
   ['Escala celular · em corte', '02 · Interior', 'O volume', 'O citoplasma é neutro',
    'Explore núcleo, mitocôndrias, retículos e Golgi dentro da célula em corte. Organelas, lipídios na borda e cargas são representações ampliadas para exploração; suas quantidades e tamanhos são esquemáticos. A separação de cargas ocorre junto à membrana, enquanto o volume permanece praticamente neutro. No próximo nível, as réguas mostram bicamada e película em proporção.',
    'citoplasma,K⁺,Na⁺,Cl⁻,ânions orgânicos,eletroneutralidade'],
@@ -428,7 +428,7 @@ const travessiaMs = () => (AXONIO_MM / 1000) / VEL_AXONIO * 1000;
    axônio: é essa proporcionalidade simples que faz a inversão ANDAR */
 const tDisparo = u => u * travessiaMs();
 const vmDe = u => vmNoTempo(disparo.t - tDisparo(u));
-/* Vem de modelos.js, onde o eletrodo é DESENHADO. Antes era um .78 escrito
+/* Vem de modelos.js, onde o ponto de registro é MARCADO. Antes era um .78 escrito
    aqui e a geometria não sabia dele: o gráfico prometia um ponto de registro
    que a cena não mostrava. Uma fonte só para os dois. */
 const U_REG = uReg;

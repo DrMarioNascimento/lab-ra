@@ -138,6 +138,24 @@ const TEX = {
     }
     g.globalAlpha = 1;
   }),
+  // Subtle tissue granulation, shared across the organelles rather than a plastic finish.
+  organelas: canvasTex(256,256,(g,w,h)=>{
+    const img=g.createImageData(w,h);
+    for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+      const n=ruido2(x/15,y/18)*10+ruido2(x/3.5,y/4.5)*3;
+      const k=(y*w+x)*4;
+      img.data[k]=230+n;img.data[k+1]=227+n;img.data[k+2]=224+n;img.data[k+3]=255;
+    }
+    g.putImageData(img,0,0);
+  }),
+  relevoOrganelas: canvasTex(256,256,(g,w,h)=>{
+    const img=g.createImageData(w,h);
+    for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+      const v=128+ruido2(x/12,y/14)*35+ruido2(x/3,y/4)*12,k=(y*w+x)*4;
+      img.data[k]=img.data[k+1]=img.data[k+2]=v;img.data[k+3]=255;
+    }
+    g.putImageData(img,0,0);
+  }),
   /* o axônio do nível 05: estas duas são REPINTADAS a cada quadro. A cor de
      cada coluna é o sinal e a intensidade da película naquele ponto do
      comprimento — a de fora e a de dentro sempre em oposição. */
@@ -171,7 +189,10 @@ const M = {
      armadilha do tendão no músculo. Mais escura e mais fosca, ela continua
      lendo como lipídio e para de competir com a onda por brilho. */
   mielina: phys({ color: 0x9c8a6e, map: TEX.mielina, roughness: .56, sheen: .30,
-    sheenColor: 0xf4e3c8, clearcoat: .10, clearcoatRoughness: .58 }),
+    sheenColor: 0xf4e3c8, clearcoat: .05, clearcoatRoughness: .58,
+    transparent:true,opacity:.56,depthWrite:false }),
+  schwann: vivo({color:0xbcb7a4,transparent:true,opacity:.28,depthWrite:false,roughness:.70}),
+  nucleoSchwann: vivo({color:0x624c73,roughness:.78,clearcoat:0}),
   cabeca: phys({ color: 0xffffff, vertexColors: true, roughness: .64, clearcoat: 0,
     sheen: .18, sheenRoughness: .7, sheenColor: 0xffe6c0 }),
   cauda: phys({ color: 0x6a564a, roughness: .82, clearcoat: 0 }),
@@ -222,9 +243,11 @@ const M = {
      é cátion, frio é ânion —, e um núcleo violeta do tamanho de um punho
      mandava a mensagem errada mais alto que todos os íons juntos. Em pardo
      neutro ele volta a ser o que é: uma organela, sem carga a declarar. */
-  nucleo: vivo({ color: 0xffffff, vertexColors: true, roughness: .70, sheenColor: 0xe8d4c4,
+  nucleo: vivo({ color: 0xffffff, vertexColors: true, roughness: .76, sheenColor: 0xe8d4c4,
+    map:TEX.organelas,bumpMap:TEX.relevoOrganelas,bumpScale:.012,
     emissive: 0x1d1310, emissiveIntensity: .38 }),
-  nucleolo: phys({ color: 0x7a6250, roughness: .62, clearcoat: 0, sheen: .35, sheenColor: 0xe0cbb4 }),
+  nucleolo: phys({ color: 0x7a6250, roughness: .76, clearcoat: 0, sheen: .25, sheenColor: 0xe0cbb4,
+    map:TEX.organelas,bumpMap:TEX.relevoOrganelas,bumpScale:.009 }),
 
   /* ---- anotação: a régua não é objeto da cena, é legenda em três dimensões,
      e por isso brilha por conta própria em vez de receber luz ---- */
@@ -542,9 +565,9 @@ const COR_NEURO = 0xd9b3bd;
 const SOMA = { R: .78 };
 // Morfologia multipolar estável: a mesma referência orienta o soma e seu corte.
 const PRIMARIOS = [
-  [-.46, .88, .13, 1.35, .170], [-.96, .20, -.17, 1.50, .150],
-  [-.68, -.67, .20, 1.24, .140], [-.12, -.94, -.28, 1.08, .120],
-  [-.64, .23, .72, 1.08, .130], [-.45, .50, -.72, .95, .112],
+  [-.46, .88, .13, 1.94, .170], [-.96, .20, -.17, 2.18, .150],
+  [-.68, -.67, .20, 1.09, .140], [-.12, -.94, -.28, 1.46, .120],
+  [-.64, .23, .72, 1.31, .130], [-.45, .50, -.72, .84, .112],
 ].map(([x,y,z,comp,r]) => ({d:V(x,y,z).normalize(),comp,r}));
 const DIR_AXO = V(.99,-.10,.05).normalize();
 function flareSoma(n) {
@@ -637,8 +660,8 @@ function neuronio() {
     const n2=V().crossVectors(dir,n1).normalize();
     const curva=curvaDePontos(t=>base.clone().addScaledVector(dir,t*comp)
       .addScaledVector(entrada.clone().sub(dir),comp*.24*(1-Math.exp(-t/.24)))
-      .addScaledVector(n1,Math.sin(t*2.4+s)*t*comp*.12)
-      .addScaledVector(n2,Math.sin(t*2.1+s*1.7)*t*comp*.085),22);
+      .addScaledVector(n1,(Math.sin(t*4.7+s)-Math.sin(s))*t*t*comp*.135)
+      .addScaledVector(n2,(Math.sin(t*3.6+s*1.7)-Math.sin(s*1.7))*t*t*comp*.105),22);
     const rFim = Math.max(.013, raio * (ordem===0?.69:.72));
     const perfil=u=>{
       const estreita=raio+(rFim-raio)*suave(u);
@@ -658,8 +681,8 @@ function neuronio() {
     const fim=curva.getPointAt(1),tan=curva.getTangentAt(1).normalize();
     // Filhas desiguais, com repartição de Rall e bifurcação suave.
     const eixo=V(random(-.4,.4),random(-.4,.4),1).cross(tan).normalize(),f=random(.57,.68);
-    for(const c of [{r:rFim*Math.pow(f, 2 / 3),ang:random(.35,.53),esc:.78},
-      {r:rFim*Math.pow(1 - f, 2 / 3),ang:-random(.43,.66),esc:.61}]) {
+    for(const c of [{r:rFim*Math.pow(f, 2 / 3),ang:random(.24,.74),esc:random(.63,.96)},
+      {r:rFim*Math.pow(1 - f, 2 / 3),ang:-random(.32,.88),esc:random(.42,.79)}]) {
       ramo(fim.clone().addScaledVector(tan,-.024), tan.clone().applyAxisAngle(eixo,c.ang).normalize(),c.r,comp*c.esc,ordem+1,false,tan);
     }
   }
@@ -678,10 +701,25 @@ function neuronio() {
   const bainhas=[];
   trechos.forEach(([u0,u1],i)=>{
     const sub=curvaDePontos(t=>eixo.getPointAt(u0+t*(u1-u0)),24);
-    bainhas.push(tuboPerfil(sub,u=>.078+(.106-i*.001-.078)*suave(clamp(Math.min(u,1-u)/.09,0,1)),
+    bainhas.push(tuboPerfil(sub,u=>.078+(.139-i*.001-.078)*suave(clamp(Math.min(u,1-u)/.09,0,1)),
       {segsU:40,segsV:20}));
   });
   const mielina=new THREE.Mesh(mergeGeometries(bainhas),M.mielina);mielina.name='mielina';g.add(mielina);
+  // Peripheral myelin: one Schwann cell per internode. The nucleus is in the
+  // outer cytoplasmic compartment, never in the axon or compact lamellae.
+  const corposSchwann=[],nucleosSchwann=[];
+  const pontosSchwann=[];
+  trechos.forEach(([u0,u1],i)=>{
+    const u=(u0+u1)/2,centro=eixo.getPointAt(u),T=eixo.getTangentAt(u).normalize();
+    const radial=V().crossVectors(T,V(0,1,0)).normalize();
+    const p=centro.clone().addScaledVector(radial,.180);
+    const mat=new THREE.Matrix4().compose(p,new THREE.Quaternion().setFromUnitVectors(V(1,0,0),T),V(1,1,1));
+    const nuc=new THREE.SphereGeometry(1,22,14);nuc.scale(.137,.046,.037);nuc.applyMatrix4(mat);nucleosSchwann.push(nuc);
+    const corpo=new THREE.SphereGeometry(1,24,16);corpo.scale(.235,.080,.070);corpo.applyMatrix4(mat);corposSchwann.push(corpo);
+    pontosSchwann.push(p);
+  });
+  const nucleos=new THREE.Mesh(mergeGeometries(nucleosSchwann),M.nucleoSchwann);nucleos.name='núcleos das células de Schwann';g.add(nucleos);
+  const neurilema=new THREE.Mesh(mergeGeometries(corposSchwann),M.schwann);neurilema.name='citoplasma periférico de Schwann';g.add(neurilema);
 
   // Arborização terminal aberta, com botões nas pontas reais das curvas.
   const fim=eixo.getPointAt(1),term=[];
@@ -696,7 +734,8 @@ function neuronio() {
   g.userData.ancoras=[['soma',V(-.12,.38,.63)],['dendritos',V(-1.65,1.25,.13)],
     ['cone axonal',eixo.getPointAt(.035)],['segmento inicial',eixo.getPointAt(.15)],
     ['axônio',eixo.getPointAt(.95)],['mielina',eixo.getPointAt(.48)],
-    ['nó de Ranvier',eixo.getPointAt(.5785)],['terminais',fim.clone().add(destinos[0])]
+    ['nó de Ranvier',eixo.getPointAt(.5785)],['terminais',fim.clone().add(destinos[0])],
+    ['núcleo de Schwann',pontosSchwann[1]]
   ];
 
   g.userData.foco = V(0, .22, .58);
@@ -804,43 +843,60 @@ function popularEsfera({ especies, n, lado, rDe, rAte, rFilme, semNucleo = false
 function organelasCelulares() {
   const g=new THREE.Group();g.name='organelas';
   const volumes=[],ancoras=[];
-  const mitoMat=vivo({color:0xa67e72,roughness:.72,sheenColor:0xf6cdb6});
-  const cristaMat=vivo({color:0x8d6d66,roughness:.75,side:THREE.DoubleSide});
-  const erMat=vivo({color:0x807087,roughness:.79,sheenColor:0xd4c2db});
-  const golgiMat=vivo({color:0x668d7d,roughness:.76,sheenColor:0xd6e8d5});
+  const tecido=o=>vivo({map:TEX.organelas,bumpMap:TEX.relevoOrganelas,bumpScale:.010,
+    roughnessMap:TEX.neuralRug,roughness:.77,...o});
+  const mitoMat=tecido({color:0xa67e72,sheenColor:0xf6cdb6});
+  const cristaMat=tecido({color:0x8d6d66,side:THREE.DoubleSide});
+  const erMat=tecido({color:0x807087,sheenColor:0xd4c2db});
+  const golgiMat=tecido({color:0x668d7d,sheenColor:0xd6e8d5});
   const ribMat=phys({color:0x645467,roughness:.86});
-  function juntar(geos,mat,name){const mesh=new THREE.Mesh(mergeGeometries(geos),mat);mesh.name=name;g.add(mesh);return mesh;}
-  function cisterna(larg,prof,y,x,z,mat,lista){
-    const s=new THREE.Shape();
-    s.moveTo(-larg/2,0);s.bezierCurveTo(-larg*.35,-prof*.56,larg*.34,-prof*.56,larg/2,0);
-    s.bezierCurveTo(larg*.35,prof*.34,-larg*.34,prof*.34,-larg/2,0);
-    const geo=new THREE.ExtrudeGeometry(s,{depth:.037,bevelEnabled:true,bevelSegments:2,steps:1,
-      bevelSize:.025,bevelThickness:.018,curveSegments:18});
-    geo.rotateX(-Math.PI/2);geo.translate(x,y,z);lista.push(geo);
+  function juntar(geos,mat,name){
+    const misto=geos.some(q=>q.index)&&geos.some(q=>!q.index);
+    const mesh=new THREE.Mesh(mergeGeometries(misto?geos.map(q=>q.index?q.toNonIndexed():q):geos),mat);
+    mesh.name=name;g.add(mesh);return mesh;
   }
-  const mitos=[],cristas=[];
-  [V(.94,.70,.54),V(-.88,-.92,.45),V(.76,-1.02,.20)].forEach((p,i)=>{
-    const aberto=i===0,geo=new THREE.SphereGeometry(1,32,22,aberto?CEL.ini:0,aberto?CEL.arco:Math.PI*2);
+  function cisterna(larg,prof,y,x,z,phase,lista) {
+    // A curved, sealed sac with asymmetric rims and soft corrugations.
+    const s=new THREE.Shape();s.moveTo(-larg/2,0);
+    s.bezierCurveTo(-larg*.40,-prof*.84,larg*.30,-prof*1.03,larg/2,.025);
+    s.bezierCurveTo(larg*.28,-prof*.24,-larg*.33,-prof*.15,-larg/2,0);
+    const geo=new THREE.ExtrudeGeometry(s,{depth:.033,bevelEnabled:true,bevelSegments:3,steps:1,
+      bevelSize:.023,bevelThickness:.018,curveSegments:26});
+    geo.rotateX(-Math.PI/2);
     const pos=geo.attributes.position;
     for(let k=0;k<pos.count;k++){
-      const x=pos.getX(k),y=pos.getY(k),z=pos.getZ(k);
-      pos.setXYZ(k,x*.44,y*.19+.055*(1-x*x),z*.21);
+      const px=pos.getX(k),py=pos.getY(k),pz=pos.getZ(k),u=px/larg;
+      pos.setXYZ(k,px*(1+.045*Math.sin(pz*13+phase)),
+        py+.13*u*u+.043*Math.sin(px*6.4+phase+pz*5)+.010*Math.sin(px*23+pz*18+phase),
+        pz+.028*Math.sin(px*5.2+phase));
     }
-    geo.computeVertexNormals();geo.rotateZ(i===1?.38:-.36);geo.translate(...p.toArray());mitos.push(geo);
-    volumes.push({p:p.toArray(),r:[.53,.35,.33]});
+    geo.computeVertexNormals();geo.rotateY(.12*Math.sin(phase));geo.rotateZ(.08*Math.sin(phase*.7));
+    geo.translate(x,y,z);lista.push(geo);
+  }
+  const mitos=[],cristas=[];
+  const formas=[[.44,.185,.21,-.36],[.395,.19,.19,.38],[.46,.17,.205,-.24]];
+  [V(.94,.70,.54),V(-.88,-.92,.45),V(.76,-1.02,.20)].forEach((p,i)=>{
+    const aberto=i===0,[a,b,c,rot]=formas[i];
+    function casca(interna){
+      const geo=new THREE.SphereGeometry(1,40,28,aberto?CEL.ini:0,aberto?CEL.arco:Math.PI*2),pos=geo.attributes.position;
+      const e=interna?.020:0;
+      for(let k=0;k<pos.count;k++){
+        const x=pos.getX(k),y=pos.getY(k),z=pos.getZ(k);
+        const rug=1+.023*ruido3(x*5+i,y*4,z*5);
+        pos.setXYZ(k,x*(a-e),y*(b-e)*rug+.095*Math.sin(x*2.1)+.035*(1-x*x),z*(c-e)*rug);
+      }
+      geo.computeVertexNormals();geo.rotateZ(rot);geo.translate(...p.toArray());return geo;
+    }
+    mitos.push(casca(false));volumes.push({p:p.toArray(),r:[.56,.45,.35]});
     if(aberto){
-      const inner=new THREE.SphereGeometry(1,30,20,CEL.ini,CEL.arco);
-      inner.scale(.415,.165,.185);inner.rotateZ(-.36);inner.translate(...p.toArray());
-      const mesh=peloAvesso(new THREE.Mesh(inner,cristaMat));mesh.name='matriz mitocondrial';g.add(mesh);
+      const mesh=peloAvesso(new THREE.Mesh(casca(true),cristaMat));mesh.name='matriz mitocondrial';g.add(mesh);
       for(let j=0;j<6;j++){
-        // Folds are thin sheets of inner membrane, not rod-like organelles.
-        const folha=new THREE.PlaneGeometry(.16,.24,6,10),pf=folha.attributes.position;
+        const folha=new THREE.PlaneGeometry(.18,.23,10,12),pf=folha.attributes.position;
         for(let k=0;k<pf.count;k++){
-          const y=pf.getY(k),z=pf.getX(k);
-          pf.setXYZ(k,-.30+j*.11+.020*Math.sin(y*22),y,z+.055);
+          const y=pf.getY(k),z=pf.getX(k),x=-.29+j*.106+.027*Math.sin(y*21+j*.6);
+          pf.setXYZ(k,x,y*(.78+.16*Math.sin(j))+.095*Math.sin(x/a*2.1)+.035,z+.046+.020*Math.sin(y*16+j));
         }
-        folha.computeVertexNormals();
-        folha.rotateZ(-.36);folha.translate(...p.toArray());cristas.push(folha);
+        folha.computeVertexNormals();folha.rotateZ(rot);folha.translate(...p.toArray());cristas.push(folha);
       }
     }
   });
@@ -848,33 +904,43 @@ function organelasCelulares() {
   ancoras.push(['mitocôndria · cristas',V(1,.69,.68)]);
   const er=[],rib=[];
   for(let j=0;j<5;j++){
-    const y=.35+j*.15;cisterna(.94-j*.035,.41,y,-.86,.49,erMat,er);
-    for(let k=0;k<19;k++){
-      const u=k/18,x=-1.28+u*.83,z=.49+.055*Math.sin(u*Math.PI*2+j);
-      const r=new THREE.SphereGeometry(.025,6,4);r.translate(x,y+.071,z);rib.push(r);
+    const y=.32+j*.145,phase=j*.48;
+    cisterna(.96-j*.038,.43+j*.012,y,-.85+.017*Math.sin(j),.63,phase,er);
+    // Ribosomes scatter across the exposed surfaces instead of a ruler-straight row.
+    for(let k=0;k<32;k++){
+      const u=((k*13+j*7)%37)/37-.5,x=u*(.96-j*.038),z=-.12+Math.sin(k*2.37+j)*.045;
+      const yy=y+.10+.13*u*u+.043*Math.sin(x*6.4+phase+z*5);
+      const r=new THREE.SphereGeometry(.019+(k%3)*.003,7,5);
+      r.translate(x-.85,yy,z+.63+.028*Math.sin(x*5.2+phase));rib.push(r);
     }
+    if(j<4){const ponte=curvaDePontos(t=>V(-1.24+.035*Math.sin(t*Math.PI),y+t*.145+.02,.54+.05*Math.sin(t*Math.PI)),12);
+      er.push(tuboPerfil(ponte,u=>.038+.008*Math.sin(u*Math.PI),{segsU:14,segsV:8}));}
   }
   juntar(er,erMat,'retículo endoplasmático rugoso');juntar(rib,ribMat,'ribossomos');
-  volumes.push({p:[-.86,.68,.49],r:[.56,.49,.32]});
+  volumes.push({p:[-.86,.68,.49],r:[.61,.56,.42]});
   ancoras.push(['retículo rugoso · Nissl',V(-.91,.84,.56)]);
   const golgi=[],vesiculas=[];
-  for(let j=0;j<5;j++)cisterna(.75-j*.065,.36,-.65+j*.13,.34,.58,golgiMat,golgi);
-  for(let i=0;i<9;i++){
-    const v=new THREE.SphereGeometry(.045+(i%3)*.012,10,8);
+  for(let j=0;j<5;j++)cisterna(.79-j*.067,.43,-.70+j*.125,.34+.026*Math.sin(j),.70-j*.018,1.7+j*.30,golgi);
+  for(let i=0;i<11;i++){
+    const v=new THREE.SphereGeometry(.043+(i%3)*.010,14,10);v.scale(1,.87+(i%3)*.08,1.06);
     v.translate(.72+Math.sin(i*2.1)*.10,-.52+(i%4)*.12,.47+Math.cos(i*1.7)*.14);vesiculas.push(v);
   }
   juntar(golgi,golgiMat,'complexo de Golgi');juntar(vesiculas,golgiMat,'vesículas');
-  volumes.push({p:[.38,-.39,.58],r:[.55,.47,.32]});
+  volumes.push({p:[.38,-.39,.58],r:[.58,.50,.44]});
   ancoras.push(['complexo de Golgi',V(.36,-.30,.65)]);
-  const ser=[];
-  for(let j=0;j<6;j++){
-    const curva=curvaDePontos(t=>V(.18+t*.78,1.04+.08*Math.sin(t*Math.PI*2+j),-.10+j*.085+.05*Math.sin(t*Math.PI)),22);
-    ser.push(tuboPerfil(curva,()=>.037,{segsU:22,segsV:7}));
-    if(j%2===0){const ponte=curvaDePontos(t=>V(.43,1.04+.08*Math.sin(.32*Math.PI*2+j+t),-.10+(j+t)*.085),10);
-      ser.push(tuboPerfil(ponte,()=>.037,{segsU:10,segsV:7}));}
+  const ser=[],caminhos=[];
+  for(let j=0;j<5;j++){
+    const curva=curvaDePontos(t=>V(.18+t*.80+.035*Math.sin(t*9+j),
+      1.03+.095*Math.sin(t*6.4+j*.84),-.07+j*.081+.075*Math.sin(t*7.2+j*.57)),32);
+    caminhos.push(curva);ser.push(tuboPerfil(curva,u=>.031*(1+.10*Math.sin(u*10+j)),{segsU:32,segsV:9}));
+  }
+  for(let j=0;j<4;j++)for(const u of [.28,.71]){
+    const a=caminhos[j].getPointAt(u),b=caminhos[j+1].getPointAt(u+.06);
+    const curva=curvaDePontos(t=>a.clone().lerp(b,t).add(V(.025*Math.sin(t*Math.PI),.024*Math.sin(t*Math.PI),0)),12);
+    ser.push(tuboPerfil(curva,u=>.029+.003*Math.sin(u*Math.PI),{segsU:12,segsV:8}));
   }
   juntar(ser,erMat,'retículo endoplasmático liso');
-  volumes.push({p:[.58,1.05,.11],r:[.53,.23,.42]});
+  volumes.push({p:[.58,1.05,.11],r:[.60,.28,.50]});
   ancoras.push(['retículo liso',V(.63,1.10,.13)]);
   return {g,volumes,ancoras};
 }
@@ -1489,48 +1555,10 @@ function axonio() {
     tampaAnelar(0, rDentro(0), rFora(0), a0, arco), tampaAnelar(1, rDentro(1), rFora(1), a0, arco),
   ], false), M.parede));
 
-  /* ── O ELETRODO DE REGISTRO ────────────────────────────────────────────
-     A ponta entra pela janela do corte e encosta na parede de DENTRO — que é
-     o que um registro intracelular é, e é de lá que sai o Vm do gráfico.
-
-     A PRIMEIRA VERSÃO NÃO LIA COMO INSTRUMENTO, e por três defeitos somados:
-
-     1. COMPRIMENTO. A haste media 2,73 no mundo, contra 0,62 de raio do
-        tubo — quatro vezes e meia. Era a coisa mais comprida do quadro, e
-        num nível cujo assunto é a parede do axônio.
-     2. LISTRAS. Havia um fio de metal com dez faces dentro de um vidro de
-        rugosidade 0,06, quase transparente e sem escrever profundidade. As
-        facetas do fio apareciam através do vidro lustroso como um hachurado,
-        e o conjunto lia como espeto listrado. O fio saiu: nesta escala ele
-        não mostra nada que o vidro já não mostre.
-     3. A CONTA SUMIA. Com 0,058 de raio, dentro do tubo e atrás da própria
-        haste, ela desaparecia em quase todo ângulo — e era ela que carregava
-        o elo com o marcador do gráfico.
-
-     Agora a haste é curta e grossa, o vidro é menos lustroso, a conta é
-     maior, e a estação ganhou uma CINTA na parede de fora: bolinha se
-     esconde quando o modelo gira, cinta se vê de qualquer lado. */
+  // Only a small visual registration point remains, linked to the graph.
   const pReg = pontoNaParede(AX.uReg, AX.aDentro, rDentro(AX.uReg) - .07);
-  const traseira = pReg.clone().add(V(.16, 1.05, .66));
-  const haste = (de, ate, r0, r1, mat, segs = 20) => {
-    const d = ate.clone().sub(de);
-    const m = new THREE.Mesh(new THREE.CylinderGeometry(r0, r1, d.length(), segs, 1, true), mat);
-    m.position.copy(de).add(ate).multiplyScalar(.5);
-    m.quaternion.setFromUnitVectors(V(0, 1, 0), d.clone().normalize());
-    return m;
-  };
-  const conta = new THREE.Mesh(new THREE.SphereGeometry(.082, 18, 14), M.marcador);
-  conta.position.copy(pReg);
-  for (const o of [haste(traseira, pReg, .105, .026, M.vidro), conta]) {
-    o.userData.foraDoQuadro = true; g.add(o);
-  }
-  /* NÃO HÁ CINTA EM VOLTA DO TUBO, e houve uma. Ela existia para resolver
-     "a conta some quando o modelo gira" — mas o que fazia a conta sumir era
-     ela ser pequena e ter a cor da parede. Corrigidos os dois, a premissa da
-     cinta caiu: quem marca a estação de longe e de qualquer ângulo é a
-     HASTE, que fica fora do tubo e nunca é encoberta; a conta marca o ponto
-     exato. Uma faixa a mais só disputaria leitura com a cor da película, que
-     neste nível é o conteúdo. */
+  const conta = new THREE.Mesh(new THREE.SphereGeometry(.082,18,14),M.marcador);
+  conta.name='ponto de registro';conta.position.copy(pReg);g.add(conta);
   g.userData.pontoRegistro = pReg;
 
   /* ── as fileiras de sinal ──────────────────────────────────────────────
