@@ -6,7 +6,7 @@
 <link rel="icon" href="../brand/orientador.webp">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=starling-20261003c">
+<link rel="stylesheet" href="style.css?v=starling-guia-20261003">
 <script src="../guard.js?v=livre-20261002b"></script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"}}</script>
 <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.1.0/dist/model-viewer.min.js"></script>
@@ -32,14 +32,14 @@
 <div class="toolbar" aria-label="Controles da experiência">
 <button id="correr" class="button primary">Iniciar</button><button id="zerar" class="button">Reiniciar</button><button id="resetView" class="button">Recentrar</button><button id="toggleLabels" class="button" aria-pressed="true">Legendas</button><button id="fullscreen" class="button">Ampliar</button>
 <label class="speed">Velocidade <input id="velocidade" type="range" min=".25" max="4" step=".25" value="1"><output id="lVelocidade">1×</output></label>
-<span class="time-note">1× = 2 min simulados/s · <b id="lMinutos">0,0</b> min</span>
+<span class="time-note" data-var="tempo">1× = 2 min simulados/s · t = <b id="lMinutos">0,0</b> min</span>
 </div>
-<div class="legend"><span class="red">Hemácias</span><span class="gold">Proteínas</span><span class="aqua">Glicocálix</span><span class="green">Linfa</span><span class="blue">Água</span></div>
+<div class="force-key" aria-label="Cores das variáveis de pressão"><span data-var="pc">Pc · hidrostática capilar</span><span data-var="pi">Pi · hidrostática intersticial</span><span data-var="oncPlasma">πc · oncótica plasmática</span><span data-var="oncInter">πi · oncótica intersticial</span><span data-var="oncSub">πsg · oncótica subglicocálix</span></div><div class="legend"><span class="red">Hemácias</span><span class="gold">Proteínas</span><span class="aqua">Glicocálix</span><span class="green">Linfa</span><span class="blue">Água</span></div>
 <article class="info-card"><span class="eyebrow" id="infoEyebrow"></span><h2 id="infoTitle"></h2><p id="infoText"></p><div id="microtags" class="microtags"></div></article>
 </div>
 <aside class="panel">
 <section class="card model-card">
-<h2>Como interpretar</h2>
+<h2>Modelo de troca</h2>
 <label class="select-label" for="modelo">Modelo de troca</label>
 <select id="modelo"><option value="revisado">Revisado · glicocálix</option><option value="classico">Clássico · comparação</option></select>
 <p id="modelNote" class="small"></p>
@@ -48,42 +48,51 @@
 </section>
 <section class="card scenario-card"><h2>Estados rápidos</h2><div id="causas" class="causas"></div><p id="causeNote" class="small"></p></section>
 <section class="card fluid-card"><div class="card-heading"><h2>Balanço do tecido</h2><span class="pill" id="balanceStatus">Equilíbrio</span></div>
-<div class="volume"><b id="lEdema">0,00</b><span>mL excedentes</span></div>
+<div class="volume" data-var="volume"><b id="lEdema">0,00</b><span>V · volume excedente em mL</span></div>
 <div class="bar" aria-hidden="true"><i id="barraEdema"></i></div>
-<dl class="balance"><div><dt>Filtração → tecido</dt><dd id="lFiltrado"></dd></div><div><dt>Absorção → sangue</dt><dd id="lAbsorcao"></dd></div><div><dt>Drenagem → linfa</dt><dd id="lLinfa"></dd></div><div class="net"><dt>Variação do volume</dt><dd id="lAcumula"></dd></div></dl>
+<dl class="balance"><div><dt>Filtração → tecido</dt><dd id="lFiltrado"></dd></div><div><dt>Absorção → sangue</dt><dd id="lAbsorcao"></dd></div><div data-var="linfa"><dt>QL · drenagem → linfa</dt><dd id="lLinfa"></dd></div><div data-var="jv"><dt>Jv · fluxo líquido de água</dt><dd id="lJv"></dd></div><div class="net" data-var="volume"><dt>Variação do volume</dt><dd id="lAcumula"></dd></div></dl>
 <p class="small">Taxas do leito didático em mL/min. O volume representa o excesso sobre o basal e não cai abaixo de zero. A pressão intersticial sobe com o acúmulo e a linfa aumenta até sua capacidade.</p>
 </section>
 <details class="card parameters" open><summary>Ajustar as forças</summary>
 <div class="card-heading"><span class="small">Ajustes preservam o líquido acumulado.</span><button id="reporOnc" class="button mini">Restaurar estado</button></div>
-<label class="ctrl">Pc · início do capilar <output id="oPcA"></output><input id="pcA" type="range" min="5" max="60" step="1" value="24"></label>
-<label class="ctrl">Pc · fim do capilar <output id="oPcV"></output><input id="pcV" type="range" min="2" max="55" step="1" value="18"></label>
-<label class="ctrl">Pi · basal do interstício <output id="oPi"></output><input id="piBase" type="range" min="-10" max="10" step="1" value="-2"></label>
-<label class="ctrl">πc · oncótica do plasma <output id="lOnc"></output><input id="oncCursor" aria-label="Pressão oncótica do plasma" type="range" min="4" max="34" step="1" value="25"></label>
-<label class="ctrl"><span id="externalLabel">πsg · oncótica subglicocálix</span><output id="oExt"></output><input id="oncExternal" type="range" min="0" max="25" step="1" value="6"></label>
-<label class="ctrl">σ · reflexão de proteínas <output id="oSigma"></output><input id="sigma" type="range" min="0" max="1" step=".05" value="1"></label>
-<label class="ctrl">Kf · condutância do leito <output id="oKf"></output><input id="kf" type="range" min=".005" max=".08" step=".005" value=".02"></label>
+<label class="ctrl" data-var="pc">Pc · pressão hidrostática capilar — início <output id="oPcA"></output><input id="pcA" type="range" min="5" max="60" step="1" value="24"></label>
+<label class="ctrl" data-var="pc">Pc · pressão hidrostática capilar — fim <output id="oPcV"></output><input id="pcV" type="range" min="2" max="55" step="1" value="18"></label>
+<label class="ctrl" data-var="pi">Pi · pressão hidrostática intersticial — basal <output id="oPi"></output><input id="piBase" type="range" min="-10" max="10" step="1" value="-2"></label>
+<label class="ctrl" data-var="oncPlasma">πc · pressão oncótica plasmática <output id="lOnc"></output><input id="oncCursor" aria-label="Pressão oncótica do plasma" type="range" min="4" max="34" step="1" value="25"></label>
+<label class="ctrl" id="externalControl" data-var="oncSub"><span id="externalLabel">πsg · pressão oncótica do líquido subglicocálix</span><output id="oExt"></output><input id="oncExternal" type="range" min="0" max="25" step="1" value="6"></label>
+<label class="ctrl" data-var="sigma">σ · coeficiente de reflexão de proteínas <output id="oSigma"></output><input id="sigma" type="range" min="0" max="1" step=".05" value="1"></label>
+<label class="ctrl" data-var="kf">Kf · coeficiente de filtração microvascular <output id="oKf"></output><input id="kf" type="range" min=".005" max=".08" step=".005" value=".02"></label>
 </details>
 </aside>
 </section>
 <section class="analysis-grid">
 <article class="card force-card"><div class="card-heading"><h2>Forças no mesmo ponto</h2><span class="pill" id="pointLabel">50% do capilar</span></div>
 <label class="ctrl">Posição entre arteríola e vênula<input id="posicao" type="range" min="0" max="100" step="1" value="50"></label>
-<div class="force-grid"><div id="cardPc"><span>Pc · hidrostática capilar</span><b id="fPc"></b><small id="dirPc"></small></div><div id="cardPi"><span>−Pi · hidrostática intersticial</span><b id="fPi"></b><small id="dirPi"></small></div><div id="cardOnc"><span>−σπc · oncótica plasmática</span><b id="fOnc"></b><small id="dirOnc"></small></div><div id="cardExt"><span id="nameExt">+σπsg · oncótica externa</span><b id="fExt"></b><small id="dirExt"></small></div></div>
-<div class="result"><span>Soma das quatro contribuições</span><b id="fSoma"></b><small id="flowDirection"></small></div>
-<p class="small">Laranja: contribuição para fora. Azul: contribuição para dentro. Os cards mostram as contribuições com sinal; σ multiplica as pressões oncóticas. As setas 3D comparam dois pontos fixos: 22% e 78%.</p></article>
+<div class="force-grid"><div id="cardPc" data-var="pc"><span>Pc · pressão hidrostática capilar</span><b id="fPc"></b><small id="dirPc"></small></div><div id="cardPi" data-var="pi"><span>−Pi · pressão hidrostática intersticial</span><b id="fPi"></b><small id="dirPi"></small></div><div id="cardOnc" data-var="oncPlasma"><span>−σπc · pressão oncótica plasmática</span><b id="fOnc"></b><small id="dirOnc"></small></div><div id="cardExt" data-var="oncSub"><span id="nameExt">+σπsg · oncótica externa</span><b id="fExt"></b><small id="dirExt"></small></div></div>
+<div class="result" data-var="efetiva"><span>ΔPef · pressão efetiva de filtração</span><b id="fSoma"></b><small id="flowDirection"></small></div>
+<p class="small">Cada variável mantém a mesma cor nos controles, cards e setas 3D. O sinal e a ponta da seta indicam o sentido: positivo para fora; negativo para dentro. O coeficiente de reflexão de proteínas (<span class="var-token" data-var="sigma">σ</span>) multiplica as pressões oncóticas. As setas comparam 22% e 78% do capilar.</p></article>
 <article class="card graph-card"><div class="card-heading"><h2>Pressão de filtração</h2><label>Unidade <select id="graphUnit" aria-label="Unidade do gráfico"><option value="mmHg">mmHg</option><option value="cmH2O">cmH₂O</option></select></label></div>
 <canvas id="curvaSoma" aria-label="Pressão líquida ao longo do capilar"></canvas>
-<div class="graph-key"><span class="orange">Filtração</span><span class="blue">Tendência de absorção</span><span class="white">Soma</span></div>
-<dl class="ends"><div><dt>Início</dt><dd id="lArterial"></dd></div><div><dt>Fim</dt><dd id="lVenular"></dd></div><div><dt>Cruzamento de zero</dt><dd id="lVirada"></dd></div></dl>
+<div class="graph-key"><span class="sign-key">Positiva · filtração</span><span class="sign-key">Negativa · tendência de absorção</span><span data-var="efetiva">ΔPef · pressão efetiva</span></div>
+<dl class="ends" data-var="efetiva"><div><dt>Início</dt><dd id="lArterial"></dd></div><div><dt>Fim</dt><dd id="lVenular"></dd></div><div><dt>Cruzamento de zero</dt><dd id="lVirada"></dd></div></dl>
 <p id="curveNote" class="small"></p></article>
-<article class="card history-card"><div class="card-heading"><h2>Líquido acumulado no tempo</h2><span class="pill">mL · min</span></div><canvas id="curvaVolume" aria-label="Volume excedente no interstício ao longo do tempo"></canvas><p class="small">Inicie a experiência para acompanhar o volume. Os estados rápidos começam uma nova observação; os ajustes manuais mantêm o volume e mudam sua evolução.</p></article>
-<article class="card ra-box"><h2>Abrir em realidade aumentada</h2><model-viewer id="arViewer" alt="Modelo de Starling em realidade aumentada" ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" ar-scale="auto" camera-controls loading="eager" reveal="auto" shadow-intensity=".4" exposure="1"></model-viewer>
+<article class="card history-card"><div class="card-heading"><h2 data-var="volume">V · líquido acumulado no tempo</h2><span class="pill">mL · min</span></div><canvas id="curvaVolume" aria-label="Volume excedente no interstício ao longo do tempo"></canvas><p class="small">Inicie a experiência para acompanhar o volume. Os estados rápidos começam uma nova observação; os ajustes manuais mantêm o volume e mudam sua evolução.</p></article>
+<article class="card ra-box"><h2>Abrir em realidade aumentada</h2><p class="small">Escolha uma das cinco peças. A prévia e o botão abaixo acompanham a sua seleção.</p><nav class="ra-choices" aria-label="Peças de realidade aumentada"><button class="button" data-ra-step="0" aria-pressed="false">01 · A rede</button><button class="button" data-ra-step="1" aria-pressed="false">02 · O capilar</button><button class="button" data-ra-step="2" aria-pressed="false">03 · As forças</button><button class="button" data-ra-step="3" aria-pressed="false">04 · A barreira</button><button class="button" data-ra-step="4" aria-pressed="false">05 · Edema e linfa</button></nav><h3 id="raPiece">01 · A rede</h3><model-viewer id="arViewer" alt="Modelo de Starling em realidade aumentada" ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" ar-scale="auto" camera-controls loading="eager" reveal="auto" shadow-intensity=".4" exposure="1"></model-viewer>
 <button id="launchAR" class="button primary" disabled>Abrir este nível em RA</button><p id="raStatus" class="small">Preparando o modelo…</p><p class="small">A RA apresenta uma fotografia 3D do estado atual. Pausar prepara o líquido e a geometria daquele instante para o ambiente.</p></article>
 </section>
-<section class="references"><h2>Modelo e referências</h2><p>Capilar contínuo sistêmico em tecido conjuntivo, com ampliação esquemática das estruturas. Dimensões relativas, pressões dos cenários, Kf, complacência e capacidade linfática são escolhas didáticas. Não representam um tecido específico nem estimam edema clínico.</p>
-<p>No modelo revisado, πsg é um valor definido pelo aluno. Não calculamos sua adaptação por transporte de proteínas. Uma soma negativa indica tendência de absorção com essas pressões fixadas; não demonstra reabsorção venosa sustentada. Na maioria dos tecidos, a filtração persiste em estado estacionário e o retorno ocorre pela linfa; absorção pode ser transitória, com exceções em tecidos especializados.</p>
+<section class="interpretation card" aria-labelledby="interpretTitle">
+<h2 id="interpretTitle">Como interpretar</h2>
+<p>Comece pelo modelo de troca e pelas pressões, compare as contribuições no mesmo ponto e depois acompanhe o balanço do tecido. A cor identifica a variável em toda a experiência; a direção vem do sinal e das setas, não da cor.</p>
+<div class="equation" id="guideEquation"></div>
+<p>Para ler a equação: a diferença das pressões hidrostáticas favorece ou se opõe à saída de água. Dela subtraímos o gradiente oncótico ponderado pelo coeficiente de reflexão. Multiplicamos o resultado pelo coeficiente de filtração para obter o fluxo de água.</p>
+<div id="variableGuide" class="variable-guide"></div>
+<div class="reading-guide"><h3>Dos pontos do capilar ao balanço do tecido</h3><p>Os cards de forças mostram um ponto escolhido; o gráfico de pressão mostra todos os pontos. O balanço integra a filtração e a absorção do leito e desconta a linfa. Como a pressão capilar varia linearmente e os outros termos são uniformes, o fluxo líquido total equivale ao coeficiente de filtração multiplicado pela pressão efetiva média do leito, não pelo valor do cursor.</p><p>Variação do volume = filtração − absorção − drenagem linfática. A simulação também aumenta a pressão intersticial com o excesso de líquido. Ao trocar de modelo ou de estado rápido, começa uma nova observação; os ajustes manuais preservam o volume acumulado.</p></div>
+<div class="unit-guide"><h3>Unidades e sinais por extenso</h3><dl><div><dt>mmHg</dt><dd>Milímetros de mercúrio, unidade de pressão.</dd></div><div><dt>cmH₂O</dt><dd>Centímetros de água, outra unidade de pressão. 1 mmHg = 1,35951 cmH₂O.</dd></div><div><dt>mL</dt><dd>Mililitros, unidade de volume.</dd></div><div><dt>min · s</dt><dd>Minutos e segundos. mL/min significa mililitros por minuto.</dd></div><div><dt>mL/min/mmHg</dt><dd>Mililitros por minuto por milímetro de mercúrio, unidade do coeficiente de filtração.</dd></div><div><dt>π · Δ · × · RA</dt><dd>Pi grego: notação da pressão oncótica; delta: diferença; ×: multiplicador da velocidade; RA: realidade aumentada.</dd></div></dl></div>
+</section>
+<section class="references"><h2>Modelo e referências</h2><p>Capilar contínuo sistêmico em tecido conjuntivo, com ampliação esquemática das estruturas. Dimensões relativas, pressões dos cenários, <span data-var="kf">coeficiente de filtração (Kf)</span>, complacência e capacidade linfática são escolhas didáticas. Não representam um tecido específico nem estimam edema clínico.</p>
+<p>No modelo revisado, <span data-var="oncSub">a pressão oncótica do líquido subglicocálix (πsg)</span> é um valor definido pelo aluno. Não calculamos sua adaptação por transporte de proteínas. Uma soma negativa indica tendência de absorção com essas pressões fixadas; não demonstra reabsorção venosa sustentada. Na maioria dos tecidos, a filtração persiste em estado estacionário e o retorno ocorre pela linfa; absorção pode ser transitória, com exceções em tecidos especializados.</p>
 <p><a href="https://doi.org/10.1093/cvr/cvq062" target="_blank" rel="noopener noreferrer">Levick &amp; Michel (2010) · Microvascular fluid exchange and the revised Starling principle</a> · <a href="https://doi.org/10.1113/jphysiol.2004.063511" target="_blank" rel="noopener noreferrer">Michel (2004) · Fluid exchange in the microcirculation</a>.</p></section>
 </main>
 <footer class="shell"><img src="../brand/mestre-lap.webp" alt="" width="64" height="64"><p>Simuladores interativos do Prof. Mário César Nascimento, PhD ©</p></footer>
-<script type="module" src="app.js?v=starling-20261003c"></script>
+<script type="module" src="app.js?v=starling-guia-20261003"></script>
 </body></html>
