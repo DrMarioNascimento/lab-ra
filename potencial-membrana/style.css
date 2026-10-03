@@ -29,7 +29,7 @@
 /* o valor de Em é o fio que costura os cinco níveis: fica no centro e em
    destaque, porque é ele que muda quando o aluno mexe em qualquer coisa */
 #emLabel { border-color: #a07ae0; color: #dcc6ff; background: #1a1226e6; }
-.gesture { position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); font-weight: 500; white-space: nowrap; }
+.gesture { position: absolute; left: 50%; bottom: 54px; transform: translateX(-50%); font-weight: 500; white-space: nowrap; }
 
 .labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
 .lbl {
@@ -125,3 +125,11 @@
   .actions { grid-template-columns: .85fr 1.4fr; }
   .learning-strip { padding: 17px; }
 }
+
+/* Chamadas nas margens preservam a leitura do volume e apontam para a peça. */
+.lbl { margin:0; max-width:158px; white-space:normal; line-height:1.2; border-radius:8px; }
+.lbl::before { display:none; }
+.label-lines { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+.label-lines path { stroke:#d5bf8a; stroke-width:1; opacity:.55; fill:none; }
+.label-lines circle { fill:#e0bd75; }
+@media(max-width:520px) { .lbl {max-width:108px;font-size:.55rem;} }

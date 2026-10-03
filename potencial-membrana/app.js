@@ -73,9 +73,6 @@ const fill = new THREE.DirectionalLight(0xffc9c0, .70); fill.position.set(-5, 2,
    força alta tingia o tecido de neon e a membrana virava anúncio */
 const rim = new THREE.DirectionalLight(0x8fa8ff, 1.15); rim.position.set(-3.5, 2.5, -6); scene.add(rim);
 
-const pedestal = new THREE.Mesh(new THREE.CylinderGeometry(3.4, 3.7, .14, 72),
-  new THREE.MeshStandardMaterial({ color: 0x0c0810, roughness: .9, metalness: .04 }));
-pedestal.position.y = -2.05; pedestal.receiveShadow = true; scene.add(pedestal);
 const root = new THREE.Group(); scene.add(root);
 
 /* ------------------------------------------------------------ texturas */
@@ -90,6 +87,13 @@ const { modelos, aplicarPotencial, aplicarOnda, uReg } = criar(canvasTex);
 
 modelos.forEach((m, i) => {
   m.visible = i === 0; root.add(m);
+  // Cada nível guarda sua própria opacidade durante o mergulho.
+  const materiais = new Map();
+  m.traverse(o => {
+    if (!o.isMesh) return;
+    if (!materiais.has(o.material)) materiais.set(o.material, o.material.clone());
+    o.material = materiais.get(o.material);
+  });
   m.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
   /* medido com tudo na identidade: um Box3 tirado no meio do mergulho
      enquadraria o quadro errado */
@@ -138,7 +142,7 @@ function goldman(alfa, Ko) {
   return RTF * Math.log10(num / den);
 }
 /* ── A CONTA QUE DESFAZ O ERRO ────────────────────────────────────────────
-   Capacitância de membrana ~1 µF/cm², que é constante universal de bicamada.
+   Capacitância de membrana ~1 µF/cm², valor típico adotado para a bicamada.
    Q = C·V dá a carga separada; dividida por Faraday, os mols de íon que de
    fato mudaram de lado. Comparados ao potássio que a célula inteira contém,
    sai a fração — e ela é ridícula. Feita ao vivo de propósito: número
@@ -184,7 +188,7 @@ const LENTIDAO = 260;                    // câmera lenta: 1 s de tela ≈ 3,8 m
 /* ------------------------------------------------------------ estado e textos */
 const dados = [
   ['Escala celular', '01 · Neurônio', 'A pergunta', 'Onde está a carga?',
-   'Duas pontas medem: a micropipeta dentro do soma e o eletrodo de referência no banho. O número que elas dão é uma DIFERENÇA entre dois lados de uma parede — não uma propriedade do corpo da célula. Aprofunde e veja o que há dentro.',
+   'Modelo didático de um neurônio multipolar mielinizado. Duas pontas medem: a micropipeta dentro do soma e o eletrodo de referência no banho. O número que elas dão é uma DIFERENÇA entre dois lados de uma parede — não uma propriedade do corpo da célula. Aprofunde e veja o que há dentro.',
    'soma,dendritos,espinhas dendríticas,cone de implantação,axônio,micropipeta'],
   ['Escala celular · em corte', '02 · Interior', 'O volume', 'O citoplasma é neutro',
    'A célula aberta ao meio. Do centro à parede — núcleo incluído — cargas positivas e negativas em número igual: o volume não se carrega em lugar nenhum. A única fila desemparelhada é a que FORRA a parede, por dentro e por fora. A espessura da membrana está muito aumentada aqui; no nível seguinte ela volta à proporção.',
@@ -193,10 +197,10 @@ const dados = [
    'Aqui o desenho está em proporção, e por isso leva régua: a bicamada mede 5 nm de superfície a superfície, e a película cabe dentro de cerca de 1 nm de cada face. Numa célula de 50 µm isso é uma casca cinquenta mil vezes mais fina que o corpo — e envolve menos de um milésimo de por cento dos íons. Mexa na permeabilidade e veja a película encher, esvaziar e inverter.',
    'bicamada · 5 nm,película · 1 nm,cabeças polares,caudas,duas faces em oposição'],
   ['Escala molecular', '04 · Travessias', 'Quatro maneiras de atravessar', 'Bicamada, canal, transportador e bomba',
-   '1 · Difusão simples: o O₂ entra e o CO₂ sai pelo próprio lipídio, sem proteína nenhuma — só molécula pequena e apolar consegue, e por isso este posto não tem peça alguma. 2 · Canal: poro de água com filtro que escolhe o íon; o de vazamento fica sempre aberto, o de Na⁺ só abre quando a voltagem manda. 3 · Difusão facilitada: o transportador liga a glicose e muda de forma, uma comporta de cada vez — daí ser lento e saturar. 4 · Transporte ativo: só a bomba trabalha contra o gradiente, e é a única que paga ATP. As três primeiras não custam nada: quem empurra é o gradiente.',
+   '1 · Difusão simples: neste exemplo, O₂ entra e CO₂ sai pelo próprio lipídio, sem proteína de transporte. 2 · Canal: poro aquoso seletivo; o de vazamento permanece aberto, e a abertura do canal de Na⁺ é representada pelo controle de permeabilidade. 3 · Difusão facilitada: o transportador liga a glicose e alterna o acesso entre as faces, uma comporta de cada vez. 4 · Transporte ativo: a bomba Na⁺/K⁺ usa ATP para levar três Na⁺ para fora e dois K⁺ para dentro, contra seus gradientes. Os três mecanismos passivos não consomem ATP diretamente; nos canais, o sentido depende do gradiente eletroquímico. As proteínas e partículas são representações didáticas ampliadas.',
    'difusão simples,canal iônico,difusão facilitada,transporte ativo,ATP'],
   ['Escala do axônio', '05 · A onda', 'A película que vira', 'Potencial de ação',
-   'Um axônio amielínico, aberto ao meio para que as duas faces apareçam ao mesmo tempo. Onde o sódio entra a película inverte: por um instante o lado de dentro fica positivo, e as duas fileiras de sinais trocam de lugar. A inversão não anda sozinha — ela acende a vizinha, e é essa sequência que viaja. Atrás dela a membrana repolariza e passa um momento ainda mais negativa que o repouso.',
+   'Aqui usamos outro exemplo: um axônio amielínico, diferente do neurônio mielinizado do nível 01. Ele está aberto ao meio para que as duas faces apareçam ao mesmo tempo. Onde o sódio entra a película inverte: por um instante o lado de dentro fica positivo, e as duas fileiras de sinais trocam de lugar. A inversão não anda sozinha — ela acende a vizinha, e é essa sequência que viaja. Atrás dela a membrana repolariza e passa um momento ainda mais negativa que o repouso.',
    'axoplasma,película interna,película externa,inversão,repolarização'],
 ];
 const E = {
@@ -209,11 +213,12 @@ const E = {
   dBox: $('disparoBox'), dCanvas: $('curvaDisparo'), dVal: $('disparoValor'), inst: $('instante'),
 };
 
-let atual = 0, transicao = null, girar = true, tempo = 0;
+let atual = 0, transicao = null, girar = false, tempo = 0;
 let alfa = .03, Ko = 4, diam = 50, Em = goldman(alfa, Ko);
 let disparo = { t: -1, tocando: false };
 
 function resetCam() {
+  root.rotation.set(0,0,atual===0&&camera.aspect<1?-.58:0);
   const q = modelos[atual].userData.quadro || { rh: 3, hv: 1 };
   const fovV = camera.fov * Math.PI / 180;
   const fovH = 2 * Math.atan(Math.tan(fovV / 2) * camera.aspect);
@@ -233,7 +238,29 @@ function resetCam() {
      quase à linha do horizonte. No neurônio, na célula em corte e no axônio
      ela sobe, porque lá o que conta é a forma inteira. */
   const ELEV = [.19, .21, .048, .052, .44];
-  camera.position.set(0, dist * ELEV[atual], dist);
+  if(!girar) {
+    // Enquadra a peça real e seu centro; no telefone o neurônio fica na diagonal.
+    root.updateWorldMatrix(true,true);
+    const pontos=[],box=new THREE.Box3();
+    modelos[atual].traverse(o=>{
+      if(!o.isMesh||o.userData.foraDoQuadro) return;
+      const p=o.geometry.attributes.position;
+      for(let i=0;i<p.count;i++) {
+        const v=V().fromBufferAttribute(p,i).applyMatrix4(o.matrixWorld);
+        pontos.push(v);box.expandByPoint(v);
+      }
+    });
+    const centro=box.getCenter(V()),direcao=V(0,ELEV[atual],1).normalize();
+    const cima=V(0,1,-ELEV[atual]).normalize();
+    let distancia=1;
+    for(const p of pontos) {
+      const v=p.sub(centro),prof=v.dot(direcao);
+      distancia=Math.max(distancia,Math.abs(v.x)*1.10/Math.tan(fovH/2)+prof,
+        Math.abs(v.dot(cima))*1.36/Math.tan(fovV/2)+prof);
+    }
+    controls.target.copy(centro);
+    camera.position.copy(centro).addScaledVector(direcao,distancia);
+  } else camera.position.set(0, dist * ELEV[atual], dist);
   controls.minDistance = q.rh * .45; controls.maxDistance = dist * 2.8;
   controls.update();
 }
@@ -252,10 +279,18 @@ function aplicarTextos(n) {
   document.querySelectorAll('.step').forEach((b, i) => b.classList.toggle('active', i === n));
   E.gBox.hidden = n === 4; E.dBox.hidden = n !== 4;
   E.labels.innerHTML = '';
+  if (n !== 4) E.em.textContent = `Em ${Em >= 0 ? '+' : ''}${Em.toFixed(0)} mV`;
   if (n === 4) { disparo = { t: 0, tocando: true }; textosDisparo(); }
 }
 function setStep(n, viaMergulho = false) {
   n = Math.max(0, Math.min(4, n)); if (n === atual) return;
+  if(transicao) {
+    restaurar(transicao.velho); transicao.velho.visible=false;
+    transicao.velho.scale.setScalar(1);transicao.velho.position.set(0,0,0);
+    transicao.novo.scale.setScalar(1);transicao.novo.position.set(0,0,0);
+    transicao=null;
+  }
+  root.rotation.set(0,0,0);
   const velho = modelos[atual], novo = modelos[n];
   /* mergulho só na descida de escala, e só de um degrau */
   const mergulho = viaMergulho && n === atual + 1 && n <= 3;
@@ -340,7 +375,7 @@ function onGoldman() {
   E.gVal.textContent = `Em ${Em >= 0 ? '+' : ''}${Em.toFixed(1)} mV · E(K⁺) ${eK.toFixed(0)} · E(Na⁺) +${eNa.toFixed(0)} · P(Na)/P(K) ${alfa < 1 ? alfa.toFixed(3) : alfa.toFixed(1)} · [K⁺]fora ${Ko.toFixed(1)} mM`;
   const q = contagem(diam, Em);
   const exp = Math.floor(Math.log10(q.molSep));
-  E.gConta.innerHTML = `<b>Célula de ${diam} µm a ${Em >= 0 ? '+' : ''}${Em.toFixed(0)} mV:</b> ${(q.molSep / Math.pow(10, exp)).toFixed(1)}×10<sup>${exp}</sup> mol de carga separada — <b>1 íon em cada ${br(q.razao)}</b> do K⁺ que a célula contém (${(100 / q.razao).toFixed(5).replace('.', ',')} %). O volume não muda: só a fila da parede.`;
+  E.gConta.innerHTML = `<b>Célula esférica equivalente de ${diam} µm a ${Em >= 0 ? '+' : ''}${Em.toFixed(0)} mV:</b> ${(q.molSep / Math.pow(10, exp)).toFixed(1)}×10<sup>${exp}</sup> mol de carga separada — <b>1 íon em cada ${br(q.razao)}</b> do K⁺ que a célula contém (${(100 / q.razao).toFixed(5).replace('.', ',')} %). O volume não muda: só a fila da parede.`;
   E.em.textContent = `Em ${Em >= 0 ? '+' : ''}${Em.toFixed(0)} mV`;
   desenharGoldman(); prepararRA();
 }
@@ -478,13 +513,11 @@ $('lento').addEventListener('input', textosDisparo);
 
 /* ------------------------------------------------------------ rótulos ancorados */
 const ancoras = {
-  0: () => [['soma', V(-.05, .80, .28)], ['dendritos', V(-1.90, 1.20, .10)], ['cone de implantação', V(.52, .38, .22)],
-    ['axônio', V(2.30, -.44, .16)], ['bainha de mielina', V(1.18, .34, .18)], ['nó de Ranvier', V(1.52, -.36, .18)],
-    ['terminais', V(3.58, .38, .10)], ['micropipeta', V(-1.20, 1.50, .92)], ['eletrodo de referência', V(2.10, -1.75, 1.18)]],
-  1: () => [['citoplasma', V(-.20, .50, .80)], ['núcleo', V(-.42, 1.00, -.10)],
+  0: () => modelos[0].userData.ancoras,
+  1: () => [['citoplasma', V(.32, .68, .38)], ['núcleo', V(-.42, .18, .25)],
     ['membrana em corte', V(1.30, -.95, 1.30)], ['película interna', V(1.31, .18, 1.14)],
     ['película externa', V(1.55, -.72, 1.29)], ['extracelular', V(-1.35, 1.95, 1.55)],
-    ['toco de dendrito', V(-2.00, .94, -.70)]],
+    ['toco de dendrito', V(-2.50, .56, -.40)]],
   2: () => [['bicamada · 5 nm', V(-3.12, 0, .35)], ['película · 1 nm', V(-3.12, .56, -.35)],
     ['cabeças polares', V(-2.10, .48, .55)], ['caudas hidrofóbicas', V(-2.10, .02, .55)],
     ['película interna', V(1.20, .55, .55)], ['película externa', V(1.20, -.55, .55)],
@@ -505,32 +538,36 @@ const ancoras = {
 let mostrarRotulos = true;
 E.rot.onclick = () => { mostrarRotulos = !mostrarRotulos; E.rot.classList.toggle('on', mostrarRotulos); E.labels.innerHTML = ''; };
 function atualizarRotulos() {
-  if (!mostrarRotulos || transicao) { if (E.labels.childElementCount) E.labels.innerHTML = ''; return; }
-  const lista = ancoras[atual]();
-  if (E.labels.childElementCount !== lista.length) E.labels.innerHTML = lista.map(([t]) => `<span class="lbl">${t}</span>`).join('');
-  const w = stage.clientWidth, h = stage.clientHeight, obj = modelos[atual];
-  /* A PEÇA GIRA, e com ela os pontos de ancoragem: em certos ângulos seis
-     rótulos caem na mesma faixa de altura e viram um borrão dourado. Ajeitar
-     as âncoras não resolve — a colisão é do ângulo, não do lugar. Então quem
-     chega depois desce até caber, na ordem de cima para baixo, e o que estiver
-     atrás da peça já sai antes por opacidade. */
-  const postos = [];
-  lista.map(([, p]) => p.clone().applyMatrix4(obj.matrixWorld).project(camera))
-    .map((v, i) => ({ i, v, x: (v.x * .5 + .5) * w, y: (-v.y * .5 + .5) * h }))
-    .sort((a, b) => a.y - b.y)
-    .forEach(q => {
-      const el = E.labels.children[q.i]; if (!el) return;
-      if (q.v.z >= 1) { el.style.opacity = 0; return; }
-      let y = q.y, voltas = 0;
-      while (voltas++ < 12 && postos.some(o => Math.abs(o.y - y) < 19 && Math.abs(o.x - q.x) < 132)) y += 19;
-      postos.push({ x: q.x, y });
-      /* e preso dentro do palco: um rótulo ancorado na beirada direita saía
-         cortado pela metade, e rótulo cortado é pior que rótulo ausente */
-      const larguraRotulo = el.offsetWidth || 90;
-      const x = clamp(q.x, 8, Math.max(8, w - larguraRotulo - 8));
-      el.style.opacity = 1;
-      el.style.transform = `translate(${x}px, ${clamp(y, 6, h - 14)}px)`;
+  if(!mostrarRotulos||transicao) {E.labels.replaceChildren();return;}
+  const lista=ancoras[atual](), w=stage.clientWidth,h=stage.clientHeight;
+  // No telefone, a anatomia principal tem prioridade sobre os instrumentos de contexto.
+  const visiveis=lista.map(([t,p],i)=>({t,p,i})).filter(q=>w>=520||atual!==0||![2,4,8,9].includes(q.i));
+  if(E.labels.querySelectorAll('.lbl').length!==visiveis.length) {
+    E.labels.innerHTML='<svg class="label-lines" aria-hidden="true"></svg>'+visiveis.map(q=>'<span class="lbl">'+q.t+'</span>').join('');
+  }
+  const svg=E.labels.querySelector('svg'),els=E.labels.querySelectorAll('.lbl');
+  const lados=[[],[]];
+  visiveis.forEach((q,i)=>{
+    const v=q.p.clone().applyMatrix4(modelos[atual].matrixWorld).project(camera);
+    q.x=(v.x*.5+.5)*w;q.y=(-v.y*.5+.5)*h;q.el=els[i];q.v=v;
+    lados[q.x<w*.5?0:1].push(q);
+  });
+  let linhas='';
+  lados.forEach((lado,dir)=>{
+    lado.sort((a,b)=>a.y-b.y);
+    const top=60,bottom=h-72,gap=25;
+    // Duas passadas respeitam as duas bordas; rótulos não se amontoam no rodapé.
+    lado.forEach((q,i)=>q.ly=Math.max(clamp(q.y,top,bottom),i?lado[i-1].ly+gap:top));
+    for(let i=lado.length-1;i>=0;i--)lado[i].ly=Math.min(lado[i].ly,i<lado.length-1?lado[i+1].ly-gap:bottom);
+    lado.forEach(q=>{
+      const width=q.el.offsetWidth, x=dir?w-width-12:12;
+      q.el.style.opacity=q.v.z<1&&q.x>=0&&q.x<=w?1:0;
+      q.el.style.transform='translate('+x+'px,'+(q.ly-10)+'px)';
+      const lx=dir?x:x+width,ly=q.ly;
+      if(q.v.z<1) linhas+='<path d="M '+lx+' '+ly+' L '+q.x+' '+q.y+'"/><circle cx="'+q.x+'" cy="'+q.y+'" r="2.5"/>';
     });
+  });
+  svg.innerHTML=linhas;
 }
 
 /* ------------------------------------------------------------ laço */
@@ -541,12 +578,18 @@ let ultimoDPR = 0, enquadrado = false;
 function resize() {
   const w = stage.clientWidth, h = stage.clientHeight;
   if (!w || !h) return;
+  const mudouFormato = Math.abs(camera.aspect - w / h) > .01;
   if (devicePixelRatio !== ultimoDPR) { ultimoDPR = devicePixelRatio; renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); }
   renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
-  if (!enquadrado) { enquadrado = true; resetCam(); }
+  if (!enquadrado || mudouFormato) { enquadrado = true; resetCam(); }
 }
 new ResizeObserver(resize).observe(stage); resize();
-$('girar').onclick = e => { girar = !girar; e.currentTarget.classList.toggle('on', girar); };
+$('girar').onclick = e => {
+  girar = !girar;
+  e.currentTarget.classList.toggle('on', girar);
+  e.currentTarget.setAttribute('aria-pressed', String(girar));
+  resetCam();
+};
 
 const clock = new THREE.Clock();
 (function loop() {
@@ -605,9 +648,10 @@ const COMO_ABRIR = ehQuickLook
   : 'Toque para abrir a câmera.';
 let arUrl = null, prepId = 0, timer = null;
 function prepararRA() {
+  const id = ++prepId;
   clearTimeout(timer);
   timer = setTimeout(async () => {
-    const id = ++prepId; E.ar.disabled = true; E.status.textContent = 'Preparando o modelo para a câmera…';
+    E.ar.disabled = true; E.status.textContent = 'Preparando o modelo para a câmera…';
     try {
       const clone = modelos[atual].clone(true);
       clone.visible = true; clone.position.set(0, 0, 0); clone.scale.setScalar(1); clone.rotation.set(0, 0, 0);
@@ -647,10 +691,11 @@ E.ar.addEventListener('click', () => {
 
 /* ------------------------------------------------------------ partida */
 E.alfa.value = Math.log10(.03);
+aplicarTextos(0);
 onGoldman();
 ajustarJanela(); textosDisparo(); desenharDisparo(); aplicarOnda(vmDe);
 const busca = new URLSearchParams(location.search);
 const pedido = parseInt(busca.get('nivel'), 10);
-if (Number.isFinite(pedido) && pedido >= 1 && pedido <= 5) irDireto(pedido - 1); else prepararRA();
+if (Number.isFinite(pedido) && pedido >= 1 && pedido <= 5) irDireto(pedido - 1); else { resetCam(); prepararRA(); }
 const ms = parseFloat(busca.get('ms'));
 if (Number.isFinite(ms)) { $('pausar').textContent = 'Seguir'; irAoInstante(ms, false); }
