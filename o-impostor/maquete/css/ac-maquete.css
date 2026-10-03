@@ -1,0 +1,31 @@
+/* A maquete. A folha continua sendo a mesma família de A Casa
+   (`ac-investigacao.css` + `ac-janelas.css`); aqui ficam só a porta de entrada
+   da RA, a imagem da câmera e as pegas. ONDE cada janela mora é assunto de
+   `ac-janelas.css` — nenhuma posição de janela é decidida aqui. */
+
+/* ---- a porta: pôr a maquete no ambiente (diálogo da faixa tela) ---- */
+html[data-ac-casa] #portal{background:linear-gradient(145deg,#18352f,#091b18)}
+html[data-ac-casa] #portal::backdrop{background:linear-gradient(180deg,#04100ecc 0%,#04100e22 60%,#04100e55 100%);backdrop-filter:none}
+#portal h2{color:#f4f1e6}
+#portal p{color:#e7eee6}
+
+/* ---- painéis ---- */
+#score{font-size:12px;color:#f0dcb4;margin-bottom:0}
+#alignment{color:#ffe7bd!important;font-weight:600!important}
+#object-list{display:grid;gap:10px;margin-bottom:15px}
+#objects #object-list button{width:100%}
+#return-desk{color:#edd4a5;text-decoration:underline}
+.chapter{text-shadow:0 2px 12px #000,0 1px 3px #000}
+.chapter p{color:#cfdbcd}
+@media(max-width:700px){.chapter h1{font-size:27px;line-height:1.15}.chapter .eyebrow{font-size:8px}}
+@media(max-height:640px){.chapter p{display:none}}
+
+/* ---- as pegas: a chave e a fechadura ---- */
+#key-grip.gesture-point,#lock-grip.gesture-point{width:76px;height:76px;border:1px solid #f2cf7880;box-shadow:0 0 22px #e3b45535;background:#c8a86e08;touch-action:none}
+#key-grip.gesture-point span,#lock-grip.gesture-point span{opacity:1;font-size:11px;font-weight:600;color:#ffe4a2;background:#102a23f2;border:1px solid #e5bc6255;padding:7px 10px}
+#key-grip.gesture-point.ready{border-color:#baf4c9;box-shadow:0 0 24px #baf4c955}
+/* A recusa tem de ser VISTA: a peça resiste, chacoalha e volta. "Não
+   acontece nada" é indistinguível de travamento. */
+#lock-grip.recusa{animation:ac-recusa .42s cubic-bezier(.36,.07,.19,.97)}
+@keyframes ac-recusa{10%,90%{transform:translate(calc(-50% - 2px),-50%)}20%,80%{transform:translate(calc(-50% + 4px),-50%)}30%,50%,70%{transform:translate(calc(-50% - 7px),-50%)}40%,60%{transform:translate(calc(-50% + 7px),-50%)}}
+@media(prefers-reduced-motion:reduce){#lock-grip.recusa{animation:none;outline:2px solid #ffb3a0}}

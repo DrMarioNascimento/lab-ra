@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="robots" content="noindex"/>
+<meta name="theme-color" content="#070605"/>
+<title>O Impostor · O quarto do jasmim</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;600&family=IBM+Plex+Mono:wght@600&display=swap" rel="stylesheet"/>
+<style>
+  :root{--void:#070605;--cream:#f4ead0;--mist:#c9bba3;--gold:#e0b13a;--gold2:#f3d078;--line:rgba(224,177,58,.3)}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden;background:var(--void);color:var(--cream);font-family:Inter,system-ui,sans-serif;touch-action:none}
+  #cena{position:fixed;inset:0;width:100vw;height:100vh;display:block}
+  body.in-ar{background:transparent}
+  .topo{position:fixed;left:0;right:0;top:0;z-index:5;display:flex;align-items:center;gap:10px;padding:max(12px,env(safe-area-inset-top)) 14px 10px;
+        background:linear-gradient(#070605ee,#07060500)}
+  .topo a{color:var(--mist);font:600 13px "IBM Plex Mono",monospace;text-decoration:none}
+  .topo b{font:700 15px Cinzel,serif;letter-spacing:.06em;color:var(--gold2)}
+  .base{position:fixed;left:0;right:0;bottom:0;z-index:5;padding:12px 14px max(14px,env(safe-area-inset-bottom));
+        background:linear-gradient(#07060500,#070605ee)}
+  #estado{min-height:1.4em;margin:0 0 10px;color:var(--cream);font-size:15px;line-height:1.4;text-align:center;text-shadow:0 1px 3px #000}
+  .acoes{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+  button{min-height:48px;padding:10px 16px;border-radius:10px;border:1px solid var(--line);background:linear-gradient(#241c16,#1a1512);
+         color:var(--gold2);font:600 13px "IBM Plex Mono",monospace;letter-spacing:.04em;text-transform:uppercase}
+  button.forte{background:linear-gradient(#f3d078,#e0b13a);color:#1a1206;border:0}
+  button[hidden]{display:none}
+  button[disabled]{opacity:.45}
+  .pega{position:fixed;z-index:6;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:50%;
+        border:2px solid rgba(243,208,120,.9);box-shadow:0 0 0 6px rgba(243,208,120,.15),0 0 18px rgba(243,208,120,.35);
+        touch-action:none;cursor:grab}
+  .pega::after{content:"";position:absolute;inset:26px;border-radius:50%;background:var(--gold2)}
+  .pega.segurando{cursor:grabbing;border-color:#fff}
+  .pega[hidden]{display:none}
+  .credito{margin:10px 0 0;color:#8f846f;font-size:11px;text-align:center}
+  .credito a{color:#b9a98a}
+  body.in-ar .credito{display:none}
+  html.embed .topo{display:none}
+  html.embed .credito{display:none}
+</style>
+</head>
+<body>
+<script>if(new URLSearchParams(location.search).get('embed')==='1')document.documentElement.classList.add('embed')</script>
+<canvas id="cena"></canvas>
+
+<div class="topo"><a href="./">← laboratório</a><b>O quarto do jasmim</b></div>
+
+<div class="base">
+  <p id="estado">Carregando…</p>
+  <div class="acoes">
+    <button id="btRA" class="forte" hidden>Ver na sala</button>
+    <button id="btPor" class="forte" hidden disabled>Pôr aqui</button>
+    <button id="btDeNovo" hidden>De novo</button>
+    <button id="btSair" hidden>Sair da RA</button>
+  </div>
+  <p class="credito">A RA no iPhone usa o 8th Wall Engine (© 2026 Niantic Spatial, Inc.), sob a
+    <a href="https://github.com/8thwall/engine/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">XR Engine License</a>, fornecido sem garantias.</p>
+</div>
+
+<script src="ra/three.min.js"></script>
+<script src="ra/GLTFLoader.js"></script>
+<script src="ra/OrbitControls.js"></script>
+<script src="ra/motor-ra.js"></script>
+<script src="ra/ambiente.js"></script>
+<script src="ra/base-ra.js"></script>
+
+<script src="ra/quarto-jasmim.js"></script>
+</body>
+</html>

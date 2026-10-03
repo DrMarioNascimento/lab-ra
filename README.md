@@ -21,6 +21,7 @@ Conteúdo migrado de `DrMarioNascimento/Dragon/laboratorio-ra`:
 | A película de carga (potencial de membrana) | `potencial-membrana/` |
 | Coração em ação (esquemático, ao vivo) | `coracao/` |
 | Coração 3D · pipeline WIP (não é o de ensino) | `bancadas/11-coracao/` |
+| O Impostor · as peças de RA (maquete e uma por capítulo, cópia independente do Dragon) | `o-impostor/` |
 
 A entrada (`index.html`) e todas as bancadas têm acesso livre. O `guard.js` apenas mantém links antigos com `destino`, preservando os parâmetros da bancada e recusando redirecionamento externo. [ACESSO.md](ACESSO.md) descreve esse percurso.
 
