@@ -652,7 +652,8 @@ function moldarCuspide(malha, abertura) {
       const y=raiz+(u.comp-raiz)*s-.10*u.comp*(1-abertura)*Math.sin(Math.PI*s)*c;
       const z=lado*u.R*c*(1-(1-.92*abertura)*t);
       if(malha.userData.mapear)malha.userData.mapear(x/u.R,y,z/u.R,p);
-      else p.set(x,y,z);
+      // Rotação de 90° em torno do eixo longitudinal do vaso, mantendo a altura.
+      else p.set(z,y,-x);
       pos.setXYZ(i*(u.nv+1)+j,p.x,p.y,p.z);
     }
   }
@@ -1102,7 +1103,7 @@ function nivelBomba(geo) {
       // suas posições dentro do vaso sem mudar músculos ou silhueta.
       m.material.depthTest=false;m.renderOrder=6;
       // A inserção lê a parede já deformada: nenhuma modificação no vaso.
-      m.userData.mapear=(x,y,z,p)=>tecidos.mapearNaVeia(h*CM+y,-z*.97,x*.97,p).sub(par.position);
+      m.userData.mapear=(x,y,z,p)=>tecidos.mapearNaVeia(h*CM+y,x*.97,z*.97,p).sub(par.position);
       moldarCuspide(m, 1); par.add(m);
     }
     par.userData.altura = h;
