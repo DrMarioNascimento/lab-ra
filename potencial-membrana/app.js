@@ -28,7 +28,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { prepararParaRA } from '../cores-para-ra.js';
-import { criar } from './modelos.js';
+import { criar } from './modelos.js?v=20261003-organelas';
 
 const $ = id => document.getElementById(id);
 const canvas = $('scene'), stage = $('stage');
@@ -188,10 +188,10 @@ const LENTIDAO = 260;                    // câmera lenta: 1 s de tela ≈ 3,8 m
 /* ------------------------------------------------------------ estado e textos */
 const dados = [
   ['Escala celular', '01 · Neurônio', 'A pergunta', 'Onde está a carga?',
-   'Modelo didático de um neurônio multipolar mielinizado. Duas pontas medem: a micropipeta dentro do soma e o eletrodo de referência no banho. O número que elas dão é uma DIFERENÇA entre dois lados de uma parede — não uma propriedade do corpo da célula. Aprofunde e veja o que há dentro.',
-   'soma,dendritos,espinhas dendríticas,cone de implantação,axônio,micropipeta'],
+   'Explore um neurônio multipolar mielinizado em três dimensões: do soma aos dendritos e ao axônio. O potencial é uma diferença entre o interior e o exterior da membrana. Aprofunde para entrar na célula, reconhecer suas organelas e chegar à bicamada.',
+   'soma,dendritos,espinhas dendríticas,cone de implantação,axônio,mielina'],
   ['Escala celular · em corte', '02 · Interior', 'O volume', 'O citoplasma é neutro',
-   'A célula aberta ao meio. Do centro à parede — núcleo incluído — cargas positivas e negativas em número igual: o volume não se carrega em lugar nenhum. A única fila desemparelhada é a que FORRA a parede, por dentro e por fora. A espessura da membrana está muito aumentada aqui; no nível seguinte ela volta à proporção.',
+   'Explore núcleo, mitocôndrias, retículos e Golgi dentro da célula em corte. Organelas, lipídios na borda e cargas são representações ampliadas para exploração; suas quantidades e tamanhos são esquemáticos. A separação de cargas ocorre junto à membrana, enquanto o volume permanece praticamente neutro. No próximo nível, as réguas mostram bicamada e película em proporção.',
    'citoplasma,K⁺,Na⁺,Cl⁻,ânions orgânicos,eletroneutralidade'],
   ['Escala nanométrica', '03 · Película', 'A separação', 'Uma pele colada na membrana',
    'Aqui o desenho está em proporção, e por isso leva régua: a bicamada mede 5 nm de superfície a superfície, e a película cabe dentro de cerca de 1 nm de cada face. Numa célula de 50 µm isso é uma casca cinquenta mil vezes mais fina que o corpo — e envolve menos de um milésimo de por cento dos íons. Mexa na permeabilidade e veja a película encher, esvaziar e inverter.',
@@ -214,6 +214,23 @@ const E = {
 };
 
 let atual = 0, transicao = null, girar = false, tempo = 0;
+let mostrarOrganelas = true;
+let mostrarCargas = true;
+const btnCargas=$('cargas');
+btnCargas.onclick=()=>{
+  mostrarCargas=!mostrarCargas;
+  modelos.slice(1,4).forEach(m=>m.traverse(o=>{if(o.userData.nuvem)o.visible=mostrarCargas;}));
+  btnCargas.classList.toggle('on',mostrarCargas);
+  btnCargas.setAttribute('aria-pressed',String(mostrarCargas));
+  E.labels.replaceChildren();prepararRA();
+};
+const btnOrganelas=$('organelas'), grupoOrganelas=modelos[1].getObjectByName('organelas');
+btnOrganelas.onclick=()=>{
+  mostrarOrganelas=!mostrarOrganelas;grupoOrganelas.visible=mostrarOrganelas;
+  btnOrganelas.classList.toggle('on',mostrarOrganelas);
+  btnOrganelas.setAttribute('aria-pressed',String(mostrarOrganelas));
+  E.labels.replaceChildren();prepararRA();
+};
 let alfa = .03, Ko = 4, diam = 50, Em = goldman(alfa, Ko);
 let disparo = { t: -1, tocando: false };
 
@@ -279,6 +296,8 @@ function aplicarTextos(n) {
   document.querySelectorAll('.step').forEach((b, i) => b.classList.toggle('active', i === n));
   E.gBox.hidden = n === 4; E.dBox.hidden = n !== 4;
   E.labels.innerHTML = '';
+  btnOrganelas.disabled=n!==1;
+  btnCargas.disabled=n<1||n>3;
   if (n !== 4) E.em.textContent = `Em ${Em >= 0 ? '+' : ''}${Em.toFixed(0)} mV`;
   if (n === 4) { disparo = { t: 0, tocando: true }; textosDisparo(); }
 }
@@ -296,8 +315,17 @@ function setStep(n, viaMergulho = false) {
   const mergulho = viaMergulho && n === atual + 1 && n <= 3;
   novo.visible = true; novo.scale.setScalar(mergulho ? .18 : .7);
   if (mergulho) novo.position.copy(velho.userData.foco || V()); else novo.position.set(0, 0, 0);
-  transicao = { velho, novo, t: 0, mergulho, foco: (velho.userData.foco || V()).clone() };
-  atual = n; aplicarTextos(n); prepararRA();
+  const cameraDe=camera.position.clone(),alvoDe=controls.target.clone();
+  atual=n;
+  // Fit the destination at its final scale, then travel to it continuously.
+  novo.scale.setScalar(1);novo.position.set(0,0,0);resetCam();
+  const cameraAte=camera.position.clone(),alvoAte=controls.target.clone();
+  camera.position.copy(cameraDe);controls.target.copy(alvoDe);controls.update();
+  novo.scale.setScalar(mergulho?.18:.7);
+  if(mergulho)novo.position.copy(velho.userData.foco||V());
+  transicao = { velho, novo, t: 0, mergulho, foco: (velho.userData.foco || V()).clone(),
+    cameraDe,alvoDe,cameraAte,alvoAte };
+  aplicarTextos(n); prepararRA();
 }
 /* Abrir direto num nível, sem transição: serve à aula que já sabe onde quer
    parar (…/potencial-membrana/?nivel=3) e serve à conferência do desenho,
@@ -516,8 +544,8 @@ const ancoras = {
   0: () => modelos[0].userData.ancoras,
   1: () => [['citoplasma', V(.32, .68, .38)], ['núcleo', V(-.42, .18, .25)],
     ['membrana em corte', V(1.30, -.95, 1.30)], ['película interna', V(1.31, .18, 1.14)],
-    ['película externa', V(1.55, -.72, 1.29)], ['extracelular', V(-1.35, 1.95, 1.55)],
-    ['toco de dendrito', V(-2.50, .56, -.40)]],
+    ['película externa', V(1.55, -.72, 1.29)],
+    ...(mostrarOrganelas?modelos[1].userData.ancorasOrganelas:[])],
   2: () => [['bicamada · 5 nm', V(-3.12, 0, .35)], ['película · 1 nm', V(-3.12, .56, -.35)],
     ['cabeças polares', V(-2.10, .48, .55)], ['caudas hidrofóbicas', V(-2.10, .02, .55)],
     ['película interna', V(1.20, .55, .55)], ['película externa', V(1.20, -.55, .55)],
@@ -540,8 +568,11 @@ E.rot.onclick = () => { mostrarRotulos = !mostrarRotulos; E.rot.classList.toggle
 function atualizarRotulos() {
   if(!mostrarRotulos||transicao) {E.labels.replaceChildren();return;}
   const lista=ancoras[atual](), w=stage.clientWidth,h=stage.clientHeight;
-  // No telefone, a anatomia principal tem prioridade sobre os instrumentos de contexto.
-  const visiveis=lista.map(([t,p],i)=>({t,p,i})).filter(q=>w>=520||atual!==0||![2,4,8,9].includes(q.i));
+  // No telefone, priorizar as estruturas principais.
+  const visiveis=lista.map(([t,p],i)=>({t,p,i})).filter(q=>
+    (mostrarCargas||atual===0||atual===4||!['película interna','película externa','volume neutro','película · 1 nm'].includes(q.t))
+    &&(mostrarOrganelas||atual!==1||q.t!=='núcleo')
+    &&(w>=520||atual!==0||![2,4].includes(q.i)));
   if(E.labels.querySelectorAll('.lbl').length!==visiveis.length) {
     E.labels.innerHTML='<svg class="label-lines" aria-hidden="true"></svg>'+visiveis.map(q=>'<span class="lbl">'+q.t+'</span>').join('');
   }
@@ -550,19 +581,21 @@ function atualizarRotulos() {
   visiveis.forEach((q,i)=>{
     const v=q.p.clone().applyMatrix4(modelos[atual].matrixWorld).project(camera);
     q.x=(v.x*.5+.5)*w;q.y=(-v.y*.5+.5)*h;q.el=els[i];q.v=v;
-    lados[q.x<w*.5?0:1].push(q);
+    // Balance the cell labels so the right edge cannot become a text wall.
+    const lado=atual===1&&['núcleo','retículo rugoso · Nissl','complexo de Golgi','membrana em corte'].includes(q.t)?0:q.x<w*.5?0:1;
+    lados[lado].push(q);
   });
   let linhas='';
   lados.forEach((lado,dir)=>{
     lado.sort((a,b)=>a.y-b.y);
-    const top=60,bottom=h-72,gap=25;
+    const top=60,bottom=h-72,gap=34;
     // Duas passadas respeitam as duas bordas; rótulos não se amontoam no rodapé.
     lado.forEach((q,i)=>q.ly=Math.max(clamp(q.y,top,bottom),i?lado[i-1].ly+gap:top));
     for(let i=lado.length-1;i>=0;i--)lado[i].ly=Math.min(lado[i].ly,i<lado.length-1?lado[i+1].ly-gap:bottom);
     lado.forEach(q=>{
       const width=q.el.offsetWidth, x=dir?w-width-12:12;
       q.el.style.opacity=q.v.z<1&&q.x>=0&&q.x<=w?1:0;
-      q.el.style.transform='translate('+x+'px,'+(q.ly-10)+'px)';
+      q.el.style.transform='translate('+x+'px,'+(q.ly-q.el.offsetHeight/2)+'px)';
       const lx=dir?x:x+width,ly=q.ly;
       if(q.v.z<1) linhas+='<path d="M '+lx+' '+ly+' L '+q.x+' '+q.y+'"/><circle cx="'+q.x+'" cy="'+q.y+'" r="2.5"/>';
     });
@@ -599,6 +632,8 @@ const clock = new THREE.Clock();
   if (transicao) {
     transicao.t = Math.min(1, transicao.t + dt * (transicao.mergulho ? 1.1 : 2.4));
     const e = 1 - Math.pow(1 - transicao.t, 3);
+    camera.position.lerpVectors(transicao.cameraDe,transicao.cameraAte,e);
+    controls.target.lerpVectors(transicao.alvoDe,transicao.alvoAte,e);
     if (transicao.mergulho) {
       transicao.velho.scale.setScalar(1 + e * 2.2);
       transicao.velho.position.copy(transicao.foco).multiplyScalar(-e * 2.2);
