@@ -1,91 +1,89 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <link rel="icon" href="../brand/orientador.webp" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#050a06" />
-  <title>Forças de Starling · Laboratório do Pesquisar RA</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=IBM+Plex+Mono:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../laboratorio.css" />
-  <link rel="stylesheet" href="style.css" />
-  <script src="../guard.js?v=livre-20261002b"></script>
-  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"}}</script>
-  <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.1.0/dist/model-viewer.min.js"></script>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101f2c"><title>Forças de Starling · Laboratório RA</title>
+<link rel="icon" href="../brand/orientador.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=starling-20261003">
+<script src="../guard.js?v=livre-20261002b"></script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"}}</script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.1.0/dist/model-viewer.min.js"></script>
 </head>
 <body>
-<header class="topbar"><nav class="nav shell" aria-label="Laboratório"><a class="brand" href="../bancadas.html"><img src="../brand/orientador.webp" alt="" width="42" height="42"><span class="brand-copy"><b>LABORATÓRIO DO PESQUISAR RA</b><span>Fisiologia · Unidade IV</span></span></a><div class="nav-actions"><a class="small-button" href="../bancadas.html">Testes</a></div></nav></header>
-<main class="page shell">
-  <div class="page-head"><div><span class="eyebrow">Teste 09 · Unidade IV · microcirculação</span><h1>Forças de Starling</h1></div><a class="back-link" href="../bancadas.html">← Voltar</a></div>
-  <p class="page-note">Quatro forças decidem se a água sai do capilar ou volta para ele, e o que decide não é nenhuma delas: é a soma. Ela dá +13 mmHg na ponta arteriolar, −​7 na venular, e troca de sinal a 65% do caminho. Puxe a albumina para baixo e veja o ponto de virada correr até sair do capilar — a partir daí filtra do começo ao fim, e o interstício encharca. Edema não é filtrar demais: é filtrar mais do que a linfa dá conta de levar.</p>
-
-  <section class="experience" aria-label="Exploração tridimensional da microcirculação">
-    <div id="stage" class="stage" role="img" aria-label="Modelo tridimensional interativo">
-      <canvas id="scene"></canvas>
-      <div class="stage-hud"><span id="estadoLabel">Normal</span><span id="somaLabel">vira a 65% do capilar</span><span id="stepLabel">01 · A rede</span></div>
-      <div class="gesture">Arraste para girar · pinça/roda para aproximar</div>
-      <div class="stage-tools">
-        <button id="resetView" class="ghost-control" type="button">Recentrar</button>
-      </div>
-    </div>
-
-    <aside class="panel">
-      <div class="progress" aria-label="Níveis"><button class="step active" data-step="0" type="button"><b>01</b><span>A rede</span></button><button class="step" data-step="1" type="button"><b>02</b><span>O capilar</span></button><button class="step" data-step="2" type="button"><b>03</b><span>As forças</span></button><button class="step" data-step="3" type="button"><b>04</b><span>A alavanca</span></button><button class="step" data-step="4" type="button"><b>05</b><span>O edema</span></button></div>
-
-      <article class="info-card" id="infoCard">
-        <span class="eyebrow" id="infoEyebrow">A pergunta</span>
-        <h2 id="infoTitle">Onde a gravidade aperta?</h2>
-        <p id="infoText"></p>
-        <div class="microtags" id="microtags"></div>
-      </article>
-
-      <div class="actions"><button id="prev" class="secondary" type="button" disabled>← Voltar</button><button id="next" class="primary" type="button">Aprofundar →</button></div>
-
-      <section class="caixa" aria-label="Causas">
-        <div class="caixa-head"><span class="eyebrow">O que empurra o equilíbrio</span></div>
-        <div class="causas" id="causas"></div>
-      </section>
-
-      <section class="caixa" id="caixaForcas" aria-label="As quatro forças" hidden>
-        <div class="caixa-head">
-          <span class="eyebrow">A soma ao longo do capilar</span>
-          <div class="caixa-btns"><button id="reporOnc" type="button">Repor albumina</button></div>
-        </div>
-        <label class="ctrl"><span>Oncótica do plasma <b><span id="lOnc">28</span> mmHg</b></span>
-          <input id="oncCursor" type="range" min="4" max="34" step="1" value="28" aria-label="Pressão oncótica do plasma" /></label>
-        <ul class="leituras">
-          <li>ponta arteriolar <b><span id="lArterial">+13</span> mmHg</b></li>
-          <li>ponta venular <b><span id="lVenular">-7</span> mmHg</b></li>
-          <li>média no capilar <b><span id="lMedia">+3.0</span> mmHg</b></li>
-          <li>ponto de virada <b><span id="lVirada">65%</span></b></li>
-        </ul>
-        <canvas id="curvaSoma" width="330" height="180" aria-label="Pressão líquida ao longo do capilar"></canvas>
-      </section>
-
-      <section class="caixa" id="caixaEdema" aria-label="O edema" hidden>
-        <div class="caixa-head">
-          <span class="eyebrow">Linfa e acúmulo</span>
-          <div class="caixa-btns"><button id="zerar" type="button">Zerar</button><button id="correr" type="button">Correr o relógio</button></div>
-        </div>
-        <ul class="leituras">
-          <li>a linfa leva <b><span id="lLinfa">3.6 ml/h</span></b></li>
-          <li>sobra e acumula <b><span id="lAcumula">nada</span></b></li>
-          <li>no interstício, após <b><span id="lMinutos">0</span> min</b> <b><span id="lEdema">0.0</span> ml</b></li>
-        </ul>
-        <div class="barra"><i id="barraEdema"></i></div>
-      </section>
-
-      <section class="ra-box" aria-label="Realidade aumentada">
-        <model-viewer id="arViewer" alt="Modelo da microcirculação em realidade aumentada" ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" ar-scale="auto" camera-controls loading="eager" reveal="auto" shadow-intensity="1" exposure="1.1"></model-viewer>
-        <button id="launchAR" class="ra-launch" type="button" disabled>Colocar este nível no ambiente</button>
-        <p id="raStatus" class="ra-status">Preparando o modelo para a câmera…</p>
-      </section>
-    </aside>
-  </section>
+<header class="topbar"><nav class="shell" aria-label="Laboratório"><a class="brand" href="../bancadas.html"><img src="../brand/orientador.webp" alt="" width="42" height="42"><span><b>LABORATÓRIO DO PESQUISAR RA</b><small>Fisiologia · Microcirculação</small></span></a><a class="button quiet" href="../bancadas.html">← Bancadas</a></nav></header>
+<main class="shell">
+<div class="page-head"><div><span class="eyebrow">EXPERIÊNCIA 09 · VIAGEM AO TECIDO</span><h1>Forças de Starling</h1></div><span class="pill">Sangue · barreira · linfa</span></div>
+<p class="intro">Explore como a água atravessa a microcirculação e como o tecido devolve esse líquido pela linfa. Acompanhe as forças, altere a barreira e observe o equilíbrio mudar.</p>
+<nav class="progress" aria-label="Níveis da experiência">
+<button class="step" data-step="0"><b>01</b> A rede</button><button class="step" data-step="1"><b>02</b> O capilar</button><button class="step" data-step="2"><b>03</b> As forças</button><button class="step" data-step="3"><b>04</b> A barreira</button><button class="step" data-step="4"><b>05</b> Edema e linfa</button>
+</nav>
+<section class="experience" aria-label="Exploração tridimensional">
+<div class="visual-column">
+<div id="stage" class="stage" aria-label="Modelo tridimensional interativo">
+<canvas id="scene" aria-label="Cena tridimensional: arraste para girar e use a roda para aproximar"></canvas>
+<div class="stage-hud"><span id="stepLabel">01 · A rede</span><span id="estadoLabel">Basal</span></div>
+<button id="exitFullscreen" class="button fullscreen-exit" type="button">Reduzir</button>
+<div id="labels" class="labels" aria-hidden="true"><svg id="leaders"></svg></div>
+<div class="stage-caption"><span id="sceneMessage">Microcirculação em tecido conjuntivo</span><small>Representação ampliada · escalas esquemáticas</small></div>
+<div class="gesture">Arraste para girar · pinça/roda para aproximar</div>
+</div>
+<div class="toolbar" aria-label="Controles da experiência">
+<button id="correr" class="button primary">Iniciar</button><button id="zerar" class="button">Reiniciar</button><button id="resetView" class="button">Recentrar</button><button id="toggleLabels" class="button" aria-pressed="true">Legendas</button><button id="fullscreen" class="button">Ampliar</button>
+<label class="speed">Velocidade <input id="velocidade" type="range" min=".25" max="4" step=".25" value="1"><output id="lVelocidade">1×</output></label>
+<span class="time-note">1× = 2 min simulados/s · <b id="lMinutos">0,0</b> min</span>
+</div>
+<div class="legend"><span class="red">Hemácias</span><span class="gold">Proteínas</span><span class="aqua">Glicocálix</span><span class="green">Linfa</span><span class="blue">Água</span></div>
+<article class="info-card"><span class="eyebrow" id="infoEyebrow"></span><h2 id="infoTitle"></h2><p id="infoText"></p><div id="microtags" class="microtags"></div></article>
+</div>
+<aside class="panel">
+<section class="card model-card">
+<h2>Como interpretar</h2>
+<label class="select-label" for="modelo">Modelo de troca</label>
+<select id="modelo"><option value="revisado">Revisado · glicocálix</option><option value="classico">Clássico · comparação</option></select>
+<p id="modelNote" class="small"></p>
+<p class="small">Os basais dos dois modelos usam pressões ilustrativas diferentes. Trocar o modelo reinicia tempo, volume e ajustes do cenário selecionado.</p>
+<div class="equation" id="equacao"></div>
+</section>
+<section class="card scenario-card"><h2>Estados rápidos</h2><div id="causas" class="causas"></div><p id="causeNote" class="small"></p></section>
+<section class="card fluid-card"><div class="card-heading"><h2>Balanço do tecido</h2><span class="pill" id="balanceStatus">Equilíbrio</span></div>
+<div class="volume"><b id="lEdema">0,00</b><span>mL excedentes</span></div>
+<div class="bar" aria-hidden="true"><i id="barraEdema"></i></div>
+<dl class="balance"><div><dt>Filtração → tecido</dt><dd id="lFiltrado"></dd></div><div><dt>Absorção → sangue</dt><dd id="lAbsorcao"></dd></div><div><dt>Drenagem → linfa</dt><dd id="lLinfa"></dd></div><div class="net"><dt>Variação do volume</dt><dd id="lAcumula"></dd></div></dl>
+<p class="small">Taxas do leito didático em mL/min. O volume representa o excesso sobre o basal e não cai abaixo de zero. A pressão intersticial sobe com o acúmulo e a linfa aumenta até sua capacidade.</p>
+</section>
+<details class="card parameters" open><summary>Ajustar as forças</summary>
+<div class="card-heading"><span class="small">Ajustes preservam o líquido acumulado.</span><button id="reporOnc" class="button mini">Restaurar estado</button></div>
+<label class="ctrl">Pc · início do capilar <output id="oPcA"></output><input id="pcA" type="range" min="5" max="60" step="1" value="24"></label>
+<label class="ctrl">Pc · fim do capilar <output id="oPcV"></output><input id="pcV" type="range" min="2" max="55" step="1" value="18"></label>
+<label class="ctrl">Pi · basal do interstício <output id="oPi"></output><input id="piBase" type="range" min="-10" max="10" step="1" value="-2"></label>
+<label class="ctrl">πc · oncótica do plasma <output id="lOnc"></output><input id="oncCursor" aria-label="Pressão oncótica do plasma" type="range" min="4" max="34" step="1" value="25"></label>
+<label class="ctrl"><span id="externalLabel">πsg · oncótica subglicocálix</span><output id="oExt"></output><input id="oncExternal" type="range" min="0" max="25" step="1" value="6"></label>
+<label class="ctrl">σ · reflexão de proteínas <output id="oSigma"></output><input id="sigma" type="range" min="0" max="1" step=".05" value="1"></label>
+<label class="ctrl">Kf · condutância do leito <output id="oKf"></output><input id="kf" type="range" min=".005" max=".08" step=".005" value=".02"></label>
+</details>
+</aside>
+</section>
+<section class="analysis-grid">
+<article class="card force-card"><div class="card-heading"><h2>Forças no mesmo ponto</h2><span class="pill" id="pointLabel">50% do capilar</span></div>
+<label class="ctrl">Posição entre arteríola e vênula<input id="posicao" type="range" min="0" max="100" step="1" value="50"></label>
+<div class="force-grid"><div id="cardPc"><span>Pc · hidrostática capilar</span><b id="fPc"></b><small id="dirPc"></small></div><div id="cardPi"><span>−Pi · hidrostática intersticial</span><b id="fPi"></b><small id="dirPi"></small></div><div id="cardOnc"><span>−σπc · oncótica plasmática</span><b id="fOnc"></b><small id="dirOnc"></small></div><div id="cardExt"><span id="nameExt">+σπsg · oncótica externa</span><b id="fExt"></b><small id="dirExt"></small></div></div>
+<div class="result"><span>Soma das quatro contribuições</span><b id="fSoma"></b><small id="flowDirection"></small></div>
+<p class="small">Laranja: contribuição para fora. Azul: contribuição para dentro. Os cards mostram as contribuições com sinal; σ multiplica as pressões oncóticas. As setas 3D comparam dois pontos fixos: 22% e 78%.</p></article>
+<article class="card graph-card"><div class="card-heading"><h2>Pressão de filtração</h2><label>Unidade <select id="graphUnit" aria-label="Unidade do gráfico"><option value="mmHg">mmHg</option><option value="cmH2O">cmH₂O</option></select></label></div>
+<canvas id="curvaSoma" aria-label="Pressão líquida ao longo do capilar"></canvas>
+<div class="graph-key"><span class="orange">Filtração</span><span class="blue">Tendência de absorção</span><span class="white">Soma</span></div>
+<dl class="ends"><div><dt>Início</dt><dd id="lArterial"></dd></div><div><dt>Fim</dt><dd id="lVenular"></dd></div><div><dt>Cruzamento de zero</dt><dd id="lVirada"></dd></div></dl>
+<p id="curveNote" class="small"></p></article>
+<article class="card history-card"><div class="card-heading"><h2>Líquido acumulado no tempo</h2><span class="pill">mL · min</span></div><canvas id="curvaVolume" aria-label="Volume excedente no interstício ao longo do tempo"></canvas><p class="small">Inicie a experiência para acompanhar o volume. Os estados rápidos começam uma nova observação; os ajustes manuais mantêm o volume e mudam sua evolução.</p></article>
+<article class="card ra-box"><h2>Abrir em realidade aumentada</h2><model-viewer id="arViewer" alt="Modelo de Starling em realidade aumentada" ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" ar-scale="auto" camera-controls loading="eager" reveal="auto" shadow-intensity=".4" exposure="1"></model-viewer>
+<button id="launchAR" class="button primary" disabled>Abrir este nível em RA</button><p id="raStatus" class="small">Preparando o modelo…</p><p class="small">A RA apresenta uma fotografia 3D do estado atual. Pausar prepara o líquido e a geometria daquele instante para o ambiente.</p></article>
+</section>
+<section class="references"><h2>Modelo e referências</h2><p>Capilar contínuo sistêmico em tecido conjuntivo, com ampliação esquemática das estruturas. Dimensões relativas, pressões dos cenários, Kf, complacência e capacidade linfática são escolhas didáticas. Não representam um tecido específico nem estimam edema clínico.</p>
+<p>No modelo revisado, πsg é um valor definido pelo aluno. Não calculamos sua adaptação por transporte de proteínas. Uma soma negativa indica tendência de absorção com essas pressões fixadas; não demonstra reabsorção venosa sustentada. Na maioria dos tecidos, a filtração persiste em estado estacionário e o retorno ocorre pela linfa; absorção pode ser transitória, com exceções em tecidos especializados.</p>
+<p><a href="https://doi.org/10.1093/cvr/cvq062" target="_blank" rel="noopener noreferrer">Levick &amp; Michel (2010) · Microvascular fluid exchange and the revised Starling principle</a> · <a href="https://doi.org/10.1113/jphysiol.2004.063511" target="_blank" rel="noopener noreferrer">Michel (2004) · Fluid exchange in the microcirculation</a>.</p></section>
 </main>
-<footer class="rodape shell"><img src="../brand/mestre-lap.webp" alt="" width="84" height="84"><p>Simuladores interativos do Prof. Mário César Nascimento, PhD ©</p></footer>
-<script type="module" src="app.js"></script>
-</body>
-</html>
+<footer class="shell"><img src="../brand/mestre-lap.webp" alt="" width="64" height="64"><p>Simuladores interativos do Prof. Mário César Nascimento, PhD ©</p></footer>
+<script type="module" src="app.js?v=starling-20261003"></script>
+</body></html>

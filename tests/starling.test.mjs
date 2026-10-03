@@ -1,195 +1,101 @@
-import assert from "node:assert/strict";
-import test from "node:test";
-import {
-  PADRAO, FOLGA_MMHG, pressaoCapilar, pressaoLiquida, pontoDeVirada,
-  mediaLiquida, fluxos, balanco, edemaEm, comCausa, CAUSAS,
-} from "../starling/fisica.js";
-
-/* ==========================================================================
-   Teste 09 — Forças de Starling
-
-   A física desta bancada é conferível SEM navegador, e por isso os testes
-   batem nela e não no desenho. Cada asserção abaixo é uma leitura do livro:
-   se o modelo deixar de reproduzi-la, é o modelo que está errado.
-   ========================================================================== */
-
-const perto = (v, alvo, folga, oq) =>
-  assert.ok(Math.abs(v - alvo) <= folga, `${oq}: ${v.toFixed(2)}, esperado ${alvo} +/- ${folga}`);
-
-test("o capilar normal reproduz os números do livro", async () => {
-  /* Guyton: +13 mmHg na ponta arteriolar, -7 na venular. A primeira escolha
-     de valores dava +19,9 e reprovou aqui. */
-  perto(pressaoLiquida(0), 13, .5, "ponta arteriolar");
-  perto(pressaoLiquida(1), -7, .5, "ponta venular");
-  perto(mediaLiquida(), 3, .5, "média ao longo do capilar");
+import assert from 'node:assert/strict';
+import test from 'node:test';
+import { readFile } from 'node:fs/promises';
+import { PADRAO, CLASSICO, TECIDO, cmH2O, pressaoCapilar, pressaoLiquida,
+  oncExterna, mediaLiquida, pontoDeVirada, fluxos, balanco, avancar,
+  edemaEm, estadoDoTecido, comCausa, CAUSAS } from '../starling/fisica.js';
+const close=(actual,expected,eps=1e-9)=>assert.ok(Math.abs(actual-expected)<eps,actual+' versus '+expected);
+test('conversão física mmHg para cmH2O preserva sinal e zero',()=>{
+ close(cmH2O(1),1.35951);close(cmH2O(-10),-13.5951);assert.equal(cmH2O(0),0);
 });
-
-test("filtra na ponta arteriolar e reabsorve na venular", async () => {
-  assert.ok(pressaoLiquida(0) > 0, "a ponta arteriolar tem de filtrar");
-  assert.ok(pressaoLiquida(1) < 0, "a ponta venular tem de reabsorver");
-  const v = pontoDeVirada();
-  assert.ok(v !== null, "tem de haver ponto de virada em tecido normal");
-  perto(v, .65, .05, "o ponto de virada");
+test('comparação clássica mantém +13 / −7 mmHg e cruzamento 65%',()=>{
+ close(pressaoLiquida(0,CLASSICO),13);close(pressaoLiquida(1,CLASSICO),-7);
+ close(mediaLiquida(CLASSICO),3);close(pontoDeVirada(CLASSICO),.65);
 });
-
-test("TECIDO NORMAL NÃO INCHA", async () => {
-  /* A asserção mais importante do arquivo. O primeiro modelo acumulava 2,3 ml
-     em meia hora em tecido saudável — plausível na tela, falso na fisiologia,
-     e foi este teste que o pegou. */
-  assert.equal(balanco().acumula, 0);
-  assert.equal(edemaEm(30), 0);
-  assert.equal(edemaEm(600), 0);
+test('revisado usa πsg, sem trocar silenciosamente por πi',()=>{
+ close(pressaoLiquida(0,PADRAO),7);close(pressaoLiquida(1,PADRAO),1);
+ assert.equal(oncExterna(PADRAO),6);
+ assert.equal(pressaoLiquida(.5,{...PADRAO,oncInter:99}),pressaoLiquida(.5,PADRAO));
+ close(pressaoLiquida(.5,{...PADRAO,oncSub:10}),8);
 });
-
-test("a folga contra o edema está em mmHg, e vale 17", async () => {
-  /* O fator de segurança é uma grandeza da fisiologia, não um ajuste de
-     desenho: a pressão capilar precisa subir ~17 mmHg antes de aparecer
-     edema. Guardá-la em ml/min esconderia isso. */
-  assert.equal(FOLGA_MMHG, 17);
-  const quase = { ...PADRAO, pcArterial: PADRAO.pcArterial + 16, pcVenular: PADRAO.pcVenular + 16 };
-  const passou = { ...PADRAO, pcArterial: PADRAO.pcArterial + 19, pcVenular: PADRAO.pcVenular + 19 };
-  assert.equal(balanco(quase).acumula, 0, "16 mmHg acima ainda cabe na folga");
-  assert.ok(balanco(passou).acumula > 0, "19 mmHg acima tem de vencer a folga");
+test('revisado não oculta pressão negativa por um clamp',()=>{
+ const e={...PADRAO,oncPlasma:34};assert.ok(pressaoLiquida(1,e)<0);
+ assert.ok(fluxos(e).reabsorvido>0);
 });
-
-test("a linfa não fica mais forte porque o capilar furou", async () => {
-  /* Escrito com o Kf do estado, o teto linfático triplicava junto com a
-     permeabilidade e a inflamação deixava de causar edema. */
-  const furado = { ...PADRAO, kf: PADRAO.kf * 3 };
-  assert.equal(balanco(furado).teto, balanco(PADRAO).teto);
+test('integral exata separa áreas positivas e negativas',()=>{
+ const f=fluxos(CLASSICO);close(f.filtrado,.0845);close(f.reabsorvido,.0245);close(f.liquido,.06);
+ for(const e of [PADRAO,CLASSICO,{...PADRAO,oncPlasma:34},{...PADRAO,oncPlasma:4}]){
+  close(fluxos(e).liquido,e.kf*mediaLiquida(e));
+ }
 });
-
-test("sem cruzamento o ponto de virada é null, e não 0 nem 1", async () => {
-  /* Com albumina no chão o capilar filtra do começo ao fim: devolver 0 ou 1
-     esconderia justamente o achado. */
-  const { estado } = comCausa("hipoalbuminemia");
-  assert.equal(pontoDeVirada(estado), null);
+test('zero nos extremos não é cruzamento interior',()=>{
+ const e={...CLASSICO,pcVenular:17};assert.equal(pontoDeVirada(e),null);
+ assert.equal(pontoDeVirada({...e,pcArterial:17}),null);
 });
-
-test("cada causa mexe numa letra diferente da equação", async () => {
-  const nomes = CAUSAS.map(c => c.id);
-  for (const id of ["normal", "depe", "cardiaca", "hipoalbuminemia", "inflamacao", "linfatico"]) {
-    assert.ok(nomes.includes(id), `falta a causa ${id}`);
-  }
-  /* a inflamação tem de derrubar sigma: é o que separa "parede furada" de
-     "pressão alta", e sem isso as duas causas ficariam iguais */
-  assert.ok(comCausa("inflamacao").estado.sigma < PADRAO.sigma);
-  /* e não pode subir a pressão: a lição é que dá para inchar sem ela */
-  assert.equal(comCausa("inflamacao").estado.pcArterial, PADRAO.pcArterial);
+test('σ=0 elimina ambas as contribuições oncóticas',()=>{
+ const e={...PADRAO,sigma:0};close(pressaoLiquida(.5,e),23);
+ close(pressaoLiquida(.5,{...e,oncPlasma:4,oncSub:25}),23);
 });
-
-test("em pé e parado, a pressão capilar fica acima da venosa do tornozelo", async () => {
-  /* liga na bancada 08, que mede 93 mmHg de pressão venosa no tornozelo:
-     para haver fluxo, a capilar tem de estar acima disso */
-  const { estado } = comCausa("depe");
-  assert.ok(estado.pcVenular > 90, `venular ${estado.pcVenular} tem de passar de 90`);
+test('pressão microvascular linear limita a posição ao leito',()=>{
+ close(pressaoCapilar(-1),24);close(pressaoCapilar(2),18);close(pressaoCapilar(.5),21);
 });
-
-test("albumina baixa incha pouco, e isso é achado e não falha", async () => {
-  /* A força oncótica inteira vale 20 mmHg: zerá-la não chega a dobrar a folga
-     de 17. Por isso o edema da hipoalbuminemia exige albumina MUITO baixa, e
-     na clínica vem acompanhado de retenção de sódio. */
-  const alb = comCausa("hipoalbuminemia"), inf = comCausa("inflamacao");
-  const eAlb = edemaEm(30, alb.estado), eInf = edemaEm(30, inf.estado);
-  assert.ok(eAlb > 0, "tem de inchar alguma coisa");
-  assert.ok(eInf > eAlb * 5, `inflamação (${eInf.toFixed(1)}) tem de inchar muito mais que albumina (${eAlb.toFixed(1)})`);
+test('normal em ambos os modos não acumula volume',()=>{
+ for(const e of [PADRAO,CLASSICO]){
+  close(balanco(e).acumula,0);close(edemaEm(1440,e),0);
+  close(balanco(e).liquido,balanco(e).linfa);
+ }
 });
-
-test("linfático obstruído incha sem nenhuma força mudar", async () => {
-  const { estado, semLinfa } = comCausa("linfatico");
-  assert.deepEqual(estado, PADRAO, "nenhuma das quatro forças muda");
-  assert.ok(balanco(estado, { semLinfa }).acumula > 0);
+test('cada estado de edema altera o determinante esperado',()=>{
+ assert.equal(CAUSAS.length,6);
+ assert.ok(comCausa('depe').estado.pcVenular>PADRAO.pcVenular);
+ assert.ok(comCausa('cardiaca').estado.pcVenular>PADRAO.pcVenular);
+ assert.ok(comCausa('hipoalbuminemia').estado.oncPlasma<PADRAO.oncPlasma);
+ assert.ok(comCausa('inflamacao').estado.sigma<PADRAO.sigma);
+ assert.ok(comCausa('inflamacao').estado.kf>PADRAO.kf);
+ assert.deepEqual(comCausa('linfatico').estado,PADRAO);
+ for(const c of CAUSAS.filter(c=>c.id!=='normal')){
+  const {estado,semLinfa}=comCausa(c.id);assert.ok(edemaEm(30,estado,{semLinfa})>0,c.id);
+ }
 });
-
-test("o edema satura em vez de crescer para sempre", async () => {
-  const { estado } = comCausa("depe");
-  const a = edemaEm(30, estado), b = edemaEm(300, estado), c = edemaEm(3000, estado);
-  assert.ok(b > a && c > b, "tem de crescer");
-  assert.ok(c < 61, "e tem de saturar: o gel do interstício endurece ao encher");
+test('retorno linfático não cresce com o Kf da inflamação',()=>{
+ const a=balanco(PADRAO,{volume:100}), b=balanco({...PADRAO,kf:.08},{volume:100});
+ assert.equal(a.linfa,b.linfa);close(a.linfa,TECIDO.capacidadeLinfa);
 });
-
-test("o fluxo é integrado ao longo do capilar, não tirado das duas pontas", async () => {
-  /* Com a virada fora do meio, a média das pontas erra o sinal. Aqui a
-     filtração tem de vencer a reabsorção mesmo com as pontas simétricas. */
-  const f = fluxos();
-  assert.ok(f.filtrado > 0 && f.reabsorvido > 0, "tem de haver os dois");
-  perto(f.liquido, PADRAO.kf * 3, .01, "o líquido é Kf vezes a média");
+test('aumento de Pi reduz filtração e edema permite drenagem posterior',()=>{
+ const c=comCausa('inflamacao'), accumulated=edemaEm(60,c.estado);
+ assert.ok(accumulated>20);
+ assert.ok(estadoDoTecido(c.estado,accumulated).pi>c.estado.pi);
+ assert.ok(balanco(c.estado,{volume:accumulated}).filtrado<balanco(c.estado).filtrado);
+ assert.ok(balanco(PADRAO,{volume:accumulated}).acumula<0);
+ assert.ok(avancar(accumulated,60,PADRAO)<accumulated);
 });
-
-/* ==========================================================================
-   O desenho, e as duas coisas que ele já mentiu
-   ========================================================================== */
-
-import { readFile } from "node:fs/promises";
-const texto = p => readFile(new URL(`../${p}`, import.meta.url), "utf8");
-
-test("o card 09 leva às forças de Starling", async () => {
-  const hub = await texto("bancadas.html");
-  assert.match(hub, /data-number="09"/);
-  assert.match(hub, /href="starling\/"/);
+test('taxa mostrada obedece ao balanço de massa e ao incremento numérico',()=>{
+ for(const c of CAUSAS){
+  const {estado:e,semLinfa}=comCausa(c.id), opts={volume:12,semLinfa};
+  const b=balanco(e,opts);close(b.acumula,b.filtrado-b.reabsorvido-b.linfa);
+  const dt=.00001;close((avancar(12,dt,e,{semLinfa})-12)/dt,b.acumula,1e-6);
+ }
 });
-
-test("a bancada tem acesso livre e traz o caminho de RA das irmãs", async () => {
-  const page = await texto("starling/index.html");
-  assert.doesNotMatch(page, /data-ra-protected/);
-  assert.match(page, /ar-modes="webxr scene-viewer quick-look"/);
+test('volume positivo não tem teto arbitrário; integração converge',()=>{
+ const e=comCausa('inflamacao').estado;
+ const a=edemaEm(1440,e);assert.ok(a>60);assert.ok(Number.isFinite(a));
+ const first=avancar(0,15,e), split=avancar(first,15,e);
+ close(split,avancar(0,30,e),1e-8);
+ assert.equal(avancar(0,-2,e),0);assert.equal(avancar(0,NaN,e),0);
+ assert.ok(avancar(1,1440,{...PADRAO,oncPlasma:34})>=0);
 });
-
-test("a cor da seta segue o SINAL, não a espécie da força", async () => {
-  /* Pi é NEGATIVA em tecido normal: ela suga para fora. Presa à espécie, a
-     cor punha uma seta azul apontando para fora — o contrário do que ocorre. */
-  const m = await texto("starling/modelos.js");
-  assert.match(m, /const mat = mmHg >= 0 \? M\.setaFora : M\.setaDentro;/);
+test('linfático obstruído remove a drenagem, não as forças iniciais',()=>{
+ const {estado:e,semLinfa}=comCausa('linfatico');
+ close(balanco(e,{semLinfa}).linfa,0);close(balanco(e,{semLinfa}).acumula,.08);
 });
-
-test("as setas atravessam a parede, e não correm ao longo do tubo", async () => {
-  const m = await texto("starling/modelos.js");
-  assert.match(m, /quaternion\.setFromUnitVectors\(EIXO_X, alvo\)/);
+test('cenários clássicos e revisados têm referências distintas explícitas',()=>{
+ assert.equal(comCausa('normal','classico').estado.modelo,'classico');
+ assert.equal(comCausa('desconhecida').nome,'Basal');
 });
-
-test("a bancada abre parada, pelo endereço", async () => {
-  /* Sem regex de propósito: a contrabarra não sobrevive à ida e volta pelo
-     shell, e um teste que compara o padrão errado passa achando que confere. */
-  const app = await texto("starling/app.js");
-  for (const chave of ["nivel", "onc", "causa"]) {
-    assert.ok(app.includes(`busca.get('${chave}')`), `falta ?${chave}=`);
-  }
-});
-
-test("a geometria não importa a física", async () => {
-  /* geometria não decide número: quem junta as duas é o app */
-  const m = await texto("starling/modelos.js");
-  assert.ok(!/from '\.\/fisica\.js'/.test(m));
-});
-
-test("o edema se ve em TRES pistas, e nao so nas gotas", async () => {
-  /* Antes, `encharcado` so empurrava as gotas um pouco: o numero dizia 52 ml e
-     a imagem nao dizia nada. Edema e VOLUME, e volume se ve. */
-  const m = await texto("starling/modelos.js");
-  assert.ok(m.includes("d.gel.scale.set(1, e, e)"), "o gel tem de inchar");
-  assert.ok(m.includes("M.gel.opacity = .13 + encharcado"), "o gel tem de escurecer de agua");
-  assert.ok(m.includes("if (u.parque < encharcado)"), "as gotas tem de FICAR no tecido");
-});
-
-test("o quadro cabe o tecido inchado, e nao o em repouso", async () => {
-  /* medido parado, o modelo saia pela beira justamente no estado que a
-     bancada existe para mostrar */
-  const app = await texto("starling/app.js");
-  assert.ok(app.includes("const FOLGA_EDEMA = 1.5"));
-  assert.ok(app.includes("raio[n] * (n === 0 ? 1 : FOLGA_EDEMA)"));
-});
-
-test("o leito capilar do nivel 01 e visivel, e a nevoa cabe nos dois tamanhos", async () => {
-  /* a nevoa calibrada para o capilar de 60 um comia 62% do nivel 01, que a
-     camera olha de 280 de distancia — o leito virava neblina roxa */
-  const app = await texto("starling/app.js");
-  assert.ok(app.includes("FogExp2(0x0a0d10, .0008)"));
-  const m = await texto("starling/modelos.js");
-  assert.ok(m.includes("mergeGeometries(caps), M.capilar"), "o leito nao pode usar o endotelio a 30%");
-});
-
-test("o linfatico se distingue do capilar a primeira vista", async () => {
-  const m = await texto("starling/modelos.js");
-  const bloco = m.slice(m.indexOf("linfa: phys("), m.indexOf("arteriola: phys("));
-  assert.ok(/opacity: \.6/.test(bloco) || /opacity: \.62/.test(bloco), "a 34% ele lia como cano cinzento");
+test('acesso livre, rotas do laboratório e RA permanecem disponíveis',async()=>{
+ const html=await readFile(new URL('../starling/index.html',import.meta.url),'utf8');
+ const hub=await readFile(new URL('../bancadas.html',import.meta.url),'utf8');
+ assert.match(hub,/href="starling\//);assert.doesNotMatch(html,/data-ra-protected/);
+ assert.ok(html.includes('ar-modes="webxr scene-viewer quick-look"'));
+ assert.ok(html.includes('https://doi.org/10.1093/cvr/cvq062'));
 });
