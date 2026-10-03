@@ -280,10 +280,10 @@ const carne = o => phys(Object.assign({
 }, o));
 const M = {
   musculo: carne({ color: 0xffffff, vertexColors: true, map: TEX.musculo, emissiveMap: TEX.musculo,
-    roughnessMap: TEX.carneRug, roughness: .86, sheenColor: 0xffb59c,
-    bumpMap: TEX.musculoBump, bumpScale: 2.2 }),
+    roughnessMap: TEX.carneRug, roughness: .88, sheen: .12, sheenColor: 0xffb59c,
+    bumpMap: TEX.musculoBump, bumpScale: .065 }),
   /* o miolo é o fundo do poço entre os fascículos: nunca recebe luz direta */
-  musculoFundo: phys({ color: 0x2e0a0d, roughness: .85, clearcoat: 0 }),
+  musculoFundo: phys({ color: 0x652a25, roughness: .90, clearcoat: 0 }),
   /* O VÉU. Este era o pior dos causadores e o último a ser visto: uma película
      branca, envernizada com clearcoat 1, desenhada em DoubleSide por cima do
      ventre inteiro. Ou seja — uma casca lisa e brilhante cobrindo o objeto.
@@ -496,7 +496,7 @@ function musculo() {
 
   /* miolo escuro: fecha o que se veria pelos vãos entre fascículos */
   g.add(revolucaoX(-MUS.A, MUS.A, s => {
-    const t = -1 + 2 * s; return .062 + MUS.Rmax * .80 * perfilVentre(t);
+    const t = -1 + 2 * s; return .062 + MUS.Rmax * .88 * perfilVentre(t);
   }, M.musculoFundo, { achata: MUS.achata }));
 
   /* os fascículos */
@@ -527,7 +527,7 @@ function musculo() {
       const fase = Math.random() * 6.283, amp = rnd(.010, .034);
       const curva = curvaDePontos(u => {
         const t = -1 + 2 * u;
-        const rr = .072 + (anel * MUS.Rmax - .072) * perfilVentre(t);
+        const rr = .072 + (anel * MUS.Rmax * .93 - .072) * perfilVentre(t);
         const a = th + torcao * t + Math.sin(fase + u * 4.1) * .10;
         const sopro = 1 + Math.sin(fase * 1.7 + u * 6.4) * amp;
         return V(t * MUS.A, Math.sin(a) * rr * sopro, Math.cos(a) * rr * MUS.achata * sopro);
@@ -537,7 +537,7 @@ function musculo() {
          perfeita é cápsula. Agora cada um tem seu ponto de maior calibre
          (`pico`), sua barriga mais ou menos cheia (`cheio`) e um ganho de
          calibre próprio — e a silhueta do feixe deixa de ser uma fórmula. */
-      const jitter = rnd(.72, 1.30);
+      const jitter = rnd(.94, 1.12);
       const pico = rnd(-.22, .22);          /* onde este fascículo é mais grosso */
       const cheio = rnd(.30, .52);          /* quão cheia é a barriga dele */
       const raio = u => {
@@ -546,25 +546,103 @@ function musculo() {
         const onda = 1 + .085 * Math.sin(u * 9.3 + th * 2.1);
         return base * jitter * onda * (.24 + .76 * Math.pow(Math.max(0, 1 - td * td), cheio));
       };
-      const tom = variar(0x8c1f18, .016, .15, .085);
+      const tom = variar(0xa74339, .008, .06, .025);
       geos.push(ocluirNoFeixe(tuboPerfil(curva, raio, { segsU: 72, segsV: 12 }),
-        tom, { raioFeixe: MUS.Rmax, aoLongo: misturaNaPonta(tom) }));
+        tom, { raioFeixe: MUS.Rmax, piso: .62, aoLongo: misturaNaPonta(tom) }));
     }
   });
   g.add(new THREE.Mesh(mergeGeometries(geos), M.musculo));
 
-  /* epimísio: a bainha do músculo inteiro, translúcida, com colágeno cruzado */
-  g.add(peloAvesso(revolucaoX(-MUS.A * 1.01, MUS.A * 1.01, s => {
-    const t = -1 + 2 * s; return .075 + MUS.Rmax * 1.045 * perfilVentre(t);
-  }, M.epimisio, { achata: MUS.achata })));
+  /* Superfície contínua do ventre, com relevo longitudinal baixo. O músculo
+     inteiro não é um cesto de cordões: os fascículos aparecem numa janela de
+     dissecção localizada, e o restante conserva a cobertura do órgão.
+     Os materiais e a montagem ficam restritos ao nível macroscópico. */
+  const nu = 112, nv = 128, pos = [], uv = [], cores = [], indices = [];
+  const corVentre = C(0x90352d), colageno = C(0xcdbf9f);
+  const coordenadasJanela = (u, a) => {
+    const x = (2 * u - 1) * MUS.A;
+    const ang = Math.atan2(Math.sin(a - .42), Math.cos(a - .42));
+    return [(x + .22) / 1.03, ang / .43];
+  };
+  const vertice = (u, v) => {
+    const a = v * Math.PI * 2, t = 2 * u - 1;
+    const perfil = perfilVentre(t);
+    const relevo = .028 * perfil * Math.cos(17 * a + .30 * t + .16 * Math.sin(4 * u))
+      + .009 * perfil * Math.sin(5 * a + 4 * u);
+    const r = .105 + (MUS.Rmax + .025) * perfil + relevo;
+    pos.push(t * MUS.A, Math.sin(a) * r + .028 * Math.sin(Math.PI * u), Math.cos(a) * r * MUS.achata);
+    uv.push(u, v);
+    const transicao = suave(THREE.MathUtils.clamp((Math.abs(t) - .76) / .24, 0, 1));
+    const c = corVentre.clone().lerp(colageno, transicao);
+    c.multiplyScalar(.94 + .06 * (.5 + .5 * Math.cos(17 * a + .30 * t)));
+    cores.push(c.r, c.g, c.b);
+    return pos.length / 3 - 1;
+  };
+  for(let i = 0; i <= nu; i++)for(let j = 0; j <= nv; j++)vertice(i / nu, j / nv);
+  const dentro = p => { const [x,y] = coordenadasJanela(uv[p*2],uv[p*2+1]*Math.PI*2);return x*x+y*y<1; };
+  /* Recorta cada triângulo na elipse em vez de apagar quadradinhos: a margem
+     da janela acompanha uma curva lisa também quando vista de perto. */
+  const margem = new Map();
+  const cruzamento = (p,q) => {
+    const chave = `${Math.min(p,q)}:${Math.max(p,q)}`;
+    if(margem.has(chave))return margem.get(chave);
+    const [x,y] = coordenadasJanela(uv[p*2],uv[p*2+1]*Math.PI*2);
+    const [xx,yy] = coordenadasJanela(uv[q*2],uv[q*2+1]*Math.PI*2);
+    const dx=xx-x,dy=yy-y,A=dx*dx+dy*dy,B=2*(x*dx+y*dy),D=Math.sqrt(Math.max(0,B*B-4*A*(x*x+y*y-1)));
+    const t1=(-B-D)/(2*A),t2=(-B+D)/(2*A),t=t1>=0&&t1<=1?t1:t2;
+    const id = vertice(THREE.MathUtils.lerp(uv[p*2],uv[q*2],t),THREE.MathUtils.lerp(uv[p*2+1],uv[q*2+1],t));
+    margem.set(chave,id); return id;
+  };
+  const triangular = (a,b,c) => {
+    const poligono = [], tri=[a,b,c];
+    for(let k=0;k<3;k++){
+      const p=tri[k],q=tri[(k+1)%3],dp=dentro(p),dq=dentro(q);
+      if(!dp)poligono.push(p);
+      if(dp!==dq)poligono.push(cruzamento(p,q));
+    }
+    for(let k=1;k<poligono.length-1;k++)indices.push(poligono[0],poligono[k],poligono[k+1]);
+  };
+  for(let i = 0; i < nu; i++)for(let j = 0; j < nv; j++) {
+    const p = i * (nv + 1) + j, q = p + nv + 1;
+    triangular(p, q, p + 1); triangular(p + 1, q, q + 1);
+  }
+  /* Exclui os vértices que ficaram dentro da abertura: não deixa normais
+     nulas nem dados sem uso no modelo exportado para realidade aumentada. */
+  const usados = new Map(), pFinal = [], uvFinal = [], cFinal = [];
+  const indexFinal = indices.map(p => {
+    if(!usados.has(p)) {
+      usados.set(p,pFinal.length / 3);
+      pFinal.push(...pos.slice(p*3,p*3+3));
+      uvFinal.push(...uv.slice(p*2,p*2+2));
+      cFinal.push(...cores.slice(p*3,p*3+3));
+    }
+    return usados.get(p);
+  });
+  const superficie = new THREE.BufferGeometry();
+  superficie.setAttribute('position', new THREE.Float32BufferAttribute(pFinal, 3));
+  superficie.setAttribute('uv', new THREE.Float32BufferAttribute(uvFinal, 2));
+  superficie.setAttribute('color', new THREE.Float32BufferAttribute(cFinal, 3));
+  superficie.setIndex(indexFinal); superficie.computeVertexNormals();
+  const ventre = new THREE.Mesh(superficie, M.musculo);
+  ventre.name = 'ventre_continuo'; g.add(ventre);
+
+  /* Bainha fina aderida ao mesmo contorno, aberta na mesma janela. Material
+     próprio do nível 01: não altera as membranas dos níveis seguintes. */
+  const fasciaGeo = superficie.clone();
+  fasciaGeo.deleteAttribute('color'); fasciaGeo.scale(1, 1.004, 1.004);
+  const fasciaMat = M.epimisio.clone();
+  fasciaMat.opacity = .055; fasciaMat.roughness = .64; fasciaMat.clearcoat = .06;
+  const fascia = new THREE.Mesh(fasciaGeo, fasciaMat);
+  fascia.name = 'epimisio_continuo'; fascia.castShadow = false; g.add(fascia);
+
+  const tendaoMat = M.tendao.clone();
+  tendaoMat.roughness = .57; tendaoMat.clearcoat = .07;
 
   /* tendões: côncavos junto ao ventre, afinando até a inserção e alargando de
      leve onde encostam no osso */
   for (const s of [-1, 1]) {
     g.add(revolucaoX(s * (MUS.xTendao - .40), s * 3.30, u =>
-      .145 + .245 * Math.pow(1 - u, 1.6) + .060 * Math.pow(u, 7), M.tendao, { segs: 34, radiais: 40, achata: .72 }));
-    const cap = new THREE.Mesh(new THREE.SphereGeometry(.20, 20, 12), M.tendao);
-    cap.scale.set(.5, 1, .72); cap.position.x = s * 3.30; g.add(cap);
+      .115 + .230 * Math.pow(1 - u, 1.7) + .090 * Math.pow(u, 6), tendaoMat, { segs: 40, radiais: 40, achata: .72 }));
 
     /* osso: diáfise curta, epífise arredondada e cartilagem na ponta.
        `foraDoQuadro` diz ao enquadramento para ignorá-los: osso aqui é contexto,
