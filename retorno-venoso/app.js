@@ -34,7 +34,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { prepararParaRA } from '../cores-para-ra.js';
-import { criar, CM, CORPO, PIH, MMHG_POR_CM, pressaoVenosa, corDaPressao } from './modelos.js?v=carregamento-tendoes-20261002';
+import { criar, CM, CORPO, PIH, MMHG_POR_CM, pressaoVenosa, corDaPressao } from './modelos.js?v=valvulas-20261002';
 import {criarEstadoBomba,avancarBomba} from './bomba.js?v=pes-bomba-20261002';
 
 const $ = id => document.getElementById(id);
@@ -149,7 +149,7 @@ const TEXTOS = [
     tags: ['bicúspide', 'degrau por segmento'] },
   { olho: 'Nível 04', titulo: 'O músculo que esvazia a veia',
     texto: 'A panturrilha é a segunda bomba do corpo. Ao contrair, espreme a veia profunda entre as barrigas: a válvula de baixo fecha, a de cima abre, e o segmento se esvazia para cima. É o mesmo músculo da bancada 06, agora com outra função.',
-    tags: ['bomba muscular', 'fluxo de mão única'] },
+    tags: ['bomba muscular', 'vista interna das válvulas', 'fluxo: distal → proximal → coração'] },
   { olho: 'Nível 05', titulo: 'Parado em pé é pior que andar',
     texto: 'De pé e imóvel, a coluna é inteira e o tornozelo fica em noventa. Bastam alguns passos para a bomba partir essa coluna e derrubar a pressão para perto de vinte e cinco. Quem desmaia em posição de sentido não desmaia por estar em pé: desmaia por estar parado.',
     tags: ['pressão venosa ambulatorial', 'retorno ao coração', 'U nos pés: microcirculação simplificada'] },
@@ -271,7 +271,35 @@ function desenharTempo() {
   ctt.strokeStyle = '#ff9d2e'; ctt.lineWidth = 2; ctt.stroke();
 }
 
-function desenhar() { desenharCurva(); desenharTempo(); renderer.render(scene, camera); }
+function desenhar() { desenharCurva(); desenharTempo(); renderer.render(scene, camera); rotularValvulas(); }
+
+// As legendas seguem o modelo; não alteram enquadramento nem geometria.
+function rotularValvulas() {
+  const layer=$('valveLabels');layer.hidden=atual!==3;if(layer.hidden)return;
+  const w=stage.clientWidth,h=stage.clientHeight,bw=w<450?120:136;
+  layer.querySelector('svg').setAttribute('viewBox',`0 0 ${w} ${h}`);
+  const valves=modelos[3].userData.valvulas;
+  const anchors=valves.map(par=>{
+    const g=par.children[0].geometry,u=g.userData,i=Math.floor(u.nu/2)*(u.nv+1)+Math.floor(u.nv/2);
+    const p=new THREE.Vector3().fromBufferAttribute(g.attributes.position,i).add(new THREE.Vector3().fromBufferAttribute(par.children[1].geometry.attributes.position,i)).multiplyScalar(.5);
+    const projected=par.localToWorld(p).project(camera);
+    return {x:(projected.x+1)*w/2,y:(1-projected.y)*h/2,visible:projected.z>-1&&projected.z<1&&Math.abs(projected.x)<1&&Math.abs(projected.y)<1};
+  });
+  const horizontal=Math.abs(anchors[1].x-anchors[0].x)>Math.abs(anchors[1].y-anchors[0].y);
+  anchors.forEach((a,i)=>{
+    const label=$('valveLabel'+i),leader=$('valveLeader'+i);label.hidden=!a.visible;leader.style.display=a.visible?'':'none';if(!a.visible)return;
+    const x=clamp(horizontal?a.x-bw/2:a.x+34,8,w-bw-8),y=clamp(horizontal?a.y+(i?-66:24):a.y-22,54,h-94);
+    label.style.transform=`translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;
+    const open=valves[i].userData.abertura;label.lastElementChild.textContent=open<.1?'Fechada':open>.85?'Aberta':'Em transição';
+    const lx=clamp(a.x,x,x+bw),ly=clamp(a.y,y,y+44);
+    leader.setAttribute('d',`M${a.x.toFixed(1)},${a.y.toFixed(1)} L${lx.toFixed(1)},${ly.toFixed(1)}`);
+  });
+  const flow=$('valveFlow'),eject=valves[1].userData.abertura>.85,fill=valves[0].userData.abertura>.85;
+  flow.style.display=anchors.every(a=>a.visible)&&(eject||fill)?'':'none';
+  if(eject||fill){const dx=anchors[1].x-anchors[0].x,dy=anchors[1].y-anchors[0].y,len=Math.hypot(dx,dy)||1,ux=dx/len,uy=dy/len,a=anchors[eject?1:0],start=eject?14:-50,end=eject?50:-14;
+    flow.setAttribute('d',`M${a.x+ux*start+uy*24},${a.y+uy*start-ux*24} L${a.x+ux*end+uy*24},${a.y+uy*end-ux*24}`);
+  }
+}
 
 /* ------------------------------------------------------------ tamanho */
 function ajustar() {
@@ -309,6 +337,7 @@ renderer.setAnimationLoop(() => {
   controls.update();
   desenharCurva();
   renderer.render(scene, camera);
+  rotularValvulas();
 });
 
 /* ------------------------------------------------------------ o sensor */

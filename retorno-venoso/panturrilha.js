@@ -35,5 +35,17 @@ export function tecidosDaPanturrilha(pele,H,R,material) {
   const tendaoPts=Array.from({length:12},(_,i)=>{const s=secao(H*(.03+.17*i/11));return s.c.add(V(0,0,-s.z*.38))}),tendao=new THREE.Group(),matTendao=new THREE.MeshStandardMaterial({color:0x786d5a,roughness:.90});tendao.name='tendao_calcaneo';tendao.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(tendaoPts),30,.010,14,false),matTendao));
   for(const [lado,y] of [[-1,.19],[1,.25]]){const s=secao(H*y),p=s.c.add(V(lado*s.x*.46,0,-s.z*.18)),q=tendaoPts.at(-1);tendao.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([q.clone(),q.clone().lerp(p,.55),p]),18,.006,12,false),matTendao))}
   const deformarVeia=aperto=>{const p=veiaGeo.attributes.position;for(let i=0;i<p.count;i++){const ring=Math.floor(i/25),c=centros[ring],s=THREE.MathUtils.clamp((c.y-H*.2174)/(H*.7391-H*.2174),0,1),w=Math.pow(Math.sin(Math.PI*s),2);p.setXYZ(i,c.x+(baseVeia[i*3]-c.x)*(1-.78*aperto*w),baseVeia[i*3+1],c.z+(baseVeia[i*3+2]-c.z)*(1+.06*aperto*w))}p.needsUpdate=true;veiaGeo.computeVertexNormals()};
-  return {curva,veiaGeo,barrigas,tendao,deformarVeia,raio};
+  // Consulta de leitura da parede da veia para encaixar as válvulas, inclusive
+  // na compressão. Os eixos vêm dos anéis reais e acompanham sua elipse.
+  const cParede=V(),aParede=V(),bParede=V(),auxParede=V();
+  const mapearNaVeia=(y,x,z,target)=>{
+    let i=THREE.MathUtils.clamp(Math.floor(y/H*80),0,79);
+    while(i<79&&centros[i+1].y<y)i++;while(i>0&&centros[i].y>y)i--;
+    const f=THREE.MathUtils.clamp((y-centros[i].y)/(centros[i+1].y-centros[i].y),0,1),p=veiaGeo.attributes.position;
+    cParede.copy(centros[i]).lerp(centros[i+1],f);
+    aParede.fromBufferAttribute(p,i*25).lerp(auxParede.fromBufferAttribute(p,(i+1)*25),f).sub(cParede);
+    bParede.fromBufferAttribute(p,i*25+6).lerp(auxParede.fromBufferAttribute(p,(i+1)*25+6),f).sub(cParede);
+    return target.copy(cParede).addScaledVector(aParede,x).addScaledVector(bParede,z);
+  };
+  return {curva,veiaGeo,barrigas,tendao,deformarVeia,raio,mapearNaVeia};
 }
