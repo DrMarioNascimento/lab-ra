@@ -30,7 +30,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { prepararParaRA } from '../cores-para-ra.js';
-import { criar } from './modelos.js';
+import { criar } from './modelos.js?v=musculo-anatomico-20261003';
 
 const $ = id => document.getElementById(id);
 const canvas = $('scene'), stage = $('stage');
@@ -46,8 +46,7 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
    exposição devolve a leitura sem devolver o brilho de plástico, porque quem
    dava o brilho era o clearcoat, não a exposição. */
 renderer.toneMappingExposure = 1.16;
-/* Sem sombra, tecido vira adesivo: é o contato com o pedestal e a sombra que um
-   fascículo joga no vizinho que dizem qual está na frente. */
+/* Sombra de contato entre estruturas para preservar a leitura de profundidade. */
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -75,8 +74,6 @@ const fill = new THREE.DirectionalLight(0xffc6ac, .75); fill.position.set(-5, 2,
    tecido de neon, então ficou fraca de propósito */
 const rim = new THREE.DirectionalLight(0xff8a4e, 1.5); rim.position.set(-3.5, 2, -6); scene.add(rim);
 
-const pedestal = new THREE.Mesh(new THREE.CylinderGeometry(3.2, 3.5, .14, 72), new THREE.MeshStandardMaterial({ color: 0x0e0907, roughness: .9, metalness: .04 }));
-pedestal.position.y = -1.9; pedestal.receiveShadow = true; scene.add(pedestal);
 const root = new THREE.Group(); scene.add(root);
 
 /* ------------------------------------------------------------ texturas (navegador) */
