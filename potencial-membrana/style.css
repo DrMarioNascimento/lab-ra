@@ -133,3 +133,7 @@
 .label-lines path { stroke:#d5bf8a; stroke-width:1; opacity:.55; fill:none; }
 .label-lines circle { fill:#e0bd75; }
 @media(max-width:520px) { .lbl {max-width:108px;font-size:.55rem;} }
+
+.ghost-control:disabled { opacity: .42; cursor: default; }
+.stage-tools { max-width:calc(100% - 20px); flex-wrap:wrap; justify-content:flex-end; }
+@media(max-width:520px) { .ghost-control { padding:7px 8px; font-size:.60rem; } }

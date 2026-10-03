@@ -17,8 +17,7 @@
    ── AS TRÊS ARMADILHAS QUE JÁ CUSTARAM CARO NO MÚSCULO ────────────────────
    Elas valem aqui inteiras, e estão respeitadas linha a linha:
    1. NADA DE VERNIZ EM TECIDO VIVO. `clearcoat` é laca de carro e de drágea.
-      Tecido tem filme úmido: `sheen`. As exceções legítimas aqui são três, e
-      só três — o vidro da micropipeta, a bainha de mielina (que é lipídio de
+      Tecido tem filme úmido: `sheen`. As exceções legítimas aqui são a bainha de mielina (que é lipídio de
       verdade, e brilha) e os íons, que são esquema molecular, não carne.
    2. SOMBRA DE CONTATO ENTRE PEÇAS ENCOSTADAS. Sem ela o olho resolve pela
       hipótese mais simples — um corpo só com relevo na casca —, e isso é a
@@ -37,6 +36,7 @@
    nada que o aluno veja. */
 
 import * as THREE from 'three';
+import { MarchingCubes } from 'three/addons/objects/MarchingCubes.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 export function criar(canvasTex) {
@@ -172,11 +172,6 @@ const M = {
      lendo como lipídio e para de competir com a onda por brilho. */
   mielina: phys({ color: 0x9c8a6e, map: TEX.mielina, roughness: .56, sheen: .30,
     sheenColor: 0xf4e3c8, clearcoat: .10, clearcoatRoughness: .58 }),
-  /* vidro de micropipeta: aqui clearcoat alto é a verdade do material */
-  vidro: phys({ color: 0xbcd6e4, roughness: .22, transmission: .0, transparent: true, opacity: .30,
-    side: THREE.FrontSide, clearcoat: .9, clearcoatRoughness: .08, depthWrite: false }),
-  metal: phys({ color: 0x9fa6ad, roughness: .32, metalness: .85 }),
-
   cabeca: phys({ color: 0xffffff, vertexColors: true, roughness: .64, clearcoat: 0,
     sheen: .18, sheenRoughness: .7, sheenColor: 0xffe6c0 }),
   cauda: phys({ color: 0x6a564a, roughness: .82, clearcoat: 0 }),
@@ -410,11 +405,19 @@ function popular({ especies, n, lado, faixa, faceY, larg = MEM.x }) {
 }
 
 /* ── as duas superfícies curvas da bicamada ─────────────────────────────── */
-function planoCurvo(mat, y0, { seg = 44, larg = MEM.x } = {}) {
+function planoCurvo(mat, y0, { seg = 44, larg = MEM.x, buracos = [] } = {}) {
   const g = new THREE.PlaneGeometry(larg * 2, MEM.z * 2, seg, Math.round(seg * MEM.z / larg));
   g.rotateX(-Math.PI / 2);
   const p = g.attributes.position;
   for (let i = 0; i < p.count; i++) p.setY(i, memY(p.getX(i), p.getZ(i)) + y0);
+  if(buracos.length){
+    const indices=g.index.array,keep=[];
+    for(let i=0;i<indices.length;i+=3){
+      const ids=[indices[i],indices[i+1],indices[i+2]],x=ids.reduce((s,k)=>s+p.getX(k),0)/3,z=ids.reduce((s,k)=>s+p.getZ(k),0)/3;
+      if(!buracos.some(b=>Math.hypot(x-b.x,z-b.z)<b.r-.075))keep.push(...ids);
+    }
+    g.setIndex(keep);
+  }
   p.needsUpdate = true; g.computeVertexNormals();
   return new THREE.Mesh(g, mat);
 }
@@ -449,41 +452,20 @@ function bicamadaDePerto({ passo = .295, rc = .112, esp = 5 * NM - 2 * .112, bur
   const cab = [], cau = [];
   const baseCab = new THREE.SphereGeometry(rc, 10, 8);
   const meio = esp / 2 - rc * .55;
-  const CAU = { colo: .054, ponta: .032, sep: .052, comp: 1.06, trechos: 5, lados: 6 };
-
-  /* A cauda: tubo varrido de raio decrescente, com calota na ponta. Sai para
-     fora ao deixar a cabeça e volta para dentro depois do joelho — é esse
-     desenho que faz as duas caudas se encontrarem no miolo em vez de descerem
-     como duas pernas. */
+  const CAU = { colo: .055, ponta: .036, sep: .046, comp: 1.06, trechos: 7, lados: 6 };
   function caudaGeo(inc) {
-    const L = meio * CAU.comp, pts = [];
-    for (let i = 0; i <= 6; i++) {
-      const u = i / 6;
-      const flex = u < .42 ? u * inc * .22 : (.42 * inc * .22 - (u - .42) * inc * .80);
-      pts.push(V(flex * L, -u * L, 0));
-    }
-    const curva = new THREE.CatmullRomCurve3(pts);
-    const g = new THREE.TubeGeometry(curva, CAU.trechos, 1, CAU.lados, false);
-    /* o TubeGeometry é de raio fixo: afino anel por anel, do colo à ponta */
-    const pos = g.attributes.position;
-    for (let t = 0; t <= CAU.trechos; t++) {
-      const u = t / CAU.trechos, r = CAU.colo * (1 - u) + CAU.ponta * u, ct = curva.getPoint(u);
-      for (let k = 0; k <= CAU.lados; k++) {
-        const i = t * (CAU.lados + 1) + k;
-        pos.setXYZ(i, ct.x + (pos.getX(i) - ct.x) * r,
-                      ct.y + (pos.getY(i) - ct.y) * r,
-                      ct.z + (pos.getZ(i) - ct.z) * r);
-      }
-    }
-    pos.needsUpdate = true; g.computeVertexNormals();
-    /* sem calota a cauda é cano cortado, e foi metade da cara de espeto */
-    const f = curva.getPoint(1), cap = new THREE.SphereGeometry(CAU.ponta, CAU.lados, 3);
-    cap.translate(f.x, f.y, f.z);
-    return mergeGeometries([g, cap]);
+    const L=meio*CAU.comp, sinal=Math.sign(inc), flex=Math.abs(inc);
+    const curva=curvaDePontos(u=>V(sinal*L*(.045*Math.sin(u*Math.PI)+flex*.65*suave(clamp((u-.35)/.65,0,1))),
+      -u*L,.016*Math.sin(u*Math.PI*1.4+sinal)*Math.sin(u*Math.PI)),12);
+    const geo=tuboPerfil(curva,u=>CAU.colo+(CAU.ponta-CAU.colo)*suave(u),
+      {segsU:CAU.trechos,segsV:CAU.lados});
+    const f=curva.getPointAt(1),cap=new THREE.SphereGeometry(CAU.ponta,CAU.lados,4);
+    cap.translate(f.x,f.y,f.z);return mergeGeometries([geo,cap]);
   }
+  const prototipos=[caudaGeo(-.18),caudaGeo(.35),caudaGeo(-.32),caudaGeo(.20)];
   const nx = Math.floor(larg * 2 / passo), nz = Math.floor(MEM.z * 2 / passo);
   for (let ix = 0; ix <= nx; ix++) for (let iz = 0; iz <= nz; iz++) {
-    const x = -larg + ix * passo + rnd(-.02, .02), z = -MEM.z + iz * passo + rnd(-.02, .02);
+    const x = -larg + ix * passo + (iz%2?.07:-.07) + rnd(-.016, .016), z = -MEM.z + iz * passo + rnd(-.02, .02);
     if (buracos.some(b => Math.hypot(x - b.x, z - b.z) < b.r)) continue;
     for (const lado of [1, -1]) {
       const y = memY(x, z) + lado * esp / 2;
@@ -495,7 +477,7 @@ function bicamadaDePerto({ passo = .295, rc = .112, esp = 5 * NM - 2 * .112, bur
       const c = baseCab.clone(); tintar(c, variar(lado > 0 ? 0xc9b394 : 0xbfa889, .015, .07, .06));
       c.translate(x, y, z); cab.push(c);
       for (const dx of [-CAU.sep, CAU.sep]) {
-        const g = caudaGeo(rnd(.24, .38) * Math.sign(dx));
+        const g = prototipos[(ix+iz+(dx>0?1:0))%prototipos.length].clone();
         /* a folha de baixo é a mesma peça de cabeça para baixo. Tem de ser
            giro em X: em Z o eixo lateral também inverteria, e a cauda passaria
            a abrir para o lado errado da própria cabeça. */
@@ -505,13 +487,13 @@ function bicamadaDePerto({ passo = .295, rc = .112, esp = 5 * NM - 2 * .112, bur
       }
     }
   }
-  g.add(new THREE.Mesh(mergeGeometries(cab), M.cabeca));
+  const cabecas=new THREE.Mesh(mergeGeometries(cab),M.cabeca);cabecas.name='cabeças polares';g.add(cabecas);
   const geoCau = mergeGeometries(cau); geoCau.deleteAttribute('uv');
-  g.add(new THREE.Mesh(geoCau, M.cauda));
+  const caudas=new THREE.Mesh(geoCau,M.cauda);caudas.name='caudas hidrofóbicas';g.add(caudas);
   /* o miolo hidrofóbico fecha o vão entre as caudas: sem ele, de raspão a
      membrana é um vidro furado e o olho atravessa a parede */
-  g.add(planoCurvo(M.miolo, .055, { larg }));
-  g.add(peloAvesso(planoCurvo(M.miolo, -.055, { larg })));
+  g.add(planoCurvo(M.miolo, .055, { larg, buracos }));
+  g.add(peloAvesso(planoCurvo(M.miolo, -.055, { larg, buracos })));
   return g;
 }
 
@@ -600,6 +582,37 @@ function espinha(ponto, dir, comp, esc = 1) {
   return g;
 }
 
+function somaContinuo(R) {
+  const alcance=1.64, res=52;
+  const campo=new MarchingCubes(res,M.neuronio,false,false,24000);
+  const raizes=PRIMARIOS.map(p=>({a:p.d.clone().multiplyScalar(R*.67),
+    b:p.d.clone().multiplyScalar(R*formaSoma(p.d)*.86+.34),r:p.r*1.12}));
+  raizes.push({a:V(.49,-.06,0),b:V(1.14,-.12,.04),r:.135});
+  const p=V(),ab=V(),ap=V();
+  for(let z=0;z<res;z++)for(let y=0;y<res;y++)for(let x=0;x<res;x++){
+    p.set((x/res*2-1)*alcance,(y/res*2-1)*alcance,(z/res*2-1)*alcance);
+    let d=Math.hypot(p.x,p.y/1.08,p.z/.93)-R*(1+.018*ruido3(p.x*3,p.y*3,p.z*3));
+    for(const q of raizes){
+      ab.copy(q.b).sub(q.a);ap.copy(p).sub(q.a);
+      const t=clamp(ap.dot(ab)/ab.lengthSq(),0,1);
+      const dist=ap.addScaledVector(ab,-t).length()-q.r*(1-.13*t);
+      const k=.21,h=clamp(.5+.5*(dist-d)/k,0,1);
+      d=dist*(1-h)+d*h-k*h*(1-h);
+    }
+    campo.field[x+y*res+z*res*res]=80-d*90;
+  }
+  campo.update();
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.BufferAttribute(campo.positionArray.slice(0,campo.count*3),3));
+  geo.setAttribute('normal',new THREE.BufferAttribute(campo.normalArray.slice(0,campo.count*3),3));
+  geo.scale(alcance,alcance,alcance);
+  const pos=geo.attributes.position,uv=new Float32Array(pos.count*2);
+  for(let i=0;i<pos.count;i++){p.fromBufferAttribute(pos,i).normalize();
+    uv[i*2]=.5+Math.atan2(p.z,p.x)/(2*Math.PI);uv[i*2+1]=.5-Math.asin(p.y)/Math.PI;}
+  geo.setAttribute('uv',new THREE.BufferAttribute(uv,2));campo.geometry.dispose();
+  return geo;
+}
+
 function neuronio() {
   const g = new THREE.Group(), R = SOMA.R;
 
@@ -612,7 +625,7 @@ function neuronio() {
     const ruido=1+.023*ruido3(n.x*2.4,n.y*2.1,n.z*2.6);
     return R * ruido * (1 + flareEm(n));
   };
-  const geoS=moldarSoma(new THREE.SphereGeometry(R,72,48));
+  const geoS=somaContinuo(R);
   tintar(geoS,C(COR_NEURO));
   const soma=new THREE.Mesh(geoS,M.neuronio); soma.name='soma'; g.add(soma);
 
@@ -629,7 +642,7 @@ function neuronio() {
     const rFim = Math.max(.013, raio * (ordem===0?.69:.72));
     const perfil=u=>{
       const estreita=raio+(rFim-raio)*suave(u);
-      const boca=alarga?1+.70*Math.exp(-Math.pow(u/.25,2)):1;
+      const boca=alarga?1+.18*Math.exp(-Math.pow(u/.22,2)):1;
       const ponta=ordem===2?1-.85*suave(clamp((u-.82)/.18,0,1)):1;
       return estreita*boca*ponta*(1+.025*Math.sin(u*9+s));
     };
@@ -683,30 +696,8 @@ function neuronio() {
   g.userData.ancoras=[['soma',V(-.12,.38,.63)],['dendritos',V(-1.65,1.25,.13)],
     ['cone axonal',eixo.getPointAt(.035)],['segmento inicial',eixo.getPointAt(.15)],
     ['axônio',eixo.getPointAt(.95)],['mielina',eixo.getPointAt(.48)],
-    ['nó de Ranvier',eixo.getPointAt(.5785)],['terminais',fim.clone().add(destinos[0])],
-    ['micropipeta',V(-1.20,1.50,.92)],['referência externa',V(2.10,-1.75,1.18)]];
-
-  /* ── contexto: as duas pontas que medem ──────────────────────────────
-     A micropipeta furando o soma e o eletrodo de referência no banho. Sem as
-     duas o número −70 mV não quer dizer nada: potencial é DIFERENÇA, e o
-     aluno que só vê um eletrodo entende voltagem como propriedade da célula,
-     que é exatamente a confusão que esta página existe para desfazer.
-     `foraDoQuadro` os tira do enquadramento: são contexto, não assunto. */
-  const ctx = [];
-  const haste = (de, ate, r0, r1, mat, segs = 20) => {
-    const d = ate.clone().sub(de), m = new THREE.Mesh(new THREE.CylinderGeometry(r0, r1, d.length(), segs, 1, true), mat);
-    m.position.copy(de).add(ate).multiplyScalar(.5);
-    m.quaternion.setFromUnitVectors(V(0, 1, 0), d.clone().normalize());
-    return m;
-  };
-  const pontaPip = V(-.18, .28, .42), traseiraPip = V(-2.35, 2.55, 1.45);
-  ctx.push(haste(traseiraPip, pontaPip, .155, .014, M.vidro));
-  ctx.push(haste(traseiraPip.clone().lerp(pontaPip, .06), pontaPip.clone().lerp(traseiraPip, .10), .020, .006, M.metal, 10));
-  const pontaRef = V(1.62, -1.18, .88);
-  ctx.push(haste(V(2.85, -2.45, 1.62), pontaRef, .062, .030, M.metal, 14));
-  const bulbo = new THREE.Mesh(new THREE.SphereGeometry(.075, 16, 12), M.metal);
-  bulbo.position.copy(pontaRef); ctx.push(bulbo);
-  ctx.forEach(o => { o.userData.foraDoQuadro = true; g.add(o); });
+    ['nó de Ranvier',eixo.getPointAt(.5785)],['terminais',fim.clone().add(destinos[0])]
+  ];
 
   g.userData.foco = V(0, .22, .58);
   return g;
@@ -810,6 +801,104 @@ function popularEsfera({ especies, n, lado, rDe, rAte, rFilme, semNucleo = false
   return cargas;
 }
 
+function organelasCelulares() {
+  const g=new THREE.Group();g.name='organelas';
+  const volumes=[],ancoras=[];
+  const mitoMat=vivo({color:0xa67e72,roughness:.72,sheenColor:0xf6cdb6});
+  const cristaMat=vivo({color:0x8d6d66,roughness:.75,side:THREE.DoubleSide});
+  const erMat=vivo({color:0x807087,roughness:.79,sheenColor:0xd4c2db});
+  const golgiMat=vivo({color:0x668d7d,roughness:.76,sheenColor:0xd6e8d5});
+  const ribMat=phys({color:0x645467,roughness:.86});
+  function juntar(geos,mat,name){const mesh=new THREE.Mesh(mergeGeometries(geos),mat);mesh.name=name;g.add(mesh);return mesh;}
+  function cisterna(larg,prof,y,x,z,mat,lista){
+    const s=new THREE.Shape();
+    s.moveTo(-larg/2,0);s.bezierCurveTo(-larg*.35,-prof*.56,larg*.34,-prof*.56,larg/2,0);
+    s.bezierCurveTo(larg*.35,prof*.34,-larg*.34,prof*.34,-larg/2,0);
+    const geo=new THREE.ExtrudeGeometry(s,{depth:.037,bevelEnabled:true,bevelSegments:2,steps:1,
+      bevelSize:.025,bevelThickness:.018,curveSegments:18});
+    geo.rotateX(-Math.PI/2);geo.translate(x,y,z);lista.push(geo);
+  }
+  const mitos=[],cristas=[];
+  [V(.94,.70,.54),V(-.88,-.92,.45),V(.76,-1.02,.20)].forEach((p,i)=>{
+    const aberto=i===0,geo=new THREE.SphereGeometry(1,32,22,aberto?CEL.ini:0,aberto?CEL.arco:Math.PI*2);
+    const pos=geo.attributes.position;
+    for(let k=0;k<pos.count;k++){
+      const x=pos.getX(k),y=pos.getY(k),z=pos.getZ(k);
+      pos.setXYZ(k,x*.44,y*.19+.055*(1-x*x),z*.21);
+    }
+    geo.computeVertexNormals();geo.rotateZ(i===1?.38:-.36);geo.translate(...p.toArray());mitos.push(geo);
+    volumes.push({p:p.toArray(),r:[.53,.35,.33]});
+    if(aberto){
+      const inner=new THREE.SphereGeometry(1,30,20,CEL.ini,CEL.arco);
+      inner.scale(.415,.165,.185);inner.rotateZ(-.36);inner.translate(...p.toArray());
+      const mesh=peloAvesso(new THREE.Mesh(inner,cristaMat));mesh.name='matriz mitocondrial';g.add(mesh);
+      for(let j=0;j<6;j++){
+        // Folds are thin sheets of inner membrane, not rod-like organelles.
+        const folha=new THREE.PlaneGeometry(.16,.24,6,10),pf=folha.attributes.position;
+        for(let k=0;k<pf.count;k++){
+          const y=pf.getY(k),z=pf.getX(k);
+          pf.setXYZ(k,-.30+j*.11+.020*Math.sin(y*22),y,z+.055);
+        }
+        folha.computeVertexNormals();
+        folha.rotateZ(-.36);folha.translate(...p.toArray());cristas.push(folha);
+      }
+    }
+  });
+  juntar(mitos,mitoMat,'mitocôndrias');juntar(cristas,cristaMat,'cristas mitocondriais');
+  ancoras.push(['mitocôndria · cristas',V(1,.69,.68)]);
+  const er=[],rib=[];
+  for(let j=0;j<5;j++){
+    const y=.35+j*.15;cisterna(.94-j*.035,.41,y,-.86,.49,erMat,er);
+    for(let k=0;k<19;k++){
+      const u=k/18,x=-1.28+u*.83,z=.49+.055*Math.sin(u*Math.PI*2+j);
+      const r=new THREE.SphereGeometry(.025,6,4);r.translate(x,y+.071,z);rib.push(r);
+    }
+  }
+  juntar(er,erMat,'retículo endoplasmático rugoso');juntar(rib,ribMat,'ribossomos');
+  volumes.push({p:[-.86,.68,.49],r:[.56,.49,.32]});
+  ancoras.push(['retículo rugoso · Nissl',V(-.91,.84,.56)]);
+  const golgi=[],vesiculas=[];
+  for(let j=0;j<5;j++)cisterna(.75-j*.065,.36,-.65+j*.13,.34,.58,golgiMat,golgi);
+  for(let i=0;i<9;i++){
+    const v=new THREE.SphereGeometry(.045+(i%3)*.012,10,8);
+    v.translate(.72+Math.sin(i*2.1)*.10,-.52+(i%4)*.12,.47+Math.cos(i*1.7)*.14);vesiculas.push(v);
+  }
+  juntar(golgi,golgiMat,'complexo de Golgi');juntar(vesiculas,golgiMat,'vesículas');
+  volumes.push({p:[.38,-.39,.58],r:[.55,.47,.32]});
+  ancoras.push(['complexo de Golgi',V(.36,-.30,.65)]);
+  const ser=[];
+  for(let j=0;j<6;j++){
+    const curva=curvaDePontos(t=>V(.18+t*.78,1.04+.08*Math.sin(t*Math.PI*2+j),-.10+j*.085+.05*Math.sin(t*Math.PI)),22);
+    ser.push(tuboPerfil(curva,()=>.037,{segsU:22,segsV:7}));
+    if(j%2===0){const ponte=curvaDePontos(t=>V(.43,1.04+.08*Math.sin(.32*Math.PI*2+j+t),-.10+(j+t)*.085),10);
+      ser.push(tuboPerfil(ponte,()=>.037,{segsU:10,segsV:7}));}
+  }
+  juntar(ser,erMat,'retículo endoplasmático liso');
+  volumes.push({p:[.58,1.05,.11],r:[.53,.23,.42]});
+  ancoras.push(['retículo liso',V(.63,1.10,.13)]);
+  return {g,volumes,ancoras};
+}
+
+function bordaBicamada(Rin,R,ini,arco) {
+  const g=new THREE.Group();g.name='bicamada no corte';
+  const cab=[],cau=[],rr=.026;
+  for(const phi of [ini,ini+arco])for(let j=2;j<64;j++){
+    const t=j/65*Math.PI,dir=V(-Math.cos(phi)*Math.sin(t),Math.cos(t),Math.sin(phi)*Math.sin(t));
+    for(const lado of [0,1]){
+      const r=lado?R-.022:Rin+.022,p=dir.clone().multiplyScalar(r);
+      const c=new THREE.SphereGeometry(rr,8,6);c.translate(...p.toArray());cab.push(tintar(c,C(0xc7b89e)));
+      for(const shift of [-.014,.014]){
+        const alvo=dir.clone().multiplyScalar((R+Rin)/2).add(V(0,shift,0));
+        const curva=curvaDePontos(u=>p.clone().lerp(alvo,u).add(V(shift*Math.sin(u*Math.PI),0,0)),7);
+        cau.push(tuboPerfil(curva,()=>.010,{segsU:7,segsV:5}));
+      }
+    }
+  }
+  g.add(new THREE.Mesh(moldarSoma(mergeGeometries(cab)),M.cabeca));
+  g.add(new THREE.Mesh(moldarSoma(mergeGeometries(cau)),M.cauda));
+  return g;
+}
+
 function interior() {
   const g = new THREE.Group();
   const { R, par, ini, arco, rNuc } = CEL, Rin = R - par;
@@ -818,9 +907,14 @@ function interior() {
   g.add(peloAvesso(new THREE.Mesh(moldarSoma(new THREE.SphereGeometry(Rin, 76, 48, ini, arco)), M.bicamadaLonge)));
   g.add(new THREE.Mesh(moldarSoma(mergeGeometries([faceDoCorte(ini, Rin, R), faceDoCorte(ini + arco, Rin, R)])), M.corte));
 
+  g.add(bordaBicamada(Rin,R,ini,arco));
+  const organelas=organelasCelulares();g.add(organelas.g);
+  g.userData.ancorasOrganelas=organelas.ancoras;
+  g.userData.volumesOrganelas=organelas.volumes;
+
   /* núcleo deslocado por ruído: esfera lisa aqui seria pérola dentro de bola,
      e a página inteira existe para não parecer drágea */
-  const geoN = new THREE.SphereGeometry(rNuc, 44, 32);
+  const geoN = new THREE.SphereGeometry(rNuc, 44, 32, ini, arco);
   const pn = geoN.attributes.position;
   for (let i = 0; i < pn.count; i++) {
     const x = pn.getX(i), y = pn.getY(i), z = pn.getZ(i);
@@ -828,9 +922,11 @@ function interior() {
     pn.setXYZ(i, x * d, y * d * .95, z * d);
   }
   pn.needsUpdate = true; geoN.computeVertexNormals(); tintar(geoN, C(0xa89078));
-  const nuc = new THREE.Mesh(geoN, M.nucleo); nuc.position.copy(CEL.nuc); g.add(nuc);
+  const nuc = new THREE.Mesh(geoN, M.nucleo); nuc.name='envoltório nuclear em corte';nuc.position.copy(CEL.nuc);organelas.g.add(nuc);
+  const interiorN=new THREE.Mesh(new THREE.SphereGeometry(rNuc*.94,40,28,ini,arco),M.nucleo);
+  peloAvesso(interiorN);interiorN.position.copy(CEL.nuc);organelas.g.add(interiorN);
   const nucl = new THREE.Mesh(new THREE.SphereGeometry(.21, 20, 14), M.nucleolo);
-  nucl.position.copy(CEL.nuc).add(V(.16, -.10, .18)); g.add(nucl);
+  nucl.name='nucléolo';nucl.position.copy(CEL.nuc).add(V(.16, -.10, .18)); organelas.g.add(nucl);
 
   /* três tocos de dendrito: são eles que dizem que este corpo é o MESMO do
      nível 01, e é isso que faz o mergulho ser mergulho e não troca de assunto */
@@ -847,29 +943,40 @@ function interior() {
      parede e o volume só começa meio raio adiante. */
   const rFilmeIn = Rin - .10, rFilmeFora = R + .11, bulkAte = Rin - .52;
   const dentro = [
-    ...popularEsfera({ especies: ['K'], n: 176, lado: 1, rDe: .10, rAte: bulkAte, rFilme: rFilmeIn, semNucleo: true }),
-    ...popularEsfera({ especies: ['A', 'A', 'Cl'], n: 176, lado: 1, rDe: .10, rAte: bulkAte, rFilme: rFilmeIn, semNucleo: true }),
+    ...popularEsfera({ especies: ['K'], n: 66, lado: 1, rDe: .10, rAte: bulkAte, rFilme: rFilmeIn, semNucleo: true }),
+    ...popularEsfera({ especies: ['A', 'A', 'Cl'], n: 66, lado: 1, rDe: .10, rAte: bulkAte, rFilme: rFilmeIn, semNucleo: true }),
   ];
   const fora = [
-    ...popularEsfera({ especies: ['Na'], n: 128, lado: -1, rDe: R + .26, rAte: R + .80, rFilme: rFilmeFora }),
-    ...popularEsfera({ especies: ['Cl'], n: 128, lado: -1, rDe: R + .26, rAte: R + .80, rFilme: rFilmeFora }),
+    ...popularEsfera({ especies: ['Na'], n: 48, lado: -1, rDe: R + .26, rAte: R + .55, rFilme: rFilmeFora }),
+    ...popularEsfera({ especies: ['Cl'], n: 48, lado: -1, rDe: R + .26, rAte: R + .55, rFilme: rFilmeFora }),
   ];
   sortear(dentro, 1); sortear(fora, 1);
   /* e um volume que NUNCA sai do lugar, dos dois lados: sem ele, num potencial
      alto o citoplasma esvaziaria de um sinal e a página passaria a ensinar
      justamente o contrário do que quer */
   const parado = [
-    ...popularEsfera({ especies: ['K'], n: 58, lado: 1, rDe: .10, rAte: bulkAte, rFilme: rFilmeIn, semNucleo: true }),
-    ...popularEsfera({ especies: ['A', 'Cl'], n: 58, lado: 1, rDe: .10, rAte: bulkAte, rFilme: rFilmeIn, semNucleo: true }),
-    ...popularEsfera({ especies: ['Na'], n: 40, lado: -1, rDe: R + .24, rAte: R + .80, rFilme: rFilmeFora }),
-    ...popularEsfera({ especies: ['Cl'], n: 40, lado: -1, rDe: R + .24, rAte: R + .80, rFilme: rFilmeFora }),
+    ...popularEsfera({ especies: ['K'], n: 24, lado: 1, rDe: .10, rAte: bulkAte, rFilme: rFilmeIn, semNucleo: true }),
+    ...popularEsfera({ especies: ['A', 'Cl'], n: 24, lado: 1, rDe: .10, rAte: bulkAte, rFilme: rFilmeIn, semNucleo: true }),
+    ...popularEsfera({ especies: ['Na'], n: 20, lado: -1, rDe: R + .24, rAte: R + .55, rFilme: rFilmeFora }),
+    ...popularEsfera({ especies: ['Cl'], n: 20, lado: -1, rDe: R + .24, rAte: R + .55, rFilme: rFilmeFora }),
   ];
   fixar(parado);
   const todas = dentro.concat(fora, parado);
   todas.forEach(c => {
-    c.r *= .84;
+    c.r *= .72;
     for(const p of new Set([c.bulk,c.filme])) {
       const f=formaSoma(p.clone().normalize());p.multiplyScalar(f);p.y*=1.08;p.z*=.93;
+    }
+  });
+  // Avoid organelle solids without changing ion counts, charge signs or film addresses.
+  let seedInterior=5163;
+  const aleatorio=()=>{seedInterior=(1664525*seedInterior+1013904223)>>>0;return seedInterior/4294967296;};
+  const ocupa=p=>p.distanceTo(CEL.nuc)<rNuc+.07||organelas.volumes.some(v=>
+    ((p.x-v.p[0])/v.r[0])**2+((p.y-v.p[1])/v.r[1])**2+((p.z-v.p[2])/v.r[2])**2<1);
+  todas.filter(c=>c.lado===1).forEach(c=>{
+    for(let i=0;ocupa(c.bulk)&&i<200;i++){
+      const p=V((aleatorio()*2-1)*1.42,(aleatorio()*2-1)*1.48,(aleatorio()*2-1)*1.26);
+      if(p.length()<1.45&&!ocupa(p))c.bulk.copy(p);
     }
   });
   g.add(inscrever(nuvem(todas.filter(c => c.z > 0), M.cargaPos)));
@@ -1019,6 +1126,12 @@ function canalDeHelices({ y0, y1, raio, poro, nH = 6, rh = .085, torcao = .6, co
       tuboPerfil(curva, u => rh * (.80 + .32 * Math.sin(u * Math.PI) + .06 * Math.sin(u * 9 + i)), { segsU: 76, segsV: 12 }),
       variar(cor, .02, .09, .075), raio((y0 + y1) / 2) + rh));
   }
+  for(let i=0;i<nH;i++)for(const y of [y0*.78,y1*.78]){
+    const a=i/nH*Math.PI*2+torcao*(y-y0)/(y1-y0),r=raio(y);
+    const dom=new THREE.SphereGeometry(rh*1.30,14,10);dom.scale(1,.90,1);
+    dom.translate(Math.cos(a)*r,y,Math.sin(a)*r);
+    geos.push(ocluirNoAnel(dom,C(cor),r+rh,.58));
+  }
   g.add(new THREE.Mesh(mergeGeometries(geos), M.proteina));
   /* a parede do poro, vista POR DENTRO: é ela que faz a boca ser um buraco e
      não uma tampa, e é nela que o filtro de seletividade aperta */
@@ -1053,7 +1166,7 @@ function portas() {
   const emY = k => memY(S[k].x, S[k].z);
   g.add(bicamadaDePerto({
     larg: LARG,
-    buracos: [[S.vazK, .68], [S.volNa, .70], [S.carr, .73], [S.bomba, .87]].map(([q, r]) => ({ x: q.x, z: q.z, r })),
+    buracos: [[S.vazK, .54], [S.volNa, .57], [S.carr, .61], [S.bomba, .68]].map(([q, r]) => ({ x: q.x, z: q.z, r })),
   }));
 
   const canalK = canalDeHelices({

@@ -219,13 +219,14 @@ test("com a onda andando a bancada avisa que a foto não acompanha", async () =>
 test("a cauda é um tubo varrido, não cilindros soldados", async () => {
   const m = await text("potencial-membrana/modelos.js");
   assert.match(m, /function caudaGeo/);
-  assert.match(m, /new THREE\.TubeGeometry\(curva, CAU\.trechos/);
+  assert.match(m, /tuboPerfil\(curva,u=>CAU\.colo/);
+  assert.match(m, /segsU:CAU\.trechos,segsV:CAU\.lados/);
 });
 
 test("a ponta da cauda tem calota", async () => {
   /* sem ela a cauda é cano cortado, e foi metade da cara de espeto */
   const m = await text("potencial-membrana/modelos.js");
-  assert.match(m, /const f = curva\.getPoint\(1\), cap = new THREE\.SphereGeometry\(CAU\.ponta/);
+  assert.match(m, /const f=curva\.getPointAt\(1\),cap=new THREE\.SphereGeometry\(CAU\.ponta/);
 });
 
 test("a cauda tem corpo: o colo é ao menos metade da cabeça", async () => {
