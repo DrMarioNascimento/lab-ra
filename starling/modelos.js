@@ -263,18 +263,19 @@ export function criar() {
     const g=i===0?rede(d):i===3?barreira(d):closeup(i,d);
     g.name='Starling-nivel-'+(i+1); g.visible=i===0; modelos.push(g);
   }
-  function animar(t, liquidaEm, {encharcado=0,semLinfa=false,nivel=0,sigma=1}={}) {
+  function animar(t, liquidaEm, {encharcado=0,semLinfa=false,nivel=0,sigma=1,oncPlasma=25,kf=.02}={}) {
     const d=motions[nivel];
     for(const {o,path,offset} of d.blood) {
       const u=(t*.07+offset)%1; o.position.copy(path.getPointAt(u));
       // Disco eritrocitário perpendicular à direção do fluxo.
       if(nivel!==0) o.quaternion.setFromUnitVectors(v(1,0,0),path.getTangentAt(u));
     }
-    for(const {o,L,u,a,r} of d.protein) {
+    for(const [i,{o,L,u,a,r}] of d.protein.entries()) {
+      o.visible=i<Math.round(d.protein.length*oncPlasma/34);
       o.position.set(((u+t*.026)%1-.5)*L,Math.cos(a)*r,Math.sin(a)*r); o.rotation.x=t*.16+a;
     }
     for(const {o,L,u,a,offset,park} of d.water) {
-      const p=liquidaEm(u), speed=.12+Math.min(Math.abs(p),40)*.008;
+      const p=liquidaEm(u), speed=(.12+Math.min(Math.abs(p),40)*.008)*kf/.02;
       const q=(t*speed+offset)%1;
       const retained=park<encharcado;
       const r=retained?7+park*14*(1+encharcado*.3):p>=0?4+q*10:14-q*10;
@@ -285,11 +286,12 @@ export function criar() {
       o.visible=!semLinfa; const q=(t*.13+offset)%1; o.position.copy(path.getPointAt(q));
     }
     for(const {o,x,z,offset} of d.crossing) {
-      const p=liquidaEm((x+16)/32), q=(t*(.2+Math.min(Math.abs(p),40)*.006)+offset)%1;
+      const p=liquidaEm((x+16)/32), q=(t*(.2+Math.min(Math.abs(p),40)*.006)*kf/.02+offset)%1;
       const y=p>=0?9-q*17:-8+q*17;
       o.visible=Math.abs(p)>.08; o.position.set(x,y+.006*x*x+.014*z*z,z);
     }
-    for(const {o,y,leak} of d.fixedProtein) {
+    for(const [i,{o,y,leak}] of d.fixedProtein.entries()) {
+      o.visible=i<Math.round(d.fixedProtein.length*oncPlasma/34);
       o.position.y=leak>sigma?y-((t*.08+leak)%1)*15:y+Math.sin(t*.2+y)*.18;
       o.rotation.y=t*.05;
     }

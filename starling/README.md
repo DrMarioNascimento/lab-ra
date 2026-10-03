@@ -42,6 +42,10 @@ de modelo reiniciam a observação; ajustes manuais mantêm o líquido acumulado
 Reiniciar zera o excesso e o tempo, preservando os parâmetros selecionados.
 A aba em segundo plano não avança a simulação.
 
+A densidade visual de proteínas acompanha πc; a velocidade das gotas acompanha
+o módulo da pressão líquida e Kf. Essas partículas são símbolos qualitativos:
+contagem, tamanho e velocidade não constituem uma calibração molecular do fluxo.
+
 A RA exporta apenas o nível visível e o estado pausado. É uma fotografia 3D,
 sem a animação fisiológica do navegador. Exportações antigas são invalidadas
 imediatamente ao mudar o estado. Legendas HTML ficam no navegador.
