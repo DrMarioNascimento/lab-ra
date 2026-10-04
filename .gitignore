@@ -3,3 +3,5 @@
 # Já o `settings.local.json` é da máquina de quem senta — permissões e
 # preferências pessoais — e não tem por que viajar no repositório.
 .claude/settings.local.json
+
+node_modules/

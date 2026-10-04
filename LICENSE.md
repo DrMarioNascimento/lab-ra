@@ -44,3 +44,8 @@ O projeto é disponibilizado para fins educacionais e demonstrativos, no estado 
 **Ano:** 2026
 
 Todos os direitos não expressamente concedidos permanecem reservados.
+
+
+## Corpo em ação
+
+O motor didático, as ampliações procedurais e a interface de `integracao/` são componentes originais abrangidos por esta licença. A silhueta e os pulmões reutilizam componentes locais existentes. O coração externo conserva os créditos de neshallads e CC BY 4.0, com compressão Meshopt, escala, acabamento e pulso visual adaptados. Three.js, Meshoptimizer e glTF Transform conservam suas licenças MIT. Consulte [atribuição](integracao/ATRIBUICAO.md); esta licença não restringe os direitos das licenças de terceiros.

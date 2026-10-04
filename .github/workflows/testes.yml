@@ -14,9 +14,7 @@
 # ficar vermelha por vinte commits sem ninguém ver. Teste que ninguém roda é
 # pior que teste que não existe: dá a sensação de estar guardado.
 #
-# SEM DEPENDÊNCIA NENHUMA, de propósito: o `package.json` do lab-ra tem seis
-# linhas e nenhum pacote, então não há `npm ci`, lockfile nem cache a fazer.
-# Se um dia houver dependência, é aqui que entra — e aí sim com lockfile.
+# A integração usa dependências de desenvolvimento para validar Meshopt.
 name: testes
 
 on:
@@ -43,4 +41,5 @@ jobs:
       # errada passa lá e quebra aqui — `coracao-bancada11-WIP.glb` é o
       # candidato óbvio. Isso é recurso, não risco: é a única régua que
       # apanha essa classe de defeito.
+      - run: npm ci
       - run: npm test
