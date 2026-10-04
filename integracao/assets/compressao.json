@@ -1,0 +1,17 @@
+{
+  "method": "EXT_meshopt_compression; sem simplify; posição 16 bits",
+  "models": [
+    {
+      "name": "corpo",
+      "source": "retorno-venoso/corpo.glb",
+      "original": 381696,
+      "compressed": 70340
+    },
+    {
+      "name": "coracao",
+      "source": "bancadas/11-coracao/fontes/scan/A-scan-realista.glb",
+      "original": 3255284,
+      "compressed": 2366656
+    }
+  ]
+}

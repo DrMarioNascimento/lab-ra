@@ -5,6 +5,14 @@
   "description": "Lab RA — bancadas de realidade aumentada do projeto MOSAICO.",
   "type": "module",
   "scripts": {
-    "test": "node --test \"tests/*.test.mjs\""
+    "test": "node --test \"tests/*.test.mjs\"",
+    "build:integracao": "node scripts/preparar-integracao.mjs"
+  },
+  "devDependencies": {
+    "@gltf-transform/core": "^4.2.1",
+    "@gltf-transform/extensions": "^4.2.1",
+    "@gltf-transform/functions": "^4.2.1",
+    "meshoptimizer": "^0.25.0",
+    "three": "^0.180.0"
   }
 }

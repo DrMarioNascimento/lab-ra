@@ -73,3 +73,8 @@ no Linux, e essa é a única régua que apanha essa classe de defeito.
 Este repositório é público para consulta e acesso à experiência no GitHub Pages, mas não é código aberto. O uso educacional permitido e as restrições de cópia, adaptação, redistribuição e exploração comercial estão descritos em [LICENSE.md](LICENSE.md).
 
 **Autor:** Mário César Nascimento, PhD.
+
+
+## Corpo em ação — Integração experimental
+
+[Corpo em ação](https://drmarionascimento.github.io/lab-ra/integracao/) permanece **somente no LAB-RA**, fora da página dos alunos e dos Tutores. Cinco aproximações conectam respiração, bombeamento, transporte e utilização de oxigênio no mesmo estado de repouso/exercício. Malhas Meshopt sem simplificação; RA animada via WebXR com indicação de compatibilidade. As curvas são didáticas; a câmera exige validação em aparelho físico. [Modelo e limites](integracao/README.md) · [Atribuição](integracao/ATRIBUICAO.md).
