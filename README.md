@@ -1,5 +1,7 @@
 # Laboratório do Pesquisar RA
 
+**Estado em 7 de outubro de 2026.** Bancadas de RA no ar, com acesso livre. Corpo em ação fica só aqui, fora da página dos alunos. Licença de uso restrito: repositório público não é código aberto. Revisão documental desta nota: 7 de outubro de 2026.
+
 **Aprender pesquisa fazendo pesquisa. Fazendo, errando e criando!**
 
 Laboratório de realidade aumentada — separado do hub MOSAICO.
@@ -70,10 +72,9 @@ no Linux, e essa é a única régua que apanha essa classe de defeito.
 
 ## Licença e uso
 
-Este repositório é público para consulta e acesso à experiência no GitHub Pages, mas não é código aberto. O uso educacional permitido e as restrições de cópia, adaptação, redistribuição e exploração comercial estão descritos em [LICENSE.md](LICENSE.md).
+Este repositório é público para consulta e acesso à experiência no GitHub Pages, mas não é código aberto. O uso educacional permitido e as restrições de cópia, adaptação, redistribuição e exploração comercial estão descritos em [LICENSE.md](LICENSE.md). Revisão documental desta nota: 7 de outubro de 2026.
 
 **Autor:** Mário César Nascimento, PhD.
-
 
 ## Corpo em ação — Integração experimental
 
