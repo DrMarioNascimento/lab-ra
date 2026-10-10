@@ -1,5 +1,12 @@
 # Laboratório do Pesquisar RA
 
+## Estado e manutenção — 10 de outubro de 2026
+
+Este laboratório mantém experiências de pesquisa e protótipos separados dos percursos de estudantes. [Corpo em ação](integracao/) permanece exclusivo deste LAB-RA; os catálogos de ensino de Fisiologia Interativa são mantidos em outro repositório.
+
+Além das bancadas de exploração espacial, o código contém experiências de coração, retorno venoso, pleura, músculo, potencial de membrana e Starling. A presença de uma bancada não declara validação científica ou compatibilidade universal com câmera/RA. Execute `npm test` para os contratos locais e valide a abertura da câmera em aparelho físico. Os créditos específicos permanecem em [CREDITOS_ATLAS.md](CREDITOS_ATLAS.md) e nos documentos das bancadas.
+
+
 **Estado em 7 de outubro de 2026.** Bancadas de RA no ar, com acesso livre. Corpo em ação fica só aqui, fora da página dos alunos. Licença de uso restrito: repositório público não é código aberto. Revisão documental desta nota: 7 de outubro de 2026.
 
 **Aprender pesquisa fazendo pesquisa. Fazendo, errando e criando!**
