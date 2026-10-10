@@ -49,3 +49,11 @@ Todos os direitos não expressamente concedidos permanecem reservados.
 ## Corpo em ação
 
 O motor didático, as ampliações procedurais e a interface de `integracao/` são componentes originais abrangidos por esta licença. A silhueta e os pulmões reutilizam componentes locais existentes. O coração externo conserva os créditos de neshallads e CC BY 4.0, com compressão Meshopt, escala, acabamento e pulso visual adaptados. Three.js, Meshoptimizer e glTF Transform conservam suas licenças MIT. Consulte [atribuição](integracao/ATRIBUICAO.md); esta licença não restringe os direitos das licenças de terceiros.
+
+---
+
+## Nota editorial — 10 de outubro de 2026
+
+Esta revisão mantém a separação entre o laboratório de pesquisa e os catálogos de ensino. Os créditos do atlas, dos modelos e das bibliotecas continuam nos documentos específicos das bancadas.
+
+Esta nota registra a revisão da documentação. Não altera as cláusulas anteriores, os titulares, as permissões, as restrições nem as licenças próprias de terceiros.
