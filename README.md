@@ -5,7 +5,9 @@
 
 [Abra a biblioteca](https://drmarionascimento.github.io/lab-ra/bancadas.html).
 
-Ambiente pessoal de criação, teste e acompanhamento. Dois conjuntos: Dragon Games, por história e versão, e Fisiologia, por unidade. As cópias em `biblioteca/` são locais e não carregam código ou modelos dos sites de origem. Serviços de RA e bibliotecas CDN utilizados pelos componentes continuam sendo dependências externas.
+Ambiente pessoal de criação, teste e acompanhamento. O medalhão e a célula animada são decorativos, sem navegação. As listas usam Prólogo e Capítulo, sem numeração automática.
+
+Dois conjuntos: Dragon Games, por história e versão, e Fisiologia, por unidade. As cópias em `biblioteca/` são locais e não carregam código ou modelos dos sites de origem. Serviços de RA e bibliotecas CDN utilizados pelos componentes continuam sendo dependências externas.
 
 As versões de referência e a correspondência dos acessos estão em [biblioteca/origens.json](biblioteca/origens.json). O retorno dos módulos de Fisiologia foi adaptado para esta biblioteca. As maquetes de Carro-Forte e VestChip têm entradas próprias de estudo, com peças liberadas, fora das partidas. Os projetos de origem não são alterados.
 
