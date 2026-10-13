@@ -1,0 +1,707 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#03060a">
+<title>A Sala às Escuras — Carro-Forte</title>
+<link rel="stylesheet" href="atividade.css?v=20260907-pista-arquivo">
+<style>
+/* ==========================================================================
+   A SALA ÀS ESCURAS — A MANHÃ DO CARRO-FORTE
+   ==========================================================================
+   Refeita em 05/09/2026 no padrão da Casa da Costa, a pedido do Mario: "a
+   janela do norte, a sala escura funcionaram perfeitamente bem. esse vai ser
+   o padrão. Não gostei do que foi feito de atividade para o carro-forte."
+
+   O QUE ELA ERA
+   -------------
+   Uma <div> com pontos absolutos e um facho de CSS que seguia o dedo. Passar
+   o dedo por cima revelava. Não havia sala, não havia escuro, não havia gesto
+   — havia uma varredura de mouse sobre um retângulo, e ela terminava em oito
+   segundos porque os quatro pontos cabiam todos na tela ao mesmo tempo.
+
+   O QUE ELA É AGORA
+   -----------------
+   O corredor dos arquivos da agência 0417, durante os 87 segundos em que a
+   câmera 3 fica cega (F09, 7h58min12s–7h59min39s). Está escuro porque a zona
+   cega é escura. O jogador está DENTRO do corredor: gira o corpo, e a lanterna
+   aponta para onde o telefone aponta. O que o facho não tocar continua no
+   escuro.
+
+   Três coisas vêm da Casa e são o motivo de a Casa funcionar:
+
+   1. O MUNDO É REDONDO E O JOGADOR ESTÁ NO MEIO. As paredes são levantadas por
+      coluna, a partir da distância real até a parede naquele rumo. Não é uma
+      foto girando: um corredor é comprido nas pontas e apertado nos lados, e o
+      corpo sente isso ao virar.
+   2. PROCURA-SE UM ENIGMA, NÃO UM PONTO BRILHANTE. A mesa diz o que se procura
+      por charada; o jogador varre o escuro e decide o que é. Marcar o alvo com
+      um brilho transformaria a busca em obediência.
+   3. UM OBJETO ESCONDE OUTRO. O painel do alarme só existe depois que o
+      armário sai da parede. É o que dá segundo fôlego a uma sala pequena — e
+      é literalmente o `escondeAtras` da Casa.
+
+   O giroflex do carro-forte, parado na porta, varre o corredor pelo vidro a
+   cada nove segundos. É o farol da costa, na versão desta manhã: mostra a sala
+   inteira por um instante e some. Serve para se localizar, nunca para achar.
+
+   O instrumento — atitude, offset do iPhone, histerese, dreno, portão do oito
+   — mora em bussola.js, com os números medidos da Casa. Aqui só há sala.
+   ========================================================================== */
+html,body{height:100%;height:100dvh;margin:0;background:#03060a;overflow:hidden;
+  touch-action:pinch-zoom;overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
+#c{position:fixed;inset:0;width:100%;height:100%;display:block}
+
+#hud{position:fixed;left:0;right:0;top:0;height:100%;height:100dvh;z-index:2;
+  pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;
+  padding:max(14px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right))
+          calc(env(safe-area-inset-bottom,0px) + 18px) max(14px,env(safe-area-inset-left))}
+#topo{text-align:center}
+#local{font:600 11px/1.2 var(--mono);letter-spacing:.2em;text-transform:uppercase;
+  color:var(--gold2);text-shadow:0 2px 10px #000}
+#enigma{font:600 clamp(17px,4.6vw,23px)/1.25 var(--display);color:#fff;
+  margin:6px auto 0;text-shadow:0 2px 18px #000,0 0 40px #000a;max-width:20em}
+#vendo{font:500 clamp(12px,3.2vw,14px)/1.4 var(--mono);color:var(--muted);
+  margin-top:7px;min-height:1.3em;letter-spacing:.06em;text-shadow:0 1px 6px #000}
+#passos{display:flex;gap:6px;justify-content:center;margin-top:10px}
+#passos i{width:26px;height:4px;border-radius:3px;background:#1d2a34;
+  box-shadow:inset 0 0 0 1px #0006}
+#passos i.on{background:var(--gold2);box-shadow:0 0 10px #efc87880}
+
+#baixo{pointer-events:auto;display:grid;gap:9px}
+#barra-mira{height:6px;border-radius:6px;background:#101b23;overflow:hidden;
+  box-shadow:inset 0 0 0 1px #26343f}
+#barra-mira i{display:block;height:100%;width:0%;border-radius:6px;
+  background:linear-gradient(90deg,#8fd6ae,#efc878);box-shadow:0 0 12px #efc87866;
+  transition:width .08s linear}
+#estado{font:600 11px/1.2 var(--mono);letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);text-align:center}
+#dedo{width:100%;min-height:46px;border:1px solid #3d5a6c;border-radius:9px;
+  background:linear-gradient(180deg,#132430,#0a1620);color:var(--ink);font-weight:700;cursor:pointer}
+
+/* o aviso do que se abriu atrás de outra coisa */
+#aviso{position:fixed;left:50%;top:24%;transform:translateX(-50%);z-index:3;
+  max-width:min(420px,86vw);padding:11px 15px;border-radius:9px;
+  border:1px solid #7a6238;background:#160f06f0;color:#efc878;
+  font:600 13px/1.4 var(--sans);text-align:center;opacity:0;transition:opacity .35s;
+  pointer-events:none}
+#aviso.on{opacity:1}
+
+/* ---------------- o oito no ar ---------------- */
+#oito{position:fixed;left:0;right:0;top:0;height:100%;height:100dvh;z-index:11;
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  gap:18px;text-align:center;padding:24px;
+  background:radial-gradient(ellipse 110% 70% at 50% 45%,#070d15f2,#02040af7)}
+#oito.on{display:flex}
+#oito-tit{font:600 clamp(28px,7vw,40px)/1.06 var(--display);color:#fff;
+  text-shadow:0 0 40px #efc87840,0 4px 30px #000}
+#oito p{font:500 clamp(16px,4.2vw,20px)/1.42 var(--sans);color:var(--ink);
+  max-width:21em;margin:0}
+#oito-trilho{width:min(260px,70vw);height:5px;border-radius:5px;background:#1c2836;
+  box-shadow:inset 0 0 0 1px #3b4f64;overflow:hidden}
+#oito-barra{height:100%;width:0%;border-radius:5px;background:#ffd9b0;
+  box-shadow:0 0 12px #ffbe7a;transition:width .1s linear}
+#oito-vai{width:min(340px,88vw);padding:16px;border-radius:10px;
+  border:1px solid #b87433;background:#1a1109ee;color:var(--gold2);
+  font:800 clamp(13px,3.4vw,16px) var(--sans);letter-spacing:.16em;
+  text-transform:uppercase;cursor:pointer}
+#oito-vai:disabled{opacity:.5;cursor:default}
+
+/* ---------------- a abertura ---------------- */
+#intro{position:fixed;left:0;right:0;top:0;height:100%;height:100dvh;z-index:10;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:14px;text-align:center;padding:26px;overflow-y:auto;
+  background:linear-gradient(180deg,#050a10f2,#01040af8)}
+#intro.off{display:none}
+#intro h1{font:600 clamp(30px,8vw,44px)/1 var(--display);margin:0;color:#fff}
+#intro .k{font:700 10px var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--gold)}
+#intro p{font:500 clamp(15px,4vw,18px)/1.45 var(--sans);color:var(--ink);max-width:22em;margin:0}
+#intro .go,#intro .alt{width:min(340px,88vw);min-height:52px;border-radius:10px;cursor:pointer}
+#intro .go{border:0;background:linear-gradient(180deg,var(--gold2),var(--gold));color:#201707;
+  font:800 14px var(--sans);letter-spacing:.1em;box-shadow:0 5px 0 #6f4d17}
+#intro .alt{border:1px solid #3d5a6c;background:#0e1a23;color:var(--ink);font-weight:700}
+
+/* ---------------- a carta do fragmento ---------------- */
+#carta{position:fixed;inset:0;z-index:12;display:none;align-items:center;justify-content:center;
+  padding:24px;background:#02060bee}
+#carta.on{display:flex}
+#carta .folha{width:min(460px,92vw);padding:20px;border-radius:12px;
+  border:1px solid #75664e;border-left:5px solid #9a7842;
+  background:linear-gradient(160deg,#e7dfca,#b9aa8d);color:#211d17}
+#carta b{display:block;font:800 clamp(22px,6.5vw,34px)/1.15 var(--mono);letter-spacing:.04em;color:#1b1005}
+#carta h3{font:600 24px var(--display);margin:6px 0 8px}
+#carta .cena{font-size:14.5px;line-height:1.5;margin:0 0 12px;color:#40382f;font-style:italic}
+#carta p{font-size:14.5px;line-height:1.5;margin:0;color:#211d17}
+#carta button{width:100%;min-height:50px;margin-top:16px;border:0;border-radius:9px;
+  background:#211d17;color:#e7dfca;font-weight:800;letter-spacing:.1em;cursor:pointer}
+</style></head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="hud">
+  <div id="topo">
+    <div id="local">CORREDOR DOS ARQUIVOS · ZONA CEGA</div>
+    <div id="enigma">—</div>
+    <div id="vendo"></div>
+    <div id="passos"></div>
+  </div>
+  <div id="baixo">
+    <div id="barra-mira"><i id="mira-i"></i></div>
+    <div id="estado">—</div>
+    <button id="dedo" type="button">Girar com o dedo</button>
+  </div>
+</div>
+
+<div id="aviso"></div>
+
+<div id="intro">
+  <div class="k">A MANHÃ DO CARRO-FORTE</div>
+  <h1>A Sala<br>às Escuras</h1>
+  <p>A câmera 3 fica cega. Você está no corredor dos arquivos, com uma lanterna, dentro desse buraco.</p>
+  <p><b>Gire o corpo com o celular na mão</b> — a lanterna aponta para onde o aparelho aponta. Quando o facho encontrar o que a mesa procura, <b>segure firme</b> até a coisa se abrir.</p>
+  <p class="small">O que o facho não tocar não entra no dossiê por nenhuma outra porta.</p>
+  <button class="go" id="b-entrar" type="button">Acender a lanterna</button>
+  <button class="alt" id="b-dedo" type="button">Estou no computador</button>
+</div>
+
+<div id="oito">
+  <div id="oito-tit">A bússola está tonta</div>
+  <p>É a bússola do aparelho que diz para onde você está virado. Sem ela acertada, a lanterna aponta para um lugar e o corredor mostra outro.</p>
+  <p><b>Desenhe um 8 no ar à sua frente com o celular</b>, devagar, umas quatro vezes. Vire o pulso enquanto faz — o que calibra é a variedade de posições, não a velocidade.</p>
+  <div id="oito-trilho"><div id="oito-barra"></div></div>
+  <button id="oito-vai" type="button" disabled>A bússola ainda está tonta</button>
+</div>
+
+<div id="carta"><div class="folha">
+  <b id="carta-cod" class="carta-num">—</b><h3 id="carta-tit">—</h3>
+  <p class="cena" id="carta-cena">—</p>
+  <p id="carta-txt">—</p>
+  <p class="pista-arquivo-hint" data-pista-arquivo-hint="1"><span class="pista-arquivo-curta">Ela vai estar no dossiê</span><span class="pista-arquivo-completa">Ela vai estar no dossiê — para quando você quiser consultar</span></p>
+  <button id="carta-ok" type="button">Guardar no dossiê</button>
+</div></div>
+
+<!-- Nasce escondido: a atividade acaba pelo relógio da mesa, e este botão só
+     reaparece no fim, como a volta. Ver atividade.js. -->
+<button id="finish" class="primary" hidden>← Voltar à Mesa</button>
+
+<script src="fragmentos.js?v=20260901-colheita1"></script>
+<script src="variacoes-carro-dados.js?v=20261012-v2"></script>
+<script src="variacoes-carro.js?v=20261012-v2"></script>
+<script src="bussola.js?v=20260905-cena2"></script>
+<script src="atividade.js?v=20260905-cena2"></script>
+<script>
+(function(){
+"use strict";
+var A=window.MosaicoAtividade, B=window.MosaicoBussola;
+var itens=A.itens('escura'), achados=new Set();
+var D2R=Math.PI/180, wrap180=B.wrap180, wrap360=B.wrap360, clamp=B.clamp;
+
+/* ── O CORREDOR, EM METROS ────────────────────────────────────────────────
+   Comprido e estreito, como corredor de arquivos é. Esta é a diferença que se
+   sente ao girar: nas pontas a parede está longe e o facho se perde; nos lados
+   ela está a um braço e o facho estoura de claro. Uma sala quadrada não teria
+   isso, e o corpo não saberia para onde está virado sem olhar a bússola. */
+var SALA_L=1.75;   /* meia-largura, parede a parede */
+var SALA_P=5.40;   /* meia-profundidade, do jogador até o fim do corredor */
+var SALA_H=2.85;   /* pé-direito */
+var OLHO=1.58;
+
+/* ── O QUE HÁ NO CORREDOR ─────────────────────────────────────────────────
+   Duas regras ao mexer aqui, as mesmas da Casa:
+     1. um objeto com `escondeAtras` vem DEPOIS da sua capa no array, senão a
+        sala pede para achar o painel antes do armário que o cobre;
+     2. `enigma` descreve sem nomear. Quem nomeia entrega, e a sala vira uma
+        lista de recados.
+
+   Os móveis com fragmento são servidos na ordem em que estão aqui: a Mesa
+   entrega um lote de códigos e cada código veste o próximo móvel. Os que
+   sobram viram CENÁRIO — acendem, têm nome, não contam. Sem eles o corredor
+   seria quatro coisas flutuando no escuro, e a busca não teria custo: tudo o
+   que o facho tocasse seria o alvo.                                       */
+var MOVEIS=[
+  { id:'arquivo', nome:'O armário de arquivo', forma:'armario',
+    enigma:'Guarda tudo o que aconteceu e não conta nada por vontade própria.',
+    larg:1.10, altura:1.98, chao:true,
+    cena:'Quatro gavetas de aço encostadas na parede. A de baixo está entreaberta um palmo. No tampo, a poeira tem uma faixa limpa do tamanho de um antebraço — alguém se apoiou aqui hoje. Na prateleira de cima, fora da ordem dos anos, uma caixa sem ano tem a lombada escrita à mão: ARQUIVO DRAGON GAMES.' },
+
+  { id:'porta', nome:'A porta dos fundos', forma:'porta',
+    enigma:'Serve para dois lados, e esta manhã serviu para um só.',
+    larg:0.98, altura:2.08, chao:true,
+    cena:'Chapa de aço, barra antipânico, o adesivo da manutenção descascando. O ferrolho está recolhido. Do lado de fora, o giroflex do carro-forte pisca e some, pisca e some.' },
+
+  { id:'carrinho', nome:'O carrinho dos malotes', forma:'carrinho',
+    enigma:'Tem quatro pés que andam e nunca sai sozinho.',
+    larg:0.86, altura:0.94, chao:true,
+    cena:'Estrutura tubular, quatro rodízios, a lona de cima solta de um lado. Um dos rodízios está travado de terra seca. As marcas no piso vão até a porta e voltam.' },
+
+  { id:'painel', nome:'O painel do alarme', forma:'painel',
+    escondeAtras:'arquivo',
+    aviso:'O armário saiu da parede. Tem um painel no reboco, atrás dele.',
+    enigma:'Fica calado justamente quando devia gritar.',
+    larg:0.34, alt:1.44, altura:0.42, chao:false,
+    cena:'Caixa cinza embutida no reboco, tampa apenas encostada. O led de linha está aceso e o de sirene, apagado. Dentro, um jumper atravessa dois bornes que não deviam se tocar.' },
+
+  { id:'guarita', nome:'O vidro da guarita', forma:'guarita',
+    enigma:'Deixa ver tudo e não deixa passar nada.',
+    larg:1.30, alt:1.72, altura:1.05, chao:false,
+    cena:'Vidro laminado com a película descolando no canto. Do lado de dentro, a cadeira está girada para a porta, não para o balcão. A caneca em cima do console ainda está morna.' },
+
+  { id:'monitor', nome:'O monitor do circuito', forma:'monitor',
+    enigma:'Mostra o mundo inteiro menos o pedaço que interessa.',
+    larg:0.46, alt:1.90, altura:0.36, chao:false,
+    cena:'Quatro quadros na tela. O terceiro está em chuvisco desde 7h58min12s, e o relógio queimado no canto continua correndo por cima do chuvisco.' },
+
+  { id:'extintor', nome:'O extintor deslocado', forma:'extintor',
+    enigma:'Passa a vida inteira pendurado esperando um dia que não vem.',
+    larg:0.22, alt:0.96, altura:0.62, chao:false,
+    cena:'Fora do suporte, apoiado no rodapé. O lacre está inteiro. O suporte na parede tem o parafuso de cima arrancado, com reboco fresco no chão embaixo.' },
+
+  { id:'saco', nome:'O saco no chão', forma:'saco',
+    enigma:'Foi feito para carregar e hoje não carregou nada.',
+    larg:0.52, altura:0.34, chao:true,
+    cena:'Saco de lona cinza, boca aberta, vazio. Dobrado como quem dobra depressa. Não tem lacre, e o campo do peso na etiqueta está em branco.' }
+];
+
+/* O rumo de cada móvel vem da PARTIDA, não de Math.random: o corredor da mesa
+   inteira é o mesmo corredor. Mesmo princípio da semente compartilhada da
+   Casa — errar junto não atrapalha, divergir sim. */
+function semente(txt){var h=2166136261;for(var i=0;i<txt.length;i++){h^=txt.charCodeAt(i);h=Math.imul(h,16777619);}return (h>>>0)/4294967296;}
+var giroBase=semente('carro-forte|escura|'+A.partida)*360;
+
+/* Os alvos: um móvel por fragmento do lote, na ordem do array. */
+var alvos=[];
+for(var i=0;i<itens.length && i<MOVEIS.length;i++){
+  MOVEIS[i].cod=itens[i]; MOVEIS[i].alvo=true; alvos.push(MOVEIS[i]);
+}
+/* Um escondido cuja capa ficou de fora do lote não pode ficar escondido para
+   sempre: sem a capa em jogo, ninguém nunca o derruba. */
+alvos.forEach(function(o){
+  if(!o.escondeAtras) return;
+  var temCapa=MOVEIS.some(function(m){ return m.id===o.escondeAtras && m.alvo; });
+  if(!temCapa) o.escondeAtras=null;
+});
+
+/* OITO SETORES DE 45°, como na Casa: com menos, dois móveis encostam e o facho
+   abre os dois de uma vez; com mais, sobra parede vazia e a busca vira sorte.
+   A ordem dos setores é embaralhada pela semente, então o corredor da partida
+   de ontem não é o de hoje. */
+var setores=[0,1,2,3,4,5,6,7];
+(function(){
+  var r=semente('setores|'+A.partida);
+  for(var k=setores.length-1;k>0;k--){
+    r=(r*9301+49297)%233280/233280;
+    var t=Math.floor(r*(k+1)), tmp=setores[k]; setores[k]=setores[t]; setores[t]=tmp;
+  }
+})();
+
+function paredeEm(b){
+  /* distância até a parede do corredor no rumo b — o raycast de sala
+     retangular da Casa, reduzido ao que esta cena usa */
+  var a=b*D2R, s=Math.sin(a), c=Math.cos(a), t=1e9;
+  if(Math.abs(s)>1e-6) t=Math.min(t, SALA_L/Math.abs(s));
+  if(Math.abs(c)>1e-6) t=Math.min(t, SALA_P/Math.abs(c));
+  return Math.max(0.9,t);
+}
+
+function posiciona(o,idx){
+  /* O jitter era +-13 graus e dois setores vizinhos podiam ficar a 19 graus um
+     do outro. Com móveis de quase 40 graus de largura aparente, o facho pegava
+     os dois de uma vez e a busca virava sorteio. +-8 garante 29 graus de
+     folga, que é mais que a largura do maior deles. */
+  o.az = wrap360(giroBase + setores[idx%8]*45 + (semente(o.id)*16-8));
+  o.dist = Math.max(0.85, paredeEm(o.az) - (o.chao?0.34:0.10));
+  var centro = o.chao ? (o.altura*0.55) : o.alt;
+  o.elev = Math.atan2(centro-OLHO, o.dist)/D2R;
+  o.hw = Math.atan2(o.larg/2, o.dist)/D2R;      /* meia-largura angular */
+  o.hh = Math.atan2(o.altura/2, o.dist)/D2R;    /* meia-altura angular   */
+  o.posto = true;
+}
+
+/* Só entra no corredor quem não está escondido. Os móveis que sobraram do lote
+   viram cenário e ocupam os setores restantes. */
+var emCena=[], nSetor=0;
+MOVEIS.forEach(function(o){
+  o.achado=false; o.posto=false;
+  if(o.escondeAtras) return;               /* nasce coberto */
+  posiciona(o,nSetor++); emCena.push(o);
+});
+
+var iAlvo=0;                                /* o enigma da vez */
+function alvoAtual(){ return alvos[iAlvo]||null; }
+
+var view={bearing:0,elev:0};
+var mira=null, modoDedo=false, arrasto=null, entrou=false;
+var W=0,H=0,DPR=1,PPD=1;
+var cv=document.getElementById('c'), cx=cv.getContext('2d');
+var t0=performance.now(), tPrev=t0;
+
+/* O FACHO. Cone estreito de propósito: um facho largo faz o corredor inteiro
+   aparecer de uma vez e a sala deixa de ser escura. 13° de miolo e queda até
+   30° é lanterna de mão, não holofote. */
+var CONE=13, CONE_FIM=30;
+function luzEm(dAng, dist){
+  var k = dAng<=CONE ? 1 : Math.max(0, 1-(dAng-CONE)/(CONE_FIM-CONE));
+  k*=k;
+  return k / (1 + dist*dist*0.055);
+}
+
+function dimensionar(){
+  DPR=Math.min(2,window.devicePixelRatio||1);
+  W=cv.clientWidth; H=cv.clientHeight;
+  cv.width=Math.round(W*DPR); cv.height=Math.round(H*DPR);
+  cx.setTransform(DPR,0,0,DPR,0,0);
+  /* mesma escala da Janela: ~70° de campo vertical no celular em pé */
+  PPD=Math.min(H/70, W/95);
+}
+window.addEventListener('resize',dimensionar);
+dimensionar();
+
+function sx(b){ return W/2 + wrap180(b-view.bearing)*PPD; }
+function sy(e){ return H/2 - (e-view.elev)*PPD; }
+
+/* ── OS PASSES ──────────────────────────────────────────────────────────── */
+
+/* 1. AS PAREDES, LEVANTADAS POR COLUNA.
+   Para cada faixa de tela: qual o rumo, a que distância está a parede naquele
+   rumo, e onde caem o teto e o rodapé. É o que faz o corredor ter forma —
+   desenhar um retângulo escuro não faria. */
+function paredes(){
+  var passoPx=5;
+  for(var x=0;x<W;x+=passoPx){
+    var b=view.bearing + (x+passoPx/2 - W/2)/PPD;
+    var d=paredeEm(b);
+    var yT=sy(Math.atan2(SALA_H-OLHO, d)/D2R);
+    var yB=sy(Math.atan2(-OLHO, d)/D2R);
+    var l=luzEm(Math.abs(wrap180(b-view.bearing)), d);
+    /* a parede é concreto pintado: cinza esverdeado sujo */
+    var v=Math.round(8 + l*150);
+    var g=cx.createLinearGradient(0,yT,0,yB);
+    g.addColorStop(0,'rgb('+Math.round(v*0.72)+','+Math.round(v*0.78)+','+Math.round(v*0.80)+')');
+    g.addColorStop(0.62,'rgb('+v+','+Math.round(v*1.03)+','+Math.round(v*0.98)+')');
+    g.addColorStop(1,'rgb('+Math.round(v*0.55)+','+Math.round(v*0.58)+','+Math.round(v*0.58)+')');
+    cx.fillStyle=g;
+    cx.fillRect(x,yT,passoPx+1,Math.max(0,yB-yT));
+    /* o rodapé, uma faixa mais escura — dá pé à parede */
+    cx.fillStyle='rgba(4,8,11,'+(0.28+l*0.30).toFixed(3)+')';
+    cx.fillRect(x, yB-(yB-yT)*0.07, passoPx+1, (yB-yT)*0.07);
+    /* o piso, do rodapé para baixo: cimento queimado, reflete pouco */
+    var vp=Math.round(5 + l*66);
+    var gp=cx.createLinearGradient(0,yB,0,H);
+    gp.addColorStop(0,'rgb('+vp+','+Math.round(vp*1.04)+','+Math.round(vp*1.02)+')');
+    gp.addColorStop(1,'rgb('+Math.round(vp*0.30)+','+Math.round(vp*0.32)+','+Math.round(vp*0.34)+')');
+    cx.fillStyle=gp;
+    cx.fillRect(x,yB,passoPx+1,Math.max(0,H-yB));
+    /* o teto, do topo para cima */
+    cx.fillStyle='rgba(6,10,14,'+(1-l*0.55).toFixed(3)+')';
+    cx.fillRect(x,0,passoPx+1,Math.max(0,yT));
+  }
+}
+
+/* 2. OS MÓVEIS. Cada um é um corpo com silhueta própria — a forma é o que
+   permite reconhecer o enigma antes de ler o nome. */
+function movel(o){
+  var l=luzEm(Math.abs(wrap180(o.az-view.bearing)), o.dist);
+  /* o que já foi achado guarda um resto de brasa, para o jogador saber onde
+     esteve sem precisar iluminar de novo */
+  var vis=Math.max(l, o.achado?0.16:0);
+  if(vis<0.02) return;
+  var x=sx(o.az), yc=sy(o.elev);
+  var hw=Math.max(2,o.hw*PPD), hh=Math.max(2,o.hh*PPD);
+  if(x<-hw*3||x>W+hw*3) return;
+  var v=Math.round(10 + vis*205);
+  function tom(m){ var n=Math.round(v*m); return 'rgb('+n+','+Math.round(n*1.02)+','+Math.round(n*1.05)+')'; }
+
+  cx.save();
+  /* SOMBRA DE CONTATO. Um retângulo desenhado sobre a parede flutua; a mancha
+     no chão é o que diz que a coisa está apoiada. Custa três linhas e é a
+     diferença entre móvel e adesivo. */
+  if(vis>0.05){
+    var so=cx.createRadialGradient(x,yc+hh,0,x,yc+hh,hw*1.9);
+    so.addColorStop(0,'rgba(0,0,0,'+(0.55*vis).toFixed(3)+')');
+    so.addColorStop(1,'rgba(0,0,0,0)');
+    cx.fillStyle=so; cx.fillRect(x-hw*2,yc+hh-hw*0.7,hw*4,hw*2.6);
+  }
+  if(o.forma==='armario'){
+    cx.fillStyle=tom(0.62); cx.fillRect(x-hw,yc-hh,hw*2,hh*2);
+    cx.strokeStyle='rgba(0,0,0,.55)'; cx.lineWidth=1;
+    for(var g=1;g<4;g++){ var yy=yc-hh+hh*2*g/4;
+      cx.beginPath(); cx.moveTo(x-hw,yy); cx.lineTo(x+hw,yy); cx.stroke(); }
+    cx.fillStyle=tom(1.15);
+    for(var g2=0;g2<4;g2++) cx.fillRect(x-hw*0.16, yc-hh+hh*2*(g2+0.5)/4-1.5, hw*0.32, 3);
+    if(!o.achado){ cx.fillStyle='rgba(0,0,0,.7)'; cx.fillRect(x-hw,yc+hh*0.44,hw*2,hh*0.10); }
+  } else if(o.forma==='porta'){
+    cx.fillStyle=tom(0.50); cx.fillRect(x-hw,yc-hh,hw*2,hh*2);
+    cx.strokeStyle=tom(1.05); cx.lineWidth=2;
+    cx.strokeRect(x-hw,yc-hh,hw*2,hh*2);
+    cx.fillStyle=tom(1.3); cx.fillRect(x-hw*0.8,yc,hw*1.6,Math.max(2,hh*0.05));
+  } else if(o.forma==='carrinho'){
+    cx.strokeStyle=tom(1.0); cx.lineWidth=Math.max(1.5,hw*0.09);
+    cx.strokeRect(x-hw,yc-hh*0.55,hw*2,hh*1.2);
+    cx.fillStyle=tom(0.85); cx.fillRect(x-hw,yc-hh*0.62,hw*2,hh*0.22);
+    cx.fillStyle=tom(0.35);
+    cx.beginPath(); cx.arc(x-hw*0.7,yc+hh*0.72,Math.max(2,hw*0.13),0,7); cx.fill();
+    cx.beginPath(); cx.arc(x+hw*0.7,yc+hh*0.72,Math.max(2,hw*0.13),0,7); cx.fill();
+  } else if(o.forma==='painel'){
+    cx.fillStyle=tom(0.72); cx.fillRect(x-hw,yc-hh,hw*2,hh*2);
+    cx.strokeStyle='rgba(0,0,0,.6)'; cx.strokeRect(x-hw,yc-hh,hw*2,hh*2);
+    /* os dois leds: linha aceso, sirene apagado — é o fato, desenhado */
+    cx.fillStyle='rgba(120,240,150,'+(0.35+vis*0.65).toFixed(2)+')';
+    cx.beginPath(); cx.arc(x-hw*0.42,yc-hh*0.45,Math.max(1.6,hw*0.11),0,7); cx.fill();
+    cx.fillStyle='rgba(70,30,30,'+(0.4+vis*0.4).toFixed(2)+')';
+    cx.beginPath(); cx.arc(x+hw*0.42,yc-hh*0.45,Math.max(1.6,hw*0.11),0,7); cx.fill();
+  } else if(o.forma==='guarita'){
+    cx.fillStyle='rgba('+Math.round(v*0.35)+','+Math.round(v*0.48)+','+Math.round(v*0.52)+',.85)';
+    cx.fillRect(x-hw,yc-hh,hw*2,hh*2);
+    cx.strokeStyle=tom(1.2); cx.lineWidth=2; cx.strokeRect(x-hw,yc-hh,hw*2,hh*2);
+    /* o reflexo da própria lanterna no vidro */
+    cx.fillStyle='rgba(255,240,210,'+(vis*0.30).toFixed(3)+')';
+    cx.fillRect(x-hw*0.55,yc-hh*0.7,hw*0.30,hh*1.4);
+  } else if(o.forma==='monitor'){
+    cx.fillStyle=tom(0.30); cx.fillRect(x-hw,yc-hh,hw*2,hh*2);
+    cx.strokeStyle=tom(0.9); cx.strokeRect(x-hw,yc-hh,hw*2,hh*2);
+    /* quatro quadros, e o terceiro em chuvisco */
+    for(var q=0;q<4;q++){
+      var qx=x-hw+ (q%2)*hw, qy=yc-hh+Math.floor(q/2)*hh;
+      cx.fillStyle = q===2
+        ? 'rgba('+(140+Math.floor(Math.random()*70))+','+(150+Math.floor(Math.random()*60))+',160,.55)'
+        : 'rgba(40,70,80,.5)';
+      cx.fillRect(qx+1,qy+1,Math.max(1,hw-2),Math.max(1,hh-2));
+    }
+  } else if(o.forma==='extintor'){
+    cx.fillStyle='rgb('+Math.round(v*1.05)+','+Math.round(v*0.34)+','+Math.round(v*0.26)+')';
+    cx.fillRect(x-hw,yc-hh*0.8,hw*2,hh*1.8);
+    cx.fillStyle=tom(0.5); cx.fillRect(x-hw*0.35,yc-hh,hw*0.7,hh*0.3);
+  } else { /* saco */
+    cx.fillStyle=tom(0.66);
+    cx.beginPath();
+    cx.moveTo(x-hw,yc+hh); cx.lineTo(x-hw*0.72,yc-hh*0.5);
+    cx.lineTo(x+hw*0.72,yc-hh*0.5); cx.lineTo(x+hw,yc+hh);
+    cx.closePath(); cx.fill();
+    cx.fillStyle='rgba(0,0,0,.75)';
+    cx.fillRect(x-hw*0.66,yc-hh*0.62,hw*1.32,hh*0.26);   /* a boca aberta */
+  }
+  /* halo de quem já entregou o fragmento */
+  if(o.achado){
+    cx.strokeStyle='rgba(239,200,120,'+(0.25+0.15*Math.sin((performance.now()-t0)/600)).toFixed(3)+')';
+    cx.lineWidth=1.5; cx.strokeRect(x-hw-3,yc-hh-3,hw*2+6,hh*2+6);
+  }
+  cx.restore();
+}
+
+/* 3. O GIROFLEX. O carro-forte está parado na porta e a luz dele entra pelo
+   vidro a cada nove segundos, varrendo o corredor. Mostra a sala inteira por
+   um instante e some — dá para se localizar, nunca para achar. */
+function giroflex(){
+  var f=((performance.now()-t0)/9000)%1;
+  var pulso=Math.pow(Math.max(0,Math.sin(f*Math.PI*2)),7)*0.5;
+  if(pulso<0.004) return;
+  var rumo=MOVEIS[1].posto?MOVEIS[1].az:0;
+  var g=cx.createRadialGradient(sx(rumo),H*0.45,0,sx(rumo),H*0.45,Math.max(W,H)*0.85);
+  g.addColorStop(0,'rgba(120,170,255,'+(pulso*0.55).toFixed(3)+')');
+  g.addColorStop(0.45,'rgba(70,110,190,'+(pulso*0.20).toFixed(3)+')');
+  g.addColorStop(1,'rgba(0,0,0,0)');
+  cx.fillStyle=g; cx.fillRect(0,0,W,H);
+}
+
+/* 4. O FACHO, desenhado por cima de tudo: é a boca da lanterna, e é o que diz
+   ao jogador onde ele está apontando sem precisar de mira na tela. */
+function facho(){
+  var r=CONE_FIM*PPD;
+  var g=cx.createRadialGradient(W/2,H/2,CONE*PPD*0.25,W/2,H/2,r);
+  g.addColorStop(0,'rgba(255,244,214,.10)');
+  g.addColorStop(0.5,'rgba(255,238,200,.045)');
+  g.addColorStop(1,'rgba(0,0,0,0)');
+  cx.fillStyle=g; cx.fillRect(0,0,W,H);
+  /* e o resto do quadro escurece: sem isto o facho não recorta nada */
+  var v=cx.createRadialGradient(W/2,H/2,r*0.55,W/2,H/2,Math.max(W,H)*0.78);
+  v.addColorStop(0,'rgba(0,0,0,0)');
+  v.addColorStop(1,'rgba(0,0,0,.72)');
+  cx.fillStyle=v; cx.fillRect(0,0,W,H);
+}
+
+/* 5. A SETA. Num corredor de 360° o alvo passa a maior parte do tempo fora da
+   tela. Ela não diz o que é nem onde exatamente: só que o jogador está girando
+   para o lado errado — o mesmo serviço que o farol da Casa presta. */
+function seta(){
+  var o=alvoAtual(); if(!o||!o.posto) return;
+  var d=wrap180(o.az-view.bearing);
+  if(Math.abs(d)<34) return;
+  var dir=d>0?1:-1, x=dir>0?W-26:26, y=H*0.5;
+  var f=0.22+0.22*Math.abs(Math.sin((performance.now()-t0)/520));
+  cx.save(); cx.translate(x,y); cx.scale(dir,1);
+  cx.fillStyle='rgba(210,225,240,'+f.toFixed(2)+')';
+  cx.beginPath(); cx.moveTo(9,0); cx.lineTo(-7,-13); cx.lineTo(-7,13); cx.closePath(); cx.fill();
+  cx.restore();
+}
+
+/* ── O QUADRO ─────────────────────────────────────────────────────────────*/
+function quadro(){
+  requestAnimationFrame(quadro);
+  var agora=performance.now();
+  var dt=Math.min(0.05,(agora-tPrev)/1000); tPrev=agora;
+  if(!entrou) return;
+
+  var alvoB=B.raw.bearing, alvoE=clamp(B.raw.elev,-42,52);
+  view.bearing=wrap360(view.bearing+wrap180(alvoB-view.bearing)*Math.min(1,dt*26));
+  view.elev+=(alvoE-view.elev)*Math.min(1,dt*26);
+
+  cx.fillStyle='#03060a'; cx.fillRect(0,0,W,H);
+  paredes();
+  emCena.forEach(movel);
+  giroflex();
+  facho();
+  seta();
+
+  progresso(dt);
+}
+
+/* ── A MIRA E O QUE ELA ABRE ──────────────────────────────────────────────*/
+function novaMira(){
+  var o=alvoAtual();
+  mira = o && o.posto ? B.Mira({az:o.az, el:o.elev}) : null;
+}
+
+function progresso(dt){
+  var o=alvoAtual();
+  var barra=document.getElementById('mira-i');
+  var est=document.getElementById('estado');
+
+  /* o que o facho está tocando agora, alvo ou não — é o retorno que impede a
+     busca de virar tentativa às cegas */
+  var perto=null, melhor=1e9;
+  emCena.forEach(function(m){
+    var d=Math.abs(wrap180(m.az-view.bearing));
+    var de=Math.abs(m.elev-view.elev);
+    if(d<Math.max(CONE,m.hw+7) && de<Math.max(9,m.hh+6) && d<melhor){ melhor=d; perto=m; }
+  });
+  document.getElementById('vendo').textContent =
+    perto ? ('você vê: '+perto.nome.toLowerCase()) : '';
+
+  if(!o||!o.posto||!mira){ barra.style.width='0%'; est.textContent='—'; return; }
+
+  /* A JANELA COBRADA ACOMPANHA O TAMANHO DO MÓVEL.
+     Aqui o jogador está DENTRO do cenário: o armário fica a dois metros e
+     ocupa meia tela na vertical. Os números da Casa - 21 graus de rumo, 3,4 de
+     altura - foram medidos para alvos pequenos e distantes; cobrados de um
+     alvo de 51 graus, deixavam a barra em zero com o facho cheio em cima da
+     coisa. A janela agora é uma fração do próprio objeto, com o piso da Casa
+     como mínimo: mira grande para coisa grande, e o extintor continua exigindo
+     pontaria porque o extintor é pequeno. */
+  var altoAz=clamp(o.hw*0.75/21, 0.85, 2.0);
+  var altoEl=clamp(o.hh*0.55/3.4, 1.0, 4.5);
+  var p=mira.passo(dt, altoAz, altoEl);
+  barra.style.width=(p*100).toFixed(1)+'%';
+  if(p>=1){ abrir(o); return; }
+
+  /* O TEXTO LÊ A MESMA JANELA QUE A BARRA. Antes ele tinha limiares próprios
+     (50 e 9 graus) e dizia "QUASE — AJUSTE FINO" enquanto a barra dizia zero.
+     Um jogador que confia no texto fica parado esperando encher. */
+  var tol=mira.tolerancia(altoAz, altoEl);
+  var dAz=Math.abs(wrap180(o.az-B.raw.bearing));
+  var dEl=Math.abs(o.elev-B.raw.elev);
+  if(Math.abs(B.raw.roll)>B.CFG.TOL_ROLL) est.textContent='ENDIREITE O APARELHO';
+  else if(dAz>tol.az*2.4) est.textContent='VARRA O CORREDOR';
+  else if(perto && perto!==o) est.textContent='NÃO É ISTO';
+  else if(dEl>tol.el) est.textContent=(o.elev>B.raw.elev?'MAIS ALTO':'MAIS BAIXO');
+  else if(dAz>tol.az) est.textContent=(wrap180(o.az-B.raw.bearing)>0?'MAIS PARA A DIREITA':'MAIS PARA A ESQUERDA');
+  else est.textContent='SEGURE ASSIM';
+}
+
+function mostrarAviso(txt){
+  var el=document.getElementById('aviso');
+  el.textContent=txt; el.classList.add('on');
+  setTimeout(function(){ el.classList.remove('on'); },4200);
+}
+
+function abrir(o){
+  o.achado=true;
+  achados.add(o.cod); A.marcar(achados,itens);
+  try{ navigator.vibrate && navigator.vibrate([14,40,26]); }catch(e){}
+
+  /* o que estava atrás dele entra em cena agora, no rumo da capa */
+  MOVEIS.forEach(function(h){
+    if(h.escondeAtras!==o.id || h.posto) return;
+    h.az=wrap360(o.az + (o.hw+2.5));
+    h.dist=Math.max(0.85, paredeEm(h.az)-0.06);
+    h.elev=Math.atan2(h.alt-OLHO, h.dist)/D2R;
+    h.hw=Math.atan2(h.larg/2,h.dist)/D2R;
+    h.hh=Math.atan2(h.altura/2,h.dist)/D2R;
+    h.posto=true; emCena.push(h);
+    if(h.aviso) mostrarAviso(h.aviso);
+  });
+
+  var f=(window.MOSAICO_FRAGMENTOS||{})[o.cod]||{};
+  document.getElementById('carta-cod').textContent=o.cod+' · '+o.nome;
+  document.getElementById('carta-tit').textContent=f.t||o.cod;
+  document.getElementById('carta-cena').textContent=o.cena;
+  document.getElementById('carta-txt').textContent=f.d||'';
+  document.getElementById('carta').classList.add('on');
+
+  iAlvo++; novaMira(); pintarPassos();
+}
+document.getElementById('carta-ok').onclick=function(){
+  document.getElementById('carta').classList.remove('on');
+};
+
+function pintarPassos(){
+  var h=document.getElementById('passos'), s='';
+  for(var i=0;i<alvos.length;i++) s+='<i class="'+(i<iAlvo?'on':'')+'"></i>';
+  h.innerHTML=s;
+  var o=alvoAtual();
+  document.getElementById('enigma').textContent =
+    o ? o.enigma : 'O corredor está vazio. A zona cega acaba de qualquer jeito.';
+}
+
+/* ── ENTRADA ─────────────────────────────────────────────────────────────*/
+function fechaIntro(){
+  document.getElementById('intro').classList.add('off');
+  entrou=true; tPrev=performance.now(); novaMira(); pintarPassos();
+}
+function porDedo(){
+  modoDedo=true;
+  /* Fecha o oito junto: quem cai aqui por falha de sensor viria com a tela do
+     oito por cima, e ela não sai sozinha. */
+  document.getElementById('oito').classList.remove('on');
+  document.getElementById('vendo').textContent='arraste para varrer o corredor';
+  fechaIntro();
+}
+document.getElementById('b-dedo').onclick=porDedo;
+document.getElementById('dedo').onclick=porDedo;
+document.getElementById('b-entrar').onclick=function(){
+  B.ativar({
+    aoLigar:function(){
+      B.oitoNoAr(document.getElementById('oito'),
+                 document.getElementById('oito-barra'),
+                 document.getElementById('oito-vai'),
+                 'Acender a lanterna', fechaIntro);
+    },
+    aoNaoResponder:function(){
+      document.getElementById('vendo').textContent='a bússola não respondeu — varra com o dedo';
+      porDedo();
+    },
+    aoNegar:function(){
+      document.getElementById('vendo').textContent='sem permissão de movimento, varra com o dedo';
+      porDedo();
+    },
+    aoIndisponivel:porDedo
+  });
+};
+
+function pDown(ev){ if(!modoDedo)return; var t=ev.touches?ev.touches[0]:ev; arrasto={x:t.clientX,y:t.clientY}; }
+function pMove(ev){
+  if(!modoDedo||!arrasto)return;
+  var t=ev.touches?ev.touches[0]:ev;
+  B.raw.bearing=wrap360(B.raw.bearing+(t.clientX-arrasto.x)*0.22);
+  B.raw.elev=clamp(B.raw.elev-(t.clientY-arrasto.y)*0.16,-40,50);
+  B.raw.roll=0;
+  arrasto={x:t.clientX,y:t.clientY};
+  if(ev.cancelable) ev.preventDefault();
+}
+function pUp(){ arrasto=null; }
+cv.addEventListener('pointerdown',pDown); cv.addEventListener('pointermove',pMove);
+cv.addEventListener('pointerup',pUp); cv.addEventListener('pointercancel',pUp);
+
+pintarPassos();
+requestAnimationFrame(quadro);
+A.iniciar({sensor:'escura',itens:itens,achados:achados});
+})();
+</script>
+</body></html>

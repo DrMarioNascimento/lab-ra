@@ -1,0 +1,2722 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>A Casa da Costa — A Noite da Tempestade</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@400;500;600;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400;1,7..72,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#05070b;
+
+    /* ---- escala de leitura no escuro ----------------------------------
+       regra: quanto menor o texto, mais perto do branco puro ele fica.
+       cor so vira "sabor" a partir de ~20px.                            */
+    --t-max:#ffffff;   /* < 18px  — sempre branco */
+    --t-hi:#f4f9fd;    /* leitura principal */
+    --t-mid:#dfeaf5;   /* apoio, so em corpo grande */
+    --t-warm:#ffd9b0;  /* ambar claro — so em texto grande */
+    --t-warms:#ffe0c0; /* ambar pequeno = branco quente */
+    --dim:#c3d3e2;
+
+    --line:#2a3949;
+    --ember:#ff9a4d;
+    --cold:#5fc8ff;
+
+    /* veu escuro atras de cada letra: garante contraste mesmo quando o
+       canvas clareia (relampago, nevoa iluminada, farol, janela acesa) */
+    --scrim:0 1px 2px #000,0 2px 10px #000d,0 0 26px #000a;
+    --scrim-strong:0 1px 2px #000,0 2px 8px #000,0 0 22px #000e,0 0 44px #000b;
+
+    --display:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+    --serif:"Literata","Charter","Bitstream Charter","Iowan Old Style",Georgia,"Noto Serif",serif;
+    --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,"Roboto Mono",monospace;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{
+    margin:0;height:100%;height:100dvh;background:#000;color:var(--t-hi);
+    font-family:var(--sans);
+    /* sem font-smoothing:antialiased de proposito: no escuro ele afina o
+       traco do texto claro. o padrao mantem a letra mais cheia. */
+    text-rendering:optimizeLegibility;
+    font-optical-sizing:auto;
+    overflow:hidden;touch-action:pinch-zoom;overscroll-behavior:none;
+    -webkit-user-select:none;user-select:none;
+  }
+  #c{position:fixed;inset:0;width:100%;height:100%;display:block;}
+
+  /* veu de contraste: escurece topo e rodape do canvas para que o texto
+     nunca dispute brilho com a cena. Fica atras do HUD, acima do canvas. */
+  #veil{position:fixed;inset:0;pointer-events:none;
+    background:
+      linear-gradient(180deg,#000000c4 0%,#00000091 13%,#00000000 32%),
+      linear-gradient(0deg,#000000db 0%,#000000ab 17%,#00000000 42%);}
+
+  /* ---------------- HUD ---------------- */
+  /* ATENCAO iOS: nao usar inset:0 aqui. Em position:fixed o Safari mede a
+     viewport GRANDE, entao o rodape do HUD fica escondido atras da barra de
+     endereco e os botoes viram intocaveis. 100dvh = viewport dinamica, que
+     com overflow:hidden e sempre a menor (ja descontando as barras).      */
+  #hud{position:fixed;left:0;right:0;top:0;height:100%;height:100dvh;
+       pointer-events:none;
+       padding:max(16px,env(safe-area-inset-top)) 16px
+               calc(env(safe-area-inset-bottom,0px) + 22px);
+       display:flex;flex-direction:column;justify-content:space-between;}
+  #top{text-align:center;}
+  #local{font-size:clamp(12px,3.2vw,15px);letter-spacing:.18em;text-transform:uppercase;
+         color:var(--t-max);font-weight:600;text-shadow:var(--scrim-strong);}
+  /* a frase que guia o jogador e leitura, nao rotulo: serifada e grande */
+  #status{font-family:var(--serif);font-size:clamp(21px,5.2vw,27px);line-height:1.28;
+          font-weight:600;color:var(--t-hi);margin:8px auto 0;min-height:1.5em;
+          max-width:20ch;letter-spacing:0;
+          text-shadow:var(--scrim-strong);transition:color .3s;}
+  #status.hot{color:var(--t-warm);}
+
+  #bottom{display:flex;flex-direction:column;gap:10px;}
+  /* as barras sao informacao de jogo, nao enfeite: 6px + contorno proprio,
+     para nao sumirem contra a nevoa clara nem contra o preto.            */
+  #meter{position:relative;height:6px;border-radius:6px;background:#1c2836;
+    box-shadow:inset 0 0 0 1px #3b4f64,0 1px 3px #000;overflow:hidden;}
+  #meter-fill{position:absolute;inset:0 auto 0 0;width:0%;border-radius:6px;
+    background:linear-gradient(90deg,#5fc8ff,#ffd9b0);
+    box-shadow:0 0 14px #ff9a4d99;transition:width .12s linear;}
+  #hold{position:relative;height:6px;border-radius:6px;background:#141d27;
+    box-shadow:inset 0 0 0 1px #33465a;overflow:hidden;opacity:0;transition:opacity .25s;}
+  #hold.on{opacity:1;}
+  #hold-fill{position:absolute;inset:0 auto 0 0;width:0%;border-radius:6px;background:#fff2e0;
+    box-shadow:0 0 14px #ffbe7a;transition:width .08s linear;}
+  #hint{font-family:var(--serif);font-style:italic;font-weight:500;
+        font-size:clamp(17px,4.2vw,20px);line-height:1.32;
+        color:var(--t-hi);text-align:center;letter-spacing:0;
+        min-height:1.4em;max-width:26ch;margin:0 auto;
+        text-shadow:var(--scrim-strong);}
+  #passos{text-align:center;font-size:clamp(17px,4.2vw,20px);letter-spacing:.4em;
+          color:var(--t-warms);min-height:1.2em;font-weight:700;
+          font-family:var(--mono);
+          text-shadow:0 1px 2px #000,0 2px 10px #000,0 0 18px #ff9a4d55;}
+  #btns{display:flex;gap:10px;pointer-events:auto;}
+  button{
+    flex:1;min-height:54px;padding:15px 10px;border-radius:9px;
+    border:1px solid #46596d;
+    background:#0a1018f2;color:var(--t-max);
+    font-family:var(--sans);font-size:clamp(14px,3.6vw,16px);font-weight:700;
+    letter-spacing:.12em;text-transform:uppercase;
+    text-shadow:0 1px 2px #000;
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  }
+  button.acc{border-color:#b87433;color:var(--t-warms);}
+
+  /* ---------------- painel do mestre ---------------- */
+  #master{position:fixed;left:12px;right:12px;z-index:6;
+    bottom:calc(env(safe-area-inset-bottom,0px) + 96px);
+    max-height:66dvh;overflow-y:auto;touch-action:pan-y pinch-zoom;overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+    background:#050a10f7;border:1px solid #2a3949;border-radius:12px;padding:13px 15px;
+    font-size:clamp(14px,3.4vw,16px);color:var(--dim);display:none;pointer-events:auto;
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}
+  #master.on{display:block;}
+  #master .l{display:flex;justify-content:space-between;gap:12px;padding:6px 0;
+    font-variant-numeric:tabular-nums;}
+  #master .l b{color:var(--t-max);font-weight:700;font-family:var(--mono);letter-spacing:.02em;}
+  #master input{width:100%;margin-top:12px;padding:13px;border-radius:8px;
+    border:1px solid #46596d;background:#0b1118;color:var(--t-max);
+    font-size:clamp(15px,3.8vw,17px);font-weight:600;
+    font-family:var(--mono);letter-spacing:.1em;text-align:center;}
+  #master .sub{margin-top:12px;font-size:clamp(14px,3.3vw,15px);line-height:1.6;
+    color:var(--t-mid);}
+  /* rotulos longos: caixa alta + tracking estouravam a largura do painel.
+     caixa normal le melhor numa frase inteira e ainda cabe.             */
+  #cal,#folga{width:100%;text-transform:none;letter-spacing:.01em;
+    font-size:clamp(14px,3.5vw,16px);font-weight:600;line-height:1.35;
+    padding:13px 12px;height:auto;}
+  #folga{margin-top:10px;border-color:#b87433;color:var(--t-warms);}
+  #cal{margin-top:8px;}
+
+  /* ---------------- abertura ---------------- */
+  /* justify-content:center centraliza, mas ESTOURA por cima quando o texto
+     e mais alto que a tela — no iPhone o botao ficava fora de alcance e a
+     pagina parecia travada. justify:safe center + touch-action:pan-y
+     resolvem: centraliza quando cabe, rola quando nao cabe.              */
+  #intro{position:fixed;left:0;right:0;top:0;height:100%;height:100dvh;
+    z-index:10;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;justify-content:safe center;text-align:center;
+    padding:clamp(20px,4vh,34px) 22px calc(env(safe-area-inset-bottom,0px) + 28px);
+    overflow-y:auto;-webkit-overflow-scrolling:touch;
+    touch-action:pan-y pinch-zoom;overscroll-behavior:contain;
+    background:radial-gradient(120% 80% at 50% 45%,#060c13ef,#020407f2 55%,#000000fa);
+    backdrop-filter:blur(2px);}
+  /* rede de seguranca para Safari antigo, que ignora "safe center": duas
+     margens automaticas fazem o mesmo — centram quando cabe, somem quando
+     nao cabe, e ai o conteudo comeca no topo e rola inteiro.            */
+  #intro::before,#intro::after,#card::before,#card::after{content:"";margin:auto;flex:0 0 0;}
+  #intro.gone{display:none;}
+  #kicker{font-family:var(--sans);font-size:clamp(11px,2.9vw,14px);letter-spacing:.16em;
+    text-transform:uppercase;font-weight:600;color:var(--t-max);
+    line-height:1.4;max-width:26ch;text-shadow:var(--scrim);}
+  #title{font-family:var(--display);font-size:clamp(40px,10.5vw,64px);line-height:1.02;
+    font-weight:600;letter-spacing:.01em;margin:12px 0 8px;color:#ffffff;
+    text-shadow:0 0 46px #ff9a4d40,0 4px 34px #000;}
+  #title b{font-weight:700;color:var(--t-warm);}
+  #sub{font-family:var(--serif);font-style:italic;font-size:clamp(17px,4.4vw,22px);
+    font-weight:500;color:var(--t-mid);margin-bottom:20px;}
+  #intro p{font-family:var(--serif);font-size:clamp(17px,4.4vw,21px);line-height:1.45;
+    font-weight:400;color:var(--t-hi);max-width:22em;margin:0 0 13px;}
+  #intro p b{color:#fff;font-weight:600;}
+  #intro p.small{font-size:clamp(16px,4vw,19px);font-weight:500;color:var(--t-mid);line-height:1.5;max-width:23em;}
+  #intro .go{flex:0 0 auto;margin-top:20px;width:min(340px,88vw);padding:17px;
+    font-size:clamp(13px,3.4vw,16px);letter-spacing:.16em;
+    border-color:#b87433;color:var(--t-warms);background:#1a1109ee;}
+  #intro .alt{flex:0 0 auto;margin-top:12px;background:none;border:none;border-radius:0;
+    min-height:48px;backdrop-filter:none;-webkit-backdrop-filter:none;color:var(--t-max);
+    font-size:clamp(14px,3.4vw,15px);letter-spacing:.1em;text-transform:uppercase;
+    font-weight:600;text-decoration:underline;text-underline-offset:6px;padding:12px;}
+  #round{margin-top:16px;font-size:clamp(13px,3.1vw,15px);letter-spacing:.16em;
+    color:var(--t-mid);font-family:var(--mono);font-weight:600;}
+  /* o codigo da rodada e o checksum do grupo: se bate, todos veem a janela
+     no mesmo rumo. Por isso ele e maior e mais quente que o resto do rodape. */
+  #round b{color:var(--t-warms);letter-spacing:.2em;font-weight:700;
+    font-size:1.35em;text-shadow:0 0 16px #ff9a4d55;}
+  #round-note{margin-top:8px;font-family:var(--sans);font-weight:500;
+    font-size:clamp(13px,3.2vw,15px);line-height:1.45;max-width:30ch;
+    color:var(--t-mid);}
+  #round-note.warn{color:#ffd9b0;font-weight:600;}
+  #round-note.ok{color:#a9e8c0;font-weight:600;}
+
+  /* ---------------- o oito no ar ---------------- */
+  #oito{position:fixed;left:0;right:0;top:0;height:100%;height:100dvh;z-index:11;
+    display:none;flex-direction:column;align-items:center;justify-content:center;
+    gap:18px;text-align:center;padding:24px;
+    background:radial-gradient(ellipse 110% 70% at 50% 45%,#070d15f2,#02040af7);}
+  #oito.on{display:flex;animation:fade .4s ease both}
+  #oito-tit{font-family:var(--display);font-size:clamp(30px,7.5vw,42px);line-height:1.06;
+    font-weight:600;color:#fff;text-shadow:0 0 40px #ffb26640,0 4px 30px #000}
+  #oito-tit.boa{color:var(--t-warms)}
+  #oito-txt{font-family:var(--serif);font-size:clamp(18px,4.6vw,22px);line-height:1.42;
+    font-weight:500;color:var(--t-hi);max-width:20em;text-shadow:var(--scrim-strong)}
+  #oito-botoes{display:none;flex-direction:column;align-items:center;gap:10px;
+    width:min(340px,88vw)}
+  #oito-botoes.on{display:flex}
+  #oito-vai{width:100%;padding:17px;font-size:clamp(13px,3.4vw,16px);letter-spacing:.16em;
+    border-color:#b87433;color:var(--t-warms);background:#1a1109ee}
+  #oito-refaz{width:100%;background:none;border:none;min-height:48px;
+    color:var(--t-max);font-size:clamp(14px,3.4vw,15px);letter-spacing:.1em;
+    text-transform:uppercase;font-weight:600;
+    text-decoration:underline;text-underline-offset:6px;padding:12px;order:2}
+  #oito-trilho{width:min(260px,70vw);height:5px;border-radius:5px;background:#1c2836;
+    box-shadow:inset 0 0 0 1px #3b4f64;overflow:hidden}
+  #oito-barra{height:100%;width:0%;border-radius:5px;background:#ffd9b0;
+    box-shadow:0 0 12px #ffbe7a}
+
+  /* ---------------- carta revelada ---------------- */
+  #card{position:fixed;left:0;right:0;top:0;height:100%;height:100dvh;z-index:12;
+    display:none;flex-direction:column;
+    align-items:center;justify-content:center;justify-content:safe center;
+    overflow-y:auto;touch-action:pan-y pinch-zoom;overscroll-behavior:contain;
+    padding:24px 22px calc(env(safe-area-inset-bottom,0px) + 24px);
+    background:#010305cc;backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);}
+  #card.on{display:flex;animation:fade .5s ease both;}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  #card-in{max-width:440px;width:100%;flex:0 0 auto;border:1px solid #4d3826;border-radius:14px;
+    padding:26px 24px;background:linear-gradient(160deg,#100b06,#070a0e);
+    box-shadow:0 30px 90px #000,0 0 70px #ff9a4d1a;}
+  #c-meta{display:flex;justify-content:space-between;gap:12px;
+    font-size:clamp(13px,3.2vw,15px);letter-spacing:.16em;
+    text-transform:uppercase;color:var(--t-warms);margin-bottom:18px;font-weight:700;}
+  #c-txt{font-family:var(--serif);font-size:clamp(21px,5.6vw,28px);line-height:1.36;
+    font-weight:500;color:#fffaf3;}
+  #c-dir{font-family:var(--serif);font-style:italic;font-weight:500;margin-top:18px;
+    font-size:clamp(17px,4.3vw,20px);line-height:1.45;color:var(--t-mid);}
+  #c-tempo{font-family:var(--mono);font-weight:700;margin-top:18px;
+    font-size:clamp(15px,3.8vw,18px);letter-spacing:.06em;color:var(--t-warms);
+    font-variant-numeric:tabular-nums;}
+  #card button{margin-top:20px;width:100%;}
+
+  /* telas curtas: encolhe o titulo e os respiros, nunca o texto de leitura */
+  @media(max-height:760px){
+    #title{font-size:clamp(34px,9vw,48px);margin:10px 0 6px;}
+    #sub{margin-bottom:14px;}
+    #intro p{margin-bottom:10px;}
+    #intro .go{margin-top:16px;padding:15px;}
+    #round{margin-top:12px;}
+  }
+  @media(max-height:640px){
+    #title{font-size:clamp(30px,8vw,40px);}
+    #intro p{font-size:clamp(16px,4.1vw,19px);line-height:1.4;}
+    #intro p.small{font-size:clamp(15px,3.8vw,17px);}
+    #sub{font-size:clamp(16px,4.1vw,19px);margin-bottom:10px;}
+  }
+  /* telas largas: a linha de leitura nao pode virar uma faixa larga demais */
+  @media(min-width:900px){
+    #status{max-width:24ch;}
+    #hint{max-width:34ch;}
+  }
+  /* ======================================================================
+     INTEGRAÇÃO E RESPONSIVIDADE (spec v2)
+     ====================================================================== */
+  html,body{overflow-x:hidden;min-height:100vh;min-height:100dvh}
+  *,*::before,*::after{box-sizing:border-box}
+
+  /* Áreas seguras nas QUATRO bordas. Só topo e rodapé não bastam: deitado,
+     o notch e as bordas arredondadas passam para as laterais.            */
+  #hud,#intro,#oito,#card,#carta,#cartao,#pistas,#final,#descanso,#falha{
+    padding-left:max(16px,env(safe-area-inset-left));
+    padding-right:max(16px,env(safe-area-inset-right));
+  }
+  #mestre,#master{
+    left:max(12px,env(safe-area-inset-left));
+    right:max(12px,env(safe-area-inset-right));
+  }
+
+  /* Botões: alvo de toque, e os três estados que a spec pede.           */
+  button{min-height:48px}
+  button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+  button[disabled]{
+    color:#dfeaf5;border-color:#33465a;background:#0a0f16f2;
+    cursor:default;filter:saturate(.35)
+  }
+
+  /* MODO INTEGRADO: o MOSAICO já mostra o nome da rodada, "Jogador contra
+     Jogador" e "Cada um por si" na moldura. Repetir aqui dentro duplica a
+     tela. Ficam só as orientações internas.                              */
+  body.embed #kicker,
+  body.embed #title,
+  body.embed #titulo,
+  body.embed #nome-jogo,
+  body.embed #sub,
+  body.embed #local{display:none}
+  body.embed #intro{justify-content:center;justify-content:safe center}
+  /* No iframe a viewport é o quadro da Mesa, não o dvh do Safari. 100dvh
+     aqui estourava o quadro e escondia FAROL; 100% preenche o sensor-play. */
+  html.embed,html.embed body{height:100%;max-height:100%;overflow:hidden}
+  html.embed #hud,html.embed #intro,html.embed #oito,html.embed #card,
+  html.embed #carta,html.embed #falha,html.embed #c{height:100%;max-height:100%}
+
+  /* ---------------- falha de sensor ---------------- */
+  #falha{position:fixed;left:0;right:0;top:0;height:100%;height:100dvh;z-index:20;
+    display:none;flex-direction:column;align-items:center;
+    justify-content:center;justify-content:safe center;gap:14px;
+    padding-top:max(20px,env(safe-area-inset-top));
+    padding-bottom:calc(env(safe-area-inset-bottom,0px) + 24px);
+    overflow-y:auto;-webkit-overflow-scrolling:touch;
+    touch-action:pan-y pinch-zoom;overscroll-behavior:contain;
+    background:radial-gradient(ellipse 110% 70% at 50% 45%,#070d15f5,#02040afa);
+    text-align:center}
+  #falha.on{display:flex}
+  #falha::before,#falha::after{content:"";margin:auto;flex:0 0 0}
+  #falha-tit{font-family:"Cormorant Garamond",Georgia,serif;
+    font-size:clamp(26px,6.5vw,36px);font-weight:600;color:#fff;line-height:1.1}
+  #falha-msg{font-family:"Literata",Georgia,serif;font-weight:500;
+    font-size:clamp(17px,4.3vw,20px);line-height:1.45;color:#f4f9fd;max-width:24em}
+  #falha button{width:min(340px,88vw);flex:0 0 auto}
+  #falha-retry{padding:16px;font-size:clamp(13px,3.4vw,16px);letter-spacing:.14em;
+    text-transform:uppercase;font-weight:700;border-radius:9px;
+    border:1px solid #b87433;color:#ffe0c0;background:#1a1109ee}
+  #falha-toque{background:none;border:none;min-height:48px;color:#fff;
+    font-size:clamp(14px,3.4vw,15px);letter-spacing:.08em;text-transform:uppercase;
+    font-weight:600;text-decoration:underline;text-underline-offset:6px;padding:12px}
+
+</style>
+
+<!-- O volume dos botoes mora num arquivo so, lido por esta pagina e pelas
+     outras tres. Entra DEPOIS do <style> de proposito: em empate de
+     especificidade, quem vem por ultimo vence, e o padrao tem de vencer. -->
+<link rel="stylesheet" href="css/profundidade.css?v=20260902-profundidade">
+<link rel="stylesheet" href="css/profundidade-1mais1.css?v=20260930-foco">
+<link rel="stylesheet" href="css/ac-janelas.css?v=20261011-t4">
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="veil"></div>
+
+<div id="hud">
+  <div id="top">
+    <div id="local">A Casa da Costa — a subida</div>
+    <div id="status">Procure a janela.</div>
+  </div>
+  <div id="bottom">
+    <div id="meter"><div id="meter-fill"></div></div>
+    <div id="hold"><div id="hold-fill"></div></div>
+    <div id="hint">Gire o corpo. O farol é fraco — use as marcas do caminho.</div>
+    <div id="passos">······</div>
+    <div id="btns">
+      <button id="b-beam" class="acc">Farol</button>
+      <button id="b-master">Mestre</button>
+    </div>
+  </div>
+</div>
+
+<div id="master">
+  <div class="l"><span>rumo (bússola)</span><b id="m-bear">--</b></div>
+  <div class="l"><span>elevação</span><b id="m-elev">--</b></div>
+  <div class="l"><span>inclinação lateral</span><b id="m-roll">--</b></div>
+  <div class="l"><span>alvo</span><b id="m-target">--</b></div>
+  <div class="l"><span>distância angular</span><b id="m-dist">--</b></div>
+  <div class="l"><span>fonte</span><b id="m-src">--</b></div>
+  <div class="l"><span>rodada</span><b id="m-round">--</b></div>
+  <div class="l"><span>folga exigida</span><b id="m-folga">--</b></div>
+  <input id="seed" spellcheck="false" autocomplete="off">
+  <div class="sub">O rumo vem só do relógio: vira a cada 30 min, junto, em todos os aparelhos. Se alguém ficou numa rodada diferente, é só digitar aqui o código do grupo.</div>
+  <button id="folga">Folga do rumo: normal</button>
+  <button id="cal">Calibrar norte (aponte ao norte e toque)</button>
+</div>
+
+<div id="oito">
+  <svg viewBox="0 0 120 80" width="118" height="79" aria-hidden="true">
+    <path d="M30 40 C30 18 58 18 60 40 C62 62 90 62 90 40 C90 18 62 18 60 40 C58 62 30 62 30 40 Z"
+          fill="none" stroke="#ffd9b0" stroke-width="2.2" stroke-linecap="round"
+          stroke-dasharray="26 190">
+      <animate attributeName="stroke-dashoffset" from="216" to="0" dur="1.5s" repeatCount="indefinite"/>
+    </path>
+  </svg>
+  <p class="oito-p">Tem muita névoa e chuva, você precisa ir em direção a casa para achar as pistas. São seis estágios, e a névoa só abre no fim.</p>
+  <p class="oito-p">Você vai usar o seu celular para te guiar até lá. A bússola precisa estar ativa: <b>desenhe um 8 no ar à sua frente com o celular</b>.</p>
+  <div id="oito-trilho"><div id="oito-barra"></div></div>
+  <div id="oito-botoes" class="on">
+    <button id="oito-vai" class="go" disabled>A bússola ainda está tonta</button>
+    <button id="oito-pular" type="button" class="alt" style="margin-top:12px;width:100%;padding:14px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.25);color:#cfe2f7;border-radius:10px;font:600 14px system-ui,sans-serif;cursor:pointer">Continuar tocando na tela</button>
+  </div>
+</div>
+
+<div id="card"><div id="card-in" data-ac-priority="3">
+  <div id="c-meta"><span id="c-tipo">Registro anterior da noite</span><span id="c-hora">21:07</span></div>
+  <div id="c-txt"></div>
+  <div id="c-dir"></div>
+  <div id="c-tempo"></div>
+  <button id="c-close">Fechar</button>
+</div></div>
+
+<div id="intro" data-ac-priority="10">
+  <div id="kicker">A noite da tempestade</div>
+  <div id="title">A Casa<br><b>da Costa</b></div>
+  <div id="sub">A janela do segundo andar</div>
+  <p>A tempestade não esperou ninguém. Às 21h29 a casa apagou por dois minutos e dois segundos. Não foi queda. Foi janela.</p>
+  <p>A janela acesa fica sempre no <b>mesmo rumo real do mundo</b>. Todos viram o corpo para o mesmo lado.</p>
+  <button class="go" id="b-start">Apontar a janela</button>
+  <button class="alt" id="b-sim">Estou no computador</button>
+  <div id="round">RODADA <b id="round-code">----</b></div>
+  <div id="round-note">Confiram: o código tem de ser o mesmo em todos os aparelhos.</div>
+</div>
+
+<div id="falha" data-ac-priority="9" role="alertdialog" aria-live="polite">
+  <div id="falha-tit">Sem sensor</div>
+  <div id="falha-msg"></div>
+  <button id="falha-retry" aria-label="Tentar ativar o sensor novamente">Tentar novamente</button>
+  <button id="falha-toque" aria-label="Continuar usando o toque na tela">Continuar tocando na tela</button>
+</div>
+
+<!-- Protocolo com a Mesa e ativacao de sensor: um so arquivo para as tres tarefas. -->
+<script src="js/tarefa-sensor.js?v=20261011-t4"></script>
+<script>
+(function(){
+"use strict";
+
+/* ==========================================================================
+   A CASA DA COSTA — a noite da tempestade
+   · o alvo é um RUMO ABSOLUTO de bússola (todos apontam para o mesmo lado
+     do mundo real), sorteado por semente compartilhada
+   · a altura do alvo é a altura de uma janela de segundo andar, calculada
+     por trigonometria a partir da distância — ela sobe conforme você chega
+   · segurar o rumo firme dá um PASSO encosta acima; são seis até a casa
+   · render em passes: céu > silhuetas > névoa procedural > casa > janela >
+     névoa rasteira > farol volumétrico > chuva em profundidade > bloom
+   ========================================================================== */
+
+/* ---------------- ajuste de jogo ---------------- */
+var CFG = {
+  VFOV: 70,          /* campo de visão vertical, graus */
+  TOL_ROLL: 18,      /* o caixilho precisa estar em pé */
+  HOLD_MS: 1500,     /* tempo firme no rumo para arrancar um passo */
+  /* --- o quanto o jogo perdoa a mão tremendo -----------------------------
+     FOLGA  multiplica a tolerância inteira (o painel do mestre troca isto)
+     SOLTA  histerese: depois de engatar, a janela de tolerância alarga —
+            é mais fácil CONTINUAR segurando do que COMEÇAR
+     DRENO  quando você sai, o progresso ESCOA em vez de zerar de uma vez  */
+  FOLGA: 1,
+  SOLTA: 1.7,
+  DRENO: 0.55,
+  ROUND_MIN: 30,     /* a rodada (e o rumo) troca a cada N minutos */
+  /* a subida da encosta, em metros até a fachada. Cada índice é um passo. */
+  /* ---- a escada de ALTURA -----------------------------------------------
+     Antes isto era uma escada de distância, e a altura do alvo saía como
+     consequência — com saltos de 1,1° e 1,4° no começo, MENORES que a
+     própria tolerância. Dava para subir sem levantar o braço.
+     Agora a escada é pensada em graus: cada parada sobe de 5 a 7°, sempre
+     mais que a tolerância, então cada etapa exige achar a altura nova.
+     As distâncias abaixo são d = JAN_H / tan(altura), nesta ordem:
+        4° · 9° · 14° · 20° · 26° · 32° · 39°                          */
+  PASSOS: [45.8, 20.2, 12.8, 8.8, 6.6, 5.1, 4.0],
+  JAN_L: 1.30,       /* meia-largura da janela, metros */
+  JAN_A: 1.65,       /* meia-altura */
+  JAN_H: 3.20,       /* altura do centro da janela acima dos seus olhos */
+  CASA_L: 7.5,       /* meia-largura da fachada */
+  CASA_H: 9.0        /* altura da platibanda */
+};
+
+/* o que a janela devolve a cada chegada — curto de propósito.
+
+   02/09/2026: esta lista inteira era do cânone antigo — o cofre arrombado, a
+   marca na trava, a névoa convidada — e nenhuma linha dela existia mais no
+   caso. Não era "um fragmento errado": era a linha do tempo velha por
+   completo, com horas que nem batiam com a janela desta atividade.
+
+   Agora sai do banco (casos/casa-da-costa.json) e desce até o que a Janela
+   do Norte prova, que é POSIÇÃO: o corpo que atravessa por dentro. Ao mexer,
+   confira o id do fragmento no banco antes de reescrever a frase.        */
+var FRAGMENTOS = [
+  { hora:"21:02", txt:"Alguém já estava no vão do sótão quando o primeiro carro parou." },              /* F22 */
+  { hora:"21:19", txt:"As chegadas em fila: 21h02, 21h05, 21h08, 21h11, 21h14, 21h19. Seis, e nenhuma antes." }, /* F21 */
+  { hora:"21:21", txt:"O quarto degrau rangeu sob peso. O terceiro não. O grupo inteiro estava na sala." },      /* F23 F04 */
+  { hora:"21:24", txt:"Cozinha e corredor sem poeira. O resto da casa tem cinco meses fechados." },     /* F02 */
+  { hora:"21:27", txt:"Uma colher no piso do corredor. Não estava ali às 21h19." },                      /* F05 F24 */
+  { hora:"21:29", txt:"A luz cai. Dois minutos e dois segundos de escuro, e uma respiração perto demais." }, /* F25 F06 */
+  { hora:"21:52", txt:"Um corpo atravessa entre o observador e a janela. Por dentro." }                  /* F07 */
+];
+var IDS=["F22", "F21", "F04", "F02", "F05", "F06", "F07"];
+/* 11/10/2026 (Tarefa 4): a Casa tem 15 variações da solução. Dentro da Mesa ou do Solo, os textos
+   acima saem da variação desta partida (os mesmos fragmentos do banco, pelo id); fora, ficam como estão. */
+(function(){try{
+  var P=window.parent&&window.parent!==window?window.parent:null; if(!P) return;
+  var C=(P.CASO&&P.CASO.variacao&&P.CASO)||(P.CasaVariacoesSolo&&P.CasaVariacoesSolo.caso&&P.CasaVariacoesSolo.caso());
+  if(!C||!C.fragmentos) return;
+  IDS.forEach(function(id,i){var f=C.fragmentos[id]; if(f&&FRAGMENTOS[i]){FRAGMENTOS[i].txt=f.d; if(f.h&&f.h!=="—")FRAGMENTOS[i].hora=f.h.split("–")[0];}});
+}catch(e){}})();
+
+
+/* uma frase por passo dado */
+var PASSO_TXT = [
+  "A névoa fechou atrás de você.",
+  "Um estalo seco. Vinha do sótão.",
+  "A luz da casa oscilou. Não foi queda.",
+  "Daqui já dá para ver a cortina.",
+  "A cortina balança. A janela está trancada.",
+  "Você está debaixo dela."
+];
+
+/* ==========================================================================
+   ENTRADA PELA URL  —  ?embed=1&s=SEMENTE&run=ID[&folga=N][&decl=N][&dev=1]
+   s   : semente fixa da tarefa. Presente, o relógio para de mandar — todo
+         jogador com a mesma semente monta exatamente o mesmo cenário.
+   run : identifica esta execução. Volta em toda mensagem enviada à Mesa e
+         filtra os comandos recebidos dela. Ausente, a tarefa segue
+         funcionando sozinha, como sempre funcionou.
+   folga: multiplicador de tolerância decidido pela MESA, não pelo aparelho.
+         Ver o bloco "a folga é da mesa" mais abaixo.
+   decl: declinação magnética combinada da mesa, em graus. Aplicada SÓ nos
+         aparelhos cujo rumo vem do norte VERDADEIRO — na prática, iPhone.
+         O Android entrega norte magnético e já é a referência; somar nele
+         deslocaria os dois juntos e não juntaria ninguém.
+
+         Por que um número digitado e não uma medida: um aparelho trava quando
+         A LEITURA DELE bate com o alvo, então todos travam lendo o mesmo
+         número. A discordância existe na direção física, e nenhuma bússola a
+         enxerga de dentro de si mesma. Não há como o grupo se auto-calibrar
+         a partir dos próprios sensores; é preciso saber onde o grupo está.
+
+         E não precisa estar certo: precisa estar combinado. Errar junto não
+         atrapalha a brincadeira — divergir, sim.
+   dev : só teste. Nunca é ligado por conta própria em lugar nenhum.
+   ========================================================================== */
+var EMBED=false, SEMENTE_URL="", RUN_ID="", DEV=false, FOLGA_URL=null, DECL_MESA=0;
+try{
+  var _q=new URLSearchParams(location.search);
+  EMBED       = _q.get("embed")==="1";
+  SEMENTE_URL = (_q.get("s")||"").trim().toUpperCase();
+  RUN_ID      = (_q.get("run")||"").trim();
+  var _f=parseFloat(_q.get("folga"));
+  if(isFinite(_f)&&_f>=0.5&&_f<=2.5) FOLGA_URL=_f;
+  var _d=parseFloat(_q.get("decl"));
+  if(isFinite(_d)&&_d>=-90&&_d<=90) DECL_MESA=_d;
+  /* ?dev=1 — modo de teste. O botao de computador nao existe para o jogador:
+     a tarefa e exclusiva de celular. Ele so aparece com dev=1, para nos
+     conseguirmos testar sem sensor. O caminho por toque continua existindo
+     sozinho pela tela de falha, entao tirar o botao nao prende ninguem. */
+  DEV = _q.get("dev")==="1";
+}catch(e){}
+
+var JOGO="janela", TAREFA="inclinacao";
+/* ==========================================================================
+   INTEGRAÇÃO COM O MOSAICO (mesa)  — contrato versão 2
+   Este bloco não decide ponto, colocação nem pista. Ele só mede o tempo da
+   tarefa e conta à mesa o que aconteceu. Sem Firebase, sem navegação, sem
+   tocar no documento pai.
+   ========================================================================== */
+var VERSAO=3;
+var modoEntrada="sensor";
+var inicioTarefa=null, fimTarefa=null, conclusaoEnviada=false, ultimoStatus=null;
+/* Estado de controle da Mesa. PAUSADO congela interação e cronômetro;
+   ABORTADO encerra a execução sem que nenhum tempo seja enviado. */
+var PAUSADO=false, ABORTADO=false, pausadoEm=null, descontoMs=0;
+
+/* O dialogo com a Mesa mora em js/tarefa-sensor.js: origem, runId e a
+   validacao das mensagens sao iguais nas tres tarefas, e uma correcao ali
+   passa a valer para todas. Aqui ficam so os atalhos locais.          */
+function ctxMesa(){ return { embed:EMBED, runId:RUN_ID }; }
+function alvoMsg(){ return TarefaSensor.alvoMsg(); }
+function envia(dados){ TarefaSensor.enviar(dados, ctxMesa()); }
+
+/* A Mesa não recebe mais estado de sensor: a única entrega é o tempo. Isto
+   virou registro interno — os pontos de chamada continuam existindo, e se um
+   dia a Mesa precisar saber que alguém empacou na permissão, basta voltar a
+   linha de envio aqui, sem mexer em mais nada.                          */
+function enviarStatus(status, modo){
+  if(modo) modoEntrada=modo;
+  if(ultimoStatus===status) return;
+  ultimoStatus=status;
+  /* Agora sai de verdade: a Mesa carimba a chegada do "ativo" no servidor,
+     e e dali que a duracao da atividade comeca a contar. */
+  TarefaSensor.status(status, ctxMesa());
+}
+function iniciarCronometroOficial(){
+  if(inicioTarefa!==null) return;
+  inicioTarefa=performance.now();
+  descontoMs=0; pausadoEm=null;
+}
+/* O tempo entregue é o tempo JOGADO: o período em que a Mesa manteve a
+   tarefa pausada sai da conta. Se a conclusão cair com a pausa ainda
+   aberta, o trecho pendente também sai — caso contrário uma pausa longa
+   sem retomada apareceria como tempo de jogo.                          */
+function concluirCronometroOficial(){
+  if(inicioTarefa===null || fimTarefa!==null) return null;
+  fimTarefa=performance.now();
+  var pendente=(pausadoEm!==null)?(fimTarefa-pausadoEm):0;
+  return Math.max(0, Math.round(fimTarefa-inicioTarefa-descontoMs-pendente));
+}
+function formatarTempo(ms){ return TarefaSensor.formatarTempo(ms); }
+var tempoFinalMs=null;
+/* A trava só fecha DEPOIS de haver um tempo válido. Travar antes deixaria a
+   tarefa impossível de concluir se isto fosse chamado antes do cronômetro
+   começar — o jogador ficaria preso sem nunca mandar nada.              */
+function enviarConclusao(){
+  if(conclusaoEnviada || ABORTADO) return null;
+  var tempoMs=concluirCronometroOficial();
+  if(tempoMs===null) return null;
+  conclusaoEnviada=true;
+  tempoFinalMs=tempoMs;
+  /* Só o que a Mesa pediu: quem executou e quanto tempo levou. Ponto,
+     colocação e pista não são assunto daqui. jogo/tarefa/versao ficam
+     apenas para a Mesa saber de qual das tarefas veio a mensagem.      */
+  envia({ mosaico:"tarefa-ok", tempoMs:tempoMs });
+  return tempoMs;
+}
+
+/* ==========================================================================
+   COMANDOS VINDOS DA MESA  —  {mosaico:"controle-tarefa", runId, acao}
+   ========================================================================== */
+var elPausa=null;
+function overlayPausa(texto){
+  if(!elPausa){
+    elPausa=document.createElement("div");
+    elPausa.setAttribute("id","pausa-mesa");
+    elPausa.className="pf-pausa";
+    elPausa.innerHTML='<div class="pf-card pf-pausa-card"><div class="pf-inset pf-pausa-msg"></div></div>';
+    document.body.appendChild(elPausa);
+  }
+  if(texto===null){ elPausa.style.display="none"; return; }
+  elPausa.querySelector(".pf-pausa-msg").textContent=texto;
+  elPausa.style.display="flex";
+}
+function aplicaPausa(){
+  if(PAUSADO||ABORTADO) return;
+  PAUSADO=true;
+  if(inicioTarefa!==null && fimTarefa===null) pausadoEm=performance.now();
+  overlayPausa("Pausado pela mesa.");
+}
+function aplicaRetomada(){
+  if(!PAUSADO||ABORTADO) return;
+  PAUSADO=false;
+  if(pausadoEm!==null){ descontoMs+=performance.now()-pausadoEm; pausadoEm=null; }
+  tPrev=performance.now();          /* senão o primeiro dt vale a pausa inteira */
+  overlayPausa(null);
+}
+/* Abortar trava o envio para sempre: conclusaoEnviada vira verdadeiro sem
+   que nada tenha sido enviado, então nem um acerto posterior escapa.    */
+function aplicaAbortar(){
+  if(ABORTADO) return;
+  ABORTADO=true; PAUSADO=true; conclusaoEnviada=true;
+  overlayPausa("Execução encerrada pela mesa.");
+}
+/* Sem esta checagem, qualquer aba ou script conseguiria mandar um "abortar"
+   para dentro do iframe. Origem e remetente são conferidos antes da ação,
+   e runId diferente do da execução corrente é simplesmente ignorado.    */
+TarefaSensor.ouvirMesa({ pausar:aplicaPausa, retomar:aplicaRetomada, abortar:aplicaAbortar }, ctxMesa());
+/* Congelar o laço para o desenho; barrar os eventos para a interação. Só
+   o laço não basta: arrasto e botões mexem no estado fora dele.        */
+if(EMBED){
+  ["mousedown","mousemove","mouseup","click","keydown","keyup",
+   "touchstart","touchmove","touchend","touchcancel",
+   "deviceorientation","deviceorientationabsolute","devicemotion"
+  ].forEach(function(tipo){
+    window.addEventListener(tipo, function(e){
+      if(!PAUSADO) return;
+      e.stopImmediatePropagation();
+      if(e.cancelable) e.preventDefault();
+    }, {capture:true, passive:false});
+  });
+}
+
+/* ---------------- utilidades ---------------- */
+var PI=Math.PI, TAU=PI*2, D2R=PI/180;
+function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+function lerp(a,b,t){ return a+(b-a)*t; }
+function sstep(a,b,x){ x=clamp((x-a)/(b-a),0,1); return x*x*(3-2*x); }
+function wrap180(d){ d=(d+180)%360; if(d<0)d+=360; return d-180; }
+function wrap360(d){ d%=360; return d<0?d+360:d; }
+function hashStr(s){ var h=2166136261>>>0; for(var i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619)>>>0; } return h>>>0; }
+function rngFrom(seed){ var a=seed>>>0; return function(){ a=a+0x6D2B79F5|0; var t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+/* 8 pontos, não 16: "leste-nordeste" é impossível de gritar no escuro e de
+   apontar sem instrumento. Estes oito todo mundo aponta de olhos fechados,
+   e ficam a 45° um do outro — folga enorme contra a tolerância de ±9°. */
+var CARD = ["norte","nordeste","leste","sudeste","sul","sudoeste","oeste","noroeste"];
+function cardinal(b){ return CARD[Math.round(wrap360(b)/45)%8]; }
+
+/* ---------------- ruído de valor (tileável) ---------------- */
+function noiseTile(size, baseFreq, octaves, persist, rnd, lo, hi){
+  if(lo===undefined){ lo=0; hi=1; }
+  var acc=new Float32Array(size*size), amp=1, tot=0, o,f,gx,gy,x,y;
+  for(o=0;o<octaves;o++){
+    f=baseFreq<<o;
+    var grid=new Float32Array(f*f);
+    for(var i=0;i<f*f;i++) grid[i]=rnd();
+    for(y=0;y<size;y++){
+      gy=y*f/size; var y0=Math.floor(gy), ty=gy-y0, sy=ty*ty*(3-2*ty);
+      var r0=(y0%f)*f, r1=((y0+1)%f)*f;
+      for(x=0;x<size;x++){
+        gx=x*f/size; var x0=Math.floor(gx), tx=gx-x0, sx=tx*tx*(3-2*tx);
+        var c0=x0%f, c1=(x0+1)%f;
+        var a=grid[r0+c0], b=grid[r0+c1], c=grid[r1+c0], d=grid[r1+c1];
+        var t0=a+(b-a)*sx, t1=c+(d-c)*sx;
+        acc[y*size+x]+=(t0+(t1-t0)*sy)*amp;
+      }
+    }
+    tot+=amp; amp*=persist;
+  }
+  var cv=document.createElement("canvas"); cv.width=cv.height=size;
+  var cx=cv.getContext("2d"), img=cx.createImageData(size,size), p=img.data;
+  for(var k=0;k<size*size;k++){
+    var v=acc[k]/tot; v=sstep(lo,hi,clamp(v,0,1));
+    p[k*4]=255; p[k*4+1]=255; p[k*4+2]=255; p[k*4+3]=(v*255)|0;
+  }
+  cx.putImageData(img,0,0);
+  return cv;
+}
+
+/* ---------------- canvas e buffers ---------------- */
+var cvs=document.getElementById("c"), ctx=cvs.getContext("2d");
+var W=0,H=0,DPR=1,PPD=1,D2=1;
+var scB=document.createElement("canvas"), sc=scB.getContext("2d");     /* cena */
+var gsB=document.createElement("canvas"), gs=gsB.getContext("2d");     /* cópia p/ refração */
+var b1B=document.createElement("canvas"), b1=b1B.getContext("2d");     /* bloom */
+var b2B=document.createElement("canvas"), b2=b2B.getContext("2d");
+var fgB=document.createElement("canvas"), fg=fgB.getContext("2d");     /* névoa */
+fgB.width=384; fgB.height=216;
+var NOISE=null, NOISE2=null;
+var CAN_FILTER=(typeof ctx.filter==="string");
+var LOW=false;
+
+function resize(){
+  W=window.innerWidth; H=window.innerHeight;
+  DPR=Math.min(window.devicePixelRatio||1, LOW?1.25:2);
+  cvs.width=scB.width=gsB.width=Math.round(W*DPR);
+  cvs.height=scB.height=gsB.height=Math.round(H*DPR);
+  [ctx,sc,gs].forEach(function(c){ c.setTransform(DPR,0,0,DPR,0,0); });
+  b1B.width=b2B.width=Math.max(2,Math.round(W*0.25));
+  b1B.height=b2B.height=Math.max(2,Math.round(H*0.25));
+  PPD=Math.min(H/CFG.VFOV, W/95);
+  D2=Math.hypot(W,H)*0.5;
+  semeiaChuva(); semeiaLente();
+}
+
+/* ---------------- estado ---------------- */
+var view={bearing:0, elev:0, roll:0};          /* suavizado */
+var raw={bearing:0, elev:0, roll:0};
+var src="nenhuma";                              /* fonte da orientação */
+var northOffset=0;
+var started=false, sim=false, simDrag=null;
+var locked=false, holdAcc=0, revealed=0, fragIdx=0;
+/* filtro adaptativo do rumo: mede a velocidade angular ja alisada, para
+   separar "varrendo o horizonte" de "mirando com a mao tremendo". */
+var spdAng=0, rawAnt=null;
+var passo=0, distAlvo=CFG.PASSOS[0], distView=CFG.PASSOS[0], passoAnim=0;
+var beamOn=true, beamPulse=0, lastPulse=-9e9;
+/* surto: o banco de nevoa que fecha a cada passo dado (1 -> 0 em ~2,2 s) */
+var surto=0;
+var t0=performance.now(), tPrev=t0, lightning=0, lightNext=6000;
+
+/* ---------------- mundo (sorteado pela semente) ---------------- */
+var SEED="", target={bearing:0,elev:4}, world={};
+/* seedManual: o mestre digitou uma semente propria, entao o relogio para de
+   mandar. rodadaVista: qual rodada o mundo atual representa, para detectar a
+   virada e trazer todo mundo junto no mesmo instante. */
+/* Semente vinda da URL vale como semente fixada. */
+var seedManual=!!SEMENTE_URL, rodadaVista=-1, tInicio=0;
+
+/* --------------------------------------------------------------------------
+   A GARANTIA DE QUE TODOS OLHAM PARA O MESMO LADO
+   O rumo e funcao APENAS do relogio. Nao depende de quando cada um abriu a
+   pagina, de quantos fragmentos ja pegou, nem de qualquer estado local.
+   Dois aparelhos quaisquer, no mesmo instante, calculam o mesmo rumo.
+   O codigo da rodada e o proprio numero da rodada em base 36 — por isso e
+   REVERSIVEL: quem estiver fora do grupo digita o codigo dos outros e cai
+   exatamente na mesma rodada, sem precisar de mais nada.
+   -------------------------------------------------------------------------- */
+/* O código deixou de ser base 36 ("LA9C") porque base 36 é péssima para
+   gritar no escuro: B/V, M/N, 0/O e 1/I se confundem. Duas palavras de uma
+   lista temática dão 4096 combinações, nenhuma ambígua de ouvido, e ainda
+   soam como o jogo. A semente É a string — digitar reconstrói o mundo.  */
+var PAL=["MARÉ","SAL","NÉVOA","FAROL","CASCO","VENTO","PEDRA","LAJE",
+         "CORVO","GAIVOTA","JUNCO","MUSGO","ÂNCORA","REMO","PROA","QUILHA",
+         "AREIA","DUNA","FALÉSIA","GRUTA","RECIFE","BANCO","CANAL","BARRA",
+         "LUME","BRASA","CINZA","FULIGEM","VELA","PAVIO","LAMPIÃO","LANTERNA",
+         "CHUVA","TROVÃO","RAIO","GRANIZO","ORVALHO","GEADA","BRUMA","GAROA",
+         "NORTE","LESTE","OESTE","SUL","AGULHA","ROSA","CARTA","RUMO",
+         "CORDA","NÓ","REDE","ANZOL","ISCA","ESCAMA","SIRI","OSTRA",
+         "TORRE","JANELA","SÓTÃO","PORÃO","SOLEIRA","TRINCO","CHAVE","COFRE"];
+function roundCode(){ return Math.floor(Date.now()/(CFG.ROUND_MIN*60000)); }
+/* Tirar as duas palavras direto dos bits do número da rodada não serve: a
+   primeira só trocaria a cada 64 rodadas, ou seja, ficaria congelada a noite
+   inteira e não carregaria informação nenhuma. Passa por um hash para as
+   duas mexerem a cada meia hora. Não precisa ser reversível ao número —
+   a semente É a string, e digitá-la reconstrói o mundo.                */
+function codigoDe(rc){
+  var h=hashStr("RODADA-"+rc);
+  var a=(h>>>7)&63, b=h&63;
+  if(b===a) b=(b+29)&63;              /* nada de "PAVIO-PAVIO" */
+  return PAL[a]+"-"+PAL[b];
+}
+function defaultSeed(){ return codigoDe(roundCode()); }
+/* minutos que faltam para a rodada virar (e o rumo mudar para todos) */
+function minutosParaVirar(){
+  var ms=CFG.ROUND_MIN*60000;
+  return (ms-(Date.now()%ms))/60000;
+}
+function shortCode(s){
+  s=String(s).toUpperCase();
+  /* o código do jogo agora são duas palavras (até uns 20 caracteres): mostrar
+     por extenso é o ponto. Só semente muito longa, digitada à mão, cai no
+     resumo por hash.                                                    */
+  return s.length<=22 ? s : hashStr(s).toString(36).toUpperCase().slice(-6);
+}
+
+function buildWorld(seedStr){
+  SEED=seedStr;
+  var rnd=rngFrom(hashStr(seedStr));
+  /* travado nos 16 pontos da rosa: o rumo cai no CENTRO de um setor de 22,5°
+     com tolerancia de 4,4°, entao sobra margem — e o nome que o painel do
+     mestre mostra passa a ser exato, em vez de errar ate 11,25°.        */
+  target.bearing=Math.floor(rnd()*8)*45;
+  passo=0; distAlvo=distView=CFG.PASSOS[0];
+  target.elev=geom().elev;
+
+  /* rochedos soltos no mar, para dar escala ao vazio */
+  var blocos=[], i;
+  for(i=0;i<7;i++){
+    blocos.push({
+      bearing: rnd()*360,
+      half: 0.7+rnd()*2.4,
+      top: 0.5+rnd()*1.6,
+      dist: 0.55+rnd()*0.45
+    });
+  }
+
+  /* pinheiros tortos pelo vento, agarrados nas bordas da trilha */
+  var pinheiros=[];
+  for(i=0;i<14;i++){
+    var z=8+rnd()*56, lado=rnd()<0.5?-1:1;
+    pinheiros.push({
+      z:z, lat: lado*(larguraTrilha(z,lado>0?1:0)*(0.86+rnd()*0.26)),
+      alt: 2.8+rnd()*3.4, inc: (rnd()*0.5+0.25)*(rnd()<0.5?-1:1)
+    });
+  }
+  pinheiros.sort(function(a,b){ return b.z-a.z; });
+
+  /* olhos-de-gato dos dois lados do caminho que sobe a encosta.
+     Guardados em metros — a perspectiva é calculada a cada quadro. */
+  /* Eram 22, um a cada 2,6 m — virava pista de pouso. Doze, mais
+     espacados, cobrem a mesma subida sem entregar o caminho de graca. */
+  var marcas=[], curva=(rnd()-0.5)*0.9;
+  for(i=0;i<12;i++){
+    var lado=(i%2)?1:-1, m=2+i*4.8;
+    marcas.push({ z:m, lat:lado*(2.6+rnd()*0.5)+curva*m*0.12 });
+  }
+  /* As outras janelas acesas da casa. lat e altura em METROS acima da
+     linha do olho; l e alt sao as meias-medidas do vao; a e quanta luz
+     sai. A fileira do meio esta em h:3.20 de proposito — e a mesma altura
+     de CFG.JAN_H, a janela acesa. E o que poe a janela num ANDAR.
+     A da janela alvo nao entra aqui: ela e desenhada a parte, com quarto,
+     cortina e silhueta.                                                */
+  var janelas=[
+    /* terreo, em pedra — o alpendre cobre o lado direito */
+    {lat:-5.3,h:-0.15,a:0.34,l:0.62,alt:0.62},
+    {lat:-2.8,h:-0.15,a:0.11,l:0.62,alt:0.62},
+    /* segundo andar — a fileira da janela acesa */
+    {lat:-5.1,h: 3.20,a:0.24,l:0.58,alt:0.86},
+    {lat:-2.6,h: 3.20,a:0.12,l:0.58,alt:0.86},
+    {lat: 3.3,h: 3.20,a:0.21,l:0.58,alt:0.86},
+    {lat: 5.7,h: 3.20,a:0.09,l:0.58,alt:0.86},
+    /* o sotao, sob o beiral — de onde veio o estalo */
+    {lat:-1.7,h: 7.25,a:0.12,l:0.46,alt:0.54},
+    {lat: 2.4,h: 7.25,a:0.07,l:0.46,alt:0.54}
+  ];
+
+  world={blocos:blocos, marcas:marcas, pinheiros:pinheiros, janelas:janelas};
+
+  /* poças na calçada */
+  world.pocas=[];
+  for(i=0;i<9;i++) world.pocas.push({ bearing:rnd()*360, elev:-9-rnd()*9, w:6+rnd()*13 });
+
+  locked=false; holdAcc=0; revealed=0; surto=0;
+  rodadaVista=roundCode();
+  /* buildWorld roda no init e a cada virada de rodada. Os dois campos abaixo
+     moram no painel do mestre, que no modo integrado não existe — daí a
+     guarda. O código da rodada fica no HUD e continua sempre presente. */
+  var seedInput=document.getElementById("seed");
+  if(seedInput && seedInput.value!==seedStr) seedInput.value=seedStr;
+  document.getElementById("round-code").textContent=shortCode(seedStr);
+  var mt=document.getElementById("m-target");
+  if(mt) mt.textContent=target.bearing.toFixed(1)+"° "+cardinal(target.bearing);
+  marcaPassos();
+  pintaRodada();
+}
+
+/* o codigo da rodada e quanto falta para ela virar — e o que o grupo compara
+   antes de comecar. Se os codigos batem, todos veem a janela no mesmo rumo. */
+function pintaRodada(){
+  var el=document.getElementById("round-note");
+  var m=minutosParaVirar();
+  if(seedManual){
+    el.textContent="Semente fixada à mão — o relógio não muda mais o rumo.";
+    el.className="ok";
+  } else if(m<5){
+    el.textContent="A rodada vira em "+(m<1?"menos de 1":Math.ceil(m))+" min. Esperem a virada para começar juntos.";
+    el.className="warn";
+  } else {
+    el.textContent="Confiram: o código tem de ser o mesmo em todos os aparelhos.";
+    el.className="";
+  }
+  var mr=document.getElementById("m-round");
+  if(mr) mr.textContent=shortCode(SEED)+"  ·  vira em "+Math.ceil(m)+" min";
+}
+
+/* os tracinhos do caminho percorrido, no rodapé */
+function marcaPassos(){
+  var s="";
+  for(var i=0;i<CFG.PASSOS.length-1;i++) s+=(i<passo?"—":"·");
+  document.getElementById("passos").textContent=s;
+}
+
+/* ==========================================================================
+   SENSORES
+   ========================================================================== */
+function eulerParaVista(a,b,g){
+  var A=a*D2R, B=b*D2R, G=g*D2R;
+  var cA=Math.cos(A), sA=Math.sin(A), cB=Math.cos(B), sB=Math.sin(B), cG=Math.cos(G), sG=Math.sin(G);
+  /* terceira coluna da matriz de rotação (eixo Z do aparelho, em coords do mundo) */
+  var z1=cA*sG+cG*sA*sB, z2=sA*sG-cA*cG*sB, z3=cB*cG;
+  /* a câmera traseira olha para -Z */
+  var Lx=-z1, Ly=-z2, Lz=-z3;
+  var bearing=wrap360(Math.atan2(Lx,Ly)/D2R);
+  var elev=Math.asin(clamp(Lz,-1,1))/D2R;
+  /* "para cima" do mundo, visto no referencial do aparelho (terceira linha) */
+  var ux=-cB*sG, uy=sB;
+  var roll=(Math.atan2(-uy,ux)+PI/2)/D2R;
+  return {bearing:bearing, elev:elev, roll:wrap180(roll)};
+}
+
+var temAbsoluto=false;
+/* ── iPhone: A BÚSSOLA VALE COMO NORTE, NUNCA COMO ALPHA ─────────────────
+   Até 03/09/2026 esta função fazia `alpha=360-webkitCompassHeading` e mandava
+   isso pela matriz de Euler. Só se sustenta com o aparelho quase deitado: a
+   janela alvo sobe até 39° acima do horizonte, ali beta chega perto de 90°,
+   que é justamente onde alpha e gamma entram em travamento de cardan. O PAR
+   reportado salta junto e continua correto; a bússola compensada não salta; e
+   a mistura dos dois faz o rumo oscilar dezenas de graus com o aparelho
+   PARADO na mão. Era o que acontecia toda vez que se levantava o braço para
+   mirar a janela — e é a causa do "o iOS não mantém o ponto" do playtest.
+
+   Agora são duas coisas separadas:
+     · a ATITUDE (alpha/beta/gamma como o sistema os reporta) dá o rumo
+       relativo. Vem do giroscópio: é lisa, e o eixo que interessa — para onde
+       as costas do aparelho olham — não degenera em ângulo nenhum.
+     · a BÚSSOLA dá o norte, e o que ela corrige é um OFFSET, que anda devagar
+       de propósito: a deriva do giroscópio é de graus por MINUTO, enquanto a
+       agulha treme a cada quadro.
+   O offset só é aprendido com o aparelho inclinado PARA TRÁS — a postura de
+   quem mira uma janela no segundo andar, e a única em que esta tarefa é
+   jogada. Um lado só, uma convenção só. Enquanto ele não engata, o rumo sai
+   exatamente como saía antes: nada regride para quem segura o telefone de
+   outro jeito. Depois de engatar, tremer a mão para cima deixa de mexer no
+   rumo.
+
+   Veio d'A Noite (ece3a3e, 28/08), onde já roda. É tratamento de SINAL: não
+   mexe em tolerância nem compensa aparelho, e por isso atravessou junto com o
+   `alto` enquanto os perfis por plataforma de lá eram removidos. */
+var bussOff=null, tOrient=0, rumoSuave=null, iosHead=null, iOSInstavel=false;
+function onOrient(e){
+  if(e.alpha===null||e.beta===null||e.gamma===null) return;
+  var iOS=(typeof e.webkitCompassHeading==="number" && !isNaN(e.webkitCompassHeading));
+  var abs=iOS || e.absolute===true || e.type==="deviceorientationabsolute";
+
+  /* No Android os dois eventos disparam: "deviceorientationabsolute" traz o
+     rumo do mundo e "deviceorientation" traz um alpha RELATIVO ao ponto em
+     que a pagina abriu. Como ambos caiam aqui, o rumo alternava entre os
+     dois referenciais quadro a quadro. Havendo fonte absoluta, a relativa
+     e descartada.                                                       */
+  if(abs) temAbsoluto=true; else if(temAbsoluto) return;
+
+  var v=eulerParaVista(e.alpha,e.beta,e.gamma);
+  raw.elev=v.elev; raw.roll=v.roll;
+
+  if(iOS){
+    iOSInstavel=typeof e.webkitCompassAccuracy==="number" &&
+      (e.webkitCompassAccuracy<0 || e.webkitCompassAccuracy>25);
+    src=iOSInstavel?"bússola instável":"bússola (iOS)";
+    var agora=performance.now();
+    var dt=tOrient?Math.min(0.25,(agora-tOrient)/1000):0.016;
+    tOrient=agora;
+    /* O rumo que a bússola afirma, pelo caminho de sempre — e com o mesmo
+       alisamento de sempre. Ele continua servindo a dois fins: é o que vale
+       enquanto o offset não engatou, e é a fonte limpa de onde o offset
+       aprende. Alisar antes importa: sem isto o offset aprenderia o tremor. */
+    var mundoCru=eulerParaVista(360-e.webkitCompassHeading,e.beta,e.gamma).bearing;
+    if(iosHead==null) iosHead=mundoCru;
+    else iosHead=wrap360(iosHead+wrap180(mundoCru-iosHead)*(iOSInstavel?0.14:0.26));
+    var mundo=iosHead;
+    /* Quanto o topo do aparelho ainda tem de horizontal. É essa projeção que
+       a bússola compensada mede; perto de zero — aparelho de pé — ela não
+       tem o que medir e o valor é ruído. E o sinal importa: a mira desta
+       tarefa acontece toda com o aparelho INCLINADO PARA TRÁS (a janela fica
+       acima do horizonte), então só desse lado o offset é aprendido. Um lado
+       só, uma convenção só, seja ela qual for do lado da Apple.        */
+    var cB=Math.cos(e.beta*D2R);
+    var peso=cB<-0.10 ? Math.min(1,(Math.abs(cB)-0.10)/0.35) : 0;
+    if(iOSInstavel) peso*=0.35;
+    if(peso>0){
+      var alvoOff=wrap180(mundo-v.bearing);
+      /* engata só numa amostra decente — o engate congela um valor, e um
+         valor ruim ficaria de herança. A troca em si é contínua: no
+         instante do engate, atitude+offset dá exatamente o mesmo rumo. */
+      if(bussOff===null){ if(peso>=0.35) bussOff=alvoOff; }
+      else {
+        var erro=wrap180(alvoOff-bussOff);
+        /* 40° num quadro é a agulha pulando, não o mundo girando */
+        if(Math.abs(erro)>40) peso*=0.15;
+        bussOff=wrap180(bussOff+erro*(1-Math.pow(0.80,dt*peso)));
+      }
+    }
+    /* Antes de engatar, nada muda em relação ao que já existia. Depois de
+       engatar, o rumo passa a vir da ATITUDE — lisa, sem degenerescência no
+       eixo que interessa — e a bússola só mantém o norte no lugar.     */
+    var fundido = (bussOff===null) ? mundo : wrap360(v.bearing+bussOff);
+    /* Um alisamento leve na SAÍDA, e não só na bússola. Ele não é cosmético:
+       o filtro adaptativo do laço mede a velocidade angular a partir daqui,
+       e alimentá-lo com o degrau de cada evento fazia-o ler tremor como
+       varredura — e afrouxar justamente quando devia apertar.          */
+    if(rumoSuave===null) rumoSuave=fundido;
+    else rumoSuave=wrap360(rumoSuave+wrap180(fundido-rumoSuave)*0.26);
+    /* A declinação da mesa entra SÓ aqui, e só para quem lê norte verdadeiro.
+       O iPhone reporta rumo em relação ao norte geográfico; o Android, ao
+       magnético. Somando a declinação no iPhone, os dois passam a falar a
+       mesma referência e param apontando para o mesmo lado do mundo real —
+       que é o que a brincadeira pede. Aplicar nos dois deslocaria a mesa
+       inteira junto e não juntaria ninguém. Isto é da Mesa e não existe n'A
+       Noite: ao trazer o offset de lá, ela tinha de continuar entrando, e
+       entra depois do alisamento porque daqui para a frente o jogo lê
+       `raw.bearing` e mais nada. */
+    raw.bearing=wrap360(rumoSuave+northOffset+DECL_MESA);
+  } else {
+    if(abs) src="bússola (absoluta)";
+    else if(src==="nenhuma"||src==="sem sensor") src="relativa — calibre o norte";
+    raw.bearing=wrap360(v.bearing+northOffset);
+  }
+  if(!started){ started=true; }
+}
+
+/* A permissão de movimento do iOS e os dois eventos do Android moram em
+   js/tarefa-sensor.js. O que é próprio desta tarefa fica aqui: a bússola
+   precisa do norte verdadeiro, e a espera é maior que a das outras porque
+   os 3 s do oito não podem contar como sensor mudo. */
+var _prazoSuaveArmado=false;
+function armarPrazoSuave(){
+  if(_prazoSuaveArmado) return;
+  if(typeof TarefaSensor==="undefined"||!TarefaSensor.prazoSuave) return;
+  _prazoSuaveArmado=true;
+  TarefaSensor.prazoSuave(ctxMesa(), function(){
+    if(conclusaoEnviada||ABORTADO) return;
+    setStatus("Tempo esgotado · sem precisão.");
+    /* Garante cronômetro mínimo e conclui para não bloquear a sala. */
+    if(inicioTarefa===null) iniciarCronometroOficial();
+    enviarConclusao();
+  });
+}
+function entrarModoDedo(motivo){
+  /* Sem giroscópio / permissão negada: finger mode, sem prender a mesa. */
+  sim=true; src="mouse/dedo"; modoEntrada="toque";
+  enviarStatus("ativo","toque");
+  raw.elev=2;
+  raw.bearing=view.bearing=wrap360(target.bearing+118);
+  try{ fechaIntro(); }catch(e){}
+  setStatus(motivo||"Arraste para girar. Toque nas zonas — sem precisão de bússola.");
+  armarPrazoSuave();
+}
+/* Fallback de sensor: modal + countdown + OK antes de liberar o dedo.
+   Soft deadline arma já aqui — o aviso não atrasa os 50s. */
+function cairNoModoDedo(motivo){
+  armarPrazoSuave();
+  if(typeof TarefaSensor!=="undefined"&&TarefaSensor.avisoAntesModoDedo){
+    TarefaSensor.avisoAntesModoDedo({ aoLiberar:function(){ entrarModoDedo(motivo); } });
+  } else {
+    entrarModoDedo(motivo);
+  }
+}
+function ativarSensor(pronto){
+  TarefaSensor.ativarOrientacao({
+    aoOrientar: onOrient,
+    aoLigar: function(){ pronto(); armarPrazoSuave(); },
+    esperaMs: 4600,
+    respondeu: function(){ return started; },
+    aoNaoResponder: function(){
+      src="sem sensor";
+      cairNoModoDedo("Bússola muda — arraste para apontar a janela.");
+    },
+    aoNegar: function(){
+      cairNoModoDedo("Movimento negado — arraste para apontar a janela.");
+    },
+    aoIndisponivel: function(){
+      cairNoModoDedo("Sem bússola — arraste para apontar a janela.");
+    }
+  });
+}
+
+/* modo mouse/dedo (computador) */
+function pDown(ev){ var t=ev.touches?ev.touches[0]:ev; simDrag={x:t.clientX,y:t.clientY}; }
+function pMove(ev){
+  if(!sim||!simDrag) return;
+  var t=ev.touches?ev.touches[0]:ev;
+  raw.bearing=wrap360(raw.bearing+(t.clientX-simDrag.x)*0.16);
+  raw.elev=clamp(raw.elev-(t.clientY-simDrag.y)*0.13,-60,60);
+  simDrag={x:t.clientX,y:t.clientY};
+  if(ev.cancelable) ev.preventDefault();
+}
+function pUp(){ simDrag=null; }
+window.addEventListener("mousedown",pDown); window.addEventListener("mousemove",pMove);
+window.addEventListener("mouseup",pUp);
+window.addEventListener("touchstart",pDown,{passive:true});
+window.addEventListener("touchmove",pMove,{passive:false});
+window.addEventListener("touchend",pUp);
+window.addEventListener("keydown",function(e){
+  if(!sim) return;
+  if(e.key==="q"||e.key==="Q") raw.roll=wrap180(raw.roll-3);
+  if(e.key==="e"||e.key==="E") raw.roll=wrap180(raw.roll+3);
+  if(e.key==="ArrowLeft") raw.bearing=wrap360(raw.bearing-2);
+  if(e.key==="ArrowRight") raw.bearing=wrap360(raw.bearing+2);
+  if(e.key==="ArrowUp") raw.elev=clamp(raw.elev+1.5,-60,60);
+  if(e.key==="ArrowDown") raw.elev=clamp(raw.elev-1.5,-60,60);
+});
+
+/* ==========================================================================
+   CHUVA / GOTAS
+   ========================================================================== */
+var chuva=[], lente=[], vidro=[];
+function semeiaChuva(){
+  chuva=[];
+  var n=LOW?150:290;
+  for(var i=0;i<n;i++){
+    var z=Math.pow(Math.random(),1.7);              /* 0 longe .. 1 perto */
+    chuva.push({
+      x:(Math.random()*2-1)*D2*1.15,
+      y:(Math.random()*2-1)*D2*1.15,
+      z:z,
+      len:lerp(9,52,z)*(0.7+Math.random()*0.7),
+      v:lerp(320,1500,z)*(0.85+Math.random()*0.35),
+      a:lerp(0.06,0.30,z)*(0.6+Math.random()*0.7)
+    });
+  }
+}
+function semeiaLente(){
+  lente=[];
+  var n=LOW?4:7;
+  for(var i=0;i<n;i++) lente.push({
+    x:(Math.random()*2-1)*W*0.5, y:(Math.random()*2-1)*H*0.5,
+    r:lerp(7,17,Math.random()), vy:0, tr:0
+  });
+}
+function semeiaVidro(){
+  vidro=[];
+  var n=LOW?14:30;
+  for(var i=0;i<n;i++) vidro.push({
+    u:Math.random(), v:Math.random(), r:lerp(2.5,8,Math.pow(Math.random(),1.5)),
+    vy:0, esp:Math.random()*4
+  });
+}
+semeiaVidro();
+
+/* ==========================================================================
+   FACHO
+   ========================================================================== */
+var beamY=0, beamRX=0, beamRY=0;
+function beamPower(){
+  if(!beamOn) return 0;
+  return 0.85 + beamPulse*1.7;
+}
+function beamAt(x,y){
+  if(!beamOn) return 0;
+  var dx=x/beamRX, dy=(y-beamY)/beamRY;
+  var d=Math.hypot(dx,dy);
+  if(d>=1) return 0;
+  var f=1-d; return f*f*beamPower();
+}
+
+/* ==========================================================================
+   PROJEÇÃO
+   ========================================================================== */
+function sx(bearing){ return wrap180(bearing-view.bearing)*PPD; }
+function sy(elev){ return -(elev-view.elev)*PPD; }
+
+/* ==========================================================================
+   GEOMETRIA — tudo sai da distância até a casa, em metros.
+   É isso que faz a janela crescer e subir enquanto você sobe a encosta.
+   ========================================================================== */
+function geom(){
+  var d=distView;
+  return {
+    d: d,
+    elev: Math.atan2(CFG.JAN_H,d)/D2R,
+    hw: Math.atan2(CFG.JAN_L,d)/D2R*PPD,
+    hh: Math.atan2(CFG.JAN_A,d)/D2R*PPD,
+    parHW: Math.atan2(CFG.CASA_L,d)/D2R*PPD,
+    parTop: Math.atan2(CFG.CASA_H,d)/D2R,
+    /* de longe a janela é um boato de luz; de perto, um cômodo */
+    nitidez: sstep(40,11,d)
+  };
+}
+/* A tolerância nascia do tamanho APARENTE da janela. Como a 46 m ela mede
+   1,6° de meia-largura, o primeiro passo — quando a pessoa ainda está
+   aprendendo — era o mais apertado de todos: ±4,4°. Curva de dificuldade
+   ao contrário. O piso subiu para que a distância pese menos.          */
+function tolerancia(){
+  var g=geom();
+  /* TOLERÂNCIA ASSIMÉTRICA, e o motivo é de hardware:
+     · o RUMO vem do magnetômetro, que treme e erra de 5 a 20° — e ainda
+       difere entre iPhone (norte verdadeiro) e Android (magnético). Não
+       adianta exigir precisão de um sensor que não tem. Fica folgado.
+     · a ALTURA vem da gravidade, pelo acelerômetro: erra bem menos de 1°,
+       não deriva e não depende de plataforma. É aqui que dá para pedir
+       precisão, e é onde as seis etapas viram jogo.
+     Cada aparelho é coerente consigo mesmo, então todos travam com a mesma
+     facilidade. O grupo fica espalhado uns 20° no mundo real — e 20° no
+     escuro continua lendo como todo mundo olhando para o mesmo lado.  */
+  /* O RUMO abriu (02/09/2026). O motivo está no parágrafo acima e o número
+     não o acompanhava: se o magnetômetro "erra de 5 a 20°", uma faixa de 9°
+     no primeiro passo é apertada abaixo do erro do próprio sensor. No iPhone,
+     onde o rumo vem da bússola crua — e piora conforme o aparelho inclina,
+     que é justamente o que a escada de altura pede —, o ponto não parava de
+     escapar. Playtest do Mario: "o android fixa o ponto muito mais fácil, o
+     iOS não mantém o ponto".
+
+     Abrir o rumo NÃO deixa o jogo mais fácil, porque o jogo não mora aqui:
+     as sete etapas são uma escada de ALTURA (4° · 9° · 14° · 20° · 26° · 32°
+     · 39°), lida pela gravidade, que erra menos de 1° e é igual em qualquer
+     telefone. É lá que a mão firme importa, e lá nada mudou.
+
+     E abrir o rumo também não junta as plataformas: cada aparelho continua
+     coerente consigo mesmo e trava apontando ao lado do outro. Isso é outro
+     problema, e quem o resolve é a mediana dos rumos de travamento. */
+  /* APONTAR ALTO CUSTA RUMO, e é geometria, não indulgência: a 39° acima do
+     horizonte — a última parada — um grau de rumo mede só cos(39°)=0,78° de
+     separação real no céu. Exigir os mesmos graus lá em cima é exigir mais
+     precisão do que embaixo, justo onde a bússola tem menos a oferecer. A
+     folga do rumo abre na mesma proporção; a da ALTURA, que vem da gravidade,
+     não muda — é ela que continua fazendo as seis etapas.
+
+     Veio d'A Noite em 03/09/2026, onde já estava. Não é perfil por
+     plataforma: vale igual em qualquer aparelho, e é exatamente por isso que
+     atravessou enquanto os perfis por plataforma de lá foram removidos. */
+  var alto=1/Math.max(0.55,Math.cos(clamp(view.elev,-60,60)*D2R));
+  return { az: clamp(g.hw/PPD*0.60+15.0, 17.0, 26.0)*CFG.FOLGA*alto,
+           el: clamp(g.hh/PPD*0.30+2.2,   2.8,  4.2)*CFG.FOLGA };
+}
+
+/* ==========================================================================
+   PASSES DE DESENHO  (tudo em coordenadas centradas, já rotacionado)
+   ========================================================================== */
+function ceu(tempo){
+  var hy=sy(0);
+  var g=sc.createLinearGradient(0,hy-D2*1.1,0,hy+D2*0.35);
+  g.addColorStop(0.00,"#060c17");
+  g.addColorStop(0.42,"#0a1424");
+  g.addColorStop(0.72,"#0e1e32");
+  g.addColorStop(0.90,"#152a42");
+  g.addColorStop(1.00,"#1b3450");
+  sc.fillStyle=g; sc.fillRect(-D2,-D2,D2*2,D2*2);
+
+  /* massas de nuvem baixa, revolvendo */
+  sc.globalCompositeOperation="lighter";
+  sc.globalAlpha=0.05+lightning*0.30;
+  var tw=NOISE.width*2.6, th=NOISE.height*1.1, ox=tempo*0.004-view.bearing*PPD*0.03;
+  for(var i=-1;i<=Math.ceil(D2*2/tw)+1;i++)
+    sc.drawImage(NOISE,-D2+((ox%tw)+tw)%tw+i*tw-tw, hy-D2*1.05, tw, th);
+  sc.globalAlpha=1;
+  sc.globalCompositeOperation="source-over";
+
+  /* ---------- o mar, lá embaixo ---------- */
+  var gg=sc.createLinearGradient(0,hy-D2*0.04,0,hy+D2);
+  gg.addColorStop(0,"rgba(20,38,58,0)");
+  gg.addColorStop(0.05,"rgba(16,32,50,0.7)");
+  gg.addColorStop(0.14,"rgba(10,22,37,0.97)");
+  gg.addColorStop(1,"rgba(4,10,19,1)");
+  sc.fillStyle=gg; sc.fillRect(-D2,hy-D2*0.04,D2*2,D2*1.04);
+
+  /* ondulação: cristas mais espaçadas conforme se aproximam */
+  sc.globalCompositeOperation="lighter";
+  for(var k=0;k<26;k++){
+    var t=k/26, yy=hy+Math.pow(t,2.0)*D2*0.95;
+    var fase=tempo*0.00035*(0.4+t)+k*1.7;
+    var amp=1+t*7, a=0.055*(1-t*0.55)*(0.5+0.5*Math.sin(fase*2.1));
+    sc.strokeStyle="rgba(122,166,208,"+a+")";
+    sc.lineWidth=Math.max(0.7,0.8+t*2.2);
+    sc.beginPath();
+    for(var x=-D2;x<=D2;x+=26)
+      sc.lineTo(x, yy+Math.sin(x*0.008*(1-t*0.6)+fase)*amp);
+    sc.stroke();
+  }
+  /* espuma pontual, mais viva perto */
+  for(var f=0;f<26;f++){
+    var tf=0.25+(f*0.37%0.72), yf=hy+Math.pow(tf,2.0)*D2*0.95;
+    var xf=((f*137.5+tempo*0.006)%(D2*2))-D2;
+    var af=0.09*(1-tf)*(0.4+0.6*Math.sin(tempo*0.001+f));
+    if(af<=0.004) continue;
+    sc.fillStyle="rgba(170,205,238,"+af+")";
+    sc.fillRect(xf,yf,10+tf*30,Math.max(0.8,tf*2.2));
+  }
+  sc.globalCompositeOperation="source-over";
+
+  /* faixa de luz baixa no horizonte, do lado da janela: o "quente/frio"
+     diegético. Fraco de propósito — quem procura precisa varrer. */
+  var tx=sx(target.bearing);
+  if(Math.abs(tx)<D2*1.5){
+    var q=sc.createRadialGradient(tx,hy,0,tx,hy,D2*0.55);
+    q.addColorStop(0,"rgba(255,146,68,0.055)");
+    q.addColorStop(0.5,"rgba(255,130,60,0.018)");
+    q.addColorStop(1,"rgba(255,120,60,0)");
+    sc.globalCompositeOperation="lighter";
+    sc.fillStyle=q; sc.fillRect(-D2,-D2,D2*2,D2*2);
+    sc.globalCompositeOperation="source-over";
+  }
+}
+
+function nevoa(camada, tempo){
+  /* camada: 0 fundo (densa, lenta) | 1 frente (rala, rápida) */
+  var esc = camada?1.35:0.72;
+  /* a cor importa mais que a quantidade: névoa de noite é densa e ESCURA.
+     Clara demais e a cena vira leite. */
+  var tint = camada?"rgba(82,106,132,1)":"rgba(58,78,100,1)";
+  /* NÉVOA MAIS PESADA, e com densidade caindo conforme você sobe: a 46 m a
+     janela é só uma mancha quente que você adivinha; a 4 m ela queima.
+     É o certo fisicamente — há menos névoa entre vocês — e serve ao jogo,
+     porque paga a subida com visão.                                     */
+  var perto = sstep(4, 46, distView);        /* 0 colado · 1 lá longe */
+  /* a base longe estava em 0,94 — perto do opaco. Além de a janela sumir,
+     não sobrava margem para o banco fechar: o surto era invisível justo nas
+     primeiras etapas, que é onde a pessoa ainda está aprendendo.       */
+  var alfa = (camada?0.54:0.72) * lerp(0.58, 1.14, perto);
+  /* o banco que fecha ao dar um passo — some junto com o resto quando você
+     já está colado na fachada, senão o fim do jogo vira um apagão      */
+  alfa += surto*(camada?0.34:0.46)*lerp(0.45,1,perto);
+  alfa = clamp(alfa, 0.18, 0.97);
+  /* "os faróis cortaram a névoa por um instante — só para ela fechar de novo" */
+  alfa *= (1-beamPulse*0.34);
+
+  fg.setTransform(1,0,0,1,0,0);
+  fg.globalCompositeOperation="source-over";
+  fg.clearRect(0,0,fgB.width,fgB.height);
+
+  var ox=-(view.bearing*PPD*(camada?0.9:0.45))*0.06 + tempo*0.0055*(camada?1.6:1);
+  /* ela vem do mar e sobe a encosta: deriva lenta para cima */
+  var oy=Math.sin(tempo*0.00013+camada)*8 + view.elev*(camada?1.1:0.5)
+         - tempo*0.0011*(camada?1.3:0.7);
+  var tw=NOISE.width*esc*1.4, th=NOISE.height*esc*0.72;
+  fg.globalAlpha=0.85;
+  for(var i=-1;i<=Math.ceil(fgB.width/tw)+1;i++)
+    for(var j=-1;j<=Math.ceil(fgB.height/th)+1;j++)
+      fg.drawImage(NOISE, ((ox%tw)+tw)%tw+i*tw-tw, ((oy%th)+th)%th+j*th-th, tw, th);
+  /* segunda oitava, sentido contrário: dá turbulência */
+  fg.globalCompositeOperation="lighter";
+  fg.globalAlpha=0.45;
+  var tw2=tw*0.47, th2=th*0.55, ox2=-ox*1.7, oy2=oy*0.6+tempo*0.004;
+  for(var i2=-1;i2<=Math.ceil(fgB.width/tw2)+1;i2++)
+    for(var j2=-1;j2<=Math.ceil(fgB.height/th2)+1;j2++)
+      fg.drawImage(NOISE2, ((ox2%tw2)+tw2)%tw2+i2*tw2-tw2, ((oy2%th2)+th2)%th2+j2*th2-th2, tw2, th2);
+
+  /* cor */
+  fg.globalCompositeOperation="source-in";
+  fg.globalAlpha=1; fg.fillStyle=tint;
+  fg.fillRect(0,0,fgB.width,fgB.height);
+
+  /* máscara vertical: névoa mora perto do horizonte */
+  var hy=sy(0), top=(hy-D2)/(D2*2), h01=clamp((hy+D2)/(D2*2),0,1);
+  fg.globalCompositeOperation="destination-in";
+  var m=fg.createLinearGradient(0,0,0,fgB.height);
+  var hf=clamp(0.5+(hy/(D2*2)),0,1);
+  m.addColorStop(0,"rgba(0,0,0,0)");
+  m.addColorStop(clamp(hf-0.30,0.01,0.98),"rgba(0,0,0,0.35)");
+  m.addColorStop(clamp(hf-0.02,0.02,0.99),"rgba(0,0,0,1)");
+  m.addColorStop(clamp(hf+0.14,0.03,1),"rgba(0,0,0,0.55)");
+  m.addColorStop(1,"rgba(0,0,0,0.05)");
+  fg.fillStyle=m; fg.fillRect(0,0,fgB.width,fgB.height);
+
+  sc.globalAlpha=alfa*(1+lightning*1.8);
+  sc.drawImage(fgB,-D2,-D2,D2*2,D2*2);
+  sc.globalAlpha=1;
+}
+
+/* o banco baixo que sobe do mar e anda rente ao chão */
+function nevoaRasteira(tempo){
+  fg.setTransform(1,0,0,1,0,0);
+  fg.globalCompositeOperation="source-over";
+  fg.clearRect(0,0,fgB.width,fgB.height);
+  var tw=NOISE.width*2.4, th=NOISE.height*0.30;
+  var ox=-(view.bearing*PPD*0.35)*0.06+tempo*0.0022;
+  var oy=Math.sin(tempo*0.0002)*4;
+  fg.globalAlpha=0.9;
+  for(var i=-1;i<=Math.ceil(fgB.width/tw)+1;i++)
+    for(var j=-1;j<=Math.ceil(fgB.height/th)+1;j++)
+      fg.drawImage(NOISE,((ox%tw)+tw)%tw+i*tw-tw,((oy%th)+th)%th+j*th-th,tw,th);
+  fg.globalCompositeOperation="source-in";
+  fg.globalAlpha=1; fg.fillStyle="rgba(66,86,108,1)";
+  fg.fillRect(0,0,fgB.width,fgB.height);
+  fg.globalCompositeOperation="destination-in";
+  var hy=sy(0), hf=clamp(0.5+(hy/(D2*2)),0,1);
+  var m=fg.createLinearGradient(0,0,0,fgB.height);
+  m.addColorStop(0,"rgba(0,0,0,0)");
+  m.addColorStop(clamp(hf-0.11,0.01,0.96),"rgba(0,0,0,0)");
+  m.addColorStop(clamp(hf+0.01,0.02,0.97),"rgba(0,0,0,1)");
+  m.addColorStop(clamp(hf+0.17,0.03,0.99),"rgba(0,0,0,0.45)");
+  m.addColorStop(1,"rgba(0,0,0,0)");
+  fg.fillStyle=m; fg.fillRect(0,0,fgB.width,fgB.height);
+  sc.globalAlpha=0.52*(1-beamPulse*0.30);
+  sc.drawImage(fgB,-D2,-D2,D2*2,D2*2);
+  sc.globalAlpha=1;
+}
+
+/* ==========================================================================
+   O PROMONTÓRIO — a língua de rocha onde a casa está plantada.
+   Desenhada em perspectiva a partir de metros: as bordas convergem e o mar
+   aparece dos dois lados. É o que faz o lugar ser uma costa, não uma rua.
+   ========================================================================== */
+/* a borda da rocha não é lisa: some ondulação determinística tira o
+   aspecto de dorso de baleia */
+function larguraTrilha(z,lado){
+  return (4.2+z*0.16)*(1+Math.sin(z*0.42+(lado||0)*2.1)*0.10
+                        +Math.sin(z*1.13+(lado||0)*4.7)*0.05);
+}
+
+function promontorio(tempo, clareza){
+  var percorrido=CFG.PASSOS[0]-distView;
+  var zs=[1.4,2,2.7,3.6,4.8,6,7.5,9.5,12,15,19,24,31,40,52,68,90], i, z, e;
+  var esq=[], dir=[];
+  for(i=0;i<zs.length;i++){
+    z=zs[i];
+    e=Math.atan2(-1.55,z)/D2R;
+    esq.push([sx(target.bearing-Math.atan2(larguraTrilha(z,0),z)/D2R),sy(e)]);
+    dir.push([sx(target.bearing+Math.atan2(larguraTrilha(z,1),z)/D2R),sy(e)]);
+  }
+  sc.beginPath();
+  sc.moveTo(esq[0][0],esq[0][1]+D2);
+  for(i=0;i<esq.length;i++) sc.lineTo(esq[i][0],esq[i][1]);
+  for(i=dir.length-1;i>=0;i--) sc.lineTo(dir[i][0],dir[i][1]);
+  sc.lineTo(dir[0][0],dir[0][1]+D2);
+  sc.closePath();
+
+  var topo=esq[esq.length-1][1], base=esq[0][1]+D2;
+  var tg=sc.createLinearGradient(0,topo,0,base);
+  tg.addColorStop(0,"rgba(13,24,38,1)");
+  tg.addColorStop(0.35,"rgba(9,16,26,1)");
+  tg.addColorStop(1,"rgba(4,8,14,1)");
+  sc.fillStyle=tg; sc.fill();
+
+  /* fio de luz na quebra da falésia — a assinatura do lugar */
+  sc.strokeStyle="rgba(128,168,206,0.16)";
+  sc.lineWidth=1.2;
+  sc.beginPath();
+  for(i=0;i<esq.length;i++) sc.lineTo(esq[i][0],esq[i][1]);
+  sc.stroke();
+  sc.beginPath();
+  for(i=0;i<dir.length;i++) sc.lineTo(dir[i][0],dir[i][1]);
+  sc.stroke();
+
+  /* textura de rocha molhada */
+  sc.save();
+  sc.beginPath();
+  sc.moveTo(esq[0][0],base);
+  for(i=0;i<esq.length;i++) sc.lineTo(esq[i][0],esq[i][1]);
+  for(i=dir.length-1;i>=0;i--) sc.lineTo(dir[i][0],dir[i][1]);
+  sc.lineTo(dir[0][0],base);
+  sc.closePath(); sc.clip();
+  sc.globalCompositeOperation="overlay";
+  sc.globalAlpha=0.20;
+  sc.drawImage(NOISE2,-D2,topo,D2*2,base-topo);
+  sc.globalAlpha=1;
+  sc.globalCompositeOperation="source-over";
+  sc.restore();
+
+  /* pinheiros tortos, agarrados na borda */
+  for(i=0;i<world.pinheiros.length;i++){
+    var p=world.pinheiros[i];
+    z=p.z-percorrido;
+    if(z<2.5) continue;
+    var bp=target.bearing+Math.atan2(p.lat,z)/D2R;
+    var xb=sx(bp), yb=sy(Math.atan2(-1.55,z)/D2R);
+    var alt=Math.atan2(p.alt,z)/D2R*PPD;
+    if(xb<-D2-60||xb>D2+60) continue;
+    var veu=clamp(1-z/60,0,1);
+    sc.fillStyle="rgba(6,11,18,"+(0.30+veu*0.62)+")";
+    /* conífera vergada pelo vento: cone estreito e serrilhado, não palmeira */
+    var inc=p.inc*alt*0.22, larg=alt*0.105, N=8, k, t, xk, yk, wq;
+    sc.beginPath();
+    sc.moveTo(xb+inc,yb-alt);
+    for(k=1;k<=N;k++){                          /* lado direito, descendo */
+      t=k/N; xk=xb+inc*(1-t*t); yk=yb-alt+alt*0.92*t;
+      wq=larg*Math.pow(t,0.85)*(k%2?1:0.80);
+      sc.lineTo(xk+wq,yk);
+    }
+    sc.lineTo(xb+alt*0.018,yb);                 /* tronco */
+    sc.lineTo(xb-alt*0.018,yb);
+    for(k=N;k>=1;k--){                          /* lado esquerdo, subindo */
+      t=k/N; xk=xb+inc*(1-t*t); yk=yb-alt+alt*0.92*t;
+      wq=larg*Math.pow(t,0.85)*(k%2?1:0.80);
+      sc.lineTo(xk-wq,yk);
+    }
+    sc.closePath(); sc.fill();
+  }
+}
+
+/* rochedos soltos no mar — a única coisa que dá escala ao vazio */
+function rochedos(){
+  var hy=sy(0);
+  if(CAN_FILTER && !LOW) sc.filter="blur(2.5px)";
+  for(var i=0;i<world.blocos.length;i++){
+    var b=world.blocos[i];
+    var cx=sx(b.bearing), hw=b.half*PPD;
+    if(cx+hw<-D2||cx-hw>D2) continue;
+    var veu=b.dist, ty=sy(b.top), by=hy+(1-veu)*D2*0.10;
+    var m=Math.pow(veu,1.3)*0.85;
+    var cr=Math.round(lerp(6,26,m)), cg2=Math.round(lerp(11,40,m)), cb=Math.round(lerp(18,56,m));
+    sc.fillStyle="rgb("+cr+","+cg2+","+cb+")";
+    sc.beginPath();
+    sc.moveTo(cx-hw,by);
+    sc.lineTo(cx-hw*0.55,ty+ (by-ty)*0.28);
+    sc.lineTo(cx-hw*0.12,ty);
+    sc.lineTo(cx+hw*0.42,ty+(by-ty)*0.35);
+    sc.lineTo(cx+hw,by);
+    sc.closePath(); sc.fill();
+    /* respingo na base */
+    sc.fillStyle="rgba(150,190,225,"+(0.05*(1-veu)+0.02)+")";
+    sc.fillRect(cx-hw*1.1,by-1,hw*2.2,2);
+  }
+  sc.filter="none";
+}
+
+function marcas(){
+  /* refletivos do caminho — só devolvem luz quando o facho passa por cima.
+     Posição em metros, projetada em perspectiva a partir de onde você está. */
+  var hy=sy(0), percorrido=CFG.PASSOS[0]-distView;
+  for(var i=0;i<world.marcas.length;i++){
+    var m=world.marcas[i];
+    var z=m.z-percorrido;                      /* metros à sua frente */
+    if(z<1.2) continue;                        /* já ficou para trás */
+    var bearing=target.bearing+Math.atan2(m.lat,z)/D2R;
+    var elev=Math.atan2(-1.55,z)/D2R;          /* altura dos olhos */
+    var x=sx(bearing), y=sy(elev);
+    if(x<-D2-40||x>D2+40||y<-D2||y>D2) continue;
+    var luz=beamAt(x,y)*clamp(1-z/30,0.04,1);  /* a névoa come o alcance */
+    var w=clamp(PPD*Math.atan2(0.10,z)/D2R*6,1.5,PPD*1.35);
+    var h=w*0.42;
+
+    sc.fillStyle="rgba(96,112,130,"+(0.05+luz*0.06)+")";
+    sc.beginPath(); sc.ellipse(x,y,w*0.5,h*0.5,0,0,TAU); sc.fill();
+
+    if(luz>0.01){
+      var a=clamp(luz*2.3,0,1);
+      sc.fillStyle="rgba(255,228,158,"+a+")";
+      sc.beginPath(); sc.ellipse(x,y-h*0.12,w*0.34,h*0.34,0,0,TAU); sc.fill();
+      var gl=sc.createRadialGradient(x,y,0,x,y,w*1.5);
+      gl.addColorStop(0,"rgba(255,204,118,"+(a*0.30)+")");
+      gl.addColorStop(1,"rgba(255,198,108,0)");
+      sc.fillStyle=gl; sc.beginPath(); sc.arc(x,y,w*1.5,0,TAU); sc.fill();
+      /* rastro do reflexo no chão molhado */
+      var rg=sc.createLinearGradient(x,y,x,y+w*1.5);
+      rg.addColorStop(0,"rgba(255,206,130,"+(a*0.26)+")");
+      rg.addColorStop(1,"rgba(255,200,110,0)");
+      sc.fillStyle=rg; sc.fillRect(x-w*0.18,y,w*0.36,w*1.5);
+    }
+  }
+}
+
+function pocas(){
+  var hy=sy(0);
+
+  sc.globalCompositeOperation="lighter";
+  if(beamOn){
+    var py2=hy+D2*0.46, pr=beamRX*0.9;
+    var bp=sc.createRadialGradient(0,py2,0,0,py2,pr);
+    bp.addColorStop(0,"rgba(168,196,226,"+(0.11*beamPower())+")");
+    bp.addColorStop(1,"rgba(150,180,214,0)");
+    sc.fillStyle=bp;
+    sc.save(); sc.translate(0,py2); sc.scale(1,0.26);
+    sc.beginPath(); sc.arc(0,0,pr,0,TAU); sc.fill(); sc.restore();
+  }
+  sc.globalCompositeOperation="source-over";
+  for(var i=0;i<world.pocas.length;i++){
+    var p=world.pocas[i];
+    var x=sx(p.bearing), y=sy(p.elev);
+    if(y<hy) continue;
+    if(x<-D2-100||x>D2+100) continue;
+    var w=p.w*PPD*0.5, h=w*0.13;
+    var g=sc.createRadialGradient(x,y,0,x,y,w);
+    var lum=0.05+beamAt(x,y)*0.35;
+    g.addColorStop(0,"rgba(150,185,220,"+lum+")");
+    g.addColorStop(1,"rgba(120,160,200,0)");
+    sc.fillStyle=g;
+    sc.save(); sc.translate(x,y); sc.scale(1,h/w);
+    sc.beginPath(); sc.arc(0,0,w,0,TAU); sc.fill(); sc.restore();
+  }
+}
+
+/* ---------- A JANELA ---------- */
+function janela(tempo, clareza, prox){
+  var g=geom();
+  var cx=sx(target.bearing), cy=sy(g.elev);
+  var hw=g.hw, hh=g.hh;
+  if(cx-g.parHW>D2||cx+g.parHW<-D2) return;
+
+  var L=clareza;                      /* 0 = engolida pela névoa, 1 = nítida */
+  var quente=lerp(0.30,1,L);
+  var hy=sy(0);
+
+  /* ---------- a Casa da Costa ----------
+     A referencia e a arte de abertura do MOSAICO: casarao de costa com o
+     TERREO EM PEDRA e o andar de cima em ENXAIMEL, o segundo AVANCANDO um
+     palmo sobre o primeiro. E o ressalto — e a sombra que ele joga na
+     pedra — que faz o olho contar dois andares num relance. Faixa pintada
+     nao faz isso; degrau faz.
+     Tudo daqui para baixo e METRO acima da linha do olho, projetado pela
+     distancia: e o que faz a casa crescer junto com a janela enquanto
+     voce sobe a encosta. As cotas da fachada:
+       -1,20 o pe, que o nevoeiro come      -0,15 janelas do terreo
+        0,30 verga da porta                  0,75 telhado do alpendre
+        1,02 a 1,28  O RESSALTO
+        3,20 a fileira do segundo andar — CFG.JAN_H, a janela acesa
+        5,90 a 6,10  cornija                 6,60 as aguas-furtadas do sotao
+        9,00 beiral — CFG.CASA_H            15,20 cumeeira
+     Nada aqui toca CFG: a mira, a tolerancia e as seis etapas continuam
+     exatamente as mesmas. Isto e so o que se ve.                        */
+  var mY=function(h){ return sy(Math.atan2(h,g.d)/D2R); };
+  var mX=function(lat){ return cx+Math.atan2(lat,g.d)/D2R*PPD; };
+  var mW=function(m){ return Math.atan2(m,g.d)/D2R*PPD; };   /* metro em px */
+  var pty=sy(g.parTop), pby=hy+D2*0.45;
+  var P=g.parHW, Pt=mW(CFG.CASA_L-0.45);       /* Pt: o terreo, mais estreito */
+  var yChao=Math.min(mY(-1.20),pby);           /* nunca desenhar abaixo da nevoa */
+  if(CAN_FILTER) sc.filter="none";
+
+  /* ---- andar de cima: reboco entre os barrotes ---- */
+  var yRess=mY(1.28);
+  var fgw=sc.createLinearGradient(0,pty,0,yRess);
+  fgw.addColorStop(0,"#0d1521");
+  fgw.addColorStop(0.34,"#0a111c");
+  fgw.addColorStop(1,"#080d16");
+  sc.fillStyle=fgw;
+  sc.fillRect(cx-P,pty,P*2,yRess-pty);
+
+  /* ---- terreo: pedra bruta, mais escura e um palmo mais estreita ---- */
+  var yTerr=mY(1.02);
+  var tgw=sc.createLinearGradient(0,yTerr,0,pby);
+  tgw.addColorStop(0,"#070c14");
+  tgw.addColorStop(0.55,"#05090f");
+  tgw.addColorStop(1,"rgba(8,13,20,0)");     /* o pe da casa some no nevoeiro */
+  sc.fillStyle=tgw;
+  sc.fillRect(cx-Pt,yTerr,Pt*2,pby-yTerr);
+  /* fiadas de pedra: so um sussurro, senao vira parede de tijolinho */
+  sc.fillStyle="rgba(104,132,164,"+(0.030+0.030*L)+")";
+  for(var fi=1;fi<=4;fi++){
+    var yf=mY(1.02-fi*0.58);
+    if(yf<pby) sc.fillRect(cx-Pt,yf,Pt*2,Math.max(1,mW(0.05)));
+  }
+
+  /* ---- O RESSALTO ---- */
+  var yR0=mY(1.28), yR1=mY(1.02), hR=Math.max(1.6,yR1-yR0);
+  var rg0=sc.createLinearGradient(0,yR0,0,yR1);
+  rg0.addColorStop(0,"rgba(128,158,192,"+(0.11+0.10*L)+")");   /* aresta molhada */
+  rg0.addColorStop(0.40,"rgba(44,58,76,"+(0.20+0.10*L)+")");
+  rg0.addColorStop(1,"rgba(2,4,8,"+(0.44+0.16*L)+")");
+  sc.fillStyle=rg0;
+  sc.fillRect(cx-P,yR0,P*2,hR);
+  /* a sombra que o avanco joga na pedra — e ela que da o degrau */
+  var rs=sc.createLinearGradient(0,yR1,0,yR1+hR*2.2);
+  rs.addColorStop(0,"rgba(0,0,0,"+(0.40+0.14*L)+")");
+  rs.addColorStop(1,"rgba(0,0,0,0)");
+  sc.fillStyle=rs;
+  sc.fillRect(cx-Pt,yR1,Pt*2,hR*2.2);
+  /* maos-francesas sob o avanco */
+  sc.fillStyle="rgba(0,0,0,"+(0.50+0.20*L)+")";
+  for(var mf=-3;mf<=3;mf++)
+    sc.fillRect(mX(mf*2.2)-Math.max(1,mW(0.09)),yR1,Math.max(2,mW(0.18)),hR*1.1);
+
+  /* ---- enxaimel: os barrotes do andar de cima ---- */
+  var eTop=mY(5.90), eBot=yR0, eEsp=Math.max(1.2,mW(0.16));
+  sc.fillStyle="rgba(0,0,0,"+(0.34+0.20*L)+")";
+  for(var bx=-6.6;bx<=6.61;bx+=1.65){
+    if(Math.abs(bx)<1.9) continue;            /* o vao da janela acesa */
+    sc.fillRect(mX(bx)-eEsp/2,eTop,eEsp,eBot-eTop);
+  }
+  sc.fillRect(cx-P,eTop,P*2,eEsp);            /* frechal de cima */
+  /* duas escoras em diagonal, para nao virar um gradeado */
+  sc.strokeStyle="rgba(0,0,0,"+(0.30+0.18*L)+")";
+  sc.lineWidth=eEsp;
+  sc.beginPath();
+  sc.moveTo(mX(-6.6),eBot); sc.lineTo(mX(-4.95),eTop);
+  sc.moveTo(mX( 6.6),eBot); sc.lineTo(mX( 4.95),eTop);
+  sc.stroke();
+
+  /* ---- cornija sob o sotao: separa o segundo andar do desvao ---- */
+  var yC0=mY(6.10), yC1=mY(5.90), hC=Math.max(1.2,yC1-yC0);
+  sc.fillStyle="rgba(112,140,172,"+(0.07+0.07*L)+")";
+  sc.fillRect(cx-P,yC0,P*2,hC);
+  sc.fillStyle="rgba(0,0,0,"+(0.30+0.12*L)+")";
+  sc.fillRect(cx-P,yC1,P*2,hC*1.3);
+
+  /* ---- cunhais: as quinas dao espessura a caixa ---- */
+  var cun=Math.max(1.5,mW(0.5));
+  var cq1=sc.createLinearGradient(cx-P,0,cx-P+cun,0);
+  cq1.addColorStop(0,"rgba(110,138,170,"+(0.09+0.07*L)+")");
+  cq1.addColorStop(1,"rgba(0,0,0,0)");
+  sc.fillStyle=cq1; sc.fillRect(cx-P,pty,cun,yRess-pty);
+  var cq2=sc.createLinearGradient(cx+P,0,cx+P-cun,0);
+  cq2.addColorStop(0,"rgba(0,0,0,"+(0.32+0.12*L)+")");
+  cq2.addColorStop(1,"rgba(0,0,0,0)");
+  sc.fillStyle=cq2; sc.fillRect(cx+P-cun,pty,cun,yRess-pty);
+
+  /* ---- chamines ANTES das aguas: o telhado cobre o pe delas ---- */
+  var CHAMINES=[[-5.4,14.6],[2.9,13.8]];
+  sc.fillStyle="#04060e";
+  for(var ch=0;ch<CHAMINES.length;ch++){
+    var chx=mX(CHAMINES[ch][0]), chw=mW(0.62), chT=mY(CHAMINES[ch][1]);
+    sc.fillRect(chx-chw,chT,chw*2,pty-chT);
+  }
+
+  /* ---- as aguas: empenas ingremes, como na arte de abertura ---- */
+  function agua(l1,l2,lp,hp){
+    sc.beginPath();
+    sc.moveTo(mX(l1),pty+1); sc.lineTo(mX(lp),mY(hp)); sc.lineTo(mX(l2),pty+1);
+    sc.closePath(); sc.fill();
+  }
+  sc.fillStyle="#050710";
+  /* Ingremes de proposito. Com 3,6 m de altura o telhado dava 23 graus e
+     a casa ficava uma caixa de sapato; a arte de abertura tem quase 50.  */
+  agua(-8.5, 8.5,-1.10,15.2);        /* agua principal */
+  agua(-7.6,-0.2,-3.90,16.4);        /* a empena grande da frente */
+  agua( 2.3, 7.1, 4.70,14.2);        /* a empena menor, a direita */
+  agua( 0.3, 2.2, 1.25,11.9);        /* agua-furtada pequena */
+
+  /* capelos das chamines, por cima do telhado */
+  for(var ch2=0;ch2<CHAMINES.length;ch2++){
+    var cxh=mX(CHAMINES[ch2][0]), cwh=mW(0.62), cth=mY(CHAMINES[ch2][1]);
+    sc.fillStyle="rgba(112,140,172,"+(0.07+0.06*L)+")";
+    sc.fillRect(cxh-cwh*1.20,cth,cwh*2.40,Math.max(1.2,mW(0.20)));
+  }
+
+  /* fio de luz do ceu nas cumeeiras molhadas */
+  sc.strokeStyle="rgba(126,158,194,"+(0.10+0.08*L)+")";
+  sc.lineWidth=1.1;
+  sc.beginPath();
+  sc.moveTo(mX(-8.5),pty+1); sc.lineTo(mX(-1.10),mY(15.2)); sc.lineTo(mX(8.5),pty+1);
+  sc.moveTo(mX(-7.6),pty+1); sc.lineTo(mX(-3.90),mY(16.4)); sc.lineTo(mX(-0.2),pty+1);
+  sc.moveTo(mX( 2.3),pty+1); sc.lineTo(mX( 4.70),mY(14.2)); sc.lineTo(mX( 7.1),pty+1);
+  sc.stroke();
+
+  /* ---- alpendre e a PORTA ENTREABERTA ----
+     As 21:07 a porta estava entreaberta: ela e pista, nao enfeite. Fica
+     a direita, sob o alpendre, como na arte de abertura.               */
+  var alY=mY(0.75), alE=mX(1.1), alD=mX(6.9);
+  sc.fillStyle="#04060e";
+  sc.fillRect(alE,alY,alD-alE,Math.max(2,mW(0.26)));
+  sc.fillStyle="rgba(112,140,172,"+(0.06+0.05*L)+")";
+  sc.fillRect(alE,alY,alD-alE,Math.max(1,mW(0.06)));
+  sc.fillStyle="#04060e";
+  for(var pl=0;pl<4;pl++)
+    sc.fillRect(mX(1.5+pl*1.6)-Math.max(1,mW(0.11)),alY,Math.max(2,mW(0.22)),yChao-alY);
+  var poE=mX(2.4), poD=mX(3.7), poT=mY(0.30);
+  sc.fillStyle="rgba(3,5,9,"+(0.80+0.15*L)+")";
+  sc.fillRect(poE,poT,poD-poE,yChao-poT);
+  var fr=Math.max(1.8,(poD-poE)*0.14);
+  sc.globalCompositeOperation="lighter";
+  var frg=sc.createLinearGradient(poD-fr,0,poD+fr*4,0);
+  frg.addColorStop(0,"rgba(255,188,114,"+(0.40*L)+")");
+  frg.addColorStop(1,"rgba(255,150,70,0)");
+  sc.fillStyle=frg;
+  sc.fillRect(poD-fr,poT,fr*5,yChao-poT);
+  sc.globalCompositeOperation="source-over";
+  sc.fillStyle="rgba(255,200,132,"+(0.34+0.34*L)+")";   /* o fio da fresta */
+  sc.fillRect(poD-fr,poT,Math.max(1.2,fr*0.45),yChao-poT);
+  sc.fillStyle="rgba(112,140,172,"+(0.07+0.06*L)+")";   /* verga */
+  sc.fillRect(poE-fr,poT-Math.max(1.2,mW(0.14)),poD-poE+fr*2,Math.max(1.2,mW(0.14)));
+
+  /* as outras janelas da casa: acesas, fracas, sem cortina se mexendo.
+     Sao as DUAS FILEIRAS que poem a janela acesa num andar. Sozinha, ela
+     nao estava em andar nenhum — era uma luz numa parede.               */
+  for(var w=0;w<world.janelas.length;w++){
+    var jw=world.janelas[w];
+    var jx=mX(jw.lat), jy=mY(jw.h);
+    var jhw=mW(jw.l||0.58), jhh=mW(jw.alt||0.86);
+    /* o brilho entra na COR do vidro, nao na transparencia — senao vira
+       um papel bege colado na parede */
+    var lum=clamp(jw.a*(0.45+0.55*L)*2.7,0,1);
+    if(lum>0.05){
+      var jg=sc.createRadialGradient(jx,jy,0,jx,jy,jhw*4.5);
+      jg.addColorStop(0,"rgba(255,170,92,"+(lum*0.20)+")");
+      jg.addColorStop(1,"rgba(255,155,84,0)");
+      sc.fillStyle=jg; sc.beginPath(); sc.arc(jx,jy,jhw*4.5,0,TAU); sc.fill();
+    }
+    sc.fillStyle="rgb("+Math.round(lerp(13,255,lum))+","+
+                        Math.round(lerp(19,186,lum))+","+
+                        Math.round(lerp(29,116,lum))+")";
+    sc.fillRect(jx-jhw,jy-jhh,jhw*2,jhh*2);
+    /* caixilho quadriculado, 2 x 3 vidracas, como na arte */
+    sc.fillStyle="rgba(8,6,4,"+(0.55+0.35*L)+")";
+    var vw=Math.max(0.9,jhw*0.06);
+    sc.fillRect(jx-vw/2,jy-jhh,vw,jhh*2);
+    for(var mh=1;mh<=2;mh++)
+      sc.fillRect(jx-jhw,jy-jhh+jhh*2*mh/3-vw/2,jhw*2,vw);
+    sc.strokeStyle="rgba(6,5,4,"+(0.6+0.3*L)+")"; sc.lineWidth=1.4;
+    sc.strokeRect(jx-jhw,jy-jhh,jhw*2,jhh*2);
+    /* peitoril de pedra */
+    var pei=Math.max(1.2,mW(0.09));
+    sc.fillStyle="rgba(112,140,172,"+(0.08+0.07*L)+")";
+    sc.fillRect(jx-jhw*1.2,jy+jhh,jhw*2.4,pei);
+    sc.fillStyle="rgba(0,0,0,"+(0.30+0.12*L)+")";
+    sc.fillRect(jx-jhw*1.2,jy+jhh+pei,jhw*2.4,pei*1.5);
+  }
+  sc.save();
+  sc.beginPath(); sc.rect(cx-g.parHW,pty,g.parHW*2,pby-pty); sc.clip();
+  sc.globalCompositeOperation="lighter";
+  var poco=sc.createRadialGradient(cx,cy,hw*0.4,cx,cy,hw*5.2);
+  poco.addColorStop(0,"rgba(255,164,92,"+(0.17*L)+")");
+  poco.addColorStop(0.45,"rgba(210,124,66,"+(0.055*L)+")");
+  poco.addColorStop(1,"rgba(180,110,60,0)");
+  sc.fillStyle=poco; sc.fillRect(cx-g.parHW,pty,g.parHW*2,pby-pty);
+  sc.globalCompositeOperation="overlay";
+  sc.globalAlpha=0.18*L;
+  sc.drawImage(NOISE2,cx-g.parHW,pty,g.parHW*2,pby-pty);
+  sc.globalAlpha=1;
+  sc.globalCompositeOperation="source-over";
+  /* escorrido de chuva sob o peitoril */
+  for(var e=0;e<7;e++){
+    var ex2=cx-hw*1.2+(e*0.18+0.04)*hw*2.4;
+    var eg=sc.createLinearGradient(0,cy+hh,0,cy+hh+hw*(1.6+e*0.4));
+    eg.addColorStop(0,"rgba(0,0,0,"+(0.22*L)+")");
+    eg.addColorStop(1,"rgba(0,0,0,0)");
+    sc.fillStyle=eg;
+    sc.fillRect(ex2,cy+hh,Math.max(1.5,hw*0.05),hw*(1.6+e*0.4));
+  }
+  sc.restore();
+  sc.fillStyle="rgba(96,124,152,"+(0.05+0.06*L)+")";
+  sc.fillRect(cx-g.parHW,pty,g.parHW*2,1.4);
+
+  /* ---------- vão recuado na parede ---------- */
+  var fw=Math.max(3,hw*0.075);                       /* espessura do caixilho */
+  sc.fillStyle="rgba(0,0,0,"+(0.5*L)+")";
+  sc.fillRect(cx-hw-fw*2.2,cy-hh-fw*2.2,hw*2+fw*4.4,hh*2+fw*4.4);
+
+  /* ---------- interior ---------- */
+  sc.save();
+  sc.beginPath(); sc.rect(cx-hw,cy-hh,hw*2,hh*2); sc.clip();
+
+  /* parede do fundo do quarto */
+  var ig=sc.createLinearGradient(cx,cy-hh,cx,cy+hh);
+  ig.addColorStop(0,"rgba(44,25,13,"+quente+")");
+  ig.addColorStop(0.55,"rgba(86,48,22,"+quente+")");
+  ig.addColorStop(1,"rgba(26,14,8,"+quente+")");
+  sc.fillStyle=ig; sc.fillRect(cx-hw,cy-hh,hw*2,hh*2);
+
+  /* poço de luz do abajur na parede do fundo (fora do centro) */
+  var lx=cx+hw*0.46, ly=cy+hh*0.28;
+  sc.globalCompositeOperation="lighter";
+  var lg=sc.createRadialGradient(lx,ly,0,lx,ly,hw*1.25);
+  lg.addColorStop(0,"rgba(255,214,158,"+(0.62*quente)+")");
+  lg.addColorStop(0.28,"rgba(255,168,92,"+(0.24*quente)+")");
+  lg.addColorStop(1,"rgba(255,140,64,0)");
+  sc.fillStyle=lg; sc.fillRect(cx-hw,cy-hh,hw*2,hh*2);
+  sc.globalCompositeOperation="source-over";
+
+  /* o abajur */
+  sc.fillStyle="rgba(255,226,180,"+(0.85*quente)+")";
+  sc.beginPath();
+  sc.moveTo(lx-hw*0.12,ly); sc.lineTo(lx+hw*0.12,ly);
+  sc.lineTo(lx+hw*0.08,ly-hh*0.15); sc.lineTo(lx-hw*0.08,ly-hh*0.15);
+  sc.closePath(); sc.fill();
+
+  /* cortina à esquerda, com dobras que respiram */
+  var cw=hw*0.78, sopro=Math.sin(tempo*0.00042)*hw*0.05;
+  var cg2=sc.createLinearGradient(cx-hw,0,cx-hw+cw,0);
+  cg2.addColorStop(0,"rgba(28,15,8,"+(0.94*quente)+")");
+  cg2.addColorStop(0.55,"rgba(74,42,20,"+(0.80*quente)+")");
+  cg2.addColorStop(1,"rgba(96,56,26,0)");
+  sc.fillStyle=cg2;
+  sc.beginPath();
+  sc.moveTo(cx-hw,cy-hh);
+  sc.lineTo(cx-hw+cw+sopro,cy-hh);
+  for(var yy=cy-hh; yy<=cy+hh; yy+=hh*0.15)
+    sc.lineTo(cx-hw+cw+sopro+Math.sin(yy*0.03+tempo*0.0006)*hw*0.06, yy);
+  sc.lineTo(cx-hw,cy+hh); sc.closePath(); sc.fill();
+  sc.strokeStyle="rgba(255,186,120,"+(0.07*quente)+")"; sc.lineWidth=1;
+  for(var d2=1;d2<=3;d2++){
+    sc.beginPath();
+    for(var y2=cy-hh;y2<=cy+hh;y2+=hh*0.12)
+      sc.lineTo(cx-hw+cw*d2/4+sopro*d2/4+Math.sin(y2*0.03+tempo*0.0006+d2)*hw*0.05, y2);
+    sc.stroke();
+  }
+
+  /* a silhueta — só depois de revelado */
+  if(revealed>0.05){
+    sc.globalAlpha=revealed*0.95;
+    sc.fillStyle="rgba(10,5,2,0.96)";
+    var px=cx+hw*0.10, pb=cy+hh, ph=hh*1.34;
+    sc.beginPath();                                   /* tronco e ombros */
+    sc.moveTo(px-hw*0.34,pb);
+    sc.bezierCurveTo(px-hw*0.32,pb-ph*0.62, px-hw*0.24,pb-ph*0.72, px-hw*0.14,pb-ph*0.76);
+    sc.bezierCurveTo(px-hw*0.13,pb-ph*0.88, px+hw*0.13,pb-ph*0.88, px+hw*0.14,pb-ph*0.76);
+    sc.bezierCurveTo(px+hw*0.24,pb-ph*0.72, px+hw*0.32,pb-ph*0.62, px+hw*0.34,pb);
+    sc.closePath(); sc.fill();
+    sc.beginPath();                                   /* cabeça */
+    sc.ellipse(px,pb-ph*0.88,hw*0.15,hw*0.175,0,0,TAU); sc.fill();
+    sc.globalAlpha=1;
+  }
+
+  /* pó suspenso no ar do quarto */
+  sc.globalCompositeOperation="lighter";
+  sc.globalAlpha=0.05*L;
+  sc.drawImage(NOISE2,cx-hw,cy-hh+Math.sin(tempo*0.0002)*8,hw*2,hh*2);
+  sc.globalAlpha=1;
+  sc.globalCompositeOperation="source-over";
+
+  /* ---------- vidro (reflexo do céu, embaçado, escorrido) ---------- */
+  sc.globalCompositeOperation="lighter";
+  var rg=sc.createLinearGradient(cx-hw,cy-hh,cx+hw*0.5,cy+hh*0.6);
+  rg.addColorStop(0,"rgba(126,164,204,"+(0.13*L*L)+")");
+  rg.addColorStop(0.30,"rgba(110,146,186,"+(0.035*L*L)+")");
+  rg.addColorStop(0.52,"rgba(100,140,180,0)");
+  sc.fillStyle=rg; sc.fillRect(cx-hw,cy-hh,hw*2,hh*2);
+  /* água escorrendo por fora do vidro */
+  for(var s=0;s<7;s++){
+    var sxp=cx-hw+((s*0.37+0.11)%1)*hw*2;
+    var sg=sc.createLinearGradient(sxp-1.5,0,sxp+1.5,0);
+    sg.addColorStop(0,"rgba(190,214,240,0)");
+    sg.addColorStop(0.5,"rgba(200,222,246,"+(0.055*L)+")");
+    sg.addColorStop(1,"rgba(190,214,240,0)");
+    sc.fillStyle=sg; sc.fillRect(sxp-1.5,cy-hh,3,hh*2);
+  }
+  sc.globalCompositeOperation="source-over";
+
+  /* ---------- travessas de vidro ---------- */
+  var cols=2, rows=3, bw=Math.max(2.4,hw*0.05);
+  for(var c=1;c<cols;c++){
+    var bx=cx-hw+(hw*2)*c/cols-bw*0.5;
+    sc.fillStyle="rgba(16,10,6,"+(0.55+L*0.45)+")"; sc.fillRect(bx,cy-hh,bw,hh*2);
+    sc.fillStyle="rgba(255,206,152,"+(0.30*L)+")";  sc.fillRect(bx,cy-hh,bw*0.3,hh*2);
+    sc.fillStyle="rgba(0,0,0,"+(0.35*L)+")";        sc.fillRect(bx+bw*0.72,cy-hh,bw*0.28,hh*2);
+  }
+  for(var r=1;r<rows;r++){
+    var by2=cy-hh+(hh*2)*r/rows-bw*0.5;
+    sc.fillStyle="rgba(16,10,6,"+(0.55+L*0.45)+")"; sc.fillRect(cx-hw,by2,hw*2,bw);
+    sc.fillStyle="rgba(255,206,152,"+(0.26*L)+")";  sc.fillRect(cx-hw,by2,hw*2,bw*0.28);
+    sc.fillStyle="rgba(0,0,0,"+(0.35*L)+")";        sc.fillRect(cx-hw,by2+bw*0.74,hw*2,bw*0.26);
+  }
+  /* embaçado nos cantos de cada vidraça */
+  sc.globalCompositeOperation="lighter";
+  for(var c3=0;c3<cols;c3++) for(var r3=0;r3<rows;r3++){
+    var px0=cx-hw+(hw*2)*c3/cols, py0=cy-hh+(hh*2)*r3/rows;
+    var pw=(hw*2)/cols, ph2=(hh*2)/rows;
+    var cg=sc.createRadialGradient(px0+pw*0.5,py0+ph2*0.5,pw*0.2,px0+pw*0.5,py0+ph2*0.5,pw*0.8);
+    cg.addColorStop(0,"rgba(214,230,246,0)");
+    cg.addColorStop(1,"rgba(206,224,242,"+(0.07*L)+")");
+    sc.fillStyle=cg; sc.fillRect(px0,py0,pw,ph2);
+  }
+  sc.globalCompositeOperation="source-over";
+  sc.restore();
+
+  /* ---------- caixilho externo com relevo ---------- */
+  sc.fillStyle="rgba(22,15,10,"+(0.55+L*0.45)+")";
+  sc.fillRect(cx-hw-fw,cy-hh-fw,hw*2+fw*2,fw);              /* verga */
+  sc.fillRect(cx-hw-fw,cy+hh,hw*2+fw*2,fw);                 /* base */
+  sc.fillRect(cx-hw-fw,cy-hh,fw,hh*2);                      /* montantes */
+  sc.fillRect(cx+hw,cy-hh,fw,hh*2);
+  sc.fillStyle="rgba(255,198,140,"+(0.22*L)+")";            /* luz batendo */
+  sc.fillRect(cx-hw-fw,cy-hh-fw,hw*2+fw*2,1.4);
+  sc.fillRect(cx-hw-fw,cy-hh,1.4,hh*2);
+  sc.fillStyle="rgba(0,0,0,"+(0.45*L)+")";
+  sc.fillRect(cx-hw-fw,cy+hh+fw-1.4,hw*2+fw*2,1.4);
+
+  /* peitoril de pedra, molhado */
+  var pey=cy+hh+fw, peh=Math.max(3,hh*0.055);
+  sc.fillStyle="rgba(34,32,30,"+(0.5+L*0.5)+")";
+  sc.fillRect(cx-hw-fw*2,pey,hw*2+fw*4,peh);
+  sc.fillStyle="rgba(255,196,140,"+(0.30*L)+")";
+  sc.fillRect(cx-hw-fw*2,pey,hw*2+fw*4,1.6);
+  sc.fillStyle="rgba(0,0,0,"+(0.55*L)+")";
+  sc.fillRect(cx-hw-fw*2,pey+peh,hw*2+fw*4,peh*0.7);
+
+  /* ---------- o que a luz faz no ar e na calçada ---------- */
+  sc.save();
+  sc.globalCompositeOperation="lighter";
+  /* halo curto na névoa, não um sol */
+  var spill=sc.createRadialGradient(cx,cy,hw*0.5,cx,cy,hw*2.6);
+  spill.addColorStop(0,"rgba(255,158,80,"+(0.11*quente)+")");
+  spill.addColorStop(0.5,"rgba(255,136,64,"+(0.035*quente)+")");
+  spill.addColorStop(1,"rgba(255,130,60,0)");
+  sc.fillStyle=spill;
+  sc.beginPath(); sc.arc(cx,cy,hw*2.6,0,TAU); sc.fill();
+  /* feixe caindo na rua */
+  if(hy>cy+hh){
+    var cone=sc.createLinearGradient(cx,cy,cx,hy+hh*0.5);
+    cone.addColorStop(0,"rgba(255,164,88,"+(0.10*quente)+")");
+    cone.addColorStop(0.55,"rgba(255,150,74,"+(0.035*quente)+")");
+    cone.addColorStop(1,"rgba(255,150,70,0)");
+    sc.fillStyle=cone;
+    sc.beginPath();
+    sc.moveTo(cx-hw*0.9,cy+hh*0.4); sc.lineTo(cx+hw*0.9,cy+hh*0.4);
+    sc.lineTo(cx+hw*1.9,hy+hh*0.5); sc.lineTo(cx-hw*1.9,hy+hh*0.5);
+    sc.closePath(); sc.fill();
+    /* poça acesa embaixo */
+    var pg=sc.createRadialGradient(cx,hy+hh*0.35,0,cx,hy+hh*0.35,hw*1.7);
+    pg.addColorStop(0,"rgba(255,170,96,"+(0.16*quente)+")");
+    pg.addColorStop(1,"rgba(255,150,70,0)");
+    sc.fillStyle=pg;
+    sc.save(); sc.translate(cx,hy+hh*0.35); sc.scale(1,0.22);
+    sc.beginPath(); sc.arc(0,0,hw*1.7,0,TAU); sc.fill(); sc.restore();
+  }
+  sc.restore();
+
+  /* de longe a janela é só um ponto quente: as camadas de névoa já cobrem
+     o resto, então nada de retângulo cinza por cima */
+
+  /* --- anel de progresso do "segurar" --- */
+  if(holdAcc>0 && !locked){
+    var p=clamp(holdAcc/CFG.HOLD_MS,0,1);
+    sc.strokeStyle="rgba(255,214,160,0.85)";
+    sc.lineWidth=2.4; sc.lineCap="round";
+    var per=(hw*4+hh*4), run=per*p;
+    sc.setLineDash([run,per]);
+    sc.strokeRect(cx-hw-fw,cy-hh-fw,hw*2+fw*2,hh*2+fw*2);
+    sc.setLineDash([]);
+  }
+  return {cx:cx,cy:cy,hw:hw,hh:hh,L:L};
+}
+
+/* gotas escorrendo na vidraça, refratando a cena */
+function gotasNoVidro(win, dt){
+  if(!win||win.L<0.35) return;
+  var a=sstep(0.35,0.8,win.L);
+  sc.save();
+  sc.beginPath(); sc.rect(win.cx-win.hw,win.cy-win.hh,win.hw*2,win.hh*2); sc.clip();
+  for(var i=0;i<vidro.length;i++){
+    var d=vidro[i];
+    d.esp-=dt;
+    if(d.esp<=0){ d.vy+=dt*(0.05+Math.random()*0.12); }
+    if(d.vy>0){ d.v+=d.vy*dt*0.55; d.vy*=0.985; }
+    if(d.v>1.05){ d.v=-0.05; d.u=Math.random(); d.vy=0; d.esp=1+Math.random()*5; }
+    var x=win.cx-win.hw+d.u*win.hw*2, y=win.cy-win.hh+d.v*win.hh*2, r=d.r;
+
+    /* rastro molhado */
+    if(d.vy>0.02){
+      var tg=sc.createLinearGradient(x,y-r*9,x,y);
+      tg.addColorStop(0,"rgba(255,225,190,0)");
+      tg.addColorStop(1,"rgba(255,230,200,"+(0.09*a)+")");
+      sc.fillStyle=tg; sc.fillRect(x-r*0.42,y-r*9,r*0.84,r*9);
+    }
+    /* refração: pedaço da cena invertido dentro da gota */
+    sc.save();
+    sc.beginPath(); sc.arc(x,y,r,0,TAU); sc.clip();
+    sc.globalAlpha=0.9*a;
+    sc.drawImage(gsB, (x-r*1.5)*DPR, (y-r*1.5)*DPR + r*10*DPR, r*3*DPR, r*3*DPR,
+                 x+r, y+r, -r*2.2, -r*2.2);
+    sc.restore();
+    /* borda e brilho */
+    sc.globalAlpha=a;
+    sc.strokeStyle="rgba(255,236,214,0.20)"; sc.lineWidth=0.8;
+    sc.beginPath(); sc.arc(x,y,r,0,TAU); sc.stroke();
+    sc.fillStyle="rgba(255,248,236,0.55)";
+    sc.beginPath(); sc.arc(x-r*0.33,y-r*0.38,Math.max(0.6,r*0.17),0,TAU); sc.fill();
+    sc.globalAlpha=1;
+  }
+  sc.restore();
+}
+
+/* ---------- FACHO VOLUMÉTRICO ---------- */
+function facho(tempo){
+  var p=beamPower();
+  if(p<=0.001) return;
+  var tremor=1+Math.sin(tempo*0.011)*0.03+Math.sin(tempo*0.037)*0.015;
+  sc.save();
+  sc.globalCompositeOperation="lighter";
+
+  /* halo do eixo */
+  var g=sc.createRadialGradient(0,beamY,0,0,beamY,beamRX*tremor);
+  g.addColorStop(0,"rgba(200,220,244,"+(0.115*p)+")");
+  g.addColorStop(0.45,"rgba(178,202,232,"+(0.042*p)+")");
+  g.addColorStop(1,"rgba(160,190,225,0)");
+  sc.save(); sc.translate(0,beamY); sc.scale(1,beamRY/beamRX);
+  sc.fillStyle=g; sc.beginPath(); sc.arc(0,0,beamRX*tremor,0,TAU); sc.fill(); sc.restore();
+
+  /* o eixo da luz descendo até a mão: elipses sobrepostas, nunca um
+     polígono — feixe de verdade não tem aresta reta na névoa */
+  for(var i=0;i<3;i++){
+    var f=1-i*0.28, ry=beamRY*(1.5-i*0.25), oy2=beamY+beamRY*(0.35+i*0.28);
+    var cg=sc.createRadialGradient(0,oy2,0,0,oy2,beamRX*f*tremor);
+    cg.addColorStop(0,"rgba(190,212,240,"+(0.030*p*f)+")");
+    cg.addColorStop(0.55,"rgba(180,204,234,"+(0.012*p*f)+")");
+    cg.addColorStop(1,"rgba(176,200,232,0)");
+    sc.save(); sc.translate(0,oy2); sc.scale(1,ry/(beamRX*f));
+    sc.fillStyle=cg; sc.beginPath(); sc.arc(0,0,beamRX*f*tremor,0,TAU); sc.fill();
+    sc.restore();
+  }
+
+  sc.restore();
+}
+
+/* ---------- CHUVA ---------- */
+function chuvaPass(dt, tempo){
+  var vento=Math.sin(tempo*0.00021)*0.42+Math.sin(tempo*0.00053)*0.18;
+  sc.lineCap="round";
+  for(var i=0;i<chuva.length;i++){
+    var d=chuva[i];
+    d.y+=d.v*dt; d.x+=vento*d.v*dt*0.42;
+    if(d.y>D2*1.15){ d.y=-D2*1.15; d.x=(Math.random()*2-1)*D2*1.15; }
+    if(d.x>D2*1.15) d.x-=D2*2.3; else if(d.x<-D2*1.15) d.x+=D2*2.3;
+
+    var luz=beamAt(d.x,d.y);
+    var a=d.a*(0.9+lightning*3)+luz*1.15*d.z;
+    if(a<0.012) continue;
+    var ex=d.x-vento*d.len*0.42, ey=d.y-d.len;
+    var g=sc.createLinearGradient(d.x,d.y,ex,ey);
+    g.addColorStop(0,"rgba(214,232,250,"+clamp(a,0,0.95)+")");
+    g.addColorStop(0.6,"rgba(198,220,244,"+clamp(a*0.45,0,0.6)+")");
+    g.addColorStop(1,"rgba(190,214,240,0)");
+    sc.strokeStyle=g;
+    sc.lineWidth=lerp(0.8,2.3,d.z);
+    sc.beginPath(); sc.moveTo(d.x,d.y); sc.lineTo(ex,ey); sc.stroke();
+  }
+}
+
+/* ---------- gotas na "lente" (primeiro plano) ---------- */
+function gotasNaLente(dt){
+  for(var i=0;i<lente.length;i++){
+    var d=lente[i];
+    d.tr-=dt;
+    if(d.tr<=0){ d.vy+=dt*3.5; }
+    d.y+=d.vy*dt*22;
+    if(d.y>H*0.55){ d.y=-H*0.5; d.x=(Math.random()*2-1)*W*0.5; d.vy=0; d.tr=1+Math.random()*6; }
+    var x=d.x+W*0.5, y=d.y+H*0.5, r=d.r;
+    /* gota fora de foco: quase só uma lente que inverte o que está atrás,
+       com aro escuro e um ponto de luz. Sem preenchimento chapado. */
+    ctx.save();
+    ctx.beginPath();
+    ctx.ellipse(x,y,r*0.86,r,0,0,TAU);
+    ctx.clip();
+    ctx.globalAlpha=0.42;
+    ctx.drawImage(gsB,(x-r*2.2)*DPR,(y-r*2.2)*DPR+r*16*DPR,r*4.4*DPR,r*4.4*DPR,
+                  x+r*1.5,y+r*1.5,-r*3,-r*3);
+    ctx.restore();
+    /* aro: escuro em cima, luz embaixo — é assim que uma gota fora de foco lê */
+    ctx.globalAlpha=0.5;
+    ctx.lineWidth=Math.max(1,r*0.14);
+    var aro=ctx.createLinearGradient(x,y-r,x,y+r);
+    aro.addColorStop(0,"rgba(8,14,22,0.55)");
+    aro.addColorStop(0.55,"rgba(120,150,180,0.10)");
+    aro.addColorStop(1,"rgba(200,224,250,0.26)");
+    ctx.strokeStyle=aro;
+    ctx.beginPath(); ctx.ellipse(x,y,r*0.86,r,0,0,TAU); ctx.stroke();
+    ctx.fillStyle="rgba(230,242,255,0.22)";
+    ctx.beginPath(); ctx.ellipse(x-r*0.28,y-r*0.40,r*0.12,r*0.09,0,0,TAU); ctx.fill();
+    ctx.globalAlpha=1;
+  }
+}
+
+/* ---------- pós: bloom, vinheta, grão ---------- */
+var grao=null;
+function fazGrao(){
+  var n=128; grao=document.createElement("canvas"); grao.width=grao.height=n;
+  var g=grao.getContext("2d"), im=g.createImageData(n,n), p=im.data;
+  for(var i=0;i<n*n;i++){ var v=(Math.random()*255)|0; p[i*4]=p[i*4+1]=p[i*4+2]=v; p[i*4+3]=16; }
+  g.putImageData(im,0,0);
+}
+function pos(tempo){
+  if(LOW){ vinhetaEGrao(tempo); return; }
+  /* bloom */
+  b1.setTransform(1,0,0,1,0,0);
+  b1.globalCompositeOperation="source-over";
+  b1.clearRect(0,0,b1B.width,b1B.height);
+  /* limiar alto: só a janela e os refletivos florescem — névoa não */
+  if(CAN_FILTER) b1.filter="brightness(0.92) contrast(4.2) saturate(1.2)";
+  b1.drawImage(scB,0,0,b1B.width,b1B.height);
+  b1.filter="none";
+  b2.clearRect(0,0,b2B.width,b2B.height);
+  if(CAN_FILTER) b2.filter="blur(7px)";
+  b2.drawImage(b1B,0,0);
+  b2.filter="none";
+  if(!CAN_FILTER){                     /* borrão manual */
+    b2.globalAlpha=0.5;
+    for(var k=1;k<=4;k++){
+      b2.drawImage(b1B,k,0); b2.drawImage(b1B,-k,0);
+      b2.drawImage(b1B,0,k); b2.drawImage(b1B,0,-k);
+    }
+    b2.globalAlpha=1;
+  }
+  ctx.save();
+  ctx.globalCompositeOperation="lighter";
+  ctx.globalAlpha=0.30;
+  ctx.drawImage(b2B,0,0,W,H);
+  ctx.restore();
+  vinhetaEGrao(tempo);
+}
+
+function vinhetaEGrao(tempo){
+  /* vinheta */
+  var v=ctx.createRadialGradient(W*0.5,H*0.48,Math.min(W,H)*0.34,W*0.5,H*0.48,Math.max(W,H)*0.82);
+  v.addColorStop(0,"rgba(0,0,0,0)");
+  v.addColorStop(0.65,"rgba(0,0,0,0.18)");
+  v.addColorStop(1,"rgba(0,0,0,0.66)");
+  ctx.fillStyle=v; ctx.fillRect(0,0,W,H);
+
+  /* grão */
+  ctx.globalAlpha=0.6;
+  var gx=(tempo*0.06)%128, gy=(tempo*0.043)%128;
+  for(var i=-1;i<=Math.ceil(W/128);i++)
+    for(var j=-1;j<=Math.ceil(H/128);j++)
+      ctx.drawImage(grao,i*128-gx,j*128-gy);
+  ctx.globalAlpha=1;
+}
+
+/* ==========================================================================
+   LOOP
+   ========================================================================== */
+function alinhamento(){
+  var t=tolerancia();
+  var dAz=Math.abs(wrap180(view.bearing-target.bearing));
+  var dEl=Math.abs(view.elev-target.elev);
+  var dRo=Math.abs(wrap180(view.roll));
+  var dist=Math.hypot(dAz,dEl);
+  /* histerese: já engatado, a janela alarga. Sem isto, um único quadro de
+     ruído do magnetômetro jogava fora 1,4 s de esforço.                 */
+  var m = holdAcc>0 ? CFG.SOLTA : 1;
+  return {dAz:dAz,dEl:dEl,dRo:dRo,dist:dist,tol:t,
+          ok:(dAz<=t.az*m && dEl<=t.el*m && dRo<=CFG.TOL_ROLL*m)};
+}
+
+/* um passo encosta acima */
+function darPasso(){
+  holdAcc=0;
+  elHold.classList.remove("on"); elHoldF.style.width="0%";
+  if(passo>=CFG.PASSOS.length-1){ revela(); return; }
+  passo++;
+  distAlvo=CFG.PASSOS[passo];
+  passoAnim=1;
+  /* O BANCO DE NÉVOA QUE FECHA A CADA PASSO.
+     Quando trava, o braço relaxa sozinho — ninguém segura a mira depois de
+     1,5 s de tensão. Sem isto, o jogo lê esse relaxamento involuntário como
+     erro do jogador: o medidor esfria e a pessoa sente que perdeu o que
+     acabou de ganhar. Com a névoa fechando, a perda de mira passa a ser
+     resposta do mundo, não falha sua — e ainda esconde a casa se
+     aproximando, que hoje acontece à vista.                            */
+  surto=1;
+  marcaPassos();
+  setStatus(PASSO_TXT[Math.min(passo-1,PASSO_TXT.length-1)],true);
+  elHint.textContent="a névoa fechou — ela subiu junto com você";
+  try{ navigator.vibrate && navigator.vibrate([10,40,18]); }catch(e){}
+  if(passo>=CFG.PASSOS.length-1) elHint.textContent="chegou. a última é mais alta.";
+}
+
+var elMeter=document.getElementById("meter-fill"),
+    elHold=document.getElementById("hold"),
+    elHoldF=document.getElementById("hold-fill"),
+    elStatus=document.getElementById("status"),
+    elHint=document.getElementById("hint");
+function setStatus(s,hot){ elStatus.textContent=s; elStatus.classList.toggle("hot",!!hot); }
+
+var ultimoTick=0, fpsAcc=0, fpsN=0, ultimoTickRodada=-9e9;
+function fechaCarta(){ document.getElementById("card").classList.remove("on"); }
+function loop(){
+  requestAnimationFrame(loop);
+  /* Pausado: nada avança e tPrev acompanha o relógio, para que a retomada
+     não receba um dt do tamanho da pausa e teleporte a cena.            */
+  if(PAUSADO){ tPrev=performance.now(); return; }
+  var agora=performance.now(), tempo=agora-t0;
+  var dt=Math.min(0.05,(agora-tPrev)/1000); tPrev=agora;
+  if(W!==window.innerWidth||H!==window.innerHeight) resize();
+  /* largura zero acontece de verdade: iframe recem-criado no modo embed, ou
+     a aba ainda sem layout. PPD vira 0, as contas viram NaN e os gradientes
+     estouram. Espera o layout chegar em vez de desenhar lixo.          */
+  if(W<2||H<2) return;
+
+  /* a virada da rodada, vigiada ao vivo. Quem abriu 20h58 e quem abriu 21h02
+     estavam em rodadas diferentes; as 21h30 os dois caem na MESMA aqui, sem
+     recarregar nada. E o que torna a sincronia auto-corretiva.          */
+  /* A RODADA CONGELA QUANDO A PARTIDA COMEÇA.
+     Antes o relógio virava a rodada no meio da subida e jogava fora tudo o
+     que o grupo tinha andado. Agora, uma vez lá fora, o rumo é seu até o
+     fim — quem chegar depois entra pelo código.
+     A exceção é a carência: nos primeiros 90 s ninguém investiu progresso,
+     então um grupo que tocou em cima da virada ainda converge sozinho. */
+  var travada = jogando && (agora-tInicio)>90000;
+  if(!seedManual && !travada && roundCode()!==rodadaVista){
+    buildWorld(defaultSeed());
+    fechaCarta();
+    setStatus("A rodada virou. A janela mudou de lado — para todos.",true);
+    elHint.textContent="gire de novo e procure o clarão";
+    try{ navigator.vibrate && navigator.vibrate([30,60,30,60,30]); }catch(e){}
+  }
+  if(agora-ultimoTickRodada>10000){ ultimoTickRodada=agora; pintaRodada(); }
+
+  /* se o aparelho não estiver dando conta, baixa a qualidade sozinho */
+  if(!LOW){
+    fpsAcc+=dt; fpsN++;
+    if(fpsN>=100){
+      if(fpsAcc/fpsN>0.027){ LOW=true; resize(); }
+      fpsAcc=0; fpsN=0;
+    }
+  }
+
+  /* --- suavização adaptativa ------------------------------------------
+     O filtro antigo era fixo e quase transparente (constante de tempo de
+     0,17 s), então o ruído do magnetômetro passava direto para a tela: o
+     rumo tremia sozinho com o aparelho parado na mão.
+     Agora a força do filtro depende da velocidade angular ALISADA — não
+     da instantânea, senão o próprio tremor se disfarçaria de movimento:
+       varrendo o horizonte  -> filtro leve, responde na hora
+       parado, mirando       -> filtro pesado, a imagem assenta          */
+  if(rawAnt===null) rawAnt=raw.bearing;
+  var vAng=Math.abs(wrap180(raw.bearing-rawAnt))/Math.max(dt,1e-4);
+  rawAnt=raw.bearing;
+  spdAng+=(vAng-spdAng)*(1-Math.pow(0.02,dt));
+  var varrendo=sstep(8,45,spdAng);                    /* 0 parado · 1 varrendo */
+  var k=1-Math.pow(lerp(0.18,0.0025,varrendo),dt);
+  view.bearing=wrap360(view.bearing+wrap180(raw.bearing-view.bearing)*k);
+  view.elev+=(raw.elev-view.elev)*k;
+  view.roll+=(wrap180(raw.roll-view.roll))*k*0.85;
+
+  /* o passo: a casa vem para cima de você, e o corpo balança */
+  /* o banco leva uns 2,5 s para abrir: tempo de recompor o braço sem pressa.
+     Com 0,12 ele evaporava em menos de um segundo e não dava para nada. */
+  surto*=Math.pow(0.30,dt);
+  passoAnim*=Math.pow(0.06,dt);
+  distView+=(distAlvo-distView)*(1-Math.pow(0.04,dt));
+  target.elev=geom().elev;
+  if(passoAnim>0.01) view.elev+=Math.sin(tempo*0.014)*passoAnim*1.1;
+
+  /* relâmpago */
+  lightning*=Math.pow(0.02,dt);
+  lightNext-=dt*1000;
+  if(lightNext<=0){ lightning=0.55+Math.random()*0.5; lightNext=7000+Math.random()*16000; }
+
+  beamPulse*=Math.pow(0.25,dt);
+  beamY=-H*0.02; beamRX=Math.min(W,H)*0.52; beamRY=beamRX*1.15;
+
+  var al=alinhamento();
+  var quente=clamp(1-al.dist/46,0,1);
+  var gg2=geom();
+  var clareza=clamp(sstep(34,6,al.dist)*sstep(CFG.TOL_ROLL*3.2,CFG.TOL_ROLL*0.7,al.dRo),0,1);
+  clareza*=lerp(0.30,1,gg2.nitidez);       /* de longe, só um boato de luz */
+  clareza=clamp(clareza+revealed*0.2,0,1);
+  if(locked) clareza=Math.max(clareza,0.94);
+
+  /* --- render --- */
+  sc.setTransform(DPR,0,0,DPR,0,0);
+  sc.clearRect(0,0,W,H);
+  sc.save();
+  sc.translate(W*0.5,H*0.5);
+  sc.rotate(view.roll*D2R);
+
+  ceu(tempo);                    /* céu de tempestade e o mar */
+  rochedos();                    /* pedras soltas na água */
+  nevoa(0,tempo);                /* névoa entre os planos */
+  var win=janela(tempo,clareza,quente);   /* a casa na ponta */
+  promontorio(tempo,clareza);    /* a rocha onde você pisa */
+  marcas();
+  pocas();
+  nevoaRasteira(tempo);          /* o banco que sobe do mar */
+  nevoa(1,tempo);                /* névoa na frente de tudo */
+  facho(tempo);
+
+  /* cópia da cena para as refrações */
+  gs.setTransform(1,0,0,1,0,0);
+  gs.clearRect(0,0,gsB.width,gsB.height);
+  gs.drawImage(scB,0,0);
+
+  gotasNoVidro(win,dt);
+  chuvaPass(dt,tempo);
+
+  /* clarão do relâmpago */
+  if(lightning>0.01){
+    sc.globalCompositeOperation="lighter";
+    sc.fillStyle="rgba(150,180,215,"+(lightning*0.13)+")";
+    sc.fillRect(-D2,-D2,D2*2,D2*2);
+    sc.globalCompositeOperation="source-over";
+  }
+  sc.restore();
+
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  ctx.clearRect(0,0,W,H);
+  ctx.drawImage(scB,0,0,W,H);
+  gotasNaLente(dt);
+  pos(tempo);
+
+  /* --- regra do jogo (só depois que o jogador entra) --- */
+  elMeter.style.width=(quente*100).toFixed(1)+"%";
+  if(!jogando){ return; }
+  if(!locked){
+    if(al.ok){
+      holdAcc=Math.min(CFG.HOLD_MS, holdAcc+dt*1000);
+      elHold.classList.add("on");
+      var p=clamp(holdAcc/CFG.HOLD_MS,0,1);
+      elHoldF.style.width=(p*100)+"%";
+      if(passoAnim<0.2){
+        setStatus(passo>=CFG.PASSOS.length-1?"Você está debaixo dela.":"Segure o rumo.",true);
+        elHint.textContent=passo>=CFG.PASSOS.length-1?"" :"a névoa abre — siga em frente";
+      }
+      if(agora-ultimoTick>170){ ultimoTick=agora; try{navigator.vibrate&&navigator.vibrate(6);}catch(e){} }
+      if(p>=1) darPasso();
+    } else {
+      /* escoa em vez de zerar: perder o rumo por meio segundo custa meio
+         segundo de progresso, não a subida inteira.                     */
+      if(holdAcc>0){
+        holdAcc=Math.max(0, holdAcc-dt*1000*CFG.DRENO);
+        elHoldF.style.width=(holdAcc/CFG.HOLD_MS*100)+"%";
+        if(holdAcc<=0) elHold.classList.remove("on");
+      }
+      /* enquanto o banco está fechado, o jogo cala a boca: nada de "só névoa
+         deste lado" apagando a frase do passo que você acabou de dar.   */
+      if(surto>0.15){ /* deixa a mensagem do passo em pé */ }
+      else if(al.dRo>CFG.TOL_ROLL && al.dist<18){ setStatus("Endireite o aparelho.",true); elHint.textContent="o caixilho precisa estar em pé"; }
+      else if(quente>0.88){ setStatus("É ali.",true);
+        elHint.textContent=al.dEl>al.tol.el?(view.elev>target.elev?"abaixe um pouco":"levante um pouco"):"segure firme"; }
+      else if(quente>0.58){ setStatus("A névoa está clareando desse lado."); elHint.textContent="siga as marcas do caminho"; }
+      else { setStatus("Só névoa deste lado."); elHint.textContent="gire o corpo devagar — o farol acende as marcas"; }
+    }
+  }
+  if(revealed<1 && locked) revealed=Math.min(1,revealed+dt*0.9);
+
+  /* painel do mestre */
+  if(mAberto){
+    document.getElementById("m-bear").textContent=Math.round(view.bearing)+"° "+cardinal(view.bearing);
+    document.getElementById("m-elev").textContent=view.elev.toFixed(1)+"°";
+    document.getElementById("m-roll").textContent=view.roll.toFixed(1)+"°";
+    document.getElementById("m-dist").textContent=al.dist.toFixed(1)+"°";
+  document.getElementById("m-folga").textContent=
+    "±"+al.tol.az.toFixed(1)+"° / ±"+al.tol.el.toFixed(1)+"°";
+    document.getElementById("m-src").textContent=sim?"mouse/dedo":src;
+  }
+}
+
+/* ==========================================================================
+   REVELAÇÃO
+   ========================================================================== */
+function revela(){
+  locked=true; holdAcc=0;
+  elHold.classList.remove("on");
+  /* O CRONÔMETRO PARA AQUI — no instante do acerto, antes dos 1,9 s de
+     animação da cortina. Se parasse junto com a carta, todo mundo levaria
+     1,9 s a mais e a comparação entre jogadores ficaria suja.         */
+  var tMs=enviarConclusao();
+  setStatus("A cortina se mexeu.",true);
+  elHint.textContent="e a janela está fechada";
+  try{ navigator.vibrate && navigator.vibrate([14,60,26]); }catch(e){}
+  var f=FRAGMENTOS[fragIdx%FRAGMENTOS.length]; fragIdx++;
+  setTimeout(function(){
+    if(EMBED){
+      /* dentro da mesa, o fragmento oficial é escolhido pelo MOSAICO conforme
+         a colocação. Mostrar um sorteado aqui poderia contradizê-lo.     */
+      document.getElementById("c-hora").textContent="";
+      document.getElementById("c-txt").textContent="O resultado foi enviado.";
+      document.getElementById("c-dir").textContent="Aguarde a classificação.";
+      document.getElementById("c-tipo").textContent="Fragmento localizado";
+    } else {
+      /* CRONOLOGIA: a tarefa integrada acontece as 21:26. O que a janela
+         devolve aqui e registro de um momento ANTERIOR da noite (21:03 a
+         21:23), nunca o relogio corrente da rodada.                   */
+      document.getElementById("c-tipo").textContent="Registro anterior da noite";
+      document.getElementById("c-hora").textContent=f.hora;
+      document.getElementById("c-txt").textContent=f.txt;
+      document.getElementById("c-dir").textContent=
+        "A janela preservou registros de momentos anteriores da noite. "+
+        "A janela estava a "+cardinal(target.bearing)+" — "+
+        String(target.bearing).replace(".",",")+"°, "+
+        "no segundo andar, a seis passos encosta acima. Todos os convidados a viram do mesmo lado do mundo.";
+    }
+    var t=tMs!==null?tMs:tempoFinalMs;
+    document.getElementById("c-tempo").textContent =
+      t!==null ? (EMBED?"Tempo registrado: ":"Seu tempo: ")+formatarTempo(t) : "";
+    document.getElementById("card").classList.add("on");
+  },1900);   /* deixa ver a silhueta aparecer antes de cobrir a cena */
+}
+
+/* ==========================================================================
+   UI
+   ========================================================================== */
+var mAberto=false, jogando=false;
+/* Elenco agora é da mesa (antes da encenação). A Janela não espera OK. */
+var _elencoJanelaOk=false;
+function elencoJanelaPodeComecar(){ return _elencoJanelaOk; }
+function fechaIntro(){
+  document.getElementById("intro").classList.add("gone");
+  /* a saida pelo dialogo "Sem sensor" nao passa pelo botao do oito, e sem
+     isto a tela do oito ficaria por cima do jogo.                       */
+  document.getElementById("oito").classList.remove("on");
+  jogando=true;
+  tInicio=performance.now();          /* daqui conta a carência de 90 s */
+  /* a tarefa so vira jogavel aqui: intro fechada, permissao resolvida,
+     calibragem feita. E daqui que o cronometro oficial conta.        */
+  iniciarCronometroOficial();
+  enviarStatus("ativo");
+}
+
+/* ---- o oito no ar --------------------------------------------------------
+   NÃO é "calibrar o norte" (definir aqui = norte): isso congelaria o zero de
+   cada um na direção em que estava virado e abriria o grupo em leque. É a
+   calibragem do MAGNETÔMETRO, que o sistema faz sozinho quando o aparelho
+   vê orientações variadas. O app não consegue disparar isso — só pode pedir
+   o gesto e esperar. Ataca os 5 a 15° de bússola torta, sem coordenar
+   ninguém com ninguém.                                                    */
+var oitoGen=0;
+function oitoNoAr(depois){
+  var gen=++oitoGen;                 /* RETENTAR pode reabrir a tela: o laco
+                                        velho tem de morrer, senao dois ticks
+                                        disputam a mesma barra.            */
+  var el=document.getElementById("oito"),
+      barra=document.getElementById("oito-barra"),
+      bt=document.getElementById("oito-vai"),
+      pular=document.getElementById("oito-pular");
+  el.classList.add("on");
+  bt.disabled=true;
+  bt.textContent="A bússola ainda está tonta";
+  bt.onclick=function(){ el.classList.remove("on"); depois(); };
+  if(pular){
+    pular.onclick=function(){
+      el.classList.remove("on");
+      entrarModoDedo("Arraste para subir a encosta.");
+    };
+  }
+
+  /* Nao existe API para perguntar ao sistema se o magnetometro ja calibrou
+     — no Android nao existe nada, e no iOS so ha webkitCompassAccuracy. O
+     unico jeito honesto que vale nas duas plataformas e medir o GESTO. Um
+     oito de verdade deixa tres marcas que estar parado nao deixa:
+       AMPLITUDE  quanto o pulso abriu em cada eixo (o MENOR dos tres manda:
+                  girar o corpo abre a guinada e nao abre os outros dois)
+       ATITUDES   por quantas orientacoes distintas o aparelho passou
+       VOLTAS     quantas vezes a guinada inverteu de sentido — e isto que
+                  separa o oito de um arco unico
+     Medido: oito rapido abre em ~4 s, oito curto e lento em ~8 s. Parado na
+     mao para em 4%, andando devagar em 13%, so girando o corpo em 36%.
+     Nao ha limiar de "percurso somado": o proprio ruido do sensor, uns 2
+     graus, enche esse contador com o telefone imovel em cima da mesa — a
+     barra marcaria metade sem ninguem fazer nada.                        */
+  var META_GUINADA=40, META_ELEV=20, META_ROLL=45,   /* amplitude, em graus */
+      META_ATITUDES=14,                  /* celulas distintas de 18 graus   */
+      META_VOLTAS=4;                     /* inversoes de sentido na guinada */
+
+  var visto={}, atitudes=0, voltas=0;
+  var ant=null, sentido=0, acum=0, gira=0, primeiro=true;
+  var mnG=0,mxG=0,mnE=0,mxE=0,mnR=0,mxR=0;
+  var t0o=performance.now(), pMax=0;
+
+  function amostra(){
+    var b=raw.bearing, ee=raw.elev, rr=raw.roll;
+    if(ant){
+      var db=wrap180(b-ant.b);
+      /* 45 graus num quadro so e troca de referencial do sensor, nao braco */
+      if(Math.abs(db)<45) gira+=db;
+      acum+=db;
+      if(Math.abs(acum)>12){        /* zona morta: tremer nao vira volta */
+        var s=acum>0?1:-1;
+        if(sentido!==0 && s!==sentido) voltas++;
+        sentido=s; acum=0;
+      }
+    }
+    ant={b:b,e:ee,r:rr};
+    if(primeiro){ mnE=mxE=ee; mnR=mxR=rr; primeiro=false; }
+    if(gira<mnG)mnG=gira; if(gira>mxG)mxG=gira;
+    if(ee<mnE)mnE=ee;     if(ee>mxE)mxE=ee;
+    if(rr<mnR)mnR=rr;     if(rr>mxR)mxR=rr;
+    var cel=Math.round(gira/18)+"|"+Math.round(ee/18)+"|"+Math.round(rr/18);
+    if(!visto[cel]){ visto[cel]=1; atitudes++; }
+  }
+
+  (function tick(){
+    if(gen!==oitoGen) return;
+    if(started) amostra();
+    var seg=(performance.now()-t0o)/1000;
+    /* Afrouxamento inteligente e progressivo para ninguém ficar preso no celular */
+    var af=1-0.70*clamp((seg-3)/5,0,1);
+    var amp=Math.min((mxG-mnG)/(META_GUINADA*af),
+                     (mxE-mnE)/(META_ELEV*af),
+                     (mxR-mnR)/(META_ROLL*af));
+    var p=0.40*clamp(amp,0,1)
+         +0.35*Math.min(1,atitudes/(META_ATITUDES*af))
+         +0.25*Math.min(1,voltas  /(META_VOLTAS  *af));
+    if(seg>=2.5) p = Math.max(p, clamp((seg-2.5)/4.5, 0, 1));
+    if(p>pMax) pMax=p;                 /* a barra nunca anda para tras */
+    barra.style.width=(Math.min(1,pMax)*100)+"%";
+    if(pMax>=0.999 || seg>=7){
+      barra.style.width="100%";
+      bt.disabled=false;
+      bt.textContent="Subir a encosta";
+      try{ navigator.vibrate && navigator.vibrate([12,50,22]); }catch(err){}
+      return;                          /* daqui em diante quem manda e o dedo */
+    }
+    requestAnimationFrame(tick);
+  })();
+}
+document.getElementById("b-start").addEventListener("click",function(){
+  /* a permissão do iOS precisa sair de DENTRO do gesto, então pede primeiro
+     e só depois roda os três segundos do oito. */
+  if(!elencoJanelaPodeComecar()) return;
+  ativarSensor(function(){ oitoNoAr(fechaIntro); });
+});
+document.getElementById("b-sim").addEventListener("click",function(){
+  if(!elencoJanelaPodeComecar()) return;
+  entrarModoDedo("Arraste para girar. Q/E inclinam.");
+});
+/* Elenco (quem você é) agora abre na mesa ANTES da encenação.
+   A Janela não espera mais esse OK — quem chegou aqui já sabe o papel. */
+_elencoJanelaOk=true;
+document.getElementById("b-beam").addEventListener("click",function(e){
+  e.stopPropagation();
+  if(!beamOn){ beamOn=true; }
+  beamPulse=1.1;
+  try{ navigator.vibrate && navigator.vibrate(6); }catch(err){}
+});
+document.getElementById("b-master")&&document.getElementById("b-master").addEventListener("click",function(){
+  mAberto=!mAberto; document.getElementById("master").classList.toggle("on",mAberto);
+});
+/* calibragem de campo: dá para achar o ponto certo no lugar do jogo, sem
+   reeditar o arquivo. Some junto com a rodada — não é estado salvo.    */
+var FOLGAS=[{n:"apertado",v:0.75},{n:"normal",v:1},{n:"largo",v:1.4},{n:"muito largo",v:1.9}];
+var iFolga=1;
+/* Null-safe de propósito: no modo integrado estes controles saem do DOM, e
+   `init()` chama pintaFolga() DEPOIS da remoção. Sem a guarda, um
+   getElementById nulo mata o init inteiro — a página abre, a abertura roda,
+   e o que some é o jogo, sem erro visível. */
+function pintaFolga(){
+  var f=FOLGAS[iFolga];
+  if(FOLGA_URL===null) CFG.FOLGA=f.v;   /* a folga da sala vence a local */
+  var el=document.getElementById("folga");
+  if(!el) return;
+  /* Com folga vinda da sala o botão vira mostrador: dizer "normal" enquanto a
+     tolerância real é outra é pior que não dizer nada — quem estiver
+     conferindo no campo leria um número que não é o que o jogo usa. */
+  el.textContent = FOLGA_URL===null
+    ? "Folga do rumo: "+f.n
+    : "Folga do rumo: "+String(FOLGA_URL).replace(".",",")+"× (da mesa)";
+}
+function aoTocar(id,fn){
+  var el=document.getElementById(id);
+  if(el) el.addEventListener("click",fn);
+}
+aoTocar("folga",function(){
+  iFolga=(iFolga+1)%FOLGAS.length; pintaFolga();
+});
+aoTocar("cal",function(){
+  northOffset=wrap360(northOffset-raw.bearing);
+  raw.bearing=0; view.bearing=0; src="calibrada à mão";
+});
+document.getElementById("seed")&&document.getElementById("seed").addEventListener("change",function(){
+  var v=this.value.trim().toUpperCase();
+  if(!v) v=defaultSeed();
+  /* digitar exatamente o codigo da rodada corrente nao e "fixar a semente":
+     e voltar para o relogio. So diverge disso vira semente manual.     */
+  /* com semente vinda da URL, o campo não devolve o mundo ao relógio. */
+  seedManual = !!SEMENTE_URL || (v!==defaultSeed());
+  buildWorld(v);
+});
+document.getElementById("c-close").addEventListener("click",function(){
+  fechaCarta();
+  if(!EMBED){
+    /* NAO entra fragIdx aqui. Ele e um contador local: quem tivesse pegado
+       mais fragmentos ganhava um rumo diferente de quem tivesse pegado
+       menos, e o grupo se abria em leque. O rumo vem so do relogio.    */
+    buildWorld(seedManual?SEED:defaultSeed());
+    setStatus("A névoa fechou. A janela continua no mesmo rumo.");
+  }
+});
+
+/* ==========================================================================
+   INÍCIO
+   ========================================================================== */
+/* ---- falha de sensor: nunca deixar o jogador preso -------------------- */
+var RETENTAR=null, SEGUIR_TOQUE=null;
+function mostraFalha(msg){
+  document.getElementById("falha-msg").textContent=msg;
+  document.getElementById("falha").classList.add("on");
+  /* a tarefa NAO esta jogavel enquanto este aviso estiver na tela, entao o
+     cronometro nao pode estar correndo. Alguns jogos chamam comeca() antes
+     de saber se o sensor respondeu — aqui o relogio volta para zero e so
+     recomeca quando a pessoa escolher um caminho.                      */
+  if(!conclusaoEnviada){ inicioTarefa=null; fimTarefa=null; }
+}
+function escondeFalha(){ document.getElementById("falha").classList.remove("on"); }
+document.getElementById("falha-retry").addEventListener("click",function(){
+  escondeFalha(); ultimoStatus=null; if(RETENTAR) RETENTAR();
+});
+document.getElementById("falha-toque").addEventListener("click",function(){
+  escondeFalha(); modoEntrada="toque"; enviarStatus("ativo","toque");
+  if(SEGUIR_TOQUE) SEGUIR_TOQUE();
+});
+RETENTAR=function(){ ativarSensor(function(){ oitoNoAr(fechaIntro); }); };
+SEGUIR_TOQUE=function(){ entrarModoDedo("Arraste para girar. Q/E inclinam."); };
+if(EMBED){ document.documentElement.classList.add("embed"); document.body.classList.add("embed"); }
+if(!DEV){
+  var _bt=document.getElementById("b-sim")||document.getElementById("alt");
+  if(_bt && _bt.parentNode) _bt.parentNode.removeChild(_bt);
+}
+
+/* ---- a folga é da mesa, não do aparelho --------------------------------
+   O botão "Mestre" mora no HUD do jogo, e o modo integrado não o escondia:
+   dentro da Mesa, QUALQUER jogador abria o painel e punha a "Folga do rumo"
+   em "muito largo" — 1,9× a tolerância inteira — ou tocava em "Calibrar
+   norte" e redefinia o próprio zero. Enquanto a atividade só dizia "pronto",
+   isso era desigualdade silenciosa. No instante em que o tempo da atividade
+   passa a valer ponto na tabela geral, vira comprar colocação com dois
+   toques.
+
+   A partida é a mesma para todos na sala: a folga desce pela URL junto com a
+   semente, e os controles saem do DOM. Com ?dev=1 eles voltam, para teste —
+   é a mesma convenção do botão de computador logo acima.                  */
+if(FOLGA_URL!==null) CFG.FOLGA=FOLGA_URL;
+if(EMBED && !DEV){
+  ["b-master","master"].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el && el.parentNode) el.parentNode.removeChild(el);
+  });
+}
+
+
+(function init(){
+  var rnd=rngFrom(20240424);
+  NOISE=noiseTile(256,4,5,0.55,rnd,0.33,0.80);     /* névoa: grumosa */
+  NOISE2=noiseTile(256,7,4,0.50,rnd,0.22,0.86);    /* grão fino: reboco, pó, luz */
+  fazGrao();
+  window.addEventListener("resize",resize);
+  window.addEventListener("orientationchange",function(){ setTimeout(resize,250); });
+  resize();
+  pintaFolga();
+  buildWorld(SEMENTE_URL || defaultSeed());
+  raw.elev=view.elev=2;
+  raw.bearing=view.bearing=wrap360(target.bearing+118);  /* a abertura não entrega a janela */
+  loop();
+})();
+
+})();
+</script>
+<script src="js/ac-janelas.js?v=20261011-t4"></script></body>
+</html>

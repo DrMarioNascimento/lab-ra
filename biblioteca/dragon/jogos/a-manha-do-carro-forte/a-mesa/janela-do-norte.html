@@ -1,0 +1,536 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050b12">
+<title>A Janela do Norte — Carro-Forte</title>
+<link rel="stylesheet" href="atividade.css?v=20260907-pista-arquivo">
+<style>
+/* ==========================================================================
+   A JANELA DO NORTE — A MANHÃ DO CARRO-FORTE
+   ==========================================================================
+   Refeita em 05/09/2026 no padrão da Casa da Costa, a pedido do Mario: "a
+   janela do norte, a sala escura funcionaram perfeitamente bem, esse vai ser
+   o padrão... a agência na garoa, encena igual a Casa".
+
+   A versão anterior era um mostrador com uma agulha. Ela já tinha as quatro
+   correções de plataforma, mas não tinha MUNDO — e é o mundo que faz a pessoa
+   levantar o braço e procurar. A Casa encena a noite da tempestade em passes;
+   esta encena a rua da agência 0417 às 8h02, na garoa.
+
+   O QUE MUDA EM RELAÇÃO À CASA, e por quê:
+   · lá são seis passos até uma casa; aqui cada passo ABRE UM FRAGMENTO do lote
+     que a Mesa entregou. O número de passos é o tamanho do lote, não seis.
+   · o farol da costa vira o giroflex do carro-forte, que varre a fachada.
+   · o alvo é uma janela da agência, e ela sobe conforme você atravessa a rua —
+     a mesma escada de ALTURA da Casa, que é a parte justa: altura se lê pela
+     gravidade e é igual em qualquer telefone.
+
+   O instrumento (atitude + offset, histerese, dreno, portão do oito) mora em
+   bussola.js, com os números da Casa. Aqui só há cena e regra.
+   ========================================================================== */
+html,body{height:100%;height:100dvh;margin:0;background:#05070c;overflow:hidden;
+  touch-action:pinch-zoom;overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
+#c{position:fixed;inset:0;width:100%;height:100%;display:block}
+
+/* O HUD é uma coluna de altura de tela: texto em cima, ação embaixo. Mesma
+   forma da Casa — e é por isso que a Mesa precisa deixar o pé do quadro
+   visível, senão os botões nascem fora da tela. */
+#hud{position:fixed;left:0;right:0;top:0;height:100%;height:100dvh;z-index:2;
+  pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;
+  padding:max(14px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right))
+          calc(env(safe-area-inset-bottom,0px) + 18px) max(14px,env(safe-area-inset-left))}
+#topo{text-align:center}
+#local{font:600 11px/1.2 var(--mono);letter-spacing:.2em;text-transform:uppercase;
+  color:var(--gold2);text-shadow:0 2px 10px #000}
+#alvo-nome{font:600 clamp(21px,5.6vw,28px)/1.15 var(--display);color:#fff;
+  margin-top:5px;text-shadow:0 2px 18px #000,0 0 40px #0008}
+#dica{font:500 clamp(13px,3.4vw,15px)/1.4 var(--sans);color:var(--muted);margin-top:6px;
+  text-shadow:0 1px 6px #000}
+#passos{display:flex;gap:6px;justify-content:center;margin-top:10px}
+#passos i{width:26px;height:4px;border-radius:3px;background:#22323f;
+  box-shadow:inset 0 0 0 1px #0006}
+#passos i.on{background:var(--gold2);box-shadow:0 0 10px #efc87880}
+
+#baixo{pointer-events:auto;display:grid;gap:9px}
+#barra-mira{height:6px;border-radius:6px;background:#132029;overflow:hidden;
+  box-shadow:inset 0 0 0 1px #2b3c49}
+#barra-mira i{display:block;height:100%;width:0%;border-radius:6px;
+  background:linear-gradient(90deg,#8fd6ae,#efc878);box-shadow:0 0 12px #efc87866;
+  transition:width .08s linear}
+#estado{font:600 11px/1.2 var(--mono);letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);text-align:center}
+#dedo{width:100%;min-height:46px;border:1px solid #46667a;border-radius:9px;
+  background:linear-gradient(180deg,#162a38,#0c1b26);color:var(--ink);font-weight:700;cursor:pointer}
+
+/* ---------------- o oito no ar ---------------- */
+#oito{position:fixed;left:0;right:0;top:0;height:100%;height:100dvh;z-index:11;
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  gap:18px;text-align:center;padding:24px;
+  background:radial-gradient(ellipse 110% 70% at 50% 45%,#070d15f2,#02040af7)}
+#oito.on{display:flex}
+#oito-tit{font:600 clamp(28px,7vw,40px)/1.06 var(--display);color:#fff;
+  text-shadow:0 0 40px #efc87840,0 4px 30px #000}
+#oito p{font:500 clamp(16px,4.2vw,20px)/1.42 var(--sans);color:var(--ink);
+  max-width:21em;margin:0}
+#oito-trilho{width:min(260px,70vw);height:5px;border-radius:5px;background:#1c2836;
+  box-shadow:inset 0 0 0 1px #3b4f64;overflow:hidden}
+#oito-barra{height:100%;width:0%;border-radius:5px;background:#ffd9b0;
+  box-shadow:0 0 12px #ffbe7a;transition:width .1s linear}
+#oito-vai{width:min(340px,88vw);padding:16px;border-radius:10px;
+  border:1px solid #b87433;background:#1a1109ee;color:var(--gold2);
+  font:800 clamp(13px,3.4vw,16px) var(--sans);letter-spacing:.16em;
+  text-transform:uppercase;cursor:pointer}
+#oito-vai:disabled{opacity:.5;cursor:default}
+
+/* ---------------- a abertura ---------------- */
+#intro{position:fixed;left:0;right:0;top:0;height:100%;height:100dvh;z-index:10;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:14px;text-align:center;padding:26px;overflow-y:auto;
+  background:linear-gradient(180deg,#060b12f2,#02050af8)}
+#intro.off{display:none}
+#intro h1{font:600 clamp(30px,8vw,44px)/1 var(--display);margin:0;color:#fff}
+#intro .k{font:700 10px var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--gold)}
+#intro p{font:500 clamp(15px,4vw,18px)/1.45 var(--sans);color:var(--ink);max-width:22em;margin:0}
+#intro .go,#intro .alt{width:min(340px,88vw);min-height:52px;border-radius:10px;cursor:pointer}
+#intro .go{border:0;background:linear-gradient(180deg,var(--gold2),var(--gold));color:#201707;
+  font:800 14px var(--sans);letter-spacing:.1em;box-shadow:0 5px 0 #6f4d17}
+#intro .alt{border:1px solid #46667a;background:#101d26;color:var(--ink);font-weight:700}
+
+/* ---------------- a carta do fragmento ---------------- */
+#carta{position:fixed;inset:0;z-index:12;display:none;align-items:center;justify-content:center;
+  padding:24px;background:#02060bee}
+#carta.on{display:flex}
+#carta .folha{width:min(460px,92vw);padding:20px;border-radius:12px;
+  border:1px solid #75664e;border-left:5px solid #9a7842;
+  background:linear-gradient(160deg,#e7dfca,#b9aa8d);color:#211d17}
+#carta b{display:block;font:800 clamp(22px,6.5vw,34px)/1.15 var(--mono);letter-spacing:.04em;color:#1b1005}
+#carta h3{font:600 24px var(--display);margin:6px 0 8px}
+#carta p{font-size:14.5px;line-height:1.5;margin:0;color:#40382f}
+#carta button{width:100%;min-height:50px;margin-top:16px;border:0;border-radius:9px;
+  background:#211d17;color:#e7dfca;font-weight:800;letter-spacing:.1em;cursor:pointer}
+</style></head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="hud">
+  <div id="topo">
+    <div id="local">AGÊNCIA 0417 · GAROA · 8H02</div>
+    <div id="alvo-nome">—</div>
+    <div id="dica">Procurando a bússola…</div>
+    <div id="passos"></div>
+  </div>
+  <div id="baixo">
+    <div id="barra-mira"><i id="mira-i"></i></div>
+    <div id="estado">—</div>
+    <button id="dedo" type="button">Girar com o dedo</button>
+  </div>
+</div>
+
+<div id="intro">
+  <div class="k">A MANHÃ DO CARRO-FORTE</div>
+  <h1>A Janela<br>do Norte</h1>
+  <p>Você está na calçada em frente à agência, na garoa. Lá dentro, atrás das janelas, ficaram os registros da manhã.</p>
+  <p>Cada janela se abre de um ponto da rua. <b>Aponte o celular para ela e segure firme</b> — quando o quadro parar de tremer, você atravessa mais um pedaço e a janela se acende.</p>
+  <p class="small">A bússola é do mundo real: todos na mesa apontam para o mesmo lado da rua.</p>
+  <button class="go" id="b-entrar" type="button">Atravessar a rua</button>
+  <button class="alt" id="b-dedo" type="button">Estou no computador</button>
+</div>
+
+<div id="oito">
+  <div id="oito-tit">A bússola está tonta</div>
+  <p>É a bússola do aparelho que diz para onde você está virado. Ela precisa se acertar antes de a rua fazer sentido.</p>
+  <p><b>Desenhe um 8 no ar à sua frente com o celular</b>, devagar, umas quatro vezes. Vire o pulso enquanto faz — o que calibra é a variedade de posições, não a velocidade.</p>
+  <div id="oito-trilho"><div id="oito-barra"></div></div>
+  <button id="oito-vai" type="button" disabled>A bússola ainda está tonta</button>
+</div>
+
+<div id="carta"><div class="folha">
+  <b id="carta-cod" class="carta-num">—</b><h3 id="carta-tit">—</h3><p id="carta-txt">—</p>
+  <p class="pista-arquivo-hint" data-pista-arquivo-hint="1"><span class="pista-arquivo-curta">Ela vai estar no dossiê</span><span class="pista-arquivo-completa">Ela vai estar no dossiê — para quando você quiser consultar</span></p>
+  <button id="carta-ok" type="button">Guardar no dossiê</button>
+</div></div>
+
+<!-- Nasce escondido: a atividade acaba pelo relógio da mesa, e este botão só
+     reaparece no fim, como a volta. Ver atividade.js. -->
+<button id="finish" class="primary" hidden>← Voltar à Mesa</button>
+
+<script src="fragmentos.js?v=20260901-colheita1"></script>
+<script src="variacoes-carro-dados.js?v=20261012-v2"></script>
+<script src="variacoes-carro.js?v=20261012-v2"></script>
+<script src="bussola.js?v=20260905-cena1"></script>
+<script src="atividade.js?v=20260905-cena1"></script>
+<script>
+(function(){
+"use strict";
+var A=window.MosaicoAtividade, B=window.MosaicoBussola;
+var itens=A.itens('norte'), achados=new Set();
+var D2R=Math.PI/180, wrap180=B.wrap180, wrap360=B.wrap360, clamp=B.clamp;
+
+/* ── A RUA ────────────────────────────────────────────────────────────────
+   A escada é de ALTURA, como na Casa, e é essa escolha que mantém a tarefa
+   justa entre aparelhos: altura se lê pela gravidade, igual em todo telefone,
+   enquanto rumo depende do magnetômetro. Cada passo aproxima da fachada, e a
+   janela alvo sobe porque você chegou mais perto dela, não porque o jogo
+   apertou. Trigonometria, não dificuldade.                                */
+var ALTURA_JANELA=4.6;                 /* metros até o peitoril do 1º andar */
+/* A RUA ENCURTOU. Com 26 m no primeiro passo a agência era uma caixinha no
+   meio da tela e não parecia o assunto — e é ela que a pessoa tem de querer
+   alcançar. Começando a 16 m a fachada já ocupa quase metade da largura num
+   celular, e a escada de altura continua inteira: 16 m dão 16° de elevação e
+   3,2 m dão 55°, que é a mesma amplitude de braço da Casa. */
+var DIST=[16,12,9,7,5.5,4.5,3.8,3.2]; /* a rua, em metros de fachada */
+var LARG_JANELA=1.15, LARG_FACHADA=11; /* metros */
+
+/* O rumo de cada janela vem da PARTIDA, não de Math.random: a mesa inteira
+   aponta para o mesmo lado da rua. Mesmo princípio da semente compartilhada
+   da Casa — errar junto não atrapalha, divergir sim. */
+function semente(txt){var h=2166136261;for(var i=0;i<txt.length;i++){h^=txt.charCodeAt(i);h=Math.imul(h,16777619);}return (h>>>0)/4294967296;}
+var base=semente('carro-forte|'+A.partida)*360;
+var janelas=itens.map(function(cod,i){
+  return {cod:cod, az:wrap360(base + i*(360/Math.max(3,itens.length)) + semente(cod)*22-11)};
+});
+
+var passo=0;                            /* quantas janelas já se abriram */
+var view={bearing:0,elev:0};            /* a câmera segue a leitura, alisada */
+var mira=B.Mira({az:janelas[0].az, el:0});
+var modoDedo=false, arrasto=null, entrou=false;
+var W=0,H=0,DPR=1,PPD=1;
+var cv=document.getElementById('c'), cx=cv.getContext('2d');
+
+function dimensionar(){
+  DPR=Math.min(2,window.devicePixelRatio||1);
+  W=cv.clientWidth; H=cv.clientHeight;
+  cv.width=Math.round(W*DPR); cv.height=Math.round(H*DPR);
+  cx.setTransform(DPR,0,0,DPR,0,0);
+  /* Mesmo PPD da Casa: 70° de campo vertical, com teto horizontal para a
+     tela deitada não esticar o mundo. */
+  PPD=Math.min(H/70, W/95);
+}
+addEventListener('resize',dimensionar); dimensionar();
+
+function sx(b){ return W/2 + wrap180(b-view.bearing)*PPD; }
+function sy(e){ return H/2 - (e-view.elev)*PPD; }
+
+function geometria(){
+  var d=DIST[Math.min(passo,DIST.length-1)];
+  return {
+    d:d,
+    elev:Math.atan2(ALTURA_JANELA,d)/D2R,
+    hw:Math.atan2(LARG_JANELA/2,d)/D2R*PPD,
+    hh:Math.atan2(0.95/2,d)/D2R*PPD,
+    fachada:Math.atan2(LARG_FACHADA/2,d)/D2R*PPD,
+    alturaFachada:Math.atan2(9.5,d)/D2R*PPD
+  };
+}
+
+/* ── A CENA, EM PASSES ───────────────────────────────────────────────────
+   Mesma ordem da Casa: céu > silhuetas > garoa ao fundo > fachada > janela >
+   névoa rasteira > giroflex > chuva em profundidade > bloom. Cada passe é
+   barato sozinho; é a soma que dá profundidade.                          */
+var t0=performance.now();
+var predios=[];
+(function(){for(var i=0;i<26;i++){var r=semente('p'+i);predios.push({az:r*360,l:6+r*22,h:3+((r*7)%1)*9,c:r});}})();
+var gotas=[];
+(function(){for(var i=0;i<130;i++){var r=semente('g'+i);gotas.push({x:r,y:(r*3)%1,v:.35+r*.9,z:.3+r*.7});}})();
+
+function ceu(){
+  /* É MANHÃ ENCOBERTA, NÃO NOITE. A primeira versão desta cena saiu quase
+     preta na tela: os tons vinham da noite da tempestade da Casa, e aqui são
+     8h02 com garoa — o céu é claro e baixo, e é ele que faz a silhueta da rua
+     aparecer. Sem contraste no fundo, nenhuma quantidade de passes adianta. */
+  var g=cx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#3d4b57'); g.addColorStop(.42,'#55636e'); g.addColorStop(.72,'#6b7681');
+  g.addColorStop(1,'#2b343d');
+  cx.fillStyle=g; cx.fillRect(0,0,W,H);
+  /* a claridade fraca de uma manhã encoberta, atrás da agência */
+  var h=sy(6);
+  var b=cx.createRadialGradient(sx(janelas[Math.min(passo,janelas.length-1)].az),h,10,
+                                sx(janelas[Math.min(passo,janelas.length-1)].az),h,H*.8);
+  b.addColorStop(0,'#95a2ab88'); b.addColorStop(1,'#0000');
+  cx.fillStyle=b; cx.fillRect(0,0,W,H);
+}
+/* A RUA. Faltava chão: sem ele o mundo era céu e escuro, e não havia onde a
+   fachada se apoiar. O asfalto molhado também devolve a luz do giroflex, que é
+   o que dá a sensação de rua e não de vazio. */
+function rua(){
+  var y=sy(-2.2);
+  var g=cx.createLinearGradient(0,y,0,H);
+  g.addColorStop(0,'#1b232b'); g.addColorStop(.35,'#141b22'); g.addColorStop(1,'#0d1319');
+  cx.fillStyle=g; cx.fillRect(0,y,W,H-y);
+  cx.strokeStyle='rgba(150,175,195,.10)'; cx.lineWidth=1;
+  cx.beginPath(); cx.moveTo(0,y); cx.lineTo(W,y); cx.stroke();
+  /* poças: faixas claras que tremem devagar */
+  var t=(performance.now()-t0)/1000;
+  for(var i=0;i<5;i++){
+    var px=((i*0.23+0.07)*W + Math.sin(t*.5+i)*6);
+    var py=y+18+i*26, l=40+i*22;
+    cx.fillStyle='rgba(170,195,215,'+(0.05-i*0.007).toFixed(3)+')';
+    cx.fillRect(px-l/2,py,l,3);
+  }
+}
+function silhuetas(){
+  var solo=sy(-2.2);
+  for(var i=0;i<predios.length;i++){
+    var p=predios[i], x=sx(p.az);
+    if(x<-260||x>W+260) continue;
+    var l=p.l*PPD*0.22, alt=p.h*PPD*0.9;
+    /* Silhueta é recorte contra o céu: ela precisa ser MAIS ESCURA que o céu e
+       clara o bastante para não virar buraco. */
+    cx.fillStyle='rgba(26,34,42,'+(.72+p.c*.22).toFixed(2)+')';
+    cx.fillRect(x-l/2, solo-alt, l, alt);
+    /* janelas acesas ao longe, poucas — é cedo */
+    if(p.c>.72){
+      cx.fillStyle='rgba(232,186,104,.30)';
+      for(var j=0;j<3;j++) cx.fillRect(x-l/2+6+j*11, solo-alt+14+j*17, 5, 7);
+    }
+  }
+}
+function garoa(prof){
+  var n=prof===0?46:84, a=prof===0?.10:.22;
+  cx.strokeStyle='rgba(190,208,220,'+a+')'; cx.lineWidth=prof===0?.8:1.25;
+  var tt=(performance.now()-t0)/1000;
+  cx.beginPath();
+  for(var i=0;i<n;i++){
+    var g=gotas[(i*3+prof)%gotas.length];
+    var z=prof===0?.35:g.z;
+    var x=((g.x + tt*0.012*z + view.bearing/900)%1)*W;
+    var y=((g.y + tt*g.v*(prof===0?.22:.6))%1)*H;
+    cx.moveTo(x,y); cx.lineTo(x-2.5*z, y+13*z);
+  }
+  cx.stroke();
+}
+function fachada(g){
+  var cAz=janelas[Math.min(passo,janelas.length-1)].az;
+  var x=sx(cAz), base=sy(-2.2), topo=base-g.alturaFachada;
+  /* A fachada é o objeto mais importante da tela e era um retângulo quase da
+     cor do céu. Agora tem volume: pedra clara na frente, sombra do lado, e um
+     contorno que a separa da garoa. */
+  var pedra=cx.createLinearGradient(x-g.fachada,0,x+g.fachada,0);
+  pedra.addColorStop(0,'#38424c'); pedra.addColorStop(.45,'#4a5560'); pedra.addColorStop(1,'#2b333c');
+  cx.fillStyle=pedra;
+  cx.fillRect(x-g.fachada, topo, g.fachada*2, base-topo);
+  cx.strokeStyle='rgba(200,220,235,.34)'; cx.lineWidth=1.5;
+  cx.strokeRect(x-g.fachada, topo, g.fachada*2, base-topo);
+  /* fiadas horizontais: dão escala e dizem que é um prédio, não um bloco */
+  cx.strokeStyle='rgba(15,21,27,.30)'; cx.lineWidth=1;
+  for(var f=1;f<5;f++){
+    var yy=topo+(base-topo)*f/5;
+    cx.beginPath(); cx.moveTo(x-g.fachada,yy); cx.lineTo(x+g.fachada,yy); cx.stroke();
+  }
+  /* as janelas que NÃO são o alvo, apagadas — a fachada tem mais de uma */
+  cx.fillStyle='rgba(18,25,32,.75)';
+  for(var c2=-1;c2<=1;c2++){
+    if(c2===0) continue;
+    cx.fillRect(x+c2*g.fachada*.55-g.hw, sy(g.elev)-g.hh, g.hw*2, g.hh*2);
+  }
+  /* a marquise e a porta, para a fachada não ser um bloco */
+  cx.fillStyle='#161d25';
+  cx.fillRect(x-g.fachada*.34, base-g.alturaFachada*.30, g.fachada*.68, g.alturaFachada*.30);
+  cx.fillStyle='rgba(232,186,104,.26)';
+  cx.fillRect(x-g.fachada*.30, base-g.alturaFachada*.26, g.fachada*.60, g.alturaFachada*.20);
+  /* o carro-forte, parado na frente: é ele que nomeia a manhã */
+  var cw=g.fachada*.52, ch=g.alturaFachada*.20;
+  cx.fillStyle='#10171e';
+  cx.fillRect(x-cw*.5, base-ch, cw, ch);
+  cx.fillStyle='rgba(200,220,235,.16)';
+  cx.fillRect(x-cw*.5, base-ch, cw, ch*.32);
+}
+function janelaAlvo(g,pr){
+  var al=janelas[Math.min(passo,janelas.length-1)];
+  var x=sx(al.az), y=sy(g.elev);
+  /* o halo cresce com a mira: é o retorno que diz "está quase" sem escrever */
+  /* O halo é o que diz "é esta". Ele nasce grande o bastante para achar a
+     janela de longe e cresce com a mira — sem isto o alvo se perde entre as
+     outras janelas apagadas da fachada. */
+  var r=g.hw*(4.2+pr*4.0);
+  var h=cx.createRadialGradient(x,y,1,x,y,Math.max(8,r));
+  h.addColorStop(0,'rgba(239,200,120,'+(.26+pr*.46).toFixed(3)+')');
+  h.addColorStop(1,'rgba(239,200,120,0)');
+  cx.fillStyle=h; cx.beginPath(); cx.arc(x,y,Math.max(8,r),0,7); cx.fill();
+  cx.fillStyle='rgba(18,26,34,.92)';
+  cx.fillRect(x-g.hw,y-g.hh,g.hw*2,g.hh*2);
+  cx.fillStyle='rgba(239,200,120,'+(.42+pr*.52).toFixed(3)+')';
+  cx.fillRect(x-g.hw+1,y-g.hh+1,g.hw*2-2,g.hh*2-2);
+  cx.strokeStyle='rgba(239,200,120,'+(.30+pr*.5).toFixed(2)+')'; cx.lineWidth=1.4;
+  cx.strokeRect(x-g.hw,y-g.hh,g.hw*2,g.hh*2);
+  /* o caixilho: duas barras, e é por elas que o roll importa */
+  cx.strokeStyle='rgba(10,16,22,.75)'; cx.lineWidth=Math.max(1,g.hw*.10);
+  cx.beginPath(); cx.moveTo(x,y-g.hh); cx.lineTo(x,y+g.hh);
+  cx.moveTo(x-g.hw,y); cx.lineTo(x+g.hw,y); cx.stroke();
+}
+/* ONDE ESTÁ A JANELA. Numa rua de 360° o alvo passa a maior parte do tempo
+   fora da tela, e sem indicação a pessoa gira à toa — foi o que aconteceu
+   comigo testando: mirei 60° errado sem perceber. O treinador de texto diz a
+   direção; esta seta diz QUANTO falta, que é o que o texto não consegue. */
+function seta(){
+  if(passo>=janelas.length) return;
+  var d=wrap180(janelas[passo].az-view.bearing);
+  if(Math.abs(d)<26) return;
+  var dir=d>0?1:-1, x=dir>0?W-26:26, y=H*0.52;
+  var f=0.35+0.35*Math.abs(Math.sin((performance.now()-t0)/420));
+  cx.save(); cx.translate(x,y); cx.scale(dir,1);
+  cx.fillStyle='rgba(239,200,120,'+f.toFixed(2)+')';
+  cx.beginPath(); cx.moveTo(9,0); cx.lineTo(-7,-13); cx.lineTo(-7,13); cx.closePath(); cx.fill();
+  cx.restore();
+  cx.fillStyle='rgba(239,200,120,.85)';
+  cx.font='600 11px ui-monospace,monospace'; cx.textAlign='center';
+  cx.fillText(Math.round(Math.abs(d))+'°', x, y+30);
+}
+function nevoaRasteira(){
+  var y=sy(-3.4);
+  var g=cx.createLinearGradient(0,y-H*.10,0,H);
+  g.addColorStop(0,'rgba(178,196,210,0)'); g.addColorStop(1,'rgba(178,196,210,.26)');
+  cx.fillStyle=g; cx.fillRect(0,y-H*.10,W,H);
+}
+/* O giroflex do carro-forte faz aqui o papel do farol da costa: varre, mostra
+   a rua por um instante e some. Nove segundos, o mesmo compasso de lá. */
+function giroflex(){
+  var f=((performance.now()-t0)%9000)/9000;
+  var forca=Math.max(0,Math.sin(f*Math.PI*2))*Math.max(0,Math.sin(f*Math.PI*2));
+  if(forca<0.01) return;
+  var az=wrap360(base+f*360), x=sx(az);
+  var g=cx.createLinearGradient(x-W*.5,0,x+W*.5,0);
+  g.addColorStop(0,'rgba(255,140,90,0)');
+  g.addColorStop(.5,'rgba(255,150,95,'+(forca*.13).toFixed(3)+')');
+  g.addColorStop(1,'rgba(255,140,90,0)');
+  cx.fillStyle=g; cx.fillRect(0,0,W,H);
+}
+function bloom(pr){
+  if(pr<=0.02) return;
+  cx.fillStyle='rgba(239,200,120,'+(pr*0.05).toFixed(3)+')';
+  cx.fillRect(0,0,W,H);
+}
+
+/* ── O LAÇO ─────────────────────────────────────────────────────────────── */
+var tPrev=performance.now();
+function quadro(){
+  var agora=performance.now();
+  var dt=(agora-tPrev)/1000; tPrev=agora;
+
+  /* A câmera segue a leitura com um alisamento leve — sem ele o mundo pisca
+     junto com o sensor, e é o mundo que a pessoa está olhando. */
+  var alvoB=B.raw.bearing, alvoE=B.raw.elev;
+  /* 14 deixava o mundo arrastando meio segundo atrás da leitura, e quem gira
+     procurando via a rua chegar depois. 26 ainda mata o tremor do sensor e
+     não atrasa a procura. */
+  view.bearing=wrap360(view.bearing+wrap180(alvoB-view.bearing)*Math.min(1,dt*26));
+  view.elev+=(alvoE-view.elev)*Math.min(1,dt*26);
+
+  var g=geometria();
+  var pr=0;
+  if(entrou && passo<janelas.length){
+    mira.alvo.az=janelas[passo].az; mira.alvo.el=g.elev;
+    /* `alto` afrouxa o rumo conforme a janela sobe: quanto mais inclinado o
+       aparelho, pior a bússola. É compensação de HARDWARE, não de dificuldade. */
+    var alto=1+clamp((g.elev-8)/34,0,1)*0.5;
+    pr=mira.passo(dt, alto);
+    document.getElementById('mira-i').style.width=(pr*100)+'%';
+    if(pr>=1) abrirJanela();
+  }
+
+  ceu(); silhuetas(); rua(); garoa(0); fachada(g); janelaAlvo(g,pr);
+  nevoaRasteira(); giroflex(); garoa(1); seta(); bloom(pr);
+  pintarEstado(pr);
+  requestAnimationFrame(quadro);
+}
+
+function pintarEstado(pr){
+  var e=document.getElementById('estado');
+  if(!entrou){ e.textContent='—'; return; }
+  if(passo>=janelas.length){ e.textContent='TODAS AS JANELAS ABERTAS'; return; }
+  var g=geometria();
+  var dAz=Math.abs(wrap180(B.raw.bearing-janelas[passo].az));
+  var dEl=Math.abs(B.raw.elev-g.elev);
+  var dRo=Math.abs(B.raw.roll);
+  if(dRo>B.CFG.TOL_ROLL) e.textContent='ENDIREITE O APARELHO';
+  else if(dAz>60) e.textContent=(wrap180(janelas[passo].az-B.raw.bearing)>0?'GIRE PARA A DIREITA':'GIRE PARA A ESQUERDA');
+  else if(dEl>8) e.textContent=(g.elev>B.raw.elev?'MAIS ALTO':'MAIS BAIXO');
+  else if(pr>0.05) e.textContent='SEGURE ASSIM';
+  else e.textContent='QUASE — AJUSTE FINO';
+}
+
+function pintarPassos(){
+  var h=document.getElementById('passos'), s='';
+  for(var i=0;i<janelas.length;i++) s+='<i class="'+(i<passo?'on':'')+'"></i>';
+  h.innerHTML=s;
+  document.getElementById('alvo-nome').textContent =
+    passo>=janelas.length ? 'A rua acabou' : ('Janela '+(passo+1)+' de '+janelas.length);
+  document.getElementById('dica').textContent =
+    passo>=janelas.length ? 'Volte à Mesa quando quiser.'
+      : 'Aponte e segure. A cada janela você atravessa mais um pedaço da rua.';
+}
+
+function abrirJanela(){
+  var cod=janelas[passo].cod;
+  mira.zerar(); passo++;
+  achados.add(cod); A.marcar(achados,itens);
+  try{ navigator.vibrate && navigator.vibrate([14,40,26]); }catch(e){}
+  var f=(window.MOSAICO_FRAGMENTOS||{})[cod]||{};
+  document.getElementById('carta-cod').textContent=cod;
+  document.getElementById('carta-tit').textContent=f.t||cod;
+  document.getElementById('carta-txt').textContent=f.d||'';
+  document.getElementById('carta').classList.add('on');
+  pintarPassos();
+}
+document.getElementById('carta-ok').onclick=function(){
+  document.getElementById('carta').classList.remove('on');
+};
+
+/* ── ENTRADA ─────────────────────────────────────────────────────────────
+   O oito entra ENTRE a permissão e a rua: pedir antes não faz sentido (o
+   sensor pode nem existir) e depois seria tarde, com a pessoa já mirando com
+   o rumo torto. */
+function fechaIntro(){
+  document.getElementById('intro').classList.add('off');
+  entrou=true; tPrev=performance.now(); pintarPassos();
+}
+function porDedo(){
+  modoDedo=true;
+  /* Fecha o oito junto: quem cai aqui por falha de sensor viria com a tela do
+     oito por cima, e ela não sai sozinha. */
+  document.getElementById('oito').classList.remove('on');
+  document.getElementById('dica').textContent='Arraste para girar. Arraste para cima e para baixo para levantar o olhar.';
+  fechaIntro();
+}
+document.getElementById('b-dedo').onclick=porDedo;
+document.getElementById('dedo').onclick=porDedo;
+document.getElementById('b-entrar').onclick=function(){
+  B.ativar({
+    aoLigar:function(){
+      B.oitoNoAr(document.getElementById('oito'),
+                 document.getElementById('oito-barra'),
+                 document.getElementById('oito-vai'),
+                 'Atravessar a rua', fechaIntro);
+    },
+    aoNaoResponder:function(){
+      document.getElementById('dica').textContent='A bússola não respondeu. Use o giro com o dedo.';
+      porDedo();
+    },
+    aoNegar:function(){
+      document.getElementById('dica').textContent='Sem a permissão de movimento o aparelho não sabe para onde você está virado.';
+      porDedo();
+    },
+    aoIndisponivel:porDedo
+  });
+};
+
+/* modo dedo: o mundo gira com o arrasto, e o instrumento fica fora do caminho */
+function pDown(ev){ if(!modoDedo)return; var t=ev.touches?ev.touches[0]:ev; arrasto={x:t.clientX,y:t.clientY}; }
+function pMove(ev){
+  if(!modoDedo||!arrasto)return;
+  var t=ev.touches?ev.touches[0]:ev;
+  B.raw.bearing=wrap360(B.raw.bearing+(t.clientX-arrasto.x)*0.22);
+  B.raw.elev=clamp(B.raw.elev-(t.clientY-arrasto.y)*0.16,-20,60);
+  B.raw.roll=0;
+  arrasto={x:t.clientX,y:t.clientY};
+  if(ev.cancelable) ev.preventDefault();
+}
+function pUp(){ arrasto=null; }
+cv.addEventListener('pointerdown',pDown); cv.addEventListener('pointermove',pMove);
+cv.addEventListener('pointerup',pUp); cv.addEventListener('pointercancel',pUp);
+
+pintarPassos();
+requestAnimationFrame(quadro);
+A.iniciar({sensor:'norte',itens:itens,achados:achados});
+})();
+</script>
+</body></html>

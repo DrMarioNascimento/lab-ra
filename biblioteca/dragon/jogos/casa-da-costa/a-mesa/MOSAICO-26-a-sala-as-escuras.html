@@ -1,0 +1,1924 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-ac-casa>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#04060a">
+<title>A Sala às Escuras — MOSAICO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@400;500;600;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400;1,7..72,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/mosaico-3d.css">
+<style>
+  :root{
+    --breu:#04060a;
+
+    /* escala de leitura no escuro — abaixo de ~18px o texto e branco puro,
+       cor so a partir de ~20px, e nunca opacity em texto.               */
+    --t-max:#ffffff;
+    --t-hi:#f4f9fd;
+    --t-mid:#dfeaf5;
+
+    --ambar:#ffb266;      /* a lanterna, o latao, o abajur */
+    --ambar-s:#ffe0c0;    /* ambar em corpo pequeno = branco quente */
+    --frio:#7fd4ff;
+    --frio-s:#c6ecff;
+
+    --scrim:0 1px 2px #000,0 2px 10px #000d,0 0 26px #000a;
+    --scrim-strong:0 1px 2px #000,0 2px 8px #000,0 0 22px #000e,0 0 44px #000b;
+
+    --display:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+    --serif:"Literata","Charter","Bitstream Charter","Iowan Old Style",Georgia,"Noto Serif",serif;
+    --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,"Roboto Mono",monospace;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+  html,body{
+    height:100%;height:100dvh;background:#000;color:var(--t-hi);
+    font-family:var(--sans);
+    text-rendering:optimizeLegibility;font-optical-sizing:auto;
+    overflow:hidden;touch-action:pinch-zoom;overscroll-behavior:none;
+    -webkit-user-select:none;user-select:none;
+  }
+  #c{position:fixed;inset:0;width:100%;height:100%;display:block}
+
+  #veil{position:fixed;inset:0;pointer-events:none;z-index:1;
+    background:
+      linear-gradient(180deg,#000000bf 0%,#00000085 12%,#00000000 30%),
+      linear-gradient(0deg,#000000d6 0%,#000000a6 16%,#00000000 40%);}
+
+  /* ATENCAO iOS: nunca inset:0 num fixo com botoes no rodape — em
+     position:fixed o Safari mede a viewport GRANDE e a barra de endereco
+     come o rodape. 100dvh e sempre a menor.                            */
+  #hud{position:fixed;left:0;right:0;top:0;height:100%;height:100dvh;
+    pointer-events:none;z-index:2;
+    display:flex;flex-direction:column;justify-content:space-between;
+    padding:max(16px,env(safe-area-inset-top)) 16px
+            calc(env(safe-area-inset-bottom,0px) + 22px);}
+  #topo{text-align:center}
+  .busca-caixa{max-width:560px;margin:10px auto 0;padding:12px 18px;border:1px solid #70978a66;border-radius:14px;background:linear-gradient(145deg,#183d35ee,#091b18ee);box-shadow:inset 0 1px 0 #c1dbc62b,inset 0 -3px 8px #0005,0 8px 20px #0007;text-align:left;width:100%;box-sizing:border-box;pointer-events:none}
+  .busca-caixa h2{margin:0;color:#dfc18a;font:700 14px/1.3 var(--sans);letter-spacing:.04em}
+  .busca-caixa #enigma,.busca-caixa #status,.busca-caixa #dica{max-width:none;text-align:left;margin:6px 0 0;min-height:0}
+  .busca-caixa #dica{font-size:15px}
+  body.ac-sala-visual #hud{z-index:200001;padding-top:max(76px,env(safe-area-inset-top));}
+  body.ac-sala-visual #card,body.ac-sala-visual #carta{z-index:300005}
+  body.ac-sala-visual #mosaico-ra-hud,body.ac-sala-visual .mosaico-ra-dica{display:none}
+  body.ac-xr-active{background:transparent!important}
+  body.ac-xr-active #c,body.ac-xr-active #veil,body.ac-xr-active #mosaico-ra-viewport canvas{visibility:hidden}
+  @media(max-height:600px){.busca-caixa{padding:7px 12px;margin-top:4px}.busca-caixa #enigma{font-size:17px}body.ac-sala-visual #hud{padding-top:12px}#local{display:none}}
+  #local{font-size:clamp(12px,3.2vw,15px);letter-spacing:.18em;text-transform:uppercase;
+    color:var(--t-max);font-weight:600;text-shadow:var(--scrim-strong)}
+  /* o enigma é o objetivo, então é ele que manda na hierarquia. O status
+     virou telemetria: quente/frio, pequeno e branco.                    */
+  #enigma{font-family:var(--serif);font-style:italic;font-weight:500;
+    font-size:clamp(19px,4.8vw,25px);line-height:1.34;
+    color:var(--ambar-s);margin:10px auto 0;max-width:24ch;min-height:1.4em;
+    text-shadow:var(--scrim-strong);transition:opacity .45s ease}
+  #enigma.trocando{opacity:0}
+  #conta{margin-top:7px;font-family:var(--mono);font-weight:700;
+    font-size:clamp(11px,2.9vw,13px);letter-spacing:.22em;
+    color:var(--t-mid);text-shadow:var(--scrim)}
+  #status{font-family:var(--sans);font-size:clamp(14px,3.5vw,16px);line-height:1.35;
+    font-weight:600;color:var(--t-max);margin:9px auto 0;min-height:1.4em;
+    max-width:28ch;text-shadow:var(--scrim-strong);transition:color .3s}
+  #status.hot{color:var(--ambar-s)}
+
+  #base{display:flex;flex-direction:column;gap:10px}
+  #medidor{position:relative;height:6px;border-radius:6px;background:#161f2a;
+    box-shadow:inset 0 0 0 1px #3b4f64,0 1px 3px #000;overflow:hidden}
+  #medidor-i{position:absolute;inset:0 auto 0 0;width:0%;border-radius:6px;
+    background:linear-gradient(90deg,#4d7f9c,#ffd9b0);
+    box-shadow:0 0 14px #ffb26699;transition:width .12s linear}
+  #firme{position:relative;height:6px;border-radius:6px;background:#111820;
+    box-shadow:inset 0 0 0 1px #33465a;overflow:hidden;opacity:0;transition:opacity .25s}
+  #firme.on{opacity:1}
+  #firme-i{position:absolute;inset:0 auto 0 0;width:0%;border-radius:6px;background:#fff2e0;
+    box-shadow:0 0 14px #ffbe7a;transition:width .08s linear}
+  #dica{font-family:var(--serif);font-style:italic;font-weight:500;
+    font-size:clamp(17px,4.2vw,20px);line-height:1.32;
+    color:var(--t-hi);text-align:center;min-height:1.4em;max-width:26ch;margin:0 auto;
+    text-shadow:var(--scrim-strong)}
+  #marcas{display:flex;gap:11px;justify-content:center;min-height:14px}
+  .marca{width:10px;height:10px;border-radius:50%;
+    background:rgba(8,12,18,.75);border:1.5px solid rgba(223,234,245,.5);
+    box-shadow:0 1px 3px #000;transition:all .5s ease}
+  .marca.on{background:var(--ambar);border-color:#ffe9d2;
+    box-shadow:0 0 13px var(--ambar),0 0 28px rgba(255,178,102,.45);transform:scale(1.3)}
+  .marca.cofre{border-style:dashed;border-color:rgba(255,178,102,.65)}
+  #botoes{display:flex;gap:10px;pointer-events:auto}
+  #b-entrar-ra[hidden],#b-ra[hidden]{display:none!important}
+  button{flex:1;min-height:54px;padding:15px 10px;border-radius:9px;
+    border:1px solid #46596d;background:#080d14f2;color:var(--t-max);
+    font-family:var(--sans);font-size:clamp(14px,3.6vw,16px);font-weight:700;
+    letter-spacing:.12em;text-transform:uppercase;text-shadow:0 1px 2px #000;
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+  button.acc{border-color:#b87433;color:var(--ambar-s)}
+
+  /* ---------------- painel do mestre ---------------- */
+  #mestre{position:fixed;left:12px;right:12px;z-index:6;
+    bottom:calc(env(safe-area-inset-bottom,0px) + 96px);
+    max-height:66dvh;overflow-y:auto;touch-action:pan-y pinch-zoom;overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+    background:#04080ef7;border:1px solid #2a3949;border-radius:12px;padding:13px 15px;
+    font-size:clamp(14px,3.4vw,16px);color:var(--t-mid);display:none;pointer-events:auto;
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  #mestre.on{display:block}
+  #mestre .l{display:flex;justify-content:space-between;gap:12px;padding:6px 0;
+    font-variant-numeric:tabular-nums}
+  #mestre .l b{color:var(--t-max);font-weight:700;font-family:var(--mono);letter-spacing:.02em}
+  #mestre input{width:100%;margin-top:12px;padding:13px;border-radius:8px;
+    border:1px solid #46596d;background:#0a1017;color:var(--t-max);
+    font-size:clamp(15px,3.8vw,17px);font-weight:600;
+    font-family:var(--mono);letter-spacing:.1em;text-align:center}
+  #mestre .sub{margin-top:12px;font-size:clamp(14px,3.3vw,15px);line-height:1.6;color:var(--t-mid)}
+  #folga,#cal{width:100%;text-transform:none;letter-spacing:.01em;
+    font-size:clamp(14px,3.5vw,16px);font-weight:600;line-height:1.35;
+    padding:13px 12px;height:auto;min-height:48px}
+  #folga{margin-top:10px;border-color:#b87433;color:var(--ambar-s)}
+  #cal{margin-top:8px}
+
+  /* ---------------- carta do objeto ---------------- */
+  #carta{position:fixed;left:0;right:0;top:0;height:100%;height:100dvh;z-index:12;
+    display:none;flex-direction:column;align-items:center;
+    justify-content:center;justify-content:safe center;
+    overflow-y:auto;touch-action:pan-y pinch-zoom;overscroll-behavior:contain;
+    padding:24px 22px calc(env(safe-area-inset-bottom,0px) + 24px);
+    background:#01030699;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  #carta::before,#carta::after{content:"";margin:auto;flex:0 0 0}
+  #carta.on{display:flex;animation:apar .5s ease both}
+  @keyframes apar{from{opacity:0}to{opacity:1}}
+  #carta-in{max-width:440px;width:100%;flex:0 0 auto;
+    border:1px solid #4d3826;border-radius:14px;padding:26px 24px;
+    background:linear-gradient(160deg,#120c06,#070a0e);
+    box-shadow:0 30px 90px #000,0 0 70px #ffb26618}
+  #k-meta{display:flex;justify-content:space-between;gap:12px;
+    font-size:clamp(13px,3.2vw,15px);letter-spacing:.16em;text-transform:uppercase;
+    color:var(--ambar-s);margin-bottom:16px;font-weight:700}
+  #k-nome{font-family:var(--display);font-size:clamp(30px,8vw,42px);line-height:1.05;
+    font-weight:600;color:#fff;margin-bottom:14px}
+  #k-txt{font-family:var(--serif);font-size:clamp(20px,5.2vw,26px);line-height:1.4;
+    font-weight:500;color:#fffaf3}
+  #k-obs{font-family:var(--serif);font-style:italic;font-weight:500;margin-top:18px;
+    font-size:clamp(17px,4.3vw,20px);line-height:1.45;color:var(--t-mid)}
+  #k-tempo{font-family:var(--mono);font-weight:700;margin-top:16px;
+    font-size:clamp(15px,3.8vw,18px);letter-spacing:.06em;color:var(--ambar-s);
+    font-variant-numeric:tabular-nums}
+  #carta button{margin-top:20px;width:100%}
+
+  /* ---------------- abertura ---------------- */
+  #intro{position:fixed;left:0;right:0;top:0;height:100%;height:100dvh;z-index:10;
+    display:flex;flex-direction:column;align-items:center;
+    justify-content:center;justify-content:safe center;text-align:center;
+    padding:clamp(20px,4vh,34px) 22px calc(env(safe-area-inset-bottom,0px) + 28px);
+    overflow-y:auto;-webkit-overflow-scrolling:touch;
+    touch-action:pan-y pinch-zoom;overscroll-behavior:contain;
+    background:radial-gradient(ellipse 120% 80% at 50% 38%,#070d15 0%,#03050a 68%)}
+  /* rede para Safari antigo, que ignora "safe center" */
+  #intro::before,#intro::after{content:"";margin:auto;flex:0 0 0}
+  #intro.gone{display:none}
+  #kicker{font-family:var(--sans);font-size:clamp(11px,2.9vw,14px);letter-spacing:.16em;
+    text-transform:uppercase;font-weight:600;color:var(--t-max);
+    line-height:1.4;max-width:26ch;text-shadow:var(--scrim)}
+  #titulo{font-family:var(--display);font-size:clamp(40px,10.5vw,64px);line-height:1.02;
+    font-weight:600;margin:12px 0 8px;color:#fff;
+    text-shadow:0 0 46px #ffb26640,0 4px 34px #000}
+  #titulo b{font-weight:700;color:var(--ambar-s)}
+  #sub{font-family:var(--serif);font-style:italic;font-size:clamp(17px,4.4vw,22px);
+    font-weight:500;color:var(--t-mid);margin-bottom:20px}
+  #intro p{font-family:var(--serif);font-size:clamp(17px,4.4vw,21px);line-height:1.45;
+    font-weight:400;color:var(--t-hi);max-width:22em;margin:0 0 13px}
+  #intro p b{color:#fff;font-weight:600}
+  #intro p.small{font-size:clamp(16px,4vw,19px);font-weight:500;color:var(--t-mid);
+    line-height:1.5;max-width:23em}
+  #intro .go{flex:0 0 auto;margin-top:20px;width:min(340px,88vw);padding:17px;
+    font-size:clamp(13px,3.4vw,16px);letter-spacing:.16em;
+    border-color:#b87433;color:var(--ambar-s);background:#1a1109ee}
+  #intro .alt{flex:0 0 auto;margin-top:12px;background:none;border:none;border-radius:0;
+    min-height:48px;backdrop-filter:none;-webkit-backdrop-filter:none;color:var(--t-max);
+    font-size:clamp(14px,3.4vw,15px);letter-spacing:.1em;text-transform:uppercase;
+    font-weight:600;text-decoration:underline;text-underline-offset:6px;padding:12px}
+  #rodada{margin-top:16px;font-size:clamp(13px,3.1vw,15px);letter-spacing:.16em;
+    color:var(--t-mid);font-family:var(--mono);font-weight:600}
+  #rodada b{color:var(--ambar-s);letter-spacing:.2em;font-weight:700;
+    font-size:1.35em;text-shadow:0 0 16px #ffb26655}
+  #nota{margin-top:8px;font-family:var(--sans);font-weight:500;
+    font-size:clamp(13px,3.2vw,15px);line-height:1.45;max-width:30ch;color:var(--t-mid)}
+  #nota.warn{color:var(--ambar-s);font-weight:600}
+  #nota.ok{color:#a9e8c0;font-weight:600}
+
+  @media(max-height:760px){
+    #titulo{font-size:clamp(34px,9vw,48px);margin:10px 0 6px}
+    #sub{margin-bottom:14px}
+    #intro p{margin-bottom:10px}
+    #intro .go{margin-top:16px;padding:15px}
+    #rodada{margin-top:12px}
+  }
+  @media(max-height:640px){
+    #titulo{font-size:clamp(30px,8vw,40px)}
+    #intro p{font-size:clamp(16px,4.1vw,19px);line-height:1.4}
+    #sub{font-size:clamp(16px,4.1vw,19px);margin-bottom:10px}
+  }
+  @media(min-width:900px){ #status{max-width:24ch} #dica{max-width:34ch} }
+  /* ======================================================================
+     INTEGRAÇÃO E RESPONSIVIDADE (spec v2)
+     ====================================================================== */
+  html,body{overflow-x:hidden;min-height:100vh;min-height:100dvh}
+  *,*::before,*::after{box-sizing:border-box}
+
+  /* ---------------- o oito no ar ---------------- */
+  #oito{position:fixed;left:0;right:0;top:0;height:100%;height:100dvh;z-index:11;
+    display:none;flex-direction:column;align-items:center;justify-content:center;
+    gap:18px;text-align:center;padding:24px;
+    background:radial-gradient(ellipse 110% 70% at 50% 45%,#070d15f2,#02040af7);}
+  #oito.on{display:flex;animation:fade .4s ease both}
+  #oito-tit{font-family:var(--display);font-size:clamp(30px,7.5vw,42px);line-height:1.06;
+    font-weight:600;color:#fff;text-shadow:0 0 40px #ffb26640,0 4px 30px #000}
+  #oito-tit.boa{color:var(--t-warms)}
+  #oito-txt{font-family:var(--serif);font-size:clamp(18px,4.6vw,22px);line-height:1.42;
+    font-weight:500;color:var(--t-hi);max-width:20em;text-shadow:var(--scrim-strong)}
+  #oito-botoes{display:none;flex-direction:column;align-items:center;gap:10px;
+    width:min(340px,88vw)}
+  #oito-botoes.on{display:flex}
+  #oito-vai{width:100%;padding:17px;font-size:clamp(13px,3.4vw,16px);letter-spacing:.16em;
+    border-color:#b87433;color:var(--t-warms);background:#1a1109ee}
+  #oito-refaz{width:100%;background:none;border:none;min-height:48px;
+    color:var(--t-max);font-size:clamp(14px,3.4vw,15px);letter-spacing:.1em;
+    text-transform:uppercase;font-weight:600;
+    text-decoration:underline;text-underline-offset:6px;padding:12px;order:2}
+  #oito-trilho{width:min(260px,70vw);height:5px;border-radius:5px;background:#1c2836;
+    box-shadow:inset 0 0 0 1px #3b4f64;overflow:hidden}
+  #oito-barra{height:100%;width:0%;border-radius:5px;background:#ffd9b0;
+    box-shadow:0 0 12px #ffbe7a}
+  /* Áreas seguras nas QUATRO bordas. Só topo e rodapé não bastam: deitado,
+     o notch e as bordas arredondadas passam para as laterais.            */
+  #hud,#intro,#oito,#card,#carta,#cartao,#pistas,#final,#descanso,#falha{
+    padding-left:max(16px,env(safe-area-inset-left));
+    padding-right:max(16px,env(safe-area-inset-right));
+  }
+  #mestre,#master{
+    left:max(12px,env(safe-area-inset-left));
+    right:max(12px,env(safe-area-inset-right));
+  }
+
+  /* Botões: alvo de toque, e os três estados que a spec pede.           */
+  button{min-height:48px}
+  button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+  button[disabled]{
+    color:#dfeaf5;border-color:#33465a;background:#0a0f16f2;
+    cursor:default;filter:saturate(.35)
+  }
+
+  /* MODO INTEGRADO: o MOSAICO já mostra o nome da rodada, "Jogador contra
+     Jogador" e "Cada um por si" na moldura. Repetir aqui dentro duplica a
+     tela. Ficam só as orientações internas.                              */
+  body.embed #kicker,
+  body.embed #title,
+  body.embed #titulo,
+  body.embed #nome-jogo,
+  body.embed #sub,
+  body.embed #local{display:none}
+  /* CRONOLOGIA: dentro da Mesa o horario historico do objeto nao aparece,
+     nem a nota que explica que os horarios sao anteriores.            */
+  body.embed #k-hora,
+  body.embed #hist-nota{display:none}
+  body.embed #intro{justify-content:center;justify-content:safe center}
+  html.embed,html.embed body{height:100%;max-height:100%;overflow:hidden}
+  html.embed #hud,html.embed #intro,html.embed #oito,html.embed #carta,
+  html.embed #falha,html.embed #c{height:100%;max-height:100%}
+
+  /* ---------------- falha de sensor ---------------- */
+  #falha{position:fixed;left:0;right:0;top:0;height:100%;height:100dvh;z-index:20;
+    display:none;flex-direction:column;align-items:center;
+    justify-content:center;justify-content:safe center;gap:14px;
+    padding-top:max(20px,env(safe-area-inset-top));
+    padding-bottom:calc(env(safe-area-inset-bottom,0px) + 24px);
+    overflow-y:auto;-webkit-overflow-scrolling:touch;
+    touch-action:pan-y pinch-zoom;overscroll-behavior:contain;
+    background:radial-gradient(ellipse 110% 70% at 50% 45%,#070d15f5,#02040afa);
+    text-align:center}
+  #falha.on{display:flex}
+  #falha::before,#falha::after{content:"";margin:auto;flex:0 0 0}
+  #falha-tit{font-family:"Cormorant Garamond",Georgia,serif;
+    font-size:clamp(26px,6.5vw,36px);font-weight:600;color:#fff;line-height:1.1}
+  #falha-msg{font-family:"Literata",Georgia,serif;font-weight:500;
+    font-size:clamp(17px,4.3vw,20px);line-height:1.45;color:#f4f9fd;max-width:24em}
+  #falha button{width:min(340px,88vw);flex:0 0 auto}
+  #falha-retry{padding:16px;font-size:clamp(13px,3.4vw,16px);letter-spacing:.14em;
+    text-transform:uppercase;font-weight:700;border-radius:9px;
+    border:1px solid #b87433;color:#ffe0c0;background:#1a1109ee}
+  #falha-toque{background:none;border:none;min-height:48px;color:#fff;
+    font-size:clamp(14px,3.4vw,15px);letter-spacing:.08em;text-transform:uppercase;
+    font-weight:600;text-decoration:underline;text-underline-offset:6px;padding:12px}
+
+</style>
+
+<!-- O volume dos botoes mora num arquivo so, lido por esta pagina e pelas
+     outras tres. Entra DEPOIS do <style> de proposito: em empate de
+     especificidade, quem vem por ultimo vence, e o padrao tem de vencer. -->
+<link rel="stylesheet" href="css/profundidade.css?v=20260902-profundidade">
+<link rel="stylesheet" href="css/profundidade-1mais1.css?v=20260930-foco">
+<link rel="stylesheet" href="css/ac-janelas.css?v=20261011-t4">
+<style>
+  /* O chevron d'A Casa também mora aqui, no mesmo canto das outras telas.
+     Acima de TUDO: em jogo a camada visual da sala sobe para z-index 200001
+     e a carta para 300005 — medido na volta 2, o toque no chevron caía nela.
+     Dentro do percurso ele some: a barra que vale é a da moldura. Fora dela,
+     o HUD desce uma barra para o botão não cair sobre a Investigação. */
+  html[data-ac-casa] #help.ac-chevron{position:fixed;z-index:2147483000;top:max(calc((var(--ac-barra) - 44px) / 2),env(safe-area-inset-top));right:max(var(--ac-margem),env(safe-area-inset-right));text-transform:none;letter-spacing:0;pointer-events:auto}
+  html[data-ac-casa]:not(.ac-sob-moldura) #hud{padding-top:max(var(--ac-barra),env(safe-area-inset-top))}
+  /* O mesmo vale para o que cobre a sala: medido no quadro do Solo a
+     390×844 (volta 2, 17/09/2026), o chevron caía sobre a primeira linha da
+     intro. */
+  html[data-ac-casa]:not(.ac-sob-moldura) #intro,
+  html[data-ac-casa]:not(.ac-sob-moldura) #oito,
+  html[data-ac-casa]:not(.ac-sob-moldura) #falha,
+  html[data-ac-casa]:not(.ac-sob-moldura) #carta{padding-top:max(var(--ac-barra),env(safe-area-inset-top))!important}
+  html.ac-sob-moldura #help{display:none!important}
+  /* As Orientações são painel: o relógio de ociosidade as recolhe e o
+     chevron as traz de volta. A Investigação é o objetivo e fica. */
+  html[data-ac-casa] body.ac-recolhido [data-ac-painel]{visibility:hidden}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<button id="help" class="ac-chevron" type="button" aria-label="Mostrar as janelas" aria-expanded="true">⌄</button>
+<div id="veil"></div>
+
+<div id="hud">
+  <div id="topo">
+    <div id="local">A Casa da Costa — a sala do térreo</div>
+    <section class="busca-caixa" aria-labelledby="investigacao-titulo"><h2 id="investigacao-titulo">Investigação:</h2><div id="enigma">—</div></section>
+    <div id="conta">1 DE 8</div>
+  </div>
+  <div id="base">
+    <div id="medidor"><div id="medidor-i"></div></div>
+    <div id="firme"><div id="firme-i"></div></div>
+    <section class="busca-caixa" data-ac-painel aria-labelledby="orientacoes-titulo"><h2 id="orientacoes-titulo">Orientações:</h2><div id="status" role="status">A lanterna acende pouco.</div><div id="dica">Gire o corpo devagar. O feixe encontra uma coisa de cada vez.</div></section>
+    <div id="marcas"></div>
+    <div id="botoes">
+      <button id="b-luz" class="acc">Lanterna</button>
+      <button id="b-ra" type="button" hidden>Sair da RA</button>
+      <button id="b-mestre">Mestre</button>
+    </div>
+  </div>
+</div>
+
+<div id="mestre">
+  <div class="l"><span>rumo (bússola)</span><b id="m-rumo">--</b></div>
+  <div class="l"><span>elevação</span><b id="m-elev">--</b></div>
+  <div class="l"><span>inclinação lateral</span><b id="m-roll">--</b></div>
+  <div class="l"><span>no feixe</span><b id="m-alvo">--</b></div>
+  <div class="l"><span>distância angular</span><b id="m-dist">--</b></div>
+  <div class="l"><span>fonte</span><b id="m-src">--</b></div>
+  <div class="l"><span>rodada</span><b id="m-rodada">--</b></div>
+  <div class="l"><span>folga exigida</span><b id="m-folga">--</b></div>
+  <input id="semente" spellcheck="false" autocomplete="off">
+  <div class="sub">A sala é a mesma para todos: o rumo de cada objeto vem só do relógio e vira a cada 30 min. Quem ficou numa rodada diferente digita aqui o código do grupo.</div>
+  <button id="folga">Folga do rumo: normal</button>
+  <button id="cal">Calibrar norte (aponte ao norte e toque)</button>
+</div>
+
+<div id="carta"><div id="carta-in" data-ac-priority="3">
+  <div id="k-meta"><span id="k-tipo">Detalhe</span><span id="k-hora">21:14</span></div>
+  <div id="k-nome"></div>
+  <div id="k-txt"></div>
+  <div id="k-obs"></div>
+  <div id="k-tempo"></div>
+  <button id="k-fechar">Voltar ao escuro</button>
+</div></div>
+
+<div id="intro" data-ac-priority="10">
+  <div id="intro-corpo">
+  <div id="kicker">A noite da tempestade — dentro da casa</div>
+  <div id="titulo">A Sala<br><b>às Escuras</b></div>
+  <div id="sub">Oito coisas, e uma frase para cada</div>
+  <p>Às 21h29 a casa apagou, e a sala ficou dois minutos e dois segundos no escuro. Você entrou pela porta entreaberta. A sala inteira cabe numa lanterna fraca.</p>
+  <p>A cada vez, uma <b>frase</b> aparece no alto. Ela não diz onde está — diz <b>o que é</b>. Decifre e procure.</p>
+  <p class="small"><b>Ache os nove antes dos outros. Não conte o que descobriu.</b> O farol da costa passa a cada nove segundos e mostra a sala inteira por um instante — use a passagem dele.</p>
+  <p class="small" id="hist-nota">Os objetos preservam registros de momentos anteriores da noite.</p>
+  <div class="pf-card" id="sala-explica" style="margin:12px 0 16px;padding:4px;text-align:left">
+    <div class="pf-inset" id="sala-explica-txt" style="padding:14px 16px;font:500 15px/1.45 system-ui,sans-serif;color:#dfeaf5">
+      As luzes caíram e você está no escuro. Acenda a lanterna e ache os objetos até preencher a barrinha. São <b id="sala-explica-n">9</b> pistas para achar.
+    </div>
+  </div>
+  <div id="rodada">RODADA <b id="cod-rodada">----</b></div>
+  <div id="nota">Confiram: o código tem de ser o mesmo em todos os aparelhos.</div>
+  </div>
+  <!-- A RA voltou (Mario, 18/09/2026). O botão só aparece no aparelho que a
+       tem: um "Entrar em RA" desabilitado na frente de quem não tem era um
+       botão morto. Quem não tem entra direto na sala. -->
+  <button class="go" id="b-entrar-ra" type="button" hidden>Entrar em RA</button>
+  <button class="go" id="b-entrar" type="button">Entrar na sala</button>
+  <button class="alt" id="b-sim">Estou no computador</button>
+</div>
+
+<div id="oito">
+  <div id="oito-tit">A bússola está tonta</div>
+  <p class="oito-p" id="oito-txt">Você vai varrer a sala no escuro com a lanterna, e é a bússola do aparelho que diz para onde você está virado. Ela precisa se acertar antes.</p>
+  <p class="oito-p"><b>Desenhe um 8 no ar à sua frente com o celular</b>, devagar, umas quatro vezes. Vire o pulso enquanto faz — é a variedade de posições que calibra, não a velocidade.</p>
+  <div id="oito-trilho"><div id="oito-barra"></div></div>
+  <div id="oito-botoes" class="on">
+    <button id="oito-vai" class="go" disabled>A bússola ainda está tonta</button>
+    <button id="oito-pular" type="button" class="alt" style="margin-top:12px;width:100%;padding:14px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.25);color:#cfe2f7;border-radius:10px;font:600 14px system-ui,sans-serif;cursor:pointer">Continuar tocando na tela</button>
+  </div>
+</div>
+
+<div id="falha" data-ac-priority="9" role="alertdialog" aria-live="polite">
+  <div id="falha-tit">Sem sensor</div>
+  <div id="falha-msg"></div>
+  <button id="falha-retry" aria-label="Tentar ativar o sensor novamente">Tentar novamente</button>
+  <button id="falha-toque" aria-label="Continuar usando o toque na tela">Continuar tocando na tela</button>
+</div>
+
+<script src="js/three.min.js"></script>
+<script src="js/vendor/GLTFLoader.js"></script><script src="js/ac-desk.js"></script><script src="js/ac-room-layout.js"></script><script src="js/ac-room-art.js"></script><script src="js/ac-room.js"></script><script src="js/mosaico-ra-engine.js?v=20261011-t4"></script>
+<!-- Protocolo com a Mesa e ativacao de sensor: um so arquivo para as tres tarefas. -->
+<script src="js/tarefa-sensor.js?v=20261011-t4"></script>
+<script>
+(function(){
+"use strict";
+
+/* ==========================================================================
+   A SALA ÀS ESCURAS — MOSAICO
+   · o rumo de cada objeto é ABSOLUTO (bússola): todos giram para o mesmo
+     lado do mundo real e encontram a mesma coisa
+   · o rumo vem SÓ do relógio (rodada de 30 min) — nenhum contador local
+     entra na semente, então ninguém se desgarra do grupo
+   · a sala é uma caixa de verdade, com projeção pinhole: as quinas e as
+     tábuas do chão são retas, não curvas
+   · a lanterna é de cabeça: o foco fica sempre no centro da tela, então a
+     iluminação é uma máscara em espaço de tela (multiply) — barata e certa
+   ========================================================================== */
+
+var CFG = {
+  VFOV: 68,          /* campo de visão vertical, graus */
+  TOL_ROLL: 18,
+  HOLD_MS: 1400,     /* tempo firme no objeto (iPhone/desktop — NÃO alterar) */
+  HOLD_MS_ANDROID: 2400, /* playtest: só Android; iOS não passa por aqui */
+  ROUND_MIN: 30,
+  FOLGA: 1,          /* multiplicador de tolerância (painel do mestre) */
+  SOLTA: 1.7,        /* histerese: a janela alarga depois de engatar */
+  DRENO: 0.55,       /* o progresso escoa em vez de zerar */
+  /* a sala, em metros */
+  SALA_L: 2.75,      /* meia-largura leste-oeste */
+  SALA_P: 2.15,      /* meia-profundidade norte-sul */
+  SALA_H: 2.95,      /* pé-direito */
+  OLHO: 1.55
+};
+/* Hold mais longo SÓ no Android. CFG.HOLD_MS permanece o valor do iPhone/
+   desktop — nunca sobrescrever no boot, senão o iOS herda o endurecimento. */
+function holdAlvo(){
+  var nav=typeof navigator!=="undefined"?navigator:{};
+  var ua=nav.userAgent||"";
+  if(typeof TarefaSensor!=="undefined"&&TarefaSensor.holdMsPorPlataforma){
+    return TarefaSensor.holdMsPorPlataforma(ua,{base:CFG.HOLD_MS,android:CFG.HOLD_MS_ANDROID},nav);
+  }
+  if(/iPad|iPhone|iPod/i.test(ua)||(nav.platform==="MacIntel"&&nav.maxTouchPoints>1)) return CFG.HOLD_MS;
+  if(/Android/i.test(ua)) return CFG.HOLD_MS_ANDROID;
+  return CFG.HOLD_MS;
+}
+
+/* ==========================================================================
+   OS OITO OBJETOS
+   alt   = altura do centro (ou da base) acima do chão, em metros
+   larg  = largura aparente em metros, usada para tolerância e desenho
+   chao  = true: fica no piso, afastado da parede
+   ========================================================================== */
+var OBJETOS = [
+  /* A ORDEM DESTE ARRAY É A ORDEM DOS ENIGMAS, e ela é CRONOLÓGICA — ver o
+     comentário em montaSala. Duas regras ao mexer aqui:
+       1. as horas têm de subir de cima para baixo;
+       2. um objeto com `escondeAtras` vem DEPOIS da sua capa, senão a sala
+          pede para achar o cofre antes do quadro que o cobre.
+
+     As horas são do banco (casos/casa-da-costa.json), não inventadas: o
+     relógio de corda trava às 21h29 por causa mecânica (F26), o apagão dura
+     de 21h29 a 21h31 (F25), e a secretária reinicia com o retorno da energia
+     e diz um nome fora dos seis (F27, F08). A sala inteira acontece dentro
+     dos 122 segundos, e termina ouvindo o nome.                          */
+
+  { id:"quadro", enigma:"Emoldura uma paisagem que nunca muda de estação, mas pode esconder algo.", nome:"O quadro torto", tipo:"Parede", hora:"21:21",
+    alt:1.62, larg:0.86, altura:0.66, chao:false,
+    txt:"Uma marinha escura, com um farol que não ilumina nada. O quadro está torto para a direita — e o retângulo limpo na parede, atrás dele, é maior do que a moldura.",
+    obs:"Um quadro não deixa marca maior que ele mesmo. Este cobre alguma coisa. A moldura gira." },
+
+  { id:"vaso", enigma:"Toda semente que cai em solo fértil cresce.", nome:"O vaso de plantas", tipo:"Chão", hora:"21:24",
+    alt:0, larg:0.42, altura:0.78, chao:true,
+    txt:"Cerâmica vidrada, uma trinca fina da borda até o meio. A terra está úmida de um lado só, e há duas folhas caídas ao pé — cortadas, não secas.",
+    obs:"O vaso foi arrastado. A marca no assoalho ainda tem terra dentro." },
+
+  { id:"escrivaninha", enigma:"Tem pernas que não andam e uma gaveta que fala.", nome:"A escrivaninha", tipo:"Chão", hora:"21:26",
+    alt:0, larg:1.28, altura:0.765, chao:true,
+    txt:"A gaveta de cima está aberta um palmo. Papéis empilhados com esmero, e um deles fora do lugar, atravessado. O tinteiro está tampado. A gaveta é funda — vai muito além dos papéis.",
+    obs:"Quem mexeu aqui teve tempo de empilhar de novo. Mas não de conferir. E a gaveta não acaba onde os papéis acabam." },
+
+  { id:"espelho", enigma:"Só diz a verdade — e ainda assim ao contrário.", nome:"O espelho oval", tipo:"Parede", hora:"21:27",
+    alt:1.70, larg:0.52, altura:0.74, chao:false,
+    txt:"Moldura de madeira clara, vidro com a prata comendo as bordas. Ele devolve a sua lanterna na cara, e por um segundo você não vê mais nada. Preso no canto da moldura, um retrato antigo e amarelado, com uma legenda à máquina: ARQUIVO DRAGON GAMES.",
+    obs:"A prata gasta distorce as bordas, mas o centro ainda devolve a luz da sala." },
+
+  { id:"janela", enigma:"Está fechada, e mesmo assim a tempestade entra por ela.", nome:"A janela do mar", tipo:"Parede", hora:"21:28",
+    alt:1.50, larg:1.05, altura:1.30, chao:false,
+    txt:"A chuva desce por fora em fios. O trinco está fechado por dentro, como devia. Mas o peitoril está molhado — e a água entrou de dentro para fora.",
+    obs:"Esta janela foi aberta e fechada durante a tempestade." },
+
+  { id:"relogio", enigma:"Anda a vida inteira e nunca sai do lugar.", nome:"O relógio de parede", tipo:"Parede", hora:"21:29",
+    /* era 1,94 m de altura e 0,38 m de largura: o único objeto que obrigava
+       a LEVANTAR o telefone e ainda o menor alvo da sala. Desceu para a
+       altura de um relógio de sala e ganhou corpo.                     */
+    alt:1.82, larg:0.52, altura:0.80, chao:false,
+    txt:"Caixa de madeira escura, mostrador amarelado, pêndulo parado. Os ponteiros marcam 21h29 — o segundo exato em que a casa apagou.",
+    obs:"Um relógio de corda não depende da rede. Este parou porque foi encostado." },
+
+  { id:"luminaria", enigma:"É a primeira coisa que se procura no escuro.", nome:"O abajur de pé", tipo:"Canto", hora:"21:29",
+    alt:0, larg:0.46, altura:1.62, chao:true,
+    txt:"Cúpula de tecido cor de creme, haste de latão, três pés. Ainda morno. O interruptor está na posição de ligado.",
+    obs:"Estava aceso quando a casa apagou. Ninguém desligou — a casa desligou." },
+
+  { id:"cofre", enigma:"Economize para a realização de um sonho.", nome:"O cofre", tipo:"Parede", hora:"21:30",
+    alt:1.28, larg:0.50, altura:0.44, chao:false,
+    escondeAtras:"quadro",
+    aviso:"O quadro está no chão. Tem um cofre no reboco.",
+    txt:"Embutido no reboco, atrás da marinha. Aço verde-escuro, disco de latão, dobradiças à vista. A porta está apenas encostada. Dentro, o envelope do inventário segue lacrado, e tudo o mais está no lugar.",
+    obs:"Estava aberto, e do cofre nada foi levado." },
+
+  /* A GAVETA QUE FALA. O enigma da escrivaninha prometia isso desde o começo
+     e nunca pagava — a gaveta era só descrição. Agora ela é a segunda capa da
+     sala, e o que está no fundo dela é o fecho: a secretária reinicia com o
+     retorno da energia (F27) e reproduz um nome fora dos seis (F08), às
+     21h31 — o último segundo dos 122 desta atividade.                     */
+  { id:"secretaria", enigma:"Não tem boca e repete o que ouviu.", nome:"A secretária eletrônica", tipo:"Gaveta", hora:"21:31",
+    alt:0.66, larg:0.30, altura:0.11, chao:false, herdaAlt:false, final:true,
+    escondeAtras:"escrivaninha",
+    aviso:"A gaveta é funda. Tem um aparelho no fundo dela.",
+    txt:"No fundo da gaveta, ligada na tomada de rodapé. A luz vermelha volta a piscar quando a energia retorna, a fita rebobina sozinha e toca uma gravação: uma voz diz um nome.",
+    obs:"O nome não é de ninguém que está na casa." }
+];
+(function(){
+  var n=document.getElementById("sala-explica-n");
+  if(n) n.textContent=String(OBJETOS.length);
+})();
+
+/* ==========================================================================
+   ENTRADA PELA URL  —  ?embed=1&s=SEMENTE&run=IDENTIFICADOR[&dev=1]
+   s   : semente fixa da tarefa. Presente, o relógio para de mandar — todo
+         jogador com a mesma semente monta exatamente o mesmo cenário.
+   run : identifica esta execução. Volta em toda mensagem enviada à Mesa e
+         filtra os comandos recebidos dela. Ausente, a tarefa segue
+         funcionando sozinha, como sempre funcionou.
+   dev : só teste. Nunca é ligado por conta própria em lugar nenhum.
+   ========================================================================== */
+var EMBED=false, SEMENTE_URL="", RUN_ID="", DEV=false;
+try{
+  var _q=new URLSearchParams(location.search);
+  EMBED       = _q.get("embed")==="1";
+  SEMENTE_URL = (_q.get("s")||_q.get("cenario")||"").trim().toUpperCase();
+  RUN_ID      = (_q.get("run")||"").trim();
+  /* ?dev=1 — modo de teste. O botao de computador nao existe para o jogador:
+     a tarefa e exclusiva de celular. Ele so aparece com dev=1, para nos
+     conseguirmos testar sem sensor. O caminho por toque continua existindo
+     sozinho pela tela de falha, entao tirar o botao nao prende ninguem. */
+  DEV = _q.get("dev")==="1";
+}catch(e){}
+
+var JOGO="sala-escura", TAREFA="busca-objetos";
+/* ==========================================================================
+   INTEGRAÇÃO COM O MOSAICO (mesa)  — contrato versão 2
+   Este bloco não decide ponto, colocação nem pista. Ele só mede o tempo da
+   tarefa e conta à mesa o que aconteceu. Sem Firebase, sem navegação, sem
+   tocar no documento pai.
+   ========================================================================== */
+var VERSAO=3;
+var modoEntrada="sensor";
+var inicioTarefa=null, fimTarefa=null, conclusaoEnviada=false, ultimoStatus=null;
+/* Estado de controle da Mesa. PAUSADO congela interação e cronômetro;
+   ABORTADO encerra a execução sem que nenhum tempo seja enviado. */
+var PAUSADO=false, ABORTADO=false, pausadoEm=null, descontoMs=0;
+
+/* O dialogo com a Mesa mora em js/tarefa-sensor.js: origem, runId e a
+   validacao das mensagens sao iguais nas tres tarefas, e uma correcao ali
+   passa a valer para todas. Aqui ficam so os atalhos locais.          */
+function ctxMesa(){ return { embed:EMBED, runId:RUN_ID }; }
+function alvoMsg(){ return TarefaSensor.alvoMsg(); }
+function envia(dados){ TarefaSensor.enviar(dados, ctxMesa()); }
+
+/* A Mesa não recebe mais estado de sensor: a única entrega é o tempo. Isto
+   virou registro interno — os pontos de chamada continuam existindo, e se um
+   dia a Mesa precisar saber que alguém empacou na permissão, basta voltar a
+   linha de envio aqui, sem mexer em mais nada.                          */
+function enviarStatus(status, modo){
+  if(modo) modoEntrada=modo;
+  if(ultimoStatus===status) return;
+  ultimoStatus=status;
+  /* Agora sai de verdade: a Mesa carimba a chegada do "ativo" no servidor,
+     e e dali que a duracao da atividade comeca a contar. */
+  TarefaSensor.status(status, ctxMesa());
+}
+function iniciarCronometroOficial(){
+  if(inicioTarefa!==null) return;
+  inicioTarefa=performance.now();
+  descontoMs=0; pausadoEm=null;
+}
+/* O tempo entregue é o tempo JOGADO: o período em que a Mesa manteve a
+   tarefa pausada sai da conta. Se a conclusão cair com a pausa ainda
+   aberta, o trecho pendente também sai — caso contrário uma pausa longa
+   sem retomada apareceria como tempo de jogo.                          */
+function concluirCronometroOficial(){
+  if(inicioTarefa===null || fimTarefa!==null) return null;
+  fimTarefa=performance.now();
+  var pendente=(pausadoEm!==null)?(fimTarefa-pausadoEm):0;
+  return Math.max(0, Math.round(fimTarefa-inicioTarefa-descontoMs-pendente));
+}
+function formatarTempo(ms){ return TarefaSensor.formatarTempo(ms); }
+var tempoFinalMs=null;
+/* A trava só fecha DEPOIS de haver um tempo válido. Travar antes deixaria a
+   tarefa impossível de concluir se isto fosse chamado antes do cronômetro
+   começar — o jogador ficaria preso sem nunca mandar nada.              */
+function enviarConclusao(){
+  if(conclusaoEnviada || ABORTADO) return null;
+  var tempoMs=concluirCronometroOficial();
+  if(tempoMs===null) return null;
+  conclusaoEnviada=true;
+  tempoFinalMs=tempoMs;
+  /* Só o que a Mesa pediu: quem executou e quanto tempo levou. Ponto,
+     colocação e pista não são assunto daqui. jogo/tarefa/versao ficam
+     apenas para a Mesa saber de qual das tarefas veio a mensagem.      */
+  envia({ mosaico:"tarefa-ok", tempoMs:tempoMs, objetosEncontrados:achados, objetosTotal:OBJETOS.length });
+  return tempoMs;
+}
+
+/* ==========================================================================
+   COMANDOS VINDOS DA MESA  —  {mosaico:"controle-tarefa", runId, acao}
+   ========================================================================== */
+var elPausa=null;
+function overlayPausa(texto){
+  if(!elPausa){
+    elPausa=document.createElement("div");
+    elPausa.setAttribute("id","pausa-mesa");
+    elPausa.className="pf-pausa";
+    elPausa.innerHTML='<div class="pf-card pf-pausa-card"><div class="pf-inset pf-pausa-msg"></div></div>';
+    document.body.appendChild(elPausa);
+  }
+  if(texto===null){ elPausa.style.display="none"; return; }
+  elPausa.querySelector(".pf-pausa-msg").textContent=texto;
+  elPausa.style.display="flex";
+}
+function aplicaPausa(){
+  if(PAUSADO||ABORTADO) return;
+  PAUSADO=true;
+  if(inicioTarefa!==null && fimTarefa===null) pausadoEm=performance.now();
+  overlayPausa("Pausado pela mesa.");
+}
+function aplicaRetomada(){
+  if(!PAUSADO||ABORTADO) return;
+  PAUSADO=false;
+  if(pausadoEm!==null){ descontoMs+=performance.now()-pausadoEm; pausadoEm=null; }
+  tPrev=performance.now();          /* senão o primeiro dt vale a pausa inteira */
+  overlayPausa(null);
+}
+/* Abortar trava o envio para sempre: conclusaoEnviada vira verdadeiro sem
+   que nada tenha sido enviado, então nem um acerto posterior escapa.    */
+function aplicaAbortar(){
+  if(ABORTADO) return;
+  ABORTADO=true; PAUSADO=true; conclusaoEnviada=true;
+  overlayPausa("Execução encerrada pela mesa.");
+}
+/* Sem esta checagem, qualquer aba ou script conseguiria mandar um "abortar"
+   para dentro do iframe. Origem e remetente são conferidos antes da ação,
+   e runId diferente do da execução corrente é simplesmente ignorado.    */
+TarefaSensor.ouvirMesa({ pausar:aplicaPausa, retomar:aplicaRetomada, abortar:aplicaAbortar }, ctxMesa());
+/* Congelar o laço para o desenho; barrar os eventos para a interação. Só
+   o laço não basta: arrasto e botões mexem no estado fora dele.        */
+if(EMBED){
+  ["mousedown","mousemove","mouseup","click","keydown","keyup",
+   "touchstart","touchmove","touchend","touchcancel",
+   "deviceorientation","deviceorientationabsolute","devicemotion"
+  ].forEach(function(tipo){
+    window.addEventListener(tipo, function(e){
+      if(!PAUSADO) return;
+      e.stopImmediatePropagation();
+      if(e.cancelable) e.preventDefault();
+    }, {capture:true, passive:false});
+  });
+}
+
+/* ---------------- utilidades ---------------- */
+var PI=Math.PI, TAU=PI*2, D2R=PI/180;
+function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+function lerp(a,b,t){ return a+(b-a)*t; }
+function sstep(a,b,x){ x=clamp((x-a)/(b-a),0,1); return x*x*(3-2*x); }
+function wrap180(d){ d=(d+180)%360; if(d<0)d+=360; return d-180; }
+function wrap360(d){ d%=360; return d<0?d+360:d; }
+function hashStr(s){ var h=2166136261>>>0; for(var i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619)>>>0; } return h>>>0; }
+function rngFrom(seed){ var a=seed>>>0; return function(){ a=a+0x6D2B79F5|0; var t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+var CARD=["norte","norte-nordeste","nordeste","leste-nordeste","leste","leste-sudeste",
+          "sudeste","sul-sudeste","sul","sul-sudoeste","sudoeste","oeste-sudoeste",
+          "oeste","oeste-noroeste","noroeste","norte-noroeste"];
+function cardinal(b){ return CARD[Math.round(wrap360(b)/22.5)%16]; }
+
+/* ---------------- canvas ---------------- */
+var cvs=document.getElementById("c"), ctx=cvs.getContext("2d");
+var scB=document.createElement("canvas"), sc=scB.getContext("2d");
+var W=0,H=0,DPR=1,CX=0,CY=0,FOC=1,LOW=false;
+var graoTile=null;
+
+function resize(){
+  W=window.innerWidth; H=window.innerHeight;
+  if(W<2||H<2) return;
+  DPR=Math.min(window.devicePixelRatio||1, LOW?1.25:2);
+  cvs.width=scB.width=Math.round(W*DPR);
+  cvs.height=scB.height=Math.round(H*DPR);
+  [ctx,sc].forEach(function(c){ c.setTransform(DPR,0,0,DPR,0,0); });
+  CX=W/2; CY=H/2;
+  FOC=(H/2)/Math.tan(CFG.VFOV/2*D2R);
+  semeiaPo();
+}
+
+/* grão de filme: uma vez só, depois é só carimbar */
+function fazGrao(){
+  var n=128, cv=document.createElement("canvas"); cv.width=cv.height=n;
+  var x=cv.getContext("2d"), img=x.createImageData(n,n), p=img.data;
+  for(var i=0;i<n*n;i++){
+    var v=(Math.random()*255)|0;
+    p[i*4]=p[i*4+1]=p[i*4+2]=v; p[i*4+3]=13;
+  }
+  x.putImageData(img,0,0);
+  graoTile=ctx.createPattern(cv,"repeat");
+}
+
+/* ==========================================================================
+   ESTADO
+   ========================================================================== */
+var view={bearing:0,elev:0,roll:0}, raw={bearing:0,elev:0,roll:0};
+var src="nenhuma", northOffset=0;
+var jogando=false, sim=false, arrasto=null;
+var holdAcc=0, achados=0, aproxima=0;
+var ordem=[], iAlvo=0;
+var qdRumo0=0, qdDist0=1, qdAlt0=1.62;   /* pose do quadro antes de descer */          /* a fila de enigmas, semeada */
+var farolFase=0, farol=0;       /* o farol lá fora, girando */
+var luzOn=true, pulso=0;
+var spdAng=0, rawAnt=null;
+var t0=performance.now(), tPrev=t0;
+var raio=0, raioProx=4000, raioForca=0;
+var po=[];
+/* Semente vinda da URL vale como semente fixada: a virada de rodada pelo
+   relógio deixa de reescrever a sala no meio da execução.              */
+var SEED="", sementeManual=!!SEMENTE_URL, rodadaVista=-1;
+var mAberto=false, ultimoTickRodada=-9e9, ultimoZum=0;
+var fpsAcc=0, fpsN=0;
+
+/* ==========================================================================
+   RODADA — o rumo é função APENAS do relógio
+   O código é o número da rodada em base 36: reversível, então quem se
+   desgarrou digita o código do grupo e cai na mesma sala.
+   ========================================================================== */
+function roundCode(){ return Math.floor(Date.now()/(CFG.ROUND_MIN*60000)); }
+function defaultSeed(){ return roundCode().toString(36).toUpperCase(); }
+function minutosParaVirar(){ var ms=CFG.ROUND_MIN*60000; return (ms-(Date.now()%ms))/60000; }
+function codigoCurto(s){
+  s=String(s).toUpperCase();
+  return s.length<=10 ? s : hashStr(s).toString(36).toUpperCase().slice(-6);
+}
+
+/* ==========================================================================
+   A SALA
+   ========================================================================== */
+var olho=[0,0,CFG.OLHO];
+
+function montaSala(seedStr){
+  SEED=seedStr;
+  var layout=ACRoom.layout(seedStr);
+  olho=layout.eye.slice();
+  for(var i=0;i<OBJETOS.length;i++){
+    var o=OBJETOS[i],pose=layout.objects[o.id];
+    o.visto=false;o.abre=0;o.anunciado=false;o.oculto=!!o.escondeAtras;
+    o.bearing=pose.bearing;o.d=pose.d;o.alt=pose.alt;
+    posicionaEm(o);
+  }
+  ACRoom.remember(seedStr);
+  /* pose de origem do quadro, para a descida ao chao poder interpolar */
+  var qd=acha_id("quadro");
+  qdRumo0=qd.bearing; qdDist0=qd.d; qdAlt0=qd.alt;
+
+  /* A ORDEM DOS ENIGMAS É CRONOLÓGICA, não sorteada.
+     Antes eu embaralhava — e isso embaralhava a linha do tempo do caso:
+     o jogador podia ler 21h18 antes de 21h06 e a história não fechava.
+     A sequência segue os horários declarados no array OBJETOS, que sobe de
+     21h21 a 21h31 — os 122 segundos do apagão. Os dois escondidos vêm por
+     último, cada um depois da sua capa, e o nome fecha a sala.
+     O sorteio continua mandando na POSIÇÃO de cada objeto na sala — o que
+     varia por rodada é onde procurar, não em que ordem.               */
+  ordem=OBJETOS.slice(); iAlvo=0;
+
+  achados=0; holdAcc=0; aproxima=0;
+  rodadaVista=roundCode();
+  pintaEnigma(false);
+  var inp=document.getElementById("semente");
+  if(inp && inp.value!==seedStr) inp.value=seedStr;  /* fora da Mesa/Solo: o campo é do painel do Mestre */
+  document.getElementById("cod-rodada").textContent=codigoCurto(seedStr);
+  pintaMarcas(); pintaRodada();
+}
+
+/* onde a parede está, no rumo b */
+function paredeEm(b){
+  var dx=Math.sin(b*D2R), dy=Math.cos(b*D2R), t=1e9;
+  if(dx>1e-6) t=Math.min(t,( CFG.SALA_L-olho[0])/dx);
+  else if(dx<-1e-6) t=Math.min(t,(-CFG.SALA_L-olho[0])/dx);
+  if(dy>1e-6) t=Math.min(t,( CFG.SALA_P-olho[1])/dy);
+  else if(dy<-1e-6) t=Math.min(t,(-CFG.SALA_P-olho[1])/dy);
+  return t;
+}
+function acha_id(id){
+  for(var i=0;i<OBJETOS.length;i++) if(OBJETOS[i].id===id) return OBJETOS[i];
+  return null;
+}
+function posiciona(o){
+  var d=paredeEm(o.bearing);
+  o.d = o.chao ? Math.max(0.9,d*0.70) : d*0.97;   /* móvel fica adiantado */
+  posicionaEm(o);
+}
+/* recalcula posição e elevação a partir do o.d que já estiver lá */
+function posicionaEm(o){
+  var k=o.d;
+  o.pos=[ olho[0]+Math.sin(o.bearing*D2R)*k,
+          olho[1]+Math.cos(o.bearing*D2R)*k,
+          o.chao ? 0 : o.alt ];
+  var zc = (o.chao ? o.altura*0.55 : o.alt) - CFG.OLHO;
+  o.elev = Math.atan2(zc, k)/D2R;
+}
+
+/* ==========================================================================
+   PROJEÇÃO PINHOLE (quinas retas, sem barril)
+   ========================================================================== */
+var F=[0,1,0], R=[1,0,0], U=[0,0,1];
+function baseCam(){
+  var y=view.bearing*D2R, p=view.elev*D2R, r=view.roll*D2R;
+  var cy=Math.cos(y), sy=Math.sin(y), cp=Math.cos(p), sp=Math.sin(p);
+  F=[sy*cp, cy*cp, sp];
+  var R0=[cy,-sy,0];
+  var U0=[ R0[1]*F[2]-R0[2]*F[1], R0[2]*F[0]-R0[0]*F[2], R0[0]*F[1]-R0[1]*F[0] ];
+  var cr=Math.cos(r), sr=Math.sin(r);
+  R=[R0[0]*cr-U0[0]*sr, R0[1]*cr-U0[1]*sr, R0[2]*cr-U0[2]*sr];
+  U=[R0[0]*sr+U0[0]*cr, R0[1]*sr+U0[1]*cr, R0[2]*sr+U0[2]*cr];
+}
+function paraCam(P){
+  var vx=P[0]-olho[0], vy=P[1]-olho[1], vz=P[2]-olho[2];
+  return [ vx*R[0]+vy*R[1]+vz*R[2],
+           vx*U[0]+vy*U[1]+vz*U[2],
+           vx*F[0]+vy*F[1]+vz*F[2] ];
+}
+var NEAR=0.07;
+function cortaNear(pts){
+  var out=[], n=pts.length;
+  for(var i=0;i<n;i++){
+    var A=pts[i], B=pts[(i+1)%n];
+    var ai=A[2]>NEAR, bi=B[2]>NEAR;
+    if(ai) out.push(A);
+    if(ai!==bi){
+      var t=(NEAR-A[2])/(B[2]-A[2]);
+      out.push([A[0]+(B[0]-A[0])*t, A[1]+(B[1]-A[1])*t, NEAR]);
+    }
+  }
+  return out;
+}
+function caminho(camPts){
+  if(camPts.length<3) return false;
+  sc.beginPath();
+  for(var i=0;i<camPts.length;i++){
+    var c=camPts[i], x=CX+FOC*c[0]/c[2], y=CY-FOC*c[1]/c[2];
+    if(i===0) sc.moveTo(x,y); else sc.lineTo(x,y);
+  }
+  sc.closePath();
+  return true;
+}
+function quad(P,estilo){
+  var cam=cortaNear([paraCam(P[0]),paraCam(P[1]),paraCam(P[2]),paraCam(P[3])]);
+  if(!caminho(cam)) return;
+  sc.fillStyle=estilo; sc.fill();
+}
+function linha(A,B,cor,esp){
+  var cam=[paraCam(A),paraCam(B)];
+  if(cam[0][2]<=NEAR&&cam[1][2]<=NEAR) return;
+  if(cam[0][2]<=NEAR||cam[1][2]<=NEAR){
+    var a=cam[0][2]>NEAR?cam[0]:cam[1], b=cam[0][2]>NEAR?cam[1]:cam[0];
+    var t=(NEAR-a[2])/(b[2]-a[2]);
+    b=[a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t, NEAR];
+    cam=[a,b];
+  }
+  sc.beginPath();
+  sc.moveTo(CX+FOC*cam[0][0]/cam[0][2], CY-FOC*cam[0][1]/cam[0][2]);
+  sc.lineTo(CX+FOC*cam[1][0]/cam[1][2], CY-FOC*cam[1][1]/cam[1][2]);
+  sc.strokeStyle=cor; sc.lineWidth=esp||1; sc.stroke();
+}
+/* está dentro do que a lanterna alcança? culling barato e agressivo */
+function noFeixe(P,margem){
+  var c=paraCam(P);
+  if(c[2]<=NEAR) return c[2]>-0.5;
+  var x=CX+FOC*c[0]/c[2], y=CY-FOC*c[1]/c[2];
+  var m=margem||0;
+  return x>-m && x<W+m && y>-m && y<H+m;
+}
+
+/* ==========================================================================
+   DESENHO DA SALA
+   ========================================================================== */
+var L=CFG.SALA_L, P=CFG.SALA_P, HT=CFG.SALA_H;
+
+function sala(){
+  /* piso: cada tábua com o seu tom, senão vira um plano chapado */
+  quad([[-L,-P,0],[L,-P,0],[L,P,0],[-L,P,0]],"#2a2119");
+  var i=0;
+  for(var x=-L; x<L-0.001; x+=0.19, i++){
+    var v=rnd1(i*4.31);
+    if(!noFeixe([x+0.095,0,0],200) && !noFeixe([x+0.095,P*0.6,0],200) &&
+       !noFeixe([x+0.095,-P*0.6,0],200)) continue;
+    var r0=38+v*16, g0=30+v*13, b0=22+v*10;
+    quad([[x,-P,0.001],[Math.min(x+0.19,L),-P,0.001],
+          [Math.min(x+0.19,L),P,0.001],[x,P,0.001]],
+         "rgb("+(r0|0)+","+(g0|0)+","+(b0|0)+")");
+    linha([x,-P,0.002],[x,P,0.002],"rgba(0,0,0,.5)",1);
+    linha([x+0.015,-P,0.002],[x+0.015,P,0.002],"rgba(255,220,180,.05)",1);
+  }
+  /* emendas de topo, desencontradas */
+  for(var y=-P+0.95; y<P; y+=0.95) linha([-L,y,0.003],[L,y,0.003],"rgba(0,0,0,.32)",1);
+
+  /* teto */
+  quad([[-L,-P,HT],[L,-P,HT],[L,P,HT],[-L,P,HT]],"#171b21");
+  /* roseta central */
+  var passos=26, aro=[];
+  for(var i=0;i<passos;i++){
+    var a=i/passos*TAU;
+    aro.push([Math.cos(a)*0.42, Math.sin(a)*0.42, HT-0.006]);
+  }
+  var cam=cortaNear(aro.map(paraCam));
+  if(caminho(cam)){ sc.strokeStyle="rgba(210,220,235,.10)"; sc.lineWidth=2; sc.stroke(); }
+
+  /* as quatro paredes + papel de parede */
+  parede([-L,P],[L,P]);    /* norte */
+  parede([L,-P],[-L,-P]);  /* sul  */
+  parede([L,P],[L,-P]);    /* leste */
+  parede([-L,-P],[-L,P]);  /* oeste */
+}
+
+/* uma parede de A para B (em planta), com papel listrado e barrado */
+function parede(A,B){
+  var meio=[(A[0]+B[0])/2,(A[1]+B[1])/2,1.4];
+  if(!noFeixe(meio,W*1.2) && !noFeixe([A[0],A[1],1.4],W*0.8) && !noFeixe([B[0],B[1],1.4],W*0.8)) return;
+
+  quad([[A[0],A[1],0],[B[0],B[1],0],[B[0],B[1],HT],[A[0],A[1],HT]],"#3a3730");
+
+  var dx=B[0]-A[0], dy=B[1]-A[1];
+  var comp=Math.hypot(dx,dy); if(comp<0.01) return;
+  var ux=dx/comp, uy=dy/comp;
+  /* normal para dentro, para afastar 2 mm da parede */
+  var nx=-uy*0.004, ny=ux*0.004;
+
+  /* listras verticais do papel */
+  var passo=0.27;
+  for(var s=passo*0.5; s<comp; s+=passo){
+    var px=A[0]+ux*s+nx, py=A[1]+uy*s+ny;
+    if(!noFeixe([px,py,1.5],120)) continue;
+    quad([[px,py,0.30],[px+ux*0.085,py+uy*0.085,0.30],
+          [px+ux*0.085,py+uy*0.085,HT-0.16],[px,py,HT-0.16]],"rgba(255,238,214,.032)");
+  }
+  /* motivo do papel, em grade */
+  for(var s2=passo; s2<comp; s2+=passo*2){
+    for(var h=0.62; h<HT-0.35; h+=0.58){
+      var mx=A[0]+ux*s2+nx*2, my=A[1]+uy*s2+ny*2;
+      if(!noFeixe([mx,my,h],90)) continue;
+      motivo([mx,my,h], ux,uy, 0.10);
+    }
+  }
+  /* rodapé e sanca */
+  quad([[A[0]+nx,A[1]+ny,0],[B[0]+nx,B[1]+ny,0],
+        [B[0]+nx,B[1]+ny,0.17],[A[0]+nx,A[1]+ny,0.17]],"#241d16");
+  linha([A[0]+nx*2,A[1]+ny*2,0.175],[B[0]+nx*2,B[1]+ny*2,0.175],"rgba(255,224,190,.10)",1.5);
+  quad([[A[0]+nx,A[1]+ny,HT-0.12],[B[0]+nx,B[1]+ny,HT-0.12],
+        [B[0]+nx,B[1]+ny,HT],[A[0]+nx,A[1]+ny,HT]],"#2c2a25");
+}
+
+/* um losango de papel de parede, desenhado no plano da parede */
+function motivo(centro,ux,uy,r){
+  var pts=[
+    [centro[0], centro[1], centro[2]+r],
+    [centro[0]+ux*r*0.6, centro[1]+uy*r*0.6, centro[2]],
+    [centro[0], centro[1], centro[2]-r],
+    [centro[0]-ux*r*0.6, centro[1]-uy*r*0.6, centro[2]]
+  ];
+  var cam=cortaNear(pts.map(paraCam));
+  if(caminho(cam)){
+    sc.strokeStyle="rgba(255,232,205,.055)"; sc.lineWidth=1.1; sc.stroke();
+  }
+}
+
+/* ==========================================================================
+   OS OBJETOS — cada um desenhado em METROS, com y para cima
+   ========================================================================== */
+function desenhaObjeto(o){
+  var c=paraCam(o.pos);
+  if(c[2]<=NEAR) return;
+  var x=CX+FOC*c[0]/c[2], y=CY-FOC*c[1]/c[2], s=FOC/c[2];
+  if(x<-W||x>W*2||y<-H||y>H*2) return;
+  o.tela=[x,y,s];
+
+  sc.save();
+  sc.translate(x,y);
+  sc.scale(s,-s);                 /* y para cima, unidades = metros */
+  sc.lineJoin="round"; sc.lineCap="round";
+  switch(o.id){
+    case "quadro":       dQuadro(o); break;
+    case "luminaria":    dLuminaria(o); break;
+    case "vaso":         dVaso(o); break;
+    case "relogio":      dRelogio(o); break;
+    case "escrivaninha": dEscrivaninha(o); break;
+    case "espelho":      dEspelho(o); break;
+    case "janela":       dJanela(o); break;
+    case "cofre":        dCofre(o); break;
+  }
+  sc.restore();
+}
+
+/* ruído determinístico: a mesma entrada dá sempre o mesmo valor. Textura
+   sorteada com Math.random() cintila de um quadro para o outro e denuncia
+   na hora que aquilo é desenho.                                        */
+function rnd1(n){var x=Math.sin(n*127.1+311.7)*43758.5453;return x-Math.floor(x);}
+var roomArt=ACRoomArt(sc);
+function dQuadro(o){roomArt.quadro(o);}
+function dLuminaria(o){roomArt.luminaria(o);}
+function dVaso(o){roomArt.vaso(o);}
+function dRelogio(o){roomArt.relogio(o);}
+function dEscrivaninha(o){roomArt.escrivaninha(o);}
+function dEspelho(o){roomArt.espelho(o);}
+function dJanela(o){roomArt.janela(o);}
+function dCofre(o){roomArt.cofre(o);}
+
+/* ==========================================================================
+   PÓ NO FEIXE
+   ========================================================================== */
+function semeiaPo(){
+  po=[];
+  var n=LOW?26:60;
+  for(var i=0;i<n;i++) po.push({
+    x:Math.random(), y:Math.random(), z:0.25+Math.random()*0.75,
+    r:0.5+Math.random()*1.6, f:Math.random()*TAU, v:0.06+Math.random()*0.18
+  });
+}
+function poeira(tempo,dt){
+  sc.save();
+  sc.globalCompositeOperation="lighter";
+  for(var i=0;i<po.length;i++){
+    var p=po[i];
+    p.y-=p.v*dt*0.045; if(p.y<-0.05){ p.y=1.05; p.x=Math.random(); }
+    var x=(p.x*1.25-0.125)*W + Math.sin(tempo*0.0006+p.f)*W*0.02;
+    var y=p.y*H;
+    var d=Math.hypot(x-CX,y-CY)/(Math.min(W,H)*0.42);
+    var a=Math.max(0,1-d)*p.z*0.5*(luzOn?1:0.15);
+    if(a<=0.006) continue;
+    sc.fillStyle="rgba(255,235,205,"+a.toFixed(3)+")";
+    sc.beginPath(); sc.arc(x,y,p.r*p.z,0,TAU); sc.fill();
+  }
+  sc.restore();
+}
+
+/* ==========================================================================
+   A LANTERNA — máscara em espaço de tela (é de cabeça, então o foco fica
+   sempre no centro). Multiply é o que dá o escuro de verdade sem apagar
+   o que emite luz própria, que é desenhado DEPOIS.
+   ========================================================================== */
+function lanterna(){
+  var base=Math.min(W,H);
+  var r=base*(luzOn?0.46:0.20)*(1+pulso*0.12);
+  /* o ambiente sobe com o raio E com a passagem do farol: nesses instantes
+     a sala inteira existe, e não só o círculo da lanterna.             */
+  var amb=clamp(0.055+raio*0.42+farol*0.30,0,0.68);
+  var forte=luzOn?1:0.34;
+
+  var g=sc.createRadialGradient(CX,CY*0.98,0,CX,CY*0.98,r);
+  function tom(v){ var q=Math.round(clamp(v,0,1)*255); return "rgb("+q+","+q+","+q+")"; }
+  g.addColorStop(0,    tom(1.00*forte+amb*0.2));
+  g.addColorStop(0.22, tom(0.92*forte+amb*0.2));
+  g.addColorStop(0.46, tom(0.52*forte+amb*0.4));
+  g.addColorStop(0.70, tom(0.20*forte+amb*0.7));
+  g.addColorStop(1,    tom(amb));
+  sc.globalCompositeOperation="multiply";
+  sc.fillStyle=g; sc.fillRect(0,0,W,H);
+  sc.globalCompositeOperation="source-over";
+
+  /* a cor da lâmpada: quente no miolo, azulada na saia */
+  sc.globalCompositeOperation="lighter";
+  var q=sc.createRadialGradient(CX,CY*0.98,0,CX,CY*0.98,r*0.8);
+  q.addColorStop(0,"rgba(255,206,150,"+(0.10*forte)+")");
+  q.addColorStop(0.5,"rgba(255,180,110,"+(0.045*forte)+")");
+  q.addColorStop(1,"rgba(120,170,220,0)");
+  sc.fillStyle=q; sc.fillRect(0,0,W,H);
+  sc.globalCompositeOperation="source-over";
+}
+
+/* o que entra pela janela: o relâmpago (raro, branco-azulado, violento) e o
+   farol da costa (a cada 9 s, âmbar frio, varrendo). Ambos são desenhados
+   DEPOIS da máscara da lanterna, senão o escuro os apagaria.           */
+function clarao(){
+  if(raio<=0.01 && farol<=0.01) return;
+  var jan=null;
+  for(var i=0;i<OBJETOS.length;i++) if(OBJETOS[i].id==="janela") jan=OBJETOS[i];
+  sc.save();
+  sc.globalCompositeOperation="lighter";
+
+  if(farol>0.01){
+    if(jan&&jan.tela){
+      /* a lâmina de luz: sai da janela e atravessa a sala */
+      var s=jan.tela;
+      var lg=sc.createLinearGradient(s[0],s[1],s[0],H);
+      lg.addColorStop(0,"rgba(226,238,255,"+(farol*0.30)+")");
+      lg.addColorStop(0.5,"rgba(180,208,240,"+(farol*0.10)+")");
+      lg.addColorStop(1,"rgba(150,185,225,0)");
+      sc.fillStyle=lg;
+      var lar=Math.max(W,H)*0.28*(0.7+farol*0.5);
+      sc.beginPath();
+      sc.moveTo(s[0]-lar*0.30,s[1]); sc.lineTo(s[0]+lar*0.30,s[1]);
+      sc.lineTo(s[0]+lar,H); sc.lineTo(s[0]-lar,H);
+      sc.closePath(); sc.fill();
+      var hg=sc.createRadialGradient(s[0],s[1],0,s[0],s[1],Math.max(W,H)*0.55);
+      hg.addColorStop(0,"rgba(232,242,255,"+(farol*0.34)+")");
+      hg.addColorStop(1,"rgba(180,210,245,0)");
+      sc.fillStyle=hg; sc.fillRect(0,0,W,H);
+    } else {
+      sc.fillStyle="rgba(196,218,245,"+(farol*0.055)+")";
+      sc.fillRect(0,0,W,H);
+    }
+  }
+
+  if(raio>0.01){
+    if(jan&&jan.tela){
+      var g=sc.createRadialGradient(jan.tela[0],jan.tela[1],0,jan.tela[0],jan.tela[1],Math.max(W,H)*0.9);
+      g.addColorStop(0,"rgba(200,222,248,"+(raio*0.42)+")");
+      g.addColorStop(0.35,"rgba(170,198,230,"+(raio*0.14)+")");
+      g.addColorStop(1,"rgba(150,180,215,0)");
+      sc.fillStyle=g;
+    } else {
+      sc.fillStyle="rgba(180,205,235,"+(raio*0.10)+")";
+    }
+    sc.fillRect(0,0,W,H);
+  }
+  sc.restore();
+}
+
+function vinheta(){
+  var g=ctx.createRadialGradient(CX,CY,Math.min(W,H)*0.20,CX,CY,Math.max(W,H)*0.78);
+  g.addColorStop(0,"rgba(0,0,0,0)");
+  g.addColorStop(0.62,"rgba(0,0,0,.36)");
+  g.addColorStop(1,"rgba(0,0,0,.90)");
+  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+  if(graoTile){ ctx.save(); ctx.fillStyle=graoTile; ctx.fillRect(0,0,W,H); ctx.restore(); }
+}
+
+/* ==========================================================================
+   SENSORES
+   ========================================================================== */
+function eulerParaVista(a,b,g){
+  var A=a*D2R, B=b*D2R, G=g*D2R;
+  var cA=Math.cos(A), sA=Math.sin(A), cB=Math.cos(B), sB=Math.sin(B), cG=Math.cos(G), sG=Math.sin(G);
+  var z1=cA*sG+cG*sA*sB, z2=sA*sG-cA*cG*sB, z3=cB*cG;
+  var Lx=-z1, Ly=-z2, Lz=-z3;
+  var bearing=wrap360(Math.atan2(Lx,Ly)/D2R);
+  var elev=Math.asin(clamp(Lz,-1,1))/D2R;
+  var ux=-cB*sG, uy=sB;
+  var roll=(Math.atan2(-uy,ux)+PI/2)/D2R;
+  return {bearing:bearing, elev:elev, roll:wrap180(roll)};
+}
+var temAbsoluto=false;
+function onOrient(e){
+  if(e.alpha===null||e.beta===null||e.gamma===null) return;
+  sensorVivo=true;   /* o oito só amostra depois que a bússola fala */
+  var alpha=e.alpha;
+  var iOS=(typeof e.webkitCompassHeading==="number" && !isNaN(e.webkitCompassHeading));
+  var abs=iOS || e.absolute===true || e.type==="deviceorientationabsolute";
+  /* no Android os dois eventos disparam; o "deviceorientation" traz alpha
+     RELATIVO ao ponto em que a página abriu. Havendo fonte absoluta, a
+     relativa é descartada — senão o rumo alterna entre os dois. */
+  if(abs) temAbsoluto=true; else if(temAbsoluto) return;
+
+  if(iOS){
+    alpha=360-e.webkitCompassHeading; src="bússola (iOS)";
+    if(typeof e.webkitCompassAccuracy==="number" &&
+       (e.webkitCompassAccuracy<0||e.webkitCompassAccuracy>25)) src="bússola instável";
+  } else if(abs){ src="bússola (absoluta)"; }
+  else if(src==="nenhuma"||src==="sem sensor"){ src="relativa — calibre o norte"; }
+
+  var v=eulerParaVista(alpha,e.beta,e.gamma);
+  raw.bearing=wrap360(v.bearing+northOffset);
+  raw.elev=v.elev; raw.roll=v.roll;
+  if(!jogando) jogando=true;
+}
+/* A permissão de movimento do iOS e os dois eventos do Android moram em
+   js/tarefa-sensor.js. Aqui fica só o que é desta tarefa. */
+var _prazoSuaveArmado=false;
+function armarPrazoSuave(){
+  if(_prazoSuaveArmado) return;
+  if(typeof TarefaSensor==="undefined"||!TarefaSensor.prazoSuave) return;
+  _prazoSuaveArmado=true;
+  TarefaSensor.prazoSuave(ctxMesa(), function(){
+    if(conclusaoEnviada||ABORTADO) return;
+    if(typeof setStatus==="function") setStatus("Tempo esgotado · sem precisão.");
+    if(inicioTarefa===null) iniciarCronometroOficial();
+    enviarConclusao();
+  });
+}
+function entrarModoDedo(msg){
+  sim=true; src="mouse/dedo"; modoEntrada="toque";
+  var _o=document.getElementById("oito"); if(_o) _o.classList.remove("on");
+  enviarStatus("ativo","toque");
+  try{ fechaIntro(); }catch(e){}
+  if(typeof setStatus==="function") setStatus(msg||"Arraste para explorar no toque.");
+  armarPrazoSuave();
+}
+function cairNoModoDedo(msg){
+  armarPrazoSuave();
+  if(typeof TarefaSensor!=="undefined"&&TarefaSensor.avisoAntesModoDedo){
+    TarefaSensor.avisoAntesModoDedo({ aoLiberar:function(){ entrarModoDedo(msg); } });
+  } else {
+    entrarModoDedo(msg);
+  }
+}
+function ativaSensor(){
+  TarefaSensor.ativarOrientacao({
+    aoOrientar: onOrient,
+    aoLigar: function(){ oitoNoAr(function(){ fechaIntro(); armarPrazoSuave(); }); },
+    esperaMs: 1400,
+    respondeu: function(){ return jogando; },
+    aoNaoResponder: function(){ cairNoModoDedo("Bússola muda — arraste para explorar."); },
+    aoNegar: function(){ cairNoModoDedo("Movimento negado — arraste para explorar."); },
+    aoIndisponivel: function(){ cairNoModoDedo("Sem bússola — arraste para explorar."); }
+  });
+}
+
+/* modo dedo/mouse */
+function pDown(ev){ var t=ev.touches?ev.touches[0]:ev; arrasto={x:t.clientX,y:t.clientY}; }
+function pMove(ev){
+  if(!sim||!arrasto) return;
+  var t=ev.touches?ev.touches[0]:ev;
+  raw.bearing=wrap360(raw.bearing+(t.clientX-arrasto.x)*0.17);
+  raw.elev=clamp(raw.elev-(t.clientY-arrasto.y)*0.14,-55,55);
+  arrasto={x:t.clientX,y:t.clientY};
+  if(ev.cancelable) ev.preventDefault();
+}
+function pUp(){ arrasto=null; }
+
+/* ==========================================================================
+   REGRA DO JOGO
+   ========================================================================== */
+function tolerancia(o){
+  /* meia-largura angular do objeto, com piso generoso: o que trava o jogo
+     é a mão tremendo, não a mira.                                       */
+  var meia = Math.atan2(o.larg*0.5, o.d)/D2R;
+  var meiaV= Math.atan2(o.altura*0.5, o.d)/D2R;
+  /* o termo do tamanho pesava demais: o relógio, o menor da sala, ficava
+     com ±9,7° enquanto o quadro tinha ±14° — 45% mais difícil sem que
+     nada no jogo avisasse. Coeficiente menor e piso mais alto achatam
+     essa diferença sem tornar nenhum deles trivial.                   */
+  return { az: clamp(meia*0.75+6.0, 9.5, 14)*CFG.FOLGA,
+           el: clamp(meiaV*0.75+5.5, 9.0, 13)*CFG.FOLGA };
+}
+function alvo(){ return iAlvo<ordem.length ? ordem[iAlvo] : null; }
+
+function alinhamento(){
+  if(window.MosaicoRA&&MosaicoRA.xrSession)return alinhamentoRA();
+  /* o mais próximo do feixe entre TUDO que ainda não foi lido — serve para
+     o "está quente" e para avisar quando você mira a coisa errada.     */
+  var melhor=null, mDist=1e9, mTol=null, mDaz=0, mDel=0;
+  for(var i=0;i<OBJETOS.length;i++){
+    var o=OBJETOS[i];
+    /* oculto = ainda atrás do quadro. Não pode nem ser mirado nem esquentar
+       o medidor, senão a sala entrega o cofre antes da hora.          */
+    if(o.visto || o.oculto) continue;
+    var t=tolerancia(o);
+    var dAz=Math.abs(wrap180(view.bearing-o.bearing));
+    var dEl=Math.abs(view.elev-o.elev);
+    /* normalizado pela tolerância de cada eixo: "quantas tolerâncias longe" */
+    var n=Math.hypot(dAz/t.az, dEl/t.el);
+    if(n<mDist){ mDist=n; melhor=o; mTol=t; mDaz=dAz; mDel=dEl; }
+  }
+  var dRo=Math.abs(wrap180(view.roll));
+  var m = holdAcc>0 ? CFG.SOLTA : 1;
+  /* ACERTO POR RETÂNGULO, não por elipse.
+     Antes isto era `mDist<=m`, onde mDist = hypot(dAz/tol, dEl/tol) — uma
+     elipse. Ela recorta os cantos: com ±12° de tolerância, errar 8,5° no
+     rumo E 8,5° na altura ao mesmo tempo dava FORA, apesar dos dois
+     estarem abaixo de 12°. E errar nos dois eixos ao mesmo tempo é o caso
+     normal, não a exceção. Dava a sensação de "esquenta, parece em cima,
+     e não trava". A elipse tem 21% menos área que o retângulo, e só 71%
+     da tolerância anunciada na diagonal.
+     A Janela do Norte sempre usou retângulo; agora os dois jogos miram
+     igual. O mDist continua servindo para escolher o objeto mais próximo
+     e para o medidor de quente/frio.                                   */
+  var dentro = !!melhor && mDaz<=mTol.az*m && mDel<=mTol.el*m && dRo<=CFG.TOL_ROLL*m;
+  var certo = dentro && melhor===alvo();
+  return { obj:melhor, tol:mTol, n:mDist, dAz:mDaz, dEl:mDel, dRo:dRo,
+           dentro:dentro, ok:certo };
+}
+
+/* a frase que está valendo, e o contador */
+function pintaEnigma(anima){
+  var el=document.getElementById("enigma"), a=alvo();
+  var txt = a ? "“"+a.enigma+"”" : "Nove de nove. A sala já disse o nome.";
+  function poe(){
+    el.textContent=txt;
+    document.getElementById("conta").textContent=
+      a ? (iAlvo+1)+" DE "+OBJETOS.length : "COMPLETO";
+    el.classList.remove("trocando");
+  }
+  if(anima){ el.classList.add("trocando"); setTimeout(poe,450); }
+  else poe();
+}
+
+function acha(o){
+  o.visto=true; achados++; iAlvo++;
+  envia({mosaico:"ac-sala-progresso",objetos:achados,total:OBJETOS.length});
+  holdAcc=0; aproxima=1;
+  pintaMarcas(); pintaEnigma(true);
+  try{ navigator.vibrate && navigator.vibrate([14,60,26]); }catch(e){}
+  /* CRONOLOGIA: a tarefa integrada acontece as 21:28. As horas dos objetos
+     (21:05 a 21:23) sao registros anteriores da noite. Dentro da Mesa elas
+     nao aparecem e o rotulo vira "Vestigio localizado".                */
+  document.getElementById("k-tipo").textContent=EMBED?"Vestígio localizado":o.tipo;
+  document.getElementById("k-hora").textContent=o.hora;
+  document.getElementById("k-nome").textContent=o.nome;
+  document.getElementById("k-txt").textContent=o.txt;
+  document.getElementById("k-obs").textContent=
+    o.obs+"  ·  Estava a "+cardinal(o.bearing)+", "+
+    o.bearing.toFixed(1).replace(".",",")+"°.";
+  document.getElementById("carta").classList.add("on");
+  /* a tarefa da Sala so termina quando os OITO forem lidos — o cofre e
+     sempre o ultimo da fila, entao ele e o criterio de conclusao.    */
+  var tMs=null;
+  if(achados>=OBJETOS.length) tMs=enviarConclusao();
+  var _t=(tMs!==null)?tMs:(achados>=OBJETOS.length?tempoFinalMs:null);
+  document.getElementById("k-tempo").textContent=
+    _t!==null ? (EMBED?"Tempo registrado: ":"Seu tempo: ")+formatarTempo(_t) : "";
+}
+function fechaCarta(){ document.getElementById("carta").classList.remove("on"); }
+
+function pintaMarcas(){
+  var el=document.getElementById("marcas"); el.innerHTML="";
+  for(var i=0;i<OBJETOS.length;i++){
+    var d=document.createElement("div");
+    d.className="marca"+(OBJETOS[i].visto?" on":"")+(OBJETOS[i].final?" cofre":"");
+    el.appendChild(d);
+  }
+}
+var elStatus=document.getElementById("status"), elDica=document.getElementById("dica");
+function setStatus(s,hot){ elStatus.textContent=s; elStatus.classList.toggle("hot",!!hot); }
+
+function pintaRodada(){
+  var el=document.getElementById("nota"), m=minutosParaVirar();
+  /* Vinda da Mesa (URL), a sala é a da partida: o jogador lê o mundo, não a
+     mecânica — "semente fixada à mão" aparecia para todos no percurso
+     (volta 2 da auditoria, 04/10/2026). */
+  if(SEMENTE_URL){ el.textContent="A mesa escolheu esta sala: é a mesma em todos os aparelhos."; el.className="ok"; }
+  else if(sementeManual){ el.textContent="Semente fixada à mão — o relógio não muda mais a sala."; el.className="ok"; }
+  else if(m<5){ el.textContent="A rodada vira em "+(m<1?"menos de 1":Math.ceil(m))+" min. Esperem a virada para começar juntos."; el.className="warn"; }
+  else { el.textContent="Confiram: o código tem de ser o mesmo em todos os aparelhos."; el.className=""; }
+  var mr=document.getElementById("m-rodada");
+  if(mr) mr.textContent=codigoCurto(SEED)+"  ·  vira em "+Math.ceil(m)+" min";
+}
+
+/* ==========================================================================
+   LAÇO
+   ========================================================================== */
+function loop(xrFrame){
+  if(xrFrame!==true)requestAnimationFrame(loop);
+  if(window.MosaicoRA&&MosaicoRA.xrSession&&xrFrame!==true)return;
+  /* Pausado: nada avança e tPrev acompanha o relógio, para que a retomada
+     não receba um dt do tamanho da pausa e teleporte a cena.            */
+  if(PAUSADO){ tPrev=performance.now(); return; }
+  var agora=performance.now(), tempo=agora-t0;
+  var dt=Math.min(0.05,(agora-tPrev)/1000); tPrev=agora;
+  if(W!==window.innerWidth||H!==window.innerHeight) resize();
+  /* largura zero acontece de verdade (iframe recém-criado, aba sem layout):
+     FOC vira infinito e tudo estoura. Espera o layout.                   */
+  if(W<2||H<2) return;
+
+  /* a virada da rodada, ao vivo: quem abriu 20h58 e quem abriu 21h02 caem
+     na MESMA sala às 21h30, sem recarregar nada. */
+  if(!sementeManual && roundCode()!==rodadaVista){
+    montaSala(defaultSeed());
+    fechaCarta();
+    setStatus("A rodada virou. A sala se rearranjou — para todos.",true);
+    elDica.textContent="gire de novo e procure com a lanterna";
+    try{ navigator.vibrate && navigator.vibrate([30,60,30,60,30]); }catch(e){}
+  }
+  if(agora-ultimoTickRodada>10000){ ultimoTickRodada=agora; pintaRodada(); }
+
+  if(!LOW){
+    fpsAcc+=dt; fpsN++;
+    if(fpsN>=100){ if(fpsAcc/fpsN>0.027){ LOW=true; resize(); } fpsAcc=0; fpsN=0; }
+  }
+
+  /* --- suavização adaptativa: leve quando varre, pesada quando mira ---- */
+  if(rawAnt===null) rawAnt=raw.bearing;
+  var vAng=Math.abs(wrap180(raw.bearing-rawAnt))/Math.max(dt,1e-4);
+  rawAnt=raw.bearing;
+  spdAng+=(vAng-spdAng)*(1-Math.pow(0.02,dt));
+  var varrendo=sstep(8,45,spdAng);
+  var k=1-Math.pow(lerp(0.18,0.0025,varrendo),dt);
+  view.bearing=wrap360(view.bearing+wrap180(raw.bearing-view.bearing)*k);
+  view.elev+=(raw.elev-view.elev)*k;
+  view.roll+=(wrap180(raw.roll-view.roll))*k*0.85;
+
+  // The task reads the orientation actually rendered by the 3D camera.
+  // A second invisible 2D view must never discover a different object.
+  if(window.MosaicoRA&&MosaicoRA.ativo){
+    if(MosaicoRA.modo!=='sala3d'){holdAcc=0;return;}
+    raw.bearing=view.bearing=wrap360(-MosaicoRA.orientacao.yaw/D2R);
+    raw.elev=view.elev=MosaicoRA.orientacao.pitch/D2R;
+    raw.roll=view.roll=0;
+  }
+  pulso*=Math.pow(0.25,dt);
+  aproxima*=Math.pow(0.12,dt);
+
+  /* relâmpago: raro, forte, imprevisível */
+  raio*=Math.pow(0.02,dt);
+  raioProx-=dt*1000;
+  if(raioProx<=0){ raio=0.5+Math.random()*0.5; raioProx=8000+Math.random()*15000; }
+
+  /* o farol da costa: previsível, ao contrário do raio. Passa a cada 9 s e
+     lava a sala por um segundo e meio — dá para decorar o ritmo e usar a
+     passagem dele para mapear onde as coisas estão.                     */
+  farolFase+=dt/9; if(farolFase>=1) farolFase-=1;
+  var fx=Math.min(farolFase,1-farolFase);
+  farol=Math.exp(-Math.pow(fx/0.055,2));
+
+  baseCam();
+
+  /* --- pintura --- */
+  sc.setTransform(DPR,0,0,DPR,0,0);
+  sc.fillStyle="#04060a"; sc.fillRect(0,0,W,H);
+  sala();
+  /* todo escondido aparece assim que a sua capa é lida */
+  for(var pi=0;pi<OBJETOS.length;pi++){
+    var ho=OBJETOS[pi];
+    if(ho.escondeAtras && acha_id(ho.escondeAtras).visto) ho.oculto=false;
+  }
+  /* SÓ O QUADRO DESCE. A gaveta já está aberta um palmo no texto do móvel:
+     quem leu a escrivaninha olhou dentro dela, e o aparelho simplesmente
+     está ali. Animar uma gaveta pediria um segundo movimento próprio, e o
+     movimento aqui existe para explicar o quadro, não para enfeitar. */
+  var qd=acha_id("quadro");
+  if(qd.visto){
+    qd.abre=Math.min(1,qd.abre+dt*0.85);
+    /* O QUADRO DESCE PARA O CHÃO.
+       Antes ele girava numa dobradiça, como porta de cofre de filme. Mas
+       quadro pendurado em prego não gira: você tira da parede e encosta no
+       rodapé. Aqui ele viaja da altura da parede até o piso, deslizando um
+       pouco para o lado — e fica levemente fora de esquadro, como fica de
+       verdade quando alguém apoia com pressa.                          */
+    var t=qd.abre*qd.abre*(3-2*qd.abre);            /* suaviza as pontas */
+    qd.bearing=wrap360(qdRumo0 + t*7.5);            /* escorrega para o lado */
+    qd.d=qdDist0*(1-t*0.10);                        /* e um passo à frente */
+    qd.alt=lerp(qdAlt0, 0.30, t);                   /* encostado no rodapé */
+    posicionaEm(qd);
+  }
+  /* de trás para a frente: sem isto o cofre pintaria por cima da moldura */
+  var fila=OBJETOS.slice().sort(function(a,b){ return b.d-a.d; });
+  for(var i=0;i<fila.length;i++){
+    fila[i].tela=null;
+    if(fila[i].oculto) continue;
+    desenhaObjeto(fila[i]);
+  }
+  lanterna();     /* o escuro entra aqui */
+  clarao();       /* e o relâmpago passa por cima dele */
+  poeira(tempo,dt);
+
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  ctx.clearRect(0,0,W,H);
+  ctx.drawImage(scB,0,0,W,H);
+  vinheta();
+
+  /* --- regra --- */
+  var al=alinhamento();
+  var quente=al.obj ? clamp(1-(al.n-1)/2.6,0,1) : 0;
+  document.getElementById("medidor-i").style.width=(quente*100).toFixed(1)+"%";
+  if(!jogando) return;
+
+  var elFirme=document.getElementById("firme"), elFirmeI=document.getElementById("firme-i");
+  if(al.ok){
+    var holdMs=holdAlvo();
+    holdAcc=Math.min(holdMs, holdAcc+dt*1000);
+    elFirme.classList.add("on");
+    elFirmeI.style.width=(holdAcc/holdMs*100)+"%";
+    setStatus("É isto. Segure.",true);
+    elDica.textContent=al.obj.final?"o cofre se abre para você":"não desvie o feixe";
+    if(agora-ultimoZum>170){ ultimoZum=agora; try{navigator.vibrate&&navigator.vibrate(6);}catch(e){} }
+    if(holdAcc>=holdMs) acha(al.obj);
+  } else {
+    /* escoa em vez de zerar: um blip de ruído não custa a busca inteira */
+    if(holdAcc>0){
+      holdAcc=Math.max(0,holdAcc-dt*1000*CFG.DRENO);
+      elFirmeI.style.width=(holdAcc/holdAlvo()*100)+"%";
+      if(holdAcc<=0) elFirme.classList.remove("on");
+    }
+    if(achados>=OBJETOS.length){
+      setStatus("A sala não tem mais nada a dizer.");
+      elDica.textContent="a fita já disse o nome";
+    } else if(al.dRo>CFG.TOL_ROLL && quente>0.5){
+      setStatus("Endireite o aparelho.",true); elDica.textContent="a sala precisa estar em pé";
+    } else if(al.dentro){
+      /* o feixe pegou uma coisa — mas não é a que a frase pede. Este é o
+         momento de dedução do jogo: dizer o nome sem dar a resposta.  */
+      setStatus("Isto é "+al.obj.nome.replace(/^(O|A) /,"").toLowerCase()+". Não é o que a frase pede.");
+      elDica.textContent="volte a girar — a frase fala de outra coisa";
+    } else if(quente>0.86){
+      setStatus("Tem alguma coisa bem aqui.",true);
+      elDica.textContent = al.dEl>al.tol.el
+        ? (view.elev>al.obj.elev?"abaixe um pouco a lanterna":"levante um pouco a lanterna")
+        : "chegue o centro em cima";
+    } else if(quente>0.5){
+      setStatus("O feixe encostou em alguma coisa.");
+      elDica.textContent="centralize para ver o que é";
+    } else {
+      setStatus(farol>0.25?"O farol passou. Guarde o que viu.":"Só parede deste lado.");
+      elDica.textContent = achados===0
+        ? "gire o corpo devagar — são sete coisas ao redor, e duas escondidas nelas"
+        : "o farol passa a cada nove segundos e mostra a sala";
+    }
+  }
+
+  /* painel do mestre */
+  if(mAberto){
+    document.getElementById("m-rumo").textContent=Math.round(view.bearing)+"° "+cardinal(view.bearing);
+    document.getElementById("m-elev").textContent=view.elev.toFixed(1)+"°";
+    document.getElementById("m-roll").textContent=view.roll.toFixed(1)+"°";
+    document.getElementById("m-alvo").textContent=al.obj?al.obj.nome:"—";
+    document.getElementById("m-dist").textContent=al.obj?al.n.toFixed(2)+"×":"—";
+    document.getElementById("m-src").textContent=sim?"mouse/dedo":src;
+    document.getElementById("m-folga").textContent=
+      al.tol?("±"+al.tol.az.toFixed(1)+"° / ±"+al.tol.el.toFixed(1)+"°"):"—";
+  }
+}
+
+/* ==========================================================================
+   CONTROLES
+   ========================================================================== */
+function fechaIntro(){
+  document.getElementById("intro").classList.add("gone");
+  var _o=document.getElementById("oito"); if(_o) _o.classList.remove("on");
+  jogando=true;
+  /* jogavel daqui: intro fechada, permissao resolvida, sala montada */
+  try{ if(window.ACJanelas&&ACJanelas.entrarAtividade) ACJanelas.entrarAtividade(); }catch(e){}
+  iniciarCronometroOficial(); enviarStatus("ativo");
+}
+
+/* O PORTÃO DO OITO, VINDO DA JANELA DO NORTE (05/09/2026).
+   A Sala às Escuras lê `webkitCompassHeading` para saber para onde o jogador
+   está virado — e no iOS essa leitura sai torta de 5 a 20° enquanto o
+   magnetômetro não se acerta. A Janela já pedia o oito desde 02/09; aqui não
+   pedia, e o jogador varria a sala com o rumo errado sem nenhum sinal de que o
+   problema era a bússola, não ele. Mario notou jogando: "só não pediu para
+   fazer o 8 da bússola".
+   O CSS desta página já reservava um #oito na lista de sobreposições — a tela
+   era esperada e nunca chegou.
+   A rotina é a mesma da Janela, de propósito: o que ela mede é o GESTO, não a
+   atividade. Duplicar aqui em vez de compartilhar segue a mesma razão dos
+   outros gêmeos do repositório — são três documentos independentes, sem
+   módulo comum a não ser o tarefa-sensor.js. */
+var sensorVivo=false;
+/* ---- o oito no ar --------------------------------------------------------
+   NÃO é "calibrar o norte" (definir aqui = norte): isso congelaria o zero de
+   cada um na direção em que estava virado e abriria o grupo em leque. É a
+   calibragem do MAGNETÔMETRO, que o sistema faz sozinho quando o aparelho
+   vê orientações variadas. O app não consegue disparar isso — só pode pedir
+   o gesto e esperar. Ataca os 5 a 15° de bússola torta, sem coordenar
+   ninguém com ninguém.                                                    */
+var oitoGen=0;
+function oitoNoAr(depois){
+  var gen=++oitoGen;                 /* RETENTAR pode reabrir a tela: o laco
+                                        velho tem de morrer, senao dois ticks
+                                        disputam a mesma barra.            */
+  var el=document.getElementById("oito"),
+      barra=document.getElementById("oito-barra"),
+      bt=document.getElementById("oito-vai"),
+      pular=document.getElementById("oito-pular");
+  el.classList.add("on");
+  bt.disabled=true;
+  bt.textContent="A bússola ainda está tonta";
+  bt.onclick=function(){ el.classList.remove("on"); depois(); };
+  if(pular){
+    pular.onclick=function(){
+      el.classList.remove("on");
+      entrarModoDedo("Arraste para girar a lanterna.");
+    };
+  }
+
+  /* Nao existe API para perguntar ao sistema se o magnetometro ja calibrou
+     — no Android nao existe nada, e no iOS so ha webkitCompassAccuracy. O
+     unico jeito honesto que vale nas duas plataformas e medir o GESTO. Um
+     oito de verdade deixa tres marcas que estar parado nao deixa:
+       AMPLITUDE  quanto o pulso abriu em cada eixo (o MENOR dos tres manda:
+                  girar o corpo abre a guinada e nao abre os outros dois)
+       ATITUDES   por quantas orientacoes distintas o aparelho passou
+       VOLTAS     quantas vezes a guinada inverteu de sentido — e isto que
+                  separa o oito de um arco unico
+     Medido: oito rapido abre em ~4 s, oito curto e lento em ~8 s. Parado na
+     mao para em 4%, andando devagar em 13%, so girando o corpo em 36%.
+     Nao ha limiar de "percurso somado": o proprio ruido do sensor, uns 2
+     graus, enche esse contador com o telefone imovel em cima da mesa — a
+     barra marcaria metade sem ninguem fazer nada.                        */
+  var META_GUINADA=40, META_ELEV=20, META_ROLL=45,   /* amplitude, em graus */
+      META_ATITUDES=14,                  /* celulas distintas de 18 graus   */
+      META_VOLTAS=4;                     /* inversoes de sentido na guinada */
+
+  var visto={}, atitudes=0, voltas=0;
+  var ant=null, sentido=0, acum=0, gira=0, primeiro=true;
+  var mnG=0,mxG=0,mnE=0,mxE=0,mnR=0,mxR=0;
+  var t0o=performance.now(), pMax=0;
+
+  function amostra(){
+    var b=raw.bearing, ee=raw.elev, rr=raw.roll;
+    if(ant){
+      var db=wrap180(b-ant.b);
+      /* 45 graus num quadro so e troca de referencial do sensor, nao braco */
+      if(Math.abs(db)<45) gira+=db;
+      acum+=db;
+      if(Math.abs(acum)>12){        /* zona morta: tremer nao vira volta */
+        var s=acum>0?1:-1;
+        if(sentido!==0 && s!==sentido) voltas++;
+        sentido=s; acum=0;
+      }
+    }
+    ant={b:b,e:ee,r:rr};
+    if(primeiro){ mnE=mxE=ee; mnR=mxR=rr; primeiro=false; }
+    if(gira<mnG)mnG=gira; if(gira>mxG)mxG=gira;
+    if(ee<mnE)mnE=ee;     if(ee>mxE)mxE=ee;
+    if(rr<mnR)mnR=rr;     if(rr>mxR)mxR=rr;
+    var cel=Math.round(gira/18)+"|"+Math.round(ee/18)+"|"+Math.round(rr/18);
+    if(!visto[cel]){ visto[cel]=1; atitudes++; }
+  }
+
+  (function tick(){
+    if(gen!==oitoGen) return;
+    if(sensorVivo) amostra();
+    /* Anistia: passados 20 s as metas afrouxam ate 45% ao longo de 15 s. No
+       campo, no escuro, em grupo, ninguem pode ficar preso num portao. Mas
+       parado continua parado: com as metas frouxas o telefone imovel chega
+       a 10%. Isto nunca vira o cronometro de 3 s que era antes.          */
+    var seg=(performance.now()-t0o)/1000;
+    /* Afrouxamento inteligente e progressivo para ninguém ficar preso no celular */
+    var af=1-0.70*clamp((seg-3)/5,0,1);
+    var amp=Math.min((mxG-mnG)/(META_GUINADA*af),
+                     (mxE-mnE)/(META_ELEV*af),
+                     (mxR-mnR)/(META_ROLL*af));
+    var p=0.40*clamp(amp,0,1)
+         +0.35*Math.min(1,atitudes/(META_ATITUDES*af))
+         +0.25*Math.min(1,voltas  /(META_VOLTAS  *af));
+    if(seg>=2.5) p = Math.max(p, clamp((seg-2.5)/4.5, 0, 1));
+    if(p>pMax) pMax=p;                 /* a barra nunca anda para tras */
+    barra.style.width=(Math.min(1,pMax)*100)+"%";
+    if(pMax>=0.999 || seg>=7){
+      barra.style.width="100%";
+      bt.disabled=false;
+      bt.textContent=pMax>=0.999 ? "Entrar na sala" : "Seguir para a sala";
+      try{ navigator.vibrate && navigator.vibrate([12,50,22]); }catch(err){}
+      return;                          /* daqui em diante quem manda e o dedo */
+    }
+    requestAnimationFrame(tick);
+  })();
+}
+
+document.getElementById("b-entrar").addEventListener("click",entrarSemRA);
+document.getElementById("b-sim").addEventListener("click",function(){
+  sim=true; src="mouse/dedo"; raw.elev=0; modoEntrada="toque"; fechaIntro();
+  setStatus("Arraste para girar o corpo.");
+});
+document.getElementById("b-luz").addEventListener("click",function(e){
+  e.stopPropagation(); luzOn=!luzOn; pulso=1.2;
+  try{ navigator.vibrate && navigator.vibrate(6); }catch(err){}
+});
+document.getElementById("b-mestre").addEventListener("click",function(){
+  mAberto=!mAberto; document.getElementById("mestre").classList.toggle("on",mAberto);
+});
+
+var FOLGAS=[{n:"apertado",v:0.75},{n:"normal",v:1},{n:"largo",v:1.4},{n:"muito largo",v:1.9}];
+var iFolga=1;
+function pintaFolga(){
+  CFG.FOLGA=FOLGAS[iFolga].v;
+  var el=document.getElementById("folga");
+  if(el) el.textContent="Folga do rumo: "+FOLGAS[iFolga].n;
+}
+document.getElementById("folga").addEventListener("click",function(){
+  iFolga=(iFolga+1)%FOLGAS.length; pintaFolga();
+});
+document.getElementById("cal").addEventListener("click",function(){
+  northOffset=wrap360(northOffset-raw.bearing);
+  raw.bearing=0; view.bearing=0; src="calibrada à mão";
+});
+document.getElementById("semente").addEventListener("change",function(){
+  var v=this.value.trim().toUpperCase();
+  if(!v) v=defaultSeed();
+  /* com semente vinda da URL, o campo não consegue devolver a sala ao
+     relógio — a Mesa é quem manda na semente daquela execução.       */
+  sementeManual = !!SEMENTE_URL || (v!==defaultSeed());
+  montaSala(v);
+});
+document.getElementById("k-fechar").addEventListener("click",function(){
+  fechaCarta();
+  /* Uma capa acabou de ser lida e o que ela guardava ainda não foi achado:
+     avisa uma vez só. `anunciado` é o que impede o aviso de voltar toda vez
+     que a pessoa fecha uma carta qualquer depois. */
+  for(var ai=0;ai<OBJETOS.length;ai++){
+    var hd=OBJETOS[ai];
+    if(!hd.escondeAtras || hd.visto || hd.anunciado) continue;
+    if(!acha_id(hd.escondeAtras).visto) continue;
+    hd.anunciado=true;
+    if(achados<OBJETOS.length){
+      setStatus(hd.aviso,true);
+      elDica.textContent="guarde o rumo — a última frase vai trazer você de volta aqui";
+      try{ navigator.vibrate && navigator.vibrate([18,70,30]); }catch(e){}
+      return;
+    }
+  }
+  if(achados>=OBJETOS.length){
+    setStatus("Nove de nove. Nada foi levado — e mesmo assim havia mais alguém.",true);
+    elDica.textContent="e o nome não é de ninguém que está na casa.";
+  }
+});
+
+window.addEventListener("mousedown",pDown);
+window.addEventListener("mousemove",pMove);
+window.addEventListener("mouseup",pUp);
+window.addEventListener("touchstart",pDown,{passive:true});
+window.addEventListener("touchmove",pMove,{passive:false});
+window.addEventListener("touchend",pUp);
+/* ---- falha de sensor: nunca deixar o jogador preso -------------------- */
+var RETENTAR=null, SEGUIR_TOQUE=null;
+function mostraFalha(msg){
+  /* sem isto a tela do oito ficaria por cima do aviso de falha */
+  var _o=document.getElementById("oito"); if(_o)_o.classList.remove("on");
+  document.getElementById("falha-msg").textContent=msg;
+  document.getElementById("falha").classList.add("on");
+  /* a tarefa NAO esta jogavel enquanto este aviso estiver na tela, entao o
+     cronometro nao pode estar correndo. Alguns jogos chamam comeca() antes
+     de saber se o sensor respondeu — aqui o relogio volta para zero e so
+     recomeca quando a pessoa escolher um caminho.                      */
+  if(!conclusaoEnviada){ inicioTarefa=null; fimTarefa=null; }
+}
+function escondeFalha(){ document.getElementById("falha").classList.remove("on"); }
+document.getElementById("falha-retry").addEventListener("click",function(){
+  escondeFalha(); ultimoStatus=null; if(RETENTAR) RETENTAR();
+});
+document.getElementById("falha-toque").addEventListener("click",function(){
+  escondeFalha(); modoEntrada="toque"; enviarStatus("ativo","toque");
+  if(SEGUIR_TOQUE) SEGUIR_TOQUE();
+});
+RETENTAR=function(){ ativaSensor(); };
+SEGUIR_TOQUE=function(){ entrarModoDedo("Arraste para girar o corpo."); };
+if(EMBED){ document.documentElement.classList.add("embed"); document.body.classList.add("embed"); }
+/* O painel do Mestre (leituras do sensor, semente, "Folga do rumo" que alarga
+   a mira em até 1,9×, "Calibrar norte") é ferramenta de campo, não de quem
+   joga. Dentro da Mesa e do Solo (embed) ele sai do DOM — a mesma convenção
+   da Janela do Norte. Antes o botão "Mestre" ficava no HUD de todo jogador
+   (Mario, 18/09/2026: botão extra, apague). Com ?dev=1 ele volta. */
+if(EMBED && !DEV){
+  ["b-mestre","mestre"].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el && el.parentNode) el.parentNode.removeChild(el);
+  });
+}
+if(!DEV){
+  var _bt=document.getElementById("b-sim")||document.getElementById("alt");
+  if(_bt && _bt.parentNode) _bt.parentNode.removeChild(_bt);
+}
+
+window.addEventListener("resize",resize);
+window.addEventListener("orientationchange",function(){ setTimeout(resize,250); });
+
+function alternarModo3DRA(){
+  if(window.MosaicoRA&&MosaicoRA.xrSession){MosaicoRA.xrSession.end();return;}
+  if(window.MosaicoRA && window.MosaicoRA.ativo){
+    window.MosaicoRA.encerrar();
+    var raCont = document.getElementById("mosaico-ra-viewport");
+    if(raCont) raCont.remove();
+  } else if(window.MosaicoRA){
+    var raCont = document.getElementById("mosaico-ra-viewport");
+    if(!raCont){
+      raCont = document.createElement("div");
+      raCont.id = "mosaico-ra-viewport";
+      raCont.style.position = "fixed";
+      raCont.style.inset = "0";
+      raCont.style.zIndex = "100";
+      document.body.appendChild(raCont);
+    }
+    window.MosaicoRA.iniciar("mosaico-ra-viewport", "sala3d");
+    document.body.classList.add('ac-sala-visual');
+    MosaicoRA.orientacao.yaw=MosaicoRA.orientacao.targetYaw=-view.bearing*D2R;
+    MosaicoRA.orientacao.pitch=MosaicoRA.orientacao.targetPitch=view.elev*D2R;
+  }
+}
+
+function entrarSemRA(){
+  entrarModoDedo('Arraste para explorar a sala e centralize o objeto procurado.');
+  if(!MosaicoRA.ativo)alternarModo3DRA();
+}
+var raPose=null,raOriginReady=false,raBusy=false;
+function alinhamentoRA(){
+  var empty={obj:null,tol:null,n:9,dAz:0,dEl:0,dRo:0,dentro:false,ok:false};
+  if(!raPose||!luzOn)return empty;
+  var ray=new THREE.Raycaster(raPose.position,raPose.direction,0.05,6.5);
+  var hits=ray.intersectObject(MosaicoRA.salaGroup,true).filter(function(hit){for(var n=hit.object;n;n=n.parent){if(n.visible===false)return false;}return true;});
+  if(!hits.length)return empty;
+  var mesh=hits[0].object,found=null;
+  for(var node=mesh;node&&!found;node=node.parent){
+    for(var o of OBJETOS){if(MosaicoRA.objetos3D[o.id]===node&&!o.visto&&!o.oculto){found=o;break;}}
+  }
+  if(!found)return empty;
+  return {obj:found,tol:{az:0,el:0},n:0,dAz:0,dEl:0,dRo:0,dentro:true,ok:found===alvo()};
+}
+async function entrarRA(){
+  if(raBusy)return;raBusy=true;
+  var button=document.getElementById('b-entrar-ra'),message=document.getElementById('ra-disponibilidade');
+  if(button)button.disabled=true;
+  var session=null;
+  try{
+    if(!navigator.xr)throw Error('unsupported');
+    session=await navigator.xr.requestSession('immersive-ar',{requiredFeatures:['local-floor','dom-overlay'],domOverlay:{root:document.body}});
+    if(!MosaicoRA.ativo)alternarModo3DRA();
+    var engine=MosaicoRA,renderer=engine.renderer;renderer.xr.enabled=true;renderer.xr.setReferenceSpaceType('local-floor');
+    await renderer.xr.setSession(session);engine.xrSession=session;raPose=null;raOriginReady=false;document.body.classList.add('ac-xr-active');
+    var bRa=document.getElementById('b-ra');if(bRa)bRa.hidden=false; /* a única saída da RA */
+    engine.scene.background=null;engine.container.style.background='transparent';
+    // Keep the canonical furniture; real surroundings replace opaque virtual walls.
+    var visibleBefore=new Map();
+    engine.salaGroup.children.forEach(child=>{visibleBefore.set(child,child.visible);if(!Object.values(engine.objetos3D).includes(child))child.visible=false;});
+    engine.xrUpdate=function(time,frame){
+      if(!frame)return;var pose=frame.getViewerPose(renderer.xr.getReferenceSpace());if(!pose){raPose=null;holdAcc=0;return;}
+      var p=pose.transform.position,q=pose.transform.orientation,position=new THREE.Vector3(p.x,p.y,p.z),quaternion=new THREE.Quaternion(q.x,q.y,q.z,q.w);
+      if(!raOriginReady){var eye=engine.roomModel.layout.eye;engine.salaGroup.position.set(p.x-eye[0],0,p.z+eye[1]);raOriginReady=true;}
+      raPose={position:position,direction:new THREE.Vector3(0,0,-1).applyQuaternion(quaternion)};
+      engine.camera.position.copy(position);engine.camera.quaternion.copy(quaternion);
+      var euler=new THREE.Euler().setFromQuaternion(quaternion,'YXZ');engine.orientacao.yaw=engine.orientacao.targetYaw=euler.y;engine.orientacao.pitch=engine.orientacao.targetPitch=euler.x;
+      engine.spotlight.intensity=luzOn?2.8:0;
+      if(acha_id('quadro').visto)engine.objetos3D.quadro.visible=false;
+      if(acha_id('escrivaninha').visto){var drawer=engine.objetos3D.gaveta;if(drawer)drawer.position.z=(drawer.userData.closedZ||.286)+.20;}
+      engine.salaGroup.updateMatrixWorld(true);loop(true);
+    };
+    session.addEventListener('end',function(){
+      document.body.classList.remove('ac-xr-active');engine.xrSession=null;engine.xrUpdate=null;raPose=null;engine.salaGroup.position.set(0,0,0);visibleBefore.forEach((visible,child)=>child.visible=visible);
+      engine.scene.background=new THREE.Color(0x04060a);engine.container.style.background='#04060a';var eye=engine.roomModel.layout.eye;engine.camera.position.set(eye[0],eye[2],-eye[1]);engine.spotlight.intensity=2.8;
+      setStatus('RA encerrada. Continue em 3D, sem perder as pistas.');holdAcc=0;
+      if(bRa)bRa.hidden=true;
+    },{once:true});
+    entrarModoDedo('Mova o celular para procurar os objetos ao seu redor.');
+    setStatus('RA ativa. Explore o espaço com cuidado.');
+  }catch(error){
+    if(session)await session.end().catch(()=>{});
+    /* A câmera não abriu (recusada ou indisponível): diz isso à vista, no
+       botão que sobra, e tira a porta da RA. A sala não tem #notice. */
+    if(message)message.textContent='Não foi possível iniciar a RA. Você pode tentar novamente ou jogar sem RA.';
+    if(button)button.hidden=true;
+    var semRa=document.getElementById('b-entrar');if(semRa)semRa.textContent='A câmera não abriu · Entrar na sala';
+    if(MosaicoRA.ativo&&!MosaicoRA.xrSession)MosaicoRA.encerrar();
+  }finally{raBusy=false;if(button)button.disabled=false;}
+}
+var entrarRaBtn=document.getElementById('b-entrar-ra');
+if(entrarRaBtn)entrarRaBtn.addEventListener('click',entrarRA);
+(async function(){
+  /* Sem linha explicativa: ela caía na rolagem da intro, abaixo da dobra
+     (y=1030 numa tela de 844, volta 2). O pedido de câmera do próprio
+     aparelho já diz o que a RA usa. */
+  var button=document.getElementById('b-entrar-ra');
+  if(!button)return;
+  try{button.hidden=!(!!navigator.xr&&await navigator.xr.isSessionSupported('immersive-ar'));}catch(_){button.hidden=true;}
+})();
+
+var bRa = document.getElementById("b-ra");
+if(bRa){
+  bRa.addEventListener("click", alternarModo3DRA);
+}
+
+/* ==========================================================================
+   INÍCIO
+   ========================================================================== */
+(function init(){
+  resize();
+  fazGrao();
+  pintaFolga();
+  montaSala(SEMENTE_URL || defaultSeed());
+  raw.elev=view.elev=-2;
+  /* a abertura não entrega nada: começa olhando para um vão de parede */
+  var vazio=wrap360(OBJETOS[0].bearing+22.5);
+  raw.bearing=view.bearing=vazio;
+  loop();
+})();
+
+/* Para a auditoria, como __escrivaninha e __maquete: no painel de testes a
+   aba fica sem requestAnimationFrame (≈4 quadros/s), e a sala só anda quadro
+   a quadro. `quadro()` roda um quadro sem agendar o próximo. */
+window.__sala={quadro:function(){loop(true);},alvo:alvo,
+  get view(){return view;},get raw(){return raw;},get jogando(){return jogando;},get achados(){return achados;},total:OBJETOS.length};
+
+})();
+</script>
+<script src="js/ac-janelas.js?v=20261011-t4"></script></body>
+</html>

@@ -1,0 +1,332 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=IBM+Plex+Mono:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+/* MOSAICO — A Manhã do Carro-Forte · A MESA
+   Identidade visual herdada de A Noite: fundo fotográfico rebaixado, placa flutuante
+   no topo, cartões com espessura e três cores de função — ouro para o dossiê,
+   verde para decisão e pergunta, azul para estado público e leitura sensorial. */
+
+:root{
+ --bg:#050b12;--ink:#f3f6f4;--ink-2:#dce6ea;--muted:#9aa9b3;
+ --gold:#d6aa58;--gold2:#efc878;--green:#70d6a0;--green-soft:#8ce4b0;--blue:#7faac1;--red:#dd968a;
+ --panel:#0d1a24;--line:#273946;--edge:#32485a;
+ --display:'Cormorant Garamond',Georgia,serif;--sans:Inter,system-ui,sans-serif;--mono:'IBM Plex Mono',Consolas,monospace;
+ --shadow:0 4px 0 #03070a,0 12px 28px #0008;
+ --alvo-de-toque:44px;
+ --dock-h:76px;
+ color-scheme:dark;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans)}
+body{overflow-x:hidden}
+button,select,input{font:inherit}
+[hidden]{display:none!important}
+.hidden{display:none!important}
+
+/* ── Cenário ─────────────────────────────────────────────────────────── */
+/* Dois papéis de parede, um por tamanho de tela. O celular fica com o hero
+   apertado do caso; a tela grande da mesa recebe o papel largo que A Noite usa
+   no telão — os arquivos moram numa cópia só, em ../carro-forte/noite/. */
+.scene{position:fixed;inset:0;z-index:-3;background:linear-gradient(180deg,#06111be8,#03070bf5),url('assets/carro-forte-hero.png') center/cover no-repeat;filter:saturate(.72) brightness(.42)}
+@media(min-width:900px){
+ .scene{background:linear-gradient(180deg,#06111be8,#03070bf5),url('../../../jogos/a-manha-do-carro-forte/a-noite/Papel-de-Parede-CarroforteTelao.jpg') center/cover no-repeat}
+}
+.rain{position:fixed;inset:0;z-index:-2;pointer-events:none;opacity:.12;background:repeating-linear-gradient(108deg,transparent 0 22px,#b5d4e633 23px,transparent 24px 50px)}
+
+/* ── Placa do topo ───────────────────────────────────────────────────── */
+.topbar{position:sticky;top:0;z-index:30;padding:max(6px,env(safe-area-inset-top)) 11px 6px}
+.topbar:before{content:"";position:absolute;z-index:-1;top:0;bottom:0;left:50%;transform:translateX(-50%);width:min(1160px,calc(100% - 16px));background:linear-gradient(160deg,#0d1c28f8,#07121bf8 62%,#050b12f8);border-left:2px solid #42657a;border-right:2px solid #42657a;border-bottom:2px solid #35576d;border-radius:0 0 11px 11px;box-shadow:0 5px 0 #020609,0 14px 28px #0008,inset 1px 0 #ffffff0c,inset -1px 0 #ffffff0c;backdrop-filter:blur(18px)}
+.topline,.turnline{width:min(1128px,calc(100% - 32px));margin-inline:auto}
+.topline{display:flex;align-items:center;gap:6px}
+.brand{display:flex;align-items:center;gap:7px;min-width:0;flex:1}
+.mark{width:32px;height:32px;flex:0 0 32px;display:grid;place-items:center;border:1px solid #d6aa5877;background:#101d29;color:var(--gold2);font:700 20px var(--display)}
+.brand div{min-width:0;display:flex;flex-direction:column;line-height:1}
+.brand b{font-size:12.5px;letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand small{font:10px/1.05 var(--mono);color:var(--muted);white-space:nowrap;margin-top:4px;overflow:hidden;text-overflow:ellipsis}
+.hud{display:flex;gap:4px}
+.icon-btn,.hud-pill{height:32px;border:1px solid #46667a;border-radius:7px;background:linear-gradient(180deg,#162a38,#0c1b26);color:var(--gold2);box-shadow:0 3px 0 #020609}
+.icon-btn{width:32px;padding:0;font-size:17px;cursor:pointer}
+.hud-pill{display:flex;align-items:center;gap:3px;padding:0 7px;font:800 12px var(--mono)}
+.turnline{min-height:36px;margin-top:6px;display:flex;align-items:center;justify-content:space-between;gap:7px;font-family:var(--mono)}
+.turnline>span{display:flex;align-items:center;gap:8px;min-width:0}
+.turnline small{width:32px;height:32px;flex:0 0 32px;display:grid;place-items:center;border:1px solid #56768a;background:#102330;color:var(--gold2);font:900 12px var(--mono)}
+.turnline b{font:800 13px var(--mono);letter-spacing:.08em}
+.turnline-right{display:flex;align-items:center;gap:7px;min-width:0}
+.turnline-right>b{color:var(--gold2);font-size:11px;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#hudSala{flex:0 0 auto;height:32px;padding:0 11px;border:1px solid #56768a;border-radius:7px;background:#102330;color:var(--gold2);font:800 10px var(--mono);letter-spacing:.12em;cursor:pointer;position:relative}
+#hudSala::after{content:'';position:absolute;left:50%;top:50%;width:max(100%,var(--alvo-de-toque));height:max(100%,var(--alvo-de-toque));transform:translate(-50%,-50%)}
+#hudSala:active{transform:translateY(2px)}
+
+/* ── Espessura ───────────────────────────────────────────────────────── */
+.depth-card{border:1px solid var(--edge);background:linear-gradient(165deg,#152431,#0b141d 68%,#071018);box-shadow:var(--shadow);border-radius:10px}
+.depth-card.gold{border-color:#725b35;border-left:4px solid #9a7842;background:linear-gradient(155deg,#2b2114,#18140e 58%,#0e0c09)}
+.depth-card.green{border-color:#315f4b;border-left:4px solid #58c78a;background:linear-gradient(155deg,#10271f,#0a1715 58%,#07110f)}
+.depth-card.blue{border-color:rgba(127,212,255,.38);border-left:4px solid #6aa8ca;background:linear-gradient(155deg,#0f2130,#0b1926 58%,#08131c)}
+.depth-card.gold>small{color:#c89a50}
+.depth-card.green>small{color:#68bd8d}
+.depth-card.blue>small{color:var(--blue)}
+.depth:active{transform:translateY(2px)}
+
+/* ── Telas ───────────────────────────────────────────────────────────── */
+main{display:block}
+.screen{display:none;min-height:calc(100vh - 92px);padding:16px 11px calc(var(--dock-h) + 18px + env(safe-area-inset-bottom));width:min(1080px,calc(100% - 22px));margin:auto}
+.screen.active{display:block;animation:enter .3s ease}
+@keyframes enter{from{opacity:0;transform:translateY(8px)}}
+@media(prefers-reduced-motion:reduce){.screen.active{animation:none}}
+
+.eyebrow,.section-head>span,article>small,.wave-head small,.drawer-head small{font:700 9px var(--mono);letter-spacing:.14em;color:var(--gold)}
+h1,h2,h3{font-family:var(--display);font-weight:600;margin:0}
+.section-head{margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.section-head h2{font-size:clamp(30px,8vw,50px);line-height:1;margin:6px 0}
+.section-head p{color:var(--muted);font-size:13px;line-height:1.5;margin:0;max-width:62ch}
+
+/* ── Prólogo ─────────────────────────────────────────────────────────── */
+.intro-copy h1{font-size:clamp(39px,11vw,72px);line-height:.95;margin:10px 0 13px}
+.intro-copy h1 em{color:var(--gold2);font-style:italic}
+.intro-copy>p{font-size:15px;line-height:1.5;color:var(--ink-2);min-height:150px;margin:1em 0}
+.principle{padding:12px;margin:14px 0;display:grid;gap:4px}
+.principle strong{font:600 21px var(--display)}
+.principle span{color:var(--muted);font-size:12px}
+.intro-actions{display:grid;gap:8px}
+.field{padding:9px;display:grid;gap:5px;min-width:0;color:var(--muted);font:600 9px var(--mono);letter-spacing:.1em;text-transform:uppercase}
+/* Um <select> é item de grade com min-width:auto e cresce até a opção mais longa.
+   Sem o min-width:0 abaixo, “H10 · Nenhum desaparecimento físico na manhã” empurra
+   a página inteira para fora da tela do celular. */
+.field select{width:100%;min-width:0;background:#08121a;border:1px solid #304655;border-radius:6px;padding:11px;color:var(--ink);min-height:44px;font:500 13px var(--sans);text-transform:none;letter-spacing:0}
+.street-card{position:relative;height:82px;margin-top:14px;border-radius:10px;overflow:hidden;border:1px solid #3f5a6e;background:linear-gradient(#0b1f26,#050f13);box-shadow:var(--shadow)}
+.street-card::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,#9fd8d016 0 1px,transparent 1px 3px)}
+.clock{position:absolute;left:10px;top:10px;z-index:1;padding:7px 12px;border-radius:8px;border:1px solid var(--gold);background:linear-gradient(180deg,#182a29,#0c1817);text-align:center}
+.clock span,.clock small{display:block;font:500 8px var(--mono);color:var(--muted)}
+.clock small{display:none}
+.clock strong{font:700 18px var(--mono);color:var(--gold2)}
+.bank{position:absolute;left:128px;right:10px;top:10px;z-index:1;height:62px;padding:13px 10px;border-radius:8px;border:1px solid #3f5a6e;background:linear-gradient(168deg,#14282f,#091a20);letter-spacing:.2em;font-size:11px}
+.bank span{float:right;color:var(--red);font:500 8px var(--mono);letter-spacing:.08em}
+
+/* ── Botões ──────────────────────────────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:46px;border-radius:9px;border:0;padding:10px 15px;font-weight:800;font-size:14px;cursor:pointer;transition:transform .1s ease,box-shadow .1s ease}
+.btn span{margin-left:auto;padding-left:10px}
+.btn.primary{background:linear-gradient(180deg,var(--gold2),var(--gold));color:#201707;box-shadow:0 5px 0 #6f4d17,0 12px 22px #000a,inset 0 1px 0 #ffffffb3}
+.btn.primary:active{transform:translateY(4px);box-shadow:0 1px 0 #6f4d17,0 5px 10px #0009,inset 0 1px 0 #ffffffb3}
+.btn.ghost{border:1px solid #46667a;background:linear-gradient(180deg,#162a38,#0c1b26);color:var(--ink);box-shadow:0 4px 0 #020609,0 10px 18px #0008}
+.btn.ghost:active{transform:translateY(3px);box-shadow:0 1px 0 #020609,0 4px 8px #0008}
+
+.dock{position:fixed;z-index:25;left:50%;transform:translateX(-50%);width:min(1080px,calc(100% - 22px));bottom:0;padding:9px 0 calc(11px + env(safe-area-inset-bottom));display:flex;gap:10px;background:linear-gradient(180deg,#050b1200,#050b12e8 26%,#050b12);border-top:1px solid #22333f}
+.dock .btn{flex:1}
+.dock .btn.ghost{flex:0 0 auto;min-width:118px}
+
+/* ── Pauta ───────────────────────────────────────────────────────────── */
+.question-grid{display:grid;gap:12px}
+.question-card{width:100%;text-align:left;padding:16px;color:var(--ink);border:1px solid #3f5a6e;border-left:4px solid #6aa8ca;background:linear-gradient(160deg,#142633,#0b1822 70%,#071119);border-radius:12px;box-shadow:0 5px 0 #020609,0 14px 26px #0008;cursor:pointer;display:grid;gap:4px}
+.question-card small{font:700 9px var(--mono);letter-spacing:.14em;color:var(--gold)}
+.question-card h3{font:600 23px var(--display)}
+.question-card p{margin:0;font-size:13px;color:var(--ink-2);line-height:1.45}
+.question-card b{font:700 10px var(--mono);color:var(--blue);letter-spacing:.04em}
+
+/* ── Pergunta em terminal ────────────────────────────────────────────── */
+.question-banner{margin:0 0 12px;padding:11px 12px;color:var(--green);border-color:#3d9a68;background:linear-gradient(155deg,#10271f,#091914 62%,#07110f);box-shadow:inset 3px 0 0 var(--green),0 4px 0 #03070a;font:600 clamp(15px,4.4vw,21px)/1.3 var(--mono)}
+
+.brief-grid,.plan-grid,.sensor-grid,.relation-grid,.hyp-grid,.ending-cards{display:grid;gap:10px}
+.brief-grid article,.plan-card,.sensor-card,.ending-card{padding:14px;display:grid;gap:5px}
+.brief-grid article p,.plan-card p{margin:0;font-size:13px;line-height:1.5;color:var(--ink-2)}
+.plan-card strong{font:600 21px var(--display);color:var(--ink)}
+.plan-grid{margin-top:10px}
+
+/* ── Sensores ────────────────────────────────────────────────────────── */
+.sensor-card h3{font-size:21px}
+.sensor-card p{margin:0;font-size:13px;line-height:1.5;color:var(--muted)}
+.sensor-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.sensor-actions .btn{flex:1;min-width:150px;text-decoration:none}
+/* A fila das atividades: a de agora tem anel, a feita fica verde, a que espera
+   fica apagada e sem ação nenhuma — não há o que clicar fora da vez. */
+.sensor-card.atual{box-shadow:0 0 0 2px #6aa8ca99,var(--shadow)}
+.sensor-card.feita{border-left-color:var(--green)}
+.sensor-card.feita>small{color:var(--green-soft)}
+.sensor-card.travada{opacity:.45;filter:grayscale(.5)}
+.sensor-card.travada>small{color:#63798a}
+.sensor-card .lote{margin:2px 0 0;font:600 11px var(--mono);color:var(--gold2)}
+/* A atividade que ainda não foi aberta pela mesa não é a atividade de agora:
+   ela é a próxima. Sem esta distinção o cartão ficava idêntico ao aberto e o
+   jogador procurava um botão que não é dele. */
+.sensor-card.esperando{box-shadow:0 0 0 1px #56768a55,var(--shadow)}
+.sensor-card .aguardando{color:#9fb6c4;text-transform:none;font:600 12px var(--sans);line-height:1.45}
+.sensor-card .aviso{color:#8fa4b0;text-transform:none;font:500 11.5px var(--sans);line-height:1.45}
+.sensor-clock{display:flex;align-items:baseline;justify-content:space-between;gap:9px;margin-top:7px;
+ padding:8px 11px;border:1px solid rgba(45,68,82,.75);border-left:4px solid var(--blue);border-radius:9px;background:#060d14;
+ box-shadow:inset 0 2px 8px rgba(0,0,0,.58),inset 1px 0 5px rgba(0,0,0,.32)}
+.sensor-clock span{font:700 9px var(--mono);letter-spacing:.16em;color:var(--muted)}
+.sensor-clock b{font:800 23px var(--mono);color:var(--gold2)}
+.sensor-clock b.urgente{color:#ff9b8b}
+/* Os campos do Mestre no prólogo. Para o convidado o bloco inteiro some e no
+   lugar fica uma linha dizendo de quem foi a decisão. */
+/* display:contents deixa os três campos serem itens da mesma grade de
+   .intro-actions. O par [hidden] não é enfeite: a regra do navegador para
+   [hidden] é de folha de usuário-agente e perde para esta, então sem ela o
+   bloco continuaria aparecendo para o convidado. */
+/* O pódio: a única coisa do fecho que é de todos. A composição de pontos
+   continua sendo de cada um, e não sobe para lugar nenhum. */
+/* O cronômetro do cabeçalho conta o que falta na fase. Vermelho nos últimos
+   dez segundos, que é quando ele passa a mudar o que a pessoa faz. */
+#timer.urgente{color:#ff9b8b}
+/* Tocou o sino: o que estava por fazer para de aceitar toque. A tela continua
+   legível de propósito — a pessoa precisa ver o que deixou para trás. */
+body.fase-vencida .screen.active .hand,
+body.fase-vencida .screen.active .hyp-grid,
+body.fase-vencida .screen.active .relation-grid,
+body.fase-vencida .screen.active .case-form,
+body.fase-vencida .screen.active .sensor-actions{opacity:.45;pointer-events:none}
+#esperaDaMesa{position:fixed;left:50%;bottom:max(12px,env(safe-area-inset-bottom));transform:translateX(-50%);
+ z-index:40;max-width:min(560px,calc(100% - 24px));padding:9px 14px;border:1px solid #3a5769;border-radius:100px;
+ background:#0a1a24ee;color:#9fb6c4;font:600 12px var(--sans);text-align:center;backdrop-filter:blur(8px)}
+.podio-linha{display:grid;grid-template-columns:34px 1fr auto;align-items:baseline;gap:9px;padding:9px 0;border-bottom:1px solid #22323f}
+.podio-linha:last-child{border-bottom:0}
+.podio-linha b{font:800 13px var(--mono);color:#7f96a6}
+.podio-linha span{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.podio-linha i{font:800 15px var(--mono);font-style:normal;color:var(--gold2)}
+.podio-linha.primeiro b,.podio-linha.primeiro i{color:var(--gold2)}
+.podio-linha.primeiro span{color:var(--gold2);font-weight:700}
+.mestre-fields{display:contents}
+.mestre-fields[hidden]{display:none}
+.sensor-card.travada .lote{color:#63798a}
+.btn:disabled{opacity:.42;filter:grayscale(.7);cursor:not-allowed}
+.btn:disabled:active{transform:none}
+.archive{margin-top:10px;padding:12px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.archive small{display:block;font:700 9px var(--mono);letter-spacing:.14em;color:var(--gold)}
+.archive b{font:800 13px var(--mono)}
+.tag{display:inline-block;margin:2px 4px 0 0;padding:4px 8px;border:1px solid #415c70;border-radius:6px;font:700 9px var(--mono);color:var(--blue)}
+
+/* ── Dossiê ──────────────────────────────────────────────────────────── */
+.dossier-meta{padding:9px 11px;font:600 11px var(--mono);color:var(--muted);margin-bottom:10px}
+.dossier-meta b{color:var(--gold2)}
+.wave{margin-bottom:14px}
+.wave-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:0 2px 6px;border-bottom:1px solid var(--line);margin-bottom:8px}
+.wave-head span{font:600 10px var(--mono);color:var(--muted)}
+.hand{display:grid;gap:6px}
+.fragment{width:100%;text-align:left;padding:9px 10px;border-radius:7px;border:1px solid #75664e;border-left:4px solid #9a7842;background:linear-gradient(160deg,#e7dfca,#b9aa8d);color:#211d17;box-shadow:0 3px 0 #090704,0 8px 14px #0005;cursor:pointer;display:grid;gap:2px;transition:transform .1s ease,box-shadow .1s ease}
+.fragment small{font:800 clamp(22px,6.5vw,34px)/1.15 var(--mono);letter-spacing:.04em;color:#1b1005}
+.fragment strong{font:600 18px var(--display);line-height:1.1}
+.fragment p{font-size:11.5px;line-height:1.4;margin:0;color:#40382f}
+.fragment.marked{border-left-color:#2e7d55;box-shadow:0 3px 0 #071108,0 0 0 2px #70d6a0aa,0 8px 14px #0005;background:linear-gradient(160deg,#e6efe0,#b6c9b3)}
+.fragment.marked small{color:#2c5a41}
+
+/* ── Hipóteses ───────────────────────────────────────────────────────── */
+.hyp-card{display:block;padding:12px;cursor:pointer;position:relative}
+.hyp-card input{position:absolute;opacity:0;pointer-events:none}
+.hyp-body{display:grid;gap:4px}
+.hyp-card small{font:700 9px var(--mono);letter-spacing:.12em;color:var(--muted)}
+.hyp-card strong{font:600 20px var(--display)}
+.hyp-card p{margin:0;font-size:12.5px;line-height:1.45;color:var(--ink-2)}
+.hyp-card em{font:500 10px var(--mono);font-style:normal;color:var(--muted)}
+.hyp-card.apoiada{border-left:4px solid #58c78a}
+.hyp-card.apoiada small{color:var(--green-soft)}
+.hyp-card.fraca{border-left:4px solid #8a5a52}
+.hyp-card.fraca small{color:var(--red)}
+.hyp-card.tensao{border-left:4px solid var(--gold)}
+.hyp-card.tensao small{color:var(--gold2)}
+.hyp-card.neutra{border-left:4px solid #3a4a56}
+.hyp-card.chosen{box-shadow:0 0 0 2px var(--gold2),var(--shadow)}
+
+/* ── Relações ────────────────────────────────────────────────────────── */
+.relation-card{width:100%;text-align:left;padding:14px;color:var(--ink);cursor:pointer;display:grid;gap:5px}
+.relation-card small{font:700 9px var(--mono);letter-spacing:.12em;color:var(--blue)}
+.relation-card h3{font-size:20px;line-height:1.15}
+.relation-card p{margin:0;font-size:12.5px;line-height:1.45;color:var(--muted)}
+.rel-pecas{font:700 11px var(--mono);color:var(--gold2)}
+.rel-pecas i{font-style:normal;color:#63798a}
+.relation-card.locked{opacity:.55;cursor:not-allowed;border-style:dashed}
+.relation-card.selected{border-left:4px solid #58c78a;box-shadow:0 0 0 2px #58c78a99,var(--shadow)}
+.contraproof{margin-top:12px;padding:14px;display:grid;gap:6px}
+.contraproof h3{font-size:20px;color:var(--green-soft)}
+.contraproof p{margin:0;font-size:13px;line-height:1.5;color:var(--ink-2)}
+
+/* ── Decisão ─────────────────────────────────────────────────────────── */
+.case-form{display:grid;gap:9px}
+.case-form .field span{display:block}
+
+/* ── Revelação ───────────────────────────────────────────────────────── */
+.reveal-stage{display:grid;min-height:52vh;align-content:center}
+.reveal-card{padding:20px;display:grid;gap:10px}
+.reveal-card h2{font-size:clamp(30px,8.5vw,54px);line-height:1.02;color:var(--gold2)}
+.reveal-card p{margin:0;font-size:14px;line-height:1.55;color:var(--ink-2)}
+
+/* ── Relatório ───────────────────────────────────────────────────────── */
+.score-wrap{display:grid;gap:12px}
+.score-wrap h2{font-size:clamp(30px,8vw,50px)}
+.score-ring{justify-self:start;display:flex;align-items:baseline;gap:6px;padding:14px 22px;border-left:4px solid var(--gold)}
+.score-ring strong{font:700 54px var(--display);color:var(--gold2);line-height:1}
+.score-ring small{font:700 12px var(--mono);color:var(--muted)}
+.score-bars{display:grid;gap:7px}
+.score-row{display:grid;grid-template-columns:minmax(96px,1.1fr) minmax(0,2fr) 34px;align-items:center;gap:9px;font:600 11px var(--mono)}
+.score-row .bar{height:9px;border-radius:5px;background:#0c1a23;border:1px solid var(--line);overflow:hidden}
+.score-row .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2))}
+.score-row b{text-align:right;color:var(--gold2)}
+.ending-card h3{font-size:19px;line-height:1.15}
+.ending-card p{margin:0;font-size:12.5px;line-height:1.45;color:var(--muted)}
+
+/* ── Coleção das seis perguntas ──────────────────────────────────────── */
+.colecao{padding:13px;display:grid;gap:7px;border-left:4px solid var(--gold)}
+.colecao>small{font:700 9px var(--mono);letter-spacing:.14em;color:var(--gold)}
+.colecao>b{font:600 22px var(--display)}
+.colecao p{margin:0;font-size:12.5px;line-height:1.45;color:var(--muted)}
+.colecao-marcas{display:flex;flex-wrap:wrap;gap:5px}
+.marca{padding:5px 8px;border:1px solid #3a4a56;border-radius:6px;font:700 9px var(--mono);letter-spacing:.08em;color:#63798a}
+.marca.on{border-color:#58c78a;background:#10271f;color:var(--green-soft)}
+
+/* ── Gaveta de regras ────────────────────────────────────────────────── */
+.drawer{position:fixed;inset:0;z-index:70;background:#000b;display:none;padding:12px;overflow:auto}
+.drawer.on{display:block}
+.drawer-card{max-width:600px;margin:6vh auto;padding:14px}
+.drawer-head{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.drawer-head h2{font-size:26px}
+.drawer p{font-size:13px;line-height:1.55;color:var(--ink-2)}
+.rules-list{display:grid;gap:8px;margin:12px 0}
+.rule-line{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.rule-line b{font-size:13px}
+.rule-line span{font:700 10px var(--mono);color:var(--muted);text-align:right}
+.coin-start{margin:14px 0 0;padding:10px;border-left:3px solid var(--gold);background:#d6aa580d}
+
+/* ── Alvo de toque de 44px sem engordar o desenho (herdado de A Noite) ── */
+.icon-btn,.hud-pill{position:relative}
+.icon-btn::after{content:'';position:absolute;left:50%;top:50%;width:max(100%,var(--alvo-de-toque));height:max(100%,var(--alvo-de-toque));transform:translate(-50%,-50%)}
+
+/* ── Telas largas ────────────────────────────────────────────────────── */
+@media(min-width:760px){
+ :root{--dock-h:82px}
+ .screen{padding:26px 18px calc(var(--dock-h) + 24px)}
+ .screen[data-screen=intro].active{display:grid;grid-template-columns:1.15fr .85fr;gap:34px;align-items:center}
+ .screen[data-screen=intro] .intro-copy{grid-column:1;grid-row:1}
+ .intro-actions{grid-column:2;grid-row:1;align-self:center}
+ .street-card{grid-column:1/-1;grid-row:2;height:120px}
+ .clock{padding:10px 16px}.clock small{display:block}.clock strong{font-size:24px}
+ .bank{left:170px;height:100px}
+ .question-grid,.brief-grid,.plan-grid,.sensor-grid,.relation-grid,.hyp-grid,.ending-cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .hand{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .section-head{display:grid;gap:2px}
+ .dock{justify-content:flex-end}
+ .dock .btn{flex:0 0 auto;min-width:240px}
+ .dock .btn.ghost{min-width:150px}
+}
+@media(min-width:1100px){
+ .question-grid,.relation-grid,.hyp-grid,.ending-cards{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .hand{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:380px){
+ .intro-copy h1{font-size:36px}
+ .street-card{display:none}
+ .dock .btn.ghost{min-width:0}
+}
+
+/* A sala tem duas portas e só precisa de uma. O #dragonSalaBtn flutuante vem do
+   firebase-room.js, compartilhado com A Noite — lá ele é a única porta e não
+   pode sumir. Aqui ele flutuava por cima do dock e atrapalhava a mão, e o
+   cabeçalho tinha espaço sobrando. Escondido, não removido: o clique
+   programático do #hudSala continua funcionando, e a presença do nó ainda é
+   como o game.js reconhece que este aparelho é o do Mestre. */
+#dragonSalaBtn{display:none}
+
+/* 11/10/2026 (Tarefa 4): os depoimentos que só este aparelho ouviu */
+.wave.depoimentos .depo-nota{margin:2px 0 10px;font-size:13px;opacity:.78}
+.fragment.depo{cursor:default}
+.fragment.depo .depo-quem{font:700 14px var(--serif,Georgia,serif);letter-spacing:.02em}
+.fragment.depo .depo-tom{display:block;margin:4px 0 6px;font-size:12px;opacity:.75}
+
+/* 12/10/2026 (Manhã v2): título longo da revelação (a verdade completa da manhã) cabe na tela. */
+.reveal-card h2.longo{font-size:clamp(1.12rem,4.4vw,1.5rem);line-height:1.38}

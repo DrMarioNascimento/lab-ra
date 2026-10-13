@@ -1,0 +1,12 @@
+[hidden]{display:none!important}*{box-sizing:border-box}
+body{margin:0;background:#060e18;color:#e8f3ff;font:15px system-ui,sans-serif}
+.viewer-layout{min-height:100vh;display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:24px;padding:24px}
+.scene-column{min-width:0;display:flex;flex-direction:column}header{pointer-events:none}small{color:#65d9df;letter-spacing:.22em;font-size:11px}h1{font-size:32px;font-weight:500;margin:8px 0}header p{color:#92a7be;line-height:1.5;margin:10px 0}
+#cell-stage{position:relative;flex:1;min-height:430px;overflow:hidden}canvas{display:block;width:100%;height:100%;touch-action:none}
+.panel{align-self:start;min-width:0;background:linear-gradient(145deg,#193344,#0e2030);border:1px solid #456575;border-radius:20px;padding:20px;box-shadow:inset 0 2px 1px #c4dff525,0 5px 0 #05141e,0 18px 32px #0005}
+button{width:100%;min-height:44px;padding:9px 13px;border:1px solid #6d91a2;border-bottom-color:#0b2330;border-radius:10px;background:linear-gradient(#527a8f,#2a4d61 50%,#163343);color:#f1f8fc;margin:7px 0;cursor:pointer;font:600 .78rem system-ui;box-shadow:inset 0 2px 1px #d7f5ff55,inset 0 -3px 3px #0006,0 4px 0 #061b25,0 8px 9px #0005;transition:transform .15s,filter .15s}
+button:hover{filter:brightness(1.12);transform:translateY(-1px)}button:active{transform:translateY(3px)}button:disabled{opacity:.4;cursor:default;transform:none}button:focus-visible{outline:3px solid #c8a7ff;outline-offset:3px}
+button[aria-pressed=true],.ra-launch{border-color:#7bd4c4;background:linear-gradient(#55978a,#2c6d61 50%,#17433a);color:#effffb}
+label{display:block;margin:14px 0 8px;color:#bdcfdf;font-size:13px}input{width:100%;accent-color:#7bd4c4;margin-top:10px}footer{color:#91a8bc;font-size:12px;line-height:1.5}#status{color:#83dee1;font-size:13px;margin-top:10px}#tip{color:#e4f3ff;min-height:24px;font-size:16px}#ar-state{font-size:11px;color:#a9c4d3;line-height:1.5}model-viewer{display:block;width:100%;height:155px;background:#091923;border:1px solid #456575;border-radius:12px;margin-top:14px}
+@media(max-width:760px){.viewer-layout{grid-template-columns:minmax(0,1fr);gap:18px;padding:18px}.panel{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px}.panel small,#ar-state,model-viewer,.ra-launch{grid-column:1/-1}.panel button{margin:3px 0}h1{font-size:26px}header p{font-size:13px}#cell-stage{flex:none;height:420px;min-height:0}model-viewer{height:160px}}
+@media(prefers-reduced-motion:reduce){button{transition:none}}

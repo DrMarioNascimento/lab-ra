@@ -1,0 +1,36 @@
+/* A Casa · Os papéis da passagem. A posição e o tamanho da mesa, do
+   tabuleiro, da bandeja e de cada pedaço saem do JS (ac-papeis.js, área()):
+   aqui fica só a matéria — madeira, papel, o pedaço erguido, a recusa. */
+#scene{position:fixed;inset:0;background:radial-gradient(120% 90% at 50% 30%,#2c1f14 0%,#140e09 62%,#070504 100%);overflow:hidden;touch-action:none}
+#mesa{position:absolute}
+#tabuleiro{position:absolute;border-radius:6px;background:#0d0906;box-shadow:inset 0 0 0 1px #c9a66c33,0 18px 40px #000a}
+#tabuleiro.encaixe{background:#1a120bcc}
+#tabuleiro>canvas{display:block;width:100%;height:100%}
+#bandeja{position:absolute;border-radius:12px;background:#0f1d1b66;box-shadow:inset 0 0 0 1px #c9a66c30}
+#bandeja[hidden]{display:none}
+
+.peca{position:absolute;left:0;top:0;padding:0;margin:0;border:0;border-radius:0;min-height:0;background:none;box-shadow:none;
+  cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none;
+  transition:left .22s ease,top .22s ease,width .18s ease,height .18s ease;filter:drop-shadow(0 2px 3px #000a)}
+#mesa.sem-transicao .peca{transition:none}
+.peca>canvas{display:block;width:100%;height:100%;pointer-events:none}
+.peca:hover:not(:disabled){filter:drop-shadow(0 2px 3px #000a) brightness(1.06)}
+.peca:active:not(:disabled){transform:none}
+/* O pedaço tocado se levanta: é o que diz "agora escolha onde ele vai". */
+.peca.erguida{z-index:5;outline:3px solid #f4d49a;outline-offset:-3px;filter:drop-shadow(0 10px 12px #000c) brightness(1.12)}
+.peca.pontas{cursor:grab}
+.peca.arrastando{z-index:20;cursor:grabbing;transition:none;filter:drop-shadow(0 14px 16px #000d) brightness(1.08)}
+.peca.presa{cursor:default;z-index:1;filter:none}
+.peca.chegando{animation:papel-chega .6s ease both}
+/* A recusa se vê: o pedaço chacoalha e fica onde estava. */
+.peca.recusa{animation:papel-recusa .42s ease}
+@keyframes papel-recusa{0%,100%{translate:0}20%{translate:-7px 0}40%{translate:7px 0}60%{translate:-5px 0}80%{translate:4px 0}}
+@keyframes papel-chega{from{opacity:0;scale:.8}to{opacity:1;scale:1}}
+#mesa.montado #tabuleiro{animation:papel-montado .9s ease}
+@keyframes papel-montado{0%{box-shadow:inset 0 0 0 1px #c9a66c33,0 0 0 0 #f4d49a00}40%{box-shadow:inset 0 0 0 1px #f4d49a,0 0 36px 8px #f4d49a66}100%{box-shadow:inset 0 0 0 1px #c9a66c33,0 18px 40px #000a}}
+
+#achado-carta h2{margin-top:2px}
+#achado-carta p{margin:0 0 10px}
+#achado-carta b{color:#e4c691;font-weight:600}
+
+@media(prefers-reduced-motion:reduce){.peca{transition:none}.peca.recusa,.peca.chegando,#mesa.montado #tabuleiro{animation:none}}

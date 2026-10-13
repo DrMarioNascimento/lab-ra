@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="pt-BR" data-ac-workbench data-ac-casa>
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#091515"><title>A Casa · Sob outra luz</title>
+  <link rel="stylesheet" href="css/mosaico-3d.css"><link rel="stylesheet" href="css/ac-investigacao.css?v=20261004-janelas"><link rel="stylesheet" href="css/ac-ra.css?v=20261004-janelas">
+<link rel="stylesheet" href="css/ac-janelas.css?v=20261011-t4">
+<script src="js/ac-cloud.js?v=20261004-janelas"></script></head>
+<body>
+  <div id="scene" data-ac-cena aria-label="Escrivaninha tridimensional da Casa da Costa"></div>
+  <header class="topbar"><a href="#" class="brand" aria-label="A Casa da Costa">AC<span>A CASA<br>DA COSTA</span></a><span class="edition">INVESTIGAÇÃO EM DUPLA</span><button id="sair-ra" class="ac-sair-ra" type="button" aria-label="Sair da realidade aumentada" hidden>✕</button><button id="help" class="ac-chevron" type="button" aria-label="Mostrar as janelas" aria-expanded="true">⌄</button></header>
+  <main>
+    <div class="chapter"><span class="eyebrow">A ESCRIVANINHA</span><h1>Sob outra luz.</h1><p>O que o escuro não deixou ver.</p></div>
+    <p id="coop-status" data-ac-priority="6" role="status">Conectando a dupla…</p><div id="loading" role="status">Preparando a escrivaninha…</div>
+    <div id="reticle" aria-hidden="true"><span></span></div>
+    <button id="candle-grip" class="gesture-point" aria-label="A vela" hidden><span aria-hidden="true">🕯️</span></button>
+    <div id="socket" class="gesture-point" aria-hidden="true" hidden><span>Castiçal</span></div>
+    <aside data-ac-priority="2" class="instruction" aria-live="polite"><div id="timer" data-ac-relogio aria-label="Tempo e pontos da vela"></div><span id="step" class="eyebrow"></span><h2 id="heading"></h2><p id="description"></p><p id="fala-parceiro" class="ac-fala" hidden></p><p id="dica" class="ac-dica" hidden></p><div id="progress" role="progressbar" aria-label="Examinar a marca" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div><button id="primary" disabled>Carregando…</button><button type="button" class="ac-como-jogar" data-ac-abrir="instructions" aria-label="Como jogar"><span aria-hidden="true">📖</span><span class="ac-como-jogar-texto">Como jogar</span></button></aside>
+    <nav class="tools" aria-label="Instrumentos de investigação"><button id="fosforo" hidden>Riscar o fósforo</button><button id="dossier" hidden>Dossiê <span id="count">0</span></button></nav>
+    <p class="caption">Madeira, luz e um detalhe esquecido.</p>
+  </main>
+  <dialog id="portal-ra" data-ac-priority="10" data-ac-decisao aria-live="polite"><span class="eyebrow">ANTES DE COMEÇAR</span><h2>A escrivaninha vai para a sua sala.</h2><p>A câmera vai procurar o chão. Aponte para ele, mova o aparelho devagar e toque para pôr o móvel. Depois, ande em volta — e, se precisar ver embaixo, abaixe o aparelho.</p><div class="portal-botoes"><button id="ra-entrar" class="portal-principal">Abrir a câmera</button><button id="ra-tela" hidden>Continuar na tela</button></div><p id="ra-aviso" class="portal-aviso" role="status"></p></dialog>
+  <dialog id="fragment" data-ac-priority="5"><span class="eyebrow">DESCOBERTA</span><div id="fragment-card"></div><button id="register" class="ac-continuar">Guardar no dossiê</button><button id="follow-clue" class="ac-continuar" hidden>Seguir a pista até a maquete</button></dialog>
+  <dialog id="instructions" data-ac-priority="10"><span class="eyebrow">A ESCRIVANINHA</span><h2>Um móvel, duas mãos.</h2><p>A casa apagou. A escrivaninha está em algum lugar da sala e guarda uma coisa pequena que ninguém devia achar.</p><p>O que um de vocês faz, o outro vê acontecer. Conversem em voz alta.</p><p id="fallback-description">Um dedo arrastando gira a cena; dois dedos aproximam. Toque no que parecer importante.</p><label class="accessible-option" hidden><input id="accessible" type="checkbox"> Mostrar botões alternativos de ação</label><p>A escrivaninha tem 4 minutos, contados desde que vocês chegam a ela. A vela vale 30 pontos e perde 1 a cada 8 segundos até a etiqueta ser achada. Duas dicas chegam no caminho: primeiro uma sutil, depois uma que ajuda mais. Se o tempo acabar, a etiqueta aparece sozinha e a vela não pontua.</p><p class="ac-credito">A realidade aumentada no iPhone usa o 8th Wall Engine (© 2026 Niantic Spatial, Inc.), sob a <a href="https://github.com/8thwall/engine/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">XR Engine License</a>, fornecido sem garantias.</p><p id="invite-wrap" hidden><a id="invite" target="_blank" rel="noopener noreferrer">Abrir a tela do colega ↗</a></p><button type="button" class="ac-continuar" data-ac-fechar>Entendi</button></dialog>
+  <div id="notice" data-ac-priority="9" role="status"></div>
+  <script src="js/three.min.js"></script><script src="js/vendor/GLTFLoader.js"></script><script src="js/vendor/OrbitControls.js"></script>
+  <script src="js/ac-ritmo.js?v=20261004-janelas"></script><script src="js/ac-ra.js?v=20261004-janelas"></script><script src="js/mosaico-3d-engine.js"></script><script src="js/ac-investigacao-state.js"></script><script src="js/ac-cooperacao.js?v=20261004-janelas"></script><script src="js/ac-desk.js?v=20261004-janelas"></script><script src="js/ac-room-layout.js"></script><script src="js/ac-room-art.js"></script><script src="js/ac-room.js"></script><script src="js/ac-investigacao.js?v=20261004-janelas"></script>
+<script src="js/ac-janelas.js?v=20261011-t4"></script></body></html>

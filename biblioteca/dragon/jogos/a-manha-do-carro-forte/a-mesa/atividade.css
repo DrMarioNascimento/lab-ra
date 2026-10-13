@@ -1,0 +1,87 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=IBM+Plex+Mono:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+/* MOSAICO — folha comum das três atividades sensoriais.
+   Mesma paleta e mesma espessura da Mesa: o jogador não muda de jogo ao abrir
+   a aba, muda de instrumento. */
+:root{
+ --bg:#050b12;--ink:#f3f6f4;--muted:#9aa9b3;--gold:#d6aa58;--gold2:#efc878;
+ --green:#70d6a0;--blue:#7faac1;--edge:#32485a;--mono:'IBM Plex Mono',monospace;
+ --display:'Cormorant Garamond',Georgia,serif;--sans:Inter,system-ui,sans-serif;
+ color-scheme:dark;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);touch-action:manipulation}
+body{padding:14px 12px calc(24px + env(safe-area-inset-bottom));max-width:760px;margin:auto}
+header{margin-bottom:14px}
+#kicker{font:700 9px var(--mono);letter-spacing:.16em;color:var(--gold)}
+h1{font:600 clamp(30px,8vw,46px)/1 var(--display);margin:6px 0 8px}
+header p{color:var(--muted);font-size:13.5px;line-height:1.5;margin:0}
+
+.room{position:relative;height:min(56vh,420px);margin-bottom:10px;border:1px solid var(--edge);border-radius:12px;background:#02070b;overflow:hidden;cursor:crosshair;touch-action:none}
+.beam{position:absolute;width:180px;height:180px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#ffe7b433 0%,#ffe7b414 42%,transparent 70%);left:-999px;top:-999px}
+.obj{position:absolute;width:132px;padding:7px 8px;border-radius:7px;border:1px solid #75664e;border-left:3px solid #9a7842;background:linear-gradient(160deg,#e7dfca,#b9aa8d);color:#211d17;opacity:0;transition:opacity .25s ease;pointer-events:none}
+.obj.found{opacity:1}
+.obj b{display:block;font:700 9px var(--mono);color:#6a5a3c}
+.obj span{display:block;font-size:10.5px;line-height:1.35;margin-top:2px}
+
+/* Vidro: cada fragmento tem a sua faixa, e a faixa só abre onde o dedo passou. */
+.glass{position:relative;height:min(56vh,420px);margin-bottom:10px;border:1px solid var(--edge);border-radius:12px;overflow:hidden;background:#0b1620;cursor:grab;touch-action:none;display:grid}
+.faixa{position:relative;display:flex;align-items:center;padding:10px 12px;border-bottom:1px solid #17293607;overflow:hidden}
+.faixa:last-child{border-bottom:0}
+.faixa .conteudo{opacity:0;transition:opacity .3s ease;font-size:13px;line-height:1.4}
+.faixa .conteudo b{display:block;font:700 9px var(--mono);color:var(--gold);margin-bottom:3px}
+.faixa .embacado{position:absolute;inset:0;background:linear-gradient(120deg,#22333dee,#16242cee);backdrop-filter:blur(6px);transition:opacity .3s ease}
+.faixa.limpa .conteudo{opacity:1}
+.faixa.limpa .embacado{opacity:0}
+.faixa .gotas{position:absolute;inset:0;opacity:.5;background:radial-gradient(circle at 20% 30%,#ffffff14 0 3px,transparent 4px),radial-gradient(circle at 62% 68%,#ffffff10 0 4px,transparent 5px),radial-gradient(circle at 84% 22%,#ffffff12 0 3px,transparent 4px)}
+.faixa.limpa .gotas{opacity:0}
+
+/* Bússola: o setor só fixa quando o aparelho aponta para ele. */
+.bussola{position:relative;width:min(74vw,300px);height:min(74vw,300px);margin:0 auto 12px;border:1px solid var(--edge);border-radius:50%;background:radial-gradient(circle,#0e1c26,#050b12);display:grid;place-items:center;touch-action:none}
+.agulha{position:absolute;width:3px;height:42%;top:8%;background:linear-gradient(var(--gold2),#8a6b28);transform-origin:50% 100%;border-radius:2px}
+.setor{position:absolute;width:64px;margin-left:-32px;text-align:center;font:700 9px var(--mono);color:#5d7386;left:50%;top:6px;transform-origin:50% calc(50vw)}
+.grau{font:800 22px var(--mono);color:var(--gold2)}
+.dica{font:600 11px var(--mono);color:var(--muted);text-align:center;margin-bottom:10px}
+
+.placar{display:flex;align-items:baseline;gap:8px;padding:9px 11px;border:1px solid var(--edge);border-left:4px solid var(--gold);border-radius:9px;background:linear-gradient(165deg,#152431,#0b141d);margin-bottom:10px}
+.placar b{font:800 15px var(--mono);color:var(--gold2)}
+.placar span{font:600 11px var(--mono);color:var(--muted)}
+
+/* O relógio da mesa. Ele fica logo abaixo do cabeçalho, antes do gesto, porque
+   é a informação que muda o que a pessoa faz: com 12 s no visor, ninguém varre
+   o corredor devagar. */
+.cronometro{display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+ padding:9px 12px;margin-bottom:11px;border:1px solid rgba(45,68,82,.75);border-left:4px solid var(--blue);
+ border-radius:9px;background:#060d14;box-shadow:inset 0 2px 8px rgba(0,0,0,.58),inset 1px 0 5px rgba(0,0,0,.32)}
+.cronometro span{font:700 9px var(--mono);letter-spacing:.16em;color:var(--muted)}
+.cronometro b{font:800 25px var(--mono);color:var(--gold2)}
+.cronometro b.urgente{color:#ff9b8b}
+
+/* O fim da atividade, e a volta. Antes daqui a página apenas desabilitava o
+   botão e escrevia "volte para a Mesa" — sem link, sem porta, sem nada. */
+.fim{padding:14px;margin-top:12px;border:1px solid var(--edge);border-left:4px solid var(--green);
+ border-radius:11px;background:linear-gradient(165deg,#122a22,#0a1a15);display:grid;gap:6px}
+.fim b{font:600 24px var(--display);color:var(--green)}
+.fim span{font-size:13.5px;line-height:1.5;color:#c6d6cd}
+.fim p{margin:0;font-size:12.5px;line-height:1.45;color:var(--gold2)}
+.fim p:empty{display:none}
+.fim button{margin-top:6px}
+
+.lista{display:grid;gap:6px;margin-bottom:12px}
+.achado{padding:8px 10px;border-radius:7px;border:1px solid #75664e;border-left:4px solid #9a7842;background:linear-gradient(160deg,#e7dfca,#b9aa8d);color:#211d17}
+.achado b{display:block;font:700 9px var(--mono);color:#6a5a3c}
+.achado span{display:block;font-size:11.5px;line-height:1.4;margin-top:2px;color:#40382f}
+
+/* Carta do fragmento: linha secundária sob a pista, sem competir com o texto. */
+.pista-arquivo-hint{text-align:center;margin:12px 0 0;font:500 13px/1.45 var(--sans);color:#5c5348}
+.pista-arquivo-hint .pista-arquivo-curta{display:none}
+@media (max-height:600px),(max-width:330px){
+  .pista-arquivo-hint .pista-arquivo-curta{display:inline}
+  .pista-arquivo-hint .pista-arquivo-completa{display:none}
+}
+
+button.primary{width:100%;min-height:52px;border:0;border-radius:10px;padding:12px 14px;font-weight:800;font-size:14px;cursor:pointer;background:linear-gradient(180deg,var(--gold2),var(--gold));color:#201707;box-shadow:0 5px 0 #6f4d17,0 12px 22px #000a}
+button.primary:active{transform:translateY(3px);box-shadow:0 2px 0 #6f4d17}
+button.primary:disabled{opacity:.5;box-shadow:none;transform:none;cursor:default}
+button.ghost{width:100%;min-height:46px;margin-bottom:10px;border:1px solid #46667a;border-radius:9px;background:linear-gradient(180deg,#162a38,#0c1b26);color:var(--ink);font-weight:700;cursor:pointer}
+body.encerrada .room,body.encerrada .glass,body.encerrada .bussola{opacity:.5;pointer-events:none}

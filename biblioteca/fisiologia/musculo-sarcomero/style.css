@@ -1,0 +1,16 @@
+/* Mesmo padrão visual das experiências RA, com controles próprios do músculo. */
+@import url('../pleura/style.css?v=inclinacao-20261002');
+.stage-tools{flex-wrap:wrap;justify-content:flex-end}
+.stage .gesture{bottom:76px;max-width:calc(100% - 32px)}
+.labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.lbl{position:absolute;left:0;top:0;transform:translate(-9999px,-9999px);margin:-11px 0 0 9px;border:1px solid #7aa6b8;border-radius:6px;background:#091923ed;padding:5px 8px;color:#e5f3f8;font:500 .65rem var(--mono);white-space:nowrap;box-shadow:0 3px 8px #0005}
+.lbl::before{content:'';position:absolute;left:-12px;top:9px;width:5px;height:5px;border-radius:50%;background:#9ce4ed}
+.lbl.ancora-direita::before{left:auto;right:-12px}
+.ghost-control.on{border-color:#7bd4c4;color:#b8f1e2}
+.contracao{border-left:4px solid #e5a5aa}
+.contracao-valor{font:500 .73rem var(--mono);line-height:1.8;color:#dce9f3;margin:0}
+#tensao{display:block;width:100%;height:auto;border:1px solid #54748766;border-radius:10px;background:#0b1b27}
+.learning-strip h2{margin:0;font-size:1.1rem;font-weight:600}
+.learning-strip p{margin:0;color:var(--mist);font-size:.85rem;line-height:1.8}
+.stage:fullscreen{width:100vw;height:100vh;border-radius:0;border:0}
+@media(max-width:520px){.stage-tools{left:10px;right:10px;bottom:14px}.stage-tools button{flex:1;padding:9px 5px;font-size:.68rem}.stage .gesture{left:10px;bottom:70px;max-width:calc(100% - 20px)}.lbl{font-size:.58rem;padding:4px 6px}}

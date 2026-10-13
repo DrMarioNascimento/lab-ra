@@ -1,0 +1,270 @@
+/* MOSAICO — PROFUNDIDADE 1+1
+   Outer spectacular navy card + inner recessed (carved) panel.
+
+   The gold-standard is the activity card “O Vidro Embaçado” on the Carro
+   Mesa: deep navy fill, light-cyan stroke, soft elevation, then a darker
+   inset for TEMPO DA MESA. Depth is the pattern — the inset may hold a
+   timer, a list, or text. Future modals should declare these classes
+   instead of inventing another box-shadow.
+
+   Tokens live here. Button *walls* (the 5px physical step) stay in
+   profundidade.css. This file is the card language. */
+
+:root{
+  --pf-navy:#0e1c28;
+  --pf-navy-mid:#152433;
+  --pf-navy-deep:#060d14;
+  --pf-stroke:rgba(159,228,255,.52);
+  --pf-stroke-hi:rgba(189,245,255,.62);
+  --pf-gold:#e8a94a;
+  --pf-gold2:#ffc46b;
+  --pf-gold-face:#ffc878;
+  --pf-gold-base:#d6aa58;
+  --pf-gold-wall:#6a3712;
+  --titulo:#f4f9fd;
+  --pf-go-face:#8ee4ad;
+  --pf-go-base:#3ea86a;
+  --pf-go-wall:#1b5c38;
+  --pf-go-ink:#062011;
+  --pf-ink:#f4f9fd;
+  --pf-ink-2:#dfeaf5;
+  --pf-muted:#c5d4dc;
+  --pf-alias:#ffcf8f;
+  --pf-card-fill:linear-gradient(165deg,#1a3348,#153044 60%,#102838);
+  --pf-card-shadow:
+    inset 0 1px 0 rgba(255,255,255,.10),
+    0 18px 50px rgba(0,0,0,.55),
+    0 0 40px rgba(127,212,255,.10);
+  --pf-inset-fill:#03080d;
+  --pf-inset-stroke:rgba(20,36,48,.95);
+  --pf-inset-shadow:
+    inset 0 3px 10px rgba(0,0,0,.72),
+    inset 2px 0 6px rgba(0,0,0,.45),
+    inset 0 -1px 0 rgba(127,212,255,.04);
+}
+
+.pf-card{
+  background:var(--pf-card-fill);
+  border:1px solid var(--pf-stroke);
+  border-radius:14px;
+  box-shadow:var(--pf-card-shadow);
+}
+.pf-card h1,.pf-card h2,.pf-card h3{color:var(--titulo)}
+.pf-inset{
+  background:var(--pf-inset-fill);
+  border:1px solid var(--pf-inset-stroke);
+  border-left:4px solid #6aa8ca;
+  border-radius:10px;
+  box-shadow:var(--pf-inset-shadow);
+  overflow:hidden;
+}
+.pf-btn-gold{
+  display:flex;align-items:center;justify-content:center;
+  width:100%;min-height:52px;margin-top:12px;padding:12px 14px;
+  border:0;border-radius:10px;cursor:pointer;
+  background:linear-gradient(180deg,var(--pf-gold-face),var(--pf-gold-base));
+  color:#1b1005;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+  box-shadow:inset 0 1px 0 #ffe2b4,0 5px 0 var(--pf-gold-wall),0 12px 22px #000a;
+}
+.pf-btn-gold:active{transform:translateY(4px);box-shadow:inset 0 1px 0 #ffe2b4,0 1px 0 var(--pf-gold-wall),0 5px 10px #0009}
+.pf-btn-go{
+  display:flex;align-items:center;justify-content:center;
+  width:100%;min-height:52px;margin-top:12px;padding:12px 14px;
+  border:0;border-radius:10px;cursor:pointer;
+  background:linear-gradient(180deg,var(--pf-go-face),var(--pf-go-base));
+  color:var(--pf-go-ink);font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+  box-shadow:inset 0 1px 0 #d4f5e2,0 5px 0 var(--pf-go-wall),0 12px 22px #000a;
+}
+.pf-btn-go:active{transform:translateY(4px);box-shadow:inset 0 1px 0 #d4f5e2,0 1px 0 var(--pf-go-wall),0 5px 10px #0009}
+.pf-btn-ghost{
+  display:flex;align-items:center;justify-content:center;
+  width:100%;min-height:48px;margin-top:10px;padding:12px 14px;
+  border:1px solid #46667a;border-radius:10px;cursor:pointer;
+  background:linear-gradient(180deg,#162a38,#0c1b26);color:var(--pf-ink);
+  font-weight:800;letter-spacing:.06em;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 4px 0 #020609,0 10px 18px #0008;
+}
+.pf-btn-ghost:active{transform:translateY(3px);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 1px 0 #020609,0 4px 8px #0008}
+.pf-cell{
+  display:block;width:100%;text-align:left;padding:14px 16px;
+  border:0;border-bottom:1px solid rgba(45,63,72,.7);border-radius:0;
+  background:transparent;color:var(--pf-ink-2);cursor:pointer;box-sizing:border-box;
+}
+.pf-cell:last-child{border-bottom:0}
+.pf-cell.on{
+  background:#25190e;color:var(--pf-gold2);
+  box-shadow:inset 0 0 0 2px var(--pf-gold),inset 0 0 18px rgba(232,169,74,.1);
+  position:relative;z-index:1;
+}
+.pf-cell b{display:block;font-size:17px;line-height:1.25;color:var(--pf-ink)}
+.pf-cell .alias{display:block;margin-top:5px;font-style:italic;color:var(--pf-alias);font-size:14px;line-height:1.35}
+.pf-cell small{display:block;margin-top:5px;color:var(--pf-muted);font-size:13.5px;line-height:1.4}
+.pf-cell.on b{color:var(--pf-gold2)}
+.pf-cell.on .alias,.pf-cell.on small{color:#ffe2b4}
+
+@media (prefers-reduced-motion:reduce){
+  .pf-btn-gold,.pf-btn-ghost{transition:none}
+  .pf-btn-gold:active,.pf-btn-ghost:active{transform:none}
+}
+
+/* Applied chrome — production doors that load this sheet last inherit 1+1
+   without inventing another box-shadow. Gold/green left-rail variants keep
+   their accent. Load AFTER local styles so these fills win on a tie. */
+
+.pf-pausa{
+  position:fixed;inset:0;z-index:99999;
+  display:none;align-items:center;justify-content:center;
+  padding:28px;background:rgba(2,6,10,.86);
+}
+.pf-pausa-card{width:min(440px,94vw);padding:20px}
+.pf-pausa-msg{
+  padding:18px 16px;color:var(--pf-ink-2);text-align:center;
+  font:500 15px/1.6 system-ui,sans-serif;letter-spacing:.03em;
+}
+
+.waiting-card,.openbox,.fecho-card{
+  background:var(--pf-card-fill);
+  border:1px solid var(--pf-stroke);
+  box-shadow:var(--pf-card-shadow);
+}
+.waiting-card{border-radius:14px;padding:14px}
+.openbox,.fecho-card{border-radius:14px}
+.waiting-inset,.openbox-inset,.fecho-inset{padding:18px 20px}
+.ready-btn{
+  min-height:58px;border:0;border-radius:10px;padding:12px 22px;cursor:pointer;
+  background:linear-gradient(180deg,var(--pf-gold-face),var(--pf-gold-base));
+  color:#1b1005;font-weight:900;
+  box-shadow:inset 0 1px 0 #ffe2b4,0 5px 0 var(--pf-gold-wall),0 12px 22px #000a;
+}
+.ready-btn:active{transform:translateY(4px);box-shadow:inset 0 1px 0 #ffe2b4,0 1px 0 var(--pf-gold-wall),0 5px 10px #0009}
+.opencontrols button{
+  min-height:48px;border:1px solid #46667a;border-radius:10px;
+  background:linear-gradient(180deg,#162a38,#0c1b26);color:var(--pf-ink);
+  font-weight:800;padding:8px 13px;cursor:pointer;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 4px 0 #020609;
+}
+.wrap .top,.wrap .question,.wrap .players,.wrap .fase{
+  background:var(--pf-card-fill);
+  border:1px solid var(--pf-stroke);
+  box-shadow:var(--pf-card-shadow);
+}
+
+.depth-card:not(.gold):not(.green):not(.blue):not(.question-banner):not(.meeting-head):not(.decision-panel){
+  background:var(--pf-card-fill);
+  border:1px solid var(--pf-stroke);
+  box-shadow:var(--pf-card-shadow);
+}
+.modal-card,.drawer-card{
+  background:var(--pf-card-fill);
+  border:1px solid var(--pf-stroke);
+  border-radius:14px;
+  box-shadow:var(--pf-card-shadow);
+}
+.modal-card .pf-inset,#modalBody.pf-inset,.drawer-inset{margin-top:10px;padding:10px}
+.choice-list{
+  background:var(--pf-inset-fill);
+  border:1px solid var(--pf-inset-stroke);
+  border-left:4px solid #6aa8ca;
+  border-radius:10px;
+  box-shadow:var(--pf-inset-shadow);
+  overflow:hidden;
+}
+.choice-item{
+  border:0;border-bottom:1px solid rgba(45,63,72,.7);border-radius:0;
+  background:transparent;
+}
+.choice-item:last-child{border-bottom:0}
+.btn.primary{
+  background:linear-gradient(180deg,var(--pf-gold-face),var(--pf-gold-base));
+  color:#1b1005;
+  box-shadow:inset 0 1px 0 #ffe2b4,0 5px 0 var(--pf-gold-wall),0 12px 22px #000a;
+}
+.btn.primary:active{
+  transform:translateY(4px);
+  box-shadow:inset 0 1px 0 #ffe2b4,0 1px 0 var(--pf-gold-wall),0 5px 10px #0009;
+}
+
+#abCasa .cartao{
+  background:var(--pf-card-fill);
+  border:1px solid var(--pf-stroke);
+  box-shadow:var(--pf-card-shadow);
+}
+#abCasa .cartao-inset{padding:4px 2px 2px}
+#abCasa .btn{
+  background:linear-gradient(180deg,var(--pf-gold-face),var(--pf-gold-base));
+  color:#1b1005;
+  box-shadow:inset 0 1px 0 #ffe2b4,0 5px 0 var(--pf-gold-wall),0 12px 22px #000a;
+}
+#abCasa .btn.fantasma{
+  background:linear-gradient(180deg,#162a38,#0c1b26);color:var(--pf-ink);
+  border:1px solid #46667a;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 4px 0 #020609;
+}
+
+.system-guard>div{
+  background:var(--pf-card-fill);
+  border:1px solid var(--pf-stroke);
+  border-radius:14px;
+  box-shadow:var(--pf-card-shadow);
+}
+.system-guard-inset{padding:8px 4px}
+
+#cartao-inner{
+  background:var(--pf-card-fill);
+  border:1px solid var(--pf-stroke);
+  border-radius:14px;
+  box-shadow:var(--pf-card-shadow);
+}
+#fechar-cartao{
+  background:linear-gradient(180deg,var(--pf-gold-face),var(--pf-gold-base));
+  color:#1b1005;border:0;border-radius:10px;
+  box-shadow:inset 0 1px 0 #ffe2b4,0 5px 0 var(--pf-gold-wall),0 12px 22px #000a;
+  text-shadow:none;
+}
+#fechar-cartao:active{
+  transform:translateY(4px);
+  box-shadow:inset 0 1px 0 #ffe2b4,0 1px 0 var(--pf-gold-wall),0 5px 10px #0009;
+  background:linear-gradient(180deg,var(--pf-gold-face),var(--pf-gold-base));
+}
+
+.shell .hero{
+  background:var(--pf-card-fill);
+  border:1px solid var(--pf-stroke);
+  box-shadow:var(--pf-card-shadow);
+}
+.shell .hero .question,.shell .opts,.shell .field,.shell .result,.shell .relation,.shell .factbox,.shell .map{
+  background:var(--pf-inset-fill);
+  border:1px solid var(--pf-inset-stroke);
+  border-left:4px solid #6aa8ca;
+  box-shadow:var(--pf-inset-shadow);
+}
+.shell .opt{
+  background:transparent;border:0;border-bottom:1px solid rgba(45,63,72,.7);border-radius:0;
+}
+.shell .opt:last-child{border-bottom:0}
+.shell .opt.on,.shell .opt:hover{background:#25190e;box-shadow:inset 0 0 0 2px var(--pf-gold)}
+.shell .opt.good{background:#10271f}
+.shell .opt.bad{background:#241310}
+
+/* Números / códigos de carta que o jogador troca ou lê à distância (iPhone).
+   Mínimo 22px — abaixo disso o playtest não lê no braço. */
+:root{--carta-num-min:22px}
+.carta-num,
+#carta-cod,
+#carta .folha>b,
+#carta-in #c-hora,
+.fragment small{
+  font-size:clamp(22px,6.5vw,34px);
+  font-weight:800;
+  letter-spacing:.04em;
+  line-height:1.15;
+}
+
+/* Foco visível pelo teclado (e por controle remoto no telão).
+   :where() tem especificidade zero: todo componente que já desenha o próprio
+   foco continua mandando; isto só aparece onde antes não aparecia nada.
+   :focus-visible não dispara em toque nem em clique de mouse. */
+:where(a,button,input,select,textarea,summary,[role="button"],[tabindex]:not([tabindex="-1"])):focus-visible{
+  outline:2px solid var(--gold2,#efc878);
+  outline-offset:3px;
+}

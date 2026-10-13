@@ -1,0 +1,924 @@
+/* ============================================================
+   MOSAICO 3D — ESTILOS VISUAIS E ESPACIAIS DE IMERSÃO MOBILE
+   A Casa da Costa — Vivência Tridimensional no Smartphone
+   ============================================================ */
+
+:root {
+  --m3d-depth: 1000px;
+  --m3d-gold-glow: 0 0 25px rgba(232, 164, 76, 0.45);
+  --m3d-cold-glow: 0 0 25px rgba(127, 212, 255, 0.45);
+  --m3d-red-glow: 0 0 25px rgba(224, 103, 79, 0.55);
+  --m3d-glass: rgba(14, 22, 33, 0.78);
+  --m3d-glass-border: rgba(127, 212, 255, 0.28);
+  --m3d-surface-shadow: 0 16px 36px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+/* Canvas Atmosférico 3D (Tempestade, Raios e Névoa) */
+#m3d-ambient-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.85;
+  transition: opacity 1s ease;
+}
+
+/* Container de Perspectiva Espacial */
+.m3d-viewport {
+  perspective: var(--m3d-depth);
+  perspective-origin: center center;
+  transform-style: preserve-3d;
+  width: 100%;
+  position: relative;
+}
+
+/* Objeto 3D que responde ao Giroscópio/Acelerômetro */
+.m3d-tilt-box {
+  transform-style: preserve-3d;
+  transition: transform 0.15s cubic-bezier(0.2, 0, 0.2, 1);
+  will-change: transform;
+}
+
+/* ============================================================
+   CARTAS E PLACAS DE EVIDÊNCIA EM 3D
+   ============================================================ */
+.m3d-card-stage {
+  perspective: 1200px;
+  width: min(100%, 380px);
+  margin: 14px auto 20px;
+  cursor: grab;
+}
+
+.m3d-card-3d {
+  position: relative;
+  display: grid;
+  width: 100%;
+  min-height: 240px;
+  border-radius: 16px;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.3s ease;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.75), 0 0 30px rgba(232, 164, 76, 0.15);
+}
+
+.m3d-card-3d.flipped {
+  transform: rotateY(180deg);
+}
+
+.m3d-card-face {
+  position: relative;
+  grid-area: 1 / 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  border-radius: 16px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 22px 20px;
+  overflow: hidden;
+  border: 1px solid rgba(232, 164, 76, 0.35);
+  background: linear-gradient(155deg, #1b2636 0%, #0c141f 55%, #070b10 100%);
+}
+
+.m3d-card-tilt { transform-style: preserve-3d; }
+.m3d-card-turn { display:block; margin:16px auto 0; min-height:44px; padding:10px 22px; border:1px solid #b69a64; border-radius:99px; color:#f5e5c4; background:#152b2b; cursor:pointer; box-shadow:0 4px 0 #071414,inset 0 1px 0 #ffffff18; font:inherit; }
+.m3d-card-turn:focus-visible { outline:3px solid #efd49b; outline-offset:4px; }
+@media(prefers-reduced-motion:reduce) { .m3d-card-3d,.m3d-card-tilt { transition:none; } .m3d-hologram-seal { animation:none; } }
+
+.m3d-card-face::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--light-x, 50%) var(--light-y, 30%), rgba(255, 255, 255, 0.18) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.m3d-card-back {
+  transform: rotateY(180deg);
+  background: linear-gradient(155deg, #24160d 0%, #150d06 60%, #0a0603 100%);
+  border-color: rgba(232, 164, 76, 0.6);
+}
+
+/* Selo Holográfico Dourado */
+.m3d-hologram-seal {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, #ffd9a0, #b8860b, #ffe5b4, #b8860b, #ffd9a0);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6), 0 0 12px rgba(232, 164, 76, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 19px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  animation: m3d-seal-shine 6s linear infinite;
+}
+
+@keyframes m3d-seal-shine {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Carimbo Confidencial / Evidência */
+.m3d-stamp {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 4px 10px;
+  border: 2px solid #e0674f;
+  color: #ff846e;
+  font: 800 11px/1.2 var(--sans);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  border-radius: 4px;
+  transform: rotate(-3deg);
+  box-shadow: 0 2px 8px rgba(224, 103, 79, 0.3);
+  margin-bottom: 12px;
+}
+
+/* ============================================================
+   TABULEIRO 3D DE RECONSTRUÇÃO DO MOSAICO
+   ============================================================ */
+.m3d-mosaico-board {
+  perspective: 1000px;
+  width: 100%;
+  max-width: 580px;
+  margin: 16px auto;
+  transform-style: preserve-3d;
+}
+
+.m3d-board-surface {
+  background: linear-gradient(175deg, #101925 0%, #0a1017 65%, #05080c 100%);
+  border: 1px solid rgba(127, 212, 255, 0.32);
+  border-radius: 18px;
+  padding: 18px 16px;
+  box-shadow: inset 0 2px 14px rgba(0, 0, 0, 0.8), 0 16px 40px rgba(0, 0, 0, 0.65), 0 0 35px rgba(25, 91, 107, 0.25);
+  transform: translateZ(10px);
+}
+
+.m3d-board-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(127, 212, 255, 0.2);
+}
+
+.m3d-slots-container {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+/* Fenda / Encaixe de Horário 3D */
+.m3d-slot {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border-radius: 12px;
+  background: rgba(4, 9, 14, 0.85);
+  border: 1px solid rgba(42, 57, 73, 0.8);
+  box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.7), 0 1px 0 rgba(255, 255, 255, 0.05);
+  transform-style: preserve-3d;
+  transition: all 0.25s ease;
+}
+
+.m3d-slot.filled {
+  background: linear-gradient(135deg, rgba(25, 91, 107, 0.5), rgba(10, 30, 42, 0.8));
+  border-color: rgba(93, 204, 134, 0.6);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5), 0 0 16px rgba(93, 204, 134, 0.2);
+}
+
+.m3d-slot.highlight-ping {
+  border-color: #ffd9a0;
+  box-shadow: 0 0 24px var(--ping-cor, rgba(232, 164, 76, 0.65));
+  animation: m3d-pulse-ping 1.4s ease-out infinite;
+}
+
+@keyframes m3d-pulse-ping {
+  0% { transform: scale(1); box-shadow: 0 0 10px var(--ping-cor, rgba(232, 164, 76, 0.4)); }
+  50% { transform: scale(1.02); box-shadow: 0 0 26px var(--ping-cor, rgba(232, 164, 76, 0.85)); }
+  100% { transform: scale(1); box-shadow: 0 0 10px var(--ping-cor, rgba(232, 164, 76, 0.4)); }
+}
+
+.m3d-slot-time {
+  flex: 0 0 auto;
+  min-width: 62px;
+  padding: 6px 10px;
+  background: #020508;
+  border: 1px solid #ff9a4d;
+  border-radius: 8px;
+  color: #ffe0c0;
+  font: 700 16px/1 var(--mono, monospace);
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.m3d-slot-target {
+  flex: 1;
+  min-width: 0;
+}
+
+.m3d-btn-select-tile {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: linear-gradient(165deg, #19293a, #0d1722);
+  border: 1px solid rgba(127, 212, 255, 0.4);
+  color: #f4f9fd;
+  font: 600 14px/1.3 var(--sans);
+  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  transform: translateZ(5px);
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.m3d-btn-select-tile:active {
+  transform: translateZ(1px);
+}
+
+.m3d-btn-select-tile.empty {
+  border-style: dashed;
+  border-color: rgba(143, 163, 184, 0.35);
+  background: rgba(10, 16, 24, 0.5);
+  color: #8fa3b8;
+}
+
+/* ============================================================
+   PINGS COOPERATIVOS ENTRE PARCEIROS DE FRAGMENTO
+   ============================================================ */
+.m3d-ping-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.m3d-btn-ping {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(15, 25, 36, 0.85);
+  color: #e6edf2;
+  font: 600 12px/1.2 var(--sans);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.m3d-btn-ping:active {
+  transform: scale(0.96);
+}
+
+.m3d-ping-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 8px currentColor;
+}
+
+/* ============================================================
+   MERCADO 3D — MOEDAS TÁTEIS E ENVELOPES COM SINISTRO
+   ============================================================ */
+.m3d-coins-stage {
+  perspective: 800px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin: 18px 0;
+}
+
+.m3d-coin-3d {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  position: relative;
+  transform-style: preserve-3d;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.7), 0 0 18px rgba(232, 164, 76, 0.4);
+  cursor: pointer;
+  animation: m3d-coin-float 4s ease-in-out infinite;
+}
+
+@keyframes m3d-coin-float {
+  0%, 100% { transform: translateY(0) rotateY(0deg) rotateX(10deg); }
+  50% { transform: translateY(-8px) rotateY(180deg) rotateX(10deg); }
+}
+
+.m3d-coin-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 900 24px/1 var(--serif);
+  color: #2b1803;
+  background: radial-gradient(circle at 35% 30%, #fff2d1 0%, #e8a94a 55%, #8f5816 100%);
+  border: 3px solid #ffd9a0;
+  box-shadow: inset 0 2px 6px rgba(255, 255, 255, 0.6), inset 0 -3px 6px rgba(0, 0, 0, 0.5);
+}
+
+.m3d-coin-back {
+  transform: rotateY(180deg);
+  background: radial-gradient(circle at 35% 30%, #ffe9b8 0%, #c9882a 60%, #683c07 100%);
+}
+
+/* Envelopes e Dossiês do Mercado */
+.m3d-envelope {
+  position: relative;
+  background: linear-gradient(165deg, #241c14, #120e0a);
+  border: 1px solid rgba(232, 164, 76, 0.5);
+  border-radius: 12px;
+  padding: 18px 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.6);
+  transform-style: preserve-3d;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.m3d-envelope:active {
+  transform: scale(0.98);
+}
+
+.m3d-wax-seal {
+  position: absolute;
+  top: -12px;
+  right: 18px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #e05244 0%, #a82015 65%, #5a0c06 100%);
+  border: 2px solid rgba(255, 120, 100, 0.6);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6), 0 0 12px rgba(224, 103, 79, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffd8d0;
+  font-size: 15px;
+}
+
+/* ============================================================
+   BANCADA DE DETETIVE 3D — DEDUÇÃO FINAL
+   ============================================================ */
+.m3d-detective-board {
+  perspective: 1100px;
+  width: 100%;
+  margin: 14px auto;
+  transform-style: preserve-3d;
+}
+
+.m3d-cork-surface {
+  background: radial-gradient(circle at 50% 30%, #151e2a 0%, #0c121b 60%, #05080c 100%);
+  border: 2px solid rgba(232, 164, 76, 0.35);
+  border-radius: 18px;
+  padding: 22px 18px;
+  box-shadow: inset 0 2px 16px rgba(0, 0, 0, 0.8), 0 18px 45px rgba(0, 0, 0, 0.7);
+  position: relative;
+  overflow: hidden;
+}
+
+.m3d-cork-surface::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 18px 18px;
+  pointer-events: none;
+}
+
+.m3d-pin {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ff846e, #c02b18);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.8), 0 0 8px #ff4530;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+/* Flash de relâmpago dinâmico */
+.m3d-lightning-flash {
+  animation: m3d-flash-burst 0.35s ease-out;
+}
+
+@keyframes m3d-flash-burst {
+  0% { filter: brightness(1); }
+  25% { filter: brightness(2.4) contrast(1.2); }
+  45% { filter: brightness(1.2); }
+  70% { filter: brightness(1.9); }
+  100% { filter: brightness(1); }
+}
+
+/* ============================================================
+   VIEWPORT E HUD DA SALA 3D & REALIDADE AUMENTADA (RA)
+   ============================================================ */
+.mosaico-ra-container {
+  position: fixed;
+  inset: 0;
+  z-index: 99998;
+  background: #04060a;
+  overflow: hidden;
+  touch-action: none;
+}
+.mosaico-ra-hud {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: max(14px, env(safe-area-inset-top)) 14px max(18px, env(safe-area-inset-bottom));
+  z-index: 100000;
+}
+.mosaico-ra-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  pointer-events: auto;
+}
+.mosaico-ra-tabs {
+  display: flex;
+  gap: 6px;
+  background: rgba(10, 16, 26, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 4px;
+}
+.mosaico-ra-tab {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font: 600 12px/1 var(--sans, sans-serif);
+  padding: 6px 12px;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.mosaico-ra-tab.active {
+  background: #f7c94a;
+  color: #0b1118;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(247, 201, 74, 0.4);
+}
+.mosaico-ra-btn-fechar {
+  background: rgba(220, 38, 38, 0.25);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+  font: 700 12px/1 var(--sans, sans-serif);
+  padding: 8px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  pointer-events: auto;
+}
+.mosaico-ra-footer {
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  text-align: center;
+}
+.mosaico-ra-dica {
+  background: rgba(8, 14, 22, 0.88);
+  border: 1px solid rgba(143, 163, 184, 0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 8px 16px;
+  font: 500 13px/1.4 var(--sans, sans-serif);
+  color: #f1f5f9;
+  max-width: min(92vw, 480px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+}
+.mosaico-ra-prog-bar {
+  width: min(84vw, 320px);
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid rgba(247, 201, 74, 0.3);
+}
+.mosaico-ra-prog-fill {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #e8a44c, #5dcc86);
+  transition: width 0.1s linear;
+}
+/* Modal de Inspecao 3D */
+.mosaico-ra-modal {
+  position: fixed;
+  inset: 0;
+  /* A cena RA usa 200000; a inspeção deve receber os cliques acima dela. */
+  z-index: 300002;
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.mosaico-ra-modal-card {
+  width: min(94vw, 420px);
+  background: linear-gradient(165deg, #152232, #0a111a);
+  border: 1px solid rgba(247, 201, 74, 0.4);
+  border-radius: 16px;
+  padding: 18px;
+  color: #f1f5f9;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8), 0 0 24px rgba(247, 201, 74, 0.15);
+}
+.mosaico-ra-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.mosaico-ra-modal-header h3 {
+  margin: 0;
+  font: 700 16px/1.2 var(--sans, sans-serif);
+  color: #f7c94a;
+}
+.mosaico-ra-modal-close {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px;
+}
+
+/* Prompt / Banner de Permissão de Câmera RA */
+.mosaico-ra-prompt {
+  position: absolute;
+  inset: 0;
+  /* BUG1-FIX: z-index muito acima do canvas (z-index:2) E do HUD (z-index:100000) */
+  z-index: 300;
+  background: rgba(4, 6, 10, 0.94);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  /* BUG1-FIX: garantir que os toques passem pelo canvas e cheguem ao prompt */
+  pointer-events: auto;
+  touch-action: auto;
+}
+.mosaico-ra-prompt-card {
+  width: min(92vw, 400px);
+  background: linear-gradient(165deg, #162436 0%, #0c141f 60%, #060a0f 100%);
+  border: 1.5px solid rgba(77, 252, 186, 0.45);
+  border-radius: 18px;
+  padding: 24px 20px;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), 0 0 30px rgba(77, 252, 186, 0.15);
+}
+
+/* ============================================================
+   RA INVESTIGAÇÃO — HUD FORENSE
+   ============================================================ */
+.ra-hud-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.ra-clue-counter {
+  position: absolute;
+  top: 66px;
+  right: 14px;
+  background: rgba(6, 12, 20, 0.90);
+  border: 1.5px solid rgba(247, 201, 74, 0.55);
+  color: #f7c94a;
+  font: 700 17px/1 'IBM Plex Mono', 'Courier New', monospace;
+  padding: 7px 14px;
+  border-radius: 22px;
+  letter-spacing: 0.12em;
+  pointer-events: none;
+  box-shadow: 0 0 14px rgba(247, 201, 74, 0.18);
+  transition: color 0.4s ease;
+}
+
+.ra-scan-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 118px;
+  height: 118px;
+  border-radius: 50%;
+  border: 2.5px solid rgba(77, 252, 186, 0.35);
+  transform: translate(-50%, -50%) scale(1);
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
+  box-shadow: 0 0 24px rgba(77, 252, 186, 0.12), inset 0 0 24px rgba(77, 252, 186, 0.05);
+}
+.ra-scan-ring::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  border: 1px dashed rgba(77, 252, 186, 0.22);
+  animation: ra-scan-rotate 4s linear infinite;
+}
+.ra-scan-ring::after {
+  content: '+';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  color: rgba(77, 252, 186, 0.4);
+  font-size: 18px;
+  line-height: 1;
+  font-weight: 300;
+}
+
+.ra-proximity-label {
+  position: absolute;
+  top: calc(50% + 72px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(4, 6, 10, 0.88);
+  border: 1px solid rgba(77, 252, 186, 0.5);
+  color: #4dfcba;
+  font: 600 12px/1 'IBM Plex Mono', monospace;
+  padding: 7px 18px;
+  border-radius: 22px;
+  letter-spacing: 0.07em;
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: 0 0 12px rgba(77, 252, 186, 0.2);
+  min-width: 40px;
+  text-align: center;
+  min-height: 26px;
+}
+
+.ra-instruction {
+  position: absolute;
+  bottom: 108px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(4, 6, 10, 0.75);
+  border: 1px solid rgba(77, 252, 186, 0.18);
+  color: rgba(77, 252, 186, 0.65);
+  font: 500 12px/1.4 var(--font-sans, sans-serif);
+  padding: 8px 18px;
+  border-radius: 22px;
+  white-space: nowrap;
+  pointer-events: none;
+  backdrop-filter: blur(4px);
+}
+
+/* Discovery flash */
+.ra-discovery-flash {
+  position: absolute;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at center, rgba(77, 252, 186, 0.22) 0%, rgba(4, 6, 10, 0.6) 70%);
+  font: 700 14px/1.3 'IBM Plex Mono', monospace;
+  color: #4dfcba;
+  text-align: center;
+  padding: 24px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  pointer-events: none;
+  animation: ra-flash-in 0.35s cubic-bezier(0.22, 1, 0.36, 1), ra-flash-out 0.5s ease 1.5s forwards;
+  border: 1px solid rgba(77, 252, 186, 0.3);
+  box-shadow: inset 0 0 60px rgba(77, 252, 186, 0.08);
+}
+
+/* ============================================================
+   RA INVESTIGAÇÃO — MODAL FULLSCREEN CINEMATOGRÁFICO
+   ============================================================ */
+.ra-investigation-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 300001;
+  background: rgba(2, 4, 8, 0.97);
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+  overflow: hidden;
+}
+
+.ra-inv-wrapper {
+  width: 100%;
+  max-height: 96vh;
+  background: linear-gradient(180deg, #0c1520 0%, #06101a 100%);
+  border-top: 1.5px solid rgba(77, 252, 186, 0.38);
+  border-radius: 22px 22px 0 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: max(env(safe-area-inset-bottom), 20px);
+  animation: ra-slide-up 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ra-inv-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid rgba(77, 252, 186, 0.1);
+  position: sticky;
+  top: 0;
+  background: linear-gradient(180deg, #0c1520 85%, transparent 100%);
+  z-index: 2;
+}
+
+.ra-inv-eyebrow {
+  font: 700 11px/1 'IBM Plex Mono', monospace;
+  letter-spacing: 0.2em;
+  color: rgba(77, 252, 186, 0.65);
+  text-transform: uppercase;
+}
+
+.ra-inv-close {
+  background: rgba(220, 38, 38, 0.20);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+  font: 600 12px/1 sans-serif;
+  padding: 7px 14px;
+  border-radius: 18px;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition: background 0.18s ease;
+}
+.ra-inv-close:active { background: rgba(220, 38, 38, 0.38); }
+
+.ra-inv-stage-wrap {
+  position: relative;
+  width: 100%;
+  height: 210px;
+  background: linear-gradient(180deg, #04080e 0%, #020510 100%);
+  overflow: hidden;
+}
+
+.ra-inv-stage {
+  width: 100% !important;
+  height: 210px !important;
+  display: block;
+}
+
+.ra-inv-obj-icon {
+  position: absolute;
+  top: 12px;
+  left: 16px;
+  font-size: 30px;
+  filter: drop-shadow(0 0 10px rgba(77, 252, 186, 0.55));
+  pointer-events: none;
+}
+
+.ra-inv-body {
+  padding: 18px 18px 10px;
+}
+
+.ra-inv-titulo {
+  font: 700 1.3rem/1.2 Cinzel, 'Times New Roman', serif;
+  color: #f7c94a;
+  margin: 0 0 13px;
+  letter-spacing: 0.07em;
+}
+
+.ra-typewriter {
+  font: 400 13.5px/1.75 'IBM Plex Mono', 'Courier New', monospace;
+  color: #8fa3b8;
+  margin: 0 0 16px;
+  min-height: 88px;
+  white-space: pre-line;
+  word-break: break-word;
+}
+
+.ra-evidence-card {
+  background: rgba(77, 252, 186, 0.055);
+  border: 1.5px solid rgba(77, 252, 186, 0.3);
+  border-radius: 14px;
+  padding: 13px 15px;
+  margin-bottom: 14px;
+  animation: ra-reveal-evidence 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ra-evidence-label {
+  font: 700 10px/1 'IBM Plex Mono', monospace;
+  letter-spacing: 0.22em;
+  color: #4dfcba;
+  margin-bottom: 9px;
+  text-transform: uppercase;
+}
+
+.ra-evidence-text {
+  font: 500 14px/1.6 var(--font-sans, sans-serif);
+  color: #f1f5f9;
+}
+
+.ra-register-btn {
+  width: 100%;
+  padding: 15px 18px;
+  background: linear-gradient(135deg, #4dfcba, #00c48a);
+  color: #04060a;
+  font: 700 13.5px/1 'IBM Plex Mono', monospace;
+  border: none;
+  border-radius: 13px;
+  cursor: pointer;
+  letter-spacing: 0.07em;
+  box-shadow: 0 5px 22px rgba(77, 252, 186, 0.32);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  margin-bottom: 4px;
+}
+.ra-register-btn:active { transform: scale(0.97); box-shadow: 0 2px 10px rgba(77, 252, 186, 0.18); }
+.ra-register-btn:disabled { opacity: 0.75; }
+
+.ra-already-collected {
+  text-align: center;
+  color: #4dfcba;
+  font: 600 13px/1 'IBM Plex Mono', monospace;
+  padding: 12px;
+  letter-spacing: 0.06em;
+}
+
+/* Celebração */
+.ra-celebracao {
+  position: absolute;
+  inset: 0;
+  z-index: 500;
+  background: rgba(2, 8, 4, 0.97);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: ra-flash-in 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ra-cel-conteudo {
+  text-align: center;
+  max-width: 380px;
+}
+
+.ra-cel-conteudo h2 {
+  font: 700 1.55rem/1.2 Cinzel, serif;
+  color: #4dfcba;
+  margin: 0 0 13px;
+  letter-spacing: 0.09em;
+  text-shadow: 0 0 30px rgba(77, 252, 186, 0.4);
+}
+
+.ra-cel-conteudo p {
+  color: #8fa3b8;
+  font-size: 14px;
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ============================================================
+   ANIMAÇÕES RA
+   ============================================================ */
+@keyframes ra-scan-rotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes ra-flash-in {
+  from { opacity: 0; transform: scale(0.94) translateY(6px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes ra-flash-out {
+  from { opacity: 1; }
+  to   { opacity: 0; pointer-events: none; }
+}
+
+@keyframes ra-slide-up {
+  from { transform: translateY(40px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes ra-reveal-evidence {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

@@ -1,0 +1,578 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a1119">
+<title>O Vidro Embaçado — Carro-Forte</title>
+<link rel="stylesheet" href="atividade.css?v=20260907-pista-arquivo">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,500;7..72,600&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================================
+   O VIDRO EMBAÇADO — A MANHÃ DO CARRO-FORTE
+   ==========================================================================
+   Refeito em 05/09/2026 no padrão da Casa da Costa, junto com a Janela e a
+   Sala. Mario: "a janela do norte, a sala escura funcionaram perfeitamente
+   bem. esse vai ser o padrão... ou a janela embaçada também é referência para
+   algo" — é, e para este.
+
+   O QUE ELE ERA
+   -------------
+   Faixas de <div> com uma camada de CSS embaçada por cima. Passar o ponteiro
+   catorze vezes sobre a faixa abria. Três defeitos num só:
+     · o gesto era esfregar o mouse, e num celular era esfregar o dedo — nada
+       que a Casa chamaria de tarefa sensorial;
+     · dava para percorrer as quatro faixas em segundos, então o relógio da
+       mesa nunca chegava a valer;
+     · e o vidro não era vidro: era uma lista com opacidade.
+
+   O QUE ELE É AGORA
+   -----------------
+   A vidraça da agência 0417 às 8h02, embaçada por dentro, com a garoa do lado
+   de fora. A regra da Casa, inteira: VOCÊ NÃO LIMPA O VIDRO COM O DEDO. Você
+   inclina o aparelho, e a água escorre por gravidade abrindo trilhas sobre o
+   que está escrito atrás. E o vidro só PARA de embaçar perto de um ângulo
+   certo — que muda a cada fragmento e é o mesmo para a mesa inteira, porque
+   sai da semente da partida.
+
+   É por isso que a mecânica se sustenta: a trilha da água não é decoração, é o
+   único jeito de ler; e o ângulo certo obriga a mão a procurar uma posição,
+   não a repetir um movimento.
+
+   Os números — 26° e 30° de tolerância, 62° e 68° de "está esquentando", 1500
+   ms de permanência — são os medidos da Casa, não escolhas novas.
+
+   O que muda de lá para cá é só o tempo do dia: lá era tempestade e relâmpago,
+   aqui é manhã encoberta e o giroflex do carro-forte parado na porta. O mesmo
+   serviço dramático, a mesma hora do caso.
+   ========================================================================== */
+html,body{height:100%;height:100dvh;margin:0;background:#0a1119;overflow:hidden;
+  touch-action:none;overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
+#c{position:fixed;inset:0;width:100%;height:100%;display:block}
+
+#hud{position:fixed;left:0;right:0;top:0;height:100%;height:100dvh;z-index:2;
+  pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;
+  padding:max(14px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right))
+          calc(env(safe-area-inset-bottom,0px) + 18px) max(14px,env(safe-area-inset-left))}
+/* O EMBAÇO É CLARO, E O HUD NASCEU ESCRITO PARA FUNDO ESCURO. Ouro sobre
+   cinza-claro e cinza sobre cinza-claro somem: na primeira prova o texto
+   "DEITE MAIS O APARELHO" - que é a única instrução da atividade - estava
+   ilegível. As duas faixas escuras nas bordas resolvem sem escurecer o vidro,
+   que é o assunto da tela. */
+#hud::before,#hud::after{content:'';position:fixed;left:0;right:0;height:26vh;
+  pointer-events:none;z-index:-1}
+#hud::before{top:0;background:linear-gradient(180deg,#050a10e8,#050a1000)}
+#hud::after{bottom:0;background:linear-gradient(0deg,#050a10ee,#050a1000)}
+#topo,#baixo{position:relative}
+#topo{text-align:center}
+#local{font:600 11px/1.2 var(--mono);letter-spacing:.2em;text-transform:uppercase;
+  color:var(--gold2);text-shadow:0 2px 10px #000}
+#dica{font:500 clamp(14px,3.6vw,16px)/1.4 var(--sans);color:var(--ink);margin-top:7px;
+  text-shadow:0 1px 8px #000;max-width:22em;margin-left:auto;margin-right:auto}
+#passos{display:flex;gap:6px;justify-content:center;margin-top:10px}
+#passos i{width:26px;height:4px;border-radius:3px;background:#22323f;
+  box-shadow:inset 0 0 0 1px #0006}
+#passos i.on{background:var(--gold2);box-shadow:0 0 10px #efc87880}
+
+#baixo{pointer-events:auto;display:grid;gap:9px}
+#barra{height:6px;border-radius:6px;background:#132029;overflow:hidden;
+  box-shadow:inset 0 0 0 1px #2b3c49}
+#barra i{display:block;height:100%;width:0%;border-radius:6px;
+  background:linear-gradient(90deg,#8fd6ae,#efc878);box-shadow:0 0 12px #efc87866;
+  transition:width .08s linear}
+#estado{font:600 11px/1.2 var(--mono);letter-spacing:.14em;text-transform:uppercase;
+  color:#dbe6ef;text-align:center;text-shadow:0 1px 6px #000}
+#dedo{width:100%;min-height:46px;border:1px solid #46667a;border-radius:9px;
+  background:linear-gradient(180deg,#162a38,#0c1b26);color:var(--ink);font-weight:700;cursor:pointer}
+
+/* ---------------- a abertura ---------------- */
+#intro{position:fixed;left:0;right:0;top:0;height:100%;height:100dvh;z-index:10;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:14px;text-align:center;padding:26px;overflow-y:auto;
+  background:linear-gradient(180deg,#070d15f2,#02050af8)}
+#intro.off{display:none}
+#intro h1{font:600 clamp(30px,8vw,44px)/1 var(--display);margin:0;color:#fff}
+#intro .k{font:700 10px var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--gold)}
+#intro p{font:500 clamp(15px,4vw,18px)/1.45 var(--sans);color:var(--ink);max-width:22em;margin:0}
+#intro .go,#intro .alt{width:min(340px,88vw);min-height:52px;border-radius:10px;cursor:pointer}
+#intro .go{border:0;background:linear-gradient(180deg,var(--gold2),var(--gold));color:#201707;
+  font:800 14px var(--sans);letter-spacing:.1em;box-shadow:0 5px 0 #6f4d17}
+#intro .alt{border:1px solid #46667a;background:#101d26;color:var(--ink);font-weight:700}
+
+/* ---------------- a carta do fragmento ---------------- */
+#carta{position:fixed;inset:0;z-index:12;display:none;align-items:center;justify-content:center;
+  padding:24px;background:#02060bee}
+#carta.on{display:flex}
+#carta .folha{width:min(460px,92vw);padding:20px;border-radius:12px;
+  border:1px solid #75664e;border-left:5px solid #9a7842;
+  background:linear-gradient(160deg,#e7dfca,#b9aa8d);color:#211d17}
+#carta b{display:block;font:800 clamp(22px,6.5vw,34px)/1.15 var(--mono);letter-spacing:.04em;color:#1b1005}
+#carta h3{font:600 24px var(--display);margin:6px 0 8px}
+#carta p{font-size:14.5px;line-height:1.5;margin:0;color:#211d17}
+#carta button{width:100%;min-height:50px;margin-top:16px;border:0;border-radius:9px;
+  background:#211d17;color:#e7dfca;font-weight:800;letter-spacing:.1em;cursor:pointer}
+</style></head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="hud">
+  <div id="topo">
+    <div id="local">VIDRAÇA DA AGÊNCIA · GAROA · 8H02</div>
+    <div id="dica">Incline o aparelho e deixe a água escorrer.</div>
+    <div id="passos"></div>
+  </div>
+  <div id="baixo">
+    <div id="barra"><i id="barra-i"></i></div>
+    <div id="estado">—</div>
+    <button id="dedo" type="button">Inclinar com o dedo</button>
+  </div>
+</div>
+
+<div id="intro">
+  <div class="k">A MANHÃ DO CARRO-FORTE</div>
+  <h1>O Vidro<br>Embaçado</h1>
+  <p>A vidraça da agência está embaçada por dentro. Atrás dela ficaram registros da manhã, e a garoa não vai parar.</p>
+  <p><b>Você não limpa este vidro com o dedo.</b> Incline o aparelho e deixe a água escorrer — só em certa inclinação ela abre trilha sobre o que está escrito atrás. Quando o texto aparecer, <b>segure a posição</b>.</p>
+  <p class="small">Cada registro pede uma inclinação diferente, e é a mesma para a mesa inteira.</p>
+  <button class="go" id="b-entrar" type="button">Chegar na vidraça</button>
+  <button class="alt" id="b-dedo" type="button">Estou no computador</button>
+</div>
+
+<div id="carta"><div class="folha">
+  <b id="carta-cod" class="carta-num">—</b><h3 id="carta-tit">—</h3><p id="carta-txt">—</p>
+  <p class="pista-arquivo-hint" data-pista-arquivo-hint="1"><span class="pista-arquivo-curta">Ela vai estar no dossiê</span><span class="pista-arquivo-completa">Ela vai estar no dossiê — para quando você quiser consultar</span></p>
+  <button id="carta-ok" type="button">Guardar no dossiê</button>
+</div></div>
+
+<!-- Nasce escondido: a atividade acaba pelo relógio da mesa, e este botão só
+     reaparece no fim, como a volta. Ver atividade.js. -->
+<button id="finish" class="primary" hidden>← Voltar à Mesa</button>
+
+<script src="fragmentos.js?v=20260901-colheita1"></script>
+<script src="variacoes-carro-dados.js?v=20261012-v2"></script>
+<script src="variacoes-carro.js?v=20261012-v2"></script>
+<script src="atividade.js?v=20260905-cena2"></script>
+<script>
+(function(){
+"use strict";
+var A=window.MosaicoAtividade;
+var itens=A.itens('vidro'), achados=new Set();
+
+/* Os números da Casa, medidos em playtest. Não mexer sem playtest. */
+var TOL_B=26, TOL_G=30;      /* tolerância por eixo, em graus            */
+var MAX_B=62, MAX_G=68;      /* alcance do "está esquentando"            */
+var HOLD_MS=1500;            /* permanência na posição para revelar      */
+var GRACA_MS=1400;           /* carência: o ângulo herdado não vale      */
+
+var cv=document.getElementById('c'), cx=cv.getContext('2d');
+var W=0,H=0,DPR=1;
+/* Duas camadas fora da tela: o EMBAÇO, que é cavado pelas gotas, e o TEXTO,
+   que fica atrás dele. Desenhar o texto direto e cobrir seria o vazamento do
+   vidro antigo — legível no inspetor sem gesto nenhum. */
+var fogC=document.createElement('canvas'), fogX=fogC.getContext('2d');
+var txtC=document.createElement('canvas'), txtX=txtC.getContext('2d');
+var frostTile=null;
+
+var beta=90, gamma=0, tBeta=90, tGamma=0;
+var temSensor=false, modoDedo=false, iniciado=false;
+var alvo={b:90,g:0}, calor=0, seguraDesde=null, travado=false, revelacao=0;
+var fila=[], atual=null, gotas=[], garoa=[];
+var t0=performance.now(), ultT=t0, graca=0;
+
+/* O ângulo de cada registro vem da PARTIDA: a mesa inteira procura a mesma
+   inclinação, e quem achou pode dizer "vira mais para a esquerda" sem estar
+   entregando resposta de outro aparelho. */
+function semente(txt){var h=2166136261;for(var i=0;i<txt.length;i++){h^=txt.charCodeAt(i);h=Math.imul(h,16777619);}return (h>>>0)/4294967296;}
+
+function dimensionar(){
+  DPR=Math.min(2,window.devicePixelRatio||1);
+  W=cv.clientWidth; H=cv.clientHeight;
+  cv.width=Math.round(W*DPR); cv.height=Math.round(H*DPR);
+  cx.setTransform(DPR,0,0,DPR,0,0);
+  /* o embaço vive a 72% da resolução: é mancha macia, não desenho fino, e
+     cavar num alvo menor é o que mantém o quadro em 60 num celular */
+  fogC.width=Math.max(1,Math.round(W*0.72)); fogC.height=Math.max(1,Math.round(H*0.72));
+  txtC.width=Math.round(W); txtC.height=Math.round(H);
+  encheGelo(1);
+  if(atual) pintaTexto(atual);
+}
+
+/* ── O EMBAÇO ────────────────────────────────────────────────────────────
+   Condensação é mancha de baixa frequência, não ruído por pixel: ruído fino
+   no alfa cheio vira chiado de televisão, não vidro. */
+function fazFrost(){
+  var n=180, c=document.createElement('canvas'); c.width=c.height=n;
+  var x=c.getContext('2d');
+  x.fillStyle='rgba(178,199,219,.80)'; x.fillRect(0,0,n,n);
+  for(var i=0;i<70;i++){
+    var bx=Math.random()*n, by=Math.random()*n, br=10+Math.random()*38;
+    var g=x.createRadialGradient(bx,by,0,bx,by,br);
+    g.addColorStop(0, Math.random()>0.45?'rgba(216,232,246,.30)':'rgba(146,170,192,.24)');
+    g.addColorStop(1,'rgba(178,199,219,0)');
+    x.fillStyle=g; x.beginPath(); x.arc(bx,by,br,0,6.2832); x.fill();
+  }
+  var d=x.getImageData(0,0,n,n);
+  for(var p=0;p<n*n;p++){
+    var v=(Math.random()*16)-8;
+    d.data[p*4]  =Math.max(0,Math.min(255,d.data[p*4]  +v));
+    d.data[p*4+1]=Math.max(0,Math.min(255,d.data[p*4+1]+v));
+    d.data[p*4+2]=Math.max(0,Math.min(255,d.data[p*4+2]+v));
+  }
+  x.putImageData(d,0,0);
+  return x.createPattern(c,'repeat');
+}
+function encheGelo(alfa){
+  fogX.setTransform(1,0,0,1,0,0);
+  fogX.globalCompositeOperation='source-over';
+  fogX.globalAlpha=alfa;
+  fogX.fillStyle=frostTile||'#b9cfe2';
+  fogX.fillRect(0,0,fogC.width,fogC.height);
+  fogX.globalAlpha=1;
+}
+function cava(x,y,r,forca){
+  var e=fogC.width/W;
+  fogX.globalCompositeOperation='destination-out';
+  var g=fogX.createRadialGradient(x*e,y*e,0,x*e,y*e,Math.max(1,r*e));
+  g.addColorStop(0,'rgba(0,0,0,'+forca+')');
+  g.addColorStop(0.55,'rgba(0,0,0,'+(forca*0.6)+')');
+  g.addColorStop(1,'rgba(0,0,0,0)');
+  fogX.fillStyle=g;
+  fogX.beginPath(); fogX.arc(x*e,y*e,Math.max(1,r*e),0,6.2832); fogX.fill();
+  fogX.globalCompositeOperation='source-over';
+}
+
+/* ── O TEXTO ATRÁS DO VIDRO ─────────────────────────────────────────────── */
+var FONTE='"Literata","Charter","Iowan Old Style",Georgia,"Noto Serif",serif';
+/* A Literata agora é carregada no <head>. O texto vai para o canvas uma vez;
+   se a fonte chegar depois, repinta — mesmo cuidado do Vidro da Casa da Costa. */
+if(document.fonts && document.fonts.load){
+  /* o canvas não pede a fonte sozinho: carrega explicitamente e repinta */
+  document.fonts.load('600 20px "Literata"').then(function(){ if(atual) pintaTexto(atual); });
+}
+function quebra(x,texto,larg){
+  var pal=texto.split(' '), linhas=[], cur='';
+  for(var i=0;i<pal.length;i++){
+    var t=cur?cur+' '+pal[i]:pal[i];
+    if(x.measureText(t).width>larg && cur){ linhas.push(cur); cur=pal[i]; }
+    else cur=t;
+  }
+  if(cur) linhas.push(cur);
+  return linhas;
+}
+function pintaTexto(f){
+  txtX.setTransform(1,0,0,1,0,0);
+  txtX.clearRect(0,0,txtC.width,txtC.height);
+  txtX.textAlign='center'; txtX.textBaseline='middle';
+  var larg=W*0.80;
+  /* peso 600: este texto é lido ATRAVÉS do embaço, e traço fino desaparece */
+  var fs=Math.max(22,Math.min(34,W/12)), linhas, lh, fsCod, alt;
+  var banda=H*0.62;
+  for(var t=0;t<8;t++){
+    txtX.font='600 '+fs+'px '+FONTE;
+    linhas=quebra(txtX,f.d,larg);
+    lh=fs*1.40; fsCod=Math.max(13,fs*0.45);
+    alt=lh*1.2+fsCod/2+(linhas.length-1)*lh+fs/2;
+    if(alt<=banda||fs<=17) break;
+    fs=Math.max(17,fs*Math.max(0.86,banda/alt));
+  }
+  var y0=H*0.47-(linhas.length-1)*lh/2;
+  txtX.fillStyle='#fdf3e4';
+  txtX.shadowColor='rgba(0,0,0,.75)'; txtX.shadowBlur=14;
+  for(var i=0;i<linhas.length;i++) txtX.fillText(linhas[i], W/2, y0+i*lh);
+  txtX.shadowBlur=0;
+  txtX.font='700 '+fsCod+'px "Inter",sans-serif';
+  txtX.fillStyle='rgba(255,207,143,.98)';
+  txtX.shadowColor='rgba(0,0,0,.8)'; txtX.shadowBlur=10;
+  txtX.fillText((f.cod+' · '+f.t).toUpperCase(), W/2, y0-lh*1.2);
+  txtX.shadowBlur=0;
+}
+
+/* ── AS GOTAS ────────────────────────────────────────────────────────────
+   O atrito estático é o que faz a inclinação valer alguma coisa: gota grande
+   escorre com pouco ângulo, gota pequena precisa de mais. Sem ele, qualquer
+   ângulo limpa e não existe alvo. */
+function novaGota(topo){
+  return { x:30+Math.random()*(W-60), y: topo? -10-Math.random()*60 : Math.random()*H,
+           r:2.2+Math.random()*7, vx:0, vy:0 };
+}
+function semeiaGotas(){ gotas=[]; for(var i=0;i<30;i++) gotas.push(novaGota(false)); }
+function semeiaGaroa(){
+  garoa=[];
+  for(var i=0;i<70;i++) garoa.push({x:Math.random()*W,y:Math.random()*H,
+    v:3+Math.random()*7, c:14+Math.random()*30, a:0.05+Math.random()*0.10});
+}
+function atualizaGotas(gx,gy,dt){
+  var forca=Math.min(1,Math.sqrt(gx*gx+gy*gy));
+  for(var i=0;i<gotas.length;i++){
+    var d=gotas[i];
+    var limiar=0.46-d.r*0.028;
+    if(forca>limiar){ d.vx+=gx*46*dt; d.vy+=gy*46*dt; d.vx*=0.90; d.vy*=0.90; }
+    else { d.vx*=0.72; d.vy*=0.72; d.r=Math.min(9.5,d.r+dt*0.35); }
+    var px=d.x, py=d.y;
+    d.x+=d.vx; d.y+=d.vy;
+    var vel=Math.abs(d.vx)+Math.abs(d.vy);
+    if(vel>0.35){
+      var pas=Math.max(1,Math.ceil(vel/2.4));
+      for(var s=0;s<=pas;s++) cava(px+(d.x-px)*s/pas, py+(d.y-py)*s/pas, d.r*0.95, 0.30);
+      d.r=Math.max(1.6,d.r-vel*0.010);
+      if(Math.random()<0.10 && gotas.length<52)
+        gotas.push({x:px,y:py,r:1.2+Math.random()*1.4,vx:0,vy:0});
+    }
+    if(d.x<-30||d.x>W+30||d.y<-70||d.y>H+40||d.r<1.5) gotas[i]=novaGota(true);
+  }
+  if(gotas.length>52) gotas.length=52;
+}
+function pintaGotas(){
+  for(var i=0;i<gotas.length;i++){
+    var d=gotas[i], r=d.r;
+    var g=cx.createRadialGradient(d.x-r*0.3,d.y-r*0.36,r*0.06, d.x,d.y,r);
+    g.addColorStop(0,'rgba(255,255,255,.55)');
+    g.addColorStop(0.30,'rgba(196,222,244,.22)');
+    g.addColorStop(0.72,'rgba(120,150,180,.14)');
+    g.addColorStop(1,'rgba(30,44,60,.30)');
+    cx.fillStyle=g;
+    cx.beginPath(); cx.ellipse(d.x,d.y,r,r*1.06,0,0,6.2832); cx.fill();
+    cx.strokeStyle='rgba(226,242,255,.20)'; cx.lineWidth=0.7;
+    cx.beginPath(); cx.arc(d.x,d.y,r,0,6.2832); cx.stroke();
+    cx.fillStyle='rgba(255,255,255,.75)';
+    cx.beginPath(); cx.arc(d.x-r*0.34,d.y-r*0.40,Math.max(0.5,r*0.17),0,6.2832); cx.fill();
+  }
+}
+
+/* ── O QUE SE VÊ ATRAVÉS ─────────────────────────────────────────────────
+   Lá era tempestade e relâmpago; aqui é manhã encoberta e o giroflex do
+   carro-forte parado na porta. É a mesma hora do caso da Janela do Norte, e a
+   paleta é a de lá: sem isso a cena volta a sair quase preta. */
+function ruaLaFora(tempo,luz){
+  var g=cx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#3d4b57'); g.addColorStop(0.42,'#55636e');
+  g.addColorStop(0.70,'#6b7681'); g.addColorStop(1,'#2b343d');
+  cx.fillStyle=g; cx.fillRect(0,0,W,H);
+  /* a calçada e os vultos do outro lado da rua, bem de leve */
+  var yh=H*0.66;
+  cx.fillStyle='rgba(26,34,42,.72)';
+  for(var i=0;i<6;i++){
+    var bw=W*(0.10+((i*37)%23)/100), bx=(i*W/5.2)-W*0.08;
+    cx.fillRect(bx, yh-H*(0.10+((i*13)%17)/100), bw, H);
+  }
+  cx.fillStyle='rgba(16,22,28,.85)'; cx.fillRect(0,yh,W,H-yh);
+  /* o giroflex, batendo na fachada de fora */
+  if(luz>0.004){
+    var gg=cx.createRadialGradient(W*0.72,H*0.42,0,W*0.72,H*0.42,Math.max(W,H)*0.9);
+    gg.addColorStop(0,'rgba(120,170,255,'+(luz*0.55).toFixed(3)+')');
+    gg.addColorStop(0.45,'rgba(70,110,190,'+(luz*0.18).toFixed(3)+')');
+    gg.addColorStop(1,'rgba(0,0,0,0)');
+    cx.fillStyle=gg; cx.fillRect(0,0,W,H);
+  }
+  /* a garoa, do lado de fora */
+  cx.strokeStyle='rgba(198,216,232,.20)'; cx.lineWidth=1;
+  for(var k=0;k<garoa.length;k++){
+    var p=garoa[k];
+    cx.globalAlpha=p.a;
+    cx.beginPath(); cx.moveTo(p.x,p.y); cx.lineTo(p.x-2,p.y+p.c); cx.stroke();
+    p.y+=p.v; if(p.y>H){ p.y=-p.c; p.x=Math.random()*W; }
+  }
+  cx.globalAlpha=1;
+}
+function caixilho(){
+  var bd=Math.max(16,Math.min(30,W*0.055));
+  cx.fillStyle='#1b2129';
+  cx.fillRect(0,0,W,bd); cx.fillRect(0,H-bd,W,bd);
+  cx.fillRect(0,0,bd,H); cx.fillRect(W-bd,0,bd,H);
+  cx.fillStyle='rgba(255,255,255,.06)';
+  cx.fillRect(bd,bd,W-bd*2,2);
+  /* a travessa alta, que é onde a condensação sempre é mais grossa */
+  cx.fillStyle='#1b2129';
+  cx.fillRect(0,H*0.155,W,bd*0.62);
+}
+function vinheta(){
+  var g=cx.createRadialGradient(W/2,H*0.5,Math.min(W,H)*0.34,W/2,H*0.5,Math.max(W,H)*0.78);
+  g.addColorStop(0,'rgba(0,0,0,0)'); g.addColorStop(1,'rgba(0,0,0,.55)');
+  cx.fillStyle=g; cx.fillRect(0,0,W,H);
+}
+
+/* ── O QUADRO ─────────────────────────────────────────────────────────── */
+var flash={t:-9999,dur:0,forca:0,prox:2600};
+function ciclo(){
+  requestAnimationFrame(ciclo);
+  var agora=performance.now(), tempo=agora-t0;
+  var dt=Math.min(0.05,(agora-ultT)/1000); ultT=agora;
+  if(W!==cv.clientWidth||H!==cv.clientHeight) dimensionar();
+  if(!iniciado) return;
+
+  beta  += (tBeta -beta )*0.14;
+  gamma += (tGamma-gamma)*0.14;
+
+  /* o giroflex, a cada poucos segundos */
+  var luz=0;
+  if(tempo-flash.t>flash.prox){
+    flash.t=tempo; flash.dur=260+Math.random()*120;
+    flash.forca=0.22+Math.random()*0.16; flash.prox=2400+Math.random()*1400;
+  }
+  var dl=tempo-flash.t;
+  if(dl<flash.dur){
+    var ff=dl/flash.dur;
+    luz=flash.forca*Math.pow(1-ff,1.4)*(ff<0.16?ff/0.16:1);
+  }
+
+  /* proximidade por eixo, NUNCA combinada: combinada, errar muito num eixo
+     seria compensado por acertar no outro, e o alvo deixa de ser um ponto */
+  var dB=Math.abs(beta-alvo.b), dG=Math.abs(gamma-alvo.g);
+  calor=Math.max(0,1-dB/MAX_B)*Math.max(0,1-dG/MAX_G);
+  var dentro = dB<=TOL_B && dG<=TOL_G && (agora-graca>GRACA_MS);
+
+  var gx=Math.sin(gamma*Math.PI/180), gy=Math.sin(beta*Math.PI/180);
+
+  /* O TRUQUE DA CASA: o vidro só PARA de embaçar perto do ângulo certo. Longe
+     dele, a condensação volta mais depressa do que a água consegue abrir. */
+  if(!travado){
+    encheGelo(Math.min(0.30,(0.030+0.30*Math.pow(1-calor,2.2))*(dt*60)));
+    atualizaGotas(gx,gy,dt);
+  } else {
+    revelacao=Math.min(1,revelacao+dt*1.5);
+    var e=fogC.width/W;
+    fogX.globalCompositeOperation='destination-out';
+    var gr=fogX.createRadialGradient(W/2*e,H*0.47*e,0, W/2*e,H*0.47*e, Math.max(W,H)*revelacao*e);
+    gr.addColorStop(0,'rgba(0,0,0,.30)'); gr.addColorStop(1,'rgba(0,0,0,0)');
+    fogX.fillStyle=gr; fogX.fillRect(0,0,fogC.width,fogC.height);
+    fogX.globalCompositeOperation='source-over';
+    atualizaGotas(gx,gy,dt);
+  }
+
+  ruaLaFora(tempo,luz);
+  /* o texto aparece na proporção do calor: perto do ângulo ele já se anuncia
+     antes de a água abrir, e é isso que ensina que existe um ângulo */
+  var vis=travado?1:Math.pow(calor,1.4);
+  if(vis>0.02){ cx.save(); cx.globalAlpha=vis; cx.drawImage(txtC,0,0,W,H); cx.restore(); }
+  cx.drawImage(fogC,0,0,W,H);
+  pintaGotas();
+  caixilho();
+  vinheta();
+
+  /* ── permanência ── */
+  var barra=document.getElementById('barra-i'), est=document.getElementById('estado');
+  if(travado||!atual){ return; }
+  if(dentro){
+    if(seguraDesde===null) seguraDesde=agora;
+    var p=Math.min(1,(agora-seguraDesde)/HOLD_MS);
+    barra.style.width=(p*100).toFixed(1)+'%';
+    est.textContent='SEGURE ASSIM';
+    if(p>=1) revela();
+  } else {
+    seguraDesde=null;
+    barra.style.width=(calor*100).toFixed(1)+'%';
+    /* O texto diz o EIXO que está mais errado, um de cada vez: dizer os dois
+       juntos vira instrução de voo, e ninguém corrige duas coisas ao mesmo
+       tempo com o aparelho na mão. */
+    if(dB/MAX_B > dG/MAX_G) est.textContent = beta>alvo.b ? 'DEITE MAIS O APARELHO' : 'LEVANTE MAIS O APARELHO';
+    else est.textContent = gamma>alvo.g ? 'INCLINE PARA A ESQUERDA' : 'INCLINE PARA A DIREITA';
+  }
+}
+
+/* ── A RODADA ───────────────────────────────────────────────────────────── */
+function novaRodada(){
+  if(fila.length===0){ atual=null;
+    document.getElementById('dica').textContent='A vidraça está limpa. Volte à Mesa quando quiser.';
+    document.getElementById('estado').textContent='—';
+    return; }
+  atual=fila.shift();
+  pintaTexto(atual);
+  /* faixa confortável de punho: nada de ângulo extremo */
+  alvo.b = 58 + semente('b|'+atual.cod+'|'+A.partida)*62;    /* 58 a 120 */
+  alvo.g = -34 + semente('g|'+atual.cod+'|'+A.partida)*68;   /* -34 a +34 */
+  travado=false; revelacao=0; seguraDesde=null;
+  graca=performance.now();
+  encheGelo(1); semeiaGotas();
+  document.getElementById('dica').textContent='Incline até o texto começar a aparecer, e segure.';
+  pintarPassos();
+}
+
+function revela(){
+  travado=true; seguraDesde=null;
+  achados.add(atual.cod); A.marcar(achados,itens);
+  try{ navigator.vibrate && navigator.vibrate([12,50,22]); }catch(e){}
+  document.getElementById('carta-cod').textContent=atual.cod;
+  document.getElementById('carta-tit').textContent=atual.t;
+  document.getElementById('carta-txt').textContent=atual.d;
+  document.getElementById('carta').classList.add('on');
+  document.getElementById('barra-i').style.width='100%';
+  document.getElementById('estado').textContent='REGISTRO ABERTO';
+  pintarPassos();
+}
+document.getElementById('carta-ok').onclick=function(){
+  document.getElementById('carta').classList.remove('on');
+  novaRodada();
+};
+
+function pintarPassos(){
+  var h=document.getElementById('passos'), s='';
+  for(var i=0;i<itens.length;i++) s+='<i class="'+(achados.has(itens[i])?'on':'')+'"></i>';
+  h.innerHTML=s;
+}
+
+/* ── ENTRADA ───────────────────────────────────────────────────────────── */
+function onOrient(e){
+  if(e.beta===null||e.beta===undefined||e.gamma===null||e.gamma===undefined) return;
+  temSensor=true; modoDedo=false;
+  tBeta=e.beta; tGamma=e.gamma;
+}
+function comeca(){
+  document.getElementById('intro').classList.add('off');
+  iniciado=true; ultT=performance.now();
+  frostTile=fazFrost(); dimensionar(); semeiaGaroa();
+  novaRodada();
+}
+function porDedo(){
+  modoDedo=true; tBeta=90; tGamma=0;
+  document.getElementById('dica').textContent='Arraste a tela para inclinar o vidro.';
+  if(!iniciado) comeca();
+}
+document.getElementById('b-dedo').onclick=porDedo;
+document.getElementById('dedo').onclick=porDedo;
+document.getElementById('b-entrar').onclick=function(){
+  var pedir = typeof DeviceOrientationEvent!=='undefined' &&
+              typeof DeviceOrientationEvent.requestPermission==='function';
+  function ouvir(){
+    window.addEventListener('deviceorientation', onOrient, true);
+    comeca();
+    /* Se em 4,6 s nenhum evento chegou, o aparelho não tem o sensor ou o
+       navegador não vai entregá-lo. Ficar esperando seria o beco sem saída das
+       outras atividades: aqui o modo dedo entra sozinho. */
+    setTimeout(function(){
+      if(!temSensor){ porDedo();
+        document.getElementById('dica').textContent='O sensor não respondeu. Arraste a tela para inclinar o vidro.'; }
+    },4600);
+  }
+  if(!pedir){
+    if(typeof DeviceOrientationEvent==='undefined'){ porDedo(); return; }
+    ouvir(); return;
+  }
+  DeviceOrientationEvent.requestPermission().then(function(r){
+    if(r==='granted') ouvir(); else porDedo();
+  }).catch(porDedo);
+};
+
+var arr=null;
+function pDown(ev){ var t=ev.touches?ev.touches[0]:ev; arr={x:t.clientX,y:t.clientY}; }
+function pMove(ev){
+  if(!arr||!modoDedo) return;
+  var t=ev.touches?ev.touches[0]:ev;
+  tGamma=Math.max(-80,Math.min(80,tGamma+(t.clientX-arr.x)*0.28));
+  tBeta =Math.max( 10,Math.min(170,tBeta +(t.clientY-arr.y)*0.28));
+  arr={x:t.clientX,y:t.clientY};
+  if(ev.cancelable) ev.preventDefault();
+}
+function pUp(){ arr=null; }
+cv.addEventListener('pointerdown',pDown); cv.addEventListener('pointermove',pMove);
+cv.addEventListener('pointerup',pUp); cv.addEventListener('pointercancel',pUp);
+
+/* A fila é o lote da Mesa, com o texto do banco. */
+var banco=window.MOSAICO_FRAGMENTOS||{};
+fila=itens.map(function(c){ return {cod:c, t:(banco[c]||{}).t||c, d:(banco[c]||{}).d||''}; });
+
+dimensionar();
+pintarPassos();
+requestAnimationFrame(ciclo);
+A.iniciar({sensor:'vidro',itens:itens,achados:achados});
+})();
+</script>
+</body></html>

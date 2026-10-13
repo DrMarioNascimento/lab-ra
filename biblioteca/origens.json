@@ -1,0 +1,279 @@
+{
+  "fontes": {
+    "Dragon": "54ffdc4e637b6143232a3cbd653cdb4a51a6c342",
+    "fisiologia-interativa": "cc4d94515bcd038cad7d30ca9e472c9912c4713f"
+  },
+  "adaptacoes": [
+    "biblioteca/fisiologia/tutor-origem.js",
+    "biblioteca\\fisiologia\\celula\\index.html",
+    "biblioteca\\fisiologia\\celula\\membrana.html",
+    "biblioteca\\fisiologia\\coracao\\index.html",
+    "biblioteca\\fisiologia\\juncao-neuromuscular\\index.html",
+    "biblioteca\\fisiologia\\musculo-sarcomero\\index.html",
+    "biblioteca\\fisiologia\\osso-vivo\\index.html",
+    "biblioteca\\fisiologia\\pleura\\index.html",
+    "biblioteca\\fisiologia\\potencial-membrana\\index.html",
+    "biblioteca\\fisiologia\\retorno-venoso\\index.html",
+    "biblioteca\\fisiologia\\starling\\index.html",
+    "Entradas de estudo Carro-Forte e VestChip e navegação dos wrappers de A Casa da Costa"
+  ],
+  "dragon": [
+    {
+      "titulo": "A Casa da Costa — A Mesa",
+      "origem": "A Mesa — A Casa da Costa",
+      "itens": [
+        {
+          "nome": "A maquete — visualização livre",
+          "url": "biblioteca/dragon/visualizador.html?id=casa-mesa-maquete"
+        },
+        {
+          "nome": "A maquete",
+          "url": "biblioteca/dragon/jogos/casa-da-costa/a-mesa/AC-maquete.html?demo=solo"
+        },
+        {
+          "nome": "A escrivaninha",
+          "url": "biblioteca/dragon/jogos/casa-da-costa/a-mesa/AC-escrivaninha.html?demo=solo"
+        },
+        {
+          "nome": "Os papéis",
+          "url": "biblioteca/dragon/jogos/casa-da-costa/a-mesa/AC-papeis.html?demo=solo"
+        },
+        {
+          "nome": "O percurso",
+          "url": "biblioteca/dragon/jogos/casa-da-costa/a-mesa/AC-percurso.html?demo=solo"
+        }
+      ]
+    },
+    {
+      "titulo": "A Casa da Costa — O Impostor",
+      "origem": "O Impostor — A Casa da Costa",
+      "itens": [
+        {
+          "nome": "Prólogo — A maquete",
+          "url": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/maquete/?demo=solo"
+        },
+        {
+          "nome": "1 — O aparador",
+          "url": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/bandeja.html"
+        },
+        {
+          "nome": "2 — A escrivaninha",
+          "url": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/escrivaninha.html"
+        },
+        {
+          "nome": "3 — O relógio",
+          "url": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/relogio.html"
+        },
+        {
+          "nome": "4 — O jardim interno",
+          "url": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/jardim.html"
+        },
+        {
+          "nome": "5 — O farol",
+          "url": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/farol.html?codigo=1234"
+        },
+        {
+          "nome": "6 — O quarto do jasmim",
+          "url": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/quarto.html"
+        }
+      ]
+    },
+    {
+      "titulo": "A Manhã do Carro-Forte — A Mesa",
+      "origem": "A Mesa — A Manhã do Carro-Forte",
+      "itens": [
+        {
+          "nome": "A janela do norte",
+          "url": "biblioteca/dragon/jogos/a-manha-do-carro-forte/a-mesa/janela-do-norte.html"
+        },
+        {
+          "nome": "O vidro embaçado",
+          "url": "biblioteca/dragon/jogos/a-manha-do-carro-forte/a-mesa/vidro-embacado.html"
+        },
+        {
+          "nome": "A sala às escuras",
+          "url": "biblioteca/dragon/jogos/a-manha-do-carro-forte/a-mesa/sala-as-escuras.html"
+        },
+        {
+          "nome": "Fragmentos em dupla",
+          "url": "biblioteca/dragon/jogos/a-manha-do-carro-forte/a-mesa/fragmentos-em-dupla.html"
+        }
+      ]
+    },
+    {
+      "titulo": "A Manhã do Carro-Forte — O Impostor",
+      "origem": "O Impostor — A Manhã do Carro-Forte",
+      "itens": [
+        {
+          "nome": "Agência 0688 — maquete e peças",
+          "url": "biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/estudo.html"
+        },
+        {
+          "nome": "1 — O malote murcho",
+          "url": "biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/estudo.html?peca=c1"
+        },
+        {
+          "nome": "2 — O rádio reserva",
+          "url": "biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/estudo.html?peca=c2"
+        },
+        {
+          "nome": "3 — A impressora de etiquetas",
+          "url": "biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/estudo.html?peca=c3"
+        },
+        {
+          "nome": "4 — O armário de vestígios",
+          "url": "biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/estudo.html?peca=c4"
+        },
+        {
+          "nome": "5 — A balança de custódia",
+          "url": "biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/estudo.html?peca=c5"
+        },
+        {
+          "nome": "6 — A noite de onze dias antes",
+          "url": "biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/estudo.html?peca=c6"
+        },
+        {
+          "nome": "7 — A escrivaninha das quinze versões",
+          "url": "biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/estudo.html?peca=c7"
+        }
+      ]
+    },
+    {
+      "titulo": "O Eco do Amanhã — VestChip",
+      "origem": "O Impostor — O Eco do Amanhã",
+      "itens": [
+        {
+          "nome": "Prólogo — A planta da torre",
+          "url": "biblioteca/dragon/jogos/o-eco-do-amanha/o-impostor/planta-estudo.html"
+        },
+        {
+          "nome": "Torre de Continuidade — andares e peças",
+          "url": "biblioteca/dragon/jogos/o-eco-do-amanha/o-impostor/estudo.html"
+        },
+        {
+          "nome": "1 — A escrivaninha do gabinete",
+          "url": "biblioteca/dragon/visualizador.html?id=vestchip-c1"
+        },
+        {
+          "nome": "2 — O fichário de consentimentos",
+          "url": "biblioteca/dragon/visualizador.html?id=vestchip-c2"
+        },
+        {
+          "nome": "3 — O cofre de índices e a balança",
+          "url": "biblioteca/dragon/visualizador.html?id=vestchip-c3"
+        },
+        {
+          "nome": "4 — O armário de serviço e a planta antiga",
+          "url": "biblioteca/dragon/visualizador.html?id=vestchip-c4"
+        },
+        {
+          "nome": "5 — O quadro elétrico do subsolo",
+          "url": "biblioteca/dragon/visualizador.html?id=vestchip-c5"
+        },
+        {
+          "nome": "6 — O relógio de custódia",
+          "url": "biblioteca/dragon/visualizador.html?id=vestchip-c6"
+        },
+        {
+          "nome": "7 — O notebook e o pendrive",
+          "url": "biblioteca/dragon/visualizador.html?id=vestchip-c7"
+        },
+        {
+          "nome": "8 — A cortiça e as alavancas",
+          "url": "biblioteca/dragon/visualizador.html?id=vestchip-c8"
+        }
+      ]
+    }
+  ],
+  "fisiologia": [
+    [
+      "I",
+      "Célula viva",
+      "celula/"
+    ],
+    [
+      "I",
+      "Do neurônio ao impulso",
+      "potencial-membrana/"
+    ],
+    [
+      "I",
+      "Forças de Starling",
+      "starling/"
+    ],
+    [
+      "II",
+      "Do nervo à força",
+      "juncao-neuromuscular/"
+    ],
+    [
+      "II",
+      "Do músculo ao sarcômero",
+      "musculo-sarcomero/"
+    ],
+    [
+      "III",
+      "Viagem ao osso vivo",
+      "osso-vivo/"
+    ],
+    [
+      "IV",
+      "Coração em ação",
+      "coracao/"
+    ],
+    [
+      "IV",
+      "A coluna de sangue",
+      "retorno-venoso/"
+    ],
+    [
+      "V",
+      "O espaço pleural",
+      "pleura/"
+    ]
+  ],
+  "pastas_antigas_removidas": [
+    ".claude",
+    ".nojekyll",
+    "a-marca-partida.html",
+    "ACESSO.md",
+    "atlas_cardiaco_geometria.blend",
+    "atlas_cardiaco_referencia.glb",
+    "atlas_corte_inspecao.png",
+    "atlas_frente.png",
+    "atlas_posterior.png",
+    "bancadas",
+    "bancadas.html",
+    "cadeia-escrivaninha.html",
+    "cadeia-janela.html",
+    "cadeia-parede.html",
+    "cadeia.js",
+    "CADEIA.md",
+    "comparacao.html",
+    "coracao",
+    "Coracao-Anatomico",
+    "cores-para-ra.js",
+    "CREDITOS_ATLAS.md",
+    "DIAGNOSTICO_BANCADA11.md",
+    "escrivaninha-gaveta.glb",
+    "escrivaninha.glb",
+    "escrivaninha.usdz",
+    "gaveta-e-papel.html",
+    "guard.js",
+    "index.html",
+    "integracao",
+    "laboratorio-ra.html",
+    "laboratorio.css",
+    "musculo-sarcomero",
+    "o-impostor",
+    "pleura",
+    "potencial-membrana",
+    "ra-teste-ios.html",
+    "retorno-venoso",
+    "scripts",
+    "sensor-inclinacao.html",
+    "starling",
+    "tests",
+    "vendor"
+  ]
+}
