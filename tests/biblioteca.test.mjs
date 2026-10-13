@@ -22,7 +22,7 @@ test('componentes originais copiados mantem os hashes registrados',()=>{
  assert.ok(Object.keys(hashes).length>100);
  for(const [p,sha] of Object.entries(hashes)){
   let payload=readFileSync(new URL(p,root));
-  if(/\.(?:js|mjs|cjs|html|css|md|json|txt)$/i.test(p))payload=Buffer.from(payload.toString('utf8').replace(/\r\n/g,'\n'));
+  if(/\.(?:js|mjs|cjs|html|css|md|json|txt|py|svg|vtt|rules)$/i.test(p)||!p.split(/[\\/]/).pop().includes('.'))payload=Buffer.from(payload.toString('utf8').replace(/\r\n/g,'\n'));
   assert.equal(createHash('sha256').update(payload).digest('hex'),sha,p);
  }
 });
