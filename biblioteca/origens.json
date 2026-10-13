@@ -49,31 +49,31 @@
       "origem": "O Impostor — A Casa da Costa",
       "itens": [
         {
-          "nome": "Prólogo — A maquete",
+          "nome": "Prólogo: A maquete",
           "url": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/maquete/?demo=solo"
         },
         {
-          "nome": "1 — O aparador",
+          "nome": "Capítulo 1: O aparador",
           "url": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/bandeja.html"
         },
         {
-          "nome": "2 — A escrivaninha",
+          "nome": "Capítulo 2: A escrivaninha",
           "url": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/escrivaninha.html"
         },
         {
-          "nome": "3 — O relógio",
+          "nome": "Capítulo 3: O relógio",
           "url": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/relogio.html"
         },
         {
-          "nome": "4 — O jardim interno",
+          "nome": "Capítulo 4: O jardim interno",
           "url": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/jardim.html"
         },
         {
-          "nome": "5 — O farol",
+          "nome": "Capítulo 5: O farol",
           "url": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/farol.html?codigo=1234"
         },
         {
-          "nome": "6 — O quarto do jasmim",
+          "nome": "Capítulo 6: O quarto do jasmim",
           "url": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/quarto.html"
         }
       ]
@@ -105,35 +105,35 @@
       "origem": "O Impostor — A Manhã do Carro-Forte",
       "itens": [
         {
-          "nome": "Agência 0688 — maquete e peças",
+          "nome": "Prólogo: Agência 0688 — maquete e peças",
           "url": "biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/estudo.html"
         },
         {
-          "nome": "1 — O malote murcho",
+          "nome": "Capítulo 1: O malote murcho",
           "url": "biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/estudo.html?peca=c1"
         },
         {
-          "nome": "2 — O rádio reserva",
+          "nome": "Capítulo 2: O rádio reserva",
           "url": "biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/estudo.html?peca=c2"
         },
         {
-          "nome": "3 — A impressora de etiquetas",
+          "nome": "Capítulo 3: A impressora de etiquetas",
           "url": "biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/estudo.html?peca=c3"
         },
         {
-          "nome": "4 — O armário de vestígios",
+          "nome": "Capítulo 4: O armário de vestígios",
           "url": "biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/estudo.html?peca=c4"
         },
         {
-          "nome": "5 — A balança de custódia",
+          "nome": "Capítulo 5: A balança de custódia",
           "url": "biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/estudo.html?peca=c5"
         },
         {
-          "nome": "6 — A noite de onze dias antes",
+          "nome": "Capítulo 6: A noite de onze dias antes",
           "url": "biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/estudo.html?peca=c6"
         },
         {
-          "nome": "7 — A escrivaninha das quinze versões",
+          "nome": "Capítulo 7: A escrivaninha das quinze versões",
           "url": "biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/estudo.html?peca=c7"
         }
       ]
@@ -143,43 +143,43 @@
       "origem": "O Impostor — O Eco do Amanhã",
       "itens": [
         {
-          "nome": "Prólogo — A planta da torre",
+          "nome": "Prólogo: A planta da torre",
           "url": "biblioteca/dragon/jogos/o-eco-do-amanha/o-impostor/planta-estudo.html"
         },
         {
-          "nome": "Torre de Continuidade — andares e peças",
+          "nome": "Prólogo: Torre de Continuidade — andares e peças",
           "url": "biblioteca/dragon/jogos/o-eco-do-amanha/o-impostor/estudo.html"
         },
         {
-          "nome": "1 — A escrivaninha do gabinete",
+          "nome": "Capítulo 1: A escrivaninha do gabinete",
           "url": "biblioteca/dragon/visualizador.html?id=vestchip-c1"
         },
         {
-          "nome": "2 — O fichário de consentimentos",
+          "nome": "Capítulo 2: O fichário de consentimentos",
           "url": "biblioteca/dragon/visualizador.html?id=vestchip-c2"
         },
         {
-          "nome": "3 — O cofre de índices e a balança",
+          "nome": "Capítulo 3: O cofre de índices e a balança",
           "url": "biblioteca/dragon/visualizador.html?id=vestchip-c3"
         },
         {
-          "nome": "4 — O armário de serviço e a planta antiga",
+          "nome": "Capítulo 4: O armário de serviço e a planta antiga",
           "url": "biblioteca/dragon/visualizador.html?id=vestchip-c4"
         },
         {
-          "nome": "5 — O quadro elétrico do subsolo",
+          "nome": "Capítulo 5: O quadro elétrico do subsolo",
           "url": "biblioteca/dragon/visualizador.html?id=vestchip-c5"
         },
         {
-          "nome": "6 — O relógio de custódia",
+          "nome": "Capítulo 6: O relógio de custódia",
           "url": "biblioteca/dragon/visualizador.html?id=vestchip-c6"
         },
         {
-          "nome": "7 — O notebook e o pendrive",
+          "nome": "Capítulo 7: O notebook e o pendrive",
           "url": "biblioteca/dragon/visualizador.html?id=vestchip-c7"
         },
         {
-          "nome": "8 — A cortiça e as alavancas",
+          "nome": "Capítulo 8: A cortiça e as alavancas",
           "url": "biblioteca/dragon/visualizador.html?id=vestchip-c8"
         }
       ]
@@ -272,5 +272,9 @@
     "starling",
     "tests",
     "vendor"
-  ]
+  ],
+  "ilustracoes": {
+    "medalhao": "CarimboMetal.jpg fornecido pelo autor, sem alteração",
+    "celula": "Fisiologia Interativa/inicio/celula-mapa.js; desenho e animação extraídos, sem interação, ECG, fichas ou links"
+  }
 }

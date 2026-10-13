@@ -5,9 +5,13 @@ import {createHash} from 'node:crypto';
 import {fileURLToPath} from 'node:url';
 const root=new URL('../',import.meta.url);
 const page=readFileSync(new URL('bancadas.html',root),'utf8');
-test('biblioteca apresenta dois cards e dois atalhos de planetas',()=>{
+test('biblioteca apresenta dois cards e duas ilustracoes sem links',()=>{
  assert.equal((page.match(/class="card"/g)||[]).length,2);
- assert.equal((page.match(/class="planeta /g)||[]).length,2);
+ assert.equal((page.match(/class="emblema"/g)||[]).length,2);
+ const emblemas=page.slice(page.indexOf('<div class="emblemas"'),page.indexOf('<div class="cards"'));
+ assert.doesNotMatch(emblemas,/<a\b/);
+ assert.match(page,/Capítulo 1: O malote murcho/);
+ assert.match(page,/Prólogo: Agência 0688/);
  assert.match(page,/Aprender pesquisa fazendo pesquisa/);
  assert.match(page,/Fazendo, errando e criando/);
 });
@@ -22,7 +26,7 @@ test('componentes originais copiados mantem os hashes registrados',()=>{
  assert.ok(Object.keys(hashes).length>100);
  for(const [p,sha] of Object.entries(hashes)){
   let payload=readFileSync(new URL(p,root));
-  if(/\.(?:js|mjs|cjs|html|css|md|json|txt|py|svg|vtt|rules)$/i.test(p)||!p.split(/[\\/]/).pop().includes('.'))payload=Buffer.from(payload.toString('utf8').replace(/\r\n/g,'\n'));
+  if(/\.(?:js|mjs|cjs|html|css|md|json|txt|py|svg|vtt|rules|gitkeep)$/i.test(p)||!p.split(/[\\/]/).pop().includes('.'))payload=Buffer.from(payload.toString('utf8').replace(/\r\n/g,'\n'));
   assert.equal(createHash('sha256').update(payload).digest('hex'),sha,p);
  }
 });
