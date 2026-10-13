@@ -1,0 +1,38 @@
+{
+  "vestchip-c1": {
+    "nome": "A escrivaninha do gabinete",
+    "glb": "jogos/o-eco-do-amanha/o-impostor/modelos/pecas/rec-escrivaninha-gabinete.glb"
+  },
+  "vestchip-c2": {
+    "nome": "O fichário de consentimentos",
+    "glb": "jogos/o-eco-do-amanha/o-impostor/modelos/pecas/rec-fichario-consentimentos.glb"
+  },
+  "vestchip-c3": {
+    "nome": "O cofre de índices e a balança",
+    "glb": "jogos/o-eco-do-amanha/o-impostor/modelos/pecas/rec-cofre-balanca.glb"
+  },
+  "vestchip-c4": {
+    "nome": "O armário de serviço e a planta antiga",
+    "glb": "jogos/o-eco-do-amanha/o-impostor/modelos/pecas/rec-armario-servico.glb"
+  },
+  "vestchip-c5": {
+    "nome": "O quadro elétrico do subsolo",
+    "glb": "jogos/o-eco-do-amanha/o-impostor/modelos/pecas/rec-quadro-eletrico.glb"
+  },
+  "vestchip-c6": {
+    "nome": "O relógio de custódia",
+    "glb": "jogos/o-eco-do-amanha/o-impostor/modelos/pecas/rec-relogio-custodia.glb"
+  },
+  "vestchip-c7": {
+    "nome": "O notebook e o pendrive",
+    "glb": "jogos/o-eco-do-amanha/o-impostor/modelos/pecas/rec-notebook-pendrive.glb"
+  },
+  "vestchip-c8": {
+    "nome": "A cortiça e as alavancas",
+    "glb": "jogos/o-eco-do-amanha/o-impostor/modelos/pecas/rec-cortica-alavancas.glb"
+  },
+  "casa-mesa-maquete": {
+    "nome": "A maquete — A Mesa · A Casa da Costa",
+    "glb": "jogos/casa-da-costa/a-mesa/assets/ac/casa-da-costa-pisos-nova.glb"
+  }
+}

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="pt-BR" data-ac-casa data-ac-moldura><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>A Casa · Investigação em dupla</title><link rel="stylesheet" href="css/ac-janelas.css?v=20261011-t4"><style>
+body{margin:0;background:#091515;color:#f4ead7;font:18px/1.5 system-ui}main{max-width:540px;margin:calc(var(--ac-barra) + var(--ac-margem)) auto var(--ac-margem);padding:var(--ac-respiro)}button,input{font:inherit;padding:14px;border-radius:10px;box-sizing:border-box;width:100%;margin:8px 0;min-height:44px}button{background:#dfbe73;color:#152522;border:0;cursor:pointer}input{background:#172e2d;color:#fff;border:1px solid #9ac5bd}a{color:#b5e5dc}
+#scene{position:fixed;left:0;right:0;bottom:0;top:var(--ac-barra);border:0;width:100%;height:calc(100dvh - var(--ac-barra));display:block;box-sizing:border-box}#scene[hidden],[hidden]{display:none!important}
+body>header{background:#0b1c1a;font-size:14px}#fragment-identity{font-size:12px;line-height:1.15;max-width:45%;border-bottom:3px solid currentColor}#stage{font-size:12px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1 1 auto}
+#block{text-align:center}#block p{font-size:var(--ac-corpo)}
+#summary{padding-top:var(--ac-respiro)}dialog{color:inherit;background:#112522;border:1px solid #8abbb4}dialog button{color:#152522}#invite{overflow-wrap:anywhere}label{display:block;margin-top:20px}
+body.fragment-themed{background:var(--fragment-dark);--fragment-edge:10px}
+body.fragment-themed>header{background:linear-gradient(120deg,var(--fragment-dark),var(--fragment-color));color:#fff;border-bottom:2px solid var(--fragment-color);box-shadow:0 4px 16px #0008}
+body.fragment-themed #fragment-identity{color:#fff!important;border-color:#fff9;font-weight:700}
+body.fragment-themed #scene{border:var(--fragment-edge) solid var(--fragment-color);border-top:0;border-radius:0 0 18px 18px;background:var(--fragment-dark)}
+@media(max-width:480px){body.fragment-themed{--fragment-edge:6px}}
+@media(max-width:520px){body.fragment-themed{--fragment-edge:3px}}
+#sync-status{background:#28230e;color:#ffe14a;border:1px solid #ffe14a}
+/* Moldura baixa (a Mesa abre o percurso a 800×540): a entrada inteira cabe na
+   tela. Com as fontes do Linux da CI, o "Entrar na dupla" caía abaixo da dobra. */
+#setup h1{font-size:clamp(22px,5.4dvh,34px);line-height:1.15;margin:0 0 8px}
+/* O botão que devolve à mesa nasce abaixo da dobra a 800×540 (y=647): ele
+   gruda no pé da tela enquanto o resumo é lido (volta 4). */
+#finish{position:sticky;bottom:var(--ac-margem);z-index:2;box-shadow:0 -10px 24px #091515,0 6px 0 #7c6331}
+#summary dl{margin:8px 0}#summary dd{margin:0 0 6px 28px}
+@media(max-height:560px){#setup{margin-top:calc(var(--ac-barra) + 6px);padding-top:6px;padding-bottom:6px}#setup p{font-size:14px;margin:0 0 6px}#setup button,#setup input{padding:10px;margin:4px 0}#setup label{margin-top:8px;font-size:15px}}
+</style><script src="js/ac-cloud.js?v=20261004-janelas"></script></head><body>
+<header><span id="fragment-identity" hidden></span><span id="stage">A Casa · Investigação em dupla</span><button id="help" class="ac-chevron" type="button" aria-label="Mostrar as janelas" aria-expanded="true">⌄</button></header>
+<main id="setup"><h1>Dois olhares, uma investigação.</h1><p>Um de vocês cria a dupla. O outro cola o convite abaixo, dentro da sua própria mesa.</p><button id="create">Criar dupla · 💡</button><label for="join-link">Convite do colega</label><input id="join-link" type="url" placeholder="Cole o link recebido"><button id="join">Entrar na dupla · 📜</button><p id="error" role="alert"></p></main>
+<iframe id="scene" hidden allow="camera; xr-spatial-tracking; accelerometer; gyroscope; magnetometer" title="Etapa da investigação"></iframe>
+<div id="sync-status" data-ac-priority="9" hidden role="status">Descobertas aguardando sincronização. Mantenha esta aba aberta.</div>
+<dialog id="block" data-ac-priority="10" data-ac-decisao role="status"><p id="block-texto"></p></dialog>
+<main id="summary" data-ac-priority="8" hidden><h1>O caminho foi revelado.</h1><p>A etiqueta levou à maquete. As três chaves abriram a casa inteira, e no vão da escada havia três papéis rasgados: a planta, um bilhete e um relógio parado.</p><p>Os papéis, sozinhos, não provam quem os guardou nem quando.</p><dl><dt>🔎 Sua investigação na sala escura</dt><dd id="points-sala"></dd><dt>🕯️ Cooperação na escrivaninha</dt><dd id="points-candle"></dd><dt>🔑 Três chaves da maquete</dt><dd id="points-keys"></dd><dt>📜 Papéis da passagem</dt><dd id="points-papeis"></dd></dl><p>A vela e as chaves valem o mesmo para os dois da dupla; a sala e os papéis são de cada um. A classificação final inclui também as demais atividades da partida.</p><button id="finish">Guardar descoberta e voltar à mesa</button><p id="result" role="status"></p></main>
+<dialog id="partners" data-ac-priority="6"><h2 id="partners-title">Convite da dupla</h2><p id="partners-intro">O colega deve colar este convite na abertura do percurso, dentro da mesa dele.</p><a id="invite"></a><p id="identity"></p><button id="close" class="ac-continuar">Entendi</button></dialog>
+<script src="js/ac-percurso.js?v=20261011-t4"></script><script src="js/ac-janelas.js?v=20261011-t4"></script></body></html>

@@ -1,0 +1,86 @@
+rules_version = '2';
+
+/* O Impostor · regras do projeto oimpostor-c30e0 (03/10/2026).
+   Projeto próprio do caso (um projeto por caso, ver FIREBASE-ISOLAMENTO.md).
+   Publicar colando no console do Firebase (Firestore → Regras → Publicar).
+   Atenção: NÃO usar `firebase deploy` com o firebase.json da raiz, que aponta para o
+   firestore.rules das outras mesas.
+
+   O que a sala guarda:
+   · mosaico/{codigo}             a sala (o gate cria; só o Mestre altera):
+                                  fase, ritmo, oi {p, partida, humanos, papeis}, cap {n, t0Ms}
+   · mosaico/{codigo}/jogadores   um por pessoa (cada um só escreve o seu):
+                                  nome, forma, etapa (último capítulo concluído), resumo (placar)
+   · mosaico/{codigo}/mensagens   as frases prontas e os anexos que um humano manda
+   · mosaico/{codigo}/eventos     sinais da história (o gesto de um portão feito por um humano)
+   Nada se apaga pelo jogo. */
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function emailMestre() {
+      return signedIn() && request.auth.token.email is string && request.auth.token.email_verified == true
+        && exists(/databases/$(database)/documents/config/mestres)
+        && request.auth.token.email in get(/databases/$(database)/documents/config/mestres).data.emails;
+    }
+    function salaPath(id) { return /databases/$(database)/documents/mosaico/$(id); }
+    function sala(id) { return get(salaPath(id)).data; }
+    function existe(id) { return exists(salaPath(id)); }
+    function ativa(id) { return existe(id) && sala(id).ativa == true; }
+    function mestre(id) { return signedIn() && existe(id) && sala(id).mestreUid == request.auth.uid; }
+    function jogador(id) { return signedIn() && exists(/databases/$(database)/documents/mosaico/$(id)/jogadores/$(request.auth.uid)); }
+    function dentro(id) { return mestre(id) || jogador(id); }
+    function camposJogador() {
+      return ['nome','forma','mestre','pronto','papelCognitivo','camadaAcessibilidade','entrouMs','atualizadoEmMs','etapa','resumo'];
+    }
+
+    match /config/mestres { allow read: if signedIn(); allow write: if false; }
+
+    match /mosaico/{id} {
+      allow get: if signedIn();
+      allow list: if false;
+      allow create: if emailMestre() && request.resource.data.mestreUid == request.auth.uid
+        && request.resource.data.ativa == true && request.resource.data.fase == 'sala';
+      allow update: if mestre(id) && request.resource.data.mestreUid == resource.data.mestreUid;
+      allow delete: if false;
+
+      match /jogadores/{uid} {
+        allow read: if dentro(id);
+        /* Entra quem chega enquanto a sala espera; depois do início, só quem já tem lugar volta. */
+        allow create: if signedIn() && uid == request.auth.uid && ativa(id) && sala(id).fase == 'sala'
+          && request.resource.data.keys().hasOnly(camposJogador())
+          && request.resource.data.nome is string && request.resource.data.nome.size() <= 24
+          && (request.resource.data.get('mestre', false) == false || mestre(id));
+        allow update: if signedIn() && uid == request.auth.uid && ativa(id)
+          && request.resource.data.keys().hasOnly(camposJogador())
+          && (request.resource.data.get('mestre', false) == false || mestre(id))
+          && (!request.resource.data.keys().hasAny(['etapa']) || request.resource.data.etapa is int)
+          && (!request.resource.data.keys().hasAny(['resumo']) || request.resource.data.resumo is map);
+        allow delete: if false;
+      }
+
+      match /mensagens/{msg} {
+        allow read: if dentro(id);
+        allow create: if dentro(id) && ativa(id) && request.resource.data.de == request.auth.uid
+          && request.resource.data.keys().hasOnly(['de','ms','slot','para','txt','anexo','img','cap'])
+          && (!request.resource.data.keys().hasAny(['txt']) || (request.resource.data.txt is string && request.resource.data.txt.size() <= 600))
+          && (!request.resource.data.keys().hasAny(['anexo']) || (request.resource.data.anexo is string && request.resource.data.anexo.size() <= 120))
+          && (!request.resource.data.keys().hasAny(['img']) || (request.resource.data.img is string && request.resource.data.img.size() <= 700000));
+        allow update, delete: if false;
+      }
+
+      match /eventos/{ev} {
+        allow read: if dentro(id);
+        allow create: if dentro(id) && ativa(id) && request.resource.data.de == request.auth.uid
+          && request.resource.data.keys().hasOnly(['de','ms','tipo','cap','t']);
+        allow update, delete: if false;
+      }
+
+      /* o telão fica para depois (decisão 5); o painel do Mestre já escuta esta coleção */
+      match /telao/{t} { allow read: if dentro(id); allow write: if false; }
+
+      match /{outra}/{doc=**} { allow read, write: if false; }
+    }
+
+    match /{caminho=**} { allow read, write: if false; }
+  }
+}

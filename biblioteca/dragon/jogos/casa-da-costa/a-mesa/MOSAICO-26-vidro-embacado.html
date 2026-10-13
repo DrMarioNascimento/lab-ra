@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#05070c">
+<title>O Vidro Embaçado — MOSAICO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@400;500;600;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400;1,7..72,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --breu:#05070c;
+
+    /* ---- mesma escala de leitura no escuro do "A Janela do Norte" -------
+       abaixo de ~18px o texto e branco puro. cor so a partir de ~20px.
+       nenhuma opacidade em texto: ela some do contraste sem avisar.     */
+    --t-max:#ffffff;
+    --t-hi:#f4f9fd;
+    --t-mid:#dfeaf5;
+
+    --frio:#7fd4ff;      /* ciano de destaque, corpo grande */
+    --frio-s:#c6ecff;    /* ciano em corpo pequeno = quase branco frio */
+    --ambar:#e8a44c;     /* ambar, corpo grande */
+    --ambar-s:#ffcf8f;   /* ambar em corpo pequeno = branco quente */
+    --nevoa:#dfeaf5;
+
+    --scrim:0 1px 2px #000,0 2px 10px #000d,0 0 26px #000a;
+    --scrim-strong:0 1px 2px #000,0 2px 8px #000,0 0 22px #000e,0 0 44px #000b;
+
+    --display:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+    --serif:"Literata","Charter","Bitstream Charter","Iowan Old Style",Georgia,"Noto Serif",serif;
+    --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,"Roboto Mono",monospace;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+  html,body{
+    height:100%;height:100dvh;background:var(--breu);color:var(--t-hi);
+    font-family:var(--sans);overflow:hidden;touch-action:pinch-zoom;overscroll-behavior:none;
+    /* sem font-smoothing:antialiased: no escuro ele afina o texto claro */
+    text-rendering:optimizeLegibility;font-optical-sizing:auto;
+  }
+  #c{position:fixed;inset:0;width:100%;height:100%;display:block}
+
+  /* veu de contraste sob o HUD: o vidro embaca e clareia o tempo todo, e o
+     relampago estoura a cena. Sem isto o texto disputa brilho com a agua. */
+  #veil{position:fixed;inset:0;pointer-events:none;z-index:1;
+    background:
+      linear-gradient(180deg,#000000b0 0%,#0000007a 11%,#00000000 28%),
+      linear-gradient(0deg,#000000cc 0%,#0000009e 15%,#00000000 38%);}
+
+  /* ATENCAO iOS: nunca inset:0 em elemento fixo com texto no rodape. Em
+     position:fixed o Safari mede a viewport GRANDE e a barra de endereco
+     come o rodape. 100dvh e sempre a viewport menor.                    */
+  #hud{
+    position:fixed;left:0;right:0;top:0;height:100%;height:100dvh;
+    pointer-events:none;z-index:2;
+    display:flex;flex-direction:column;justify-content:space-between;
+    padding:max(18px,env(safe-area-inset-top)) 20px
+            calc(env(safe-area-inset-bottom,0px) + 22px);
+  }
+  #topbar{text-align:center}
+  #local{
+    font-size:clamp(12px,3.2vw,15px);letter-spacing:.18em;text-transform:uppercase;
+    color:var(--t-max);font-weight:600;text-shadow:var(--scrim-strong);
+  }
+  #linha{width:44px;height:1px;background:rgba(223,234,245,.5);margin:11px auto 0}
+  #bottombar{text-align:center}
+  #marcas{display:flex;gap:13px;justify-content:center;margin-bottom:16px}
+  /* as marcas sao placar: precisam de contorno proprio para existirem tanto
+     contra o vidro claro quanto contra o breu.                          */
+  .marca{
+    width:10px;height:10px;border-radius:50%;
+    background:rgba(10,16,24,.7);border:1.5px solid rgba(223,234,245,.55);
+    box-shadow:0 1px 3px #000;
+    transition:all .5s ease;
+  }
+  .marca.on{
+    background:var(--frio);border-color:#e8f7ff;
+    box-shadow:0 0 14px var(--frio),0 0 30px rgba(127,212,255,.45);
+    transform:scale(1.35);
+  }
+  #dica{
+    font-family:var(--serif);font-style:italic;font-weight:500;
+    font-size:clamp(17px,4.2vw,20px);line-height:1.35;
+    color:var(--t-hi);min-height:1.5em;max-width:26ch;margin:0 auto;
+    transition:opacity .6s ease;text-shadow:var(--scrim-strong);
+  }
+
+  /* ---------- Menu de pistas ---------- */
+  #btn-pistas{
+    position:fixed;z-index:7;pointer-events:auto;
+    left:calc(env(safe-area-inset-left,0px) + 14px);
+    top:calc(env(safe-area-inset-top,0px) + 12px);
+    display:flex;align-items:center;gap:9px;
+    min-height:48px;padding:12px 20px;border-radius:100px;
+    border:1px solid rgba(127,212,255,.55);
+    background:rgba(6,10,16,.9);color:var(--frio-s);
+    font-family:var(--sans);font-size:clamp(13px,3.3vw,15px);font-weight:700;
+    letter-spacing:.14em;text-transform:uppercase;
+    text-shadow:0 1px 2px #000;
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease;
+  }
+  #btn-pistas.on{opacity:1;transform:translateY(0)}
+  #btn-pistas b{
+    font-size:clamp(16px,4.2vw,19px);letter-spacing:0;
+    color:var(--t-max);font-variant-numeric:tabular-nums;
+  }
+  #pistas{
+    position:fixed;left:0;right:0;top:0;height:100%;height:100dvh;z-index:9;
+    background:linear-gradient(170deg,#080d14,#04060a);
+    padding:calc(env(safe-area-inset-top,0px) + 22px) 22px
+            calc(env(safe-area-inset-bottom,0px) + 28px);
+    overflow-y:auto;-webkit-overflow-scrolling:touch;
+    /* body tem touch-action:pinch-zoom e isso vale para os filhos: sem esta linha
+       a lista de pistas simplesmente nao rola no iPhone.                */
+    touch-action:pan-y pinch-zoom;overscroll-behavior:contain;
+    opacity:0;pointer-events:none;transition:opacity .5s ease;
+  }
+  #pistas.on{opacity:1;pointer-events:auto}
+  #pistas h2{
+    font-family:var(--sans);font-size:clamp(12px,3.1vw,14px);font-weight:600;
+    letter-spacing:.22em;text-transform:uppercase;color:var(--t-max);
+    text-align:center;margin:8px 0 26px;
+  }
+  #pistas-nota{
+    font-family:var(--serif);font-size:clamp(15px,3.6vw,17px);line-height:1.45;
+    font-weight:600;color:var(--t-max);text-align:center;
+    max-width:34em;margin:0 auto 18px;
+  }
+  #pistas-lista{max-width:34em;margin:0 auto}
+  .pista{
+    border-left:2px solid rgba(127,212,255,.6);
+    padding:2px 0 2px 16px;margin-bottom:26px;
+  }
+  .pista .ph{
+    font-size:clamp(13px,3.2vw,15px);letter-spacing:.16em;color:var(--ambar-s);
+    font-variant-numeric:tabular-nums;font-weight:700;
+  }
+  .pista .pf{
+    font-family:var(--serif);font-size:clamp(19px,4.8vw,23px);line-height:1.42;
+    font-weight:400;color:var(--t-hi);margin-top:9px;
+  }
+  #pistas-vazio{
+    font-family:var(--serif);font-style:italic;font-weight:500;
+    font-size:clamp(18px,4.6vw,22px);
+    color:var(--t-mid);text-align:center;margin-top:18vh;line-height:1.5;
+  }
+  #fechar-pistas{
+    display:block;margin:14px auto 0;min-height:52px;
+    font-family:var(--sans);font-size:clamp(13px,3.4vw,15px);font-weight:700;
+    letter-spacing:.14em;text-transform:uppercase;
+    padding:15px 38px;border-radius:2px;
+    border:1px solid rgba(223,234,245,.5);
+    background:rgba(8,12,18,.6);color:var(--t-max);
+  }
+
+  #cartao{
+    position:fixed;left:16px;right:16px;z-index:6;
+    bottom:calc(env(safe-area-inset-bottom,0px) + 18px);
+    transform:translateY(130%);opacity:0;
+    transition:transform .9s cubic-bezier(.16,1,.3,1),opacity .6s ease;
+    pointer-events:none;
+  }
+  #cartao.on{transform:translateY(0);opacity:1;pointer-events:auto}
+  #cartao-inner{
+    position:relative;
+    background:linear-gradient(160deg,rgba(14,20,29,.97),rgba(6,10,15,.985));
+    border:1px solid rgba(127,212,255,.34);border-radius:3px;
+    padding:20px 22px 18px;
+    box-shadow:0 24px 70px rgba(0,0,0,.85),0 0 60px rgba(127,212,255,.07),inset 0 1px 0 rgba(255,255,255,.06);
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  }
+  #cartao-inner::before{
+    content:"";position:absolute;left:0;top:0;bottom:0;width:2px;
+    background:linear-gradient(180deg,transparent,var(--frio),transparent);opacity:.85;
+  }
+  #c-meta{display:flex;align-items:baseline;gap:12px;margin-bottom:12px}
+  #c-tipo{
+    font-size:clamp(13px,3.2vw,15px);letter-spacing:.18em;text-transform:uppercase;
+    color:var(--frio-s);font-weight:700;
+  }
+  #c-hora{
+    font-size:clamp(13px,3.2vw,15px);letter-spacing:.1em;color:var(--t-mid);
+    font-variant-numeric:tabular-nums;font-weight:600;margin-left:auto;
+  }
+  #c-txt{
+    font-family:var(--serif);font-size:clamp(21px,5.6vw,28px);line-height:1.38;
+    font-weight:500;color:var(--t-hi);
+  }
+  /* Botao explicito: aqui a pessoa esta inclinando o celular e fecharia
+     a pista sem querer se bastasse tocar na tela.                     */
+  #c-tempo{font-family:var(--mono);font-weight:700;margin-top:16px;
+    font-size:clamp(15px,3.8vw,18px);letter-spacing:.06em;color:var(--ambar-s);
+    font-variant-numeric:tabular-nums}
+  #c-txt{white-space:pre-line}
+  #fechar-cartao{
+    display:block;width:100%;margin-top:20px;min-height:54px;
+    font-family:var(--sans);font-size:clamp(14px,3.6vw,16px);font-weight:700;
+    letter-spacing:.14em;text-transform:uppercase;
+    padding:16px;border-radius:2px;
+    border:1px solid rgba(127,212,255,.6);
+    background:rgba(127,212,255,.1);color:var(--frio-s);
+    text-shadow:0 1px 2px #000;
+  }
+  #fechar-cartao:active{background:rgba(127,212,255,.22)}
+
+  #descanso{
+    position:fixed;left:0;right:0;top:0;height:100%;height:100dvh;z-index:7;
+    background:rgba(4,6,10,.93);
+    display:flex;flex-direction:column;align-items:center;
+    justify-content:center;justify-content:safe center;
+    gap:18px;text-align:center;
+    padding:24px 34px calc(env(safe-area-inset-bottom,0px) + 24px);
+    overflow-y:auto;touch-action:pan-y pinch-zoom;overscroll-behavior:contain;
+    opacity:0;pointer-events:none;transition:opacity .9s ease;
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  }
+  #descanso.on{opacity:1;pointer-events:auto}
+  #descanso p{
+    font-family:var(--serif);font-style:italic;font-weight:500;
+    font-size:clamp(19px,5vw,24px);
+    color:var(--t-hi);max-width:18em;line-height:1.45;
+  }
+  #resp-arco{flex:0 0 auto}
+
+  #intro{
+    position:fixed;left:0;right:0;top:0;height:100%;height:100dvh;z-index:10;
+    background:radial-gradient(ellipse 120% 80% at 50% 32%,#080e16 0%,#04060a 66%);
+    display:flex;flex-direction:column;align-items:center;
+    justify-content:center;justify-content:safe center;
+    padding:clamp(20px,4vh,34px) 24px calc(env(safe-area-inset-bottom,0px) + 28px);
+    text-align:center;transition:opacity 1.1s ease;
+    overflow-y:auto;-webkit-overflow-scrolling:touch;
+    touch-action:pan-y pinch-zoom;overscroll-behavior:contain;
+  }
+  /* rede de seguranca para Safari antigo, que ignora "safe center": as duas
+     margens automaticas centram quando cabe e somem quando nao cabe — ai o
+     conteudo comeca no topo e rola inteiro, em vez de estourar por cima. */
+  #intro::before,#intro::after{content:"";margin:auto;flex:0 0 0}
+  #intro.out{opacity:0;pointer-events:none}
+  #titulo{
+    font-family:var(--sans);font-size:clamp(12px,3.1vw,15px);letter-spacing:.2em;
+    text-transform:uppercase;font-weight:600;color:var(--t-max);margin-bottom:14px;
+  }
+  #nome-jogo{
+    font-family:var(--display);font-size:clamp(40px,10.5vw,64px);line-height:1.03;
+    font-weight:600;color:#ffffff;margin-bottom:8px;
+    text-shadow:0 0 50px rgba(127,212,255,.2),0 4px 30px #000;
+  }
+  #sub{
+    font-family:var(--serif);font-style:italic;font-weight:500;
+    font-size:clamp(17px,4.4vw,22px);color:var(--t-mid);margin-bottom:20px;
+  }
+  #instr{
+    font-family:var(--serif);font-size:clamp(17px,4.4vw,21px);line-height:1.48;
+    font-weight:400;color:var(--t-hi);max-width:22em;margin-bottom:16px;
+  }
+  #priv{
+    font-family:var(--sans);font-size:clamp(13px,3.2vw,15px);letter-spacing:.06em;
+    font-weight:500;color:var(--t-mid);max-width:26em;line-height:1.6;margin-bottom:24px;
+  }
+  .btn{
+    pointer-events:auto;font-family:var(--sans);font-size:clamp(14px,3.6vw,16px);font-weight:700;
+    letter-spacing:.14em;text-transform:uppercase;padding:18px 38px;border-radius:2px;
+    min-height:54px;flex:0 0 auto;
+    border:1px solid rgba(127,212,255,.6);background:rgba(127,212,255,.09);color:var(--frio-s);
+    text-shadow:0 1px 2px #000;
+    transition:background .3s ease,box-shadow .3s ease;
+  }
+  #alt{
+    margin-top:16px;font-size:clamp(14px,3.4vw,15px);letter-spacing:.1em;
+    color:var(--t-max);font-weight:600;flex:0 0 auto;
+    text-decoration:underline;text-underline-offset:6px;
+    pointer-events:auto;background:none;border:none;text-transform:uppercase;
+    font-family:var(--sans);padding:12px;
+  }
+  #aviso{
+    position:fixed;left:0;right:0;z-index:5;
+    top:calc(env(safe-area-inset-top,0px) + 74px);
+    text-align:center;font-size:clamp(13px,3.2vw,15px);letter-spacing:.12em;
+    font-weight:600;text-transform:uppercase;color:var(--frio-s);opacity:0;
+    text-shadow:var(--scrim-strong);
+    transition:opacity .8s ease;pointer-events:none;
+  }
+  #aviso.on{opacity:1}
+
+  #final{
+    position:fixed;left:0;right:0;top:0;height:100%;height:100dvh;z-index:8;
+    display:flex;flex-direction:column;align-items:center;
+    justify-content:center;justify-content:safe center;gap:24px;
+    padding:24px 30px calc(env(safe-area-inset-bottom,0px) + 24px);
+    opacity:0;pointer-events:none;
+    overflow-y:auto;touch-action:pan-y pinch-zoom;overscroll-behavior:contain;
+    transition:opacity 1.4s ease;text-align:center;
+    background:rgba(4,6,10,.82);
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  }
+  #final.on{opacity:1;pointer-events:auto}
+  #final-frase{
+    font-family:var(--serif);font-style:italic;font-weight:500;
+    font-size:clamp(19px,5vw,24px);line-height:1.45;
+    color:var(--t-hi);max-width:21em;text-shadow:var(--scrim-strong);
+  }
+  /* telas curtas: encolhe so o titulo e os respiros, nunca o texto de leitura */
+  @media(max-height:760px){
+    #nome-jogo{font-size:clamp(34px,9vw,48px)}
+    #sub{margin-bottom:14px}
+    #instr{margin-bottom:12px}
+    #priv{margin-bottom:18px}
+    #alt{margin-top:12px}
+  }
+  @media(max-height:640px){
+    #nome-jogo{font-size:clamp(30px,8vw,40px)}
+    #instr{font-size:clamp(16px,4.1vw,19px);line-height:1.42}
+    #sub{font-size:clamp(16px,4.1vw,19px);margin-bottom:10px}
+  }
+  @media(min-width:900px){
+    #dica{max-width:34ch}
+  }
+  /* ======================================================================
+     INTEGRAÇÃO E RESPONSIVIDADE (spec v2)
+     ====================================================================== */
+  html,body{overflow-x:hidden;min-height:100vh;min-height:100dvh}
+  *,*::before,*::after{box-sizing:border-box}
+
+  /* Áreas seguras nas QUATRO bordas. Só topo e rodapé não bastam: deitado,
+     o notch e as bordas arredondadas passam para as laterais.            */
+  #hud,#intro,#oito,#card,#carta,#cartao,#pistas,#final,#descanso,#falha{
+    padding-left:max(16px,env(safe-area-inset-left));
+    padding-right:max(16px,env(safe-area-inset-right));
+  }
+  #mestre,#master{
+    left:max(12px,env(safe-area-inset-left));
+    right:max(12px,env(safe-area-inset-right));
+  }
+
+  /* Botões: alvo de toque, e os três estados que a spec pede.           */
+  button{min-height:48px}
+  button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+  button[disabled]{
+    color:#dfeaf5;border-color:#33465a;background:#0a0f16f2;
+    cursor:default;filter:saturate(.35)
+  }
+
+  /* MODO INTEGRADO: o MOSAICO já mostra o nome da rodada, "Jogador contra
+     Jogador" e "Cada um por si" na moldura. Repetir aqui dentro duplica a
+     tela. Ficam só as orientações internas.                              */
+  body.embed #kicker,
+  body.embed #title,
+  body.embed #titulo,
+  body.embed #nome-jogo,
+  body.embed #sub,
+  body.embed #local{display:none}
+  /* CRONOLOGIA: o caderno de pistas e o botao dele nao existem dentro da
+     Mesa - a lista mostra horarios de registros sorteados.            */
+  body.embed #btn-pistas,
+  body.embed #pistas{display:none}
+  body.embed #intro{justify-content:center;justify-content:safe center}
+  html.embed,html.embed body{height:100%;max-height:100%;overflow:hidden}
+  html.embed #hud,html.embed #intro,html.embed #oito,html.embed #carta,
+  html.embed #falha,html.embed #c,html.embed #pistas{height:100%;max-height:100%}
+
+  /* ---------------- falha de sensor ---------------- */
+  #falha{position:fixed;left:0;right:0;top:0;height:100%;height:100dvh;z-index:20;
+    display:none;flex-direction:column;align-items:center;
+    justify-content:center;justify-content:safe center;gap:14px;
+    padding-top:max(20px,env(safe-area-inset-top));
+    padding-bottom:calc(env(safe-area-inset-bottom,0px) + 24px);
+    overflow-y:auto;-webkit-overflow-scrolling:touch;
+    touch-action:pan-y pinch-zoom;overscroll-behavior:contain;
+    background:radial-gradient(ellipse 110% 70% at 50% 45%,#070d15f5,#02040afa);
+    text-align:center}
+  #falha.on{display:flex}
+  #falha::before,#falha::after{content:"";margin:auto;flex:0 0 0}
+  #falha-tit{font-family:"Cormorant Garamond",Georgia,serif;
+    font-size:clamp(26px,6.5vw,36px);font-weight:600;color:#fff;line-height:1.1}
+  #falha-msg{font-family:"Literata",Georgia,serif;font-weight:500;
+    font-size:clamp(17px,4.3vw,20px);line-height:1.45;color:#f4f9fd;max-width:24em}
+  #falha button{width:min(340px,88vw);flex:0 0 auto}
+  #falha-retry{padding:16px;font-size:clamp(13px,3.4vw,16px);letter-spacing:.14em;
+    text-transform:uppercase;font-weight:700;border-radius:9px;
+    border:1px solid #b87433;color:#ffe0c0;background:#1a1109ee}
+  #falha-toque{background:none;border:none;min-height:48px;color:#fff;
+    font-size:clamp(14px,3.4vw,15px);letter-spacing:.08em;text-transform:uppercase;
+    font-weight:600;text-decoration:underline;text-underline-offset:6px;padding:12px}
+
+</style>
+
+<!-- O volume dos botoes mora num arquivo so, lido por esta pagina e pelas
+     outras tres. Entra DEPOIS do <style> de proposito: em empate de
+     especificidade, quem vem por ultimo vence, e o padrao tem de vencer. -->
+<link rel="stylesheet" href="css/profundidade.css?v=20260902-profundidade">
+<link rel="stylesheet" href="css/profundidade-1mais1.css?v=20260930-foco">
+<link rel="stylesheet" href="css/ac-janelas.css?v=20261011-t4">
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="veil"></div>
+
+<div id="hud">
+  <div id="topbar">
+    <div id="local">A janela do segundo andar</div>
+    <div id="linha"></div>
+  </div>
+  <div id="bottombar">
+    <div id="marcas"></div>
+    <div id="dica">Incline o aparelho. A água obedece.</div>
+  </div>
+</div>
+
+<button id="btn-pistas">Pistas <b>0</b></button>
+
+<div id="pistas">
+  <h2>Minhas pistas</h2>
+  <p id="pistas-nota">O vidro revelou um registro de um momento anterior da noite.</p>
+  <div id="pistas-lista"></div>
+  <div id="pistas-vazio">O vidro ainda est&aacute; fechado.<br>Nada foi lido.</div>
+  <button id="fechar-pistas">Voltar &agrave; janela</button>
+</div>
+
+<div id="aviso"></div>
+
+<div id="cartao"><div id="cartao-inner" data-ac-priority="3">
+  <div id="c-meta"><span id="c-tipo">Registro anterior da noite</span><span id="c-hora"></span></div>
+  <div id="c-txt"></div>
+  <div id="c-tempo"></div>
+  <button id="fechar-cartao">Fechar pista</button>
+</div></div>
+
+<div id="descanso">
+  <svg id="resp-arco" width="54" height="54" viewBox="0 0 54 54">
+    <circle cx="27" cy="27" r="20" fill="none" stroke="#1c2836" stroke-width="1.5"/>
+    <circle id="resp-fill" cx="27" cy="27" r="20" fill="none" stroke="#7fd4ff"
+            stroke-width="1.5" stroke-linecap="round"
+            stroke-dasharray="125.6" stroke-dashoffset="125.6"
+            transform="rotate(-90 27 27)"/>
+  </svg>
+  <p>Solte o punho. A casa não tem pressa.</p>
+</div>
+
+<div id="final" data-ac-priority="8">
+  <div id="final-frase">Às 22h40, sete xícaras secavam na pia.<br>Seis pessoas beberam chá naquela noite.</div>
+  <button class="btn" id="btn-again">Recomeçar</button>
+</div>
+
+<div id="intro" data-ac-priority="10">
+  <div id="titulo">A Casa da Costa</div>
+  <div id="nome-jogo">O Vidro<br>Embaçado</div>
+  <div id="sub">A janela que não deveria abrir</div>
+  <div id="instr">O vidro está embaçado por dentro. Você não pode limpá-lo com o dedo. Incline o aparelho e deixe a água escorrer &mdash; só no ângulo certo ela abre uma trilha sobre o que está escrito atrás.</div>
+  <div id="priv">O texto só é legível de frente. Quem estiver ao seu lado vê borrão.</div>
+  <button class="btn" id="btn-start">Chegar na janela</button>
+  <button id="alt">Sem sensor &mdash; usar o dedo</button>
+</div>
+
+<div id="falha" data-ac-priority="9" role="alertdialog" aria-live="polite">
+  <div id="falha-tit">Sem sensor</div>
+  <div id="falha-msg"></div>
+  <button id="falha-retry" aria-label="Tentar ativar o sensor novamente">Tentar novamente</button>
+  <button id="falha-toque" aria-label="Continuar usando o toque na tela">Continuar tocando na tela</button>
+</div>
+
+<!-- Protocolo com a Mesa e ativacao de sensor: um so arquivo para as tres tarefas. -->
+<script src="js/tarefa-sensor.js?v=20261011-t4"></script>
+<script>
+(function(){
+"use strict";
+
+/* ================= AJUSTE DE JOGO =================
+   Isto e uma brincadeira, nao um instrumento de medicao.
+   As faixas sao largas de proposito: o prazer esta em ver a agua
+   obedecer a mao, nao em acertar um angulo exato.               */
+var TOL_B = 26, TOL_G = 30;    /* tolerancia por eixo (graus) */
+var MAX_B = 62, MAX_G = 68;    /* alcance do "esta esquentando" */
+var HOLD_MS = 1500;
+var DESCANSO_A_CADA = 3;       /* ergonomia: pausa a cada N fragmentos */
+
+/* ================= FRAGMENTOS =================
+   02/09/2026: esta lista era do cânone antigo, a mesma que estava na Janela
+   do Norte — o cofre arrombado, a névoa convidada. Nenhuma linha dela existia
+   mais no caso.
+
+   O Vidro Embaçado é a atividade de NÚMERO e REGISTRO: medida, contagem,
+   documento, e informação cuja leitura muda quando relacionada a outra. Por
+   isso os fragmentos daqui são o hidrômetro, o boiler, a despensa e as
+   xícaras — coisas que se contam —, e não sombras no corredor.
+
+   Saem do banco (casos/casa-da-costa.json). Ao mexer, confira o id.       */
+var FRAGMENTOS = [
+  { hora:"19:40", txt:"O aviso chega às 19h40. Às 20h05 a movimentação já é perceptível de dentro da casa." },  /* F29 */
+  { hora:"21:24", txt:"Cozinha e corredor sem poeira. Os outros cômodos são compatíveis com cinco meses fechados." }, /* F02 */
+  { hora:"22:10", txt:"Conferência das 22h10: o envelope do inventário segue lacrado, e nada foi levado do cofre." }, /* F31 F32 */
+  { hora:"22:40", txt:"Sete xícaras limpas secando na pia. Seis pessoas do grupo beberam chá naquela noite." },  /* F01 */
+  { hora:"—",     txt:"O hidrômetro registra consumo diário contínuo nos cinco meses em que a casa esteve vazia." }, /* F13 */
+  { hora:"—",     txt:"O boiler foi acionado em dias diferentes das visitas semanais do Morador." }              /* F14 */
+];
+var IDS=["F29", "F02", "F32", "F01", "F13", "F14"];
+/* 11/10/2026 (Tarefa 4): a Casa tem 15 variações da solução. Dentro da Mesa ou do Solo, os textos
+   acima saem da variação desta partida (os mesmos fragmentos do banco, pelo id); fora, ficam como estão. */
+(function(){try{
+  var P=window.parent&&window.parent!==window?window.parent:null; if(!P) return;
+  var C=(P.CASO&&P.CASO.variacao&&P.CASO)||(P.CasaVariacoesSolo&&P.CasaVariacoesSolo.caso&&P.CasaVariacoesSolo.caso());
+  if(!C||!C.fragmentos) return;
+  IDS.forEach(function(id,i){var f=C.fragmentos[id]; if(f&&FRAGMENTOS[i]){FRAGMENTOS[i].txt=f.d; if(f.h&&f.h!=="—")FRAGMENTOS[i].hora=f.h.split("–")[0];}});
+}catch(e){}})();
+
+
+/* ================= MODO EMBUTIDO =================
+   Dentro da mesa isto e uma TAREFA: ao revelar, avisa a pagina que
+   hospeda em vez de seguir sozinho para a proxima rodada. Um acerto
+   encerra. As seis bolinhas do modo sozinho nao valem aqui.        */
+/* ==========================================================================
+   ENTRADA PELA URL  —  ?embed=1&s=SEMENTE&run=IDENTIFICADOR[&dev=1]
+   s   : semente fixa da tarefa. Presente, nada mais é sorteado ao acaso —
+         quem abrir com a mesma semente monta exatamente o mesmo céu.
+         Ausente, a tarefa sorteia como sempre sorteou.
+   run : identifica esta execução. Volta em toda mensagem enviada à Mesa e
+         filtra os comandos recebidos dela.
+   dev : só teste. Nunca é ligado por conta própria em lugar nenhum.
+   ========================================================================== */
+var EMBED=false, SEMENTE_URL="", RUN_ID="", DEV=false;
+try{
+  var _q=new URLSearchParams(location.search);
+  EMBED       = _q.get("embed")==="1";
+  SEMENTE_URL = (_q.get("s")||"").trim().toUpperCase();
+  RUN_ID      = (_q.get("run")||"").trim();
+  /* ?dev=1 — modo de teste. O botao de computador nao existe para o jogador:
+     a tarefa e exclusiva de celular. Ele so aparece com dev=1, para nos
+     conseguirmos testar sem sensor. O caminho por toque continua existindo
+     sozinho pela tela de falha, entao tirar o botao nao prende ninguem. */
+  DEV = _q.get("dev")==="1";
+}catch(e){}
+
+/* ==========================================================================
+   SORTEIO SEMEADO
+   Esta tarefa nasceu antes da camada de semente das outras duas e sorteava
+   tudo direto do Math.random(), ou seja, cada aparelho via um céu diferente.
+   Daqui em diante, o que define o CENÁRIO passa por sorteio(): com semente,
+   é reprodutível; sem semente, cai no Math.random() de antes e nada muda
+   para quem abre a tarefa sozinho. O que é só ambiente — relâmpago, chuva,
+   gelo, grão — continua no Math.random(): é ruído, não cenário, e não
+   precisa bater entre aparelhos.
+   ========================================================================== */
+function hashStr(s){ var h=2166136261>>>0; for(var i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619)>>>0; } return h>>>0; }
+function rngFrom(seed){ var a=seed>>>0; return function(){ a=a+0x6D2B79F5|0; var t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+var RND = SEMENTE_URL ? rngFrom(hashStr(SEMENTE_URL)) : null;
+function sorteio(){ return RND ? RND() : Math.random(); }
+
+var JOGO="vidro", TAREFA="constelacao";
+/* ==========================================================================
+   INTEGRAÇÃO COM O MOSAICO (mesa)  — contrato versão 2
+   Este bloco não decide ponto, colocação nem pista. Ele só mede o tempo da
+   tarefa e conta à mesa o que aconteceu. Sem Firebase, sem navegação, sem
+   tocar no documento pai.
+   ========================================================================== */
+var VERSAO=3;
+var modoEntrada="sensor";
+var inicioTarefa=null, fimTarefa=null, conclusaoEnviada=false, ultimoStatus=null;
+/* Estado de controle da Mesa. PAUSADO congela interação e cronômetro;
+   ABORTADO encerra a execução sem que nenhum tempo seja enviado. */
+var PAUSADO=false, ABORTADO=false, pausadoEm=null, descontoMs=0;
+
+/* O dialogo com a Mesa mora em js/tarefa-sensor.js: origem, runId e a
+   validacao das mensagens sao iguais nas tres tarefas, e uma correcao ali
+   passa a valer para todas. Aqui ficam so os atalhos locais.          */
+function ctxMesa(){ return { embed:EMBED, runId:RUN_ID }; }
+function alvoMsg(){ return TarefaSensor.alvoMsg(); }
+function envia(dados){ TarefaSensor.enviar(dados, ctxMesa()); }
+
+/* A Mesa não recebe mais estado de sensor: a única entrega é o tempo. Isto
+   virou registro interno — os pontos de chamada continuam existindo, e se um
+   dia a Mesa precisar saber que alguém empacou na permissão, basta voltar a
+   linha de envio aqui, sem mexer em mais nada.                          */
+function enviarStatus(status, modo){
+  if(modo) modoEntrada=modo;
+  if(ultimoStatus===status) return;
+  ultimoStatus=status;
+  /* Agora sai de verdade: a Mesa carimba a chegada do "ativo" no servidor,
+     e e dali que a duracao da atividade comeca a contar. */
+  TarefaSensor.status(status, ctxMesa());
+}
+function iniciarCronometroOficial(){
+  if(inicioTarefa!==null) return;
+  inicioTarefa=performance.now();
+  descontoMs=0; pausadoEm=null;
+}
+/* O tempo entregue é o tempo JOGADO: o período em que a Mesa manteve a
+   tarefa pausada sai da conta. Se a conclusão cair com a pausa ainda
+   aberta, o trecho pendente também sai.                                */
+function concluirCronometroOficial(){
+  if(inicioTarefa===null || fimTarefa!==null) return null;
+  fimTarefa=performance.now();
+  var pendente=(pausadoEm!==null)?(fimTarefa-pausadoEm):0;
+  return Math.max(0, Math.round(fimTarefa-inicioTarefa-descontoMs-pendente));
+}
+function formatarTempo(ms){ return TarefaSensor.formatarTempo(ms); }
+var tempoFinalMs=null;
+/* A trava só fecha DEPOIS de haver um tempo válido. Travar antes deixaria a
+   tarefa impossível de concluir se isto fosse chamado antes do cronômetro
+   começar — o jogador ficaria preso sem nunca mandar nada.              */
+function enviarConclusao(){
+  if(conclusaoEnviada || ABORTADO) return null;
+  var tempoMs=concluirCronometroOficial();
+  if(tempoMs===null) return null;
+  conclusaoEnviada=true;
+  tempoFinalMs=tempoMs;
+  /* Só o que a Mesa pediu: quem executou e quanto tempo levou. Ponto,
+     colocação e pista não são assunto daqui.                          */
+  envia({ mosaico:"tarefa-ok", tempoMs:tempoMs });
+  return tempoMs;
+}
+function avisaMesa(){ enviarConclusao(); }
+
+/* ==========================================================================
+   COMANDOS VINDOS DA MESA  —  {mosaico:"controle-tarefa", runId, acao}
+   ========================================================================== */
+var elPausa=null;
+function overlayPausa(texto){
+  if(!elPausa){
+    elPausa=document.createElement("div");
+    elPausa.setAttribute("id","pausa-mesa");
+    elPausa.className="pf-pausa";
+    elPausa.innerHTML='<div class="pf-card pf-pausa-card"><div class="pf-inset pf-pausa-msg"></div></div>';
+    document.body.appendChild(elPausa);
+  }
+  if(texto===null){ elPausa.style.display="none"; return; }
+  elPausa.querySelector(".pf-pausa-msg").textContent=texto;
+  elPausa.style.display="flex";
+}
+function aplicaPausa(){
+  if(PAUSADO||ABORTADO) return;
+  PAUSADO=true;
+  if(inicioTarefa!==null && fimTarefa===null) pausadoEm=performance.now();
+  overlayPausa("Pausado pela mesa.");
+}
+function aplicaRetomada(){
+  if(!PAUSADO||ABORTADO) return;
+  PAUSADO=false;
+  if(pausadoEm!==null){ descontoMs+=performance.now()-pausadoEm; pausadoEm=null; }
+  ultT=performance.now();      /* senão o primeiro dt vale a pausa inteira */
+  holdStart=null;              /* e a contagem de "segure" recomeça limpa  */
+  overlayPausa(null);
+}
+/* Abortar trava o envio para sempre: conclusaoEnviada vira verdadeiro sem
+   que nada tenha sido enviado, então nem um acerto posterior escapa.    */
+function aplicaAbortar(){
+  if(ABORTADO) return;
+  ABORTADO=true; PAUSADO=true; conclusaoEnviada=true;
+  overlayPausa("Execução encerrada pela mesa.");
+}
+/* Sem esta checagem, qualquer aba ou script conseguiria mandar um "abortar"
+   para dentro do iframe. Origem e remetente são conferidos antes da ação,
+   e runId diferente do da execução corrente é simplesmente ignorado.    */
+TarefaSensor.ouvirMesa({ pausar:aplicaPausa, retomar:aplicaRetomada, abortar:aplicaAbortar }, ctxMesa());
+/* Congelar o laço cuida do desenho; barrar os eventos cuida da interação.
+   Só o laço não bastaria: o sensor mexe no estado fora dele.           */
+if(EMBED){
+  ["mousedown","mousemove","mouseup","click","keydown","keyup",
+   "touchstart","touchmove","touchend","touchcancel",
+   "deviceorientation","deviceorientationabsolute","devicemotion"
+  ].forEach(function(tipo){
+    window.addEventListener(tipo, function(e){
+      if(!PAUSADO) return;
+      e.stopImmediatePropagation();
+      if(e.cancelable) e.preventDefault();
+    }, {capture:true, passive:false});
+  });
+}
+
+/* ================= ESTADO ================= */
+var cvs=document.getElementById("c"), ctx=cvs.getContext("2d");
+var W=0,H=0,DPR=1;
+var fogC=document.createElement("canvas"), fogX=fogC.getContext("2d");
+var txtC=document.createElement("canvas"), txtX=txtC.getContext("2d");
+var frostTile=null, temFiltro=false;
+
+var beta=90, gamma=0, tBeta=90, tGamma=0;
+var temSensor=false, modoDedo=false, iniciado=false;
+var alvo={b:90,g:0}, heat=0, holdStart=null, travado=false;
+var fila=[], atual=null, feitos=0, revelacao=0;
+var gotas=[], chuva=[], t0=performance.now(), graca=0;
+var relampago={t:-9999,dur:0,forca:0,prox:3000};
+var cortinaF=0;
+
+/* ================= SETUP ================= */
+function resize(){
+  DPR=Math.min(window.devicePixelRatio||1,2.5);
+  W=window.innerWidth; H=window.innerHeight;
+  cvs.width=Math.round(W*DPR); cvs.height=Math.round(H*DPR);
+  cvs.style.width=W+"px"; cvs.style.height=H+"px";
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  var fw=Math.max(1,Math.round(W*0.72)), fh=Math.max(1,Math.round(H*0.72));
+  fogC.width=fw; fogC.height=fh;
+  txtC.width=Math.round(W); txtC.height=Math.round(H);
+  encheGelo(1);
+  if(atual) pintaTexto(atual);
+}
+
+function fazFrost(){
+  /* condensacao: manchas macias de baixa frequencia, nao ruido por pixel.
+     Ruido fino no alpha cheio vira chiado de TV, nao vidro embacado.   */
+  var n=180, c=document.createElement("canvas"); c.width=c.height=n;
+  var x=c.getContext("2d");
+  x.fillStyle="rgba(178,199,219,.80)"; x.fillRect(0,0,n,n);
+  for(var i=0;i<70;i++){
+    var bx=Math.random()*n, by=Math.random()*n, br=10+Math.random()*38;
+    var g=x.createRadialGradient(bx,by,0,bx,by,br);
+    var claro=Math.random()>0.45;
+    g.addColorStop(0, claro?"rgba(216,232,246,.30)":"rgba(146,170,192,.24)");
+    g.addColorStop(1,"rgba(178,199,219,0)");
+    x.fillStyle=g; x.beginPath(); x.arc(bx,by,br,0,6.2832); x.fill();
+  }
+  /* grao muito discreto, so para tirar o aspecto de plastico */
+  var d=x.getImageData(0,0,n,n);
+  for(var p=0;p<n*n;p++){
+    var v=(Math.random()*16)-8;
+    d.data[p*4]  =Math.max(0,Math.min(255,d.data[p*4]  +v));
+    d.data[p*4+1]=Math.max(0,Math.min(255,d.data[p*4+1]+v));
+    d.data[p*4+2]=Math.max(0,Math.min(255,d.data[p*4+2]+v));
+  }
+  x.putImageData(d,0,0);
+  return x.createPattern(c,"repeat");
+}
+
+function encheGelo(alpha){
+  fogX.setTransform(1,0,0,1,0,0);
+  fogX.globalCompositeOperation="source-over";
+  fogX.globalAlpha=alpha;
+  fogX.fillStyle=frostTile||"#b9cfe2";
+  fogX.fillRect(0,0,fogC.width,fogC.height);
+  fogX.globalAlpha=1;
+}
+
+/* ================= TEXTO ATRAS DO VIDRO ================= */
+function quebra(x,texto,larg){
+  var pal=texto.split(" "), linhas=[], cur="";
+  for(var i=0;i<pal.length;i++){
+    var t=cur?cur+" "+pal[i]:pal[i];
+    if(x.measureText(t).width>larg && cur){ linhas.push(cur); cur=pal[i]; }
+    else cur=t;
+  }
+  if(cur) linhas.push(cur);
+  return linhas;
+}
+var FONTE_LEITURA='"Literata","Charter","Iowan Old Style",Georgia,"Noto Serif",serif';
+function pintaTexto(f){
+  txtX.setTransform(1,0,0,1,0,0);
+  txtX.clearRect(0,0,txtC.width,txtC.height);
+  /* Literata e bem mais larga que a Cormorant no mesmo corpo, entao o corpo
+     desce e a caixa alarga — o texto acaba com MAIS letra legivel por linha.
+     Peso 600: este texto e lido atraves do embaco, traco fino desaparece. */
+  txtX.textAlign="center"; txtX.textBaseline="middle";
+  var larg=W*0.80;
+
+  /* a faixa util do vidro: abaixo da travessa de madeira, acima da base do
+     caixilho. Sem isto, em tela curta a primeira linha (e a hora) ficavam
+     desenhadas ATRAS da madeira, que e pintada depois.                  */
+  var bd=Math.max(16,Math.min(30,W*0.055));
+  var topoBanda=H*0.155+bd*0.62+14, baseBanda=H-bd-14;
+  var banda=Math.max(90,baseBanda-topoBanda);
+
+  var fs=Math.max(24,Math.min(36,W/12));
+  var linhas,lh,fsHora,alt;
+  for(var tent=0;tent<8;tent++){
+    txtX.font='600 '+fs+'px '+FONTE_LEITURA;
+    linhas=quebra(txtX,f.txt,larg);
+    lh=fs*1.40; fsHora=Math.max(14,fs*0.45);
+    alt=lh*1.2+fsHora/2+(linhas.length-1)*lh+fs/2;
+    if(alt<=banda||fs<=18) break;
+    /* melhor o texto encolher do que a primeira linha sumir */
+    fs=Math.max(18,fs*Math.max(0.86,banda/alt));
+  }
+
+  var y0=H*0.47-(linhas.length-1)*lh/2;
+  var topo=y0-lh*1.2-fsHora/2;
+  if(topo<topoBanda) y0+=topoBanda-topo;
+  var base=y0+(linhas.length-1)*lh+fs/2;
+  if(base>baseBanda) y0-=base-baseBanda;
+
+  txtX.fillStyle="#fdf3e4";
+  txtX.shadowColor="rgba(0,0,0,.75)"; txtX.shadowBlur=14;
+  for(var i=0;i<linhas.length;i++) txtX.fillText(linhas[i], W/2, y0+i*lh);
+  txtX.shadowBlur=0;
+  /* a hora era ~10px atras da condensacao: invisivel. */
+  txtX.font='700 '+fsHora+'px "Inter",sans-serif';
+  txtX.fillStyle="rgba(255,207,143,.98)";
+  txtX.shadowColor="rgba(0,0,0,.8)"; txtX.shadowBlur=10;
+  txtX.fillText(f.hora.split("").join(" "), W/2, y0-lh*1.2);
+  txtX.shadowBlur=0;
+}
+
+/* ================= SENSOR ================= */
+function onOrient(e){
+  if(e.beta===null||e.beta===undefined||e.gamma===null||e.gamma===undefined) return;
+  temSensor=true; modoDedo=false;
+  tBeta=e.beta; tGamma=e.gamma;
+}
+var arr=null;
+function ptDown(ev){ var t=ev.touches?ev.touches[0]:ev; arr={x:t.clientX,y:t.clientY}; }
+function ptMove(ev){
+  if(!arr||!modoDedo) return;
+  var t=ev.touches?ev.touches[0]:ev;
+  tGamma=Math.max(-80,Math.min(80,tGamma+(t.clientX-arr.x)*0.28));
+  tBeta =Math.max( 10,Math.min(170,tBeta +(t.clientY-arr.y)*0.28));
+  arr={x:t.clientX,y:t.clientY};
+  if(ev.cancelable) ev.preventDefault();
+}
+function ptUp(){ arr=null; }
+
+/* ================= GOTAS ================= */
+function novaGota(topo){
+  return {
+    x: 30+Math.random()*(W-60),
+    y: topo? -10-Math.random()*60 : Math.random()*H,
+    r: 2.2+Math.random()*7,
+    vx:0, vy:0, viva:true
+  };
+}
+function semeiaGotas(){
+  gotas=[];
+  for(var i=0;i<30;i++) gotas.push(novaGota(false));
+}
+function semeiaChuva(){
+  chuva=[];
+  for(var i=0;i<70;i++) chuva.push({
+    x:Math.random()*W, y:Math.random()*H,
+    v:5+Math.random()*11, c:20+Math.random()*40, a:0.05+Math.random()*0.13
+  });
+}
+
+function cava(x,y,r,forca){
+  var e=fogC.width/W;
+  fogX.globalCompositeOperation="destination-out";
+  var g=fogX.createRadialGradient(x*e,y*e,0,x*e,y*e,Math.max(1,r*e));
+  g.addColorStop(0,"rgba(0,0,0,"+forca+")");
+  g.addColorStop(0.55,"rgba(0,0,0,"+(forca*0.6)+")");
+  g.addColorStop(1,"rgba(0,0,0,0)");
+  fogX.fillStyle=g;
+  fogX.beginPath(); fogX.arc(x*e,y*e,Math.max(1,r*e),0,6.2832); fogX.fill();
+  fogX.globalCompositeOperation="source-over";
+}
+
+function atualizaGotas(gx,gy,dt){
+  var forca=Math.min(1,Math.sqrt(gx*gx+gy*gy));
+  for(var i=0;i<gotas.length;i++){
+    var d=gotas[i];
+    /* atrito estatico: gotas grandes escorrem antes das pequenas */
+    var limiar=0.46-d.r*0.028;
+    if(forca>limiar){
+      d.vx+=gx*46*dt; d.vy+=gy*46*dt;
+      d.vx*=0.90; d.vy*=0.90;
+    } else {
+      d.vx*=0.72; d.vy*=0.72;
+      d.r=Math.min(9.5,d.r+dt*0.35);      /* condensa parada */
+    }
+    var px=d.x, py=d.y;
+    d.x+=d.vx; d.y+=d.vy;
+    var vel=Math.abs(d.vx)+Math.abs(d.vy);
+    if(vel>0.35){
+      var pas=Math.max(1,Math.ceil(vel/2.4));
+      for(var s=0;s<=pas;s++){
+        cava(px+(d.x-px)*s/pas, py+(d.y-py)*s/pas, d.r*0.95, 0.30);
+      }
+      d.r=Math.max(1.6,d.r-vel*0.010);    /* perde massa na trilha */
+      if(Math.random()<0.10 && gotas.length<52)
+        gotas.push({x:px,y:py,r:1.2+Math.random()*1.4,vx:0,vy:0,viva:true});
+    }
+    if(d.x<-30||d.x>W+30||d.y<-70||d.y>H+40||d.r<1.5) gotas[i]=novaGota(true);
+  }
+  if(gotas.length>52) gotas.length=52;
+}
+
+function pintaGotas(){
+  ctx.save();
+  for(var i=0;i<gotas.length;i++){
+    var d=gotas[i], r=d.r;
+    var g=ctx.createRadialGradient(d.x-r*0.3,d.y-r*0.36,r*0.06, d.x,d.y,r);
+    g.addColorStop(0,"rgba(255,255,255,.55)");
+    g.addColorStop(0.30,"rgba(196,222,244,.22)");
+    g.addColorStop(0.72,"rgba(120,150,180,.14)");
+    g.addColorStop(1,"rgba(30,44,60,.30)");
+    ctx.fillStyle=g;
+    ctx.beginPath(); ctx.ellipse(d.x,d.y,r,r*1.06,0,0,6.2832); ctx.fill();
+    ctx.strokeStyle="rgba(226,242,255,.20)"; ctx.lineWidth=0.7;
+    ctx.beginPath(); ctx.arc(d.x,d.y,r,0,6.2832); ctx.stroke();
+    ctx.fillStyle="rgba(255,255,255,.75)";
+    ctx.beginPath(); ctx.arc(d.x-r*0.34,d.y-r*0.40,Math.max(0.5,r*0.17),0,6.2832); ctx.fill();
+  }
+  ctx.restore();
+}
+
+/* ================= CENARIO ================= */
+function tempestade(tempo,luz){
+  var g=ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,"#080d16"); g.addColorStop(0.48,"#0c1420");
+  g.addColorStop(0.63,"#101a28"); g.addColorStop(1,"#05080e");
+  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+
+  /* nuvens */
+  ctx.save(); ctx.globalCompositeOperation="lighter";
+  for(var i=0;i<5;i++){
+    var cx=((i*370 + tempo*0.012)%(W+700))-350;
+    var cy=H*(0.10+i*0.07);
+    var gc=ctx.createRadialGradient(cx,cy,0,cx,cy,240+i*40);
+    var a=0.030+luz*0.19;
+    gc.addColorStop(0,"rgba(122,150,180,"+a+")");
+    gc.addColorStop(1,"rgba(122,150,180,0)");
+    ctx.fillStyle=gc; ctx.beginPath(); ctx.arc(cx,cy,240+i*40,0,6.2832); ctx.fill();
+  }
+  ctx.restore();
+
+  /* horizonte / mar */
+  ctx.save();
+  ctx.strokeStyle="rgba(140,170,200,"+(0.07+luz*0.4)+")"; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(0,H*0.63); ctx.lineTo(W,H*0.63); ctx.stroke();
+  for(var k=0;k<7;k++){
+    var y=H*0.63+8+k*k*3.2;
+    ctx.strokeStyle="rgba(120,150,182,"+(0.045+luz*0.16)*(1-k/8)+")";
+    ctx.beginPath();
+    for(var x=0;x<=W;x+=16)
+      ctx.lineTo(x, y+Math.sin(x*0.021+tempo/(900+k*220))*(2+k*0.9));
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  /* chuva do lado de fora */
+  ctx.save();
+  var incl=Math.max(-0.5,Math.min(0.5,gamma/70));
+  for(var r=0;r<chuva.length;r++){
+    var p=chuva[r];
+    p.y+=p.v; p.x+=incl*p.v*0.5;
+    if(p.y>H){ p.y=-p.c; p.x=Math.random()*W; }
+    if(p.x<-40) p.x=W+20; if(p.x>W+40) p.x=-20;
+    ctx.strokeStyle="rgba(180,206,230,"+(p.a+luz*0.25)+")"; ctx.lineWidth=0.9;
+    ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(p.x-incl*p.c,p.y+p.c); ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function cortina(tempo){
+  /* a cortina que balanca sem vento */
+  cortinaF=Math.sin(tempo/2400)*14+Math.sin(tempo/900)*4;
+  ctx.save();
+  var lg=ctx.createLinearGradient(0,0,W*0.22,0);
+  lg.addColorStop(0,"rgba(6,9,14,.80)");
+  lg.addColorStop(0.6,"rgba(8,12,18,.34)");
+  lg.addColorStop(1,"rgba(8,12,18,0)");
+  ctx.fillStyle=lg;
+  ctx.beginPath();
+  ctx.moveTo(0,0);
+  ctx.lineTo(W*0.14+cortinaF,0);
+  for(var y=0;y<=H;y+=28)
+    ctx.lineTo(W*0.14+cortinaF+Math.sin(y*0.011+tempo/1700)*11, y);
+  ctx.lineTo(0,H); ctx.closePath(); ctx.fill();
+  /* dobras */
+  ctx.strokeStyle="rgba(150,175,200,.045)"; ctx.lineWidth=1;
+  for(var d=1;d<=4;d++){
+    ctx.beginPath();
+    for(var yy=0;yy<=H;yy+=26)
+      ctx.lineTo(W*0.14*d/5+cortinaF*d/5+Math.sin(yy*0.011+tempo/1700+d)*9, yy);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function caixilho(){
+  var b=Math.max(16,Math.min(30,W*0.055));
+  ctx.save();
+  /* sombra interna do vidro */
+  var s=ctx.createLinearGradient(0,0,0,H);
+  s.addColorStop(0,"rgba(0,0,0,.55)"); s.addColorStop(0.16,"rgba(0,0,0,0)");
+  s.addColorStop(0.84,"rgba(0,0,0,0)"); s.addColorStop(1,"rgba(0,0,0,.5)");
+  ctx.fillStyle=s; ctx.fillRect(0,0,W,H);
+
+  /* madeira */
+  var mg=ctx.createLinearGradient(0,0,b,b);
+  mg.addColorStop(0,"#2a2018"); mg.addColorStop(0.5,"#3a2c20"); mg.addColorStop(1,"#1d1610");
+  ctx.fillStyle=mg;
+  ctx.fillRect(0,0,W,b); ctx.fillRect(0,H-b,W,b);
+  ctx.fillRect(0,0,b,H); ctx.fillRect(W-b,0,b,H);
+  /* travessa superior */
+  ctx.fillRect(0,H*0.155,W,b*0.62);
+
+  /* veio da madeira */
+  ctx.strokeStyle="rgba(0,0,0,.24)"; ctx.lineWidth=0.8;
+  for(var i=0;i<26;i++){
+    var y=Math.random()*0; /* deterministico abaixo */
+    ctx.beginPath();
+    ctx.moveTo(0, (i*H/26)); ctx.lineTo(b, (i*H/26)+3); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(W-b, (i*H/26)); ctx.lineTo(W, (i*H/26)-3); ctx.stroke();
+  }
+  /* luz de topo no caixilho */
+  ctx.fillStyle="rgba(255,226,190,.055)";
+  ctx.fillRect(b,b-2,W-2*b,2);
+  ctx.fillRect(b,H*0.155+b*0.62-2,W-2*b,2);
+  ctx.restore();
+}
+
+function vinheta(){
+  var g=ctx.createRadialGradient(W/2,H*0.47,Math.min(W,H)*0.22, W/2,H*0.47,Math.max(W,H)*0.76);
+  g.addColorStop(0,"rgba(0,0,0,0)");
+  g.addColorStop(0.6,"rgba(0,0,0,.34)");
+  g.addColorStop(1,"rgba(0,0,0,.86)");
+  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+}
+
+/* ================= LOOP ================= */
+var ultT=performance.now();
+function passo(){
+  requestAnimationFrame(passo);
+  /* Pausado: nada avança e ultT acompanha o relógio, para que a retomada
+     não receba um dt do tamanho da pausa e teleporte a cena.           */
+  if(PAUSADO){ ultT=performance.now(); return; }
+  var agora=performance.now(), tempo=agora-t0;
+  var dt=Math.min(0.05,(agora-ultT)/1000); ultT=agora;
+  /* barra de endereco do celular muda a altura sem disparar resize */
+  if(W!==window.innerWidth||H!==window.innerHeight) resize();
+  if(!iniciado) return;
+
+  beta  += (tBeta -beta )*0.14;
+  gamma += (tGamma-gamma)*0.14;
+
+  /* relampago */
+  var luz=0;
+  if(tempo-relampago.t>relampago.prox){
+    relampago.t=tempo; relampago.dur=200+Math.random()*180;
+    relampago.forca=0.30+Math.random()*0.30;
+    relampago.prox=7000+Math.random()*9000;
+  }
+  var dl=tempo-relampago.t;
+  if(dl<relampago.dur){
+    var f=dl/relampago.dur;
+    luz=relampago.forca*Math.pow(1-f,1.5)*(f<0.14?f/0.14:1)*(1+0.6*Math.sin(f*30));
+  }
+
+  /* proximidade - por eixo, nunca combinada */
+  var dB=Math.abs(beta-alvo.b), dG=Math.abs(gamma-alvo.g);
+  var hb=Math.max(0,1-dB/MAX_B), hg=Math.max(0,1-dG/MAX_G);
+  heat=hb*hg;
+  var dentro = dB<=TOL_B && dG<=TOL_G && (agora-graca>1400);
+
+  /* gravidade da agua */
+  var gx=Math.sin(gamma*Math.PI/180);
+  var gy=Math.sin(beta *Math.PI/180);
+
+  /* --- o truque: o vidro so deixa de embacar perto do angulo certo --- */
+  if(!travado){
+    var regen=(0.030+0.30*Math.pow(1-heat,2.2))*(dt*60);
+    encheGelo(Math.min(0.30,regen));
+    atualizaGotas(gx,gy,dt);
+  } else {
+    revelacao=Math.min(1,revelacao+dt*1.5);
+    var e=fogC.width/W;
+    fogX.globalCompositeOperation="destination-out";
+    var gr=fogX.createRadialGradient(W/2*e,H*0.47*e,0, W/2*e,H*0.47*e, Math.max(W,H)*revelacao*e);
+    gr.addColorStop(0,"rgba(0,0,0,.30)"); gr.addColorStop(1,"rgba(0,0,0,0)");
+    fogX.fillStyle=gr; fogX.fillRect(0,0,fogC.width,fogC.height);
+    fogX.globalCompositeOperation="source-over";
+    atualizaGotas(gx,gy,dt);
+  }
+
+  /* ---------- pintura ---------- */
+  tempestade(tempo,luz);
+
+  /* texto atras do vidro */
+  var vis=travado?1:Math.pow(heat,1.4);
+  if(vis>0.02){
+    ctx.save();
+    if(temFiltro && !travado && vis<0.99){
+      ctx.filter="blur("+((1-vis)*5.5).toFixed(2)+"px)";
+      ctx.globalAlpha=Math.max(0.25,vis);
+      ctx.drawImage(txtC,0,0,W,H);
+    } else if(!travado && vis<0.99){
+      ctx.globalAlpha=vis*0.34;
+      for(var o=0;o<5;o++){
+        var an=o*1.2566, rr=(1-vis)*4.5;
+        ctx.drawImage(txtC,Math.cos(an)*rr,Math.sin(an)*rr,W,H);
+      }
+    } else {
+      ctx.globalAlpha=1; ctx.drawImage(txtC,0,0,W,H);
+    }
+    ctx.restore();
+  }
+
+  /* condensacao - uma passada so; duas empilhadas estouram o branco */
+  ctx.save();
+  ctx.globalAlpha=0.82;
+  ctx.drawImage(fogC,0,0,W,H);
+  ctx.restore();
+
+  pintaGotas();
+
+  if(luz>0){
+    ctx.save(); ctx.globalCompositeOperation="lighter";
+    ctx.fillStyle="rgba(176,202,228,"+(luz*0.30)+")"; ctx.fillRect(0,0,W,H);
+    ctx.restore();
+  }
+
+  cortina(tempo);
+  caixilho();
+  vinheta();
+
+  /* hold */
+  var dica=document.getElementById("dica");
+  if(!travado){
+    if(dentro){
+      if(holdStart===null) holdStart=agora;
+      var el=agora-holdStart;
+      anel(Math.min(1,el/HOLD_MS));
+      dica.textContent="A água está parando. Segure.";
+      if(el>=HOLD_MS) revela();
+    } else {
+      holdStart=null;
+      dica.textContent = heat>0.55 ? "Quase. A trilha está aguentando."
+                       : heat>0.25 ? "A água escorre, mas o vidro fecha de novo."
+                       : "Incline o aparelho. A água obedece.";
+    }
+  }
+}
+
+function anel(pct){
+  var y=H*0.80, x=W/2;
+  ctx.save();
+  ctx.strokeStyle="rgba(127,212,255,.16)"; ctx.lineWidth=1.4;
+  ctx.beginPath(); ctx.arc(x,y,22,0,6.2832); ctx.stroke();
+  ctx.strokeStyle="rgba(190,236,255,.95)"; ctx.lineWidth=2; ctx.lineCap="round";
+  ctx.shadowColor="rgba(127,212,255,.9)"; ctx.shadowBlur=12;
+  ctx.beginPath(); ctx.arc(x,y,22,-Math.PI/2,-Math.PI/2+6.2832*pct); ctx.stroke();
+  ctx.restore();
+}
+
+/* ================= RODADAS ================= */
+function novaRodada(){
+  if(fila.length===0){ fim(); return; }
+  atual=fila.shift();
+  pintaTexto(atual);
+  /* faixa confortavel de punho: nada de angulo extremo */
+  /* CENÁRIO: com semente, este é o mesmo alvo em todos os aparelhos. */
+  alvo.b = 58 + sorteio()*62;      /* 58 a 120 graus */
+  alvo.g = -34 + sorteio()*68;     /* -34 a +34      */
+  travado=false; revelacao=0; holdStart=null;
+  graca=performance.now();
+  encheGelo(1); semeiaGotas();
+  document.getElementById("dica").style.opacity="1";
+}
+
+function revela(){
+  travado=true; holdStart=null; feitos++;
+  /* para aqui, no instante do acerto — nao quando a pessoa fecha o cartao */
+  var tMs=enviarConclusao();
+  if(navigator.vibrate) navigator.vibrate([12,50,22]);
+  /* Dentro da Mesa o caderno de pistas nao existe: quem entrega a pista
+     oficial e o MOSAICO, depois da classificacao. Guardar aqui exporia
+     um registro sorteado dentro do iframe.                            */
+  marcas(); if(!EMBED) guardaPista(atual);
+  if(EMBED){
+    document.getElementById("c-tipo").textContent="Fragmento localizado";
+    document.getElementById("c-hora").textContent="";
+    document.getElementById("c-txt").textContent=
+      "O resultado foi enviado.\nAguarde a classificação.";
+  } else {
+    /* CRONOLOGIA: a tarefa integrada acontece as 21:28. Os registros do
+       vidro (21:03 a 21:20) sao de momentos ANTERIORES da noite.      */
+    document.getElementById("c-tipo").textContent="Registro anterior da noite";
+    document.getElementById("c-hora").textContent=atual.hora;
+    document.getElementById("c-txt").textContent=atual.txt;
+  }
+  var _t=(tMs!==null)?tMs:tempoFinalMs;
+  document.getElementById("c-tempo").textContent=
+    _t!==null ? (EMBED?"Tempo registrado: ":"Seu tempo: ")+formatarTempo(_t) : "";
+  document.getElementById("cartao").classList.add("on");
+  document.getElementById("dica").style.opacity="0";
+  /* nada de temporizador: a rodada so segue quando a pessoa fechar */
+}
+
+function fecharPista(){
+  document.getElementById("cartao").classList.remove("on");
+  if(EMBED){ avisaMesa(); return; }
+  if(fila.length===0){ setTimeout(fim,900); return; }
+  if(feitos%DESCANSO_A_CADA===0) descansa(); else novaRodada();
+}
+
+function descansa(){
+  var d=document.getElementById("descanso"), f=document.getElementById("resp-fill");
+  d.classList.add("on");
+  f.style.transition="none"; f.style.strokeDashoffset="125.6";
+  setTimeout(function(){
+    f.style.transition="stroke-dashoffset 6s linear";
+    f.style.strokeDashoffset="0";
+  },60);
+  setTimeout(function(){ d.classList.remove("on"); novaRodada(); },6600);
+}
+
+function fim(){ document.getElementById("final").classList.add("on"); }
+
+/* ============== MENU DE PISTAS ============== */
+function guardaPista(f){
+  document.querySelector("#btn-pistas b").textContent=feitos;
+  document.getElementById("btn-pistas").classList.add("on");
+  var d=document.createElement("div");
+  d.className="pista";
+  d.innerHTML='<span class="ph"></span><div class="pf"></div>';
+  d.querySelector(".ph").textContent=f.hora;
+  d.querySelector(".pf").textContent=f.txt;
+  document.getElementById("pistas-lista").appendChild(d);
+  document.getElementById("pistas-vazio").style.display="none";
+}
+function limpaPistas(){
+  document.getElementById("pistas-lista").innerHTML="";
+  document.getElementById("pistas-vazio").style.display="";
+  document.querySelector("#btn-pistas b").textContent="0";
+  document.getElementById("btn-pistas").classList.remove("on");
+}
+document.getElementById("btn-pistas").addEventListener("click",function(){
+  document.getElementById("pistas").classList.add("on");
+});
+document.getElementById("fechar-pistas").addEventListener("click",function(){
+  document.getElementById("pistas").classList.remove("on");
+});
+
+/* ============== TELA CHEIA ============== */
+function telaCheia(){
+  var el=document.documentElement;
+  var f=el.requestFullscreen||el.webkitRequestFullscreen||
+        el.mozRequestFullScreen||el.msRequestFullscreen;
+  if(f){ try{ f.call(el); }catch(e){} }
+  if(screen.orientation && screen.orientation.lock){
+    try{ screen.orientation.lock("portrait"); }catch(e){}
+  }
+}
+
+/* Na Mesa (?embed=1) a tarefa é UM acerto: revela() avisa a hospedeira
+   e fecharPista() volta. Seis bolinhas prometem seis rodadas que nunca
+   acontecem — e, se o iframe remonta, a primeira acesa volta a zero. */
+function totalMarcas(){ return EMBED ? 1 : FRAGMENTOS.length; }
+function marcas(){
+  var el=document.getElementById("marcas"); if(!el) return;
+  el.innerHTML="";
+  var n=totalMarcas();
+  for(var i=0;i<n;i++){
+    var d=document.createElement("div");
+    d.className="marca"+(i<feitos?" on":"");
+    el.appendChild(d);
+  }
+}
+
+function embaralha(){
+  fila=FRAGMENTOS.slice();
+  for(var i=fila.length-1;i>0;i--){
+    /* CENÁRIO: define QUAL fragmento sai primeiro. Ver nota no cabeçalho
+       do sorteio semeado — com semente, todos recebem o mesmo. */
+    var j=(sorteio()*(i+1))|0, t=fila[i]; fila[i]=fila[j]; fila[j]=t;
+  }
+  if(EMBED) fila=fila.slice(0,1);
+  feitos=0; marcas();
+}
+
+/* ================= INICIO ================= */
+function comeca(){
+  document.getElementById("intro").classList.add("out");
+  iniciado=true; embaralha(); novaRodada();
+  /* jogavel a partir daqui: intro fechada, permissao resolvida, primeira
+     rodada montada. E o mesmo criterio da Janela do Norte.          */
+  iniciarCronometroOficial();
+  enviarStatus("ativo");
+  setTimeout(function(){ document.getElementById("intro").style.display="none"; },1200);
+}
+function avisa(t){
+  var a=document.getElementById("aviso");
+  a.textContent=t; a.classList.add("on");
+  setTimeout(function(){a.classList.remove("on");},4200);
+}
+/* A permissão de movimento do iOS mora em js/tarefa-sensor.js. Esta tarefa
+   é a única que NÃO quer o rumo absoluto: a água obedece à inclinação, não
+   ao norte, então ouve só "deviceorientation". */
+var _prazoSuaveArmado=false;
+function armarPrazoSuave(){
+  if(_prazoSuaveArmado) return;
+  if(typeof TarefaSensor==="undefined"||!TarefaSensor.prazoSuave) return;
+  _prazoSuaveArmado=true;
+  TarefaSensor.prazoSuave(ctxMesa(), function(){
+    if(conclusaoEnviada||ABORTADO) return;
+    avisa("Tempo esgotado · sem precisão.");
+    if(inicioTarefa===null) iniciarCronometroOficial();
+    enviarConclusao();
+  });
+}
+function entrarModoDedo(msg){
+  modoDedo=true; tBeta=90; tGamma=0; modoEntrada="toque";
+  enviarStatus("ativo","toque");
+  try{ telaCheia(); }catch(e){}
+  comeca();
+  avisa(msg||"Modo dedo — arraste a tela");
+  armarPrazoSuave();
+}
+function cairNoModoDedo(msg){
+  armarPrazoSuave();
+  if(typeof TarefaSensor!=="undefined"&&TarefaSensor.avisoAntesModoDedo){
+    TarefaSensor.avisoAntesModoDedo({ aoLiberar:function(){ entrarModoDedo(msg); } });
+  } else {
+    entrarModoDedo(msg);
+  }
+}
+function ativaSensor(){
+  TarefaSensor.ativarOrientacao({
+    aoOrientar: onOrient,
+    aoLigar: function(){ comeca(); armarPrazoSuave(); },
+    esperaMs: 1800,
+    absoluto: false,
+    respondeu: function(){ return temSensor; },
+    aoNaoResponder: function(){ cairNoModoDedo("Giroscópio mudo — arraste a tela."); },
+    aoNegar: function(){ cairNoModoDedo("Movimento negado — arraste a tela."); },
+    aoIndisponivel: function(){ cairNoModoDedo("Sem giroscópio — arraste a tela."); }
+  });
+}
+
+document.getElementById("btn-start").addEventListener("click",function(){
+  telaCheia(); ativaSensor();
+});
+document.getElementById("alt").addEventListener("click",function(){
+  entrarModoDedo("Modo dedo — arraste a tela");
+});
+document.getElementById("btn-again").addEventListener("click",function(){
+  document.getElementById("final").classList.remove("on");
+  limpaPistas(); embaralha(); novaRodada();
+});
+/* so o botao fecha — tocar na tela nao, para nao fechar sem querer */
+document.getElementById("fechar-cartao").addEventListener("click",function(e){
+  e.stopPropagation();
+  fecharPista();
+});
+
+cvs.addEventListener("touchstart",ptDown,{passive:true});
+cvs.addEventListener("touchmove",ptMove,{passive:false});
+cvs.addEventListener("touchend",ptUp,{passive:true});
+cvs.addEventListener("mousedown",ptDown);
+window.addEventListener("mousemove",ptMove);
+window.addEventListener("mouseup",ptUp);
+/* ---- falha de sensor: nunca deixar o jogador preso -------------------- */
+var RETENTAR=null, SEGUIR_TOQUE=null;
+function mostraFalha(msg){
+  document.getElementById("falha-msg").textContent=msg;
+  document.getElementById("falha").classList.add("on");
+  /* a tarefa NAO esta jogavel enquanto este aviso estiver na tela, entao o
+     cronometro nao pode estar correndo. Alguns jogos chamam comeca() antes
+     de saber se o sensor respondeu — aqui o relogio volta para zero e so
+     recomeca quando a pessoa escolher um caminho.                      */
+  if(!conclusaoEnviada){ inicioTarefa=null; fimTarefa=null; }
+}
+function escondeFalha(){ document.getElementById("falha").classList.remove("on"); }
+document.getElementById("falha-retry").addEventListener("click",function(){
+  escondeFalha(); ultimoStatus=null; if(RETENTAR) RETENTAR();
+});
+document.getElementById("falha-toque").addEventListener("click",function(){
+  escondeFalha(); modoEntrada="toque"; enviarStatus("ativo","toque");
+  if(SEGUIR_TOQUE) SEGUIR_TOQUE();
+});
+RETENTAR=function(){ ativaSensor(); };
+SEGUIR_TOQUE=function(){ entrarModoDedo("Modo dedo — arraste a tela"); };
+if(EMBED){ document.documentElement.classList.add("embed"); document.body.classList.add("embed"); }
+if(!DEV){
+  var _bt=document.getElementById("b-sim")||document.getElementById("alt");
+  if(_bt && _bt.parentNode) _bt.parentNode.removeChild(_bt);
+}
+
+window.addEventListener("resize",resize);
+window.addEventListener("orientationchange",function(){setTimeout(resize,220);});
+
+/* o texto vai para um canvas UMA vez. Se a fonte da web ainda nao tiver
+   chegado nesse instante, ele fica desenhado na fonte de reserva para
+   sempre — e no campo, com sinal ruim, e exatamente o que acontece.  */
+if(document.fonts && document.fonts.ready){
+  document.fonts.ready.then(function(){ if(atual) pintaTexto(atual); });
+}
+
+ctx.filter="blur(2px)"; temFiltro=(ctx.filter==="blur(2px)"); ctx.filter="none";
+frostTile=fazFrost();
+resize(); semeiaGotas(); semeiaChuva(); marcas();
+requestAnimationFrame(passo);
+})();
+</script>
+<script src="js/ac-janelas.js?v=20261011-t4"></script></body>
+</html>

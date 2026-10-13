@@ -1,0 +1,28 @@
+/* Apresentação comum das experiências RA; anatomia e cálculos preservados. */
+@import url('../pleura/style.css?v=inclinacao-20261002');
+.labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.lbl{position:absolute;left:0;top:0;transform:translate(-9999px,-9999px);margin:0;padding:4px 8px;max-width:158px;border:1px solid #7aa6b8;border-radius:8px;background:#091923ed;color:#e5f3f8;font:500 .66rem var(--mono);white-space:normal;line-height:1.2;transition:opacity .2s}
+.label-lines{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.label-lines path{stroke:#d5bf8a;stroke-width:1;opacity:.55;fill:none}.label-lines circle{fill:#e0bd75}
+.ghost-control.on{border-color:#7bd4c4;color:#b8f1e2;background:linear-gradient(#55978a,#2c6d61 50%,#17433a)}
+.stage-tools{left:12px;right:12px;flex-wrap:wrap;justify-content:flex-end;max-width:calc(100% - 24px)}
+.stage .gesture{bottom:76px;max-width:calc(100% - 32px)}
+#emLabel{border-color:#a07ae0;color:#dcc6ff;background:#1a2439ed}
+#goldmanBox{border-left:4px solid #aa9bdd}#disparoBox{border-left:4px solid #edb176}
+.valor{margin:0;color:#dce9f3;font:500 .73rem var(--mono);line-height:1.8}
+.caixa canvas{display:block;width:100%;height:auto;border:1px solid #54748766;border-radius:10px;background:#0b1b27}
+.conta{margin:0;padding:10px 12px;border-left:3px solid #aa9bdd;background:#aa9bdd12;color:#d8cbe8;font-size:.81rem;line-height:1.6}.conta b{color:#e5f3f8}
+.learning-strip{margin:22px 0 4px;padding:22px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(140deg,#0a1824,#1a3040);display:grid;grid-template-columns:minmax(220px,.62fr) 1.38fr;gap:25px;align-items:center}
+.learning-strip h2{margin:7px 0 0;font-size:1.25rem;font-weight:600}.learning-strip p{margin:0;color:var(--mist);font-size:.85rem;line-height:1.8}
+#giroEstado{margin:0;color:#b8d8e7;font:.76rem var(--mono)}
+@media(max-width:900px){.learning-strip{grid-template-columns:1fr;gap:8px}}
+@media(max-width:520px){.lbl{max-width:108px;font-size:.55rem;padding:3px 6px}.stage-tools{gap:6px}.stage-tools button{font-size:.64rem;padding:8px 7px;flex:1}.learning-strip{padding:17px}}
+/* seis níveis: uma fileira no computador, três no tablet, duas no telefone */
+.progress{grid-template-columns:repeat(6,minmax(0,1fr))}
+#comunicacaoBox{border-left:4px solid #f0c45a}
+@media(max-width:1000px){.progress{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:650px){.progress{grid-template-columns:repeat(2,minmax(0,1fr))}.progress .step:last-child{grid-column:auto}}
+
+/* Quatro abas na experiência do neurônio. */
+.progress{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:650px){.progress{grid-template-columns:repeat(2,minmax(0,1fr))}}

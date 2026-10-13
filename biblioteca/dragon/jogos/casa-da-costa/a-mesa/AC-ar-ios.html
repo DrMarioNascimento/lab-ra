@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#091515">
+<title>A Casa · Realidade Aumentada</title>
+<style>
+  html,body{margin:0;min-height:100dvh;background:#091515;color:#ffe1ac;font:16px/1.45 system-ui,sans-serif}
+  main{min-height:100dvh;display:grid;place-items:center;padding:28px 20px max(28px,env(safe-area-inset-bottom))}
+  .card{width:min(420px,100%);text-align:center}
+  a[rel="ar"]{display:inline-flex;flex-direction:column;align-items:center;gap:12px;padding:18px 22px;border-radius:18px;
+    border:1px solid #c9a66c;background:linear-gradient(#3a2c10,#241a08);color:#ffe1ac;text-decoration:none;font:700 16px/1.2 system-ui}
+  a[rel="ar"] img{width:96px;height:96px;object-fit:cover;border-radius:12px;pointer-events:none}
+  p{margin:16px 0 0;color:#d7c4a0}
+  .erro{color:#ffb4a0}
+  .voltar{display:inline-block;margin-top:22px;color:#e8bb55}
+</style>
+</head>
+<body>
+<main>
+  <div class="card">
+    <a id="ar" rel="ar" href="assets/ac/escrivaninha.usdz">
+      <img src="assets/ac/escrivaninha-ar.png" width="96" height="96" alt="Escrivaninha da Casa da Costa">
+    </a>
+    <p id="status">Toque na escrivaninha para colocá-la na sua sala.</p>
+    <a class="voltar" href="javascript:void(0)" id="voltar">Voltar à investigação</a>
+  </div>
+</main>
+<script>
+(function(){
+  const a=document.getElementById('ar');
+  const st=document.getElementById('status');
+  const modelo=new URLSearchParams(location.search).get('modelo');
+  if(modelo){
+    try{
+      const u=new URL(modelo, location.href);
+      if(u.origin===location.origin && /\.usdz$/i.test(u.pathname)) a.href=u.href;
+    }catch(e){}
+  }
+  document.getElementById('voltar').onclick=function(ev){
+    ev.preventDefault();
+    if(history.length>1) history.back();
+    else if(window.opener) window.close();
+  };
+  function supports(){
+    try{return !!(a.relList&&a.relList.supports&&a.relList.supports('ar'));}catch(e){return false;}
+  }
+  if(!supports()){
+    a.removeAttribute('rel');
+    st.className='erro';
+    st.textContent='Este aparelho não abre Realidade Aumentada. No iPhone, use o Safari (não um app interno) e toque de novo.';
+    return;
+  }
+  fetch(a.href, {method:'HEAD'}).then(function(r){
+    const type=(r.headers.get('content-type')||'').toLowerCase();
+    if(!r.ok || /text\/html/.test(type)){
+      st.className='erro';
+      st.textContent='O arquivo 3D da escrivaninha não chegou ('+(r.status||'?')+'). Sem ele o Safari pede para baixar uma página, e a RA não abre.';
+      a.removeAttribute('rel');
+    }
+  }).catch(function(){
+    st.className='erro';
+    st.textContent='Não foi possível conferir o arquivo 3D. Verifique a conexão e tente de novo.';
+  });
+})();
+</script>
+</body>
+</html>

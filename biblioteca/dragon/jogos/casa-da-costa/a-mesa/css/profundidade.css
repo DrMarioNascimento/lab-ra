@@ -1,0 +1,382 @@
+/* MOSAICO — PROFUNDIDADE
+   O padrao unico de volume fisico dos botoes. Uma fonte so, lida por A Mesa e
+   pelas tres atividades sensoriais, para que A Casa da Costa sirva de base aos
+   outros casos sem que cada pagina reinvente a propria sombra.
+
+   ===========================================================================
+   1. O QUE E O PADRAO
+
+   Um botao com volume NAO e "um botao com sombra". Sao quatro camadas, e e a
+   ordem delas que faz o objeto ter espessura:
+
+     1. inset 0 1px 0 <clara>        o fio de luz na aresta de cima. E o que
+                                     diz que existe uma quina virada para a luz.
+     2. inset 0 -2px 0 <escura>      a curvatura da base: a face nao e plana,
+                                     ela vira para baixo antes de virar parede.
+     3. 0 <parede>px 0 <solida>      a PAREDE lateral. Sem desfoque nenhum —
+                                     e ela que da a altura. Desfocar aqui
+                                     devolve o objeto ao plano.
+     4. 0 <parede+1>px 0 1px <funda> o fio escuro de 1px que fecha o contorno,
+        + 0 <parede+5>px <blur> ...  e a sombra projetada no chao, essa sim mole.
+
+   Ao pressionar: transform:translateY(<curso>) e a parede cai para 1px. O
+   objeto desce ate quase encostar; 1px de parede sobra para ele nao virar um
+   decalque. A sombra do chao ENCOLHE mas NAO SOME — quando ela some, o estado
+   pressionado le como "desligado" em vez de "afundado".
+
+   O curso e sempre a parede menos 1px. Parede 5 -> curso 4.
+
+   ===========================================================================
+   2. A REGRA QUE JA ERRAMOS UMA VEZ
+
+   A PAREDE TEM DE SER MAIS CLARA QUE O FUNDO DA PAGINA.
+
+   Ela e uma face lateral iluminada de frente, nao uma sombra. No Carro-Forte a
+   primeira tentativa pintou a parede de #01080a sobre fundo #050e11 e o volume
+   simplesmente nao apareceu: preto sobre preto nao existe. Quem separa o bloco
+   do fundo e o fio escuro de 1px da camada 4, nao a parede.
+
+   O fundo desta casa e --breu #05070c. Toda parede aqui e mais clara que isso.
+
+   ===========================================================================
+   3. ESCALA
+
+   Quatro alturas, e so. Para calibrar depois, mexer nos tokens — nunca nas
+   regras.
+
+     botao de acao   parede 5px, curso 4px   .btn, .mkt-acao, acoes sensoriais
+     caixa clicavel  parede 4px, curso 3px   .forma-op, .pers-op, .partida-casa
+     botao pequeno   parede 3px, curso 2px   .btn-sm, pilulas da barra, icones
+     caixa de fundo  parede 3px, SEM curso   .card, .jog, .pergunta-mae
+
+   A ordem nao e decorativa. A caixa de fundo e a MAIS BAIXA de todas porque e
+   o continente: caixa mais alta que o botao que ela contem inverte a
+   hierarquia, e o que devia ser fundo passa a parecer estar na frente. E ela
+   nao afunda, porque nao se clica nela — degrau que nao responde ao toque e
+   promessa quebrada.
+
+   A parede nao ocupa espaco no layout: ela e sombra, e o elemento seguinte
+   sobe por cima dela. Quem ganha parede precisa de folga embaixo de pelo
+   menos parede + 6px — os 5px do degrau mais o fio e a sombra. Foi o que
+   aconteceu com a nota canonica das atividades, que tinha 8px de margem e
+   cobria o degrau do botao acima dela.
+
+   ===========================================================================
+   4. O QUE FICA DE FORA, E POR QUE
+
+   .btn-fantasma  — e o "voltar". Nasceu com a borda transparente para recuar.
+                    Dar parede a ele e faze-lo competir com a acao principal.
+   :disabled      — botao que nao afunda nao anuncia que afunda. Fica plano.
+
+   ===========================================================================
+   5. ONDE ISSO NAO PODE VOLTAR A MORAR
+
+   Ate 02/09/2026 esta mesma ideia estava escrita TRES vezes, em <style>
+   injetados por JavaScript: casa-da-costa-v2.js, mercado-casa-da-costa.js e
+   sensor-casa-da-costa-v2.js. Todas as tres pintavam a parede de PRETO
+   (rgba(0,0,0,.72), #05080d, rgba(0,0,0,.55)) sobre o breu #05070c — o volume
+   simplesmente nao existia, e ninguem percebia porque nao havia com o que
+   comparar. Pior: por serem injetadas depois, venciam qualquer folha de estilo
+   da pagina, entao consertar o CSS nao adiantava nada.
+
+   Regra: camada de caso NAO desenha profundidade. Ela declara a classe; a
+   altura e a parede saem daqui. Se um componente novo precisa de volume,
+   acrescente o seletor a este arquivo — nao um box-shadow ao JavaScript.
+   =========================================================================== */
+
+:root{
+  /* alturas — o curso e sempre a parede menos 1 */
+  --parede:5px;     --curso:4px;
+  --parede-sm:3px;  --curso-sm:2px;
+  --parede-cx:4px;  --curso-cx:3px;
+
+  /* paredes por familia. Todas mais claras que --breu (#05070c);
+     a "funda" e o fio de 1px que fecha o contorno por baixo.
+     Sao tons ESCUROS da familia, nao brilhantes: a face destes botoes e quase
+     preta (fundo com 6% de cor), e uma parede saturada vira uma barra acesa
+     embaixo do botao em vez de parecer a lateral dele. Claras o bastante para
+     existir sobre o breu, escuras o bastante para pertencer a peca. */
+  --parede-cor:#141d28;        --parede-funda:#080e14;
+  --parede-ambar:#4a3111;      --parede-ambar-funda:#241705;
+  --parede-frio:#143749;       --parede-frio-funda:#091c26;
+  --parede-perigo:#4a1e14;     --parede-perigo-funda:#240e08;
+}
+
+/* A cor da parede de cada familia. Separar cor de geometria e o que deixa
+   calibrar uma sem mexer na outra. */
+.btn                { --p:var(--parede-cor);    --pf:var(--parede-funda) }
+.btn-ambar          { --p:var(--parede-ambar);  --pf:var(--parede-ambar-funda) }
+.btn-frio           { --p:var(--parede-frio);   --pf:var(--parede-frio-funda) }
+.btn-perigo         { --p:var(--parede-perigo); --pf:var(--parede-perigo-funda) }
+.btn-caso,#btn-pistas,.btn-menu-mestre{
+                      --p:var(--parede-frio);   --pf:var(--parede-frio-funda) }
+#ctrl-abertura button,#btn-pular,#btn-pular-participante{
+                      --p:var(--parede-cor);    --pf:var(--parede-funda) }
+.forma-op,.pers-op,.ritmo-op{
+                      --p:var(--parede-cor);    --pf:var(--parede-funda) }
+.partida-casa{        --p:var(--parede-cor);    --pf:var(--parede-funda) }
+.partida-casa.on{     --p:var(--parede-ambar);  --pf:var(--parede-ambar-funda) }
+.mosaico-escolher,.mosaico-opcao{
+                      --p:var(--parede-ambar);  --pf:var(--parede-ambar-funda) }
+
+/* ---------- botao de acao: parede 5 ---------------------------------- */
+/* A regra base e so `.btn`, especificidade 0-1-0. Excluir as variantes com
+   uma corrente de :not() daria 0-5-0 a esta regra — alta demais para qualquer
+   pagina sobrescrever depois, e foi assim que ela nasceu. Quem manda aqui e a
+   ORDEM: as excecoes vem mais abaixo, com a mesma especificidade, e vencem por
+   chegarem por ultimo. Mexer na ordem quebra o padrao; mexer nos seletores nao. */
+.btn{
+  transition:transform .15s ease,box-shadow .15s ease,
+             background .25s ease,border-color .25s ease;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.10),
+    inset 0 -2px 0 rgba(0,0,0,.34),
+    0 var(--parede) 0 var(--p),
+    0 calc(var(--parede) + 1px) 0 1px var(--pf),
+    0 calc(var(--parede) + 5px) 14px rgba(0,0,0,.45);
+}
+.btn:active:not(:disabled){
+  transform:translateY(var(--curso));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.05),
+    inset 0 -1px 0 rgba(0,0,0,.30),
+    0 1px 0 var(--p),
+    0 2px 0 1px var(--pf),
+    0 3px 7px rgba(0,0,0,.34);
+}
+.btn:active{background:#141d28}
+.btn-ambar:active{background:rgba(232,164,76,.14)}
+.btn-frio:active{background:rgba(127,212,255,.14)}
+.btn-perigo:active{background:rgba(224,103,79,.16)}
+
+/* ---------- botao pequeno e pilulas da barra: parede 3 ---------------- */
+.btn-sm,.btn-caso,#btn-pistas,#ctrl-abertura button,#btn-pular,#btn-pular-participante{
+  transition:transform .15s ease,box-shadow .15s ease,
+             background .25s ease,border-color .25s ease;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.09),
+    inset 0 -1px 0 rgba(0,0,0,.30),
+    0 var(--parede-sm) 0 var(--p),
+    0 calc(var(--parede-sm) + 1px) 0 1px var(--pf),
+    0 calc(var(--parede-sm) + 4px) 10px rgba(0,0,0,.42);
+}
+.btn-sm:active:not(:disabled),.btn-caso:active,#btn-pistas:active,
+#ctrl-abertura button:active,#btn-pular:active,#btn-pular-participante:active{
+  transform:translateY(var(--curso-sm));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.05),
+    0 1px 0 var(--p),
+    0 2px 0 1px var(--pf),
+    0 3px 6px rgba(0,0,0,.32);
+}
+
+/* A Sala morava fixa no centro do rodape, com translateX(-50%), e por isso
+   precisava repetir o -50% ao afundar: transform e substituido, nao
+   acumulado, e um translateY sozinho a jogaria para a esquerda no toque.
+   Em 02/09/2026 ela subiu para o cabecalho e deixou de ser flutuante, entao
+   o caso especial saiu. */
+.btn-menu-mestre{
+  transition:transform .15s ease,box-shadow .15s ease,background .25s ease;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.09),
+    0 var(--parede-sm) 0 var(--p),
+    0 calc(var(--parede-sm) + 1px) 0 1px var(--pf),
+    0 calc(var(--parede-sm) + 4px) 10px rgba(0,0,0,.42);
+}
+.btn-menu-mestre:active{
+  transform:translateY(var(--curso-sm));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.05),
+    0 1px 0 var(--p),
+    0 2px 0 1px var(--pf),
+    0 3px 6px rgba(0,0,0,.32);
+}
+
+/* ---------- caixa clicavel: parede 4 ---------------------------------- */
+.forma-op,.pers-op,.ritmo-op,.mosaico-opcao,.mosaico-escolher,.partida-casa{
+  transition:transform .15s ease,box-shadow .15s ease,
+             background .25s ease,border-color .25s ease;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.08),
+    inset 0 -1px 0 rgba(0,0,0,.28),
+    0 var(--parede-cx) 0 var(--p),
+    0 calc(var(--parede-cx) + 1px) 0 1px var(--pf),
+    0 calc(var(--parede-cx) + 4px) 12px rgba(0,0,0,.42);
+}
+.forma-op:active:not(:disabled),.pers-op:active:not(:disabled),
+.ritmo-op:active:not(:disabled),.mosaico-opcao:active,
+.mosaico-escolher:active,.partida-casa:active{
+  transform:translateY(var(--curso-cx));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.05),
+    0 1px 0 var(--p),
+    0 2px 0 1px var(--pf),
+    0 3px 7px rgba(0,0,0,.32);
+}
+
+
+/* ---------- caixa de fundo: parede 3, sem curso ----------------------- */
+/* Estas nao se clicam. Ganham a parede mais baixa da escala para existirem
+   como objeto sem passar na frente do botao que carregam, e nao ganham
+   :active nenhum. Vinham do <style> do casa-da-costa-v2.js com parede
+   rgba(0,0,0,.42) — preta, invisivel sobre o breu. */
+.card,.jog,.fragmento-encontro,.sala-acordeao,.deducao-card,
+.pergunta-mae,.painel-mapa{
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.05),
+    0 var(--parede-sm) 0 var(--parede-cor),
+    0 calc(var(--parede-sm) + 1px) 0 1px var(--parede-funda),
+    0 calc(var(--parede-sm) + 6px) 16px rgba(0,0,0,.34);
+}
+/* A pergunta-mae e o mapa sao ambar por dentro; a parede acompanha. */
+.pergunta-mae,.painel-mapa{
+  box-shadow:
+    inset 0 1px 0 rgba(255,225,180,.10),
+    0 var(--parede-sm) 0 var(--parede-ambar),
+    0 calc(var(--parede-sm) + 1px) 0 1px var(--parede-ambar-funda),
+    0 calc(var(--parede-sm) + 6px) 16px rgba(0,0,0,.34);
+}
+
+/* ---------- o mercado ------------------------------------------------- */
+/* .mkt-acao e botao de acao: e onde se compra. .mkt-lacre e o pacote fechado
+   no balaio — caixa clicavel, e a cor dela (nova ambar, repassada fria) diz a
+   procedencia, entao a parede segue a cor e nao o neutro. */
+.mkt-acao{ --p:var(--parede-ambar); --pf:var(--parede-ambar-funda);
+  transition:transform .15s ease,box-shadow .15s ease,background .25s ease;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.09),
+    inset 0 -2px 0 rgba(0,0,0,.34),
+    0 var(--parede) 0 var(--p),
+    0 calc(var(--parede) + 1px) 0 1px var(--pf),
+    0 calc(var(--parede) + 5px) 14px rgba(0,0,0,.42);
+}
+.mkt-acao:active:not(:disabled){
+  transform:translateY(var(--curso));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.05),
+    0 1px 0 var(--p),
+    0 2px 0 1px var(--pf),
+    0 3px 7px rgba(0,0,0,.34);
+}
+.mkt-lacre{ --p:var(--parede-cor); --pf:var(--parede-funda);
+  transition:transform .15s ease,box-shadow .15s ease;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.09),
+    0 var(--parede-cx) 0 var(--p),
+    0 calc(var(--parede-cx) + 1px) 0 1px var(--pf),
+    0 calc(var(--parede-cx) + 4px) 12px rgba(0,0,0,.42);
+}
+.mkt-lacre.nova{ --p:var(--parede-ambar); --pf:var(--parede-ambar-funda) }
+.mkt-lacre.repassada{ --p:var(--parede-frio); --pf:var(--parede-frio-funda) }
+.mkt-lacre:active{
+  transform:translateY(var(--curso-cx));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.05),
+    0 1px 0 var(--p),
+    0 2px 0 1px var(--pf),
+    0 3px 7px rgba(0,0,0,.32);
+}
+.mkt-acao:disabled,.mkt-lacre:disabled{
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04); transform:none;
+}
+
+/* A nota canonica das atividades: caixa de fundo, escrita por JavaScript com
+   style inline. Inline vence folha de estilo, entao o sensor-casa-da-costa-v2
+   passou a nao escrever sombra nenhuma e a marcar a classe abaixo. */
+.nota-canonica{
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.06),
+    0 var(--parede-sm) 0 var(--parede-cor),
+    0 calc(var(--parede-sm) + 1px) 0 1px var(--parede-funda),
+    0 calc(var(--parede-sm) + 6px) 16px rgba(0,0,0,.3);
+}
+/* ---------- as tres atividades sensoriais ---------------------------- */
+/* Os botoes flutuam sobre a cena viva, com backdrop-filter. A parede solida
+   convive com o desfoque do fundo: ela e sombra do elemento, nao filtro. */
+#btns button,#botoes button,#falha button,#card button,#carta button,.go{
+  --p:var(--parede-cor); --pf:var(--parede-funda);
+  transition:transform .15s ease,box-shadow .15s ease,background .25s ease;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.10),
+    inset 0 -2px 0 rgba(0,0,0,.34),
+    0 var(--parede) 0 var(--p),
+    0 calc(var(--parede) + 1px) 0 1px var(--pf),
+    0 calc(var(--parede) + 5px) 14px rgba(0,0,0,.5);
+}
+#btns button.acc,#botoes button.acc{
+  --p:var(--parede-ambar); --pf:var(--parede-ambar-funda);
+}
+#btns button:active,#botoes button:active,#falha button:active,
+#card button:active,#carta button:active,.go:active:not(:disabled){
+  transform:translateY(var(--curso));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.05),
+    inset 0 -1px 0 rgba(0,0,0,.30),
+    0 1px 0 var(--p),
+    0 2px 0 1px var(--pf),
+    0 3px 7px rgba(0,0,0,.4);
+}
+#btns button:active,#botoes button:active{background:#18242f}
+
+/* O Vidro Embacado tem .btn proprio, frio, e nao carrega as classes da Mesa.
+   Ele cai na regra do botao de acao la em cima; aqui so troca a cor da parede
+   e devolve o brilho de vidro que a regra generica apagaria. */
+#btn-start:active,#btn-again:active{background:rgba(127,212,255,.2)}
+#btn-start,#btn-again{
+  --p:var(--parede-frio); --pf:var(--parede-frio-funda);
+}
+
+/* ---------- estados que nao afundam ---------------------------------- */
+/* Botao desligado fica plano: prometer o degrau e nao entregar e pior do que
+   nao prometer. */
+.btn:disabled,.btn-sm:disabled,.forma-op:disabled,.pers-op:disabled,
+.ritmo-op:disabled,#btns button:disabled,#botoes button:disabled,.go:disabled{
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+  transform:none;
+}
+
+
+/* ---------- vizinhanca ------------------------------------------------ */
+/* No celular, :hover gruda: o dedo levanta e o botao continua erguido ate o
+   proximo toque em outro lugar. Todo realce de passagem mora aqui dentro. */
+@media (hover:hover) and (pointer:fine){
+  .btn:hover:not(:disabled){
+    transform:translateY(-2px);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.14),
+      inset 0 -2px 0 rgba(0,0,0,.34),
+      0 calc(var(--parede) + 2px) 0 var(--p),
+      0 calc(var(--parede) + 3px) 0 1px var(--pf),
+      0 calc(var(--parede) + 9px) 20px rgba(0,0,0,.5);
+  }
+  .forma-op:not(:disabled):hover,.pers-op:not(:disabled):hover,
+  .mosaico-opcao:hover,.mosaico-escolher:hover{
+    transform:translateY(-2px);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.12),
+      0 calc(var(--parede-cx) + 2px) 0 var(--p),
+      0 calc(var(--parede-cx) + 3px) 0 1px var(--pf),
+      0 calc(var(--parede-cx) + 8px) 18px rgba(0,0,0,.46);
+  }
+}
+
+/* Quem pediu menos movimento continua tendo o volume: o que sai e a animacao
+   entre os dois estados, nao a espessura. */
+@media (prefers-reduced-motion:reduce){
+  .btn,.btn-sm,.btn-caso,#btn-pistas,.btn-menu-mestre,.forma-op,.pers-op,
+  .ritmo-op,.mosaico-opcao,.mosaico-escolher,#btns button,#botoes button{
+    transition:background .25s ease,border-color .25s ease;
+  }
+}
+
+/* ---------- o fantasma nao afunda ------------------------------------- */
+/* Fica de fora por decisao, nao por esquecimento — ver o item 4 do cabecalho.
+   Vem no FIM do arquivo de proposito: cada seletor aqui empata em
+   especificidade com o da regra que ele desliga (.btn = 0-1-0, .btn:active:
+   not(:disabled) = 0-3-0, o mesmo no hover) e vence por chegar depois. Subir
+   este bloco para perto do .btn devolve a parede ao botao de voltar. */
+.btn-fantasma{box-shadow:none}
+.btn-fantasma:active:not(:disabled){transform:none;box-shadow:none}
+@media (hover:hover) and (pointer:fine){
+  .btn-fantasma:hover:not(:disabled){transform:none;box-shadow:none}
+}

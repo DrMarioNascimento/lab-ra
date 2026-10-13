@@ -57,3 +57,8 @@ O motor didático, as ampliações procedurais e a interface de `integracao/` s�
 Esta revisão mantém a separação entre o laboratório de pesquisa e os catálogos de ensino. Os créditos do atlas, dos modelos e das bibliotecas continuam nos documentos específicos das bancadas.
 
 Esta nota registra a revisão da documentação. Não altera as cláusulas anteriores, os titulares, as permissões, as restrições nem as licenças próprias de terceiros.
+
+
+## Componentes da biblioteca
+
+As cópias de Dragon Games e Fisiologia Interativa preservam as condições e autorias de suas origens, registradas em `biblioteca/dragon/LICENCA-ORIGEM.md` e `biblioteca/fisiologia/LICENCA-ORIGEM.md`. A presente organização não amplia as permissões desses materiais. Licenças de bibliotecas de terceiros acompanham os respectivos arquivos.

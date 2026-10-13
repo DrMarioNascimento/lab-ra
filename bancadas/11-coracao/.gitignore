@@ -1,5 +1,0 @@
-# Pacote oficial (~62 MB) — baixar com scripts/baixar_bodyparts3d.py
-fontes/bodyparts3d/_pack/
-*.zip
-__pycache__/
-*.pyc

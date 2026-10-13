@@ -1,0 +1,92 @@
+/* MOSAICO · A PELE COMUM (11/10/2026)
+
+   Decisão do Mario: A Casa da Costa (Mesa), A Manhã do Carro-Forte (Mesa) e A Casa da Costa: O Impostor
+   vestem a MESMA pele — a do Impostor da Casa: azul-petróleo de noite, cartões com parede inferior,
+   abas em relevo, botão dourado que afunda, Georgia nos títulos e Inter no resto.
+   O Carro-Forte: O Impostor (fontes e texto de terminal próprios) e o VestChip (futuro) têm visual
+   próprio; o que é comum a TODOS é a profundidade e a resposta ao clique.
+
+   Esta folha só cobre: troca cores, faces e fontes. A geometria do volume e do afundar continua em
+   profundidade.css (parede, curso, sombra) — aqui mudam apenas as cores das paredes. Carregada por
+   último no MOSAICO-mesa.html. Nada de lógica, texto ou regra muda. */
+
+:root{
+  --breu:#050b12; --painel:#0d1a24; --linha:#273946;
+  --nevoa:#9aa9b3; --ambar:#d6aa58; --frio:#7faac1;
+  --titulo:#f3f6f4; --texto:#e8eef0; --dim:#9aa9b3; --vermelho:#dd968a;
+  --go:#70d6a0; --go-face:#efc878; --go-base:#d6aa58; --go-wall:#6f4d17; --go-ink:#201707;
+  --serif:Georgia,"Times New Roman",serif;
+  --sans:Inter,"Segoe UI",system-ui,-apple-system,sans-serif;
+  /* as paredes do volume (profundidade.css lê estas variáveis) */
+  --parede-cor:#0a1822;    --parede-funda:#020609;
+  --parede-ambar:#6f4d17;  --parede-ambar-funda:#2e1f08;
+  --parede-frio:#13293a;   --parede-frio-funda:#020609;
+  --pele-face:linear-gradient(180deg,#162a38,#0c1b26);
+  --pele-cartao:linear-gradient(165deg,#152431,#0b141d 68%,#071018);
+  --pele-borda:#32485a;
+}
+
+html{background:radial-gradient(120% 70% at 50% 0%,#12283a 0%,#07121b 55%,#03070b 100%) fixed,#050b12}
+
+/* ── cartões: face escura com parede inferior ── */
+.card{
+  border:1px solid var(--pele-borda);border-bottom:2px solid #06131d;border-radius:10px;
+  background:var(--pele-cartao);
+  box-shadow:inset 0 1px 0 #ffffff10,0 5px 0 #020609,0 12px 22px #0008;
+}
+.caso-card>.card{background:var(--pele-cartao);border-color:var(--pele-borda)}
+
+/* ── botões: a face muda, o volume é o de profundidade.css ── */
+.btn{
+  background:var(--pele-face);border-color:#46667a;color:var(--titulo);
+  border-radius:9px;letter-spacing:.06em;font-weight:700;
+}
+.btn-ambar,.btn-go{
+  background:linear-gradient(180deg,var(--go-face),var(--go-base));color:var(--go-ink);border-color:#a8823f;
+}
+.btn-ambar:active,.btn-go:active{background:linear-gradient(180deg,#e3bb6a,#c79a4b)}
+.btn-frio{background:var(--pele-face);border-color:#46667a;color:#cfe3ee}
+.btn-frio:active{background:linear-gradient(180deg,#132430,#0a1720)}
+
+/* ── a barra do jogo (Caso · Arquivo · Sala) como abas em relevo ── */
+.barra-jogo{background:#07111acc;border-color:#3a5568}
+.btn-caso,#btn-pistas,.btn-menu-mestre{
+  background:linear-gradient(180deg,#1a3143 0%,#102331 45%,#09151f 100%);
+  border-color:#3a5568;color:#dce6ea;font-family:var(--sans);font-weight:700;letter-spacing:.04em;
+}
+.btn-menu-mestre.ativo,.btn-caso.ativo{background:linear-gradient(180deg,#27485d 0%,#173246 48%,#0c1d2a 100%);border-color:#7897aa;color:#efc878}
+
+/* ── a faixa da rodada, como o topo do Impostor ── */
+.rodada-telao{
+  background:linear-gradient(160deg,#0d1c28f8,#07121bf8 62%,#050b12f8);
+  border:1px solid #42657a;border-bottom:2px solid #355469;border-radius:12px;
+  box-shadow:inset 0 1px 0 #ffffff10,0 4px 0 #020609,0 10px 18px #0008;
+}
+.rodada-telao .rotulo{color:#c89a50;font-family:var(--sans);font-weight:700;letter-spacing:.14em}
+.rodada-telao .nome{color:#efc878;font-family:var(--serif)}
+.rodada-telao .rodada-sub{color:#9fb8c6}
+
+/* ── campos de escolha como as caixas do Impostor ── */
+.selecao-toque{
+  background:linear-gradient(180deg,#142b39,#0b1923);border:1px solid #33505f;border-bottom-width:2px;border-radius:12px;color:var(--titulo);
+}
+.selecao-toque:focus{outline:3px solid #d6aa5833;border-color:#d6aa58}
+
+/* ── a Sala do mestre e os painéis ── */
+.menu-mestre-card{
+  background:linear-gradient(165deg,#0b1822f2,#061019f5);border:1px solid #4c697c;border-bottom-width:2px;
+  box-shadow:inset 0 1px 0 #ffffff10,0 6px 0 #020609,0 16px 32px #000a;
+}
+.sala-acordeao{background:linear-gradient(180deg,#0f1f2bf0,#08131cf0);border-color:#33505f}
+
+/* ── o volume e o afundar onde ainda faltavam (comum a todos os jogos) ── */
+/* a Sala piscando: o pulso era só sombra e apagava a parede do botão; agora a parede pulsa junto */
+@keyframes alertaMestre{
+  0%,100%{box-shadow:inset 0 1px 0 #ffffff14,0 3px 0 var(--parede-frio),0 4px 0 1px var(--parede-frio-funda),0 0 0 0 rgba(221,150,138,.25)}
+  50%{box-shadow:inset 0 1px 0 #ffffff14,0 3px 0 var(--parede-frio),0 4px 0 1px var(--parede-frio-funda),0 0 0 5px rgba(221,150,138,.18),0 0 24px rgba(221,150,138,.75)}
+}
+.m3d-btn-select-tile,.ac-giro-todos,.m3d-btn-ping{
+  box-shadow:inset 0 1px 0 #ffffff12,0 3px 0 var(--parede-frio),0 4px 0 1px var(--parede-frio-funda),0 8px 12px #0007;
+  transition:transform .12s ease,box-shadow .12s ease;
+}
+.m3d-btn-select-tile:active,.ac-giro-todos:active,.m3d-btn-ping:active{transform:translateY(2px);box-shadow:inset 0 2px 5px #0008,0 1px 0 var(--parede-frio-funda)}

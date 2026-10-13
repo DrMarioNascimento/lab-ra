@@ -1,0 +1,35 @@
+/* A realidade aumentada d'A Casa — o que a escrivaninha e a maquete dividem.
+   ONDE cada janela mora continua sendo assunto de ac-janelas.css. */
+/* ---- realidade aumentada ----
+   Em RA a tela é do MUNDO: saem os botões de apoio (Mario, 18/09/2026: "os
+   botões têm que aparecer se não funcionou RA"), o título do capítulo e a
+   legenda. Ficam a pista (faixa baixa, recolhível), a barra com o chevron e o
+   ✕ de sair — a única saída da RA. */
+body.in-ar #scene canvas{background:transparent}
+body.in-ar,body.ra-slam,body.ra-webxr{background:transparent}
+body.ra-webxr #scene canvas{visibility:hidden}
+body.in-ar .chapter,body.in-ar .caption{display:none!important}
+.ac-sair-ra{border-radius:50%;padding:0;width:42px;min-height:42px;font:600 17px/1 system-ui;background:#3a1512e8;border-color:#e59a8a88;margin-left:auto;margin-right:10px}
+.ac-dica{font:600 13px/1.5 system-ui!important;color:#d8c8ff!important;background:#241c3a99;border-left:3px solid #b18aff;padding:8px 10px;border-radius:6px}
+.ac-fala{font:600 13px/1.5 system-ui!important;color:#bff0e4!important;background:#0f332c99;border-left:3px solid #a2dcd5;padding:8px 10px;border-radius:6px}
+.ac-credito{font:11px/1.5 system-ui!important;color:#9fb2aa!important}
+.ac-credito a{color:#cfe3da}
+#ra-opcoes button{width:100%}
+#portal-ra h2{color:#f4f1e6}
+#portal-ra p{color:#e7eee6}
+html[data-ac-casa] #portal-ra{background:linear-gradient(145deg,#18352f,#091b18)}
+
+
+/* ---- a porta da RA (diálogo da faixa tela) ---- */
+.portal-botoes{display:flex;flex-direction:column;gap:10px}
+.portal-botoes button{width:100%}
+.portal-botoes .portal-principal{background:linear-gradient(#3a6c5c,#1d4438);border-color:#8fc0ac;color:#fffaf0;font-size:15px;min-height:52px}
+.portal-aviso{font:13px/1.45 system-ui;color:#ffe7bd;margin:14px 0 0;min-height:1.45em}
+
+/* ---- a legenda dos ícones, no fim do "Como jogar" ---- */
+.ac-legenda{margin:18px 0 14px;padding-top:14px;border-top:1px solid #baa06b44}
+.ac-legenda h3{margin:0 0 6px;font:600 15px/1.3 system-ui;color:#f4e6c6}
+.ac-legenda p{font:12px/1.5 system-ui!important;margin:8px 0 4px!important}
+.ac-legenda ul{list-style:none;margin:0;padding:0;display:grid;gap:5px}
+.ac-legenda li{font:13px/1.45 system-ui;color:#dfe7df}
+.ac-legenda li span{display:inline-block;width:1.6em;text-align:center}

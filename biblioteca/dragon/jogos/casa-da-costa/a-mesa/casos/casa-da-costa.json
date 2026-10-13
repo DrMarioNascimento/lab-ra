@@ -1,0 +1,1835 @@
+{
+ "_leia": "CASO CANÔNICO DA CASA DA COSTA — edição técnica consolidada, 02/09/2026. A realidade é única; cada partida escolhe uma pergunta diferente sem reescrever os fatos.",
+ "id": "casa-da-costa",
+ "titulo": "A Casa da Costa",
+ "subtitulo": "A Noite da Tempestade",
+ "anoConstrucao": 1867,
+ "perguntaPadrao": "sete",
+ "configuracao": {
+  "versaoPontuacao": "5.1-dinamica",
+  "jogadores": {
+   "minimo": 1,
+   "maximo": 12,
+   "copiasPorPersonagem": 2
+  },
+  "moedasIniciais": 12,
+  "precos": {
+   "baixo": 1,
+   "justo": 3,
+   "alto": 5
+  },
+  "limitesSegundos": {
+   "performance": 60,
+   "constelacao": 180,
+   "inclinacao": 180,
+   "cooperacao": 60,
+   "mercado": 180,
+   "deducao": 120
+  },
+  "pesos": {
+   "tempo": 29,
+   "qualidade": 13,
+   "cooperacao": 28,
+   "economia": 20,
+   "sensorial": 5,
+   "performance": 5
+  },
+  "sensorial": {
+   "rapidoMs": 75000,
+   "minimoMs": 9000,
+   "primeiros": 3
+  }
+ },
+ "realidadeCanonica": {
+  "premissa": "Seis pessoas atravessam o portão da Casa da Costa numa noite de tempestade, convocadas para o inventário de um falecido. Contam-se ao entrar: seis. Contam-se de novo na sala: seis. Às 21h29 a luz cai por dois minutos e dois segundos. Quando volta, continuam contando seis — mas há sete xícaras limpas secando na cozinha.",
+  "sintese": "Havia sete pessoas dentro da Casa da Costa. A sétima era a antiga acompanhante do proprietário, que permaneceu no quarto de serviço por cinco meses após o falecimento dele. Ela não entrou naquela noite: nunca saiu. O apagão foi causado pela chuva e pela caixa de passagem submersa. Nada foi furtado.",
+  "frase": "A casa não estava assombrada. A casa estava ocupada."
+ },
+ "partidas": {
+  "sete": {
+   "titulo": "Sete dentro da casa",
+   "natureza": "QUANTO + ONDE",
+   "pergunta": "Seis pessoas atravessaram o portão. Quantas estavam dentro da casa?",
+   "principal": "contagemReal",
+   "campos": [
+    {
+     "id": "contagemDeclarada",
+     "rotulo": "Contagem declarada",
+     "opcoes": [
+      "5",
+      "6",
+      "7",
+      "8"
+     ],
+     "resposta": "6"
+    },
+    {
+     "id": "contagemReal",
+     "rotulo": "Contagem real",
+     "opcoes": [
+      "6",
+      "7",
+      "8",
+      "Não é possível determinar"
+     ],
+     "resposta": "7"
+    },
+    {
+     "id": "sinaisCasa",
+     "rotulo": "Sinais atribuíveis à casa",
+     "opcoes": [
+      "Estalos do sótão e cortina",
+      "Respiração e sombra",
+      "Colher e cadeira morna",
+      "Pegadas e xícaras"
+     ],
+     "resposta": "Estalos do sótão e cortina"
+    },
+    {
+     "id": "sinaisCorpo",
+     "rotulo": "Sinais que exigem um corpo",
+     "opcoes": [
+      "Degrau, respiração, sombra e colher",
+      "Estalos, vento e umidade",
+      "Cortina, disjuntor e caixa de passagem",
+      "Névoa, chuva e rangidos gerais"
+     ],
+     "resposta": "Degrau, respiração, sombra e colher"
+    },
+    {
+     "id": "localizacao",
+     "rotulo": "Onde estava a pessoa a mais?",
+     "opcoes": [
+      "Quarto de serviço atrás do jardim interno",
+      "Farol",
+      "Anexo do caseiro",
+      "Porão sob o cofre"
+     ],
+     "resposta": "Quarto de serviço atrás do jardim interno"
+    },
+    {
+     "id": "duracao",
+     "rotulo": "Há quanto tempo?",
+     "opcoes": [
+      "Desde aquela tarde",
+      "Quarenta minutos",
+      "Cinco meses",
+      "Catorze meses"
+     ],
+     "resposta": "Cinco meses"
+    },
+    {
+     "id": "confirmacao",
+     "rotulo": "O que fecha a contagem?",
+     "opcoes": [
+      "Sete xícaras + ausência seletiva de poeira",
+      "A porta do cofre entreaberta",
+      "A queda de energia",
+      "A janela trancada"
+     ],
+     "resposta": "Sete xícaras + ausência seletiva de poeira"
+    }
+   ],
+   "revelacao": "Entraram seis pelo portão. Estavam sete dentro da casa. A sétima pessoa não entrou naquela noite — nunca saiu."
+  },
+  "cinco": {
+   "titulo": "Cinco meses",
+   "natureza": "HÁ QUANTO TEMPO",
+   "pergunta": "Desde quando alguém permanece na Casa da Costa?",
+   "principal": "duracao",
+   "campos": [
+    {
+     "id": "duracao",
+     "rotulo": "Duração da permanência",
+     "opcoes": [
+      "Uma noite",
+      "Duas semanas",
+      "Cinco meses",
+      "Catorze meses"
+     ],
+     "resposta": "Cinco meses"
+    },
+    {
+     "id": "marco",
+     "rotulo": "Marco inicial",
+     "opcoes": [
+      "O falecimento do antigo dono",
+      "O anúncio do inventário",
+      "O início da tempestade",
+      "A primeira visita do Morador"
+     ],
+     "resposta": "O falecimento do antigo dono"
+    },
+    {
+     "id": "consumo",
+     "rotulo": "Registro que sustenta continuidade",
+     "opcoes": [
+      "Hidrômetro com consumo diário",
+      "Relógio da sala",
+      "Cofre entreaberto",
+      "Queda em três casas"
+     ],
+     "resposta": "Hidrômetro com consumo diário"
+    },
+    {
+     "id": "rotina",
+     "rotulo": "Outro sinal de rotina",
+     "opcoes": [
+      "Boiler acionado fora das visitas do Morador",
+      "Janela fechada",
+      "Envelope lacrado",
+      "Luz religada às 21h31"
+     ],
+     "resposta": "Boiler acionado fora das visitas do Morador"
+    },
+    {
+     "id": "domestico",
+     "rotulo": "Sinais domésticos",
+     "opcoes": [
+      "Xícaras, poeira e despensa",
+      "Cofre, chave e envelope",
+      "Raio, névoa e vento",
+      "Carros, portão e relógio"
+     ],
+     "resposta": "Xícaras, poeira e despensa"
+    }
+   ],
+   "revelacao": "Os sinais de ocupação não nasceram naquela noite. Eles atravessam os cinco meses desde o falecimento do antigo dono."
+  },
+  "apagao": {
+   "titulo": "Os 2 minutos e 2 segundos",
+   "natureza": "COMO",
+   "pergunta": "Como uma pessoa atravessou a casa durante o apagão sem ser identificada?",
+   "principal": "movimento",
+   "campos": [
+    {
+     "id": "movimento",
+     "rotulo": "O que aconteceu no escuro?",
+     "opcoes": [
+      "Uma pessoa já dentro da casa atravessou corredor e sala",
+      "Alguém entrou pela janela",
+      "O Morador desligou a energia e abriu o cofre",
+      "Ninguém se moveu; tudo foi estrutural"
+     ],
+     "resposta": "Uma pessoa já dentro da casa atravessou corredor e sala"
+    },
+    {
+     "id": "inicio",
+     "rotulo": "Onde o deslocamento começa?",
+     "opcoes": [
+      "Vão do sótão",
+      "Portão principal",
+      "Cozinha",
+      "Farol"
+     ],
+     "resposta": "Vão do sótão"
+    },
+    {
+     "id": "fim",
+     "rotulo": "Para onde ela segue?",
+     "opcoes": [
+      "Porta do jardim / quarto de serviço",
+      "Cofre",
+      "Portão principal",
+      "Anexo do caseiro"
+     ],
+     "resposta": "Porta do jardim / quarto de serviço"
+    },
+    {
+     "id": "sinais",
+     "rotulo": "O que acompanha o trajeto?",
+     "opcoes": [
+      "Respiração, sombra e colher chutada",
+      "Somente estalos do sótão",
+      "Abertura da janela",
+      "Disjuntor desligado"
+     ],
+     "resposta": "Respiração, sombra e colher chutada"
+    },
+    {
+     "id": "apagao",
+     "rotulo": "Quem provocou o apagão?",
+     "opcoes": [
+      "Ninguém dentro da casa",
+      "A Sétima",
+      "O Morador",
+      "A Herdeira"
+     ],
+     "resposta": "Ninguém dentro da casa"
+    }
+   ],
+   "revelacao": "A escuridão não foi produzida para esconder o trajeto. Foi um evento da tempestade que a Sétima reconheceu e aproveitou."
+  },
+  "nome": {
+   "titulo": "O nome",
+   "natureza": "QUEM",
+   "pergunta": "De quem é o nome que a secretária eletrônica reproduziu às 21h31?",
+   "principal": "identidade",
+   "campos": [
+    {
+     "id": "identidade",
+     "rotulo": "A quem o nome pertence?",
+     "opcoes": [
+      "À antiga acompanhante do proprietário",
+      "À Herdeira",
+      "Ao Morador",
+      "Ao antigo zelador"
+     ],
+     "resposta": "À antiga acompanhante do proprietário"
+    },
+    {
+     "id": "fonte",
+     "rotulo": "De onde vem o nome?",
+     "opcoes": [
+      "Última mensagem gravada pelo antigo dono",
+      "Ligação feita naquela noite",
+      "Relatório policial",
+      "Contrato lido em voz alta"
+     ],
+     "resposta": "Última mensagem gravada pelo antigo dono"
+    },
+    {
+     "id": "documento",
+     "rotulo": "O que liga o nome a uma pessoa real?",
+     "opcoes": [
+      "Registro de pagamentos de acompanhante",
+      "Registro do cofre",
+      "Conta de energia",
+      "Lista de convidados"
+     ],
+     "resposta": "Registro de pagamentos de acompanhante"
+    },
+    {
+     "id": "periodo",
+     "rotulo": "Quando os pagamentos cessaram?",
+     "opcoes": [
+      "Cinco meses atrás",
+      "Naquela manhã",
+      "Catorze meses atrás",
+      "Às 21h31"
+     ],
+     "resposta": "Cinco meses atrás"
+    }
+   ],
+   "revelacao": "A gravação não era uma voz impossível. Era uma mensagem antiga reativada com o retorno da energia; o nome coincide com o registro da acompanhante."
+  },
+  "corpo": {
+   "titulo": "Casa, corpo ou assombração?",
+   "natureza": "QUAL / QUE TIPO",
+   "pergunta": "Quais fenômenos eram da própria casa e quais exigiam uma presença humana?",
+   "principal": "leitura",
+   "campos": [
+    {
+     "id": "leitura",
+     "rotulo": "Leitura final",
+     "opcoes": [
+      "Parte era a casa; parte exigia um corpo",
+      "Tudo era assombração",
+      "Tudo era estrutura e tempestade",
+      "Tudo foi encenado pelos seis"
+     ],
+     "resposta": "Parte era a casa; parte exigia um corpo"
+    },
+    {
+     "id": "estrutura",
+     "rotulo": "Fenômenos estruturais",
+     "opcoes": [
+      "Estalos do sótão, umidade e cortina",
+      "Respiração, sombra e cadeira morna",
+      "Pegadas, colher e degrau",
+      "Xícaras, contrato e hidrômetro"
+     ],
+     "resposta": "Estalos do sótão, umidade e cortina"
+    },
+    {
+     "id": "corpo",
+     "rotulo": "Fenômenos que exigem corpo",
+     "opcoes": [
+      "Degrau sob carga, respiração, sombra e cadeira morna",
+      "Higrômetro, vento e caixa de passagem",
+      "Cortina, chuva e disjuntor",
+      "Religamento, envelope e cofre"
+     ],
+     "resposta": "Degrau sob carga, respiração, sombra e cadeira morna"
+    },
+    {
+     "id": "cofre",
+     "rotulo": "O cofre prova o quê?",
+     "opcoes": [
+      "Nada foi furtado; a porta estava apenas encostada",
+      "Houve invasão",
+      "A Herdeira roubou o envelope",
+      "O apagão foi provocado"
+     ],
+     "resposta": "Nada foi furtado; a porta estava apenas encostada"
+    }
+   ],
+   "revelacao": "A hipótese 'só a casa' estava correta para parte dos fenômenos — e justamente por isso era uma armadilha quando usada para explicar tudo."
+  },
+  "perceber": {
+   "titulo": "Quem deveria ter percebido?",
+   "natureza": "QUEM COMPOSTO",
+   "pergunta": "Quem teve oportunidade de perceber a ocupação e por que ela permaneceu invisível?",
+   "principal": "cadeia",
+   "campos": [
+    {
+     "id": "cadeia",
+     "rotulo": "O que melhor explica a falha coletiva?",
+     "opcoes": [
+      "Sinais verdadeiros foram atribuídos a causas isoladas",
+      "Todos sabiam e esconderam",
+      "A casa apagava provas",
+      "A Sétima possuía todas as chaves"
+     ],
+     "resposta": "Sinais verdadeiros foram atribuídos a causas isoladas"
+    },
+    {
+     "id": "morador",
+     "rotulo": "Por que o Morador não percebeu?",
+     "opcoes": [
+      "Atribuía a limpeza ao próprio cuidado",
+      "Nunca entrava na casa",
+      "Não conhecia o quarto de serviço",
+      "Estava fora da cidade por cinco meses"
+     ],
+     "resposta": "Atribuía a limpeza ao próprio cuidado"
+    },
+    {
+     "id": "familia",
+     "rotulo": "O que a família deixou de verificar?",
+     "opcoes": [
+      "A saída efetiva da acompanhante após o falecimento",
+      "A existência do cofre",
+      "O horário do apagão",
+      "O funcionamento da janela"
+     ],
+     "resposta": "A saída efetiva da acompanhante após o falecimento"
+    },
+    {
+     "id": "grupo",
+     "rotulo": "O que o grupo fez naquela noite?",
+     "opcoes": [
+      "Interpretou sinais antes de recontar pessoas e relações",
+      "Contou sete ao entrar",
+      "Encontrou o quarto de serviço imediatamente",
+      "Provou uma invasão"
+     ],
+     "resposta": "Interpretou sinais antes de recontar pessoas e relações"
+    }
+   ],
+   "revelacao": "Ninguém precisava mentir para que a presença passasse despercebida. Cada sinal verdadeiro recebeu uma explicação local suficientemente confortável."
+  }
+ },
+ "fragmentos": {
+  "F01": {
+   "h": "22:40",
+   "t": "As xícaras",
+   "d": "Sete xícaras limpas secando na pia. Seis pessoas do grupo beberam chá naquela noite.",
+   "f": "estrutural",
+   "familia": "domestica",
+   "fecho": 1,
+   "m": [
+    37,
+    70
+   ]
+  },
+  "F02": {
+   "h": "21:24",
+   "t": "Ausência de poeira",
+   "d": "Cozinha e corredor sem poeira; os demais cômodos são compatíveis com cinco meses fechados.",
+   "f": "relacional",
+   "familia": "domestica",
+   "m": [
+    47,
+    68
+   ]
+  },
+  "F03": {
+   "h": "—",
+   "t": "A despensa",
+   "d": "Latas alinhadas; três viradas para trás, compatíveis com controle de estoque próprio.",
+   "f": "contextual",
+   "familia": "domestica",
+   "m": [
+    40,
+    74
+   ]
+  },
+  "F04": {
+   "h": "21:21",
+   "t": "O quarto degrau",
+   "d": "Range sob peso; o terceiro não. Registros às 21h21 e às 23h40, sem pessoa do grupo na escada.",
+   "f": "relacional",
+   "familia": "fisica",
+   "m": [
+    55,
+    66
+   ]
+  },
+  "F05": {
+   "h": "21:27",
+   "t": "A colher",
+   "d": "Talher encontrado no piso do corredor depois do apagão; não estava ali às 21h19.",
+   "f": "relacional",
+   "familia": "fisica",
+   "m": [
+    57,
+    60
+   ]
+  },
+  "F06": {
+   "h": "21:29–21:31",
+   "t": "A respiração",
+   "d": "A Jornalista relata respiração próxima no escuro, em posição incompatível com os outros cinco.",
+   "f": "interpretativo",
+   "familia": "fisica",
+   "m": [
+    56,
+    58
+   ]
+  },
+  "F07": {
+   "h": "21:52",
+   "t": "O vulto",
+   "d": "O Policial vê um corpo atravessar entre o observador e a janela.",
+   "f": "interpretativo",
+   "familia": "fisica",
+   "m": [
+    58,
+    55
+   ]
+  },
+  "F08": {
+   "h": "21:31",
+   "t": "O nome",
+   "d": "A secretária eletrônica reinicia às 21h31 e reproduz um nome fora dos seis presentes.",
+   "f": "interpretativo",
+   "familia": "documental",
+   "m": [
+    72,
+    38
+   ]
+  },
+  "F09": {
+   "h": "—",
+   "t": "O contrato",
+   "d": "Pagamento mensal a acompanhante por catorze meses, encerrado há cinco meses; o nome coincide com a gravação.",
+   "f": "estrutural",
+   "familia": "documental",
+   "fecho": 1,
+   "m": [
+    70,
+    45
+   ]
+  },
+  "F10": {
+   "h": "23:05",
+   "t": "As pegadas",
+   "d": "Par de pegadas no jardim que entra e não sai; numeração distinta da dos presentes.",
+   "f": "estrutural",
+   "familia": "fisica",
+   "m": [
+    48,
+    52
+   ]
+  },
+  "F11": {
+   "h": "—",
+   "t": "A porta do jardim",
+   "d": "Porta do quarto de serviço sem tranca e com dobradiça recentemente lubrificada; a porta para o corredor está emperrada por tinta.",
+   "f": "estrutural",
+   "familia": "fisica",
+   "m": [
+    45,
+    48
+   ]
+  },
+  "F12": {
+   "h": "21:35",
+   "t": "A cadeira morna",
+   "d": "Assento no corredor acima da temperatura ambiente às 21h35.",
+   "f": "relacional",
+   "familia": "domestica",
+   "m": [
+    57,
+    64
+   ]
+  },
+  "F13": {
+   "h": "—",
+   "t": "Consumo de água",
+   "d": "O hidrômetro registra consumo diário contínuo nos cinco meses em que a casa esteve vazia.",
+   "f": "estrutural",
+   "familia": "domestica",
+   "fecho": 1,
+   "m": [
+    39,
+    72
+   ]
+  },
+  "F14": {
+   "h": "—",
+   "t": "O boiler",
+   "d": "Acionamentos em dias diferentes das visitas semanais do Morador.",
+   "f": "relacional",
+   "familia": "domestica",
+   "fecho": 1,
+   "m": [
+    42,
+    69
+   ]
+  },
+  "F15": {
+   "h": "06:50",
+   "t": "Queda em rede",
+   "d": "Concessionária: interrupção às 21h29 em três unidades; retorno às 21h31.",
+   "f": "estrutural",
+   "familia": "eletrica",
+   "m": [
+    50,
+    44
+   ]
+  },
+  "F16": {
+   "h": "08:20",
+   "t": "O disjuntor",
+   "d": "A chave geral permaneceu ligada; sem sinal de acionamento manual.",
+   "f": "relacional",
+   "familia": "eletrica",
+   "m": [
+    52,
+    46
+   ]
+  },
+  "F17": {
+   "h": "08:20",
+   "t": "A caixa de passagem",
+   "d": "Caixa enterrada no jardim submersa, com oxidação recente.",
+   "f": "estrutural",
+   "familia": "eletrica",
+   "m": [
+    49,
+    49
+   ]
+  },
+  "F18": {
+   "h": "—",
+   "t": "Direção da água",
+   "d": "Folhas molhadas na face inferior e solo encharcado sob cobertura.",
+   "f": "contextual",
+   "familia": "eletrica",
+   "m": [
+    46,
+    45
+   ]
+  },
+  "F19": {
+   "h": "02:15",
+   "t": "O higrômetro",
+   "d": "Picos de umidade coincidem com estalos regulares do sótão.",
+   "f": "contextual",
+   "familia": "fisica",
+   "m": [
+    66,
+    33
+   ]
+  },
+  "F20": {
+   "h": "21:36",
+   "t": "Cofre e relógio",
+   "d": "O cofre estava encostado e nada foi subtraído; há marca no móvel compatível com impacto, e o relógio de corda travou às 21h29.",
+   "f": "interpretativo",
+   "familia": "fisica",
+   "m": [
+    62,
+    73
+   ]
+  },
+  "F21": {
+   "h": "21:02–21:19",
+   "t": "Sequência de chegadas",
+   "d": "21h02 Investigador; 21h05 Herdeira; 21h08 Jornalista; 21h11 Advogado; 21h14 Policial; 21h19 Menina.",
+   "f": "relacional",
+   "familia": "documental",
+   "m": [
+    30,
+    80
+   ]
+  },
+  "F22": {
+   "h": "21:02",
+   "t": "Posição inicial da Sétima",
+   "d": "Às 21h02 já havia alguém no vão do sótão; essa presença antecede a chegada dos seis.",
+   "f": "estrutural",
+   "familia": "documental",
+   "fecho": 1,
+   "m": [
+    66,
+    30
+   ]
+  },
+  "F23": {
+   "h": "21:21",
+   "t": "Primeiro rangido",
+   "d": "Às 21h21 o quarto degrau range enquanto o grupo está reunido na sala.",
+   "f": "relacional",
+   "familia": "fisica",
+   "m": [
+    54,
+    64
+   ]
+  },
+  "F24": {
+   "h": "21:27",
+   "t": "Queda da colher",
+   "d": "Às 21h27 a colher cai no corredor, antes do apagão.",
+   "f": "relacional",
+   "familia": "fisica",
+   "m": [
+    59,
+    62
+   ]
+  },
+  "F25": {
+   "h": "21:29–21:31",
+   "t": "Janela de 122 segundos",
+   "d": "Apagão entre 21h29 e 21h31; duração total de dois minutos e dois segundos.",
+   "f": "contextual",
+   "familia": "documental",
+   "m": [
+    63,
+    57
+   ]
+  },
+  "F26": {
+   "h": "21:36",
+   "t": "Relógio de corda",
+   "d": "O relógio não depende da rede elétrica; sua parada às 21h29 exige causa mecânica.",
+   "f": "relacional",
+   "familia": "fisica",
+   "m": [
+    64,
+    70
+   ]
+  },
+  "F27": {
+   "h": "21:31",
+   "t": "Reinício da secretária",
+   "d": "A secretária eletrônica reinicia com o retorno da energia e reproduz uma gravação preexistente.",
+   "f": "interpretativo",
+   "familia": "documental",
+   "m": [
+    70,
+    41
+   ]
+  },
+  "F28": {
+   "h": "—",
+   "t": "Anotação do espólio",
+   "d": "Folha encontrada pelo advogado: um nome e a frase “não vender a casa antes de falar com ela”.",
+   "f": "estrutural",
+   "familia": "documental",
+   "fecho": 1,
+   "m": [
+    74,
+    44
+   ]
+  },
+  "F29": {
+   "h": "19:40",
+   "t": "Aviso tardio",
+   "d": "O Morador é avisado às 19h40; às 20h05 a movimentação já é perceptível de dentro da casa.",
+   "f": "contextual",
+   "familia": "documental",
+   "m": [
+    78,
+    52
+   ]
+  },
+  "F30": {
+   "h": "20:05",
+   "t": "Saída bloqueada",
+   "d": "Encosta alagada e portão de serviço ocupado pelos carros tornam impraticável sair sem ser visto.",
+   "f": "contextual",
+   "familia": "fisica",
+   "m": [
+    28,
+    84
+   ]
+  },
+  "F31": {
+   "h": "22:10",
+   "t": "Envelope íntegro",
+   "d": "Conferência às 22h10: o envelope do inventário segue lacrado.",
+   "f": "interpretativo",
+   "familia": "documental",
+   "m": [
+    61,
+    76
+   ]
+  },
+  "F32": {
+   "h": "22:10",
+   "t": "Cofre sem subtração",
+   "d": "Nada foi levado do cofre; a porta estava apenas encostada.",
+   "f": "interpretativo",
+   "familia": "documental",
+   "m": [
+    63,
+    73
+   ]
+  },
+  "F33": {
+   "h": "—",
+   "t": "Rotina do Morador",
+   "d": "As visitas do Morador ocorrem duas vezes por semana, o que permite comparar seus dias com água e boiler.",
+   "f": "relacional",
+   "familia": "domestica",
+   "m": [
+    80,
+    60
+   ]
+  },
+  "F34": {
+   "h": "—",
+   "t": "Quarto de serviço",
+   "d": "O cômodo atrás do jardim tem porta externa funcional e porta interna emperrada.",
+   "f": "estrutural",
+   "familia": "fisica",
+   "m": [
+    43,
+    50
+   ]
+  },
+  "F35": {
+   "h": "—",
+   "t": "Contrato encerrado por telefone",
+   "d": "O término do vínculo não foi acompanhado de retirada de pertences nem de vistoria do quarto.",
+   "f": "estrutural",
+   "familia": "documental",
+   "fecho": 1,
+   "m": [
+    73,
+    48
+   ]
+  },
+  "F36": {
+   "h": "23:05",
+   "t": "Permanência sem saída",
+   "d": "Pegadas e porta indicam circulação do quarto para o jardim, mas nenhuma saída pelo portão naquela noite.",
+   "f": "estrutural",
+   "familia": "fisica",
+   "fecho": 1,
+   "m": [
+    46,
+    55
+   ]
+  }
+ },
+ "hipoteses": [
+  {
+   "id": "H1",
+   "t": "Assombração",
+   "d": "Respiração, vulto, nome, degrau e relógio formam uma leitura sobrenatural aparente.",
+   "apoia": [
+    "F06",
+    "F07",
+    "F08",
+    "F04",
+    "F20"
+   ],
+   "enfraquece": [
+    "F09",
+    "F13",
+    "F27",
+    "F35"
+   ]
+  },
+  {
+   "id": "H2",
+   "t": "Só a casa",
+   "d": "Umidade, madeira e vento explicam parte real dos fenômenos — e a generalização é a armadilha.",
+   "apoia": [
+    "F19",
+    "F18",
+    "F15"
+   ],
+   "enfraquece": [
+    "F01",
+    "F12",
+    "F13",
+    "F14"
+   ]
+  },
+  {
+   "id": "H3",
+   "t": "Intruso entrou durante a reunião",
+   "d": "Presença física, apagão e pegadas podem ser lidos como entrada recente.",
+   "apoia": [
+    "F06",
+    "F07",
+    "F10",
+    "F05"
+   ],
+   "enfraquece": [
+    "F22",
+    "F13",
+    "F30",
+    "F02"
+   ]
+  },
+  {
+   "id": "H4",
+   "t": "Alguém entrou antes dos seis",
+   "d": "Anotação, nome estranho e cofre encostado deslocam a entrada para antes do inventário, mas ainda para aquela noite.",
+   "apoia": [
+    "F28",
+    "F08",
+    "F20",
+    "F32"
+   ],
+   "enfraquece": [
+    "F13",
+    "F09",
+    "F35"
+   ]
+  },
+  {
+   "id": "H5",
+   "t": "Tentativa de furto",
+   "d": "Cofre tocado, apagão e movimentação no corredor parecem preparar subtração.",
+   "apoia": [
+    "F20",
+    "F05",
+    "F07"
+   ],
+   "enfraquece": [
+    "F31",
+    "F32"
+   ]
+  },
+  {
+   "id": "H6",
+   "t": "Encenação do apagão",
+   "d": "A coincidência temporal sugere sabotagem até a falha externa aparecer.",
+   "apoia": [
+    "F25",
+    "F20",
+    "F26"
+   ],
+   "enfraquece": [
+    "F15",
+    "F16",
+    "F17"
+   ]
+  },
+  {
+   "id": "H7",
+   "t": "O Morador mantém alguém na casa",
+   "d": "Limpeza e rotina doméstica incriminam o caseiro antes de se comparar visitas com consumo.",
+   "apoia": [
+    "F02",
+    "F03",
+    "F14"
+   ],
+   "enfraquece": [
+    "F33",
+    "F13"
+   ]
+  },
+  {
+   "id": "H8",
+   "t": "Alguém mora ali há dias",
+   "d": "Água, boiler, estoque e poeira sustentam ocupação recente.",
+   "apoia": [
+    "F01",
+    "F02",
+    "F03",
+    "F12"
+   ],
+   "enfraquece": [
+    "F09",
+    "F13",
+    "F35"
+   ]
+  },
+  {
+   "id": "H9",
+   "t": "Alguém mora ali há cinco meses",
+   "d": "Contrato, consumo contínuo e boiler fora das visitas fecham a duração sem ainda fechar a contagem.",
+   "apoia": [
+    "F09",
+    "F13",
+    "F14",
+    "F33",
+    "F35"
+   ],
+   "enfraquece": [],
+   "canonica": 1
+  },
+  {
+   "id": "H10",
+   "t": "Havia sete dentro da casa",
+   "d": "As famílias doméstica, física e documental convergem.",
+   "apoia": [
+    "F01",
+    "F04",
+    "F06",
+    "F10",
+    "F11",
+    "F22",
+    "F36"
+   ],
+   "enfraquece": [],
+   "canonica": 1
+  }
+ ],
+ "relacoes": [
+  {
+   "id": "R1",
+   "t": "Xícaras, poeira e despensa",
+   "pecas": [
+    [
+     "F01"
+    ],
+    [
+     "F02"
+    ],
+    [
+     "F03"
+    ]
+   ],
+   "efeito": "“Casa bem cuidada” vira rotina de habitação."
+  },
+  {
+   "id": "R2",
+   "t": "Água e boiler contra as visitas",
+   "pecas": [
+    [
+     "F13"
+    ],
+    [
+     "F14"
+    ],
+    [
+     "F33"
+    ]
+   ],
+   "efeito": "Separa o uso da casa da rotina do Morador."
+  },
+  {
+   "id": "R3",
+   "t": "Peso, objeto e calor",
+   "pecas": [
+    [
+     "F04",
+     "F23"
+    ],
+    [
+     "F05",
+     "F24"
+    ],
+    [
+     "F12"
+    ]
+   ],
+   "efeito": "Três sinais que, juntos, exigem presença material."
+  },
+  {
+   "id": "R4",
+   "t": "Respiração e vulto contra as posições",
+   "pecas": [
+    [
+     "F06"
+    ],
+    [
+     "F07"
+    ],
+    [
+     "F21"
+    ]
+   ],
+   "efeito": "Cruzando a posição dos seis durante o escuro, sobra um ponto ocupado."
+  },
+  {
+   "id": "R5",
+   "t": "O nome contra o contrato",
+   "pecas": [
+    [
+     "F08",
+     "F27"
+    ],
+    [
+     "F09"
+    ],
+    [
+     "F28"
+    ]
+   ],
+   "efeito": "O nome deixa de ser fenômeno e vira pessoa documentalmente vinculada à casa."
+  },
+  {
+   "id": "R6",
+   "t": "Pegadas e acesso funcional",
+   "pecas": [
+    [
+     "F10"
+    ],
+    [
+     "F11"
+    ],
+    [
+     "F34"
+    ]
+   ],
+   "efeito": "Localiza a área em que alguém pode permanecer sem usar o portão principal."
+  },
+  {
+   "id": "R7",
+   "t": "Rede, disjuntor e caixa de passagem",
+   "pecas": [
+    [
+     "F15"
+    ],
+    [
+     "F16"
+    ],
+    [
+     "F17"
+    ]
+   ],
+   "efeito": "Apagão externo elimina sabotagem interna como explicação necessária."
+  },
+  {
+   "id": "R8",
+   "t": "Relógio, impacto e ausência de furto",
+   "pecas": [
+    [
+     "F20"
+    ],
+    [
+     "F26"
+    ],
+    [
+     "F32"
+    ]
+   ],
+   "efeito": "Explica a coincidência das 21h29 sem recorrer ao apagão."
+  },
+  {
+   "id": "R9",
+   "t": "Chegadas contra a posição anterior",
+   "pecas": [
+    [
+     "F21"
+    ],
+    [
+     "F22"
+    ]
+   ],
+   "efeito": "Alguém já estava dentro antes do primeiro dos seis entrar: “intruso” vira “presença prévia”."
+  },
+  {
+   "id": "R10",
+   "t": "Contrato, consumo e término sem vistoria",
+   "pecas": [
+    [
+     "F09"
+    ],
+    [
+     "F13",
+     "F14"
+    ],
+    [
+     "F35"
+    ]
+   ],
+   "efeito": "Sustentam permanência de cinco meses."
+  }
+ ],
+ "pares": [
+  {
+   "id": "P-A",
+   "a": {
+    "f": "F13",
+    "txt": "O hidrômetro registra consumo diário e contínuo."
+   },
+   "b": {
+    "f": "F33",
+    "txt": "O Morador entra na casa principal duas vezes por semana."
+   },
+   "produz": "O consumo não pode ser atribuído apenas ao caseiro."
+  },
+  {
+   "id": "P-B",
+   "a": {
+    "f": "F04",
+    "txt": "O quarto degrau range sob peso às 21h21 e às 23h40; o terceiro não range."
+   },
+   "b": {
+    "f": "F21",
+    "txt": "Chegadas: 21h02, 21h05, 21h08, 21h11, 21h14 e 21h19. Depois da última, o grupo permaneceu reunido na sala."
+   },
+   "produz": "O som exige peso em local não ocupado pelo grupo."
+  },
+  {
+   "id": "P-C",
+   "a": {
+    "f": "F15",
+    "txt": "Três casas da encosta ficaram sem energia às 21h29."
+   },
+   "b": {
+    "f": "F16",
+    "txt": "O disjuntor interno permaneceu ligado."
+   },
+   "produz": "O apagão não foi provocado dentro da casa."
+  },
+  {
+   "id": "P-D",
+   "a": {
+    "f": "F08",
+    "txt": "A gravação diz um nome que não pertence aos seis."
+   },
+   "b": {
+    "f": "F09",
+    "txt": "Um contrato de acompanhante traz o mesmo nome."
+   },
+   "produz": "O fenômeno acústico vira identidade verificável."
+  },
+  {
+   "id": "P-E",
+   "a": {
+    "f": "F10",
+    "txt": "As pegadas entram e não saem."
+   },
+   "b": {
+    "f": "F34",
+    "txt": "Há porta externa funcional para o quarto de serviço."
+   },
+   "produz": "As pegadas deixam de sugerir passagem e passam a sugerir localização."
+  },
+  {
+   "id": "P-F",
+   "a": {
+    "f": "F26",
+    "txt": "O relógio da sala é de corda e não depende da rede."
+   },
+   "b": {
+    "f": "F20",
+    "txt": "Há marca de impacto do cofre no móvel do relógio."
+   },
+   "produz": "A parada às 21h29 deixa de parecer efeito do apagão."
+  },
+  {
+   "id": "P-G",
+   "a": {
+    "f": "F01",
+    "txt": "Sete xícaras limpas secam na pia."
+   },
+   "b": {
+    "f": "F21",
+    "txt": "Seis pessoas do grupo tomaram chá naquela noite."
+   },
+   "produz": "A sétima xícara deixa de ser louça excedente e vira indício de rotina adicional."
+  }
+ ],
+ "mercado": {
+  "_leia": "Mercado trazido do Captura (A Noite do Carro-Forte), que é o consolidado, SOBREPONDO o mercado de negociação que a Casa tinha. Não há mais venda com preço escolhido: quem quer se desfazer CONSIGNA no balaio e só recebe se alguém levar. Da Casa fica só a confiança, que passa a julgar o que a pessoa põe no balaio. Números provisórios (Mario, 02/09/2026: 'vamos de 12 inicialmente até fazer contas').",
+  "precos": {
+   "nova": 4,
+   "repassada": 2,
+   "arriscar": 3
+  },
+  "consignadaVolta": false,
+  "acoesPorPessoa": 3,
+  "_simultaneo": "Sem rodízio de vez (Mario, 02/09/2026: “simultâneo é mais dinâmico e atraente”). Todos agem no próprio aparelho durante os 480 s da fase, e o que limita é o TETO DE AÇÕES — não o relógio, que numa mesa de 12 daria uma ação por pessoa. Três ações a 4 moedas é exatamente a carteira de 12: a carteira e o teto apertam no mesmo ponto. Arriscar conta como ação, senão acertar de graça permitiria fechar a decisão inteira sem custo.",
+  "lacradosPorVez": 3,
+  "rotulos": {
+   "nova": "Nova",
+   "repassada": "Repassada"
+  }
+ },
+ "rendimento": {
+  "_leia": "O que cada atividade sensorial rende ao dossiê. A NATUREZA do fragmento vem da atividade (função cognitiva do §17); a QUANTIDADE vem do quanto a pessoa andou nela; o tempo não entra aqui — paga em ponto. Famílias em ordem de preferência: o sorteio puxa da primeira que ainda tiver fragmento no terço aberto e só então desce.",
+  "janela": {
+   "familias": [
+    "fisica",
+    "documental"
+   ],
+   "nota": "espaço, posição, sequência e tempo"
+  },
+  "vidro": {
+   "familias": [
+    "documental",
+    "eletrica",
+    "domestica"
+   ],
+   "nota": "números, registros, lacres e documentos"
+  },
+  "salaEscura": {
+   "familias": [
+    "domestica",
+    "fisica"
+   ],
+   "nota": "vestígios materiais e procura espacial"
+  },
+  "colocacao": {
+   "_leia": "Quem CONCLUI a atividade leva 1, passivamente. Os primeiros a concluir levam mais um. A ordem de chegada é carimbada pelo servidor, então é inforjável — ao contrário da duração, que o aparelho do jogador apenas afirma. Quem NÃO conclui leva zero (Mario, 02/09/2026) — por isso não existe canal de progresso parcial. Números provisórios (Mario, 02/09/2026: 'por ora'): mexer aqui não exige tocar em código.",
+   "primeiros": 3,
+   "podio": 2,
+   "concluiu": 1,
+   "andou": 0,
+   "vendavel": false
+  },
+  "_escala": "Um terço tem cerca de UM fragmento por jogador (13/18/24/30 conforme a mesa). Por isso o piso é 1: quem fez a atividade leva um, passivamente. O teto de 3 é o que o gesto cheio compra. Fragmentos PODEM se repetir entre jogadores — sem isso a fatia teria de ser exclusiva, e doze pessoas não cabem num terço de dez. Repetindo, cada um sorteia o seu e o número de jogadores deixa de importar."
+ },
+ "duracoes": {
+  "curta": {
+   "n": 13,
+   "rel": 3,
+   "rot": "Curta",
+   "nota": "12–14 fragmentos · predomínio de estruturais e relacionais"
+  },
+  "padrao": {
+   "n": 18,
+   "rel": 4,
+   "rot": "Padrão",
+   "nota": "16–20 fragmentos · equilíbrio entre as quatro funções"
+  },
+  "longa": {
+   "n": 24,
+   "rel": 6,
+   "rot": "Longa",
+   "nota": "22–26 fragmentos · mais pistas paralelas e reconstrução espacial"
+  },
+  "mesa": {
+   "n": 30,
+   "rel": 8,
+   "rot": "Mesa grande",
+   "nota": "seleção dinâmica de F01–F36 · pares entre celulares"
+  }
+ },
+ "protecao": {
+  "_leia": "Combinações que não podem chegar juntas à mesma mão inicial nem ao mesmo pequeno conjunto de jogadores. Cada conjunto é uma lista de UNIDADES, e a proibição só vale quando todas as unidades têm representante na mesma mão: F08 e F09 são a mesma unidade (identidade), e por isso podem ser as duas metades de um par.",
+  "conjuntos": [
+   [
+    [
+     "F01"
+    ],
+    [
+     "F09"
+    ],
+    [
+     "F13",
+     "F14"
+    ]
+   ],
+   [
+    [
+     "F10",
+     "F11"
+    ],
+    [
+     "F22"
+    ]
+   ],
+   [
+    [
+     "F08",
+     "F09"
+    ],
+    [
+     "F28"
+    ],
+    [
+     "F35"
+    ]
+   ]
+  ],
+  "maxFechoPorTerco": {
+   "primeiro": 0,
+   "segundo": 2
+  }
+ },
+ "selecao": {
+  "_leia": "Matriz de reutilização do banco por pergunta. Centrais entram sempre; incidentais só preenchem o que sobra.",
+  "sete": {
+   "hipotese": "H10",
+   "derruba": [
+    "H1",
+    "H2",
+    "H3"
+   ],
+   "centrais": [
+    "F01",
+    "F04",
+    "F06",
+    "F09",
+    "F10",
+    "F13",
+    "F22",
+    "F36"
+   ],
+   "incidentais": [
+    "F03",
+    "F18",
+    "F19",
+    "F29",
+    "F30"
+   ]
+  },
+  "cinco": {
+   "hipotese": "H9",
+   "derruba": [
+    "H7",
+    "H8"
+   ],
+   "centrais": [
+    "F09",
+    "F13",
+    "F14",
+    "F33",
+    "F35",
+    "F02",
+    "F03"
+   ],
+   "incidentais": [
+    "F05",
+    "F06",
+    "F07",
+    "F24",
+    "F25"
+   ]
+  },
+  "apagao": {
+   "hipotese": "H10",
+   "derruba": [
+    "H6",
+    "H3"
+   ],
+   "centrais": [
+    "F04",
+    "F05",
+    "F06",
+    "F07",
+    "F21",
+    "F25",
+    "F15",
+    "F16",
+    "F17"
+   ],
+   "incidentais": [
+    "F03",
+    "F13",
+    "F14",
+    "F19",
+    "F33"
+   ]
+  },
+  "nome": {
+   "hipotese": "H9",
+   "derruba": [
+    "H1",
+    "H4"
+   ],
+   "centrais": [
+    "F08",
+    "F09",
+    "F27",
+    "F28",
+    "F35"
+   ],
+   "incidentais": [
+    "F04",
+    "F05",
+    "F12",
+    "F18",
+    "F19"
+   ]
+  },
+  "corpo": {
+   "hipotese": "H10",
+   "derruba": [
+    "H1",
+    "H2"
+   ],
+   "centrais": [
+    "F04",
+    "F06",
+    "F07",
+    "F12",
+    "F18",
+    "F19",
+    "F20",
+    "F32"
+   ],
+   "incidentais": [
+    "F09",
+    "F28",
+    "F35",
+    "F29"
+   ]
+  },
+  "perceber": {
+   "hipotese": "H9",
+   "derruba": [
+    "H7"
+   ],
+   "centrais": [
+    "F02",
+    "F13",
+    "F14",
+    "F29",
+    "F33",
+    "F35"
+   ],
+   "incidentais": [
+    "F06",
+    "F07",
+    "F25",
+    "F26"
+   ]
+  }
+ },
+ "mosaicoBanco": {
+  "_leia": "Banco PRÓPRIO do Mosaico coletivo, separado das pistas públicas e dos lotes das atividades. Cada sala sorteia 'itens' deles, UM POR HORÁRIO — nove pares do caso dividem o mesmo instante (F04/F23 às 21h21, F05/F24 às 21h27…) e dois no mesmo slot não teriam ordem certa entre si. São referências, não textos: o rótulo sai do banco de fragmentos ou das públicas, para o fato continuar tendo uma fonte só. ATENÇÃO: a noite atravessa a meia-noite — 02h15, 06h50 e 08h20 vêm DEPOIS de 23h05, e ordenar por texto inverteria a resposta.",
+  "itens": 6,
+  "pool": [
+   "pub-2102",
+   "pub-2121",
+   "pub-2124",
+   "pub-2127",
+   "pub-2129",
+   "pub-2131",
+   "F29",
+   "F30",
+   "F22",
+   "F23",
+   "F02",
+   "F24",
+   "F25",
+   "F27",
+   "F12",
+   "F26",
+   "F07",
+   "F31",
+   "F01",
+   "F36",
+   "F19",
+   "F15",
+   "F17"
+  ]
+ },
+ "mosaico": {
+  "instrucao": "Relacione os acontecimentos públicos à linha factual da noite.",
+  "ordemCorreta": [
+   "pub-2102",
+   "pub-2121",
+   "pub-2124",
+   "pub-2127",
+   "pub-2129",
+   "pub-2131"
+  ],
+  "dicas": {
+   "pub-2102": "A primeira pessoa do grupo chega.",
+   "pub-2121": "Um peso aparece onde ninguém do grupo está.",
+   "pub-2124": "A casa fechada mostra um sinal de rotina.",
+   "pub-2127": "Um objeto muda a leitura do corredor.",
+   "pub-2129": "O escuro dura dois minutos e dois segundos.",
+   "pub-2131": "Um aparelho antigo volta junto com a energia."
+  },
+  "rotulos": {
+   "pub-2102": "Primeira chegada",
+   "pub-2121": "O quarto degrau",
+   "pub-2124": "Ausência de poeira",
+   "pub-2127": "A colher",
+   "pub-2129": "O apagão",
+   "pub-2131": "O nome"
+  }
+ },
+ "tarefas": {
+  "inclinacao": {
+   "titulo": "A Janela do Norte",
+   "arquivo": "MOSAICO-26-a-janela-do-norte.html?embed=1",
+   "pista": {
+    "id": "tarefa-inclinacao",
+    "hora": "21:29",
+    "txt": "O vulto cruzou o corredor pelo lado de dentro. A sombra não prova entrada. Prova presença."
+   }
+  },
+  "constelacao": {
+   "titulo": "O Vidro Embaçado",
+   "arquivo": "MOSAICO-26-vidro-embacado.html?embed=1",
+   "pista": {
+    "id": "tarefa-interior",
+    "hora": "22:40",
+    "txt": "Sete xícaras limpas secavam na pia. A cozinha e o corredor tinham menos poeira do que os cômodos realmente fechados."
+   }
+  },
+  "salaEscura": {
+   "titulo": "A Sala às Escuras",
+   "arquivo": "MOSAICO-26-a-sala-as-escuras.html?embed=1&v=20260916-sala-3d",
+   "pista": {
+    "id": "tarefa-interior",
+    "hora": "21:29–21:31",
+    "txt": "Respiração, sombra e uma colher deslocada formam um trajeto que não cabe nas posições dos seis."
+   },
+   "papeis": {
+    "_leia": "Os papéis rasgados da passagem (4ª cena do percurso, Mesa e Solo). Cada quebra-cabeça monta uma dimensão da MESMA pista acima: ONDE (a planta img/casa-da-costa-planta-1867.svg, com uma marca por fragmento em 'onde', no cômodo que o texto do próprio fragmento diz), O QUÊ (o bilhete, com o 'txt') e QUANDO (o relógio de corda, com os ponteiros em 'hora'). O cômodo é nome de rótulo da planta, não o campo 'm' do banco: medido em 18/09/2026, 'm' não bate com essa planta (F22, o vão do sótão, cairia no bloco de texto). Nada aqui entra no Arquivo além da pista, que a Mesa já entrega ao fim do percurso.",
+    "onde": [
+     { "f": "F06", "comodo": "SALA DE ESTAR" },
+     { "f": "F24", "comodo": "CORREDOR" },
+     { "f": "F07", "comodo": "CORREDOR" }
+    ],
+    "hora": "21:29",
+    "achado": "Sob a despensa"
+   }
+  }
+ },
+ "arte": {
+  "capa": "img/capa-vertical.jpg",
+  "painel": "img/fundo-painel.jpg",
+  "espera": "img/aguardando.jpg",
+  "video": "img/abertura.mp4",
+  "_abertura": "Papel de parede da abertura, atrás da narração. Vertical no celular, horizontal no telão. Recomprimidos a 82% ao entrar: os originais tinham 2,6 e 2,9 MB, que num jogo de celular é a diferença entre abrir e desistir.",
+  "aberturaSoNoTelao": true,
+  "_aberturaSoNoTelao": "A abertura toca no telão e no aparelho do Mestre, não no de cada jogador (Mario, 02/09/2026). O celular do participante entra direto na sala. Pôr false devolve a abertura a todos os aparelhos.",
+  "aberturaVertical": "img/abertura-vertical.jpg",
+  "aberturaTelao": "img/abertura-telao.jpg",
+  "planta": "img/casa-da-costa-planta-1867.webp"
+ },
+ "elenco": [
+  {
+   "id": "investigador",
+   "av": "🔎",
+   "nome": "{O Investigador|A Investigadora}",
+   "desc": "Chega primeiro. Registra o que vê antes de atribuir sentido."
+  },
+  {
+   "id": "herdeiro",
+   "av": "🗝️",
+   "nome": "{O Herdeiro|A Herdeira}",
+   "desc": "Recebe o espólio e conhece lembranças da casa, mas não toda a sua rotina recente."
+  },
+  {
+   "id": "morador",
+   "av": "🏠",
+   "nome": "{O Morador|A Moradora}",
+   "desc": "Caseiro do anexo. Entra na casa principal duas vezes por semana."
+  },
+  {
+   "id": "jornalista",
+   "av": "🎤",
+   "nome": "{O Jornalista|A Jornalista}",
+   "desc": "Transforma sensações em perguntas e não esquece a respiração no escuro."
+  },
+  {
+   "id": "policial",
+   "av": "🚓",
+   "nome": "{O Policial|A Policial}",
+   "desc": "Vê um vulto onde uma sombra, tecnicamente, não deveria existir."
+  },
+  {
+   "id": "menina",
+   "av": "🧸",
+   "nome": "{O Menino|A Menina}",
+   "desc": "{O último|A última} a entrar. Olha para o chão quando os adultos olham para a casa."
+  }
+ ],
+ "roteiros": {
+  "investigador": {
+   "resumo": "Você chega primeiro. Entre com cuidado, examine o corredor e reaja a um estalo vindo da casa antes de qualquer explicação.",
+   "acao": "Caminhe devagar, passe a mão pela parede e pare ao ouvir um estalo imaginário. Olhe para cima e depois para trás.",
+   "rub": "A primeira pessoa do grupo entra e percebe que a casa produz sinais antes de oferecer explicações.",
+   "tom": "Desconfiad{o|a}, mas sem concluir cedo demais",
+   "fala": "“Ouvi um estalo atrás de mim. Pode ser madeira, pode ser a tempestade. Mas antes de decidir o que foi, quero saber exatamente onde cada pessoa está.”",
+   "pos": "Permaneça olhando o corredor por alguns segundos."
+  },
+  "herdeiro": {
+   "resumo": "Você reconhece a cozinha e percebe algo banal demais para parecer pista: quase não há poeira onde deveria haver cinco meses de abandono.",
+   "acao": "Observe a mesa, passe o dedo por uma superfície imaginária e mostre a ponta do dedo ao grupo.",
+   "rub": "A pessoa que recebe o espólio percebe que a cozinha parece cuidada demais.",
+   "tom": "Baixo, primeiro intrigad{o|a}; depois firme",
+   "fala": "“A casa está fechada há cinco meses. Então me expliquem isto: por que a cozinha está limpa? Não limpa para um inventário. Limpa como um lugar usado.”",
+   "pos": "Olhe para a cozinha, não para as pessoas."
+  },
+  "morador": {
+   "resumo": "Você conhece a escada. Mostre ao grupo que o terceiro degrau é firme e que é o quarto que range sob peso.",
+   "acao": "Conte três passos silenciosos com os dedos e, no quarto, interrompa o movimento como se o degrau tivesse rangido.",
+   "rub": "O caseiro distingue um ruído estrutural comum de um degrau que responde a carga.",
+   "tom": "Seguro, como quem conhece a casa há muito tempo",
+   "fala": "“O terceiro degrau é firme. O quarto range quando alguém pisa. Eu conheço essa escada. Se ele rangeu agora, houve peso ali.”",
+   "pos": "Mantenha os olhos na escada imaginária."
+  },
+  "jornalista": {
+   "resumo": "Durante o apagão, você sente uma respiração muito próxima em um ponto onde nenhum dos outros deveria estar.",
+   "acao": "Feche os olhos por um instante, vire o rosto como se alguém tivesse respirado perto do seu ouvido e dê um passo para o lado.",
+   "rub": "No escuro, uma percepção corporal entra em conflito com as posições conhecidas do grupo.",
+   "tom": "Contido no início; incisivo ao final",
+   "fala": "“Alguém respirou aqui. Perto demais. Eu sei onde vocês estavam antes de a luz cair — e ninguém deveria estar deste lado.”",
+   "pos": "Aponte para o espaço vazio ao seu lado."
+  },
+  "policial": {
+   "resumo": "No escuro, você percebe um corpo atravessando a linha entre você e uma janela. O que parece sombra não precisa de luz projetada: basta bloquear a pouca luz exterior.",
+   "acao": "Fixe um ponto ao longe, acompanhe com a cabeça um movimento lateral e recue meio passo.",
+   "rub": "Uma presença corta a luz residual da janela durante o apagão.",
+   "tom": "Objetivo e cauteloso",
+   "fala": "“Vi um vulto cruzar o corredor. Não digo que era uma sombra. Digo que alguma coisa passou entre mim e a janela.”",
+   "pos": "Continue acompanhando o corredor com os olhos."
+  },
+  "menina": {
+   "resumo": "Você observa o jardim interno. A chuva cai por toda parte, mas ali as folhas estão molhadas por baixo e um par de pegadas entra sem mostrar saída.",
+   "acao": "Abaixe-se como se examinasse o chão, toque uma folha imaginária e siga um rastro com o dedo até uma porta.",
+   "rub": "A pessoa mais próxima do jardim percebe que a água e as pegadas contam histórias diferentes.",
+   "tom": "Calm{o|a} e muito sério",
+   "fala": "“Aqui não choveu do jeito que vocês pensam. As folhas estão molhadas por baixo. E estas pegadas entram… mas não saem.”",
+   "pos": "Termine olhando para a porta do quarto de serviço."
+  }
+ },
+ "pistas": {
+  "investigador": {
+   "id": "priv-investigador",
+   "hora": "21:21",
+   "qualidade": "boa",
+   "txt": "O quarto degrau range sob carga; o terceiro não. Às 21h21, ninguém do grupo estava na escada."
+  },
+  "herdeiro": {
+   "id": "priv-herdeiro",
+   "hora": "21:24",
+   "qualidade": "boa",
+   "txt": "Cozinha e corredor estão quase sem poeira; os demais cômodos acumulam cinco meses de abandono."
+  },
+  "morador": {
+   "id": "priv-morador",
+   "hora": "—",
+   "qualidade": "boa",
+   "txt": "O hidrômetro registra consumo diário contínuo e o boiler foi acionado em dias fora das suas duas visitas semanais."
+  },
+  "jornalista": {
+   "id": "priv-jornalista",
+   "hora": "21:29–21:31",
+   "qualidade": "mediana",
+   "txt": "Você ouviu uma respiração a menos de dois metros, num ponto onde nenhum dos outros cinco estava."
+  },
+  "policial": {
+   "id": "priv-policial",
+   "hora": "21:29–21:31",
+   "qualidade": "mediana",
+   "txt": "O vulto cruzou entre você e a janela. O sinal é compatível com um corpo bloqueando a luz exterior."
+  },
+  "menina": {
+   "id": "priv-menina",
+   "hora": "23:05",
+   "qualidade": "boa",
+   "txt": "No jardim interno, um par de pegadas de numeração diferente entra e não sai; a porta do antigo quarto de serviço não tem tranca."
+  }
+ },
+ "publicas": [
+  {
+   "id": "pub-2102",
+   "hora": "21:02",
+   "txt": "O Investigador é a primeira pessoa do grupo a chegar. A contagem começa com quem atravessa o portão."
+  },
+  {
+   "id": "pub-2121",
+   "hora": "21:21",
+   "txt": "O quarto degrau range sob peso. Nenhuma das seis pessoas está na escada."
+  },
+  {
+   "id": "pub-2124",
+   "hora": "21:24",
+   "txt": "A cozinha está sem poeira compatível com cinco meses de casa fechada."
+  },
+  {
+   "id": "pub-2127",
+   "hora": "21:27",
+   "txt": "Uma colher cai no corredor e permanece ali antes do apagão."
+  },
+  {
+   "id": "pub-2129",
+   "hora": "21:29",
+   "txt": "A energia cai em três casas da encosta. O disjuntor interno continua ligado."
+  },
+  {
+   "id": "pub-2131",
+   "hora": "21:31",
+   "txt": "A energia retorna. A secretária eletrônica reinicia e reproduz um nome que não pertence a nenhum dos seis."
+  }
+ ],
+ "relogio": {
+  "sala": "21:00",
+  "escuro": "21:00",
+  "cena": null,
+  "encenacao": null,
+  "votacao": "21:23",
+  "performance": "21:23",
+  "inclinacao": "21:29",
+  "constelacao": "22:40",
+  "mosaico": "23:05",
+  "cooperacao": "23:40",
+  "mercado": "02:15",
+  "deducao": "08:20",
+  "resultado": "08:20",
+  "historia": "08:20"
+ },
+ "capitulos": {
+  "sala": "Seis atravessaram o portão",
+  "escuro": "A casa apagou",
+  "cena": "A casa escolheu alguém",
+  "encenacao": "O que cada um percebeu",
+  "votacao": "A energia da mesa",
+  "performance": "A energia da mesa",
+  "inclinacao": "A Janela do Norte",
+  "constelacao": "Sinais dentro da casa",
+  "mosaico": "A verdade é um fragmento",
+  "cooperacao": "O núcleo se recorda",
+  "mercado": "Mercado de pistas",
+  "deducao": "A decisão final",
+  "resultado": "A contagem fecha",
+  "historia": "A Noite da Tempestade"
+ },
+ "historia": [
+  "Seis pessoas atravessaram o portão da Casa da Costa numa noite de tempestade, convocadas para o inventário de um falecido.",
+  "Às 21h29 a luz caiu por dois minutos e dois segundos. Dentro do escuro houve respiração, metal, peso e um vulto onde nenhum dos seis deveria estar.",
+  "Quando a luz voltou, todos continuaram contando seis.",
+  "Na cozinha, sete xícaras limpas secavam na pia."
+ ],
+ "revelacaoFinal": {
+  "titulo": "A contagem da Casa da Costa",
+  "sintese": "Entraram seis pelo portão. Havia sete pessoas dentro da casa. A sétima não entrou naquela noite — nunca saiu.",
+  "historia": [
+   "Há cinco meses, após o falecimento do antigo dono, o contrato de sua acompanhante terminou por telefone. Sem ter para onde ir e com a porta do jardim ainda destrancada, ela permaneceu no antigo quarto de serviço.",
+   "Ela aprendeu a casa: os dias do Morador, o quarto degrau que range, o sótão que estala com a umidade, a porta que não trava. Lavava a própria xícara, organizava a despensa e tirava o pó porque poeira é rastro.",
+   "Na noite do inventário, a encosta alagada e a chegada dos carros impediram uma saída discreta. Ela se escondeu no sótão. Às 21h29, a chuva derrubou a energia de três casas; o disjuntor da Casa da Costa permaneceu ligado.",
+   "Durante os dois minutos e dois segundos de escuridão, ela atravessou corredor e sala: respirou perto da Jornalista, passou entre o Policial e a janela, chutou a colher e seguiu até o jardim. O cofre, que já estava encostado, cedeu apenas um centímetro ao toque.",
+   "Às 21h31 a energia voltou e a secretária eletrônica reproduziu o fim de uma mensagem antiga do proprietário, dizendo o nome da acompanhante. Nada foi furtado; o envelope do inventário permaneceu lacrado.",
+   "Sete xícaras, ausência seletiva de poeira, consumo contínuo de água, boiler fora dos dias do Morador, pegadas sem saída, contrato e gravação fecham a mesma conclusão: a casa não estava assombrada. Estava ocupada."
+  ],
+  "evidencias": [
+   {
+    "titulo": "Rotina doméstica",
+    "texto": "Sete xícaras, ausência seletiva de poeira e despensa organizada não provam nada isoladamente; juntas descrevem habitação."
+   },
+   {
+    "titulo": "Massa e temperatura",
+    "texto": "Degrau sob carga, colher deslocada e cadeira morna exigem corpo, objeto e calor."
+   },
+   {
+    "titulo": "Presença no apagão",
+    "texto": "Respiração e vulto, cruzados com as posições dos seis, deixam um ponto ocupado sem autor entre os presentes."
+   },
+   {
+    "titulo": "Cinco meses",
+    "texto": "Hidrômetro e boiler registram uso contínuo em dias nos quais a casa deveria estar vazia."
+   },
+   {
+    "titulo": "Identidade e localização",
+    "texto": "Contrato, gravação, pegadas e porta do quarto de serviço transformam presença em pessoa e lugar."
+   },
+   {
+    "titulo": "Contraprova do crime",
+    "texto": "O apagão veio da rede; o cofre estava apenas encostado; o envelope permaneceu íntegro. Não houve furto."
+   }
+  ]
+ }
+}

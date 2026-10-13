@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="pt-BR" data-ac-casa>
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#091515"><title>A Casa · Os papéis</title>
+  <link rel="stylesheet" href="css/ac-investigacao.css?v=20261004-janelas"><link rel="stylesheet" href="css/ac-papeis.css?v=20261004-janelas"><link rel="stylesheet" href="css/ac-ra.css?v=20261004-janelas">
+<link rel="stylesheet" href="css/ac-janelas.css?v=20261011-t4">
+</head>
+<body>
+  <!-- A mesa onde os papéis são montados. É a cena: tocar nela recolhe as
+       janelas, como na escrivaninha e na maquete. -->
+  <div id="scene" data-ac-cena aria-label="Papéis rasgados achados no vão da escada">
+    <div id="mesa" aria-live="off"><div id="tabuleiro"></div><div id="bandeja" aria-label="Pedaços soltos"></div></div>
+  </div>
+  <header class="topbar"><a href="#" class="brand" aria-label="A Casa da Costa">AC<span>A CASA<br>DA COSTA</span></a><span class="edition">O VÃO DA ESCADA · OS PAPÉIS</span><button id="help" class="ac-chevron" type="button" aria-label="Mostrar as janelas" aria-expanded="true">⌄</button></header>
+  <main>
+    <div id="loading" role="status">Juntando os papéis…</div>
+    <aside data-ac-priority="2" class="instruction" aria-live="polite"><div id="timer" data-ac-relogio aria-label="Tempo e pontos dos papéis"></div><span id="step" class="eyebrow"></span><h2 id="heading"></h2><p id="description"></p><p id="dica" class="ac-dica" hidden></p><button id="primary" hidden></button><button type="button" class="ac-como-jogar" data-ac-abrir="instructions" aria-label="Como jogar"><span aria-hidden="true">📖</span><span class="ac-como-jogar-texto">Como jogar</span></button></aside>
+  </main>
+  <dialog id="instructions" data-ac-priority="10"><span class="eyebrow">O VÃO DA ESCADA</span><h2>Três papéis rasgados.</h2><p>No vão da escada, alguém guardou papéis em pedaços: uma folha de planta, um bilhete e o mostrador de um relógio.</p><p>A planta se remonta tocando em dois pedaços, que trocam de lugar. O bilhete se monta arrastando cada pedaço até o recorte que ele preenche. No relógio, os pedaços deslizam para o espaço vazio.</p><p>Os três papéis têm 4 minutos. Cada um vale 5 pontos se montado em 30 segundos e perde 1 a cada 20 s (mínimo 2). Duas dicas chegam em cada papel. Se o tempo acabar, os que faltam se montam sozinhos e não pontuam.</p><button type="button" class="ac-continuar" data-ac-fechar>Entendi</button></dialog>
+  <dialog id="achado" data-ac-priority="5"><span class="eyebrow">DESCOBERTA</span><div id="achado-carta"></div><button id="guardar" class="ac-continuar">Guardar no dossiê</button></dialog>
+  <div id="notice" data-ac-priority="9" role="status"></div>
+  <script src="js/ac-ritmo.js?v=20261004-janelas"></script><script src="js/ac-papeis.js?v=20261011-t4"></script>
+<script src="js/ac-janelas.js?v=20261011-t4"></script></body></html>

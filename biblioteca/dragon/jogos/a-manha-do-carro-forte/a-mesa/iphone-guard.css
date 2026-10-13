@@ -1,0 +1,25 @@
+/* MOSAICO · protocolo iPhone: viewport estável, safe-area e guarda de orientação.
+   Carregado depois de styles.css — só corrige o que o desenho não resolve sozinho. */
+html{-webkit-text-size-adjust:100%;touch-action:manipulation}
+body{overscroll-behavior-y:none}
+
+.system-guard{position:fixed;inset:0;z-index:9999;background:#050b12f7;display:grid;place-items:center;padding:calc(24px + env(safe-area-inset-top)) 22px calc(24px + env(safe-area-inset-bottom));text-align:center}
+.system-guard>div{width:min(520px,100%);border:1px solid rgba(159,228,255,.52);border-radius:14px;background:linear-gradient(165deg,#1a3348,#153044 60%,#102838);padding:16px;box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 18px 50px rgba(0,0,0,.55),0 0 40px rgba(127,212,255,.10)}
+.system-guard span{display:block;font:700 10px var(--mono);letter-spacing:.18em;color:var(--gold);margin-bottom:10px}
+.system-guard strong{display:block;font:600 30px var(--display)}
+.system-guard p{color:var(--muted);line-height:1.55;font-size:13px}
+
+/* Nada rola horizontalmente durante a mão; o que for largo rola dentro de si. */
+.fragment,.hyp-card,.relation-card,.plan-card,.ending-card,.question-card,.brief-grid article{min-width:0;overflow-wrap:anywhere;word-break:normal}
+.section-head p,.dossier-meta,.rel-pecas,.contraproof p{overflow-wrap:anywhere}
+.intro-actions,.sensor-actions,.archive{flex-wrap:wrap}
+
+@media(max-width:560px){
+ .topbar{padding-bottom:5px}
+ .screen{padding-top:14px}
+ .score-row{grid-template-columns:minmax(84px,1fr) minmax(0,1.4fr) 30px;font-size:10px}
+ .reveal-card h2{font-size:clamp(28px,10vw,44px)}
+}
+@media(orientation:landscape) and (max-height:600px){
+ body.guard-orientation{overflow:hidden}
+}
