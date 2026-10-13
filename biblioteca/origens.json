@@ -232,15 +232,12 @@
       "pleura/"
     ]
   ],
-  "pastas_antigas_removidas": [
-    ".claude",
-    ".nojekyll",
+  "conteudos_antigos_retirados_ou_substituidos": [
     "a-marca-partida.html",
     "ACESSO.md",
     "atlas_cardiaco_geometria.blend",
     "atlas_cardiaco_referencia.glb",
     "atlas_corte_inspecao.png",
-    "atlas_frente.png",
     "atlas_posterior.png",
     "bancadas",
     "bancadas.html",
