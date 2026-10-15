@@ -1,5 +1,12 @@
 # LAB-RA — biblioteca e experimentação
 
+## Ambiente de experimentação
+
+Este repositório reúne materiais de estudo e experimentação. A disponibilidade de uma bancada de um jogo não representa lançamento público nem abertura para participação externa. Os materiais educacionais de Fisiologia permanecem acessíveis nos projetos de origem, conforme suas condições próprias.
+
+Portal do autor: https://www.drmarionascimento.com.br/ · Dragon Games: https://dragongames.dev.br/
+
+
 **Aprender pesquisa fazendo pesquisa.**
 *Fazendo, errando e criando!*
 
