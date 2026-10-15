@@ -24,7 +24,7 @@ Origem: `DrMarioNascimento/lab-ra/musculo-sarcomero`, revisão aprovada `6792eb5
 
 A banda A mantém 1,6 µm; banda I e zona H variam com o comprimento, conforme a implementação aprovada. A curva de tensão ativa relativa é uma aproximação por trechos da relação isométrica em fibras musculares de rã de [Gordon, Huxley e Julian (1966)](https://pubmed.ncbi.nlm.nih.gov/5921536/). Não é força absoluta, tensão passiva, curva força–velocidade nem uma medida clínica individual. As contas e o sarcômero não foram modificados na transferência.
 
-Modelos e texturas são procedurais, criados no código do projeto. Não foi acrescentado um modelo anatômico de terceiros. A autoria e a licença principal permanecem em [LICENSE.md](../../LICENSE.md); Three.js e model-viewer conservam suas licenças próprias.
+Modelos e texturas são procedurais, criados no código do projeto. Não foi acrescentado um modelo anatômico de terceiros. A autoria e a licença principal permanecem em [LICENSE.md](../LICENCA-ORIGEM.md); Three.js e model-viewer conservam suas licenças próprias.
 
 ## RA com botões no iPhone (revisão de 05/10/2026; botão único em 09/10/2026)
 
