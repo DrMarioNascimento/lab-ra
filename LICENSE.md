@@ -62,3 +62,9 @@ Esta nota registra a revisão da documentação. Não altera as cláusulas anter
 ## Componentes da biblioteca
 
 As cópias de Dragon Games e Fisiologia Interativa preservam as condições e autorias de suas origens, registradas em `biblioteca/dragon/LICENCA-ORIGEM.md` e `biblioteca/fisiologia/LICENCA-ORIGEM.md`. A presente organização não amplia as permissões desses materiais. Licenças de bibliotecas de terceiros acompanham os respectivos arquivos.
+
+## Endereço de apresentação — 14 de outubro de 2026
+
+O portal de apresentação do autor usa o endereço abaixo. Este endereço não altera a hospedagem própria do recurso, a titularidade ou as permissões desta licença.
+
+https://www.drmarionascimento.com.br/
