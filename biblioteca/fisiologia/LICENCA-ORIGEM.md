@@ -98,7 +98,7 @@ Os modelos e as texturas procedurais de `ra/musculo-sarcomero/`, `ra/potencial-m
 | Three.js | Renderização 3D e exportação dos modelos | [MIT](https://github.com/mrdoob/three.js/blob/r180/LICENSE) |
 | `<model-viewer>` | Visualização e abertura dos modelos em RA | [Apache 2.0](https://github.com/google/model-viewer/blob/v4.1.0/LICENSE) |
 
-A licença restrita dos componentes originais deste projeto **não substitui nem restringe** as licenças dos modelos e bibliotecas de terceiros. Os créditos, as adaptações e a procedência estão em [ra/assets/ATRIBUICAO.md](ra/assets/ATRIBUICAO.md), [ra/coracao/ATTRIBUTION.md](ra/coracao/ATTRIBUTION.md) e [ra/coracao/LICENSE.md](ra/coracao/LICENSE.md). O uso da nomenclatura Z-Anatomy é identificado nessa documentação; suas malhas não fazem parte desta migração.
+A licença restrita dos componentes originais deste projeto **não substitui nem restringe** as licenças dos modelos e bibliotecas de terceiros. Os créditos, as adaptações e a procedência estão em [ra/assets/ATRIBUICAO.md](assets/ATRIBUICAO.md), [ra/coracao/ATTRIBUTION.md](coracao/ATTRIBUTION.md) e [ra/coracao/LICENSE.md](coracao/LICENSE.md). O uso da nomenclatura Z-Anatomy é identificado nessa documentação; suas malhas não fazem parte desta migração.
 
 Os batimentos de cada área cardíaca (segmento) foram cuidadosamente calculados pelo **Prof. Mário César Nascimento, PhD**, e sincronizados ao ciclo cardíaco simulado. Esse crédito se refere ao trabalho de animação e cálculo do simulador; não transfere a autoria dos modelos anatômicos de terceiros ao autor do projeto.
 
@@ -236,7 +236,7 @@ The procedural models and textures in `ra/musculo-sarcomero/`, `ra/potencial-mem
 | Three.js | 3D rendering and model export | [MIT](https://github.com/mrdoob/three.js/blob/r180/LICENSE) |
 | `<model-viewer>` | Model viewing and augmented reality | [Apache 2.0](https://github.com/google/model-viewer/blob/v4.1.0/LICENSE) |
 
-The restricted license for this project's original components **does not replace or restrict** third-party model and library licenses. Credits, changes and provenance are documented in [ra/assets/ATRIBUICAO.md](ra/assets/ATRIBUICAO.md), [ra/coracao/ATTRIBUTION.md](ra/coracao/ATTRIBUTION.md) and [ra/coracao/LICENSE.md](ra/coracao/LICENSE.md). Z-Anatomy nomenclature is identified there; its meshes are not part of this migration.
+The restricted license for this project's original components **does not replace or restrict** third-party model and library licenses. Credits, changes and provenance are documented in [ra/assets/ATRIBUICAO.md](assets/ATRIBUICAO.md), [ra/coracao/ATTRIBUTION.md](coracao/ATTRIBUTION.md) and [ra/coracao/LICENSE.md](coracao/LICENSE.md). Z-Anatomy nomenclature is identified there; its meshes are not part of this migration.
 
 The beating movements for each cardiac area (segment) were carefully calculated by **Mário César Nascimento, PhD**, and synchronized with the simulated cardiac cycle. This credits the simulator's animation and calculation work; it does not transfer authorship of third-party anatomical models to the project author.
 
