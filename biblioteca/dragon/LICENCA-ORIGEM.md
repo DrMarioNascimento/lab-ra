@@ -35,7 +35,7 @@ Copyright © 2026 Mário César Nascimento e Osana Melo Nascimento. Todos os dir
 
 ## 3. Uso permitido
 
-3.1. **Permissão para jogar e avaliar.** É concedida ao público uma autorização limitada, pessoal, revogável, intransferível e não exclusiva, nos limites permitidos pela legislação, para:
+3.1. **Desenvolvimento e testes internos.** Os jogos ainda não foram lançados ao público. Os testes são realizados internamente, sem participação externa. A eventual disponibilidade de páginas de demonstração não constitui abertura para participação pública. Somente os titulares e colaboradores internos expressamente autorizados recebem autorização limitada, pessoal, revogável, intransferível e não exclusiva, nos limites permitidos pela legislação, para:
 
 - acessar a implantação oficial mantida pelos titulares;
 - participar de partidas sem cobrança organizada por eles ou por pessoa expressamente autorizada;
@@ -172,7 +172,7 @@ Copyright © 2026 Mário César Nascimento and Osana Melo Nascimento. All rights
 
 ## 3. Permitted use
 
-3.1. **Permission to play and evaluate.** The public is granted a limited, personal, revocable, non-transferable and non-exclusive authorization, within the limits allowed by law, to:
+3.1. **Development and internal testing.** The games have not been released to the public. Testing is internal, with no external participation. Demonstration pages do not open the games to public participation. Only the rights holders and expressly authorized internal collaborators receive a limited, personal, revocable, non-transferable and non-exclusive authorization, within the limits allowed by law, to:
 
 - access the official deployment maintained by the rights holders;
 - take part in free-of-charge matches organized by them or by a person expressly authorized by them;
@@ -279,13 +279,32 @@ Esta nota registra a revisão da documentação. Não altera as cláusulas anter
 O catálogo também apresenta jogos mantidos em outros repositórios:
 
 - [Mosaico Card](https://github.com/DrMarioNascimento/Mosaico-Card): autoria declarada de Mário César Nascimento e Osana Melo Nascimento; licença proprietária do projeto.
-- [Eita!](https://eita-quiz.web.app/): autoria e titularidade declaradas de Mário César Nascimento; licença de uso educacional restrito no repositório próprio, cujo acesso segue suas permissões.
+- [Eita!](https://eita.dragongames.dev.br/): autoria e titularidade declaradas de Mário César Nascimento; licença de uso educacional restrito no repositório próprio, cujo acesso segue suas permissões.
 
 Os materiais visuais desses jogos usados no catálogo têm origem registrada em
-[brand/jogos/README.md](brand/jogos/README.md). Esta nota identifica os projetos
+[brand/jogos/README.md](https://github.com/DrMarioNascimento/Dragon/blob/main/brand/jogos/README.md). Esta nota identifica os projetos
 relacionados; não altera os titulares, as permissões, as restrições ou as condições
 anteriores desta licença nem as licenças próprias dos jogos e de terceiros.
 
 The catalog also links to independently maintained games. Their respective
 authors and licenses remain identified in the source projects. This documentary
 note does not amend the preceding terms or the licenses of those games or third parties.
+
+## Atualização de acesso e endereços — 14 de outubro de 2026
+
+A seção 3.1 foi atualizada para refletir os testes internos, sem participação externa. Permanecem as autorias, as demais condições e as licenças de terceiros.
+
+## Endereços oficiais
+
+| Projeto | Endereço |
+|---|---|
+| Portal do Prof. Mário | https://www.drmarionascimento.com.br/ |
+| Dragon Games | https://dragongames.dev.br/ |
+| Mosaico Card | https://mosaico-card.dragongames.dev.br/ |
+| A Casa da Costa | https://casa-da-costa.dragongames.dev.br/ |
+| A Manhã do Carro-Forte | https://carro-forte.dragongames.dev.br/ |
+| O Eco do Amanhã | https://eco-do-amanha.dragongames.dev.br/ |
+
+## Cópia de referência no Lab-RA
+
+Condições atuais do projeto de origem Dragon/MOSAICO, incluindo testes internos sem participação externa. A cópia na biblioteca não amplia permissões e preserva créditos dos componentes efetivamente presentes.
