@@ -7,7 +7,7 @@ Esta experiência usa três modelos com fontes e licenças distintas:
 
 Os batimentos de cada área cardíaca (segmento) foram cuidadosamente calculados pelo **Prof. Mário César Nascimento, PhD**, e sincronizados ao ciclo cardíaco simulado. Essa atribuição ao trabalho do simulador não substitui os créditos dos modelos de terceiros. Consulte [ATTRIBUTION.md](ATTRIBUTION.md).
 
-Os componentes originais do projeto seguem [a licença principal](../../LICENSE.md); os modelos acima conservam suas licenças próprias. A migração não inclui o catálogo PART-OF, os OBJ originais ou arquivos `.blend` de Z-Anatomy.
+Os componentes originais do projeto seguem [a licença principal](../LICENCA-ORIGEM.md); os modelos acima conservam suas licenças próprias. A migração não inclui o catálogo PART-OF, os OBJ originais ou arquivos `.blend` de Z-Anatomy.
 
 ## BodyParts3D
 
