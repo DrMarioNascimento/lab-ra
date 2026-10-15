@@ -10,7 +10,7 @@ Portal do autor: https://www.drmarionascimento.com.br/ · Dragon Games: https://
 **Aprender pesquisa fazendo pesquisa.**
 *Fazendo, errando e criando!*
 
-[Abra a biblioteca](https://drmarionascimento.github.io/lab-ra/bancadas.html).
+[Abra a biblioteca](https://lab-ra.dragongames.dev.br/bancadas.html).
 
 Ambiente pessoal de criação, teste e acompanhamento. O medalhão e a célula animada são decorativos, sem navegação. As listas usam Prólogo e Capítulo, sem numeração automática.
 
