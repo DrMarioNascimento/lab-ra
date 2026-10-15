@@ -10,7 +10,7 @@ A publicação deste repositório não constitui cessão, transferência, renún
 
 ## Materiais de terceiros
 
-Modelos, atlas, bibliotecas, fontes ou outros componentes de terceiros permanecem sujeitos às respectivas licenças e aos créditos próprios. Consulte [CREDITOS_ATLAS.md](CREDITOS_ATLAS.md) quando aplicável. Esta licença não concede direitos pertencentes a terceiros.
+Modelos, atlas, bibliotecas, fontes ou outros componentes de terceiros permanecem sujeitos às respectivas licenças e aos créditos próprios. Consulte o registro histórico `CREDITOS_ATLAS.md` (fora da árvore atual) quando aplicável. Esta licença não concede direitos pertencentes a terceiros.
 
 ## Uso permitido
 
@@ -46,9 +46,11 @@ O projeto é disponibilizado para fins educacionais e demonstrativos, no estado 
 Todos os direitos não expressamente concedidos permanecem reservados.
 
 
-## Corpo em ação
+## Registro histórico — Corpo em ação
 
-O motor didático, as ampliações procedurais e a interface de `integracao/` são componentes originais abrangidos por esta licença. A silhueta e os pulmões reutilizam componentes locais existentes. O coração externo conserva os créditos de neshallads e CC BY 4.0, com compressão Meshopt, escala, acabamento e pulso visual adaptados. Three.js, Meshoptimizer e glTF Transform conservam suas licenças MIT. Consulte [atribuição](integracao/ATRIBUICAO.md); esta licença não restringe os direitos das licenças de terceiros.
+A experiência `integracao/` não integra a biblioteca atual. O registro de autoria e créditos abaixo é histórico; não representa uma entrada disponível neste repositório.
+
+O motor didático, as ampliações procedurais e a interface de `integracao/` são componentes originais abrangidos por esta licença. A silhueta e os pulmões reutilizam componentes locais existentes. O coração externo conserva os créditos de neshallads e CC BY 4.0, com compressão Meshopt, escala, acabamento e pulso visual adaptados. Three.js, Meshoptimizer e glTF Transform conservam suas licenças MIT. Consulte o registro histórico `integracao/ATRIBUICAO.md` (fora da árvore atual); esta licença não restringe os direitos das licenças de terceiros.
 
 ---
 
