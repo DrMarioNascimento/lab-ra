@@ -1,5 +1,11 @@
 # Viagem ao osso vivo
 
+## Manutenção e origem — 19 de outubro de 2026
+
+Esta pasta é uma cópia local de estudo dentro da biblioteca LAB-RA. O texto técnico abaixo registra a experiência de origem; os acessos da biblioteca e o retorno local são definidos pelo LAB-RA. A procedência e a revisão da cópia devem ser conferidas em `biblioteca/origens.json`, na raiz. Alterações no Fisiologia Interativa não são sincronizadas automaticamente aqui.
+
+Consulte o [README principal](../../../README.md) e a [licença da raiz](../../../LICENSE.md). Créditos e licenças específicos deste módulo permanecem nos documentos abaixo.
+
 Experiência procedural original e independente de outros repositórios. Cinco ampliações: fêmur desmontável; compacto e esponjoso; ósteon vascularizado com corte e lacuna ampliada; osteoclasto em corte com escavação/transcitose; osteoblastos em corte, secreção e colágeno/hidroxiapatita ampliados. A matriz sob as células é o tecido estudado, sem pedestal de apresentação. Three.js 0.180.0 e model-viewer 4.0.0 vêm do CDN; apresentação, geometria e cálculos estão neste repositório.
 
 ## Reprodução e escalas

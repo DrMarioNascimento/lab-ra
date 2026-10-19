@@ -1,5 +1,11 @@
 # Coração em ação · realidade aumentada
 
+## Manutenção e origem — 19 de outubro de 2026
+
+Esta pasta é uma cópia local de estudo dentro da biblioteca LAB-RA. O texto técnico abaixo registra a experiência de origem; os acessos da biblioteca e o retorno local são definidos pelo LAB-RA. A procedência e a revisão da cópia devem ser conferidas em `biblioteca/origens.json`, na raiz. Alterações no Fisiologia Interativa não são sincronizadas automaticamente aqui.
+
+Consulte o [README principal](../../../README.md) e a [licença da raiz](../../../LICENSE.md). Créditos e licenças específicos deste módulo permanecem nos documentos abaixo.
+
 Experiência independente do Fisiologia Interativa. Origem confirmada pelo professor: `DrMarioNascimento/lab-ra/bancadas/11-coracao/prototipo/duas-pecas.html`, revisão `85d13200078f5201d251c857efde5326cd53daa7`.
 
 ## Vistas preservadas

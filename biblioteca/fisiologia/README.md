@@ -1,5 +1,11 @@
 # Fisiologia em realidade aumentada
 
+## Manutenção e origem — 19 de outubro de 2026
+
+Esta pasta é uma cópia local de estudo dentro da biblioteca LAB-RA. O texto técnico abaixo registra a experiência de origem; os acessos da biblioteca e o retorno local são definidos pelo LAB-RA. A procedência e a revisão da cópia devem ser conferidas em `biblioteca/origens.json`, na raiz. Alterações no Fisiologia Interativa não são sincronizadas automaticamente aqui.
+
+Consulte o [README principal](../../README.md) e a [licença da raiz](../../LICENSE.md). Créditos e licenças específicos deste módulo permanecem nos documentos abaixo.
+
 Experiências independentes do Fisiologia Interativa, abertas pelos Tutores de Educação Física e Fisioterapia. Pleura inclui Camadas, Mecânica, Pneumotórax, Gradiente e Zonas de West, controles de respiração e velocidade, Repouso, Exercício, Enfisema, Fibrose e Capacidade vital forçada.
 
 Acesse [Pleura RA](https://fisiologia.drmarionascimento.com.br/ra/pleura/). “Voltar ao Tutor” respeita o percurso de origem. Não há catálogo de bancadas, porta de acesso ou credenciais Google.

@@ -1,5 +1,9 @@
 # LAB-RA — biblioteca e experimentação
 
+## Situação atual — 19 de outubro de 2026
+
+Biblioteca pessoal de experimentação em [bancadas.html](bancadas.html), com cópias locais de Dragon Games e Fisiologia. A origem e a revisão de cada cópia estão em [biblioteca/origens.json](biblioteca/origens.json). Atualizar o projeto de origem não atualiza automaticamente estas cópias; confira a procedência antes de sincronizar. Os jogos continuam em testes internos.
+
 ## Ambiente de experimentação
 
 Este repositório reúne materiais de estudo e experimentação. A disponibilidade de uma bancada de um jogo não representa lançamento público nem abertura para participação externa. Os materiais educacionais de Fisiologia permanecem acessíveis nos projetos de origem, conforme suas condições próprias.

@@ -1,5 +1,11 @@
 # A película de carga · Fisiologia celular
 
+## Manutenção e origem — 19 de outubro de 2026
+
+Esta pasta é uma cópia local de estudo dentro da biblioteca LAB-RA. O texto técnico abaixo registra a experiência de origem; os acessos da biblioteca e o retorno local são definidos pelo LAB-RA. A procedência e a revisão da cópia devem ser conferidas em `biblioteca/origens.json`, na raiz. Alterações no Fisiologia Interativa não são sincronizadas automaticamente aqui.
+
+Consulte o [README principal](../../../README.md) e a [licença da raiz](../../../LICENSE.md). Créditos e licenças específicos deste módulo permanecem nos documentos abaixo.
+
 Experiência independente em [Fisiologia Interativa](https://fisiologia.drmarionascimento.com.br/ra/potencial-membrana/), transferida da versão aprovada do Lab RA, revisão `303bad15b77d7c995fdc90f20fa0e2b9eaa0902f`. O arquivo `modelos.js` é integralmente idêntico à origem: dendritos, mielina, núcleos de Schwann, organelas, membranas, proteínas e ausência dos instrumentos e das bases preservados.
 
 Seis níveis: Neurônio, Comunicação, Interior, Película, Travessias e A onda. A anatomia, a iluminação, as transições de mergulho, o enquadramento e os cálculos permanecem os aprovados. A apresentação segue os outros simuladores RA: assinatura, card celular nos dois percursos, retorno ao Tutor, botões com profundidade, ampliação e início/pausa/velocidade do giro. O giro afeta somente a visualização.

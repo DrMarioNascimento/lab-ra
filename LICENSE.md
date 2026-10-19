@@ -52,15 +52,6 @@ A experiência `integracao/` não integra a biblioteca atual. O registro de auto
 
 O motor didático, as ampliações procedurais e a interface de `integracao/` são componentes originais abrangidos por esta licença. A silhueta e os pulmões reutilizam componentes locais existentes. O coração externo conserva os créditos de neshallads e CC BY 4.0, com compressão Meshopt, escala, acabamento e pulso visual adaptados. Three.js, Meshoptimizer e glTF Transform conservam suas licenças MIT. Consulte o registro histórico `integracao/ATRIBUICAO.md` (fora da árvore atual); esta licença não restringe os direitos das licenças de terceiros.
 
----
-
-## Nota editorial — 10 de outubro de 2026
-
-Esta revisão mantém a separação entre o laboratório de pesquisa e os catálogos de ensino. Os créditos do atlas, dos modelos e das bibliotecas continuam nos documentos específicos das bancadas.
-
-Esta nota registra a revisão da documentação. Não altera as cláusulas anteriores, os titulares, as permissões, as restrições nem as licenças próprias de terceiros.
-
-
 ## Componentes da biblioteca
 
 As cópias de Dragon Games e Fisiologia Interativa preservam as condições e autorias de suas origens, registradas em `biblioteca/dragon/LICENCA-ORIGEM.md` e `biblioteca/fisiologia/LICENCA-ORIGEM.md`. A presente organização não amplia as permissões desses materiais. Licenças de bibliotecas de terceiros acompanham os respectivos arquivos.
@@ -70,3 +61,9 @@ As cópias de Dragon Games e Fisiologia Interativa preservam as condições e au
 O portal de apresentação do autor usa o endereço abaixo. Este endereço não altera a hospedagem própria do recurso, a titularidade ou as permissões desta licença.
 
 https://www.drmarionascimento.com.br/
+
+## Revisão documental — 19 de outubro de 2026
+
+Abrange os componentes originais da biblioteca de experimentação. As cópias de Dragon Games e Fisiologia continuam sujeitas aos registros de origem e às licenças próprias, sem ampliação de permissões pela sua inclusão na biblioteca.
+
+Esta revisão atualiza a identificação e o escopo documental. Preserva os titulares, as permissões e as restrições existentes. Não substitui nem restringe as licenças próprias de componentes de terceiros.
