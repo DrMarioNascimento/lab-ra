@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#091923">
+<title>Coração em ação · Fisiologia Interativa</title><link rel="icon" href="../brand/orientador.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../laboratorio.css"><link rel="stylesheet" href="origem.css?v=coracao-20261003"><link rel="stylesheet" href="style.css?v=coracao-20261003">
+<script src="../tutor-origem.js?v=ra-20261002" defer></script><script src="erro.js?v=coracao-20261003" defer></script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"}}</script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.1.0/dist/model-viewer.min.js"></script>
+</head>
+<body>
+<header class="topbar"><nav class="nav shell" aria-label="Fisiologia Interativa"><a class="brand" data-voltar-tutor href="../../../bancadas.html#fisiologia"><img src="../brand/orientador.webp" alt="" width="42" height="42"><span class="brand-copy"><b>FISIOLOGIA INTERATIVA</b><span>RA - Realidade Aumentada</span></span></a><div class="nav-actions"><a class="small-button" data-voltar-tutor href="../../../bancadas.html#fisiologia">Voltar à biblioteca</a></div></nav></header>
+<main class="page shell">
+<div class="page-head"><span class="eyebrow">Realidade aumentada · Sistema cardiovascular</span><h1>Coração em ação</h1></div>
+<p class="page-note">Explore as vistas interna, externa e no tórax. Compare contração, valvas, pressões e volume no mesmo instante do ciclo cardíaco.</p>
+<section class="ciclo-controls" aria-label="Execução da simulação">
+<div class="playback"><span class="eyebrow">Execução</span><button id="iniciar" type="button" class="primary">Iniciar</button><button id="pausar" type="button" disabled>Pausar</button><button id="umCiclo" type="button">Um ciclo</button><button id="reiniciar" type="button">Reiniciar</button></div>
+<div class="execution-settings"><label class="ctrl"><span>Velocidade de execução <span><b id="vlento">0.30</b>×</span></span><input id="lento" type="range" min="0.05" max="2" step="0.05" value="0.3" aria-label="Velocidade de execução"></label><button id="restaurarParametros" type="button">Restaurar parâmetros</button></div>
+<p class="execution-note">A velocidade altera a reprodução; a frequência cardíaca define o ciclo fisiológico. A experiência abre pausada. Use Um ciclo para observar um batimento completo.</p><p id="cicloEstado" role="status">Pausado · Vista Interna</p>
+</section>
+<section class="instantes caixa" aria-label="Instantes do ciclo"><span class="eyebrow">Instantes do ciclo</span><div class="causas"><button id="arEnche" type="button">Enchimento</button><button id="arEjeta" type="button">Ejeção</button></div><p class="nota">Pare em um dos instantes para comparar as valvas ou levar a vista escolhida para a realidade aumentada.</p></section>
+<div class="experience">
+<div class="viewer-column">
+<section class="caixa vistas" aria-label="Vista do coração"><div class="pecas"><button id="pB" type="button" aria-pressed="true" disabled>Vista Interna</button><button id="pA" type="button" aria-pressed="false" disabled>Vista Externa</button><button id="pT" type="button" aria-pressed="false">Vista no tórax</button></div><div id="toraxControls" hidden><label><input id="atenuarTorax" type="checkbox" checked> Atenuar tórax para observar coração e vasos</label><p class="nota">Tórax anatômico estático: os batimentos permanecem nas vistas interna e externa; o painel mantém as leituras do mesmo motor.</p></div><p id="toraxStatus" class="nota" role="status"></p><div class="legenda-controls"><span class="eyebrow">Legendas</span><div class="pecas"><button id="legValvas" type="button" aria-pressed="false">Valvas</button><button id="legVasos" type="button" aria-pressed="false">Vasos</button></div></div><p id="notaLegendas" class="nota">Escolha as legendas que deseja observar.</p></section>
+<div class="cena stage" id="stage"><canvas id="palco" aria-label="Modelo tridimensional do coração"></canvas><div class="camadaLegendas" id="legendas"><svg class="fios" id="fios"></svg></div><div class="stage-hud"><span id="vistaLabel">Vista Interna</span><span>Arraste para girar · amplie para explorar</span></div><p class="modelo-status" id="modeloStatus">Carregando os modelos do coração…</p><div class="stage-tools"><button id="telaCheia" type="button">Ampliar</button><button id="resetView" type="button">Restaurar vista</button></div><div class="falha" id="falha" hidden></div></div>
+<section class="caixa grafico-box" aria-label="Diagrama de Wiggers"><span class="eyebrow">Gráfico · um único ciclo</span><h2>Diagrama de Wiggers</h2><p class="nota">O cursor acompanha o mesmo instante da peça: pressões, volume ventricular, atividade elétrica e bulhas.</p><canvas id="wiggers" width="600" height="410" role="img" aria-label="Diagrama de Wiggers com pressões, volume ventricular, ECG esquemático e bulhas"></canvas><div class="series-legenda"><span class="aorta">Aorta</span><span class="ventriculo">Ventrículo esquerdo</span><span class="atrio">Átrio esquerdo</span><span class="volume">Volume VE</span><span class="ecg">ECG esquemático</span></div></section>
+<section class="caixa explicacao"><h2>Três vistas, o mesmo painel</h2><p class="nota">A Vista Externa mostra a superfície do coração; a Vista Interna revela estruturas separadas e o movimento das cúspides. A Vista no tórax mostra o coração e os vasos em seu contexto anatômico, sem animação própria. Os estados das valvas são calculados pelo motor a partir das pressões.</p><p class="nota">A condução elétrica aparece no gráfico e na leitura do instante; seu trajeto anatômico não está desenhado nestes modelos. As marcações externas são aproximadas. O modelo interno está em desenvolvimento; suas limitações anatômicas foram preservadas nesta transferência.</p></section>
+</div>
+<aside class="panel">
+<section class="caixa parametros"><span class="eyebrow">Parâmetros</span><label class="ctrl"><span>Instante do ciclo <b id="vfase">0.300</b></span><input id="fase" type="range" min="0" max="0.999" step="0.001" value="0.3" aria-label="Instante do ciclo cardíaco"></label><label class="ctrl"><span>Frequência cardíaca <span><b id="vbpm">75</b> bpm</span></span><input id="bpm" type="range" min="40" max="200" step="1" value="75" aria-label="Frequência cardíaca"></label><label class="ctrl"><span>Amplitude visual <span><b id="vamp">1.00</b>×</span></span><input id="amp" type="range" min="0" max="2" step="0.05" value="1" aria-label="Amplitude visual da contração"></label><p class="nota">A amplitude ajusta o movimento visual; não altera os valores calculados.</p></section>
+<section class="caixa leituras-card pressao-card"><span class="eyebrow">Pressões · mesmo instante</span><div class="leitura" style="--card-color:#dce9f3"><span>Ventrículo esquerdo</span><b id="lpve">—</b><small id="uPve"></small></div><div class="leitura" style="--card-color:#88c5ff"><span>Átrio esquerdo</span><b id="lpae">—</b><small id="uPae"></small></div><div class="leitura" style="--card-color:#ff939b"><span>Aorta</span><b id="lpao">—</b><small id="uPao"></small></div></section>
+<section class="caixa leituras-card volume-card"><span class="eyebrow">Volumes</span><div class="leitura" style="--card-color:#ffcb96"><span>Ventrículo esquerdo</span><b id="lvve">—</b></div><div class="leitura" style="--card-color:#8cdcca"><span>Átrio esquerdo / direito</span><b id="lvae">—</b></div></section>
+<section class="caixa valvas-card"><span class="eyebrow">Valvas · estado do motor</span><div id="estado"></div><p class="nota" id="notaValvas"></p></section>
+<section class="caixa ciclo-card"><span class="eyebrow">Ciclo e atividade elétrica</span><div class="lin"><span>Fase</span><b id="lfase">—</b></div><div class="lin"><span>Atividade elétrica</span><b id="leletrico">—</b></div><div class="lin"><span>Sístole / diástole</span><b id="lsisdia">—</b></div><div class="lin"><span>Diástole por minuto</span><b id="lcoronaria">—</b></div><div class="lin"><span>Impulso visual (dP/dt)</span><b id="limp">—</b></div></section>
+<section class="caixa ajustes-card"><span class="eyebrow">Ajustes visuais</span><details id="avA" hidden>
+      <summary>Cursores da Vista Externa</summary>
+      <label>1 · contração atrial · <b id="vaA1">1.00</b></label>
+      <input id="aA1" type="range" min="0" max="2" step="0.05" value="1" />
+      <label>2 · contração ventricular · <b id="vaA2">1.00</b></label>
+      <input id="aA2" type="range" min="0" max="2" step="0.05" value="1" />
+      <label>3 · onda ápice→base · <b id="vaA3">85</b> ms</label>
+      <input id="aA3" type="range" min="0" max="200" step="5" value="85" />
+      <label>4 · plano valvar desce · <b id="vaA4">1.00</b></label>
+      <input id="aA4" type="range" min="0" max="2" step="0.05" value="1" />
+      <label>5 · ictus · <b id="vaA5">1.00</b></label>
+      <input id="aA5" type="range" min="0" max="3" step="0.05" value="1" />
+      <label>âncora do encurtamento · <b id="vaAnc">30</b>%</label>
+      <input id="aAnc" type="range" min="0" max="80" step="1" value="30" />
+    </details><details id="avB" hidden>
+      <summary>Cursores da Vista Interna</summary>
+      <label>1 · curso da cúspide · <b id="vbB1">1.00</b></label>
+      <input id="bB1" type="range" min="0" max="3" step="0.05" value="1" />
+      <label>2 · contração dos átrios · <b id="vbB2">0.120</b></label>
+      <input id="bB2" type="range" min="0" max="0.4" step="0.005" value="0.12" />
+      <label>3 · ventrículo, aperto radial · <b id="vbB3">0.180</b></label>
+      <input id="bB3" type="range" min="0" max="0.4" step="0.005" value="0.18" />
+      <label>4 · ventrículo, encurtamento · <b id="vbB4">0.140</b></label>
+      <input id="bB4" type="range" min="0" max="0.3" step="0.005" value="0.14" />
+      <label>5 · ictus · <b id="vbB5">7.0</b> mm</label>
+      <input id="bB5" type="range" min="0" max="14" step="0.5" value="7" />
+    </details></section>
+<section class="ra-box" aria-label="Realidade aumentada"><model-viewer id="arViewer" alt="Coração em realidade aumentada" ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" ar-scale="auto" camera-controls loading="eager" reveal="auto" shadow-intensity="1" exposure="1.1"></model-viewer><button id="launchAR" type="button" disabled>Abrir em realidade aumentada</button><p id="raStatus" class="ra-status">Escolha um instante pausado para preparar o modelo.</p><div id="cicloTesteBox" hidden><button id="cicloTeste" type="button">Ciclo na mesa (teste)</button><div id="cicloVisor" hidden><model-viewer id="arCiclo" alt="Ciclo cardíaco em realidade aumentada" ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" ar-scale="auto" autoplay camera-controls loading="eager" reveal="auto" shadow-intensity="1" exposure="1.1"></model-viewer><button id="cicloAbrir" type="button" disabled>Abrir o ciclo em realidade aumentada</button></div><p id="cicloStatus" class="ra-status" role="status"></p></div></section>
+<section class="referencias-modelo" aria-label="Referências dos modelos"><p id="creditoA"><b>Referência do modelo — somente Vista Externa</b> · <a href="https://sketchfab.com/3d-models/realistic-human-heart-3f8072336ce94d18b3d0d055a1ece089" target="_blank" rel="noopener noreferrer">Realistic Human Heart</a>, de neshallads · <a href="https://creativecommons.org/licenses/by/4.0/deed.pt-br" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>. Escala, materiais e animação ajustados.</p><p id="creditoB"><b>Fonte da Vista Interna</b> · BodyParts3D © The Database Center for Life Science · <a href="https://creativecommons.org/licenses/by-sa/2.1/jp/" target="_blank" rel="noopener noreferrer">CC BY-SA 2.1 JP</a>. Composição, cor e movimento adaptados.</p><p id="creditoT"><b>Fonte declarada da Vista no tórax</b> · BodyParts3D © The Database Center for Life Science. Arquivo torax-vasos-encaixe.glb fornecido pelo autor do projeto; encaixe preservado, enquadramento e atenuação ajustados. <a href="https://dbarchive.biosciencedbc.jp/en/bodyparts3d/" target="_blank" rel="noopener noreferrer">Fonte do atlas</a> · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>.</p><p class="nota-segmentos">Os batimentos de cada área cardíaca (segmento) foram cuidadosamente calculados pelo Prof. Mário César Nascimento, PhD, e sincronizados ao ciclo cardíaco simulado, com movimentos distintos para átrios, ventrículos, plano valvar e ápice.</p><p><a href="ATTRIBUTION.md" target="_blank" rel="noopener noreferrer">Atribuições e alterações</a> · <a href="LICENSE.md" target="_blank" rel="noopener noreferrer">Licenças</a>. A RA apresenta o instante escolhido; o batimento permanece na página.</p></section>
+</aside>
+</div>
+</main>
+<footer class="rodape shell"><img src="../brand/mestre-lap.webp" alt="" width="84" height="84"><p class="signature">Simuladores interativos utilizados nas disciplinas de Fisiologia Humana do Prof. Mário César Nascimento, PhD ©</p></footer>
+<script type="module" src="app.js?v=torax-20261010"></script>
+</body>
+</html>

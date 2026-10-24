@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" href="../brand/orientador.webp" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#091923" />
+  <title>O espaço pleural · Fisiologia Interativa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../laboratorio.css" />
+  <link rel="stylesheet" href="style.css?v=torax-ra-20261008-vasos-foco" />
+  <script src="../tutor-origem.js?v=ra-20261002" defer></script>
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"}}</script>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.1.0/dist/model-viewer.min.js"></script>
+<style>.pleura-camadas{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}.pleura-camadas label{display:flex;align-items:center;gap:8px;padding:12px;border:1px solid #426275;border-radius:12px}.pleura-camadas input{width:22px;height:22px;accent-color:#71d6ef}.pleura-camadas label:first-child{color:#75d5ff}.pleura-camadas label:nth-child(2){color:#caa0ff}</style></head>
+<body>
+<header class="topbar"><nav class="nav shell" aria-label="Fisiologia Interativa"><a class="brand" data-voltar-tutor href="../../../bancadas.html#fisiologia"><img src="../brand/orientador.webp" alt="" width="42" height="42"><span class="brand-copy"><b>FISIOLOGIA INTERATIVA</b><span>RA - Realidade Aumentada</span></span></a><div class="nav-actions"><a class="small-button" data-voltar-tutor href="../../../bancadas.html#fisiologia">Voltar à biblioteca</a></div></nav></header>
+<main class="page shell">
+  <div class="page-head"><div><span class="eyebrow">Realidade aumentada · Pleura e West</span><h1>O espaço pleural</h1></div></div>
+  <p class="page-note">Explore as camadas pleurais, a mecânica respiratória, o pneumotórax, o gradiente pleural e as zonas de West. Mude a postura e acompanhe a relação entre pressão, ventilação e perfusão.</p>
+
+  <section id="cicloControls" class="ciclo-controls" aria-label="Ciclo respiratório">
+    <div class="playback"><span class="eyebrow">Ciclo respiratório</span><button id="respirar" class="primary" type="button">Iniciar</button><button id="pausar" type="button" disabled>Pausar</button><button id="avancarFase" type="button">Próxima fase</button><button id="reiniciar" type="button" title="Voltar ao fim da expiração">Reiniciar</button></div>
+    <div class="execution-settings">
+      <label class="ctrl speed-control"><span>Velocidade de execução <b id="velocidadeValor">1,00×</b></span><input id="velocidade" type="range" min="0.25" max="2" step="0.25" value="1" aria-label="Velocidade de execução" /></label>
+      <label class="loop-control"><input id="loopContinuo" type="checkbox" checked /> Execução contínua</label>
+      <button id="restaurarParametros" type="button">Restaurar parâmetros</button>
+    </div>
+    <p id="notaExecucao" class="execution-note">A velocidade altera apenas a reprodução. Referência: 15 respirações/min · coração: 75 bpm.</p>
+    <p id="cicloEstado" role="status">Fim da expiração</p>
+  </section>
+
+  <section class="estados-rapidos caixa" aria-label="Estados rápidos">
+    <div class="caixa-head"><span class="eyebrow">Estados rápidos</span></div>
+    <div id="estadosRapidos" class="causas"></div>
+    <p id="notaEstado" class="estado" aria-live="polite"></p>
+  </section>
+
+  <div class="progress" aria-label="Níveis"><button class="step active" data-step="0" type="button"><b>01</b><span>Camadas</span></button><button class="step" data-step="1" type="button"><b>02</b><span>Mecânica</span></button><button class="step" data-step="2" type="button"><b>03</b><span>Pneumotórax</span></button><button class="step" data-step="3" type="button"><b>04</b><span>Gradiente</span></button><button class="step" data-step="4" type="button"><b>05</b><span>Zonas de West</span></button></div>
+
+  <section class="experience" aria-label="Exploração tridimensional da pleura e das zonas de West">
+    <div class="viewer-column">
+      <div id="stage" class="stage" role="group" aria-label="Modelo tridimensional e controles de visualização">
+      <canvas id="scene"></canvas>
+      <div id="anatomiaLegenda" class="anatomia-legenda" aria-live="polite"></div>
+      <p id="modeloStatus" class="modelo-status" role="status">Carregando o coração anatômico…</p>
+      <div id="frestaPontos" class="fresta-pontos" aria-hidden="true" hidden></div>
+      <div id="perfilPontos" class="perfil-pontos" aria-hidden="true" hidden><span id="perfilApice">Ápice</span><span id="perfilBase">Base</span></div>
+      <div class="stage-hud"><span id="posturaLabel">Ortostatismo · 90°</span><span id="pplLabel">Pleural · centro −6,2 cmH₂O<small id="pplMmHg" class="pressao-equivalente">−4,6 mmHg</small></span><span id="stepLabel">01 · Camadas</span></div>
+      <div class="gesture">Incline o aparelho · arraste para girar a vista</div>
+      <div class="stage-tools">
+        <button id="telaCheia" class="ghost-control" type="button">Ampliar</button>
+        <button id="resetView" class="ghost-control" type="button">Restaurar vista</button>
+      </div>
+    </div>
+
+      <div class="pleura-camadas" aria-label="Camadas e atenuação"><label><input type="checkbox" id="camadaVisceral" checked> Visceral · azul</label><label><input type="checkbox" id="camadaParietal" checked> Parietal · lilás</label><label><input type="checkbox" id="atenuarPulmoes" checked> Atenuar pulmões</label><label><input type="checkbox" id="atenuarOssos" checked> Atenuar ossos</label></div>
+      <article class="info-card" id="infoCard">
+        <span class="eyebrow" id="infoEyebrow">A pergunta</span>
+        <h2 id="infoTitle">Onde a gravidade aperta?</h2>
+        <p id="infoText"></p>
+        <div class="microtags" id="microtags"></div>
+      </article>
+
+      <section class="caixa grafico-box" aria-label="Gráficos fisiológicos">
+        <div class="caixa-head"><span class="eyebrow">Gráficos</span></div>
+        <div id="modosGrafico" class="causas" aria-label="Tipo de gráfico">
+          <button type="button" data-grafico="perfil" class="on" aria-pressed="true">Perfil regional</button>
+          <button type="button" data-grafico="ciclo" aria-pressed="false">Volume e fluxo</button>
+        </div>
+        <p id="notaGrafico" class="nota"></p>
+        <canvas id="curvaPerfil" width="600" height="330" role="img" aria-label="Ventilação e perfusão regionais, com escalas separadas"></canvas>
+        <p id="resumoGrafico" class="grafico-resumo"></p>
+        <p id="indicesCVF" class="nota" hidden></p>
+      </section>
+
+      <div class="actions"><button id="prev" class="secondary" type="button" disabled>← Anterior</button><button id="next" class="primary" type="button">Próximo →</button></div>
+    </div>
+
+    <aside class="panel" aria-label="Controles e leituras">
+      <section id="legendaFresta" class="caixa legenda-fresta" aria-label="Legenda das camadas da parede ao pulmão">
+        <div class="caixa-head"><span class="eyebrow">Da parede ao pulmão</span></div>
+        <ol>
+          <li style="--tecido:#c7987c"><b>1</b> Pele</li>
+          <li style="--tecido:#d2b56d"><b>2</b> Tecido subcutâneo</li>
+          <li style="--tecido:#984757"><b>3</b> Músculos intercostais e costelas</li>
+          <li style="--tecido:#8db7ca"><b>4</b> Pleura parietal · ligada à parede</li>
+          <li style="--tecido:#a8dcf0"><b>5</b> Filme de líquido pleural</li>
+          <li style="--tecido:#d9a1b2"><b>6</b> Pleura visceral · ligada ao pulmão</li>
+          <li style="--tecido:#b77285"><b>7</b> Parênquima pulmonar</li>
+        </ol>
+        <p class="nota">Números sobre a peça. Camadas ampliadas para leitura. Ao furar a parede, o filme líquido dá lugar à separação por ar, em âmbar.</p>
+      </section>
+
+      <section class="caixa" id="caixaPneumo" aria-label="Pneumotórax">
+        <div class="caixa-head"><span class="eyebrow">Estado pleural</span></div>
+        <div class="causas" id="pneumos">
+          <button type="button" data-pneumo="nenhum" class="on">Normal</button>
+          <button type="button" data-pneumo="aberto">Aberto</button>
+          <button type="button" data-pneumo="hipertensivo">Hipertensivo</button>
+        </div>
+        <p class="nota">Alteração pleural à direita. Os valores de volume e retorno aparecem abaixo, junto às demais leituras.</p>
+      </section>
+
+      <section class="caixa" id="caixaPostura" aria-label="Postura e leituras respiratórias">
+        <div class="caixa-head">
+          <span class="eyebrow">Postura do corpo</span>
+          <div class="caixa-btns"><button id="deitar" type="button">Deitado</button><button id="levantar" type="button">Em pé</button></div>
+        </div>
+        <button id="permitir" class="permitir" type="button" hidden>Usar a inclinação do aparelho</button>
+        <p id="sensorEstado" class="estado">Verificando sensor de inclinação…</p>
+        <label class="ctrl"><span>Inclinação <b id="grauValor">90°</b></span>
+          <input id="grauCursor" type="range" min="0" max="90" step="1" value="90" aria-label="Inclinação do corpo" /></label>
+<div class="reading-group" ><h3>Contexto da leitura</h3><ul class="leituras"><li style="--card-color:#9fd0e8">Fase respiratória <b><span id="lFase">parado no fim da expiração</span></b></li><li style="--card-color:#aebed3">Altura efetiva do eixo gravitacional <b><span id="lAltura">30 cm</span></b></li></ul></div>
+<div class="reading-group" ><h3>1 · Pressões respiratórias</h3><ul class="leituras"><li class="leitura-comum" style="--card-color:#f0c895">pressão alveolar <b><span id="lPalv">0.00</span> cmH₂O<small id="lPalvEquiv" class="pressao-equivalente">0.00 mmHg</small></b></li><li style="--card-color:#88c5ff">Pleural · ápice <b><span id="lApice">−10.0</span> cmH₂O<small id="lApiceEquiv" class="pressao-equivalente">−7.4 mmHg</small></b></li><li style="--card-color:#88c5ff">Pleural · base <b><span id="lBase">−2.5</span> cmH₂O<small id="lBaseEquiv" class="pressao-equivalente">−1.8 mmHg</small></b></li><li style="--card-color:#90ddcf">Transpulmonar · ápice <b><span id="lPlApice"></span> cmH₂O<small id="lPlApiceEquiv" class="pressao-equivalente"></small></b></li><li style="--card-color:#90ddcf">Transpulmonar · base <b><span id="lPlBase"></span> cmH₂O<small id="lPlBaseEquiv" class="pressao-equivalente"></small></b></li></ul></div>
+        <p class="nota">Alveolar: referência atmosférica = 0. Transpulmonar = alveolar − pleural. Ápice à esquerda, base à direita em cada par.</p>
+<div class="reading-group" ><h3>2 · Volume e ventilação</h3><ul class="leituras"><li style="--card-color:#8bdbc0">Volume alveolar no ápice <b><span id="lVolApice">63</span>%</b></li><li style="--card-color:#8bdbc0">Volume alveolar na base <b><span id="lVolBase">22</span>%</b></li><li class="leitura-comum" style="--card-color:#8bdbc0">Volume pulmonar do modelo <b><span id="lVolumeTotal"></span></b></li><li style="--card-color:#7ad3c7">Ventilação base/ápice <b><span id="lVent">2.12×</span></b></li></ul></div>
+<div class="reading-group" id="leiturasTorax"><h3>Pulmão direito e parede torácica</h3><ul class="leituras"><li style="--card-color:#8bdbc0">Pulmão direito <b><span id="lPulmao">40</span>% da capacidade</b></li><li style="--card-color:#9fd0e8">caixa torácica <b><span id="lCaixa">40</span>% da capacidade</b></li></ul></div>
+<div class="reading-group" ><h3>Efeito da pressão intratorácica</h3><ul class="leituras"><li style="--card-color:#eaa2c8">Retorno venoso estimado <b><span id="lRetorno">100</span>% da referência do modelo</b></li></ul></div>
+        <p class="nota">Adulto virtual: capacidade pulmonar total de 6 L. Volumes regionais relativos; retorno venoso é um índice ilustrativo.</p>
+      </section>
+
+      <section class="caixa" id="caixaZonas" aria-label="Zonas de West" hidden>
+        <div class="caixa-head"><span class="eyebrow">3 · Perfusão e zonas de West</span></div>
+        <div class="causas" id="cenarios"></div>
+        <p id="notaCenario" class="estado"></p>
+        <ul class="leituras">
+          <li style="--card-color:#f2a9a4">Arterial · ápice <b><span id="lPaApice">4.5</span> mmHg<small id="lPaApiceEquiv" class="pressao-equivalente">6.1 cmH₂O</small></b></li>
+          <li style="--card-color:#c7adfa">Venosa · ápice <b><span id="lPvApice">−5.5</span> mmHg<small id="lPvApiceEquiv" class="pressao-equivalente">−7.5 cmH₂O</small></b></li>
+          <li style="--card-color:#f2a9a4">Arterial · base <b><span id="lPaBase">27.9</span> mmHg<small id="lPaBaseEquiv" class="pressao-equivalente">38.0 cmH₂O</small></b></li>
+          <li style="--card-color:#c7adfa">Venosa · base <b><span id="lPvBase">17.9</span> mmHg<small id="lPvBaseEquiv" class="pressao-equivalente">24.4 cmH₂O</small></b></li>
+          <li style="--card-color:#c7adfa">Zonas do ápice à base <b><span id="lZonas">223333333</span></b></li>
+          <li style="--card-color:#eaa2c8">Perfusão base/ápice <b><span id="lFluxo">2.24×</span></b></li>
+        </ul>
+      </section>
+
+      <p><a href="pleuras.html" class="vasos-ampliar">Ver pleuras e controles de atenuação →</a></p>
+      <section class="ra-box" id="visualizacaoRA" aria-label="Visualização 3D e realidade aumentada">
+        <a href="modelo-aprovado.html" class="vasos-ampliar">Ver o modelo aprovado em 3D →</a>
+        <button id="verVasos" class="secondary" type="button">Ver coração e vasos em foco</button>
+        <a href="vasos.html" class="vasos-ampliar">Abrir coração e vasos em tela ampla →</a>
+        <model-viewer id="arViewer" alt="Modelo anatômico 3D e realidade aumentada" ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" ar-scale="auto" camera-controls loading="eager" reveal="auto" shadow-intensity="1" exposure="1.1"></model-viewer>
+        <label class="ra-modelo" for="raModelo"><span>Visualização 3D / modelo para RA</span><select id="raModelo"><option value="simulacao">Estado fisiológico atual</option><option value="aprovado">Modelo revisado aprovado</option><option value="completo">Tórax anatômico completo corrigido</option><option value="vasos">Coração e vasos em foco</option></select></label>
+        <button id="launchAR" class="ra-launch" type="button" disabled>Abrir em realidade aumentada</button>
+        <p id="raStatus" class="ra-status">Preparando o modelo para a câmera…</p>
+        <p id="raNotaModelo" class="ra-status">A RA acompanha o nível, o estado e a postura selecionados na simulação.</p>
+      </section>
+      <section class="referencias-modelo" aria-label="Observações anatômicas e referências">
+        <p>Lobos pulmonares: as cores diferentes são uma convenção didática para distinguir os lobos. A pequena separação no modelo destaca as fissuras anatômicas; não representa ar entre os lobos. Referência: <a href="https://pubmed.ncbi.nlm.nih.gov/9276555/" target="_blank" rel="noopener noreferrer">Classificação anatômica das fissuras pulmonares — Craig e Walker (1997)</a>.</p>
+        <p id="creditoCoracao">Coração: modelo anatômico 3D · <a href="https://sketchfab.com/3d-models/realistic-human-heart-3f8072336ce94d18b3d0d055a1ece089" target="_blank" rel="noopener noreferrer">Realistic Human Heart</a>, de neshallads · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>. Escala, posição e acabamento ajustados ao tórax.</p>
+        <p>Tórax anatômico completo: modelo derivado de <a href="https://dbarchive.biosciencedbc.jp/en/bodyparts3d/" target="_blank" rel="noopener noreferrer">BodyParts3D</a>, © The Database Center for Life Science · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>. Composição e correções do modelo documentadas em <a href="../assets/ATRIBUICAO.md">ra/assets/ATRIBUICAO.md</a>. Este modelo é estático e não reproduz os estados fisiológicos da simulação.
+      </section>
+    </aside>
+  </section>
+</main>
+<footer class="rodape shell"><img src="../brand/mestre-lap.webp" alt="" width="84" height="84"><p class="signature">Simuladores interativos utilizados nas disciplinas de Fisiologia Humana do Prof. Mário César Nascimento, PhD ©</p></footer>
+<script type="module" src="app.js?v=simulador-20261009"></script>
+</body>
+</html>

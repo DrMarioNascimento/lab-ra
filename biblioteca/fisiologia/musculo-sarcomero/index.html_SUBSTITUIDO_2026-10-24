@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#091923" />
+  <title>Do músculo ao sarcômero · Fisiologia Interativa</title>
+  <link rel="icon" href="../brand/orientador.webp" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../laboratorio.css" />
+  <link rel="stylesheet" href="style.css?v=muscular-20261003" />
+  <script src="../tutor-origem.js?v=ra-20261002" defer></script>
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"}}</script>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.1.0/dist/model-viewer.min.js"></script>
+</head>
+<body>
+<header class="topbar"><nav class="nav shell" aria-label="Fisiologia Interativa"><a class="brand" data-voltar-tutor href="../../../bancadas.html#fisiologia"><img src="../brand/orientador.webp" alt="" width="42" height="42"><span class="brand-copy"><b>FISIOLOGIA INTERATIVA</b><span>RA - Realidade Aumentada</span></span></a><div class="nav-actions"><a class="small-button" data-voltar-tutor href="../../../bancadas.html#fisiologia">Voltar à biblioteca</a></div></nav></header>
+<main class="page shell">
+  <div class="page-head"><div><span class="eyebrow">Realidade aumentada · Sistema muscular</span><h1>Do músculo ao sarcômero</h1></div></div>
+  <p class="page-note">Explore cinco níveis de organização do músculo esquelético: músculo → fascículo → fibra muscular → miofibrila → sarcômero. Na miofibrila e no sarcômero, ajuste o comprimento, observe o deslizamento dos filamentos e acompanhe a tensão relativa.</p>
+
+  <section class="ciclo-controls" aria-label="Rotação da peça tridimensional">
+    <div class="playback"><span class="eyebrow">Rotação da peça</span><button id="iniciar" class="primary" type="button">Iniciar giro</button><button id="pausar" type="button" disabled>Pausar giro</button><button id="restaurarParametros" type="button">Restaurar parâmetros</button></div>
+    <div class="execution-settings"><label class="ctrl speed-control"><span>Velocidade do giro <b id="velocidadeValor">1,00×</b></span><input id="velocidade" type="range" min="0.25" max="2" step="0.25" value="1" aria-label="Velocidade do giro" /></label></div>
+    <p class="execution-note">O giro altera apenas a visualização. A contração é controlada pelo comprimento, por Contrair e por Relaxar nos níveis 04 e 05.</p>
+    <p id="giroEstado" role="status">Giro pausado</p>
+  </section>
+
+  <div class="progress" aria-label="Níveis de organização">
+    <button class="step active" data-step="0" type="button"><b>01</b><span>Músculo</span></button>
+    <button class="step" data-step="1" type="button"><b>02</b><span>Fascículo</span></button>
+    <button class="step" data-step="2" type="button"><b>03</b><span>Fibra</span></button>
+    <button class="step" data-step="3" type="button"><b>04</b><span>Miofibrila</span></button>
+    <button class="step" data-step="4" type="button"><b>05</b><span>Sarcômero</span></button>
+  </div>
+
+  <section class="experience" aria-label="Exploração tridimensional do músculo ao sarcômero">
+    <div class="viewer-column">
+      <div id="stage" class="stage" role="group" aria-label="Modelo tridimensional e controles de visualização">
+        <canvas id="scene"></canvas><div id="labels" class="labels" aria-hidden="true"></div>
+        <div class="stage-hud"><span id="scaleLabel">Escala macroscópica</span><span id="stepLabel">01 · Músculo</span></div>
+        <div class="gesture">Arraste para girar · pinça/roda para aproximar</div>
+        <div class="stage-tools"><button id="rotulos" class="ghost-control on" type="button" aria-pressed="true">Rótulos</button><button id="telaCheia" class="ghost-control" type="button">Ampliar</button><button id="resetView" class="ghost-control" type="button">Restaurar vista</button></div>
+      </div>
+      <article class="info-card" id="infoCard"><span class="eyebrow" id="infoEyebrow">Órgão contrátil</span><h2 id="infoTitle">Músculo esquelético</h2><p id="infoText">Ventre fusiforme envolvido pelo epimísio, com tendões nas extremidades.</p><div class="microtags" id="microtags"></div></article>
+      <div class="actions"><button id="prev" class="secondary" type="button" disabled>← Voltar</button><button id="next" class="primary" type="button">Aprofundar →</button></div>
+      <section class="caixa learning-strip"><span class="eyebrow">Ideia central</span><h2>Do que vemos ao que produz força</h2><p>O músculo é organizado em fascículos, fibras e miofibrilas. No sarcômero, os filamentos deslizam e a sobreposição entre actina e miosina influencia a tensão produzida.</p></section>
+    </div>
+    <aside class="panel" aria-label="Comprimento, tensão e realidade aumentada">
+      <section id="contracaoBox" class="caixa contracao" hidden aria-label="Comprimento do sarcômero">
+        <div class="caixa-head"><span class="eyebrow">Comprimento e tensão</span><div class="caixa-btns"><button id="relaxar" type="button">Relaxar</button><button id="contrair" type="button">Contrair</button></div></div>
+        <label class="ctrl"><span>Comprimento do sarcômero</span><input id="contracao" type="range" min="1.5" max="3.4" step="0.01" value="2.4" aria-label="Comprimento do sarcômero em micrômetros" /></label>
+        <p id="contracaoValor" class="contracao-valor"></p>
+        <canvas id="tensao" width="330" height="150" role="img" aria-label="Curva comprimento–tensão"></canvas>
+        <p class="nota">A banda A tem o comprimento da miosina e não muda. O que encolhe são a banda I e a zona H: as actinas deslizam para o centro.</p>
+      </section>
+      <section class="ra-box" aria-label="Realidade aumentada"><model-viewer id="arViewer" alt="Modelo muscular em realidade aumentada" ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" ar-scale="auto" camera-controls loading="eager" reveal="auto" shadow-intensity="1" exposure="1.1"></model-viewer><button id="launchAR" class="ra-launch" type="button" disabled>Abrir em realidade aumentada</button><p id="raStatus" class="ra-status">Preparando o modelo para a câmera…</p></section>
+      <section class="referencias-modelo" aria-label="Observações e referência"><p>Modelo didático de músculo fusiforme: a janela no epimísio expõe os fascículos. Os cortes e as escalas são ampliados para leitura; os níveis não estão todos na mesma escala.</p><p>A curva comprimento–tensão conserva a aproximação por trechos baseada em fibras musculares de rã de <a href="https://pubmed.ncbi.nlm.nih.gov/5921536/" target="_blank" rel="noopener noreferrer">Gordon, Huxley e Julian (1966)</a>. Representa tensão ativa relativa em condições isométricas, não força absoluta nem uma medida clínica individual.</p><p>A RA apresenta o nível e o comprimento selecionados como uma peça estática no ambiente; na miofibrila e no sarcômero, escolha o comprimento antes de abrir.</p></section>
+    </aside>
+  </section>
+</main>
+<footer class="rodape shell"><img src="../brand/mestre-lap.webp" alt="" width="84" height="84"><p class="signature">Simuladores interativos utilizados nas disciplinas de Fisiologia Humana do Prof. Mário César Nascimento, PhD ©</p></footer>
+<script type="module" src="app.js?v=muscular-mito-20261009"></script>
+</body>
+</html>

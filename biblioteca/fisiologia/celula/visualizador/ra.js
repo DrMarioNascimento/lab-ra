@@ -2,13 +2,24 @@ import * as T from 'three';
 import {GLTFExporter} from './vendor/GLTFExporter.js';
 import {mergeGeometries} from './vendor/BufferGeometryUtils.js';
 import {prepararParaRA} from '../../potencial-membrana/cores-para-ra.js';
+import {GLTFLoader} from './vendor/GLTFLoader.js';
+/* Peça de RA leve. celula-aprimorada.glb tem ~2 milhões de vértices sem índice
+   (81 MB); a peça exportada passava de 130 MB e nenhum iPhone a converte em USDZ.
+   celula-ra.glb é a MESMA geometria com os vértices repetidos soldados
+   (gltf-transform weld, sem perda: nenhuma forma muda), 23 MB. A página continua
+   exibindo o modelo completo; só a cópia levada à RA troca cada malha pela
+   equivalente leve, pelo nome do nó. Membrana, núcleo aberto e corte seguem valendo. */
+let leves=null;
+const carregarLeves=()=>leves??=new GLTFLoader().loadAsync('./celula-ra.glb').then(g=>{const m=new Map();g.scene.traverse(o=>{if(o.isMesh&&o.name&&!m.has(o.name))m.set(o.name,o.geometry)});return m}).catch(e=>{console.warn('celula-ra.glb indisponível; a RA usará o modelo completo.',e);return new Map()});
 export function configureAR(root){
  const prepare=document.getElementById('prepare-ar'),launch=document.getElementById('launch-ar'),viewer=document.getElementById('cell-ar'),status=document.getElementById('ar-state');let url,version=0;
  let timer;const invalidate=()=>{clearTimeout(timer);timer=setTimeout(()=>prepare.click(),700);version++;launch.disabled=true;status.textContent='Prepare o estado atual para RA.'};
  ['mem','nuc','motion','cut','speed'].forEach(id=>document.getElementById(id).addEventListener('click',invalidate));
  document.getElementById('cut').addEventListener('input',invalidate);
  prepare.onclick=async()=>{const id=++version;prepare.disabled=true;launch.disabled=true;status.textContent='Preparando a peça…';try{
+  const leve=await carregarLeves();if(id!==version)return;
   const clone=root.clone(true);clone.updateMatrixWorld(true);const instances=[];
+  clone.traverse(o=>{if(o.isMesh&&!o.isInstancedMesh&&leve.has(o.name))o.geometry=leve.get(o.name)});
   clone.traverse(o=>{if(o.isInstancedMesh)instances.push(o);if(!o.isMesh||!o.material.clippingPlanes?.length)return;const geo=o.geometry.clone(),pos=geo.attributes.position,idx=geo.index?.array,keep=[],point=new T.Vector3();for(let k=0;k<(idx?idx.length:pos.count);k+=3){point.set(0,0,0);for(let v=0;v<3;v++)point.add(new T.Vector3().fromBufferAttribute(pos,idx?idx[k+v]:k+v));point.multiplyScalar(1/3).applyMatrix4(o.matrixWorld);if(o.material.clippingPlanes.every(p=>p.distanceToPoint(point)>=0))keep.push(idx?idx[k]:k,idx?idx[k+1]:k+1,idx?idx[k+2]:k+2)}geo.setIndex(keep);o.geometry=geo;o.material=o.material.clone();o.material.clippingPlanes=[]});
   // Expand instancing in the export clone for compatibility with mobile AR viewers.
   for(const o of instances){const matrix=new T.Matrix4(),pieces=[];for(let i=0;i<o.count;i++){o.getMatrixAt(i,matrix);pieces.push(o.geometry.clone().applyMatrix4(matrix))}const geo=mergeGeometries(pieces);pieces.forEach(g=>g.dispose());const mesh=new T.Mesh(geo,o.material);mesh.name=o.name;mesh.position.copy(o.position);mesh.quaternion.copy(o.quaternion);mesh.scale.copy(o.scale);mesh.visible=o.visible;o.parent.add(mesh);o.removeFromParent()}
