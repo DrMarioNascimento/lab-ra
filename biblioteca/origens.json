@@ -276,5 +276,88 @@
   "ilustracoes": {
     "medalhao": "CarimboMetal.jpg fornecido pelo autor, sem alteração",
     "celula": "Fisiologia Interativa/inicio/celula-mapa.js; desenho e animação extraídos, sem interação, ECG, fichas ou links"
-  }
+  },
+  "atualizacoes": [
+    {
+      "data": "2026-10-24",
+      "fonte": "DrMarioNascimento/fisiologia-interativa",
+      "commit_fonte": "b4087965d55256d0a73a852ddb179a0129be4ad7",
+      "commit_copia": "0eaf05a01d1b5f8d818c823a6c3b6c7fc1b97760",
+      "criterio": "Conteúdo de cada arquivo idêntico ao blob da origem indicada; hashes de texto normalizados para LF, como no teste. A revisão de origem geral acima continua histórica.",
+      "arquivos": [
+        {
+          "arquivo": "biblioteca/fisiologia/ra-botoes-ios.js",
+          "origem": "ra/ra-botoes-ios.js",
+          "sha256_anterior": "cd6c7b880b1bc9cd5c856da501bf36a8ec50f70f6f6d30d20e0b3617f1fb46da",
+          "sha256": "6e0bf9fea2317e6a825aa65a915f66365326bc33bdac83556ec3e6e07bc96efc"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/juncao-neuromuscular/app.js",
+          "origem": "ra/juncao-neuromuscular/app.js",
+          "sha256_anterior": "99e4e338e81226478f5153aa7f9527a97e9b5261d55c19e475318c2b53bcd071",
+          "sha256": "f2e2a4f6d152c938c7351b850ac81d0af202057fd121810cd3d6507c529787aa"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/osso-vivo/app.js",
+          "origem": "ra/osso-vivo/app.js",
+          "sha256_anterior": "1a6b794b8a17ecccebeb9e3e56296e41e976c8ebd5f0fdd98506d02e462dd424",
+          "sha256": "305a2b981da9acd454ad09a697bb650bb430673bc8376e33e2470a2e9889b991"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/pleura/modelo-aprovado.html",
+          "origem": "ra/pleura/modelo-aprovado.html",
+          "sha256_anterior": "6e6c44a45fb9d310b28499dfed71fb2e194de5032ea481a6096ac9f63010185a",
+          "sha256": "acafe2a19ee4270234fb700606718f4a076dab8126eaec3c6aa4ae1d70063fef"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/pleura/vasos.html",
+          "origem": "ra/pleura/vasos.html",
+          "sha256_anterior": "b78b333105f7338370670b02116883c2e17de8da37f2e858e69a84d1aff38086",
+          "sha256": "e2c97e14a512c1377f1496a2131ecd39f0acb350cfbee58f3bebcf89ad70ece8"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/starling/app.js",
+          "origem": "ra/starling/app.js",
+          "sha256_anterior": "aeb3b17f58710b3e72342ed1b8edecb15a36681ee5532174d878423db9db9629",
+          "sha256": "c5e30e2842801d15cf332fe64026d390e345dd0b49740a61a763c2f0a7a03aaf"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/tests/musculo-miofibrila.test.mjs",
+          "origem": "ra/tests/musculo-miofibrila.test.mjs",
+          "sha256_anterior": "528bbeebf35f346e2d017041635cca0e580ca9580eb2e27cdc4ed69395f9e3f6",
+          "sha256": "04c77472c7e41b4011e2b6e69506f06f33686be7475bd4e78d9c0a36b257c294"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/tests/starling-migracao.test.mjs",
+          "origem": "ra/tests/starling-migracao.test.mjs",
+          "sha256_anterior": "9ab535d04d9321c0a60613ab14808bf6e82bf72c37362087d5738790a46985e7",
+          "sha256": "6ed403ac5ba5b457280e08c4ddf3c88f8d6fda38a91afe0b3b5784c50b733e33"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/index.html",
+          "origem": "ra/celula/visualizador/index.html",
+          "sha256_anterior": "a6b796910b811074fb76b52845bee92a4b712dc9841842c9d349a71c566e88ff",
+          "sha256": "8c3e6bd18f90c87edbc54644d7d7d66b25d89cbb5ef54e0211e24eb8e9358adc"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/ra.js",
+          "origem": "ra/celula/visualizador/ra.js",
+          "sha256_anterior": "c0fb54d23b25de4ff9b486e2230d64ecb989bf13c82d34154e23e583eaab8425",
+          "sha256": "661c5926b00af96a4f0ee50a8e9eb58f9f253f79073f118843dc17ddb288aeef"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/ra-ios.js",
+          "origem": "ra/ra-ios.js",
+          "sha256": "4897184b63e240bd7e473aa62155efae83a36a83041be1fad24ec14a8a81a978",
+          "adicionado": true
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/celula-ra.glb",
+          "origem": "ra/celula/visualizador/celula-ra.glb",
+          "sha256": "866c704db85e1e5ad1eed699e49cce822a69213cb185d59c769d73b2974f598d",
+          "adicionado": true
+        }
+      ]
+    }
+  ]
 }
