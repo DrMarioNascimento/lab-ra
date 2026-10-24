@@ -3,6 +3,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { prepararParaRA } from '../cores-para-ra.js';
+import { usdzComBotoes } from '../ra-botoes-ios.js';
 import { VARIAVEIS, simboloHTML, notacaoHTML } from './variaveis.js?v=starling-guia-20261003';
 import { criar } from './modelos.js?v=starling-guia-20261003';
 import { pressaoCapilar, pressaoLiquida, oncExterna, pontoDeVirada,
@@ -217,7 +218,7 @@ function ajustar(){
 }
 new ResizeObserver(ajustar).observe(stage);addEventListener('resize',drawGraphs);
 function prepararRA(){
- const id=++prepId;clearTimeout(arTimer);if(correndo)return;
+ const id=++prepId;clearTimeout(arTimer);placasProntas=false;placasFalharam=false;ancoraAR.removeAttribute('href');if(correndo)return;
  $('launchAR').disabled=true;$('raStatus').textContent='Preparando o estado atual…';
  arTimer=setTimeout(async()=>{
   try{
@@ -230,17 +231,99 @@ function prepararRA(){
    const buffer=await new GLTFExporter().parseAsync(wrap,{binary:true,onlyVisible:true});
    if(id!==prepId||correndo)return;
    if(arUrl)URL.revokeObjectURL(arUrl);arUrl=URL.createObjectURL(new Blob([buffer],{type:'model/gltf-binary'}));
-   arReadyId=id;$('arViewer').src=arUrl;
+   arReadyId=id;$('arViewer').dataset.raPlacas=usaPlacas()?'1':'';$('arViewer').src=arUrl;
+   if(usaPlacas())await prepararPlacas(id);
   }catch(err){if(id!==prepId)return;console.error(err);$('raStatus').textContent='Não foi possível preparar a RA. O modelo 3D continua disponível.';}
  },300);
 }
 $('arViewer').addEventListener('load',()=>{
  if(correndo||arReadyId!==prepId)return;
+ if(usaPlacas()){if(!placasProntas){$('launchAR').disabled=true;$('raStatus').textContent='Preparando as placas das condições…';}return;}
  $('launchAR').disabled=!$('arViewer').canActivateAR;
  $('raStatus').textContent=$('arViewer').canActivateAR?'Estado pronto. Abra em RA no aparelho compatível. Ampliação de aproximadamente 65 cm.':'Modelo 3D pronto. Para RA, use Safari no iPhone/iPad ou Chrome no Android compatível.';
 });
 $('arViewer').addEventListener('error',()=>{$('launchAR').disabled=true;$('raStatus').textContent='Não foi possível abrir o modelo em RA.';});
-$('launchAR').onclick=async()=>{try{await $('arViewer').activateAR();}catch{$('raStatus').textContent='A câmera não abriu. Confira a compatibilidade e a permissão no navegador.';}};
+$('launchAR').onclick=async()=>{if(usaPlacas()&&placasProntas&&ancoraAR.href){ancoraAR.click();return;}try{await $('arViewer').activateAR();}catch{$('raStatus').textContent='A câmera não abriu. Confira a compatibilidade e a permissão no navegador.';}};
+/* ── PLACAS NO IPHONE · Duas estações (nível 03) ─────────────────────────────
+   Mesma técnica e configuração do sarcômero do Músculo (`../ra-botoes-ios.js`):
+   no iPhone, o botão de RA abre a peça com placas no chão, uma por condição, e
+   a pinça fica travada para que a peça nunca cubra as placas. Tocar numa placa
+   leva as setas (comprimento e sentido de cada contribuição) e as partículas
+   ao estado daquela condição.
+
+   O ESTADO DE CADA PLACA sai da MESMA cadeia da tela — comCausa → estadoDoTecido
+   → animar + aplicarForcas —, no mesmo instante da animação e com volume
+   intersticial zero: são as forças NO INÍCIO de cada condição, antes do
+   acúmulo de edema. Ajustes manuais do painel não entram nas placas.
+   Condições: Basal, Estase venosa, Albumina baixa e Inflamação. Congestão
+   cardíaca mexe nas mesmas forças que a estase (pressão capilar), e a
+   obstrução linfática não muda as forças no início — por isso ficam de fora,
+   e a fileira de placas cabe na frente da peça.
+
+   O QUE SE MOVE é descoberto, não listado: tudo o que muda de pose ou de
+   visibilidade entre as condições. Só peças inteiras; o que some vira escala
+   quase nula, porque o Quick Look não esconde objetos. Na cópia da RA, cada
+   malha que se move é pendurada direto no primeiro grupo PARADO acima dela, com
+   a pose medida nesse referencial — haste e ponta de uma seta mudam dentro de
+   um grupo que também se move, e o Quick Look anima melhor peças soltas. O
+   desenho é o mesmo; só muda o pai. */
+const ehQuickLook=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const ancoraAR=document.createElement('a');ancoraAR.rel='ar';ancoraAR.hidden=true;ancoraAR.appendChild(document.createElement('img'));document.body.appendChild(ancoraAR);
+let placasUrl=null,placasProntas=false,placasFalharam=false,pacotePlacas=null,usdaPlacas='';
+const CONDICOES_PLACAS=['normal','depe','hipoalbuminemia','inflamacao'];
+const usaPlacas=()=>atual===2&&!placasFalharam&&(ehQuickLook||new URLSearchParams(location.search).has('botoesios'));
+function noInicioDa(id){
+ const c=comCausa(id,modelo),e=estadoDoTecido(c.estado,0);
+ animar(tempo,u=>pressaoLiquida(u,e),{encharcado:0,semLinfa:c.semLinfa,nivel:2,sigma:e.sigma,oncPlasma:e.oncPlasma,kf:e.kf});
+ aplicarForcas(2,e,pressaoCapilar,oncExterna);
+}
+async function prepararPlacas(id){
+ try{
+  const t0=performance.now(),peca=modelos[2],todos=[];peca.traverse(o=>todos.push(o));
+  const visivel=o=>{for(let x=o;x&&x!==peca;x=x.parent)if(!x.visible)return false;return true;};
+  /* fotografias: cada condição das placas e, por último, a de abertura */
+  const ids=[...CONDICOES_PLACAS,causaAtual],fotos=ids.map(c=>{noInicioDa(c);peca.updateMatrixWorld(true);return todos.map(o=>({m:o.matrix.clone(),v:o.visible}));});
+  const igual=(a,b)=>a.elements.every((x,i)=>Math.abs(x-b.elements[i])<1e-7);
+  const muda=new Set(todos.filter((o,i)=>o!==peca&&fotos.some(f=>!igual(f[i].m,fotos[0][i].m)||f[i].v!==fotos[0][i].v)));
+  /* malhas que se movem: as que mudam e as que estão dentro de algo que muda */
+  const acimaMuda=o=>{for(let x=o;x&&x!==peca;x=x.parent)if(muda.has(x))return true;return false;};
+  const malhas=todos.filter(o=>o.isMesh&&acimaMuda(o));
+  /* referencial parado: o pai do mais alto que muda na cadeia */
+  const parado=o=>{let r=o.parent;for(let x=o;x&&x!==peca;x=x.parent)if(muda.has(x))r=x.parent;return r;};
+  const refs=malhas.map(parado);
+  const QUASE_ZERO=new THREE.Matrix4().makeScale(1e-4,1e-4,1e-4);
+  const poses=ids.map(c=>{noInicioDa(c);peca.updateMatrixWorld(true);
+   return malhas.map((m,i)=>{const rel=new THREE.Matrix4().copy(refs[i].matrixWorld).invert().multiply(m.matrixWorld);return visivel(m)?rel:rel.multiply(QUASE_ZERO);});});
+  /* a peça de abertura: a condição atual, no início */
+  noInicioDa(causaAtual);peca.updateMatrixWorld(true);
+  const clone=peca.clone(true);clone.visible=true;
+  const lista=[];clone.traverse(o=>lista.push(o));const par=o=>lista[todos.indexOf(o)];
+  const moveis=malhas.map((m,i)=>{const c=par(m),r=par(refs[i]);r.add(c);c.visible=true;poses.at(-1)[i].decompose(c.position,c.quaternion,c.scale);return c;});
+  anatomy();peca.updateMatrixWorld(true);
+  clone.position.set(0,0,0);clone.scale.setScalar(1);clone.updateMatrixWorld(true);
+  const tam=new THREE.Box3().setFromObject(clone).getSize(new THREE.Vector3());clone.scale.setScalar(.65/Math.max(tam.x,tam.y,tam.z));clone.updateMatrixWorld(true);
+  const b=new THREE.Box3().setFromObject(clone),c=b.getCenter(new THREE.Vector3());clone.position.set(-c.x,-b.min.y,-c.z);
+  moveis.forEach((m,i)=>{m.name='rqbMovel_'+i;});                       // nome único antes das gêmeas
+  prepararParaRA(clone);
+  /* gêmeas pelo avesso (dupla face) acompanham a parte de origem, como no Músculo */
+  const juntos=[...moveis],posesJuntas=poses.map(p=>[...p]);
+  moveis.forEach((m,i)=>m.parent.children.filter(x=>x.name===m.name+'-avesso').forEach(g=>{juntos.push(g);posesJuntas.forEach(p=>p.push(p[i]));}));
+  const estados=CONDICOES_PLACAS.map((cid,k)=>({rotulo:CAUSAS.find(x=>x.id===cid).nome,poses:posesJuntas[k]}));
+  const {usdz,usda,alinhado}=await usdzComBotoes({peca:clone,moveis:juntos,estados});
+  if(id!==prepId||correndo)return;
+  if(placasUrl)URL.revokeObjectURL(placasUrl);placasUrl=URL.createObjectURL(new Blob([usdz],{type:'model/vnd.usdz+zip'}));
+  /* sem pinça: ampliada, a peça cobriria as placas (aprendido no sarcômero) */
+  ancoraAR.href=placasUrl+'#allowsContentScaling=0';placasProntas=true;
+  pacotePlacas={bytes:usdz.byteLength,ms:Math.round(performance.now()-t0),partes:juntos.length,alinhado:alinhado.every(a=>a.ok)};usdaPlacas=usda;
+  $('launchAR').disabled=false;
+  $('raStatus').textContent='Pronto · peça de cerca de 65 cm. Na mesa, toque nas placas para comparar as forças no início de cada condição, antes do acúmulo de edema.';
+ }catch(err){
+  console.error(err);if(id!==prepId)return;
+  placasFalharam=true;anatomy();
+  $('launchAR').disabled=!$('arViewer').canActivateAR;$('raStatus').textContent='Estado pronto para RA, sem as placas das condições (não puderam ser preparadas).';
+ }
+}
+window.pacotePlacasIOS=()=>pacotePlacas;window.usdaPlacasIOS=()=>usdaPlacas;
 addEventListener('pagehide',()=>{++prepId;clearTimeout(arTimer);if(arUrl)URL.revokeObjectURL(arUrl);});
 const busca=new URLSearchParams(location.search);
 if(busca.get('modelo')==='classico')modelo='classico';

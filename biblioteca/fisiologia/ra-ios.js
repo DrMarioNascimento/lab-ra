@@ -23,7 +23,11 @@
 
    COMO INCLUIR. Script clássico (sem type="module"), imediatamente antes de
    </body>. Ele precisa rodar antes dos módulos da página, para ser o primeiro
-   a ouvir o `load` do visualizador. */
+   a ouvir o `load` do visualizador.
+
+   PEÇAS COM PLACAS (Contrair/Relaxar etc.). A página marca o visualizador
+   com data-ra-placas="1" antes de trocar o `src`; aqui ele é deixado em paz,
+   porque o USDZ das placas já é montado pela página antes do toque. */
 (function () {
   'use strict';
 
@@ -84,11 +88,14 @@
 
     mv.addEventListener('load', (ev) => {
       if (ev.detail && ev.detail[MARCA]) return;           // é o nosso repasse
-      ev.stopImmediatePropagation();                       // a página espera o USDZ
       trocarActivateAR(mv, st);
       const token = ++st.token;
       if (st.url) { URL.revokeObjectURL(st.url); st.url = null; }
       st.src = mv.src;
+      /* peça com placas: a própria página monta o USDZ (com os botões) e o abre
+         pelo link dela. Gerar outro aqui só gastaria tempo e memória. */
+      if (mv.dataset.raPlacas === '1') return;
+      ev.stopImmediatePropagation();                       // a página espera o USDZ
       const repassar = () => {
         if (token !== st.token) return;
         const detalhe = Object.assign({}, ev.detail || {}, { [MARCA]: true });

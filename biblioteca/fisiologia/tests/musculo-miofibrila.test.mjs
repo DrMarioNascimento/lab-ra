@@ -77,13 +77,29 @@ test('ra-botoes-ios: percursos em série, geometria com 4 casas e geometrias rep
   assert.match(mod, /if \(porConteudo\.has\(chave\)\)/);
 });
 
-test('placas no iPhone: Osso vivo (Montar/Desmontar) e Comunicação (Disparar) usam o botão único', () => {
+test('placas no iPhone: Osso vivo (Montar/Desmontar; Aliviar/Comprimir) e Comunicação (Disparar) usam o botão único', () => {
   const osso = fs.readFileSync(new URL('../osso-vivo/app.js', import.meta.url), 'utf8');
   const mem = fs.readFileSync(new URL('../potencial-membrana/app.js', import.meta.url), 'utf8');
-  assert.match(osso, /estados:\[\{rotulo:'Montar',poses:poses\[0\]\},\{rotulo:'Desmontar',poses:poses\[1\]\}\]/);
-  assert.match(osso, /const usaPlacas=\(\)=>nivel===0&&!placasFalharam&&/);
+  /* nível 01: Montar/Desmontar; níveis 02 e 03: Aliviar/Comprimir (2026-10-24) */
+  assert.match(osso, /0:\{rotulos:\['Montar','Desmontar'\]/);
+  assert.match(osso, /rotulos:\['Aliviar','Comprimir'\]/);
+  assert.match(osso, /1:compressao\(1\),2:compressao\(2\)/);
+  assert.match(osso, /estados:cfg\.rotulos\.map\(\(rotulo,k\)=>\(\{rotulo,poses:poses\[k\]\}\)\)/);
+  assert.match(osso, /const usaPlacas=\(\)=>Boolean\(PLACAS\[nivel\]\)&&\(nivel===0\|\|mostrarCarga\)&&!placasFalharam&&/);
   assert.match(osso, /if\(usaPlacas\(\)&&placasProntas&&ancoraAR\.href\)\{ancoraAR\.click\(\);return;\}/);
   assert.match(mem, /estados: \[\{ rotulo: 'Disparar', passos \}\]/);
   assert.match(mem, /const usaPlacaCom = \(\) => atual === COM && !placaComFalhou/);
   assert.match(mem, /if \(usaPlacaCom\(\) && placaComPronta && ancoraCom\.href\) \{ ancoraCom\.click\(\); return; \}/);
+});
+
+test('placas no iPhone: Junção (Relaxar/Contrair, níveis 04 e 05) e Starling (condições) usam o botão único e a pinça travada', () => {
+  const jun = fs.readFileSync(new URL('../juncao-neuromuscular/app.js', import.meta.url), 'utf8');
+  const sta = fs.readFileSync(new URL('../starling/app.js', import.meta.url), 'utf8');
+  assert.match(jun, /estados:\[\{rotulo:'Relaxar',poses:posesTodos\[0\]\},\{rotulo:'Contrair',poses:posesTodos\[1\]\}\]/);
+  assert.match(jun, /const PLACAS=\{\r?\n 3:/);
+  assert.match(sta, /const CONDICOES_PLACAS=\['normal','depe','hipoalbuminemia','inflamacao'\]/);
+  for (const app of [jun, sta]) {
+    assert.match(app, /if\(usaPlacas\(\)&&placasProntas&&ancoraAR\.href\)\{ancoraAR\.click\(\);return;\}/);
+    assert.match(app, /ancoraAR\.href=placasUrl\+'#allowsContentScaling=0'/);
+  }
 });

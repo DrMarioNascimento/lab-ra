@@ -26,7 +26,11 @@ function placa(rotulo, larguraM, alturaM) {
   const g = c.getContext('2d');
   g.fillStyle = '#123446'; g.fillRect(0, 0, c.width, c.height);
   g.strokeStyle = '#9ce4ed'; g.lineWidth = 14; g.strokeRect(7, 7, c.width - 14, c.height - 14);
-  g.fillStyle = '#ffffff'; g.font = `700 ${Math.round(c.height * .46)}px Inter, Arial, sans-serif`;
+  /* rótulo que não cabe encolhe até caber: "Albumina baixa" passava da borda */
+  let corpo = Math.round(c.height * .46);
+  g.font = `700 ${corpo}px Inter, Arial, sans-serif`;
+  while (corpo > 18 && g.measureText(rotulo).width > c.width * .86) { corpo -= 2; g.font = `700 ${corpo}px Inter, Arial, sans-serif`; }
+  g.fillStyle = '#ffffff';
   g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(rotulo, c.width / 2, c.height / 2 + 2);
   const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace;
   const mat = new THREE.MeshStandardMaterial({ map: tex, roughness: .7, metalness: 0 });

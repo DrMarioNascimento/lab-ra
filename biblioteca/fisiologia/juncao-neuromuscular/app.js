@@ -3,6 +3,7 @@ import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {GLTFExporter} from 'three/addons/exporters/GLTFExporter.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {prepararParaRA} from '../cores-para-ra.js';
+import {usdzComBotoes} from '../ra-botoes-ios.js';
 import {novaMitocondria} from '../mitocondria.js';
 import {criar,NIVEIS} from './modelos.js?v=jun-mito-20261009';
 import {simular,noInstante,fase,CORES,LIMIAR} from './fisica.js?v=jun-20261003';
@@ -117,19 +118,81 @@ function clonarPeca(source){
  for(const child of source.children)clone.add(clonarPeca(child));return clone;
 }
 function prepararRA(){
- const id=++exportId;clearTimeout(arTimer);$('launchAR').disabled=true;
+ const id=++exportId;clearTimeout(arTimer);$('launchAR').disabled=true;placasProntas=false;placasFalharam=false;ancoraAR.removeAttribute('href');
  if(running||$('panel-ra').hidden)return;$('raStatus').textContent='Preparando o estado atual…';
  arTimer=setTimeout(async()=>{try{
   anatomy.atualizar(nivel,noInstante(sim,instante),instante,sim);const clone=clonarPeca(anatomy.modelos[nivel]);clone.visible=true;
   const box=new THREE.Box3().setFromObject(clone),size=box.getSize(new THREE.Vector3());clone.scale.setScalar(.65/Math.max(size.x,size.y,size.z));clone.updateMatrixWorld(true);
   const fitted=new THREE.Box3().setFromObject(clone),center=fitted.getCenter(new THREE.Vector3());clone.position.set(-center.x,-fitted.min.y,-center.z);prepararParaRA(clone);
   const wrap=new THREE.Group();wrap.add(clone);const buffer=await new GLTFExporter().parseAsync(wrap,{binary:true,onlyVisible:true});
-  if(id!==exportId||running||disposed)return;if(arUrl)URL.revokeObjectURL(arUrl);arUrl=URL.createObjectURL(new Blob([buffer],{type:'model/gltf-binary'}));readyId=id;$('arViewer').alt='Peça selecionada: '+NIVEIS[nivel].nome;$('arViewer').src=arUrl;
+  if(id!==exportId||running||disposed)return;if(arUrl)URL.revokeObjectURL(arUrl);arUrl=URL.createObjectURL(new Blob([buffer],{type:'model/gltf-binary'}));readyId=id;$('arViewer').alt='Peça selecionada: '+NIVEIS[nivel].nome;$('arViewer').dataset.raPlacas=usaPlacas()?'1':'';$('arViewer').src=arUrl;
+  if(usaPlacas())await prepararPlacas(id);
  }catch(e){if(id!==exportId)return;console.error(e);$('raStatus').textContent='Não foi possível preparar a RA. A experiência 3D continua disponível.';}},250);
 }
-$('arViewer').addEventListener('load',()=>{if(readyId!==exportId||running)return;$('launchAR').disabled=!$('arViewer').canActivateAR;$('launchAR').textContent='Abrir '+NIVEIS[nivel].nome+' em RA';$('raStatus').textContent=$('arViewer').canActivateAR?'Estado pronto para RA · ampliação de aproximadamente 65 cm.':'Modelo 3D pronto. Para RA, use Safari no iPhone/iPad ou Chrome no Android compatível.';});
+$('arViewer').addEventListener('load',()=>{if(readyId!==exportId||running)return;if(usaPlacas()){if(!placasProntas){$('launchAR').disabled=true;$('raStatus').textContent='Preparando as placas Relaxar e Contrair…';}return;}$('launchAR').disabled=!$('arViewer').canActivateAR;$('launchAR').textContent='Abrir '+NIVEIS[nivel].nome+' em RA';$('raStatus').textContent=$('arViewer').canActivateAR?'Estado pronto para RA · ampliação de aproximadamente 65 cm.':'Modelo 3D pronto. Para RA, use Safari no iPhone/iPad ou Chrome no Android compatível.';});
 $('arViewer').addEventListener('error',()=>{$('launchAR').disabled=true;$('raStatus').textContent='A prévia de RA não carregou. O modelo 3D continua disponível.';});
-$('launchAR').onclick=()=>{$('arViewer').activateAR().catch(()=>{$('raStatus').textContent='A câmera não abriu. Confira a compatibilidade e a permissão no aparelho.';});};
+$('launchAR').onclick=()=>{if(usaPlacas()&&placasProntas&&ancoraAR.href){ancoraAR.click();return;}$('arViewer').activateAR().catch(()=>{$('raStatus').textContent='A câmera não abriu. Confira a compatibilidade e a permissão no aparelho.';});};
+/* ── PLACAS NO IPHONE · Relaxar e Contrair (níveis 04 e 05) ──────────────────
+   Mesma técnica e mesma configuração do sarcômero do Músculo
+   (`../ra-botoes-ios.js`): no iPhone, o botão de RA abre a peça com duas
+   placas no chão, e a pinça fica travada para que a peça nunca cubra as placas.
+   Só peças inteiras se movem, e as poses saem da MESMA função da tela
+   (`anatomy.atualizar`), com a ativação contrátil nos dois extremos:
+   · 0 → repouso, sarcômero de 2,4 µm (Relaxar);
+   · 1 → ativação máxima, 1,9 µm (Contrair) — os mesmos valores do Músculo.
+   Nível 04 (A tríade): as miofibrilas encurtam no eixo e o retículo
+   sarcoplasmático acompanha, como na tela (escala e deslocamento das redes).
+   Nível 05 (A contração): o sarcômero aprovado do Músculo — discos Z com as
+   actinas deslizam e a titina acompanha; os filamentos não mudam de tamanho.
+   A peça abre no instante da tela; partículas e sinais ficam nesse instante.
+   Se as placas falharem, o botão abre a peça comum. */
+const ehQuickLook=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const ancoraAR=document.createElement('a');ancoraAR.rel='ar';ancoraAR.hidden=true;ancoraAR.appendChild(document.createElement('img'));document.body.appendChild(ancoraAR);
+let placasUrl=null,placasProntas=false,placasFalharam=false,pacotePlacas=null,usdaPlacas='';
+const PLACAS={
+ 3:peca=>[...peca.userData.myofibrils,...peca.userData.reticula.map(r=>r.network)],
+ 4:peca=>{let s=null;peca.traverse(o=>{if(!s&&o.userData&&o.userData.zL&&o.userData.titinas)s=o;});if(!s)throw new Error('sarcômero não carregado');return [s.userData.zL,s.userData.zR,...s.userData.titinas.map(t=>t.mola)];}
+};
+const usaPlacas=()=>Boolean(PLACAS[nivel])&&!placasFalharam&&(ehQuickLook||new URLSearchParams(location.search).has('botoesios'));
+/* a mesma simulação, com a ativação contrátil fixada num extremo: o resto do
+   estado visual (sinais, partículas, receptores) continua o do instante */
+function comAtivacao(ativacao){
+ const base={...estadoVisualAtual(),ativacao};
+ return {...sim,amostras:[{...base,t:0},{...base,t:sim.duracao+1}]};
+}
+const estadoVisualAtual=()=>estadoVisual(sim,instante);
+async function prepararPlacas(id){
+ const n=nivel;
+ try{
+  const t0=performance.now(),peca=anatomy.modelos[n],partes=PLACAS[n](peca),a=noInstante(sim,instante);
+  const poses=[0,1].map(k=>{anatomy.atualizar(n,a,instante,comAtivacao(k));return partes.map(g=>{g.updateMatrix();return g.matrix.clone();});});
+  const uniao=new THREE.Box3();for(const k of [0,1]){anatomy.atualizar(n,a,instante,comAtivacao(k));peca.updateMatrixWorld(true);uniao.union(new THREE.Box3().setFromObject(peca));}
+  anatomy.atualizar(n,a,instante,sim);peca.updateMatrixWorld(true);
+  const clone=clonarPeca(peca);clone.visible=true;
+  const orig=[],copia=[];peca.traverse(o=>orig.push(o));clone.traverse(o=>copia.push(o));
+  const moveis=partes.map(g=>copia[orig.indexOf(g)]);
+  const tam=uniao.getSize(new THREE.Vector3());clone.scale.setScalar(.65/Math.max(tam.x,tam.y,tam.z));clone.position.set(0,0,0);clone.updateMatrixWorld(true);
+  const b=new THREE.Box3().setFromObject(clone),c=b.getCenter(new THREE.Vector3());clone.position.set(-c.x,-b.min.y,-c.z);
+  moveis.forEach((m,i)=>{m.name='rqbMovel_'+i;});                       // nome único antes das gêmeas
+  prepararParaRA(clone);
+  /* gêmeas pelo avesso (dupla face) acompanham a parte de origem, como no Músculo */
+  const todos=[...moveis],posesTodos=poses.map(p=>[...p]);
+  moveis.forEach((m,i)=>{m.parent.children.filter(x=>x.name===m.name+'-avesso').forEach(g=>{todos.push(g);posesTodos.forEach((p,k)=>p.push(poses[k][i]));});});
+  const {usdz,usda,alinhado}=await usdzComBotoes({peca:clone,moveis:todos,estados:[{rotulo:'Relaxar',poses:posesTodos[0]},{rotulo:'Contrair',poses:posesTodos[1]}]});
+  if(id!==exportId||running||disposed)return;
+  if(placasUrl)URL.revokeObjectURL(placasUrl);placasUrl=URL.createObjectURL(new Blob([usdz],{type:'model/vnd.usdz+zip'}));
+  /* sem pinça: ampliada, a peça cobriria as placas (aprendido no sarcômero) */
+  ancoraAR.href=placasUrl+'#allowsContentScaling=0';placasProntas=true;
+  pacotePlacas={nivel:n,bytes:usdz.byteLength,ms:Math.round(performance.now()-t0),partes:todos.length,alinhado:alinhado.every(a=>a.ok)};usdaPlacas=usda;
+  $('launchAR').disabled=false;$('launchAR').textContent='Abrir '+NIVEIS[n].nome+' em RA';
+  $('raStatus').textContent='Pronto · peça de cerca de 65 cm. Na mesa, toque em Relaxar ou Contrair.';
+ }catch(e){
+  console.error(e);if(id!==exportId)return;
+  placasFalharam=true;anatomy.atualizar(n,noInstante(sim,instante),instante,sim);
+  $('launchAR').disabled=!$('arViewer').canActivateAR;$('raStatus').textContent='Estado pronto para RA, sem as placas Relaxar e Contrair (não puderam ser preparadas).';
+ }
+}
+window.pacotePlacasIOS=()=>pacotePlacas;window.usdaPlacasIOS=()=>usdaPlacas;
 $('play').onclick=()=>{if(!running&&instante>=sim.duracao)instante=0;definirRunning(!running);atualizar();};$('reset').onclick=()=>{definirRunning(false);instante=0;atualizar();prepararRA();};
 $('instant').oninput=()=>{definirRunning(false);instante=Number($('instant').value);atualizar();prepararRA();};
 $('speed').oninput=()=>{speed=Number($('speed').value);$('speedValue').textContent=fmt(speed,speed%1?2:0)+'×';};
