@@ -37,3 +37,7 @@ Direitos autorais e restrições: [LICENSE.md](LICENSE.md). As licenças de bibl
 ## Conferência
 
 `npm test` executa os testes da biblioteca e os motores independentes de Starling e junção neuromuscular. Testes copiados da Fisiologia que exigem a interface dos Tutores pertencem ao projeto de origem e não fazem parte deste comando. As telas de estudo de modelos GLB permitem inspeção e RA; não reproduzem a pontuação nem as etapas narrativas da partida. Os testes de câmera exigem aparelho compatível.
+
+## Estado das verificações técnicas — 24 de outubro de 2026
+
+A publicação no GitHub Pages foi concluída. O workflow de testes mantém uma falha **anterior à atualização documental**: o hash registrado para `biblioteca/fisiologia/ra-botoes-ios.js` em `biblioteca/arquivos-originais.json` não corresponde à cópia atual. O [run anterior](https://github.com/DrMarioNascimento/lab-ra/actions/runs/40102374159) já falhava; [nesta revisão](https://github.com/DrMarioNascimento/lab-ra/actions/runs/40112358331), 29 testes passaram e um falhou. As entradas do catálogo passaram no teste de existência local. A reconciliação dos hashes precisa conferir a origem e as adaptações, sem simplesmente aceitar qualquer conteúdo novo. Esta revisão não alterou os hashes nem certifica todas as cópias experimentais.
