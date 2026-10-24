@@ -1,0 +1,429 @@
+{
+  "fontes": {
+    "Dragon": "54ffdc4e637b6143232a3cbd653cdb4a51a6c342",
+    "fisiologia-interativa": "cc4d94515bcd038cad7d30ca9e472c9912c4713f"
+  },
+  "adaptacoes": [
+    "biblioteca/fisiologia/tutor-origem.js",
+    "biblioteca\\fisiologia\\celula\\index.html",
+    "biblioteca\\fisiologia\\celula\\membrana.html",
+    "biblioteca\\fisiologia\\coracao\\index.html",
+    "biblioteca\\fisiologia\\juncao-neuromuscular\\index.html",
+    "biblioteca\\fisiologia\\musculo-sarcomero\\index.html",
+    "biblioteca\\fisiologia\\osso-vivo\\index.html",
+    "biblioteca\\fisiologia\\pleura\\index.html",
+    "biblioteca\\fisiologia\\potencial-membrana\\index.html",
+    "biblioteca\\fisiologia\\retorno-venoso\\index.html",
+    "biblioteca\\fisiologia\\starling\\index.html",
+    "Entradas de estudo Carro-Forte e VestChip e navegação dos wrappers de A Casa da Costa",
+    "biblioteca/fisiologia/README.md",
+    "biblioteca/fisiologia/coracao/LICENSE.md",
+    "biblioteca/fisiologia/coracao/README.md",
+    "biblioteca/fisiologia/juncao-neuromuscular/README.md",
+    "biblioteca/fisiologia/musculo-sarcomero/README.md",
+    "biblioteca/fisiologia/osso-vivo/README.md",
+    "biblioteca/fisiologia/potencial-membrana/README.md",
+    "biblioteca/fisiologia/starling/README.md"
+  ],
+  "dragon": [
+    {
+      "titulo": "A Casa da Costa — A Mesa",
+      "origem": "A Mesa — A Casa da Costa",
+      "itens": [
+        {
+          "nome": "A maquete — visualização livre",
+          "url": "biblioteca/dragon/visualizador.html?id=casa-mesa-maquete"
+        },
+        {
+          "nome": "A maquete",
+          "url": "biblioteca/dragon/jogos/casa-da-costa/a-mesa/AC-maquete.html?demo=solo"
+        },
+        {
+          "nome": "A escrivaninha",
+          "url": "biblioteca/dragon/jogos/casa-da-costa/a-mesa/AC-escrivaninha.html?demo=solo"
+        },
+        {
+          "nome": "Os papéis",
+          "url": "biblioteca/dragon/jogos/casa-da-costa/a-mesa/AC-papeis.html?demo=solo"
+        },
+        {
+          "nome": "O percurso",
+          "url": "biblioteca/dragon/jogos/casa-da-costa/a-mesa/AC-percurso.html?demo=solo"
+        }
+      ]
+    },
+    {
+      "titulo": "A Casa da Costa — O Impostor",
+      "origem": "O Impostor — A Casa da Costa",
+      "itens": [
+        {
+          "nome": "Prólogo: A maquete",
+          "url": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/maquete/?demo=solo"
+        },
+        {
+          "nome": "Capítulo 1: O aparador",
+          "url": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/bandeja.html"
+        },
+        {
+          "nome": "Capítulo 2: A escrivaninha",
+          "url": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/escrivaninha.html"
+        },
+        {
+          "nome": "Capítulo 3: O relógio",
+          "url": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/relogio.html"
+        },
+        {
+          "nome": "Capítulo 4: O jardim interno",
+          "url": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/jardim.html"
+        },
+        {
+          "nome": "Capítulo 5: O farol",
+          "url": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/farol.html?codigo=1234"
+        },
+        {
+          "nome": "Capítulo 6: O quarto do jasmim",
+          "url": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/quarto.html"
+        }
+      ]
+    },
+    {
+      "titulo": "A Manhã do Carro-Forte — A Mesa",
+      "origem": "A Mesa — A Manhã do Carro-Forte",
+      "itens": [
+        {
+          "nome": "A janela do norte",
+          "url": "biblioteca/dragon/jogos/a-manha-do-carro-forte/a-mesa/janela-do-norte.html"
+        },
+        {
+          "nome": "O vidro embaçado",
+          "url": "biblioteca/dragon/jogos/a-manha-do-carro-forte/a-mesa/vidro-embacado.html"
+        },
+        {
+          "nome": "A sala às escuras",
+          "url": "biblioteca/dragon/jogos/a-manha-do-carro-forte/a-mesa/sala-as-escuras.html"
+        },
+        {
+          "nome": "Fragmentos em dupla",
+          "url": "biblioteca/dragon/jogos/a-manha-do-carro-forte/a-mesa/fragmentos-em-dupla.html"
+        }
+      ]
+    },
+    {
+      "titulo": "A Manhã do Carro-Forte — O Impostor",
+      "origem": "O Impostor — A Manhã do Carro-Forte",
+      "itens": [
+        {
+          "nome": "Prólogo: Agência 0688 — maquete e peças",
+          "url": "biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/estudo.html"
+        },
+        {
+          "nome": "Capítulo 1: O malote murcho",
+          "url": "biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/estudo.html?peca=c1"
+        },
+        {
+          "nome": "Capítulo 2: O rádio reserva",
+          "url": "biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/estudo.html?peca=c2"
+        },
+        {
+          "nome": "Capítulo 3: A impressora de etiquetas",
+          "url": "biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/estudo.html?peca=c3"
+        },
+        {
+          "nome": "Capítulo 4: O armário de vestígios",
+          "url": "biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/estudo.html?peca=c4"
+        },
+        {
+          "nome": "Capítulo 5: A balança de custódia",
+          "url": "biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/estudo.html?peca=c5"
+        },
+        {
+          "nome": "Capítulo 6: A noite de onze dias antes",
+          "url": "biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/estudo.html?peca=c6"
+        },
+        {
+          "nome": "Capítulo 7: A escrivaninha das quinze versões",
+          "url": "biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/estudo.html?peca=c7"
+        }
+      ]
+    },
+    {
+      "titulo": "O Eco do Amanhã — VestChip",
+      "origem": "O Impostor — O Eco do Amanhã",
+      "itens": [
+        {
+          "nome": "Prólogo: A planta da torre",
+          "url": "biblioteca/dragon/jogos/o-eco-do-amanha/o-impostor/planta-estudo.html"
+        },
+        {
+          "nome": "Prólogo: Torre de Continuidade — andares e peças",
+          "url": "biblioteca/dragon/jogos/o-eco-do-amanha/o-impostor/estudo.html"
+        },
+        {
+          "nome": "Capítulo 1: A escrivaninha do gabinete",
+          "url": "biblioteca/dragon/visualizador.html?id=vestchip-c1"
+        },
+        {
+          "nome": "Capítulo 2: O fichário de consentimentos",
+          "url": "biblioteca/dragon/visualizador.html?id=vestchip-c2"
+        },
+        {
+          "nome": "Capítulo 3: O cofre de índices e a balança",
+          "url": "biblioteca/dragon/visualizador.html?id=vestchip-c3"
+        },
+        {
+          "nome": "Capítulo 4: O armário de serviço e a planta antiga",
+          "url": "biblioteca/dragon/visualizador.html?id=vestchip-c4"
+        },
+        {
+          "nome": "Capítulo 5: O quadro elétrico do subsolo",
+          "url": "biblioteca/dragon/visualizador.html?id=vestchip-c5"
+        },
+        {
+          "nome": "Capítulo 6: O relógio de custódia",
+          "url": "biblioteca/dragon/visualizador.html?id=vestchip-c6"
+        },
+        {
+          "nome": "Capítulo 7: O notebook e o pendrive",
+          "url": "biblioteca/dragon/visualizador.html?id=vestchip-c7"
+        },
+        {
+          "nome": "Capítulo 8: A cortiça e as alavancas",
+          "url": "biblioteca/dragon/visualizador.html?id=vestchip-c8"
+        }
+      ]
+    }
+  ],
+  "fisiologia": [
+    [
+      "I",
+      "Célula viva",
+      "celula/"
+    ],
+    [
+      "I",
+      "Do neurônio ao impulso",
+      "potencial-membrana/"
+    ],
+    [
+      "I",
+      "Forças de Starling",
+      "starling/"
+    ],
+    [
+      "II",
+      "Do nervo à força",
+      "juncao-neuromuscular/"
+    ],
+    [
+      "II",
+      "Do músculo ao sarcômero",
+      "musculo-sarcomero/"
+    ],
+    [
+      "III",
+      "Viagem ao osso vivo",
+      "osso-vivo/"
+    ],
+    [
+      "IV",
+      "Coração em ação",
+      "coracao/"
+    ],
+    [
+      "IV",
+      "A coluna de sangue",
+      "retorno-venoso/"
+    ],
+    [
+      "V",
+      "O espaço pleural",
+      "pleura/"
+    ]
+  ],
+  "conteudos_antigos_retirados_ou_substituidos": [
+    "a-marca-partida.html",
+    "ACESSO.md",
+    "atlas_cardiaco_geometria.blend",
+    "atlas_cardiaco_referencia.glb",
+    "atlas_corte_inspecao.png",
+    "atlas_posterior.png",
+    "bancadas",
+    "bancadas.html",
+    "cadeia-escrivaninha.html",
+    "cadeia-janela.html",
+    "cadeia-parede.html",
+    "cadeia.js",
+    "CADEIA.md",
+    "comparacao.html",
+    "coracao",
+    "Coracao-Anatomico",
+    "cores-para-ra.js",
+    "CREDITOS_ATLAS.md",
+    "DIAGNOSTICO_BANCADA11.md",
+    "escrivaninha-gaveta.glb",
+    "escrivaninha.glb",
+    "escrivaninha.usdz",
+    "gaveta-e-papel.html",
+    "guard.js",
+    "index.html",
+    "integracao",
+    "laboratorio-ra.html",
+    "laboratorio.css",
+    "musculo-sarcomero",
+    "o-impostor",
+    "pleura",
+    "potencial-membrana",
+    "ra-teste-ios.html",
+    "retorno-venoso",
+    "scripts",
+    "sensor-inclinacao.html",
+    "starling",
+    "tests",
+    "vendor"
+  ],
+  "ilustracoes": {
+    "medalhao": "CarimboMetal.jpg fornecido pelo autor, sem alteração",
+    "celula": "Fisiologia Interativa/inicio/celula-mapa.js; desenho e animação extraídos, sem interação, ECG, fichas ou links"
+  },
+  "atualizacoes": [
+    {
+      "data": "2026-10-24",
+      "fonte": "DrMarioNascimento/fisiologia-interativa",
+      "commit_fonte": "b4087965d55256d0a73a852ddb179a0129be4ad7",
+      "commit_copia": "0eaf05a01d1b5f8d818c823a6c3b6c7fc1b97760",
+      "criterio": "Conteúdo de cada arquivo idêntico ao blob da origem indicada; hashes de texto normalizados para LF, como no teste. A revisão de origem geral acima continua histórica.",
+      "arquivos": [
+        {
+          "arquivo": "biblioteca/fisiologia/ra-botoes-ios.js",
+          "origem": "ra/ra-botoes-ios.js",
+          "sha256_anterior": "cd6c7b880b1bc9cd5c856da501bf36a8ec50f70f6f6d30d20e0b3617f1fb46da",
+          "sha256": "6e0bf9fea2317e6a825aa65a915f66365326bc33bdac83556ec3e6e07bc96efc"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/juncao-neuromuscular/app.js",
+          "origem": "ra/juncao-neuromuscular/app.js",
+          "sha256_anterior": "99e4e338e81226478f5153aa7f9527a97e9b5261d55c19e475318c2b53bcd071",
+          "sha256": "f2e2a4f6d152c938c7351b850ac81d0af202057fd121810cd3d6507c529787aa"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/osso-vivo/app.js",
+          "origem": "ra/osso-vivo/app.js",
+          "sha256_anterior": "1a6b794b8a17ecccebeb9e3e56296e41e976c8ebd5f0fdd98506d02e462dd424",
+          "sha256": "305a2b981da9acd454ad09a697bb650bb430673bc8376e33e2470a2e9889b991"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/pleura/modelo-aprovado.html",
+          "origem": "ra/pleura/modelo-aprovado.html",
+          "sha256_anterior": "6e6c44a45fb9d310b28499dfed71fb2e194de5032ea481a6096ac9f63010185a",
+          "sha256": "acafe2a19ee4270234fb700606718f4a076dab8126eaec3c6aa4ae1d70063fef"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/pleura/vasos.html",
+          "origem": "ra/pleura/vasos.html",
+          "sha256_anterior": "b78b333105f7338370670b02116883c2e17de8da37f2e858e69a84d1aff38086",
+          "sha256": "e2c97e14a512c1377f1496a2131ecd39f0acb350cfbee58f3bebcf89ad70ece8"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/starling/app.js",
+          "origem": "ra/starling/app.js",
+          "sha256_anterior": "aeb3b17f58710b3e72342ed1b8edecb15a36681ee5532174d878423db9db9629",
+          "sha256": "c5e30e2842801d15cf332fe64026d390e345dd0b49740a61a763c2f0a7a03aaf"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/tests/musculo-miofibrila.test.mjs",
+          "origem": "ra/tests/musculo-miofibrila.test.mjs",
+          "sha256_anterior": "528bbeebf35f346e2d017041635cca0e580ca9580eb2e27cdc4ed69395f9e3f6",
+          "sha256": "04c77472c7e41b4011e2b6e69506f06f33686be7475bd4e78d9c0a36b257c294"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/tests/starling-migracao.test.mjs",
+          "origem": "ra/tests/starling-migracao.test.mjs",
+          "sha256_anterior": "9ab535d04d9321c0a60613ab14808bf6e82bf72c37362087d5738790a46985e7",
+          "sha256": "6ed403ac5ba5b457280e08c4ddf3c88f8d6fda38a91afe0b3b5784c50b733e33"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/index.html",
+          "origem": "ra/celula/visualizador/index.html",
+          "sha256_anterior": "a6b796910b811074fb76b52845bee92a4b712dc9841842c9d349a71c566e88ff",
+          "sha256": "8c3e6bd18f90c87edbc54644d7d7d66b25d89cbb5ef54e0211e24eb8e9358adc"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/ra.js",
+          "origem": "ra/celula/visualizador/ra.js",
+          "sha256_anterior": "c0fb54d23b25de4ff9b486e2230d64ecb989bf13c82d34154e23e583eaab8425",
+          "sha256": "661c5926b00af96a4f0ee50a8e9eb58f9f253f79073f118843dc17ddb288aeef"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/ra-ios.js",
+          "origem": "ra/ra-ios.js",
+          "sha256": "4897184b63e240bd7e473aa62155efae83a36a83041be1fad24ec14a8a81a978",
+          "adicionado": true
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/celula-ra.glb",
+          "origem": "ra/celula/visualizador/celula-ra.glb",
+          "sha256": "866c704db85e1e5ad1eed699e49cce822a69213cb185d59c769d73b2974f598d",
+          "adicionado": true
+        }
+      ]
+    },
+    {
+      "data": "2026-10-24",
+      "tipo": "reconciliacao-de-adaptacoes-documentais",
+      "fonte": "DrMarioNascimento/fisiologia-interativa",
+      "commit_fonte": "cc4d94515bcd038cad7d30ca9e472c9912c4713f",
+      "commit_adaptacao": "159c36cbf5db48f26a3f43022f45407802dbde80",
+      "criterio": "Hashes anteriores conferidos com a origem. Remover somente a nota de manutenção de 19/10 e reverter a atualização do domínio e dos links de licença reproduz integralmente o texto de origem. Nenhuma alteração adicional de conteúdo foi aceita.",
+      "arquivos": [
+        {
+          "arquivo": "biblioteca/fisiologia/README.md",
+          "origem": "ra/README.md",
+          "sha256_anterior": "9c28106c8dc65f988ff49dd3c475b41926a03493c8f4f93c8035864e07e3818e",
+          "sha256": "0d3f8d150ed736b4127630cec337c5cb5ceecf822f9ca41623da29fc665367d3"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/coracao/LICENSE.md",
+          "origem": "ra/coracao/LICENSE.md",
+          "sha256_anterior": "ffbacf67b14bc3db1127a97c02d7101c25794852b9ca78b1045ed28d1638b0b3",
+          "sha256": "cc9d1caa65fe23d8f0a95d5989140f08aadca45db3b02aa6d9bd9bbcb1a3b748"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/coracao/README.md",
+          "origem": "ra/coracao/README.md",
+          "sha256_anterior": "bc2a77d72f07d27fdab3a1c4f4513fbcff9be3554a1f1eff439b2e6d57a64f50",
+          "sha256": "b84366a2549ca981a5d9eb65f0e8a62d62876551d22a11f02e7d94fb846f7c86"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/juncao-neuromuscular/README.md",
+          "origem": "ra/juncao-neuromuscular/README.md",
+          "sha256_anterior": "dea08b0fc660a8de6df3bb4c1acea84494a754a82a6e83e4b35ffd74f879cf47",
+          "sha256": "5c2db4e571f524b3351f6bf41a7861d9552376a91afbc4cb5c3e137d9bd96263"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/README.md",
+          "origem": "ra/musculo-sarcomero/README.md",
+          "sha256_anterior": "6c8cd4206798703849466b6b6e6424ab3cf10714e79cb423ff77ebaa5b80fc46",
+          "sha256": "d187ddd12b2e3c1a949bf21240a0cd50b6f1186b794ef22f09411b0da7778ded"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/osso-vivo/README.md",
+          "origem": "ra/osso-vivo/README.md",
+          "sha256_anterior": "e3fa52945f1ec58c78aeef11c6cf8203ec6f2255c99ef645218e4501b0991990",
+          "sha256": "c2401e26497799cc35eb64df2fb932fec3a22e661ca5783bf24fba33950485e7"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/potencial-membrana/README.md",
+          "origem": "ra/potencial-membrana/README.md",
+          "sha256_anterior": "c3a85abcfa32e52cb7de2466e1976f24dba3a86f6ed4e0b134daa5134dd3ce5d",
+          "sha256": "816cdc8e2fab9b52a793a0ecc8de7b626a5a7ede42914448be3f63d52380c067"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/starling/README.md",
+          "origem": "ra/starling/README.md",
+          "sha256_anterior": "dae132b4ac8008e5d147842fb6d023d8ca92cc8b24b2b29ef0ee2ca83c932fbe",
+          "sha256": "a0d4747a6af466b8eaeeed514f369fc15d18da934220265ea2c00482d17031a0"
+        }
+      ]
+    }
+  ]
+}

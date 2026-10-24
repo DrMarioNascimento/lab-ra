@@ -424,6 +424,33 @@
           "sha256": "a0d4747a6af466b8eaeeed514f369fc15d18da934220265ea2c00482d17031a0"
         }
       ]
+    },
+    {
+      "data": "2026-10-24",
+      "tipo": "atualizacao-da-origem",
+      "fonte": "DrMarioNascimento/fisiologia-interativa",
+      "commit_fonte": "c91e381417e0a2664f4228322b0bc9c6ef3ea7e4",
+      "criterio": "Cópia byte a byte da origem. Correção da RA no iPhone: Do músculo ao sarcômero e Potencial de membrana marcam o visualizador com data-ra-placas antes de trocar o modelo, para o ra-ios.js não gerar um segundo USDZ enquanto as placas são montadas; o teste do músculo acompanha a nova versão do app.js.",
+      "arquivos": [
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/app.js",
+          "origem": "ra/musculo-sarcomero/app.js",
+          "sha256_anterior": "728735ae40f4f9b1862b426cc88060269147647b9178f24370595f0ebcdf511e",
+          "sha256": "77e7ba57b5d84960b9153d887444d4d01d0aba1cae29269d1f5aa0a4053dc955"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/potencial-membrana/app.js",
+          "origem": "ra/potencial-membrana/app.js",
+          "sha256_anterior": "ad24920f1a12ef6e1412afc2be1df84a7f9fee4988534da3a7258b3838b0a14b",
+          "sha256": "a55a4c54b21d3141037d976f6e80929741f86f40b180665aae6d2f1a1bb94cc1"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/tests/musculo-miofibrila.test.mjs",
+          "origem": "ra/tests/musculo-miofibrila.test.mjs",
+          "sha256_anterior": "04c77472c7e41b4011e2b6e69506f06f33686be7475bd4e78d9c0a36b257c294",
+          "sha256": "6318ce7a0e5c244e3d6e9b3c55c1860a70c69b37ffd9ddb9b701337b45b07078"
+        }
+      ]
     }
   ]
 }

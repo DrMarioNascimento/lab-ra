@@ -44,8 +44,15 @@ test('atualizações de procedência correspondem ao manifesto e caminhos são �
  assert.equal(normalizados.size,Object.keys(hashes).length,'caminho duplicado com separadores diferentes');
  for(const sha of normalizados.values())assert.match(sha,/^[a-f0-9]{64}$/);
  const origens=JSON.parse(readFileSync(new URL('biblioteca/origens.json',root),'utf8'));
+ /* um arquivo pode ser atualizado mais de uma vez: o manifesto confere com o registro mais recente,
+    e cada registro novo parte do hash deixado pelo anterior */
+ const ultimo=new Map();
  for(const registro of origens.atualizacoes){
   assert.match(registro.commit_fonte,/^[a-f0-9]{40}$/);assert.ok(registro.criterio);
-  for(const arquivo of registro.arquivos)assert.equal(normalizados.get(arquivo.arquivo),arquivo.sha256,arquivo.arquivo);
+  for(const arquivo of registro.arquivos){
+   if(ultimo.has(arquivo.arquivo)&&arquivo.sha256_anterior)assert.equal(arquivo.sha256_anterior,ultimo.get(arquivo.arquivo),arquivo.arquivo+' (sequência)');
+   ultimo.set(arquivo.arquivo,arquivo.sha256);
+  }
  }
+ for(const [arquivo,sha] of ultimo)assert.equal(normalizados.get(arquivo),sha,arquivo);
 });

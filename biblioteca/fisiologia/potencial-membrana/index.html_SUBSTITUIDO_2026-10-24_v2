@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#091923" />
+  <title>Do neurônio ao impulso · Fisiologia Interativa</title>
+  <link rel="icon" href="../brand/orientador.webp" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../laboratorio.css" />
+  <link rel="stylesheet" href="style.css?v=celula-transferencia-20261009" />
+  <script src="../tutor-origem.js?v=ra-20261002" defer></script>
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"}}</script>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.1.0/dist/model-viewer.min.js"></script>
+</head>
+<body>
+<header class="topbar"><nav class="nav shell" aria-label="Fisiologia Interativa"><a class="brand" data-voltar-tutor href="../../../bancadas.html#fisiologia"><img src="../brand/orientador.webp" alt="" width="42" height="42"><span class="brand-copy"><b>FISIOLOGIA INTERATIVA</b><span>RA - Realidade Aumentada</span></span></a><div class="nav-actions"><a class="small-button" data-voltar-tutor href="../../../bancadas.html#fisiologia">Voltar à biblioteca</a></div></nav></header>
+<main class="page shell">
+  <div class="page-head"><div><span class="eyebrow">Realidade aumentada · Fisiologia celular</span><h1>Do neurônio ao impulso</h1></div></div>
+  <p class="page-note">Quatro níveis exploram Neurônio, Comunicação, Interior e A onda. O painel de Goldman relaciona permeabilidade e potencial nos níveis Neurônio e Interior. Comunicação acompanha o sinal entre neurônios; A onda mostra um exemplo didático separado de propagação em axônio amielínico. A bicamada e os mecanismos de transporte estão agora na <a href="../celula/" data-celula-link>Célula viva</a>.</p>
+
+<section class="ciclo-controls" aria-label="Rotação da peça tridimensional"><div class="playback"><span class="eyebrow">Rotação da peça</span><button id="iniciarGiro" class="primary" type="button">Iniciar giro</button><button id="pausarGiro" type="button" disabled>Pausar giro</button></div><div class="execution-settings"><label class="ctrl speed-control"><span>Velocidade do giro <b id="velocidadeGiroValor">1,00×</b></span><input id="velocidadeGiro" type="range" min="0.25" max="2" step="0.25" value="1" aria-label="Velocidade do giro" /></label></div><p class="execution-note">O giro altera apenas a visualização. Em Comunicação, use Disparar, Pausar e Velocidade para acompanhar o sinal. Em A onda, use Disparar, Pausar e Câmera lenta adicional para controlar o potencial de ação.</p><p id="giroEstado" role="status">Giro pausado</p></section>
+      <div class="progress" aria-label="Níveis">
+        <button class="step active" data-step="0" type="button"><b>01</b><span>Neurônio</span></button>
+        <button class="step" data-step="1" type="button"><b>02</b><span>Comunicação</span></button>
+        <button class="step" data-step="2" type="button"><b>03</b><span>Interior</span></button>
+        <button class="step" data-step="5" type="button"><b>04</b><span>A onda</span></button>
+      </div>
+  <section class="experience" aria-label="Exploração tridimensional do potencial de membrana">
+    <div class="viewer-column">
+    <div id="stage" class="stage" role="region" aria-label="Exploração do modelo tridimensional">
+      <canvas id="scene" role="img" aria-label="Modelo tridimensional interativo"></canvas>
+      <div id="labels" class="labels" aria-hidden="true"></div>
+      <div class="stage-hud"><span id="scaleLabel">Escala celular</span><span id="emLabel">Em −70 mV</span><span id="stepLabel">01 · Neurônio</span></div>
+      <div class="gesture">Arraste para girar · pinça/roda para aproximar</div>
+      <div class="stage-tools">
+        <button id="rotulos" class="ghost-control on" type="button">Rótulos</button>
+        <button id="organelas" class="ghost-control on" type="button" aria-pressed="true" disabled>Organelas</button>
+        <button id="cargas" class="ghost-control on" type="button" aria-pressed="true" disabled>Cargas</button>
+        <button id="telaCheia" class="ghost-control" type="button">Ampliar</button>
+        <button id="resetView" class="ghost-control" type="button">Restaurar vista</button>
+      </div>
+    </div>
+
+      <article class="info-card" id="infoCard">
+        <span class="eyebrow" id="infoEyebrow">A pergunta</span>
+        <h2 id="infoTitle">Onde está a carga?</h2>
+        <p id="infoText">Explore o neurônio em três dimensões e aprofunde para entrar na célula.</p>
+        <div class="microtags" id="microtags"></div>
+      </article>
+      <div class="actions"><button id="prev" class="secondary" type="button" disabled>← Voltar</button><button id="next" class="primary" type="button">Aprofundar →</button></div>
+    </div>
+    <aside class="panel" aria-label="Potencial de membrana e realidade aumentada">
+
+
+
+
+
+
+      <section id="goldmanBox" class="caixa" aria-label="Permeabilidade e potencial">
+        <div class="caixa-head"><span class="eyebrow">Equação de Goldman</span><div class="caixa-btns"><button id="repouso" type="button">Repouso</button><button id="pico" type="button">Pico</button></div></div>
+        <label class="ctrl"><span>Permeabilidade ao Na⁺ ÷ ao K⁺</span><input id="alfa" type="range" min="-2" max="1.5" step="0.01" value="-1.52" aria-label="Razão de permeabilidade do sódio sobre o potássio, em escala logarítmica" /></label>
+        <label class="ctrl"><span>[K⁺] extracelular (mM)</span><input id="ko" type="range" min="1" max="20" step="0.5" value="4" aria-label="Potássio extracelular" /></label>
+        <label class="ctrl"><span>Diâmetro da célula (µm)</span><input id="diam" type="range" min="10" max="120" step="5" value="50" aria-label="Diâmetro da célula" /></label>
+        <p id="goldmanValor" class="valor"></p>
+        <canvas id="curvaGoldman" width="330" height="160" aria-label="Potencial de membrana em função da permeabilidade ao sódio"></canvas>
+        <p id="goldmanConta" class="conta"></p>
+        <p class="nota">A conta usa uma célula esférica equivalente; não inclui a área dos dendritos e do axônio. É refeita a cada movimento, com 1 µF/cm² de capacitância de membrana e 140 mM de K⁺ interno. Na nova RA Célula viva, Película mostra bicamada e separação de cargas com réguas, e Travessias apresenta os mecanismos de transporte.</p>
+      </section>
+
+      <section id="comunicacaoBox" class="caixa" hidden aria-label="Comunicação entre neurônios">
+        <div class="caixa-head"><span class="eyebrow">Comunicação entre neurônios</span><div class="caixa-btns"><button id="comDisparar" type="button">Disparar</button><button id="comPausar" type="button">Pausar</button></div></div>
+        <label class="ctrl"><span>Posição do sinal (s de animação)</span><input id="comInstante" type="range" min="0" max="7.9" step="0.02" value="0" aria-label="Posição do sinal ao longo dos três neurônios" /></label>
+        <label class="ctrl"><span>Velocidade da animação</span><input id="comVelocidade" type="range" min="0.25" max="1.5" step="0.25" value="1" aria-label="Velocidade da animação do sinal" /></label>
+        <p id="comunicacaoValor" class="valor"></p>
+        <p class="nota">Câmera lenta: a animação inteira representa poucos milissegundos. A esfera luminosa marca onde está o sinal. Na sinapse ela não atravessa como corrente: o terminal libera neurotransmissor, que cruza a fenda e gera um novo potencial no neurônio seguinte. Um único potencial pós-sináptico costuma ser pequeno; é a soma de muitas entradas que leva o cone de implantação ao limiar. Os saltos da esfera sob a mielina representam a condução saltatória entre nódulos de Ranvier.</p>
+      </section>
+
+      <section id="disparoBox" class="caixa" hidden aria-label="Potencial de ação">
+        <div class="caixa-head"><span class="eyebrow">Potencial de ação</span><div class="caixa-btns"><button id="disparar" type="button">Disparar</button><button id="pausar" type="button">Pausar</button></div></div>
+        <label class="ctrl"><span>Instante do disparo (ms)</span><input id="instante" type="range" min="0" max="8.4" step="0.02" value="0" aria-label="Instante do potencial de ação" /></label>
+        <label class="ctrl"><span>Câmera lenta adicional</span><input id="lento" type="range" min="1" max="40" step="1" value="1" aria-label="Fator de câmera lenta" /></label>
+        <p id="disparoValor" class="valor"></p>
+        <canvas id="curvaDisparo" width="330" height="160" aria-label="Curva do potencial de ação no ponto de registro"></canvas>
+        <p class="nota">A cor da parede é o sinal da película e as duas faces estão sempre em oposição: o que viaja é a inversão. A curva é uma forma didática por trechos, independente do painel de Goldman; não é uma simulação de Hodgkin–Huxley. Neste axônio amielínico ela avança ponto a ponto, acendendo a vizinha, e leva 3 ms para atravessar 6 mm. Use o cursor de instante para parar no pico, na repolarização ou no momento exato em que os sinais trocam de lado.</p>
+      </section>
+
+      <section class="ra-box" aria-label="Realidade aumentada">
+        <model-viewer id="arViewer" alt="Modelo do potencial de membrana em realidade aumentada" ar autoplay ar-modes="webxr scene-viewer quick-look" ar-placement="floor" ar-scale="auto" camera-controls loading="eager" reveal="auto" shadow-intensity="1" exposure="1.1"></model-viewer>
+        <button id="launchAR" class="ra-launch" type="button" disabled>Abrir em realidade aumentada</button>
+        <p id="raStatus" class="ra-status">Preparando o modelo para a câmera…</p>
+      </section>
+<section class="referencias-modelo" aria-label="Observações do modelo"><p>Modelos e texturas procedurais didáticos. As organelas e as proteínas de transporte são ampliadas para leitura; os quatro níveis usam escalas distintas. O modelo da comunicação mostra três neurônios em cadeia; a esfera luminosa e o tempo da animação são representações didáticas. No neurônio periférico, a translucidez da mielina permite observar os núcleos das células de Schwann.</p><p>Os níveis 01 e 03 usam Goldman; A onda apresenta um exemplo separado de propagação em axônio amielínico, sem simular Hodgkin–Huxley. A RA mostra o nível e o estado selecionados como peça estática.</p></section>
+    </aside>
+  </section>
+
+  <section class="learning-strip"><div><span class="eyebrow">Ideia central</span><h2>Voltagem não é propriedade do corpo da célula</h2></div><p>É uma diferença entre dois lados de uma parede. O citoplasma permanece eletricamente neutro; o que muda é a fila de íons encostada na membrana — tão fina que envolve menos de um milésimo de por cento do potássio que a célula contém. É por isso que o potencial pode inverter em menos de um milissegundo sem que a composição interna mude de forma perceptível: mover essa película é barato, e é esse preço baixo que torna o impulso nervoso possível.</p></section>
+</main>
+<footer class="rodape shell"><img src="../brand/mestre-lap.webp" alt="" width="84" height="84"><p class="signature">Simuladores interativos utilizados nas disciplinas de Fisiologia Humana do Prof. Mário César Nascimento, PhD ©</p></footer>
+<script type="module" src="app.js?v=mitocondria-20261009"></script>
+<script src="../ra-ios.js?v=ra-ios-20261024"></script></body>
+</html>

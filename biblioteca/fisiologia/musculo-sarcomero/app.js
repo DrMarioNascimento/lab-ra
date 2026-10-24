@@ -486,6 +486,10 @@ function prepararRA() {
       const buf = await new GLTFExporter().parseAsync(wrap, { binary: true, onlyVisible: true });
       if (id !== prepId) return;
       if (arUrl) URL.revokeObjectURL(arUrl); arUrl = URL.createObjectURL(new Blob([buf], { type: 'model/gltf-binary' }));
+      /* com as placas, o USDZ já é montado aqui (prepararBotoes): o ra-ios.js não deve
+         gerar um segundo arquivo ao mesmo tempo. No iPhone as duas conversões juntas
+         esgotavam a memória, a montagem das placas falhava e a peça abria sem elas. */
+      E.viewer.dataset.raPlacas = usaBotoes() ? '1' : '';
       E.viewer.src = arUrl;
     } catch (err) { console.error(err); E.status.textContent = 'Não foi possível preparar o modelo para RA.'; }
   }, 350);

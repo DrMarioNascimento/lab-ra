@@ -874,6 +874,7 @@ function prepararRA() {
       if (atual === COM) {
         if (id !== prepId) return;
         if (arUrl) { URL.revokeObjectURL(arUrl); arUrl = null; }
+        E.viewer.dataset.raPlacas = usaPlacaCom() ? '1' : '';   /* a placa Disparar monta o próprio USDZ; o ra-ios.js não gera outro */
         E.viewer.src = URL_COMUNICACAO;
         if (usaPlacaCom()) await prepararPlacaCom(id);
         return;
@@ -893,6 +894,7 @@ function prepararRA() {
       if (id !== prepId) return;
       if (arUrl) URL.revokeObjectURL(arUrl);
       arUrl = URL.createObjectURL(new Blob([buf], { type: 'model/gltf-binary' }));
+      E.viewer.dataset.raPlacas = '';
       E.viewer.src = arUrl;
     } catch (err) { console.error(err); E.status.textContent = 'Não foi possível preparar o modelo para RA.'; }
   }, 350);
