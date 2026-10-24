@@ -67,3 +67,13 @@ https://www.drmarionascimento.com.br/
 Abrange os componentes originais da biblioteca de experimentação. As cópias de Dragon Games e Fisiologia continuam sujeitas aos registros de origem e às licenças próprias, sem ampliação de permissões pela sua inclusão na biblioteca.
 
 Esta revisão atualiza a identificação e o escopo documental. Preserva os titulares, as permissões e as restrições existentes. Não substitui nem restringe as licenças próprias de componentes de terceiros.
+
+## Escopo e disponibilidade — 24 de outubro de 2026
+
+A biblioteca e as novas cópias de bancadas conservam a autoria e as licenças da origem. Cópias de jogos não se tornam públicas por integrar um ambiente de experimentação. A retirada de experimentos antigos não elimina créditos ou direitos de seus titulares.
+
+Esta revisão documenta o escopo e a disponibilidade atuais; preserva os titulares, as permissões e as restrições existentes, inclusive os direitos e licenças próprios de terceiros. Acesso público não equivale a licença de código aberto.
+
+Inventário de acessos: https://www.drmarionascimento.com.br/#acesso-publico
+
+**English — scope and availability, October 24, 2026:** The library and copied benches retain origin authorship and licenses. Copying a game into an experimental library does not open it to public participation. Existing ownership, grants, restrictions and third-party terms are preserved; public access does not mean open source.

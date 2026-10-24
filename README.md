@@ -1,6 +1,14 @@
 # LAB-RA — biblioteca e experimentação
 
-## Situação atual — 19 de outubro de 2026
+## Disponibilidade e novidades — 24 de outubro de 2026
+
+**Biblioteca de experimentação**, com entradas em [bancadas.html](https://lab-ra.dragongames.dev.br/bancadas.html). As nove bancadas de Fisiologia usam os caminhos atuais em `biblioteca/fisiologia/`: célula, potencial de membrana, Starling, junção neuromuscular, músculo/sarcômero, osso vivo, coração, retorno venoso e pleura.
+
+Para os materiais educacionais disponíveis ao público, o [portal de Fisiologia](https://fisiologia.drmarionascimento.com.br/) é a referência principal. As cópias locais de jogos conservam o estágio e as restrições da origem. Antigos atalhos de experiências retiradas não são contabilizados como atividades novas. Esta biblioteca não libera jogos fechados.
+
+[Ver todos os recursos públicos](https://www.drmarionascimento.com.br/#acesso-publico). O acesso respeita [LICENSE.md](LICENSE.md).
+
+## Contexto técnico — registro de 19 de outubro de 2026
 
 Biblioteca pessoal de experimentação em [bancadas.html](bancadas.html), com cópias locais de Dragon Games e Fisiologia. A origem e a revisão de cada cópia estão em [biblioteca/origens.json](biblioteca/origens.json). Atualizar o projeto de origem não atualiza automaticamente estas cópias; confira a procedência antes de sincronizar. Os jogos continuam em testes internos.
 
