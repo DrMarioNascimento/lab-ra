@@ -21,15 +21,31 @@ test('todos os acessos do catalogo existem localmente',()=>{
   assert.ok(existsSync(fileURLToPath(url)),href);
  }
 });
-test('componentes originais copiados mantem os hashes registrados',()=>{
+test('componentes copiados mantem os hashes registrados e adaptações documentadas',()=>{
  const hashes=JSON.parse(readFileSync(new URL('biblioteca/arquivos-originais.json',root),'utf8'));
  assert.ok(Object.keys(hashes).length>100);
+ const divergencias=[];
  for(const [p,sha] of Object.entries(hashes)){
+  if(!existsSync(new URL(p,root))){divergencias.push({arquivo:p,erro:"arquivo ausente"});continue;}
   let payload=readFileSync(new URL(p,root));
   if(/\.(?:js|mjs|cjs|html|css|md|json|txt|py|svg|vtt|rules|gitkeep)$/i.test(p)||!p.split(/[\\/]/).pop().includes('.'))payload=Buffer.from(payload.toString('utf8').replace(/\r\n/g,'\n'));
-  assert.equal(createHash('sha256').update(payload).digest('hex'),sha,p);
+  const actual=createHash('sha256').update(payload).digest('hex');
+  if(actual!==sha)divergencias.push({arquivo:p,esperado:sha,atual:actual});
  }
+ assert.deepEqual(divergencias,[], 'todas as divergências de integridade');
 });
 test('Fisiologia retorna para biblioteca sem entrar em Tutor',()=>{
  const s=readFileSync(new URL('biblioteca/fisiologia/tutor-origem.js',root),'utf8');assert.match(s,/bancadas.html#fisiologia/);assert.doesNotMatch(s,/tutor-ef|tutor-fisio/);
+});
+
+test('atualizações de procedência correspondem ao manifesto e caminhos são únicos',()=>{
+ const hashes=JSON.parse(readFileSync(new URL('biblioteca/arquivos-originais.json',root),'utf8'));
+ const normalizados=new Map(Object.entries(hashes).map(([p,h])=>[p.replaceAll('\\','/'),h]));
+ assert.equal(normalizados.size,Object.keys(hashes).length,'caminho duplicado com separadores diferentes');
+ for(const sha of normalizados.values())assert.match(sha,/^[a-f0-9]{64}$/);
+ const origens=JSON.parse(readFileSync(new URL('biblioteca/origens.json',root),'utf8'));
+ for(const registro of origens.atualizacoes){
+  assert.match(registro.commit_fonte,/^[a-f0-9]{40}$/);assert.ok(registro.criterio);
+  for(const arquivo of registro.arquivos)assert.equal(normalizados.get(arquivo.arquivo),arquivo.sha256,arquivo.arquivo);
+ }
 });

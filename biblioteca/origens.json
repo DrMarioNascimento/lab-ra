@@ -15,7 +15,15 @@
     "biblioteca\\fisiologia\\potencial-membrana\\index.html",
     "biblioteca\\fisiologia\\retorno-venoso\\index.html",
     "biblioteca\\fisiologia\\starling\\index.html",
-    "Entradas de estudo Carro-Forte e VestChip e navegação dos wrappers de A Casa da Costa"
+    "Entradas de estudo Carro-Forte e VestChip e navegação dos wrappers de A Casa da Costa",
+    "biblioteca/fisiologia/README.md",
+    "biblioteca/fisiologia/coracao/LICENSE.md",
+    "biblioteca/fisiologia/coracao/README.md",
+    "biblioteca/fisiologia/juncao-neuromuscular/README.md",
+    "biblioteca/fisiologia/musculo-sarcomero/README.md",
+    "biblioteca/fisiologia/osso-vivo/README.md",
+    "biblioteca/fisiologia/potencial-membrana/README.md",
+    "biblioteca/fisiologia/starling/README.md"
   ],
   "dragon": [
     {
@@ -356,6 +364,64 @@
           "origem": "ra/celula/visualizador/celula-ra.glb",
           "sha256": "866c704db85e1e5ad1eed699e49cce822a69213cb185d59c769d73b2974f598d",
           "adicionado": true
+        }
+      ]
+    },
+    {
+      "data": "2026-10-24",
+      "tipo": "reconciliacao-de-adaptacoes-documentais",
+      "fonte": "DrMarioNascimento/fisiologia-interativa",
+      "commit_fonte": "cc4d94515bcd038cad7d30ca9e472c9912c4713f",
+      "commit_adaptacao": "159c36cbf5db48f26a3f43022f45407802dbde80",
+      "criterio": "Hashes anteriores conferidos com a origem. Remover somente a nota de manutenção de 19/10 e reverter a atualização do domínio e dos links de licença reproduz integralmente o texto de origem. Nenhuma alteração adicional de conteúdo foi aceita.",
+      "arquivos": [
+        {
+          "arquivo": "biblioteca/fisiologia/README.md",
+          "origem": "ra/README.md",
+          "sha256_anterior": "9c28106c8dc65f988ff49dd3c475b41926a03493c8f4f93c8035864e07e3818e",
+          "sha256": "0d3f8d150ed736b4127630cec337c5cb5ceecf822f9ca41623da29fc665367d3"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/coracao/LICENSE.md",
+          "origem": "ra/coracao/LICENSE.md",
+          "sha256_anterior": "ffbacf67b14bc3db1127a97c02d7101c25794852b9ca78b1045ed28d1638b0b3",
+          "sha256": "cc9d1caa65fe23d8f0a95d5989140f08aadca45db3b02aa6d9bd9bbcb1a3b748"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/coracao/README.md",
+          "origem": "ra/coracao/README.md",
+          "sha256_anterior": "bc2a77d72f07d27fdab3a1c4f4513fbcff9be3554a1f1eff439b2e6d57a64f50",
+          "sha256": "b84366a2549ca981a5d9eb65f0e8a62d62876551d22a11f02e7d94fb846f7c86"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/juncao-neuromuscular/README.md",
+          "origem": "ra/juncao-neuromuscular/README.md",
+          "sha256_anterior": "dea08b0fc660a8de6df3bb4c1acea84494a754a82a6e83e4b35ffd74f879cf47",
+          "sha256": "5c2db4e571f524b3351f6bf41a7861d9552376a91afbc4cb5c3e137d9bd96263"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/README.md",
+          "origem": "ra/musculo-sarcomero/README.md",
+          "sha256_anterior": "6c8cd4206798703849466b6b6e6424ab3cf10714e79cb423ff77ebaa5b80fc46",
+          "sha256": "d187ddd12b2e3c1a949bf21240a0cd50b6f1186b794ef22f09411b0da7778ded"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/osso-vivo/README.md",
+          "origem": "ra/osso-vivo/README.md",
+          "sha256_anterior": "e3fa52945f1ec58c78aeef11c6cf8203ec6f2255c99ef645218e4501b0991990",
+          "sha256": "c2401e26497799cc35eb64df2fb932fec3a22e661ca5783bf24fba33950485e7"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/potencial-membrana/README.md",
+          "origem": "ra/potencial-membrana/README.md",
+          "sha256_anterior": "c3a85abcfa32e52cb7de2466e1976f24dba3a86f6ed4e0b134daa5134dd3ce5d",
+          "sha256": "816cdc8e2fab9b52a793a0ecc8de7b626a5a7ede42914448be3f63d52380c067"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/starling/README.md",
+          "origem": "ra/starling/README.md",
+          "sha256_anterior": "dae132b4ac8008e5d147842fb6d023d8ca92cc8b24b2b29ef0ee2ca83c932fbe",
+          "sha256": "a0d4747a6af466b8eaeeed514f369fc15d18da934220265ea2c00482d17031a0"
         }
       ]
     }

@@ -42,4 +42,6 @@ Direitos autorais e restrições: [LICENSE.md](LICENSE.md). As licenças de bibl
 
 A divergência de integridade foi reconciliada com o projeto de origem. Dez arquivos atualizados e dois arquivos novos foram comparados, byte a byte pelo identificador Git, com a revisão `b4087965d55256d0a73a852ddb179a0129be4ad7` de `fisiologia-interativa`. O manifesto registra os hashes correspondentes; `biblioteca/origens.json` preserva as referências anteriores e documenta esta atualização por arquivo.
 
+Também foram reconciliadas oito adaptações documentais de 19/10: notas de procedência, domínio atualizado e caminhos para a licença preservada. A reversão apenas dessas adaptações reproduz exatamente os textos da origem registrada. O manifesto inclui essas cópias adaptadas, identificadas em `origens.json`.
+
 O teste de integridade continua obrigatório e verifica os 588 arquivos registrados. Os resultados de cada revisão estão no [workflow de testes](https://github.com/DrMarioNascimento/lab-ra/actions). Testes automáticos não substituem inspeção visual, câmera/RA em aparelho compatível nem login Google real. Essas verificações interativas não foram repetidas nesta revisão porque a conexão do navegador estava indisponível.
