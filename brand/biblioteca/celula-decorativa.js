@@ -80,11 +80,12 @@ function arcText(str,rr,center,bottom,font,fill,step,stroke){
 }
 let CX0=0,CY0=0;
 let lockPos=null;
+const lockArt = new Image();
+lockArt.onload = () => { if (RM) frame(performance.now()); };
+lockArt.src = new URL('../../assets/icons/locks/closed-white.png', document.currentScript.src).href;
 function drawLock(x,y,s,col){
-  c.save();c.translate(x,y);c.strokeStyle=col;c.fillStyle='#070b10';c.lineWidth=1.5;
-  c.beginPath();c.arc(0,-s*.35,s*.55,Math.PI,0);c.stroke();
-  c.beginPath();c.roundRect(-s*.8,-s*.35,s*1.6,s*1.2,2);c.fill();c.stroke();
-  c.fillStyle=col;c.beginPath();c.arc(0,s*.2,s*.18,0,7);c.fill();c.restore();
+  if (!lockArt.complete || !lockArt.naturalWidth) return;
+  c.drawImage(lockArt,318,104,792,1090,x-s*.8,y-s*1.1,s*1.6,s*2.2);
 }
 function rbc(x,y,r,sat){ // hemácia bicôncava vista de cima
   const col = sat>0.5 ? [255,77,90] : [150,40,70];
