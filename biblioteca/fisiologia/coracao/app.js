@@ -1610,3 +1610,10 @@ $('resetView').onclick=restaurarVista;
 $('telaCheia').onclick=async()=>{const palco=$('stage');if(document.fullscreenElement)await document.exitFullscreen();else await palco.requestFullscreen();medir()};
 addEventListener('fullscreenchange',()=>{medir();$('telaCheia').textContent=document.fullscreenElement?'Reduzir':'Ampliar'});
 atualizarExecucao();
+
+// A mesma exportação é usada na compilação dos arquivos públicos.
+window.__compilarCiclo=gerarCiclo;
+window.__cicloPronto=()=>Boolean(pecaA.aplicar&&pecaB.aplicar);
+
+import {instalarCicloPortatil} from '../ciclo-portatil.js';
+instalarCicloPortatil({experiencia:'coracao',nivel:()=>atual==='A'?1:2,niveis:[1,2]});

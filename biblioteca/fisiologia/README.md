@@ -2,9 +2,9 @@
 
 ## Manutenção e origem — 19 de outubro de 2026
 
-Esta pasta é uma cópia local de estudo dentro da biblioteca LAB-RA. O texto técnico abaixo registra a experiência de origem; os acessos da biblioteca e o retorno local são definidos pelo LAB-RA. A procedência e a revisão da cópia devem ser conferidas em `biblioteca/origens.json`, na raiz. Alterações no Fisiologia Interativa não são sincronizadas automaticamente aqui.
+Módulo de Fisiologia em RA, mantido neste repositório e acessado pelos percursos dos tutores. A Unidade 06 — Sistema Endócrino possui documentação separada em `endocrino/`; sua inclusão não altera a procedência dos modelos desta experiência. Os créditos e as licenças específicos abaixo permanecem aplicáveis.
 
-Consulte o [README principal](../../README.md) e a [licença da raiz](../../LICENSE.md). Créditos e licenças específicos deste módulo permanecem nos documentos abaixo.
+Consulte o [README principal](../README.md) e a [licença da raiz](../LICENSE.md). Créditos e licenças específicos deste módulo permanecem nos documentos abaixo.
 
 Experiências independentes do Fisiologia Interativa, abertas pelos Tutores de Educação Física e Fisioterapia. Pleura inclui Camadas, Mecânica, Pneumotórax, Gradiente e Zonas de West, controles de respiração e velocidade, Repouso, Exercício, Enfisema, Fibrose e Capacidade vital forçada.
 
@@ -42,7 +42,7 @@ PA/PV compartilham a escala dos gráficos, e os cards informam o desnível em re
 
 Coração e Retorno venoso têm acessos próprios no destaque RA cardiovascular dos Tutores EF e Fisioterapia. Iniciar/Pausar, Um ciclo, Reiniciar, velocidade, frequência, amplitude, instantes rápidos, ampliação e legendas usam o padrão das outras experiências. A exportação RA preserva o instante pausado escolhido e invalida exportações antigas ao iniciar ou trocar a vista. Não exige Google nem carrega recursos do repositório anterior. [Detalhes, validação e atribuições](coracao/README.md).
 
-Os dois botões cardiovasculares usam o mesmo acabamento dourado com profundidade 3D. A referência *Realistic Human Heart* corresponde somente à Vista Externa; a Vista Interna deriva de BodyParts3D. Os batimentos de cada área cardíaca (segmento) foram cuidadosamente calculados pelo Prof. Mário César Nascimento, PhD. Consulte as [atribuições dos modelos](assets/ATRIBUICAO.md), as [licenças do coração](coracao/LICENSE.md) e a [licença principal](LICENCA-ORIGEM.md), que preserva as licenças próprias dos componentes de terceiros.
+Os dois botões cardiovasculares usam o mesmo acabamento dourado com profundidade 3D. A referência *Realistic Human Heart* corresponde somente à Vista Externa; a Vista Interna deriva de BodyParts3D. Os batimentos de cada área cardíaca (segmento) foram cuidadosamente calculados pelo Prof. Mário César Nascimento, PhD. Consulte as [atribuições dos modelos](assets/ATRIBUICAO.md), as [licenças do coração](coracao/LICENSE.md) e a [licença principal](../LICENSE.md), que preserva as licenças próprias dos componentes de terceiros.
 
 ## Do músculo ao sarcômero · Sistema muscular
 
@@ -65,3 +65,8 @@ A apresentação segue as demais experiências: assinatura, retorno ao Tutor de 
 ## Viagem ao osso vivo
 
 [Nova experiência](https://fisiologia.drmarionascimento.com.br/ra/osso-vivo/) procedural original: desmontagem do osso, compacto e esponjoso, ósteon com vasos e canalículos, osteoclasto com transcitose, osteoblasto com síntese e mineralização extracelular. Colágeno entrelaçado e cristais em placas ganham uma ampliação própria; setas e deformação ampliada tornam a carga visível. Três cenários de carga compartilham um ciclo demonstrativo; valores são volumes relativos escolhidos, sem densitometria ou calendário clínico. Controles de reprodução, rótulos, cinco peças estáticas em RA, roteiro e questões nos quatro Tutores. EF: Osteoarticular; Fisioterapia: Sistema muscular, preservando suas cinco unidades. [Modelo, referências e limites](osso-vivo/README.md).
+
+## Volume e movimento — 25/10/2026
+
+Placas e textos extrudados, ciclos portáteis em GLB e USDZ e preservação das exportações de estado. Consulte [a revisão e os limites de compatibilidade](REVISAO-VOLUME-MOVIMENTO.md).
+

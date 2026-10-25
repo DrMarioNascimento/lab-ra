@@ -1,0 +1,50 @@
+{
+  "bytes": 31929480,
+  "sha256": "bb8dcf1c9ac7322ced2f1dc9f77ffec9085c188af7a71f2fa1cf71e4f5fc8d1b",
+  "parts": [
+    {
+      "file": "parte-01.bin",
+      "bytes": 3000000
+    },
+    {
+      "file": "parte-02.bin",
+      "bytes": 3000000
+    },
+    {
+      "file": "parte-03.bin",
+      "bytes": 3000000
+    },
+    {
+      "file": "parte-04.bin",
+      "bytes": 3000000
+    },
+    {
+      "file": "parte-05.bin",
+      "bytes": 3000000
+    },
+    {
+      "file": "parte-06.bin",
+      "bytes": 3000000
+    },
+    {
+      "file": "parte-07.bin",
+      "bytes": 3000000
+    },
+    {
+      "file": "parte-08.bin",
+      "bytes": 3000000
+    },
+    {
+      "file": "parte-09.bin",
+      "bytes": 3000000
+    },
+    {
+      "file": "parte-10.bin",
+      "bytes": 3000000
+    },
+    {
+      "file": "parte-11.bin",
+      "bytes": 1929480
+    }
+  ]
+}

@@ -18,25 +18,13 @@
         de 64 bytes que o Quick Look exige.
    --------------------------------------------------------------------------- */
 import * as THREE from 'three';
+import {placaVolume} from './texto-volume.js';
 import { USDZExporter } from 'three/addons/exporters/USDZExporter.js';
 import { unzipSync, zipSync, strFromU8, strToU8 } from 'three/addons/libs/fflate.module.js';
 
 function placa(rotulo, larguraM, alturaM) {
-  const c = document.createElement('canvas'); c.width = 512; c.height = Math.round(512 * alturaM / larguraM);
-  const g = c.getContext('2d');
-  g.fillStyle = '#123446'; g.fillRect(0, 0, c.width, c.height);
-  g.strokeStyle = '#9ce4ed'; g.lineWidth = 14; g.strokeRect(7, 7, c.width - 14, c.height - 14);
-  /* rótulo que não cabe encolhe até caber: "Albumina baixa" passava da borda */
-  let corpo = Math.round(c.height * .46);
-  g.font = `700 ${corpo}px Inter, Arial, sans-serif`;
-  while (corpo > 18 && g.measureText(rotulo).width > c.width * .86) { corpo -= 2; g.font = `700 ${corpo}px Inter, Arial, sans-serif`; }
-  g.fillStyle = '#ffffff';
-  g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(rotulo, c.width / 2, c.height / 2 + 2);
-  const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace;
-  const mat = new THREE.MeshStandardMaterial({ map: tex, roughness: .7, metalness: 0 });
-  /* caixa fina: a face de cima mostra o texto, e a placa fica de pé sozinha */
-  const geo = new THREE.BoxGeometry(larguraM, .006, alturaM);
-  return new THREE.Mesh(geo, mat);
+ const p=placaVolume(rotulo,{largura:larguraM,altura:alturaM,espessura:.006});
+ p.rotation.x=-Math.PI/2; return p;
 }
 
 /* caminhos dos prims no USDA, pelo nome: acompanha `def … "nome"` e as

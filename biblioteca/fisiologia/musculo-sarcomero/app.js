@@ -579,3 +579,6 @@ window.urlBotoesIOS = () => botoesUrl;
 onContracao();
 const pedido = parseInt(new URLSearchParams(location.search).get('nivel'), 10);
 if (Number.isFinite(pedido) && pedido >= 1 && pedido <= 5) irDireto(pedido - 1); else prepararRA();
+
+import {instalarCicloPortatil} from '../ciclo-portatil.js';
+instalarCicloPortatil({experiencia:'musculo-sarcomero',nivel:()=>atual+1,niveis:[5]});

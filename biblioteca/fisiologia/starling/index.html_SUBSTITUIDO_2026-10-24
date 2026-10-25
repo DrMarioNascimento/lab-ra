@@ -12,7 +12,7 @@
 <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.1.0/dist/model-viewer.min.js"></script>
 </head>
 <body>
-<header class="topbar"><nav class="shell" aria-label="Fisiologia Interativa"><a class="brand" data-voltar-tutor href="../../../bancadas.html#fisiologia"><img src="../brand/orientador.webp" alt="" width="42" height="42"><span><b>FISIOLOGIA INTERATIVA</b><small>RA - Realidade Aumentada · Unidade 1 · Celular</small></span></a><a class="button quiet small-button" data-voltar-tutor href="../../../bancadas.html#fisiologia">Voltar à biblioteca</a></nav></header>
+<header class="topbar"><nav class="shell" aria-label="Fisiologia Interativa"><a class="brand" data-voltar-tutor href="../../tutor-ef.html"><img src="../brand/orientador.webp" alt="" width="42" height="42"><span><b>FISIOLOGIA INTERATIVA</b><small>RA - Realidade Aumentada · Unidade 1 · Celular</small></span></a><a class="button quiet small-button" data-voltar-tutor href="../../tutor-ef.html">Voltar ao Tutor</a></nav></header>
 <main class="shell">
 <div class="page-head"><div><span class="eyebrow">UNIDADE 1 · CELULAR · VIAGEM AO TECIDO</span><h1>Forças de Starling</h1></div><span class="pill">Sangue · barreira · linfa</span></div>
 <p class="intro">Explore como a água atravessa a microcirculação e como o tecido devolve esse líquido pela linfa. Acompanhe as forças, altere a barreira e observe o equilíbrio mudar.</p>

@@ -10,3 +10,5 @@ button[aria-pressed=true],.ra-launch{border-color:#7bd4c4;background:linear-grad
 label{display:block;margin:14px 0 8px;color:#bdcfdf;font-size:13px}input{width:100%;accent-color:#7bd4c4;margin-top:10px}footer{color:#91a8bc;font-size:12px;line-height:1.5}#status{color:#83dee1;font-size:13px;margin-top:10px}#tip{color:#e4f3ff;min-height:24px;font-size:16px}#ar-state{font-size:11px;color:#a9c4d3;line-height:1.5}model-viewer{display:block;width:100%;height:155px;background:#091923;border:1px solid #456575;border-radius:12px;margin-top:14px}
 @media(max-width:760px){.viewer-layout{grid-template-columns:minmax(0,1fr);gap:18px;padding:18px}.panel{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px}.panel small,#ar-state,model-viewer,.ra-launch{grid-column:1/-1}.panel button{margin:3px 0}h1{font-size:26px}header p{font-size:13px}#cell-stage{flex:none;height:420px;min-height:0}model-viewer{height:160px}}
 @media(prefers-reduced-motion:reduce){button{transition:none}}
+
+.cell-poster{display:block;width:100%;height:100%;max-height:620px;object-fit:contain}

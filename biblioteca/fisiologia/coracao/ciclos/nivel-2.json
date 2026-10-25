@@ -1,0 +1,550 @@
+{
+  "vista": "Vista Interna",
+  "fc": 75,
+  "bytes": 35720780,
+  "mb": 34.07,
+  "amostras": 24,
+  "duracaoCicloS": 0.8,
+  "normaisNoMorph": true,
+  "limiarMm": 0.05,
+  "malhasNaPeca": 79,
+  "malhasAnimadas": 78,
+  "verticesAnimados": 56088,
+  "malhasExportadasAnimadas": 78,
+  "verticesExportadosAnimados": 56088,
+  "erroInterpolacaoMaxMm": 3.731,
+  "ondeErroInterpolacao": "FJ2635",
+  "erroPorIntervaloMm": [
+    0.377,
+    0.271,
+    0.309,
+    0.034,
+    0.017,
+    0.034,
+    0.022,
+    0.657,
+    3.731,
+    0.726,
+    0.749,
+    0.024,
+    0.008,
+    0.005,
+    0.002,
+    0.523,
+    0.664,
+    0.237,
+    0.075,
+    0.034,
+    0.014,
+    0.026,
+    0.01,
+    0.008
+  ],
+  "erroMalhasParadasMaxMm": 0.019,
+  "ondeErroParadas": "FJ2676",
+  "fechamentoDoLacoMm": 0,
+  "caixaCicloM": [
+    0.1157,
+    0.1046,
+    0.1063
+  ],
+  "alturaRepousoM": 0.1046,
+  "msMedirEMontar": 300.2,
+  "msMedir": 13.5,
+  "msExportar": 3608.1,
+  "preparacaoCores": {
+    "assadas": 0,
+    "cores": 0,
+    "tingidas": 0,
+    "uvDescartado": 0,
+    "ignoradas": 0,
+    "gemeas": 0,
+    "viradas": 0
+  },
+  "etapas": {
+    "msMorphs": 269,
+    "msPosicionar": 17.2,
+    "msPrepararCores": 0.2
+  },
+  "porMalha": [
+    {
+      "nome": "miocardio_ve",
+      "vertices": 487,
+      "excursaoMm": 5.630530466686841,
+      "erroInterpMm": 3.248740926876441
+    },
+    {
+      "nome": "musculo_papilar_anterolateral_ve",
+      "vertices": 532,
+      "excursaoMm": 5.3822770014634855,
+      "erroInterpMm": 2.8463270131882545
+    },
+    {
+      "nome": "musculo_papilar_anterior_vd",
+      "vertices": 580,
+      "excursaoMm": 6.112023129522893,
+      "erroInterpMm": 3.342027437357022
+    },
+    {
+      "nome": "musculo_papilar_posterior_vd",
+      "vertices": 484,
+      "excursaoMm": 4.838983491396369,
+      "erroInterpMm": 2.6283934176009653
+    },
+    {
+      "nome": "musculo_papilar_septal_vd",
+      "vertices": 539,
+      "excursaoMm": 6.327643925016036,
+      "erroInterpMm": 1.1441525113357207
+    },
+    {
+      "nome": "parede_ae",
+      "vertices": 4284,
+      "excursaoMm": 10.456124531409314,
+      "erroInterpMm": 1.8906587620234072
+    },
+    {
+      "nome": "parede_ad",
+      "vertices": 9887,
+      "excursaoMm": 10.439509177665396,
+      "erroInterpMm": 1.8876512210535683
+    },
+    {
+      "nome": "cuspide_anterior_mitral",
+      "vertices": 4052,
+      "excursaoMm": 8.181238933083264,
+      "erroInterpMm": 1.3250798526283931
+    },
+    {
+      "nome": "cuspide_posterior_mitral",
+      "vertices": 2560,
+      "excursaoMm": 8.784509664366198,
+      "erroInterpMm": 1.2974186700748098
+    },
+    {
+      "nome": "cuspide_anterior_tricuspide",
+      "vertices": 4282,
+      "excursaoMm": 10.35439973034389,
+      "erroInterpMm": 1.4319308153713408
+    },
+    {
+      "nome": "cuspide_posterior_tricuspide",
+      "vertices": 2729,
+      "excursaoMm": 9.81925156018785,
+      "erroInterpMm": 1.370178056422279
+    },
+    {
+      "nome": "cuspide_septal_tricuspide",
+      "vertices": 2591,
+      "excursaoMm": 11.989749874637978,
+      "erroInterpMm": 1.3206056008454465
+    },
+    {
+      "nome": "cuspide_anterior_aortica",
+      "vertices": 508,
+      "excursaoMm": 8.73121468814285,
+      "erroInterpMm": 1.692514066761901
+    },
+    {
+      "nome": "cuspide_posterior_direita_aortica",
+      "vertices": 215,
+      "excursaoMm": 6.824012906993638,
+      "erroInterpMm": 1.3016614071625394
+    },
+    {
+      "nome": "cuspide_posterior_esquerda_aortica",
+      "vertices": 526,
+      "excursaoMm": 5.967518357590875,
+      "erroInterpMm": 1.1642627740095657
+    },
+    {
+      "nome": "cuspide_anterior_esquerda_pulmonar",
+      "vertices": 708,
+      "excursaoMm": 6.130871182028592,
+      "erroInterpMm": 0.7683100042561418
+    },
+    {
+      "nome": "cuspide_anterior_direita_pulmonar",
+      "vertices": 769,
+      "excursaoMm": 5.559460021329076,
+      "erroInterpMm": 0.7723799880205452
+    },
+    {
+      "nome": "cuspide_posterior_pulmonar",
+      "vertices": 573,
+      "excursaoMm": 6.797870938897518,
+      "erroInterpMm": 0.6913087830749849
+    },
+    {
+      "nome": "tronco_coronaria_esquerda",
+      "vertices": 121,
+      "excursaoMm": 1.2441557601235997,
+      "erroInterpMm": 0.13109123454904467
+    },
+    {
+      "nome": "tronco_descendente_anterior",
+      "vertices": 1549,
+      "excursaoMm": 6.806352621276977,
+      "erroInterpMm": 3.6702237664745225
+    },
+    {
+      "nome": "tronco_coronaria_direita",
+      "vertices": 2255,
+      "excursaoMm": 8.581121831527394,
+      "erroInterpMm": 1.5516227758110872
+    },
+    {
+      "nome": "seio_coronario",
+      "vertices": 331,
+      "excursaoMm": 7.146704977669757,
+      "erroInterpMm": 1.2922537655620425
+    },
+    {
+      "nome": "FJ2632",
+      "vertices": 91,
+      "excursaoMm": 6.8784640015368765,
+      "erroInterpMm": 1.2437504337029102
+    },
+    {
+      "nome": "FJ2633",
+      "vertices": 318,
+      "excursaoMm": 6.95508351169336,
+      "erroInterpMm": 1.2576065230933553
+    },
+    {
+      "nome": "FJ2634",
+      "vertices": 158,
+      "excursaoMm": 6.8957244751763795,
+      "erroInterpMm": 1.2468721291818623
+    },
+    {
+      "nome": "FJ2635",
+      "vertices": 495,
+      "excursaoMm": 6.901606825935513,
+      "erroInterpMm": 3.730939125867295
+    },
+    {
+      "nome": "FJ2636",
+      "vertices": 282,
+      "excursaoMm": 6.113627265997922,
+      "erroInterpMm": 2.5016599015840937
+    },
+    {
+      "nome": "FJ2637",
+      "vertices": 144,
+      "excursaoMm": 6.440143127229327,
+      "erroInterpMm": 3.5794406780694104
+    },
+    {
+      "nome": "FJ2638",
+      "vertices": 246,
+      "excursaoMm": 6.733239615289141,
+      "erroInterpMm": 3.6620284938668424
+    },
+    {
+      "nome": "FJ2639",
+      "vertices": 122,
+      "excursaoMm": 6.0809934471570415,
+      "erroInterpMm": 3.432274020209356
+    },
+    {
+      "nome": "FJ2640",
+      "vertices": 218,
+      "excursaoMm": 6.080375037798788,
+      "erroInterpMm": 3.4319962828767836
+    },
+    {
+      "nome": "FJ2641",
+      "vertices": 322,
+      "excursaoMm": 6.557133586940868,
+      "erroInterpMm": 3.61684893241053
+    },
+    {
+      "nome": "FJ2642",
+      "vertices": 525,
+      "excursaoMm": 6.927599213407121,
+      "erroInterpMm": 3.0525096844757766
+    },
+    {
+      "nome": "FJ2643",
+      "vertices": 269,
+      "excursaoMm": 7.164021423250026,
+      "erroInterpMm": 1.2953851391440305
+    },
+    {
+      "nome": "FJ2644",
+      "vertices": 193,
+      "excursaoMm": 4.923627955281866,
+      "erroInterpMm": 0.8902807971438191
+    },
+    {
+      "nome": "FJ2645",
+      "vertices": 224,
+      "excursaoMm": 6.736925429363289,
+      "erroInterpMm": 1.2181586388477255
+    },
+    {
+      "nome": "FJ2646",
+      "vertices": 287,
+      "excursaoMm": 5.960982526044907,
+      "erroInterpMm": 1.6757764570544942
+    },
+    {
+      "nome": "FJ2647",
+      "vertices": 216,
+      "excursaoMm": 6.388808170559001,
+      "erroInterpMm": 3.5168617564001567
+    },
+    {
+      "nome": "FJ2648",
+      "vertices": 203,
+      "excursaoMm": 6.2316651890033095,
+      "erroInterpMm": 2.127573558001923
+    },
+    {
+      "nome": "FJ2649",
+      "vertices": 692,
+      "excursaoMm": 7.737805053528928,
+      "erroInterpMm": 1.3991347508817662
+    },
+    {
+      "nome": "FJ2650",
+      "vertices": 316,
+      "excursaoMm": 6.7033980267522,
+      "erroInterpMm": 1.2120958241539945
+    },
+    {
+      "nome": "FJ2651",
+      "vertices": 395,
+      "excursaoMm": 6.552260954176936,
+      "erroInterpMm": 1.1847680996425716
+    },
+    {
+      "nome": "FJ2652",
+      "vertices": 240,
+      "excursaoMm": 6.024699217413891,
+      "erroInterpMm": 1.0893746549213827
+    },
+    {
+      "nome": "FJ2653",
+      "vertices": 232,
+      "excursaoMm": 4.687650598827264,
+      "erroInterpMm": 2.9148389467983407
+    },
+    {
+      "nome": "FJ2654",
+      "vertices": 150,
+      "excursaoMm": 5.507195737106901,
+      "erroInterpMm": 3.216810942456181
+    },
+    {
+      "nome": "FJ2656",
+      "vertices": 434,
+      "excursaoMm": 7.801494671835692,
+      "erroInterpMm": 1.410652158441671
+    },
+    {
+      "nome": "FJ2667",
+      "vertices": 267,
+      "excursaoMm": 6.491187942063011,
+      "erroInterpMm": 1.5012819551149466
+    },
+    {
+      "nome": "FJ2668",
+      "vertices": 176,
+      "excursaoMm": 5.865669773209562,
+      "erroInterpMm": 1.060619604907008
+    },
+    {
+      "nome": "FJ2670",
+      "vertices": 280,
+      "excursaoMm": 2.7843938531231682,
+      "erroInterpMm": 0.5034692073719567
+    },
+    {
+      "nome": "FJ2671",
+      "vertices": 313,
+      "excursaoMm": 8.364224499172906,
+      "erroInterpMm": 1.5124042179148152
+    },
+    {
+      "nome": "FJ2672",
+      "vertices": 447,
+      "excursaoMm": 8.286558632510499,
+      "erroInterpMm": 1.4983603580790035
+    },
+    {
+      "nome": "FJ2673",
+      "vertices": 243,
+      "excursaoMm": 8.112064241221256,
+      "erroInterpMm": 1.4668095485910524
+    },
+    {
+      "nome": "FJ2674",
+      "vertices": 186,
+      "excursaoMm": 7.056744199036894,
+      "erroInterpMm": 1.275987047602863
+    },
+    {
+      "nome": "FJ2675",
+      "vertices": 148,
+      "excursaoMm": 7.704451047515151,
+      "erroInterpMm": 1.3931060701080664
+    },
+    {
+      "nome": "FJ2676",
+      "vertices": 233,
+      "excursaoMm": 0.018630970914590678,
+      "erroParadaMm": 0.018630970914590678
+    },
+    {
+      "nome": "FJ2677",
+      "vertices": 198,
+      "excursaoMm": 7.813153748024217,
+      "erroInterpMm": 1.4127611443534822
+    },
+    {
+      "nome": "FJ2692",
+      "vertices": 608,
+      "excursaoMm": 5.737136222193101,
+      "erroInterpMm": 3.33111694297017
+    },
+    {
+      "nome": "FJ2693",
+      "vertices": 480,
+      "excursaoMm": 5.567586417347574,
+      "erroInterpMm": 3.0706092197745094
+    },
+    {
+      "nome": "FJ2694",
+      "vertices": 305,
+      "excursaoMm": 3.704945293218086,
+      "erroInterpMm": 0.998461631278783
+    },
+    {
+      "nome": "FJ2695",
+      "vertices": 163,
+      "excursaoMm": 4.470935446239244,
+      "erroInterpMm": 2.8559588323492173
+    },
+    {
+      "nome": "FJ2696",
+      "vertices": 286,
+      "excursaoMm": 4.954681704513286,
+      "erroInterpMm": 2.740221959842244
+    },
+    {
+      "nome": "FJ2697",
+      "vertices": 188,
+      "excursaoMm": 5.858955261465808,
+      "erroInterpMm": 3.3512489368619853
+    },
+    {
+      "nome": "FJ2698",
+      "vertices": 195,
+      "excursaoMm": 5.984707115374732,
+      "erroInterpMm": 3.4288550761484156
+    },
+    {
+      "nome": "FJ2699",
+      "vertices": 126,
+      "excursaoMm": 5.925879760791976,
+      "erroInterpMm": 3.39184015590193
+    },
+    {
+      "nome": "FJ2700",
+      "vertices": 197,
+      "excursaoMm": 6.057043755327995,
+      "erroInterpMm": 3.4448074658697454
+    },
+    {
+      "nome": "FJ2714",
+      "vertices": 482,
+      "excursaoMm": 5.782947842579294,
+      "erroInterpMm": 2.9070715185198406
+    },
+    {
+      "nome": "FJ2715",
+      "vertices": 185,
+      "excursaoMm": 4.977872897085743,
+      "erroInterpMm": 3.028821436417254
+    },
+    {
+      "nome": "FJ2716",
+      "vertices": 188,
+      "excursaoMm": 5.1866985554141785,
+      "erroInterpMm": 3.111661446945071
+    },
+    {
+      "nome": "FJ2717",
+      "vertices": 259,
+      "excursaoMm": 5.70853079890069,
+      "erroInterpMm": 1.0322064154706503
+    },
+    {
+      "nome": "FJ2718",
+      "vertices": 139,
+      "excursaoMm": 4.806629661284257,
+      "erroInterpMm": 0.8406422788886488
+    },
+    {
+      "nome": "FJ2719",
+      "vertices": 299,
+      "excursaoMm": 3.6792737384992984,
+      "erroInterpMm": 2.0482156446780824
+    },
+    {
+      "nome": "FJ2720",
+      "vertices": 233,
+      "excursaoMm": 4.097963631681707,
+      "erroInterpMm": 1.9397528171617844
+    },
+    {
+      "nome": "FJ2721",
+      "vertices": 198,
+      "excursaoMm": 4.116359765887142,
+      "erroInterpMm": 2.6889267912800703
+    },
+    {
+      "nome": "FJ2722",
+      "vertices": 244,
+      "excursaoMm": 4.733768897564871,
+      "erroInterpMm": 2.971659972309603
+    },
+    {
+      "nome": "FJ2724",
+      "vertices": 294,
+      "excursaoMm": 8.492242681681589,
+      "erroInterpMm": 1.5355514890739008
+    },
+    {
+      "nome": "FJ2731",
+      "vertices": 454,
+      "excursaoMm": 7.93208439438361,
+      "erroInterpMm": 1.434264402752865
+    },
+    {
+      "nome": "FJ2727",
+      "vertices": 627,
+      "excursaoMm": 8.064636205013167,
+      "erroInterpMm": 3.477167776611093
+    },
+    {
+      "nome": "FJ2728",
+      "vertices": 190,
+      "excursaoMm": 7.68214587649672,
+      "erroInterpMm": 1.3890721930917438
+    },
+    {
+      "nome": "FJ2729",
+      "vertices": 156,
+      "excursaoMm": 6.4431236061886725,
+      "erroInterpMm": 1.2914532783019201
+    }
+  ],
+  "quadrosPorCiclo": 48,
+  "dtMotorS": 0.01667,
+  "msAmostrar": 95.2,
+  "msTotal": 4004,
+  "aparelho": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.8078.4 Safari/537.36"
+}

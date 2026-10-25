@@ -2,9 +2,9 @@
 
 ## Manutenção e origem — 19 de outubro de 2026
 
-Esta pasta é uma cópia local de estudo dentro da biblioteca LAB-RA. O texto técnico abaixo registra a experiência de origem; os acessos da biblioteca e o retorno local são definidos pelo LAB-RA. A procedência e a revisão da cópia devem ser conferidas em `biblioteca/origens.json`, na raiz. Alterações no Fisiologia Interativa não são sincronizadas automaticamente aqui.
+Módulo de Fisiologia em RA, mantido neste repositório e acessado pelos percursos dos tutores. A Unidade 06 — Sistema Endócrino possui documentação separada em `endocrino/`; sua inclusão não altera a procedência dos modelos desta experiência. Os créditos e as licenças específicos abaixo permanecem aplicáveis.
 
-Consulte o [README principal](../../../README.md) e a [licença da raiz](../../../LICENSE.md). Créditos e licenças específicos deste módulo permanecem nos documentos abaixo.
+Consulte o [README principal](../../README.md) e a [licença da raiz](../../LICENSE.md). Créditos e licenças específicos deste módulo permanecem nos documentos abaixo.
 
 Experiência independente em [Fisiologia Interativa](https://fisiologia.drmarionascimento.com.br/ra/potencial-membrana/), transferida da versão aprovada do Lab RA, revisão `303bad15b77d7c995fdc90f20fa0e2b9eaa0902f`. O arquivo `modelos.js` é integralmente idêntico à origem: dendritos, mielina, núcleos de Schwann, organelas, membranas, proteínas e ausência dos instrumentos e das bases preservados.
 
@@ -14,7 +14,7 @@ Goldman, Nernst, contagem de cargas por capacitância e propagação foram prese
 
 Organelas, proteínas, membrana e cargas são representações didáticas com escalas próprias. A translucidez da mielina é um recurso de leitura. A RA exporta o estado estático selecionado; a câmera depende de dispositivo compatível. Não exige credencial Google e não carrega arquivos do Lab RA. Three.js e model-viewer conservam os CDNs e versões fixados nas outras experiências.
 
-O catálogo compartilhado dos quatro acessos ao Tutor, com e sem IA, inclui o roteiro e três questões específicas. Modelos e texturas procedurais originais são cobertos pela [licença do projeto](../LICENCA-ORIGEM.md); as bibliotecas mantêm suas licenças.
+O catálogo compartilhado dos quatro acessos ao Tutor, com e sem IA, inclui o roteiro e três questões específicas. Modelos e texturas procedurais originais são cobertos pela [licença do projeto](../../LICENSE.md); as bibliotecas mantêm suas licenças.
 
 ## Comunicação (nível 02, 09/10/2026)
 

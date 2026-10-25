@@ -209,3 +209,6 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden&&running)de
 addEventListener('pagehide',()=>{disposed=true;++exportId;clearTimeout(arTimer);renderer.setAnimationLoop(null);if(arUrl)URL.revokeObjectURL(arUrl);controls.dispose();renderer.dispose();environment.dispose();});
 const query=new URLSearchParams(location.search),initial=Number.parseInt(query.get('nivel'),10);novaObservacao();resize();selecionar(Number.isFinite(initial)?initial-1:0);
 renderer.setAnimationLoop(t=>{const dt=Math.min(.06,Math.max(0,(t-frame)/1000));frame=t;if(running&&!document.hidden){const next=avancarInstante(instante,dt*40*speed,sim.duracao,$('loop').checked);instante=next.instante;uiElapsed+=dt;const ui=uiElapsed>=.05||next.terminou;atualizar(ui);if(ui)uiElapsed=0;if(next.terminou)definirRunning(false);}controls.update();posicionarLegendas();renderer.render(scene,camera);});
+
+import {instalarCicloPortatil} from '../ciclo-portatil.js';
+instalarCicloPortatil({experiencia:'juncao-neuromuscular',nivel:()=>nivel+1,niveis:[1,2,3,4,5]});

@@ -20,7 +20,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "9c28106c8dc65f988ff49dd3c475b41926a03493c8f4f93c8035864e07e3818e"
+      "sha256": "1a29ea12a46d6cbf35d1ae0c265c880759d684c88854f9af0dd67cfb5a6ce75e"
     },
     {
       "path": "assets/ATRIBUICAO.md",
@@ -64,7 +64,7 @@
     },
     {
       "path": "ra-botoes-ios.js",
-      "sha256": "cd6c7b880b1bc9cd5c856da501bf36a8ec50f70f6f6d30d20e0b3617f1fb46da"
+      "sha256": "f4803b2ddb3e81ba0b33e09372c5345a7adbf9f9a28273860e07d6042cffcc94"
     },
     {
       "path": "package.json",
@@ -84,7 +84,7 @@
     },
     {
       "path": "pleura/app.js",
-      "sha256": "0f594c1209387cb119fe2980260854b1a09b5c994c6e618f73991f5a0ac05e14"
+      "sha256": "d67c2426f66d0df7debd6c097a6a1319b5ce1eea1f17db3e810eb79482784cc8"
     },
     {
       "path": "pleura/estados.js",
@@ -100,7 +100,7 @@
     },
     {
       "path": "pleura/index.html",
-      "sha256": "96903eadc75ec8fc2c4351d2f2c05113a6a5049df10c9e2fa1e6f525ba68caf9"
+      "sha256": "6e0f5f38495fdc24368040e479bcff82d60f2bf6929fdddfea4dc7df241f14f0"
     },
     {
       "path": "pleura/modelos.js",
@@ -120,11 +120,11 @@
     },
     {
       "path": "tutor-origem.js",
-      "sha256": "d17dd0acbfb6611edb35a5fb5c2e5c1de311379701e02c06c2d8803e0ca713d2"
+      "sha256": "a4e881765b0d6e458daa8c0a21526631e3c1b5b0a6d755a1f958830326352dce"
     },
     {
       "path": "retorno-venoso/app.js",
-      "sha256": "62efd3ea0b2d10d640a5859bcd4bf5e1f054a43181cd465514f5992bc3fa05d6"
+      "sha256": "13061ec8fa35ad789e690ab90e745365e150571265c703cc32c7a9db32dfca07"
     },
     {
       "path": "retorno-venoso/bomba.js",
@@ -140,7 +140,7 @@
     },
     {
       "path": "retorno-venoso/index.html",
-      "sha256": "b7cc1dfe0f7441d9320ac41a62d923502850b2c82134dd4e692ac5129c659515"
+      "sha256": "e06220f24d0fa613d945104747d5ff3b674ba372aa1175903ecd155948dcc448"
     },
     {
       "path": "retorno-venoso/modelos.js",
@@ -176,7 +176,7 @@
     },
     {
       "path": "coracao/app.js",
-      "sha256": "5c7f17286143a84973df1fe9ee26e2353994a7ced1a206d82f5e31e60757f850"
+      "sha256": "321543887d28edbc9052046412fbf89d77a123dd2464130fc922181a666e262e"
     },
     {
       "path": "coracao/ATTRIBUTION.md",
@@ -192,7 +192,7 @@
     },
     {
       "path": "coracao/index.html",
-      "sha256": "172b4064727ce0cd8e2b98fb15d3d7c0c90b26973e31539208b7e162f43c5368"
+      "sha256": "77e8ebad22a51174dfb131d899cd0b865a96c5fe2e91054299741a3b1afee08f"
     },
     {
       "path": "coracao/legendas-a.js",
@@ -232,15 +232,15 @@
     },
     {
       "path": "coracao/README.md",
-      "sha256": "bc2a77d72f07d27fdab3a1c4f4513fbcff9be3554a1f1eff439b2e6d57a64f50"
+      "sha256": "c51a2934aafb8595f1b573c1e9fb2aa858636f1953ad6437079774dd586a2abc"
     },
     {
       "path": "musculo-sarcomero/app.js",
-      "sha256": "728735ae40f4f9b1862b426cc88060269147647b9178f24370595f0ebcdf511e"
+      "sha256": "3e43ea5ac1991c57e2e57077dd70a1c1b7f45b6526e3e6b1780b1e744ad35cbf"
     },
     {
       "path": "musculo-sarcomero/index.html",
-      "sha256": "5dd0bd8ef0ae7ed683ad8a6d8328830e3d9f149dec28ed8a0512064086b25092"
+      "sha256": "c1ebd6731437badf9f69aa268dcf6563a6c83b684d3c49699b1248bd65006233"
     },
     {
       "path": "musculo-sarcomero/modelos.js",
@@ -248,7 +248,7 @@
     },
     {
       "path": "musculo-sarcomero/README.md",
-      "sha256": "6c8cd4206798703849466b6b6e6424ab3cf10714e79cb423ff77ebaa5b80fc46"
+      "sha256": "cb78afde047ecd75c7352fecee018b5393d03aab76d0e2b48af274f8e3b576b7"
     },
     {
       "path": "musculo-sarcomero/style.css",
@@ -260,11 +260,11 @@
     },
     {
       "path": "potencial-membrana/app.js",
-      "sha256": "ad24920f1a12ef6e1412afc2be1df84a7f9fee4988534da3a7258b3838b0a14b"
+      "sha256": "a55a4c54b21d3141037d976f6e80929741f86f40b180665aae6d2f1a1bb94cc1"
     },
     {
       "path": "potencial-membrana/index.html",
-      "sha256": "d75105c71294db36a6b8f08a8690a4f650174c1361ae816a367990f774a13546"
+      "sha256": "845556ce846fec240457741ad110ef019893c9ce4a5f2685233536b0afd8bf5c"
     },
     {
       "path": "potencial-membrana/modelos.js",
@@ -272,7 +272,7 @@
     },
     {
       "path": "potencial-membrana/README.md",
-      "sha256": "c3a85abcfa32e52cb7de2466e1976f24dba3a86f6ed4e0b134daa5134dd3ce5d"
+      "sha256": "d24e579d200cc824bde64c72c5721dcecbe484c6c6059055b8df63aa71706b9c"
     },
     {
       "path": "potencial-membrana/style.css",
@@ -292,7 +292,7 @@
     },
     {
       "path": "starling/app.js",
-      "sha256": "aeb3b17f58710b3e72342ed1b8edecb15a36681ee5532174d878423db9db9629"
+      "sha256": "d7695f13cf3999e91aa9a9e6afa2aaa622db9c8e1f3e3f8c68dacbf6704a5746"
     },
     {
       "path": "starling/fisica.js",
@@ -300,7 +300,7 @@
     },
     {
       "path": "starling/index.html",
-      "sha256": "8d105949377c3812652a1e21eab98f999d2ac46d58af53761499d442360c4909"
+      "sha256": "10cba4ff11f13f22cbf01c3d5a123dbfa0c3d097a353a8c5d16ff074155cfb4e"
     },
     {
       "path": "starling/modelos.js",
@@ -308,7 +308,7 @@
     },
     {
       "path": "starling/README.md",
-      "sha256": "dae132b4ac8008e5d147842fb6d023d8ca92cc8b24b2b29ef0ee2ca83c932fbe"
+      "sha256": "9d71e758c4b06cd7a3665ae544fc4d5ee9f8b3c57eef46a40fa8bd37f9bf1b4a"
     },
     {
       "path": "starling/style.css",
@@ -320,7 +320,7 @@
     },
     {
       "path": "juncao-neuromuscular/app.js",
-      "sha256": "99e4e338e81226478f5153aa7f9527a97e9b5261d55c19e475318c2b53bcd071"
+      "sha256": "037c6d2829f4e1eb8089d296d3a49fd88934f9c0454662fd279e2555956f4594"
     },
     {
       "path": "juncao-neuromuscular/fisica.js",
@@ -328,7 +328,7 @@
     },
     {
       "path": "juncao-neuromuscular/index.html",
-      "sha256": "15eaa64473534b50505608dc86ccf254e6bc2f307fde812d04166f79d1b5691c"
+      "sha256": "8feea98e88a04b9b800a4512417ebf63f7a10d7d5a6cf367be6998c9672e911c"
     },
     {
       "path": "juncao-neuromuscular/modelos.js",
@@ -336,7 +336,7 @@
     },
     {
       "path": "juncao-neuromuscular/README.md",
-      "sha256": "dea08b0fc660a8de6df3bb4c1acea84494a754a82a6e83e4b35ffd74f879cf47"
+      "sha256": "639ef4c355748b1c884492678dd3d135bba70147573da2f6c4e02352e135059e"
     },
     {
       "path": "juncao-neuromuscular/style.css",
@@ -356,7 +356,7 @@
     },
     {
       "path": "osso-vivo/app.js",
-      "sha256": "1a6b794b8a17ecccebeb9e3e56296e41e976c8ebd5f0fdd98506d02e462dd424"
+      "sha256": "ee8b9e382478a9c54f1709ec3211b37736e8f7bcdf3ebcfd2a1a1efbe18a066a"
     },
     {
       "path": "osso-vivo/fisica.js",
@@ -364,7 +364,7 @@
     },
     {
       "path": "osso-vivo/index.html",
-      "sha256": "cf3c1420087b6b209a24120011b45b7163f29d717f603c3faa0d96f5d838c0bc"
+      "sha256": "0c1567f65c37ce2ad3255a1726673171ae1a268a2798448381c0c32e5a3af494"
     },
     {
       "path": "osso-vivo/modelos.js",
@@ -372,7 +372,7 @@
     },
     {
       "path": "osso-vivo/README.md",
-      "sha256": "e3fa52945f1ec58c78aeef11c6cf8203ec6f2255c99ef645218e4501b0991990"
+      "sha256": "25f4b8dc2ca3edbab95a0b6f955edd34f4480d80046d9a84244dd0efc6d1b20b"
     },
     {
       "path": "osso-vivo/style.css",
@@ -388,7 +388,7 @@
     },
     {
       "path": "pleura/vasos.html",
-      "sha256": "b78b333105f7338370670b02116883c2e17de8da37f2e858e69a84d1aff38086"
+      "sha256": "e2c97e14a512c1377f1496a2131ecd39f0acb350cfbee58f3bebcf89ad70ece8"
     },
     {
       "path": "pleura/vasos-foco.js",
@@ -400,7 +400,7 @@
     },
     {
       "path": "pleura/modelo-aprovado.html",
-      "sha256": "6e6c44a45fb9d310b28499dfed71fb2e194de5032ea481a6096ac9f63010185a"
+      "sha256": "acafe2a19ee4270234fb700606718f4a076dab8126eaec3c6aa4ae1d70063fef"
     },
     {
       "path": "assets/pleura-duas-camadas.glb",
@@ -437,6 +437,194 @@
     {
       "path": "assets/torax-vasos-encaixe.glb",
       "sha256": "7317d2261a01a662cf445e0fb32075cbf445b3e247e028d4162f0f1e63b96dc5"
+    },
+    {
+      "path": "texto-volume.js",
+      "sha256": "280a3d2f0db5abca613b3bb59a1cc706b48c4deb09b254bcc67183d10baa42ad"
+    },
+    {
+      "path": "fonte-ra.js",
+      "sha256": "a54dcace8fcb66f24cfc4efdd1568b9c2d18c732ee96b2d856704441c404284a"
+    },
+    {
+      "path": "fonte-ra-LICENSE.txt",
+      "sha256": "0dab92d0544f7b233403f14b84a663bdbfa746982eda629e7f4f9ffe1b036feb"
+    },
+    {
+      "path": "ciclo-portatil.js",
+      "sha256": "c85c2fd11ebca322272c0841b8ea5b3a1776583e4f786760e4e73ceb75db3a66"
+    },
+    {
+      "path": "celula/tools/glb_data.py",
+      "sha256": "8f633a5b0bf7b2d391db18c8baa4f54edf36365baf55f9e084ac6bd86ec0f560"
+    },
+    {
+      "path": "coracao/ciclos/nivel-1.glb",
+      "sha256": "954841112cc8c87ac0a0740238853f72638a521d925ab0a4cfacb78f8a7ab478"
+    },
+    {
+      "path": "coracao/ciclos/nivel-1.usdz",
+      "sha256": "0acbd5e93099b2929dc16c2b95f1648e4f632cc1607948e481dc6aa9058703e9"
+    },
+    {
+      "path": "coracao/ciclos/nivel-2.glb",
+      "sha256": "04f675e737ff50bbd2654eb9c9948d63d56834276b3e38f360d264fd9571ec13"
+    },
+    {
+      "path": "coracao/ciclos/nivel-2.usdz",
+      "sha256": "d53740bcd8e54734a1ca4fb6b13e3b54dd64438cf835214cc5ac30e6a544bd44"
+    },
+    {
+      "path": "juncao-neuromuscular/ciclos/nivel-1.glb",
+      "sha256": "d0c5ea2c4f1a77e8844d32929850c02059b0317c5e1eca6b0912647e866694d5"
+    },
+    {
+      "path": "juncao-neuromuscular/ciclos/nivel-1.usdz",
+      "sha256": "9a954a55d79ae49aa0b914ca2968693b5e57fa84eaf4fbf2fa5a271c6e259b51"
+    },
+    {
+      "path": "juncao-neuromuscular/ciclos/nivel-2.glb",
+      "sha256": "2dbb81879dd61a74e4dfa9edb746468095f75f02549470a062404192f551ab8a"
+    },
+    {
+      "path": "juncao-neuromuscular/ciclos/nivel-2.usdz",
+      "sha256": "97d53adc887f8ec7ed178066ce40bd79169c9a8071cff3b7e0e169d8f468a2ec"
+    },
+    {
+      "path": "juncao-neuromuscular/ciclos/nivel-3.glb",
+      "sha256": "eae9724b6a587eaf8be3b1ee8a2daaa35e0fd178cf2cd213560bb81c3cdee264"
+    },
+    {
+      "path": "juncao-neuromuscular/ciclos/nivel-3.usdz",
+      "sha256": "5e994ad3ed7a329872ff87458b61d312129fdf0d676a685ff4d9004c0a288c34"
+    },
+    {
+      "path": "juncao-neuromuscular/ciclos/nivel-4.glb",
+      "sha256": "f2e39e04cf718e83008b685385cb6154ddece5aca6491ebb3fcad57b4835cfa3"
+    },
+    {
+      "path": "juncao-neuromuscular/ciclos/nivel-4.usdz",
+      "sha256": "04d369f30fe6a46c35d7640a9a16428b15491351874182672ea73bb596928a5f"
+    },
+    {
+      "path": "juncao-neuromuscular/ciclos/nivel-5.glb",
+      "sha256": "73d631e9bf1a706a04eafb5de6e5008336d45e8c3e1b7fdbaf13e7e3379a46b3"
+    },
+    {
+      "path": "juncao-neuromuscular/ciclos/nivel-5.usdz",
+      "sha256": "9f4b744edb64a058ce2024078a099a31fff87d615fa7b72cdd019a5921d492cd"
+    },
+    {
+      "path": "musculo-sarcomero/ciclos/nivel-5.glb",
+      "sha256": "6bc8090042b8878b06f7b45b85d278196d0b5840ff1b32d8b5b2b223297cbd3a"
+    },
+    {
+      "path": "musculo-sarcomero/ciclos/nivel-5.usdz",
+      "sha256": "50143543567410c36d8d1669653ff68f1d3a20d2d9733b408b96fd78b8fec0bd"
+    },
+    {
+      "path": "osso-vivo/ciclos/nivel-1.glb",
+      "sha256": "53b9cf55e115ffefcb0b485671b149c5eb0374ef310fc0fa08632c4795efab73"
+    },
+    {
+      "path": "osso-vivo/ciclos/nivel-1.usdz",
+      "sha256": "4f85a2591e546ae57b99b85e67e0890e959898a1899b974524e53a51fd121288"
+    },
+    {
+      "path": "osso-vivo/ciclos/nivel-2.glb",
+      "sha256": "a33cf0e8f8ca1e6120b24ce6acafef145c0321e66198668cac427b637dc76f17"
+    },
+    {
+      "path": "osso-vivo/ciclos/nivel-2.usdz",
+      "sha256": "ff7c0d21a9881e66fd0ceb74537dc09c7ca3ec645249cda6acf1b3cb58abd6e3"
+    },
+    {
+      "path": "osso-vivo/ciclos/nivel-3.glb",
+      "sha256": "1e3097f1a8c71bf59a151a2cdbde9789814970d97e5c375b1ea951f43657cf43"
+    },
+    {
+      "path": "osso-vivo/ciclos/nivel-3.usdz",
+      "sha256": "0a5147b5b03c5333f7cd499ce7eceab386773ab7ff4a4fdb92f87cc41edef855"
+    },
+    {
+      "path": "osso-vivo/ciclos/nivel-4.glb",
+      "sha256": "ac6f8ba1610f61a67b4bc46e7d87593c6f00764de0b71b5b17de2f6c9a4aa6a8"
+    },
+    {
+      "path": "osso-vivo/ciclos/nivel-4.usdz",
+      "sha256": "5ce47af4a431db92ae9804de6cace4a08728357d18045c25448730da277463de"
+    },
+    {
+      "path": "osso-vivo/ciclos/nivel-5.glb",
+      "sha256": "78c78205029577c0dfdabbae78a6f07877362cc16d16ae9b155685f1b94864c1"
+    },
+    {
+      "path": "osso-vivo/ciclos/nivel-5.usdz",
+      "sha256": "e07e1b42ff619a5e0ea0ee041e501108fb1ee70fac1d74c1d7d1104d3ae21cb7"
+    },
+    {
+      "path": "pleura/ciclos/nivel-2.glb",
+      "sha256": "2a2e2029efc14fee0a5963c2b5c23bf075cdce35532654edbdd8235bfd1168ff"
+    },
+    {
+      "path": "pleura/ciclos/nivel-2.usdz",
+      "sha256": "629763c6d1277aa3e5be4fdcb000c6057f8c35662e0cb271a926a4f29efa75f2"
+    },
+    {
+      "path": "retorno-venoso/ciclos/nivel-3.glb",
+      "sha256": "c1a26ac9c9762d7c93dda7b176cd76a12eea9bd22177cb09db5573f433eabda2"
+    },
+    {
+      "path": "retorno-venoso/ciclos/nivel-3.usdz",
+      "sha256": "338e895315e8943400ad9bc40b5d66fa2c159c6745367c4f5e9274ef347ef526"
+    },
+    {
+      "path": "retorno-venoso/ciclos/nivel-4.glb",
+      "sha256": "adfed945c7087ab092b4031b9c95081ec3f0649f3e9c03585f44bcf4d10151d7"
+    },
+    {
+      "path": "retorno-venoso/ciclos/nivel-4.usdz",
+      "sha256": "c00905fd216f02c34d372d0921681295e2f76c37634d1ceebc9ee79048e74df4"
+    },
+    {
+      "path": "starling/ciclos/nivel-1.glb",
+      "sha256": "3ce0882c9a0eff681b6241b545ba88f24ca57d93fc4ebeccb75d2f64354ad7f2"
+    },
+    {
+      "path": "starling/ciclos/nivel-1.usdz",
+      "sha256": "725187e36b91b5ae441979c0c47079832f0313c1fe3834db58f413f15170a97a"
+    },
+    {
+      "path": "starling/ciclos/nivel-2.glb",
+      "sha256": "ecf55f9dac750e3bf9110ff98fa0885ccd9d63a46d03eae7d15188d53a0e542f"
+    },
+    {
+      "path": "starling/ciclos/nivel-2.usdz",
+      "sha256": "9df9ce292139fe7ffdbd9eec77aa4f0e6afba18c640ea1f37ce354748a11d356"
+    },
+    {
+      "path": "starling/ciclos/nivel-3.glb",
+      "sha256": "e999a1f940eeacd7514abfc8c06bcbde817af13cd4af5fce218c2b7d8e2e15f3"
+    },
+    {
+      "path": "starling/ciclos/nivel-3.usdz",
+      "sha256": "9d2ab37018f639c7fcda040bb867f30a52d8942cfc046009eadbc50bfeb1630b"
+    },
+    {
+      "path": "starling/ciclos/nivel-4.glb",
+      "sha256": "95edb63d54627878a6716c9e12c238ececc7f1215c4c1dac0479293e2dc3c913"
+    },
+    {
+      "path": "starling/ciclos/nivel-4.usdz",
+      "sha256": "1e658598dc1c7fd1eaf313f2c0aff4c54a8d58b0154469af8f30c5193ed07c4d"
+    },
+    {
+      "path": "starling/ciclos/nivel-5.glb",
+      "sha256": "48380fcd984b2372328547b6f5674623729917fd3febdbbde539b94de4ed09a3"
+    },
+    {
+      "path": "starling/ciclos/nivel-5.usdz",
+      "sha256": "956f2dc27df2d831e291f7014ef500a33e8e8d1df18f78d19b2a74ba49e7ab60"
     }
   ],
   "normalizacao": "Textos: UTF-8 e LF; modelos e imagens: bytes originais.",
@@ -470,5 +658,10 @@
       "tipo": "Modelo procedural original; reutiliza o sarcômero aprovado sem modificar musculo-sarcomero/modelos.js",
       "sarcomeroBase": "ec0414d006e6ea2d2102208c79da597b9284660b"
     }
-  }
+  },
+  "atualizacao": {
+    "data": "2026-10-25",
+    "escopo": "Placas e textos extrudados; ciclos GLB e USDZ derivados dos motores das bancadas; arquivos públicos para Android e iPhone."
+  },
+  "adaptacaoLab": "Preserva index.html e tutor-origem.js do Lab-RA; hashes conferem com esta instalação."
 }

@@ -451,6 +451,1441 @@
           "sha256": "6318ce7a0e5c244e3d6e9b3c55c1860a70c69b37ffd9ddb9b701337b45b07078"
         }
       ]
+    },
+    {
+      "data": "2026-10-25",
+      "tipo": "atualizacao-da-origem",
+      "fonte": "DrMarioNascimento/fisiologia-interativa",
+      "commit_fonte": "c16aae9c0b9d1f2b6e888373d60473f6fa960a7c",
+      "criterio": "Sincronização dos textos e placas em relevo e dos ciclos GLB/USDZ. Preservados os adaptadores index.html e tutor-origem.js do Lab-RA; o manifesto local foi refeito para esses adaptadores.",
+      "arquivos": [
+        {
+          "arquivo": "biblioteca/fisiologia/README.md",
+          "origem": "ra/README.md",
+          "sha256_anterior": "0d3f8d150ed736b4127630cec337c5cb5ceecf822f9ca41623da29fc665367d3",
+          "sha256": "1a29ea12a46d6cbf35d1ae0c265c880759d684c88854f9af0dd67cfb5a6ce75e"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/REVISAO-VOLUME-MOVIMENTO.md",
+          "origem": "ra/REVISAO-VOLUME-MOVIMENTO.md",
+          "sha256_anterior": null,
+          "sha256": "bf77120ece388e6bc6a5f0c72a8fd1dd81059d773174d59c1262f65c950a36b9"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/index.html",
+          "origem": "ra/celula/index.html",
+          "sha256_anterior": null,
+          "sha256": "cba25b5db5a39fb1cccd246a6ccca91de021737848f132c3c00fe9a6d487bfb9"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/laboratorio-membrana.html",
+          "origem": "ra/celula/laboratorio-membrana.html",
+          "sha256_anterior": null,
+          "sha256": "7797c76f7873b96205a6afe09f69462acbb796e91b688a0f0401212f48f6e60c"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/membrana/README.md",
+          "origem": "ra/celula/membrana/README.md",
+          "sha256_anterior": null,
+          "sha256": "dac827bd0879a910d42a7ca5e9720f4bc62a3c42422f1c6b290c4773e789a4d8"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/membrana/app.js",
+          "origem": "ra/celula/membrana/app.js",
+          "sha256_anterior": null,
+          "sha256": "a2ccc0520c8c16021901afde2b81820efcbcb6a409fc4f916a427e13a44ad61d"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/membrana/assets/pelicula-v1.glb",
+          "origem": "ra/celula/membrana/assets/pelicula-v1.glb",
+          "sha256_anterior": null,
+          "sha256": "7391097d3477024fa1eb9864e83cd2eb669ef1349256c130e14a678c508c10a3"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/membrana/assets/pelicula-v1.glb.validation.json",
+          "origem": "ra/celula/membrana/assets/pelicula-v1.glb.validation.json",
+          "sha256_anterior": null,
+          "sha256": "37a7b30a5fb0ac0000ca40149c5c21736bbc9139bd3d25467575f430d35459ca"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/membrana/assets/pelicula-v1.usdz",
+          "origem": "ra/celula/membrana/assets/pelicula-v1.usdz",
+          "sha256_anterior": null,
+          "sha256": "58bb028b08f7e99c8569286fa3ec87be360184102e457057bec7e51f69d6ffb9"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/membrana/assets/pelicula-v1.validation.json",
+          "origem": "ra/celula/membrana/assets/pelicula-v1.validation.json",
+          "sha256_anterior": null,
+          "sha256": "35975cd52746dbc4dde9a7a3f9c14c8f8ed16efff5e72444ae5aae1ece84ac3c"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/membrana/assets/pelicula-v1.webp",
+          "origem": "ra/celula/membrana/assets/pelicula-v1.webp",
+          "sha256_anterior": null,
+          "sha256": "251d3ab5e4a42745edd9f8b7a28b127e2f30bfbab220b97b53cf18c7433ad7ca"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/membrana/assets/travessias-v1.glb",
+          "origem": "ra/celula/membrana/assets/travessias-v1.glb",
+          "sha256_anterior": null,
+          "sha256": "cbdb29bfc14bcd319029f2bc2fd5d729e571c92bc7b0416206c8d5f78ba45845"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/membrana/assets/travessias-v1.glb.validation.json",
+          "origem": "ra/celula/membrana/assets/travessias-v1.glb.validation.json",
+          "sha256_anterior": null,
+          "sha256": "5250ed090793936aa4f02488faa37134468cf2ff5e89b80dc59368236bf0eae6"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/membrana/assets/travessias-v1.usdz",
+          "origem": "ra/celula/membrana/assets/travessias-v1.usdz",
+          "sha256_anterior": null,
+          "sha256": "8ac4cd68a52c59c4230b5bf9b2a7cb60851823eae06e93daa2d5caf142164feb"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/membrana/assets/travessias-v1.validation.json",
+          "origem": "ra/celula/membrana/assets/travessias-v1.validation.json",
+          "sha256_anterior": null,
+          "sha256": "79386921def327d5a514285c27f95962ec8212e97fec889b18df5090795e7405"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/membrana/assets/travessias-v1.webp",
+          "origem": "ra/celula/membrana/assets/travessias-v1.webp",
+          "sha256_anterior": null,
+          "sha256": "87b5b61e7eff888eaea087724605091160b05323978063d3301f512bd37b95eb"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/membrana/ciclo.js",
+          "origem": "ra/celula/membrana/ciclo.js",
+          "sha256_anterior": null,
+          "sha256": "e4bebcceafd3fc8da81b860468dea476e110651165c30e87558f9b0656db4cd3"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/membrana/style.css",
+          "origem": "ra/celula/membrana/style.css",
+          "sha256_anterior": null,
+          "sha256": "23d7db395e639cd9ffc67086f5076f8908b84b1901d38d40f05c77895d63eb0f"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/membrana/tools/construir.mjs",
+          "origem": "ra/celula/membrana/tools/construir.mjs",
+          "sha256_anterior": null,
+          "sha256": "d4a97475a27f022e2b20a7b0221e6c71da261b54590dce5a1c0ed30f76d51531"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/membrana/tools/ios.py",
+          "origem": "ra/celula/membrana/tools/ios.py",
+          "sha256_anterior": null,
+          "sha256": "2d047676bfc6b26c38d7872c4da94daa04fd51965f2bca6ed9b9ad58538804cb"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/membrana/tools/preview.py",
+          "origem": "ra/celula/membrana/tools/preview.py",
+          "sha256_anterior": null,
+          "sha256": "64b1fb62fe288b3f1be7c52b95409e620cae5779ec2847ff532a913edebf38fa"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/membrana.html",
+          "origem": "ra/celula/membrana.html",
+          "sha256_anterior": null,
+          "sha256": "508fd33ccc37641e453d8d87c1880d6597a1108f5549c7063a6096b0e170d703"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/membrana.html_SUBSTITUIDO_2026-10-24",
+          "origem": "ra/celula/membrana.html_SUBSTITUIDO_2026-10-24",
+          "sha256_anterior": null,
+          "sha256": "8a80cb74210b7014e88eb81429baeca25dc02d6be8ae92b3d0407102246d3409"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/tabs.js",
+          "origem": "ra/celula/tabs.js",
+          "sha256_anterior": "26630d8045dc85e38da3d15981e6330fdaab9621f861b4d6e77fd14e87ccb72b",
+          "sha256": "8eb439957ac70f24c1b219bc979b00d2f2d8dc1603871e7dc207181315d1ff5f"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/tools/.gitignore",
+          "origem": "ra/celula/tools/.gitignore",
+          "sha256_anterior": null,
+          "sha256": "9ae81a8778225fa85c4c2eb23365d2d3240baf765653d855c6f87a46b3537a2e"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/tools/README.md",
+          "origem": "ra/celula/tools/README.md",
+          "sha256_anterior": null,
+          "sha256": "52dab42541bc5dcbc056e365ac9bec7a8a1e5c9d4b29cea6736fd39ae2876c5b"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/tools/bake.py",
+          "origem": "ra/celula/tools/bake.py",
+          "sha256_anterior": null,
+          "sha256": "cf50c66dd23dbb5f78d4d640187544a8ae83a478cccb6f627c016b88d2f9288d"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/tools/cleanup.mjs",
+          "origem": "ra/celula/tools/cleanup.mjs",
+          "sha256_anterior": null,
+          "sha256": "9e1b3376a979ef79a40972a4754cfbf7c8b06576746df4db2dcbce3ecb13438f"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/tools/compress.py",
+          "origem": "ra/celula/tools/compress.py",
+          "sha256_anterior": null,
+          "sha256": "a3aacff0a49fffdf371c9708274301d9e7079253e6c05e2fe3f48dd80cac6d6d"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/tools/fix-tangents.mjs",
+          "origem": "ra/celula/tools/fix-tangents.mjs",
+          "sha256_anterior": null,
+          "sha256": "853a7a5695ee050b77015de9853a6262afbf530a0af6684c6a091c45734d48b1"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/tools/glb_data.py",
+          "origem": "ra/celula/tools/glb_data.py",
+          "sha256_anterior": null,
+          "sha256": "8f633a5b0bf7b2d391db18c8baa4f54edf36365baf55f9e084ac6bd86ec0f560"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/tools/mobile-textures.py",
+          "origem": "ra/celula/tools/mobile-textures.py",
+          "sha256_anterior": null,
+          "sha256": "c68ed0705f895e5699d13602f8563feaa69644781768a4f0d5ea7b2fac87fc1f"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/tools/package-lock.json",
+          "origem": "ra/celula/tools/package-lock.json",
+          "sha256_anterior": null,
+          "sha256": "14ee382cc2cb3e6dca0ebb370082a8832b2b374cfe7ceb5e740ebcfdea5618b5"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/tools/package.json",
+          "origem": "ra/celula/tools/package.json",
+          "sha256_anterior": null,
+          "sha256": "eb045ea61bfa1dace3e0f0b09b92e17b1d1c035ce9bb2eec3a09f07422c52983"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/tools/requirements.txt",
+          "origem": "ra/celula/tools/requirements.txt",
+          "sha256_anterior": null,
+          "sha256": "69da680517f7c31cb8d5c08db7afa7ef40b8e04d4c04e1d3eb14c7d228e7aba6"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/tools/simplify.mjs",
+          "origem": "ra/celula/tools/simplify.mjs",
+          "sha256_anterior": null,
+          "sha256": "0d22deeca0376b801d189cbee1985960d853a5da0c306f74c5e5af5d71154195"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/tools/surface-compress.py",
+          "origem": "ra/celula/tools/surface-compress.py",
+          "sha256_anterior": null,
+          "sha256": "5f95c595d99a2be26694d9535e19bde6c6db6f913532542faa2ae0fdda49e1e2"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/tools/tangents.mjs",
+          "origem": "ra/celula/tools/tangents.mjs",
+          "sha256_anterior": null,
+          "sha256": "c244ea019f743baed6800837ccac3324a27297f8c9861cea7f63831d07850eeb"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/tools/usdz.py",
+          "origem": "ra/celula/tools/usdz.py",
+          "sha256_anterior": null,
+          "sha256": "bf9106e29fa054f7cf401ce753bf2336a5ef3632215e3bdf911b6bd74c70c8d1"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/tools/validate.mjs",
+          "origem": "ra/celula/tools/validate.mjs",
+          "sha256_anterior": null,
+          "sha256": "8ef359443224b07a45b8d3ec920ed163a0cf7fe6873f13abb06bef420c7d0e63"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/tools/validation-v3.json",
+          "origem": "ra/celula/tools/validation-v3.json",
+          "sha256_anterior": null,
+          "sha256": "50177b83da1830e0e043510c24a3767eebd3331e700552cf223612878cc328d6"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/tools/variants.py",
+          "origem": "ra/celula/tools/variants.py",
+          "sha256_anterior": null,
+          "sha256": "b57b64292bb80c6fcf89f4a25a9b0426f44896e2ca46d0b4bfa13f43cdcd84a2"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/app.js",
+          "origem": "ra/celula/visualizador/app.js",
+          "sha256_anterior": "8dbc8070bddc448332118b115802e2242dd8a059e3873f51c3a4c489e26381b3",
+          "sha256": "4ae1b9de7cc8586bc614713504bd1eccd0aeaed0766e81c8f1f6f17b345ddc8f"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/celula-ios-v2.usdz",
+          "origem": "ra/celula/visualizador/celula-ios-v2.usdz",
+          "sha256_anterior": null,
+          "sha256": "427d1e3d7a058e056d92d244e52f83a5ceaeddd501e4c4726156e135e7801a27"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/celula-mobile-v2.glb",
+          "origem": "ra/celula/visualizador/celula-mobile-v2.glb",
+          "sha256_anterior": null,
+          "sha256": "4a8bbd68c322656fac5a215cf943cf646472e21282c2606ffcd9026aa7cfc00c"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/celula-nova-poster.webp",
+          "origem": "ra/celula/visualizador/celula-nova-poster.webp",
+          "sha256_anterior": null,
+          "sha256": "3d528abc5b59891b9581b8acf96cb0c528d56b0f81ddc6dcf397d49540fcd472"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/celula-v3-completa.glb",
+          "origem": "ra/celula/visualizador/celula-v3-completa.glb",
+          "sha256_anterior": null,
+          "sha256": "fbb8119c11fdc051f7c61b10a5ef30969cb0194cec5f8792895b1dab19ad38e1"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/celula-v3-completa.usdz",
+          "origem": "ra/celula/visualizador/celula-v3-completa.usdz",
+          "sha256_anterior": null,
+          "sha256": "8575ac50580ef59816e2baa18bc13bdb4799187e6e66d0721cc1c9f3a7905cc7"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/celula-v3-completa.validation.json",
+          "origem": "ra/celula/visualizador/celula-v3-completa.validation.json",
+          "sha256_anterior": null,
+          "sha256": "206cdcebcfd73189ba9c0e35e474decfc471fabe3c408d9bb0ec9bb1218c351f"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/celula-v3-completa.webp",
+          "origem": "ra/celula/visualizador/celula-v3-completa.webp",
+          "sha256_anterior": null,
+          "sha256": "afc0660096eff727ca46710def78c65ac2623dc03ad5d0d80e7006907e27cacf"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/celula-v3-sem-membrana-celular.glb",
+          "origem": "ra/celula/visualizador/celula-v3-sem-membrana-celular.glb",
+          "sha256_anterior": null,
+          "sha256": "f8a226b56dae7a6858f34a5b5f4457ac3c21e5cfa66bcd6edf6d72ae720dfbce"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/celula-v3-sem-membrana-celular.usdz",
+          "origem": "ra/celula/visualizador/celula-v3-sem-membrana-celular.usdz",
+          "sha256_anterior": null,
+          "sha256": "5309a26379eaba4b87704e6f82af6ba00df690e4d3993c4c170ed4ecdbf28dc6"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/celula-v3-sem-membrana-celular.validation.json",
+          "origem": "ra/celula/visualizador/celula-v3-sem-membrana-celular.validation.json",
+          "sha256_anterior": null,
+          "sha256": "af1e762280d8cceea7e21ed1ce276300fce6526d07053341caf9ad4a69507b47"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/celula-v3-sem-membrana-celular.webp",
+          "origem": "ra/celula/visualizador/celula-v3-sem-membrana-celular.webp",
+          "sha256_anterior": null,
+          "sha256": "cb78e689aa67c60db03adfc95ce3871c0db63d80488b503b998bacf6a4577ca7"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/celula-v3-sem-membranas-mitocondriais.glb",
+          "origem": "ra/celula/visualizador/celula-v3-sem-membranas-mitocondriais.glb",
+          "sha256_anterior": null,
+          "sha256": "4a58c9e687ba5bc4c495b304ce50a6ced648af3c5097cb07687cd752ed65ea20"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/celula-v3-sem-membranas-mitocondriais.usdz",
+          "origem": "ra/celula/visualizador/celula-v3-sem-membranas-mitocondriais.usdz",
+          "sha256_anterior": null,
+          "sha256": "a8d87dde01b4fa65676bd2bc67c7364ad7da48f1809c9fd52acfcf65726c994d"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/celula-v3-sem-membranas-mitocondriais.validation.json",
+          "origem": "ra/celula/visualizador/celula-v3-sem-membranas-mitocondriais.validation.json",
+          "sha256_anterior": null,
+          "sha256": "6214399b00364df66e47ed4fd5d3a98859d6065bf9cc33ecf4342946a4606bd0"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/celula-v3-sem-membranas-mitocondriais.webp",
+          "origem": "ra/celula/visualizador/celula-v3-sem-membranas-mitocondriais.webp",
+          "sha256_anterior": null,
+          "sha256": "0d3b907c35522dced868765cd819a17bb3d143af8ee057023c4393f8d80980aa"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/celula-v3-sem-membranas.glb",
+          "origem": "ra/celula/visualizador/celula-v3-sem-membranas.glb",
+          "sha256_anterior": null,
+          "sha256": "e87fe0484b2ed8f919ea610b8670f6fb9ccd0cf803676f6faa2aecef57e6ca38"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/celula-v3-sem-membranas.usdz",
+          "origem": "ra/celula/visualizador/celula-v3-sem-membranas.usdz",
+          "sha256_anterior": null,
+          "sha256": "d451cd41e517dcbdc75b9671de0bf5f0f0ab20a18369251edd45f99e77a43306"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/celula-v3-sem-membranas.validation.json",
+          "origem": "ra/celula/visualizador/celula-v3-sem-membranas.validation.json",
+          "sha256_anterior": null,
+          "sha256": "5f502b725225bb74c780a0d002ed581dfb002551aeeb43a575d1e96cb8ed326e"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/celula-v3-sem-membranas.webp",
+          "origem": "ra/celula/visualizador/celula-v3-sem-membranas.webp",
+          "sha256_anterior": null,
+          "sha256": "12d6feb1d7f39ba332f538fd14262719f10383055b13e022444750a4a1d69e79"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/index.html",
+          "origem": "ra/celula/visualizador/index.html",
+          "sha256_anterior": "8c3e6bd18f90c87edbc54644d7d7d66b25d89cbb5ef54e0211e24eb8e9358adc",
+          "sha256": "dc553db1278f558edb10635632d21a82051244305139198e576f0c51d76bdc0e"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/index.html_SUBSTITUIDO_2026-10-24",
+          "origem": "ra/celula/visualizador/index.html_SUBSTITUIDO_2026-10-24",
+          "sha256_anterior": null,
+          "sha256": "a6b796910b811074fb76b52845bee92a4b712dc9841842c9d349a71c566e88ff"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/layers.js",
+          "origem": "ra/celula/visualizador/layers.js",
+          "sha256_anterior": null,
+          "sha256": "a3c563ee4531ee7a9d3000f9c6524eb2e2cb572994ef3ea581724cbab925feb0"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/layout.css",
+          "origem": "ra/celula/visualizador/layout.css",
+          "sha256_anterior": "db772f6d6d081e228a308c03d20cde25d057940526e8a89f832054b883ba6525",
+          "sha256": "ce03bc50f6291c15d5ab1da720b01f16d8c951460928a16cf5374562dc803b81"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/modelo-original-v2/manifest.json",
+          "origem": "ra/celula/visualizador/modelo-original-v2/manifest.json",
+          "sha256_anterior": null,
+          "sha256": "81101b0d11d5b4d15e86011e227d52e6dadb048ba56d027acf222f10077bea1d"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/modelo-original-v2/parte-01.bin",
+          "origem": "ra/celula/visualizador/modelo-original-v2/parte-01.bin",
+          "sha256_anterior": null,
+          "sha256": "88037287f7479c11ec422176e0c42f8cd7baf43da5bc9827bc29a5f9f749bfbb"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/modelo-original-v2/parte-02.bin",
+          "origem": "ra/celula/visualizador/modelo-original-v2/parte-02.bin",
+          "sha256_anterior": null,
+          "sha256": "bc4759d84c1fa051485e6b571171d99a701256ffa7918d4335792eae0c466215"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/modelo-original-v2/parte-03.bin",
+          "origem": "ra/celula/visualizador/modelo-original-v2/parte-03.bin",
+          "sha256_anterior": null,
+          "sha256": "141397d8e902d68cf7332b19b4e737c61103278e7ce1779ad48d4b98ffad6c90"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/modelo-original-v2/parte-04.bin",
+          "origem": "ra/celula/visualizador/modelo-original-v2/parte-04.bin",
+          "sha256_anterior": null,
+          "sha256": "c95984a76cc22141a3eeee7f7843a9dc325335d3cdd30d47d55d9bce80986fbd"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/modelo-original-v2/parte-05.bin",
+          "origem": "ra/celula/visualizador/modelo-original-v2/parte-05.bin",
+          "sha256_anterior": null,
+          "sha256": "82f4f15c48cfd734d3bdd215f832f5d302f94eb53217deae759f4c61828cea31"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/modelo-original-v2/parte-06.bin",
+          "origem": "ra/celula/visualizador/modelo-original-v2/parte-06.bin",
+          "sha256_anterior": null,
+          "sha256": "81bf16b8d2b56bb0359d3aa3553b8b3a2ec935b6bdd7a27d3eb4b33d88e593fa"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/modelo-original-v2/parte-07.bin",
+          "origem": "ra/celula/visualizador/modelo-original-v2/parte-07.bin",
+          "sha256_anterior": null,
+          "sha256": "22243cf47fb3148fdcb95d9c72bf6939a67c4f573f8f5c0a46b8f2ea970d88af"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/modelo-original-v2/parte-08.bin",
+          "origem": "ra/celula/visualizador/modelo-original-v2/parte-08.bin",
+          "sha256_anterior": null,
+          "sha256": "12d01e4717e7547af4b2d409aa2ee76b29a3af898eba479d2e6a9d6b1ca3ffbd"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/modelo-original-v2/parte-09.bin",
+          "origem": "ra/celula/visualizador/modelo-original-v2/parte-09.bin",
+          "sha256_anterior": null,
+          "sha256": "6751e17d30dbec1016a1c82ac1c08d663f71a230ff1ef49c7c0ca9d7a88bde76"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/modelo-original-v2/parte-10.bin",
+          "origem": "ra/celula/visualizador/modelo-original-v2/parte-10.bin",
+          "sha256_anterior": null,
+          "sha256": "ee0cccf027d825fb0837dfa653222a645aa87b7c930e88f51308ce65ea580c56"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/modelo-original-v3/manifest.json",
+          "origem": "ra/celula/visualizador/modelo-original-v3/manifest.json",
+          "sha256_anterior": null,
+          "sha256": "276299aff9de4e1503d2c1dd2024569bb40621a23511659d5212b4b826c3bb59"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/modelo-original-v3/parte-01.bin",
+          "origem": "ra/celula/visualizador/modelo-original-v3/parte-01.bin",
+          "sha256_anterior": null,
+          "sha256": "2b109e5fb984c069ddfd5dcd0b245d4f439b3f7486f8f9aea358fb44d88b2d67"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/modelo-original-v3/parte-02.bin",
+          "origem": "ra/celula/visualizador/modelo-original-v3/parte-02.bin",
+          "sha256_anterior": null,
+          "sha256": "d262b1682dbda3afbf5f1bfcbce07d92cc08d57fe53099d5e27af38743d0ca42"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/modelo-original-v3/parte-03.bin",
+          "origem": "ra/celula/visualizador/modelo-original-v3/parte-03.bin",
+          "sha256_anterior": null,
+          "sha256": "db2bae2f1ba264cdc95257d491e3407a79f486b95d2d738000392ca20e4d5b34"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/modelo-original-v3/parte-04.bin",
+          "origem": "ra/celula/visualizador/modelo-original-v3/parte-04.bin",
+          "sha256_anterior": null,
+          "sha256": "fbd50d3fedffa0b56d283c54d37c98e446fa9df1202fa6e83dd5ecbc1ecaafec"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/modelo-original-v3/parte-05.bin",
+          "origem": "ra/celula/visualizador/modelo-original-v3/parte-05.bin",
+          "sha256_anterior": null,
+          "sha256": "0d897bc75f149509f545f010d9ce143775d79246a2f6795399142f4afe8ea69d"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/modelo-original-v3/parte-06.bin",
+          "origem": "ra/celula/visualizador/modelo-original-v3/parte-06.bin",
+          "sha256_anterior": null,
+          "sha256": "642de1f9ed48fc22e3fce18e2b36eb55326de64f641f9f91d8d93273d3a9f7c0"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/modelo-original-v3/parte-07.bin",
+          "origem": "ra/celula/visualizador/modelo-original-v3/parte-07.bin",
+          "sha256_anterior": null,
+          "sha256": "e12937ec85d34691e0814235fab25333731191e589149631f597181e732b77f2"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/modelo-original-v3/parte-08.bin",
+          "origem": "ra/celula/visualizador/modelo-original-v3/parte-08.bin",
+          "sha256_anterior": null,
+          "sha256": "112bf939b2ccbdf285236478299ec53a73be5195a8d1e429976333c51f8c4929"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/modelo-original-v3/parte-09.bin",
+          "origem": "ra/celula/visualizador/modelo-original-v3/parte-09.bin",
+          "sha256_anterior": null,
+          "sha256": "74e0217304bd74122439780a87cdacd8f3a008e80675e2ca4ce9bd46edf13d1f"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/modelo-original-v3/parte-10.bin",
+          "origem": "ra/celula/visualizador/modelo-original-v3/parte-10.bin",
+          "sha256_anterior": null,
+          "sha256": "94cf08ee7f9289d1f326edf87466e2e02a4aecad5775705fdac79cab288a4755"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/modelo-original-v3/parte-11.bin",
+          "origem": "ra/celula/visualizador/modelo-original-v3/parte-11.bin",
+          "sha256_anterior": null,
+          "sha256": "20d3fd8209ae8a09f9bfe6abdad63c3078097ec46041751aab2c58a16774331b"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/ra.js",
+          "origem": "ra/celula/visualizador/ra.js",
+          "sha256_anterior": "661c5926b00af96a4f0ee50a8e9eb58f9f253f79073f118843dc17ddb288aeef",
+          "sha256": "5b317e8e71650bc01d2a92ffd15d7b928b81fa0e844031f56a10636b74d3cf42"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/ra.js_SUBSTITUIDO_2026-10-24",
+          "origem": "ra/celula/visualizador/ra.js_SUBSTITUIDO_2026-10-24",
+          "sha256_anterior": null,
+          "sha256": "c0fb54d23b25de4ff9b486e2230d64ecb989bf13c82d34154e23e583eaab8425"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/vendor/BufferGeometryUtils.js",
+          "origem": "ra/celula/visualizador/vendor/BufferGeometryUtils.js",
+          "sha256_anterior": "c25b7930e570e9ec56173cd3b866ec8d2e10016630db3937efb439daf1cedbf6",
+          "sha256": "3de832095679e56578beddf70f3e90846a47ec8a886fa8eb21c973cdaef88922"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/vendor/GLTFLoader.js",
+          "origem": "ra/celula/visualizador/vendor/GLTFLoader.js",
+          "sha256_anterior": "c4022577d024403514218a96794dc56c2f20b56617fcb6b3f5635448db71fb93",
+          "sha256": "90dd7e2f7b9ea79209c52ff779b9c39af49cf559f7bb04e9b090e02db36ce2b2"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/ciclo-portatil.js",
+          "origem": "ra/ciclo-portatil.js",
+          "sha256_anterior": null,
+          "sha256": "c85c2fd11ebca322272c0841b8ea5b3a1776583e4f786760e4e73ceb75db3a66"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/coracao/LICENSE.md",
+          "origem": "ra/coracao/LICENSE.md",
+          "sha256_anterior": "cc9d1caa65fe23d8f0a95d5989140f08aadca45db3b02aa6d9bd9bbcb1a3b748",
+          "sha256": "ffbacf67b14bc3db1127a97c02d7101c25794852b9ca78b1045ed28d1638b0b3"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/coracao/README.md",
+          "origem": "ra/coracao/README.md",
+          "sha256_anterior": "b84366a2549ca981a5d9eb65f0e8a62d62876551d22a11f02e7d94fb846f7c86",
+          "sha256": "c51a2934aafb8595f1b573c1e9fb2aa858636f1953ad6437079774dd586a2abc"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/coracao/app.js",
+          "origem": "ra/coracao/app.js",
+          "sha256_anterior": "5c7f17286143a84973df1fe9ee26e2353994a7ced1a206d82f5e31e60757f850",
+          "sha256": "321543887d28edbc9052046412fbf89d77a123dd2464130fc922181a666e262e"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/coracao/ciclos/nivel-1.glb",
+          "origem": "ra/coracao/ciclos/nivel-1.glb",
+          "sha256_anterior": null,
+          "sha256": "954841112cc8c87ac0a0740238853f72638a521d925ab0a4cfacb78f8a7ab478"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/coracao/ciclos/nivel-1.json",
+          "origem": "ra/coracao/ciclos/nivel-1.json",
+          "sha256_anterior": null,
+          "sha256": "c444f8993fc5c11a07bf5902132db917627ae58ddfc6090b534a116dd3d774ba"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/coracao/ciclos/nivel-1.usdz",
+          "origem": "ra/coracao/ciclos/nivel-1.usdz",
+          "sha256_anterior": null,
+          "sha256": "0acbd5e93099b2929dc16c2b95f1648e4f632cc1607948e481dc6aa9058703e9"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/coracao/ciclos/nivel-1.validation.json",
+          "origem": "ra/coracao/ciclos/nivel-1.validation.json",
+          "sha256_anterior": null,
+          "sha256": "31eb5beb3ddce83be4db069b322de60e73cf3f2b63a5f7a1f2cc70493f9f6370"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/coracao/ciclos/nivel-2.glb",
+          "origem": "ra/coracao/ciclos/nivel-2.glb",
+          "sha256_anterior": null,
+          "sha256": "04f675e737ff50bbd2654eb9c9948d63d56834276b3e38f360d264fd9571ec13"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/coracao/ciclos/nivel-2.json",
+          "origem": "ra/coracao/ciclos/nivel-2.json",
+          "sha256_anterior": null,
+          "sha256": "b0ffe425e88d412e217a5b4dc59dd2237b17416c511e9e8f24fb76c131303d0b"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/coracao/ciclos/nivel-2.usdz",
+          "origem": "ra/coracao/ciclos/nivel-2.usdz",
+          "sha256_anterior": null,
+          "sha256": "d53740bcd8e54734a1ca4fb6b13e3b54dd64438cf835214cc5ac30e6a544bd44"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/coracao/ciclos/nivel-2.validation.json",
+          "origem": "ra/coracao/ciclos/nivel-2.validation.json",
+          "sha256_anterior": null,
+          "sha256": "125da205e2287893feb5bb9c3349f8c8c115004c163de39702097166b5bf26aa"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/coracao/index.html",
+          "origem": "ra/coracao/index.html",
+          "sha256_anterior": null,
+          "sha256": "77e8ebad22a51174dfb131d899cd0b865a96c5fe2e91054299741a3b1afee08f"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/coracao/index.html_SUBSTITUIDO_2026-10-24",
+          "origem": "ra/coracao/index.html_SUBSTITUIDO_2026-10-24",
+          "sha256_anterior": null,
+          "sha256": "172b4064727ce0cd8e2b98fb15d3d7c0c90b26973e31539208b7e162f43c5368"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/fonte-ra-LICENSE.txt",
+          "origem": "ra/fonte-ra-LICENSE.txt",
+          "sha256_anterior": null,
+          "sha256": "0dab92d0544f7b233403f14b84a663bdbfa746982eda629e7f4f9ffe1b036feb"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/fonte-ra.js",
+          "origem": "ra/fonte-ra.js",
+          "sha256_anterior": null,
+          "sha256": "a54dcace8fcb66f24cfc4efdd1568b9c2d18c732ee96b2d856704441c404284a"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/juncao-neuromuscular/README.md",
+          "origem": "ra/juncao-neuromuscular/README.md",
+          "sha256_anterior": "5c2db4e571f524b3351f6bf41a7861d9552376a91afbc4cb5c3e137d9bd96263",
+          "sha256": "639ef4c355748b1c884492678dd3d135bba70147573da2f6c4e02352e135059e"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/juncao-neuromuscular/app.js",
+          "origem": "ra/juncao-neuromuscular/app.js",
+          "sha256_anterior": "f2e2a4f6d152c938c7351b850ac81d0af202057fd121810cd3d6507c529787aa",
+          "sha256": "037c6d2829f4e1eb8089d296d3a49fd88934f9c0454662fd279e2555956f4594"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/juncao-neuromuscular/app.js_SUBSTITUIDO_2026-10-24",
+          "origem": "ra/juncao-neuromuscular/app.js_SUBSTITUIDO_2026-10-24",
+          "sha256_anterior": null,
+          "sha256": "99e4e338e81226478f5153aa7f9527a97e9b5261d55c19e475318c2b53bcd071"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/juncao-neuromuscular/ciclos/nivel-1.glb",
+          "origem": "ra/juncao-neuromuscular/ciclos/nivel-1.glb",
+          "sha256_anterior": null,
+          "sha256": "d0c5ea2c4f1a77e8844d32929850c02059b0317c5e1eca6b0912647e866694d5"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/juncao-neuromuscular/ciclos/nivel-1.json",
+          "origem": "ra/juncao-neuromuscular/ciclos/nivel-1.json",
+          "sha256_anterior": null,
+          "sha256": "0008906fbc1f58047e2eeda64a6d1833fa23f4544a1f324c55fa5f9088a214fd"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/juncao-neuromuscular/ciclos/nivel-1.usdz",
+          "origem": "ra/juncao-neuromuscular/ciclos/nivel-1.usdz",
+          "sha256_anterior": null,
+          "sha256": "9a954a55d79ae49aa0b914ca2968693b5e57fa84eaf4fbf2fa5a271c6e259b51"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/juncao-neuromuscular/ciclos/nivel-1.validation.json",
+          "origem": "ra/juncao-neuromuscular/ciclos/nivel-1.validation.json",
+          "sha256_anterior": null,
+          "sha256": "7f83fe3e8b708a11eeba9917c49a6026d9abe03e37bef5993485add268bccd67"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/juncao-neuromuscular/ciclos/nivel-2.glb",
+          "origem": "ra/juncao-neuromuscular/ciclos/nivel-2.glb",
+          "sha256_anterior": null,
+          "sha256": "2dbb81879dd61a74e4dfa9edb746468095f75f02549470a062404192f551ab8a"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/juncao-neuromuscular/ciclos/nivel-2.json",
+          "origem": "ra/juncao-neuromuscular/ciclos/nivel-2.json",
+          "sha256_anterior": null,
+          "sha256": "b9ee8d581f68362cc9480266350ec8f3d56dbd18ef9773a621ffd1a7e81c69d1"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/juncao-neuromuscular/ciclos/nivel-2.usdz",
+          "origem": "ra/juncao-neuromuscular/ciclos/nivel-2.usdz",
+          "sha256_anterior": null,
+          "sha256": "97d53adc887f8ec7ed178066ce40bd79169c9a8071cff3b7e0e169d8f468a2ec"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/juncao-neuromuscular/ciclos/nivel-2.validation.json",
+          "origem": "ra/juncao-neuromuscular/ciclos/nivel-2.validation.json",
+          "sha256_anterior": null,
+          "sha256": "78c1bec3c936a252bff2483189d9515422119b47b332897f75fa7d813af1b5fa"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/juncao-neuromuscular/ciclos/nivel-3.glb",
+          "origem": "ra/juncao-neuromuscular/ciclos/nivel-3.glb",
+          "sha256_anterior": null,
+          "sha256": "eae9724b6a587eaf8be3b1ee8a2daaa35e0fd178cf2cd213560bb81c3cdee264"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/juncao-neuromuscular/ciclos/nivel-3.json",
+          "origem": "ra/juncao-neuromuscular/ciclos/nivel-3.json",
+          "sha256_anterior": null,
+          "sha256": "5cdae53886fe8b5315fb0710a88308efe56a6b32095c3bc44dcaefc6a211dc8a"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/juncao-neuromuscular/ciclos/nivel-3.usdz",
+          "origem": "ra/juncao-neuromuscular/ciclos/nivel-3.usdz",
+          "sha256_anterior": null,
+          "sha256": "5e994ad3ed7a329872ff87458b61d312129fdf0d676a685ff4d9004c0a288c34"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/juncao-neuromuscular/ciclos/nivel-3.validation.json",
+          "origem": "ra/juncao-neuromuscular/ciclos/nivel-3.validation.json",
+          "sha256_anterior": null,
+          "sha256": "c6d3cabf0c8534ee3e03d210414a9e3d994ef0443f9b32f01beb6ed545283532"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/juncao-neuromuscular/ciclos/nivel-4.glb",
+          "origem": "ra/juncao-neuromuscular/ciclos/nivel-4.glb",
+          "sha256_anterior": null,
+          "sha256": "f2e39e04cf718e83008b685385cb6154ddece5aca6491ebb3fcad57b4835cfa3"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/juncao-neuromuscular/ciclos/nivel-4.json",
+          "origem": "ra/juncao-neuromuscular/ciclos/nivel-4.json",
+          "sha256_anterior": null,
+          "sha256": "a6e7d50fa67151f03cc3a91609233356625540066f5410d303a0a7e00441f0ed"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/juncao-neuromuscular/ciclos/nivel-4.usdz",
+          "origem": "ra/juncao-neuromuscular/ciclos/nivel-4.usdz",
+          "sha256_anterior": null,
+          "sha256": "04d369f30fe6a46c35d7640a9a16428b15491351874182672ea73bb596928a5f"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/juncao-neuromuscular/ciclos/nivel-4.validation.json",
+          "origem": "ra/juncao-neuromuscular/ciclos/nivel-4.validation.json",
+          "sha256_anterior": null,
+          "sha256": "96fa70b9adf0d7c95ab4874af8afa92a800f2f97fc095a5aa06daacdbb2a35e3"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/juncao-neuromuscular/ciclos/nivel-5.glb",
+          "origem": "ra/juncao-neuromuscular/ciclos/nivel-5.glb",
+          "sha256_anterior": null,
+          "sha256": "73d631e9bf1a706a04eafb5de6e5008336d45e8c3e1b7fdbaf13e7e3379a46b3"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/juncao-neuromuscular/ciclos/nivel-5.json",
+          "origem": "ra/juncao-neuromuscular/ciclos/nivel-5.json",
+          "sha256_anterior": null,
+          "sha256": "115a7cb32f50fb6959f52b199e9a8ba6a92a96efbe956d5de890597d8361e3ae"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/juncao-neuromuscular/ciclos/nivel-5.usdz",
+          "origem": "ra/juncao-neuromuscular/ciclos/nivel-5.usdz",
+          "sha256_anterior": null,
+          "sha256": "9f4b744edb64a058ce2024078a099a31fff87d615fa7b72cdd019a5921d492cd"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/juncao-neuromuscular/ciclos/nivel-5.validation.json",
+          "origem": "ra/juncao-neuromuscular/ciclos/nivel-5.validation.json",
+          "sha256_anterior": null,
+          "sha256": "7cc63f143451c70caf9057e10410e2843c47a72be0f23b7ec6a578de7612707d"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/juncao-neuromuscular/index.html",
+          "origem": "ra/juncao-neuromuscular/index.html",
+          "sha256_anterior": null,
+          "sha256": "8feea98e88a04b9b800a4512417ebf63f7a10d7d5a6cf367be6998c9672e911c"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/juncao-neuromuscular/index.html_SUBSTITUIDO_2026-10-24",
+          "origem": "ra/juncao-neuromuscular/index.html_SUBSTITUIDO_2026-10-24",
+          "sha256_anterior": null,
+          "sha256": "15eaa64473534b50505608dc86ccf254e6bc2f307fde812d04166f79d1b5691c"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/README.md",
+          "origem": "ra/musculo-sarcomero/README.md",
+          "sha256_anterior": "d187ddd12b2e3c1a949bf21240a0cd50b6f1186b794ef22f09411b0da7778ded",
+          "sha256": "cb78afde047ecd75c7352fecee018b5393d03aab76d0e2b48af274f8e3b576b7"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/app.js",
+          "origem": "ra/musculo-sarcomero/app.js",
+          "sha256_anterior": "77e7ba57b5d84960b9153d887444d4d01d0aba1cae29269d1f5aa0a4053dc955",
+          "sha256": "3e43ea5ac1991c57e2e57077dd70a1c1b7f45b6526e3e6b1780b1e744ad35cbf"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/app.js_SUBSTITUIDO_2026-10-24",
+          "origem": "ra/musculo-sarcomero/app.js_SUBSTITUIDO_2026-10-24",
+          "sha256_anterior": null,
+          "sha256": "728735ae40f4f9b1862b426cc88060269147647b9178f24370595f0ebcdf511e"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/ciclos/nivel-5.glb",
+          "origem": "ra/musculo-sarcomero/ciclos/nivel-5.glb",
+          "sha256_anterior": null,
+          "sha256": "6bc8090042b8878b06f7b45b85d278196d0b5840ff1b32d8b5b2b223297cbd3a"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/ciclos/nivel-5.json",
+          "origem": "ra/musculo-sarcomero/ciclos/nivel-5.json",
+          "sha256_anterior": null,
+          "sha256": "e37312ac3273761a91592060211d93a4337e1832c516131668a7bd1a04591974"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/ciclos/nivel-5.usdz",
+          "origem": "ra/musculo-sarcomero/ciclos/nivel-5.usdz",
+          "sha256_anterior": null,
+          "sha256": "50143543567410c36d8d1669653ff68f1d3a20d2d9733b408b96fd78b8fec0bd"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/ciclos/nivel-5.validation.json",
+          "origem": "ra/musculo-sarcomero/ciclos/nivel-5.validation.json",
+          "sha256_anterior": null,
+          "sha256": "b734735d689f43b8840b39fe099dcbf3780048bfe8fbd2a759367e5a441347d8"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/index.html",
+          "origem": "ra/musculo-sarcomero/index.html",
+          "sha256_anterior": null,
+          "sha256": "c1ebd6731437badf9f69aa268dcf6563a6c83b684d3c49699b1248bd65006233"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/index.html_SUBSTITUIDO_2026-10-24",
+          "origem": "ra/musculo-sarcomero/index.html_SUBSTITUIDO_2026-10-24",
+          "sha256_anterior": null,
+          "sha256": "5dd0bd8ef0ae7ed683ad8a6d8328830e3d9f149dec28ed8a0512064086b25092"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/index.html_SUBSTITUIDO_2026-10-24_v2",
+          "origem": "ra/musculo-sarcomero/index.html_SUBSTITUIDO_2026-10-24_v2",
+          "sha256_anterior": null,
+          "sha256": "b440e607294d098850a3156c40516cc914e69a36ecd633cf2164fe3929ffe171"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/osso-vivo/README.md",
+          "origem": "ra/osso-vivo/README.md",
+          "sha256_anterior": "c2401e26497799cc35eb64df2fb932fec3a22e661ca5783bf24fba33950485e7",
+          "sha256": "25f4b8dc2ca3edbab95a0b6f955edd34f4480d80046d9a84244dd0efc6d1b20b"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/osso-vivo/app.js",
+          "origem": "ra/osso-vivo/app.js",
+          "sha256_anterior": "305a2b981da9acd454ad09a697bb650bb430673bc8376e33e2470a2e9889b991",
+          "sha256": "ee8b9e382478a9c54f1709ec3211b37736e8f7bcdf3ebcfd2a1a1efbe18a066a"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/osso-vivo/app.js_SUBSTITUIDO_2026-10-24",
+          "origem": "ra/osso-vivo/app.js_SUBSTITUIDO_2026-10-24",
+          "sha256_anterior": null,
+          "sha256": "1a6b794b8a17ecccebeb9e3e56296e41e976c8ebd5f0fdd98506d02e462dd424"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/osso-vivo/ciclos/nivel-1.glb",
+          "origem": "ra/osso-vivo/ciclos/nivel-1.glb",
+          "sha256_anterior": null,
+          "sha256": "53b9cf55e115ffefcb0b485671b149c5eb0374ef310fc0fa08632c4795efab73"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/osso-vivo/ciclos/nivel-1.json",
+          "origem": "ra/osso-vivo/ciclos/nivel-1.json",
+          "sha256_anterior": null,
+          "sha256": "fe681b7751e2994363f02f127b3f3238c8e99381e5d7722892ecad0c1866cffc"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/osso-vivo/ciclos/nivel-1.usdz",
+          "origem": "ra/osso-vivo/ciclos/nivel-1.usdz",
+          "sha256_anterior": null,
+          "sha256": "4f85a2591e546ae57b99b85e67e0890e959898a1899b974524e53a51fd121288"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/osso-vivo/ciclos/nivel-1.validation.json",
+          "origem": "ra/osso-vivo/ciclos/nivel-1.validation.json",
+          "sha256_anterior": null,
+          "sha256": "cf948c030dca260590120769600c2efad2c5de2fd851f05a333566db755dab6a"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/osso-vivo/ciclos/nivel-2.glb",
+          "origem": "ra/osso-vivo/ciclos/nivel-2.glb",
+          "sha256_anterior": null,
+          "sha256": "a33cf0e8f8ca1e6120b24ce6acafef145c0321e66198668cac427b637dc76f17"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/osso-vivo/ciclos/nivel-2.json",
+          "origem": "ra/osso-vivo/ciclos/nivel-2.json",
+          "sha256_anterior": null,
+          "sha256": "344a7ea655c77e8be057fbc39759639236e23c7c11c01ff0763b2e1b02e74d4d"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/osso-vivo/ciclos/nivel-2.usdz",
+          "origem": "ra/osso-vivo/ciclos/nivel-2.usdz",
+          "sha256_anterior": null,
+          "sha256": "ff7c0d21a9881e66fd0ceb74537dc09c7ca3ec645249cda6acf1b3cb58abd6e3"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/osso-vivo/ciclos/nivel-2.validation.json",
+          "origem": "ra/osso-vivo/ciclos/nivel-2.validation.json",
+          "sha256_anterior": null,
+          "sha256": "d59e5c5df45d39394fdd56f07a5b43e898b0a69fe00090243a48fadbc8b4c3e8"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/osso-vivo/ciclos/nivel-3.glb",
+          "origem": "ra/osso-vivo/ciclos/nivel-3.glb",
+          "sha256_anterior": null,
+          "sha256": "1e3097f1a8c71bf59a151a2cdbde9789814970d97e5c375b1ea951f43657cf43"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/osso-vivo/ciclos/nivel-3.json",
+          "origem": "ra/osso-vivo/ciclos/nivel-3.json",
+          "sha256_anterior": null,
+          "sha256": "ce6ac25a6a6aebea01ef6e82a193ff06cfff598480fbdb05ee889c197862d5d7"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/osso-vivo/ciclos/nivel-3.usdz",
+          "origem": "ra/osso-vivo/ciclos/nivel-3.usdz",
+          "sha256_anterior": null,
+          "sha256": "0a5147b5b03c5333f7cd499ce7eceab386773ab7ff4a4fdb92f87cc41edef855"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/osso-vivo/ciclos/nivel-3.validation.json",
+          "origem": "ra/osso-vivo/ciclos/nivel-3.validation.json",
+          "sha256_anterior": null,
+          "sha256": "305fe25543a316c054c8568b60bb7773fd66d1682c9ee73e907687f8987d3043"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/osso-vivo/ciclos/nivel-4.glb",
+          "origem": "ra/osso-vivo/ciclos/nivel-4.glb",
+          "sha256_anterior": null,
+          "sha256": "ac6f8ba1610f61a67b4bc46e7d87593c6f00764de0b71b5b17de2f6c9a4aa6a8"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/osso-vivo/ciclos/nivel-4.json",
+          "origem": "ra/osso-vivo/ciclos/nivel-4.json",
+          "sha256_anterior": null,
+          "sha256": "d5c922f4f16283b3f9e72535304be8f881f25526c1a51d11f22c65965bac4d7b"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/osso-vivo/ciclos/nivel-4.usdz",
+          "origem": "ra/osso-vivo/ciclos/nivel-4.usdz",
+          "sha256_anterior": null,
+          "sha256": "5ce47af4a431db92ae9804de6cace4a08728357d18045c25448730da277463de"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/osso-vivo/ciclos/nivel-4.validation.json",
+          "origem": "ra/osso-vivo/ciclos/nivel-4.validation.json",
+          "sha256_anterior": null,
+          "sha256": "4d1e53f783f3f23bde20be0220a9d316f80edea48545bf60c762f789006630b0"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/osso-vivo/ciclos/nivel-5.glb",
+          "origem": "ra/osso-vivo/ciclos/nivel-5.glb",
+          "sha256_anterior": null,
+          "sha256": "78c78205029577c0dfdabbae78a6f07877362cc16d16ae9b155685f1b94864c1"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/osso-vivo/ciclos/nivel-5.json",
+          "origem": "ra/osso-vivo/ciclos/nivel-5.json",
+          "sha256_anterior": null,
+          "sha256": "1d4dbcb22894210d7377c7dca9ec8c5894c440b49543003eb9d79fd154c09049"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/osso-vivo/ciclos/nivel-5.usdz",
+          "origem": "ra/osso-vivo/ciclos/nivel-5.usdz",
+          "sha256_anterior": null,
+          "sha256": "e07e1b42ff619a5e0ea0ee041e501108fb1ee70fac1d74c1d7d1104d3ae21cb7"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/osso-vivo/ciclos/nivel-5.validation.json",
+          "origem": "ra/osso-vivo/ciclos/nivel-5.validation.json",
+          "sha256_anterior": null,
+          "sha256": "a78206e2944a3c46cd1ca5ac74ed6ffcca0187b2d9ab7d31ecb06cbf20e98cc1"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/osso-vivo/index.html",
+          "origem": "ra/osso-vivo/index.html",
+          "sha256_anterior": null,
+          "sha256": "0c1567f65c37ce2ad3255a1726673171ae1a268a2798448381c0c32e5a3af494"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/osso-vivo/index.html_SUBSTITUIDO_2026-10-24",
+          "origem": "ra/osso-vivo/index.html_SUBSTITUIDO_2026-10-24",
+          "sha256_anterior": null,
+          "sha256": "cf3c1420087b6b209a24120011b45b7163f29d717f603c3faa0d96f5d838c0bc"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/pleura/app.js",
+          "origem": "ra/pleura/app.js",
+          "sha256_anterior": "0f594c1209387cb119fe2980260854b1a09b5c994c6e618f73991f5a0ac05e14",
+          "sha256": "d67c2426f66d0df7debd6c097a6a1319b5ce1eea1f17db3e810eb79482784cc8"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/pleura/ciclos/nivel-2.glb",
+          "origem": "ra/pleura/ciclos/nivel-2.glb",
+          "sha256_anterior": null,
+          "sha256": "2a2e2029efc14fee0a5963c2b5c23bf075cdce35532654edbdd8235bfd1168ff"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/pleura/ciclos/nivel-2.json",
+          "origem": "ra/pleura/ciclos/nivel-2.json",
+          "sha256_anterior": null,
+          "sha256": "c514cf79cf30a2a649f3190a0b4c8e64ad27c0bac5a473e3083e04e97223a9a7"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/pleura/ciclos/nivel-2.usdz",
+          "origem": "ra/pleura/ciclos/nivel-2.usdz",
+          "sha256_anterior": null,
+          "sha256": "629763c6d1277aa3e5be4fdcb000c6057f8c35662e0cb271a926a4f29efa75f2"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/pleura/ciclos/nivel-2.validation.json",
+          "origem": "ra/pleura/ciclos/nivel-2.validation.json",
+          "sha256_anterior": null,
+          "sha256": "70a22fe6e890e9b406f34e7a088ef17ea84d5ca14416a41b56e2e3c77cc76d9f"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/pleura/index.html",
+          "origem": "ra/pleura/index.html",
+          "sha256_anterior": null,
+          "sha256": "6e0f5f38495fdc24368040e479bcff82d60f2bf6929fdddfea4dc7df241f14f0"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/pleura/index.html_SUBSTITUIDO_2026-10-24",
+          "origem": "ra/pleura/index.html_SUBSTITUIDO_2026-10-24",
+          "sha256_anterior": null,
+          "sha256": "96903eadc75ec8fc2c4351d2f2c05113a6a5049df10c9e2fa1e6f525ba68caf9"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/pleura/modelo-aprovado.html_SUBSTITUIDO_2026-10-24",
+          "origem": "ra/pleura/modelo-aprovado.html_SUBSTITUIDO_2026-10-24",
+          "sha256_anterior": null,
+          "sha256": "6e6c44a45fb9d310b28499dfed71fb2e194de5032ea481a6096ac9f63010185a"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/pleura/vasos.html_SUBSTITUIDO_2026-10-24",
+          "origem": "ra/pleura/vasos.html_SUBSTITUIDO_2026-10-24",
+          "sha256_anterior": null,
+          "sha256": "b78b333105f7338370670b02116883c2e17de8da37f2e858e69a84d1aff38086"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/potencial-membrana/README.md",
+          "origem": "ra/potencial-membrana/README.md",
+          "sha256_anterior": "816cdc8e2fab9b52a793a0ecc8de7b626a5a7ede42914448be3f63d52380c067",
+          "sha256": "d24e579d200cc824bde64c72c5721dcecbe484c6c6059055b8df63aa71706b9c"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/potencial-membrana/app.js_SUBSTITUIDO_2026-10-24",
+          "origem": "ra/potencial-membrana/app.js_SUBSTITUIDO_2026-10-24",
+          "sha256_anterior": null,
+          "sha256": "ad24920f1a12ef6e1412afc2be1df84a7f9fee4988534da3a7258b3838b0a14b"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/potencial-membrana/index.html",
+          "origem": "ra/potencial-membrana/index.html",
+          "sha256_anterior": null,
+          "sha256": "845556ce846fec240457741ad110ef019893c9ce4a5f2685233536b0afd8bf5c"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/potencial-membrana/index.html_SUBSTITUIDO_2026-10-24",
+          "origem": "ra/potencial-membrana/index.html_SUBSTITUIDO_2026-10-24",
+          "sha256_anterior": null,
+          "sha256": "d75105c71294db36a6b8f08a8690a4f650174c1361ae816a367990f774a13546"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/potencial-membrana/index.html_SUBSTITUIDO_2026-10-24_v2",
+          "origem": "ra/potencial-membrana/index.html_SUBSTITUIDO_2026-10-24_v2",
+          "sha256_anterior": null,
+          "sha256": "ac05834fbb51f35b71183b5736337804009597829516ed0a46498b5f3e069712"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/ra-botoes-ios.js",
+          "origem": "ra/ra-botoes-ios.js",
+          "sha256_anterior": "6e0bf9fea2317e6a825aa65a915f66365326bc33bdac83556ec3e6e07bc96efc",
+          "sha256": "f4803b2ddb3e81ba0b33e09372c5345a7adbf9f9a28273860e07d6042cffcc94"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/ra-botoes-ios.js_SUBSTITUIDO_2026-10-24",
+          "origem": "ra/ra-botoes-ios.js_SUBSTITUIDO_2026-10-24",
+          "sha256_anterior": null,
+          "sha256": "cd6c7b880b1bc9cd5c856da501bf36a8ec50f70f6f6d30d20e0b3617f1fb46da"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/retorno-venoso/app.js",
+          "origem": "ra/retorno-venoso/app.js",
+          "sha256_anterior": "62efd3ea0b2d10d640a5859bcd4bf5e1f054a43181cd465514f5992bc3fa05d6",
+          "sha256": "13061ec8fa35ad789e690ab90e745365e150571265c703cc32c7a9db32dfca07"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/retorno-venoso/ciclos/nivel-3.glb",
+          "origem": "ra/retorno-venoso/ciclos/nivel-3.glb",
+          "sha256_anterior": null,
+          "sha256": "c1a26ac9c9762d7c93dda7b176cd76a12eea9bd22177cb09db5573f433eabda2"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/retorno-venoso/ciclos/nivel-3.json",
+          "origem": "ra/retorno-venoso/ciclos/nivel-3.json",
+          "sha256_anterior": null,
+          "sha256": "37c8f05a2d4b0afc2fefe031369975da1c9caffa91d185a9068d2d252899d75a"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/retorno-venoso/ciclos/nivel-3.usdz",
+          "origem": "ra/retorno-venoso/ciclos/nivel-3.usdz",
+          "sha256_anterior": null,
+          "sha256": "338e895315e8943400ad9bc40b5d66fa2c159c6745367c4f5e9274ef347ef526"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/retorno-venoso/ciclos/nivel-3.validation.json",
+          "origem": "ra/retorno-venoso/ciclos/nivel-3.validation.json",
+          "sha256_anterior": null,
+          "sha256": "6ec8bbe371a01360a236be427fd53bdf28a176a26067bf092ed81009634f631b"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/retorno-venoso/ciclos/nivel-4.glb",
+          "origem": "ra/retorno-venoso/ciclos/nivel-4.glb",
+          "sha256_anterior": null,
+          "sha256": "adfed945c7087ab092b4031b9c95081ec3f0649f3e9c03585f44bcf4d10151d7"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/retorno-venoso/ciclos/nivel-4.json",
+          "origem": "ra/retorno-venoso/ciclos/nivel-4.json",
+          "sha256_anterior": null,
+          "sha256": "1bccbe196a2bafb536dbd9365cf2cc81970049e329ac30d6285d1b5bec1d7309"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/retorno-venoso/ciclos/nivel-4.usdz",
+          "origem": "ra/retorno-venoso/ciclos/nivel-4.usdz",
+          "sha256_anterior": null,
+          "sha256": "c00905fd216f02c34d372d0921681295e2f76c37634d1ceebc9ee79048e74df4"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/retorno-venoso/ciclos/nivel-4.validation.json",
+          "origem": "ra/retorno-venoso/ciclos/nivel-4.validation.json",
+          "sha256_anterior": null,
+          "sha256": "12dd9504119798006e68f5272cb6f04927432ede3f12619047f99f56ce4f68bd"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/retorno-venoso/index.html",
+          "origem": "ra/retorno-venoso/index.html",
+          "sha256_anterior": null,
+          "sha256": "e06220f24d0fa613d945104747d5ff3b674ba372aa1175903ecd155948dcc448"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/retorno-venoso/index.html_SUBSTITUIDO_2026-10-24",
+          "origem": "ra/retorno-venoso/index.html_SUBSTITUIDO_2026-10-24",
+          "sha256_anterior": null,
+          "sha256": "b7cc1dfe0f7441d9320ac41a62d923502850b2c82134dd4e692ac5129c659515"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/scripts/atualizar-manifesto.cjs",
+          "origem": "ra/scripts/atualizar-manifesto.cjs",
+          "sha256_anterior": null,
+          "sha256": "dae898708d9f23da461cfdd9627d4658078435c3f9c1c6f206406684039cb9f3"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/scripts/compilar-ciclos.js",
+          "origem": "ra/scripts/compilar-ciclos.js",
+          "sha256_anterior": null,
+          "sha256": "ef74a9cccc5644b60041f715a1a9706929705e572cc4b78c710ee52f386aff31"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/scripts/construir-portateis.cjs",
+          "origem": "ra/scripts/construir-portateis.cjs",
+          "sha256_anterior": null,
+          "sha256": "f1b87557da243182e1e076487a31bc1dc50418f3e4a4fc0bb58b2640f26ec5c9"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/scripts/converter-ciclos.py",
+          "origem": "ra/scripts/converter-ciclos.py",
+          "sha256_anterior": null,
+          "sha256": "8f13cda7aa8d04a349f20c0fc232e62a4b36b6d8b9dff59b671e9c58c3f5fb12"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/scripts/verificar-portateis.cjs",
+          "origem": "ra/scripts/verificar-portateis.cjs",
+          "sha256_anterior": null,
+          "sha256": "ea18891968d5728fe6c917403441fead0b5f2da585d1ab56d515b07fa6d06c00"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/starling/README.md",
+          "origem": "ra/starling/README.md",
+          "sha256_anterior": "a0d4747a6af466b8eaeeed514f369fc15d18da934220265ea2c00482d17031a0",
+          "sha256": "9d71e758c4b06cd7a3665ae544fc4d5ee9f8b3c57eef46a40fa8bd37f9bf1b4a"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/starling/app.js",
+          "origem": "ra/starling/app.js",
+          "sha256_anterior": "c5e30e2842801d15cf332fe64026d390e345dd0b49740a61a763c2f0a7a03aaf",
+          "sha256": "d7695f13cf3999e91aa9a9e6afa2aaa622db9c8e1f3e3f8c68dacbf6704a5746"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/starling/app.js_SUBSTITUIDO_2026-10-24",
+          "origem": "ra/starling/app.js_SUBSTITUIDO_2026-10-24",
+          "sha256_anterior": null,
+          "sha256": "aeb3b17f58710b3e72342ed1b8edecb15a36681ee5532174d878423db9db9629"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/starling/ciclos/nivel-1.glb",
+          "origem": "ra/starling/ciclos/nivel-1.glb",
+          "sha256_anterior": null,
+          "sha256": "3ce0882c9a0eff681b6241b545ba88f24ca57d93fc4ebeccb75d2f64354ad7f2"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/starling/ciclos/nivel-1.json",
+          "origem": "ra/starling/ciclos/nivel-1.json",
+          "sha256_anterior": null,
+          "sha256": "30bfc47b9e5ca4d6046171b942cdb740c783ee27c560fd39189f9838f48f52ff"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/starling/ciclos/nivel-1.usdz",
+          "origem": "ra/starling/ciclos/nivel-1.usdz",
+          "sha256_anterior": null,
+          "sha256": "725187e36b91b5ae441979c0c47079832f0313c1fe3834db58f413f15170a97a"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/starling/ciclos/nivel-1.validation.json",
+          "origem": "ra/starling/ciclos/nivel-1.validation.json",
+          "sha256_anterior": null,
+          "sha256": "2bc0246e1d62d32a793fd839ef7f44aab30b8d32aae7acd66b44bb679761087d"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/starling/ciclos/nivel-2.glb",
+          "origem": "ra/starling/ciclos/nivel-2.glb",
+          "sha256_anterior": null,
+          "sha256": "ecf55f9dac750e3bf9110ff98fa0885ccd9d63a46d03eae7d15188d53a0e542f"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/starling/ciclos/nivel-2.json",
+          "origem": "ra/starling/ciclos/nivel-2.json",
+          "sha256_anterior": null,
+          "sha256": "d62e6efb322cd836cfb4051eabda71eee135c4ffc65d9e5812261ecb26dfffcb"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/starling/ciclos/nivel-2.usdz",
+          "origem": "ra/starling/ciclos/nivel-2.usdz",
+          "sha256_anterior": null,
+          "sha256": "9df9ce292139fe7ffdbd9eec77aa4f0e6afba18c640ea1f37ce354748a11d356"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/starling/ciclos/nivel-2.validation.json",
+          "origem": "ra/starling/ciclos/nivel-2.validation.json",
+          "sha256_anterior": null,
+          "sha256": "ea6afdfa735c5eb84fe2d10f277a63365e3bf4ff2f62b711811963f8f99e66f3"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/starling/ciclos/nivel-3.glb",
+          "origem": "ra/starling/ciclos/nivel-3.glb",
+          "sha256_anterior": null,
+          "sha256": "e999a1f940eeacd7514abfc8c06bcbde817af13cd4af5fce218c2b7d8e2e15f3"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/starling/ciclos/nivel-3.json",
+          "origem": "ra/starling/ciclos/nivel-3.json",
+          "sha256_anterior": null,
+          "sha256": "b7213596452dd69f454ea4ff220bf06d9301a80065653c23ea0326149c93d432"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/starling/ciclos/nivel-3.usdz",
+          "origem": "ra/starling/ciclos/nivel-3.usdz",
+          "sha256_anterior": null,
+          "sha256": "9d2ab37018f639c7fcda040bb867f30a52d8942cfc046009eadbc50bfeb1630b"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/starling/ciclos/nivel-3.validation.json",
+          "origem": "ra/starling/ciclos/nivel-3.validation.json",
+          "sha256_anterior": null,
+          "sha256": "e5a8adaf66bb1fdb5df4260ce06bfe3eb7b3e6a7a8e33ccdbaab39ba271a46cd"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/starling/ciclos/nivel-4.glb",
+          "origem": "ra/starling/ciclos/nivel-4.glb",
+          "sha256_anterior": null,
+          "sha256": "95edb63d54627878a6716c9e12c238ececc7f1215c4c1dac0479293e2dc3c913"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/starling/ciclos/nivel-4.json",
+          "origem": "ra/starling/ciclos/nivel-4.json",
+          "sha256_anterior": null,
+          "sha256": "64718b3c24f8c2774bb807945c1cc31f9307033f8b24124ddd09d3d73e86b8e3"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/starling/ciclos/nivel-4.usdz",
+          "origem": "ra/starling/ciclos/nivel-4.usdz",
+          "sha256_anterior": null,
+          "sha256": "1e658598dc1c7fd1eaf313f2c0aff4c54a8d58b0154469af8f30c5193ed07c4d"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/starling/ciclos/nivel-4.validation.json",
+          "origem": "ra/starling/ciclos/nivel-4.validation.json",
+          "sha256_anterior": null,
+          "sha256": "fd244fa4d80c157f81a7efd61bf16950f83f091e1ba199ddb73b6cacde473ae7"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/starling/ciclos/nivel-5.glb",
+          "origem": "ra/starling/ciclos/nivel-5.glb",
+          "sha256_anterior": null,
+          "sha256": "48380fcd984b2372328547b6f5674623729917fd3febdbbde539b94de4ed09a3"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/starling/ciclos/nivel-5.json",
+          "origem": "ra/starling/ciclos/nivel-5.json",
+          "sha256_anterior": null,
+          "sha256": "43ccdb0ca0ab7ac4e4750fe663e474e6ccd04bff96926d833bccbc4cf07dd9ca"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/starling/ciclos/nivel-5.usdz",
+          "origem": "ra/starling/ciclos/nivel-5.usdz",
+          "sha256_anterior": null,
+          "sha256": "956f2dc27df2d831e291f7014ef500a33e8e8d1df18f78d19b2a74ba49e7ab60"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/starling/ciclos/nivel-5.validation.json",
+          "origem": "ra/starling/ciclos/nivel-5.validation.json",
+          "sha256_anterior": null,
+          "sha256": "62123312d27ad00980f8bb7d5e7670a18255dd3d8ad0b4e61714b1ed0416dfc1"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/starling/index.html",
+          "origem": "ra/starling/index.html",
+          "sha256_anterior": null,
+          "sha256": "10cba4ff11f13f22cbf01c3d5a123dbfa0c3d097a353a8c5d16ff074155cfb4e"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/starling/index.html_SUBSTITUIDO_2026-10-24",
+          "origem": "ra/starling/index.html_SUBSTITUIDO_2026-10-24",
+          "sha256_anterior": null,
+          "sha256": "8d105949377c3812652a1e21eab98f999d2ac46d58af53761499d442360c4909"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/tests/celula-nova-ra.test.mjs",
+          "origem": "ra/tests/celula-nova-ra.test.mjs",
+          "sha256_anterior": null,
+          "sha256": "8c872845a660b16e80babd2ac51b60f223743b79dc7aab50c58eb8ff3f7ba08d"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/tests/celula-transferencia.test.mjs",
+          "origem": "ra/tests/celula-transferencia.test.mjs",
+          "sha256_anterior": "2e14dfe6ab67af0bfd3a95ec72047227153407b2423885df43cd284ab649d237",
+          "sha256": "acfe45596941801e5a00b1a4138a83d6fdc6e1c7a458d1545faf45a97c3b3cb1"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/tests/instalacao-independente.test.mjs",
+          "origem": "ra/tests/instalacao-independente.test.mjs",
+          "sha256_anterior": "985d246a650446f5de308a8aad319c44524fbc1933cdf052f010e230f49565da",
+          "sha256": "3f751a6d931cccb8c594abc6a3b0c732ad739120ec76e9b2317336f71673af75"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/tests/membrana-movimento.test.mjs",
+          "origem": "ra/tests/membrana-movimento.test.mjs",
+          "sha256_anterior": null,
+          "sha256": "d118da647388fb6b98b6a98d0fbe144b8b20f19aaacb4bbf997317d07ab6eea3"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/tests/musculo-miofibrila.test.mjs_SUBSTITUIDO_2026-10-24",
+          "origem": "ra/tests/musculo-miofibrila.test.mjs_SUBSTITUIDO_2026-10-24",
+          "sha256_anterior": null,
+          "sha256": "528bbeebf35f346e2d017041635cca0e580ca9580eb2e27cdc4ed69395f9e3f6"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/tests/musculo-miofibrila.test.mjs_SUBSTITUIDO_2026-10-24_v2",
+          "origem": "ra/tests/musculo-miofibrila.test.mjs_SUBSTITUIDO_2026-10-24_v2",
+          "sha256_anterior": null,
+          "sha256": "04c77472c7e41b4011e2b6e69506f06f33686be7475bd4e78d9c0a36b257c294"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/tests/starling-migracao.test.mjs",
+          "origem": "ra/tests/starling-migracao.test.mjs",
+          "sha256_anterior": "6ed403ac5ba5b457280e08c4ddf3c88f8d6fda38a91afe0b3b5784c50b733e33",
+          "sha256": "9a464cfd624adb28e74d63f524133f933f3ee300a53055cf8bb72fe8ccaebd2b"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/tests/starling-migracao.test.mjs_SUBSTITUIDO_2026-10-24",
+          "origem": "ra/tests/starling-migracao.test.mjs_SUBSTITUIDO_2026-10-24",
+          "sha256_anterior": null,
+          "sha256": "9ab535d04d9321c0a60613ab14808bf6e82bf72c37362087d5738790a46985e7"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/tests/texto-volume.test.mjs",
+          "origem": "ra/tests/texto-volume.test.mjs",
+          "sha256_anterior": null,
+          "sha256": "f35983f609bf76e0aa41bca430286b073414abd18423a15da310d78c0c817ff6"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/texto-volume.js",
+          "origem": "ra/texto-volume.js",
+          "sha256_anterior": null,
+          "sha256": "280a3d2f0db5abca613b3bb59a1cc706b48c4deb09b254bcc67183d10baa42ad"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/manifesto.json",
+          "origem": "ra/manifesto.json",
+          "sha256_anterior": "f6891afd6e03f4b7987a801c5306fd3c5b1488a2f3afb76fc2102353b92ebd59",
+          "sha256": "7cac6737cdc304a5b787bed89fa16d624ec3a4b2606aee838411b8a00449a43b"
+        }
+      ]
     }
-  ]
+  ],
+  "ultima_sincronizacao_fisiologia": {
+    "data": "2026-10-25",
+    "commit": "c16aae9c0b9d1f2b6e888373d60473f6fa960a7c"
+  }
 }

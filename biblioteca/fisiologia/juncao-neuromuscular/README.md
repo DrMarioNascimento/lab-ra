@@ -2,9 +2,9 @@
 
 ## Manutenção e origem — 19 de outubro de 2026
 
-Esta pasta é uma cópia local de estudo dentro da biblioteca LAB-RA. O texto técnico abaixo registra a experiência de origem; os acessos da biblioteca e o retorno local são definidos pelo LAB-RA. A procedência e a revisão da cópia devem ser conferidas em `biblioteca/origens.json`, na raiz. Alterações no Fisiologia Interativa não são sincronizadas automaticamente aqui.
+Módulo de Fisiologia em RA, mantido neste repositório e acessado pelos percursos dos tutores. A Unidade 06 — Sistema Endócrino possui documentação separada em `endocrino/`; sua inclusão não altera a procedência dos modelos desta experiência. Os créditos e as licenças específicos abaixo permanecem aplicáveis.
 
-Consulte o [README principal](../../../README.md) e a [licença da raiz](../../../LICENSE.md). Créditos e licenças específicos deste módulo permanecem nos documentos abaixo.
+Consulte o [README principal](../../README.md) e a [licença da raiz](../../LICENSE.md). Créditos e licenças específicos deste módulo permanecem nos documentos abaixo.
 
 Experiência original do Sistema Muscular, para EF e Fisioterapia. Cinco ampliações: O encontro, O terminal, A fenda, A tríade e A contração. Sem mesas, pedestais, autenticação Google ou dependências do Lab RA.
 

@@ -1,0 +1,10 @@
+import {NodeIO} from '@gltf-transform/core';
+import {ALL_EXTENSIONS} from '@gltf-transform/extensions';
+import {weld,simplify,prune,dedup} from '@gltf-transform/functions';
+import {MeshoptSimplifier} from 'meshoptimizer';
+await MeshoptSimplifier.ready;
+const io=new NodeIO().registerExtensions(ALL_EXTENSIONS);
+const doc=await io.read('./celula-humana.glb');
+await doc.transform(weld(),simplify({simplifier:MeshoptSimplifier,ratio:.15,error:.006}),dedup(),prune());
+await io.write('./simplified.glb',doc);
+console.log('Simplified meshes:',doc.getRoot().listMeshes().length,'animation tracks:',doc.getRoot().listAnimations()[0].listChannels().length);

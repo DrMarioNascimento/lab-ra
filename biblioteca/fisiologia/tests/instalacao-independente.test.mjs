@@ -7,7 +7,7 @@ const base=new URL('../',import.meta.url),ler=p=>readFile(new URL(p,base));
 test('instalação conserva todos os recursos declarados na migração de Pleura',async()=>{
  const manifest=JSON.parse(await ler('manifesto.json'));assert(manifest.arquivos.length>=20);
  for(const f of manifest.arquivos) {
-  const b=await ler(f.path),content=/\.(glb|webp)$/.test(f.path)?b:b.toString('utf8').replace(/\r\n/g,'\n');
+  const b=await ler(f.path),content=/\.(glb|webp|usdz)$/.test(f.path)?b:b.toString('utf8').replace(/\r\n/g,'\n');
   assert.equal(createHash('sha256').update(content).digest('hex'),f.sha256,f.path);
  }
 });

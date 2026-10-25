@@ -496,3 +496,6 @@ if (Number.isFinite(grauPedido)) definirGrau(grauPedido, true);
 /* desenha uma vez à mão: o laço pode estar congelado, e sem isto a conferência
    fotografa uma tela em branco e acusa um defeito que não existe */
 desenhar();
+
+import {instalarCicloPortatil} from '../ciclo-portatil.js';
+instalarCicloPortatil({experiencia:'retorno-venoso',nivel:()=>atual+1,niveis:[3,4]});

@@ -346,3 +346,6 @@ renderer.setAnimationLoop(t=>{
  }
  controls.update();placeLabels();renderer.render(scene,camera);
 });
+
+import {instalarCicloPortatil} from '../ciclo-portatil.js';
+instalarCicloPortatil({experiencia:'starling',nivel:()=>atual+1,niveis:[1,2,3,4,5]});

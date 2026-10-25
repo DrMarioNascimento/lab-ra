@@ -1,0 +1,82 @@
+{
+  "vista": "Vista Externa",
+  "fc": 75,
+  "bytes": 19225964,
+  "mb": 18.34,
+  "amostras": 24,
+  "duracaoCicloS": 0.8,
+  "normaisNoMorph": true,
+  "limiarMm": 0.05,
+  "malhasNaPeca": 1,
+  "malhasAnimadas": 1,
+  "verticesAnimados": 12013,
+  "malhasExportadasAnimadas": 2,
+  "verticesExportadosAnimados": 24026,
+  "erroInterpolacaoMaxMm": 2.563,
+  "ondeErroInterpolacao": "hartZBrush_defualt_group_Heart_Tex_0",
+  "erroPorIntervaloMm": [
+    0.359,
+    0.265,
+    0.284,
+    0.063,
+    0.059,
+    0.063,
+    0.018,
+    0.368,
+    2.563,
+    0.393,
+    0.545,
+    0.267,
+    0.218,
+    0.138,
+    0.002,
+    0.007,
+    0.216,
+    0.087,
+    0.156,
+    0.03,
+    0.022,
+    0.012,
+    0.011,
+    0.007
+  ],
+  "erroMalhasParadasMaxMm": 0,
+  "ondeErroParadas": null,
+  "fechamentoDoLacoMm": 0,
+  "caixaCicloM": [
+    0.0707,
+    0.1046,
+    0.0574
+  ],
+  "alturaRepousoM": 0.1046,
+  "msMedirEMontar": 101,
+  "msMedir": 5.5,
+  "msExportar": 3321,
+  "preparacaoCores": {
+    "assadas": 0,
+    "cores": 0,
+    "tingidas": 0,
+    "uvDescartado": 0,
+    "ignoradas": 0,
+    "gemeas": 1,
+    "viradas": 0
+  },
+  "etapas": {
+    "msMorphs": 64.1,
+    "msPosicionar": 12,
+    "msPrepararCores": 13.6
+  },
+  "porMalha": [
+    {
+      "nome": "hartZBrush_defualt_group_Heart_Tex_0",
+      "vertices": 12013,
+      "excursaoMm": 4.472778284039304,
+      "erroInterpMm": 2.5629756703324973
+    }
+  ],
+  "quadrosPorCiclo": 48,
+  "dtMotorS": 0.01667,
+  "msAmostrar": 233.6,
+  "msTotal": 3656.2,
+  "aparelho": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.8078.4 Safari/537.36"
+}

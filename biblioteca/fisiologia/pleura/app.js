@@ -576,3 +576,6 @@ irAoNivel(Number.isFinite(nivel) ? nivel - 1 : 0);
 /* desenha uma vez à mão: o laço pode estar congelado no painel do navegador */
 desenhar();
 if (modeloPedido === 'vasos') $('visualizacaoRA').scrollIntoView({ block: 'center' });
+
+import {instalarCicloPortatil} from '../ciclo-portatil.js';
+instalarCicloPortatil({experiencia:'pleura',nivel:()=>atual+1,niveis:[2],nota:'Ciclo respiratório no modelo esquemático da bancada, em repouso e sem pneumotórax. Os modelos anatômicos aprovados continuam na seleção de RA acima.'});

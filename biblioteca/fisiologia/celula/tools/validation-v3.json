@@ -1,0 +1,50 @@
+[
+  {
+    "variant": "completa",
+    "glbBytes": 12508868,
+    "gltfErrors": 0,
+    "gltfWarnings": 0,
+    "usdz": {
+      "meshes": 337,
+      "tracks": 359,
+      "duration": 24.0,
+      "validation": []
+    }
+  },
+  {
+    "variant": "sem-membrana-celular",
+    "glbBytes": 12508852,
+    "gltfErrors": 0,
+    "gltfWarnings": 0,
+    "usdz": {
+      "meshes": 335,
+      "tracks": 359,
+      "duration": 24.0,
+      "validation": []
+    }
+  },
+  {
+    "variant": "sem-membranas-mitocondriais",
+    "glbBytes": 12508760,
+    "gltfErrors": 0,
+    "gltfWarnings": 0,
+    "usdz": {
+      "meshes": 326,
+      "tracks": 359,
+      "duration": 24.0,
+      "validation": []
+    }
+  },
+  {
+    "variant": "sem-membranas",
+    "glbBytes": 12508740,
+    "gltfErrors": 0,
+    "gltfWarnings": 0,
+    "usdz": {
+      "meshes": 324,
+      "tracks": 359,
+      "duration": 24.0,
+      "validation": []
+    }
+  }
+]

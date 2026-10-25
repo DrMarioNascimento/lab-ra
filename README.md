@@ -45,3 +45,7 @@ A divergência de integridade foi reconciliada com o projeto de origem. Dez arqu
 Também foram reconciliadas oito adaptações documentais de 19/10: notas de procedência, domínio atualizado e caminhos para a licença preservada. A reversão apenas dessas adaptações reproduz exatamente os textos da origem registrada. O manifesto inclui essas cópias adaptadas, identificadas em `origens.json`.
 
 O teste de integridade continua obrigatório e verifica os 588 arquivos registrados. Os resultados de cada revisão estão no [workflow de testes](https://github.com/DrMarioNascimento/lab-ra/actions). Testes automáticos não substituem inspeção visual, câmera/RA em aparelho compatível nem login Google real. Essas verificações interativas não foram repetidas nesta revisão porque a conexão do navegador estava indisponível.
+
+## RA de fisiologia — 25/10/2026
+
+Sincronizada a revisão c16aae9c0b9d1f2b6e888373d60473f6fa960a7c do Fisiologia Interativa: textos e placas extrudados e 27 modelos animados com pares GLB/USDZ. Navegação própria do Lab-RA preservada. Validações e limites em biblioteca/fisiologia/REVISAO-VOLUME-MOVIMENTO.md.

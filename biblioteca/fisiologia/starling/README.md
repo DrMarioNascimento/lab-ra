@@ -2,13 +2,13 @@
 
 ## Manutenção e origem — 19 de outubro de 2026
 
-Esta pasta é uma cópia local de estudo dentro da biblioteca LAB-RA. O texto técnico abaixo registra a experiência de origem; os acessos da biblioteca e o retorno local são definidos pelo LAB-RA. A procedência e a revisão da cópia devem ser conferidas em `biblioteca/origens.json`, na raiz. Alterações no Fisiologia Interativa não são sincronizadas automaticamente aqui.
+Módulo de Fisiologia em RA, mantido neste repositório e acessado pelos percursos dos tutores. A Unidade 06 — Sistema Endócrino possui documentação separada em `endocrino/`; sua inclusão não altera a procedência dos modelos desta experiência. Os créditos e as licenças específicos abaixo permanecem aplicáveis.
 
-Consulte o [README principal](../../../README.md) e a [licença da raiz](../../../LICENSE.md). Créditos e licenças específicos deste módulo permanecem nos documentos abaixo.
+Consulte o [README principal](../../README.md) e a [licença da raiz](../../LICENSE.md). Créditos e licenças específicos deste módulo permanecem nos documentos abaixo.
 
 Experiência independente do Fisiologia Interativa, transferida da versão aprovada do Lab RA, revisão `5ac3f4cce5b8d62d76d9fc3cced1e0e0bc2f224d`. [Abrir experiência](https://fisiologia.drmarionascimento.com.br/ra/starling/).
 
-App, modelos, física, paleta de variáveis e estilos são cópias integrais da origem aprovada. A adaptação muda somente a identificação do projeto, a assinatura e o retorno ao Tutor do percurso de origem. Não exige Google nem carrega arquivos do Lab RA. Modelos e texturas são procedurais originais, cobertos pela [licença do projeto](../LICENCA-ORIGEM.md); artigos e bibliotecas conservam seus próprios direitos.
+App, modelos, física, paleta de variáveis e estilos são cópias integrais da origem aprovada. A adaptação muda somente a identificação do projeto, a assinatura e o retorno ao Tutor do percurso de origem. Não exige Google nem carrega arquivos do Lab RA. Modelos e texturas são procedurais originais, cobertos pela [licença do projeto](../../LICENSE.md); artigos e bibliotecas conservam seus próprios direitos.
 
 O card RA da Unidade 1 — Celular mantém A película de carga e acrescenta Forças de Starling com o mesmo destaque. O roteiro e três questões são compartilhados pelos Tutores EF, Fisioterapia e as duas versões Moodle, com e sem IA. As forças microvasculares de Starling não são a lei cardíaca de Frank–Starling.
 
