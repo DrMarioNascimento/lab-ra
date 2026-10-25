@@ -1,0 +1,37 @@
+name: Sincronizar RA dos jogos
+on:
+  push:
+    branches: [codex/ra-jogos-20261025]
+    paths: ['scripts/sincronizar-jogos.cjs', '.github/workflows/ra-jogos.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  sincronizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/checkout@v4
+        with:
+          repository: DrMarioNascimento/casa-da-costa
+          ref: 1455fb2d961f326a6b5ec2859dbe23093ccd1b19
+          path: fonte-casa
+          persist-credentials: false
+      - run: node scripts/sincronizar-jogos.cjs fonte-casa
+      - run: node --test tests/*.test.mjs biblioteca/fisiologia/tests/starling.test.mjs biblioteca/fisiologia/tests/juncao-neuromuscular.test.mjs
+      - name: Conferir relevo, deformações e clima no navegador
+        run: |
+          npm install --no-save playwright
+          node node_modules/playwright/cli.js install --with-deps chromium
+          node biblioteca/dragon/jogos/casa-da-costa/tests/ra-volume.browser.cjs
+      - name: Registrar sincronização
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add biblioteca README.md
+          git diff --cached --quiet || git commit -m "Sincroniza RA dos jogos com textos em relevo e clima local"
+          git push
