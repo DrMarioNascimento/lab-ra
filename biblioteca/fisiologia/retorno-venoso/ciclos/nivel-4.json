@@ -1,6 +1,13 @@
 {
   "trilhas": 12,
-  "bytes": 4602960,
+  "bytes": 2066224,
   "titulo": "Bomba muscular da panturrilha",
-  "duracao": 2.3
+  "duracao": 2.3,
+  "texturas": {
+    "malhas": 4,
+    "familias": {
+      "endotelio": 4
+    },
+    "semUV": 4
+  }
 }

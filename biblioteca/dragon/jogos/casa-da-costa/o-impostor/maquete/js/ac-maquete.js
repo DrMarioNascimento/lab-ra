@@ -46,7 +46,7 @@
   var reduzido = false;
   try { reduzido = matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
 
-  var motor = null, mundo = null, ra = null, poeira = null, clima = null;
+  var motor = null, mundo = null, ra = null, poeira = null, clima = null, vida = null;
   var cena, camera, renderer, controles, chao, sol;
   var coop = null, dados = null, online = false, movimento = null, movimentoEm = 0, ultimoTip = '';
   var pendente = false, descartado = false;
@@ -1063,6 +1063,7 @@
     if (mundo) {
       animarCamadas(dt);
       if (clima) clima.update(dt);
+      if (vida) vida.update(dt);
       atualizarRealces(tempo / 1000);
       if (vooDaChave) {
         vooDaChave.t += dt; var t = Math.min(1, vooDaChave.t / 0.7), s = t * t * (3 - 2 * t);
@@ -1434,7 +1435,9 @@
       });
     }).then(function (m) {
       mundo = m;
-      clima = RAClima.criar(mundo.raiz,{reduzido:reduzido});
+      clima = RAClima.criar(mundo.raiz,{reduzido:reduzido,aoClarao:function(b){if(vida)vida.clarao(b);}});
+      /* 25/10/2026: a casa reage à noite — vidros, jasmim, fonte, fumaça e mar (ra-vida-casa.js). */
+      if (window.RAVidaCasa) vida = RAVidaCasa.criar(mundo, clima, { reduzido: reduzido });
       cena.add(mundo.raiz);
       /* A poeira mora DENTRO da maquete: acompanha escala, giro e pose. */
       poeira = createACGoldDust(mundo.raiz, { reduced: reduzido });
@@ -1542,6 +1545,7 @@
     descartado = true;
     if (poeira) poeira.dispose();
     if (clima) clima.dispose();
+    if (vida) vida.dispose();
     if (coop) coop.close();
     if (ra) ra.sair();
     desligar.forEach(function (fn) { fn(); });

@@ -29,7 +29,22 @@ Há validação de formato, integridade e fisiologia e inspeção visual no nave
 
 Instalar three 0.180.0, @napi-rs/canvas, playwright, gltf-validator e o Chromium; Python com numpy, Pillow e usd-core.
 
-Executar construir.mjs de Película/Travessias, scripts/construir-portateis.cjs, celula/membrana/tools/ios.py, scripts/converter-ciclos.py, scripts/verificar-portateis.cjs e scripts/atualizar-manifesto.cjs.
+Executar construir.mjs de Película/Travessias, scripts/construir-portateis.cjs, celula/membrana/tools/ios.py, scripts/converter-ciclos.py, scripts/comprimir-ciclos.mjs, scripts/verificar-portateis.cjs e scripts/atualizar-manifesto.cjs. A compressão vem depois do USDZ, porque o conversor lê o GLB cru.
 
 O workflow ra-portatil.yml realiza a construção e registra os arquivos gerados.
 
+
+## Piloto Starling — textura e compressão
+
+Os cinco ciclos do Starling ganharam superfície de tecido (starling/texturas.js): cor, relevo e aspereza procedurais para vasos, endotélio, membrana basal, núcleo, citoplasma, colágeno e hemácia. Glicocálix, proteínas, água e setas continuam lisos, por serem moléculas ou esquemas. A textura entra só na cópia exportada; a bancada na tela conserva os materiais aprovados.
+
+Os GLB passam por dedup e Draco (scripts/comprimir-ciclos.mjs): 14,3 MB → 2,9 MB nos cinco níveis, com as mesmas trilhas, nós e placas. O USDZ não é comprimido e cresce de 0,2 a 0,3 MB por nível com as texturas.
+
+## Todas as experiências — peso, relevo e movimento (25/10/2026)
+
+- Deformações em poucas formas básicas (scripts/formas-reduzidas.js): cada instante deixa de ser uma cópia da malha. No compilador vale para todos os ciclos; no coração, gerado pela própria bancada, entra por scripts/reduzir-deformacoes.mjs sobre o arquivo pronto. Coração interno 37,0 → 4,2 MB (GLB) e 34,6 → 6,1 MB (USDZ); externo 20,5 → 8,4 MB.
+- Draco em todos os GLB dos ciclos (dedup + Draco): osso 10–18 MB → 0,6–3,6 MB; junção 2,7–10 MB → 0,4–1,2 MB; pleura 22,9 → 8,3 MB.
+- Osso vivo e Junção neuromuscular recebiam uma cor lisa de 64 px no lugar da textura da bancada; agora levam a mesma textura da tela (scripts/texturas-das-bancadas.js). O relevo (bumpMap) vira mapa normal, que o USDZ carrega.
+- Textura de tecido (texturas-tecido.js) também na pleura (costelas, cartilagens, diafragma, intercostais) e nas válvulas do retorno venoso. Coração, sarcômero e cores de pressão ficam como estavam.
+- Starling: nível 1 com vasomoção, linfângions e hemácias visíveis; níveis 2 a 5 com o glicocálix que se curva com o fluxo e as abas do linfático inicial. Velocidades em voltas inteiras por ciclo, sem salto ao recomeçar.
+- Página: "Ver em 3D · tela cheia" em todos os visualizadores, e aviso no Android sem RA do Google.

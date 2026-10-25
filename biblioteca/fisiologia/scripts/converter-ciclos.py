@@ -7,6 +7,8 @@ files=list(root.glob('*/ciclos/*.glb'))+list((root/'celula'/'visualizador').glob
 for source in files:
  # O conversor grava deformações como UsdSkelBlendShape, além das trilhas TRS.
  if source.with_suffix('.usdz').exists() and source.with_suffix('.usdz').stat().st_mtime>source.stat().st_mtime:continue
+ # GLB já comprimido (comprimir-ciclos.mjs): o USDZ saiu do GLB cru, antes da compressão.
+ if b'KHR_draco_mesh_compression' in source.read_bytes()[:200000]:continue
  with tempfile.TemporaryDirectory(prefix='ciclo-usdz-') as folder:
   usdz.ROOT=Path(folder);usdz.convert(source,source.with_suffix('.usdz'))
 

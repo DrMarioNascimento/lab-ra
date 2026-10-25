@@ -1,6 +1,17 @@
 {
-  "trilhas": 108,
-  "bytes": 3109856,
+  "trilhas": 109,
+  "bytes": 3608836,
   "titulo": "Forças de Starling",
-  "duracao": 8
+  "duracao": 8,
+  "texturas": {
+    "malhas": 29,
+    "familias": {
+      "colageno": 1,
+      "citoplasma": 12,
+      "nucleo": 7,
+      "endotelio": 1,
+      "basal": 1,
+      "hemacia": 7
+    }
+  }
 }

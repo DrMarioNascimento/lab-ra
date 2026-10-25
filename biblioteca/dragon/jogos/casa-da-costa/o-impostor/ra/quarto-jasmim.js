@@ -110,6 +110,11 @@
   pega('Janela', janela, SAIDA === 'janela' ? 'A janela está aberta um palmo. Entra o cheiro do jasmim.' : 'A janela dá para o jardim. O jasmim sobe do lado de fora.', null, null);
   pega('Portinha', portinha, SAIDA === 'janela' ? 'A portinha do fundo, para a copa, está fechada.' : 'A portinha do fundo, para a copa, está aberta. Vem um ar frio.', null, null);
 
+  /* 25/10/2026: a tempestade lá fora, pela janela do jasmim: o clarão entra por
+     ela e o trovão vem depois. Dentro do quarto não chove (clima.js, modo interno). */
+  var clima = window.RAClima ? RAClima.criar(R, { interno: true, janela: [janX, 0.17, -D / 2 + 0.06], limites: [[-W / 2, 0, -D / 2], [W / 2, H, D / 2]],
+    aoClarao: function (br) { if (vidroJ.material.emissive) { vidroJ.material.emissive.setRGB(.75 * br, .82 * br, br); } } }) : null;
+  if (clima) { b.aCadaQuadro(function (dt) { clima.update(dt); }); addEventListener('pagehide', function (e) { if (!e.persisted) clima.dispose(); }); }
   b.comecar();
   b.estado('O quarto do jasmim.');
   window.OIQuarto = { saida: function () { return SAIDA; } };

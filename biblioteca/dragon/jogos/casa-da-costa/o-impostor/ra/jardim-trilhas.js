@@ -259,6 +259,10 @@
   /* uma luz da cozinha, na varanda */
   var luz = new THREE.PointLight(0xffc27a, 0.8, 0.9); luz.position.set(px(3.2), 0.14, pz(-7)); R.add(luz);
 
+  /* 25/10/2026: relâmpagos e trovão sobre o pátio. A chuva continua a desta
+     página (a das trilhas); nada de nevoeiro, que esconderia as pegadas. */
+  var clima = window.RAClima ? RAClima.criar(R, { interno: true }) : null;
+  if (clima) { b.aCadaQuadro(function (dt) { clima.update(dt); }); addEventListener('pagehide', function (e) { if (!e.persisted) clima.dispose(); }); }
   b.comecar();
   window.OIJardim = { fim: function () { return FIM; }, inicio: function () { return INICIO; }, pegadas: function () { return pegadas.children.length; } };
 })();

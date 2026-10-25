@@ -671,6 +671,10 @@
     if (chegadaAlinhada) raiz.updateMatrixWorld(true);
 
     var relogio = acertarRelogio(raiz);
+    /* 25/10/2026: onde sai a fumaça, medido ANTES de fundir (depois a chaminé
+       vira pedra sem nome). A maciça fica de fora: o capitel e os peitos dela
+       são as fechaduras. */
+    var marcosDaVida = marcarVida(raiz);
 
     /* 2 — recolher alvos e fechaduras ANTES de fundir: o que vira geometria
        fundida perde o nome e não pode mais ser tocado nem aceso. */
@@ -780,6 +784,7 @@
       base: base,
       camadasRealinhadas: realinhadas,
       chegadaAlinhada: chegadaAlinhada,
+      vida: marcosDaVida,
       revelacao: revelacao,
       baseY: Math.abs(completo.min.y) < 1e-6 ? 0 : completo.min.y,
       altura: completo.max.y - completo.min.y,
@@ -801,6 +806,21 @@
   }
 
   /* A camada de um nó é o ancestral de primeiro nível dentro de `casa-da-costa`. */
+  var CHAMINES_COM_FUMACA = ['chamine-da-cozinha', 'chamine-menor'];
+  function marcarVida(raiz) {
+    var chamines = [];
+    raiz.updateMatrixWorld(true);
+    var inversa = new THREE.Matrix4().copy(raiz.matrixWorld).invert();
+    raiz.traverse(function (o) {
+      if (CHAMINES_COM_FUMACA.indexOf(o.name) < 0) return;
+      var b = new THREE.Box3().setFromObject(o).applyMatrix4(inversa);
+      if (b.isEmpty()) return;
+      var topo = b.getCenter(new THREE.Vector3()); topo.y = b.max.y;
+      chamines.push({ nome: o.name, camada: camadaDe(o), ponto: topo.toArray(), largura: Math.max(b.max.x - b.min.x, b.max.z - b.min.z) });
+    });
+    return { chamines: chamines };
+  }
+
   function camadaDe(objeto) {
     for (var n = objeto; n; n = n.parent) {
       for (var e in EXCECOES) if (bate(n.name, e)) return EXCECOES[e];

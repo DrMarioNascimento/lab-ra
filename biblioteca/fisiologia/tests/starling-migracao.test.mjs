@@ -6,11 +6,12 @@ import {createHash} from 'node:crypto';
 const text=f=>fs.readFileSync(new URL('../starling/'+f,import.meta.url),'utf8').replace(/\r\n/g,'\n');
 const hashes={
   "app.js": "c5e30e2842801d15cf332fe64026d390e345dd0b49740a61a763c2f0a7a03aaf",
-  "modelos.js": "6a18be432bd4d3e4e7d8d1a7720372d22f2203348532d7597f21b55b08aa76b1",
+  "modelos.js": "0e78c88a2a561d32a7baa6f7a42625131307400d065102361552b35bc5bde480",
   "fisica.js": "9f4976e3663ef8f7ca1faeeefa8cc6cec11e5815d7b2b0b84d838bbfb025dec8",
   "variaveis.js": "ea7e64db03d4c2b662f8907df29bbfc8634fec435769d3de0dd320106ef5c777",
   "style.css": "cdd6680fbadc1cf4398ce49a3cb0d47572a33f91e861cb433745751103fdabd4"
 };
+// modelos.js: revisão 5ac3f4c + arteríola/vênula ligadas à rede e linfático longo no nível 1, e movimento das estruturas da rede (vasomoção, linfângions, hemácias visíveis; glicocálix que ondula e abas do linfático nos níveis 2 a 5), pedidos pelo Mario em 2026-10-25
 // app.js: revisão aprovada 5ac3f4c + placas das condições no iPhone (Duas estações), aprovadas em 2026-10-24
 test('Starling conserva app, anatomia, física, paleta e estilos da revisão aprovada 5ac3f4c (app.js com placas de 2026-10-24)',()=>{for(const [f,h]of Object.entries(hashes))assert.equal(createHash('sha256').update(f==='app.js'?text(f).replace('ra-botoes-ios.js?v=volume-20261025','ra-botoes-ios.js').replace(/\nimport \{instalarCicloPortatil\} from '\.\.\/ciclo-portatil\.js';\ninstalarCicloPortatil\([^\n]*\);\n$/,''):text(f)).digest('hex'),h,f);});
 test('Starling é independente e retorna ao Tutor do percurso de origem',()=>{for(const f of ['index.html','app.js','modelos.js','style.css'])assert.doesNotMatch(text(f),/https?:\/\/(?:drmarionascimento\.github\.io\/lab-ra|raw\.githubusercontent\.com\/DrMarioNascimento\/lab-ra)|bancadas\.html|guard\.js/i);assert.match(text('index.html'),/UNIDADE 1 · CELULAR/);assert.match(text('index.html'),/data-voltar-tutor/);assert.match(text('index.html'),/tutor-origem\.js/);});

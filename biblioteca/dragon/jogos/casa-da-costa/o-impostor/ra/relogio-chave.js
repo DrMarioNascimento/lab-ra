@@ -68,6 +68,10 @@
     esconderChave(r[1].scene);
     pegaDaPorta(); pegaDaPortinhola(); pegaDoPendulo(); pegaDaGaveta(); pegaDaChave();
     b.aCadaQuadro(quadro);
+    /* 25/10/2026: a noite de tempestade chega à sala pelo clarão de uma janela ao
+       lado e pelo trovão. Não mexe no pêndulo, nos ponteiros nem na chave. */
+    var clima = window.RAClima ? RAClima.criar(b.raiz, { interno: true, janela: [-0.9, 1.6, 0.6] }) : null;
+    if (clima) { b.aCadaQuadro(function (dt) { clima.update(dt); }); addEventListener('pagehide', function (e) { if (!e.persisted) clima.dispose(); }); }
     b.comecar();
   }).catch(function (e) { b.estado('O modelo não carregou: ' + (e && e.message || e)); });
 
