@@ -1,0 +1,32 @@
+name: Sincronizar RA de fisiologia
+on:
+  push:
+    branches: [codex/ra-fisiologia-20261025]
+    paths: ['scripts/sincronizar-fisiologia.cjs', '.github/workflows/ra-fisiologia.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  sincronizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/checkout@v4
+        with:
+          repository: DrMarioNascimento/fisiologia-interativa
+          ref: c16aae9c0b9d1f2b6e888373d60473f6fa960a7c
+          path: fonte-fisiologia
+          persist-credentials: false
+      - run: node scripts/sincronizar-fisiologia.cjs fonte-fisiologia/ra c16aae9c0b9d1f2b6e888373d60473f6fa960a7c
+      - run: node --test tests/*.test.mjs biblioteca/fisiologia/tests/starling.test.mjs biblioteca/fisiologia/tests/juncao-neuromuscular.test.mjs
+      - name: Registrar sincronização
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add biblioteca README.md
+          git diff --cached --quiet || git commit -m "Sincroniza fisiologia com volume e ciclos animados para iPhone e Android"
+          git push
