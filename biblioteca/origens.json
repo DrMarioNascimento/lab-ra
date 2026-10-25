@@ -1882,6 +1882,246 @@
           "sha256": "7cac6737cdc304a5b787bed89fa16d624ec3a4b2606aee838411b8a00449a43b"
         }
       ]
+    },
+    {
+      "data": "2026-10-25",
+      "tipo": "atualizacao-da-origem",
+      "fonte": "DrMarioNascimento/casa-da-costa",
+      "commit_fonte": "1455fb2d961f326a6b5ec2859dbe23093ccd1b19",
+      "criterio": "Porta os textos extrudados e as movimentações das RA; preserva as adaptações de navegação do Lab-RA. O clima permanece ligado à âncora e não intercepta os toques nas pistas.",
+      "arquivos": [
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/a-mesa/AC-escrivaninha.html",
+          "origem": "a-mesa/AC-escrivaninha.html",
+          "sha256_anterior": "c67df4ad5fff9d852cf29a97ed61fdf0ad0e095b66d42b1da2831ce3271bc511",
+          "sha256": "26eb2650f87c8118307b3043b443cfd4404f7b2d7c94fc24fb3b161f2d97cf54"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/a-mesa/AC-maquete.html",
+          "origem": "a-mesa/AC-maquete.html",
+          "sha256_anterior": "d1ceb2cd936847f8e5e55ffa4b0dccec8f251f698eb637f95e47d08aa1cf209f",
+          "sha256": "ab497194d83f11667713fd9c83e4dca0dd8e11a4d8169cc6a14e78cc6c2a6635"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/a-mesa/MOSAICO-26-a-sala-as-escuras.html",
+          "origem": "a-mesa/MOSAICO-26-a-sala-as-escuras.html",
+          "sha256_anterior": "23b0d7245a2cd9ec16bda5fc9bb0b62516a985721fadcae2e69d5b9aa2f8083f",
+          "sha256": "8c9ed8b3a824f672ca820c55be74c80a1f03be05b9fed59c9e8d7ad292f622c5"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/a-mesa/js/ac-maquete.js",
+          "origem": "a-mesa/js/ac-maquete.js",
+          "sha256_anterior": "c843d9642418d298fb3465e6dd768a7aad852d902e17913255cd170a3148845c",
+          "sha256": "3701b11907eca8b52eeb23ab8429bb4971d6dbd7c6372c232f720cdc8ca46359"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/a-mesa/js/ra-clima.js",
+          "origem": "a-mesa/js/ra-clima.js",
+          "sha256_anterior": null,
+          "sha256": "4ee8c6c08e36083813e12aa955e51cb3b524d26ee455e3e6b890b6ebb07a7646"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/a-mesa/js/textos-volume.js",
+          "origem": "a-mesa/js/textos-volume.js",
+          "sha256_anterior": null,
+          "sha256": "55a4d49659ec3992849e4af0d65b909a0bcc0bb7b5c264f985ce069c21104842"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/bandeja.html",
+          "origem": "o-impostor/bandeja.html",
+          "sha256_anterior": null,
+          "sha256": "75177c46ab34c1841f219c82df3e7c614cb2b0f2b152a91fb7ed4be88888e8d0"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/escrivaninha.html",
+          "origem": "o-impostor/escrivaninha.html",
+          "sha256_anterior": null,
+          "sha256": "7fde900c42e416f7cfd4349a5438321e615a8328cb5ce605da96fe75669b94d3"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/farol.html",
+          "origem": "o-impostor/farol.html",
+          "sha256_anterior": null,
+          "sha256": "5dc314c895df564c5e58102512eaef95bddece8b90990f7fcf1c4979a6a1f630"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/index.html",
+          "origem": "o-impostor/index.html",
+          "sha256_anterior": null,
+          "sha256": "677d253646d40f5e17918b5acb378251c4966e95ecb8639957186aa466b9ab0f"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/jardim.html",
+          "origem": "o-impostor/jardim.html",
+          "sha256_anterior": null,
+          "sha256": "606572f95c54296b02e913adc4f74da542fe5787866ab404f1a881d6ea4a30dc"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/livro.html",
+          "origem": "o-impostor/livro.html",
+          "sha256_anterior": "29c48ad77e36d5034804999ffd4d3f577b0a85d8eaa2134a29174c5e1e80a206",
+          "sha256": "e45355cc5b2873e8e909569e2a558ec832b6d014b7501f11f29edb4086df0c54"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/maquete/index.html",
+          "origem": "o-impostor/maquete/index.html",
+          "sha256_anterior": "2f5737cfd82cb6885d27bbd0088b9737450f6bd7e2f318c4775a79fef4177aca",
+          "sha256": "0ad3fc516cfb2f3bc313fda4ff75068d4f00cdf3411c03c7ee3d8349ccdb4626"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/maquete/js/ac-maquete.js",
+          "origem": "o-impostor/maquete/js/ac-maquete.js",
+          "sha256_anterior": "b7f2791cc8ac8ae15f797c90b1e513cfdb5ea7bf7b63ef5a42576cae2140227f",
+          "sha256": "94ebd4c62e74c86ef09566d3fcdb67cd9912d86a798a163a7d6d5888ea5e4b8a"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/maquete/js/ra-clima.js",
+          "origem": "o-impostor/maquete/js/ra-clima.js",
+          "sha256_anterior": null,
+          "sha256": "4ee8c6c08e36083813e12aa955e51cb3b524d26ee455e3e6b890b6ebb07a7646"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/maquete/js/textos-volume.js",
+          "origem": "o-impostor/maquete/js/textos-volume.js",
+          "sha256_anterior": null,
+          "sha256": "55a4d49659ec3992849e4af0d65b909a0bcc0bb7b5c264f985ce069c21104842"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/quarto.html",
+          "origem": "o-impostor/quarto.html",
+          "sha256_anterior": null,
+          "sha256": "20ef5342bf32ce2d1db02fa07f1b7ac1a9e8e466df74e099e47570ca37bcc222"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/ra/clima.js",
+          "origem": "o-impostor/ra/clima.js",
+          "sha256_anterior": null,
+          "sha256": "4ee8c6c08e36083813e12aa955e51cb3b524d26ee455e3e6b890b6ebb07a7646"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/ra/farol-livro.js",
+          "origem": "o-impostor/ra/farol-livro.js",
+          "sha256_anterior": "8ee37876eb307bf0d05031dcf386413ed972ded8fa129637cc66d5c802109190",
+          "sha256": "28a54d09cd02b0bac0cbd754eec5aa2eb3ab791e163dc3a2e3cb165ab49bf006"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/ra/textos-volume.js",
+          "origem": "o-impostor/ra/textos-volume.js",
+          "sha256_anterior": null,
+          "sha256": "55a4d49659ec3992849e4af0d65b909a0bcc0bb7b5c264f985ce069c21104842"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/relogio.html",
+          "origem": "o-impostor/relogio.html",
+          "sha256_anterior": null,
+          "sha256": "57a38233de30cc07494b2dac7ba40d3bce74e5686dbc1034aecdd021a8f3c779"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/tests/ra-volume.browser.cjs",
+          "origem": "tests/ra-volume.browser.cjs",
+          "sha256_anterior": null,
+          "sha256": "204638a9eb15f6e45ad01ab3afa3dea023255b487c153fc7658778709494bcbd"
+        }
+      ]
+    },
+    {
+      "data": "2026-10-25",
+      "tipo": "atualizacao-da-origem",
+      "fonte": "DrMarioNascimento/carro-forte",
+      "commit_fonte": "743d5e6f5fb16224eb7aa4831bd870580209a2fb",
+      "criterio": "Porta os textos extrudados e as movimentações das RA; preserva as adaptações de navegação do Lab-RA. O clima permanece ligado à âncora e não intercepta os toques nas pistas.",
+      "arquivos": [
+        {
+          "arquivo": "biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/estudo.html",
+          "origem": "o-impostor/estudo.html",
+          "sha256_anterior": null,
+          "sha256": "0c28a375ad9006290b0469cd667619714999ef32d03cfa4e4439a5acafe1c6d6"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/maquete.js",
+          "origem": "o-impostor/maquete.js",
+          "sha256_anterior": "262f8c5b2906846b08d14e0b6dc5accb15c5e255faa0c9bd08c8dcf2a3eacd45",
+          "sha256": "068dc18c74ad25e18188297925a0d03eea529498450c961c5eedfc40ff2bd01a"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/ra-textos-volume.js",
+          "origem": "o-impostor/ra-textos-volume.js",
+          "sha256_anterior": null,
+          "sha256": "55a4d49659ec3992849e4af0d65b909a0bcc0bb7b5c264f985ce069c21104842"
+        }
+      ]
+    },
+    {
+      "data": "2026-10-25",
+      "tipo": "atualizacao-da-origem",
+      "fonte": "DrMarioNascimento/eco-do-amanha",
+      "commit_fonte": "42a6466f36665d03555ebd5d2ecbfbca82a89cf4",
+      "criterio": "Porta os textos extrudados e as movimentações das RA; preserva as adaptações de navegação do Lab-RA. O clima permanece ligado à âncora e não intercepta os toques nas pistas.",
+      "arquivos": [
+        {
+          "arquivo": "biblioteca/dragon/jogos/o-eco-do-amanha/o-impostor/estudo.html",
+          "origem": "o-impostor/estudo.html",
+          "sha256_anterior": null,
+          "sha256": "d298de1990a5a1bd1ddc4ae22a6d15cedc09d0341c211715906fd0db67821073"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/o-eco-do-amanha/o-impostor/maquete.js",
+          "origem": "o-impostor/maquete.js",
+          "sha256_anterior": "402bd18a9ddc7f9a59bd02a6a5bf56af1b115a4bc3e5b8d27843122e42ed30d7",
+          "sha256": "1deec9f48c37ccfb1e15e9175d8c5212b55d64ffe85b1da3a80873cca202d198"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/o-eco-do-amanha/o-impostor/objeto.js",
+          "origem": "o-impostor/objeto.js",
+          "sha256_anterior": "615bdd8381fbf264698e9305102888ac0f9c595e5d29b72e9f3c94d6c8f9593f",
+          "sha256": "38164b71c40fff4db5640ff542fff046b486d18e2e98516dd4e03492d8b69cdd"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/o-eco-do-amanha/o-impostor/peca3d.js",
+          "origem": "o-impostor/peca3d.js",
+          "sha256_anterior": "7a68d732be039da66c801f7ff05aeeedc29bb5e9d29bc2b4fa40f9732d2c649b",
+          "sha256": "c0e72ac5aaa17d9cc1dbbeddb405e62cc61efeb1c4776a8c55c73006858fc902"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/o-eco-do-amanha/o-impostor/planta-estudo.html",
+          "origem": "o-impostor/planta-estudo.html",
+          "sha256_anterior": null,
+          "sha256": "61785a69bb14dbe4131fc54e2a49f0f6d7eaff1b7186f1a7928cb31d1b395d75"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/o-eco-do-amanha/o-impostor/planta-original.js",
+          "origem": "o-impostor/planta-original.js",
+          "sha256_anterior": null,
+          "sha256": "bf3da8110be05474c0075124a22d31e576859f6595b84112d873d08eb06b847b"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/o-eco-do-amanha/o-impostor/ra-clima.js",
+          "origem": "o-impostor/ra-clima.js",
+          "sha256_anterior": null,
+          "sha256": "4ee8c6c08e36083813e12aa955e51cb3b524d26ee455e3e6b890b6ebb07a7646"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/o-eco-do-amanha/o-impostor/ra-textos-volume.js",
+          "origem": "o-impostor/ra-textos-volume.js",
+          "sha256_anterior": null,
+          "sha256": "55a4d49659ec3992849e4af0d65b909a0bcc0bb7b5c264f985ce069c21104842"
+        }
+      ]
+    },
+    {
+      "data": "2026-10-25",
+      "tipo": "atualizacao-da-origem",
+      "fonte": "DrMarioNascimento/Dragon",
+      "commit_fonte": "b749aaab7a15e821a4903230ab692c2d3a53b8c4",
+      "criterio": "Porta os textos extrudados e as movimentações das RA; preserva as adaptações de navegação do Lab-RA. O clima permanece ligado à âncora e não intercepta os toques nas pistas.",
+      "arquivos": [
+        {
+          "arquivo": "biblioteca/dragon/RA-VOLUME-MOVIMENTO.md",
+          "origem": "RA-VOLUME-MOVIMENTO.md",
+          "sha256_anterior": null,
+          "sha256": "1a1f7489eca5af33949e3317edb3dba6fe4bf736534c8234c6e3ba91609228b6"
+        }
+      ]
     }
   ],
   "ultima_sincronizacao_fisiologia": {

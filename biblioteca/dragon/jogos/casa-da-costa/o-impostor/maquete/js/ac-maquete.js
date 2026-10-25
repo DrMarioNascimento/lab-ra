@@ -46,7 +46,7 @@
   var reduzido = false;
   try { reduzido = matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
 
-  var motor = null, mundo = null, ra = null, poeira = null;
+  var motor = null, mundo = null, ra = null, poeira = null, clima = null;
   var cena, camera, renderer, controles, chao, sol;
   var coop = null, dados = null, online = false, movimento = null, movimentoEm = 0, ultimoTip = '';
   var pendente = false, descartado = false;
@@ -1062,6 +1062,7 @@
     if (controles && controles.enabled) controles.update();
     if (mundo) {
       animarCamadas(dt);
+      if (clima) clima.update(dt);
       atualizarRealces(tempo / 1000);
       if (vooDaChave) {
         vooDaChave.t += dt; var t = Math.min(1, vooDaChave.t / 0.7), s = t * t * (3 - 2 * t);
@@ -1433,6 +1434,7 @@
       });
     }).then(function (m) {
       mundo = m;
+      clima = RAClima.criar(mundo.raiz,{reduzido:reduzido});
       cena.add(mundo.raiz);
       /* A poeira mora DENTRO da maquete: acompanha escala, giro e pose. */
       poeira = createACGoldDust(mundo.raiz, { reduced: reduzido });
@@ -1539,6 +1541,7 @@
     if (e.persisted) { renderer.setAnimationLoop(null); return; }
     descartado = true;
     if (poeira) poeira.dispose();
+    if (clima) clima.dispose();
     if (coop) coop.close();
     if (ra) ra.sair();
     desligar.forEach(function (fn) { fn(); });

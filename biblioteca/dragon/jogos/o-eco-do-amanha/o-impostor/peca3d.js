@@ -17,7 +17,7 @@
 (function (global) {
   'use strict';
   var BASE = (function () { var s = document.currentScript && document.currentScript.src; return s ? s.replace(/[^/]*$/, '') : ''; })();
-  var LIB = BASE + 'lib/', SCRIPTS = [LIB + 'three.min.js', LIB + 'GLTFLoader.js', LIB + 'OrbitControls.js', LIB + 'ac-ra.js', LIB + 'ac-maquete-ra.js'];
+  var LIB = BASE + 'lib/', SCRIPTS = [LIB + 'three.min.js', BASE + 'ra-textos-volume.js', LIB + 'GLTFLoader.js', LIB + 'OrbitControls.js', LIB + 'ac-ra.js', LIB + 'ac-maquete-ra.js'];
   var pronto = null, renderer, cena, camera, controles, raiz, ra = null, host = null, ui = null, cfg = null, st = null, vivo = false;
   var cache = {}, modelo = null, nos = {}, base = {}, atual = {}, areas = {}, marcados = [], anim = null, relogio = 0, tocando = null, ultimaVista = '';
 

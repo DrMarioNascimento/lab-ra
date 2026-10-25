@@ -28,9 +28,10 @@
      aoObjeto, aoAbrirItem, aoAndar, aoEntrar, aoSair, aoPonto, aoFoto}). */
 (function (global) {
   'use strict';
+ var climaRA=null;
   var BASE = (function () { var s = document.currentScript && document.currentScript.src; return s ? s.replace(/[^/]*$/, '') : ''; })();
   var LIB = BASE + 'lib/';
-  var SCRIPTS = [LIB + 'three.min.js', LIB + 'GLTFLoader.js', LIB + 'meshopt_decoder.js', LIB + 'OrbitControls.js', LIB + 'ac-ra.js', LIB + 'ac-maquete-ra.js'];
+  var SCRIPTS = [LIB + 'three.min.js', BASE + 'ra-textos-volume.js', BASE + 'ra-clima.js', LIB + 'GLTFLoader.js', LIB + 'meshopt_decoder.js', LIB + 'OrbitControls.js', LIB + 'ac-ra.js', LIB + 'ac-maquete-ra.js'];
   var MODELO = BASE + 'modelos/torre.glb';
 
   /* metros do modelo → "1 de pegada" do motor de RA (o lote tem ~97 m: ~1 de pegada, ≈ 42 cm na mesa) */
@@ -541,6 +542,7 @@
   function desenhar(tempo, quadroXR) {
     var t = tempo || performance.now(), dt = Math.min(0.05, (t - (antes || t)) / 1000); antes = t; relogio += dt;
     if (ra) ra.atualizar(dt, quadroXR);
+    if(climaRA){climaRA.grupo.visible=climaRA.estado().ligado&&!dentro;if(!dentro)climaRA.update(dt);}
     var k = Math.min(1, dt * 5);
     Object.keys(andares).forEach(function (q) {
       var A = andares[q], at = A.at, al = A.alvo;
@@ -565,6 +567,7 @@
     opcoes = o || {}; if (!el) criarTela(); el.hidden = false; ativo = true; el.querySelector('#maqCarregando').hidden = false;
     cartao('A MAQUETE', 'A torre do subsolo à cobertura. Toque num andar: ele sai como uma gaveta, e dá para entrar nele. Os losangos dourados são as peças do caso; o anel dourado marca o seu andar.');
     return carregarTudo().then(function () {
+      if(!climaRA)climaRA=RAClima.criar(raiz,{host:el.querySelector('.maq-ferr')||el});
       el.querySelector('#maqCarregando').hidden = true; aplicar(); redimensionar();
       if (dentro && opcoes.entrar !== dentro) sairDoAndar();
       if (!ra || ra.estado().modo !== 'ra') { if (!dentro) enquadrar(); }

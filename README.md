@@ -49,3 +49,7 @@ O teste de integridade continua obrigatório e verifica os 588 arquivos registra
 ## RA de fisiologia — 25/10/2026
 
 Sincronizada a revisão c16aae9c0b9d1f2b6e888373d60473f6fa960a7c do Fisiologia Interativa: textos e placas extrudados e 27 modelos animados com pares GLB/USDZ. Navegação própria do Lab-RA preservada. Validações e limites em biblioteca/fisiologia/REVISAO-VOLUME-MOVIMENTO.md.
+
+## RA dos jogos — 25/10/2026
+
+Sincronizados textos dinâmicos com relevo, clima das cenas externas da Casa da Costa e da Torre de Continuidade e preservação das animações de investigação. Confira biblioteca/dragon/RA-VOLUME-MOVIMENTO.md. A validação com câmera em iPhone e Android físicos permanece pendente.
