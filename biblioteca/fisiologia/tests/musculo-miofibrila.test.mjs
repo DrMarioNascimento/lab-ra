@@ -42,7 +42,7 @@ test('músculo: RA com botões no iPhone — botão único, só no nível 05, po
   assert.match(html, /<button id="launchAR"/);                                      // o botão atual continua
   assert.match(app, /const usaBotoes = \(\) => atual === 4 && !botoesFalhou && \(ehQuickLook/);
   assert.match(app, /botoesFalhou = true;/);                                        // sem as placas, o botão volta à peça comum
-  assert.match(html, /app\.js\?v=placas-20261024/);
+  assert.match(html, /app\.js\?v=volume-20261025/);
   assert.match(app, /if \(usaBotoes\(\) && botoesProntos && ancoraAR\.href\) \{ ancoraAR\.click\(\); return; \}/);
   assert.match(app, /const ESTADOS_BOTOES = \[\{ rotulo: 'Relaxar', L: 2\.4 \}, \{ rotulo: 'Contrair', L: 1\.9 \}\];/);
   assert.match(app, /aplicarComprimento\(sarc, e\.L\)/);

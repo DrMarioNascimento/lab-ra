@@ -117,7 +117,7 @@
   "biblioteca/fisiologia/tests/juncao-reproducao.test.mjs": "606b378581b8a11c899ffb880218462a3593ee89893d0aa846422cb7a0fef68d",
   "biblioteca/fisiologia/tests/mitocondria.test.mjs": "745b0cca6e4b4be53205bc664e499cdc1f92e4f8ff60b8204cccb782544a4c2c",
   "biblioteca/fisiologia/tests/musculo-migracao.test.mjs": "2b17f1f8e3ee8d2ee676175b95c71df19f273d6a27476d110bbc6993c1a8216f",
-  "biblioteca/fisiologia/tests/musculo-miofibrila.test.mjs": "6318ce7a0e5c244e3d6e9b3c55c1860a70c69b37ffd9ddb9b701337b45b07078",
+  "biblioteca/fisiologia/tests/musculo-miofibrila.test.mjs": "48cb7798d381fc2edc05eb099e24f4555701e13d74019f119b2cbb65017c1a4d",
   "biblioteca/fisiologia/tests/osso-animacao.test.mjs": "501110244faab495d9d71aafef220daea5708385eece925c5ecfc9ac22ecbe1e",
   "biblioteca/fisiologia/tests/osso-textura.test.mjs": "fa7c73af0c199fa804ff2fab689d003dc1b547b34c352dd67ec76eed4f1dcbcd",
   "biblioteca/fisiologia/tests/osso-vivo.test.mjs": "4ad7f459632340224166d51099c720e8bfbcd82b35a6134a166f5cff84cdc9bd",

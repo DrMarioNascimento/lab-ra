@@ -2327,10 +2327,64 @@
           "sha256": "1a1f7489eca5af33949e3317edb3dba6fe4bf736534c8234c6e3ba91609228b6"
         }
       ]
+    },
+    {
+      "data": "2026-10-25",
+      "tipo": "atualizacao-da-origem",
+      "fonte": "DrMarioNascimento/fisiologia-interativa",
+      "commit_fonte": "bc0dc17461b4a5416806deff85a6d0b5dcc53ce4",
+      "criterio": "Sincronização dos textos e placas em relevo e dos ciclos GLB/USDZ. Preservados os adaptadores index.html e tutor-origem.js do Lab-RA; o manifesto local foi refeito para esses adaptadores.",
+      "arquivos": [
+        {
+          "arquivo": "biblioteca/fisiologia/tests/musculo-miofibrila.test.mjs",
+          "origem": "ra/tests/musculo-miofibrila.test.mjs",
+          "sha256_anterior": "6318ce7a0e5c244e3d6e9b3c55c1860a70c69b37ffd9ddb9b701337b45b07078",
+          "sha256": "48cb7798d381fc2edc05eb099e24f4555701e13d74019f119b2cbb65017c1a4d"
+        }
+      ]
+    },
+    {
+      "data": "2026-10-25",
+      "tipo": "atualizacao-da-origem",
+      "fonte": "DrMarioNascimento/casa-da-costa",
+      "commit_fonte": "33ff5292c6063b0be9995fca636c2cd07a991d42",
+      "criterio": "Porta os textos extrudados e as movimentações das RA; preserva as adaptações de navegação do Lab-RA. O clima permanece ligado à âncora e não intercepta os toques nas pistas.",
+      "arquivos": []
+    },
+    {
+      "data": "2026-10-25",
+      "tipo": "atualizacao-da-origem",
+      "fonte": "DrMarioNascimento/carro-forte",
+      "commit_fonte": "681127128c6042ed50863c41a521044ac949c805",
+      "criterio": "Porta os textos extrudados e as movimentações das RA; preserva as adaptações de navegação do Lab-RA. O clima permanece ligado à âncora e não intercepta os toques nas pistas.",
+      "arquivos": []
+    },
+    {
+      "data": "2026-10-25",
+      "tipo": "atualizacao-da-origem",
+      "fonte": "DrMarioNascimento/eco-do-amanha",
+      "commit_fonte": "cdfa121ab310334ed40fab6973545888022fc08b",
+      "criterio": "Porta os textos extrudados e as movimentações das RA; preserva as adaptações de navegação do Lab-RA. O clima permanece ligado à âncora e não intercepta os toques nas pistas.",
+      "arquivos": []
+    },
+    {
+      "data": "2026-10-25",
+      "tipo": "atualizacao-da-origem",
+      "fonte": "DrMarioNascimento/Dragon",
+      "commit_fonte": "b749aaab7a15e821a4903230ab692c2d3a53b8c4",
+      "criterio": "Porta os textos extrudados e as movimentações das RA; preserva as adaptações de navegação do Lab-RA. O clima permanece ligado à âncora e não intercepta os toques nas pistas.",
+      "arquivos": [
+        {
+          "arquivo": "biblioteca/dragon/RA-VOLUME-MOVIMENTO.md",
+          "origem": "RA-VOLUME-MOVIMENTO.md",
+          "sha256_anterior": "1a1f7489eca5af33949e3317edb3dba6fe4bf736534c8234c6e3ba91609228b6",
+          "sha256": "1a1f7489eca5af33949e3317edb3dba6fe4bf736534c8234c6e3ba91609228b6"
+        }
+      ]
     }
   ],
   "ultima_sincronizacao_fisiologia": {
     "data": "2026-10-25",
-    "commit": "a6253847bbe6c7435dc2f849b92bca87a15015bd"
+    "commit": "bc0dc17461b4a5416806deff85a6d0b5dcc53ce4"
   }
 }
