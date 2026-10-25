@@ -34,7 +34,7 @@ import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { prepararParaRA } from './cores-para-ra.js';
-import { usdzComBotoes } from '../ra-botoes-ios.js';
+import { usdzComBotoes } from '../ra-botoes-ios.js?v=volume-20261025-auditoria';
 import { novaMitocondria } from '../mitocondria.js';
 import { criar } from './modelos.js?v=celular-20261003';
 

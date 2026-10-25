@@ -31,7 +31,7 @@
  var climaRA=null;
   var BASE = (function () { var s = document.currentScript && document.currentScript.src; return s ? s.replace(/[^/]*$/, '') : ''; })();
   var LIB = BASE + 'lib/';
-  var SCRIPTS = [LIB + 'three.min.js', BASE + 'ra-textos-volume.js', BASE + 'ra-clima.js', LIB + 'GLTFLoader.js', LIB + 'meshopt_decoder.js', LIB + 'OrbitControls.js', LIB + 'ac-ra.js', LIB + 'ac-maquete-ra.js'];
+  var SCRIPTS = [LIB + 'three.min.js', BASE + 'ra-textos-volume.js?v=volume-20261025-auditoria', BASE + 'ra-clima.js', LIB + 'GLTFLoader.js', LIB + 'meshopt_decoder.js', LIB + 'OrbitControls.js', LIB + 'ac-ra.js', LIB + 'ac-maquete-ra.js'];
   var MODELO = BASE + 'modelos/torre.glb';
 
   /* metros do modelo → "1 de pegada" do motor de RA (o lote tem ~97 m: ~1 de pegada, ≈ 42 cm na mesa) */

@@ -2381,10 +2381,229 @@
           "sha256": "1a1f7489eca5af33949e3317edb3dba6fe4bf736534c8234c6e3ba91609228b6"
         }
       ]
+    },
+    {
+      "data": "2026-10-25",
+      "tipo": "atualizacao-da-origem",
+      "fonte": "DrMarioNascimento/fisiologia-interativa",
+      "commit_fonte": "5de49509f8c214dc1a0108a8feb9b20fda3e43b7",
+      "criterio": "Correções auditadas do relevo em vários materiais e do cache; navegação do Lab-RA preservada.",
+      "arquivos": [
+        {
+          "arquivo": "biblioteca/fisiologia/manifesto.json",
+          "origem": "ra/manifesto.json",
+          "sha256_anterior": "53703c49b2ff9d0f70e7777a34007fb3593a78978195ecebae78e0cd1f91ce99",
+          "sha256": "64c05b2048d59dcbafad457263da489e25b0a8ad8261356676b95334fe4dc9a3"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/potencial-membrana/app.js",
+          "origem": "ra/potencial-membrana/app.js",
+          "sha256_anterior": "a55a4c54b21d3141037d976f6e80929741f86f40b180665aae6d2f1a1bb94cc1",
+          "sha256": "dd80c4434a45774c2d7ff7ecda2620d9ac0e8bba55fedcd8669b8a9e3643e08d"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/potencial-membrana/index.html",
+          "origem": "ra/potencial-membrana/index.html",
+          "sha256_anterior": "845556ce846fec240457741ad110ef019893c9ce4a5f2685233536b0afd8bf5c",
+          "sha256": "bdac662b5c7de149366fccb916f95c80722d523ad423285c971c7eb18a3e47e1"
+        }
+      ]
+    },
+    {
+      "data": "2026-10-25",
+      "tipo": "atualizacao-da-origem",
+      "fonte": "DrMarioNascimento/casa-da-costa",
+      "commit_fonte": "273602545a68664391ccd436faf3cb9380fa9edc",
+      "criterio": "Correções auditadas do relevo em vários materiais e do cache; navegação do Lab-RA preservada.",
+      "arquivos": [
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/a-mesa/AC-escrivaninha.html",
+          "origem": "a-mesa/AC-escrivaninha.html",
+          "sha256_anterior": "26eb2650f87c8118307b3043b443cfd4404f7b2d7c94fc24fb3b161f2d97cf54",
+          "sha256": "f5555449c6d08a23e4bff6aa215314d5f5c98eaeba9ede92c060cba27dddb8c2"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/a-mesa/AC-maquete.html",
+          "origem": "a-mesa/AC-maquete.html",
+          "sha256_anterior": "81265dea26a8c1cc9864bdca23064746e82c3ade6ee391fdf1bbf2556b47f31d",
+          "sha256": "cd6c845759b9b110744cf7d49c0699ee0bbbe94aee39b8c05dd9cc91cee46b90"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/a-mesa/AC-papeis.html",
+          "origem": "a-mesa/AC-papeis.html",
+          "sha256_anterior": "26981bfc2a2706b29cbb37c656f4c72d2d8fd11cf0b4391d8a55f474c84f9208",
+          "sha256": "a54d38cf9c47ec209e64daa4290e1139a6e2b613090aa5fe485cf9181a800715"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/a-mesa/AC-percurso.html",
+          "origem": "a-mesa/AC-percurso.html",
+          "sha256_anterior": "126f80f89e787aa0b15833626f7fcd50b8072764e1b42b87e59b0609d22fe045",
+          "sha256": "6fafc8dfc18576cf77f7a5ac7d405ac717bd699aaee9e8702ceeac595afb0674"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/a-mesa/MOSAICO-26-a-janela-do-norte.html",
+          "origem": "a-mesa/MOSAICO-26-a-janela-do-norte.html",
+          "sha256_anterior": "81b612cac0d8a2b395615760cd4c8ef40d75a7a7ab7c9d74670f33b4dcc14680",
+          "sha256": "30ea1961064a7ae8410ae8940647d498ff482bd75a3c9111bb07930fd1fc76fa"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/a-mesa/MOSAICO-26-a-sala-as-escuras.html",
+          "origem": "a-mesa/MOSAICO-26-a-sala-as-escuras.html",
+          "sha256_anterior": "8c9ed8b3a824f672ca820c55be74c80a1f03be05b9fed59c9e8d7ad292f622c5",
+          "sha256": "eea7020abcad176ae74b7c2eec3171b747808c60005c7d30d15cacfee1c4ef54"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/a-mesa/MOSAICO-26-vidro-embacado.html",
+          "origem": "a-mesa/MOSAICO-26-vidro-embacado.html",
+          "sha256_anterior": "5d31dd0ab00cb455a72f34d51034edb9812079f8832d5cb99e10313e85e7957c",
+          "sha256": "a76cc309cc5f2d374329ee91432a188e6e68d34ee5fbcb5ecf6dba1cc9af83e3"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/a-mesa/js/textos-volume.js",
+          "origem": "a-mesa/js/textos-volume.js",
+          "sha256_anterior": "55a4d49659ec3992849e4af0d65b909a0bcc0bb7b5c264f985ce069c21104842",
+          "sha256": "0cf1d9eb17480988a0260ee2da0af77207ddfbbb08d982ab4caa7440573105e1"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/bandeja.html",
+          "origem": "o-impostor/bandeja.html",
+          "sha256_anterior": "75177c46ab34c1841f219c82df3e7c614cb2b0f2b152a91fb7ed4be88888e8d0",
+          "sha256": "b3d89bf2736ed4b72a8dc45576cdcd7c9062ffa8fa0bd36afff7862a0fab3230"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/escrivaninha.html",
+          "origem": "o-impostor/escrivaninha.html",
+          "sha256_anterior": "7fde900c42e416f7cfd4349a5438321e615a8328cb5ce605da96fe75669b94d3",
+          "sha256": "60ea5af6218e9f2a65dc7e829c65dfdd3f6307bc8dda703817736516e3df7d86"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/farol.html",
+          "origem": "o-impostor/farol.html",
+          "sha256_anterior": "32925cf6775a6552373213084f841a8ff1a2e6bf385119a167cf1c06b6ab8776",
+          "sha256": "5c52ab7743d54bdc43ba372560bce11e98056dcd6a46fa495eb62abb4ea4735e"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/jardim.html",
+          "origem": "o-impostor/jardim.html",
+          "sha256_anterior": "606572f95c54296b02e913adc4f74da542fe5787866ab404f1a881d6ea4a30dc",
+          "sha256": "e3113cf8d51782e0611b95579fc1c9097c5b0a4503f27a769835ac7848d3add0"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/livro.html",
+          "origem": "o-impostor/livro.html",
+          "sha256_anterior": "e45355cc5b2873e8e909569e2a558ec832b6d014b7501f11f29edb4086df0c54",
+          "sha256": "0368e34a47f34272afddce5147e8ae77f448f80a226bb007678d6817d5e08e0e"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/maquete/index.html",
+          "origem": "o-impostor/maquete/index.html",
+          "sha256_anterior": "210b87cd38b0e97a01f23e8eae9e44e4c964d16e49fa01eaebb0cd21f8b0d978",
+          "sha256": "fe617866e6e04b3363de5e0a5a7e108ab3192019f2bfa858ff270ef0751c5de3"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/maquete/js/textos-volume.js",
+          "origem": "o-impostor/maquete/js/textos-volume.js",
+          "sha256_anterior": "55a4d49659ec3992849e4af0d65b909a0bcc0bb7b5c264f985ce069c21104842",
+          "sha256": "0cf1d9eb17480988a0260ee2da0af77207ddfbbb08d982ab4caa7440573105e1"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/quarto.html",
+          "origem": "o-impostor/quarto.html",
+          "sha256_anterior": "20ef5342bf32ce2d1db02fa07f1b7ac1a9e8e466df74e099e47570ca37bcc222",
+          "sha256": "2c9ea28ddbd51de2d2e30856c9230a5324214ba41f04582e43e00fb37091f80e"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/ra/textos-volume.js",
+          "origem": "o-impostor/ra/textos-volume.js",
+          "sha256_anterior": "55a4d49659ec3992849e4af0d65b909a0bcc0bb7b5c264f985ce069c21104842",
+          "sha256": "0cf1d9eb17480988a0260ee2da0af77207ddfbbb08d982ab4caa7440573105e1"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/relogio.html",
+          "origem": "o-impostor/relogio.html",
+          "sha256_anterior": "57a38233de30cc07494b2dac7ba40d3bce74e5686dbc1034aecdd021a8f3c779",
+          "sha256": "487368170037927d0fd06b38f4f35619f06dfa07d75e54d5bdb97cf77a8243d9"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/tests/ra-volume.browser.cjs",
+          "origem": "tests/ra-volume.browser.cjs",
+          "sha256_anterior": "204638a9eb15f6e45ad01ab3afa3dea023255b487c153fc7658778709494bcbd",
+          "sha256": "5f9c04aad5508882fcf7239c8aaf36a438c6b6a9f073e4377968c9e16879f064"
+        }
+      ]
+    },
+    {
+      "data": "2026-10-25",
+      "tipo": "atualizacao-da-origem",
+      "fonte": "DrMarioNascimento/carro-forte",
+      "commit_fonte": "604f4a08cd49e23891c1c24761e82041d26151de",
+      "criterio": "Correções auditadas do relevo em vários materiais e do cache; navegação do Lab-RA preservada.",
+      "arquivos": [
+        {
+          "arquivo": "biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/maquete.js",
+          "origem": "o-impostor/maquete.js",
+          "sha256_anterior": "068dc18c74ad25e18188297925a0d03eea529498450c961c5eedfc40ff2bd01a",
+          "sha256": "e65afb93e601121326264e275fb9c73684482e149a897aa72ef104a8f81f6d2a"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/ra-textos-volume.js",
+          "origem": "o-impostor/ra-textos-volume.js",
+          "sha256_anterior": "55a4d49659ec3992849e4af0d65b909a0bcc0bb7b5c264f985ce069c21104842",
+          "sha256": "0cf1d9eb17480988a0260ee2da0af77207ddfbbb08d982ab4caa7440573105e1"
+        }
+      ]
+    },
+    {
+      "data": "2026-10-25",
+      "tipo": "atualizacao-da-origem",
+      "fonte": "DrMarioNascimento/eco-do-amanha",
+      "commit_fonte": "cd8c09231feea3981ab99fa12cab48fcbced1bb6",
+      "criterio": "Correções auditadas do relevo em vários materiais e do cache; navegação do Lab-RA preservada.",
+      "arquivos": [
+        {
+          "arquivo": "biblioteca/dragon/jogos/o-eco-do-amanha/o-impostor/maquete.js",
+          "origem": "o-impostor/maquete.js",
+          "sha256_anterior": "1deec9f48c37ccfb1e15e9175d8c5212b55d64ffe85b1da3a80873cca202d198",
+          "sha256": "d46c055b7e2bca2caabc3eb89368978c72578a58a63ef0418ce160666966bf3e"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/o-eco-do-amanha/o-impostor/objeto.js",
+          "origem": "o-impostor/objeto.js",
+          "sha256_anterior": "38164b71c40fff4db5640ff542fff046b486d18e2e98516dd4e03492d8b69cdd",
+          "sha256": "622c46fd5488b290cefb9b62165c4ae8eed8ec59f7cf56d13717c0c05efe8b92"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/o-eco-do-amanha/o-impostor/peca3d.js",
+          "origem": "o-impostor/peca3d.js",
+          "sha256_anterior": "c0e72ac5aaa17d9cc1dbbeddb405e62cc61efeb1c4776a8c55c73006858fc902",
+          "sha256": "38eec511861e0be890533b77c8137576fc02e8dd1e0b04d65e8ed8c3da519f64"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/o-eco-do-amanha/o-impostor/ra-textos-volume.js",
+          "origem": "o-impostor/ra-textos-volume.js",
+          "sha256_anterior": "55a4d49659ec3992849e4af0d65b909a0bcc0bb7b5c264f985ce069c21104842",
+          "sha256": "0cf1d9eb17480988a0260ee2da0af77207ddfbbb08d982ab4caa7440573105e1"
+        }
+      ]
+    },
+    {
+      "data": "2026-10-25",
+      "tipo": "atualizacao-da-origem",
+      "fonte": "DrMarioNascimento/Dragon",
+      "commit_fonte": "b722697c31eeceedca3c99557ab318ed1b8a1e6e",
+      "criterio": "Correções auditadas do relevo em vários materiais e do cache; navegação do Lab-RA preservada.",
+      "arquivos": [
+        {
+          "arquivo": "biblioteca/dragon/RA-VOLUME-MOVIMENTO.md",
+          "origem": "RA-VOLUME-MOVIMENTO.md",
+          "sha256_anterior": "1a1f7489eca5af33949e3317edb3dba6fe4bf736534c8234c6e3ba91609228b6",
+          "sha256": "22e747ab6a228df22c687ceceeeb8a9b8c966e2cc5d79480d5ef7496a51fcd2e"
+        }
+      ]
     }
   ],
   "ultima_sincronizacao_fisiologia": {
     "data": "2026-10-25",
-    "commit": "bc0dc17461b4a5416806deff85a6d0b5dcc53ce4"
+    "commit": "5de49509f8c214dc1a0108a8feb9b20fda3e43b7"
   }
 }

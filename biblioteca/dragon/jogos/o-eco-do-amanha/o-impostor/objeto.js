@@ -16,7 +16,7 @@
 (function (global) {
   'use strict';
   var BASE = (function () { var s = document.currentScript && document.currentScript.src; return s ? s.replace(/[^/]*$/, '') : ''; })();
-  var LIB = BASE + 'lib/', SCRIPTS = [LIB + 'three.min.js', BASE + 'ra-textos-volume.js', LIB + 'GLTFLoader.js', LIB + 'OrbitControls.js', LIB + 'ac-ra.js', LIB + 'ac-maquete-ra.js'];
+  var LIB = BASE + 'lib/', SCRIPTS = [LIB + 'three.min.js', BASE + 'ra-textos-volume.js?v=volume-20261025-auditoria', LIB + 'GLTFLoader.js', LIB + 'OrbitControls.js', LIB + 'ac-ra.js', LIB + 'ac-maquete-ra.js'];
   var el = null, renderer, cena, camera, controles, raiz, mundo, ra = null, op = {}, aberto = false, pronto = null;
   var gavetas = [], montes = [], pasta = null, itens = [], animando = [], anim = null, relogio = 0, tocando = null, atual = null;
   var FL = 0.24, FC = 0.33; /* folha: largura e comprimento (um pouco maior que A4, para ler na tela) */

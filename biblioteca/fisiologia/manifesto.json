@@ -260,11 +260,11 @@
     },
     {
       "path": "potencial-membrana/app.js",
-      "sha256": "a55a4c54b21d3141037d976f6e80929741f86f40b180665aae6d2f1a1bb94cc1"
+      "sha256": "dd80c4434a45774c2d7ff7ecda2620d9ac0e8bba55fedcd8669b8a9e3643e08d"
     },
     {
       "path": "potencial-membrana/index.html",
-      "sha256": "845556ce846fec240457741ad110ef019893c9ce4a5f2685233536b0afd8bf5c"
+      "sha256": "bdac662b5c7de149366fccb916f95c80722d523ad423285c971c7eb18a3e47e1"
     },
     {
       "path": "potencial-membrana/modelos.js",

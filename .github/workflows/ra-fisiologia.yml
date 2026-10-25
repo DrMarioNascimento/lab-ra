@@ -18,10 +18,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: DrMarioNascimento/fisiologia-interativa
-          ref: c16aae9c0b9d1f2b6e888373d60473f6fa960a7c
+          ref: 5de49509f8c214dc1a0108a8feb9b20fda3e43b7
           path: fonte-fisiologia
           persist-credentials: false
-      - run: node scripts/sincronizar-fisiologia.cjs fonte-fisiologia/ra c16aae9c0b9d1f2b6e888373d60473f6fa960a7c
+      - run: node scripts/sincronizar-fisiologia.cjs fonte-fisiologia/ra 5de49509f8c214dc1a0108a8feb9b20fda3e43b7
       - run: node --test tests/*.test.mjs biblioteca/fisiologia/tests/starling.test.mjs biblioteca/fisiologia/tests/juncao-neuromuscular.test.mjs
       - name: Registrar sincronização
         run: |

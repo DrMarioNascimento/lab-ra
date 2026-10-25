@@ -51,4 +51,8 @@ O teste de integridade continua obrigatório e verifica os 588 arquivos registra
 Sincronizados textos dinâmicos com relevo, clima das cenas externas da Casa da Costa e da Torre de Continuidade e preservação das animações de investigação. Confira biblioteca/dragon/RA-VOLUME-MOVIMENTO.md. A validação com câmera em iPhone e Android físicos permanece pendente.
 ## RA de fisiologia — 25/10/2026
 
-Sincronizada a revisão bc0dc17461b4a5416806deff85a6d0b5dcc53ce4 do Fisiologia Interativa: textos e placas extrudados e 27 modelos animados com pares GLB/USDZ. Navegação própria do Lab-RA preservada. Validações e limites em biblioteca/fisiologia/REVISAO-VOLUME-MOVIMENTO.md.
+Sincronizada a revisão 5de49509f8c214dc1a0108a8feb9b20fda3e43b7 do Fisiologia Interativa: textos e placas extrudados e 27 modelos animados com pares GLB/USDZ. Navegação própria do Lab-RA preservada. Validações e limites em biblioteca/fisiologia/REVISAO-VOLUME-MOVIMENTO.md.
+
+## Auditoria da implantação
+
+A auditoria de 25/10/2026 corrigiu relevo em objetos com vários materiais e carimbos de cache. Evidências, escopo e limites em [AUDITORIA-RA-2026-10-25.md](AUDITORIA-RA-2026-10-25.md).

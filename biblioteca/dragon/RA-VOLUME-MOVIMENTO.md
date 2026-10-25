@@ -33,3 +33,7 @@ Foram conferidos caminhos, sintaxe, carregamento das maquetes, abertura do farol
 Na Casa da Costa, o teste de regressão do relevo, da deformação da superfície e do clima pode ser repetido com Playwright e Chromium instalados:
 
     node tests/ra-volume.browser.cjs
+
+## Auditoria da implantação — 25/10/2026
+
+A auditoria identificou e corrigiu uma lacuna do relevo em malhas com vários materiais, como a etiqueta do rádio do farol. Cada grupo de faces com texto agora recebe seu próprio relevo, com remoção ao limpar a textura. Os arquivos carregados receberam nova versão de cache. Na Casa da Costa, os módulos compartilhados da mesa e das atividades sensoriais voltaram a usar o mesmo carimbo de versão.

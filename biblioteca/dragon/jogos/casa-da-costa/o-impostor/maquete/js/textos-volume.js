@@ -46,12 +46,13 @@
   }
   return loops?paths.toShapes():[];
  }
- function relief(mesh,map){
+ function relief(mesh,map,materialIndex){
   var image=map.image;if(!image||!image.__raMask||!mesh.geometry.attributes.uv)return null;
   var shapes=contours(image.__raMask);if(!shapes.length)return null;
   var src=mesh.geometry,pos=src.attributes.position,uv=src.attributes.uv,index=src.index,faces=[],largest=0,axis=new T.Vector3();
   function point(i){return new T.Vector3().fromBufferAttribute(pos,i);}
   for(var k=0;k<(index?index.count:pos.count);k+=3){
+   if(materialIndex!==undefined&&!src.groups.some(function(g){return g.materialIndex===materialIndex&&k>=g.start&&k<g.start+g.count;}))continue;
    var ids=[0,1,2].map(function(j){return index?index.getX(k+j):k+j;}),a=point(ids[0]),b=point(ids[1]),c=point(ids[2]),n=new T.Vector3().crossVectors(b.clone().sub(a),c.clone().sub(a)),area=n.length();
    if(area>largest){largest=area;axis.copy(n).normalize();}faces.push({ids:ids,a:a,b:b,c:c,n:n.normalize(),area:area});
   }
@@ -98,13 +99,25 @@
  var OriginalRenderer=T.WebGLRenderer;
  function VolumeRenderer(parameters){var renderer=new OriginalRenderer(parameters),render=renderer.render;
  renderer.render=function(scene,camera){
-  var pending=[];scene.traverseVisible(function(o){
-   if(!o.isMesh||o.userData.raTextRelief||Array.isArray(o.material))return;var map=o.material&&o.material.map,image=map&&map.image;
-   if(!image||!image.__raMask){var previous=o.__raTextVolume;if(previous&&previous.mesh){o.remove(previous.mesh);previous.mesh.geometry.dispose();previous.mesh.material.dispose();}o.__raTextVolume=null;return;}var revision=image.__raRevision||0,old=o.__raTextVolume;
-   if(old&&old.image===image&&old.revision===revision&&old.geometry===o.geometry){atualizarRelevo(old.mesh,o.geometry);if(old.mesh){old.mesh.visible=o.material.visible!==false;old.mesh.material.opacity=o.material.opacity;old.mesh.material.transparent=o.material.transparent||o.material.opacity<1;}return;}pending.push([o,map,image,revision,old]);
+  var pending=[];
+  function remover(record,o){if(record&&record.mesh){o.remove(record.mesh);record.mesh.geometry.dispose();record.mesh.material.dispose();}}
+  function opacidade(record,material){if(record&&record.mesh){record.mesh.visible=material.visible!==false;record.mesh.material.opacity=material.opacity;record.mesh.material.transparent=material.transparent||material.opacity<1;}}
+  scene.traverseVisible(function(o){
+   if(!o.isMesh||o.userData.raTextRelief)return;
+   var multi=Array.isArray(o.material),materials=multi?o.material:[o.material],previous=o.__raTextVolumes||[o.__raTextVolume],next=[];
+   materials.forEach(function(material,slot){
+    var map=material&&material.map,image=map&&map.image,old=previous[slot];
+    if(!image||!image.__raMask){remover(old,o);next[slot]=null;return;}
+    var revision=image.__raRevision||0,materialIndex=multi?slot:undefined;
+    if(old&&old.image===image&&old.revision===revision&&old.geometry===o.geometry&&old.materialIndex===materialIndex){atualizarRelevo(old.mesh,o.geometry);opacidade(old,material);next[slot]=old;return;}
+    remover(old,o);next[slot]=null;pending.push({object:o,map:map,image:image,revision:revision,slot:slot,material:material,materialIndex:materialIndex});
+   });
+   for(var i=materials.length;i<previous.length;i++)remover(previous[i],o);
+   o.__raTextVolumes=next;o.__raTextVolume=next[0]||null;
   });
-  pending.forEach(function(p){var o=p[0],old=p[4];if(old&&old.mesh){o.remove(old.mesh);old.mesh.geometry.dispose();old.mesh.material.dispose();}
-   var m=relief(o,p[1]);if(m){m.visible=o.material.visible!==false;m.material.opacity=o.material.opacity;m.material.transparent=o.material.transparent||o.material.opacity<1;o.add(m);}o.__raTextVolume={image:p[2],revision:p[3],mesh:m,geometry:o.geometry};
+  pending.forEach(function(p){
+   var o=p.object,m=relief(o,p.map,p.materialIndex),record={image:p.image,revision:p.revision,mesh:m,geometry:o.geometry,materialIndex:p.materialIndex};
+   if(m){opacidade(record,p.material);o.add(m);}o.__raTextVolumes[p.slot]=record;o.__raTextVolume=o.__raTextVolumes[0]||null;
   });
   return render.call(renderer,scene,camera);
  };return renderer;}

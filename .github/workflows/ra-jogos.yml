@@ -18,16 +18,16 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: DrMarioNascimento/casa-da-costa
-          ref: 33ff5292c6063b0be9995fca636c2cd07a991d42
+          ref: 273602545a68664391ccd436faf3cb9380fa9edc
           path: fonte-casa
           persist-credentials: false
       - uses: actions/checkout@v4
         with:
           repository: DrMarioNascimento/fisiologia-interativa
-          ref: bc0dc17461b4a5416806deff85a6d0b5dcc53ce4
+          ref: 5de49509f8c214dc1a0108a8feb9b20fda3e43b7
           path: fonte-fisiologia
           persist-credentials: false
-      - run: node scripts/sincronizar-fisiologia.cjs fonte-fisiologia/ra bc0dc17461b4a5416806deff85a6d0b5dcc53ce4
+      - run: node scripts/sincronizar-fisiologia.cjs fonte-fisiologia/ra 5de49509f8c214dc1a0108a8feb9b20fda3e43b7
       - run: node scripts/sincronizar-jogos.cjs fonte-casa
       - run: node --test tests/*.test.mjs biblioteca/fisiologia/tests/starling.test.mjs biblioteca/fisiologia/tests/juncao-neuromuscular.test.mjs
       - name: Conferir relevo, deformações e clima no navegador
