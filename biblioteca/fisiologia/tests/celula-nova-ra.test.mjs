@@ -9,14 +9,14 @@ function harness(userAgent,platform='',touch=0){
 test('iPhone and iPad open a public USDZ through a top-level rel=ar link in the same gesture',()=>{
  for(const [ua,platform,touch] of [['iPhone','iPhone',5],['Macintosh','MacIntel',5]]){
   const h=harness(ua,platform,touch);assert.equal(h.env.platform,'ios');assert.equal(h.get('launch-ar').disabled,false);h.get('launch-ar').onclick();
-  assert.equal(h.opened.length,1);assert.equal(h.opened[0].rel,'ar');assert.equal(h.opened[0].child,'img');assert.match(h.opened[0].href,/^https:\/\/.*celula-v3-completa\.usdz$/);
+  assert.equal(h.opened.length,1);assert.equal(h.opened[0].rel,'ar');assert.equal(h.opened[0].child,'img');assert.match(h.opened[0].href,/^https:\/\/.*celula-v3-completa\.usdz\?v=volume-20261025$/);
  }
 });
 test('Android prepares the selected GLB and activates WebXR first, like the working membrane tabs',()=>{
  const h=harness('Android');assert.equal(h.get('cell-ar').attributes['ar-modes'],'webxr scene-viewer quick-look');
  assert.equal(h.get('cell-ar').hidden,false);assert.equal(h.get('launch-ar').disabled,true);
  h.get('launch-ar').onclick();assert.equal(h.activated.length,0);assert.equal(h.opened.length,0);
- assert.match(h.get('cell-ar').src,/celula-v3-completa\.glb$/);
+ assert.match(h.get('cell-ar').src,/celula-v3-completa\.glb\?v=volume-20261025$/);
  h.get('cell-ar').canActivateAR=true;h.get('cell-ar').listeners.load();assert.equal(h.get('launch-ar').disabled,false);
  h.get('launch-ar').onclick();assert.equal(h.activated.length,1);assert.equal(h.opened.length,0);
 });
@@ -51,15 +51,15 @@ test('Layer changes select the correct iOS asset and require the new Android mod
     h.get('cell-ar').listeners.load({detail:{url:h.get('cell-ar').src}});
    }
    h.get('launch-ar').onclick();const href=ua==='iPhone'?h.opened.at(-1).href:h.activated.at(-1);
-   assert(href.endsWith('celula-v3-'+variant+(ua==='iPhone'?'.usdz':'.glb')));
-   assert(h.get('cell-ar').attributes['ios-src'].endsWith('celula-v3-'+variant+'.usdz'));
+   assert(new URL(href).pathname.endsWith('celula-v3-'+variant+(ua==='iPhone'?'.usdz':'.glb')));
+   assert(new URL(h.get('cell-ar').attributes['ios-src']).pathname.endsWith('celula-v3-'+variant+'.usdz'));
   }
  }
 });
 test('Android load failures, retries and AR lifecycle do not leave a stale enabled button',()=>{
  const h=harness('Android'),v=h.get('cell-ar');v.canActivateAR=true;v.listeners.load();
  v.listeners.error();assert.equal(h.get('launch-ar').disabled,true);
- const first=v.src;h.get('prepare-ar').onclick();assert.notEqual(v.src,first);assert(v.src.includes('?retry=1'));
+ const first=v.src;h.get('prepare-ar').onclick();assert.notEqual(v.src,first);assert(new URL(v.src).searchParams.get('retry')==='1');
  v.listeners.load({detail:{url:first}});assert.equal(h.get('launch-ar').disabled,true);
  v.listeners.load({detail:{url:v.src}});assert.equal(h.get('launch-ar').disabled,false);
  v.listeners['ar-status']({detail:{status:'session-started'}});v.listeners['ar-status']({detail:{status:'not-presenting'}});

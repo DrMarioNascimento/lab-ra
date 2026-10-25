@@ -48,12 +48,12 @@ test('Android espera o modelo e só ativa RA diretamente no clique',()=>{
  v.dispatch('load',{url:v.getAttribute('src')});assert(!b.disabled);b.click();assert.equal(v.activated,1);assert.equal(v.timeScale,1);
 });
 test('iPhone abre USDZ público mesmo se a prévia WebGL falhar',()=>{
- const h=harness('ios');assert(!h.el('launch-ar').disabled);h.el('membrane-model').dispatch('error');h.el('launch-ar').click();const a=h.clicks.find(c=>c.id==='a');assert.equal(a.rel,'ar');assert.match(a.href,/pelicula-v1\.usdz$/);
+ const h=harness('ios');assert(!h.el('launch-ar').disabled);h.el('membrane-model').dispatch('error');h.el('launch-ar').click();const a=h.clicks.find(c=>c.id==='a');assert.equal(a.rel,'ar');assert.match(a.href,/pelicula-v1\.usdz\?v=volume-20261025$/);
 });
 test('troca de aba descarta carregamento antigo e atualiza a RA',()=>{
  const h=harness(),v=h.el('membrane-model'),old=v.getAttribute('src');
  h.events.message({origin:'https://outro.test',source:h.parent,data:{type:'celula-nivel',nivel:4}});assert.equal(v.getAttribute('src'),old);
- h.events.message({origin:'https://example.test',source:h.parent,data:{type:'celula-nivel',nivel:4}});assert.match(v.getAttribute('src'),/travessias-v1.glb$/);assert.match(v.getAttribute('ios-src'),/travessias-v1.usdz$/);
+ h.events.message({origin:'https://example.test',source:h.parent,data:{type:'celula-nivel',nivel:4}});assert.match(v.getAttribute('src'),/travessias-v1.glb\?v=volume-20261025$/);assert.match(v.getAttribute('ios-src'),/travessias-v1.usdz\?v=volume-20261025$/);
  v.dispatch('load',{url:old});assert(h.el('launch-ar').disabled);v.dispatch('load',{url:v.getAttribute('src')});assert(!h.el('launch-ar').disabled);
 });
 test('pausa, velocidade, instante e visibilidade controlam a animação',()=>{
@@ -71,6 +71,6 @@ test('sem botão RA duplicado; laboratório mantém Goldman e explica seu escopo
 });
 
 test('sem WebGL mostra prévia explícita, sem carregamento infinito, e preserva Quick Look',()=>{
- const h=harness('ios',false);assert.equal(h.el('phase').textContent,'Prévia do modelo');assert(!h.el('model-poster').hidden);assert.match(h.el('model-poster').src,/pelicula-v1.webp$/);assert(!h.el('launch-ar').disabled);assert(h.el('play').disabled);
+ const h=harness('ios',false);assert.equal(h.el('phase').textContent,'Prévia do modelo');assert(!h.el('model-poster').hidden);assert.match(h.el('model-poster').src,/pelicula-v1.webp\?v=volume-20261025$/);assert(!h.el('launch-ar').disabled);assert(h.el('play').disabled);
  const a=harness('android',false);assert(a.el('launch-ar').disabled);assert(!a.el('membrane-model').getAttribute('src'));
 });

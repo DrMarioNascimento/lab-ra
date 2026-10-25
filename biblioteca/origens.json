@@ -2122,10 +2122,215 @@
           "sha256": "1a1f7489eca5af33949e3317edb3dba6fe4bf736534c8234c6e3ba91609228b6"
         }
       ]
+    },
+    {
+      "data": "2026-10-25",
+      "tipo": "atualizacao-da-origem",
+      "fonte": "DrMarioNascimento/fisiologia-interativa",
+      "commit_fonte": "a6253847bbe6c7435dc2f849b92bca87a15015bd",
+      "criterio": "Sincronização dos textos e placas em relevo e dos ciclos GLB/USDZ. Preservados os adaptadores index.html e tutor-origem.js do Lab-RA; o manifesto local foi refeito para esses adaptadores.",
+      "arquivos": [
+        {
+          "arquivo": "biblioteca/fisiologia/celula/index.html",
+          "origem": "ra/celula/index.html",
+          "sha256_anterior": "cba25b5db5a39fb1cccd246a6ccca91de021737848f132c3c00fe9a6d487bfb9",
+          "sha256": "e8ee4de0a09ed7d82d0caf97209a9b28db51190309e8ce389f9fbb17d53c3685"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/membrana/app.js",
+          "origem": "ra/celula/membrana/app.js",
+          "sha256_anterior": "a2ccc0520c8c16021901afde2b81820efcbcb6a409fc4f916a427e13a44ad61d",
+          "sha256": "a661d93765f64c76d95d60599e5633c99f1d2598562d0d705bf68a7c1c976b7f"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/membrana.html",
+          "origem": "ra/celula/membrana.html",
+          "sha256_anterior": "508fd33ccc37641e453d8d87c1880d6597a1108f5549c7063a6096b0e170d703",
+          "sha256": "1f77d6eceec7ad6b687183241ddb0c500d3f7b1703dce6d8a3e623972408b483"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/tabs.js",
+          "origem": "ra/celula/tabs.js",
+          "sha256_anterior": "8eb439957ac70f24c1b219bc979b00d2f2d8dc1603871e7dc207181315d1ff5f",
+          "sha256": "93694285a1a1c989d105445451c82255ff6ce1dedc4b761eb59a054603beb08b"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/app.js",
+          "origem": "ra/celula/visualizador/app.js",
+          "sha256_anterior": "4ae1b9de7cc8586bc614713504bd1eccd0aeaed0766e81c8f1f6f17b345ddc8f",
+          "sha256": "dfb5a97b97f9c2987eb25776e071990fba9f1b3fcbafb24f4b62f99b81fc1984"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/index.html",
+          "origem": "ra/celula/visualizador/index.html",
+          "sha256_anterior": "dc553db1278f558edb10635632d21a82051244305139198e576f0c51d76bdc0e",
+          "sha256": "6094a0b39e28fe9ed154a15323c0898648ee76d7b4b26fb97f8b77dfc38b18b3"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/ra.js",
+          "origem": "ra/celula/visualizador/ra.js",
+          "sha256_anterior": "5b317e8e71650bc01d2a92ffd15d7b928b81fa0e844031f56a10636b74d3cf42",
+          "sha256": "d218d0909bbef8b00b6889d74857712fe0171cd58e460c14ca199afc266cc3d2"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/coracao/index.html",
+          "origem": "ra/coracao/index.html",
+          "sha256_anterior": "77e8ebad22a51174dfb131d899cd0b865a96c5fe2e91054299741a3b1afee08f",
+          "sha256": "21dbc803a67da90d349ddf8b241eaf6e29d6635fe68dc103bfadc4f9185bc847"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/juncao-neuromuscular/app.js",
+          "origem": "ra/juncao-neuromuscular/app.js",
+          "sha256_anterior": "037c6d2829f4e1eb8089d296d3a49fd88934f9c0454662fd279e2555956f4594",
+          "sha256": "8b3d54d8f8376509a21f9ca0bed2454a79d24136dbd8773107256cd3a242189f"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/juncao-neuromuscular/index.html",
+          "origem": "ra/juncao-neuromuscular/index.html",
+          "sha256_anterior": "8feea98e88a04b9b800a4512417ebf63f7a10d7d5a6cf367be6998c9672e911c",
+          "sha256": "af60de67691b43d4c0f8235a14f3af8b09be238b1a9c4e4f74b5f6a096477e26"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/app.js",
+          "origem": "ra/musculo-sarcomero/app.js",
+          "sha256_anterior": "3e43ea5ac1991c57e2e57077dd70a1c1b7f45b6526e3e6b1780b1e744ad35cbf",
+          "sha256": "86a05bfd8b5b80820bfb743e739cd312c0b4cb9e5540e6897502f421b24ef463"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/index.html",
+          "origem": "ra/musculo-sarcomero/index.html",
+          "sha256_anterior": "c1ebd6731437badf9f69aa268dcf6563a6c83b684d3c49699b1248bd65006233",
+          "sha256": "a679e3c9139d09f171fa95bd99124b4ed58edf05e8a869096c47a60354138d01"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/osso-vivo/app.js",
+          "origem": "ra/osso-vivo/app.js",
+          "sha256_anterior": "ee8b9e382478a9c54f1709ec3211b37736e8f7bcdf3ebcfd2a1a1efbe18a066a",
+          "sha256": "e74053bbc4111f444231a85c5f5aeee7ca16413023c2945e16a027898b8a719c"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/osso-vivo/index.html",
+          "origem": "ra/osso-vivo/index.html",
+          "sha256_anterior": "0c1567f65c37ce2ad3255a1726673171ae1a268a2798448381c0c32e5a3af494",
+          "sha256": "780a4161fb80009c1c13ce1e05add9cd203cee2846201f9bbaeeed310c1354d9"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/package.json",
+          "origem": "ra/package.json",
+          "sha256_anterior": "6b0e924d0b60cc0e2d09b134767fc37b88bc967dc3b50e8b8a796c831944b104",
+          "sha256": "10f6705ead4b298ad6e26ae58e318aba19bb89253075af5c4db466879df05bea"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/pleura/index.html",
+          "origem": "ra/pleura/index.html",
+          "sha256_anterior": "6e0f5f38495fdc24368040e479bcff82d60f2bf6929fdddfea4dc7df241f14f0",
+          "sha256": "12482a0b5240c2bf1af4402e6bd47cd4d3f861f02002f4478afb18ed655520ae"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/retorno-venoso/index.html",
+          "origem": "ra/retorno-venoso/index.html",
+          "sha256_anterior": "e06220f24d0fa613d945104747d5ff3b674ba372aa1175903ecd155948dcc448",
+          "sha256": "8bf0d293ae196f5021c4e615ece6a54fbee212e1c860dc430126342142ed94bb"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/starling/app.js",
+          "origem": "ra/starling/app.js",
+          "sha256_anterior": "d7695f13cf3999e91aa9a9e6afa2aaa622db9c8e1f3e3f8c68dacbf6704a5746",
+          "sha256": "f0bdd102a647c1474c0637a424df3ec30561b642cdadecf4c7852e99e50c2e0f"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/starling/index.html",
+          "origem": "ra/starling/index.html",
+          "sha256_anterior": "10cba4ff11f13f22cbf01c3d5a123dbfa0c3d097a353a8c5d16ff074155cfb4e",
+          "sha256": "094ffed8d4957fa4f43be62d3c96f51ff01f2e4cd624e203f886bb70657ca520"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/tests/celula-nova-ra.test.mjs",
+          "origem": "ra/tests/celula-nova-ra.test.mjs",
+          "sha256_anterior": "8c872845a660b16e80babd2ac51b60f223743b79dc7aab50c58eb8ff3f7ba08d",
+          "sha256": "b174d76725403423fb4c5c1de7676a27950ceb95e065c0c42b103c3cf6ed0d54"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/tests/membrana-movimento.test.mjs",
+          "origem": "ra/tests/membrana-movimento.test.mjs",
+          "sha256_anterior": "d118da647388fb6b98b6a98d0fbe144b8b20f19aaacb4bbf997317d07ab6eea3",
+          "sha256": "af80cac8c213cc185eee330070f89a600085ee241d362faa789269df199748ad"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/tests/starling-migracao.test.mjs",
+          "origem": "ra/tests/starling-migracao.test.mjs",
+          "sha256_anterior": "9a464cfd624adb28e74d63f524133f933f3ee300a53055cf8bb72fe8ccaebd2b",
+          "sha256": "8ea3a4623835ee11c11ed2f611d719b7a04005c37628fe757b5f8c408d047420"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/manifesto.json",
+          "origem": "ra/manifesto.json",
+          "sha256_anterior": "7cac6737cdc304a5b787bed89fa16d624ec3a4b2606aee838411b8a00449a43b",
+          "sha256": "53703c49b2ff9d0f70e7777a34007fb3593a78978195ecebae78e0cd1f91ce99"
+        }
+      ]
+    },
+    {
+      "data": "2026-10-25",
+      "tipo": "atualizacao-da-origem",
+      "fonte": "DrMarioNascimento/casa-da-costa",
+      "commit_fonte": "33ff5292c6063b0be9995fca636c2cd07a991d42",
+      "criterio": "Porta os textos extrudados e as movimentações das RA; preserva as adaptações de navegação do Lab-RA. O clima permanece ligado à âncora e não intercepta os toques nas pistas.",
+      "arquivos": [
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/a-mesa/AC-maquete.html",
+          "origem": "a-mesa/AC-maquete.html",
+          "sha256_anterior": "ab497194d83f11667713fd9c83e4dca0dd8e11a4d8169cc6a14e78cc6c2a6635",
+          "sha256": "81265dea26a8c1cc9864bdca23064746e82c3ade6ee391fdf1bbf2556b47f31d"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/farol.html",
+          "origem": "o-impostor/farol.html",
+          "sha256_anterior": "5dc314c895df564c5e58102512eaef95bddece8b90990f7fcf1c4979a6a1f630",
+          "sha256": "32925cf6775a6552373213084f841a8ff1a2e6bf385119a167cf1c06b6ab8776"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/maquete/index.html",
+          "origem": "o-impostor/maquete/index.html",
+          "sha256_anterior": "0ad3fc516cfb2f3bc313fda4ff75068d4f00cdf3411c03c7ee3d8349ccdb4626",
+          "sha256": "210b87cd38b0e97a01f23e8eae9e44e4c964d16e49fa01eaebb0cd21f8b0d978"
+        }
+      ]
+    },
+    {
+      "data": "2026-10-25",
+      "tipo": "atualizacao-da-origem",
+      "fonte": "DrMarioNascimento/carro-forte",
+      "commit_fonte": "681127128c6042ed50863c41a521044ac949c805",
+      "criterio": "Porta os textos extrudados e as movimentações das RA; preserva as adaptações de navegação do Lab-RA. O clima permanece ligado à âncora e não intercepta os toques nas pistas.",
+      "arquivos": []
+    },
+    {
+      "data": "2026-10-25",
+      "tipo": "atualizacao-da-origem",
+      "fonte": "DrMarioNascimento/eco-do-amanha",
+      "commit_fonte": "cdfa121ab310334ed40fab6973545888022fc08b",
+      "criterio": "Porta os textos extrudados e as movimentações das RA; preserva as adaptações de navegação do Lab-RA. O clima permanece ligado à âncora e não intercepta os toques nas pistas.",
+      "arquivos": []
+    },
+    {
+      "data": "2026-10-25",
+      "tipo": "atualizacao-da-origem",
+      "fonte": "DrMarioNascimento/Dragon",
+      "commit_fonte": "b749aaab7a15e821a4903230ab692c2d3a53b8c4",
+      "criterio": "Porta os textos extrudados e as movimentações das RA; preserva as adaptações de navegação do Lab-RA. O clima permanece ligado à âncora e não intercepta os toques nas pistas.",
+      "arquivos": [
+        {
+          "arquivo": "biblioteca/dragon/RA-VOLUME-MOVIMENTO.md",
+          "origem": "RA-VOLUME-MOVIMENTO.md",
+          "sha256_anterior": "1a1f7489eca5af33949e3317edb3dba6fe4bf736534c8234c6e3ba91609228b6",
+          "sha256": "1a1f7489eca5af33949e3317edb3dba6fe4bf736534c8234c6e3ba91609228b6"
+        }
+      ]
     }
   ],
   "ultima_sincronizacao_fisiologia": {
     "data": "2026-10-25",
-    "commit": "c16aae9c0b9d1f2b6e888373d60473f6fa960a7c"
+    "commit": "a6253847bbe6c7435dc2f849b92bca87a15015bd"
   }
 }

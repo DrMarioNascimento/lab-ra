@@ -1,4 +1,4 @@
-import {configureAR} from './ra.js?v=celula-v3-android1';
+import {configureAR} from './ra.js?v=volume-20261025';
 import {configureLayers} from './layers.js?v=celula-v3';
 import * as T from 'three';
 import {GLTFLoader} from './vendor/GLTFLoader.js';

@@ -1,5 +1,5 @@
 import {DURACAO,estadoPelicula,estadoTransporte} from './ciclo.js';
-import {nativePlatform} from '../visualizador/ra.js?v=celula-v3-android1';
+import {nativePlatform} from '../visualizador/ra.js?v=volume-20261025';
 const $=id=>document.getElementById(id),viewer=$('membrane-model'),launch=$('launch-ar'),status=$('ar-status');
 const webgl=(()=>{try{const gl=document.createElement('canvas').getContext('webgl2');if(!gl)return false;gl.getExtension('WEBGL_lose_context')?.loseContext();return true;}catch{return false;}})();
 const platform=nativePlatform(),query=new URLSearchParams(location.search);
@@ -33,7 +33,7 @@ function requestModel(){
  ready=false;lastPhase='';$('phase').textContent='Carregando a animação…';
  ['play','restart','speed','timeline','reset-view'].forEach(id=>$(id).disabled=true);
  launch.disabled=platform!=='ios';$('retry').hidden=true;
- requested=links.glb+(retry?'?tentativa='+retry:'');
+ requested=links.glb+(retry?'&tentativa='+retry:'');
  $('model-poster').hidden=false;$('model-poster').src=links.poster;$('model-poster').alt='Prévia do modelo real: '+content[mode].title;
  viewer.setAttribute('poster',links.poster);viewer.setAttribute('ios-src',links.usdz);
  if(!webgl){$('phase').textContent='Prévia do modelo';$('explanation').textContent='Este navegador não disponibilizou a visualização 3D. A imagem mostra o modelo real da experiência.';status.textContent=platform==='ios'?'Toque no botão para abrir a animação em RA no iPhone.':'Para explorar o movimento e a RA, abra em um navegador com suporte a 3D, como o Chrome de um Android compatível.';return;}
@@ -52,7 +52,7 @@ function select(next){
  viewer.alt=c.alt;$('legend').innerHTML=c.legend;$('scope').textContent=c.scope;
  $('observations').classList.toggle('four',mode==='travessias');
  $('observations').replaceChildren(...c.cards.map(([title,text],i)=>{const a=document.createElement('article'),n=document.createElement('span'),b=document.createElement('b'),p=document.createElement('p');n.className='card-number';n.textContent=String(i+1).padStart(2,'0');b.textContent=title;p.textContent=text;a.append(n,b,p);return a;}));
- links=Object.fromEntries([['glb','glb'],['usdz','usdz'],['poster','webp']].map(([key,ext])=>[key,new URL(`assets/${mode}-v1.${ext}`,import.meta.url).href]));
+ links=Object.fromEntries([['glb','glb'],['usdz','usdz'],['poster','webp']].map(([key,ext])=>[key,new URL(`assets/${mode}-v1.${ext}`,import.meta.url).href+'?v=volume-20261025']));
  retry=0;requestModel();updateLab();
 }
 function failed(){presenting=false;status.textContent='A RA não abriu. No Android, use o Chrome e confira a permissão de câmera. Toque no botão para tentar novamente.';visibility(active);}

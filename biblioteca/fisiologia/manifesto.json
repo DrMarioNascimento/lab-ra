@@ -68,7 +68,7 @@
     },
     {
       "path": "package.json",
-      "sha256": "6b0e924d0b60cc0e2d09b134767fc37b88bc967dc3b50e8b8a796c831944b104"
+      "sha256": "10f6705ead4b298ad6e26ae58e318aba19bb89253075af5c4db466879df05bea"
     },
     {
       "path": "pleura/ANATOMIA.md",
@@ -100,7 +100,7 @@
     },
     {
       "path": "pleura/index.html",
-      "sha256": "6e0f5f38495fdc24368040e479bcff82d60f2bf6929fdddfea4dc7df241f14f0"
+      "sha256": "12482a0b5240c2bf1af4402e6bd47cd4d3f861f02002f4478afb18ed655520ae"
     },
     {
       "path": "pleura/modelos.js",
@@ -140,7 +140,7 @@
     },
     {
       "path": "retorno-venoso/index.html",
-      "sha256": "e06220f24d0fa613d945104747d5ff3b674ba372aa1175903ecd155948dcc448"
+      "sha256": "8bf0d293ae196f5021c4e615ece6a54fbee212e1c860dc430126342142ed94bb"
     },
     {
       "path": "retorno-venoso/modelos.js",
@@ -192,7 +192,7 @@
     },
     {
       "path": "coracao/index.html",
-      "sha256": "77e8ebad22a51174dfb131d899cd0b865a96c5fe2e91054299741a3b1afee08f"
+      "sha256": "21dbc803a67da90d349ddf8b241eaf6e29d6635fe68dc103bfadc4f9185bc847"
     },
     {
       "path": "coracao/legendas-a.js",
@@ -236,11 +236,11 @@
     },
     {
       "path": "musculo-sarcomero/app.js",
-      "sha256": "3e43ea5ac1991c57e2e57077dd70a1c1b7f45b6526e3e6b1780b1e744ad35cbf"
+      "sha256": "86a05bfd8b5b80820bfb743e739cd312c0b4cb9e5540e6897502f421b24ef463"
     },
     {
       "path": "musculo-sarcomero/index.html",
-      "sha256": "c1ebd6731437badf9f69aa268dcf6563a6c83b684d3c49699b1248bd65006233"
+      "sha256": "a679e3c9139d09f171fa95bd99124b4ed58edf05e8a869096c47a60354138d01"
     },
     {
       "path": "musculo-sarcomero/modelos.js",
@@ -292,7 +292,7 @@
     },
     {
       "path": "starling/app.js",
-      "sha256": "d7695f13cf3999e91aa9a9e6afa2aaa622db9c8e1f3e3f8c68dacbf6704a5746"
+      "sha256": "f0bdd102a647c1474c0637a424df3ec30561b642cdadecf4c7852e99e50c2e0f"
     },
     {
       "path": "starling/fisica.js",
@@ -300,7 +300,7 @@
     },
     {
       "path": "starling/index.html",
-      "sha256": "10cba4ff11f13f22cbf01c3d5a123dbfa0c3d097a353a8c5d16ff074155cfb4e"
+      "sha256": "094ffed8d4957fa4f43be62d3c96f51ff01f2e4cd624e203f886bb70657ca520"
     },
     {
       "path": "starling/modelos.js",
@@ -320,7 +320,7 @@
     },
     {
       "path": "juncao-neuromuscular/app.js",
-      "sha256": "037c6d2829f4e1eb8089d296d3a49fd88934f9c0454662fd279e2555956f4594"
+      "sha256": "8b3d54d8f8376509a21f9ca0bed2454a79d24136dbd8773107256cd3a242189f"
     },
     {
       "path": "juncao-neuromuscular/fisica.js",
@@ -328,7 +328,7 @@
     },
     {
       "path": "juncao-neuromuscular/index.html",
-      "sha256": "8feea98e88a04b9b800a4512417ebf63f7a10d7d5a6cf367be6998c9672e911c"
+      "sha256": "af60de67691b43d4c0f8235a14f3af8b09be238b1a9c4e4f74b5f6a096477e26"
     },
     {
       "path": "juncao-neuromuscular/modelos.js",
@@ -356,7 +356,7 @@
     },
     {
       "path": "osso-vivo/app.js",
-      "sha256": "ee8b9e382478a9c54f1709ec3211b37736e8f7bcdf3ebcfd2a1a1efbe18a066a"
+      "sha256": "e74053bbc4111f444231a85c5f5aeee7ca16413023c2945e16a027898b8a719c"
     },
     {
       "path": "osso-vivo/fisica.js",
@@ -364,7 +364,7 @@
     },
     {
       "path": "osso-vivo/index.html",
-      "sha256": "0c1567f65c37ce2ad3255a1726673171ae1a268a2798448381c0c32e5a3af494"
+      "sha256": "780a4161fb80009c1c13ce1e05add9cd203cee2846201f9bbaeeed310c1354d9"
     },
     {
       "path": "osso-vivo/modelos.js",

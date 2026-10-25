@@ -3,7 +3,7 @@ import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {GLTFExporter} from 'three/addons/exporters/GLTFExporter.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {prepararParaRA} from '../cores-para-ra.js';
-import {usdzComBotoes} from '../ra-botoes-ios.js';
+import {usdzComBotoes} from '../ra-botoes-ios.js?v=volume-20261025';
 import {criar,NIVEIS} from './modelos.js?v=osso-deforma-20261004';
 import {avancar,CENARIOS,CORES} from './fisica.js?v=osso-deforma-20261004';
 import {estadoNivel} from './animacao.js?v=osso-deforma-20261004';

@@ -6,7 +6,7 @@ export function nativePlatform(nav=navigator){
 export function arLinks(base,variant='completa'){
  if(!['completa','sem-membrana-celular','sem-membranas-mitocondriais','sem-membranas'].includes(variant))variant='completa';
  const glb=new URL('./celula-v3-'+variant+'.glb',base).href,usdz=new URL('./celula-v3-'+variant+'.usdz',base).href;
- return {glb,usdz};
+ return {glb:glb+'?v=volume-20261025',usdz:usdz+'?v=volume-20261025'};
 }
 export function configureAR({getVariant=()=> 'completa',subscribe=()=>{},onPresenting=()=>{}}={}){
  const prepare=document.getElementById('prepare-ar'),launch=document.getElementById('launch-ar'),viewer=document.getElementById('cell-ar'),status=document.getElementById('ar-state');
@@ -19,7 +19,7 @@ export function configureAR({getVariant=()=> 'completa',subscribe=()=>{},onPrese
  function prepareModel(){
   ready=false;viewer.hidden=false;
   if(platform!=='ios'){launch.disabled=true;launch.textContent='Preparando realidade aumentada…';}
-  requestedSrc=links.glb+(failedLoad?'?retry='+ ++retry:'');failedLoad=false;
+  requestedSrc=links.glb+(failedLoad?'&retry='+ ++retry:'');failedLoad=false;
   viewer.setAttribute('src',requestedSrc);
   status.textContent='Carregando a célula para RA. Aguarde o botão Abrir em realidade aumentada ficar disponível.';
  }
