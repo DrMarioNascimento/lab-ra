@@ -14,10 +14,11 @@ function casa(root){
  }
  let p=path.join(root,'o-impostor/ra/farol-livro.js'),s=fs.readFileSync(p,'utf8');if(!s.includes('RAClima.criar')){s=s.replace('b.comecar();',"var clima=RAClima.criar(b.raiz,{limites:[[-.5,0,-.4],[.5,.72,.4]]});\n    b.aCadaQuadro(function(dt){clima.update(dt);});\n    addEventListener('pagehide',function(e){if(!e.persisted)clima.dispose();});\n    b.comecar();");fs.writeFileSync(p,s);}
  p=path.join(root,'o-impostor/farol.html');s=fs.readFileSync(p,'utf8');if(!s.includes('ra/clima.js'))s=s.replace('<script src="ra/farol-livro.js">','<script src="ra/clima.js?v=20261025"></script>\n<script src="ra/farol-livro.js">');fs.writeFileSync(p,s);
- function walk(dir){for(const e of fs.readdirSync(dir,{withFileTypes:true})){const p=path.join(dir,e.name);if(e.isDirectory())walk(p);else if(e.name.endsWith('.html')){let s=fs.readFileSync(p,'utf8');if(s.includes('textos-volume.js'))continue;let t=s.replace(/(<script src="((?:[^"]*\/)?)(?:three\.min\.js)(?:\?[^"]*)?"><\/script>)/g,(all,tag,prefix)=>tag+'<script src="'+prefix+'textos-volume.js?v=20261025"></script>');if(s!==t)fs.writeFileSync(p,t);}}}
+ function walk(dir){for(const e of fs.readdirSync(dir,{withFileTypes:true})){const p=path.join(dir,e.name);if(e.isDirectory())walk(p);else if(e.name.endsWith('.html')){let s=fs.readFileSync(p,'utf8');let t=s.replace(/(src=["'][^"']*(?:ac-maquete|farol-livro|maquete|peca3d|objeto)\.js)(?:\?[^"']*)?(["'])/g,'$1?v=volume-20261025$2');if(!s.includes('textos-volume.js'))t=t.replace(/(<script src="((?:[^"]*\/)?)(?:three\.min\.js)(?:\?[^"]*)?"><\/script>)/g,(all,tag,prefix)=>tag+'<script src="'+prefix+'textos-volume.js?v=20261025"></script>');if(s!==t)fs.writeFileSync(p,t);}}}
  walk(path.join(root,'a-mesa'));walk(path.join(root,'o-impostor'));
 }
 function outros(root,eco){
+ const html=path.join(root,'o-impostor/mesa.html');if(fs.existsSync(html)){let h=fs.readFileSync(html,'utf8');h=h.replace(/(src=["'][^"']*(?:maquete|peca3d|objeto)\.js)(?:\?[^"']*)?(["'])/g,'$1?v=volume-20261025$2');fs.writeFileSync(html,h);}
  const dir=path.join(root,'o-impostor');fs.writeFileSync(path.join(dir,'ra-textos-volume.js'),text);
  for(const f of fs.readdirSync(dir).filter(x=>x.endsWith('.js'))){const p=path.join(dir,f);let s=fs.readFileSync(p,'utf8');if(s.includes('SCRIPTS')&&s.includes("'three.min.js'")&&!s.includes('ra-textos-volume.js')){s=s.replace(/([A-Z0-9]+ \+ 'three\.min\.js',)/,"$1 BASE + 'ra-textos-volume.js',");fs.writeFileSync(p,s);}}
  if(eco){
@@ -45,9 +46,9 @@ function group(folder,fonte,commit,origem){
  if(fs.statSync(path.join(root,folder)).isDirectory())walk(path.join(root,folder));else{const key=folder,next=hash(path.join(root,folder));changed.push({arquivo:key,origem:'RA-VOLUME-MOVIMENTO.md',sha256_anterior:hashes[key]||null,sha256:next});hashes[key]=next;}
  origins.atualizacoes.push({data:'2026-10-25',tipo:'atualizacao-da-origem',fonte,commit_fonte:commit,criterio:'Porta os textos extrudados e as movimentações das RA; preserva as adaptações de navegação do Lab-RA. O clima permanece ligado à âncora e não intercepta os toques nas pistas.',arquivos:changed});console.log(fonte,changed.length,'arquivos');
 }
-group(prefix+'casa-da-costa','DrMarioNascimento/casa-da-costa','1455fb2d961f326a6b5ec2859dbe23093ccd1b19','');
-group(prefix+'a-manha-do-carro-forte','DrMarioNascimento/carro-forte','743d5e6f5fb16224eb7aa4831bd870580209a2fb','');
-group(prefix+'o-eco-do-amanha','DrMarioNascimento/eco-do-amanha','42a6466f36665d03555ebd5d2ecbfbca82a89cf4','');
+group(prefix+'casa-da-costa','DrMarioNascimento/casa-da-costa','33ff5292c6063b0be9995fca636c2cd07a991d42','');
+group(prefix+'a-manha-do-carro-forte','DrMarioNascimento/carro-forte','681127128c6042ed50863c41a521044ac949c805','');
+group(prefix+'o-eco-do-amanha','DrMarioNascimento/eco-do-amanha','cdfa121ab310334ed40fab6973545888022fc08b','');
 group('biblioteca/dragon/RA-VOLUME-MOVIMENTO.md','DrMarioNascimento/Dragon','b749aaab7a15e821a4903230ab692c2d3a53b8c4','');
 fs.writeFileSync(hpath,JSON.stringify(hashes,null,2)+'\n');fs.writeFileSync(opath,JSON.stringify(origins,null,2)+'\n');
-fs.appendFileSync(path.join(root,'README.md'),'\n## RA dos jogos — 25/10/2026\n\nSincronizados textos dinâmicos com relevo, clima das cenas externas da Casa da Costa e da Torre de Continuidade e preservação das animações de investigação. Confira biblioteca/dragon/RA-VOLUME-MOVIMENTO.md. A validação com câmera em iPhone e Android físicos permanece pendente.\n');
+if(!fs.readFileSync(path.join(root,'README.md'),'utf8').includes('## RA dos jogos — 25/10/2026'))fs.appendFileSync(path.join(root,'README.md'),'\n## RA dos jogos — 25/10/2026\n\nSincronizados textos dinâmicos com relevo, clima das cenas externas da Casa da Costa e da Torre de Continuidade e preservação das animações de investigação. Confira biblioteca/dragon/RA-VOLUME-MOVIMENTO.md. A validação com câmera em iPhone e Android físicos permanece pendente.\n');
