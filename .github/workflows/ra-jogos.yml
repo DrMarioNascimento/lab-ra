@@ -24,10 +24,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: DrMarioNascimento/fisiologia-interativa
-          ref: a6253847bbe6c7435dc2f849b92bca87a15015bd
+          ref: bc0dc17461b4a5416806deff85a6d0b5dcc53ce4
           path: fonte-fisiologia
           persist-credentials: false
-      - run: node scripts/sincronizar-fisiologia.cjs fonte-fisiologia/ra a6253847bbe6c7435dc2f849b92bca87a15015bd
+      - run: node scripts/sincronizar-fisiologia.cjs fonte-fisiologia/ra bc0dc17461b4a5416806deff85a6d0b5dcc53ce4
       - run: node scripts/sincronizar-jogos.cjs fonte-casa
       - run: node --test tests/*.test.mjs biblioteca/fisiologia/tests/starling.test.mjs biblioteca/fisiologia/tests/juncao-neuromuscular.test.mjs
       - name: Conferir relevo, deformações e clima no navegador
