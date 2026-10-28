@@ -46,3 +46,12 @@ Modelos e texturas são procedurais, criados no código do projeto. Não foi acr
 ## Mitocôndrias novas na Fibra (09/10/2026)
 
 - As 84 mitocôndrias entre as miofibrilas eram cápsulas lisas fundidas numa malha só em `modelos.js` (aprovado, intocado). Em `app.js` a malha é desfeita cápsula por cápsula (todas têm o mesmo número de vértices); a caixa de cada uma dá o lugar e o comprimento da mitocôndria compartilhada fechada (`../mitocondria.js`) que entra no lugar, deitada no eixo da fibra. Se a estrutura não for a esperada, ou o GLB não chegar, ficam as antigas.
+
+## Acabamento do músculo e da miofibrila (28/10/2026)
+
+`modelos.js` continua sendo a versão aprovada, sem alteração. O acabamento fica em `acabamento.js`, aplicado por cima das peças logo depois de `criar()`.
+
+- **01 · Músculo:** o relevo de 17 gomos iguais deu lugar a 23 feixes irregulares, com sulco mais escuro entre eles; fibras finas em relevo no comprimento; epimísio como película levemente azulada, acesa na borda; borda de epimísio cortado em volta da janela; tendão com fibras de colágeno.
+- **Origem, articulação e inserção:** no lugar das duas pontas de osso iguais, o desenho segue um músculo que cruza articulação (proporções do braquiorradial, sem nomeá-lo na tela). Origem na extremidade distal de um osso, mostrado em parte e cortado na margem (face com cortical, esponjosa e medula); articulação levemente fletida, com côndilos, cartilagem, fenda e cápsula translúcida; segundo osso inteiro; inserção perto da extremidade dele, junto ao processo estiloide. O ventre corre ao lado do segundo osso e os tendões descem até a superfície óssea. Rótulos: origem, articulação, inserção, osso. Na RA o nível 01 passou a 0,55 m, porque a peça ficou mais longa.
+- **04 · Miofibrila:** os três sarcômeros são cópias do sarcômero do 05 (actina em hélice com tropomiosina e troponina, cabeças de miosina, titina, pontes da linha M), com a mesma `aplicarComprimento`. A capa passou ao raio do disco Z do 05 (0,47), e os sarcômeros ficam em 1:1 — antes eram alargados 1,34× na espessura. A capa da frente é translúcida e mostra os filamentos dos três; o lado de dentro do fundo é sombreado. As actinas de cada disco Z são unidas por material para aliviar o celular. A RA do nível 04 fica mais pesada, perto da do 05.
+- O brilho de borda e a sombra interna são do navegador; a RA leva a forma e as cores.

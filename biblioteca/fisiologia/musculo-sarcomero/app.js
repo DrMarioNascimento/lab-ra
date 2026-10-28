@@ -33,6 +33,7 @@ import { prepararParaRA } from '../cores-para-ra.js';
 import { usdzComBotoes } from '../ra-botoes-ios.js?v=volume-20261025';
 import { novaMitocondria } from '../mitocondria.js';
 import { criar } from './modelos.js?v=musculo-anatomico-20261003';
+import { aplicarAcabamento } from './acabamento.js?v=acabamento-20261028';
 
 const $ = id => document.getElementById(id);
 const canvas = $('scene'), stage = $('stage');
@@ -86,7 +87,9 @@ function canvasTex(w, h, draw, { repeatX = 1, repeatY = 1 } = {}) {
   t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(repeatX, repeatY);
   t.anisotropy = 8; return t;
 }
-const { modelos, aplicarComprimento, SARC, SCM } = criar(canvasTex);
+const { modelos, aplicarComprimento, SARC, SCM, M: MATERIAIS } = criar(canvasTex);
+/* acabamento do 01 e do 04 (acabamento.js): por cima da versão aprovada, antes de tudo que lê as peças */
+aplicarAcabamento(modelos, MATERIAIS, aplicarComprimento);
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
 
 /* MITOCÔNDRIAS NOVAS NA FIBRA. Em `modelos.js` (aprovado, intocado) as 84
@@ -133,7 +136,7 @@ modelos.forEach((m, i) => {
 const sarc = modelos[4];
 
 const dados = [
-  ['Escala macroscópica', '01 · Músculo', 'Órgão contrátil', 'Músculo esquelético', 'Ventre fusiforme envolvido pelo epimísio, com tendões nas extremidades. Sob a fáscia já se veem os feixes: o músculo é organizado em fascículos.', 'ventre muscular,epimísio,tendão,fascículos'],
+  ['Escala macroscópica', '01 · Músculo', 'Órgão contrátil', 'Músculo esquelético', 'Ventre fusiforme envolvido pelo epimísio. O tendão de origem prende-se a um osso, o músculo cruza a articulação e o tendão de inserção prende-se ao osso seguinte: ao encurtar, o ventre aproxima a inserção da origem e move a articulação. Sob a fáscia já se veem os feixes: o músculo é organizado em fascículos.', 'ventre muscular,epimísio,origem,inserção,articulação,fascículos'],
   ['Escala mesoscópica', '02 · Fascículo', 'Feixe de fibras', 'Fascículo muscular', 'Dezenas de fibras envolvidas pelo perimísio. Capilares serpenteiam entre elas. Na extremidade cortada, as fibras aparecem individualmente.', 'perimísio,fibras,capilares,endomísio'],
   ['Escala celular', '03 · Fibra', 'Célula multinucleada', 'Fibra muscular', 'Uma célula longa: sarcolema estriado, núcleos achatados na periferia, mitocôndrias entre miofibrilas paralelas. A estriação vista de fora vem de dentro.', 'sarcolema,núcleos periféricos,mitocôndrias,miofibrilas'],
   ['Escala subcelular', '04 · Miofibrila', 'Cadeia de sarcômeros', 'Miofibrila', 'Sarcômeros em série, de disco Z a disco Z. O corte longitudinal mostra que as bandas claras e escuras são os próprios filamentos vistos de lado. Deslize o controle: os sarcômeros em série encurtam juntos, e a banda A não muda.', 'disco Z,banda I,banda A,sarcômeros em série'],
@@ -244,10 +247,14 @@ const ancoras = {
   /* nível 04: as âncoras acompanham o comprimento escolhido — disco Z entre o
      1º e o 2º sarcômero, banda I no meio da metade esquerda da banda I do
      sarcômero central, banda A dentro dela */
-  3: () => { const L = sarc.userData.comprimento; return [['disco Z', V(-L / 2, -.62, .2)], ['banda A (escura)', V(.45, -.55, .2)], ['banda I (clara)', V(-(SCM.A / 2 + L / 2) / 2, .6, .2)], ['filamentos', V(0, .2, .4)]]; },
+  3: () => { const L = sarc.userData.comprimento; return [['disco Z', V(-L / 2, -.49, .16)], ['banda A (escura)', V(.45, -.44, .16)], ['banda I (clara)', V(-(SCM.A / 2 + L / 2) / 2, .48, .16)], ['filamentos', V(0, .15, .32)]]; },
   2: () => [['sarcolema', V(-1.6, .85, 0)], ['núcleo periférico', V(.4, .8, .3)], ['miofibrilas', V(2.7, .2, 0)], ['mitocôndrias', V(-.6, -.55, .5)]],
   1: () => [['perimísio', V(-1.4, 1.05, 0)], ['fibras musculares', V(2.1, .44, .3)], ['capilar', V(0, -.9, .4)]],
-  0: () => [['ventre muscular', V(0, 1.06, .4)], ['tendão', V(2.95, .40, 0)], ['osso', V(4.3, .55, 0)], ['epimísio', V(-1.35, -.90, .5)], ['fascículos', V(.5, .84, .58)]],
+  /* nível 01: origem, articulação e inserção montadas em acabamento.js; o conjunto foi centralizado (desvio) */
+  0: () => { const d = modelos[0].userData.desvio || V(), p = modelos[0].userData.pontos, a = v => v.clone().add(d);
+    if (!p) return [['ventre muscular', V(0, 1.06, .4)], ['tendão', V(2.95, .40, 0)], ['osso', V(4.3, .55, 0)], ['epimísio', V(-1.35, -.90, .5)], ['fascículos', V(.5, .84, .58)]];
+    return [['ventre muscular', a(V(0, 1.06, .4))], ['fascículos', a(V(.5, .84, .58))], ['epimísio', a(V(1.7, -.52, .5))], ['tendão', a(V(-2.75, -.12, .06))],
+      ['origem', a(p.origem)], ['articulação', a(p.articulacao.clone().add(V(.05, .5, .32)))], ['inserção', a(p.insercao)], ['osso', a(p.osso)]]; },
 };
 let mostrarRotulos = true; E.rot.onclick = () => { mostrarRotulos = !mostrarRotulos; E.rot.classList.toggle('on', mostrarRotulos); E.rot.setAttribute('aria-pressed',String(mostrarRotulos)); E.labels.innerHTML = ''; };
 function atualizarRotulos() {
@@ -437,7 +444,7 @@ const clock = new THREE.Clock();
 })();
 
 /* ------------------------------------------------------------ RA */
-const TAM_REAL = [.36, .40, .46, .60, .90]; // metros, maior dimensão de cada nível no ambiente
+const TAM_REAL = [.55, .40, .46, .60, .90]; // metros, maior dimensão de cada nível no ambiente
 /* O QUE O IPHONE FAZ HOJE, e por que a página precisa dizer.
    O Quick Look abre no modo Objeto: o modelo aparece parado sobre fundo claro,
    e a câmera só entra depois de um toque em "AR", no alto da folha. O iOS

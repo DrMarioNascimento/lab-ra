@@ -235,8 +235,12 @@
       "sha256": "c51a2934aafb8595f1b573c1e9fb2aa858636f1953ad6437079774dd586a2abc"
     },
     {
+      "path": "musculo-sarcomero/acabamento.js",
+      "sha256": "710c17e173976fa0d7a701e224bc3505475a59701444d9ef99f089c35a024077"
+    },
+    {
       "path": "musculo-sarcomero/app.js",
-      "sha256": "86a05bfd8b5b80820bfb743e739cd312c0b4cb9e5540e6897502f421b24ef463"
+      "sha256": "33067d00ea5415f59806b4a832d06fbbde21c2a03edb40a959801580e095dbce"
     },
     {
       "path": "musculo-sarcomero/index.html",
@@ -248,7 +252,7 @@
     },
     {
       "path": "musculo-sarcomero/README.md",
-      "sha256": "cb78afde047ecd75c7352fecee018b5393d03aab76d0e2b48af274f8e3b576b7"
+      "sha256": "3149b902629234fc053f295cc4d407afe55c050490b106bbefd13229dde50c1f"
     },
     {
       "path": "musculo-sarcomero/style.css",
