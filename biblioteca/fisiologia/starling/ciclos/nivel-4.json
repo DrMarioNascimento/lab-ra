@@ -1,6 +1,15 @@
 {
-  "trilhas": 71,
-  "bytes": 2562024,
+  "trilhas": 72,
+  "bytes": 3397108,
   "titulo": "Glicocálix",
-  "duracao": 8
+  "duracao": 8,
+  "texturas": {
+    "malhas": 7,
+    "familias": {
+      "nucleo": 4,
+      "endotelio": 1,
+      "basal": 1,
+      "colageno": 1
+    }
+  }
 }

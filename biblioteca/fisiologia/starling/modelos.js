@@ -71,16 +71,17 @@ function fibroblasto(group, x,y,z) {
   }
   group.add(g);
 }
-function hemaciaGeo() {
+function hemaciaGeo(n=40, lados=28) {
   const pts=[];
-  for(let i=0;i<=40;i++) {
-    const a=Math.PI*i/40, r=3.15*Math.sin(a), rr=Math.sin(a);
+  for(let i=0;i<=n;i++) {
+    const a=Math.PI*i/n, r=3.15*Math.sin(a), rr=Math.sin(a);
     const h=.65*Math.cos(a)*(.26+1.3*rr*rr);
     pts.push(new THREE.Vector2(r,h));
   }
-  const geo=new THREE.LatheGeometry(pts,28); geo.rotateZ(Math.PI/2); return geo;
+  const geo=new THREE.LatheGeometry(pts,lados); geo.rotateZ(Math.PI/2); return geo;
 }
-const HEM=hemaciaGeo(), DROP=esfera(.43), PROT=organico(.58);
+// Na rede são 64 discos pequenos: a versão leve tem um décimo dos triângulos.
+const HEM=hemaciaGeo(), HEM_LEVE=hemaciaGeo(12,14), DROP=esfera(.43), PROT=organico(.58);
 function proteina() {
   const g=new THREE.Group();
   g.add(mesh(PROT,M.albumina,[0,0,0],[1.8,.8,1]));
@@ -104,7 +105,7 @@ function corteParede(length, radius=4.4, start=.12, extent=Math.PI*1.47) {
   }
   return mergeGeometries(geos);
 }
-function capilar(length=62, radius=4.4) {
+function capilar(length=62, radius=4.4, motion=null) {
   const g=new THREE.Group();
   g.add(mesh(corteParede(length,radius),M.parede));
   g.add(mesh(corteParede(length,radius+.28),M.basal));
@@ -120,7 +121,8 @@ function capilar(length=62, radius=4.4) {
     const q=v(x+.15,Math.cos(a)*(r-.7),Math.sin(a)*(r-.7));
     brush.push(tubo(curva([p,p.clone().lerp(q,.6).add(v(.08,.05,.03)),q]),.07,5,4));
   }
-  g.add(mesh(mergeGeometries(brush),M.glicocalix));
+  const escova=mesh(mergeGeometries(brush),M.glicocalix); g.add(escova);
+  if(motion) motion.escova=ondulavel(escova,(x,y,z)=>(radius-.22-Math.hypot(y,z))/.7);
   const per=new THREE.Group();
   per.add(mesh(organico(1.25),M.pericito,[6,-radius-1,-1],[3,.58,1]));
   for(let i=0;i<5;i++) {
@@ -133,43 +135,99 @@ function capilar(length=62, radius=4.4) {
   }
   g.add(per); return g;
 }
-function linfatico(g, motion, scale=1) {
-  const pts=[[-19,-14,-2],[-12,-15,-3],[2,-17,-4],[18,-17,-5],[30,-14,-6]];
-  const path=curva(pts.map(p=>p.map(n=>n*scale)));
-  g.add(mesh(tubo(path,2.6*scale),M.linfa));
+// Tubo que muda de calibre sem sair do eixo: guarda a forma de repouso e o
+// centro de cada anel; aplicar(f) multiplica o raio por f(s), s ao longo do tubo.
+function calibravel(o, path, segments, sides) {
+  const p=o.geometry.attributes.position, base=Float32Array.from(p.array);
+  const centro=new Float32Array(p.count*3), s=new Float32Array(p.count);
+  for(let i=0;i<=segments;i++) {
+    const c=path.getPointAt(i/segments);
+    for(let j=0;j<=sides;j++) { const k=i*(sides+1)+j; centro[k*3]=c.x; centro[k*3+1]=c.y; centro[k*3+2]=c.z; s[k]=i/segments; }
+  }
+  return {aplicar(f) {
+    for(let k=0;k<p.count;k++) { const m=f(s[k]); for(let a=0;a<3;a++) p.array[k*3+a]=centro[k*3+a]+(base[k*3+a]-centro[k*3+a])*m; }
+    p.needsUpdate=true;
+  }};
+}
+// Escova do glicocálix que se curva com o cisalhamento do fluxo: cada vértice
+// se desloca no sentido do fluxo (x) em proporção ao quadrado da sua altura
+// sobre a membrana, com a fase andando ao longo do vaso. A raiz não se move.
+function ondulavel(o, alturaDe, amplitude=.3) {
+  const p=o.geometry.attributes.position, base=Float32Array.from(p.array), peso=new Float32Array(p.count);
+  for(let k=0;k<p.count;k++) { const w=Math.min(1,Math.max(0,alturaDe(base[k*3],base[k*3+1],base[k*3+2]))); peso[k]=w*w; }
+  return {aplicar(fase) {
+    for(let k=0;k<p.count;k++) { const x=base[k*3]; p.array[k*3]=x+amplitude*peso[k]*Math.sin(fase+.32*x); p.array[k*3+2]=base[k*3+2]+.35*amplitude*peso[k]*Math.cos(fase+.32*x); }
+    p.needsUpdate=true;
+  }};
+}
+function linfatico(g, motion, scale=1, pts=[[-19,-14,-2],[-12,-15,-3],[2,-17,-4],[18,-17,-5],[30,-14,-6]], bomba=false) {
+  // bomba: true = inicial + coletor contrátil (rede); 'inicial' = só abas e
+  // entrada pulsátil, porque o linfático inicial não tem músculo (nível 5).
+  const path=curva(pts.map(p=>p.map(n=>n*scale))), segs=pts.length>5?96:48;
+  const tuboLinfa=mesh(tubo(path,2.6*scale,segs),M.linfa); g.add(tuboLinfa);
   g.add(mesh(organico(2.6*scale),M.linfa,pts[0].map(n=>n*scale),[1.1,1,1]));
-  // Sobreposição endotelial: abas de entrada do linfático inicial.
+  // Sobreposição endotelial: abas de entrada do linfático inicial. Com bomba,
+  // ficam só no trecho inicial; o resto do tubo é o coletor que contrai.
   for(let i=0;i<6;i++) {
-    const p=path.getPointAt(.12+i*.12);
+    const s=bomba===true?.07+i*.085:.12+i*.12, p=path.getPointAt(s);
     const flap=mesh(new THREE.SphereGeometry(1.4*scale,16,8,0,Math.PI),M.linfa,[p.x,p.y+2.2*scale,p.z+.7*scale],[1,.3,1]);
-    g.add(flap);
+    g.add(flap); if(bomba) motion.abas.push({o:flap,s});
     g.add(mesh(tubo(curva([p.clone().add(v(0,2.4*scale,0)),p.clone().add(v(1,5*scale,-1)),p.clone().add(v(3,7*scale,-3))]),.1*scale,12,4),M.fibra));
   }
-  for(let i=0;i<9;i++) { const o=mesh(DROP,M.agua); g.add(o); motion.lymph.push({o,path,offset:i/9}); }
+  if(bomba===true) motion.linfaTubo=calibravel(tuboLinfa,path,segs,10);
+  const n=bomba===true?14:9;
+  for(let i=0;i<n;i++) { const o=mesh(DROP,M.agua); g.add(o); motion.lymph.push({o,path,offset:i/n,...(bomba?{vel:.125,pulso:true}:{})}); }
 }
+// Na rede as paredes são translúcidas, como na microscopia intravital: sem
+// isso as hemácias correm escondidas dentro de tubos opacos e o fluxo some.
+const VIDRO={transparent:true,depthWrite:false};
+const MR={
+  arterial:phys('#bc4456',{...VIDRO,opacity:.5}), venoso:phys('#8566a7',{...VIDRO,opacity:.5}),
+  capilar:phys('#d87588',{...VIDRO,opacity:.42}),
+};
 function rede(motion) {
   const g=new THREE.Group(); fibras(g,112,28);
   [[-22,17,-14],[14,-11,-16],[35,18,-15]].forEach(p=>fibroblasto(g,...p));
-  const left=curva([[-56,12,0],[-38,10,1],[-24,5,0],[-16,-4,-1]]);
-  const right=curva([[17,-4,0],[29,7,-1],[42,10,1],[57,13,0]]);
-  g.add(mesh(tubo(left,3.5,55,12,1.9),M.arterial));
-  g.add(mesh(tubo(right,2.2,55,12,4.2),M.venoso));
+  // Pontas na meia altura da rede: os capilares se abrem em leque para cima e
+  // para baixo, sem grampo de volta (revisão 2026-10-25).
+  const left=curva([[-56,12,0],[-38,10,1],[-26,5,0],[-16,0,-1]]);
+  const right=curva([[16,0,0],[29,7,-1],[42,10,1],[57,13,0]]);
+  // A ponta da arteríola e o começo da vênula afinam até o calibre capilar:
+  // a última arteríola continua no capilar, sem coto aberto (revisão 2026-10-25).
+  const rArt=u=>3.5+(.95-3.5)*u, rVen=u=>.95+(4.2-.95)*u;
+  const arteriola=mesh(tubo(left,3.5,55,12,.95),MR.arterial); g.add(arteriola);
+  motion.vasomocao=calibravel(arteriola,left,55,12);
+  g.add(mesh(tubo(right,.95,55,12,4.2),MR.venoso));
+  // Trecho de curva entre t0 e t1, para o funil de cada ramificação.
+  const trecho=(path,t0,t1)=>curva(Array.from({length:7},(_,k)=>path.getPointAt(t0+(t1-t0)*k/6)));
   const paths=[];
   for(let i=0;i<5;i++) {
-    const a=left.getPointAt(.32+i*.17), b=right.getPointAt(i*.15);
+    const ua=.32+i*.17, ub=i*.15, a=left.getPointAt(ua), b=right.getPointAt(ub);
     const y=-22+i*10, z=(i%2?2:-3);
-    const path=curva([a,[-24,y*.65,z],[-9,y+Math.sin(i)*2,z+1],[8,y,z],[20,y*.7,z],b]);
-    g.add(mesh(tubo(path,.88,64,10),M.capilar)); paths.push(path);
-    [a,b].forEach(p=>g.add(mesh(esfera(1.2),M.capilar,[p.x,p.y,p.z])));
+    const path=curva([a,[Math.max(-24,a.x+6),y*.65,z],[-9,y+Math.sin(i)*2,z+1],[8,y,z],[Math.min(20,b.x-5),y*.7,z],b]);
+    g.add(mesh(tubo(path,.88,64,10),MR.capilar)); paths.push(path);
+    [[a,rArt(ua)],[b,rVen(ub)]].forEach(([p,r])=>g.add(mesh(esfera(Math.min(1.2,r)),MR.capilar,[p.x,p.y,p.z])));
+    // Funil na saída da arteríola e na chegada à vênula: o capilar nasce do
+    // vaso maior em vez de atravessar a parede como um fio espetado.
+    g.add(mesh(tubo(trecho(path,0,.13),Math.min(2.2,rArt(ua)*.75),16,10,.88),MR.arterial));
+    g.add(mesh(tubo(trecho(path,.87,1),.88,16,10,Math.min(2.6,rVen(ub)*.75)),MR.venoso));
   }
   for(let i=0;i<4;i++) {
     const a=paths[i].getPointAt(.36+(i%2)*.14), b=paths[i+1].getPointAt(.5);
-    g.add(mesh(tubo(curva([a,a.clone().lerp(b,.5).add(v(2,0,-1)),b]),.65,20,8),M.capilar));
+    g.add(mesh(tubo(curva([a,a.clone().lerp(b,.5).add(v(2,0,-1)),b]),.65,20,8),MR.capilar));
   }
-  for(const path of paths) for(let i=0;i<5;i++) {
-    const o=mesh(esfera(.58),M.hemacia); g.add(o); motion.blood.push({o,path,offset:i/5,scale:1});
-  }
-  linfatico(g,motion,1.2);
+  // (posições fixas por índice, sem rnd(): o sorteio é compartilhado e mexer
+  // nele aqui deslocaria fibras e proteínas dos níveis 2 a 5)
+  // Hemácias em disco, do calibre do capilar (passam em fila), e soltas na luz
+  // da arteríola e da vênula. Velocidades em voltas por 8 s inteiras: o ciclo
+  // fecha sem salto. Nos capilares o fluxo acompanha a vasomoção.
+  const hem=()=>{const o=mesh(HEM_LEVE,M.hemacia); o.scale.setScalar(.25); g.add(o); return o;};
+  for(const path of paths) for(let i=0;i<8;i++) motion.fluxo.push({o:hem(),path,offset:i/8,vel:.125,acopla:true});
+  for(let i=0;i<12;i++) motion.fluxo.push({o:hem(),path:left,offset:i/12,vel:.25,raio:rArt,vaso:true,rho:.2+.45*(i*.618%1),theta:i*2.4});
+  for(let i=0;i<12;i++) motion.fluxo.push({o:hem(),path:right,offset:i/12,vel:.125,raio:rVen,rho:.2+.45*(i*.382%1),theta:i*2.4+1});
+  // Na rede, o linfático atravessa o campo e sai ao lado da vênula (revisão 2026-10-25),
+  // e bombeia: abas no trecho inicial, dois linfângions contráteis no coletor.
+  linfatico(g,motion,1.2,[[-28,-13,-1],[-19,-14,-2],[-12,-15,-3],[2,-17,-4],[18,-17,-5],[30,-14,-6],[40,-10,-6],[48,-7,-5]],true);
   g.userData.rotulos=[
     {nome:'Arteríola',p:[-45,12,0],cor:'arterial'},
     {nome:'Rede capilar',p:[0,22,0],cor:'arterial'},
@@ -186,11 +244,12 @@ function seta() {
 function closeup(n,motion) {
   const g=new THREE.Group(), L=n===2?44:62;
   fibras(g,L+10,9); fibroblasto(g,-12,13,-12);
-  g.add(capilar(L));
+  g.add(capilar(L,4.4,motion));
   const path=curva([[-L/2,0,0],[0,.2,0],[L/2,0,0]]);
   for(let i=0;i<7;i++) {
     const o=mesh(HEM,M.hemacia); o.rotation.y=(i%2-.5)*.2; g.add(o);
-    motion.blood.push({o,path,offset:i/7,scale:1});
+    // 1/14 por segundo: 4/7 de volta em 8 s, e as sete hemácias fecham o ciclo sem salto
+    motion.blood.push({o,path,offset:i/7,scale:1,vel:1/14});
   }
   for(let i=0;i<22;i++) {
     const o=proteina(); g.add(o); motion.protein.push({o,L,u:rnd(),a:rnd()*6.28,r:1.7+rnd()*1.2});
@@ -205,7 +264,7 @@ function closeup(n,motion) {
   }
   if(n===4) {
     const gel=mesh(organico(1,1,true),phys('#83afbb',{transparent:true,opacity:.09,depthWrite:false}),[0,-1,-4],[L*.52,16,10]);
-    g.add(gel); motion.gel=gel; linfatico(g,motion);
+    g.add(gel); motion.gel=gel; linfatico(g,motion,1,undefined,'inicial');
   }
   g.userData.rotulos=[
     {nome:'Hemácia',p:[-18,0,3],cor:'arterial'},
@@ -240,7 +299,8 @@ function barreira(motion) {
     brushes.push(tubo(curva([[x,y+.12,z],[x-.3*Math.cos(i),y+.9,z-.25*Math.sin(i)],tip]),.085,7,5));
     if(i%4===0) brushes.push(tubo(curva([[x,y+1.3,z],tip.clone().add(v(-.5,-.2,.4))]),.065,4,4));
   }
-  g.add(mesh(mergeGeometries(brushes),M.glicocalix));
+  const escova=mesh(mergeGeometries(brushes),M.glicocalix); g.add(escova);
+  motion.escova=ondulavel(escova,(x,y,z)=>(y-surface(x,z))/3.3,.45);
   for(let i=0;i<18;i++) {
     const o=proteina(); o.scale.setScalar(1.5); o.position.set((rnd()-.5)*34,5+rnd()*4,(rnd()-.5)*20); g.add(o);
     motion.fixedProtein.push({o,y:o.position.y,leak:i/18});
@@ -263,14 +323,15 @@ export function criar() {
   seed=19;
   const motions=[], modelos=[];
   for(let i=0;i<5;i++) {
-    const d={blood:[],protein:[],water:[],arrows:[],lymph:[],crossing:[],fixedProtein:[]}; motions.push(d);
+    const d={blood:[],protein:[],water:[],arrows:[],lymph:[],crossing:[],fixedProtein:[],fluxo:[],abas:[]}; motions.push(d);
     const g=i===0?rede(d):i===3?barreira(d):closeup(i,d);
     g.name='Starling-nivel-'+(i+1); g.visible=i===0; modelos.push(g);
   }
+  const W=2*Math.PI/8;
   function animar(t, liquidaEm, {encharcado=0,semLinfa=false,nivel=0,sigma=1,oncPlasma=25,kf=.02}={}) {
     const d=motions[nivel];
-    for(const {o,path,offset} of d.blood) {
-      const u=(t*.07+offset)%1; o.position.copy(path.getPointAt(u));
+    for(const {o,path,offset,vel=.07} of d.blood) {
+      const u=(t*vel+offset)%1; o.position.copy(path.getPointAt(u));
       // Disco eritrocitário perpendicular à direção do fluxo.
       if(nivel!==0) o.quaternion.setFromUnitVectors(v(1,0,0),path.getTangentAt(u));
     }
@@ -286,8 +347,34 @@ export function criar() {
       o.visible=retained||Math.abs(p)>.08;
       o.position.set((u-.5)*L,Math.cos(a)*r,Math.sin(a)*r);
     }
-    for(const {o,path,offset} of d.lymph) {
-      o.visible=!semLinfa; const q=(t*.13+offset)%1; o.position.copy(path.getPointAt(q));
+    for(const {o,path,offset,vel=.13,pulso} of d.lymph) {
+      // com bomba, a linfa avança aos empurrões, mais rápido na contração
+      o.visible=!semLinfa; const q=((t*vel+offset+(pulso?.025*Math.sin(W*t):0))%1+1)%1; o.position.copy(path.getPointAt(q));
+    }
+    // Vasomoção: oscilação rítmica do tônus da arteríola, um ciclo a cada 8 s
+    // (7,5 por minuto); o fluxo capilar sobe quando ela dilata.
+    const vaso=1+.22*Math.sin(W*t);
+    d.vasomocao?.aplicar(()=>vaso);
+    for(const f of d.fluxo) {
+      const desl=f.vel*t+(f.acopla?f.vel*.4*(1-Math.cos(W*t))/W:0), u=((desl+f.offset)%1+1)%1;
+      const p=f.path.getPointAt(u), tg=f.path.getTangentAt(u);
+      if(f.rho) {
+        const n=v(0,1,0).cross(tg).normalize(), b=tg.clone().cross(n), r=f.raio(u)*(f.vaso?vaso:1)*f.rho;
+        p.addScaledVector(n,Math.cos(f.theta)*r).addScaledVector(b,Math.sin(f.theta)*r);
+      }
+      f.o.position.copy(p); f.o.quaternion.setFromUnitVectors(v(1,0,0),tg);
+    }
+    // Linfângions: o coletor (s > 0,58) contrai em dois segmentos, um depois do
+    // outro; as válvulas entre eles ficam no calibre. Quando o primeiro relaxa,
+    // a pressão na luz cai e as abas do trecho inicial se abrem para a entrada.
+    const seg=[[.58,.79,0],[.79,1,.22]].map(([a,b,fase])=>({a,b,c:Math.max(0,Math.sin(W*t-2*Math.PI*fase))**2}));
+    for(const {o} of d.abas) o.rotation.x=-.55*(1-seg[0].c);
+    d.escova?.aplicar(W*t);
+    if(d.linfaTubo) {
+      d.linfaTubo.aplicar(s=>{
+        for(const {a,b,c} of seg) if(s>a&&s<b) return 1-.45*c*Math.sin(Math.PI*(s-a)/(b-a));
+        return s<.58?1+.05*(1-seg[0].c):1;
+      });
     }
     for(const {o,x,z,offset} of d.crossing) {
       const p=liquidaEm((x+16)/32), q=(t*(.2+Math.min(Math.abs(p),40)*.006)*kf/.02+offset)%1;

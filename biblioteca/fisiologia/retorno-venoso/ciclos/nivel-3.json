@@ -1,6 +1,13 @@
 {
   "trilhas": 12,
-  "bytes": 2609620,
+  "bytes": 1195384,
   "titulo": "Válvulas venosas",
-  "duracao": 2.3
+  "duracao": 2.3,
+  "texturas": {
+    "malhas": 6,
+    "familias": {
+      "endotelio": 6
+    },
+    "semUV": 6
+  }
 }

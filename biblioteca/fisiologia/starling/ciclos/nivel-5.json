@@ -1,6 +1,18 @@
 {
-  "trilhas": 117,
-  "bytes": 3218992,
+  "trilhas": 130,
+  "bytes": 3807128,
   "titulo": "Retorno linfático",
-  "duracao": 8
+  "duracao": 8,
+  "texturas": {
+    "malhas": 43,
+    "familias": {
+      "colageno": 7,
+      "citoplasma": 12,
+      "nucleo": 7,
+      "endotelio": 1,
+      "basal": 1,
+      "hemacia": 7,
+      "vaso": 8
+    }
+  }
 }

@@ -27,7 +27,9 @@
   function st() { try { return typeof state !== "undefined" ? state : null; } catch (e) { return null; } }
   function tela() { var s = st(); return s ? s.screen : ""; }
   function mestre() { try { return !(global.MOSAICO_ROOM && global.MOSAICO_ROOM.code) || global.MOSAICO_ROOM.role === "master"; } catch (e) { return false; } }
-  function noite() { return /\/noite\//.test(location.pathname); }
+  /* 25/10/2026: o jogo mora em /a-noite/ desde a separação do Dragon; a regra antiga
+     (/\/noite\//) nunca casava, e A Noite rodava os passos da Mesa sem `state.screen`. */
+  function noite() { return /\/(a-)?noite\//.test(location.pathname); }
 
   var PASSOS = [
     { id: "m-intro-mestre", rot: "Você abre a mesa",

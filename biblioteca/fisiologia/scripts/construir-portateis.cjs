@@ -1,8 +1,10 @@
 const fs=require('fs'),http=require('http'),path=require('path'),{chromium}=require('playwright');
+// Argumentos opcionais restringem a construção: node construir-portateis.cjs starling
+const somente=process.argv.slice(2);
 const root=path.resolve(__dirname,'../..'),port=8794,mime={'.html':'text/html','.js':'text/javascript','.json':'application/json','.glb':'model/gltf-binary','.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp'};
 const server=http.createServer((req,res)=>{const url=new URL(req.url,'http://localhost'),file=path.resolve(root,'.'+decodeURIComponent(url.pathname));if(!file.startsWith(root+path.sep)){res.writeHead(403).end();return;}if(url.pathname==='/__build.html'){res.setHeader('Content-Type','text/html');res.end('<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>');return;}fs.readFile(file,(e,b)=>{res.writeHead(e?404:200,{'Content-Type':mime[path.extname(file)]||'application/octet-stream'});res.end(e?'missing':b);});});
 (async()=>{await new Promise(r=>server.listen(port,'127.0.0.1',r));const browser=await chromium.launch({headless:true,args:['--enable-unsafe-swiftshader']});
-try{const jobs=[...['osso-vivo','juncao-neuromuscular','starling'].flatMap(t=>Array.from({length:5},(_,i)=>[t,i])),['musculo-sarcomero',4],['retorno-venoso',2],['retorno-venoso',3],['pleura',1],['coracao',0],['coracao',1],...Array.from({length:4},(_,i)=>['celula',i])];for(const [tipo,nivel]of jobs){
+try{const jobs=[...['osso-vivo','juncao-neuromuscular','starling'].flatMap(t=>Array.from({length:5},(_,i)=>[t,i])),['musculo-sarcomero',4],['retorno-venoso',2],['retorno-venoso',3],['pleura',1],['coracao',0],['coracao',1],...Array.from({length:4},(_,i)=>['celula',i])].filter(([t])=>!somente.length||somente.includes(t));for(const [tipo,nivel]of jobs){
  const page=await browser.newPage();page.on('pageerror',e=>console.error('PAGE',e.message));
  await page.route('https://cdn.jsdelivr.net/npm/three@0.180.0/**',async route=>{const rel=new URL(route.request().url()).pathname.split('three@0.180.0/')[1];await route.fulfill({path:path.join(root,'node_modules/three',rel),contentType:'text/javascript'});});
  if(tipo==='coracao'){

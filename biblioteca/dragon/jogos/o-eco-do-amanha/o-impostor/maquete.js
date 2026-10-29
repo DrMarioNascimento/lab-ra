@@ -28,10 +28,10 @@
      aoObjeto, aoAbrirItem, aoAndar, aoEntrar, aoSair, aoPonto, aoFoto}). */
 (function (global) {
   'use strict';
- var climaRA=null;
+ var climaRA=null,vivaT=null;
   var BASE = (function () { var s = document.currentScript && document.currentScript.src; return s ? s.replace(/[^/]*$/, '') : ''; })();
   var LIB = BASE + 'lib/';
-  var SCRIPTS = [LIB + 'three.min.js', BASE + 'ra-textos-volume.js?v=volume-20261025-auditoria', BASE + 'ra-clima.js', LIB + 'GLTFLoader.js', LIB + 'meshopt_decoder.js', LIB + 'OrbitControls.js', LIB + 'ac-ra.js', LIB + 'ac-maquete-ra.js'];
+  var SCRIPTS = [LIB + 'three.min.js', BASE + 'ra-textos-volume.js?v=volume-20261025-auditoria', BASE + 'ra-clima.js?v=tempestade-20261026', BASE + 'obra-projecao.js?v=tempestade-20261026', BASE + 'torre-viva.js?v=tempestade-20261026', BASE + 'guia-ra.js?v=guia-20261026', LIB + 'GLTFLoader.js', LIB + 'meshopt_decoder.js', LIB + 'OrbitControls.js', LIB + 'ac-ra.js', LIB + 'ac-maquete-ra.js'];
   var MODELO = BASE + 'modelos/torre.glb';
 
   /* metros do modelo → "1 de pegada" do motor de RA (o lote tem ~97 m: ~1 de pegada, ≈ 42 cm na mesa) */
@@ -543,6 +543,8 @@
     var t = tempo || performance.now(), dt = Math.min(0.05, (t - (antes || t)) / 1000); antes = t; relogio += dt;
     if (ra) ra.atualizar(dt, quadroXR);
     if(climaRA){climaRA.grupo.visible=climaRA.estado().ligado&&!dentro;if(!dentro)climaRA.update(dt);}
+    /* 25/10/2026: a torre na tempestade e as obras na imprensa (torre-viva.js) */
+    if(vivaT)vivaT.update(dt,dentro,climaRA?climaRA.vento(relogio):.2);
     var k = Math.min(1, dt * 5);
     Object.keys(andares).forEach(function (q) {
       var A = andares[q], at = A.at, al = A.alvo;
@@ -567,11 +569,19 @@
     opcoes = o || {}; if (!el) criarTela(); el.hidden = false; ativo = true; el.querySelector('#maqCarregando').hidden = false;
     cartao('A MAQUETE', 'A torre do subsolo à cobertura. Toque num andar: ele sai como uma gaveta, e dá para entrar nele. Os losangos dourados são as peças do caso; o anel dourado marca o seu andar.');
     return carregarTudo().then(function () {
-      if(!climaRA)climaRA=RAClima.criar(raiz,{host:el.querySelector('.maq-ferr')||el});
+      if(!climaRA)climaRA=RAClima.criar(raiz,{host:el.querySelector('.maq-ferr')||el,aoClarao:function(b){if(vivaT)vivaT.clarao(b);}});
+      if(!vivaT&&global.TorreViva)vivaT=TorreViva.criar(modelo,andares,{base:BASE});
       el.querySelector('#maqCarregando').hidden = true; aplicar(); redimensionar();
       if (dentro && opcoes.entrar !== dentro) sairDoAndar();
       if (!ra || ra.estado().modo !== 'ra') { if (!dentro) enquadrar(); }
       renderer.setAnimationLoop(desenhar);
+      /* 25/10/2026: na primeira vez neste aparelho, o que é cada coisa na tela (guia-ra.js) */
+      if (global.GuiaRA) GuiaRA.mostrar('eco-maquete', [
+        { alvo: '#maqPalco', txt: 'Arraste para girar a torre; com dois dedos, aproxime. Um toque num andar o puxa para fora, como uma gaveta.' },
+        { alvo: '#maqRA', txt: 'Pôr na mesa abre a câmera e coloca a torre sobre a sua mesa.' },
+        { alvo: '.ra-clima-toggle', txt: 'O clima liga e desliga a chuva e os relâmpagos. Ele não muda nada no caso.' },
+        { alvo: '#maqSair', txt: 'Por aqui você volta para a mesa do jogo.' }
+      ]);
       if (opcoes.alvo && andares[opcoes.alvo] && !dentro) { var A = andares[opcoes.alvo], f = fator(); controles.target.set(0, (A.base.y - CHAO) * S, 0); camera.position.set(0.7 * f, (A.base.y - CHAO) * S + 0.35, 1.05 * f); controles.update(); tocarAndar(opcoes.alvo); }
       if (opcoes.entrar && andares[opcoes.entrar] && dentro !== opcoes.entrar) setTimeout(function () { if (trancado(opcoes.entrar)) { var A3 = andares[opcoes.entrar], f3 = fator(); controles.target.set(0, (A3.base.y - CHAO) * S, 0); camera.position.set(0.7 * f3, (A3.base.y - CHAO) * S + 0.35, 1.05 * f3); controles.update(); } entrarNoAndar(opcoes.entrar); }, 500);
     }).catch(function (e) { el.querySelector('#maqCarregando').textContent = 'A maquete não abriu: ' + ((e && e.message) || e); throw e; });

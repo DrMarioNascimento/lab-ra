@@ -41,6 +41,54 @@ export function instalarCicloPortatil({experiencia,nivel=()=>1,niveis,nota='Cicl
  document.addEventListener('visibilitychange',()=>{if(document.hidden)viewer.pause();else if(playing&&box.open&&ready)viewer.play();});
  box.append(summary,text,select,prepare,launch,message,play,viewer);host.append(box);
  const style=document.createElement('style');style.textContent='.ra-ciclo-portatil{margin:16px 0;padding:18px;border:1px solid #678d9c;border-radius:22px;background:linear-gradient(145deg,#233d50,#102330);box-shadow:inset 0 2px 2px #ffffff20,0 5px 15px #0005;color:#edf5f7}.ra-ciclo-portatil summary{font-weight:700;cursor:pointer}.ra-ciclo-portatil button,.ra-ciclo-portatil select{margin:6px;padding:10px 14px;border-radius:12px;min-height:44px}.ra-ciclo-portatil p{line-height:1.45}';document.head.append(style);
+ instalarVer3D();
  return {limpar};
+}
+
+/* Ver em 3D: o mesmo visualizador da página ampliado para a tela inteira, para
+   o aparelho que não tem RA. No Android isso é comum: sem o "Google Play
+   Services para RA" certificado, o botão de RA leva à Play Store e a loja diz
+   que o app "só está disponível para seus outros dispositivos" (visto num
+   teste do Mario em 2026-10-25). A página não consegue saber disso antes.
+   A ampliação é por sobreposição fixa, e não pela API de tela cheia, porque o
+   Safari do iPhone não amplia elementos que não sejam vídeo. O visualizador é
+   MOVIDO para a sobreposição e devolvido ao fechar: um cartão com
+   backdrop-filter prenderia um position:fixed dentro dele. */
+const ANDROID=/Android/i.test(navigator.userAgent);
+let instalado=false;
+function instalarVer3D(){
+ if(instalado)return;instalado=true;
+ const camada=document.createElement('div');camada.className='ra-ver3d';camada.hidden=true;camada.setAttribute('role','dialog');camada.setAttribute('aria-label','Modelo em 3D na tela inteira');
+ const fechar=document.createElement('button');fechar.type='button';fechar.className='ra-ver3d-fechar';fechar.textContent='Fechar 3D';
+ const dica=document.createElement('p');dica.className='ra-ver3d-dica';dica.textContent='Arraste para girar · pinça para aproximar';
+ camada.append(fechar,dica);document.body.append(camada);
+ let aberto=null;
+ function sair(){
+  if(!aberto)return;const {viewer,pai,proximo,css}=aberto;aberto=null;
+  pai.insertBefore(viewer,proximo);viewer.style.cssText=css;camada.hidden=true;document.documentElement.classList.remove('ra-ver3d-ativo');
+ }
+ function entrar(viewer){
+  if(aberto||!viewer.getAttribute('src'))return;
+  aberto={viewer,pai:viewer.parentNode,proximo:viewer.nextSibling,css:viewer.style.cssText};
+  camada.insertBefore(viewer,dica);viewer.style.cssText='position:absolute;inset:0;width:100%;height:100%;background:#0a1520';
+  camada.hidden=false;document.documentElement.classList.add('ra-ver3d-ativo');fechar.focus();
+  if(viewer.hasAttribute('autoplay'))viewer.play?.();
+ }
+ fechar.onclick=sair;document.addEventListener('keydown',e=>{if(e.key==='Escape')sair();});
+ for(const viewer of document.querySelectorAll('model-viewer[ar]')){
+  const barra=document.createElement('div');barra.className='ra-ver3d-barra';
+  const botao=document.createElement('button');botao.type='button';botao.className='button';botao.textContent='Ver em 3D · tela cheia';
+  const pronto=()=>{botao.disabled=!viewer.getAttribute('src');barra.hidden=viewer.hidden;};
+  new MutationObserver(pronto).observe(viewer,{attributes:true,attributeFilter:['src','hidden']});pronto();
+  botao.onclick=()=>entrar(viewer);barra.append(botao);
+  if(ANDROID){
+   const aviso=document.createElement('p');aviso.className='ra-ver3d-aviso';
+   aviso.append('No Android, a câmera só abre em aparelhos compatíveis com a RA do Google. Se o botão de RA levar à Play Store dizendo que o app só está disponível para outros dispositivos, este aparelho não tem RA: use Ver em 3D. ');
+   const lista=document.createElement('a');lista.href='https://developers.google.com/ar/devices';lista.target='_blank';lista.rel='noopener noreferrer';lista.textContent='Aparelhos compatíveis';
+   aviso.append(lista,'.');barra.append(aviso);
+  }
+  viewer.after(barra);
+ }
+ const style=document.createElement('style');style.textContent='.ra-ver3d{position:fixed;inset:0;z-index:2147483000;background:#0a1520}.ra-ver3d[hidden],.ra-ver3d-barra[hidden]{display:none}.ra-ver3d-fechar{position:absolute;top:max(12px,env(safe-area-inset-top));right:12px;z-index:2;min-height:44px;padding:10px 16px;border-radius:12px;border:1px solid #678d9c;background:#233d50;color:#edf5f7;font:inherit;font-weight:700}.ra-ver3d-dica{position:absolute;left:0;right:0;bottom:max(12px,env(safe-area-inset-bottom));z-index:2;margin:0;text-align:center;color:#c9d6dc;font-size:14px;pointer-events:none}html.ra-ver3d-ativo,html.ra-ver3d-ativo body{overflow:hidden}.ra-ver3d-barra{margin:8px 0}.ra-ver3d-barra button{min-height:44px;padding:10px 14px;border-radius:12px}.ra-ver3d-aviso{margin:8px 0 0;font-size:14px;line-height:1.45;color:#c9d6dc}.ra-ver3d-aviso a{color:#ffd75e}';document.head.append(style);
 }
 

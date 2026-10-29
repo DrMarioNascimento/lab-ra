@@ -340,6 +340,14 @@
       $('btDeNovo').onclick = function () { op.deNovo && op.deNovo(); };
       renderer.setAnimationLoop(desenhar);
       estado(op.textoInicio || '');
+      /* 25/10/2026: na primeira peça aberta neste aparelho, o que é cada coisa
+         na tela (guia-ra.js). Uma vez só, para todas as peças do Impostor. */
+      if (global.GuiaRA) GuiaRA.mostrar('impostor-peca', [
+        { alvo: '#cena', txt: 'Arraste com um dedo para girar a peça; com dois, aproxime ou afaste.' },
+        { alvo: '#estado', txt: 'Aqui embaixo aparece o que você nota ao tocar nas coisas.' },
+        { alvo: '#btRA', txt: 'Ver na sala abre a câmera e põe a peça sobre a sua mesa, em tamanho de maquete.' },
+        { alvo: '.ra-clima-toggle', txt: 'O clima liga e desliga a chuva e os trovões. Ele não muda nada no caso.' }
+      ]);
     }
 
     Object.assign(api, {

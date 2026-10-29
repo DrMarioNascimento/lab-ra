@@ -1,6 +1,16 @@
 {
   "trilhas": 61,
-  "bytes": 22922488,
+  "bytes": 18841052,
   "titulo": "Mecânica respiratória",
-  "duracao": 4
+  "duracao": 4,
+  "texturas": {
+    "malhas": 66,
+    "familias": {
+      "cartilagem": 37,
+      "osso": 26,
+      "musculo": 2,
+      "colageno": 1
+    },
+    "semUV": 52
+  }
 }

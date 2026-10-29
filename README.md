@@ -56,3 +56,10 @@ Sincronizada a revisão 5de49509f8c214dc1a0108a8feb9b20fda3e43b7 do Fisiologia I
 ## Auditoria da implantação
 
 A auditoria de 25/10/2026 corrigiu relevo em objetos com vários materiais e carimbos de cache. Evidências, escopo e limites em [AUDITORIA-RA-2026-10-25.md](AUDITORIA-RA-2026-10-25.md).
+## RA de fisiologia — 25/10/2026
+
+Sincronizada a revisão 1c6c75afd0a5642c2bb0d298d48d85112c6c3b21 do Fisiologia Interativa: textos e placas extrudados e 27 modelos animados com pares GLB/USDZ. Navegação própria do Lab-RA preservada. Validações e limites em biblioteca/fisiologia/REVISAO-VOLUME-MOVIMENTO.md.
+
+## RA dos jogos — 25/10/2026 (tarde)
+
+Copiadas das branches `ra/tempestade-e-movimento` dos três jogos (ainda não mescladas lá): tempestade com chuva que pousa, nevoeiro, relâmpago e trovão; vida nas maquetes d'A Casa, no farol, na Torre de Continuidade e na agência 0688; as obras de Mário César Nascimento projetadas na sala de imprensa do Eco; e o guia de primeira vez nas telas de RA. As adaptações de caminho do Lab-RA foram preservadas; a procedência está em `biblioteca/origens.json` (script `scripts/registrar-jogos.cjs`). Detalhes em `biblioteca/dragon/RA-VOLUME-MOVIMENTO.md`.
