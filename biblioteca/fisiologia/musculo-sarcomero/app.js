@@ -34,6 +34,7 @@ import { usdzComBotoes } from '../ra-botoes-ios.js?v=volume-20261025';
 import { novaMitocondria } from '../mitocondria.js';
 import { criar } from './modelos.js?v=musculo-anatomico-20261003';
 import { aplicarAcabamento } from './acabamento.js?v=acabamento-20261028';
+import { montarBiceps, TEXTO_BICEPS } from './biceps.js?v=biceps-20261029';
 
 const $ = id => document.getElementById(id);
 const canvas = $('scene'), stage = $('stage');
@@ -134,6 +135,19 @@ modelos.forEach((m, i) => {
   m.userData.quadro = { rh: Math.max(t.x, t.z), hv: t.y };
 });
 const sarc = modelos[4];
+
+/* NÍVEL 01 · BÍCEPS BRAQUIAL (biceps.js). O músculo por código continua
+   montado acima e é a reserva: some enquanto o arquivo carrega e volta se ele
+   não chegar. Até lá, rótulos e RA do 01 esperam (musculoPronto). */
+let musculoPronto = false;
+montarBiceps(modelos[0], new URL('../assets/biceps-braquial.glb?v=20261029', import.meta.url).href).then(trocou => {
+  if (trocou) {
+    dados[0][3] = TEXTO_BICEPS.titulo; dados[0][4] = TEXTO_BICEPS.texto; dados[0][5] = TEXTO_BICEPS.tags;
+    TAM_REAL[0] = modelos[0].userData.tamanhoReal;
+  }
+  musculoPronto = true;
+  if (atual === 0) { aplicarTextos(0); if (!transicao) resetCam(); prepararRA(); }
+});
 
 const dados = [
   ['Escala macroscópica', '01 · Músculo', 'Órgão contrátil', 'Músculo esquelético', 'Ventre fusiforme envolvido pelo epimísio. O tendão de origem prende-se a um osso, o músculo cruza a articulação e o tendão de inserção prende-se ao osso seguinte: ao encurtar, o ventre aproxima a inserção da origem e move a articulação. Sob a fáscia já se veem os feixes: o músculo é organizado em fascículos.', 'ventre muscular,epimísio,origem,inserção,articulação,fascículos'],
@@ -251,7 +265,9 @@ const ancoras = {
   2: () => [['sarcolema', V(-1.6, .85, 0)], ['núcleo periférico', V(.4, .8, .3)], ['miofibrilas', V(2.7, .2, 0)], ['mitocôndrias', V(-.6, -.55, .5)]],
   1: () => [['perimísio', V(-1.4, 1.05, 0)], ['fibras musculares', V(2.1, .44, .3)], ['capilar', V(0, -.9, .4)]],
   /* nível 01: origem, articulação e inserção montadas em acabamento.js; o conjunto foi centralizado (desvio) */
-  0: () => { const d = modelos[0].userData.desvio || V(), p = modelos[0].userData.pontos, a = v => v.clone().add(d);
+  0: () => { if (!musculoPronto) return [];
+    if (modelos[0].userData.rotulos) return modelos[0].userData.rotulos;   /* bíceps (biceps.js) */
+    const d = modelos[0].userData.desvio || V(), p = modelos[0].userData.pontos, a = v => v.clone().add(d);
     if (!p) return [['ventre muscular', V(0, 1.06, .4)], ['tendão', V(2.95, .40, 0)], ['osso', V(4.3, .55, 0)], ['epimísio', V(-1.35, -.90, .5)], ['fascículos', V(.5, .84, .58)]];
     return [['ventre muscular', a(V(0, 1.06, .4))], ['fascículos', a(V(.5, .84, .58))], ['epimísio', a(V(1.7, -.52, .5))], ['tendão', a(V(-2.75, -.12, .06))],
       ['origem', a(p.origem)], ['articulação', a(p.articulacao.clone().add(V(.05, .5, .32)))], ['inserção', a(p.insercao)], ['osso', a(p.osso)]]; },
@@ -444,7 +460,7 @@ const clock = new THREE.Clock();
 })();
 
 /* ------------------------------------------------------------ RA */
-const TAM_REAL = [.55, .40, .46, .60, .90]; // metros, maior dimensão de cada nível no ambiente
+const TAM_REAL = [.55, .40, .46, .60, .90]; // metros, maior dimensão de cada nível no ambiente (o 01 passa ao tamanho real do bíceps quando ele carrega)
 /* O QUE O IPHONE FAZ HOJE, e por que a página precisa dizer.
    O Quick Look abre no modo Objeto: o modelo aparece parado sobre fundo claro,
    e a câmera só entra depois de um toque em "AR", no alto da folha. O iOS
@@ -478,6 +494,7 @@ const maiorLado = obj => { const c = clonarSemDados(obj); c.visible = true; c.po
 const LADO_REPOUSO = { 3: maiorLado(modelos[3]), 4: maiorLado(modelos[4]) };
 function prepararRA() {
   if (typeof prepararBotoes === 'function') prepararBotoes();
+  if (atual === 0 && !musculoPronto) { clearTimeout(timer); E.ar.disabled = true; E.status.textContent = 'Carregando o bíceps…'; return; }
   clearTimeout(timer); timer = setTimeout(async () => {
     const id = ++prepId; E.ar.disabled = true; E.status.textContent = 'Preparando o modelo para a câmera…';
     try {

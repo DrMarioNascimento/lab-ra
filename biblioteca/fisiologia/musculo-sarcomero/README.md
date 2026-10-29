@@ -10,6 +10,17 @@ Experiência independente em `Fisiologia Interativa`, acessível pelo destaque R
 
 Origem: `DrMarioNascimento/lab-ra/musculo-sarcomero`, revisão aprovada `6792eb577870bb72933b845791743bc872bcbad2`. O arquivo `modelos.js` foi transferido sem alterações: ventre contínuo, janela no epimísio, fascículos, tendões e os cinco níveis mantêm a versão aprovada. Não há base em nenhum nível.
 
+## Nível 01 · bíceps braquial modelado (29/10/2026)
+
+- O músculo do nível 01 deixou de ser o fuso desenhado por código: agora é o bíceps braquial com escápula, úmero, rádio e ulna (`../assets/biceps-braquial.glb`), carregado por `biceps.js`. Fica de pé, na posição anatômica, com a face anterior para a câmera; o giro da página é em torno do eixo vertical.
+- O arquivo veio do designer (`biceps_tendoes_novos.glb`) e foi corrigido antes de entrar: saiu uma peça solta (cone branco a uns 20 cm do braço) e o tendão distal antigo, que terminava no ar à frente do rádio, foi trocado por um tendão contínuo que nasce dentro do ventre, desce à frente do cotovelo, mergulha entre rádio e ulna e se prende na tuberosidade do rádio (face anteromedial, ~2,5 cm abaixo da cabeça do rádio).
+- Peso: de 6,0 MB para 0,9 MB (rádio e ulna vinham em cinco partes com os mesmos vértices; ossos simplificados sem perda visível; texturas no tamanho do que cobrem; malha em Draco, decodificador do three 0.180 no jsDelivr). O USDZ do iPhone fica em ~11,7 MB, menor que o do músculo por código (~12,7 MB).
+- Rótulos do 01: ventre muscular, fascículos, epimísio, cabeça longa, origem da cabeça curta (processo coracoide), articulação do cotovelo, inserção (tuberosidade do rádio) e úmero. Texto do painel reescrito para o bíceps: duas cabeças na escápula, cruza ombro e cotovelo, flexiona o cotovelo e supina o antebraço.
+- RA do 01 em tamanho real (≈0,37 m de altura).
+- Reserva: `modelos.js` (aprovado, intocado) e `acabamento.js` continuam montando o músculo por código. Ele fica escondido enquanto o arquivo carrega e volta se o GLB não chegar em 20 s; enquanto isso, rótulos e RA do 01 esperam.
+- Limites conhecidos: o ventre das duas cabeças é uma peça só; o antebraço termina cortado; não há aponeurose bicipital; com zoom muito forte do lado de fora do cotovelo ainda aparecem pequenas sobras da malha dos ossos.
+- Versões anteriores: `app.js_SUBSTITUIDO_2026-10-29`, `README.md_SUBSTITUIDO_2026-10-29`, `../assets/ATRIBUICAO.md_SUBSTITUIDO_2026-10-29` e `../manifesto.json_SUBSTITUIDO_2026-10-29`.
+
 ## Controles
 
 - Músculo → Fascículo → Fibra → Miofibrila → Sarcômero: níveis e escalas distintas.
@@ -30,7 +41,7 @@ Origem: `DrMarioNascimento/lab-ra/musculo-sarcomero`, revisão aprovada `6792eb5
 
 A banda A mantém 1,6 µm; banda I e zona H variam com o comprimento, conforme a implementação aprovada. A curva de tensão ativa relativa é uma aproximação por trechos da relação isométrica em fibras musculares de rã de [Gordon, Huxley e Julian (1966)](https://pubmed.ncbi.nlm.nih.gov/5921536/). Não é força absoluta, tensão passiva, curva força–velocidade nem uma medida clínica individual. As contas e o sarcômero não foram modificados na transferência.
 
-Modelos e texturas são procedurais, criados no código do projeto. Não foi acrescentado um modelo anatômico de terceiros. A autoria e a licença principal permanecem em [LICENSE.md](../../LICENSE.md); Three.js e model-viewer conservam suas licenças próprias.
+Os níveis 02 a 05 e a reserva do 01 são procedurais, criados no código do projeto. O nível 01 usa o bíceps modelado (`../assets/biceps-braquial.glb`); procedência em [ATRIBUICAO.md](../assets/ATRIBUICAO.md). A autoria e a licença principal permanecem em [LICENSE.md](../../LICENSE.md); Three.js e model-viewer conservam suas licenças próprias.
 
 ## RA com botões no iPhone (revisão de 05/10/2026; botão único em 09/10/2026)
 

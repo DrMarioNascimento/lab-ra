@@ -24,7 +24,11 @@
     },
     {
       "path": "assets/ATRIBUICAO.md",
-      "sha256": "0c32fa82939ab29ba656b117804d85be81252e8e9036f3247af5cf6a6993888d"
+      "sha256": "6e961301db4594d668bbf0d16d7ee7859322ac3c776c9e113f1f026b7f5c6bc8"
+    },
+    {
+      "path": "assets/biceps-braquial.glb",
+      "sha256": "7ad721d8df74c6736ce52a620f5ffdb9d16318d677e30d16535100bb0e83b83a"
     },
     {
       "path": "assets/coracao.glb",
@@ -240,7 +244,11 @@
     },
     {
       "path": "musculo-sarcomero/app.js",
-      "sha256": "33067d00ea5415f59806b4a832d06fbbde21c2a03edb40a959801580e095dbce"
+      "sha256": "6ebb6aa700cabd08d162f5f26d31ad7e9609fa3390810ef4437ebc1f98032516"
+    },
+    {
+      "path": "musculo-sarcomero/biceps.js",
+      "sha256": "7d0ce48ae7c95194bf509e5dc9e63e717aaf43183ef5e109ee7c45d2a8e60a23"
     },
     {
       "path": "musculo-sarcomero/index.html",
@@ -252,7 +260,7 @@
     },
     {
       "path": "musculo-sarcomero/README.md",
-      "sha256": "3149b902629234fc053f295cc4d407afe55c050490b106bbefd13229dde50c1f"
+      "sha256": "6616948f3b83c2ad46a6c943f64700d4a489b54a9efccb0a9cf0e46891967d97"
     },
     {
       "path": "musculo-sarcomero/style.css",
