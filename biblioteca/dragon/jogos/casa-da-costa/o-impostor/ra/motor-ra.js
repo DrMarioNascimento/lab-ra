@@ -344,12 +344,10 @@
     };
   }
 
-  /* Adianta o download do motor enquanto o jogador lê a tela. */
+  /* O rastreador só é baixado por entrar(), após o pedido de RA.
+     A exploração 3D não precisa antecipar os arquivos da câmera. */
   function preparar() {
-    if (!ehCelular() || global.OI_SEM_SLAM) return;
-    if (navigator.xr && navigator.xr.isSessionSupported) {
-      navigator.xr.isSessionSupported('immersive-ar').then(function (ok) { if (!ok) carregarXR8().catch(function () {}); }, function () { carregarXR8().catch(function () {}); });
-    } else carregarXR8().catch(function () {});
+    return Promise.resolve();
   }
 
   global.OIRA = { criar: criar, preparar: preparar, ehIOS: ehIOS, ehCelular: ehCelular, carregarXR8: carregarXR8 };

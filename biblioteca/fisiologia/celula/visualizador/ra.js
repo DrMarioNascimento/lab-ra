@@ -71,6 +71,5 @@ export function configureAR({getVariant=()=> 'completa',subscribe=()=>{},onPrese
  });
  if(platform==='android'){
   prepare.textContent='Preparar realidade aumentada';
-  prepareModel();
  }
 }

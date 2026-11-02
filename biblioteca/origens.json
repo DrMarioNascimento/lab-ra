@@ -2600,6 +2600,308 @@
           "sha256": "22e747ab6a228df22c687ceceeeb8a9b8c966e2cc5d79480d5ef7496a51fcd2e"
         }
       ]
+    },
+    {
+      "data": "2026-11-02",
+      "tipo": "adaptacao-local",
+      "fonte": "DrMarioNascimento/lab-ra",
+      "commit_fonte": "651c7b9c3554718798faff88942ad68b38b1b2a2",
+      "criterio": "Entrega em rede limitada sem substituir os protótipos locais. Ciclos leves publicados são uma escolha explícita; arquivos geométricos e animações locais preservados.",
+      "arquivos": [
+        {
+          "arquivo": "biblioteca/fisiologia/manifesto.json",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "64c05b2048d59dcbafad457263da489e25b0a8ad8261356676b95334fe4dc9a3",
+          "sha256": "441b169b710950535431ac6c3c2a27c985f3313b74b77c615ecb3a0fcfdc78b4"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/assets/ATRIBUICAO.md",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "0c32fa82939ab29ba656b117804d85be81252e8e9036f3247af5cf6a6993888d",
+          "sha256": "6e961301db4594d668bbf0d16d7ee7859322ac3c776c9e113f1f026b7f5c6bc8"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/tabs.js",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "93694285a1a1c989d105445451c82255ff6ce1dedc4b761eb59a054603beb08b",
+          "sha256": "0c923d759b0e86e9296df8e67ad4afce50c088f11383e6dbf90cb23bda8eb914"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/coracao/app.js",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "321543887d28edbc9052046412fbf89d77a123dd2464130fc922181a666e262e",
+          "sha256": "9687a294c2ebf35481bea4702e88413cd4604ece280501f4a79be0db0ceba1d5"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/juncao-neuromuscular/app.js",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "8b3d54d8f8376509a21f9ca0bed2454a79d24136dbd8773107256cd3a242189f",
+          "sha256": "def5fced1cf8c076c2d3aa3d31408519eabec816107a4f05b76cf68d99ec7e26"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/app.js",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "86a05bfd8b5b80820bfb743e739cd312c0b4cb9e5540e6897502f421b24ef463",
+          "sha256": "ac882ac3f21f878777503b37e7395ac42fa3a24c2eba05ab02a38b10ad354c13"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/README.md",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "cb78afde047ecd75c7352fecee018b5393d03aab76d0e2b48af274f8e3b576b7",
+          "sha256": "6616948f3b83c2ad46a6c943f64700d4a489b54a9efccb0a9cf0e46891967d97"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/osso-vivo/app.js",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "e74053bbc4111f444231a85c5f5aeee7ca16413023c2945e16a027898b8a719c",
+          "sha256": "097ebd880ad0a219cc8a01b7a1f95f7fc30546edd1cf3a9e727664cb106500b8"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/pleura/app.js",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "d67c2426f66d0df7debd6c097a6a1319b5ce1eea1f17db3e810eb79482784cc8",
+          "sha256": "26d45b8de4944377cb2a139959b9f9e907587d82e89a6651dd2194d06c850895"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/retorno-venoso/app.js",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "13061ec8fa35ad789e690ab90e745365e150571265c703cc32c7a9db32dfca07",
+          "sha256": "0cbe4bbfba04df43b6bc859a42ba160c70198bf0969d1006f281c05cc891a1fc"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/starling/app.js",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "f0bdd102a647c1474c0637a424df3ec30561b642cdadecf4c7852e99e50c2e0f",
+          "sha256": "8f195eb15f452927ca4a38de7cb2cc7ca23220ebea91ddecbdb00c586496fb20"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/tests/musculo-miofibrila.test.mjs",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "48cb7798d381fc2edc05eb099e24f4555701e13d74019f119b2cbb65017c1a4d",
+          "sha256": "73afed5eaea4116ed4689c4a2b79c9955fea097d1ceb3035472a253f1ca894ec"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/tests/starling-migracao.test.mjs",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "8ea3a4623835ee11c11ed2f611d719b7a04005c37628fe757b5f8c408d047420",
+          "sha256": "44c41de59e381d24cb48efd5fc00514e58f9daee8d466c64d55052b7f2c33e1e"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/app.js",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "dfb5a97b97f9c2987eb25776e071990fba9f1b3fcbafb24f4b62f99b81fc1984",
+          "sha256": "aea05b3ee4d7f83f1490463d2b55b8739fb6a298b93ccc7f102c3db8017179fd"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/index.html",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "6094a0b39e28fe9ed154a15323c0898648ee76d7b4b26fb97f8b77dfc38b18b3",
+          "sha256": "16c11f943fe590f81eccebffe20b55f4746931265dc00eaa324e05a04fd8cf59"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/visualizador/ra.js",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "d218d0909bbef8b00b6889d74857712fe0171cd58e460c14ca199afc266cc3d2",
+          "sha256": "2bacaac426a0d6a59e0cba44e79641be416116f892769b91cfda4204fc758863"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/o-eco-do-amanha/o-impostor/maquete.js",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "d46c055b7e2bca2caabc3eb89368978c72578a58a63ef0418ce160666966bf3e",
+          "sha256": "8ab46ea6fbc57369eb03d7bfce36c4012e228e9dc2931b3fbfbdf3ae7448ee7e"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/o-eco-do-amanha/o-impostor/objeto.js",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "622c46fd5488b290cefb9b62165c4ae8eed8ec59f7cf56d13717c0c05efe8b92",
+          "sha256": "31db9da349f479a796448ff73ab53d2a0d2ea1338ec515e2fa4aba53bb933e7c"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/o-eco-do-amanha/o-impostor/peca3d.js",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "38eec511861e0be890533b77c8137576fc02e8dd1e0b04d65e8ed8c3da519f64",
+          "sha256": "d854cb92869017ea3843090b9a9f891315821ad883c70654cacece455a1290c7"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/o-eco-do-amanha/o-impostor/lib/ac-ra.js",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "a2b1d80248105312080cdc024b409dbf06a822db58844b2c3b3e514141b71f0d",
+          "sha256": "59424e3e31da70de968cdace31ac6f92f7e2c2d3622e15e50042a9fc82842932"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/a-mesa/AC-escrivaninha.html",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "f5555449c6d08a23e4bff6aa215314d5f5c98eaeba9ede92c060cba27dddb8c2",
+          "sha256": "1a67fbaad2b83319ec56b44e8f443bfbdae38d183f8c165040cf2afee229f57d"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/a-mesa/AC-maquete.html",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "cd6c845759b9b110744cf7d49c0699ee0bbbe94aee39b8c05dd9cc91cee46b90",
+          "sha256": "142b55c7e42aa195288792086fc63b8ca8ff0686b1279f1a60c6bf84c4a91cd2"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/livro.html",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "0368e34a47f34272afddce5147e8ae77f448f80a226bb007678d6817d5e08e0e",
+          "sha256": "1144436236f8458a7f39732fa8293091329510cd1a592b8d8a3c8072e54b3efb"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/maquete/index.html",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "fe617866e6e04b3363de5e0a5a7e108ab3192019f2bfa858ff270ef0751c5de3",
+          "sha256": "c9e0899c05e65873f7e2869de3bebe5202da3ca695e1729f95da766ba72dd011"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/ra/motor-ra.js",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "03f0d2ebd5fbb9a251ecc90a355e6dd143cd02183465b02eabdd188afca3bd6b",
+          "sha256": "9ff64eaaf44f6eae914326eca191b5e330e1f04df6fb5530712921262ff04b11"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/maquete/js/ac-ra.js",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "a2b1d80248105312080cdc024b409dbf06a822db58844b2c3b3e514141b71f0d",
+          "sha256": "59424e3e31da70de968cdace31ac6f92f7e2c2d3622e15e50042a9fc82842932"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/a-mesa/js/ac-ra.js",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "a2b1d80248105312080cdc024b409dbf06a822db58844b2c3b3e514141b71f0d",
+          "sha256": "59424e3e31da70de968cdace31ac6f92f7e2c2d3622e15e50042a9fc82842932"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/maquete.js",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "e65afb93e601121326264e275fb9c73684482e149a897aa72ef104a8f81f6d2a",
+          "sha256": "8a7a5265af1bca0298a3f7a7f1de4e1e043cbff4487342ac1f8b4ee8260c7271"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/index.html",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "e8ee4de0a09ed7d82d0caf97209a9b28db51190309e8ce389f9fbb17d53c3685",
+          "sha256": "04d6fbe59a2ad15522a70e5733411e892b53ae3f4b9eab627d51af912fc2e4d8"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/membrana/app.js",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "a661d93765f64c76d95d60599e5633c99f1d2598562d0d705bf68a7c1c976b7f",
+          "sha256": "127fd283ca7a8c4ceaa255a8c231f44cb4ff1b79fb6add2b12fccdf13cbb3585"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/celula/membrana.html",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "1f77d6eceec7ad6b687183241ddb0c500d3f7b1703dce6d8a3e623972408b483",
+          "sha256": "49cb5064325e12589ae59ab349e8163757adfdfb8246dec7c23facac894e8201"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/ciclo-portatil.js",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "c85c2fd11ebca322272c0841b8ea5b3a1776583e4f786760e4e73ceb75db3a66",
+          "sha256": "47124402fd414c3648ed7985384335b7906dc996cc97fe07ec735bff03e340ec"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/coracao/index.html",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "21dbc803a67da90d349ddf8b241eaf6e29d6635fe68dc103bfadc4f9185bc847",
+          "sha256": "1c400216782efd4560c6f68d08990f065d22ba52977d788ddcaa14be27bfea2d"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/juncao-neuromuscular/index.html",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "af60de67691b43d4c0f8235a14f3af8b09be238b1a9c4e4f74b5f6a096477e26",
+          "sha256": "884adff9027b2f8da6f6478ac983ee76de6de470faecc883e96bd7482be93bac"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/index.html",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "a679e3c9139d09f171fa95bd99124b4ed58edf05e8a869096c47a60354138d01",
+          "sha256": "71652eebbf157dc9988009f2766a0ad2a35af3975b5c052b45846a91b0152afb"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/osso-vivo/index.html",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "780a4161fb80009c1c13ce1e05add9cd203cee2846201f9bbaeeed310c1354d9",
+          "sha256": "66a87bbc86cc6a8c2ab69b3e077dc856973b072ed5f759044cec6d26b0cf6d0b"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/pleura/index.html",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "12482a0b5240c2bf1af4402e6bd47cd4d3f861f02002f4478afb18ed655520ae",
+          "sha256": "2a55da285834ad80c699d534edcbe87dce51382ef075035b60c3981af2a110d1"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/retorno-venoso/index.html",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "8bf0d293ae196f5021c4e615ece6a54fbee212e1c860dc430126342142ed94bb",
+          "sha256": "95950c7ac709bc27f2a72dc98271a8cbb84691ebda2a761ef11396deb3a6fedd"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/starling/index.html",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "094ffed8d4957fa4f43be62d3c96f51ff01f2e4cd624e203f886bb70657ca520",
+          "sha256": "1718af740e07bf2a8c45d440d568da03b1ac8aff046d0b175b22dfc02039826f"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/tests/membrana-movimento.test.mjs",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "af80cac8c213cc185eee330070f89a600085ee241d362faa789269df199748ad",
+          "sha256": "ad305e2dca59c321b593c5d47e05968b8f0790faf5964d3d6588a91d44668db6"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/bandeja.html",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "b3d89bf2736ed4b72a8dc45576cdcd7c9062ffa8fa0bd36afff7862a0fab3230",
+          "sha256": "e4d4029547af85e87bbebb8946dc421435fb3610fe1e1a4406bcf920094b0db9"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/escrivaninha.html",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "60ea5af6218e9f2a65dc7e829c65dfdd3f6307bc8dda703817736516e3df7d86",
+          "sha256": "3b9e48e82044fc05aa3b067c26c0993bd3cf4c1f76318a11c8d7ad1657c70afa"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/farol.html",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "5c52ab7743d54bdc43ba372560bce11e98056dcd6a46fa495eb62abb4ea4735e",
+          "sha256": "84af81e0e8ec11abc3aa632534932fe8d586fdf5b7446f01d8f82da3144710fd"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/jardim.html",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "e3113cf8d51782e0611b95579fc1c9097c5b0a4503f27a769835ac7848d3add0",
+          "sha256": "253f5bde254e4487249af80de252e6cee1c21fa17934247f28487806d094fa29"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/quarto.html",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "2c9ea28ddbd51de2d2e30856c9230a5324214ba41f04582e43e00fb37091f80e",
+          "sha256": "f42ad7123398211ebd33debc74185dc5cd48244db715085df0c2110501a850b3"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/relogio.html",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "487368170037927d0fd06b38f4f35619f06dfa07d75e54d5bdb97cf77a8243d9",
+          "sha256": "ac31bfaad0ae14cb89345fcb119dfe6b5afe0c39bebec470f1d764e02163ab4a"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/estudo.html",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "0c28a375ad9006290b0469cd667619714999ef32d03cfa4e4439a5acafe1c6d6",
+          "sha256": "ae6c2771a6b7aa2be046ea911696fb416e5b32f5b5eb337e235ce330ae580003"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/o-eco-do-amanha/o-impostor/estudo.html",
+          "origem": "adaptação local de entrega em rede limitada",
+          "sha256_anterior": "d298de1990a5a1bd1ddc4ae22a6d15cedc09d0341c211715906fd0db67821073",
+          "sha256": "2f4646392e44f420bbe74d7b10cd634061a15d2cd008cd9db5d9d855b0a9adb1"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/rede.js",
+          "origem": "política de prévia opcional",
+          "sha256": "d30b7d3cf12ba279a1e4817b71f2d0551fa602354a12bfa0afebec147f7cbb0d"
+        }
+      ]
     }
   ],
   "ultima_sincronizacao_fisiologia": {

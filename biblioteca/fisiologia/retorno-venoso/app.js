@@ -497,5 +497,5 @@ if (Number.isFinite(grauPedido)) definirGrau(grauPedido, true);
    fotografa uma tela em branco e acusa um defeito que não existe */
 desenhar();
 
-import {instalarCicloPortatil} from '../ciclo-portatil.js';
+import {instalarCicloPortatil} from '../ciclo-portatil.js?v=wifi-20261102';
 instalarCicloPortatil({experiencia:'retorno-venoso',nivel:()=>atual+1,niveis:[3,4]});

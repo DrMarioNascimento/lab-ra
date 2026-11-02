@@ -1,10 +1,11 @@
+import {deferPreview} from '../../rede.js?v=wifi-20261102';
 import {DURACAO,estadoPelicula,estadoTransporte} from './ciclo.js';
 import {nativePlatform} from '../visualizador/ra.js?v=volume-20261025';
 const $=id=>document.getElementById(id),viewer=$('membrane-model'),launch=$('launch-ar'),status=$('ar-status');
 const webgl=(()=>{try{const gl=document.createElement('canvas').getContext('webgl2');if(!gl)return false;gl.getExtension('WEBGL_lose_context')?.loseContext();return true;}catch{return false;}})();
 const platform=nativePlatform(),query=new URLSearchParams(location.search);
 let mode='',ready=false,requested='',links={},retry=0,playing=!matchMedia('(prefers-reduced-motion: reduce)').matches,active=true,presenting=false;
-let frame=0,lastPhase='';
+let frame=0,lastPhase='',previewOptedIn=!deferPreview();
 const content={
  pelicula:{title:'Onde está a carga?',subtitle:'Acompanhe a separação das cargas junto à membrana — e veja o que muda quando o potencial se inverte.',alt:'Bicamada lipídica com cargas animadas nas duas faces: repouso, inversão e retorno',legend:'<span class="warm">+ cargas positivas</span><span class="cool">− cargas negativas</span>',cards:[['Duas faces, uma diferença','As cargas se reorganizam junto às superfícies. No repouso, o lado interno é negativo em relação ao externo.'],['O volume continua quase neutro','A animação amplia as cargas para permitir sua observação. A separação envolve apenas uma fração muito pequena dos íons da célula.'],['Inverter não é carregar a célula inteira','Durante a inversão, a diferença de potencial muda de sinal. Observe a redistribuição perto da membrana em cada lado.']],scope:'Demonstração esquemática em câmera lenta: −70 mV → +35 mV → −70 mV. O tempo de 16 segundos é de animação, não fisiológico. Partículas ampliadas e amostragem reduzida; os números de esferas não representam concentrações. Nesta vista, as cargas se redistribuem em cada lado; a passagem pela membrana é explorada em Travessias.'},
  travessias:{title:'Como atravessar a membrana?',subtitle:'Compare quatro caminhos em movimento: pelo lipídio, por canais, por um transportador e pela bomba que usa ATP.',alt:'Transporte pela membrana animado: gases, canais de potássio e sódio, glicose e bomba sódio-potássio',legend:'<span class="warm">Na⁺ laranja · K⁺ amarelo</span><span class="cool">Glicose lilás · ATP azul</span>',cards:[['Pelo lipídio','O₂ entra e CO₂ sai neste exemplo. Moléculas pequenas e apolares atravessam a bicamada sem uma proteína de transporte.'],['Pelos canais','Os poros seletivos permitem a passagem de íons. Aqui, K⁺ sai e Na⁺ entra: os canais estão abertos e os gradientes favorecem esses sentidos.'],['Pelo transportador','A glicose se liga e atravessa por acesso alternado. Observe a fase ocluída: as duas comportas não ficam abertas ao mesmo tempo.'],['Pela bomba Na⁺/K⁺','Cada ciclo usa ATP para transportar três Na⁺ para fora e dois K⁺ para dentro, contra seus gradientes. A proteína muda de conformação.']],scope:'Movimentos, formas, tamanhos e tempos são representações didáticas. Os fluxos passivos dependem dos gradientes; os sentidos mostrados correspondem ao cenário ilustrado. A bomba mantém gradientes ao longo do tempo: não é ela que produz a repolarização rápida de cada potencial de ação. A glicose atravessa por difusão facilitada, sem consumo direto de ATP.'}
@@ -36,7 +37,10 @@ function requestModel(){
  requested=links.glb+(retry?'&tentativa='+retry:'');
  $('model-poster').hidden=false;$('model-poster').src=links.poster;$('model-poster').alt='Prévia do modelo real: '+content[mode].title;
  viewer.setAttribute('poster',links.poster);viewer.setAttribute('ios-src',links.usdz);
+ $('retry').textContent='Tentar carregar novamente';
  if(!webgl){$('phase').textContent='Prévia do modelo';$('explanation').textContent='Este navegador não disponibilizou a visualização 3D. A imagem mostra o modelo real da experiência.';status.textContent=platform==='ios'?'Toque no botão para abrir a animação em RA no iPhone.':'Para explorar o movimento e a RA, abra em um navegador com suporte a 3D, como o Chrome de um Android compatível.';return;}
+ if(!previewOptedIn){$('phase').textContent='Prévia 3D opcional';$('retry').hidden=false;$('retry').textContent='Carregar prévia 3D';status.textContent=platform==='ios'?'Abra diretamente a RA ou carregue a prévia 3D, se desejar.':'Carregue a prévia 3D quando quiser explorar o modelo.';return;}
+
  viewer.setAttribute('src',requested);
  status.textContent=platform==='ios'?'O modelo animado já pode ser aberto no iPhone. A prévia está carregando.':'Carregando o modelo animado. Aguarde “Pronto” para abrir a RA.';
 }
@@ -75,6 +79,7 @@ viewer.addEventListener('load',event=>{
  status.textContent=platform==='ios'||viewer.canActivateAR?'Pronto. Toque em Abrir em realidade aumentada para ver o ciclo em movimento.':'Modelo pronto para explorar aqui. Para RA, abra no Safari do iPhone ou no Chrome de um Android compatível.';
 });
 viewer.addEventListener('error',()=>{
+ if(!previewOptedIn)return;
  ready=false;$('model-poster').hidden=false;launch.disabled=platform!=='ios';['play','restart','speed','timeline','reset-view'].forEach(id=>$(id).disabled=true);
  $('phase').textContent='Prévia 3D indisponível';$('explanation').textContent='A imagem mostra o modelo real. Tente carregar novamente ou abra em um navegador compatível.';
  status.textContent=platform==='ios'?'Você ainda pode abrir o modelo animado em RA no iPhone pelo botão.':'Não foi possível carregar a prévia 3D neste navegador. Tente novamente ou abra no Chrome do Android.';$('retry').hidden=false;
@@ -85,7 +90,7 @@ viewer.addEventListener('ar-status',event=>{
  presenting=s==='session-started'||s==='object-placed';
  if(presenting){viewer.timeScale=1;viewer.play();}else syncPlayback();
 });
-$('retry').onclick=()=>{retry++;requestModel();};
+$('retry').onclick=()=>{previewOptedIn=true;retry++;requestModel();};
 $('play').onclick=()=>{playing=!playing;syncPlayback();};
 $('restart').onclick=()=>{viewer.currentTime=0;playing=true;syncPlayback();showPhase();};
 $('speed').onchange=syncPlayback;
