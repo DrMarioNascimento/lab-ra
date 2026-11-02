@@ -17,7 +17,7 @@ test('biblioteca apresenta dois cards e duas ilustracoes sem links',()=>{
 });
 test('todos os acessos do catalogo existem localmente',()=>{
  for(const [,href] of page.matchAll(/href="([^"]+)"/g)){
-  const url=new URL(href,root);if(!url.pathname.endsWith('.html')&&!url.pathname.endsWith('.css')&&!url.pathname.endsWith('.webp'))url.pathname=url.pathname.replace(/\/$/,'')+'/index.html';
+  const url=new URL(href,root);if(url.protocol!=='file:')continue;if(!url.pathname.endsWith('.html')&&!url.pathname.endsWith('.css')&&!url.pathname.endsWith('.webp'))url.pathname=url.pathname.replace(/\/$/,'')+'/index.html';
   assert.ok(existsSync(fileURLToPath(url)),href);
  }
 });

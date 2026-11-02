@@ -38,7 +38,7 @@ function harness(platform='android',webgl=true){
  const el=id=>{if(!elements.has(id))elements.set(id,new El(id));return elements.get(id);};
  const document={getElementById:el,querySelector:el,createElement:tag=>new El(tag),body:new El('body'),hidden:false};
  const parent={postMessage:(d,o)=>posts.push([d,o])};
- const context=vm.createContext({document,parent,window:{top:{document}},location:{href:'https://example.test/ra/celula/membrana.html?nivel=4',origin:'https://example.test',search:'?nivel=4'},URL,URLSearchParams,console,setTimeout(){},matchMedia:()=>({matches:false}),nativePlatform:()=>platform,requestAnimationFrame:()=>1,cancelAnimationFrame(){},ResizeObserver:class{constructor(cb){this.cb=cb;}observe(){this.cb();}},addEventListener:(t,fn)=>events[t]=fn,DURACAO,estadoPelicula,estadoTransporte});
+ const context=vm.createContext({document,parent,window:{top:{document}},location:{href:'https://example.test/ra/celula/membrana.html?nivel=4',origin:'https://example.test',search:'?nivel=4'},URL,URLSearchParams,console,setTimeout(){},matchMedia:()=>({matches:false}),nativePlatform:()=>platform,deferPreview:()=>platform==='ios',requestAnimationFrame:()=>1,cancelAnimationFrame(){},ResizeObserver:class{constructor(cb){this.cb=cb;}observe(){this.cb();}},addEventListener:(t,fn)=>events[t]=fn,DURACAO,estadoPelicula,estadoTransporte});
  const source=read('membrana/app.js').replace(/^import .*;\n/gm,'').replaceAll('import.meta.url',"'https://example.test/ra/celula/membrana/app.js'");
  vm.runInContext(source,context);
  return {el,events,parent,clicks,context};

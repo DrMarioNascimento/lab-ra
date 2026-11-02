@@ -604,5 +604,5 @@ onContracao();
 const pedido = parseInt(new URLSearchParams(location.search).get('nivel'), 10);
 if (Number.isFinite(pedido) && pedido >= 1 && pedido <= 5) irDireto(pedido - 1); else prepararRA();
 
-import {instalarCicloPortatil} from '../ciclo-portatil.js';
+import {instalarCicloPortatil} from '../ciclo-portatil.js?v=wifi-20261102';
 instalarCicloPortatil({experiencia:'musculo-sarcomero',nivel:()=>atual+1,niveis:[5]});

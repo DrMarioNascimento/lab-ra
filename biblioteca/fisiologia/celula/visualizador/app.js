@@ -1,3 +1,4 @@
+import {deferPreview,optionalPreview} from '../../rede.js?v=wifi-20261102';
 import {configureAR} from './ra.js?v=volume-20261025';
 import {configureLayers} from './layers.js?v=celula-v3';
 import * as T from 'three';
@@ -17,7 +18,8 @@ catch(error){
  for(const id of ['nuc','motion','speed','reset'])button(id).disabled=true;
  console.warn('Prévia 3D indisponível',error);
 }
-if(renderer) init().catch(error=>{status.textContent='Não foi possível carregar a prévia. Recarregue a página ou abra o modelo em RA.';console.error(error);});
+if(renderer&&deferPreview())for(const id of ['nuc','motion','speed','reset'])button(id).disabled=true;
+if(renderer){if(deferPreview())optionalPreview({container:stage,load:async()=>{await init();for(const id of ['motion','speed','reset'])button(id).disabled=false;},status,getVariant:layers.getVariant,subscribe:layers.subscribe});else init().catch(error=>{status.textContent='Não foi possível carregar a prévia. Recarregue a página ou abra o modelo em RA.';console.error(error);});}
 async function init(){
  renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.localClippingEnabled=true;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;stage.append(renderer.domElement);
  const scene=new T.Scene(),camera=new T.PerspectiveCamera(38,1,.01,100),controls=new OrbitControls(camera,renderer.domElement);

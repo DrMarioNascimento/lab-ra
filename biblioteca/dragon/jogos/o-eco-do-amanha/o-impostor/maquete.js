@@ -31,7 +31,7 @@
  var climaRA=null;
   var BASE = (function () { var s = document.currentScript && document.currentScript.src; return s ? s.replace(/[^/]*$/, '') : ''; })();
   var LIB = BASE + 'lib/';
-  var SCRIPTS = [LIB + 'three.min.js', BASE + 'ra-textos-volume.js?v=volume-20261025-auditoria', BASE + 'ra-clima.js', LIB + 'GLTFLoader.js', LIB + 'meshopt_decoder.js', LIB + 'OrbitControls.js', LIB + 'ac-ra.js', LIB + 'ac-maquete-ra.js'];
+  var SCRIPTS = [LIB + 'three.min.js', BASE + 'ra-textos-volume.js?v=volume-20261025-auditoria', BASE + 'ra-clima.js', LIB + 'GLTFLoader.js', LIB + 'meshopt_decoder.js', LIB + 'OrbitControls.js', LIB + 'ac-ra.js?v=wifi-20261102', LIB + 'ac-maquete-ra.js'];
   var MODELO = BASE + 'modelos/torre.glb';
 
   /* metros do modelo → "1 de pegada" do motor de RA (o lote tem ~97 m: ~1 de pegada, ≈ 42 cm na mesa) */
@@ -207,7 +207,7 @@
     });
     extras.forEach(function (n) { n.traverse(function (o) { o.userData.circ = n.name; }); });
     if (lote) lote.traverse(function (o) { o.userData.lote = true; });
-    interiorSubsolo(); interiorImprensa(); enfeites(); interioresDoModelo();
+    interiorSubsolo(); interiorImprensa(); enfeites();
   }
 
   /* ── os interiores do designer (11/10/2026): int-subsolo-central-energia.glb e int-sala-de-imprensa.glb.
@@ -221,10 +221,12 @@
     x.fillStyle = '#86e1ea'; x.font = '700 34px "DM Mono",monospace'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('VESTCHIP · TRANSMISSÃO DAS 06H00 · EM ESPERA', 512, 50);
     var tx = new THREE.CanvasTexture(c); tx.encoding = THREE.sRGBEncoding; malha.material = new THREE.MeshBasicMaterial({ map: tx, toneMapped: false });
   }
-  function interioresDoModelo() {
+  var interioresPendentes = {};
+  function interioresDoModelo(andar) {
     if (/[?&]sem3d=1/.test(global.location.search)) return;
-    Object.keys(INTERIORES).forEach(function (a) {
-      var A = andares[a], I = INTERIORES[a]; if (!A || !A.interior) return;
+    [andar].forEach(function (a) {
+      var A = andares[a], I = INTERIORES[a]; if (!I || !A || !A.interior || interioresPendentes[a]) return;
+      interioresPendentes[a] = true;
       try {
         var L = new global.THREE.GLTFLoader(); if (global.MeshoptDecoder) L.setMeshoptDecoder(global.MeshoptDecoder);
         L.load(BASE + I[0], function (gl) {
@@ -240,8 +242,8 @@
           if (a === '+8') telasImprensa(g);
           A.interior.children.slice().forEach(function (c) { A.interior.remove(c); });
           A.interior.add(g);
-        }, undefined, function () { /* fica o interior feito em código */ });
-      } catch (e) { /* idem */ }
+        }, undefined, function () { delete interioresPendentes[a]; /* a próxima entrada pode tentar de novo */ });
+      } catch (e) { delete interioresPendentes[a]; }
     });
   }
 
@@ -368,6 +370,7 @@
   function entrarNoAndar(a) {
     var A = andares[a]; if (!A || LACRADO[a]) return;
     if (trancado(a)) { if (dentro) sairDoAndar(); abrirGaveta(a); cartaoTrava(a); return; }
+    interioresDoModelo(a);
     dentro = a; tProcura = 0; aberta = null; moldura(null); var i0 = ORDEM.indexOf(a);
     Object.keys(andares).forEach(function (k) {
       var B = andares[k], i = ORDEM.indexOf(k);

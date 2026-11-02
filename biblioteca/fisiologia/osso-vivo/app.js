@@ -194,5 +194,5 @@ addEventListener('pagehide',()=>{disposed=true;++exportId;clearTimeout(arTimer);
 const initial=Number.parseInt(new URLSearchParams(location.search).get('nivel'),10);resize();selecionar(Number.isFinite(initial)?initial-1:0);
 renderer.setAnimationLoop(t=>{const dt=Math.min(.06,Math.max(0,(t-frame)/1000));frame=t;if(running&&!document.hidden){const next=avancar(instante,dt*speed/40,$('loop').checked);instante=next.t;uiElapsed+=dt;const ui=uiElapsed>=.05||next.fim;atualizar(ui);if(ui)uiElapsed=0;if(next.fim)definirRunning(false);}controls.update();posicionarLegendas();renderer.render(scene,camera);});
 
-import {instalarCicloPortatil} from '../ciclo-portatil.js';
+import {instalarCicloPortatil} from '../ciclo-portatil.js?v=wifi-20261102';
 instalarCicloPortatil({experiencia:'osso-vivo',nivel:()=>nivel+1,niveis:[1,2,3,4,5]});
