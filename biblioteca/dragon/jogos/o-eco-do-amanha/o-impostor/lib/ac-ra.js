@@ -59,7 +59,7 @@
       s.onerror = function () { carregando = null; falha(Error('O motor de RA não pôde ser baixado.')); };
       s.onload = function () { setTimeout(pronto, 0); };
       document.head.appendChild(s);
-      setTimeout(function () { if (!global.XR8) { carregando = null; falha(Error('O motor de RA demorou demais para abrir.')); } }, 45000);
+      setTimeout(function () { if (!global.XR8) { carregando = null; falha(Error('O motor de RA demorou demais para abrir.')); } }, 180000);
     });
     return carregando;
   }

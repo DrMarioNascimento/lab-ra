@@ -2726,7 +2726,7 @@
           "arquivo": "biblioteca/dragon/jogos/o-eco-do-amanha/o-impostor/lib/ac-ra.js",
           "origem": "adaptação local de entrega em rede limitada",
           "sha256_anterior": "a2b1d80248105312080cdc024b409dbf06a822db58844b2c3b3e514141b71f0d",
-          "sha256": "59424e3e31da70de968cdace31ac6f92f7e2c2d3622e15e50042a9fc82842932"
+          "sha256": "f35efa979328a497b222356aba27fe655babf86862e9755d824e06a240c028ba"
         },
         {
           "arquivo": "biblioteca/dragon/jogos/casa-da-costa/a-mesa/AC-escrivaninha.html",
@@ -2756,19 +2756,19 @@
           "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/ra/motor-ra.js",
           "origem": "adaptação local de entrega em rede limitada",
           "sha256_anterior": "03f0d2ebd5fbb9a251ecc90a355e6dd143cd02183465b02eabdd188afca3bd6b",
-          "sha256": "9ff64eaaf44f6eae914326eca191b5e330e1f04df6fb5530712921262ff04b11"
+          "sha256": "07f63c696634f84e600b329732afb504626579bddce0e396348efb6b2c88dc03"
         },
         {
           "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/maquete/js/ac-ra.js",
           "origem": "adaptação local de entrega em rede limitada",
           "sha256_anterior": "a2b1d80248105312080cdc024b409dbf06a822db58844b2c3b3e514141b71f0d",
-          "sha256": "59424e3e31da70de968cdace31ac6f92f7e2c2d3622e15e50042a9fc82842932"
+          "sha256": "f35efa979328a497b222356aba27fe655babf86862e9755d824e06a240c028ba"
         },
         {
           "arquivo": "biblioteca/dragon/jogos/casa-da-costa/a-mesa/js/ac-ra.js",
           "origem": "adaptação local de entrega em rede limitada",
           "sha256_anterior": "a2b1d80248105312080cdc024b409dbf06a822db58844b2c3b3e514141b71f0d",
-          "sha256": "59424e3e31da70de968cdace31ac6f92f7e2c2d3622e15e50042a9fc82842932"
+          "sha256": "f35efa979328a497b222356aba27fe655babf86862e9755d824e06a240c028ba"
         },
         {
           "arquivo": "biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/maquete.js",
