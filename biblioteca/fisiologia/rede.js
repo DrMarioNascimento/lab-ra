@@ -6,7 +6,7 @@ export function deferPreview(nav=navigator){
 }
 export function optionalPreview({container,load,status,getVariant=()=>'completa',subscribe=()=>{}}){
  const button=document.createElement('button');button.type='button';button.textContent='Carregar prévia 3D';
- button.style.cssText='margin:16px;padding:12px 18px;min-height:44px;border-radius:12px';
+ button.style.cssText='position:absolute;z-index:2;left:12px;right:12px;bottom:16px;width:calc(100% - 24px);max-width:320px;margin:0 auto;padding:12px 18px;min-height:44px;border-radius:12px';
  const poster=document.createElement('img');poster.alt='Prévia da célula humana';poster.className='cell-poster';
  const update=()=>poster.src='./celula-v3-'+getVariant()+'.webp';update();subscribe(update);container.append(poster,button);
  status.textContent='A prévia 3D é opcional. No iPhone, você pode abrir diretamente a realidade aumentada.';
