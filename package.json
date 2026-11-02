@@ -2,10 +2,10 @@
   "name": "lab-ra",
   "version": "1.0.0",
   "private": true,
-  "description": "LAB-RA \u2014 biblioteca pessoal de cria\u00e7\u00e3o e experimenta\u00e7\u00e3o",
+  "description": "LAB-RA — biblioteca pessoal de criação e experimentação",
   "type": "module",
   "scripts": {
-    "test": "node --test \"tests/*.test.mjs\" biblioteca/fisiologia/tests/starling.test.mjs biblioteca/fisiologia/tests/juncao-neuromuscular.test.mjs"
+    "test": "node --test \"tests/*.test.mjs\" biblioteca/fisiologia/tests/starling.test.mjs biblioteca/fisiologia/tests/juncao-neuromuscular.test.mjs biblioteca/fisiologia/tests/rede-limitada.test.mjs"
   },
   "devDependencies": {
     "@gltf-transform/core": "^4.2.1",

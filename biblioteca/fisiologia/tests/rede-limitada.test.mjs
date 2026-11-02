@@ -40,7 +40,7 @@ if(source.includes('Versão leve publicada'))test('Lab-RA oferece ciclo publicad
 });
 
 test('Película no iPhone mantém o botão nativo pronto sem baixar GLB antes da escolha',async()=>{
- const code=fs.readFileSync(new URL('celula/membrana/app.js',base),'utf8'),start=code.indexOf('async function requestModel()'),end=code.indexOf('\nfunction updateLab()',start),elements=new Map();
+ const code=fs.readFileSync(new URL('celula/membrana/app.js',base),'utf8'),start=code.search(/(?:async )?function requestModel\(\)/),end=code.indexOf('\nfunction updateLab()',start),elements=new Map();
  const el=id=>{if(!elements.has(id))elements.set(id,{attrs:{},setAttribute(k,v){this.attrs[k]=v;}});return elements.get(id);};let decoderCalls=0;
  const c={$:el,viewer:el('membrane-model'),launch:el('launch-ar'),status:el('status'),platform:'ios',previewOptedIn:false,ready:false,lastPhase:'',retry:0,requested:'',links:{glb:'model.glb',usdz:'model.usdz',poster:'model.webp'},mode:'pelicula',content:{pelicula:{title:'Película'}},webgl:true,configureMeshopt:async()=>{decoderCalls++;}};
  vm.createContext(c);vm.runInContext(code.slice(start,end),c);await c.requestModel();assert.equal(c.viewer.attrs['ios-src'],'model.usdz');assert.equal(c.viewer.attrs.src,undefined);assert.equal(c.launch.disabled,false);assert.equal(decoderCalls,0);
