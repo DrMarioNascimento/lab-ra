@@ -50,10 +50,10 @@ function beam(parent,a,b,w,color) {
 }
 const model = new T.Group();
 scene.add(model);
-box(model,0xa4b9cf,0,-.15,0,100,.28,64);
+box(model,0xa4b9cf,0,-.15,0,100,.28,82);
 for(let i=0;i<29;i++){
   const x=(i-14)*2.65, h=1.5+((i*13)%11)*.44;
-  const z=-16-(i%3)*1.5;
+  const z=-26-(i%3)*1.5;
   box(model,i%2 ? 0x8ea4b8 : 0x9aafc2,x,h/2,z,1.4+i%4*.25,h,1.6);
   if(i%4===0) box(model,0x839aae,x,h+.32,z,.12,.65,.12);
 }
@@ -95,7 +95,10 @@ for(let i=0;i<12;i++){
 beam(station,[0,4.39,1.56],[.24,4.53,1.56],.062,0x383833);
 beam(station,[0,4.39,1.57],[.14,4.06,1.57],.044,0x383833);
 
-const straight=22, radius=5.1, arc=Math.PI*radius, length=4*straight+2*arc;
+const straight=29, radius=5.1, rearTrackZ=-11.1;
+const curveCenterZ=(radius+rearTrackZ)/2;
+const curveRadius=(radius-rearTrackZ)/2;
+const arc=Math.PI*curveRadius, length=4*straight+2*arc;
 const junctionX=.8;
 function smoothstep(t){
   const n=Math.max(0,Math.min(1,t));
@@ -108,14 +111,14 @@ function mainTrackZ(x){
 }
 function route(distance,lateral=0){
   let s=((distance%length)+length)%length;
-  const r=radius+lateral;
+  const r=curveRadius+lateral;
   if(s<2*straight){const x=-straight+s;return [x,mainTrackZ(x)+lateral];}
   s-=2*straight;
-  if(s<arc){const a=s/radius;return [straight+r*Math.sin(a),r*Math.cos(a)];}
+  if(s<arc){const a=s/curveRadius;return [straight+r*Math.sin(a),curveCenterZ+r*Math.cos(a)];}
   s-=arc;
-  if(s<2*straight)return [straight-s,-r];
-  const a=(s-2*straight)/radius;
-  return [-straight-r*Math.sin(a),-r*Math.cos(a)];
+  if(s<2*straight)return [straight-s,rearTrackZ-lateral];
+  const a=(s-2*straight)/curveRadius;
+  return [-straight-r*Math.sin(a),curveCenterZ-r*Math.cos(a)];
 }
 function branch(t){return [junctionX+t*20,radius+8.8*t*t];}
 function rail(points){
@@ -124,8 +127,8 @@ function rail(points){
   mesh(model,new T.TubeGeometry(path,points.length-1,.035,6,false),0x526471,0,0,0);
 }
 for(const offset of [-.46,.46]){
-  rail(Array.from({length:241},(_,i)=>{
-    const [x,z]=route(i*length/240,offset);
+  rail(Array.from({length:321},(_,i)=>{
+    const [x,z]=route(i*length/320,offset);
     return new T.Vector3(x,.12,z);
   }));
   rail(Array.from({length:31},(_,i)=>{
@@ -135,7 +138,7 @@ for(const offset of [-.46,.46]){
   }));
 }
 const sleeperGeo=new T.BoxGeometry(.19,.10,1.34);
-const mainSleeperCount=178;
+const mainSleeperCount=245;
 const firstBranchSleeper=5;
 const branchSleeperSteps=27;
 const sleeperCount=mainSleeperCount+branchSleeperSteps-firstBranchSleeper+1;
