@@ -230,7 +230,9 @@ function resize(){
   const w=stage.clientWidth,h=stage.clientHeight;
   if(!w||!h)return;
   camera.aspect=w/h;
-  camera.position.set(0,elevated?32:7.2,elevated?31:Math.max(25,53/camera.aspect));
+  const overviewScale=Math.max(1,2.2/camera.aspect);
+  if(elevated) camera.position.set(0,56*overviewScale,49*overviewScale);
+  else camera.position.set(0,7.2,Math.max(25,53/camera.aspect));
   camera.lookAt(0,elevated?1.9:3.65,0);camera.updateProjectionMatrix();renderer.setSize(w,h,false);
 }
 new ResizeObserver(resize).observe(stage);
