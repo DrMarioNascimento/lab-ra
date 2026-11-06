@@ -10,7 +10,8 @@
 <small>LAB‑RA · EXPERIMENTO</small><h1>Dilema do Bonde em 3D</h1>
 <p>Siga o bonde pela frente da estação e acompanhe seu retorno pelo trilho ao fundo.</p>
 <div id="stage"><p id="fallback" role="status">Carregando a cena 3D…</p></div>
-<nav aria-label="Controles da cena"><button id="play" disabled>Pausar</button><button id="reset" disabled>Recomeçar</button><button id="slow" aria-pressed="false" disabled>Câmera lenta</button><button id="view" aria-pressed="false" disabled>Vista elevada</button></nav>
+<nav aria-label="Controles da cena"><button id="play" disabled>Pausar</button><button id="reset" disabled>Recomeçar</button><button id="slow" aria-pressed="false" disabled>Câmera lenta</button><button id="view" aria-pressed="false" disabled>Vista elevada</button><button id="ar" hidden>Colocar na mesa em RA</button></nav>
+<p id="arHelp" role="status" hidden></p>
 <p id="phase"></p>
 </main>
 <script type="module">
@@ -18,7 +19,7 @@ const get = id => document.getElementById(id);
 try {
 const T = await import('https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js');
 const stage = get('stage');
-const renderer = new T.WebGLRenderer({antialias:true});
+const renderer = new T.WebGLRenderer({antialias:true,alpha:true});
 renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));
 renderer.toneMapping = T.ACESFilmicToneMapping;
 renderer.setClearColor(0xeaf0f5);
@@ -228,7 +229,7 @@ marker('1',singleX,1.98,singleZ+.06);
 let elevated=false, playing=!matchMedia('(prefers-reduced-motion: reduce)').matches, rate=1, distance=9, last;
 function resize(){
   const w=stage.clientWidth,h=stage.clientHeight;
-  if(!w||!h)return;
+  if(!w||!h||renderer.xr.isPresenting)return;
   camera.aspect=w/h;
   const overviewScale=Math.max(1,2.2/camera.aspect);
   if(elevated) camera.position.set(0,56*overviewScale,49*overviewScale);
@@ -237,8 +238,84 @@ function resize(){
 }
 new ResizeObserver(resize).observe(stage);
 resize();
-function frame(now){
-  if(playing&&last!==undefined) distance=(distance+Math.min((now-last)/1000,.05)*5.7*rate)%length;
+const arButton=get('ar');
+const arHelp=get('arHelp');
+const reticle=new T.Mesh(
+  new T.RingGeometry(.035,.045,40).rotateX(-Math.PI/2),
+  new T.MeshBasicMaterial({color:0x2b87ff,side:T.DoubleSide})
+);
+reticle.visible=false;
+scene.add(reticle);
+let hitSource=null;
+let placed=false;
+renderer.xr.enabled=true;
+renderer.xr.setReferenceSpaceType('local');
+function arMessage(message){
+  arHelp.hidden=false;
+  arHelp.textContent=message;
+}
+async function openAR(){
+  arButton.disabled=true;
+  let session;
+  try{
+    session=await navigator.xr.requestSession('immersive-ar',{requiredFeatures:['hit-test']});
+    session.addEventListener('end',()=>{
+      hitSource?.cancel();
+      hitSource=null;
+      placed=false;
+      reticle.visible=false;
+      model.position.set(0,0,0);
+      model.scale.setScalar(1);
+      model.visible=true;
+      renderer.setClearAlpha(1);
+      arButton.disabled=false;
+      arMessage('Para reposicionar a maquete, abra a RA novamente.');
+    },{once:true});
+    await renderer.xr.setSession(session);
+    renderer.setClearAlpha(0);
+    model.visible=false;
+    const viewer=await session.requestReferenceSpace('viewer');
+    const source=await session.requestHitTestSource({space:viewer});
+    if(renderer.xr.getSession()!==session){
+      source.cancel();
+      return;
+    }
+    hitSource=source;
+    session.addEventListener('select',()=>{
+      if(!reticle.visible||placed)return;
+      model.position.copy(reticle.position);
+      model.scale.setScalar(.008);
+      model.visible=true;
+      reticle.visible=false;
+      distance=9;
+      placed=true;
+    });
+  }catch(error){
+    if(session&&renderer.xr.getSession()===session)await session.end().catch(()=>{});
+    arButton.disabled=false;
+    arMessage('A sessão de RA não abriu. Você pode continuar na vista 3D.');
+    console.error(error);
+  }
+}
+if(navigator.xr){
+  navigator.xr.isSessionSupported('immersive-ar').then(supported=>{
+    if(!supported)return;
+    arButton.hidden=false;
+    arButton.onclick=openAR;
+    arMessage('Em RA, aponte para a mesa e toque quando o círculo azul aparecer.');
+  }).catch(()=>{});
+}
+function frame(now,xrFrame){
+  if(xrFrame&&hitSource&&!placed){
+    const hit=xrFrame.getHitTestResults(hitSource)[0];
+    const pose=hit?.getPose(renderer.xr.getReferenceSpace());
+    reticle.visible=Boolean(pose);
+    if(pose){
+      const {x,y,z}=pose.transform.position;
+      reticle.position.set(x,y+.002,z);
+    }
+  }
+  if((renderer.xr.isPresenting?placed:playing)&&last!==undefined) distance=(distance+Math.min((now-last)/1000,.05)*5.7*rate)%length;
   last=now;
   const [x,z]=route(distance),[nx,nz]=route(distance+.03);
   car.position.set(x,.04,z);car.rotation.y=Math.atan2(z-nz,nx-x);
@@ -246,7 +323,7 @@ function frame(now){
   const label=distance<2*straight?'Primeiro plano · saída pela direita':distance<2*straight+arc?'Curva · fora do enquadramento':distance<4*straight+arc?'Trilho ao fundo · passagem atrás da estação':'Curva · retorno ao primeiro plano';
   if(get('phase').textContent!==label)get('phase').textContent=label;
   renderer.render(scene,camera);
-  requestAnimationFrame(frame);
+
 }
 function syncPlay(){get('play').textContent=playing?'Pausar':'Reproduzir';}
 get('play').onclick=()=>{playing=!playing;syncPlay();};
@@ -254,9 +331,9 @@ get('reset').onclick=()=>{distance=9;};
 get('slow').onclick=()=>{rate=rate===1?.5:1;get('slow').setAttribute('aria-pressed',String(rate===.5));};
 get('view').onclick=()=>{elevated=!elevated;get('view').setAttribute('aria-pressed',String(elevated));resize();};
 syncPlay();
-for(const button of document.querySelectorAll('button'))button.disabled=false;
+for(const button of document.querySelectorAll('nav button'))button.disabled=false;
 get('fallback').remove();
-frame(performance.now());
+renderer.setAnimationLoop(frame);
 } catch(error) {
   get('fallback').textContent='Não foi possível abrir a cena. Confira a conexão e o suporte a WebGL no navegador.';
   console.error(error);
