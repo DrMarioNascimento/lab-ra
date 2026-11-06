@@ -107,6 +107,7 @@ function route(distance,lateral=0){
   const a=(s-2*straight)/radius;
   return [-straight-r*Math.sin(a),-r*Math.cos(a)];
 }
+function branch(t){return [2.6+t*20,radius+8.8*t*t];}
 function rail(points){
   const path=new T.CurvePath();
   for(let i=1;i<points.length;i++)path.add(new T.LineCurve3(points[i-1],points[i]));
@@ -119,21 +120,23 @@ for(const offset of [-.46,.46]){
   }));
   rail(Array.from({length:31},(_,i)=>{
     const t=i/30;
-    return new T.Vector3(2.6+t*20,.12,radius+offset+3.8*t*t);
+    const [x,z]=branch(t);
+    return new T.Vector3(x,.12,z+offset);
   }));
 }
 const sleeperGeo=new T.BoxGeometry(.19,.10,1.34);
-const sleepers=new T.InstancedMesh(sleeperGeo,material(0x79543f),206);
+const sleepers=new T.InstancedMesh(sleeperGeo,material(0x79543f),197);
 const dummy=new T.Object3D();
-for(let i=0;i<206;i++){
+for(let i=0;i<197;i++){
   if(i<178){
     const d=i*length/178,[x,z]=route(d),[nx,nz]=route(d+.05);
     dummy.position.set(x,.045,z);
     dummy.rotation.y=Math.atan2(z-nz,nx-x);
   }else{
-    const t=(i-178)/27;
-    dummy.position.set(2.6+t*20,.045,radius+3.8*t*t);
-    dummy.rotation.y=-Math.atan(7.6*t/20);
+    const t=(i-178+9)/27;
+    const [x,z]=branch(t);
+    dummy.position.set(x,.045,z);
+    dummy.rotation.y=-Math.atan(17.6*t/20);
   }
   dummy.updateMatrix();sleepers.setMatrixAt(i,dummy.matrix);
 }
@@ -184,7 +187,8 @@ function person(x,z,coat){
   box(g,0x614d3b,0,1.53,0,.34,.065,.28);
 }
 for(const x of [7.2,9.1,11])person(x,radius+.08,0x9b7955);
-person(12.5,radius+1.08,0xe1e6e7);
+const [singleX,singleZ]=branch(.45);
+person(singleX,singleZ,0xe1e6e7);
 person(-1.6,7.1,0x2e6392);
 beam(model,[.72,.14,7.15],[.35,.95,7.15],.08,0x5e7189);
 mesh(model,new T.SphereGeometry(.16,16,10),0xc8242d,.35,.95,7.15);
@@ -196,7 +200,7 @@ function marker(label,x,y,z){
   sprite.position.set(x,y,z);sprite.scale.set(.8,.8,.8);model.add(sprite);
 }
 marker('3',9.1,2.03,radius+.18);
-marker('1',12.5,1.98,radius+1.14);
+marker('1',singleX,1.98,singleZ+.06);
 
 let elevated=false, playing=!matchMedia('(prefers-reduced-motion: reduce)').matches, rate=1, distance=9, last;
 function resize(){
@@ -204,7 +208,7 @@ function resize(){
   if(!w||!h)return;
   camera.aspect=w/h;
   camera.position.set(0,elevated?32:7.2,elevated?31:Math.max(25,53/camera.aspect));
-  camera.lookAt(0,1.9,0);camera.updateProjectionMatrix();renderer.setSize(w,h,false);
+  camera.lookAt(0,elevated?1.9:3.65,0);camera.updateProjectionMatrix();renderer.setSize(w,h,false);
 }
 new ResizeObserver(resize).observe(stage);
 resize();
