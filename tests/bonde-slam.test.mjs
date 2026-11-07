@@ -20,7 +20,7 @@ function harness() {
 
 test('SLAM libera ponto visual com pose NORMAL sem exigir deslocamento adicional',async()=>{
   const h=harness();await h.ra.entrar({slam:true});
-  assert.equal(h.config().scale,'absolute');assert.equal(h.config().disableWorldTracking,false);assert.equal(h.camera.position.y,1.2);
+  assert.equal(h.config().scale,'responsive');assert.equal(h.config().disableWorldTracking,false);assert.equal(h.camera.position.y,1.2);
   h.frame(0,undefined,{trackingStatus:'LIMITED',trackingReason:'INITIALIZING'});assert(!h.ra.estado().temMira);
   h.frame(100);assert(h.ra.estado().pronto);assert(h.ra.estado().temMira);
   assert(h.tipos().includes('FEATURE_POINT'));assert.equal(h.ra.pose().elements[14],-1);

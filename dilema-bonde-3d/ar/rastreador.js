@@ -44,8 +44,8 @@ import * as THREE from 'three';
    laço separado deixava a casa um quadro atrás da imagem, e isso se vê como
    um tremor.
 
-   O Bonde usa escala absoluta em metros. A colocação exige pose NORMAL
-   válida e um ponto real retornado pelo rastreador, inclusive FEATURE_POINT. */
+   O Bonde usa a escala responsiva das RAs interativas do Mosaico. A colocação
+   exige pose NORMAL válida e um ponto real do rastreador, inclusive FEATURE_POINT. */
 const motor = (function (global) {
   'use strict';
 
@@ -251,7 +251,7 @@ const motor = (function (global) {
               else { motivo = 'erro'; sair(); }
             }
           };
-          XR8.XrController.configure({ disableWorldTracking: false, scale: 'absolute' });
+          XR8.XrController.configure({ disableWorldTracking: false, scale: 'responsive' });
           XR8.addCameraPipelineModules([XR8.GlTextureRenderer.pipelineModule(), XR8.XrController.pipelineModule(), modulo]);
           try { XR8.run({ canvas: canvasCamera }); }
           catch (e) { falha(e); }
