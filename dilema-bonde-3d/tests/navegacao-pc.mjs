@@ -40,7 +40,13 @@ try {
   await page.mouse.move(700,370);await page.mouse.down();await page.mouse.move(800,420,{steps:8});await page.mouse.up();
   depois=await estado();assert(distancia(panAntes.alvo,depois.alvo)>1);assert(Math.abs(panAntes.dist-depois.dist)<.001);
   assert.equal(depois.rota,antes.rota);relatorio.push('Mouse: giro e deslocamento sem acionar a alavanca');
-  await page.getByRole('button',{name:'Visão geral',exact:true}).click();await page.locator('#cena').focus();
+  await page.getByRole('button',{name:'Girar',exact:true}).click();const direitoAntes=await estado();
+  await page.mouse.move(700,370);await page.mouse.down({button:'right'});await page.mouse.move(780,400,{steps:8});await page.mouse.up({button:'right'});
+  assert(distancia((await estado()).alvo,direitoAntes.alvo)>1);assert.equal((await estado()).rota,antes.rota);
+  const rodaAntes=(await estado()).dist;await page.mouse.wheel(0,-200);
+  await page.waitForFunction(d=>__testePC.camera.position.distanceTo(__testePC.controls.target)<d*.95,rodaAntes);
+  relatorio.push('Botão direito e roda do mouse');
+  await page.getByRole('button',{name:'Visão geral',exact:true}).click();
   let tecladoAntes=await estado();await page.keyboard.press('ArrowUp');assert(distancia((await estado()).alvo,tecladoAntes.alvo)>1);
   await page.keyboard.press('+');assert((await estado()).dist<tecladoAntes.dist);
   await page.keyboard.press('r');assert(distancia((await estado()).cam,antes.cam)<.001);relatorio.push('Teclado: setas, zoom e R');

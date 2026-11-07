@@ -26,7 +26,7 @@ export function criarNavegacao({camera,controls,canvas,maquete,documento=documen
   }
   function focar(nome) {
     assentar();
-    if(nome==='geral') { camera.position.set(0,100,150);controls.target.set(0,0,8); }
+    if(nome==='geral') { camera.position.set(0,100,150);controls.target.set(0,0,8);documento.getElementById('vista').value='geral'; }
     else if(nome==='cima') { camera.position.set(0,180,8.1);controls.target.set(0,0,8); }
     else {
       const objeto=maquete.focos[nome];if(!objeto)return;
@@ -51,7 +51,7 @@ export function criarNavegacao({camera,controls,canvas,maquete,documento=documen
   documento.getElementById('vista').onchange=e=>focar(e.target.value);
   documento.getElementById('visaoGeral').onclick=()=>{focar('geral');documento.getElementById('vista').value='geral';};
   const teclado=e=>{
-    if(e.ctrlKey||e.metaKey||e.altKey||![documento.body,canvas].includes(e.target))return;
+    if(e.ctrlKey||e.metaKey||e.altKey||e.isComposing||e.target.closest('input,textarea,select,[contenteditable="true"]'))return;
     const a={ArrowLeft:()=>mover(-1,0),ArrowRight:()=>mover(1,0),ArrowUp:()=>mover(0,1),ArrowDown:()=>mover(0,-1),'+':()=>zoom(.8),'=':()=>zoom(.8),'-':()=>zoom(1.25),'r':()=>focar('geral'),'R':()=>focar('geral')}[e.key];
     if(a){e.preventDefault();a();}
   };
