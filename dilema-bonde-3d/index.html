@@ -22,13 +22,20 @@ const stage = get('stage');
 const renderer = new T.WebGLRenderer({antialias:true,alpha:true});
 renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));
 renderer.toneMapping = T.ACESFilmicToneMapping;
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=T.PCFSoftShadowMap;
 renderer.setClearColor(0xeaf0f5);
 stage.append(renderer.domElement);
 const scene = new T.Scene();
 scene.fog = new T.Fog(0xeaf0f5,33,92);
-scene.add(new T.HemisphereLight(0xf3f8ff,0x8a99ac,2.1));
+scene.add(new T.HemisphereLight(0xe6efff,0x847353,1.65));
 const sun = new T.DirectionalLight(0xffefd6,2.5);
-sun.position.set(-8,15,12);
+sun.position.set(-24,44,21);
+sun.castShadow=true;
+Object.assign(sun.shadow.camera,{left:-48,right:48,top:36,bottom:-36,far:105});
+sun.shadow.camera.updateProjectionMatrix();
+sun.shadow.mapSize.set(2048,2048);
+sun.shadow.normalBias=.045;
 scene.add(sun);
 const camera = new T.PerspectiveCamera(34,2.2,.1,145);
 const materials = new Map();
@@ -39,6 +46,8 @@ function material(color) {
 function mesh(parent, geometry, color, x,y,z) {
   const object = new T.Mesh(geometry,material(color));
   object.position.set(x,y,z);
+  object.castShadow=true;
+  object.receiveShadow=true;
   parent.add(object);
   return object;
 }
@@ -51,11 +60,45 @@ function beam(parent,a,b,w,color) {
 }
 const model = new T.Group();
 scene.add(model);
-box(model,0x63794b,0,-.26,-5,83,.5,53);
+let textureSeed=3107;
+function randomDetail(){
+  textureSeed=(Math.imul(textureSeed,1664525)+1013904223)>>>0;
+  return textureSeed/4294967296;
+}
+function surfaceTexture(colors,repeat){
+  const canvas=document.createElement('canvas');
+  canvas.width=canvas.height=256;
+  const ctx=canvas.getContext('2d');
+  ctx.fillStyle=colors[0];ctx.fillRect(0,0,256,256);
+  for(let i=0;i<26000;i++){
+    ctx.fillStyle=colors[1+Math.floor(randomDetail()*(colors.length-1))];
+    ctx.globalAlpha=.16+randomDetail()*.5;
+    ctx.fillRect(randomDetail()*256,randomDetail()*256,.5+randomDetail()*2.5,.5+randomDetail()*3);
+  }
+  const texture=new T.CanvasTexture(canvas);
+  texture.colorSpace=T.SRGBColorSpace;
+  texture.wrapS=texture.wrapT=T.RepeatWrapping;
+  texture.repeat.set(...repeat);
+  texture.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());
+  return texture;
+}
+const grass=box(model,0x63794b,0,-.26,-5,83,.5,53);
+grass.material=new T.MeshStandardMaterial({
+  map:surfaceTexture(['#687f42','#abb15d','#38472a','#809854','#57543a'],[22,14]),
+  roughness:1
+});
+grass.castShadow=false;
+box(model,0x494235,0,-.58,-5,83,.27,53);
 for(let i=0;i<29;i++){
   const x=(i-14)*2.65, h=1.5+((i*13)%11)*.44;
   const z=-26-(i%3)*1.5;
   box(model,i%2 ? 0x8ea4b8 : 0x9aafc2,x,h/2,z,1.4+i%4*.25,h,1.6);
+  const facadeZ=z+.81;
+  for(let row=0;row<Math.floor(h/.66)-1;row++){
+    for(const dx of [-.35,.35]){
+      box(model,(i+row)%4===0?0xd4b88a:0x667985,x+dx,.58+row*.63,facadeZ,.22,.28,.028);
+    }
+  }
   if(i%4===0) box(model,0x839aae,x,h+.32,z,.12,.65,.12);
 }
 const station = new T.Group();
@@ -72,6 +115,15 @@ for(const side of [-1,1]){
   box(station,0x536c7d,0,3.16,side*2.02,14.1,.2,.23);
   const canopy=box(station,0x6f899d,0,3.62,side*1.13,14.2,.09,2.4);
   canopy.rotation.x=side*.32;
+  for(let i=0;i<25;i++){
+    const seam=box(station,0x475e70,(i-12)*.56,3.68,side*1.13,.026,.04,2.41);
+    seam.rotation.x=canopy.rotation.x;
+  }
+  for(const x of [-5.4,-2.7,0,2.7,5.4]){
+    box(station,0xf1cc86,x,2.95,side*1.72,.30,.085,.15);
+    box(station,0x8d6842,x,.53,side*1.57,.75,.11,.28);
+    box(station,0x8d6842,x,.67,side*1.72,.75,.20,.065);
+  }
 }
 for(const x of [-7,-4.7,-2.35,0,2.35,4.7,7]){
   beam(station,[x,3.32,-2.18],[x,4.04,0],.09,0x344d5f);
@@ -161,10 +213,46 @@ box(model,0x435665,workshopX,1.72,workshopZ,5.15,.18,2.43);
 box(model,0x483e34,workshopX+.92,.77,workshopZ+1.04,1.55,1.35,.08);
 box(model,0xdbc68f,workshopX-1.12,.97,workshopZ+1.04,.78,.48,.08);
 
+const ballastSegments=[];
+function addBallast(sample,count){
+  for(let i=0;i<count;i++){
+    const a=sample(i/count),b=sample((i+1)/count);
+    ballastSegments.push([a,b]);
+  }
+}
+addBallast(t=>{
+  const s=t*length,[x,z]=route(s);
+  return new T.Vector3(x,trackHeight(s)+.014,z);
+},310);
+addBallast(t=>{
+  const [x,z]=branch(t);
+  return new T.Vector3(x,.015,z);
+},55);
+const ballast=new T.InstancedMesh(
+  new T.BoxGeometry(1,.05,1.78),
+  new T.MeshStandardMaterial({color:0xffffff,roughness:1}),
+  ballastSegments.length
+);
+const ballastPiece=new T.Object3D();
+for(const [i,[a,b]] of ballastSegments.entries()){
+  const tangent=b.clone().sub(a);
+  ballastPiece.position.copy(a).lerp(b,.5);
+  ballastPiece.rotation.set(0,Math.atan2(-tangent.z,tangent.x),
+    Math.atan2(tangent.y,Math.hypot(tangent.x,tangent.z)),'YXZ');
+  ballastPiece.scale.x=tangent.length()+.06;
+  ballastPiece.updateMatrix();
+  ballast.setMatrixAt(i,ballastPiece.matrix);
+  ballast.setColorAt(i,new T.Color(0x8a8271).multiplyScalar(.82+randomDetail()*.3));
+}
+ballast.receiveShadow=true;
+model.add(ballast);
+const steel=material(0x788994);
+steel.metalness=.65;
+steel.roughness=.33;
 function rail(points){
   const path=new T.CurvePath();
   for(let i=1;i<points.length;i++)path.add(new T.LineCurve3(points[i-1],points[i]));
-  mesh(model,new T.TubeGeometry(path,points.length-1,.035,6,false),0x526471,0,0,0);
+  mesh(model,new T.TubeGeometry(path,points.length-1,.035,6,false),0x788994,0,0,0);
 }
 for(const offset of [-.46,.46]){
   rail(Array.from({length:321},(_,i)=>{
@@ -204,6 +292,11 @@ for(let i=0;i<sleeperCount;i++){
   }
   dummy.updateMatrix();sleepers.setMatrixAt(i,dummy.matrix);
 }
+sleepers.castShadow=true;
+sleepers.receiveShadow=true;
+for(let i=0;i<sleeperCount;i++){
+  sleepers.setColorAt(i,new T.Color().setScalar(.70+randomDetail()*.30));
+}
 model.add(sleepers);
 
 const foliage=new T.IcosahedronGeometry(.82,1);
@@ -216,7 +309,20 @@ for(const [x,z,size] of [[-25,-5,1.15],[-19,-3,.85],[-15,-6,1.15],[-9,-4,.68],[1
 }
 const car=new T.Group();
 model.add(car);
-box(car,0xb91c20,0,1.02,0,5.05,1.43,1.52);
+const body=new T.Shape();
+body.moveTo(-2.31,.35);
+body.quadraticCurveTo(-2.53,.35,-2.53,.58);
+body.lineTo(-2.53,1.55);
+body.quadraticCurveTo(-2.53,1.76,-2.29,1.76);
+body.lineTo(2.29,1.76);
+body.quadraticCurveTo(2.53,1.76,2.53,1.55);
+body.lineTo(2.53,.58);
+body.quadraticCurveTo(2.53,.35,2.31,.35);
+body.closePath();
+mesh(car,new T.ExtrudeGeometry(body,{
+  depth:1.43,bevelEnabled:true,bevelSize:.045,bevelThickness:.045,bevelSegments:2
+}),0xb91c20,0,0,-.715);
+material(0xb91c20).roughness=.34;
 box(car,0xe53830,0,.72,0,5.07,.55,1.54);
 box(car,0x1d4679,0,1.04,0,5.1,.15,1.56);
 box(car,0x2d3942,0,1.78,0,5.16,.17,1.64);
@@ -225,7 +331,9 @@ for(const side of [-1,1]){
   box(car,0x762026,0,.52,side*.78,4.89,.10,.035);
   for(const x of [-1.95,-1.13,-.37,.37,1.13,1.95]){
     box(car,0x182d43,x,1.41,side*.77,.66,.56,.05);
-    box(car,0x388bd1,x,1.41,side*.81,.55,.45,.035);
+    box(car,0x426b86,x,1.41,side*.81,.55,.45,.035);
+    box(car,0xd2a767,x,1.28,side*.832,.49,.075,.016);
+    box(car,0xc2c3b4,x,1.43,side*.835,.018,.46,.018);
     beam(car,[x-.17,1.24,side*.836],[x+.02,1.61,side*.836],.028,0x86c9ea);
   }
 }
@@ -330,11 +438,13 @@ async function openAR(){
       model.scale.setScalar(1);
       model.visible=true;
       renderer.setClearAlpha(1);
+      renderer.shadowMap.enabled=true;
       arButton.disabled=false;
       arMessage('Para reposicionar a maquete, abra a RA novamente.');
     },{once:true});
     await renderer.xr.setSession(session);
     renderer.setClearAlpha(0);
+    renderer.shadowMap.enabled=false;
     model.visible=false;
     const viewer=await session.requestReferenceSpace('viewer');
     const source=await session.requestHitTestSource({space:viewer});
