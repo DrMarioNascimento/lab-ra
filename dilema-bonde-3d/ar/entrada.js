@@ -37,7 +37,7 @@
       link.setAttribute('aria-disabled', 'true');
       status.textContent = 'Preparando a nova rodada. Aguarde antes de abrir a RA.';
       try {
-        const { prepararPersonagens } = await import('./personagens.js?v=20261107-ra5');
+        const { prepararPersonagens } = await import('./personagens.js?v=20261107-ra7');
         const proxima = await prepararPersonagens();
         const anterior = url; url = proxima.url;
         link.href = url + '#allowsContentScaling=1'; link.setAttribute('download', 'dilema-bonde.usdz');
@@ -66,7 +66,7 @@
     if (!app) {
       estado.textContent = 'Preparando a maquete…';
       try {
-        const modulo = await import('./web.js?v=20261107-ra6');
+        const modulo = await import('./web.js?v=20261107-ra7');
         app = await modulo.preparar({ informar: t => { estado.textContent = t; } });
         botao.textContent = 'Abrir em realidade aumentada';
         estado.textContent = 'Pronto. Toque para abrir a câmera e aponte para a mesa ou o chão.';

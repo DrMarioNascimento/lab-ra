@@ -7,6 +7,8 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { ARAUCARIAS_RA } from './vegetacao-ra.js?v=20261107-ra5';
+import { ajustarProporcoes, ESCALA_PERSONAGENS } from './proporcoes.js?v=20261107-ra7';
+import { ligarRelogio } from './relogio.js?v=20261107-ra7';
 
 export const Y_TRILHO = 0.42;
 const BITOLA = 1.435;
@@ -176,6 +178,8 @@ export async function criarMaquete(opts = {}) {
   const [estacao, oficina, bonde, arvoreAntigaGLB, arvoreGLB, araucariaGLB] = await Promise.all([carregar('estacao.glb'), carregar('oficina.glb'), carregar('bonde.glb'), carregar('arvore.glb'), carregar('arvore_nova1.glb'), carregar('araucaria.glb')]);
   avisa('Carregando personagens…');
   await garantirPersonagens(['operador', g0.presetPrincipal || 'trabalhador', g0.presetRamal || 'desconhecidos']);
+  ajustarProporcoes(estacao, bonde);
+  const atualizarRelogio = ligarRelogio(estacao, opts.agora);
   estacao.position.set(0, 0, ZT + 1.9); root.add(estacao);                     // eixo da via da estação sobre o trecho de cima
   oficina.position.set(6, 0, ZR + 5.45); root.add(oficina);                   // entre o ramal (atrás) e o principal (frente)
   root.add(bonde);
@@ -183,8 +187,8 @@ export async function criarMaquete(opts = {}) {
   // luzes internas dos modelos ficam fracas no ambiente da maquete
   root.traverse(o => { if (o.isLight) o.intensity *= 0.3; });
 
-  const rodeiros = []; bonde.traverse(o => { if (/^Rodeiro_/.test(o.name)) rodeiros.push(o); });
-  const ESC_PERS = opts.escalaPersonagens ?? 1.5;
+  const rodeiros = []; bonde.traverse(o => { if (/^Rodeiro_\d+$/.test(o.name)) rodeiros.push(o); });
+  const ESC_PERS = opts.escalaPersonagens ?? ESCALA_PERSONAGENS;
   const modelo = n => {
     const fonte = PERS[n] || PERS.desconhecidos, base = fonte.clone(true); base.position.set(0, 0, 0);
     const bb = new THREE.Box3().setFromObject(base), h = bb.max.y - bb.min.y, alvo = (ALTURA[n] ?? 1.75) * ESC_PERS;
@@ -359,6 +363,7 @@ export async function criarMaquete(opts = {}) {
     // partes que se movem durante a rodada (para gravar o percurso da RA nativa do iPhone)
     partesMoveis: () => [bonde, haste, ...agulhas.map(a => a.piv), disco, ...grupoPrincipal.children, ...grupoRamal.children, ...grupoPrincipal.userData.fantasmas.children, ...grupoRamal.userData.fantasmas.children],
     update(dt) {
+      atualizarRelogio();
       // alavanca e agulhas acompanham o estado com suavidade
       const alvoAng = estado.rota === 'ramal' ? 0.55 : -0.55;
       haste.rotation.z += (alvoAng - haste.rotation.z) * Math.min(1, dt * 8);

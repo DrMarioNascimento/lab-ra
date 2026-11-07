@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Bonde RA">
-<link rel="manifest" href="manifest.webmanifest?v=20261107-ra6">
+<link rel="manifest" href="manifest.webmanifest?v=20261107-ra7">
 <link rel="apple-touch-icon" href="../../brand/orientador.webp">
 <title>Dilema do Bonde — Realidade Aumentada</title>
 <style>
@@ -78,7 +78,7 @@
   @media (max-height: 500px) { #linkAR img { width: 140px; } #inicio h1 { font-size: 21px; } #inicio p { margin: 10px 0; } }
 </style>
 <script type="importmap">{ "imports": { "three": "../vendor/three/three.module.js", "three/addons/": "../vendor/three/addons/" } }</script>
-<script src="entrada.js?v=20261107-ra6" defer></script>
+<script src="entrada.js?v=20261107-ra7" defer></script>
 </head>
 <body>
 <canvas id="cena" hidden></canvas>
@@ -86,13 +86,13 @@
   <h1>Dilema do Bonde em RA</h1>
   <section id="nativo" aria-label="Realidade aumentada do iPhone e iPad">
     <!-- O link nativo existe antes de qualquer JavaScript/WebGL. Safari exige uma única imagem filha. -->
-    <a id="linkAR" rel="ar" href="maquete.usdz?v=20261107-ra5#allowsContentScaling=1" aria-label="Abrir em realidade aumentada" aria-describedby="statusAR"><img src="maquete-ar.jpg" width="220" height="140" alt="Abrir a maquete do Dilema do Bonde em realidade aumentada"></a>
+    <a id="linkAR" rel="ar" href="maquete.usdz?v=20261107-ra7#allowsContentScaling=1" aria-label="Abrir em realidade aumentada" aria-describedby="statusAR"><img src="maquete-ar.jpg" width="220" height="140" alt="Abrir a maquete do Dilema do Bonde em realidade aumentada"></a>
     <p><strong>Toque na maquete para abrir em realidade aumentada.</strong></p>
     <p id="statusAR" role="status">No iPhone ou iPad, use o Safari. Se aparecer o modo Objeto, toque em <b>AR</b> no alto da tela. Aponte para a mesa ou o chão.</p>
     <p>Toque nas placas <b>Manter o curso</b>, <b>Desviar o bonde</b> e <b>Reiniciar</b>. Use pinça para ajustar o tamanho e arraste para mudar de lugar.</p>
     <p id="paresAR">Trilho principal: 1 trabalhador. Ramal: 3 desconhecidos.</p>
     <button id="trocarAR" class="secundario" type="button" hidden>Trocar personagens</button>
-    <a class="opcao" href="?modo=interativo&amp;v=20261107-ra6">RA com botões fixos na tela</a>
+    <a class="opcao" href="?modo=interativo&amp;v=20261107-ra7">RA com botões fixos na tela</a>
     <small>Arraste, amplie e gire a maquete. Para usar os controles fixos sem abas e endereço do Safari, abra pela Tela de Início.</small>
   </section>
   <section id="web" aria-label="Realidade aumentada com câmera" hidden>
@@ -100,7 +100,7 @@
     <p>Arraste com um dedo para mover. Use dois dedos para ampliar, reduzir ou girar. Os botões ficam fixos na tela.</p>
     <button id="comecar" type="button">Preparar realidade aumentada</button>
     <p id="estadoEntrada" role="status">Primeiro prepare a maquete. Depois, abra a câmera e permita o acesso.</p>
-    <a id="voltarNativo" class="opcao" href="?modo=nativo&amp;v=20261107-ra6" hidden>Usar visualizador do iPhone, com placas na maquete</a>
+    <a id="voltarNativo" class="opcao" href="?modo=nativo&amp;v=20261107-ra7" hidden>Usar visualizador do iPhone, com placas na maquete</a>
     <small>Rastreamento de câmera: 8th Wall Engine © 2026 Niantic Spatial, Inc. · <a href="https://github.com/8thwall/engine/blob/main/LICENSE">Licença</a></small>
   </section>
   <details id="instalarRA" hidden>
@@ -112,7 +112,7 @@
     </ol>
     <p>Assim os controles ficam na tela sem as barras do Safari. Adicionar o ícone e continuar nesta aba não muda a visualização.</p>
   </details>
-  <small id="versaoRA">Versão 07/11 · RA6</small>
+  <small id="versaoRA">Versão 07/11 · RA7</small>
   <nav class="navegar"><a href="../index.html">Ver sem RA</a><a href="../../bancadas.html#etica">Voltar ao laboratório</a></nav>
   <noscript><p>O link acima abre a RA no Safari do iPhone/iPad. No Android, ative o JavaScript.</p></noscript>
 </div></main>

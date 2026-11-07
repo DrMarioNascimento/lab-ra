@@ -101,3 +101,13 @@ O teste real do usuário mostrou que a RA5 permanecia na câmera sem habilitar �
 - `npm test`: 74 testes aprovados. Layout, gesto corrigido, posições das árvores, fantasmas e USDZ da RA5 preservados. Versionados apenas os arquivos necessários para o reparo; o modelo nativo não precisa ser baixado novamente por causa desta mudança.
 
 Fonte inspecionada: https://cdn.jsdelivr.net/npm/@8thwall/engine-binary@1.0.0/dist/xr-slam.js — SHA-256 `398f675c920892afd4521d5196df2b6b8a1b8a90b6a5c749cf5ad1a6e0a85270`. A validação física de estabilidade e reconhecimento do ambiente continua dependendo do iPhone; a fotografia identifica a etapa travada, mas não fornece o estado interno dos sensores.
+
+## RA7 — relógio e proporções
+
+- Adultos: altura de 2,625 para 4,20 unidades (+60%); crianças mantêm a diferença relativa de altura. Espaçamento e fantasmas acompanham o aumento.
+- Bonde: crescimento vertical de 70% somente acima de y=0,80. Truques/rodas conservam a geometria. Pantógrafo sobe inteiro; nenhum alargamento ou alongamento horizontal.
+- Estação: estrutura acima do piso cresce verticalmente 40%; relógio sobe inteiro, conservando o mostrador circular. Folga vertical conservadora superior a 0,40 entre pantógrafo e o ponto mais baixo dos telhados laterais. Posição da via preservada.
+- Relógio web: hora local do aparelho, segundos contínuos e atualização independente de iniciar/pausar/reiniciar o bonde. USDZ: comportamento próprio de entrada na cena e três ciclos independentes (60/3600/43200 s). O USDZ pré-gerado começa em 10:10:30; troca de personagens no celular usa a hora do preparo. USDZ não consulta o relógio do sistema depois de aberto.
+- Reconstrução integral do USDZ usa a mesma cena/exportador do celular, via Chromium/Playwright; evita corrigir apenas a geometria sem refazer os destinos absolutos das ações. Arquivo local: 38.147.337 bytes (menor que RA6).
+- Auditoria local: 41 testes do bonde; todos os vértices conferidos em X/Z; rodas intactas; relógio circular; altura dos personagens e folga da cobertura conferidas novamente no USDZ; 30 validadores OpenUSD sem erros; três botões/percursos e relógio com referências resolvidas.
+- A validação física dos gestos/rastreio e a execução dos comportamentos Quick Look em iPhone continuam dependendo do aparelho. Os módulos de rastreio/gestos da RA6 não foram alterados.

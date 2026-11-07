@@ -21,6 +21,7 @@
 import * as THREE from 'three';
 import {placaVolume} from './texto-volume.js';
 import { USDZExporter } from 'three/addons/exporters/USDZExporter.js';
+import { comportamentoRelogio } from './relogio-usdz.js?v=20261107-ra7';
 import { unzipSync, zipSync, strFromU8, strToU8 } from 'three/addons/libs/fflate.module.js';
 
 function placa(rotulo, larguraM, alturaM) {
@@ -108,97 +109,70 @@ export async function usdzComBotoes({ peca, moveis, estados, duracao = 1.2 }) {
   const caminho = nome => { const c = mapa.get(nome); if (!c) throw new Error('prim ausente: ' + nome); return c; };
 
   /* PERCURSO: grupo em SÉRIE de passos; cada passo é um grupo PARALELO que
-     leva todas as partes ao mesmo tempo. Duração zero trava o Quick Look em
-     alguns casos, então o menor passo dura 0,01 s. */
-  const sequencia = (passos, k) => {
-    const l = ['      rel actions = [' + passos.map((_, j) => `<Passo_${k}_${j}>`).join(', ') + ']',
-      '      token info:id = "Group"', '      bool loops = 0', '      int performCount = 1', '      token type = "serial"', ''];
-    passos.forEach((ps, j) => {
-      l.push(`      def Preliminary_Action "Passo_${k}_${j}"`, '      {',
-        '        rel actions = [' + moveis.map((_, i) => `<Mover_${k}_${j}_${i}>`).join(', ') + ']',
-        '        token info:id = "Group"', '        bool loops = 0', '        int performCount = 1', '        token type = "parallel"', '');
-      moveis.forEach((_, i) => l.push(
-        `        def Preliminary_Action "Mover_${k}_${j}_${i}"`, '        {',
-        `          rel affectedObjects = <${caminho('rqbMovel_' + i)}>`,
-        `          double duration = ${Math.max(.01, ps.duracao)}`, `          token easeType = "${ps.ease || 'none'}"`,
-        '          token info:id = "Transform"', '          token type = "absolute"',
-        `          rel xformTarget = <${caminho(`rqbAlvo_${k}_${j}_${i}`)}>`, '        }'));
-      l.push('      }');
-    });
-    return l;
-  };
-  const b = ['', 'def Scope "Behaviors"', '{'];
-  estados.forEach((e, k) => {
-    b.push(`  def Preliminary_Behavior "Comportamento_${k}"`, '  {',
-      `    rel triggers = <Toque_${k}>`, `    rel actions = <Grupo_${k}>`, '    uniform bool exclusive = 0', '',
-      `    def Preliminary_Trigger "Toque_${k}"`, '    {',
-      `      rel affectedObjects = <${caminho('rqbBotao_' + k)}>`, '      token info:id = "TapGesture"', '    }', '',
-      `    def Preliminary_Action "Grupo_${k}"`, '    {');
-    if (e.passos) { b.push(...sequencia(e.passos, k), '    }', '  }', ''); return; }
-    b.push('      rel actions = [' + moveis.map((_, i) => `<Mover_${k}_${i}>`).join(', ') + ']',
-      '      token info:id = "Group"', '      bool loops = 0', '      int performCount = 1', '      token type = "parallel"', '');
-    moveis.forEach((_, i) => b.push(
-      `      def Preliminary_Action "Mover_${k}_${i}"`, '      {',
-      `        rel affectedObjects = <${caminho('rqbMovel_' + i)}>`,
-      `        double duration = ${duracao}`, '        token easeType = "inout"',
-      '        token info:id = "Transform"', '        token type = "absolute"',
-      `        rel xformTarget = <${caminho(`rqbAlvo_${k}_${i}`)}>`, '      }'));
-    b.push('    }', '  }', '');
-  });
-  b.push('}');
-  linhas.splice(fimDaCena, 0, ...b.map(l => '      ' + l));
-  const novo = linhas.join('\n');
-  // Tipos dos shaders USD: entradas vetoriais e nome de primvar devem coincidir com o esquema.
-  arquivos['model.usda'] = strToU8(novo.replace(/token inputs:in\.connect/g, 'float2 inputs:in.connect').replace(/token inputs:varname/g, 'string inputs:varname'));
-  /* GEOMETRIA COM 4 CASAS. O exportador escreve cada vértice, normal e UV em
-     TEXTO com até 16 algarismos, e o USDZ não pode ser comprimido. No osso,
-     isso dava 52 MB. Quatro casas na unidade do modelo ficam muito abaixo do
-     milímetro na mesa, invisível para o olho e um terço menor no arquivo. */
-  for (const nome of Object.keys(arquivos)) {
-    if (!nome.startsWith('geometries/')) continue;
-    arquivos[nome] = strToU8(strFromU8(arquivos[nome]).replace(/(\d\.\d{3})\d+/g, '$1'));
-  }
-  /* GEOMETRIAS REPETIDAS VIRAM UMA SÓ. Peças clonadas ganham geometria com
-     outro número e o exportador grava uma cópia inteira para cada uma; quando
-     o conteúdo é idêntico, todas passam a apontar para o mesmo arquivo. */
-  const porConteudo = new Map(), troca = new Map();
-  for (const nome of Object.keys(arquivos)) {
-    if (!nome.startsWith('geometries/')) continue;
-    const chave = strFromU8(arquivos[nome]);
-    if (porConteudo.has(chave)) { troca.set(nome, porConteudo.get(chave)); delete arquivos[nome]; }
-    else porConteudo.set(chave, nome);
-  }
-  if (troca.size) {
-    let texto = strFromU8(arquivos['model.usda']);
-    for (const [de, para] of troca) texto = texto.split('@./' + de + '@').join('@./' + para + '@');
-    arquivos['model.usda'] = strToU8(texto);
-  }
-
-  /* refaz o zip: model.usda primeiro e cada arquivo alinhado a 64 bytes */
-  const ordem = ['model.usda', ...Object.keys(arquivos).filter(f => f !== 'model.usda')];
-  /* cabeçalho local do zip = 30 bytes + nome + campo extra (4 + enchimento):
-     o enchimento põe o INÍCIO DOS DADOS de cada arquivo num múltiplo de 64 */
-  const saida = {}; let pos = 0;
-  for (const nome of ordem) {
-    const dado = arquivos[nome], base = pos + 30 + nome.length;
-    let extra = 0;
-    if (base % 64) { const p = (64 - ((base + 4) % 64)) % 64; extra = 4 + p; saida[nome] = [dado, { extra: { 12345: new Uint8Array(p) } }]; }
-    else saida[nome] = dado;
-    pos = base + extra + dado.length;
-  }
-  const usdz = zipSync(saida, { level: 0 });
-  return { usdz, usda: strFromU8(arquivos['model.usda']), alinhado: alinhamento(usdz) };
-}
-
-/* confere: onde começam os dados de cada arquivo dentro do zip */
-export function alinhamento(zip) {
-  const v = new DataView(zip.buffer, zip.byteOffset, zip.byteLength), lista = [];
-  let p = 0;
-  while (p + 30 <= zip.length && v.getUint32(p, true) === 0x04034b50) {
-    const tam = v.getUint32(p + 18, true), nl = v.getUint16(p + 26, true), el = v.getUint16(p + 28, true);
-    const nome = new TextDecoder().decode(zip.subarray(p + 30, p + 30 + nl)), dados = p + 30 + nl + el;
-    lista.push({ nome, dados, ok: dados % 64 === 0 });
-    p = dados + tam;
-  }
-  return lista;
-}
+     leva todas as partes…15190 tokens truncated…    for i in src.infolist():
+        offset = i.header_offset + 30 + len(i.filename.encode()) + struct.unpack_from('<H', raw, i.header_offset + 28)[0]
+        assert offset % 64 == 0 and i.compress_type == 0, i.filename
+stage = Usd.Stage.Open(str(path))
+assert stage
+assert not UsdUtils.ComputeAllDependencies(str(path))[2], 'Referências ausentes'
+errors = UsdValidation.ValidationContext(UsdValidation.ValidationRegistry().GetOrLoadAllValidators()).Validate(stage)
+for e in errors: print(e.GetErrorAsString())
+assert not errors, f'{len(errors)} falhas de validação'
+behaviors = [p for p in stage.Traverse() if p.GetTypeName() == 'Preliminary_Behavior']
+assert len(behaviors) == 4
+relogio = next(p for p in behaviors if p.GetName() == 'Relogio_Continuo')
+assert relogio.GetChild('Inicio').GetAttribute('type').Get() == 'enter'
+for i, (nome, periodo) in enumerate(zip(['Ponteiro_Horas','Ponteiro_Minutos','Ponteiro_Segundos'],[43200,3600,60])):
+    ciclo = relogio.GetChild('Ponteiros').GetChild('Ciclo_'+str(i))
+    assert ciclo.GetAttribute('loops').Get()
+    girar = ciclo.GetChild('Girar')
+    assert girar.GetAttribute('duration').Get() == periodo
+    assert girar.GetAttribute('axis').Get() == (0,0,-1)
+    alvo = girar.GetRelationship('affectedObjects').GetTargets()
+    assert len(alvo) == 1 and alvo[0].name == nome
+araucarias = stage.GetPrimAtPath('/Root/Scenes/Scene/Maquete_RA/Maquete/Araucarias')
+assert araucarias, 'Araucárias ausentes'
+assert len(araucarias.GetChildren()) == 2, 'Esperadas exatamente duas araucárias'
+maquete = stage.GetPrimAtPath('/Root/Scenes/Scene/Maquete_RA/Maquete')
+cache = UsdGeom.XformCache()
+def limites(prim, referencia):
+    caixa = Gf.Range3d()
+    inversa = cache.GetLocalToWorldTransform(referencia).GetInverse()
+    for item in Usd.PrimRange(prim):
+        if item.IsA(UsdGeom.Mesh):
+            matriz = cache.GetLocalToWorldTransform(item) * inversa
+            for ponto in UsdGeom.Mesh(item).GetPointsAttr().Get():
+                caixa.UnionWith(matriz.Transform(Gf.Vec3d(ponto)))
+    return caixa
+bonde = next(p for p in stage.Traverse() if p.GetName() == 'Bonde')
+carroceria = bonde.GetChild('Carroceria')
+cabine = limites(carroceria, bonde)
+assert 5.52 < cabine.GetMax()[1] < 5.55, 'Altura da cabine não foi atualizada'
+assert 2.49 < cabine.GetSize()[2] < 2.51, 'Largura da cabine mudou'
+estacao = next(p for p in stage.Traverse() if p.GetName() == 'Estacao')
+teto = next(p for p in Usd.PrimRange(estacao) if p.GetName() == 'Ala_Oeste_Estrutura_telhado_metal_azul')
+assert limites(teto,estacao).GetMin()[1] - (limites(bonde,bonde).GetMax()[1]+.42) > .4
+pessoa = next(p for p in stage.Traverse() if p.GetName() == 'rqbMovel_5')
+assert abs(limites(pessoa,maquete).GetSize()[1]-4.2)<.005, 'Personagem nativo ainda pequeno'
+fantasmas = [p for p in maquete.GetChildren() if p.GetName().startswith('Fantasmas')]
+assert sorted(len(p.GetChildren()) for p in fantasmas) == [1,3]
+for p in fantasmas:
+    esperado = (4,.27,30) if len(p.GetChildren()) == 1 else (-8,.27,14)
+    pos = UsdGeom.Xformable(p).GetLocalTransformation().ExtractTranslation()
+    assert all(abs(a-b)<1e-8 for a,b in zip(pos,esperado)), 'Fantasmas fora do local do impacto'
+    cache = UsdGeom.XformCache()
+    cena = maquete.GetParent().GetParent()
+    invCena = cache.GetLocalToWorldTransform(cena).GetInverse()
+    for f in p.GetChildren():
+        indice = f.GetName().removeprefix('rqbMovel_')
+        repouso = (cache.GetLocalToWorldTransform(f)*invCena).ExtractTranslation()
+        for nome in ['rqbAlvo_0_0_'+indice,'rqbAlvo_1_0_'+indice,'rqbAlvo_2_0_'+indice]:
+            alvo = cena.GetChild(nome)
+            assert alvo, 'Destino da animação ausente'
+            destino = UsdGeom.Xformable(alvo).GetLocalTransformation().ExtractTranslation()
+            assert (destino-repouso).GetLength()<1e-8, 'Animação do fantasma volta ao centro'
+for p in stage.Traverse():
+    for rel in p.GetRelationships():
+        for target in rel.GetTargets():
+            assert stage.GetObjectAtPath(target), f'Alvo ausente: {p.GetPath()} -> {target}'
+print(f'OK: {path.name}; {len(raw)} bytes; 3 percursos/botões e relógio independente; malhas, texturas e alvos válidos; 30 validadores OpenUSD sem falhas.')
