@@ -66,7 +66,7 @@
     if (!app) {
       estado.textContent = 'Preparando a maquete…';
       try {
-        const modulo = await import('./web.js?v=20261107-ra5');
+        const modulo = await import('./web.js?v=20261107-ra6');
         app = await modulo.preparar({ informar: t => { estado.textContent = t; } });
         botao.textContent = 'Abrir em realidade aumentada';
         estado.textContent = 'Pronto. Toque para abrir a câmera e aponte para a mesa ou o chão.';
