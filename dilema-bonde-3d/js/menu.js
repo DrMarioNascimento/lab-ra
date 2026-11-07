@@ -32,6 +32,7 @@ export function criarMenu({pai=document.body,config,aplicar,aoAbrir=()=>{},aoFec
   let aberta=false,ocupada=false,origem=null;
   if(modo==='nativo'){
     document.body.classList.add('menu-na-entrada');
+    $('[data-secao="visual"] summary').textContent='Qualidade';
     host.querySelectorAll('[data-web]').forEach(el=>el.hidden=true);
     $('[data-secao="maquete"]').hidden=true;$('[data-secao="reflexao"]').hidden=true;
     $('[data-secao="ajuda"]').innerHTML='<summary>Como jogar e autoria</summary><p>No visualizador do iPhone, toque nas placas Manter o curso, Desviar o bonde e Reiniciar. Ajuste tamanho e posição com os dedos.</p><p>O Menu, os sons, a contagem e a reflexão interativa estão disponíveis na opção RA com botões fixos na tela.</p><p>Prof. Dr. Mário César Nascimento · Ética Interativa · Dragon Games.</p>';
@@ -66,6 +67,7 @@ export function criarMenu({pai=document.body,config,aplicar,aoAbrir=()=>{},aoFec
   $('#novaRodada').onclick=()=>executar(()=>novaRodada?.());
   form.onsubmit=e=>{e.preventDefault();$('#aplicarMenu').click();};
   return {abrir,fechar,aberta:()=>aberta,host,controles:$('#controlesMaquete'),
+    limparResultado(){$('#resultadoBonde').innerHTML='<p>Esta rodada ainda não tem resultado.</p><p>Que responsabilidade existe ao agir? E ao manter o curso?</p>';},
     resultado(r){const el=$('#resultadoBonde');el.replaceChildren();
       const p=document.createElement('p');p.textContent=`${r.rota==='ramal'?'O bonde foi desviado.':'O curso foi mantido.'} Pessoas atingidas: ${r.atingidos}. Pessoas poupadas: ${r.poupados}.`;el.append(p);
       for(const i of r.indicadores){const linha=document.createElement('label');linha.className='indicador';linha.textContent=`${i.nome}: ${i.valor}/100`;const meter=document.createElement('meter');meter.min=0;meter.max=100;meter.value=i.valor;linha.append(meter);el.append(linha);}

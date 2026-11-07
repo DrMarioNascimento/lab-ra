@@ -1,3 +1,4 @@
+import {mudaRodada} from './configuracao.js?v=20261107-ra11';
 import {criarRodada} from './rodada.js?v=20261107-ra11';
 import {criarMenu} from './menu.js?v=20261107-ra11';
 import {criarSom} from './som.js?v=20261107-ra11';
@@ -13,8 +14,8 @@ export function ligarInterface({m,config,pai,modo='pc',status=()=>{},aoMenu=()=>
     $('crono').textContent=e.pausada?'Ⅱ':String(e.tempo);
   }
   const rodada=criarRodada(m,config,{aoMudar:sincronizar,aoResultado:r=>menu.resultado(r),som:som.tocar});
-  const nova=async(c,{aleatorio=false}={})=>{await rodada.nova(c,{aleatorio});aoConfig(rodada.config());status('Nova rodada. Escolha o trilho e toque em Partir.');};
-  menu=criarMenu({pai,modo,config:rodada.config,aplicar:async c=>{await rodada.ajustar(c);aoConfig(rodada.config());status('Ajustes aplicados.');},aoAbrir:()=>{rodada.bloquear('menu',true);aoMenu(true);},aoFechar:()=>{rodada.bloquear('menu',false);aoMenu(false);if(continuar){continuar=false;rodada.play();}},novaRodada:async()=>{await nova(rodada.config(),{aleatorio:rodada.config().modo==='livre'});continuar=rodada.config().loop;}});
+  const nova=async(c,{aleatorio=false}={})=>{await rodada.nova(c,{aleatorio});menu.limparResultado();aoConfig(rodada.config());status('Nova rodada. Escolha o trilho e toque em Partir.');};
+  menu=criarMenu({pai,modo,config:rodada.config,aplicar:async c=>{const nova=mudaRodada(rodada.config(),c);await rodada.ajustar(c);if(nova)menu.limparResultado();aoConfig(rodada.config());status('Ajustes aplicados.');},aoAbrir:()=>{rodada.bloquear('menu',true);aoMenu(true);},aoFechar:()=>{rodada.bloquear('menu',false);aoMenu(false);if(continuar){continuar=false;rodada.play();}},novaRodada:async()=>{await nova(rodada.config(),{aleatorio:rodada.config().modo==='livre'});continuar=rodada.config().loop;}});
   $('manter').onclick=()=>rodada.escolher('principal');$('desviar').onclick=()=>rodada.escolher('ramal');
   $('play').onclick=()=>{rodada.play();status(rodada.estado().pausada?'Rodada pausada.':'Decida antes de o bonde passar pela agulha.');};
   if($('reset'))$('reset').onclick=async()=>{try{await nova(rodada.config(),{aleatorio:rodada.config().modo==='livre'});}catch{status('Não foi possível trocar os personagens. Tente novamente.');}};

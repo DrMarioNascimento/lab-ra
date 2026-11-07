@@ -6,7 +6,7 @@ import * as THREE from 'three';
 import { ligarGestos } from '../dilema-bonde-3d/ar/gestos.js';
 import { criarAvisos } from '../dilema-bonde-3d/ar/avisos.js';
 
-import {lerConfig,grupos} from '../dilema-bonde-3d/js/configuracao.js';
+import {lerConfig,grupos,mudaRodada} from '../dilema-bonde-3d/js/configuracao.js';
 import {PERFIS} from '../dilema-bonde-3d/js/qualidade.js';
 import {criarRodada} from '../dilema-bonde-3d/js/rodada.js';
 // Integra entrada na câmera, motor e controles de produção. Substitui somente
@@ -42,7 +42,7 @@ test('ponto visual libera Colocar aqui, apresenta a maquete e mantém âncora ao
   const sandbox={THREE:{...THREE,WebGLRenderer:Renderer},window,navigator:{userAgent:'iPhone',mediaDevices:{getUserMedia(){}}},
     document:{getElementById:id=>el[id],createElement:()=>new Element(),body:new Element(),documentElement:{}},
     URLSearchParams,location:{search:''},devicePixelRatio:1,innerWidth:400,innerHeight:800,addEventListener(){},setTimeout:()=>1,clearTimeout(){},Promise,console,
-    lerConfig,grupos,PERFIS,criarRodada,qualidadeDoAparelho:()=>"equilibrada",adaptarResolucao:()=>()=>{},criarRotulos:()=>({atualizar(){}}),criarSom:()=>({tocar(){}}),
+    lerConfig,grupos,mudaRodada,PERFIS,criarRodada,qualidadeDoAparelho:()=>"equilibrada",adaptarResolucao:()=>()=>{},criarRotulos:()=>({atualizar(){}}),criarSom:()=>({tocar(){}}),
     criarMenu:({aoAbrir,aoFechar})=>({aberta:()=>false,controles:new Element(),fechar(){aoFechar();},abrir(){aoAbrir();}}),
     criarMaquete:async()=>model,ligarGestos,criarAvisos:elemento=>criarAvisos(elemento,{agendar:()=>1,cancelar(){}})};
   const context=vm.createContext(sandbox);

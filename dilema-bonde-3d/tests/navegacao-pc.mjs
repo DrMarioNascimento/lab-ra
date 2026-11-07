@@ -29,7 +29,7 @@ try{
  // O mesmo controlador e as geometrias reais, avançando somente o relógio do teste.
  await page.evaluate(()=>{for(let i=0;i<6000&&__testePC.ui.rodada.estado().fase!=='resultado';i++)__testePC.ui.rodada.atualizar(.05);});
  assert(await page.locator('#resultadoBonde').isVisible());assert((await page.locator('#resultadoBonde').textContent()).includes('Pessoas atingidas: 0'));assert.equal(await page.locator('#resultadoBonde meter').count(),5);
- await page.locator('#novaRodada').click();await page.waitForFunction(()=>!__testePC.ui.menu.aberta());assert.equal(await page.locator('#crono').textContent(),'0');
+ await page.locator('#novaRodada').click();await page.waitForFunction(()=>!__testePC.ui.menu.aberta());assert.equal(await page.locator('#crono').textContent(),'0');assert(!(await page.locator('#resultadoBonde').textContent()).includes('Pessoas atingidas:'));
  for(const tamanho of [{width:1280,height:800},{width:1024,height:768},{width:390,height:844},{width:844,height:390}]){
   await page.setViewportSize(tamanho);await page.locator('#menu').click();const box=await page.locator('.menu-painel').boundingBox();assert(box.x>=0&&box.y>=0&&box.x+box.width<=tamanho.width+.1&&box.y+box.height<=tamanho.height+.1);await fechar();assert(await page.locator('#play').isVisible());
  }

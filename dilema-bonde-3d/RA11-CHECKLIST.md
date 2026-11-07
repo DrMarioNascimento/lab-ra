@@ -39,7 +39,8 @@ A primeira simplificação foi revista visualmente: malhas um pouco mais detalha
 - [x] Chromium: carregamento sob demanda, navegação PC, quatro tamanhos de tela, Menu, configuração 2/0, rodada completa, reflexão e nova rodada.
 - [x] RA com rastreador simulado no navegador: preparo econômico, colocação, menu, âncora estável, câmera aproximando, perda/retorno, zoom e saída/reentrada.
 - [x] USDZ: três percursos/botões, relógio independente, malhas/texturas/alvos e 30 validadores OpenUSD.
-- [ ] Revisão automatizada do commit final, CI completo e conferência após publicação.
+
+O resultado da revisão automatizada, do CI completo e da conferência da publicação é registrado na descrição da PR desta versão.
 
 ## Limites e diferenças entre os caminhos
 
