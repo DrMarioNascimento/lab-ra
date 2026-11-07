@@ -1,6 +1,7 @@
 import * as THREE from 'three';
-import { criarMaquete } from '../js/cena.js';
+import { criarMaquete } from '../js/cena.js?v=20261107-ra3';
 import motor from './rastreador.js';
+import { ligarGestos } from './gestos.js?v=20261107-ra3';
 
 export async function preparar({ informar }) {
   const $ = id => document.getElementById(id), canvas = $('cena');
@@ -11,7 +12,7 @@ export async function preparar({ informar }) {
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.xr.enabled = true;
-  const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(60, 1, .005, 50);
+  const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(60, 1, .001, 200);
   scene.add(new THREE.HemisphereLight(0xf2f6ff, 0x6a7a50, 2));
   const sol = new THREE.DirectionalLight(0xfff1dc, 2.6); sol.position.set(-.6, 1.2, .8); scene.add(sol);
   const ancora = new THREE.Group(), base = new THREE.Group();
@@ -29,6 +30,7 @@ export async function preparar({ informar }) {
     bM.disabled = bD.disabled = !colocada || trocando || m.estado.travado;
     play.disabled = !colocada || trocando || contando || m.estado.rodando;
     reset.disabled = !colocada || trocando;
+    for (const id of ['diminuir','aumentar','tamanho']) $(id).disabled = !colocada || reposicionando;
   };
   const escolher = rota => { if (colocada && m.definirRota(rota)) sincronizar(); };
   bM.onclick = () => escolher('principal'); bD.onclick = () => escolher('ramal');
@@ -47,16 +49,24 @@ export async function preparar({ informar }) {
   m.estado.aoImpacto = r => status(r === 'principal' ? 'O bonde seguiu pelo trilho principal.' : 'O bonde foi desviado para o ramal.');
   m.estado.aoFim = () => status('O bonde voltou à estação. Toque em Reiniciar para uma nova rodada.');
   const ray = new THREE.Raycaster(), pt = new THREE.Vector2();
-  const ra = motor.criar({ renderer, camera, cena: scene, altura: 1.2, desenhar,
-    aoTocar(x, y) {
+  function tocar(x, y) {
       if (!colocada || reposicionando) { posicionar(); return; }
       const r = canvas.getBoundingClientRect();
       pt.set((x-r.left)/r.width*2-1, 1-(y-r.top)/r.height*2);
       ray.setFromCamera(pt, ra.cameraAtiva());
       if (ray.intersectObject(m.alvoToque, false).length && m.alternarAlavanca()) sincronizar();
-    },
+  }
+  const ra = motor.criar({ renderer, camera, cena: scene, altura: 1.2, desenhar,
+    aoTocar(x,y) { if (!gestos.ocupado()) tocar(x,y); },
     aoMudar(e) { if (!e.ativo && !entrando) voltar(); }
   });
+  const gestos = ligarGestos({ elemento: canvas, alvo: ancora, camera: () => ra.cameraAtiva(),
+    podeMover: () => ra.ativo() && colocada && !reposicionando, aoToque: tocar,
+    aoAlterar: escala => { $('tamanho').textContent = Math.round(escala*100) + '%'; }
+  });
+  $('diminuir').onclick = () => gestos.ampliar(1/1.2);
+  $('aumentar').onclick = () => gestos.ampliar(1.2);
+  $('tamanho').onclick = () => gestos.restaurarTamanho();
   // Consultado durante o preparo: a sessão é pedida sem await no próximo toque.
   const suporte = await ra.suporte();
   if (!suporte.webxr && !suporte.slam) {
@@ -73,20 +83,12 @@ export async function preparar({ informar }) {
     const pose = ra.pose(); ancora.position.setFromMatrixPosition(pose); ancora.quaternion.setFromRotationMatrix(pose);
     ancora.visible = true; colocada = true; reposicionando = false;
     colocar.textContent = 'Recolocar'; colocar.disabled = false;
-    status('Escolha o trilho e toque em Partir.'); sincronizar();
+    status('Arraste para mover. Use dois dedos para ampliar e girar.'); sincronizar();
   }
   colocar.onclick = () => {
     if (!colocada || reposicionando) posicionar();
-    else { reposicionando = true; colocar.textContent = 'Colocar aqui'; status('Aponte para a nova superfície e toque em Colocar aqui.'); }
+    else { reposicionando = true; gestos.limpar(); sincronizar(); colocar.textContent = 'Colocar aqui'; status('Aponte para a nova superfície e toque em Colocar aqui.'); }
   };
-  let toque = null;
-  canvas.addEventListener('pointerdown', e => { toque = [e.clientX,e.clientY]; });
-  canvas.addEventListener('pointerup', e => {
-    if (ra.estado().modo !== 'slam' || !toque) return;
-    if (Math.hypot(e.clientX-toque[0],e.clientY-toque[1]) < 10 && (!colocada || reposicionando)) posicionar();
-    toque = null;
-  });
-  canvas.addEventListener('pointercancel', () => { toque = null; });
   // Tocar um controle HTML não deve também disparar a seleção XR da alavanca.
   $('overlay').addEventListener('beforexrselect', e => { if (e.target.closest('button')) e.preventDefault(); });
   function desenhar(t, frame) {
@@ -102,6 +104,7 @@ export async function preparar({ informar }) {
   }
   function voltar() {
     renderer.setAnimationLoop(null); canvas.hidden = true; $('overlay').hidden = true; $('inicio').hidden = false;
+    gestos.limpar(); ancora.scale.setScalar(1); $('tamanho').textContent = '100%';
     ancora.visible = false; colocada = false; reposicionando = false; ultimo = null; reiniciar();
     $('comecar').disabled = false; redimensionar();
     if (document.fullscreenElement) document.exitFullscreen().catch(() => {});

@@ -4,11 +4,13 @@
   const $ = id => document.getElementById(id);
   const ios = /iPad|iPhone|iPod/.test(navigator.userAgent)
     || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  const ensaioNativo = new URLSearchParams(location.search).has('quicklook');
+  const params = new URLSearchParams(location.search);
+  const ensaioNativo = params.has('quicklook');
+  const interativo = params.get('modo') === 'interativo';
   const link = $('linkAR'), status = $('statusAR'), trocar = $('trocarAR');
   let suporta = false;
   try { suporta = link.relList.supports('ar'); } catch {}
-  if (ios || suporta || ensaioNativo) {
+  if ((ios || suporta || ensaioNativo) && !interativo) {
     // Nunca retirar rel="ar": um resultado negativo não deve transformar RA em navegação/download.
     trocar.hidden = false;
     if (ios && !suporta) status.textContent = 'Abra esta página no Safari para usar a realidade aumentada. Em navegadores internos de aplicativos, a RA pode não abrir.';
@@ -31,10 +33,10 @@
       link.setAttribute('aria-disabled', 'true');
       status.textContent = 'Preparando a nova rodada. Aguarde antes de abrir a RA.';
       try {
-        const { prepararPersonagens } = await import('./personagens.js?v=20261107-ra2');
+        const { prepararPersonagens } = await import('./personagens.js?v=20261107-ra3');
         const proxima = await prepararPersonagens();
         const anterior = url; url = proxima.url;
-        link.href = url; link.setAttribute('download', 'dilema-bonde.usdz');
+        link.href = url + '#allowsContentScaling=1'; link.setAttribute('download', 'dilema-bonde.usdz');
         $('paresAR').textContent = proxima.descricao;
         status.textContent = 'Pronto. Toque na maquete; se aparecer Objeto, selecione AR no alto da tela.';
         if (anterior) URL.revokeObjectURL(anterior);
@@ -51,6 +53,7 @@
     return;
   }
   $('nativo').hidden = true; $('web').hidden = false;
+  $('voltarNativo').hidden = !(ios || suporta || ensaioNativo);
   const botao = $('comecar'), estado = $('estadoEntrada');
   let app = null;
   botao.onclick = async () => {
@@ -59,7 +62,7 @@
     if (!app) {
       estado.textContent = 'Preparando a maquete…';
       try {
-        const modulo = await import('./web.js?v=20261107-ra2');
+        const modulo = await import('./web.js?v=20261107-ra3');
         app = await modulo.preparar({ informar: t => { estado.textContent = t; } });
         botao.textContent = 'Abrir em realidade aumentada';
         estado.textContent = 'Pronto. Toque para abrir a câmera e aponte para a mesa ou o chão.';

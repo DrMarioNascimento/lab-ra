@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { ARAUCARIAS_RA } from './vegetacao-ra.js';
 
 export const Y_TRILHO = 0.42;
 const BITOLA = 1.435;
@@ -279,7 +280,7 @@ export async function criarMaquete(opts = {}) {
       } };
     instanciar(arvoreAntigaGLB, antigas, 6.5, 'Arvores_Copa_Larga');
     instanciar(arvoreGLB, arvoresGLB, 6.5, 'Arvores');
-    instanciar(araucariaGLB, araucarias, 13, 'Araucarias'); mesh(flores, mCor, 'Arbustos_Flores');
+    instanciar(araucariaGLB, opts.ra ? ARAUCARIAS_RA : araucarias, 13, 'Araucarias'); mesh(flores, mCor, 'Arbustos_Flores');
     mesh(pedras.map(g => tingir(g, 0xffffff)), matTex('pedra', 0xa8a49c, 0.5, { vertexColors: true }), 'Pedras');
 
     // cidadezinha ao fundo (atrás da estação)

@@ -33,6 +33,9 @@ for e in errors: print(e.GetErrorAsString())
 assert not errors, f'{len(errors)} falhas de validação'
 behaviors = [p for p in stage.Traverse() if p.GetTypeName() == 'Preliminary_Behavior']
 assert len(behaviors) == 3
+araucarias = stage.GetPrimAtPath('/Root/Scenes/Scene/Maquete_RA/Maquete/Araucarias')
+assert araucarias, 'Araucárias ausentes'
+assert len(araucarias.GetChildren()) == 2, 'Esperadas exatamente duas araucárias'
 for p in stage.Traverse():
     for rel in p.GetRelationships():
         for target in rel.GetTargets():

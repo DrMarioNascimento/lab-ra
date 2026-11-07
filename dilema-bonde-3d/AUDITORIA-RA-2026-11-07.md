@@ -35,3 +35,21 @@ O navegador remoto não dispõe de câmera ARKit/ARCore nem de contexto WebGL ut
 A tela inicial permanece uma página web. O visualizador nativo abre depois do toque; se abrir no modo Objeto, selecionar AR. Em navegadores internos de aplicativos, abrir o endereço no Safari. O arquivo nativo tem aproximadamente 37,5 MB; a correção preserva sua qualidade visual e não tenta reduzir a malha.
 
 Referências técnicas: [WebKit: links AR](https://webkit.org/blog/8421/viewing-augmented-reality-assets-in-safari-for-ios/), [Apple: Quick Look](https://developer.apple.com/quick-look-gallery/).
+
+## Complemento: tamanho, posição, controles e araucárias (ra3)
+
+- Quick Look continua sendo a entrada padrão no iPhone, com escala explicitamente habilitada (`allowsContentScaling=1`) no arquivo pronto e nas rodadas geradas. Seus gestos de posição/tamanho continuam sob controle do iOS.
+- Opção “RA com botões fixos na tela”: abre também no iPhone o modo interativo com controles semitransparentes. Nesse modo o Safari pode exibir suas barras; a opção nativa permanece disponível. Uma imagem transparente na maquete não se torna um controle fixo da tela. Banners de ações do Quick Look encerram o visualizador ao serem acionados, por isso não substituem os controles do jogo.
+- No modo interativo, um dedo desloca a âncora no plano; dois dedos ampliam/reduzem, giram e deslocam. “Recolocar” aceita uma nova superfície. Botões −/+/100% ajustam somente o tamanho, preservando lugar e rotação. A rodada e as animações não são reiniciadas por esses gestos. Proteções numéricas cobrem 0,01–100 vezes a escala inicial (largura 8 mm–80 m).
+- Duas araucárias do GLB original, com textura, em (-54, -41) e (56, 43). Ambas ficam fora do anel, com distância do tronco aos trilhos superior a 12 unidades e fora das áreas de oficina, personagens e alavanca. Copas permanecem dentro do terreno. A exportação nativa não as remove mais; não se alterou a vegetação da versão de tela.
+- Arquivo pronto: 39.129.418 bytes, crescimento de 1.646.236 bytes (4,4%). SHA-256: `721f12c98ccfaeb539f774c9dc3ad459eb95386c294598734bc699ec1b86d0af`.
+
+Nova auditoria local:
+
+- 57 testes aprovados, incluindo movimento, pinça, rotação, transição de dois dedos para um, cancelamento, retorno ao tamanho inicial sem mudar posição, supressão de seleção XR duplicada, entrada interativa no iPhone e afastamento das duas árvores dos trilhos.
+- Todos os valores de atributos e alvos de relacionamentos dos 7.372 prims anteriores do USDZ preservados (comparação semântica; caminhos de texturas comparados sem a parte resolvida dependente do diretório).
+- Nova validação OpenUSD: 30 validadores sem falhas; exatamente duas araucárias; três comportamentos nativos mantidos. Repetir a geração das árvores resulta no mesmo SHA-256.
+- Inspeção do layout dos controles em 390 × 844 e 844 × 390: todos os nove botões dentro da tela, sem rolagem horizontal. Essa inspeção visual não simula câmera nem rastreamento real.
+- Dependências alteradas versionadas com `20261107-ra3` para evitar reaproveitar o código anterior em cache.
+
+Referência para a limitação dos controles nativos: [Apple, WWDC20 — Shop online with AR Quick Look](https://developer.apple.com/videos/play/wwdc2020/10604/). Os limites de validação em aparelho físico descritos acima continuam válidos.
