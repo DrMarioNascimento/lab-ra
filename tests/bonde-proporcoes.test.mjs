@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import { lerGeometriaGLB } from '../dilema-bonde-3d/scripts/geometria-glb.mjs';
-import { ajustarProporcoes, ESCALA_PERSONAGENS } from '../dilema-bonde-3d/js/proporcoes.js';
+import { ajustarProporcoes, ESCALA_PERSONAGENS, FATOR_LARGURA_BONDE } from '../dilema-bonde-3d/js/proporcoes.js';
 import { angulosRelogio, ligarRelogio, PONTEIROS } from '../dilema-bonde-3d/js/relogio.js';
 import { comportamentoRelogio } from '../dilema-bonde-3d/ar/relogio-usdz.js';
 const estacao = await lerGeometriaGLB('dilema-bonde-3d/assets/estacao.glb');
@@ -17,19 +17,43 @@ const pisoAntes = box(estacao.getObjectByName('Piso_Plataforma')).clone();
 const relogioAntes = box(estacao.getObjectByName('Relogio')).clone();
 ajustarProporcoes(estacao,bonde);
 
-test('dimensões laterais e comprimento de cada vértice preservam vias e dormentes',()=>{
+test('carroceria alarga 12%; comprimento, estação, truques e pantógrafo preservam dimensões laterais',()=>{
   for(const modelo of [estacao,bonde]) {
     modelo.updateMatrixWorld(true);
     modelo.traverse(o=>{if(!o.isMesh)return;
       const original=antes.get(o),a=new THREE.Vector3(),b=new THREE.Vector3();
+      let fixo=modelo===estacao;for(let p=o;p;p=p.parent)if(/^Truque_|^Pantografo$/.test(p.name))fixo=true;
       const pos=o.geometry.attributes.position,velha=original.geometria.attributes.position;
       for(let i=0;i<pos.count;i++) {
         a.fromBufferAttribute(velha,i).applyMatrix4(original.matriz);
         b.fromBufferAttribute(pos,i).applyMatrix4(o.matrixWorld);
-        assert(Math.abs(a.x-b.x)<.00001);assert(Math.abs(a.z-b.z)<.00001);
+        assert(Math.abs(a.x-b.x)<.00001);assert(Math.abs(a.z*(fixo?1:FATOR_LARGURA_BONDE)-b.z)<.00001);
       }
     });
   }
+});
+test('carroceria tem 2,80 unidades e o contorno físico mantém folga na plataforma',()=>{
+  const largura=box(bonde.getObjectByName('Carroceria')).getSize(new THREE.Vector3()).z;
+  assert(largura>2.80&&largura<2.81);
+  const piso=box(estacao.getObjectByName('Piso_Plataforma')),eixo=estacao.getObjectByName('Eixo_Via').position.z;
+  const zs=[];estacao.getObjectByName('Piso_Plataforma').traverse(o=>{if(!o.isMesh)return;
+    const p=o.geometry.attributes.position;for(let i=0;i<p.count;i++)zs.push(new THREE.Vector3().fromBufferAttribute(p,i).applyMatrix4(o.matrixWorld).z);
+  });
+  const esquerda=Math.max(...zs.filter(z=>z<eixo))-eixo,direita=Math.min(...zs.filter(z=>z>eixo))-eixo;
+  const contorno=[];const alturas=[piso.min.y-.42,piso.max.y-.42];
+  bonde.traverse(o=>{if(!o.isMesh)return;
+    for(let p=o;p;p=p.parent)if(p.name==='Feixes_Farol')return; // luz não é obstáculo físico
+    const g=o.geometry,p=g.attributes.position,n=g.index?.count??p.count;
+    for(let i=0;i<n;i+=3){
+      const vs=[0,1,2].map(k=>new THREE.Vector3().fromBufferAttribute(p,g.index?g.index.getX(i+k):i+k).applyMatrix4(o.matrixWorld));
+      for(const y of alturas)for(let k=0;k<3;k++){
+        const a=vs[k],b=vs[(k+1)%3];if((a.y-y)*(b.y-y)>0)continue;
+        if(Math.abs(a.y-b.y)<1e-10){if(Math.abs(a.y-y)<1e-6)contorno.push(a.z,b.z);continue;}
+        contorno.push(a.z+(b.z-a.z)*(y-a.y)/(b.y-a.y));
+      }
+    }
+  });
+  assert(contorno.length>0);assert(Math.min(...contorno)-esquerda>.05);assert(direita-Math.max(...contorno)>.05);
 });
 test('rodas e truques conservam geometria; plataforma conserva nível; cobertura libera pantógrafo',()=>{
   bonde.traverse(o=>{if(!o.isMesh)return;

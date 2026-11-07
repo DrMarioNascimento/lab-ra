@@ -61,7 +61,9 @@ bonde = next(p for p in stage.Traverse() if p.GetName() == 'Bonde')
 carroceria = bonde.GetChild('Carroceria')
 cabine = limites(carroceria, bonde)
 assert 6.91 < cabine.GetMax()[1] < 6.94, 'Altura da cabine não foi atualizada'
-assert 2.49 < cabine.GetSize()[2] < 2.51, 'Largura da cabine mudou'
+assert 2.79 < cabine.GetSize()[2] < 2.81, 'Carroceria não recebeu o alargamento de 12%'
+for nome in ['Truque_Traseiro','Truque_Dianteiro']:
+    assert abs(limites(bonde.GetChild(nome),bonde).GetSize()[2]-1.725)<.005, 'A bitola dos truques foi alterada'
 estacao = next(p for p in stage.Traverse() if p.GetName() == 'Estacao')
 teto = next(p for p in Usd.PrimRange(estacao) if p.GetName() == 'Ala_Oeste_Estrutura_telhado_metal_azul')
 assert limites(teto,estacao).GetMin()[1] - (limites(bonde,bonde).GetMax()[1]+.42) > .4

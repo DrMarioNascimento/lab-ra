@@ -7,7 +7,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { ARAUCARIAS_RA } from './vegetacao-ra.js?v=20261107-ra8';
-import { ajustarProporcoes, ESCALA_PERSONAGENS, FATOR_OPERADOR, ESCALA_OFICINA } from './proporcoes.js?v=20261107-ra8';
+import { ajustarProporcoes, ESCALA_PERSONAGENS, FATOR_OPERADOR, ESCALA_OFICINA } from './proporcoes.js?v=20261107-ra9';
 import { criarCidade } from './cidade.js?v=20261107-ra8';
 import { ligarRelogio } from './relogio.js?v=20261107-ra7';
 
