@@ -93,7 +93,10 @@ const distVia = (x, z) => { let m = 1e9; for (const [a, b] of amostrasVia) m = M
 export async function criarMaquete(opts = {}) {
   const root = new THREE.Group(); root.name = 'Maquete';
   const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
-  const carregar = url => new Promise((ok, erro) => loader.load(BASE + url, g => ok(g.scene), undefined, erro));
+  // versões leves (sufixo _ra) para a RA nativa do iPhone: o USDZ guarda a geometria em texto
+  const LEVES = new Set(['araucaria', 'arvore', 'arvore_nova1', 'oficina', 'cientista', 'colega', 'criancas', 'desconhecidos', 'estudante', 'gestante', 'idoso', 'operador', 'trabalhador', 'vinculo']);
+  const nomeArq = url => { const b = url.replace('.glb', ''); return opts.ra && LEVES.has(b) ? b + '_ra.glb' : url; };
+  const carregar = url => new Promise((ok, erro) => loader.load(BASE + nomeArq(url), g => ok(g.scene), undefined, erro));
 
   // ---------- terreno da maquete (base com bordas de terra) ----------
   {
@@ -316,13 +319,15 @@ export async function criarMaquete(opts = {}) {
     pausar() { estado.rodando = false; },
     reiniciar() {
       Object.assign(estado, { s: estado.s0, v: 0, rodando: false, impacto: false, travado: false });
-      [grupoPrincipal, grupoRamal].forEach(g => { g.userData.caido = 0; g.children.forEach(p => { p.rotation.x = 0; p.position.y = 0; }); });
+      [grupoPrincipal, grupoRamal].forEach(g => { g.userData.caido = 0; g.children.forEach((p, i) => { p.rotation.x = 0; p.position.y = 0; p.position.z = (i % 2) * 0.25 - 0.1; }); });
       posicionarBonde();
     },
     irPara(rota, s) { estado.rota = rota; aplicarAlavanca(true); estado.s = s; estado.travado = s + 6.6 > S_DESVIO; posicionarBonde(); },
     S_ALVO,
     atingido() { return estado.rota === 'principal' ? 'principal' : 'ramal'; },
     alvoToque, alavanca,
+    // partes que se movem durante a rodada (para gravar o percurso da RA nativa do iPhone)
+    partesMoveis: () => [bonde, haste, ...agulhas.map(a => a.piv), disco, ...grupoPrincipal.children, ...grupoRamal.children],
     update(dt) {
       // alavanca e agulhas acompanham o estado com suavidade
       const alvoAng = estado.rota === 'ramal' ? 0.55 : -0.55;

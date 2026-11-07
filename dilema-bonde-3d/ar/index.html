@@ -200,6 +200,40 @@ async function iniciarGiroscopio() {
   });
 }
 
+// =====================================================================
+// iPhone/iPad: RA NATIVA (AR Quick Look) — tela cheia, apoiada na mesa, pinça e arraste do iOS,
+// com as placas "Manter o curso", "Desviar o bonde" e "Reiniciar" na mesa (mesmo recurso do músculo-sarcômero)
+// =====================================================================
+const ehIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+if (ehIOS || new URLSearchParams(location.search).has('quicklook')) {
+  const bt = document.getElementById('comecar'), info = document.querySelector('#inicio > div > div');
+  info.innerHTML = 'Abre na câmera do iPhone, em tela cheia: aponte para a mesa ou o chão.<br>Na mesa aparecem três placas: <b>Manter o curso</b>, <b>Desviar o bonde</b> e <b>Reiniciar</b> — toque nelas.<br>Pinça aproxima e afasta; arraste para mudar de lugar.';
+  const outro = document.createElement('button'); outro.textContent = 'Trocar personagens'; outro.style.cssText = 'margin-left:10px;background:linear-gradient(#5b6b82,#3d4a5c);box-shadow:0 5px 0 #26303d,0 10px 20px rgba(0,0,0,.35)'; bt.after(outro);
+  const ancoraAR = document.createElement('a'); ancoraAR.rel = 'ar'; ancoraAR.hidden = true; ancoraAR.appendChild(document.createElement('img')); document.body.appendChild(ancoraAR);
+  const PAPEIS = ['trabalhador', 'idoso', 'gestante', 'criancas', 'estudante', 'cientista', 'colega', 'vinculo', 'desconhecidos'];
+  let url = null, montando = false;
+  const preparar = async () => {
+    if (montando) return; montando = true; bt.disabled = true; outro.disabled = true; bt.textContent = 'Preparando a RA…';
+    try {
+      const pool = [...PAPEIS], a = pool.splice(Math.floor(Math.random() * pool.length), 1)[0], b = pool[Math.floor(Math.random() * pool.length)];
+      const { criarMaquete: cm } = await import('../js/cena.js?v=' + Date.now());       // cena nova a cada preparo
+      const { montarUSDZ } = await import('./quicklook.js');
+      const m = await cm({ grupos: { presetPrincipal: a, nPrincipal: 1, presetRamal: b, nRamal: 3 }, ra: true });
+      const { usdz } = await montarUSDZ(m);
+      if (url) URL.revokeObjectURL(url);
+      url = URL.createObjectURL(new Blob([usdz], { type: 'model/vnd.usdz+zip' })); ancoraAR.href = url;
+      const nome = { trabalhador: 'trabalhador', idoso: 'idoso', gestante: 'gestante', criancas: 'criança', estudante: 'estudante', cientista: 'cientista', colega: 'colega de turma', vinculo: 'vínculo afetivo', desconhecidos: 'desconhecidos' };
+      bt.textContent = 'Abrir em realidade aumentada'; bt.disabled = false;
+      info.innerHTML += `<br><small>Nesta rodada: trilho principal com 1 ${nome[a]}; ramal com 3 (${nome[b]}).</small>`;
+    } catch (e) { console.error(e); bt.textContent = 'Não foi possível preparar a RA'; info.textContent = String(e && e.message || e); }
+    montando = false; outro.disabled = false;
+  };
+  // o toque tem de abrir o Quick Look sem nenhuma espera antes (regra do Safari)
+  bt.onclick = () => { if (ancoraAR.href) ancoraAR.click(); };
+  outro.onclick = () => { info.innerHTML = info.innerHTML.replace(/<br><small>.*<\/small>/, ''); preparar(); };
+  document.getElementById('overlay').style.display = 'none';
+  preparar();
+} else
 document.getElementById('comecar').onclick = async () => {
   document.getElementById('inicio').remove();
   try {
