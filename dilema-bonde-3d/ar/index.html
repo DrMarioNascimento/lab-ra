@@ -206,33 +206,37 @@ async function iniciarGiroscopio() {
 // =====================================================================
 const ehIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 if (ehIOS || new URLSearchParams(location.search).has('quicklook')) {
-  const bt = document.getElementById('comecar'), info = document.querySelector('#inicio > div > div');
-  info.innerHTML = 'Abre na câmera do iPhone, em tela cheia: aponte para a mesa ou o chão.<br>Na mesa aparecem três placas: <b>Manter o curso</b>, <b>Desviar o bonde</b> e <b>Reiniciar</b> — toque nelas.<br>Pinça aproxima e afasta; arraste para mudar de lugar.';
-  const outro = document.createElement('button'); outro.textContent = 'Trocar personagens'; outro.style.cssText = 'margin-left:10px;background:linear-gradient(#5b6b82,#3d4a5c);box-shadow:0 5px 0 #26303d,0 10px 20px rgba(0,0,0,.35)'; bt.after(outro);
-  const ancoraAR = document.createElement('a'); ancoraAR.rel = 'ar'; ancoraAR.hidden = true; ancoraAR.appendChild(document.createElement('img')); document.body.appendChild(ancoraAR);
-  const PAPEIS = ['trabalhador', 'idoso', 'gestante', 'criancas', 'estudante', 'cientista', 'colega', 'vinculo', 'desconhecidos'];
-  let url = null, montando = false;
-  const preparar = async () => {
-    if (montando) return; montando = true; bt.disabled = true; outro.disabled = true; bt.textContent = 'Preparando a RA…';
-    try {
-      const pool = [...PAPEIS], a = pool.splice(Math.floor(Math.random() * pool.length), 1)[0], b = pool[Math.floor(Math.random() * pool.length)];
-      const { criarMaquete: cm } = await import('../js/cena.js?v=' + Date.now());       // cena nova a cada preparo
-      const { montarUSDZ } = await import('./quicklook.js');
-      const m = await cm({ grupos: { presetPrincipal: a, nPrincipal: 1, presetRamal: b, nRamal: 3 }, ra: true });
-      const { usdz } = await montarUSDZ(m);
-      if (url) URL.revokeObjectURL(url);
-      url = URL.createObjectURL(new Blob([usdz], { type: 'model/vnd.usdz+zip' })); ancoraAR.href = url;
-      const nome = { trabalhador: 'trabalhador', idoso: 'idoso', gestante: 'gestante', criancas: 'criança', estudante: 'estudante', cientista: 'cientista', colega: 'colega de turma', vinculo: 'vínculo afetivo', desconhecidos: 'desconhecidos' };
-      bt.textContent = 'Abrir em realidade aumentada'; bt.disabled = false;
-      info.innerHTML += `<br><small>Nesta rodada: trilho principal com 1 ${nome[a]}; ramal com 3 (${nome[b]}).</small>`;
-    } catch (e) { console.error(e); bt.textContent = 'Não foi possível preparar a RA'; info.textContent = String(e && e.message || e); }
-    montando = false; outro.disabled = false;
-  };
-  // o toque tem de abrir o Quick Look sem nenhuma espera antes (regra do Safari)
-  bt.onclick = () => { if (ancoraAR.href) ancoraAR.click(); };
-  outro.onclick = () => { info.innerHTML = info.innerHTML.replace(/<br><small>.*<\/small>/, ''); preparar(); };
+  // MESMO ESQUEMA DAS OUTRAS RA DO LAB-RA (ex.: A Casa da Costa): link <a rel="ar"> VISÍVEL,
+  // tocado diretamente, apontando para um .usdz pronto no servidor.
+  const card = document.querySelector('#inicio > div');
+  card.innerHTML = `<h2 style="margin:0 0 8px">Dilema do Bonde em RA</h2>
+    <a id="linkAR" rel="ar" href="maquete.usdz" style="display:inline-flex;flex-direction:column;align-items:center;gap:10px;padding:14px 16px;border-radius:18px;background:linear-gradient(#e0473a,#b22a20);box-shadow:0 5px 0 #7a1a12,0 10px 20px rgba(0,0,0,.35);color:#fff;text-decoration:none;font:800 17px Nunito,system-ui">
+      <img src="maquete-ar.jpg" alt="Maquete do Dilema do Bonde" style="width:220px;border-radius:12px;pointer-events:none">Toque para abrir na câmera</a>
+    <p id="statusAR" style="margin:14px 0 0">Aponte para a mesa ou o chão. Na mesa aparecem as placas <b>Manter o curso</b>, <b>Desviar o bonde</b> e <b>Reiniciar</b> — toque nelas. Pinça aproxima; arraste muda de lugar.</p>
+    <p style="margin:10px 0 0;font-size:14px"><small id="paresAR">Nesta versão: 1 trabalhador no trilho principal; 3 desconhecidos no ramal.</small></p>
+    <button id="trocarAR" style="margin-top:12px;height:48px;padding:0 22px;border-radius:999px;border:0;font:800 15px Nunito,system-ui;color:#fff;background:linear-gradient(#5b6b82,#3d4a5c);box-shadow:0 5px 0 #26303d">Trocar personagens</button>
+    <div style="margin-top:14px;font-size:14px"><a href="../index.html" style="color:#f5c97a">Ver sem RA</a></div>`;
   document.getElementById('overlay').style.display = 'none';
-  preparar();
+  const a = document.getElementById('linkAR'), st = document.getElementById('statusAR'), bt = document.getElementById('trocarAR');
+  let suporta = false; try { suporta = !!(a.relList && a.relList.supports && a.relList.supports('ar')); } catch (e) {}
+  if (!suporta) { a.removeAttribute('rel'); st.textContent = 'Este aparelho não abre a RA do iPhone. Use o Safari (não um app interno) e toque de novo.'; }
+  const PAPEIS = ['trabalhador', 'idoso', 'gestante', 'criancas', 'estudante', 'cientista', 'colega', 'vinculo', 'desconhecidos'];
+  const NOME = { trabalhador: 'trabalhador', idoso: 'idoso', gestante: 'gestante', criancas: 'criança', estudante: 'estudante', cientista: 'cientista', colega: 'colega de turma', vinculo: 'vínculo afetivo', desconhecidos: 'desconhecidos' };
+  let url = null;
+  // outros personagens: o iPhone monta um novo arquivo; o mesmo link passa a abri-lo
+  bt.onclick = async () => {
+    bt.disabled = true; bt.textContent = 'Montando…';
+    try {
+      const pool = [...PAPEIS], p1 = pool.splice(Math.floor(Math.random() * pool.length), 1)[0], p3 = pool[Math.floor(Math.random() * pool.length)];
+      const { criarMaquete: cm } = await import('../js/cena.js?v=' + Date.now());
+      const { montarUSDZ } = await import('./quicklook.js');
+      const m = await cm({ grupos: { presetPrincipal: p1, nPrincipal: 1, presetRamal: p3, nRamal: 3 }, ra: true });
+      const { usdz } = await montarUSDZ(m);
+      if (url) URL.revokeObjectURL(url); url = URL.createObjectURL(new Blob([usdz], { type: 'model/vnd.usdz+zip' }));
+      a.href = url; document.getElementById('paresAR').textContent = `Nesta versão: 1 ${NOME[p1]} no trilho principal; 3 (${NOME[p3]}) no ramal.`;
+    } catch (e) { console.error(e); st.textContent = 'Não deu para montar outros personagens neste aparelho; o link abre a versão padrão.'; a.href = 'maquete.usdz'; }
+    bt.disabled = false; bt.textContent = 'Trocar personagens';
+  };
 } else
 document.getElementById('comecar').onclick = async () => {
   document.getElementById('inicio').remove();

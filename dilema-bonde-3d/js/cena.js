@@ -211,11 +211,36 @@ export async function criarMaquete(opts = {}) {
 
   // grupos nos trilhos
   const grupoPrincipal = new THREE.Group(), grupoRamal = new THREE.Group(); root.add(grupoPrincipal, grupoRamal);
+  for (const g of [grupoPrincipal, grupoRamal]) { const f = new THREE.Group(); f.name = 'Fantasmas'; g.userData.fantasmas = f; root.add(f); }
   const POS_PRINCIPAL = V(4, 0.27, ZB), POS_RAMAL = V(-8, 0.27, ZR);
   const S_ALVO = { principal: sNoPonto(ROTAS.principal, POS_PRINCIPAL.x, POS_PRINCIPAL.z), ramal: sNoPonto(ROTAS.ramal, POS_RAMAL.x, POS_RAMAL.z) };
+  // FANTASMINHA (como no Dilema do Bonde 2D): corpo branco translúcido, barra ondulada, olhos e sorriso
+  const matFantasma = new THREE.MeshStandardMaterial({ name: 'fantasma', color: 0xf5f7f8, emissive: 0x9aa3a8, emissiveIntensity: 0.35, roughness: 0.6, transparent: true, opacity: 0.88, depthWrite: false });
+  const matOlho = new THREE.MeshStandardMaterial({ name: 'fantasma_olho', color: 0x37474f, roughness: 0.4 });
+  const geoFantasma = (() => {
+    const pts = [[0, 2.42], [0.22, 2.38], [0.42, 2.22], [0.55, 1.98], [0.6, 1.6], [0.6, 1.0], [0.62, 0.55], [0.66, 0.32]].map(([r, y]) => new THREE.Vector2(r, y));
+    const g = new THREE.LatheGeometry(pts, 36), p = g.attributes.position;
+    for (let i = 0; i < p.count; i++) { const y = p.getY(i); if (y < 0.6) { const a = Math.atan2(p.getZ(i), p.getX(i)); p.setY(i, y + (0.6 - y) / 0.28 * 0.11 * Math.sin(a * 7)); } }
+    g.computeVertexNormals(); return g;
+  })();
+  function criarFantasma() {
+    const f = new THREE.Group(); f.name = 'Fantasma';
+    f.add(new THREE.Mesh(geoFantasma, matFantasma));
+    for (const sx of [-1, 1]) {
+      const o = new THREE.Mesh(new THREE.SphereGeometry(0.1, 14, 10), matOlho); o.scale.set(1, 1.15, 0.5); o.position.set(sx * 0.19, 1.98, 0.5); f.add(o);
+      const b = new THREE.Mesh(new THREE.SphereGeometry(0.03, 8, 6), new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.5 })); b.position.set(sx * 0.19 + 0.035, 2.03, 0.55); f.add(b);
+    }
+    const boca = new THREE.Mesh(new THREE.TorusGeometry(0.13, 0.022, 6, 16, Math.PI * 0.8), matOlho); boca.rotation.z = Math.PI + Math.PI * 0.1; boca.position.set(0, 1.78, 0.56); f.add(boca);
+    f.scale.setScalar(1e-4); f.visible = true; return f;
+  }
+  const PEQ = 1e-4;
   function montarGrupo(grupo, centro, preset, n) {
     grupo.clear(); grupo.position.copy(centro); grupo.userData.caido = 0;
-    for (let i = 0; i < n; i++) { const p = modelo(preset); p.position.x = (i - (n - 1) / 2) * 0.85 * ESC_PERS; p.position.z = (i % 2) * 0.25 - 0.1; p.rotation.y = (i - (n - 1) / 2) * 0.12; grupo.add(p); }
+    const fant = grupo.userData.fantasmas; if (fant) fant.clear();
+    for (let i = 0; i < n; i++) {
+      const p = modelo(preset); p.position.x = (i - (n - 1) / 2) * 0.85 * ESC_PERS; p.position.z = (i % 2) * 0.25 - 0.1; p.rotation.y = (i - (n - 1) / 2) * 0.12; grupo.add(p);
+      const f = criarFantasma(); f.position.copy(p.position); f.userData.base = p.position.clone(); fant.add(f);
+    }
   }
 
   // ---------- vegetação, pedras e cidadezinha ----------
@@ -319,7 +344,8 @@ export async function criarMaquete(opts = {}) {
     pausar() { estado.rodando = false; },
     reiniciar() {
       Object.assign(estado, { s: estado.s0, v: 0, rodando: false, impacto: false, travado: false });
-      [grupoPrincipal, grupoRamal].forEach(g => { g.userData.caido = 0; g.children.forEach((p, i) => { p.rotation.x = 0; p.position.y = 0; p.position.z = (i % 2) * 0.25 - 0.1; }); });
+      [grupoPrincipal, grupoRamal].forEach(g => { g.userData.caido = 0; g.children.forEach((p, i) => { p.rotation.x = 0; p.position.y = 0; p.position.z = (i % 2) * 0.25 - 0.1; p.scale.setScalar(1); });
+        g.userData.fantasmas.children.forEach(f => { f.scale.setScalar(PEQ); f.position.copy(f.userData.base); }); });
       posicionarBonde();
     },
     irPara(rota, s) { estado.rota = rota; aplicarAlavanca(true); estado.s = s; estado.travado = s + 6.6 > S_DESVIO; posicionarBonde(); },
@@ -327,7 +353,7 @@ export async function criarMaquete(opts = {}) {
     atingido() { return estado.rota === 'principal' ? 'principal' : 'ramal'; },
     alvoToque, alavanca,
     // partes que se movem durante a rodada (para gravar o percurso da RA nativa do iPhone)
-    partesMoveis: () => [bonde, haste, ...agulhas.map(a => a.piv), disco, ...grupoPrincipal.children, ...grupoRamal.children],
+    partesMoveis: () => [bonde, haste, ...agulhas.map(a => a.piv), disco, ...grupoPrincipal.children, ...grupoRamal.children, ...grupoPrincipal.userData.fantasmas.children, ...grupoRamal.userData.fantasmas.children],
     update(dt) {
       // alavanca e agulhas acompanham o estado com suavidade
       const alvoAng = estado.rota === 'ramal' ? 0.55 : -0.55;
@@ -350,11 +376,18 @@ export async function criarMaquete(opts = {}) {
         if (estado.s >= sFim - 0.02) { estado.s = sFim; estado.v = 0; estado.rodando = false; estado.aoFim && estado.aoFim(estado.rota); }
         posicionarBonde();
       }
-      // queda dos atingidos
+      // atingidos: o boneco some e o fantasminha sobe (~3,2 s), como no Dilema do Bonde 2D
       for (const g of [grupoPrincipal, grupoRamal]) if (g.userData.caido > 0 && g.userData.caido < 1) {
-        g.userData.caido = Math.min(1, g.userData.caido + dt * 2.2);
-        const k = 1 - (1 - g.userData.caido) ** 3;
-        g.children.forEach((p, i) => { p.rotation.x = -k * (Math.PI / 2 - 0.05); p.position.y = 0.05 * k; p.position.z = (i % 2) * 0.25 - 0.1 - k * 0.2; });
+        g.userData.caido = Math.min(1, g.userData.caido + dt / 3.4);
+        const k = g.userData.caido, ESC_F = ESC_PERS * 0.95;
+        g.children.forEach(p => p.scale.setScalar(Math.max(PEQ, 1 - k * 8)));
+        g.userData.fantasmas.children.forEach((f, i) => {
+          const t = THREE.MathUtils.clamp((k - i * 0.025) / 0.94, 0, 1);
+          const e = t < 0.08 ? t / 0.08 : t > 0.82 ? Math.max(0, (1 - t) / 0.18) : 1;
+          f.scale.setScalar(Math.max(PEQ, ESC_F * e * (0.92 + 0.12 * t)));
+          f.position.set(f.userData.base.x + Math.sin(t * 9 + i) * 0.25, f.userData.base.y + 0.2 + t * 7.5 + t * t * 2, f.userData.base.z);
+          matFantasma.opacity = 0.88;
+        });
       }
     },
   };
