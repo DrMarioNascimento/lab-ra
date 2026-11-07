@@ -1,10 +1,10 @@
 name: Auditar RA do Bonde
 on:
   push:
-    branches: [main, codex/corrigir-ra-bonde-20261107]
-    paths: ['dilema-bonde-3d/**', 'tests/bonde-ra.test.mjs', '.github/workflows/bonde-ra.yml']
+    branches: [main, codex/bonde-gestos-araucarias-20261107]
+    paths: ['dilema-bonde-3d/**', 'tests/bonde-*.test.mjs', '.github/workflows/bonde-ra.yml']
   pull_request:
-    paths: ['dilema-bonde-3d/**', 'tests/bonde-ra.test.mjs', '.github/workflows/bonde-ra.yml']
+    paths: ['dilema-bonde-3d/**', 'tests/bonde-*.test.mjs', '.github/workflows/bonde-ra.yml']
 permissions:
   contents: read
 jobs:
@@ -25,17 +25,19 @@ jobs:
           python-version: '3.12'
       - run: npm ci
       - run: python -m pip install usd-core==26.11
-      # Migração única do arquivo binário na branch de reparo. Nunca escreve em main.
-      - name: Normalizar arquivo nativo existente
-        if: github.event_name == 'push' && github.ref == 'refs/heads/codex/corrigir-ra-bonde-20261107'
+      # Reproduz a atualização binária na branch de trabalho; nunca escreve em main.
+      - name: Restaurar duas araucárias no arquivo nativo
+        if: github.event_name == 'push' && github.ref == 'refs/heads/codex/bonde-gestos-araucarias-20261107'
         run: |
-          python dilema-bonde-3d/tests/validar-usdz.py --corrigir-tipos
+          node dilema-bonde-3d/scripts/araucarias-usdz.mjs /tmp/bonde-araucarias
+          python dilema-bonde-3d/scripts/inserir-araucarias-usdz.py /tmp/bonde-araucarias
+          python dilema-bonde-3d/tests/validar-usdz.py
           if ! git diff --quiet -- dilema-bonde-3d/ar/maquete.usdz; then
             git config user.name 'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
             git add dilema-bonde-3d/ar/maquete.usdz
-            git commit -m "Corrige tipos USD dos materiais da maquete nativa"
-            git push origin HEAD:codex/corrigir-ra-bonde-20261107
+            git commit -m "Restaura duas araucárias fora dos trilhos no USDZ nativo"
+            git push origin HEAD:codex/bonde-gestos-araucarias-20261107
           fi
       - run: npm test
       - run: python dilema-bonde-3d/tests/validar-usdz.py

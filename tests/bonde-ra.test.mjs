@@ -6,7 +6,7 @@ import * as THREE from '../dilema-bonde-3d/vendor/three/three.module.js';
 
 const entrada = fs.readFileSync(new URL('../dilema-bonde-3d/ar/entrada.js',import.meta.url),'utf8');
 const html = fs.readFileSync(new URL('../dilema-bonde-3d/ar/index.html',import.meta.url),'utf8');
-function harness({ua='iPhone',platform='',touch=0,ar=true,top=false,load=async()=>{throw Error('importação inesperada');}}={}) {
+function harness({ua='iPhone',platform='',touch=0,ar=true,top=false,search='',load=async()=>{throw Error('importação inesperada');}}={}) {
   const events={}, imports=[], revoked=[], clicked=[];
   class Element {
     hidden=false; disabled=false; textContent=''; children=[]; attrs={}; events={};
@@ -18,13 +18,13 @@ function harness({ua='iPhone',platform='',touch=0,ar=true,top=false,load=async()
     addEventListener(k,f){this.events[k]=f;} appendChild(e){this.children.push(e);return e;}
     click(){clicked.push(this);} remove(){}
   }
-  const els=Object.fromEntries(['nativo','web','linkAR','statusAR','trocarAR','paresAR','comecar','estadoEntrada'].map(id=>[id,new Element()]));
+  const els=Object.fromEntries(['nativo','web','linkAR','statusAR','trocarAR','paresAR','comecar','estadoEntrada','voltarNativo'].map(id=>[id,new Element()]));
   els.web.hidden=true;els.trocarAR.hidden=true;els.linkAR.href='maquete.usdz?v=20261107-ra1';els.linkAR.rel='ar';els.paresAR.textContent='rodada padrão';
   const doc={getElementById:id=>els[id],createElement:()=>new Element(),body:new Element()};
   const window={};window.top=top?{document:doc}:window;
   const U=class extends URL {};U.revokeObjectURL=x=>revoked.push(x);
   vm.runInNewContext(entrada.replace(/\bimport\(/g,'__import('),{
-    document:doc,window,navigator:{userAgent:ua,platform,maxTouchPoints:touch},location:{search:''},URLSearchParams,URL:U,
+    document:doc,window,navigator:{userAgent:ua,platform,maxTouchPoints:touch},location:{search},URLSearchParams,URL:U,
     __import:async url=>{imports.push(url);return load(url);},console:{warn(){}},setTimeout:()=>0,addEventListener:(n,f)=>{events[n]=f;},
     WebGLRenderingContext:class{constructor(){throw Error('WebGL proibido no caminho nativo');}}
   });
@@ -54,8 +54,8 @@ test('troca nativa bloqueia toque durante preparo e preserva a última rodada em
   const pending=h.els.trocarAR.onclick();await new Promise(resolve=>setImmediate(resolve));
   let prevented=false;h.els.linkAR.events.click({preventDefault(){prevented=true;}});assert(prevented);assert(h.els.trocarAR.disabled);
   finish({url:'blob:nova',descricao:'nova rodada'});await pending;
-  assert.equal(h.els.linkAR.href,'blob:nova');assert.equal(h.els.linkAR.getAttribute('download'),'dilema-bonde.usdz');
-  await h.els.trocarAR.onclick();assert.equal(h.els.linkAR.href,'blob:nova');assert.equal(h.els.paresAR.textContent,'nova rodada');
+  assert.equal(h.els.linkAR.href,'blob:nova#allowsContentScaling=1');assert.equal(h.els.linkAR.getAttribute('download'),'dilema-bonde.usdz');
+  await h.els.trocarAR.onclick();assert.equal(h.els.linkAR.href,'blob:nova#allowsContentScaling=1');assert.equal(h.els.paresAR.textContent,'nova rodada');
   assert.equal(h.els.trocarAR.disabled,false);assert.equal(h.els.linkAR.hasAttribute('aria-disabled'),false);assert.deepEqual(h.revoked,[]);
 });
 test('substituir uma rodada libera apenas o blob anterior e retorno por cache preserva o atual',async()=>{
@@ -71,6 +71,12 @@ test('falha de preparo web permite nova tentativa; abertura usa gesto sem espera
   await h.els.comecar.onclick();assert.match(h.els.comecar.textContent,/Abrir/);
   gesture=true;const run=h.els.comecar.onclick();gesture=false;await run;
   assert(called);assert.equal(n,2);assert.equal(h.els.comecar.disabled,false);assert.match(h.els.estadoEntrada.textContent,/não foram autorizados/);
+});
+
+test('iPhone pode escolher controles fixos e retornar ao nativo sem carregar WebGL antecipadamente',()=>{
+  const {els,imports}=harness({search:'?modo=interativo'});
+  assert(els.nativo.hidden);assert(!els.web.hidden);assert(!els.voltarNativo.hidden);assert.equal(imports.length,0);
+  assert.match(html,/maquete\.usdz\?v=[^"#]+#allowsContentScaling=1/);
 });
 
 test('motor: pedido XR síncrono, colocação, saída e reentrada liberam hit-test',async()=>{
