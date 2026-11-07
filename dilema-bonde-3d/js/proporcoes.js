@@ -1,11 +1,12 @@
 import * as THREE from 'three';
 
-// Personagens +60%. Bonde cresce somente acima do chassi; rodas, bitola,
-// comprimento e largura conservam a geometria original.
+// Personagens +60%. A carroceria cresce em altura e largura; os truques,
+// a bitola, o comprimento e o mecanismo do pantógrafo permanecem originais.
 export const ESCALA_PERSONAGENS = 2.4;
 export const FATOR_PERSONAGENS = ESCALA_PERSONAGENS / 1.5;
 export const ALTURA_CHASSI = .8;
 export const FATOR_CABINE = 2.2;
+export const FATOR_LARGURA_BONDE = 1.12;
 export const FATOR_OPERADOR = 1.35;
 export const ESCALA_OFICINA = 1.4;
 export const PISO_ESTACAO = 1.1;
@@ -15,7 +16,7 @@ const esticar = (y, piso, fator) => y <= piso ? y : piso + (y - piso) * fator;
 
 // Trabalha nas coordenadas do modelo, inclusive quando o GLB usa atributos
 // quantizados. Não muda os pivôs, importantes para rodas e ponteiros.
-function esticarMalhas(modelo, piso, fator, ignorar) {
+function esticarMalhas(modelo, piso, fator, ignorar, largura = 1) {
   modelo.updateMatrixWorld(true);
   const inversa = modelo.matrixWorld.clone().invert();
   modelo.traverse(o => {
@@ -29,10 +30,11 @@ function esticarMalhas(modelo, piso, fator, ignorar) {
     for (let i = 0; i < p.count; i++) {
       v.fromBufferAttribute(p, i).applyMatrix4(matriz);
       const acima = v.y > piso;
-      v.y = esticar(v.y, piso, fator); v.applyMatrix4(volta).toArray(pos, i * 3);
+      v.y = esticar(v.y, piso, fator); v.z *= largura; v.applyMatrix4(volta).toArray(pos, i * 3);
       if (n) {
         normal.fromBufferAttribute(n, i).applyMatrix3(normalIda);
         if (acima) normal.y /= fator;
+        normal.z /= largura;
         normal.applyMatrix3(normalVolta).normalize().toArray(norm, i * 3);
       }
     }
@@ -51,9 +53,9 @@ export function ajustarProporcoes(estacao, bonde) {
   esticarMalhas(estacao, PISO_ESTACAO, FATOR_ESTACAO, o => temAncestral(o, n => n === 'Relogio'));
   const relogio = estacao.getObjectByName('Relogio');
   if (relogio) relogio.position.y = esticar(relogio.position.y, PISO_ESTACAO, FATOR_ESTACAO);
-  esticarMalhas(bonde, ALTURA_CHASSI, FATOR_CABINE, o => temAncestral(o, n => /^Truque_|^Pantografo$/.test(n)));
+  esticarMalhas(bonde, ALTURA_CHASSI, FATOR_CABINE, o => temAncestral(o, n => /^Truque_|^Pantografo$/.test(n)), FATOR_LARGURA_BONDE);
   const pantografo = bonde.getObjectByName('Pantografo');
   if (pantografo) pantografo.position.y += ELEVACAO_PANTOGRAFO;
-  bonde.traverse(o => { if (o.isLight) o.position.y = esticar(o.position.y, ALTURA_CHASSI, FATOR_CABINE); });
+  bonde.traverse(o => { if (o.isLight) { o.position.y = esticar(o.position.y, ALTURA_CHASSI, FATOR_CABINE); o.position.z *= FATOR_LARGURA_BONDE; } });
   estacao.userData.proporcoesRA7 = bonde.userData.proporcoesRA7 = true;
 }

@@ -1,4 +1,4 @@
-import { criarMaquete } from '../js/cena.js?v=20261107-ra8';
+import { criarMaquete } from '../js/cena.js?v=20261107-ra9';
 import { montarUSDZ } from './quicklook.js?v=20261107-ra8';
 
 export async function prepararPersonagens() {
