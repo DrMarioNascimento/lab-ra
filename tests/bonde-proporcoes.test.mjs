@@ -2,12 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import { lerGeometriaGLB } from '../dilema-bonde-3d/scripts/geometria-glb.mjs';
-import { ajustarProporcoes, ESCALA_PERSONAGENS, FATOR_LARGURA_BONDE } from '../dilema-bonde-3d/js/proporcoes.js';
+import { ajustarProporcoes, ESCALA_PERSONAGENS, FATOR_LARGURA_BONDE, BITOLA } from '../dilema-bonde-3d/js/proporcoes.js';
 import { angulosRelogio, ligarRelogio, PONTEIROS } from '../dilema-bonde-3d/js/relogio.js';
 import { comportamentoRelogio } from '../dilema-bonde-3d/ar/relogio-usdz.js';
 const estacao = await lerGeometriaGLB('dilema-bonde-3d/assets/estacao.glb');
 const bonde = await lerGeometriaGLB('dilema-bonde-3d/assets/bonde.glb');
-const box = o => new THREE.Box3().setFromObject(o);
+const box = o => { o.updateWorldMatrix(true,true);return new THREE.Box3().setFromObject(o,true); };
 const antes = new Map();
 for (const modelo of [estacao,bonde]) {
   modelo.updateMatrixWorld(true);
@@ -17,25 +17,25 @@ const pisoAntes = box(estacao.getObjectByName('Piso_Plataforma')).clone();
 const relogioAntes = box(estacao.getObjectByName('Relogio')).clone();
 ajustarProporcoes(estacao,bonde);
 
-test('carroceria alarga 12%; comprimento, estação, truques e pantógrafo preservam dimensões laterais',()=>{
+test('bonde inteiro e estação alargam juntos sem alterar o comprimento',()=>{
   for(const modelo of [estacao,bonde]) {
     modelo.updateMatrixWorld(true);
     modelo.traverse(o=>{if(!o.isMesh)return;
       const original=antes.get(o),a=new THREE.Vector3(),b=new THREE.Vector3();
-      let fixo=modelo===estacao;for(let p=o;p;p=p.parent)if(/^Truque_|^Pantografo$/.test(p.name))fixo=true;
+      for(let p=o;p;p=p.parent)if(p.name==='Relogio')return; // mostrador rígido, verificado separadamente
       const pos=o.geometry.attributes.position,velha=original.geometria.attributes.position;
       for(let i=0;i<pos.count;i++) {
         a.fromBufferAttribute(velha,i).applyMatrix4(original.matriz);
         b.fromBufferAttribute(pos,i).applyMatrix4(o.matrixWorld);
-        assert(Math.abs(a.x-b.x)<.00001);assert(Math.abs(a.z*(fixo?1:FATOR_LARGURA_BONDE)-b.z)<.00001);
+        assert(Math.abs(a.x-b.x)<.00001);assert(Math.abs(a.z*FATOR_LARGURA_BONDE-b.z)<.00001);
       }
     });
   }
 });
-test('carroceria tem 2,80 unidades e o contorno físico mantém folga na plataforma',()=>{
+test('carroceria tem 4,00 unidades e a estação ampliada mantém folga na plataforma',()=>{
   const largura=box(bonde.getObjectByName('Carroceria')).getSize(new THREE.Vector3()).z;
-  assert(largura>2.80&&largura<2.81);
-  const piso=box(estacao.getObjectByName('Piso_Plataforma')),eixo=estacao.getObjectByName('Eixo_Via').position.z;
+  assert(largura>3.99&&largura<4.01);
+  const piso=box(estacao.getObjectByName('Piso_Plataforma')),eixo=estacao.getObjectByName('Eixo_Via').getWorldPosition(new THREE.Vector3()).z;
   const zs=[];estacao.getObjectByName('Piso_Plataforma').traverse(o=>{if(!o.isMesh)return;
     const p=o.geometry.attributes.position;for(let i=0;i<p.count;i++)zs.push(new THREE.Vector3().fromBufferAttribute(p,i).applyMatrix4(o.matrixWorld).z);
   });
@@ -53,7 +53,17 @@ test('carroceria tem 2,80 unidades e o contorno físico mantém folga na platafo
       }
     }
   });
-  assert(contorno.length>0);assert(Math.min(...contorno)-esquerda>.05);assert(direita-Math.max(...contorno)>.05);
+  assert(contorno.length>0);assert(Math.min(...contorno)-esquerda>.3);assert(direita-Math.max(...contorno)>.3);
+});
+test('os quatro rodeiros abrangem a bitola ampliada sem alterar o diâmetro das rodas',()=>{
+  for(let i=1;i<=4;i++){
+    const zs=[];bonde.getObjectByName(`Rodeiro_${i}_mesh_aro_roda`).traverse(o=>{if(!o.isMesh)return;
+      const p=o.geometry.attributes.position;for(let j=0;j<p.count;j++)zs.push(new THREE.Vector3().fromBufferAttribute(p,j).applyMatrix4(o.matrixWorld).z);
+      const original=antes.get(o),old=new THREE.Box3().setFromBufferAttribute(original.geometria.attributes.position).applyMatrix4(original.matriz),now=box(o);
+      assert(Math.abs(now.getSize(new THREE.Vector3()).y-old.getSize(new THREE.Vector3()).y)<1e-6);
+    });
+    for(const sinal of [-1,1]){const lado=zs.filter(z=>Math.sign(z)===sinal);assert(Math.min(...lado)<sinal*BITOLA/2-.036);assert(Math.max(...lado)>sinal*BITOLA/2+.036);}
+  }
 });
 test('rodas e truques conservam geometria; plataforma conserva nível; cobertura libera pantógrafo',()=>{
   bonde.traverse(o=>{if(!o.isMesh)return;

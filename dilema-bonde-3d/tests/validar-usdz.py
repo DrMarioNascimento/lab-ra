@@ -61,10 +61,29 @@ bonde = next(p for p in stage.Traverse() if p.GetName() == 'Bonde')
 carroceria = bonde.GetChild('Carroceria')
 cabine = limites(carroceria, bonde)
 assert 6.91 < cabine.GetMax()[1] < 6.94, 'Altura da cabine não foi atualizada'
-assert 2.79 < cabine.GetSize()[2] < 2.81, 'Carroceria não recebeu o alargamento de 12%'
+assert 3.99 < limites(carroceria,maquete).GetSize()[2] < 4.01, 'Bonde inteiro não recebeu a largura de 4,00'
 for nome in ['Truque_Traseiro','Truque_Dianteiro']:
-    assert abs(limites(bonde.GetChild(nome),bonde).GetSize()[2]-1.725)<.005, 'A bitola dos truques foi alterada'
+    assert abs(limites(bonde.GetChild(nome),maquete).GetSize()[2]-2.76)<.005, 'Truques não acompanham a nova bitola'
+alvos_bonde = [p for p in stage.Traverse() if p.GetName().startswith('rqbAlvo_') and p.GetName().endswith('_0')]
+assert len(alvos_bonde)>100
+for p in alvos_bonde:
+    matriz = UsdGeom.Xformable(p).GetLocalTransformation()
+    assert abs(matriz.TransformDir(Gf.Vec3d(0,0,1)).GetLength()/matriz.TransformDir(Gf.Vec3d(1,0,0)).GetLength()-1.6)<1e-6, 'Animação muda a largura do bonde'
 estacao = next(p for p in stage.Traverse() if p.GetName() == 'Estacao')
+eixo = next(p for p in Usd.PrimRange(estacao) if p.GetName() == 'Eixo_Via')
+eixo_pos = (cache.GetLocalToWorldTransform(eixo)*cache.GetLocalToWorldTransform(maquete).GetInverse()).ExtractTranslation()
+assert abs(eixo_pos[2]+30)<1e-6, 'Estação desalinhada dos trilhos'
+assert limites(estacao,maquete).GetSize()[2]>20, 'Estação não foi alargada'
+trilhos = next(p for p in stage.Traverse() if p.GetName() == 'Trilhos')
+afastamentos = []
+for p in Usd.PrimRange(trilhos):
+    if p.IsA(UsdGeom.Mesh):
+        matriz = cache.GetLocalToWorldTransform(p)*cache.GetLocalToWorldTransform(maquete).GetInverse()
+        for v in UsdGeom.Mesh(p).GetPointsAttr().Get():
+            v = matriz.Transform(Gf.Vec3d(v))
+            if abs(v[0])<1e-5 and abs(v[1]-.42)<1e-5 and abs(v[2]+30)<2:
+                afastamentos.append(abs(v[2]+30))
+assert afastamentos and abs(min(afastamentos)-1.112)<1e-4 and abs(max(afastamentos)-1.184)<1e-4, 'Bitola nativa não corresponde aos eixos'
 teto = next(p for p in Usd.PrimRange(estacao) if p.GetName() == 'Ala_Oeste_Estrutura_telhado_metal_azul')
 assert limites(teto,estacao).GetMin()[1] - (limites(bonde,bonde).GetMax()[1]+.42) > .4
 pessoa = next(p for p in stage.Traverse() if p.GetName() == 'rqbMovel_5')
@@ -75,14 +94,14 @@ oficina = next(p for p in stage.Traverse() if p.GetName() == 'Oficina')
 area = limites(oficina,maquete)
 assert area.GetSize()[0]>20.7 and area.GetSize()[1]>10.1
 assert area.GetMin()[0]>-4.5 and area.GetMax()[0]<16.5, 'Oficina encobre personagens do ramal'
-assert area.GetMin()[2]>10.8 and area.GetMax()[2]<27.2, 'Oficina invade a faixa dos trilhos'
+assert area.GetMin()[2]>9.4 and area.GetMax()[2]<25.6, 'Oficina invade a faixa dos trilhos'
 assert not any(p.GetName() in ['Arbustos_Flores','Floreiras','Objetos_Patio_folhagem','Objetos_Patio_flores_rosa'] for p in stage.Traverse())
 for lado in ['Frente','Fundos','Direita','Esquerda']:
     assert any(p.GetName().startswith('Cidade_Janelas_'+lado) for p in stage.Traverse()), 'Fachada sem janelas: '+lado
 fantasmas = [p for p in maquete.GetChildren() if p.GetName().startswith('Fantasmas')]
 assert sorted(len(p.GetChildren()) for p in fantasmas) == [1,3]
 for p in fantasmas:
-    esperado = (4,.27,30) if len(p.GetChildren()) == 1 else (-8,.27,8)
+    esperado = (4,.27,30) if len(p.GetChildren()) == 1 else (-8,.27,4)
     pos = UsdGeom.Xformable(p).GetLocalTransformation().ExtractTranslation()
     assert all(abs(a-b)<1e-8 for a,b in zip(pos,esperado)), 'Fantasmas fora do local do impacto'
     cache = UsdGeom.XformCache()
