@@ -10,7 +10,7 @@
 <small>LAB‑RA · EXPERIMENTO</small><h1>Dilema do Bonde em 3D</h1>
 <p>Siga o bonde pela frente da estação e acompanhe seu retorno pelo trilho ao fundo.</p>
 <div id="stage"><p id="fallback" role="status">Carregando a cena 3D…</p></div>
-<nav aria-label="Controles da cena"><button id="play" disabled>Pausar</button><button id="reset" disabled>Recomeçar</button><button id="slow" aria-pressed="false" disabled>Câmera lenta</button><button id="view" aria-pressed="false" disabled>Vista elevada</button><button id="ar" hidden>Colocar na mesa em RA</button></nav>
+<nav aria-label="Controles da cena"><button id="play" disabled>Pausar</button><button id="reset" disabled>Recomeçar</button><button id="slow" aria-pressed="false" disabled>Câmera lenta</button><button id="view" aria-pressed="false" disabled>Vista elevada</button><button id="ar" hidden>Colocar na mesa em RA</button><button id="route" aria-pressed="false">Testar desvio</button></nav>
 <p id="arHelp" role="status" hidden></p>
 <p id="phase"></p>
 </main>
@@ -51,7 +51,7 @@ function beam(parent,a,b,w,color) {
 }
 const model = new T.Group();
 scene.add(model);
-box(model,0xa4b9cf,0,-.15,0,100,.28,82);
+box(model,0x63794b,0,-.26,-5,83,.5,53);
 for(let i=0;i<29;i++){
   const x=(i-14)*2.65, h=1.5+((i*13)%11)*.44;
   const z=-26-(i%3)*1.5;
@@ -60,41 +60,42 @@ for(let i=0;i<29;i++){
 }
 const station = new T.Group();
 model.add(station);
-station.position.set(0,0,-1.5);
-box(station,0x8e9eab,0,.12,0,13.4,.24,4.5);
-box(station,0x768da2,0,1.55,0,11.8,2.85,3.55);
-function roof(width,depth,y,rise){
-  const shape=new T.Shape();
-  shape.moveTo(-depth/2,0);shape.lineTo(0,rise);shape.lineTo(depth/2,0);shape.closePath();
-  const geometry=new T.ExtrudeGeometry(shape,{depth:width,bevelEnabled:false});
-  geometry.rotateY(Math.PI/2);
-  mesh(station,geometry,0x586e82,-width/2,y,0);
+const stationDeck=2.1;
+station.position.set(0,stationDeck,-11.1);
+for(const side of [-1,1]){
+  box(station,0x929b99,0,.05,side*1.57,14,.3,1.15);
+  for(const x of [-6.5,-4.3,-2.15,0,2.15,4.3,6.5]){
+    box(station,0x465b69,x,1.67,side*2.02,.16,3.35,.16);
+    box(station,0x878d82,x,-stationDeck/2,side*1.65,.55,stationDeck,.55);
+    box(station,0xb9a87c,x,.65,side*1.7,.72,.12,.32);
+  }
+  box(station,0x536c7d,0,3.16,side*2.02,14.1,.2,.23);
+  const canopy=box(station,0x6f899d,0,3.62,side*1.13,14.2,.09,2.4);
+  canopy.rotation.x=side*.32;
 }
-roof(12.8,4.6,2.98,1.05);
-box(station,0x8499aa,0,3.9,.12,2.45,3,2.5);
-roof(3.4,3.05,5.45,.8);
+for(const x of [-7,-4.7,-2.35,0,2.35,4.7,7]){
+  beam(station,[x,3.32,-2.18],[x,4.04,0],.09,0x344d5f);
+  beam(station,[x,4.04,0],[x,3.32,2.18],.09,0x344d5f);
+}
+box(station,0x42596b,0,3.32,2.15,2.25,1.15,.18);
+for(let i=0;i<10;i++){
+  const rise=(10-i)*stationDeck/10;
+  box(station,0xa9a79a,0,rise/2-stationDeck,2.3+i*.23,1.65,rise,.24);
+}
 function disk(parent,color,x,y,z,r,depth){
   const item=mesh(parent,new T.CylinderGeometry(r,r,depth,32),color,x,y,z);
   item.rotation.x=Math.PI/2;
   return item;
 }
-for(const x of [-4.1,-1.38,1.38,4.1]){
-  for(const side of [-1,1]){
-    disk(station,0x4d6679,x,1.48,side*1.79,.68,.06);
-    box(station,0x4d6679,x,.94,side*1.79,1.36,1.12,.07);
-    disk(station,0x2e485b,x,1.46,side*1.84,.50,.06);
-    box(station,0x2e485b,x,.94,side*1.84,1,1.05,.06);
-  }
-}
-disk(station,0x25404c,0,4.39,1.42,.76,.14);
-disk(station,0xffecc4,0,4.39,1.51,.64,.04);
+disk(station,0x25404c,0,3.35,2.26,.45,.09);
+disk(station,0xffecc4,0,3.35,2.32,.37,.035);
 for(let i=0;i<12;i++){
   const a=i*Math.PI/6;
-  const tick=box(station,0x5c5647,Math.sin(a)*.54,4.39+Math.cos(a)*.54,1.54,.037,.12,.025);
+  const tick=box(station,0x5c5647,Math.sin(a)*.31,3.35+Math.cos(a)*.31,2.35,.021,.065,.018);
   tick.rotation.z=-a;
 }
-beam(station,[0,4.39,1.56],[.24,4.53,1.56],.062,0x383833);
-beam(station,[0,4.39,1.57],[.14,4.06,1.57],.044,0x383833);
+beam(station,[0,3.35,2.37],[.15,3.44,2.37],.04,0x383833);
+beam(station,[0,3.35,2.37],[.08,3.16,2.37],.03,0x383833);
 
 const straight=29, radius=5.1, rearTrackZ=-11.1;
 const curveCenterZ=(radius+rearTrackZ)/2;
@@ -121,7 +122,45 @@ function route(distance,lateral=0){
   const a=(s-2*straight)/curveRadius;
   return [-straight-r*Math.sin(a),curveCenterZ-r*Math.cos(a)];
 }
-function branch(t){return [junctionX+t*20,radius+8.8*t*t];}
+const branchEnd=27, branchSpan=branchEnd-junctionX;
+function branch(t){
+  const x=junctionX+t*branchSpan;
+  return [x,mainTrackZ(x)+8.6*Math.sin(Math.PI*t)**2];
+}
+function trackHeight(distance){
+  const s=((distance%length)+length)%length;
+  if(s<2*straight)return 0;
+  if(s<2*straight+arc)return stationDeck*smoothstep((s-2*straight)/arc);
+  if(s<4*straight+arc)return stationDeck;
+  return stationDeck*(1-smoothstep((s-4*straight-arc)/arc));
+}
+function carRoute(distance,useBranch){
+  const x=distance-straight;
+  return useBranch&&x>=junctionX&&x<=branchEnd
+    ? branch((x-junctionX)/branchSpan)
+    : route(distance);
+}
+for(const x of [-21,-14,-8,0,8,14,21]){
+  box(model,0x878d82,x,stationDeck/2-.06,rearTrackZ,.6,stationDeck,1.6);
+}
+box(model,0x778385,0,stationDeck-.11,rearTrackZ,58,.20,1.58);
+for(const start of [2*straight,4*straight+arc]){
+  for(let i=1;i<24;i++){
+    const s=start+i*arc/24;
+    const [x,z]=route(s),[nx,nz]=route(s+.05);
+    const y=trackHeight(s);
+    const deck=box(model,0x778385,x,y-.11,z,1.12,.20,1.58);
+    deck.rotation.y=Math.atan2(z-nz,nx-x);
+    if(i%4===0)box(model,0x878d82,x,y/2-.1,z,.57,Math.max(.05,y),1.4);
+  }
+}
+const workshopX=14,workshopZ=6.9;
+box(model,0xa9a18a,workshopX,.10,workshopZ,5.2,.20,2.5);
+box(model,0x9a8d75,workshopX,.86,workshopZ,4.7,1.55,2.05);
+box(model,0x435665,workshopX,1.72,workshopZ,5.15,.18,2.43);
+box(model,0x483e34,workshopX+.92,.77,workshopZ+1.04,1.55,1.35,.08);
+box(model,0xdbc68f,workshopX-1.12,.97,workshopZ+1.04,.78,.48,.08);
+
 function rail(points){
   const path=new T.CurvePath();
   for(let i=1;i<points.length;i++)path.add(new T.LineCurve3(points[i-1],points[i]));
@@ -130,7 +169,7 @@ function rail(points){
 for(const offset of [-.46,.46]){
   rail(Array.from({length:321},(_,i)=>{
     const [x,z]=route(i*length/320,offset);
-    return new T.Vector3(x,.12,z);
+    return new T.Vector3(x,trackHeight(i*length/320)+.12,z);
   }));
   rail(Array.from({length:31},(_,i)=>{
     const t=i/30;
@@ -141,30 +180,40 @@ for(const offset of [-.46,.46]){
 const sleeperGeo=new T.BoxGeometry(.19,.10,1.34);
 const mainSleeperCount=245;
 const firstBranchSleeper=5;
-const branchSleeperSteps=27;
-const sleeperCount=mainSleeperCount+branchSleeperSteps-firstBranchSleeper+1;
+const branchSleeperSteps=41;
+const lastBranchSleeper=branchSleeperSteps-firstBranchSleeper;
+const sleeperCount=mainSleeperCount+lastBranchSleeper-firstBranchSleeper+1;
 const sleepers=new T.InstancedMesh(sleeperGeo,material(0x79543f),sleeperCount);
 const dummy=new T.Object3D();
 for(let i=0;i<sleeperCount;i++){
   dummy.scale.set(1,1,1);
   if(i<mainSleeperCount){
     const d=i*length/mainSleeperCount,[x,z]=route(d),[nx,nz]=route(d+.05);
-    const t=(x-junctionX)/20;
-    const shared=d<2*straight&&t>=0&&t<firstBranchSleeper/branchSleeperSteps;
+    const t=(x-junctionX)/branchSpan;
+    const shared=d<2*straight&&t>=0&&t<=1&&(t<firstBranchSleeper/branchSleeperSteps||t>lastBranchSleeper/branchSleeperSteps);
     const extension=shared?branch(t)[1]-z:0;
     dummy.scale.z=1+extension/1.34;
-    dummy.position.set(x,.045,z+extension/2);
+    dummy.position.set(x,trackHeight(d)+.045,z+extension/2);
     dummy.rotation.y=Math.atan2(z-nz,nx-x);
   }else{
     const t=(i-mainSleeperCount+firstBranchSleeper)/branchSleeperSteps;
     const [x,z]=branch(t);
     dummy.position.set(x,.045,z);
-    dummy.rotation.y=-Math.atan(17.6*t/20);
+    const [nx,nz]=branch(t+.002);
+    dummy.rotation.y=Math.atan2(z-nz,nx-x);
   }
   dummy.updateMatrix();sleepers.setMatrixAt(i,dummy.matrix);
 }
 model.add(sleepers);
 
+const foliage=new T.IcosahedronGeometry(.82,1);
+for(const [x,z,size] of [[-25,-5,1.15],[-19,-3,.85],[-15,-6,1.15],[-9,-4,.68],[17,-5,.9],[23,-4,1.18],[26,-7,.82],[-23,-20,.9],[20,-20,1.1],[29,-19,1.2],[-28,-17,1.2]]){
+  box(model,0x66503a,x,.62*size,z,.17*size,1.24*size,.17*size);
+  const crown=mesh(model,foliage,0x496735,x,1.75*size,z);
+  crown.scale.set(size,1.35*size,size);
+  const tip=mesh(model,foliage,0x688147,x-.24*size,2.25*size,z+.12);
+  tip.scale.setScalar(.64*size);
+}
 const car=new T.Group();
 model.add(car);
 box(car,0xb91c20,0,1.02,0,5.05,1.43,1.52);
@@ -172,6 +221,8 @@ box(car,0xe53830,0,.72,0,5.07,.55,1.54);
 box(car,0x1d4679,0,1.04,0,5.1,.15,1.56);
 box(car,0x2d3942,0,1.78,0,5.16,.17,1.64);
 for(const side of [-1,1]){
+  box(car,0xe6bb75,0,1.12,side*.79,5.02,.036,.018);
+  box(car,0x762026,0,.52,side*.78,4.89,.10,.035);
   for(const x of [-1.95,-1.13,-.37,.37,1.13,1.95]){
     box(car,0x182d43,x,1.41,side*.77,.66,.56,.05);
     box(car,0x388bd1,x,1.41,side*.81,.55,.45,.035);
@@ -210,9 +261,10 @@ function person(x,z,coat){
   box(g,0x614d3b,0,1.53,0,.34,.065,.28);
 }
 for(const x of [7.2,9.1,11])person(x,mainTrackZ(x),0x9b7955);
-const [singleX,singleZ]=branch(.52);
+const [singleX,singleZ]=branch(.42);
 person(singleX,singleZ,0xe1e6e7);
 const controlAreaZ=9.05;
+box(model,0x979b91,-.65,.025,controlAreaZ,3.1,.09,1.05);
 person(-1.6,controlAreaZ,0x2e6392);
 beam(model,[.72,.14,controlAreaZ+.05],[.35,.95,controlAreaZ+.05],.08,0x5e7189);
 mesh(model,new T.SphereGeometry(.16,16,10),0xc8242d,.35,.95,controlAreaZ+.05);
@@ -232,12 +284,22 @@ function resize(){
   if(!w||!h||renderer.xr.isPresenting)return;
   camera.aspect=w/h;
   const overviewScale=Math.max(1,2.2/camera.aspect);
+  scene.fog.near=elevated?90:39;
+  scene.fog.far=elevated?145:92;
   if(elevated) camera.position.set(0,56*overviewScale,49*overviewScale);
   else camera.position.set(0,7.2,Math.max(25,53/camera.aspect));
   camera.lookAt(0,elevated?1.9:3.65,0);camera.updateProjectionMatrix();renderer.setSize(w,h,false);
 }
 new ResizeObserver(resize).observe(stage);
 resize();
+let activeBranch=false;
+const routeButton=get('route');
+routeButton.onclick=()=>{
+  activeBranch=!activeBranch;
+  routeButton.setAttribute('aria-pressed',String(activeBranch));
+  routeButton.textContent=activeBranch?'Testar trilho principal':'Testar desvio';
+  distance=9;
+};
 const arButton=get('ar');
 const arHelp=get('arHelp');
 const reticle=new T.Mesh(
@@ -317,10 +379,14 @@ function frame(now,xrFrame){
   }
   if((renderer.xr.isPresenting?placed:playing)&&last!==undefined) distance=(distance+Math.min((now-last)/1000,.05)*5.7*rate)%length;
   last=now;
-  const [x,z]=route(distance),[nx,nz]=route(distance+.03);
-  car.position.set(x,.04,z);car.rotation.y=Math.atan2(z-nz,nx-x);
+  const nextDistance=(distance+.03)%length;
+  const [x,z]=carRoute(distance,activeBranch),[nx,nz]=carRoute(nextDistance,activeBranch);
+  const y=trackHeight(distance);
+  const tangent=new T.Vector3(nx-x,trackHeight(nextDistance)-y,nz-z).normalize();
+  car.position.set(x,y+.04,z);
+  car.rotation.set(0,Math.atan2(-tangent.z,tangent.x),Math.asin(tangent.y),'YXZ');
   for(const wheel of wheels)wheel.rotation.z=-distance/.27;
-  const label=distance<2*straight?'Primeiro plano · saída pela direita':distance<2*straight+arc?'Curva · fora do enquadramento':distance<4*straight+arc?'Trilho ao fundo · passagem atrás da estação':'Curva · retorno ao primeiro plano';
+  const label=distance<2*straight?'Primeiro plano · saída pela direita':distance<2*straight+arc?'Curva · fora do enquadramento':distance<4*straight+arc?'Retorno elevado · passagem pela estação':'Curva · retorno ao primeiro plano';
   if(get('phase').textContent!==label)get('phase').textContent=label;
   renderer.render(scene,camera);
 
