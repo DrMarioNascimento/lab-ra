@@ -43,7 +43,7 @@ test('ponto visual libera Colocar aqui, apresenta a maquete e mantém âncora ao
     document:{getElementById:id=>el[id],createElement:()=>new Element(),body:new Element(),documentElement:{}},
     URLSearchParams,location:{search:''},devicePixelRatio:1,innerWidth:400,innerHeight:800,addEventListener(){},setTimeout:()=>1,clearTimeout(){},Promise,console,
     lerConfig,grupos,mudaRodada,PERFIS,criarRodada,qualidadeDoAparelho:()=>"equilibrada",adaptarResolucao:()=>()=>{},criarRotulos:()=>({atualizar(){}}),criarSom:()=>({tocar(){}}),
-    criarMenu:({aoAbrir,aoFechar})=>({aberta:()=>false,controles:new Element(),fechar(){aoFechar();},abrir(){aoAbrir();}}),
+    criarMenu:({aoAbrir,aoFechar})=>({aberta:()=>false,controles:new Element(),limparResultado(){},fechar(){aoFechar();},abrir(){aoAbrir();}}),
     criarMaquete:async()=>model,ligarGestos,criarAvisos:elemento=>criarAvisos(elemento,{agendar:()=>1,cancelar(){}})};
   const context=vm.createContext(sandbox);
   const motor=fs.readFileSync(new URL('../dilema-bonde-3d/ar/rastreador.js',import.meta.url),'utf8').replace(/^import[^\n]+\n/,'').replace('export default motor;','');

@@ -42,7 +42,7 @@ export async function preparar({ informar, config=lerConfig() }) {
     ui.rodada.bloquear('rastreio',!colocada||!pronto||reposicionando);
     for(const id of ['diminuir','aumentar','tamanho'])$(id).disabled=!colocada||!pronto||reposicionando;
   };
-  const reiniciar=()=>ui.rodada.reiniciar();
+  const reiniciar=()=>{ui.rodada.reiniciar();ui.menu.limparResultado();};
   const ray = new THREE.Raycaster(), pt = new THREE.Vector2();
   function tocar(x, y) {
       if (!ra.estado().pronto || ui?.menu.aberta()) return;
