@@ -53,6 +53,7 @@ function geoSimples(g) {
 function matSimples(m) {
   if (!m.isMeshStandardMaterial) m = new THREE.MeshStandardMaterial({ color: m.color || 0xffffff, map: m.map || null, emissive: m.color || 0x000000, emissiveIntensity: 0.6, transparent: m.transparent, opacity: m.opacity });
   else { m = m.clone(); m.normalMap = null; m.aoMap = null; m.roughnessMap = null; m.metalnessMap = null; m.vertexColors = false; }
+  m.side = THREE.FrontSide; // Quick Look exporta apenas a face frontal.
   return m;
 }
 // cor por vértice não atravessa o USDZ: separa a malha por cor, com um material de cor sólida para cada uma

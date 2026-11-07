@@ -148,7 +148,8 @@ export async function usdzComBotoes({ peca, moveis, estados, duracao = 1.2 }) {
   b.push('}');
   linhas.splice(fimDaCena, 0, ...b.map(l => '      ' + l));
   const novo = linhas.join('\n');
-  arquivos['model.usda'] = strToU8(novo);
+  // Tipos dos shaders USD: entradas vetoriais e nome de primvar devem coincidir com o esquema.
+  arquivos['model.usda'] = strToU8(novo.replace(/token inputs:in\.connect/g, 'float2 inputs:in.connect').replace(/token inputs:varname/g, 'string inputs:varname'));
   /* GEOMETRIA COM 4 CASAS. O exportador escreve cada vértice, normal e UV em
      TEXTO com até 16 algarismos, e o USDZ não pode ser comprimido. No osso,
      isso dava 52 MB. Quatro casas na unidade do modelo ficam muito abaixo do
