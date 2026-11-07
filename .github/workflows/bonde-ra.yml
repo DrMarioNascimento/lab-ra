@@ -1,7 +1,7 @@
 name: Auditar RA do Bonde
 on:
   push:
-    branches: [main, codex/bonde-gestos-araucarias-20261107]
+    branches: [main, codex/bonde-fixacao-fantasmas-20261107]
     paths: ['dilema-bonde-3d/**', 'tests/bonde-*.test.mjs', '.github/workflows/bonde-ra.yml']
   pull_request:
     paths: ['dilema-bonde-3d/**', 'tests/bonde-*.test.mjs', '.github/workflows/bonde-ra.yml']
@@ -26,8 +26,8 @@ jobs:
       - run: npm ci
       - run: python -m pip install usd-core==26.11
       # Reproduz a atualização binária na branch de trabalho; nunca escreve em main.
-      - name: Restaurar duas araucárias no arquivo nativo
-        if: github.event_name == 'push' && github.ref == 'refs/heads/codex/bonde-gestos-araucarias-20261107'
+      - name: Atualizar araucárias e fantasmas no arquivo nativo
+        if: github.event_name == 'push' && github.ref == 'refs/heads/codex/bonde-fixacao-fantasmas-20261107'
         run: |
           node dilema-bonde-3d/scripts/araucarias-usdz.mjs /tmp/bonde-araucarias
           python dilema-bonde-3d/scripts/inserir-araucarias-usdz.py /tmp/bonde-araucarias
@@ -36,8 +36,8 @@ jobs:
             git config user.name 'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
             git add dilema-bonde-3d/ar/maquete.usdz
-            git commit -m "Restaura duas araucárias fora dos trilhos no USDZ nativo"
-            git push origin HEAD:codex/bonde-gestos-araucarias-20261107
+            git commit -m "Corrige centros dos fantasmas e posições das araucárias no USDZ nativo"
+            git push origin HEAD:codex/bonde-fixacao-fantasmas-20261107
           fi
       - run: npm test
       - run: python dilema-bonde-3d/tests/validar-usdz.py

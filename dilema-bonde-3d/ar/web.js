@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { criarMaquete } from '../js/cena.js?v=20261107-ra3';
-import motor from './rastreador.js';
-import { ligarGestos } from './gestos.js?v=20261107-ra3';
+import { criarMaquete } from '../js/cena.js?v=20261107-ra5';
+import motor from './rastreador.js?v=20261107-ra5';
+import { ligarGestos } from './gestos.js?v=20261107-ra5';
 import { criarAvisos } from './avisos.js?v=20261107-ra4';
 
 export async function preparar({ informar }) {
@@ -25,14 +25,15 @@ export async function preparar({ informar }) {
   base.add(m.root);
   const avisos = criarAvisos($('aviso'));
   const status = (t,opcoes) => avisos.mostrar(t,opcoes);
-  let colocada = false, reposicionando = false, contando = false, tempo = 10, acum = 0, ultimo = null, entrando = false, trocando = false;
+  let colocada = false, reposicionando = false, contando = false, tempo = 10, acum = 0, ultimo = null, entrando = false, trocando = false, rastreioPerdido = false;
   const bM = $('manter'), bD = $('desviar'), play = $('play'), reset = $('reset'), colocar = $('colocar');
   const sincronizar = () => {
     bM.classList.toggle('ativo', m.rota === 'principal'); bD.classList.toggle('ativo', m.rota === 'ramal');
-    bM.disabled = bD.disabled = !colocada || trocando || m.estado.travado;
-    play.disabled = !colocada || trocando || contando || m.estado.rodando;
+    const pronto = ra.estado().pronto;
+    bM.disabled = bD.disabled = !colocada || !pronto || trocando || m.estado.travado;
+    play.disabled = !colocada || !pronto || trocando || contando || m.estado.rodando;
     reset.disabled = !colocada || trocando;
-    for (const id of ['diminuir','aumentar','tamanho']) $(id).disabled = !colocada || reposicionando;
+    for (const id of ['diminuir','aumentar','tamanho']) $(id).disabled = !colocada || !pronto || reposicionando;
   };
   const escolher = rota => { if (colocada && m.definirRota(rota)) sincronizar(); };
   bM.onclick = () => escolher('principal'); bD.onclick = () => escolher('ramal');
@@ -52,6 +53,7 @@ export async function preparar({ informar }) {
   m.estado.aoFim = () => status('O bonde voltou à estação. Toque em Reiniciar para uma nova rodada.');
   const ray = new THREE.Raycaster(), pt = new THREE.Vector2();
   function tocar(x, y) {
+      if (!ra.estado().pronto) return;
       if (!colocada || reposicionando) { posicionar(); return; }
       const r = canvas.getBoundingClientRect();
       pt.set((x-r.left)/r.width*2-1, 1-(y-r.top)/r.height*2);
@@ -63,7 +65,7 @@ export async function preparar({ informar }) {
     aoMudar(e) { if (!e.ativo && !entrando) voltar(); }
   });
   const gestos = ligarGestos({ elemento: canvas, alvo: ancora, camera: () => ra.cameraAtiva(),
-    podeMover: () => ra.ativo() && colocada && !reposicionando, aoToque: tocar,
+    podeMover: () => ra.ativo() && ra.estado().pronto && colocada && !reposicionando, aoToque: tocar,
     aoAlterar: escala => { $('tamanho').textContent = Math.round(escala*100) + '%'; }
   });
   $('diminuir').onclick = () => gestos.ampliar(1/1.2);
@@ -71,7 +73,7 @@ export async function preparar({ informar }) {
   $('tamanho').onclick = () => gestos.restaurarTamanho();
   $('ajudaRA').onclick = () => {
     $('ajustes').open = false;
-    status(colocada && !reposicionando ? 'Arraste para mover. Use dois dedos para ampliar e girar.' : 'Mova o celular devagar. Aponte para a superfície e toque em Colocar aqui.', {duracao:8000});
+    status(colocada && !reposicionando ? 'Aproxime o celular para ver de perto. Arraste para mover; use dois dedos para ampliar e girar.' : 'Mova o celular um pouco para os lados, apontando para a mesa. Quando a mira aparecer, toque em Colocar aqui.', {duracao:8000});
   };
   // Consultado durante o preparo: a sessão é pedida sem await no próximo toque.
   const suporte = await ra.suporte();
@@ -102,18 +104,30 @@ export async function preparar({ informar }) {
     if (!ra.ativo()) return;
     const dt = ultimo === null ? 0 : Math.min(.05, (t-ultimo)/1000); ultimo = t;
     ra.quadro(frame); ra.mostrarMira(!colocada || reposicionando);
-    if (!colocada || reposicionando) colocar.disabled = !ra.estado().temMira;
-    if (colocada && !reposicionando) {
-      if (contando) { acum += dt; while (acum >= 1 && contando) { acum--; tempo--; $('crono').textContent = String(Math.max(0,tempo)); if (tempo <= 0) { contando = false; m.partir(); } } }
-      m.update(dt); sincronizar();
+    const pronto = ra.estado().pronto;
+    if (colocada) {
+      ancora.visible = pronto;
+      if (!pronto && !rastreioPerdido) {
+        rastreioPerdido = true; gestos.limpar();
+        status('Rastreamento interrompido. Aponte novamente para a mesma superfície e mova o celular devagar.',{persistente:true});
+      } else if (pronto && rastreioPerdido) {
+        rastreioPerdido = false;
+        status('Rastreamento recuperado. A maquete permanece no lugar.');
+      }
     }
+    if (!colocada || reposicionando) colocar.disabled = !ra.estado().temMira;
+    if (colocada && pronto && !reposicionando) {
+      if (contando) { acum += dt; while (acum >= 1 && contando) { acum--; tempo--; $('crono').textContent = String(Math.max(0,tempo)); if (tempo <= 0) { contando = false; m.partir(); } } }
+      m.update(dt);
+    }
+    sincronizar();
     renderer.render(scene,camera);
   }
   function voltar() {
     renderer.setAnimationLoop(null); canvas.hidden = true; $('overlay').hidden = true; $('inicio').hidden = false;
     gestos.limpar(); ancora.scale.setScalar(1); $('tamanho').textContent = '100%';
     avisos.ocultar(); $('ajustes').open = false;
-    ancora.visible = false; colocada = false; reposicionando = false; ultimo = null; reiniciar();
+    ancora.visible = false; colocada = false; reposicionando = false; rastreioPerdido = false; ultimo = null; reiniciar();
     $('comecar').disabled = false; redimensionar();
     if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
   }
@@ -132,7 +146,7 @@ export async function preparar({ informar }) {
         if (!suporte.webxr && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {});
         await ra.entrar(suporte);
         renderer.setClearColor(0x000000,0); colocar.style.display = 'block'; colocar.textContent = 'Colocar aqui';
-        status('Mova o celular devagar. Quando a mira aparecer, toque em Colocar aqui.',{persistente:true});
+        status('Mova o celular um pouco para os lados, apontando para a mesa. Quando a mira aparecer, toque em Colocar aqui.',{persistente:true});
         if (ra.estado().modo === 'webxr') renderer.setAnimationLoop(desenhar);
       } catch (error) { await ra.sair(); voltar(); throw error; }
       finally { entrando = false; }

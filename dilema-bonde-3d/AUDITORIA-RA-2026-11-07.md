@@ -65,3 +65,25 @@ As capturas enviadas mostram duas faixas do Safari (endereço e abas), além do 
 - 63 testes locais aprovados, incluindo os fluxos de abertura instalada, retorno ao nativo, início dentro do escopo e ciclo dos avisos. Layout inspecionado em 768 × 250 (área reduzida em paisagem) e 390 × 844; verificados abrir/fechar Ajustes e desaparecimento do aviso. Recolocar fica oculto enquanto o menu está aberto para não ficar encoberto pelo painel.
 
 Referências: [Apple: abrir um site como app](https://support.apple.com/guide/iphone/open-as-web-app-iphea86e5236/27/ios/27), [WebKit: apps da Tela de Início no Safari 26](https://webkit.org/blog/17333/webkit-features-in-safari-26-0/#every-site-can-be-a-web-app-on-ios-and-ipados). A instalação e a câmera no iPhone real ainda dependem da conferência no aparelho; esta auditoria não simula a interface do sistema.
+
+## Complemento: fixação espacial, araucárias e fantasmas (RA5)
+
+O usuário aprovou a interface RA4 depois de recolher as barras do Safari. Seu relato de maquete acompanhando o aparelho foi tratado como defeito de rastreamento/interação, não como prova de cache antigo. O CSS e a distribuição dos controles aprovados foram preservados.
+
+Achados e correções:
+
+- O arraste subtraía um ponto projetado com a câmera do início do gesto de outro projetado com a câmera atual. Depois de arrastar/pinçar, manter o dedo parado e aproximar o aparelho podia transportar a âncora. Agora ambos os pontos são projetados com a mesma pose atual; somente o deslocamento dos dedos move a maquete.
+- A colocação aceitava hit-test durante rastreio limitado e até pontos isolados. O caminho SLAM agora usa escala absoluta em metros e só libera colocação com pose completa, estado `NORMAL`, pelo menos 750 ms estáveis e translação medida de 2,5 cm. Requer superfície detectada/estimada; não aceita `FEATURE_POINT` ou coordenadas inválidas. A ajuda orienta mover o aparelho para os lados.
+- Durante perda de rastreamento, a cena e a simulação pausam e os gestos são cancelados. A transformação da maquete é preservada; ela reaparece após recuperação sem ser recolocada automaticamente à frente da câmera. Isso impede apresentar uma imagem congelada como se estivesse fixada no mundo. A deriva residual do SLAM e a estabilidade física continuam dependentes do teste no aparelho.
+- As duas araucárias estavam nos cantos externos, fora de enquadramentos aproximados. Foram trazidas para (-24, -44) e (42, 44), mantendo as malhas/texturas existentes, copas dentro da base, troncos a mais de 12 unidades de ambos os trilhos e fora das zonas de interação. A conferência geométrica confirma duas árvores; não certifica a visibilidade em todo enquadramento possível.
+- Erro confirmado dos fantasmas: o grupo era irmão das pessoas e não recebia seu deslocamento. A animação surgia no centro da maquete em vez do local do impacto. Corrigidos grupos principal/ramal no JavaScript. No USDZ pronto foram corrigidos também todos os destinos absolutos das animações; mudar só o pai não bastava. As três ações e as trajetórias do bonde permanecem intactas.
+- Entrada, cena, rastreador, gestos, vegetação, troca de personagens e arquivo nativo recebem a versão `20261107-ra5`. A tela inicial mostra “Versão 07/11 · RA5”, sem ocupar o campo da câmera.
+
+Auditoria após a correção:
+
+- `npm test`: **73 testes aprovados**. Foram acrescentados testes de câmera transladando durante gesto, inicialização/perda/recuperação de SLAM, aproximação da câmera com aumento da projeção sem deslocar a âncora, três sessões consecutivas e quatro percursos alternando os trilhos.
+- O teste de cena lê as geometrias GLB reais sem GPU. Confirma a altura/copa das duas araucárias, os fantasmas saindo junto aos personagens atingidos, subindo, desaparecendo e sendo limpos ao reiniciar. Texturas, câmera física e aparência renderizada não são validadas por esse teste.
+- USDZ: 30 validadores OpenUSD sem falhas; três comportamentos, dois modelos de araucária e destinos de repouso/reinício dos quatro fantasmas nas coordenadas corretas. Repetir o gerador produz o mesmo SHA-256: `0c9d5bb21cd3ed49ab4742b3e50be46325c33ec4416224ffe2cfb92dc2c39e03` (39.136.938 bytes).
+- A tentativa de instalar o navegador local para renderização retornou um pacote vazio/inválido; o navegador remoto anteriormente não disponibilizou WebGL. Nenhum desses testes equivale a uma sessão ARKit/ARCore nem a confirmação física de fixação no iPhone.
+
+Fontes do contrato do rastreador: [escala absoluta](https://8thwall.org/docs/api/engine/xrcontroller/configure), [pose e trackingStatus](https://8thwall.org/docs/api/engine/xrcontroller/pipelinemodule), [limitações de rastreamento de superfícies](https://8thwall.org/docs/troubleshooting/world-tracking-issues).

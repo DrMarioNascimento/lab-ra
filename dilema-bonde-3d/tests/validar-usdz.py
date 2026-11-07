@@ -3,7 +3,7 @@ Requer usd-core. Uso: python validar-usdz.py [--corrigir-tipos] [arquivo.usdz]
 """
 from pathlib import Path
 import sys, zipfile, struct
-from pxr import Usd, UsdUtils, UsdValidation
+from pxr import Usd, UsdGeom, UsdUtils, UsdValidation
 path = next((Path(x) for x in sys.argv[1:] if not x.startswith('--')), Path(__file__).parents[1] / 'ar/maquete.usdz')
 if '--corrigir-tipos' in sys.argv:
     with zipfile.ZipFile(path) as src:
@@ -36,6 +36,24 @@ assert len(behaviors) == 3
 araucarias = stage.GetPrimAtPath('/Root/Scenes/Scene/Maquete_RA/Maquete/Araucarias')
 assert araucarias, 'Araucárias ausentes'
 assert len(araucarias.GetChildren()) == 2, 'Esperadas exatamente duas araucárias'
+maquete = stage.GetPrimAtPath('/Root/Scenes/Scene/Maquete_RA/Maquete')
+fantasmas = [p for p in maquete.GetChildren() if p.GetName().startswith('Fantasmas')]
+assert sorted(len(p.GetChildren()) for p in fantasmas) == [1,3]
+for p in fantasmas:
+    esperado = (4,.27,30) if len(p.GetChildren()) == 1 else (-8,.27,14)
+    pos = UsdGeom.Xformable(p).GetLocalTransformation().ExtractTranslation()
+    assert all(abs(a-b)<1e-8 for a,b in zip(pos,esperado)), 'Fantasmas fora do local do impacto'
+    cache = UsdGeom.XformCache()
+    cena = maquete.GetParent().GetParent()
+    invCena = cache.GetLocalToWorldTransform(cena).GetInverse()
+    for f in p.GetChildren():
+        indice = f.GetName().removeprefix('rqbMovel_')
+        repouso = (cache.GetLocalToWorldTransform(f)*invCena).ExtractTranslation()
+        for nome in ['rqbAlvo_0_0_'+indice,'rqbAlvo_1_0_'+indice,'rqbAlvo_2_0_'+indice]:
+            alvo = cena.GetChild(nome)
+            assert alvo, 'Destino da animação ausente'
+            destino = UsdGeom.Xformable(alvo).GetLocalTransformation().ExtractTranslation()
+            assert (destino-repouso).GetLength()<1e-8, 'Animação do fantasma volta ao centro'
 for p in stage.Traverse():
     for rel in p.GetRelationships():
         for target in rel.GetTargets():
