@@ -21,6 +21,7 @@ export function criarRodada(m,config,{aoMudar=()=>{},aoResultado=()=>{},som=()=>
     async ajustar(config){if(ocupada)return false;const novo=normalizar(config);if(mudaRodada(c,novo))return api.nova(novo);c=novo;publicar();return true;},
     reiniciar:zerar,
     atualizar(dt){
+      const travadoAntes=m.estado.travado;
       if(ocupada||pausada||bloqueios.size){m.update(0);return;}
       if(fase==='contagem'){
         const t=Math.ceil(restante);restante=Math.max(0,restante-dt);if(Math.ceil(restante)!==t)som('tick');
@@ -30,6 +31,7 @@ export function criarRodada(m,config,{aoMudar=()=>{},aoResultado=()=>{},som=()=>
         // Mantém o tempo de decisão, mas apresenta o desfecho sem percurso animado.
         for(let i=0;i<5000&&fase==='percurso';i++)m.update(.05);
       }else m.update(dt);
+      if(travadoAntes!==m.estado.travado)publicar();
     }
   };
   m.estado.vMax=c.velocidade;

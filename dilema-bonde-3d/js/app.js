@@ -32,7 +32,7 @@ const v = (qs.get('cam') || '').split(',').map(Number);
 const vista = v.length === 6 && v.every(n => !isNaN(n)) ? v : VISTAS.geral;
 camera.position.set(vista[0], vista[1], vista[2]); controls.target.set(vista[3], vista[4], vista[5]);
 
-function redimensionar() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+function redimensionar() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h;camera.fov=THREE.MathUtils.radToDeg(2*Math.atan(Math.tan(THREE.MathUtils.degToRad(40)/2)*Math.max(1,1.6/camera.aspect))); camera.updateProjectionMatrix(); }
 addEventListener('resize', redimensionar); redimensionar();
 
 const m = await criarMaquete({ qualidade, grupos: grupos(config), progresso:t=>document.getElementById('estadoCarga').textContent=t });

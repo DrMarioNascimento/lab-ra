@@ -3,9 +3,10 @@ import {criarRodada} from './rodada.js?v=20261107-ra11';
 import {criarMenu} from './menu.js?v=20261107-ra11';
 import {criarSom} from './som.js?v=20261107-ra11';
 export function ligarInterface({m,config,pai,modo='pc',status=()=>{},aoMenu=()=>{},aoConfig=()=>{}}){
-  const $=id=>document.getElementById(id);let menu,continuar=false;
+  const $=id=>document.getElementById(id);let menu,continuar=false,travadoAnterior=false;
   const som=criarSom(()=>rodada.config());
   function sincronizar(e){
+    if(e.travado&&!travadoAnterior)status('O bonde passou pela agulha. A decisão está tomada.');travadoAnterior=e.travado;
     $('manter').classList.toggle('ativo',e.rota==='principal');$('desviar').classList.toggle('ativo',e.rota==='ramal');
     $('manter').disabled=$('desviar').disabled=e.bloqueada||e.ocupada||e.travado||e.fase==='resultado';
     $('play').disabled=e.bloqueada||e.ocupada||e.fase==='resultado';if($('reset'))$('reset').disabled=e.bloqueada||e.ocupada;

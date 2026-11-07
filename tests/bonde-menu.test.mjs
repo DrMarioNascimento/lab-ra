@@ -30,3 +30,5 @@ test('texturas originais são preservadas byte a byte nas variantes de árvore',
 
 test('som, rótulos e qualidade mudam sem reiniciar o tempo ou o percurso',async()=>{const {r,m,avancou}=setup({tempo:0});r.play();r.atualizar(1);const antes=avancou();await r.ajustar({...r.config(),som:true,rotulos:false,qualidade:'economica'});assert.equal(r.estado().fase,'percurso');assert(m.estado.rodando);assert.equal(avancou(),antes);assert.equal(r.config().som,true);});
 test('alterar tempo ou personagens prepara nova rodada',async()=>{const {r}=setup();r.play();r.atualizar(3);await r.ajustar({...r.config(),tempo:15,nPrincipal:2});assert.equal(r.estado().fase,'pronta');assert.equal(r.estado().tempo,15);});
+
+test('trava da agulha é publicada imediatamente para desativar os botões',()=>{const {m}=setup();const estados=[];const r=criarRodada(m,{...PADRAO,tempo:0},{aoMudar:e=>estados.push(e)});m.update=()=>{if(m.estado.rodando)m.estado.travado=true;};r.play();r.atualizar(.05);assert.equal(estados.at(-1).travado,true);});
