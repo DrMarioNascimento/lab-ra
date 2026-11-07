@@ -1,4 +1,5 @@
-"""Acrescenta duas araucárias ao USDZ pronto; preserva trilhos, bonde e ações.
+"""Atualiza duas araucárias e o centro dos fantasmas no USDZ pronto.
+Preserva trilhos, bonde, personagens e sequências de ações.
 Uso: python inserir-araucarias-usdz.py /tmp/araucarias [arquivo.usdz]
 Depende da saída de araucarias-usdz.mjs e de usd-core.
 """
@@ -18,6 +19,31 @@ with tempfile.TemporaryDirectory() as tmp:
         destino.parent.mkdir(parents=True,exist_ok=True)
         destino.write_bytes(dados)
     stage = Usd.Stage.Open(str(tmp/'model.usda'))
+    maquete = stage.GetPrimAtPath('/Root/Scenes/Scene/Maquete_RA/Maquete')
+    fantasmas = [p for p in maquete.GetChildren() if p.GetName().startswith('Fantasmas')]
+    assert sorted(len(p.GetChildren()) for p in fantasmas) == [1,3], 'Grupos de fantasmas inesperados'
+    for p in fantasmas:
+        centro = (4,.27,30) if len(p.GetChildren()) == 1 else (-8,.27,14)
+        ops = UsdGeom.Xformable(p).GetOrderedXformOps()
+        assert len(ops) == 1 and ops[0].GetOpType() == UsdGeom.XformOp.TypeTransform
+        ops[0].Set(Gf.Matrix4d(1).SetTranslate(Gf.Vec3d(*centro)))
+    # As ações do Quick Look usam destinos absolutos, irmãos da maquete.
+    # Corrigir só o pai faria o primeiro passo da animação voltar ao centro.
+    cache = UsdGeom.XformCache()
+    cena = maquete.GetParent().GetParent()
+    invCena = cache.GetLocalToWorldTransform(cena).GetInverse()
+    for grupo in fantasmas:
+        for fantasma in grupo.GetChildren():
+            indice = fantasma.GetName().removeprefix('rqbMovel_')
+            destinos = [p for p in cena.GetChildren() if p.GetName().startswith('rqbAlvo_') and p.GetName().endswith('_'+indice)]
+            inicial = cena.GetChild('rqbAlvo_0_0_'+indice)
+            assert inicial and len(destinos)>3, 'Percurso do fantasma ausente'
+            esperado = (cache.GetLocalToWorldTransform(fantasma)*invCena).ExtractTranslation()
+            atual = UsdGeom.Xformable(inicial).GetLocalTransformation().ExtractTranslation()
+            delta = esperado-atual
+            for alvo in destinos:
+                op = UsdGeom.Xformable(alvo).GetOrderedXformOps()[0]
+                matriz = op.Get(); matriz.SetTranslateOnly(matriz.ExtractTranslation()+delta); op.Set(matriz)
     raiz = '/Root/Scenes/Scene/Maquete_RA/Maquete/Araucarias'
     # Idempotente: refazer nunca acumula árvores.
     stage.RemovePrim(raiz)

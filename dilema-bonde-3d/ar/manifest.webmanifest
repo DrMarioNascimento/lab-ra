@@ -3,7 +3,7 @@
   "name": "Dilema do Bonde em RA",
   "short_name": "Bonde RA",
   "lang": "pt-BR",
-  "start_url": "./?modo=interativo&v=20261107-ra4",
+  "start_url": "./?modo=interativo&v=20261107-ra5",
   "scope": "./",
   "display": "standalone",
   "background_color": "#16223a",

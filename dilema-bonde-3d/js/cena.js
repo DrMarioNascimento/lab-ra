@@ -6,7 +6,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { ARAUCARIAS_RA } from './vegetacao-ra.js';
+import { ARAUCARIAS_RA } from './vegetacao-ra.js?v=20261107-ra5';
 
 export const Y_TRILHO = 0.42;
 const BITOLA = 1.435;
@@ -237,7 +237,10 @@ export async function criarMaquete(opts = {}) {
   const PEQ = 1e-4;
   function montarGrupo(grupo, centro, preset, n) {
     grupo.clear(); grupo.position.copy(centro); grupo.userData.caido = 0;
-    const fant = grupo.userData.fantasmas; if (fant) fant.clear();
+    const fant = grupo.userData.fantasmas;
+    // Os fantasmas são irmãos das pessoas: recebem seu centro, sem herdar
+    // a redução de escala dos personagens durante o impacto.
+    if (fant) { fant.clear(); fant.position.copy(centro); }
     for (let i = 0; i < n; i++) {
       const p = modelo(preset); p.position.x = (i - (n - 1) / 2) * 0.85 * ESC_PERS; p.position.z = (i % 2) * 0.25 - 0.1; p.rotation.y = (i - (n - 1) / 2) * 0.12; grupo.add(p);
       const f = criarFantasma(); f.position.copy(p.position); f.userData.base = p.position.clone(); fant.add(f);

@@ -43,6 +43,21 @@ test('toque simples continua disponível para colocação; cancelamento e saída
 test('toque DOM não dispara uma segunda seleção XR',()=>{
   const h=preparar();let cancelado=false;h.handlers.beforexrselect({preventDefault:()=>cancelado=true});assert(cancelado);
 });
+test('aproximar ou girar o celular durante um gesto não transporta a maquete',()=>{
+  const h=preparar();h.event('pointerdown',1,200,400);h.event('pointermove',1,230,410);
+  const pos=h.alvo.position.clone(), tamanho=h.alvo.scale.clone(), rot=h.alvo.quaternion.clone();
+  for(let i=0;i<6;i++) {
+    h.camera.position.z-=.1;h.camera.position.x+=.05;h.camera.rotation.y+=.025;h.camera.updateMatrixWorld(true);
+    h.event('pointermove',1,230,410);
+    assert(h.alvo.position.distanceTo(pos)<1e-10);
+  }
+  assert(h.alvo.scale.equals(tamanho));assert(h.alvo.quaternion.equals(rot));
+  h.event('pointerdown',2,300,410);
+  h.camera.position.z-=.2;h.camera.updateMatrixWorld(true);
+  h.event('pointermove',2,300,410);assert(h.alvo.position.distanceTo(pos)<1e-10);
+  h.event('pointerup',2,300,410);h.event('pointerup',1,230,410);
+  assert.equal(h.taps.length,0);
+});
 test('duas araucárias ficam fora de ambos os trilhos e das zonas de interação',()=>{
   assert.equal(ARAUCARIAS_RA.length,2);
   for(const a of ARAUCARIAS_RA) {

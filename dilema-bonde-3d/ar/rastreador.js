@@ -44,13 +44,12 @@ import * as THREE from 'three';
    laço separado deixava a casa um quadro atrás da imagem, e isso se vê como
    um tremor.
 
-   A escala: no modo "responsivo" da 8th Wall a unidade da cena é a altura
-   inicial do aparelho sobre a superfície. `altura` diz quanto isso vale em
-   metros para cada atividade (a escrivaninha vai ao chão; a maquete, à mesa). */
+   O Bonde usa escala absoluta em metros. Antes da primeira colocação,
+   confirma rastreio NORMAL estável e translação real da câmera. */
 const motor = (function (global) {
   'use strict';
 
-  var XR8_SRC = 'https://cdn.jsdelivr.net/npm/@8thwall/engine-binary@1/dist/xr.js';
+  var XR8_SRC = 'https://cdn.jsdelivr.net/npm/@8thwall/engine-binary@1.0.0/dist/xr.js';
   var carregando = null;
 
   function ehIOS() {
@@ -100,6 +99,7 @@ const motor = (function (global) {
     var aoTocar = opcoes.aoTocar || null;
     var modo = 'nenhum', sessao = null, fonteDeHit = null, temMira = false, rastreando = false, motivo = '';
     var canvasCamera = null, laco = null, geracao = 0, espacoDeReferencia = null, aoRedimensionar = null;
+    var estavelDesde = null, primeiraPosicao = null, transladou = false, pronto = false;
 
     var mira = new THREE.Mesh(
       new THREE.RingGeometry(0.075, 0.095, 40).rotateX(-Math.PI / 2),
@@ -205,8 +205,10 @@ const motor = (function (global) {
             onStart: function () {
               clearTimeout(limite);
               if (minha !== geracao) { desmontarSlam(); falha(Error("cancelado")); return; }
+              camera.position.set(0, altura, 0); camera.quaternion.identity(); camera.updateMatrixWorld(true);
               XR8.XrController.updateCameraProjectionMatrix({ origin: { x: 0, y: altura, z: 0 }, facing: { w: 1, x: 0, y: 0, z: 0 } });
               comecou = true; modo = 'slam'; rastreando = false; temMira = false;
+              estavelDesde = null; primeiraPosicao = null; transladou = false; pronto = false;
               document.body.classList.add('in-ar', 'ra-slam');
               cena.background = null; renderer.setClearAlpha(0);
               camera.clearViewOffset();
@@ -217,17 +219,28 @@ const motor = (function (global) {
             },
             onUpdate: function (dados) {
               var r = dados && dados.processCpuResult && dados.processCpuResult.reality;
-              if (!r || !r.intrinsics) return;
+              var antes = rastreando, prontoAntes = pronto;
+              var poseValida = r && r.intrinsics && r.intrinsics.length === 16 &&
+                Array.from(r.intrinsics).every(Number.isFinite) && r.position && r.rotation &&
+                [r.position.x,r.position.y,r.position.z,r.rotation.x,r.rotation.y,r.rotation.z,r.rotation.w].every(Number.isFinite);
+              rastreando = !!poseValida && r.trackingStatus === 'NORMAL' && r.trackingReason !== 'INITIALIZING';
+              motivo = r && r.trackingReason || '';
+              if (!rastreando) {
+                estavelDesde = null; primeiraPosicao = null; pronto = false; temMira = false;
+                if (antes || prontoAntes) avisar();
+                return;
+              }
               for (var i = 0; i < 16; i++) camera.projectionMatrix.elements[i] = r.intrinsics[i];
               camera.projectionMatrixInverse.copy(camera.projectionMatrix).invert();
               if (r.rotation) camera.quaternion.set(r.rotation.x, r.rotation.y, r.rotation.z, r.rotation.w);
               if (r.position) camera.position.set(r.position.x, r.position.y, r.position.z);
               camera.updateMatrixWorld(true);
-              var antes = rastreando;
-              rastreando = r.trackingStatus !== 'LIMITED' && r.trackingStatus !== 'NOT_AVAILABLE';
-              motivo = r.trackingReason || '';
+              var agora = global.performance.now();
+              if (estavelDesde === null) { estavelDesde = agora; primeiraPosicao = camera.position.clone(); }
+              if (camera.position.distanceTo(primeiraPosicao) >= .025) transladou = true;
+              pronto = transladou && agora - estavelDesde >= 750;
               atualizarMiraSlam(XR8);
-              if (antes !== rastreando) avisar();
+              if (antes !== rastreando || prontoAntes !== pronto) avisar();
             },
             onRender: function () {
               if (opcoes.desenhar) opcoes.desenhar(global.performance.now(), null);
@@ -239,7 +252,7 @@ const motor = (function (global) {
               else { motivo = 'erro'; sair(); }
             }
           };
-          XR8.XrController.configure({ disableWorldTracking: false, scale: 'responsive' });
+          XR8.XrController.configure({ disableWorldTracking: false, scale: 'absolute' });
           XR8.addCameraPipelineModules([XR8.GlTextureRenderer.pipelineModule(), XR8.XrController.pipelineModule(), modulo]);
           try { XR8.run({ canvas: canvasCamera }); }
           catch (e) { falha(e); }
@@ -252,10 +265,16 @@ const motor = (function (global) {
     }
 
     function atualizarMiraSlam(XR8) {
+      temMira = false;
+      if (!pronto) return;
       var hits = [];
-      try { hits = XR8.XrController.hitTest(0.5, 0.5, ['DETECTED_SURFACE', 'ESTIMATED_SURFACE', 'FEATURE_POINT']) || []; } catch (e) { hits = []; }
-      var melhor = null, ordem = { DETECTED_SURFACE: 0, ESTIMATED_SURFACE: 1, FEATURE_POINT: 2 };
-      for (var i = 0; i < hits.length; i++) if (!melhor || (ordem[hits[i].type] ?? 3) < (ordem[melhor.type] ?? 3)) melhor = hits[i];
+      try { hits = XR8.XrController.hitTest(0.5, 0.5, ['DETECTED_SURFACE', 'ESTIMATED_SURFACE']) || []; } catch (e) { hits = []; }
+      var melhor = null, ordem = { DETECTED_SURFACE: 0, ESTIMATED_SURFACE: 1 };
+      for (var i = 0; i < hits.length; i++) {
+        var hit = hits[i], p = hit.position;
+        if (!(hit.type in ordem) || !p || ![p.x,p.y,p.z].every(Number.isFinite)) continue;
+        if (!melhor || ordem[hit.type] < ordem[melhor.type]) melhor = hit;
+      }
       temMira = !!melhor;
       if (melhor) { tmpV.set(melhor.position.x, melhor.position.y, melhor.position.z); mirarEm(tmpV); }
     }
@@ -290,6 +309,7 @@ const motor = (function (global) {
     function terminar() {
       var eraSlam = modo === 'slam';
       modo = 'nenhum'; temMira = false; rastreando = false; mira.visible = false;
+      pronto = false; transladou = false; primeiraPosicao = null; estavelDesde = null;
       document.body.classList.remove('in-ar', 'ra-webxr', 'ra-slam');
       renderer.setClearAlpha(1);
       if (eraSlam) {
@@ -337,7 +357,7 @@ const motor = (function (global) {
     }
 
     function estado() {
-      return { modo: modo, ativo: modo !== 'nenhum', rastreando: rastreando, temMira: temMira, motivo: motivo, iOS: ehIOS() };
+      return { modo: modo, ativo: modo !== 'nenhum', rastreando: rastreando, pronto: modo === 'webxr' ? rastreando : pronto, temMira: temMira, motivo: motivo, iOS: ehIOS() };
     }
 
     return {

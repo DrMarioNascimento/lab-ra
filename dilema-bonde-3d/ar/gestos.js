@@ -24,7 +24,7 @@ export function ligarGestos({ elemento, alvo, camera, podeMover, aoToque, aoAlte
     const normal = new THREE.Vector3(0,1,0).applyQuaternion(alvo.quaternion);
     const plano = new THREE.Plane().setFromNormalAndCoplanarPoint(normal, alvo.position);
     const p = amostra();
-    inicio = { ...p, plano, normal, ponto: ponto(p,plano), pos: alvo.position.clone(), q: alvo.quaternion.clone(), escala: alvo.scale.x };
+    inicio = { ...p, plano, normal, ultimo: p, q: alvo.quaternion.clone(), escala: alvo.scale.x };
   }
   function tamanho(valor) {
     if (!Number.isFinite(valor) || valor <= 0) return;
@@ -44,8 +44,12 @@ export function ligarGestos({ elemento, alvo, camera, podeMover, aoToque, aoAlte
     dedos.set(e.pointerId,{...anterior,x:e.clientX,y:e.clientY});
     if (Math.hypot(e.clientX-anterior.origX,e.clientY-anterior.origY) > 8) consumido = true;
     if (!inicio || !podeMover() || !consumido) return;
-    const p = amostra(), atual = ponto(p,inicio.plano);
-    if (inicio.ponto && atual) alvo.position.copy(inicio.pos).add(atual.sub(inicio.ponto));
+    const p = amostra();
+    // Os dois raios usam a MESMA pose atual da câmera. Só o deslocamento do
+    // dedo move a âncora; aproximar o celular com um dedo parado não a arrasta.
+    const anteriorNoPlano = ponto(inicio.ultimo,inicio.plano), atual = ponto(p,inicio.plano);
+    if (anteriorNoPlano && atual) alvo.position.add(atual.sub(anteriorNoPlano));
+    inicio.ultimo = p;
     if (dedos.size >= 2 && inicio.d > 8) {
       tamanho(inicio.escala * p.d / inicio.d);
       const delta = Math.atan2(Math.sin(p.ang-inicio.ang),Math.cos(p.ang-inicio.ang));
