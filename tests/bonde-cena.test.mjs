@@ -52,6 +52,8 @@ test('bolas verdes removidas e operador destacado com 5,67 unidades de altura',(
 test('oficina 40% maior deixa passagem livre nas duas rotas, inclusive nas curvas',()=>{
   const b=new THREE.Box3().setFromObject(m.focos.oficina,true);
   assert(b.max.x-b.min.x>20.7);assert(b.max.y-b.min.y>10.1);
+  const pessoasRamal=m.root.children.filter(o=>o.userData.fantasmas)[1];
+  assert(new THREE.Box3().setFromObject(pessoasRamal,true).max.x+.25<b.min.x,'oficina encobre o grupo do ramal na vista frontal: '+new THREE.Box3().setFromObject(pessoasRamal,true).max.x+'; oficina '+b.min.x);
   const oficina=new OBB().fromBox3(b.clone().expandByScalar(.25));
   const bonde=m.focos.bonde, pos=bonde.position.clone(),rot=bonde.quaternion.clone();
   bonde.position.set(0,0,0);bonde.quaternion.identity();

@@ -187,9 +187,9 @@ export async function criarMaquete(opts = {}) {
   for (const nome of ['Objetos_Patio_folhagem', 'Objetos_Patio_flores_rosa']) oficina.getObjectByName(nome)?.removeFromParent();
   oficina.name = 'Oficina'; oficina.scale.setScalar(ESCALA_OFICINA);
   const caixaOficina = new THREE.Box3().setFromObject(oficina, true);
-  oficina.position.set(-(caixaOficina.min.x+caixaOficina.max.x)/2, -caixaOficina.min.y,
+  oficina.position.set(6-(caixaOficina.min.x+caixaOficina.max.x)/2, -caixaOficina.min.y,
     (ZR+ZB)/2-(caixaOficina.min.z+caixaOficina.max.z)/2);
-  root.add(oficina); // centralizada no corredor ampliado, incluindo telhado e pátio
+  root.add(oficina); // no corredor ampliado, à direita dos personagens do ramal
   root.add(bonde);
   [estacao, oficina, bonde].forEach(o => o.traverse(m => { if (m.isMesh) { m.castShadow = !m.material.transparent; m.receiveShadow = true; } }));
   // luzes internas dos modelos ficam fracas no ambiente da maquete

@@ -72,6 +72,7 @@ assert abs(limites(operador,maquete).GetSize()[1]-5.67)<.005, 'Operador nativo a
 oficina = next(p for p in stage.Traverse() if p.GetName() == 'Oficina')
 area = limites(oficina,maquete)
 assert area.GetSize()[0]>20.7 and area.GetSize()[1]>10.1
+assert area.GetMin()[0]>-4.5 and area.GetMax()[0]<16.5, 'Oficina encobre personagens do ramal'
 assert area.GetMin()[2]>10.8 and area.GetMax()[2]<27.2, 'Oficina invade a faixa dos trilhos'
 assert not any(p.GetName() in ['Arbustos_Flores','Floreiras','Objetos_Patio_folhagem','Objetos_Patio_flores_rosa'] for p in stage.Traverse())
 for lado in ['Frente','Fundos','Direita','Esquerda']:
