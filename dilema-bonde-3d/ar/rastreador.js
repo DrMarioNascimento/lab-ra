@@ -44,8 +44,8 @@ import * as THREE from 'three';
    laço separado deixava a casa um quadro atrás da imagem, e isso se vê como
    um tremor.
 
-   O Bonde usa escala absoluta em metros. Antes da primeira colocação,
-   confirma rastreio NORMAL estável e translação real da câmera. */
+   O Bonde usa a escala responsiva das RAs interativas do Mosaico. A colocação
+   exige pose NORMAL válida e um ponto real do rastreador, inclusive FEATURE_POINT. */
 const motor = (function (global) {
   'use strict';
 
@@ -99,7 +99,7 @@ const motor = (function (global) {
     var aoTocar = opcoes.aoTocar || null;
     var modo = 'nenhum', sessao = null, fonteDeHit = null, temMira = false, rastreando = false, motivo = '';
     var canvasCamera = null, laco = null, geracao = 0, espacoDeReferencia = null, aoRedimensionar = null;
-    var estavelDesde = null, primeiraPosicao = null, transladou = false, pronto = false;
+    var pronto = false;
 
     var mira = new THREE.Mesh(
       new THREE.RingGeometry(0.075, 0.095, 40).rotateX(-Math.PI / 2),
@@ -208,7 +208,7 @@ const motor = (function (global) {
               camera.position.set(0, altura, 0); camera.quaternion.identity(); camera.updateMatrixWorld(true);
               XR8.XrController.updateCameraProjectionMatrix({ origin: { x: 0, y: altura, z: 0 }, facing: { w: 1, x: 0, y: 0, z: 0 } });
               comecou = true; modo = 'slam'; rastreando = false; temMira = false;
-              estavelDesde = null; primeiraPosicao = null; transladou = false; pronto = false;
+              pronto = false;
               document.body.classList.add('in-ar', 'ra-slam');
               cena.background = null; renderer.setClearAlpha(0);
               camera.clearViewOffset();
@@ -226,7 +226,7 @@ const motor = (function (global) {
               rastreando = !!poseValida && r.trackingStatus === 'NORMAL' && r.trackingReason !== 'INITIALIZING';
               motivo = r && r.trackingReason || '';
               if (!rastreando) {
-                estavelDesde = null; primeiraPosicao = null; pronto = false; temMira = false;
+                pronto = false; temMira = false;
                 if (antes || prontoAntes) avisar();
                 return;
               }
@@ -235,10 +235,9 @@ const motor = (function (global) {
               if (r.rotation) camera.quaternion.set(r.rotation.x, r.rotation.y, r.rotation.z, r.rotation.w);
               if (r.position) camera.position.set(r.position.x, r.position.y, r.position.z);
               camera.updateMatrixWorld(true);
-              var agora = global.performance.now();
-              if (estavelDesde === null) { estavelDesde = agora; primeiraPosicao = camera.position.clone(); }
-              if (camera.position.distanceTo(primeiraPosicao) >= .025) transladou = true;
-              pronto = transladou && agora - estavelDesde >= 750;
+              // O próprio motor avalia o rastreio. Não impor uma segunda
+              // calibração por distância/tempo que pode impedir a colocação.
+              pronto = true;
               atualizarMiraSlam(XR8);
               if (antes !== rastreando || prontoAntes !== pronto) avisar();
             },
@@ -252,7 +251,7 @@ const motor = (function (global) {
               else { motivo = 'erro'; sair(); }
             }
           };
-          XR8.XrController.configure({ disableWorldTracking: false, scale: 'absolute' });
+          XR8.XrController.configure({ disableWorldTracking: false, scale: 'responsive' });
           XR8.addCameraPipelineModules([XR8.GlTextureRenderer.pipelineModule(), XR8.XrController.pipelineModule(), modulo]);
           try { XR8.run({ canvas: canvasCamera }); }
           catch (e) { falha(e); }
@@ -268,8 +267,10 @@ const motor = (function (global) {
       temMira = false;
       if (!pronto) return;
       var hits = [];
-      try { hits = XR8.XrController.hitTest(0.5, 0.5, ['DETECTED_SURFACE', 'ESTIMATED_SURFACE']) || []; } catch (e) { hits = []; }
-      var melhor = null, ordem = { DETECTED_SURFACE: 0, ESTIMATED_SURFACE: 1 };
+      // O engine-binary 1.0.0 configura surfaces=false e usa pontos visuais.
+      // Excluir FEATURE_POINT deixa a câmera aberta sem liberar a mira.
+      try { hits = XR8.XrController.hitTest(0.5, 0.5, ['DETECTED_SURFACE', 'ESTIMATED_SURFACE', 'FEATURE_POINT']) || []; } catch (e) { hits = []; }
+      var melhor = null, ordem = { DETECTED_SURFACE: 0, ESTIMATED_SURFACE: 1, FEATURE_POINT: 2 };
       for (var i = 0; i < hits.length; i++) {
         var hit = hits[i], p = hit.position;
         if (!(hit.type in ordem) || !p || ![p.x,p.y,p.z].every(Number.isFinite)) continue;
@@ -309,7 +310,7 @@ const motor = (function (global) {
     function terminar() {
       var eraSlam = modo === 'slam';
       modo = 'nenhum'; temMira = false; rastreando = false; mira.visible = false;
-      pronto = false; transladou = false; primeiraPosicao = null; estavelDesde = null;
+      pronto = false;
       document.body.classList.remove('in-ar', 'ra-webxr', 'ra-slam');
       renderer.setClearAlpha(1);
       if (eraSlam) {

@@ -87,3 +87,17 @@ Auditoria após a correção:
 - A tentativa de instalar o navegador local para renderização retornou um pacote vazio/inválido; o navegador remoto anteriormente não disponibilizou WebGL. Nenhum desses testes equivale a uma sessão ARKit/ARCore nem a confirmação física de fixação no iPhone.
 
 Fontes do contrato do rastreador: [escala absoluta](https://8thwall.org/docs/api/engine/xrcontroller/configure), [pose e trackingStatus](https://8thwall.org/docs/api/engine/xrcontroller/pipelinemodule), [limitações de rastreamento de superfícies](https://8thwall.org/docs/troubleshooting/world-tracking-issues).
+
+## Correção de regressão: câmera aberta, botão bloqueado (RA6)
+
+O teste real do usuário mostrou que a RA5 permanecia na câmera sem habilitar “Colocar aqui”. Isso invalida qualquer interpretação de que os testes anteriores certificavam a entrada no aparelho.
+
+- Inspecionado o JavaScript distribuído **`@8thwall/engine-binary@1.0.0/dist/xr-slam.js`**, não apenas a documentação. A configuração interna desativa a detecção de superfícies (`setSurfaces(false)` e `setVerticalSurfaces(false)`) e a API de hit-test retorna também `FEATURE_POINT`. A RA5 excluía justamente esse tipo da consulta e da seleção.
+- Restaurado `FEATURE_POINT`, mantendo preferência por superfícies quando disponíveis. Continua obrigatório receber pose válida e rastreio `NORMAL`; posições ausentes ou não finitas continuam recusadas. Não se cria ponto fictício na frente da câmera.
+- Restabelecida a escala `responsive`, usada nas RAs interativas do Mosaico. A escala `absolute` introduzida na RA5 exige coleta adicional de movimento para estimar metros; a orientação lateral da página não correspondia ao avanço/recuo recomendado. Não há necessidade dessa calibração métrica para uma maquete com escala livre. Referência: https://8thwall.org/docs/engine/guides/coaching-overlays.
+- Removida a calibração adicional própria de 750 ms/2,5 cm. A decisão de prontidão usa o estado do motor, sem impor uma segunda condição de movimento ao usuário. Esta seção substitui essa parte do comportamento descrito na RA5.
+- O teste do motor agora respeita os tipos solicitados e fornece pontos visuais, corrigindo a lacuna do mock anterior. Um novo teste integra o rastreador e o `web.js` de produção: câmera → ponto visual → habilitar o botão → colocar → mover câmera → perda/recuperação → sair. DOM/GPU/câmera/modelo são substituídos nesse teste; não é uma sessão física.
+- Prova de regressão: executar o teste novo sobre o rastreador publicado da RA5 falha em “FEATURE_POINT deve habilitar o botão real”. Sobre a RA6, passa.
+- `npm test`: 74 testes aprovados. Layout, gesto corrigido, posições das árvores, fantasmas e USDZ da RA5 preservados. Versionados apenas os arquivos necessários para o reparo; o modelo nativo não precisa ser baixado novamente por causa desta mudança.
+
+Fonte inspecionada: https://cdn.jsdelivr.net/npm/@8thwall/engine-binary@1.0.0/dist/xr-slam.js — SHA-256 `398f675c920892afd4521d5196df2b6b8a1b8a90b6a5c749cf5ad1a6e0a85270`. A validação física de estabilidade e reconhecimento do ambiente continua dependendo do iPhone; a fotografia identifica a etapa travada, mas não fornece o estado interno dos sensores.
