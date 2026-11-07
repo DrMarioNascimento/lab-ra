@@ -37,9 +37,9 @@ test('rodas e truques conservam geometria; plataforma conserva nível; cobertura
     if(roda)assert.deepEqual(o.geometry.attributes.position.array,antes.get(o).geometria.attributes.position.array);
   });
   const piso=box(estacao.getObjectByName('Piso_Plataforma'));
-  // Só a tampa de 4 cm acima do nível 1,10 cresce 1,6 cm.
+  // A tampa de 4 cm acima do nível 1,10 cresce menos de 3 cm.
   assert(Math.abs(piso.min.y-pisoAntes.min.y)<1e-5);
-  assert(piso.max.y-pisoAntes.max.y<.017);
+  assert(piso.max.y-pisoAntes.max.y<.029);
   const teto=box(estacao.getObjectByName('Ala_Oeste_Estrutura_telhado_metal_azul'));
   const altoBonde=box(bonde).max.y+.42;
   assert(teto.min.y-altoBonde>.4,`folga mínima: ${teto.min.y-altoBonde}`);

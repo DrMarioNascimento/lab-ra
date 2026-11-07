@@ -23,7 +23,7 @@ with tempfile.TemporaryDirectory() as tmp:
     fantasmas = [p for p in maquete.GetChildren() if p.GetName().startswith('Fantasmas')]
     assert sorted(len(p.GetChildren()) for p in fantasmas) == [1,3], 'Grupos de fantasmas inesperados'
     for p in fantasmas:
-        centro = (4,.27,30) if len(p.GetChildren()) == 1 else (-8,.27,14)
+        centro = (4,.27,30) if len(p.GetChildren()) == 1 else (-8,.27,8)
         ops = UsdGeom.Xformable(p).GetOrderedXformOps()
         assert len(ops) == 1 and ops[0].GetOpType() == UsdGeom.XformOp.TypeTransform
         ops[0].Set(Gf.Matrix4d(1).SetTranslate(Gf.Vec3d(*centro)))

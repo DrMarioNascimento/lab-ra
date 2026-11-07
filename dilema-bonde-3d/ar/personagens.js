@@ -1,5 +1,5 @@
-import { criarMaquete } from '../js/cena.js?v=20261107-ra7';
-import { montarUSDZ } from './quicklook.js?v=20261107-ra7';
+import { criarMaquete } from '../js/cena.js?v=20261107-ra8';
+import { montarUSDZ } from './quicklook.js?v=20261107-ra8';
 
 export async function prepararPersonagens() {
   const papeis = ['trabalhador', 'idoso', 'gestante', 'criancas', 'estudante', 'cientista', 'colega', 'vinculo', 'desconhecidos'];

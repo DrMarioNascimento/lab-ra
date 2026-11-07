@@ -2,15 +2,16 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { OBB } from 'three/addons/math/OBB.js';
 import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder } from 'meshoptimizer';
-import { criarMaquete } from '../dilema-bonde-3d/js/cena.js';
+import { criarMaquete, ROTAS } from '../dilema-bonde-3d/js/cena.js';
 import { ARAUCARIAS_RA } from '../dilema-bonde-3d/js/vegetacao-ra.js';
 
 // Lê as malhas GLB reais sem exigir GPU. Texturas e o rótulo 2D não entram
 // nesta verificação de espaço, percurso e animação; não é um teste visual.
-async function preparar() {
+async function preparar(opts = {ra:true}) {
   await MeshoptDecoder.ready;
   const io=new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({'meshopt.decoder':MeshoptDecoder});
   const load=GLTFLoader.prototype.load,tex=THREE.TextureLoader.prototype.load,doc=globalThis.document;
@@ -37,10 +38,51 @@ async function preparar() {
   };
   THREE.TextureLoader.prototype.load=()=>new THREE.Texture();
   globalThis.document={createElement:()=>({getContext:()=>({fillText(){}})})};
-  try { return await criarMaquete({ra:true}); }
+  try { return await criarMaquete(opts); }
   finally { GLTFLoader.prototype.load=load;THREE.TextureLoader.prototype.load=tex;globalThis.document=doc; }
 }
 const m=await preparar();
+const m3d=await preparar({ra:false});
+
+test('bolas verdes removidas e operador destacado com 5,67 unidades de altura',()=>{
+  for(const cena of [m,m3d]) for(const nome of ['Arbustos_Flores','Floreiras','Objetos_Patio_folhagem','Objetos_Patio_flores_rosa']) assert(!cena.root.getObjectByName(nome),nome);
+  const altura=new THREE.Box3().setFromObject(m.focos.operador,true).getSize(new THREE.Vector3()).y;
+  assert(Math.abs(altura-5.67)<.001);
+});
+test('oficina 40% maior deixa passagem livre nas duas rotas, inclusive nas curvas',()=>{
+  const b=new THREE.Box3().setFromObject(m.focos.oficina,true);
+  assert(b.max.x-b.min.x>20.7);assert(b.max.y-b.min.y>10.1);
+  const pessoasRamal=m.root.children.filter(o=>o.userData.fantasmas)[1];
+  assert(new THREE.Box3().setFromObject(pessoasRamal,true).max.x+.25<b.min.x,'oficina encobre o grupo do ramal na vista frontal: '+new THREE.Box3().setFromObject(pessoasRamal,true).max.x+'; oficina '+b.min.x);
+  const oficina=new OBB().fromBox3(b.clone().expandByScalar(.25));
+  const bonde=m.focos.bonde, pos=bonde.position.clone(),rot=bonde.quaternion.clone();
+  bonde.position.set(0,0,0);bonde.quaternion.identity();
+  const caixaLocal=new THREE.Box3().setFromObject(bonde,true);
+  bonde.position.copy(pos);bonde.quaternion.copy(rot);
+  for(const [nome,rota] of Object.entries(ROTAS))for(let i=0;i<=800;i++) {
+    m.irPara(nome,rota.getLength()*i/800);
+    bonde.updateMatrixWorld(true);
+    const envelope=new OBB().fromBox3(caixaLocal).applyMatrix4(bonde.matrixWorld);
+    assert(!envelope.intersectsOBB(oficina),`bonde invade a oficina: ${nome}, ${i}/800`);
+  }
+  m.reiniciar();
+});
+for(const [tipo,maquete] of [['RA',m],['3D',m3d]])test(`cidade ${tipo} tem textura e janelas nos quatro lados; copas ficam afastadas das construções`,()=>{
+  const m=maquete;
+  const cidade=m.root.getObjectByName('Cidade');assert(cidade);
+  for(const face of ['Frente','Fundos','Direita','Esquerda'])assert(cidade.children.some(c=>c.name.startsWith('Cidade_Janelas_'+face)));
+  for(const c of cidade.children.filter(c=>/^Cidade_Paredes|^Cidade_Telhados/.test(c.name)))assert(c.material.map);
+  const construcoes=[new THREE.Box3().setFromObject(m.focos.estacao,true),new THREE.Box3().setFromObject(m.focos.oficina,true),...cidade.userData.volumes];
+  m.root.updateMatrixWorld(true);
+  for(const a of m.root.children.filter(o=>o.isInstancedMesh&&/^Arvores|^Araucarias/.test(o.name))) {
+    for(let i=0;i<a.count;i++) {
+      const matriz=new THREE.Matrix4();a.getMatrixAt(i,matriz);
+      const bb=new THREE.Box3();const p=a.geometry.attributes.position;
+      for(let j=0;j<p.count;j++)bb.expandByPoint(new THREE.Vector3().fromBufferAttribute(p,j).applyMatrix4(matriz));
+      for(const b of construcoes)assert(!(bb.min.x<b.max.x+.3&&bb.max.x>b.min.x-.3&&bb.min.z<b.max.z+.3&&bb.max.z>b.min.z-.3),'copa invade construção');
+    }
+  }
+});
 
 test('adultos ficam 60% maiores, abaixo da cabine, e afastados entre si',()=>{
   const grupos=m.root.children.filter(o=>o.userData.fantasmas);

@@ -24,6 +24,17 @@
   #crono { min-width: 54px; height: 40px; border-radius: 999px; display: grid; place-items: center; font-weight: 800; color: #2b3445; border: 2px solid #2b3445; padding: 0 6px; box-sizing: border-box; }
   #aviso { position: fixed; top: max(12px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); background: rgba(255,255,255,.92); color: #2b3445; padding: 8px 16px; border-radius: 999px; font-weight: 800; font-size: 14px; box-shadow: 0 4px 14px rgba(0,0,0,.18); z-index: 3; text-align: center; max-width: 86vw; }
   #girar { position: fixed; inset: 0; display: none; place-items: center; text-align: center; background: #2b3445; color: #fff; font-weight: 800; z-index: 9; padding: 24px; }
+  #navegacao { display:none; position:fixed; top:66px; left:16px; z-index:4; width:232px; box-sizing:border-box; padding:12px; border:1px solid #fff; border-radius:18px; background:rgba(243,246,250,.94); color:#263448; box-shadow:0 5px 0 #8e9cac,0 8px 24px #20304330; }
+  #navegacao summary { cursor:pointer; font-weight:800; }
+  #navegacao .nav-linha { display:flex; gap:7px; margin-top:10px; }
+  #navegacao button,#navegacao select { min-height:36px; border:1px solid #b9c5d3; border-radius:10px; color:#263448; background:linear-gradient(#fff,#dce5ee); box-shadow:0 3px 0 #9aaabb; font:800 13px 'Nunito',sans-serif; cursor:pointer; flex:1; }
+  #navegacao button:active { transform:translateY(2px);box-shadow:0 1px 0 #9aaabb; }
+  #navegacao button[aria-pressed=true] { color:white;background:linear-gradient(#4876a1,#315a80); }
+  #navegacao select { width:100%;margin-top:5px;padding:4px; }
+  #navegacao label { display:block;margin-top:14px;font-size:12px;font-weight:800; }
+  #navegacao p { font-size:12px;line-height:1.45;margin:10px 0 0; }
+  #navegacao :focus-visible,.ico:focus-visible,.pill:focus-visible { outline:3px solid #d18a18;outline-offset:3px; }
+  @media (any-pointer:fine) and (min-width:780px) { #navegacao { display:block; } }
   @media (orientation: portrait) and (max-width: 700px) { #girar { display: grid; } }
 </style>
 <script type="importmap">{ "imports": { "three": "./vendor/three/three.module.js", "three/addons/": "./vendor/three/addons/" } }</script>
@@ -32,6 +43,15 @@
 <canvas id="cena"></canvas>
 <div id="carregando"><div>Montando a maquete…<p><a href="ar/">Abrir em realidade aumentada</a></p></div></div>
 <div id="aviso">Toque na alavanca (ou nos botões) para escolher o trilho</div>
+<details id="navegacao" open>
+  <summary>Navegar na maquete</summary>
+  <div class="nav-linha" role="group" aria-label="Modo de arrastar"><button data-modo="girar" aria-pressed="true">Girar</button><button data-modo="mover" aria-pressed="false">Mover</button></div>
+  <p id="dicaNavegacao">Arraste para girar a maquete.</p>
+  <div class="nav-linha" role="group" aria-label="Aproximação"><button data-zoom="1.25" aria-label="Afastar">−</button><button data-zoom="0.8" aria-label="Aproximar">+</button><button id="visaoGeral" style="flex:3">Visão geral</button></div>
+  <div class="nav-linha" role="group" aria-label="Deslocar a vista"><button data-mover="-1,0" aria-label="Mover para a esquerda">←</button><button data-mover="0,1" aria-label="Mover para frente">↑</button><button data-mover="0,-1" aria-label="Mover para trás">↓</button><button data-mover="1,0" aria-label="Mover para a direita">→</button></div>
+  <label for="vista">Ir para</label><select id="vista"><option value="geral">Visão geral</option><option value="bonde">Bonde</option><option value="operador">Operador e alavanca</option><option value="oficina">Oficina</option><option value="estacao">Estação</option><option value="cima">Vista de cima</option></select>
+  <p>Roda do mouse: zoom · botão direito: mover.<br>Teclado: setas, +, − e R para voltar.</p>
+</details>
 <div class="barra">
   <button id="manter" class="pill ativo">Manter o curso</button>
   <div class="centro">
@@ -47,7 +67,8 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { criarMaquete } from './js/cena.js?v=20261107-ra7';
+import { criarMaquete } from './js/cena.js?v=20261107-ra8';
+import { criarNavegacao } from './js/navegacao.js?v=20261107-ra8';
 
 const canvas = document.getElementById('cena');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: !!window.__captura });
@@ -75,6 +96,7 @@ addEventListener('resize', redimensionar); redimensionar();
 
 const m = await criarMaquete({ grupos: { presetPrincipal: qs.get('p1') || 'trabalhador', nPrincipal: 1, presetRamal: qs.get('p3') || 'desconhecidos', nRamal: 3 } });
 scene.add(m.root);
+const navegacao = criarNavegacao({camera,controls,canvas,maquete:m});
 document.getElementById('carregando').style.opacity = 0; setTimeout(() => document.getElementById('carregando').remove(), 600);
 
 // ---------- interface ----------
@@ -92,7 +114,7 @@ m.estado.aoFim = () => { aviso.textContent += ' — o bonde voltou à estação.
 
 // toque na alavanca (raycast)
 const ray = new THREE.Raycaster(), ptr = new THREE.Vector2(); let toque0 = null;
-canvas.addEventListener('pointerdown', e => { toque0 = [e.clientX, e.clientY]; });
+canvas.addEventListener('pointerdown', e => { toque0 = e.button===0 && navegacao.podeSelecionar() ? [e.clientX,e.clientY] : null; });
 canvas.addEventListener('pointerup', e => {
   if (!toque0 || Math.hypot(e.clientX - toque0[0], e.clientY - toque0[1]) > 8) return;
   ptr.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1); ray.setFromCamera(ptr, camera);
