@@ -21,6 +21,7 @@
 import * as THREE from 'three';
 import {placaVolume} from './texto-volume.js';
 import { USDZExporter } from 'three/addons/exporters/USDZExporter.js';
+import { comportamentoRelogio } from './relogio-usdz.js?v=20261107-ra7';
 import { unzipSync, zipSync, strFromU8, strToU8 } from 'three/addons/libs/fflate.module.js';
 
 function placa(rotulo, larguraM, alturaM) {
@@ -145,6 +146,7 @@ export async function usdzComBotoes({ peca, moveis, estados, duracao = 1.2 }) {
       `        rel xformTarget = <${caminho(`rqbAlvo_${k}_${i}`)}>`, '      }'));
     b.push('    }', '  }', '');
   });
+  if (mapa.has('Ponteiro_Segundos')) b.push(comportamentoRelogio(caminho));
   b.push('}');
   linhas.splice(fimDaCena, 0, ...b.map(l => '      ' + l));
   const novo = linhas.join('\n');

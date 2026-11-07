@@ -42,6 +42,16 @@ async function preparar() {
 }
 const m=await preparar();
 
+test('adultos ficam 60% maiores, abaixo da cabine, e afastados entre si',()=>{
+  const grupos=m.root.children.filter(o=>o.userData.fantasmas);
+  for(const g of grupos)for(const p of g.children){
+    const altura=new THREE.Box3().setFromObject(p).getSize(new THREE.Vector3()).y;
+    assert(Math.abs(altura-4.2)<.001);
+  }
+  const ramal=grupos[1];
+  assert(Math.abs(ramal.children[1].position.x-ramal.children[0].position.x-2.04)<1e-10);
+});
+
 test('malha real contém duas araucárias com altura e copa dentro da maquete',()=>{
   const arvores=m.root.children.filter(o=>o.name==='Araucarias');assert(arvores.length>0);
   for(const [i,a] of ARAUCARIAS_RA.entries()) {
@@ -66,7 +76,8 @@ for(const rota of ['principal','ramal','principal','ramal'])test(`percurso ${rot
     for(const f of atingido.userData.fantasmas.children)if(f.scale.x>.5) {
       houveFantasma=true;const pos=f.getWorldPosition(new THREE.Vector3());
       assert(Math.abs(pos.z-atingido.position.z)<.3,'fantasma deve sair do trilho atingido');
-      assert(Math.abs(pos.x-atingido.position.x)<2);
+      assert(Math.abs(pos.x-atingido.position.x-f.userData.base.x)<=.251,
+        'fantasma deve sair da posição do personagem, com oscilação máxima de 0,25');
       if(pos.y>atingido.position.y+5)subiu=true;
     }
     assert(preservado.userData.fantasmas.children.every(f=>f.scale.x<=.00011));
