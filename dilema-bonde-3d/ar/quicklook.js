@@ -6,7 +6,7 @@
    do próprio iPhone. */
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { usdzComBotoes } from './ra-botoes-ios.js';
+import { usdzComBotoes } from './ra-botoes-ios.js?v=20261107-ra2';
 
 const PASSO = 0.3;            // s entre poses gravadas
 const LARGURA_REAL = 1.2;
