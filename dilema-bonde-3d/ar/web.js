@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { criarMaquete } from '../js/cena.js?v=20261107-ra3';
 import motor from './rastreador.js';
 import { ligarGestos } from './gestos.js?v=20261107-ra3';
+import { criarAvisos } from './avisos.js?v=20261107-ra4';
 
 export async function preparar({ informar }) {
   const $ = id => document.getElementById(id), canvas = $('cena');
@@ -22,7 +23,8 @@ export async function preparar({ informar }) {
   catch (error) { renderer.dispose(); throw error; }
   m.root.traverse(o => { if (o.isMesh) { o.castShadow = false; o.receiveShadow = false; } if (o.isLight) o.visible = false; });
   base.add(m.root);
-  const status = t => { $('aviso').textContent = t; };
+  const avisos = criarAvisos($('aviso'));
+  const status = (t,opcoes) => avisos.mostrar(t,opcoes);
   let colocada = false, reposicionando = false, contando = false, tempo = 10, acum = 0, ultimo = null, entrando = false, trocando = false;
   const bM = $('manter'), bD = $('desviar'), play = $('play'), reset = $('reset'), colocar = $('colocar');
   const sincronizar = () => {
@@ -41,7 +43,7 @@ export async function preparar({ informar }) {
   }
   reset.onclick = async () => {
     if (trocando) return;
-    reiniciar(); trocando = true; sincronizar(); status('Preparando nova rodada…');
+    reiniciar(); trocando = true; sincronizar(); status('Preparando nova rodada…',{persistente:true});
     try { await m.sortearPersonagens(); status('Nova rodada. Escolha o trilho e toque em Partir.'); }
     catch { status('Não foi possível trocar os personagens. A rodada anterior continua disponível.'); }
     finally { trocando = false; sincronizar(); }
@@ -67,6 +69,10 @@ export async function preparar({ informar }) {
   $('diminuir').onclick = () => gestos.ampliar(1/1.2);
   $('aumentar').onclick = () => gestos.ampliar(1.2);
   $('tamanho').onclick = () => gestos.restaurarTamanho();
+  $('ajudaRA').onclick = () => {
+    $('ajustes').open = false;
+    status(colocada && !reposicionando ? 'Arraste para mover. Use dois dedos para ampliar e girar.' : 'Mova o celular devagar. Aponte para a superfície e toque em Colocar aqui.', {duracao:8000});
+  };
   // Consultado durante o preparo: a sessão é pedida sem await no próximo toque.
   const suporte = await ra.suporte();
   if (!suporte.webxr && !suporte.slam) {
@@ -83,14 +89,15 @@ export async function preparar({ informar }) {
     const pose = ra.pose(); ancora.position.setFromMatrixPosition(pose); ancora.quaternion.setFromRotationMatrix(pose);
     ancora.visible = true; colocada = true; reposicionando = false;
     colocar.textContent = 'Recolocar'; colocar.disabled = false;
-    status('Arraste para mover. Use dois dedos para ampliar e girar.'); sincronizar();
+    $('ajustes').open = false;
+    status('Arraste para mover. Use dois dedos para ampliar e girar.',{duracao:4500}); sincronizar();
   }
   colocar.onclick = () => {
     if (!colocada || reposicionando) posicionar();
-    else { reposicionando = true; gestos.limpar(); sincronizar(); colocar.textContent = 'Colocar aqui'; status('Aponte para a nova superfície e toque em Colocar aqui.'); }
+    else { reposicionando = true; $('ajustes').open = false; gestos.limpar(); sincronizar(); colocar.textContent = 'Colocar aqui'; status('Aponte para a nova superfície e toque em Colocar aqui.',{persistente:true}); }
   };
   // Tocar um controle HTML não deve também disparar a seleção XR da alavanca.
-  $('overlay').addEventListener('beforexrselect', e => { if (e.target.closest('button')) e.preventDefault(); });
+  $('overlay').addEventListener('beforexrselect', e => { if (e.target.closest('button,summary,#ajustes')) e.preventDefault(); });
   function desenhar(t, frame) {
     if (!ra.ativo()) return;
     const dt = ultimo === null ? 0 : Math.min(.05, (t-ultimo)/1000); ultimo = t;
@@ -105,25 +112,27 @@ export async function preparar({ informar }) {
   function voltar() {
     renderer.setAnimationLoop(null); canvas.hidden = true; $('overlay').hidden = true; $('inicio').hidden = false;
     gestos.limpar(); ancora.scale.setScalar(1); $('tamanho').textContent = '100%';
+    avisos.ocultar(); $('ajustes').open = false;
     ancora.visible = false; colocada = false; reposicionando = false; ultimo = null; reiniciar();
     $('comecar').disabled = false; redimensionar();
     if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
   }
   async function sair() { await ra.sair(); voltar(); }
   $('sair').onclick = sair;
-  addEventListener('pagehide', () => { ra.sair(); renderer.setAnimationLoop(null); });
+  addEventListener('pagehide', () => { avisos.ocultar(); ra.sair(); renderer.setAnimationLoop(null); });
   canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); sair(); informar('O contexto 3D foi interrompido. Recarregue a página para preparar a RA novamente.'); $('comecar').disabled = true; });
   return {
     async entrar() {
       entrando = true; canvas.hidden = false; $('overlay').hidden = false; $('inicio').hidden = true;
       redimensionar(); renderer.setClearColor(0x000000,0); ultimo = null;
-      status('Abrindo a câmera…');
+      $('ajustes').open = false;
+      status('Abrindo a câmera…',{persistente:true});
       try {
         // No modo web, a tela cheia precisa ser solicitada no gesto, sem aguardar a câmera.
         if (!suporte.webxr && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {});
         await ra.entrar(suporte);
         renderer.setClearColor(0x000000,0); colocar.style.display = 'block'; colocar.textContent = 'Colocar aqui';
-        status('Mova o celular devagar. Quando a mira aparecer, toque em Colocar aqui.');
+        status('Mova o celular devagar. Quando a mira aparecer, toque em Colocar aqui.',{persistente:true});
         if (ra.estado().modo === 'webxr') renderer.setAnimationLoop(desenhar);
       } catch (error) { await ra.sair(); voltar(); throw error; }
       finally { entrando = false; }

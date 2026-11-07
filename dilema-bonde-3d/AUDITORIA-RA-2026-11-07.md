@@ -53,3 +53,15 @@ Nova auditoria local:
 - Dependências alteradas versionadas com `20261107-ra3` para evitar reaproveitar o código anterior em cache.
 
 Referência para a limitação dos controles nativos: [Apple, WWDC20 — Shop online with AR Quick Look](https://developer.apple.com/videos/play/wwdc2020/10604/). Os limites de validação em aparelho físico descritos acima continuam válidos.
+
+## Complemento: barras do Safari e área útil (ra4)
+
+As capturas enviadas mostram duas faixas do Safari (endereço e abas), além do aviso persistente da RA. A página não controla essas faixas do navegador. A abertura como app da web pela Tela de Início é o caminho para manter os controles interativos sem as barras do Safari; adicionar o ícone e continuar na aba não muda a visualização.
+
+- Manifesto com identidade e escopo próprios em `/dilema-bonde-3d/ar/`, início no modo interativo e `display: standalone`. Metadados da Tela de Início e ícone existente do professor; sem novos assets ou cache de modelos.
+- Detecção de abertura pela Tela de Início (`navigator.standalone` e media query) entra no modo interativo mesmo sem query string. A escolha explícita `modo=nativo` continua disponível.
+- Orientação de instalação no Safari, recolhida na entrada nativa e aberta na interativa. Some ao iniciar pelo ícone.
+- Zoom recolhido em “Ajustes”; “Sair” compacto; controles inferiores menores. Aviso de movimento some após 4,5 segundos, com ajuda recuperável em Ajustes. Procura de superfície e carregamento continuam com instrução visível.
+- 63 testes locais aprovados, incluindo os fluxos de abertura instalada, retorno ao nativo, início dentro do escopo e ciclo dos avisos. Layout inspecionado em 768 × 250 (área reduzida em paisagem) e 390 × 844; verificados abrir/fechar Ajustes e desaparecimento do aviso. Recolocar fica oculto enquanto o menu está aberto para não ficar encoberto pelo painel.
+
+Referências: [Apple: abrir um site como app](https://support.apple.com/guide/iphone/open-as-web-app-iphea86e5236/27/ios/27), [WebKit: apps da Tela de Início no Safari 26](https://webkit.org/blog/17333/webkit-features-in-safari-26-0/#every-site-can-be-a-web-app-on-ios-and-ipados). A instalação e a câmera no iPhone real ainda dependem da conferência no aparelho; esta auditoria não simula a interface do sistema.
