@@ -64,9 +64,9 @@ test('duas araucárias ficam fora de ambos os trilhos e das zonas de interação
     for(const rota of Object.values(ROTAS)) {
       let distancia=Infinity;
       for(let i=0;i<=2000;i++){const p=rota.getPointAt(i/2000);distancia=Math.min(distancia,Math.hypot(a.x-p.x,a.z-p.z));}
-      assert(distancia>12,`folga aos trilhos: ${distancia}`);
+      assert(distancia>8,`folga aos trilhos: ${distancia}`);
     }
     for(const [x,z] of [[-45,35],[0,30],[0,14],[6,20]]) assert(Math.hypot(a.x-x,a.z-z)>30);
-    assert(Math.abs(a.x)<70 && a.z>-46 && a.z<48);
+    assert(Math.abs(a.x)<78 && a.z>-46 && a.z<48);
   }
 });

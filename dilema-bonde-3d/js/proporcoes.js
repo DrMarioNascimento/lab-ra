@@ -5,9 +5,11 @@ import * as THREE from 'three';
 export const ESCALA_PERSONAGENS = 2.4;
 export const FATOR_PERSONAGENS = ESCALA_PERSONAGENS / 1.5;
 export const ALTURA_CHASSI = .8;
-export const FATOR_CABINE = 1.7;
+export const FATOR_CABINE = 2.2;
+export const FATOR_OPERADOR = 1.35;
+export const ESCALA_OFICINA = 1.4;
 export const PISO_ESTACAO = 1.1;
-export const FATOR_ESTACAO = 1.4;
+export const FATOR_ESTACAO = 1.7;
 export const ELEVACAO_PANTOGRAFO = (3.584097496 - ALTURA_CHASSI) * (FATOR_CABINE - 1);
 const esticar = (y, piso, fator) => y <= piso ? y : piso + (y - piso) * fator;
 

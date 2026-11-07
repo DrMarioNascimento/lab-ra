@@ -60,17 +60,26 @@ def limites(prim, referencia):
 bonde = next(p for p in stage.Traverse() if p.GetName() == 'Bonde')
 carroceria = bonde.GetChild('Carroceria')
 cabine = limites(carroceria, bonde)
-assert 5.52 < cabine.GetMax()[1] < 5.55, 'Altura da cabine não foi atualizada'
+assert 6.91 < cabine.GetMax()[1] < 6.94, 'Altura da cabine não foi atualizada'
 assert 2.49 < cabine.GetSize()[2] < 2.51, 'Largura da cabine mudou'
 estacao = next(p for p in stage.Traverse() if p.GetName() == 'Estacao')
 teto = next(p for p in Usd.PrimRange(estacao) if p.GetName() == 'Ala_Oeste_Estrutura_telhado_metal_azul')
 assert limites(teto,estacao).GetMin()[1] - (limites(bonde,bonde).GetMax()[1]+.42) > .4
 pessoa = next(p for p in stage.Traverse() if p.GetName() == 'rqbMovel_5')
 assert abs(limites(pessoa,maquete).GetSize()[1]-4.2)<.005, 'Personagem nativo ainda pequeno'
+operador = next(p for p in stage.Traverse() if p.GetName() == 'Operador')
+assert abs(limites(operador,maquete).GetSize()[1]-5.67)<.005, 'Operador nativo ainda pequeno'
+oficina = next(p for p in stage.Traverse() if p.GetName() == 'Oficina')
+area = limites(oficina,maquete)
+assert area.GetSize()[0]>20.7 and area.GetSize()[1]>10.1
+assert area.GetMin()[2]>10.8 and area.GetMax()[2]<27.2, 'Oficina invade a faixa dos trilhos'
+assert not any(p.GetName() in ['Arbustos_Flores','Floreiras','Objetos_Patio_folhagem','Objetos_Patio_flores_rosa'] for p in stage.Traverse())
+for lado in ['Frente','Fundos','Direita','Esquerda']:
+    assert any(p.GetName().startswith('Cidade_Janelas_'+lado) for p in stage.Traverse()), 'Fachada sem janelas: '+lado
 fantasmas = [p for p in maquete.GetChildren() if p.GetName().startswith('Fantasmas')]
 assert sorted(len(p.GetChildren()) for p in fantasmas) == [1,3]
 for p in fantasmas:
-    esperado = (4,.27,30) if len(p.GetChildren()) == 1 else (-8,.27,14)
+    esperado = (4,.27,30) if len(p.GetChildren()) == 1 else (-8,.27,8)
     pos = UsdGeom.Xformable(p).GetLocalTransformation().ExtractTranslation()
     assert all(abs(a-b)<1e-8 for a,b in zip(pos,esperado)), 'Fantasmas fora do local do impacto'
     cache = UsdGeom.XformCache()
