@@ -1,518 +1,113 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
+<head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Dilema do Bonde 3D · Lab‑RA</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dilema do Bonde — Maquete 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box}body{margin:0;background:#eaf0f5;color:#203247;font:16px system-ui}main{max-width:1440px;margin:auto;padding:clamp(12px,3vw,38px)}h1{margin:.2em 0}small{letter-spacing:.1em;font-weight:700}p{margin:.5em 0 1em}#stage{aspect-ratio:2.2;position:relative;border-radius:16px;overflow:hidden;background:#dbe5ed}canvas{display:block;width:100%;height:100%}nav{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}button{font:inherit;background:#204c80;color:white;border:1px solid #6593bb;border-radius:10px;padding:9px 14px;box-shadow:0 3px #133351;cursor:pointer}button:active{transform:translateY(2px)}#fallback{padding:20px}button:disabled{opacity:.5}
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #c9d3e0; font-family: 'Nunito', system-ui, sans-serif; -webkit-user-select: none; user-select: none; }
+  #cena { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+  #carregando { position: fixed; inset: 0; display: grid; place-items: center; color: #2b3445; font-weight: 800; font-size: 18px; background: #c9d3e0; z-index: 5; transition: opacity .5s; }
+  .barra { position: fixed; left: 0; right: 0; bottom: max(10px, env(safe-area-inset-bottom)); display: flex; justify-content: space-between; align-items: center; padding: 0 max(12px, env(safe-area-inset-left)); gap: 10px; pointer-events: none; z-index: 3; }
+  .barra > * { pointer-events: auto; }
+  .pill { height: 50px; border-radius: 999px; border: 0; font: 800 15px 'Nunito', sans-serif; padding: 0 22px; cursor: pointer; color: #fff; box-shadow: 0 5px 0 rgba(0,0,0,.25), 0 8px 18px rgba(0,0,0,.22); transform: translateY(0); transition: transform .08s, box-shadow .08s, filter .2s; }
+  .pill:active { transform: translateY(4px); box-shadow: 0 1px 0 rgba(0,0,0,.25), 0 3px 8px rgba(0,0,0,.2); }
+  .pill.ativo { outline: 3px solid #fff; outline-offset: 2px; }
+  .pill:disabled { filter: grayscale(.7) brightness(.85); cursor: default; }
+  #manter { background: linear-gradient(#3f7fd1, #2a5fa8); min-width: 150px; }
+  #desviar { background: linear-gradient(#e39a2b, #c27412); min-width: 150px; }
+  .centro { display: flex; gap: 8px; background: rgba(255,255,255,.9); border-radius: 999px; padding: 6px 8px; box-shadow: 0 5px 0 rgba(0,0,0,.18), 0 8px 18px rgba(0,0,0,.18); }
+  .ico { width: 40px; height: 40px; border-radius: 50%; border: 0; background: linear-gradient(#f4f6fa, #dfe4ec); box-shadow: 0 3px 0 #b9c1cf; font-size: 17px; cursor: pointer; color: #2b3445; }
+  .ico:active { transform: translateY(3px); box-shadow: 0 0 0 #b9c1cf; }
+  #crono { min-width: 54px; height: 40px; border-radius: 999px; display: grid; place-items: center; font-weight: 800; color: #2b3445; border: 2px solid #2b3445; padding: 0 6px; box-sizing: border-box; }
+  #aviso { position: fixed; top: max(12px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); background: rgba(255,255,255,.92); color: #2b3445; padding: 8px 16px; border-radius: 999px; font-weight: 800; font-size: 14px; box-shadow: 0 4px 14px rgba(0,0,0,.18); z-index: 3; text-align: center; max-width: 86vw; }
+  #girar { position: fixed; inset: 0; display: none; place-items: center; text-align: center; background: #2b3445; color: #fff; font-weight: 800; z-index: 9; padding: 24px; }
+  @media (orientation: portrait) and (max-width: 700px) { #girar { display: grid; } }
 </style>
-<main>
-<small>LAB‑RA · EXPERIMENTO</small><h1>Dilema do Bonde em 3D</h1>
-<p>Siga o bonde pela frente da estação e acompanhe seu retorno pelo trilho ao fundo.</p>
-<div id="stage"><p id="fallback" role="status">Carregando a cena 3D…</p></div>
-<nav aria-label="Controles da cena"><button id="play" disabled>Pausar</button><button id="reset" disabled>Recomeçar</button><button id="slow" aria-pressed="false" disabled>Câmera lenta</button><button id="view" aria-pressed="false" disabled>Vista elevada</button><button id="ar" hidden>Colocar na mesa em RA</button><button id="route" aria-pressed="false">Testar desvio</button></nav>
-<p id="arHelp" role="status" hidden></p>
-<p id="phase"></p>
-</main>
+<script type="importmap">{ "imports": { "three": "./vendor/three/three.module.js", "three/addons/": "./vendor/three/addons/" } }</script>
+</head>
+<body>
+<canvas id="cena"></canvas>
+<div id="carregando">Montando a maquete…</div>
+<div id="aviso">Toque na alavanca (ou nos botões) para escolher o trilho</div>
+<div class="barra">
+  <button id="manter" class="pill ativo">Manter o curso</button>
+  <div class="centro">
+    <button class="ico" id="play" title="Partir">▶</button>
+    <div id="crono">10</div>
+    <button class="ico" id="reset" title="Reiniciar">↺</button>
+    <button class="ico" id="tela" title="Tela cheia">⛶</button>
+  </div>
+  <button id="desviar" class="pill">Desviar o bonde</button>
+</div>
+<div id="girar">Gire o celular para a horizontal 📱↻</div>
 <script type="module">
-const get = id => document.getElementById(id);
-try {
-const T = await import('https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js');
-const stage = get('stage');
-const renderer = new T.WebGLRenderer({antialias:true,alpha:true});
-renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));
-renderer.toneMapping = T.ACESFilmicToneMapping;
-renderer.shadowMap.enabled=true;
-renderer.shadowMap.type=T.PCFSoftShadowMap;
-renderer.setClearColor(0xeaf0f5);
-stage.append(renderer.domElement);
-const scene = new T.Scene();
-scene.fog = new T.Fog(0xeaf0f5,33,92);
-scene.add(new T.HemisphereLight(0xe6efff,0x847353,1.65));
-const sun = new T.DirectionalLight(0xffefd6,2.5);
-sun.position.set(-24,44,21);
-sun.castShadow=true;
-Object.assign(sun.shadow.camera,{left:-48,right:48,top:36,bottom:-36,far:105});
-sun.shadow.camera.updateProjectionMatrix();
-sun.shadow.mapSize.set(2048,2048);
-sun.shadow.normalBias=.045;
-scene.add(sun);
-const camera = new T.PerspectiveCamera(34,2.2,.1,145);
-const materials = new Map();
-function material(color) {
-  if (!materials.has(color)) materials.set(color,new T.MeshStandardMaterial({color,roughness:.72}));
-  return materials.get(color);
-}
-function mesh(parent, geometry, color, x,y,z) {
-  const object = new T.Mesh(geometry,material(color));
-  object.position.set(x,y,z);
-  object.castShadow=true;
-  object.receiveShadow=true;
-  parent.add(object);
-  return object;
-}
-const box=(parent,color,x,y,z,w,h,d)=>mesh(parent,new T.BoxGeometry(w,h,d),color,x,y,z);
-function beam(parent,a,b,w,color) {
-  const from=new T.Vector3(...a),to=new T.Vector3(...b);
-  const center=from.clone().lerp(to,.5);
-  const piece=box(parent,color,...center.toArray(),w,from.distanceTo(to),w);
-  piece.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),to.sub(from).normalize());
-}
-const model = new T.Group();
-scene.add(model);
-let textureSeed=3107;
-function randomDetail(){
-  textureSeed=(Math.imul(textureSeed,1664525)+1013904223)>>>0;
-  return textureSeed/4294967296;
-}
-function surfaceTexture(colors,repeat){
-  const canvas=document.createElement('canvas');
-  canvas.width=canvas.height=256;
-  const ctx=canvas.getContext('2d');
-  ctx.fillStyle=colors[0];ctx.fillRect(0,0,256,256);
-  for(let i=0;i<26000;i++){
-    ctx.fillStyle=colors[1+Math.floor(randomDetail()*(colors.length-1))];
-    ctx.globalAlpha=.16+randomDetail()*.5;
-    ctx.fillRect(randomDetail()*256,randomDetail()*256,.5+randomDetail()*2.5,.5+randomDetail()*3);
-  }
-  const texture=new T.CanvasTexture(canvas);
-  texture.colorSpace=T.SRGBColorSpace;
-  texture.wrapS=texture.wrapT=T.RepeatWrapping;
-  texture.repeat.set(...repeat);
-  texture.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());
-  return texture;
-}
-const grass=box(model,0x63794b,0,-.26,-5,83,.5,53);
-grass.material=new T.MeshStandardMaterial({
-  map:surfaceTexture(['#687f42','#abb15d','#38472a','#809854','#57543a'],[22,14]),
-  roughness:1
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { criarMaquete } from './js/cena.js';
+
+const canvas = document.getElementById('cena');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: !!window.__captura });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+renderer.shadowMap.enabled = !new URLSearchParams(location.search).has('leve'); renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0xc9d3e0);
+scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
+scene.add(new THREE.HemisphereLight(0xf2f6ff, 0x5a6a40, 0.7));
+const sol = new THREE.DirectionalLight(0xfff1dc, 2.4); sol.position.set(-40, 70, 50); sol.castShadow = true;
+sol.shadow.mapSize.set(2048, 2048); Object.assign(sol.shadow.camera, { left: -85, right: 85, top: 60, bottom: -60, near: 10, far: 220 }); sol.shadow.bias = -0.0004; sol.shadow.normalBias = 0.04;
+scene.add(sol);
+
+const camera = new THREE.PerspectiveCamera(32, 1, 0.5, 600);
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true; controls.maxPolarAngle = Math.PI * 0.47; controls.minDistance = 12; controls.maxDistance = 260; controls.target.set(0, 0, 4);
+const VISTAS = { geral: [0, 100, 150, 0, 0, 8] };
+const qs = new URLSearchParams(location.search);
+const v = (qs.get('cam') || '').split(',').map(Number);
+const vista = v.length === 6 && v.every(n => !isNaN(n)) ? v : VISTAS.geral;
+camera.position.set(vista[0], vista[1], vista[2]); controls.target.set(vista[3], vista[4], vista[5]);
+
+function redimensionar() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+addEventListener('resize', redimensionar); redimensionar();
+
+const m = await criarMaquete({ grupos: { presetPrincipal: qs.get('p1') || 'trabalhador', nPrincipal: 1, presetRamal: qs.get('p3') || 'desconhecidos', nRamal: 3 } });
+scene.add(m.root);
+document.getElementById('carregando').style.opacity = 0; setTimeout(() => document.getElementById('carregando').remove(), 600);
+
+// ---------- interface ----------
+const aviso = document.getElementById('aviso'), bM = document.getElementById('manter'), bD = document.getElementById('desviar');
+const crono = document.getElementById('crono');
+function sincronizar() { bM.classList.toggle('ativo', m.rota === 'principal'); bD.classList.toggle('ativo', m.rota === 'ramal'); }
+function escolher(r) { if (m.definirRota(r)) sincronizar(); else if (m.estado.travado) aviso.textContent = 'O bonde já passou pela agulha — a decisão está tomada'; }
+bM.onclick = () => escolher('principal'); bD.onclick = () => escolher('ramal');
+let tempo = 10, contando = false;
+document.getElementById('play').onclick = () => { if (!contando && !m.estado.rodando) { contando = true; aviso.textContent = 'O bonde vai partir… decida antes da agulha'; } };
+document.getElementById('reset').onclick = () => { m.reiniciar(); tempo = 10; contando = false; crono.textContent = '10'; aviso.textContent = 'Toque na alavanca (ou nos botões) para escolher o trilho'; [bM, bD].forEach(b => b.disabled = false); sincronizar(); };
+document.getElementById('tela').onclick = () => { const el = document.documentElement; if (!document.fullscreenElement) (el.requestFullscreen || el.webkitRequestFullscreen)?.call(el); else document.exitFullscreen?.(); };
+m.estado.aoImpacto = r => { aviso.textContent = r === 'principal' ? 'O bonde seguiu pelo trilho principal' : 'O bonde foi desviado para o ramal'; };
+m.estado.aoFim = () => { aviso.textContent += ' — toque ↺ para nova rodada'; };
+
+// toque na alavanca (raycast)
+const ray = new THREE.Raycaster(), ptr = new THREE.Vector2(); let toque0 = null;
+canvas.addEventListener('pointerdown', e => { toque0 = [e.clientX, e.clientY]; });
+canvas.addEventListener('pointerup', e => {
+  if (!toque0 || Math.hypot(e.clientX - toque0[0], e.clientY - toque0[1]) > 8) return;
+  ptr.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1); ray.setFromCamera(ptr, camera);
+  if (ray.intersectObject(m.alvoToque, false).length) { if (m.alternarAlavanca()) sincronizar(); else aviso.textContent = 'O bonde já passou pela agulha — a decisão está tomada'; }
 });
-grass.castShadow=false;
-box(model,0x494235,0,-.58,-5,83,.27,53);
-for(let i=0;i<29;i++){
-  const x=(i-14)*2.65, h=1.5+((i*13)%11)*.44;
-  const z=-26-(i%3)*1.5;
-  box(model,i%2 ? 0x8ea4b8 : 0x9aafc2,x,h/2,z,1.4+i%4*.25,h,1.6);
-  const facadeZ=z+.81;
-  for(let row=0;row<Math.floor(h/.66)-1;row++){
-    for(const dx of [-.35,.35]){
-      box(model,(i+row)%4===0?0xd4b88a:0x667985,x+dx,.58+row*.63,facadeZ,.22,.28,.028);
-    }
-  }
-  if(i%4===0) box(model,0x839aae,x,h+.32,z,.12,.65,.12);
-}
-const station = new T.Group();
-model.add(station);
-const stationDeck=2.1;
-station.position.set(0,stationDeck,-11.1);
-for(const side of [-1,1]){
-  box(station,0x929b99,0,.05,side*1.57,14,.3,1.15);
-  for(const x of [-6.5,-4.3,-2.15,0,2.15,4.3,6.5]){
-    box(station,0x465b69,x,1.67,side*2.02,.16,3.35,.16);
-    box(station,0x878d82,x,-stationDeck/2,side*1.65,.55,stationDeck,.55);
-    box(station,0xb9a87c,x,.65,side*1.7,.72,.12,.32);
-  }
-  box(station,0x536c7d,0,3.16,side*2.02,14.1,.2,.23);
-  const canopy=box(station,0x6f899d,0,3.62,side*1.13,14.2,.09,2.4);
-  canopy.rotation.x=side*.32;
-  for(let i=0;i<25;i++){
-    const seam=box(station,0x475e70,(i-12)*.56,3.68,side*1.13,.026,.04,2.41);
-    seam.rotation.x=canopy.rotation.x;
-  }
-  for(const x of [-5.4,-2.7,0,2.7,5.4]){
-    box(station,0xf1cc86,x,2.95,side*1.72,.30,.085,.15);
-    box(station,0x8d6842,x,.53,side*1.57,.75,.11,.28);
-    box(station,0x8d6842,x,.67,side*1.72,.75,.20,.065);
-  }
-}
-for(const x of [-7,-4.7,-2.35,0,2.35,4.7,7]){
-  beam(station,[x,3.32,-2.18],[x,4.04,0],.09,0x344d5f);
-  beam(station,[x,4.04,0],[x,3.32,2.18],.09,0x344d5f);
-}
-box(station,0x42596b,0,3.32,2.15,2.25,1.15,.18);
-for(let i=0;i<10;i++){
-  const rise=(10-i)*stationDeck/10;
-  box(station,0xa9a79a,0,rise/2-stationDeck,2.3+i*.23,1.65,rise,.24);
-}
-function disk(parent,color,x,y,z,r,depth){
-  const item=mesh(parent,new T.CylinderGeometry(r,r,depth,32),color,x,y,z);
-  item.rotation.x=Math.PI/2;
-  return item;
-}
-disk(station,0x25404c,0,3.35,2.26,.45,.09);
-disk(station,0xffecc4,0,3.35,2.32,.37,.035);
-for(let i=0;i<12;i++){
-  const a=i*Math.PI/6;
-  const tick=box(station,0x5c5647,Math.sin(a)*.31,3.35+Math.cos(a)*.31,2.35,.021,.065,.018);
-  tick.rotation.z=-a;
-}
-beam(station,[0,3.35,2.37],[.15,3.44,2.37],.04,0x383833);
-beam(station,[0,3.35,2.37],[.08,3.16,2.37],.03,0x383833);
 
-const straight=29, radius=5.1, rearTrackZ=-11.1;
-const curveCenterZ=(radius+rearTrackZ)/2;
-const curveRadius=(radius-rearTrackZ)/2;
-const arc=Math.PI*curveRadius, length=4*straight+2*arc;
-const junctionX=.8;
-function smoothstep(t){
-  const n=Math.max(0,Math.min(1,t));
-  return n*n*(3-2*n);
-}
-function mainTrackZ(x){
-  const opening=smoothstep((x-junctionX)/10);
-  const approachToCurve=smoothstep((x-15)/(straight-15));
-  return radius-2.45*opening*(1-approachToCurve);
-}
-function route(distance,lateral=0){
-  let s=((distance%length)+length)%length;
-  const r=curveRadius+lateral;
-  if(s<2*straight){const x=-straight+s;return [x,mainTrackZ(x)+lateral];}
-  s-=2*straight;
-  if(s<arc){const a=s/curveRadius;return [straight+r*Math.sin(a),curveCenterZ+r*Math.cos(a)];}
-  s-=arc;
-  if(s<2*straight)return [straight-s,rearTrackZ-lateral];
-  const a=(s-2*straight)/curveRadius;
-  return [-straight-r*Math.sin(a),curveCenterZ-r*Math.cos(a)];
-}
-const branchEnd=27, branchSpan=branchEnd-junctionX;
-function branch(t){
-  const x=junctionX+t*branchSpan;
-  return [x,mainTrackZ(x)+8.6*Math.sin(Math.PI*t)**2];
-}
-function trackHeight(distance){
-  const s=((distance%length)+length)%length;
-  if(s<2*straight)return 0;
-  if(s<2*straight+arc)return stationDeck*smoothstep((s-2*straight)/arc);
-  if(s<4*straight+arc)return stationDeck;
-  return stationDeck*(1-smoothstep((s-4*straight-arc)/arc));
-}
-function carRoute(distance,useBranch){
-  const x=distance-straight;
-  return useBranch&&x>=junctionX&&x<=branchEnd
-    ? branch((x-junctionX)/branchSpan)
-    : route(distance);
-}
-for(const x of [-21,-14,-8,0,8,14,21]){
-  box(model,0x878d82,x,stationDeck/2-.06,rearTrackZ,.6,stationDeck,1.6);
-}
-box(model,0x778385,0,stationDeck-.11,rearTrackZ,58,.20,1.58);
-for(const start of [2*straight,4*straight+arc]){
-  for(let i=1;i<24;i++){
-    const s=start+i*arc/24;
-    const [x,z]=route(s),[nx,nz]=route(s+.05);
-    const y=trackHeight(s);
-    const deck=box(model,0x778385,x,y-.11,z,1.12,.20,1.58);
-    deck.rotation.y=Math.atan2(z-nz,nx-x);
-    if(i%4===0)box(model,0x878d82,x,y/2-.1,z,.57,Math.max(.05,y),1.4);
-  }
-}
-const workshopX=14,workshopZ=6.9;
-box(model,0xa9a18a,workshopX,.10,workshopZ,5.2,.20,2.5);
-box(model,0x9a8d75,workshopX,.86,workshopZ,4.7,1.55,2.05);
-box(model,0x435665,workshopX,1.72,workshopZ,5.15,.18,2.43);
-box(model,0x483e34,workshopX+.92,.77,workshopZ+1.04,1.55,1.35,.08);
-box(model,0xdbc68f,workshopX-1.12,.97,workshopZ+1.04,.78,.48,.08);
-
-const ballastSegments=[];
-function addBallast(sample,count){
-  for(let i=0;i<count;i++){
-    const a=sample(i/count),b=sample((i+1)/count);
-    ballastSegments.push([a,b]);
-  }
-}
-addBallast(t=>{
-  const s=t*length,[x,z]=route(s);
-  return new T.Vector3(x,trackHeight(s)+.014,z);
-},310);
-addBallast(t=>{
-  const [x,z]=branch(t);
-  return new T.Vector3(x,.015,z);
-},55);
-const ballast=new T.InstancedMesh(
-  new T.BoxGeometry(1,.05,1.78),
-  new T.MeshStandardMaterial({color:0xffffff,roughness:1}),
-  ballastSegments.length
-);
-const ballastPiece=new T.Object3D();
-for(const [i,[a,b]] of ballastSegments.entries()){
-  const tangent=b.clone().sub(a);
-  ballastPiece.position.copy(a).lerp(b,.5);
-  ballastPiece.rotation.set(0,Math.atan2(-tangent.z,tangent.x),
-    Math.atan2(tangent.y,Math.hypot(tangent.x,tangent.z)),'YXZ');
-  ballastPiece.scale.x=tangent.length()+.06;
-  ballastPiece.updateMatrix();
-  ballast.setMatrixAt(i,ballastPiece.matrix);
-  ballast.setColorAt(i,new T.Color(0x8a8271).multiplyScalar(.82+randomDetail()*.3));
-}
-ballast.receiveShadow=true;
-model.add(ballast);
-const steel=material(0x788994);
-steel.metalness=.65;
-steel.roughness=.33;
-function rail(points){
-  const path=new T.CurvePath();
-  for(let i=1;i<points.length;i++)path.add(new T.LineCurve3(points[i-1],points[i]));
-  mesh(model,new T.TubeGeometry(path,points.length-1,.035,6,false),0x788994,0,0,0);
-}
-for(const offset of [-.46,.46]){
-  rail(Array.from({length:321},(_,i)=>{
-    const [x,z]=route(i*length/320,offset);
-    return new T.Vector3(x,trackHeight(i*length/320)+.12,z);
-  }));
-  rail(Array.from({length:31},(_,i)=>{
-    const t=i/30;
-    const [x,z]=branch(t);
-    return new T.Vector3(x,.12,z+offset);
-  }));
-}
-const sleeperGeo=new T.BoxGeometry(.19,.10,1.34);
-const mainSleeperCount=245;
-const firstBranchSleeper=5;
-const branchSleeperSteps=41;
-const lastBranchSleeper=branchSleeperSteps-firstBranchSleeper;
-const sleeperCount=mainSleeperCount+lastBranchSleeper-firstBranchSleeper+1;
-const sleepers=new T.InstancedMesh(sleeperGeo,material(0x79543f),sleeperCount);
-const dummy=new T.Object3D();
-for(let i=0;i<sleeperCount;i++){
-  dummy.scale.set(1,1,1);
-  if(i<mainSleeperCount){
-    const d=i*length/mainSleeperCount,[x,z]=route(d),[nx,nz]=route(d+.05);
-    const t=(x-junctionX)/branchSpan;
-    const shared=d<2*straight&&t>=0&&t<=1&&(t<firstBranchSleeper/branchSleeperSteps||t>lastBranchSleeper/branchSleeperSteps);
-    const extension=shared?branch(t)[1]-z:0;
-    dummy.scale.z=1+extension/1.34;
-    dummy.position.set(x,trackHeight(d)+.045,z+extension/2);
-    dummy.rotation.y=Math.atan2(z-nz,nx-x);
-  }else{
-    const t=(i-mainSleeperCount+firstBranchSleeper)/branchSleeperSteps;
-    const [x,z]=branch(t);
-    dummy.position.set(x,.045,z);
-    const [nx,nz]=branch(t+.002);
-    dummy.rotation.y=Math.atan2(z-nz,nx-x);
-  }
-  dummy.updateMatrix();sleepers.setMatrixAt(i,dummy.matrix);
-}
-sleepers.castShadow=true;
-sleepers.receiveShadow=true;
-for(let i=0;i<sleeperCount;i++){
-  sleepers.setColorAt(i,new T.Color().setScalar(.70+randomDetail()*.30));
-}
-model.add(sleepers);
-
-const foliage=new T.IcosahedronGeometry(.82,1);
-for(const [x,z,size] of [[-25,-5,1.15],[-19,-3,.85],[-15,-6,1.15],[-9,-4,.68],[17,-5,.9],[23,-4,1.18],[26,-7,.82],[-23,-20,.9],[20,-20,1.1],[29,-19,1.2],[-28,-17,1.2]]){
-  box(model,0x66503a,x,.62*size,z,.17*size,1.24*size,.17*size);
-  const crown=mesh(model,foliage,0x496735,x,1.75*size,z);
-  crown.scale.set(size,1.35*size,size);
-  const tip=mesh(model,foliage,0x688147,x-.24*size,2.25*size,z+.12);
-  tip.scale.setScalar(.64*size);
-}
-const car=new T.Group();
-model.add(car);
-const body=new T.Shape();
-body.moveTo(-2.31,.35);
-body.quadraticCurveTo(-2.53,.35,-2.53,.58);
-body.lineTo(-2.53,1.55);
-body.quadraticCurveTo(-2.53,1.76,-2.29,1.76);
-body.lineTo(2.29,1.76);
-body.quadraticCurveTo(2.53,1.76,2.53,1.55);
-body.lineTo(2.53,.58);
-body.quadraticCurveTo(2.53,.35,2.31,.35);
-body.closePath();
-mesh(car,new T.ExtrudeGeometry(body,{
-  depth:1.43,bevelEnabled:true,bevelSize:.045,bevelThickness:.045,bevelSegments:2
-}),0xb91c20,0,0,-.715);
-material(0xb91c20).roughness=.34;
-box(car,0xe53830,0,.72,0,5.07,.55,1.54);
-box(car,0x1d4679,0,1.04,0,5.1,.15,1.56);
-box(car,0x2d3942,0,1.78,0,5.16,.17,1.64);
-for(const side of [-1,1]){
-  box(car,0xe6bb75,0,1.12,side*.79,5.02,.036,.018);
-  box(car,0x762026,0,.52,side*.78,4.89,.10,.035);
-  for(const x of [-1.95,-1.13,-.37,.37,1.13,1.95]){
-    box(car,0x182d43,x,1.41,side*.77,.66,.56,.05);
-    box(car,0x426b86,x,1.41,side*.81,.55,.45,.035);
-    box(car,0xd2a767,x,1.28,side*.832,.49,.075,.016);
-    box(car,0xc2c3b4,x,1.43,side*.835,.018,.46,.018);
-    beam(car,[x-.17,1.24,side*.836],[x+.02,1.61,side*.836],.028,0x86c9ea);
-  }
-}
-for(const end of [-1,1]){
-  box(car,0x244e78,end*2.54,1.41,0,.05,.5,1.15);
-  box(car,end===1?0xffe5a7:0xb51c20,end*2.57,.87,0,.08,.19,.24);
-  box(car,0x333d46,end*2.62,.43,0,.19,.16,1.64);
-}
-const wheels=[];
-for(const x of [-1.77,-1.03,1.03,1.77]){
-  for(const side of [-1,1]){
-    const wheel=new T.Group();
-    wheel.position.set(x,.34,side*.62);car.add(wheel);wheels.push(wheel);
-    disk(wheel,0x222830,0,0,0,.27,.19);
-    disk(wheel,0x9aabb8,0,0,side*.11,.15,.027);
-    box(wheel,0x344452,.045,0,side*.129,.06,.045,.025);
-  }
-}
-const pantograph=[[-.72,1.88,0],[0,2.25,0],[.63,2.65,0],[0,2.74,0],[-.66,2.54,0],[0,2.25,0],[.71,1.88,0]];
-for(let i=1;i<pantograph.length;i++)beam(car,pantograph[i-1],pantograph[i],.049,0x892b2a);
-beam(car,[-.36,2.75,0],[.36,2.75,0],.045,0x323c46);
-
-function person(x,z,coat){
-  const g=new T.Group();
-  g.position.set(x,0,z);model.add(g);
-  for(const sign of [-1,1]){
-    box(g,0x423831,sign*.11,.32,0,.15,.59,.17);
-    box(g,0x302b28,sign*.11,.08,.04,.17,.11,.25);
-    box(g,coat,sign*.24,.92,.02,.13,.46,.17);
-  }
-  box(g,coat,0,.95,0,.39,.63,.25);
-  mesh(g,new T.SphereGeometry(.137,12,8),0xc59774,0,1.42,0);
-  box(g,0x614d3b,0,1.53,0,.34,.065,.28);
-}
-for(const x of [7.2,9.1,11])person(x,mainTrackZ(x),0x9b7955);
-const [singleX,singleZ]=branch(.42);
-person(singleX,singleZ,0xe1e6e7);
-const controlAreaZ=9.05;
-box(model,0x979b91,-.65,.025,controlAreaZ,3.1,.09,1.05);
-person(-1.6,controlAreaZ,0x2e6392);
-beam(model,[.72,.14,controlAreaZ+.05],[.35,.95,controlAreaZ+.05],.08,0x5e7189);
-mesh(model,new T.SphereGeometry(.16,16,10),0xc8242d,.35,.95,controlAreaZ+.05);
-function marker(label,x,y,z){
-  const canvas=document.createElement('canvas');canvas.width=64;canvas.height=64;
-  const ctx=canvas.getContext('2d');
-  ctx.fillStyle='#25384b';ctx.font='bold 50px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(label,32,32);
-  const sprite=new T.Sprite(new T.SpriteMaterial({map:new T.CanvasTexture(canvas),depthWrite:false}));
-  sprite.position.set(x,y,z);sprite.scale.set(.8,.8,.8);model.add(sprite);
-}
-marker('3',9.1,2.03,mainTrackZ(9.1)+.1);
-marker('1',singleX,1.98,singleZ+.06);
-
-let elevated=false, playing=!matchMedia('(prefers-reduced-motion: reduce)').matches, rate=1, distance=9, last;
-function resize(){
-  const w=stage.clientWidth,h=stage.clientHeight;
-  if(!w||!h||renderer.xr.isPresenting)return;
-  camera.aspect=w/h;
-  const overviewScale=Math.max(1,2.2/camera.aspect);
-  scene.fog.near=elevated?90:39;
-  scene.fog.far=elevated?145:92;
-  if(elevated) camera.position.set(0,56*overviewScale,49*overviewScale);
-  else camera.position.set(0,7.2,Math.max(25,53/camera.aspect));
-  camera.lookAt(0,elevated?1.9:3.65,0);camera.updateProjectionMatrix();renderer.setSize(w,h,false);
-}
-new ResizeObserver(resize).observe(stage);
-resize();
-let activeBranch=false;
-const routeButton=get('route');
-routeButton.onclick=()=>{
-  activeBranch=!activeBranch;
-  routeButton.setAttribute('aria-pressed',String(activeBranch));
-  routeButton.textContent=activeBranch?'Testar trilho principal':'Testar desvio';
-  distance=9;
-};
-const arButton=get('ar');
-const arHelp=get('arHelp');
-const reticle=new T.Mesh(
-  new T.RingGeometry(.035,.045,40).rotateX(-Math.PI/2),
-  new T.MeshBasicMaterial({color:0x2b87ff,side:T.DoubleSide})
-);
-reticle.visible=false;
-scene.add(reticle);
-let hitSource=null;
-let placed=false;
-renderer.xr.enabled=true;
-renderer.xr.setReferenceSpaceType('local');
-function arMessage(message){
-  arHelp.hidden=false;
-  arHelp.textContent=message;
-}
-async function openAR(){
-  arButton.disabled=true;
-  let session;
-  try{
-    session=await navigator.xr.requestSession('immersive-ar',{requiredFeatures:['hit-test']});
-    session.addEventListener('end',()=>{
-      hitSource?.cancel();
-      hitSource=null;
-      placed=false;
-      reticle.visible=false;
-      model.position.set(0,0,0);
-      model.scale.setScalar(1);
-      model.visible=true;
-      renderer.setClearAlpha(1);
-      renderer.shadowMap.enabled=true;
-      arButton.disabled=false;
-      arMessage('Para reposicionar a maquete, abra a RA novamente.');
-    },{once:true});
-    await renderer.xr.setSession(session);
-    renderer.setClearAlpha(0);
-    renderer.shadowMap.enabled=false;
-    model.visible=false;
-    const viewer=await session.requestReferenceSpace('viewer');
-    const source=await session.requestHitTestSource({space:viewer});
-    if(renderer.xr.getSession()!==session){
-      source.cancel();
-      return;
-    }
-    hitSource=source;
-    session.addEventListener('select',()=>{
-      if(!reticle.visible||placed)return;
-      model.position.copy(reticle.position);
-      model.scale.setScalar(.008);
-      model.visible=true;
-      reticle.visible=false;
-      distance=9;
-      placed=true;
-    });
-  }catch(error){
-    if(session&&renderer.xr.getSession()===session)await session.end().catch(()=>{});
-    arButton.disabled=false;
-    arMessage('A sessão de RA não abriu. Você pode continuar na vista 3D.');
-    console.error(error);
-  }
-}
-if(navigator.xr){
-  navigator.xr.isSessionSupported('immersive-ar').then(supported=>{
-    if(!supported)return;
-    arButton.hidden=false;
-    arButton.onclick=openAR;
-    arMessage('Em RA, aponte para a mesa e toque quando o círculo azul aparecer.');
-  }).catch(()=>{});
-}
-function frame(now,xrFrame){
-  if(xrFrame&&hitSource&&!placed){
-    const hit=xrFrame.getHitTestResults(hitSource)[0];
-    const pose=hit?.getPose(renderer.xr.getReferenceSpace());
-    reticle.visible=Boolean(pose);
-    if(pose){
-      const {x,y,z}=pose.transform.position;
-      reticle.position.set(x,y+.002,z);
-    }
-  }
-  if((renderer.xr.isPresenting?placed:playing)&&last!==undefined) distance=(distance+Math.min((now-last)/1000,.05)*5.7*rate)%length;
-  last=now;
-  const nextDistance=(distance+.03)%length;
-  const [x,z]=carRoute(distance,activeBranch),[nx,nz]=carRoute(nextDistance,activeBranch);
-  const y=trackHeight(distance);
-  const tangent=new T.Vector3(nx-x,trackHeight(nextDistance)-y,nz-z).normalize();
-  car.position.set(x,y+.04,z);
-  car.rotation.set(0,Math.atan2(-tangent.z,tangent.x),Math.asin(tangent.y),'YXZ');
-  for(const wheel of wheels)wheel.rotation.z=-distance/.27;
-  const label=distance<2*straight?'Primeiro plano · saída pela direita':distance<2*straight+arc?'Curva · fora do enquadramento':distance<4*straight+arc?'Retorno elevado · passagem pela estação':'Curva · retorno ao primeiro plano';
-  if(get('phase').textContent!==label)get('phase').textContent=label;
-  renderer.render(scene,camera);
-
-}
-function syncPlay(){get('play').textContent=playing?'Pausar':'Reproduzir';}
-get('play').onclick=()=>{playing=!playing;syncPlay();};
-get('reset').onclick=()=>{distance=9;};
-get('slow').onclick=()=>{rate=rate===1?.5:1;get('slow').setAttribute('aria-pressed',String(rate===.5));};
-get('view').onclick=()=>{elevated=!elevated;get('view').setAttribute('aria-pressed',String(elevated));resize();};
-syncPlay();
-for(const button of document.querySelectorAll('nav button'))button.disabled=false;
-get('fallback').remove();
-renderer.setAnimationLoop(frame);
-} catch(error) {
-  get('fallback').textContent='Não foi possível abrir a cena. Confira a conexão e o suporte a WebGL no navegador.';
-  console.error(error);
-}
+// ---------- laço ----------
+const relogio = new THREE.Clock(); let acum = 0;
+renderer.setAnimationLoop(() => {
+  const dt = Math.min(0.05, relogio.getDelta());
+  if (contando) { acum += dt; if (acum >= 1) { acum = 0; tempo--; crono.textContent = String(Math.max(0, tempo)); if (tempo <= 0) { contando = false; m.partir(); } } }
+  if (m.estado.travado) [bM, bD].forEach(b => b.disabled = true);
+  m.update(dt); controls.update(); renderer.render(scene, camera);
+});
+window.__maquete = m; window.__pronto = true;
 </script>
+</body>
 </html>
