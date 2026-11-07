@@ -1,0 +1,90 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+import * as THREE from '../dilema-bonde-3d/vendor/three/three.module.js';
+
+const entrada = fs.readFileSync(new URL('../dilema-bonde-3d/ar/entrada.js',import.meta.url),'utf8');
+const html = fs.readFileSync(new URL('../dilema-bonde-3d/ar/index.html',import.meta.url),'utf8');
+function harness({ua='iPhone',platform='',touch=0,ar=true,top=false,load=async()=>{throw Error('importação inesperada');}}={}) {
+  const events={}, imports=[], revoked=[], clicked=[];
+  class Element {
+    hidden=false; disabled=false; textContent=''; children=[]; attrs={}; events={};
+    relList={supports:()=>ar};
+    set href(v){this.attrs.href=v;} get href(){return this.attrs.href;}
+    set rel(v){this.attrs.rel=v;} get rel(){return this.attrs.rel;}
+    setAttribute(k,v){this.attrs[k]=v;} getAttribute(k){return this.attrs[k]??null;}
+    hasAttribute(k){return k in this.attrs;} removeAttribute(k){delete this.attrs[k];}
+    addEventListener(k,f){this.events[k]=f;} appendChild(e){this.children.push(e);return e;}
+    click(){clicked.push(this);} remove(){}
+  }
+  const els=Object.fromEntries(['nativo','web','linkAR','statusAR','trocarAR','paresAR','comecar','estadoEntrada'].map(id=>[id,new Element()]));
+  els.web.hidden=true;els.trocarAR.hidden=true;els.linkAR.href='maquete.usdz?v=20261107-ra1';els.linkAR.rel='ar';els.paresAR.textContent='rodada padrão';
+  const doc={getElementById:id=>els[id],createElement:()=>new Element(),body:new Element()};
+  const window={};window.top=top?{document:doc}:window;
+  const U=class extends URL {};U.revokeObjectURL=x=>revoked.push(x);
+  vm.runInNewContext(entrada.replace(/\bimport\(/g,'__import('),{
+    document:doc,window,navigator:{userAgent:ua,platform,maxTouchPoints:touch},location:{search:''},URLSearchParams,URL:U,
+    __import:async url=>{imports.push(url);return load(url);},console:{warn(){}},setTimeout:()=>0,addEventListener:(n,f)=>{events[n]=f;},
+    WebGLRenderingContext:class{constructor(){throw Error('WebGL proibido no caminho nativo');}}
+  });
+  return {els,imports,revoked,clicked,events};
+}
+
+test('entrada nativa já está no HTML, sem depender de WebGL, com uma única imagem no link',()=>{
+  const a=html.match(/<a id="linkAR"[^>]*>([\s\S]*?)<\/a>/)[1];
+  assert.match(a,/^<img[^>]+>$/);assert.doesNotMatch(html,/WebGLRenderer|type="module"/);
+  assert.match(html,/rel="ar" href="maquete\.usdz\?v=/);
+});
+for(const opts of [{ua:'iPhone'},{ua:'iPad'},{ua:'Macintosh',platform:'MacIntel',touch:5},{ua:'future-device',ar:true}])
+test('entrada nativa não baixa módulos nem pede câmera: '+JSON.stringify(opts),()=>{
+  const {els,imports}=harness(opts);assert.equal(els.web.hidden,true);assert.equal(els.trocarAR.hidden,false);assert.equal(els.linkAR.rel,'ar');assert.equal(imports.length,0);
+});
+test('detecção negativa em navegador interno não transforma RA em download comum',()=>{
+  const {els}=harness({ar:false});assert.equal(els.linkAR.rel,'ar');assert.match(els.statusAR.textContent,/Safari/);
+});
+test('iframe abre link AR pelo documento superior no mesmo toque',()=>{
+  const {els,clicked}=harness({top:true});let prevented=false;
+  els.linkAR.events.click({preventDefault(){prevented=true;}});
+  assert(prevented);assert.equal(clicked.length,1);assert.equal(clicked[0].rel,'ar');assert.equal(clicked[0].children.length,1);
+});
+test('troca nativa bloqueia toque durante preparo e preserva a última rodada em falha',async()=>{
+  let finish, count=0;
+  const h=harness({load:async()=>({prepararPersonagens:()=>{count++;return count===1?new Promise(r=>finish=r):Promise.reject(Error('offline'));}})});
+  const pending=h.els.trocarAR.onclick();await new Promise(resolve=>setImmediate(resolve));
+  let prevented=false;h.els.linkAR.events.click({preventDefault(){prevented=true;}});assert(prevented);assert(h.els.trocarAR.disabled);
+  finish({url:'blob:nova',descricao:'nova rodada'});await pending;
+  assert.equal(h.els.linkAR.href,'blob:nova');assert.equal(h.els.linkAR.getAttribute('download'),'dilema-bonde.usdz');
+  await h.els.trocarAR.onclick();assert.equal(h.els.linkAR.href,'blob:nova');assert.equal(h.els.paresAR.textContent,'nova rodada');
+  assert.equal(h.els.trocarAR.disabled,false);assert.equal(h.els.linkAR.hasAttribute('aria-disabled'),false);assert.deepEqual(h.revoked,[]);
+});
+test('substituir uma rodada libera apenas o blob anterior e retorno por cache preserva o atual',async()=>{
+  let n=0;const h=harness({load:async()=>({prepararPersonagens:async()=>({url:'blob:'+ ++n,descricao:'rodada '+n})})});
+  await h.els.trocarAR.onclick();await h.els.trocarAR.onclick();assert.deepEqual(h.revoked,['blob:1']);
+  h.events.pagehide({persisted:true});assert.deepEqual(h.revoked,['blob:1']);h.events.pagehide({persisted:false});assert.deepEqual(h.revoked,['blob:1','blob:2']);
+});
+test('falha de preparo web permite nova tentativa; abertura usa gesto sem esperar outro preparo',async()=>{
+  let n=0,gesture=false,called=false;
+  const h=harness({ua:'Android',ar:false,load:async()=>({preparar:async()=>{if(++n===1)throw Error('WebGL indisponível');return {entrar(){called=gesture;return Promise.reject(Object.assign(Error('denied'),{name:'NotAllowedError'}));}};}})});
+  assert(h.els.nativo.hidden);assert(!h.els.web.hidden);
+  await h.els.comecar.onclick();assert.equal(h.els.comecar.disabled,false);assert.match(h.els.estadoEntrada.textContent,/tentar novamente/);
+  await h.els.comecar.onclick();assert.match(h.els.comecar.textContent,/Abrir/);
+  gesture=true;const run=h.els.comecar.onclick();gesture=false;await run;
+  assert(called);assert.equal(n,2);assert.equal(h.els.comecar.disabled,false);assert.match(h.els.estadoEntrada.textContent,/não foram autorizados/);
+});
+
+test('motor: pedido XR síncrono, colocação, saída e reentrada liberam hit-test',async()=>{
+  const src=fs.readFileSync(new URL('../dilema-bonde-3d/ar/rastreador.js',import.meta.url),'utf8').replace(/^import[^\n]+\n/,'').replace('export default motor;','window.testMotor = motor;');
+  let requested=0,cancelled=0;const sessions=[];
+  const window={addEventListener(){},removeEventListener(){},performance:{now:()=>0}};
+  const navigator={userAgent:'Android',mediaDevices:{getUserMedia(){}},xr:{requestSession(){requested++;const events={};const s={addEventListener:(k,f)=>events[k]=f,requestReferenceSpace:async()=>({}),requestHitTestSource:async()=>({cancel(){cancelled++;}}),end:async()=>events.end()};sessions.push(s);return Promise.resolve(s);}}};
+  const renderer={domElement:{style:{},getBoundingClientRect:()=>({left:0,top:0,width:400,height:800})},setClearAlpha(){},xr:{setReferenceSpaceType(){},setSession:async()=>{},getReferenceSpace:()=>({})}};
+  vm.runInNewContext(src,{THREE,window,navigator,document:{body:{classList:{add(){},remove(){}}}},console,setTimeout:()=>0,Promise});
+  const ra=window.testMotor.criar({renderer,camera:new THREE.PerspectiveCamera(),cena:new THREE.Scene()});
+  for(let i=0;i<3;i++){
+    const entering=ra.entrar({webxr:true});assert.equal(requested,i+1);await entering;assert(ra.ativo());
+    ra.quadro({getHitTestResults:()=>[{getPose:()=>({transform:{position:{x:1,y:0,z:-2}}})}]});
+    assert(ra.estado().temMira);assert.equal(ra.pose().elements[12],1);
+    await ra.sair();assert.equal(ra.ativo(),false);assert.equal(cancelled,i+1);
+  }
+});

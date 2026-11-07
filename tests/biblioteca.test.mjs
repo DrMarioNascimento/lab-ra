@@ -5,8 +5,8 @@ import {createHash} from 'node:crypto';
 import {fileURLToPath} from 'node:url';
 const root=new URL('../',import.meta.url);
 const page=readFileSync(new URL('bancadas.html',root),'utf8');
-test('biblioteca apresenta dois cards e duas ilustracoes sem links',()=>{
- assert.equal((page.match(/class="card"/g)||[]).length,2);
+test('biblioteca apresenta Dragon, Fisiologia e Ética e duas ilustrações sem links',()=>{
+ assert.equal((page.match(/class="card"/g)||[]).length,3);
  assert.equal((page.match(/class="emblema"/g)||[]).length,2);
  const emblemas=page.slice(page.indexOf('<div class="emblemas"'),page.indexOf('<div class="cards"'));
  assert.doesNotMatch(emblemas,/<a\b/);

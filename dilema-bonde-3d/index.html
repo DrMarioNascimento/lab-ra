@@ -30,7 +30,7 @@
 </head>
 <body>
 <canvas id="cena"></canvas>
-<div id="carregando">Montando a maquete…</div>
+<div id="carregando"><div>Montando a maquete…<p><a href="ar/">Abrir em realidade aumentada</a></p></div></div>
 <div id="aviso">Toque na alavanca (ou nos botões) para escolher o trilho</div>
 <div class="barra">
   <button id="manter" class="pill ativo">Manter o curso</button>
@@ -38,11 +38,11 @@
     <button class="ico" id="play" title="Partir">▶</button>
     <div id="crono">10</div>
     <button class="ico" id="reset" title="Reiniciar">↺</button>
-    <button class="ico" id="tela" title="Tela cheia">⛶</button>
+    <button class="ico" id="tela" title="Tela cheia">⛶</button><a class="ico" href="ar/" title="Abrir em realidade aumentada" style="display:grid;place-items:center;text-decoration:none;font:800 14px system-ui">RA</a>
   </div>
   <button id="desviar" class="pill">Desviar o bonde</button>
 </div>
-<div id="girar">Gire o celular para a horizontal 📱↻</div>
+<div id="girar"><div>Gire o celular para a horizontal 📱↻<p><a href="ar/" style="color:inherit">Abrir em realidade aumentada</a></p></div></div>
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
