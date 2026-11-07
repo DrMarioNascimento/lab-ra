@@ -6,16 +6,15 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { ARAUCARIAS_RA } from './vegetacao-ra.js?v=20261107-ra8';
-import { ajustarProporcoes, ESCALA_PERSONAGENS, FATOR_OPERADOR, ESCALA_OFICINA } from './proporcoes.js?v=20261107-ra9';
+import { ARAUCARIAS_RA } from './vegetacao-ra.js?v=20261107-ra10';
+import { ajustarProporcoes, ESCALA_PERSONAGENS, FATOR_OPERADOR, ESCALA_OFICINA, FATOR_LARGURA_VIA, BITOLA, LARGURA_DORMENTE } from './proporcoes.js?v=20261107-ra10';
 import { criarCidade } from './cidade.js?v=20261107-ra8';
 import { ligarRelogio } from './relogio.js?v=20261107-ra7';
 
 export const Y_TRILHO = 0.42;
-const BITOLA = 1.435;
-const L = 40, R = 30, ZT = -30, ZB = 30;          // anel: retas x∈[-L, L], semicírculos de raio R
-export const Z_RAMAL = 8;
-const XD = -38, ZR = Z_RAMAL;                          // desvio (agulha) em x = XD; ramal em z = ZR
+const L = 46, R = 30, ZT = -30, ZB = 30;          // anel mais longo para ampliar a área interna
+export const Z_RAMAL = 4;
+const XD = -42, ZR = Z_RAMAL;
 const BASE = new URL('../assets/', import.meta.url).href;
 
 // ---------- curvas ----------
@@ -31,9 +30,9 @@ const SEG = {
   arcoE: new Arco(-L, 0, R, -Math.PI / 2, -Math.PI * 1.5),
   baixoAteDesvio: reta([-L, ZB], [XD, ZB]),
   baixoPrincipal: reta([XD, ZB], [L, ZB]),
-  ramalSai: bez([XD, ZB], [XD + 13, ZB], [XD + 13, ZR], [XD + 26, ZR]),
-  ramalReto: reta([XD + 26, ZR], [-XD - 26, ZR]),
-  ramalVolta: bez([-XD - 26, ZR], [-XD - 13, ZR], [-XD - 13, ZB], [-XD, ZB]),
+  ramalSai: bez([XD, ZB], [XD + 12, ZB], [XD + 12, ZR], [XD + 24, ZR]),
+  ramalReto: reta([XD + 24, ZR], [-XD - 24, ZR]),
+  ramalVolta: bez([-XD - 24, ZR], [-XD - 12, ZR], [-XD - 12, ZB], [-XD, ZB]),
   baixoFim: reta([-XD, ZB], [L, ZB]),
   arcoD: new Arco(L, 0, R, Math.PI / 2, -Math.PI / 2),
   topoD: reta([L, ZT], [0, ZT]),
@@ -65,7 +64,7 @@ function matTex(nome, cor, rep, o = {}) {
 function viaAoLongo(curva, mats, dormentes, opts = {}) {
   const len = curva.getLength(), n = Math.max(2, Math.ceil(len / 0.5));
   const pos = [], uv = [], idx = [];
-  const lastro = [[-1.85, 0.0], [-1.35, 0.27], [1.35, 0.27], [1.85, 0.0]];
+  const lastro = [[-1.85, 0.0], [-1.35, 0.27], [1.35, 0.27], [1.85, 0.0]].map(([x,y])=>[x*FATOR_LARGURA_VIA,y]);
   const trilho = [[-0.036, Y_TRILHO - 0.15], [-0.036, Y_TRILHO], [0.036, Y_TRILHO], [0.036, Y_TRILHO - 0.15]];
   const gL = { pos: [], uv: [], idx: [] }, gT = { pos: [], uv: [], idx: [] };
   const p = new THREE.Vector3(), t = new THREE.Vector3();
@@ -127,7 +126,7 @@ export async function criarMaquete(opts = {}) {
   }
   const mL = new THREE.Mesh(mergeGeometries(lastros), mLastro); mL.receiveShadow = true; mL.name = 'Lastro'; via.add(mL);
   const mT = new THREE.Mesh(mergeGeometries(trilhos), mTrilho); mT.castShadow = true; mT.name = 'Trilhos'; via.add(mT);
-  const gd = new THREE.BoxGeometry(0.24, 0.14, 2.5); const iD = new THREE.InstancedMesh(gd, mDorm, dorm.length); iD.name = 'Dormentes';
+  const gd = new THREE.BoxGeometry(0.24, 0.14, LARGURA_DORMENTE); const iD = new THREE.InstancedMesh(gd, mDorm, dorm.length); iD.name = 'Dormentes';
   const m4 = new THREE.Matrix4(), q = new THREE.Quaternion();
   dorm.forEach((d, i) => { q.setFromAxisAngle(V(0, 1, 0), d.ang); m4.compose(V(d.x, 0.2, d.z), q, V(1, 1, 1)); iD.setMatrixAt(i, m4); });
   iD.receiveShadow = true; via.add(iD);
@@ -140,7 +139,7 @@ export async function criarMaquete(opts = {}) {
     const a = new THREE.Mesh(new THREE.BoxGeometry(6.5, 0.12, 0.07), new THREE.MeshStandardMaterial({ color: 0xb8b4ae, metalness: 0.9, roughness: 0.25 }));
     a.position.x = -3.25; a.castShadow = true; piv.add(a); desvio.add(piv); agulhas.push({ piv, lado });
   }
-  const sinal = new THREE.Group(); sinal.position.set(XD + 1, 0, ZB + 2.6); desvio.add(sinal);
+  const sinal = new THREE.Group(); sinal.position.set(XD + 1, 0, ZB + 1.85*FATOR_LARGURA_VIA + 1); desvio.add(sinal);
   sinal.add(new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 1.3, 8).translate(0, 0.65, 0), new THREE.MeshStandardMaterial({ color: 0x2b2f36, metalness: 0.6, roughness: 0.4 })));
   const disco = new THREE.Group(); disco.position.y = 1.35; sinal.add(disco);
   const mVerde = new THREE.MeshStandardMaterial({ color: 0x2f9a4a, emissive: 0x1b6a30, emissiveIntensity: 0.6 }), mAmarelo = new THREE.MeshStandardMaterial({ color: 0xf2b21b, emissive: 0xa06a00, emissiveIntensity: 0.6 });
@@ -163,7 +162,7 @@ export async function criarMaquete(opts = {}) {
   // área de toque maior (invisível) para facilitar o clique no celular
   const alvoToque = new THREE.Mesh(new THREE.BoxGeometry(2.4, 3.2, 2.2).translate(0, 1.4, 0), new THREE.MeshBasicMaterial({ visible: false })); alvoToque.name = 'Alavanca_Toque'; alavanca.add(alvoToque);
   // tirante até o desvio
-  { const a = V(ALAV.x, 0.12, ALAV.z), b = V(XD + 0.3, 0.12, ZB + 1.4), d = b.clone().sub(a);
+  { const a = V(ALAV.x, 0.12, ALAV.z), b = V(XD + 0.3, 0.12, ZB + BITOLA/2 + .7), d = b.clone().sub(a);
     const g = new THREE.CylinderGeometry(0.03, 0.03, d.length(), 6); g.rotateZ(Math.PI / 2); const m = new THREE.Mesh(g, mCaixa);
     m.position.copy(a.clone().add(b).multiplyScalar(0.5)); m.rotation.y = Math.atan2(-d.z, d.x); root.add(m); }
 
@@ -183,12 +182,12 @@ export async function criarMaquete(opts = {}) {
   estacao.getObjectByName('Floreiras')?.removeFromParent();
   ajustarProporcoes(estacao, bonde);
   const atualizarRelogio = ligarRelogio(estacao, opts.agora);
-  estacao.position.set(0, 0, ZT + 1.9); root.add(estacao);                     // eixo da via da estação sobre o trecho de cima
+  estacao.position.set(0, 0, ZT - estacao.getObjectByName('Eixo_Via').position.z * estacao.scale.z); root.add(estacao);
   for (const nome of ['Objetos_Patio_folhagem', 'Objetos_Patio_flores_rosa']) oficina.getObjectByName(nome)?.removeFromParent();
   oficina.name = 'Oficina'; oficina.scale.setScalar(ESCALA_OFICINA);
   const caixaOficina = new THREE.Box3().setFromObject(oficina, true);
   oficina.position.set(6-(caixaOficina.min.x+caixaOficina.max.x)/2, -caixaOficina.min.y,
-    (ZR+ZB)/2-(caixaOficina.min.z+caixaOficina.max.z)/2);
+    (ZR+ZB)/2+.5-(caixaOficina.min.z+caixaOficina.max.z)/2);
   root.add(oficina); // no corredor ampliado, à direita dos personagens do ramal
   root.add(bonde);
   [estacao, oficina, bonde].forEach(o => o.traverse(m => { if (m.isMesh) { m.castShadow = !m.material.transparent; m.receiveShadow = true; } }));
@@ -274,9 +273,9 @@ export async function criarMaquete(opts = {}) {
       (pinheiro ? arvoresGLB : (rnd()<.45 ? antigas : araucarias)).push({x,z,esc,rot:rnd()*6.28});
     };
     let tent = 0, nArv = 0;
-    while (nArv < 46 && tent++ < 3000) { const x = (rnd() * 2 - 1) * 76, z = -48 + rnd() * 98; if (livre(x, z, 8)) { arvore(x, z, 0.8 + rnd() * 0.7, rnd() < 0.45); nArv++; } }
+    while (nArv < 46 && tent++ < 3000) { const x = (rnd() * 2 - 1) * 76, z = -48 + rnd() * 98; if (livre(x, z, 9.5)) { arvore(x, z, 0.8 + rnd() * 0.7, rnd() < 0.45); nArv++; } }
     tent = 0; let nP = 0;
-    while (nP < 14 && tent++ < 2000) { const x = (rnd() * 2 - 1) * 72, z = -44 + rnd() * 92; if (livre(x, z, 5)) { const g = new THREE.IcosahedronGeometry(1, 2); const p = g.attributes.position; for (let i = 0; i < p.count; i++) { const v = V(p.getX(i), p.getY(i), p.getZ(i)); const k = 0.75 + 0.35 * Math.sin(v.x * 3.1 + v.y * 2.3) * Math.cos(v.z * 2.7); p.setXYZ(i, v.x * k, v.y * k * 0.65, v.z * k); } const e = 1 + rnd() * 1.6; g.scale(e * 1.4, e, e); g.rotateY(rnd() * 6); g.translate(x, e * 0.35, z); g.computeVertexNormals(); pedras.push(g); nP++; } }
+    while (nP < 14 && tent++ < 2000) { const x = (rnd() * 2 - 1) * 72, z = -44 + rnd() * 92; if (livre(x, z, 7)) { const g = new THREE.IcosahedronGeometry(1, 2); const p = g.attributes.position; for (let i = 0; i < p.count; i++) { const v = V(p.getX(i), p.getY(i), p.getZ(i)); const k = 0.75 + 0.35 * Math.sin(v.x * 3.1 + v.y * 2.3) * Math.cos(v.z * 2.7); p.setXYZ(i, v.x * k, v.y * k * 0.65, v.z * k); } const e = 1 + rnd() * 1.6; g.scale(e * 1.4, e, e); g.rotateY(rnd() * 6); g.translate(x, e * 0.35, z); g.computeVertexNormals(); pedras.push(g); nP++; } }
     const mesh = (gs, m, nome) => { if (!gs.length) return; const me = new THREE.Mesh(mergeGeometries(gs.map(limpa)), m); me.castShadow = true; me.receiveShadow = true; me.name = nome; root.add(me); };
     // árvores do usuário: copa larga (antiga), folhosa nova e araucária — instanciadas (uma chamada de desenho por parte)
     const instanciar = (modelo, lista, altura, nome) => { if (!lista.length) return;

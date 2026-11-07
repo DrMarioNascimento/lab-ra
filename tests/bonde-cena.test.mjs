@@ -8,6 +8,7 @@ import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder } from 'meshoptimizer';
 import { criarMaquete, ROTAS } from '../dilema-bonde-3d/js/cena.js';
 import { ARAUCARIAS_RA } from '../dilema-bonde-3d/js/vegetacao-ra.js';
+import { BITOLA, LARGURA_DORMENTE } from '../dilema-bonde-3d/js/proporcoes.js';
 
 // Lê as malhas GLB reais sem exigir GPU. Texturas e o rótulo 2D não entram
 // nesta verificação de espaço, percurso e animação; não é um teste visual.
@@ -49,16 +50,18 @@ test('bolas verdes removidas e operador destacado com 5,67 unidades de altura',(
   const altura=new THREE.Box3().setFromObject(m.focos.operador,true).getSize(new THREE.Vector3()).y;
   assert(Math.abs(altura-5.67)<.001);
 });
-test('oficina 40% maior deixa passagem livre nas duas rotas, inclusive nas curvas',()=>{
+for(const [tipo,maquete] of [['RA',m],['3D',m3d]])test(`oficina deixa passagem livre para o bonde largo em ${tipo}, inclusive nas curvas`,()=>{
+  const m=maquete;
   const b=new THREE.Box3().setFromObject(m.focos.oficina,true);
-  assert(b.max.x-b.min.x>20.7);assert(b.max.y-b.min.y>10.1);
+  // Os arquivos completo e simplificado têm contornos diferentes; ambos mantêm a ampliação de 40%.
+  assert.equal(m.focos.oficina.scale.x,1.4);assert(b.max.x-b.min.x>18.1);assert(b.max.y-b.min.y>10);
   const pessoasRamal=m.root.children.filter(o=>o.userData.fantasmas)[1];
   assert(new THREE.Box3().setFromObject(pessoasRamal,true).max.x+.25<b.min.x,'oficina encobre o grupo do ramal na vista frontal: '+new THREE.Box3().setFromObject(pessoasRamal,true).max.x+'; oficina '+b.min.x);
   const oficina=new OBB().fromBox3(b.clone().expandByScalar(.25));
-  const bonde=m.focos.bonde, pos=bonde.position.clone(),rot=bonde.quaternion.clone();
-  bonde.position.set(0,0,0);bonde.quaternion.identity();
+  const bonde=m.focos.bonde, pos=bonde.position.clone(),rot=bonde.quaternion.clone(),escala=bonde.scale.clone();
+  bonde.position.set(0,0,0);bonde.quaternion.identity();bonde.scale.setScalar(1);
   const caixaLocal=new THREE.Box3().setFromObject(bonde,true);
-  bonde.position.copy(pos);bonde.quaternion.copy(rot);
+  bonde.position.copy(pos);bonde.quaternion.copy(rot);bonde.scale.copy(escala);
   for(const [nome,rota] of Object.entries(ROTAS))for(let i=0;i<=800;i++) {
     m.irPara(nome,rota.getLength()*i/800);
     bonde.updateMatrixWorld(true);
@@ -66,6 +69,15 @@ test('oficina 40% maior deixa passagem livre nas duas rotas, inclusive nas curva
     assert(!envelope.intersectsOBB(oficina),`bonde invade a oficina: ${nome}, ${i}/800`);
   }
   m.reiniciar();
+});
+test('via ampliada mantém bitola, dormentes e lastro sobre a base, com estação alinhada',()=>{
+  const via=m.root.getObjectByName('Via'),p=via.getObjectByName('Trilhos').geometry.attributes.position,afastamentos=[];
+  for(let i=0;i<p.count;i++)if(Math.abs(p.getX(i))<1e-5&&Math.abs(p.getY(i)-.42)<1e-5&&Math.abs(p.getZ(i)+30)<2)afastamentos.push(Math.abs(p.getZ(i)+30));
+  assert(afastamentos.length>0);assert(Math.abs(Math.min(...afastamentos)-(BITOLA/2-.036))<1e-4);assert(Math.abs(Math.max(...afastamentos)-(BITOLA/2+.036))<1e-4);
+  const dorm=via.getObjectByName('Dormentes');dorm.geometry.computeBoundingBox();assert(Math.abs(dorm.geometry.boundingBox.getSize(new THREE.Vector3()).z-LARGURA_DORMENTE)<1e-6);
+  const lastro=via.getObjectByName('Lastro').geometry.attributes.position;
+  for(let i=0;i<lastro.count;i++){const x=Math.max(0,Math.abs(lastro.getX(i))-66),z=Math.max(0,Math.abs(lastro.getZ(i)-2)-38);assert(x*x+z*z<=196.001,'lastro sai da base');}
+  m.root.updateMatrixWorld(true);assert(Math.abs(m.focos.estacao.getObjectByName('Eixo_Via').getWorldPosition(new THREE.Vector3()).z+30)<1e-6);
 });
 for(const [tipo,maquete] of [['RA',m],['3D',m3d]])test(`cidade ${tipo} tem textura e janelas nos quatro lados; copas ficam afastadas das construções`,()=>{
   const m=maquete;
