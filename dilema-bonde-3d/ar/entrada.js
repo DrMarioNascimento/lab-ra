@@ -6,7 +6,11 @@
     || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   const params = new URLSearchParams(location.search);
   const ensaioNativo = params.has('quicklook');
-  const interativo = params.get('modo') === 'interativo';
+  const standalone = navigator.standalone === true || window.matchMedia?.('(display-mode: standalone)').matches === true
+    || window.matchMedia?.('(display-mode: fullscreen)').matches === true;
+  const interativo = params.get('modo') === 'interativo' || (standalone && params.get('modo') !== 'nativo');
+  $('instalarRA').hidden = !ios || standalone;
+  $('instalarRA').open = ios && interativo && !standalone;
   const link = $('linkAR'), status = $('statusAR'), trocar = $('trocarAR');
   let suporta = false;
   try { suporta = link.relList.supports('ar'); } catch {}
@@ -62,7 +66,7 @@
     if (!app) {
       estado.textContent = 'Preparando a maquete…';
       try {
-        const modulo = await import('./web.js?v=20261107-ra3');
+        const modulo = await import('./web.js?v=20261107-ra4');
         app = await modulo.preparar({ informar: t => { estado.textContent = t; } });
         botao.textContent = 'Abrir em realidade aumentada';
         estado.textContent = 'Pronto. Toque para abrir a câmera e aponte para a mesa ou o chão.';

@@ -6,7 +6,7 @@ import * as THREE from '../dilema-bonde-3d/vendor/three/three.module.js';
 
 const entrada = fs.readFileSync(new URL('../dilema-bonde-3d/ar/entrada.js',import.meta.url),'utf8');
 const html = fs.readFileSync(new URL('../dilema-bonde-3d/ar/index.html',import.meta.url),'utf8');
-function harness({ua='iPhone',platform='',touch=0,ar=true,top=false,search='',load=async()=>{throw Error('importação inesperada');}}={}) {
+function harness({ua='iPhone',platform='',touch=0,ar=true,top=false,search='',standalone=false,displayMode=false,load=async()=>{throw Error('importação inesperada');}}={}) {
   const events={}, imports=[], revoked=[], clicked=[];
   class Element {
     hidden=false; disabled=false; textContent=''; children=[]; attrs={}; events={};
@@ -18,13 +18,13 @@ function harness({ua='iPhone',platform='',touch=0,ar=true,top=false,search='',lo
     addEventListener(k,f){this.events[k]=f;} appendChild(e){this.children.push(e);return e;}
     click(){clicked.push(this);} remove(){}
   }
-  const els=Object.fromEntries(['nativo','web','linkAR','statusAR','trocarAR','paresAR','comecar','estadoEntrada','voltarNativo'].map(id=>[id,new Element()]));
+  const els=Object.fromEntries(['nativo','web','linkAR','statusAR','trocarAR','paresAR','comecar','estadoEntrada','voltarNativo','instalarRA'].map(id=>[id,new Element()]));
   els.web.hidden=true;els.trocarAR.hidden=true;els.linkAR.href='maquete.usdz?v=20261107-ra1';els.linkAR.rel='ar';els.paresAR.textContent='rodada padrão';
   const doc={getElementById:id=>els[id],createElement:()=>new Element(),body:new Element()};
-  const window={};window.top=top?{document:doc}:window;
+  const window={matchMedia:()=>({matches:displayMode})};window.top=top?{document:doc}:window;
   const U=class extends URL {};U.revokeObjectURL=x=>revoked.push(x);
   vm.runInNewContext(entrada.replace(/\bimport\(/g,'__import('),{
-    document:doc,window,navigator:{userAgent:ua,platform,maxTouchPoints:touch},location:{search},URLSearchParams,URL:U,
+    document:doc,window,navigator:{userAgent:ua,platform,maxTouchPoints:touch,standalone},location:{search},URLSearchParams,URL:U,
     __import:async url=>{imports.push(url);return load(url);},console:{warn(){}},setTimeout:()=>0,addEventListener:(n,f)=>{events[n]=f;},
     WebGLRenderingContext:class{constructor(){throw Error('WebGL proibido no caminho nativo');}}
   });
@@ -77,6 +77,27 @@ test('iPhone pode escolher controles fixos e retornar ao nativo sem carregar Web
   const {els,imports}=harness({search:'?modo=interativo'});
   assert(els.nativo.hidden);assert(!els.web.hidden);assert(!els.voltarNativo.hidden);assert.equal(imports.length,0);
   assert.match(html,/maquete\.usdz\?v=[^"#]+#allowsContentScaling=1/);
+});
+
+for (const opts of [{standalone:true},{displayMode:true}])
+test('abrir pelo ícone entra no modo interativo e não pede nova instalação: '+JSON.stringify(opts),()=>{
+  const {els,imports}=harness(opts);
+  assert(els.nativo.hidden);assert(!els.web.hidden);assert(els.instalarRA.hidden);assert.equal(imports.length,0);
+});
+test('app instalado preserva a escolha explícita do visualizador nativo',()=>{
+  const {els}=harness({standalone:true,search:'?modo=nativo'});
+  assert(els.web.hidden);assert(!els.nativo.hidden);assert(els.instalarRA.hidden);
+});
+test('instrução de abrir sem barras aparece no Safari interativo, sem bloquear o preparo',()=>{
+  const {els}=harness({search:'?modo=interativo'});
+  assert(!els.instalarRA.hidden);assert(els.instalarRA.open);assert(!els.comecar.disabled);
+});
+test('ícone inicia no bonde interativo, dentro do escopo instalado, com identidade própria',()=>{
+  const manifesto=JSON.parse(fs.readFileSync(new URL('../dilema-bonde-3d/ar/manifest.webmanifest',import.meta.url),'utf8'));
+  const base=new URL('https://lab-ra.dragongames.dev.br/dilema-bonde-3d/ar/');
+  const start=new URL(manifesto.start_url,base),scope=new URL(manifesto.scope,base);
+  assert.equal(manifesto.display,'standalone');assert.equal(start.searchParams.get('modo'),'interativo');
+  assert(start.href.startsWith(scope.href));assert.equal(new URL(manifesto.id,base).pathname,base.pathname);
 });
 
 test('motor: pedido XR síncrono, colocação, saída e reentrada liberam hit-test',async()=>{
