@@ -163,8 +163,15 @@ export async function criarMaquete(opts = {}) {
   // personagens: um GLB por papel (pasta AAnimacoes/Bonde).
   const ARQ = { gestante: 'gestante', trabalhador: 'trabalhador', idoso: 'idoso', criancas: 'criancas', estudante: 'estudante', cientista: 'cientista', colega: 'colega', vinculo: 'vinculo', desconhecidos: 'desconhecidos', operador: 'operador' };
   const ALTURA = { criancas: 1.3 };
-  const [estacao, oficina, bonde, arvoreGLB, ...pg] = await Promise.all([carregar('estacao.glb'), carregar('oficina.glb'), carregar('bonde.glb'), carregar('arvore.glb'), ...Object.values(ARQ).map(f => carregar(f + '.glb'))]);
-  const PERS = {}; Object.keys(ARQ).forEach((k, i) => { PERS[k] = pg[i]; });
+  // só carrega os personagens em uso (economiza memória no celular/RA); os demais vêm sob demanda
+  const PERS = {};
+  const garantirPersonagens = async lista => { await Promise.all([...new Set(lista)].filter(k => ARQ[k] && !PERS[k]).map(async k => { PERS[k] = await carregar(ARQ[k] + '.glb'); })); };
+  const avisa = t => { try { opts.progresso && opts.progresso(t); } catch (e) {} };
+  const g0 = opts.grupos || {};
+  avisa('Carregando estação, bonde e oficina…');
+  const [estacao, oficina, bonde, arvoreGLB] = await Promise.all([carregar('estacao.glb'), carregar('oficina.glb'), carregar('bonde.glb'), carregar('arvore.glb')]);
+  avisa('Carregando personagens…');
+  await garantirPersonagens(['operador', g0.presetPrincipal || 'trabalhador', g0.presetRamal || 'desconhecidos']);
   estacao.position.set(0, 0, ZT + 1.9); root.add(estacao);                     // eixo da via da estação sobre o trecho de cima
   oficina.position.set(6, 0, ZR + 5.45); root.add(oficina);                   // entre o ramal (atrás) e o principal (frente)
   root.add(bonde);
@@ -265,7 +272,7 @@ export async function criarMaquete(opts = {}) {
   // =====================================================================
   // ESTADO E ANIMAÇÃO
   // =====================================================================
-  const estado = { rota: 'principal', s: 2, v: 0, vMax: opts.velocidade ?? 9, rodando: false, impacto: false, s0: 2, alavancaAng: 0, agulhaAlvo: 0, agulha: 0, aoImpacto: null, aoFim: null, travado: false };
+  const estado = { rota: 'principal', s: 0.5, v: 0, vMax: opts.velocidade ?? 12, rodando: false, impacto: false, s0: 0.5, alavancaAng: 0, agulhaAlvo: 0, agulha: 0, aoImpacto: null, aoFim: null, travado: false };
   const tmpA = new THREE.Vector3(), tmpB = new THREE.Vector3();
   function posicionarBonde() {
     const c = ROTAS[estado.rota], len = c.getLength();
@@ -285,7 +292,18 @@ export async function criarMaquete(opts = {}) {
     // troca a posição do desvio (só antes de o bonde passar pela agulha)
     alternarAlavanca() { if (estado.travado) return false; estado.rota = estado.rota === 'principal' ? 'ramal' : 'principal'; aplicarAlavanca(false); posicionarBonde(); return true; },
     definirRota(r) { if (estado.travado || r === estado.rota) return false; estado.rota = r; aplicarAlavanca(false); posicionarBonde(); return true; },
-    configurar({ presetPrincipal = 'trabalhador', nPrincipal = 1, presetRamal = 'desconhecidos', nRamal = 3 } = {}) {
+    // nova rodada: sorteia dois papéis diferentes (e diferentes dos atuais) para os dois trilhos
+    async sortearPersonagens() {
+      const PAPEIS = ['trabalhador', 'idoso', 'gestante', 'criancas', 'estudante', 'cientista', 'colega', 'vinculo', 'desconhecidos'];
+      const atuais = [estado.presets?.[0], estado.presets?.[1]];
+      const pool = PAPEIS.filter(p => !atuais.includes(p));
+      const a = pool.splice(Math.floor(Math.random() * pool.length), 1)[0], b = pool[Math.floor(Math.random() * pool.length)];
+      await api.configurar({ presetPrincipal: a, nPrincipal: 1, presetRamal: b, nRamal: 3 });
+      return [a, b];
+    },
+    async configurar({ presetPrincipal = 'trabalhador', nPrincipal = 1, presetRamal = 'desconhecidos', nRamal = 3 } = {}) {
+      await garantirPersonagens([presetPrincipal, presetRamal]);
+      estado.presets = [presetPrincipal, presetRamal];
       montarGrupo(grupoPrincipal, POS_PRINCIPAL, presetPrincipal, nPrincipal);
       montarGrupo(grupoRamal, POS_RAMAL, presetRamal, nRamal);
       // pessoas ficam de frente para a câmera (sul)
@@ -310,15 +328,17 @@ export async function criarMaquete(opts = {}) {
       disco.rotation.y = estado.agulha * Math.PI / 2;
       if (estado.rodando) {
         const c = ROTAS[estado.rota], len = c.getLength();
-        const alvo = estado.impacto ? 0 : estado.vMax;
-        estado.v += (alvo - estado.v) * Math.min(1, dt * (estado.impacto ? 0.9 : 0.6));
-        const ds = estado.v * dt; estado.s += ds;
+        // parte da estação, dá a volta e para de novo na estação (ponto final = ponto de partida)
+        const sFim = len - 1.8, frenagem = 1.4;                       // m/s² na chegada
+        const vLim = Math.sqrt(Math.max(0, 2 * frenagem * (sFim - estado.s)));
+        const alvo = Math.min(estado.vMax, vLim);
+        estado.v += (alvo - estado.v) * Math.min(1, dt * (alvo < estado.v ? 4 : 0.6));
+        const ds = Math.min(estado.v * dt, Math.max(0, sFim - estado.s)); estado.s += ds;
         rodeiros.forEach(r => { r.rotation.z -= ds / 0.35; });
         if (!estado.travado && estado.s + 6.6 > S_DESVIO) estado.travado = true;           // passou da agulha: decisão travada
         const sAlvo = S_ALVO[estado.rota], grupo = estado.rota === 'principal' ? grupoPrincipal : grupoRamal;
         if (!estado.impacto && estado.s + 6.8 >= sAlvo - 0.6) { estado.impacto = true; grupo.userData.caido = 0.0001; estado.aoImpacto && estado.aoImpacto(estado.rota); }
-        if (estado.impacto && estado.v < 0.15) { estado.rodando = false; estado.aoFim && estado.aoFim(estado.rota); }
-        if (estado.s > len - 8) { estado.s = len - 8; estado.rodando = false; }
+        if (estado.s >= sFim - 0.02) { estado.s = sFim; estado.v = 0; estado.rodando = false; estado.aoFim && estado.aoFim(estado.rota); }
         posicionarBonde();
       }
       // queda dos atingidos
@@ -329,7 +349,7 @@ export async function criarMaquete(opts = {}) {
       }
     },
   };
-  api.configurar(opts.grupos);
+  await api.configurar(opts.grupos);
   aplicarAlavanca(true); posicionarBonde();
   return api;
 }

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dilema do Bonde — Realidade Aumentada</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #000; font-family: 'Nunito', system-ui, sans-serif; -webkit-user-select: none; user-select: none; }
+  #ar { position: fixed; inset: 0; }
+  #inicio { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; background: #16223a; color: #f5ecd6; text-align: center; padding: 24px; }
+  #inicio button { margin-top: 18px; height: 56px; padding: 0 30px; border-radius: 999px; border: 0; font: 800 18px 'Nunito'; color: #fff; background: linear-gradient(#e0473a, #b22a20); box-shadow: 0 5px 0 #7a1a12, 0 10px 20px rgba(0,0,0,.35); }
+  #inicio button:active { transform: translateY(4px); box-shadow: 0 1px 0 #7a1a12; }
+  #inicio a { color: #f5c97a; }
+  .barra { position: fixed; left: 0; right: 0; bottom: max(10px, env(safe-area-inset-bottom)); display: flex; justify-content: space-between; align-items: center; padding: 0 12px; gap: 8px; z-index: 5; }
+  .pill { height: 52px; border-radius: 999px; border: 0; font: 800 15px 'Nunito'; padding: 0 18px; color: #fff; box-shadow: 0 5px 0 rgba(0,0,0,.3), 0 8px 18px rgba(0,0,0,.3); }
+  .pill:active { transform: translateY(4px); box-shadow: 0 1px 0 rgba(0,0,0,.3); }
+  .pill.ativo { outline: 3px solid #fff; outline-offset: 2px; }
+  .pill:disabled { filter: grayscale(.7) brightness(.85); }
+  #manter { background: linear-gradient(#3f7fd1, #2a5fa8); }
+  #desviar { background: linear-gradient(#e39a2b, #c27412); }
+  .centro { display: flex; gap: 8px; background: rgba(255,255,255,.92); border-radius: 999px; padding: 6px 8px; box-shadow: 0 5px 0 rgba(0,0,0,.2); }
+  .ico { width: 42px; height: 42px; border-radius: 50%; border: 0; background: linear-gradient(#f4f6fa, #dfe4ec); box-shadow: 0 3px 0 #b9c1cf; font-size: 18px; color: #2b3445; }
+  .ico:active { transform: translateY(3px); box-shadow: none; }
+  #crono { min-width: 54px; height: 42px; border-radius: 999px; display: grid; place-items: center; font-weight: 800; color: #2b3445; border: 2px solid #2b3445; box-sizing: border-box; padding: 0 6px; }
+  #aviso { position: fixed; top: max(12px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); background: rgba(255,255,255,.92); color: #2b3445; padding: 8px 16px; border-radius: 999px; font-weight: 800; font-size: 14px; z-index: 5; text-align: center; max-width: 88vw; }
+  .mindar-ui-overlay { z-index: 4 !important; }
+</style>
+<script type="importmap">{
+  "imports": { "three": "../vendor/three/three.module.js", "three/addons/": "../vendor/three/addons/" },
+  "scopes": { "../vendor/mindar/": { "three": "../vendor/three-compat.js" } }
+}</script>
+</head>
+<body>
+<div id="ar"></div>
+<div id="inicio"><div>
+  <h2 style="margin:0 0 8px">Dilema do Bonde em RA</h2>
+  <div>Aponte a câmera para o marcador impresso ou mostrado na TV.<br>A maquete aparece sobre ele.</div>
+  <button id="comecar">Abrir câmera</button>
+  <div style="margin-top:14px;font-size:14px"><a href="marcador.jpg" target="_blank">Abrir o marcador</a> · <a href="../index.html">Ver sem RA</a></div>
+</div></div>
+<div id="aviso">Procurando o marcador…</div>
+<div class="barra">
+  <button id="manter" class="pill ativo">Manter o curso</button>
+  <div class="centro"><button class="ico" id="play">▶</button><div id="crono">10</div><button class="ico" id="reset">↺</button></div>
+  <button id="desviar" class="pill">Desviar o bonde</button>
+</div>
+<script type="module">
+import * as THREE from 'three';
+import { MindARThree } from '../vendor/mindar/mindar-image-three.prod.js';
+
+document.getElementById('comecar').onclick = async () => {
+  document.getElementById('inicio').remove();
+  // a cena é carregada só depois do toque (a câmera exige gesto do usuário)
+  const { criarMaquete } = await import('../js/cena.js');
+  const mindar = new MindARThree({ container: document.getElementById('ar'), imageTargetSrc: 'marcador.mind', uiScanning: 'no', uiLoading: 'no', filterMinCF: 0.0001, filterBeta: 0.001 });
+  const { renderer, scene, camera } = mindar;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.outputColorSpace = THREE.SRGBColorSpace;
+  scene.add(new THREE.HemisphereLight(0xf2f6ff, 0x6a7a50, 2.0));
+  const sol = new THREE.DirectionalLight(0xfff1dc, 2.8); sol.position.set(-0.4, 1, 0.8); scene.add(sol);
+
+  const m = await criarMaquete({ grupos: { presetPrincipal: 'trabalhador', nPrincipal: 1, presetRamal: 'desconhecidos', nRamal: 3 } });
+  // o marcador tem largura 1 (unidade do MindAR). A área da maquete (160 m) ocupa ~0,91 da largura da imagem.
+  const ancora = mindar.addAnchor(0);
+  const base = new THREE.Group();
+  const esc = 0.914 / 160; base.scale.setScalar(esc);
+  base.rotation.x = Math.PI / 2;           // plano da imagem (XY) → chão da maquete (XZ)
+  base.position.y = -0.03;                 // alinhamento vertical com a foto do marcador
+  base.add(m.root); ancora.group.add(base);
+  // sombras desligadas na RA (mais leve no celular)
+  m.root.traverse(o => { if (o.isMesh) { o.castShadow = false; o.receiveShadow = false; } });
+
+  const aviso = document.getElementById('aviso');
+  ancora.onTargetFound = () => { aviso.textContent = 'Toque na alavanca ou nos botões para escolher o trilho'; };
+  ancora.onTargetLost = () => { aviso.textContent = 'Procurando o marcador…'; };
+
+  const bM = document.getElementById('manter'), bD = document.getElementById('desviar'), crono = document.getElementById('crono');
+  const sinc = () => { bM.classList.toggle('ativo', m.rota === 'principal'); bD.classList.toggle('ativo', m.rota === 'ramal'); };
+  const escolher = r => { if (m.definirRota(r)) sinc(); else if (m.estado.travado) aviso.textContent = 'O bonde já passou pela agulha — a decisão está tomada'; };
+  bM.onclick = () => escolher('principal'); bD.onclick = () => escolher('ramal');
+  let tempo = 10, contando = false, acum = 0;
+  document.getElementById('play').onclick = () => { if (!contando && !m.estado.rodando) contando = true; };
+  document.getElementById('reset').onclick = () => { m.reiniciar(); tempo = 10; contando = false; crono.textContent = '10'; [bM, bD].forEach(b => b.disabled = false); sinc(); };
+  m.estado.aoImpacto = r => { aviso.textContent = r === 'principal' ? 'O bonde seguiu pelo trilho principal' : 'O bonde foi desviado para o ramal'; };
+
+  // toque na alavanca
+  const ray = new THREE.Raycaster(), ptr = new THREE.Vector2();
+  renderer.domElement.addEventListener('pointerup', e => {
+    const r = renderer.domElement.getBoundingClientRect();
+    ptr.set((e.clientX - r.left) / r.width * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1); ray.setFromCamera(ptr, camera);
+    if (ray.intersectObject(m.alvoToque, false).length && m.alternarAlavanca()) sinc();
+  });
+
+  await mindar.start();
+  const relogio = new THREE.Clock();
+  renderer.setAnimationLoop(() => {
+    const dt = Math.min(0.05, relogio.getDelta());
+    if (contando) { acum += dt; if (acum >= 1) { acum = 0; tempo--; crono.textContent = String(Math.max(0, tempo)); if (tempo <= 0) { contando = false; m.partir(); } } }
+    if (m.estado.travado) [bM, bD].forEach(b => b.disabled = true);
+    m.update(dt); renderer.render(scene, camera);
+  });
+};
+</script>
+</body>
+</html>

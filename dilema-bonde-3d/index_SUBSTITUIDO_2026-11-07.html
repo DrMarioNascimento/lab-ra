@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dilema do Bonde — Maquete 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #c9d3e0; font-family: 'Nunito', system-ui, sans-serif; -webkit-user-select: none; user-select: none; }
+  #cena { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+  #carregando { position: fixed; inset: 0; display: grid; place-items: center; color: #2b3445; font-weight: 800; font-size: 18px; background: #c9d3e0; z-index: 5; transition: opacity .5s; }
+  .barra { position: fixed; left: 0; right: 0; bottom: max(10px, env(safe-area-inset-bottom)); display: flex; justify-content: space-between; align-items: center; padding: 0 max(12px, env(safe-area-inset-left)); gap: 10px; pointer-events: none; z-index: 3; }
+  .barra > * { pointer-events: auto; }
+  .pill { height: 50px; border-radius: 999px; border: 0; font: 800 15px 'Nunito', sans-serif; padding: 0 22px; cursor: pointer; color: #fff; box-shadow: 0 5px 0 rgba(0,0,0,.25), 0 8px 18px rgba(0,0,0,.22); transform: translateY(0); transition: transform .08s, box-shadow .08s, filter .2s; }
+  .pill:active { transform: translateY(4px); box-shadow: 0 1px 0 rgba(0,0,0,.25), 0 3px 8px rgba(0,0,0,.2); }
+  .pill.ativo { outline: 3px solid #fff; outline-offset: 2px; }
+  .pill:disabled { filter: grayscale(.7) brightness(.85); cursor: default; }
+  #manter { background: linear-gradient(#3f7fd1, #2a5fa8); min-width: 150px; }
+  #desviar { background: linear-gradient(#e39a2b, #c27412); min-width: 150px; }
+  .centro { display: flex; gap: 8px; background: rgba(255,255,255,.9); border-radius: 999px; padding: 6px 8px; box-shadow: 0 5px 0 rgba(0,0,0,.18), 0 8px 18px rgba(0,0,0,.18); }
+  .ico { width: 40px; height: 40px; border-radius: 50%; border: 0; background: linear-gradient(#f4f6fa, #dfe4ec); box-shadow: 0 3px 0 #b9c1cf; font-size: 17px; cursor: pointer; color: #2b3445; }
+  .ico:active { transform: translateY(3px); box-shadow: 0 0 0 #b9c1cf; }
+  #crono { min-width: 54px; height: 40px; border-radius: 999px; display: grid; place-items: center; font-weight: 800; color: #2b3445; border: 2px solid #2b3445; padding: 0 6px; box-sizing: border-box; }
+  #aviso { position: fixed; top: max(12px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); background: rgba(255,255,255,.92); color: #2b3445; padding: 8px 16px; border-radius: 999px; font-weight: 800; font-size: 14px; box-shadow: 0 4px 14px rgba(0,0,0,.18); z-index: 3; text-align: center; max-width: 86vw; }
+  #girar { position: fixed; inset: 0; display: none; place-items: center; text-align: center; background: #2b3445; color: #fff; font-weight: 800; z-index: 9; padding: 24px; }
+  @media (orientation: portrait) and (max-width: 700px) { #girar { display: grid; } }
+</style>
+<script type="importmap">{ "imports": { "three": "./vendor/three/three.module.js", "three/addons/": "./vendor/three/addons/" } }</script>
+</head>
+<body>
+<canvas id="cena"></canvas>
+<div id="carregando">Montando a maquete…</div>
+<div id="aviso">Toque na alavanca (ou nos botões) para escolher o trilho</div>
+<div class="barra">
+  <button id="manter" class="pill ativo">Manter o curso</button>
+  <div class="centro">
+    <button class="ico" id="play" title="Partir">▶</button>
+    <div id="crono">10</div>
+    <button class="ico" id="reset" title="Reiniciar">↺</button>
+    <button class="ico" id="tela" title="Tela cheia">⛶</button>
+  </div>
+  <button id="desviar" class="pill">Desviar o bonde</button>
+</div>
+<div id="girar">Gire o celular para a horizontal 📱↻</div>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { criarMaquete } from './js/cena.js';
+
+const canvas = document.getElementById('cena');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: !!window.__captura });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+renderer.shadowMap.enabled = !new URLSearchParams(location.search).has('leve'); renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0xc9d3e0);
+scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
+scene.add(new THREE.HemisphereLight(0xf2f6ff, 0x5a6a40, 0.7));
+const sol = new THREE.DirectionalLight(0xfff1dc, 2.4); sol.position.set(-40, 70, 50); sol.castShadow = true;
+sol.shadow.mapSize.set(2048, 2048); Object.assign(sol.shadow.camera, { left: -85, right: 85, top: 60, bottom: -60, near: 10, far: 220 }); sol.shadow.bias = -0.0004; sol.shadow.normalBias = 0.04;
+scene.add(sol);
+
+const camera = new THREE.PerspectiveCamera(32, 1, 0.5, 600);
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true; controls.maxPolarAngle = Math.PI * 0.47; controls.minDistance = 12; controls.maxDistance = 260; controls.target.set(0, 0, 4);
+const VISTAS = { geral: [0, 100, 150, 0, 0, 8] };
+const qs = new URLSearchParams(location.search);
+const v = (qs.get('cam') || '').split(',').map(Number);
+const vista = v.length === 6 && v.every(n => !isNaN(n)) ? v : VISTAS.geral;
+camera.position.set(vista[0], vista[1], vista[2]); controls.target.set(vista[3], vista[4], vista[5]);
+
+function redimensionar() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+addEventListener('resize', redimensionar); redimensionar();
+
+const m = await criarMaquete({ grupos: { presetPrincipal: qs.get('p1') || 'trabalhador', nPrincipal: 1, presetRamal: qs.get('p3') || 'desconhecidos', nRamal: 3 } });
+scene.add(m.root);
+document.getElementById('carregando').style.opacity = 0; setTimeout(() => document.getElementById('carregando').remove(), 600);
+
+// ---------- interface ----------
+const aviso = document.getElementById('aviso'), bM = document.getElementById('manter'), bD = document.getElementById('desviar');
+const crono = document.getElementById('crono');
+function sincronizar() { bM.classList.toggle('ativo', m.rota === 'principal'); bD.classList.toggle('ativo', m.rota === 'ramal'); }
+function escolher(r) { if (m.definirRota(r)) sincronizar(); else if (m.estado.travado) aviso.textContent = 'O bonde já passou pela agulha — a decisão está tomada'; }
+bM.onclick = () => escolher('principal'); bD.onclick = () => escolher('ramal');
+let tempo = 10, contando = false;
+document.getElementById('play').onclick = () => { if (!contando && !m.estado.rodando) { contando = true; aviso.textContent = 'O bonde vai partir… decida antes da agulha'; } };
+document.getElementById('reset').onclick = () => { m.reiniciar(); tempo = 10; contando = false; crono.textContent = '10'; aviso.textContent = 'Toque na alavanca (ou nos botões) para escolher o trilho'; [bM, bD].forEach(b => b.disabled = false); sincronizar(); };
+document.getElementById('tela').onclick = () => { const el = document.documentElement; if (!document.fullscreenElement) (el.requestFullscreen || el.webkitRequestFullscreen)?.call(el); else document.exitFullscreen?.(); };
+m.estado.aoImpacto = r => { aviso.textContent = r === 'principal' ? 'O bonde seguiu pelo trilho principal' : 'O bonde foi desviado para o ramal'; };
+m.estado.aoFim = () => { aviso.textContent += ' — toque ↺ para nova rodada'; };
+
+// toque na alavanca (raycast)
+const ray = new THREE.Raycaster(), ptr = new THREE.Vector2(); let toque0 = null;
+canvas.addEventListener('pointerdown', e => { toque0 = [e.clientX, e.clientY]; });
+canvas.addEventListener('pointerup', e => {
+  if (!toque0 || Math.hypot(e.clientX - toque0[0], e.clientY - toque0[1]) > 8) return;
+  ptr.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1); ray.setFromCamera(ptr, camera);
+  if (ray.intersectObject(m.alvoToque, false).length) { if (m.alternarAlavanca()) sincronizar(); else aviso.textContent = 'O bonde já passou pela agulha — a decisão está tomada'; }
+});
+
+// ---------- laço ----------
+const relogio = new THREE.Clock(); let acum = 0;
+renderer.setAnimationLoop(() => {
+  const dt = Math.min(0.05, relogio.getDelta());
+  if (contando) { acum += dt; if (acum >= 1) { acum = 0; tempo--; crono.textContent = String(Math.max(0, tempo)); if (tempo <= 0) { contando = false; m.partir(); } } }
+  if (m.estado.travado) [bM, bD].forEach(b => b.disabled = true);
+  m.update(dt); controls.update(); renderer.render(scene, camera);
+});
+window.__maquete = m; window.__pronto = true;
+</script>
+</body>
+</html>

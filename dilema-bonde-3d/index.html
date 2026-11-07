@@ -84,11 +84,11 @@ function sincronizar() { bM.classList.toggle('ativo', m.rota === 'principal'); b
 function escolher(r) { if (m.definirRota(r)) sincronizar(); else if (m.estado.travado) aviso.textContent = 'O bonde já passou pela agulha — a decisão está tomada'; }
 bM.onclick = () => escolher('principal'); bD.onclick = () => escolher('ramal');
 let tempo = 10, contando = false;
-document.getElementById('play').onclick = () => { if (!contando && !m.estado.rodando) { contando = true; aviso.textContent = 'O bonde vai partir… decida antes da agulha'; } };
-document.getElementById('reset').onclick = () => { m.reiniciar(); tempo = 10; contando = false; crono.textContent = '10'; aviso.textContent = 'Toque na alavanca (ou nos botões) para escolher o trilho'; [bM, bD].forEach(b => b.disabled = false); sincronizar(); };
+document.getElementById('play').onclick = () => { if (!contando && !m.estado.rodando) { contando = true; aviso.textContent = 'O bonde vai partir da estação… decida antes da agulha'; } };
+document.getElementById('reset').onclick = () => { m.reiniciar(); m.sortearPersonagens(); tempo = 10; contando = false; crono.textContent = '10'; aviso.textContent = 'Toque na alavanca (ou nos botões) para escolher o trilho'; [bM, bD].forEach(b => b.disabled = false); sincronizar(); };
 document.getElementById('tela').onclick = () => { const el = document.documentElement; if (!document.fullscreenElement) (el.requestFullscreen || el.webkitRequestFullscreen)?.call(el); else document.exitFullscreen?.(); };
 m.estado.aoImpacto = r => { aviso.textContent = r === 'principal' ? 'O bonde seguiu pelo trilho principal' : 'O bonde foi desviado para o ramal'; };
-m.estado.aoFim = () => { aviso.textContent += ' — toque ↺ para nova rodada'; };
+m.estado.aoFim = () => { aviso.textContent += ' — o bonde voltou à estação. Toque ↺ para nova rodada'; };
 
 // toque na alavanca (raycast)
 const ray = new THREE.Raycaster(), ptr = new THREE.Vector2(); let toque0 = null;
