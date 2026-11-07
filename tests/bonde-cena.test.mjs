@@ -43,7 +43,8 @@ async function preparar(opts = {ra:true}) {
   finally { GLTFLoader.prototype.load=load;THREE.TextureLoader.prototype.load=tex;globalThis.document=doc; }
 }
 const m=await preparar();
-const m3d=await preparar({ra:false});
+const m3d=await preparar({ra:false,qualidade:'detalhada'});
+const economica=await preparar({ra:true,qualidade:'economica'});
 
 test('bolas verdes removidas e operador destacado com 5,67 unidades de altura',()=>{
   for(const cena of [m,m3d]) for(const nome of ['Arbustos_Flores','Floreiras','Objetos_Patio_folhagem','Objetos_Patio_flores_rosa']) assert(!cena.root.getObjectByName(nome),nome);
@@ -141,4 +142,25 @@ for(const rota of ['principal','ramal','principal','ramal'])test(`percurso ${rot
   assert(atingido.userData.fantasmas.children.every(f=>f.scale.x<.00011));
   m.reiniciar();assert(grupos.every(g=>g.children.every(p=>p.scale.x===1)));
   assert(grupos.every(g=>g.userData.fantasmas.children.every(f=>f.scale.x<.00011)));
+});
+
+test('vegetação RA11 mantém 27 árvores comuns e duas araucárias, abaixo de 600 mil triângulos',()=>{
+  assert.equal(m.root.userData.arvoresComuns,27);
+  const ara=m.root.children.filter(o=>o.isInstancedMesh&&o.name==='Araucarias');assert.equal(ara[0].count,2);
+  let n=0;m.root.traverseVisible(o=>{if(o.isMesh)n+=(o.geometry.index?.count||o.geometry.attributes.position.count)/3*(o.isInstancedMesh?o.count:1);});assert(n<600000,'orçamento da cena: '+n);if(process.env.BONDE_METRICAS)console.log('Triângulos Equilibrada: '+n);
+});
+test('placa acessível está fora dos trilhos e da estação',()=>{
+  const placa=new THREE.Box3().setFromObject(m.focos.placa,true),estacao=new THREE.Box3().setFromObject(m.focos.estacao,true);assert(!placa.intersectsBox(estacao));
+  for(const c of Object.values(ROTAS))for(let i=0;i<1000;i++){const ponto=c.getPointAt(i/1000);assert(!(ponto.x>placa.min.x-2&&ponto.x<placa.max.x+2&&ponto.z>placa.min.z-2&&ponto.z<placa.max.z+2));}
+  assert.deepEqual(m.alvosMenu.map(o=>o.userData.secaoMenu),['ajuda','rodada','reflexao']);
+});
+test('cinco personagens no ramal preservam folga da oficina e recalculam o impacto',async()=>{
+  await m.configurar({presetPrincipal:'trabalhador',nPrincipal:5,presetRamal:'desconhecidos',nRamal:5});
+  const g=m.root.children.filter(o=>o.userData.fantasmas)[1],oficina=new THREE.Box3().setFromObject(m.focos.oficina,true);
+  assert(new THREE.Box3().setFromObject(g,true).max.x+.25<oficina.min.x);assert(g.position.x< -8);
+  await m.configurar();m.reiniciar();
+});
+
+test('perfil Econômico conserva araucárias e cena abaixo de 400 mil triângulos',()=>{
+ assert.equal(economica.root.userData.arvoresComuns,18);let n=0;economica.root.traverseVisible(o=>{if(o.isMesh)n+=(o.geometry.index?.count||o.geometry.attributes.position.count)/3*(o.isInstancedMesh?o.count:1);});assert(n<400000,'orçamento econômico: '+n);assert.equal(economica.root.getObjectByName('Araucarias').count,2);if(process.env.BONDE_METRICAS)console.log('Triângulos Econômica: '+n);
 });

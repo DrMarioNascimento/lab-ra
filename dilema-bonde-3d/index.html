@@ -35,15 +35,16 @@
   #navegacao p { font-size:12px;line-height:1.45;margin:10px 0 0; }
   #navegacao :focus-visible,.ico:focus-visible,.pill:focus-visible { outline:3px solid #d18a18;outline-offset:3px; }
   @media (any-pointer:fine) and (min-width:780px) { #navegacao { display:block; } }
-  @media (orientation: portrait) and (max-width: 700px) { #girar { display: grid; } }
+
 </style>
 <script type="importmap">{ "imports": { "three": "./vendor/three/three.module.js", "three/addons/": "./vendor/three/addons/" } }</script>
+<link rel="stylesheet" href="menu.css?v=20261107-ra11">
 </head>
 <body>
 <canvas id="cena"></canvas>
-<div id="carregando"><div>Montando a maquete…<p><a href="ar/">Abrir em realidade aumentada</a></p></div></div>
+<div id="carregando"><div style="padding:24px;text-align:center"><h1 style="font-size:26px">Dilema do Bonde</h1><p>Explore a maquete e discuta suas escolhas.</p><label class="qualidade-entrada">Qualidade<select id="qualidadeEntrada"><option value="auto">Automática</option><option value="economica">Econômica</option><option value="equilibrada">Equilibrada</option><option value="detalhada">Detalhada</option></select><small>Se o aparelho travou, escolha Econômica antes de carregar.</small></label><button id="carregarMaquete" class="pill" style="background:#315a80">Abrir maquete</button><p id="estadoCarga" role="status">Versão RA11 · Menu e vegetação otimizada</p><p><a href="ar/">Abrir em realidade aumentada</a></p></div></div>
 <div id="aviso">Toque na alavanca (ou nos botões) para escolher o trilho</div>
-<details id="navegacao" open>
+<details id="navegacao" open hidden>
   <summary>Navegar na maquete</summary>
   <div class="nav-linha" role="group" aria-label="Modo de arrastar"><button data-modo="girar" aria-pressed="true">Girar</button><button data-modo="mover" aria-pressed="false">Mover</button></div>
   <p id="dicaNavegacao">Arraste para girar a maquete.</p>
@@ -56,80 +57,13 @@
   <button id="manter" class="pill ativo">Manter o curso</button>
   <div class="centro">
     <button class="ico" id="play" title="Partir">▶</button>
-    <div id="crono">10</div>
-    <button class="ico" id="reset" title="Reiniciar">↺</button>
-    <button class="ico" id="tela" title="Tela cheia">⛶</button><a class="ico" href="ar/" title="Abrir em realidade aumentada" style="display:grid;place-items:center;text-decoration:none;font:800 14px system-ui">RA</a>
+    <div id="crono" role="timer">10</div>
+
+
   </div>
   <button id="desviar" class="pill">Desviar o bonde</button>
 </div>
 <div id="girar"><div>Gire o celular para a horizontal 📱↻<p><a href="ar/" style="color:inherit">Abrir em realidade aumentada</a></p></div></div>
-<script type="module">
-import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { criarMaquete } from './js/cena.js?v=20261107-ra10';
-import { criarNavegacao } from './js/navegacao.js?v=20261107-ra8';
-
-const canvas = document.getElementById('cena');
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: !!window.__captura });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
-renderer.shadowMap.enabled = !new URLSearchParams(location.search).has('leve'); renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-const scene = new THREE.Scene(); scene.background = new THREE.Color(0xc9d3e0);
-scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
-scene.add(new THREE.HemisphereLight(0xf2f6ff, 0x5a6a40, 0.7));
-const sol = new THREE.DirectionalLight(0xfff1dc, 2.4); sol.position.set(-40, 70, 50); sol.castShadow = true;
-sol.shadow.mapSize.set(2048, 2048); Object.assign(sol.shadow.camera, { left: -85, right: 85, top: 60, bottom: -60, near: 10, far: 220 }); sol.shadow.bias = -0.0004; sol.shadow.normalBias = 0.04;
-scene.add(sol);
-
-const camera = new THREE.PerspectiveCamera(32, 1, 0.5, 600);
-const controls = new OrbitControls(camera, canvas);
-controls.enableDamping = true; controls.maxPolarAngle = Math.PI * 0.47; controls.minDistance = 12; controls.maxDistance = 260; controls.target.set(0, 0, 4);
-const VISTAS = { geral: [0, 100, 150, 0, 0, 8] };
-const qs = new URLSearchParams(location.search);
-const v = (qs.get('cam') || '').split(',').map(Number);
-const vista = v.length === 6 && v.every(n => !isNaN(n)) ? v : VISTAS.geral;
-camera.position.set(vista[0], vista[1], vista[2]); controls.target.set(vista[3], vista[4], vista[5]);
-
-function redimensionar() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
-addEventListener('resize', redimensionar); redimensionar();
-
-const m = await criarMaquete({ grupos: { presetPrincipal: qs.get('p1') || 'trabalhador', nPrincipal: 1, presetRamal: qs.get('p3') || 'desconhecidos', nRamal: 3 } });
-scene.add(m.root);
-const navegacao = criarNavegacao({camera,controls,canvas,maquete:m});
-document.getElementById('carregando').style.opacity = 0; setTimeout(() => document.getElementById('carregando').remove(), 600);
-
-// ---------- interface ----------
-const aviso = document.getElementById('aviso'), bM = document.getElementById('manter'), bD = document.getElementById('desviar');
-const crono = document.getElementById('crono');
-function sincronizar() { bM.classList.toggle('ativo', m.rota === 'principal'); bD.classList.toggle('ativo', m.rota === 'ramal'); }
-function escolher(r) { if (m.definirRota(r)) sincronizar(); else if (m.estado.travado) aviso.textContent = 'O bonde já passou pela agulha — a decisão está tomada'; }
-bM.onclick = () => escolher('principal'); bD.onclick = () => escolher('ramal');
-let tempo = 10, contando = false;
-document.getElementById('play').onclick = () => { if (!contando && !m.estado.rodando) { contando = true; aviso.textContent = 'O bonde vai partir da estação… decida antes da agulha'; } };
-document.getElementById('reset').onclick = () => { m.reiniciar(); m.sortearPersonagens(); tempo = 10; contando = false; crono.textContent = '10'; aviso.textContent = 'Toque na alavanca (ou nos botões) para escolher o trilho'; [bM, bD].forEach(b => b.disabled = false); sincronizar(); };
-document.getElementById('tela').onclick = () => { const el = document.documentElement; if (!document.fullscreenElement) (el.requestFullscreen || el.webkitRequestFullscreen)?.call(el); else document.exitFullscreen?.(); };
-m.estado.aoImpacto = r => { aviso.textContent = r === 'principal' ? 'O bonde seguiu pelo trilho principal' : 'O bonde foi desviado para o ramal'; };
-m.estado.aoFim = () => { aviso.textContent += ' — o bonde voltou à estação. Toque ↺ para nova rodada'; };
-
-// toque na alavanca (raycast)
-const ray = new THREE.Raycaster(), ptr = new THREE.Vector2(); let toque0 = null;
-canvas.addEventListener('pointerdown', e => { toque0 = e.button===0 && navegacao.podeSelecionar() ? [e.clientX,e.clientY] : null; });
-canvas.addEventListener('pointerup', e => {
-  if (!toque0 || Math.hypot(e.clientX - toque0[0], e.clientY - toque0[1]) > 8) return;
-  ptr.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1); ray.setFromCamera(ptr, camera);
-  if (ray.intersectObject(m.alvoToque, false).length) { if (m.alternarAlavanca()) sincronizar(); else aviso.textContent = 'O bonde já passou pela agulha — a decisão está tomada'; }
-});
-
-// ---------- laço ----------
-const relogio = new THREE.Clock(); let acum = 0;
-renderer.setAnimationLoop(() => {
-  const dt = Math.min(0.05, relogio.getDelta());
-  if (contando) { acum += dt; if (acum >= 1) { acum = 0; tempo--; crono.textContent = String(Math.max(0, tempo)); if (tempo <= 0) { contando = false; m.partir(); } } }
-  if (m.estado.travado) [bM, bD].forEach(b => b.disabled = true);
-  m.update(dt); controls.update(); renderer.render(scene, camera);
-});
-window.__maquete = m; window.__pronto = true;
-</script>
+<script type="module" src="js/entrada-pc.js?v=20261107-ra11"></script>
 </body>
 </html>

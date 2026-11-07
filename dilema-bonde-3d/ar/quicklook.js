@@ -10,7 +10,7 @@ import { usdzComBotoes } from './ra-botoes-ios.js?v=20261107-ra7';
 
 const PASSO = 0.3;            // s entre poses gravadas
 const LARGURA_REAL = 1.2;
-const ARVORES_RA = 14;          // por tipo de árvore (cada uma tem 45–66 mil triângulos)     // a maquete (160 m) fica com ~1 m na mesa
+const ARVORES_RA = 27; // Malhas otimizadas; mantém a mesma distribuição do visualizador web.
 
 function gravar(m) {
   const moveis = m.partesMoveis();
@@ -75,7 +75,7 @@ function separarPorCor(mesh) {
 function prepararCena(raiz) {
   const trocas = [];
   raiz.traverse(o => {
-    if (o.isLight || (o.isMesh && o.material && o.material.visible === false) || o.name === 'Alavanca_Toque' || o.name === 'Arbustos_Flores' || o.name === 'Arvores_Copa_Larga') { trocas.push([o, null]); return; }
+    if (o.isLight || (o.isMesh && o.material && o.material.visible === false) || o.name === 'Alavanca_Toque' || o.name === 'Arbustos_Flores' || o.name === 'Placa_Menu') { trocas.push([o, null]); return; }
     if (o.isInstancedMesh) {
       const M = new THREE.Matrix4(), g = geoSimples(o.geometry), mat = matSimples(o.material), grupo = new THREE.Group(); grupo.name = o.name;
       grupo.position.copy(o.position); grupo.quaternion.copy(o.quaternion); grupo.scale.copy(o.scale);

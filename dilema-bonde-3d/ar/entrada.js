@@ -1,6 +1,7 @@
 /* O caminho nativo não importa Three, não cria WebGL e não espera um download no toque. */
-(function () {
+(async function () {
   'use strict';
+  const {lerConfig,salvarConfig,normalizar,sortear}=await import('../js/configuracao.js?v=20261107-ra11');
   const $ = id => document.getElementById(id);
   const ios = /iPad|iPhone|iPod/.test(navigator.userAgent)
     || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -31,14 +32,16 @@
       a.appendChild(doc.createElement('img')); a.hidden = true; doc.body.appendChild(a);
       a.click(); setTimeout(() => a.remove(), 4000);
     });
-    trocar.onclick = async () => {
+    let configNativa=normalizar({qualidade:lerConfig().qualidade});
+    const gerar=async proximaConfig=> {
       if (preparando) return;
       preparando = true; trocar.disabled = true; trocar.textContent = 'Preparando personagens…';
       link.setAttribute('aria-disabled', 'true');
       status.textContent = 'Preparando a nova rodada. Aguarde antes de abrir a RA.';
       try {
-        const { prepararPersonagens } = await import('./personagens.js?v=20261107-ra10');
-        const proxima = await prepararPersonagens();
+        const { prepararPersonagens } = await import('./personagens.js?v=20261107-ra11');
+        const proxima = await prepararPersonagens(proximaConfig);
+        configNativa=proximaConfig;
         const anterior = url; url = proxima.url;
         link.href = url + '#allowsContentScaling=1'; link.setAttribute('download', 'dilema-bonde.usdz');
         $('paresAR').textContent = proxima.descricao;
@@ -48,11 +51,15 @@
         console.warn('[Bonde RA] Preparação indisponível:', error);
         // Mantém arquivo E descrição da última rodada válida, inclusive após falha de rede.
         status.textContent = 'Não foi possível trocar os personagens. A rodada indicada abaixo continua disponível; tente novamente quando a conexão melhorar.';
+        throw error;
       } finally {
         preparando = false; trocar.disabled = false; trocar.textContent = 'Trocar personagens';
         link.removeAttribute('aria-disabled');
       }
     };
+    trocar.onclick=()=>gerar(sortear(configNativa)).catch(()=>{});
+    const {criarMenu}=await import('../js/menu.js?v=20261107-ra11');
+    criarMenu({modo:'nativo',config:()=>configNativa,aplicar:gerar});
     addEventListener('pagehide', e => { if (!e.persisted && url) URL.revokeObjectURL(url); });
     return;
   }
@@ -60,15 +67,17 @@
   $('voltarNativo').hidden = !(ios || suporta || ensaioNativo);
   const botao = $('comecar'), estado = $('estadoEntrada');
   let app = null;
+  const qualidade=$('qualidadeEntrada');qualidade.value=lerConfig().qualidade;
+  qualidade.onchange=()=>{salvarConfig({...lerConfig(),qualidade:qualidade.value});if(app)location.reload();};
   botao.onclick = async () => {
     if (botao.disabled) return;
     botao.disabled = true;
     if (!app) {
       estado.textContent = 'Preparando a maquete…';
       try {
-        const modulo = await import('./web.js?v=20261107-ra10');
-        app = await modulo.preparar({ informar: t => { estado.textContent = t; } });
-        botao.textContent = 'Abrir em realidade aumentada';
+        const modulo = await import('./web.js?v=20261107-ra11');
+        app = await modulo.preparar({ config:salvarConfig({...lerConfig(),qualidade:qualidade.value}), informar: t => { estado.textContent = t; } });
+        qualidade.disabled=true;botao.textContent = 'Abrir em realidade aumentada';
         estado.textContent = 'Pronto. Toque para abrir a câmera e aponte para a mesa ou o chão.';
       } catch (error) {
         console.warn('[Bonde RA] Preparação indisponível:', error);
@@ -78,6 +87,7 @@
     }
     try {
       // Já preparado: entrar() é chamado diretamente no gesto, antes de qualquer await.
+      if(app.qualidade!==lerConfig().qualidade){location.reload();return;}
       await app.entrar();
     } catch (error) {
       estado.textContent = error.name === 'NotAllowedError'

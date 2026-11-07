@@ -1,7 +1,7 @@
 name: Auditar RA do Bonde
 on:
   push:
-    branches: [main, codex/bonde-conjunto-largo-20261107]
+    branches: [main, codex/bonde-menu-vegetacao-20261107]
     paths: ['dilema-bonde-3d/**', 'tests/bonde-*.test.mjs', '.github/workflows/bonde-ra.yml']
   pull_request:
     paths: ['dilema-bonde-3d/**', 'tests/bonde-*.test.mjs', '.github/workflows/bonde-ra.yml']
@@ -10,7 +10,7 @@ permissions:
 jobs:
   auditar:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     permissions:
       contents: write
     steps:
@@ -26,20 +26,23 @@ jobs:
       - run: npm ci
       - run: python -m pip install usd-core==26.11
       - run: npx playwright install --with-deps chromium
+      - name: Otimizar vegetação a partir dos originais
+        run: node dilema-bonde-3d/scripts/otimizar-vegetacao.mjs
       - name: Navegação real no PC e interface móvel
         run: node dilema-bonde-3d/tests/navegacao-pc.mjs
       # Reproduz a atualização binária na branch de trabalho; nunca escreve em main.
-      - name: Reconstruir maquete nativa RA10
-        if: github.event_name == 'push' && github.ref == 'refs/heads/codex/bonde-conjunto-largo-20261107'
+      - name: Reconstruir maquete e vegetação RA11
+        if: github.event_name == 'push' && github.ref == 'refs/heads/codex/bonde-menu-vegetacao-20261107'
         run: |
           node dilema-bonde-3d/scripts/gerar-usdz.mjs
           python dilema-bonde-3d/tests/validar-usdz.py
-          if ! git diff --quiet -- dilema-bonde-3d/ar/maquete.usdz; then
+          git add dilema-bonde-3d/ar/maquete.usdz dilema-bonde-3d/assets/*_mobile.glb dilema-bonde-3d/assets/*_economica.glb
+          if ! git diff --cached --quiet; then
             git config user.name 'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-            git add dilema-bonde-3d/ar/maquete.usdz
-            git commit -m "Reconstrói USDZ RA10 com bonde, bitola e estação ampliados"
-            git push origin HEAD:codex/bonde-conjunto-largo-20261107
+            git add dilema-bonde-3d/ar/maquete.usdz dilema-bonde-3d/assets/*_mobile.glb dilema-bonde-3d/assets/*_economica.glb
+            git commit -m "Reconstrói USDZ RA11 e vegetação otimizada"
+            git push origin HEAD:codex/bonde-menu-vegetacao-20261107
           fi
       - run: npm test
       - run: python dilema-bonde-3d/tests/validar-usdz.py
