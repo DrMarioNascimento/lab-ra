@@ -28,7 +28,7 @@ export function criarRotulos(m){
       i.tabua.scale.set(largura,altura,1);i.texto.scale.set(largura*.95,altura*.95,1);
       i.postes.forEach((p,j)=>p.position.set((j?1:-1)*(largura/2-.35),-.8,0));
       const grupo=m.gruposCena[i.chave],esquerda=grupo.userData.esquerda;
-      i.placa.position.set(esquerda-.65-largura/2,1.65,grupo.position.z+2.3);
+      i.placa.position.set(esquerda-.65-largura/2,1.65,grupo.position.z+(i.chave==='ramal'?-2.3:2.3));
       i.placa.visible=c.rotulos;i.placa.userData.texto=rotulo;i.placa.userData.largura=largura;i.tex.needsUpdate=true;
     }},
     remover(){for(const i of itens){i.placa.removeFromParent();i.placa.traverse(o=>o.geometry?.dispose());i.texto.material.dispose();i.tex.dispose();}metal.dispose();}

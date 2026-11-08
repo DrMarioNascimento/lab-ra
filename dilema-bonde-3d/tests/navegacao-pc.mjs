@@ -39,7 +39,7 @@ try{
  // Posições e rótulos reais, incluindo uma maquete escalada/girada como na RA.
  await page.evaluate(async()=>{const t=__testePC;await t.ui.rodada.nova({...t.ui.rodada.config(),modo:'livre',principal:'trabalhador',ramal:'desconhecidos',nPrincipal:1,nRamal:3,tempo:0,movimentoReduzido:false});t.rotulos.atualizar(t.ui.rodada.config());});
  const placas=await page.evaluate(()=>['principal','ramal'].map(k=>{const p=__maquete.root.getObjectByName('Rotulo_'+k);return {texto:p.userData.texto,w:p.userData.largura,x:p.position.x,y:p.position.y,z:p.position.z,esquerda:__maquete.gruposCena[k].userData.esquerda};}));
- assert.equal(placas[0].texto,'1 Trabalhador');assert.equal(placas[1].texto,'3 Desconhecidos');assert(placas[0].w<placas[1].w);
+ assert.equal(placas[0].texto,'1 Trabalhador');assert.equal(placas[1].texto,'3 Desconhecidos');assert(placas[0].w<placas[1].w);assert.equal(placas[0].z,32.3);assert(Math.abs(placas[1].z-1.7)<1e-10);
  for(const p of placas){assert(p.x+p.w/2<p.esquerda-.5);assert(p.y<2);}
  const posicaoPlacas=await page.evaluate(()=>['principal','ramal'].map(k=>__maquete.root.getObjectByName('Rotulo_'+k).position.toArray()));
  await page.evaluate(()=>{const m=__maquete;m.root.scale.setScalar(.005);m.root.rotation.y=.7;__testePC.rotulos.atualizar(__testePC.ui.rodada.config());});

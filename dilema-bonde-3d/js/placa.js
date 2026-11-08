@@ -18,9 +18,9 @@ export function criarPlaca(madeira) {
     const y=7.5-i*2.25;
     const tabua=new THREE.Mesh(geo,madeira);tabua.position.y=y;tabua.name='Placa_'+secao;tabua.userData.secaoMenu=secao;tabua.castShadow=tabua.receiveShadow=true;placa.add(tabua);alvos.push(tabua);
     const cv=document.createElement('canvas');cv.width=512;cv.height=128;const ctx=cv.getContext('2d');
-    ctx.fillStyle='#fff0cf';ctx.font='800 49px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.shadowColor='#342616';ctx.shadowBlur=2;ctx.shadowOffsetY=3;ctx.fillText(rotulo,256,64);
+    ctx.fillStyle='#233f4a';ctx.font='800 49px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.shadowColor='#ffefd0';ctx.shadowBlur=1;ctx.shadowOffsetY=1;ctx.fillText(rotulo,256,64);
     const tex=new THREE.CanvasTexture(cv);tex.colorSpace=THREE.SRGBColorSpace;
-    const tinta=new THREE.Mesh(new THREE.PlaneGeometry(9.2,1.8),new THREE.MeshStandardMaterial({map:tex,transparent:true,depthWrite:false,roughness:1}));tinta.position.set(0,y,.215);tinta.name='Texto_'+secao;placa.add(tinta);
+    const tinta=new THREE.Mesh(new THREE.PlaneGeometry(9.2,1.8),new THREE.MeshStandardMaterial({map:tex,transparent:true,depthWrite:false,roughness:1}));tinta.position.set(0,y,.25);tinta.name='Texto_'+secao;placa.add(tinta);
     for(const x of [-4.55,4.55]){const pino=new THREE.Mesh(new THREE.SphereGeometry(.075,8,6),metal);pino.scale.z=.45;pino.position.set(x,y,.22);placa.add(pino);}
   }
   return {placa,alvos};
