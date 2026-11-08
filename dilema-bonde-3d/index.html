@@ -36,13 +36,16 @@
   #navegacao :focus-visible,.ico:focus-visible,.pill:focus-visible { outline:3px solid #d18a18;outline-offset:3px; }
   @media (any-pointer:fine) and (min-width:780px) { #navegacao { display:block; } }
 
+  details.qualidade-entrada { margin: 14px auto 0; max-width: 340px; text-align: left; font-size: 14px; }
+  details.qualidade-entrada summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #245874; text-decoration: underline; text-underline-offset: 3px; }
+  details.qualidade-entrada label { display: block; font-weight: 800; }
 </style>
 <script type="importmap">{ "imports": { "three": "./vendor/three/three.module.js", "three/addons/": "./vendor/three/addons/" } }</script>
 <link rel="stylesheet" href="menu.css?v=20261108-clara">
 </head>
 <body>
 <canvas id="cena"></canvas>
-<div id="carregando"><div><h1 style="font-size:26px">Dilema do Bonde</h1><p>Explore a maquete e discuta suas escolhas.</p><label class="qualidade-entrada">Qualidade<select id="qualidadeEntrada"><option value="auto">Automática</option><option value="economica">Econômica</option><option value="equilibrada">Equilibrada</option><option value="detalhada">Detalhada</option></select><small>Se o aparelho travou, escolha Econômica antes de carregar.</small></label><button id="carregarMaquete" class="pill">Abrir maquete</button><p id="estadoCarga" role="status">Versão RA14 · Operador em destaque</p><p><a href="ar/">Abrir em realidade aumentada</a></p></div></div>
+<div id="carregando"><div><h1 style="font-size:26px">Dilema do Bonde</h1><p>Explore a maquete e discuta suas escolhas.</p><button id="carregarMaquete" class="pill">Abrir maquete</button><p id="estadoCarga" role="status">Versão RA14 · Operador em destaque</p><details class="qualidade-entrada" id="qualidadeCaixa"><summary>Aparelho lento? Usar modo leve</summary><label>Qualidade<select id="qualidadeEntrada"><option value="auto">Automática</option><option value="economica">Econômica</option><option value="equilibrada">Equilibrada</option><option value="detalhada">Detalhada</option></select></label><small>Automática ajusta a resolução sozinha. Se o aparelho travou, escolha Econômica antes de abrir.</small></details><p><a href="ar/">Abrir em realidade aumentada</a></p></div></div>
 <div id="aviso">Toque na alavanca (ou nos botões) para escolher o trilho</div>
 <details id="navegacao" open hidden>
   <summary>Navegar na maquete</summary>
@@ -64,6 +67,6 @@
   <button id="desviar" class="pill">Desviar o bonde</button>
 </div>
 <div id="girar"><div>Gire o celular para a horizontal 📱↻<p><a href="ar/" style="color:inherit">Abrir em realidade aumentada</a></p></div></div>
-<script type="module" src="js/entrada-pc.js?v=20261108-ra14"></script>
+<script type="module" src="js/entrada-pc.js?v=20261108-ra14b"></script>
 </body>
 </html>

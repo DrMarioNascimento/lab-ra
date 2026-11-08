@@ -76,9 +76,12 @@
   .barra { margin: 0 auto; max-width: 660px; padding-left: max(10px, env(safe-area-inset-left)); padding-right: max(10px, env(safe-area-inset-right)); }
   @media (max-width: 560px) { .barra { display: grid; grid-template-columns: 1fr 1fr; } .centro { grid-row: 1; grid-column: 1 / -1; justify-self: center; } .pill { height: 46px; padding: 0 8px; font-size: 13px; } #colocar { bottom: max(142px, calc(env(safe-area-inset-bottom) + 132px)); } }
   @media (max-height: 500px) { #linkAR img { width: 140px; } #inicio h1 { font-size: 21px; } #inicio p { margin: 10px 0; } }
+  details.qualidade-entrada { margin: 14px auto 0; max-width: 340px; text-align: left; font-size: 14px; }
+  details.qualidade-entrada summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #245874; text-decoration: underline; text-underline-offset: 3px; }
+  details.qualidade-entrada label { display: block; font-weight: 800; }
 </style>
 <script type="importmap">{ "imports": { "three": "../vendor/three/three.module.js", "three/addons/": "../vendor/three/addons/" } }</script>
-<script src="entrada.js?v=20261108-ra14" defer></script>
+<script src="entrada.js?v=20261108-ra14b" defer></script>
 <link rel="stylesheet" href="../menu.css?v=20261108-clara">
 </head>
 <body>
@@ -99,9 +102,10 @@
   <section id="web" aria-label="Realidade aumentada com câmera" hidden>
     <p>Coloque a maquete sobre a mesa ou o chão e decida o percurso do bonde.</p>
     <p>Arraste com um dedo para mover. Use dois dedos para ampliar, reduzir ou girar. Os botões ficam fixos na tela.</p>
-    <label class="qualidade-entrada">Qualidade<select id="qualidadeEntrada"><option value="auto">Automática</option><option value="economica">Econômica</option><option value="equilibrada">Equilibrada</option><option value="detalhada">Detalhada</option></select><small>Se o aparelho travou, escolha Econômica antes de preparar.</small></label>
+    
     <button id="comecar" type="button">Preparar realidade aumentada</button>
     <p id="estadoEntrada" role="status">Primeiro prepare a maquete. Depois, abra a câmera e permita o acesso.</p>
+    <details class="qualidade-entrada" id="qualidadeCaixa"><summary>Aparelho lento? Usar modo leve</summary><label>Qualidade<select id="qualidadeEntrada"><option value="auto">Automática</option><option value="economica">Econômica</option><option value="equilibrada">Equilibrada</option><option value="detalhada">Detalhada</option></select></label><small>Automática ajusta a resolução sozinha. Se o aparelho travou, escolha Econômica antes de preparar.</small></details>
     <a id="voltarNativo" class="opcao" href="?modo=nativo&amp;v=20261108-ra14" hidden>Usar visualizador do iPhone, com placas na maquete</a>
     <small>Rastreamento de câmera: 8th Wall Engine © 2026 Niantic Spatial, Inc. · <a href="https://github.com/8thwall/engine/blob/main/LICENSE">Licença</a></small>
   </section>

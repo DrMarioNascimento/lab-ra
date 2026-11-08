@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#e4ebed">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Bonde RA">
+<link rel="manifest" href="manifest.webmanifest?v=20261108-clara">
+<link rel="apple-touch-icon" href="../../brand/orientador.webp">
+<title>Dilema do Bonde — Realidade Aumentada</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #000; font-family: 'Nunito', system-ui, sans-serif; -webkit-user-select: none; user-select: none; }
+  #video { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; display: none; }
+  #cena { position: fixed; inset: 0; width: 100%; height: 100%; touch-action: none; }
+  #overlay { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
+  #overlay > * { pointer-events: auto; }
+  #inicio { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; background: #16223a; color: #f5ecd6; text-align: center; padding: 24px; }
+  #inicio button { margin-top: 18px; height: 56px; padding: 0 30px; border-radius: 999px; border: 0; font: 800 18px 'Nunito',system-ui,sans-serif; color: #fff; background: linear-gradient(#e0473a, #b22a20); box-shadow: 0 5px 0 #7a1a12, 0 10px 20px rgba(0,0,0,.35); }
+  #inicio button:active { transform: translateY(4px); box-shadow: 0 1px 0 #7a1a12; }
+  #inicio a { color: #f5c97a; }
+  .barra { position: fixed; left: 0; right: 0; bottom: max(10px, env(safe-area-inset-bottom)); display: flex; justify-content: space-between; align-items: center; padding: 0 12px; gap: 8px; }
+  .pill { height: 44px; border-radius: 999px; border: 0; font: 800 14px 'Nunito',system-ui,sans-serif; padding: 0 14px; color: #fff; box-shadow: 0 3px 0 rgba(0,0,0,.3), 0 6px 12px rgba(0,0,0,.25); }
+  .pill:active { transform: translateY(4px); box-shadow: 0 1px 0 rgba(0,0,0,.3); }
+  .pill.ativo { outline: 3px solid #fff; outline-offset: 2px; }
+  .pill:disabled { filter: grayscale(.7) brightness(.85); }
+  #manter { background: linear-gradient(#3f7fd1, #2a5fa8); }
+  #desviar { background: linear-gradient(#e39a2b, #c27412); }
+  .centro { display: flex; gap: 4px; background: rgba(255,255,255,.92); border-radius: 999px; padding: 4px; box-shadow: 0 3px 0 rgba(0,0,0,.2); }
+  .ico { width: 44px; height: 44px; border-radius: 50%; border: 0; background: linear-gradient(#f4f6fa, #dfe4ec); box-shadow: 0 3px 0 #b9c1cf; font-size: 18px; color: #2b3445; }
+  .ico:active { transform: translateY(3px); box-shadow: none; }
+  #crono { min-width: 44px; height: 44px; border-radius: 999px; display: grid; place-items: center; font-weight: 800; color: #2b3445; border: 2px solid #2b3445; box-sizing: border-box; padding: 0 6px; }
+  #aviso { position: fixed; top: max(12px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); background: rgba(255,255,255,.92); color: #2b3445; padding: 8px 16px; border-radius: 999px; font-weight: 800; font-size: 14px; text-align: center; max-width: 88vw; }
+  #colocar { position: fixed; right: 12px; top: max(60px, calc(env(safe-area-inset-top) + 50px)); height: 44px; padding: 0 16px; border-radius: 999px; border: 0; font: 800 14px 'Nunito'; color: #2b3445; background: linear-gradient(#ffffff, #e3e8f0); box-shadow: 0 4px 0 #b9c1cf; display: none; }
+  #colocar:active { transform: translateY(3px); box-shadow: none; }
+
+  [hidden] { display: none !important; }
+  * { box-sizing: border-box; }
+  #inicio { overflow-y: auto; padding: max(20px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
+  #inicio > div { width: min(100%, 520px); margin: auto; }
+  #inicio h1 { font-size: 26px; margin: 0 0 16px; }
+  #inicio p { line-height: 1.5; }
+  #linkAR { display: inline-block; padding: 12px; border-radius: 18px; background: linear-gradient(#e0473a,#b22a20); box-shadow: 0 5px 0 #7a1a12,0 10px 20px #0005; }
+  #linkAR img { display: block; width: min(220px, 65vw); height: auto; border-radius: 12px; }
+  #linkAR[aria-disabled="true"] { opacity: .65; }
+  #inicio .secundario { background: linear-gradient(#5b6b82,#3d4a5c); box-shadow: 0 5px 0 #26303d; font-size: 15px; height: auto; min-height: 46px; padding: 10px 20px; }
+  #inicio button:disabled { opacity: .65; }
+  #statusAR, #estadoEntrada { min-height: 3em; }
+  .navegar { margin-top: 20px; display: flex; flex-wrap: wrap; justify-content: center; gap: 18px; }
+  #sair { position: fixed; left: max(12px, env(safe-area-inset-left)); top: max(12px, env(safe-area-inset-top)); z-index: 6; }
+  #aviso { top: max(64px, calc(env(safe-area-inset-top) + 52px)); border-radius: 12px; font-size: 13px; width: min(440px, calc(100vw - 100px)); max-width: none; padding: 8px 12px; }
+  #colocar { top: auto; bottom: max(86px, calc(env(safe-area-inset-bottom) + 76px)); }
+  #ajustes { position: fixed; top: max(12px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); z-index: 7; color: #fff; }
+  #ajustes summary { display: grid; place-items: center; margin-left: auto; width: 86px; height: 44px; border-radius: 24px; background: #16223ac9; font-size: 13px; font-weight: 800; cursor: pointer; list-style: none; touch-action: manipulation; }
+  #ajustes summary::-webkit-details-marker { display: none; }
+  #ajustes .painel { margin-top: 6px; padding: 8px; border-radius: 18px; background: #16223ae8; box-shadow: 0 4px 16px #0005; }
+  #ajustes[open] ~ #colocar { visibility: hidden; }
+  #zoom { display: flex; align-items: center; gap: 4px; }
+  #ajudaRA { display: block; width: 100%; min-height: 44px; margin-top: 8px; padding: 8px; border-radius: 14px; border: 1px solid #ffffff55; background: #ffffff14; color: #fff; font-weight: 700; }
+  #tamanho { width: 60px; font-size: 13px; }
+  #aviso { pointer-events: none; }
+  #overlay button { font-family: inherit; touch-action: manipulation; cursor: pointer; }
+  #overlay button:disabled { opacity: .5; cursor: default; }
+  #sair { background: #16223ab8; }
+  #manter { background: linear-gradient(#3f7fd1dc,#2a5fa8dc); }
+  #desviar { background: linear-gradient(#d78d21e6,#a55e08e6); }
+  .centro, #aviso { background: #f6f8fbd9; }
+  .opcao { display: block; margin: 22px 0 8px; padding: 13px; border: 1px solid #f5c97a88; border-radius: 14px; font-weight: 800; text-decoration: none; }
+  #inicio small { display: block; line-height: 1.5; }
+  #instalarRA { margin: 18px 0; padding: 12px 16px; border: 1px solid #f5c97a88; border-radius: 14px; text-align: left; line-height: 1.5; }
+  #instalarRA summary { cursor: pointer; font-weight: 800; color: #f5c97a; min-height: 28px; }
+  #instalarRA ol { margin-bottom: 8px; padding-left: 24px; }
+  #instalarRA p { font-size: 14px; margin-bottom: 0; }
+  .barra { margin: 0 auto; max-width: 660px; padding-left: max(10px, env(safe-area-inset-left)); padding-right: max(10px, env(safe-area-inset-right)); }
+  @media (max-width: 560px) { .barra { display: grid; grid-template-columns: 1fr 1fr; } .centro { grid-row: 1; grid-column: 1 / -1; justify-self: center; } .pill { height: 46px; padding: 0 8px; font-size: 13px; } #colocar { bottom: max(142px, calc(env(safe-area-inset-bottom) + 132px)); } }
+  @media (max-height: 500px) { #linkAR img { width: 140px; } #inicio h1 { font-size: 21px; } #inicio p { margin: 10px 0; } }
+</style>
+<script type="importmap">{ "imports": { "three": "../vendor/three/three.module.js", "three/addons/": "../vendor/three/addons/" } }</script>
+<script src="entrada.js?v=20261108-ra14" defer></script>
+<link rel="stylesheet" href="../menu.css?v=20261108-clara">
+</head>
+<body>
+<canvas id="cena" hidden></canvas>
+<main id="inicio"><div>
+  <h1>Dilema do Bonde em RA</h1>
+  <section id="nativo" aria-label="Realidade aumentada do iPhone e iPad">
+    <!-- O link nativo existe antes de qualquer JavaScript/WebGL. Safari exige uma única imagem filha. -->
+    <a id="linkAR" rel="ar" href="maquete.usdz?v=20261107-ra12#allowsContentScaling=1" aria-label="Abrir em realidade aumentada" aria-describedby="statusAR"><img src="maquete-ar.jpg" width="220" height="140" alt="Abrir a maquete do Dilema do Bonde em realidade aumentada"></a>
+    <p><strong id="instrucaoAR">Toque na maquete para abrir em realidade aumentada.</strong></p>
+    <p id="statusAR" role="status">No iPhone ou iPad, use o Safari. Se aparecer o modo Objeto, toque em <b>AR</b> no alto da tela. Aponte para a mesa ou o chão.</p>
+    <p>Toque nas placas <b>Manter o curso</b>, <b>Desviar o bonde</b> e <b>Reiniciar</b>. Use pinça para ajustar o tamanho e arraste para mudar de lugar.</p>
+    <p id="paresAR">Trilho principal: 1 trabalhador. Ramal: 3 desconhecidos.</p>
+    <button id="trocarAR" class="secundario" type="button" hidden>Trocar personagens</button>
+    <a class="opcao" href="?modo=interativo&amp;v=20261108-ra14">RA com botões fixos na tela</a>
+    <small>Arraste, amplie e gire a maquete. Para usar os controles fixos sem abas e endereço do Safari, abra pela Tela de Início.</small>
+  </section>
+  <section id="web" aria-label="Realidade aumentada com câmera" hidden>
+    <p>Coloque a maquete sobre a mesa ou o chão e decida o percurso do bonde.</p>
+    <p>Arraste com um dedo para mover. Use dois dedos para ampliar, reduzir ou girar. Os botões ficam fixos na tela.</p>
+    <label class="qualidade-entrada">Qualidade<select id="qualidadeEntrada"><option value="auto">Automática</option><option value="economica">Econômica</option><option value="equilibrada">Equilibrada</option><option value="detalhada">Detalhada</option></select><small>Se o aparelho travou, escolha Econômica antes de preparar.</small></label>
+    <button id="comecar" type="button">Preparar realidade aumentada</button>
+    <p id="estadoEntrada" role="status">Primeiro prepare a maquete. Depois, abra a câmera e permita o acesso.</p>
+    <a id="voltarNativo" class="opcao" href="?modo=nativo&amp;v=20261108-ra14" hidden>Usar visualizador do iPhone, com placas na maquete</a>
+    <small>Rastreamento de câmera: 8th Wall Engine © 2026 Niantic Spatial, Inc. · <a href="https://github.com/8thwall/engine/blob/main/LICENSE">Licença</a></small>
+  </section>
+  <details id="instalarRA" hidden>
+    <summary>Abrir sem abas e barra de endereço</summary>
+    <ol>
+      <li>No Safari, toque em <b>Compartilhar</b>.</li>
+      <li>Escolha <b>Adicionar à Tela de Início</b>, mantenha <b>Abrir como App da Web</b> ativado e toque em <b>Adicionar</b>.</li>
+      <li>Abra o ícone <b>Bonde RA</b> na Tela de Início.</li>
+    </ol>
+    <p>Assim os controles ficam na tela sem as barras do Safari. Adicionar o ícone e continuar nesta aba não muda a visualização.</p>
+  </details>
+  <small id="versaoRA">Versão 08/11 · RA14</small>
+  <nav class="navegar"><a href="../index.html">Ver sem RA</a><a href="../../bancadas.html#etica">Voltar ao laboratório</a></nav>
+  <noscript><p>O link acima abre a RA no Safari do iPhone/iPad. No Android, ative o JavaScript.</p></noscript>
+</div></main>
+<div id="overlay" hidden>
+  <button id="sair" class="pill secundario" type="button" aria-label="Sair da RA">Sair</button>
+  <div id="ajustes" hidden>
+    <div class="painel">
+    <div id="zoom" role="group" aria-label="Tamanho da maquete">
+    <button id="diminuir" class="ico" type="button" aria-label="Diminuir maquete" disabled>−</button>
+    <button id="tamanho" class="ico" type="button" aria-label="Restaurar tamanho inicial da maquete" disabled>100%</button>
+    <button id="aumentar" class="ico" type="button" aria-label="Ampliar maquete" disabled>+</button>
+    </div>
+    <button id="ajudaRA" type="button">Como mover a maquete</button>
+    </div>
+  </div>
+  <div id="aviso" role="status">Aponte para a superfície</div>
+  <button id="colocar" type="button" disabled>Colocar aqui</button>
+  <div class="barra">
+    <button id="manter" class="pill ativo" type="button" disabled>Manter o curso</button>
+    <div class="centro"><button class="ico" id="play" aria-label="Partir" type="button" disabled>▶</button><div id="crono" role="timer">10</div></div>
+    <button id="desviar" class="pill" type="button" disabled>Desviar o bonde</button>
+  </div>
+</div>
+</body>
+</html>

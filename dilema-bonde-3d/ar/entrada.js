@@ -75,21 +75,31 @@
   const botao = $('comecar'), estado = $('estadoEntrada');
   let app = null;
   const qualidade=$('qualidadeEntrada');qualidade.value=lerConfig().qualidade;
+  // Proteção contra travamento: marca antes de preparar/abrir; se não terminar, a próxima entrada usa a Econômica.
+  const CHAVE='bonde-carga-pendente-ra';
+  const marcar=v=>{try{v?localStorage.setItem(CHAVE,String(Date.now())):localStorage.removeItem(CHAVE);}catch{}};
+  let travou=false;try{travou=!!localStorage.getItem(CHAVE);}catch{}
+  if(travou&&qualidade.value!=='economica'){
+    qualidade.value='economica';salvarConfig({...lerConfig(),qualidade:'economica'});
+    const caixa=qualidade.closest?.('details');if(caixa)caixa.open=true;
+    estado.textContent='A última abertura não terminou. Para proteger o aparelho, a qualidade Econômica foi escolhida. Você pode mudar abaixo.';
+  }
   qualidade.onchange=()=>{salvarConfig({...lerConfig(),qualidade:qualidade.value});if(app)location.reload();};
   botao.onclick = async () => {
     if (botao.disabled) return;
     botao.disabled = true;
     if(app&&app.qualidade!==lerConfig().qualidade){location.reload();return;}
     if (!app || app.precisaNova?.()) {
-      estado.textContent = 'Preparando a maquete…';
+      estado.textContent = 'Preparando a maquete…';marcar(true);
       try {
         const config=novaEntrada({...lerConfig(),qualidade:qualidade.value},app?.configAtual?.());
         if(app)await app.prepararNova(config);
         else {const modulo=await import('./web.js?v=20261108-ra14');app=await modulo.preparar({config,informar:t=>{estado.textContent=t;}});}
         registrarEntrada(config);
         qualidade.disabled=true;botao.textContent = 'Abrir em realidade aumentada';
-        estado.textContent = 'Pronto. Toque para abrir a câmera e aponte para a mesa ou o chão.';
+        estado.textContent = 'Pronto. Toque para abrir a câmera e aponte para a mesa ou o chão.';marcar(false);
       } catch (error) {
+        marcar(false);
         console.warn('[Bonde RA] Preparação indisponível:', error);
         estado.textContent = 'Não foi possível preparar a RA. Confira a conexão e o suporte a 3D do navegador, ou use Ver sem RA. Você pode tentar novamente.';
       } finally { botao.disabled = false; }
@@ -98,8 +108,12 @@
     try {
       // Já preparado: entrar() é chamado diretamente no gesto, antes de qualquer await.
       if(app.qualidade!==lerConfig().qualidade){location.reload();return;}
+      marcar(true);
       await app.entrar();
+      // Considera a sessão estável depois de alguns segundos com a câmera e a maquete ativas.
+      setTimeout(()=>marcar(false),10000);
     } catch (error) {
+      marcar(false);
       estado.textContent = error.name === 'NotAllowedError'
         ? 'A câmera ou os sensores não foram autorizados. Permita o acesso nas configurações do navegador e tente novamente.'
         : 'A RA não abriu. Tente novamente ou continue em Ver sem RA.';
