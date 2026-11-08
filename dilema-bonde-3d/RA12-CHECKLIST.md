@@ -19,3 +19,5 @@ A PR desta versão registra os resultados da execução em Chromium, dos testes 
 A auditoria cobre singular/plural, entradas sucessivas, preparo nativo sob demanda, falhas de carga, pausas, foco, quatro tamanhos de tela, navegação, posição dos grupos, placas fora das vias, estabilidade dos rótulos sob escala/giro, fantasmas no PC e na RA interativa simulada, geometria e alvos animados no USDZ.
 
 Não houve teste físico do Quick Look no iPhone nem no Galaxy A56. A validação de um arquivo USDZ e do rastreador simulado não comprova o comportamento da câmera ou do visualizador nativo num aparelho real.
+
+Revisão: a textura dos rótulos mantém 512×128 pixels na GPU; só a proporção da placa e o desenho mudam. O teste de navegador alterna nome curto, longo e curto após renderizar, confere conteúdo distinto e ausência de erros de upload.

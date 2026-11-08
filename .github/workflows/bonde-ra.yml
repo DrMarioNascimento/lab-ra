@@ -4,6 +4,7 @@ on:
     branches: [main, codex/bonde-placas-fantasmas-ra12]
     paths: ['dilema-bonde-3d/**', 'tests/bonde-*.test.mjs', '.github/workflows/bonde-ra.yml']
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths: ['dilema-bonde-3d/**', 'tests/bonde-*.test.mjs', '.github/workflows/bonde-ra.yml']
 permissions:
   contents: read

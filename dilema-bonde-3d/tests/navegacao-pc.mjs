@@ -9,7 +9,7 @@ const servidor=http.createServer(async(req,res)=>{try{const file=path.resolve(ra
 await new Promise(r=>servidor.listen(0,'127.0.0.1',r));let browser;
 try{
  browser=await chromium.launch({headless:true,executablePath:process.env.BONDE_CHROMIUM||undefined,args:['--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
- const page=await browser.newPage({viewport:{width:1280,height:800}}),erros=[],glbs=[];page.on('pageerror',e=>erros.push(e.message));page.on('request',r=>{if(r.url().includes('.glb'))glbs.push(r.url());});await page.route('https://fonts.**',r=>r.abort());await page.addInitScript(()=>window.__captura=true);
+ const page=await browser.newPage({viewport:{width:1280,height:800}}),erros=[],glbs=[];page.on('pageerror',e=>erros.push(e.message));page.on('console',msg=>{if(/INVALID_VALUE|INVALID_OPERATION|texSubImage2D/.test(msg.text()))erros.push(msg.text());});page.on('request',r=>{if(r.url().includes('.glb'))glbs.push(r.url());});await page.route('https://fonts.**',r=>r.abort());await page.addInitScript(()=>window.__captura=true);
  const url=`http://127.0.0.1:${servidor.address().port}/dilema-bonde-3d/index.html?leve=1&auditoria`;
  await page.goto(url,{waitUntil:'networkidle'});assert.equal(glbs.length,0,'nenhum GLB antes de escolher qualidade');
  await page.locator('#qualidadeEntrada').selectOption('equilibrada');await page.locator('#carregarMaquete').click();await page.waitForFunction(()=>window.__pronto,null,{timeout:90000});
@@ -38,6 +38,19 @@ try{
 
  // Posições e rótulos reais, incluindo uma maquete escalada/girada como na RA.
  await page.evaluate(async()=>{const t=__testePC;await t.ui.rodada.nova({...t.ui.rodada.config(),modo:'livre',principal:'trabalhador',ramal:'desconhecidos',nPrincipal:1,nRamal:3,tempo:0,movimentoReduzido:false});t.rotulos.atualizar(t.ui.rodada.config());});
+
+ // Troca curta → longa → curta após a primeira renderização: a GPU não pode
+ // ficar com pixels antigos nem receber texSubImage2D maior que o armazenamento.
+ const texturas=await page.evaluate(async()=>{const t=__testePC,amostras=[];
+  for(const [papel,n] of [['idoso',1],['colega',5],['trabalhador',1]]){
+   await t.ui.rodada.nova({...t.ui.rodada.config(),principal:papel,nPrincipal:n});t.rotulos.atualizar(t.ui.rodada.config());t.renderer.render(t.scene,t.camera);
+   const placa=t.m.root.getObjectByName('Rotulo_principal'),map=placa.children.find(o=>o.material?.map?.isCanvasTexture).material.map;
+   const pixels=map.image.getContext('2d').getImageData(0,0,512,128).data;let hash=0;for(let i=0;i<pixels.length;i++)hash=(hash*31+pixels[i])|0;
+   amostras.push({uuid:map.uuid,w:map.image.width,h:map.image.height,erro:t.renderer.getContext().getError(),hash,texto:placa.userData.texto});
+  }return amostras;});
+ assert.equal(new Set(texturas.map(t=>t.uuid)).size,1);assert.equal(new Set(texturas.map(t=>t.hash)).size,3);
+ for(const t of texturas){assert.equal(t.w,512);assert.equal(t.h,128);assert.equal(t.erro,0);}
+ assert.deepEqual(texturas.map(t=>t.texto),['1 Idoso','5 Colegas de turma','1 Trabalhador']);
  const placas=await page.evaluate(()=>['principal','ramal'].map(k=>{const p=__maquete.root.getObjectByName('Rotulo_'+k);return {texto:p.userData.texto,w:p.userData.largura,x:p.position.x,y:p.position.y,z:p.position.z,esquerda:__maquete.gruposCena[k].userData.esquerda};}));
  assert.equal(placas[0].texto,'1 Trabalhador');assert.equal(placas[1].texto,'3 Desconhecidos');assert(placas[0].w<placas[1].w);assert.equal(placas[0].z,32.3);assert(Math.abs(placas[1].z-1.7)<1e-10);
  for(const p of placas){assert(p.x+p.w/2<p.esquerda-.5);assert(p.y<2);}

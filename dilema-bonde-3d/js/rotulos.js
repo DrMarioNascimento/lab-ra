@@ -8,10 +8,10 @@ export function criarRotulos(m){
   const metal=new THREE.MeshStandardMaterial({color:0x3f4c46,roughness:.85,metalness:.25});
   for(const chave of ['principal','ramal']){
     const placa=new THREE.Group();placa.name='Rotulo_'+chave;m.root.add(placa);
-    const canvas=document.createElement('canvas');canvas.height=128;
+    const canvas=document.createElement('canvas');canvas.width=512;canvas.height=128;
     const tex=new THREE.CanvasTexture(canvas);tex.colorSpace=THREE.SRGBColorSpace;
     const tabua=new THREE.Mesh(new THREE.BoxGeometry(1,1,.18),m.madeiraPlacas);placa.add(tabua);
-    const texto=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshStandardMaterial({map:tex,transparent:true,roughness:1,depthWrite:false}));texto.position.z=.096;placa.add(texto);
+    const texto=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshStandardMaterial({map:tex,transparent:true,roughness:1,depthWrite:false}));texto.position.z=.13;placa.add(texto);
     const postes=[-1,1].map(()=>{const p=new THREE.Mesh(new THREE.BoxGeometry(.12,1.2,.12),metal);placa.add(p);return p;});
     itens.push({chave,placa,canvas,tex,tabua,texto,postes});
   }
@@ -19,12 +19,13 @@ export function criarRotulos(m){
     atualizar(c){for(const i of itens){
       const n=i.chave==='principal'?c.nPrincipal:c.nRamal,papel=c[i.chave],rotulo=textoGrupo(papel,n);
       const ctx=i.canvas.getContext('2d');ctx.font='800 38px sans-serif';
-      i.canvas.width=Math.ceil(ctx.measureText(rotulo).width+72);
-      ctx.font='800 38px sans-serif';ctx.clearRect(0,0,i.canvas.width,128);
-      ctx.fillStyle='#243f44';ctx.fillRect(10,10,i.canvas.width-20,108);
-      ctx.strokeStyle='#bd9561';ctx.lineWidth=3;ctx.strokeRect(13,13,i.canvas.width-26,102);
-      ctx.fillStyle='#fff2d5';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(rotulo,i.canvas.width/2,64);
-      const altura=1.65,largura=Math.max(3.2,Math.min(10.8,i.canvas.width/128*altura));
+      const comprimento=Math.ceil(ctx.measureText(rotulo).width+72);
+      // Armazenamento da textura permanece 512×128 depois do primeiro envio à GPU.
+      ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,512,128);ctx.save();ctx.scale(512/comprimento,1);
+      ctx.fillStyle='#243f44';ctx.fillRect(10,10,comprimento-20,108);
+      ctx.strokeStyle='#bd9561';ctx.lineWidth=3;ctx.strokeRect(13,13,comprimento-26,102);
+      ctx.fillStyle='#fff2d5';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(rotulo,comprimento/2,64);ctx.restore();
+      const altura=1.65,largura=Math.max(3.2,Math.min(10.8,comprimento/128*altura));
       i.tabua.scale.set(largura,altura,1);i.texto.scale.set(largura*.95,altura*.95,1);
       i.postes.forEach((p,j)=>p.position.set((j?1:-1)*(largura/2-.35),-.8,0));
       const grupo=m.gruposCena[i.chave],esquerda=grupo.userData.esquerda;
