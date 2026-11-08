@@ -28,6 +28,7 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - name: Otimizar vegetação a partir dos originais
         run: node dilema-bonde-3d/scripts/otimizar-vegetacao.mjs
+      - run: npm test
       - name: Navegação real no PC e interface móvel
         env:
           BONDE_CAPTURAS: qa-ra12
@@ -46,5 +47,4 @@ jobs:
             git commit -m "Reconstrói USDZ RA12 e vegetação otimizada"
             git push origin HEAD:codex/bonde-placas-fantasmas-ra12
           fi
-      - run: npm test
       - run: python dilema-bonde-3d/tests/validar-usdz.py

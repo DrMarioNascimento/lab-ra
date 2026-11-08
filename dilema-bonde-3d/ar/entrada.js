@@ -39,7 +39,7 @@
     });
     let configNativa=lerConfig();
     const gerar=async proximaConfig=> {
-      if (preparando) return;
+      if (preparando) throw new Error('Aguarde a preparação em andamento.');
       preparando = true; trocar.disabled = true; trocar.textContent = 'Preparando personagens…';
       link.setAttribute('aria-disabled', 'true');
       status.textContent = 'Preparando a nova rodada. Aguarde antes de abrir a RA.';

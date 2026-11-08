@@ -34,7 +34,6 @@ try{
   await page.setViewportSize(tamanho);assert(await page.evaluate(()=>{__testePC.navegacao.focar('geral');__testePC.camera.updateMatrixWorld();const obj=__maquete.root.getObjectByName('Base_Terra');obj.updateMatrixWorld(true);const a=obj.geometry.attributes.position,v=__testePC.camera.position.clone();for(let i=0;i<a.count;i++){v.fromBufferAttribute(a,i).applyMatrix4(obj.matrixWorld).project(__testePC.camera);if(Math.abs(v.x)>1.001||Math.abs(v.y)>1.001)return false;}return true;}),'visão geral deve enquadrar a base inteira');await page.locator('#menu').click();const box=await page.locator('.menu-painel').boundingBox();assert(box.x>=0&&box.y>=0&&box.x+box.width<=tamanho.width+.1&&box.y+box.height<=tamanho.height+.1);await fechar();assert(await page.locator('#play').isVisible());
  }
  await page.setViewportSize({width:1280,height:800});const sec=await page.evaluate(()=>__maquete.root.getObjectByName('Ponteiro_Segundos').rotation.z);await page.waitForFunction(v=>__maquete.root.getObjectByName('Ponteiro_Segundos').rotation.z!==v,sec,{timeout:15000});
- if(process.env.BONDE_CAPTURAS){await fs.mkdir(process.env.BONDE_CAPTURAS,{recursive:true});await page.evaluate(()=>__testePC.renderer.setAnimationLoop(null));for(const foco of ['geral','operador','oficina','bonde','estacao','cima']){const imagem=await page.evaluate(f=>{__testePC.navegacao.focar(f);__testePC.renderer.render(__testePC.scene,__testePC.camera);return __testePC.renderer.domElement.toDataURL();},foco);await fs.writeFile(path.join(process.env.BONDE_CAPTURAS,foco+'.png'),Buffer.from(imagem.split(',')[1],'base64'));}await page.locator('#menu').click();await page.screenshot({path:path.join(process.env.BONDE_CAPTURAS,'menu.png')});}
 
 
  // Posições e rótulos reais, incluindo uma maquete escalada/girada como na RA.
@@ -49,7 +48,7 @@ try{
  if(process.env.BONDE_CAPTURAS){await page.evaluate(()=>{__testePC.renderer.setAnimationLoop(null);__testePC.renderer.render(__testePC.scene,__testePC.camera);});
   for(const nome of ['geral-ra12','menu-ra12','placa-ra12']){
    if(nome==='menu-ra12')await page.locator('#menu').click();
-   if(nome==='placa-ra12'){await page.locator('#fecharMenu').click();await page.evaluate(()=>{const t=__testePC;t.camera.position.set(32,11,64);t.controls.target.set(32,4,44);t.controls.update();t.renderer.render(t.scene,t.camera);});}
+   if(nome==='placa-ra12'){await page.locator('#fecharMenu').click();await page.evaluate(()=>{const t=__testePC;t.camera.position.set(28,11,64);t.controls.target.set(28,4,44);t.controls.update();t.renderer.render(t.scene,t.camera);});}
    const jpg=await page.screenshot({type:'jpeg',quality:58});console.log('RA12_VISUAL:'+JSON.stringify({nome,data:jpg.toString('base64')}));
   }
  }

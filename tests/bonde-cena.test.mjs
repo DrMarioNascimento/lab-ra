@@ -85,7 +85,7 @@ for(const [tipo,maquete] of [['RA',m],['3D',m3d]])test(`cidade ${tipo} tem textu
   const cidade=m.root.getObjectByName('Cidade');assert(cidade);
   for(const face of ['Frente','Fundos','Direita','Esquerda'])assert(cidade.children.some(c=>c.name.startsWith('Cidade_Janelas_'+face)));
   for(const c of cidade.children.filter(c=>/^Cidade_Paredes|^Cidade_Telhados/.test(c.name)))assert(c.material.map);
-  const construcoes=[new THREE.Box3().setFromObject(m.focos.estacao,true),new THREE.Box3().setFromObject(m.focos.oficina,true),...cidade.userData.volumes];
+  const construcoes=[new THREE.Box3().setFromObject(m.focos.estacao,true),new THREE.Box3().setFromObject(m.focos.oficina,true),new THREE.Box3().setFromObject(m.focos.placa,true),...cidade.userData.volumes];
   m.root.updateMatrixWorld(true);
   for(const a of m.root.children.filter(o=>o.isInstancedMesh&&/^Arvores|^Araucarias/.test(o.name))) {
     for(let i=0;i<a.count;i++) {
@@ -174,6 +174,6 @@ test('grupos e rótulos têm referências à esquerda da oficina também com cin
  await m.configurar();m.reiniciar();
 });
 test('placa de madeira está no gramado frontal e preserva textura e relevo',()=>{
- assert.equal(m.focos.placa.position.x,32);assert.equal(m.focos.placa.position.z,44);
+ assert.equal(m.focos.placa.position.x,28);assert.equal(m.focos.placa.position.z,44);
  for(const alvo of m.alvosMenu){assert(alvo.material.map);assert(alvo.geometry.parameters.options.bevelEnabled);}
 });

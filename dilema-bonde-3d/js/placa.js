@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 // No gramado frontal indicado no print, entre a via e a borda da maquete.
-export const POSICAO_PLACA={x:32,z:44};
+export const POSICAO_PLACA={x:28,z:44};
 export function criarPlaca(madeira) {
   const placa=new THREE.Group();placa.name='Placa_Menu';placa.position.set(POSICAO_PLACA.x,0,POSICAO_PLACA.z);
   const metal=new THREE.MeshStandardMaterial({color:0x4b4d43,metalness:.55,roughness:.65});
