@@ -46,6 +46,26 @@ const m=await preparar();
 const m3d=await preparar({ra:false,qualidade:'detalhada'});
 const economica=await preparar({ra:true,qualidade:'economica'});
 
+for(const [tipo,maquete] of [['RA',m],['3D',m3d],['Econômica',economica]])test(`terreno ${tipo}: só o gramado cobre o topo; bordas e fundo fecham a base`,()=>{
+  const grama=maquete.root.getObjectByName('Gramado'),base=maquete.root.getObjectByName('Base_Terra');
+  maquete.root.updateMatrixWorld(true);
+  const ray=new THREE.Raycaster();
+  for(const x of [-65,0,65])for(const z of [-35,2,39]){
+    ray.set(new THREE.Vector3(x,10,z),new THREE.Vector3(0,-1,0));
+    assert(ray.intersectObject(grama,false).length>0,'gramado deve cobrir a base');
+    assert.equal(ray.intersectObject(base,false).length,0,'tampa de terra disputa profundidade com o gramado');
+    ray.set(new THREE.Vector3(x,-10,z),new THREE.Vector3(0,1,0));
+    assert(ray.intersectObject(base,false).length>0,'fundo da base deve permanecer fechado');
+  }
+  const g=new THREE.Box3().setFromObject(grama),b=new THREE.Box3().setFromObject(base);
+  for(const eixo of ['x','z'])for(const limite of ['min','max'])assert(Math.abs(g[limite][eixo]-b[limite][eixo])<1e-4,'contornos do gramado e da base devem coincidir');
+  assert(Math.abs(g.max.y-b.max.y)<1e-4,'lateral deve encostar no gramado');
+  for(const [origem,direcao] of [[[90,-1,2],[-1,0,0]],[[-90,-1,2],[1,0,0]],[[0,-1,65],[0,0,-1]],[[0,-1,-65],[0,0,1]]]){
+    ray.set(new THREE.Vector3(...origem),new THREE.Vector3(...direcao));
+    assert(ray.intersectObject(base,false).length>0,'lateral da base deve permanecer fechada');
+  }
+});
+
 test('bolas verdes removidas e operador destacado com 5,67 unidades de altura',()=>{
   for(const cena of [m,m3d]) for(const nome of ['Arbustos_Flores','Floreiras','Objetos_Patio_folhagem','Objetos_Patio_flores_rosa']) assert(!cena.root.getObjectByName(nome),nome);
   const altura=new THREE.Box3().setFromObject(m.focos.operador,true).getSize(new THREE.Vector3()).y;

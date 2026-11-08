@@ -1,4 +1,4 @@
-import { criarMaquete } from '../js/cena.js?v=20261107-ra12';
+import { criarMaquete } from '../js/cena.js?v=20261108-ra13';
 import { montarUSDZ } from './quicklook.js?v=20261107-ra12';
 
 import {normalizar,grupos,textoGrupo} from '../js/configuracao.js?v=20261107-ra12';

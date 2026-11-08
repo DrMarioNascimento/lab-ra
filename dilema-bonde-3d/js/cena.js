@@ -110,13 +110,23 @@ export async function criarMaquete(opts = {}) {
 
   // ---------- terreno da maquete (base com bordas de terra) ----------
   {
-    const s = new THREE.Shape(), w = 80, h = 52, r = 14, cz = 2;
+    // Ao girar -90° em X, o Y do contorno vira -Z: centro final em Z = 2.
+    const s = new THREE.Shape(), w = 80, h = 52, r = 14, cz = -2;
     s.moveTo(-w + r, -h + cz); s.lineTo(w - r, -h + cz); s.quadraticCurveTo(w, -h + cz, w, -h + r + cz); s.lineTo(w, h - r + cz); s.quadraticCurveTo(w, h + cz, w - r, h + cz);
     s.lineTo(-w + r, h + cz); s.quadraticCurveTo(-w, h + cz, -w, h - r + cz); s.lineTo(-w, -h + r + cz); s.quadraticCurveTo(-w, -h + cz, -w + r, -h + cz);
     const topo = new THREE.ShapeGeometry(s, 24); topo.rotateX(-Math.PI / 2);
     const mt = matTex('grama', 0xffffff, 1 / 5); mt.map.repeat.set(1 / 5, 1 / 5); mt.normalMap.repeat.set(1 / 5, 1 / 5);
     const mTopo = new THREE.Mesh(topo, mt); mTopo.receiveShadow = true; mTopo.name = 'Gramado'; root.add(mTopo);
-    const lado = new THREE.ExtrudeGeometry(s, { depth: 3, bevelEnabled: false, curveSegments: 24 }); lado.rotateX(Math.PI / 2); lado.translate(0, -0.02, 0);
+    const lado = new THREE.ExtrudeGeometry(s, { depth: 3, bevelEnabled: false, curveSegments: 24 });
+    lado.rotateX(-Math.PI / 2); lado.translate(0, -3, 0);
+    // Só laterais e fundo. A tampa da extrusão, antes a 0,1 mm do gramado
+    // na escala inicial da RA, podia provocar disputa de profundidade no Android.
+    // O índice remove essa tampa de fato, inclusive na exportação para USDZ.
+    const faces = [], normais = lado.attributes.normal;
+    for (let i = 0; i < normais.count; i += 3) {
+      if (normais.getY(i) < 0.5) faces.push(i, i + 1, i + 2);
+    }
+    lado.setIndex(faces); lado.clearGroups();
     const ml = matTex('terra', 0xffffff, 1 / 3); const mLado = new THREE.Mesh(lado, ml); mLado.name = 'Base_Terra'; root.add(mLado);
   }
 
