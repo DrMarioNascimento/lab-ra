@@ -7,7 +7,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { ARAUCARIAS_RA } from './vegetacao-ra.js?v=20261107-ra10';
-import { ajustarProporcoes, ESCALA_PERSONAGENS, FATOR_OPERADOR, ESCALA_OFICINA, FATOR_LARGURA_VIA, BITOLA, LARGURA_DORMENTE } from './proporcoes.js?v=20261107-ra10';
+import { ajustarProporcoes, ESCALA_PERSONAGENS, FATOR_OPERADOR, ESCALA_OFICINA, FATOR_LARGURA_VIA, BITOLA, LARGURA_DORMENTE } from './proporcoes.js?v=20261108-ra14';
 import { criarCidade } from './cidade.js?v=20261107-ra8';
 import { ligarRelogio } from './relogio.js?v=20261107-ra7';
 import { PERFIS, selecionarArvores } from './qualidade.js?v=20261107-ra12';
@@ -234,8 +234,9 @@ export async function criarMaquete(opts = {}) {
     return m;
   }
 
-  // operador junto à alavanca
-  const operador = modelo('operador'); operador.name = 'Operador'; operador.position.set(ALAV.x + 1.8, 0.02, ALAV.z + 3.6); operador.rotation.y = 0.35; root.add(operador);   // de frente para o jogador (câmera ao sul), de costas para a alavanca
+  // À direita da alavanca, alinhado à entrada do desvio e fora da via.
+  // A folga lateral mantém corpo e mecanismo separados na vista frontal.
+  const operador = modelo('operador'); operador.name = 'Operador'; operador.position.set(XD + 2, 0.02, ALAV.z + 2); operador.rotation.y = 0.35; root.add(operador);
 
   // grupos nos trilhos
   const grupoPrincipal = new THREE.Group(), grupoRamal = new THREE.Group(); root.add(grupoPrincipal, grupoRamal);
