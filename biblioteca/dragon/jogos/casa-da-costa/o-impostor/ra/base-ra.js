@@ -233,14 +233,16 @@
     });
 
     /* ---------- RA ---------- */
+    var rotuloPor = 'Pôr aqui';
     function montarRA() {
+      rotuloPor = $('btPor').textContent || rotuloPor;
       ra = OIRA.criar({
         renderer: renderer, camera: camera, cena: cena, altura: op.alturaDoAparelho || 1.35, miraEscala: op.miraEscala || 1,
         desenhar: desenhar,
         aoTocar: function () { porAqui(); }, /* no WebXR, tocar a tela também põe a peça */
         aoMudar: function (e) {
           if (!e.ativo && modo === 'ra') voltarParaMesa();
-          $('btPor').disabled = !(e.ativo && e.temMira);
+          $('btPor').disabled = posto ? false : !(e.ativo && e.temMira);
         }
       });
       ra.suporte().then(function (s) { if (s.webxr || s.slam) $('btRA').hidden = false; });
@@ -256,7 +258,8 @@
           estado('A RA não abriu (' + (e && e.message || e) + '). Siga aqui mesmo, girando com o dedo.');
         });
       };
-      $('btPor').onclick = porAqui;
+      $('btPor').onclick = function () { if (posto) recolocar(); else porAqui(); };
+      ligarPinca();
       /* na 8th Wall (iPhone) o toque na própria cena também põe a peça */
       renderer.domElement.addEventListener('pointerup', function () { if (modo === 'ra' && !posto) porAqui(); });
     }
@@ -267,7 +270,7 @@
        na altura op.alturaDoAparelho. Se o teste de superfície ainda não achou nada, a mira
        vai para onde o olhar do aparelho cruza esse chão — assim "Pôr aqui" sempre funciona. */
     function poseDoChao() {
-      if (ra.estado().modo !== 'slam') return null;
+      if (ra.estado().modo !== 'slam' || !ra.estado().rastreando) return null;
       var c = ra.cameraAtiva(); c.updateMatrixWorld();
       var o = new THREE.Vector3().setFromMatrixPosition(c.matrixWorld), d = c.getWorldDirection(new THREE.Vector3());
       if (d.y > -0.08) return null;
@@ -295,8 +298,34 @@
       raiz.position.setFromMatrixPosition(m); raiz.quaternion.setFromRotationMatrix(m);
       if (op.giroRA) raiz.rotateY(op.giroRA); /* qual lado da peça fica de frente para quem olha */
       raiz.scale.setScalar(op.escalaRA || 1); raiz.visible = true; posto = true;
-      ra.mostrarMira(false); $('btPor').hidden = true;
+      ra.mostrarMira(false);
+      /* O mesmo botão vira "Recolocar": escolhe outro lugar sem sair da RA. */
+      $('btPor').textContent = 'Recolocar'; $('btPor').disabled = false; $('btPor').hidden = false;
       estado(op.textoInicio || '');
+    }
+    function recolocar() {
+      if (modo !== 'ra' || !posto) return;
+      posto = false; raiz.visible = false; tinhaMira = null; pinca = null;
+      $('btPor').textContent = rotuloPor;
+      estado(op.textoMira || 'Aponte para onde a peça vai ficar e toque em Pôr aqui.');
+    }
+    /* Dois dedos ampliam ou reduzem a peça posta, sem mudar o lugar (0,25× a 4× do tamanho inicial). */
+    var pinca = null;
+    function distancia(t) { return Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY); }
+    function ligarPinca() {
+      var alvo = renderer.domElement;
+      alvo.addEventListener('touchstart', function (e) {
+        if (modo !== 'ra' || !posto || e.touches.length !== 2 || segurada) return;
+        pinca = { d: distancia(e.touches), s: raiz.scale.x }; e.preventDefault();
+      }, { passive: false });
+      alvo.addEventListener('touchmove', function (e) {
+        if (!pinca || e.touches.length !== 2) return;
+        var base = op.escalaRA || 1, nova = pinca.s * distancia(e.touches) / (pinca.d || 1);
+        raiz.scale.setScalar(Math.min(base * 4, Math.max(base * 0.25, nova))); e.preventDefault();
+      }, { passive: false });
+      ['touchend', 'touchcancel'].forEach(function (tipo) {
+        alvo.addEventListener(tipo, function (e) { if (pinca && e.touches.length < 2) pinca = null; });
+      });
     }
     function ligarBotoesRA() {
       $('btSair').onclick = function () { ra.sair(); };
@@ -310,6 +339,7 @@
       chao.visible = true; cena.background = new THREE.Color(FUNDO); controles.enabled = true;
       camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); enquadrar();
       $('btRA').hidden = false; $('btRA').disabled = false; $('btPor').hidden = true; $('btSair').hidden = true;
+      $('btPor').textContent = rotuloPor; pinca = null;
       estado(op.textoInicio || '');
     }
 

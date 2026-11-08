@@ -28,8 +28,9 @@ export function instalarCicloPortatil({experiencia,nivel=()=>1,niveis,nota='Cicl
   try{
    const result=await Promise.all([fetch(ios?usdz:glb,{method:'HEAD'})]);
    if(id!==ticket)return;if(result.some(r=>!r.ok))throw Error('arquivo ausente');
+   const bytes=Number(result[0].headers?.get?.('content-length'))||0,tamanho=bytes>0?' Arquivo de '+(bytes/1048576).toFixed(bytes>=10485760?0:1).replace('.',',')+' MB'+(bytes>15728640?'; em rede lenta pode demorar alguns minutos.':'.'):'';
    links={glb,usdz};viewer.setAttribute('ios-src',usdz);if(ios){preview.hidden=false;}else{viewer.hidden=false;viewer.setAttribute('src',glb);}
-   launch.disabled=!ios;message.textContent=ios?'Pronto para abrir no iPhone. A prévia 3D é opcional e só será baixada se você pedir.':'Carregando o ciclo. Aguarde a liberação do botão.';
+   launch.disabled=!ios;message.textContent=(ios?'Pronto para abrir no iPhone. A prévia 3D é opcional e só será baixada se você pedir.':'Carregando o ciclo. Aguarde a liberação do botão.')+tamanho;
   }catch{if(id===ticket)message.textContent='Não foi possível carregar o ciclo. Confira a conexão e tente novamente.';}
  };
  preview.onclick=()=>{if(!links)return;preview.disabled=true;viewer.hidden=false;viewer.setAttribute('src',links.glb);};

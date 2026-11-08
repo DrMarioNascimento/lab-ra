@@ -2902,6 +2902,110 @@
           "sha256": "d7eaca44df696b5eaa01dd63ccf6a22d2608eee230d42c4d5a2dbe4721f392c5"
         }
       ]
+    },
+    {
+      "data": "2026-11-08",
+      "tipo": "adaptacao-local",
+      "fonte": "DrMarioNascimento/lab-ra",
+      "commit_fonte": "9f0dc04bb9680985ce6a5f93fcef9b9d68a264a5",
+      "criterio": "Aplicação das lições da RA do Dilema do Bonde: Ampliar funcional no iPhone (tela cheia simulada onde a API não existe), áreas seguras do notch, logo preservado no retorno à biblioteca, tamanho do ciclo antes de abrir, motor 8th Wall fixado na 1.0.0, cena oculta e colocação bloqueada durante perda de rastreio, Recolocar e pinça nas salas do O Impostor. Versões anteriores guardadas com _SUBSTITUIDO_2026-11-08.",
+      "arquivos": [
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/a-mesa/js/ac-ra.js",
+          "origem": "adaptação local: RA no iPhone (tela cheia, bordas, rastreio e recolocação)",
+          "sha256_anterior": "f35efa979328a497b222356aba27fe655babf86862e9755d824e06a240c028ba",
+          "sha256": "2344e6c1b3e3f2b29379302adc17ce38df73f66bd78fdb82aacb1a4f603c1599"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/maquete/js/ac-ra.js",
+          "origem": "adaptação local: RA no iPhone (tela cheia, bordas, rastreio e recolocação)",
+          "sha256_anterior": "f35efa979328a497b222356aba27fe655babf86862e9755d824e06a240c028ba",
+          "sha256": "2344e6c1b3e3f2b29379302adc17ce38df73f66bd78fdb82aacb1a4f603c1599"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/ra/base-ra.js",
+          "origem": "adaptação local: RA no iPhone (tela cheia, bordas, rastreio e recolocação)",
+          "sha256_anterior": "d0f837006a29281da75e70cebcc600975a56926ea8fce2ac265ed2c841b3b500",
+          "sha256": "92776c98210390f162abb83896518145a12f2d48047dd6d58ca243930b501e65"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/casa-da-costa/o-impostor/ra/motor-ra.js",
+          "origem": "adaptação local: RA no iPhone (tela cheia, bordas, rastreio e recolocação)",
+          "sha256_anterior": "07f63c696634f84e600b329732afb504626579bddce0e396348efb6b2c88dc03",
+          "sha256": "0dee1fdd108c4ac9b713f42c04191a861be1d6d9c8aeaf4f2aed8b8db22e4592"
+        },
+        {
+          "arquivo": "biblioteca/dragon/jogos/o-eco-do-amanha/o-impostor/lib/ac-ra.js",
+          "origem": "adaptação local: RA no iPhone (tela cheia, bordas, rastreio e recolocação)",
+          "sha256_anterior": "f35efa979328a497b222356aba27fe655babf86862e9755d824e06a240c028ba",
+          "sha256": "2344e6c1b3e3f2b29379302adc17ce38df73f66bd78fdb82aacb1a4f603c1599"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/ciclo-portatil.js",
+          "origem": "adaptação local: RA no iPhone (tela cheia, bordas, rastreio e recolocação)",
+          "sha256_anterior": "47124402fd414c3648ed7985384335b7906dc996cc97fe07ec735bff03e340ec",
+          "sha256": "be9d503ca1b9aeafaba57dc4235b489e0662de2215c391c70271fe4ec63ec673"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/coracao/index.html",
+          "origem": "adaptação local: RA no iPhone (tela cheia, bordas, rastreio e recolocação)",
+          "sha256_anterior": "1c400216782efd4560c6f68d08990f065d22ba52977d788ddcaa14be27bfea2d",
+          "sha256": "5709ca17ce958720d98cce70ccfae00e6f91ba53c90d9656db7a0b9deeca428f"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/juncao-neuromuscular/index.html",
+          "origem": "adaptação local: RA no iPhone (tela cheia, bordas, rastreio e recolocação)",
+          "sha256_anterior": "884adff9027b2f8da6f6478ac983ee76de6de470faecc883e96bd7482be93bac",
+          "sha256": "e110bfd6194c4c74347582a291d16522927973127ea69d80746918641c68a01e"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/laboratorio.css",
+          "origem": "adaptação local: RA no iPhone (tela cheia, bordas, rastreio e recolocação)",
+          "sha256_anterior": "628c15d0d7b3af805304793f6d8d80384cf90dbc849291b2735b4f82a3a9e5b7",
+          "sha256": "3d952d2d722255feda9974dce218ee5a1ca03f0d02ddfee0372983f557cf0dd5"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/index.html",
+          "origem": "adaptação local: RA no iPhone (tela cheia, bordas, rastreio e recolocação)",
+          "sha256_anterior": "71652eebbf157dc9988009f2766a0ad2a35af3975b5c052b45846a91b0152afb",
+          "sha256": "e5e274a43b4e2967eedab18740a1012bb4b12e3cada9fd80c989df62d2e213d7"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/osso-vivo/index.html",
+          "origem": "adaptação local: RA no iPhone (tela cheia, bordas, rastreio e recolocação)",
+          "sha256_anterior": "66a87bbc86cc6a8c2ab69b3e077dc856973b072ed5f759044cec6d26b0cf6d0b",
+          "sha256": "fea8ed1dc4d18714208ab77c981f6bc5748a22b7d251e10df5fe1ca3f8b91883"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/pleura/index.html",
+          "origem": "adaptação local: RA no iPhone (tela cheia, bordas, rastreio e recolocação)",
+          "sha256_anterior": "2a55da285834ad80c699d534edcbe87dce51382ef075035b60c3981af2a110d1",
+          "sha256": "c55733d55f4612bfd1fa1e2fc792d1244ea1c1c8ffdcc51c03c36604cc980fa0"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/potencial-membrana/index.html",
+          "origem": "adaptação local: RA no iPhone (tela cheia, bordas, rastreio e recolocação)",
+          "sha256_anterior": "bdac662b5c7de149366fccb916f95c80722d523ad423285c971c7eb18a3e47e1",
+          "sha256": "8780f3b269dff99d6587ee1f045c7f96a59e0c4fbcdd8104866c90f538c601bc"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/retorno-venoso/index.html",
+          "origem": "adaptação local: RA no iPhone (tela cheia, bordas, rastreio e recolocação)",
+          "sha256_anterior": "95950c7ac709bc27f2a72dc98271a8cbb84691ebda2a761ef11396deb3a6fedd",
+          "sha256": "6e4bc48652cba26cb8d6dfdb5eef211c1861b24edff5fbf1f2b0c4763d4adeef"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/starling/index.html",
+          "origem": "adaptação local: RA no iPhone (tela cheia, bordas, rastreio e recolocação)",
+          "sha256_anterior": "1718af740e07bf2a8c45d440d568da03b1ac8aff046d0b175b22dfc02039826f",
+          "sha256": "5ec5369c918956b8f2fafeed384780c83280232d96b07c747af73aeb3e54bc6a"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/tela-cheia.js",
+          "origem": "arquivo novo do Lab-RA: tela cheia simulada no iPhone",
+          "sha256": "3476bbcac739f2b91116f74c83dfdf59f1efde2d7769c6acdeaf35f4c6f3472a"
+        }
+      ]
     }
   ],
   "ultima_sincronizacao_fisiologia": {

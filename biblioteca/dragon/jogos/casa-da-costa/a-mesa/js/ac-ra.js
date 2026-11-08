@@ -33,7 +33,7 @@
 (function (global) {
   'use strict';
 
-  var XR8_SRC = 'https://cdn.jsdelivr.net/npm/@8thwall/engine-binary@1/dist/xr.js';
+  var XR8_SRC = 'https://cdn.jsdelivr.net/npm/@8thwall/engine-binary@1.0.0/dist/xr.js';
   var carregando = null;
 
   function ehIOS() {
@@ -211,6 +211,9 @@
               if (antes !== rastreando) avisar();
             },
             onRender: function () {
+              /* Câmera perdeu o ambiente: a cena some até o rastreio voltar, em vez de
+                 ficar "colada" na tela e andar junto com o aparelho. */
+              cena.visible = rastreando;
               if (opcoes.desenhar) opcoes.desenhar(global.performance.now(), null);
             },
             onCanvasSizeChange: function () { medirCanvas(); },
@@ -233,6 +236,7 @@
     }
 
     function atualizarMiraSlam(XR8) {
+      if (!rastreando) { temMira = false; return; } /* sem rastreio, nada de mira nem de colocar */
       var hits = [];
       try { hits = XR8.XrController.hitTest(0.5, 0.5, ['DETECTED_SURFACE', 'ESTIMATED_SURFACE', 'FEATURE_POINT']) || []; } catch (e) { hits = []; }
       var melhor = null, ordem = { DETECTED_SURFACE: 0, ESTIMATED_SURFACE: 1, FEATURE_POINT: 2 };
@@ -270,6 +274,7 @@
     function terminar() {
       var eraSlam = modo === 'slam';
       modo = 'nenhum'; temMira = false; rastreando = false; mira.visible = false;
+      cena.visible = true;
       document.body.classList.remove('in-ar', 'ra-webxr', 'ra-slam');
       renderer.setClearAlpha(1);
       if (eraSlam) {
