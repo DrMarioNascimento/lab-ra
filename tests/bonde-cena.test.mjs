@@ -66,10 +66,10 @@ for(const [tipo,maquete] of [['RA',m],['3D',m3d],['Econômica',economica]])test(
   }
 });
 
-test('bolas verdes removidas e operador destacado com 5,67 unidades de altura',()=>{
+test('bolas verdes removidas e operador destacado com 6,51 unidades de altura',()=>{
   for(const cena of [m,m3d]) for(const nome of ['Arbustos_Flores','Floreiras','Objetos_Patio_folhagem','Objetos_Patio_flores_rosa']) assert(!cena.root.getObjectByName(nome),nome);
   const altura=new THREE.Box3().setFromObject(m.focos.operador,true).getSize(new THREE.Vector3()).y;
-  assert(Math.abs(altura-5.67)<.001);
+  assert(Math.abs(altura-6.51)<.001);
 });
 for(const [tipo,maquete] of [['RA',m],['3D',m3d]])test(`oficina deixa passagem livre para o bonde largo em ${tipo}, inclusive nas curvas`,()=>{
   const m=maquete;

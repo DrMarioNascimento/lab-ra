@@ -44,7 +44,7 @@
       link.setAttribute('aria-disabled', 'true');
       status.textContent = 'Preparando a nova rodada. Aguarde antes de abrir a RA.';
       try {
-        const { prepararPersonagens } = await import('./personagens.js?v=20261108-ra13');
+        const { prepararPersonagens } = await import('./personagens.js?v=20261108-ra14');
         const proxima = await prepararPersonagens(proximaConfig);
         configNativa=registrarEntrada(proximaConfig);pronta=true;
         $('instrucaoAR').textContent='Pronto. Toque na maquete para abrir em realidade aumentada.';
@@ -85,7 +85,7 @@
       try {
         const config=novaEntrada({...lerConfig(),qualidade:qualidade.value},app?.configAtual?.());
         if(app)await app.prepararNova(config);
-        else {const modulo=await import('./web.js?v=20261108-ra13');app=await modulo.preparar({config,informar:t=>{estado.textContent=t;}});}
+        else {const modulo=await import('./web.js?v=20261108-ra14');app=await modulo.preparar({config,informar:t=>{estado.textContent=t;}});}
         registrarEntrada(config);
         qualidade.disabled=true;botao.textContent = 'Abrir em realidade aumentada';
         estado.textContent = 'Pronto. Toque para abrir a câmera e aponte para a mesa ou o chão.';

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { criarMaquete } from '../js/cena.js?v=20261108-ra13';
+import { criarMaquete } from '../js/cena.js?v=20261108-ra14';
 import motor from './rastreador.js?v=20261107-ra12';
 import { ligarGestos } from './gestos.js?v=20261107-ra12';
 import { criarAvisos } from './avisos.js?v=20261107-ra4';
