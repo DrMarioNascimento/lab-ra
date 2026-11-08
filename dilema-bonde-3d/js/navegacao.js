@@ -51,7 +51,7 @@ export function criarNavegacao({camera,controls,canvas,maquete,documento=documen
   documento.getElementById('vista').onchange=e=>focar(e.target.value);
   documento.getElementById('visaoGeral').onclick=()=>{focar('geral');documento.getElementById('vista').value='geral';};
   const teclado=e=>{
-    if(e.ctrlKey||e.metaKey||e.altKey||e.isComposing||e.target.closest('input,textarea,select,[contenteditable="true"]'))return;
+    if(e.ctrlKey||e.metaKey||e.altKey||e.isComposing||e.target.closest('input,textarea,select,[role="dialog"],[contenteditable="true"]'))return;
     const a={ArrowLeft:()=>mover(-1,0),ArrowRight:()=>mover(1,0),ArrowUp:()=>mover(0,1),ArrowDown:()=>mover(0,-1),'+':()=>zoom(.8),'=':()=>zoom(.8),'-':()=>zoom(1.25),'r':()=>focar('geral'),'R':()=>focar('geral')}[e.key];
     if(a){e.preventDefault();a();}
   };

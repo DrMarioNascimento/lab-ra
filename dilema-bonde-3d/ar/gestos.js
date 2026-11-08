@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 // A transformação atua na âncora, preservando o movimento do bonde e dos personagens.
-export function ligarGestos({ elemento, alvo, camera, podeMover, aoToque, aoAlterar = () => {} }) {
+export function ligarGestos({ elemento, alvo, camera, podeMover, podeAjustar = podeMover, aoToque, aoAlterar = () => {} }) {
   const dedos = new Map(), raio = new THREE.Raycaster(), ndc = new THREE.Vector2();
   let inicio = null, consumido = false;
   function amostra() {
@@ -77,7 +77,7 @@ export function ligarGestos({ elemento, alvo, camera, podeMover, aoToque, aoAlte
   return {
     ocupado: () => dedos.size > 0,
     limpar() { dedos.clear(); inicio = null; consumido = false; },
-    ampliar(fator) { if (podeMover()) { tamanho(alvo.scale.x*fator); rebase(); } },
-    restaurarTamanho() { if (podeMover()) { tamanho(1); rebase(); } },
+    ampliar(fator) { if (podeAjustar()) { tamanho(alvo.scale.x*fator); rebase(); } },
+    restaurarTamanho() { if (podeAjustar()) { tamanho(1); rebase(); } },
   };
 }

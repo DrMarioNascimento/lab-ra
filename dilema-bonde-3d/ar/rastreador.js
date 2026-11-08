@@ -176,7 +176,7 @@ const motor = (function (global) {
     /* ---------------- 8th Wall (iPhone) ---------------- */
     function medirCanvas() {
       if (!canvasCamera) return;
-      var r = renderer.domElement.getBoundingClientRect(), dpr = Math.min(global.devicePixelRatio || 1, 2);
+      var r = renderer.domElement.getBoundingClientRect(), dpr = Math.min(global.devicePixelRatio || 1, opcoes.pixelRatioCamera || 2);
       canvasCamera.style.left = r.left + 'px'; canvasCamera.style.top = r.top + 'px';
       canvasCamera.style.width = r.width + 'px'; canvasCamera.style.height = r.height + 'px';
       var w = Math.max(2, Math.round(r.width * dpr)), h = Math.max(2, Math.round(r.height * dpr));

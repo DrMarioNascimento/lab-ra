@@ -10,6 +10,8 @@ import { ARAUCARIAS_RA } from './vegetacao-ra.js?v=20261107-ra10';
 import { ajustarProporcoes, ESCALA_PERSONAGENS, FATOR_OPERADOR, ESCALA_OFICINA, FATOR_LARGURA_VIA, BITOLA, LARGURA_DORMENTE } from './proporcoes.js?v=20261107-ra10';
 import { criarCidade } from './cidade.js?v=20261107-ra8';
 import { ligarRelogio } from './relogio.js?v=20261107-ra7';
+import { PERFIS, selecionarArvores } from './qualidade.js?v=20261107-ra11';
+import { criarPlaca } from './placa.js?v=20261107-ra11';
 
 export const Y_TRILHO = 0.42;
 const L = 46, R = 30, ZT = -30, ZB = 30;          // anel mais longo para ampliar a área interna
@@ -96,10 +98,14 @@ const distVia = (x, z) => { let m = 1e9; for (const [a, b] of amostrasVia) m = M
 // =====================================================================
 export async function criarMaquete(opts = {}) {
   const root = new THREE.Group(); root.name = 'Maquete';
+  const perfil=PERFIS[opts.qualidade]||PERFIS.equilibrada;
+  root.userData.qualidade=opts.qualidade||'equilibrada';
   const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
   // versões leves (sufixo _ra) para a RA nativa do iPhone: o USDZ guarda a geometria em texto
   const LEVES = new Set(['araucaria', 'arvore', 'arvore_nova1', 'oficina', 'cientista', 'colega', 'criancas', 'desconhecidos', 'estudante', 'gestante', 'idoso', 'operador', 'trabalhador', 'vinculo']);
-  const nomeArq = url => { const b = url.replace('.glb', ''); return opts.ra && LEVES.has(b) ? b + '_ra.glb' : url; };
+  const nomeArq = url => { const b = url.replace('.glb', '');
+    if(b==='arvore'||b==='arvore_nova1')return b+'_'+perfil.arvores+'.glb';
+    return (opts.ra||opts.qualidade!=='detalhada') && LEVES.has(b) ? b + '_ra.glb' : url; };
   const carregar = url => new Promise((ok, erro) => loader.load(BASE + nomeArq(url), g => ok(g.scene), undefined, erro));
 
   // ---------- terreno da maquete (base com bordas de terra) ----------
@@ -251,7 +257,7 @@ export async function criarMaquete(opts = {}) {
     const fant = grupo.userData.fantasmas;
     // Os fantasmas são irmãos das pessoas: recebem seu centro, sem herdar
     // a redução de escala dos personagens durante o impacto.
-    if (fant) { fant.clear(); fant.position.copy(centro); }
+    if (fant) { fant.traverse(o=>{if(o.geometry&&o.geometry!==geoFantasma)o.geometry.dispose();if(o.material&&o.material!==matFantasma&&o.material!==matOlho)o.material.dispose();}); fant.clear(); fant.position.copy(centro); }
     for (let i = 0; i < n; i++) {
       const p = modelo(preset); p.position.x = (i - (n - 1) / 2) * 0.85 * ESC_PERS; p.position.z = (i % 2) * 0.25 - 0.1; p.rotation.y = (i - (n - 1) / 2) * 0.12; grupo.add(p);
       const f = criarFantasma(); f.position.copy(p.position); f.userData.base = p.position.clone(); fant.add(f);
@@ -260,7 +266,8 @@ export async function criarMaquete(opts = {}) {
 
   const cidade = criarCidade(matTex('pedra', 0xffffff, 1), matTex('madeira', 0x586477, 1));
   root.add(cidade);
-  const construcoes = [new THREE.Box3().setFromObject(estacao, true), new THREE.Box3().setFromObject(oficina, true), ...cidade.userData.volumes];
+  const {placa,alvos:alvosMenu}=criarPlaca(matTex('madeira',0x9d683c,1));root.add(placa);
+  const construcoes = [new THREE.Box3().setFromObject(estacao, true), new THREE.Box3().setFromObject(oficina, true),new THREE.Box3().setFromObject(placa,true), ...cidade.userData.volumes];
 
   // ---------- vegetação e pedras ----------
   {
@@ -288,9 +295,11 @@ export async function criarMaquete(opts = {}) {
           M.compose(T, Q, S).multiply(p.matrixWorld); inst.setMatrixAt(i, M); });
         root.add(inst);
       } };
-    instanciar(arvoreAntigaGLB, antigas, 6.5, 'Arvores_Copa_Larga');
-    instanciar(arvoreGLB, arvoresGLB, 6.5, 'Arvores');
-    instanciar(araucariaGLB, opts.ra ? ARAUCARIAS_RA : araucarias, 13, 'Araucarias');
+    const escolhidas=selecionarArvores(arvoresGLB,antigas,perfil.quantidade);
+    instanciar(arvoreAntigaGLB, escolhidas.antigas, 6.5, 'Arvores_Copa_Larga');
+    instanciar(arvoreGLB, escolhidas.novas, 6.5, 'Arvores');
+    instanciar(araucariaGLB, ARAUCARIAS_RA, 13, 'Araucarias');
+    root.userData.arvoresComuns=escolhidas.antigas.length+escolhidas.novas.length;
     mesh(pedras.map(g => tingir(g, 0xffffff)), matTex('pedra', 0xa8a49c, 0.5, { vertexColors: true }), 'Pedras');
 
 
@@ -314,7 +323,7 @@ export async function criarMaquete(opts = {}) {
     if (instantaneo) estado.agulha = estado.agulhaAlvo;
   }
   const api = {
-    root, estado, S_DESVIO, focos: { bonde, oficina, operador, estacao },
+    root, estado, S_DESVIO, alvosMenu, focos: { bonde, oficina, operador, estacao, placa },
     get rota() { return estado.rota; },
     // troca a posição do desvio (só antes de o bonde passar pela agulha)
     alternarAlavanca() { if (estado.travado) return false; estado.rota = estado.rota === 'principal' ? 'ramal' : 'principal'; aplicarAlavanca(false); posicionarBonde(); return true; },
@@ -332,7 +341,9 @@ export async function criarMaquete(opts = {}) {
       await garantirPersonagens([presetPrincipal, presetRamal]);
       estado.presets = [presetPrincipal, presetRamal];
       montarGrupo(grupoPrincipal, POS_PRINCIPAL, presetPrincipal, nPrincipal);
-      montarGrupo(grupoRamal, POS_RAMAL, presetRamal, nRamal);
+      const centroRamal=POS_RAMAL.clone();centroRamal.x-=Math.max(0,nRamal-3)*.85*ESC_PERS/2;
+      montarGrupo(grupoRamal, centroRamal, presetRamal, nRamal);
+      S_ALVO.ramal=sNoPonto(ROTAS.ramal,centroRamal.x,centroRamal.z);
       // pessoas ficam de frente para a câmera (sul)
     },
     partir() { if (!estado.rodando) { estado.rodando = true; } },
