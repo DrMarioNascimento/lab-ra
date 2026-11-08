@@ -4,3 +4,37 @@
 .menu-painel #ajustes{position:static;color:#263448}.menu-painel #ajustes .painel{background:none;box-shadow:none;margin:0;padding:0}.menu-painel #ajustes .ico{min-width:44px}.menu-painel #ajudaRA{background:#e0e8ef;color:#263448;border:1px solid #acb8c7}
 .menu-painel #colocar{position:static;margin:12px auto;min-height:44px}
 .menu-na-entrada #inicio{padding-top:max(80px,calc(env(safe-area-inset-top) + 70px))}
+
+/* RA12: madeira, azul da estação, creme e âmbar; relevo também nos controles. */
+.menu-host{--madeira:#705238;--creme:#f4ecd9;--azul:#294b65;--tinta:#263d40;--borda:#bda27c;color:var(--tinta)}
+.menu-botao{background:linear-gradient(#436b82,#263f52);border:1px solid #afc1ba;box-shadow:inset 0 2px 0 #fff3,0 5px 0 #172c38,0 8px 16px #0003}
+.menu-botao:active{transform:translateY(3px);box-shadow:inset 0 1px 0 #fff2,0 2px 0 #172c38}
+.menu-fundo{background:#162c35a6}
+.menu-painel{background:linear-gradient(135deg,#fbf5e7,#e8dcc3);border:3px solid #94744f;box-shadow:inset 0 2px 0 #fff,0 7px 0 #503c2b,0 16px 40px #10202780;border-radius:22px;padding:18px;color:var(--tinta)}
+.menu-painel header{padding:13px 14px;margin:-2px -2px 12px;border:1px solid #153345;border-radius:12px;background:linear-gradient(#426b83,#29495e);color:#fff2d7;box-shadow:inset 0 2px 0 #a9c4cd80,0 4px 0 #1a3444,0 6px 12px #18333e30}
+.menu-painel h2{letter-spacing:.2px;text-shadow:0 2px #142f40}
+.menu-painel button{border:1px solid #ad906b;background:linear-gradient(#fff8e7,#e7d7b6);color:var(--tinta);box-shadow:inset 0 2px 0 #fff,0 4px 0 #967953,0 6px 8px #44382424;transition:transform .12s,box-shadow .12s}
+.menu-painel button:active{transform:translateY(3px);box-shadow:inset 0 1px 0 #fff9,0 1px 0 #967953}
+.menu-painel button:disabled{opacity:.55;transform:none}
+.menu-painel select,.menu-painel input:not([type=checkbox]){background:linear-gradient(#f5eddc,#fffdf5);color:var(--tinta);border:1px solid #ad9675;box-shadow:inset 0 2px 4px #775f3926,0 1px 0 #fff}
+.menu-painel input[type=checkbox]{accent-color:#3f6957}
+.menu-painel details{background:linear-gradient(110deg,#fffaf0,#f1e6ce);border:1px solid #c0a782;border-left:5px solid #8b704d;box-shadow:inset 0 1px 0 #fff,0 4px 0 #c4b08c,0 6px 10px #59482a18;margin:14px 0;padding:10px 12px}
+.menu-painel details[open]{border-left-color:#315a73}
+.menu-painel summary{min-height:44px;align-content:center;color:#294b60;line-height:1.35}
+.menu-painel fieldset{border:1px solid #c5af8a;background:#e8dcc269;box-shadow:inset 0 2px 4px #6e563221,0 1px #fff;border-radius:12px}
+.menu-painel legend{color:#355849;padding:0 5px}
+.menu-painel .menu-nota,.menu-painel .menu-pausa{color:#52645e}
+.menu-painel .menu-pausa{padding:9px 11px;border-radius:9px;background:#e2e8dd;box-shadow:inset 0 1px 3px #24453a24}
+.menu-painel footer{padding:10px 0 4px}
+.menu-painel footer button:first-child{background:linear-gradient(#4e7d99,#315a73);border-color:#224258;color:#fff5df;box-shadow:inset 0 2px 0 #b2d1df80,0 4px 0 #1c3b50,0 7px 10px #203b4226}
+.menu-painel footer button:first-child:active{box-shadow:0 1px 0 #1c3b50}
+.menu-painel .indicador{padding:10px 12px;background:#fff9ec;border:1px solid #d4c09d;border-radius:10px;box-shadow:inset 0 1px #fff,0 3px 0 #c8b38f}
+.menu-painel meter{height:20px;accent-color:#496e58}
+.menu-painel #ajudaRA{background:#e2e8dd;color:#294c40;border-color:#a7b7a8}
+#inicio>div,#carregando>div{border:2px solid #9e815b;border-radius:24px;background:linear-gradient(145deg,#304d60,#1b303f);box-shadow:inset 0 2px 0 #d2dfd038,0 7px 0 #10232f,0 16px 36px #0005;padding:24px}
+#carregando>div{max-width:calc(100vw - 24px)}
+#inicio #linkAR{background:linear-gradient(#cc9b52,#9a672c);box-shadow:inset 0 2px 0 #ffdc9a,0 5px 0 #63401e,0 10px 20px #0005}
+#inicio button:not(.secundario){background:linear-gradient(#4e7d99,#315a73);box-shadow:inset 0 2px 0 #b2d1df80,0 5px 0 #1c3b50,0 10px 20px #0004}
+@media(hover:hover){.menu-painel button:not(:disabled):hover,.menu-botao:hover{filter:brightness(1.06)}}
+@media(max-width:560px){.menu-painel{padding:12px}.menu-painel header{padding:10px}.menu-painel details{padding:8px}.menu-grade{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}#inicio>div{padding:18px 13px}}
+@media(prefers-reduced-motion:reduce){.menu-painel button{transition:none}}

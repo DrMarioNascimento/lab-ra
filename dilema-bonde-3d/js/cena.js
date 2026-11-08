@@ -10,8 +10,8 @@ import { ARAUCARIAS_RA } from './vegetacao-ra.js?v=20261107-ra10';
 import { ajustarProporcoes, ESCALA_PERSONAGENS, FATOR_OPERADOR, ESCALA_OFICINA, FATOR_LARGURA_VIA, BITOLA, LARGURA_DORMENTE } from './proporcoes.js?v=20261107-ra10';
 import { criarCidade } from './cidade.js?v=20261107-ra8';
 import { ligarRelogio } from './relogio.js?v=20261107-ra7';
-import { PERFIS, selecionarArvores } from './qualidade.js?v=20261107-ra11';
-import { criarPlaca } from './placa.js?v=20261107-ra11';
+import { PERFIS, selecionarArvores } from './qualidade.js?v=20261107-ra12';
+import { criarPlaca } from './placa.js?v=20261107-ra12';
 
 export const Y_TRILHO = 0.42;
 const L = 46, R = 30, ZT = -30, ZB = 30;          // anel mais longo para ampliar a área interna
@@ -230,7 +230,7 @@ export async function criarMaquete(opts = {}) {
   // grupos nos trilhos
   const grupoPrincipal = new THREE.Group(), grupoRamal = new THREE.Group(); root.add(grupoPrincipal, grupoRamal);
   for (const g of [grupoPrincipal, grupoRamal]) { const f = new THREE.Group(); f.name = 'Fantasmas'; g.userData.fantasmas = f; root.add(f); }
-  const POS_PRINCIPAL = V(4, 0.27, ZB), POS_RAMAL = V(-8, 0.27, ZR);
+  const POS_PRINCIPAL = V(-14, 0.27, ZB), POS_RAMAL = V(-10, 0.27, ZR);
   const S_ALVO = { principal: sNoPonto(ROTAS.principal, POS_PRINCIPAL.x, POS_PRINCIPAL.z), ramal: sNoPonto(ROTAS.ramal, POS_RAMAL.x, POS_RAMAL.z) };
   // FANTASMINHA (como no Dilema do Bonde 2D): corpo branco translúcido, barra ondulada, olhos e sorriso
   const matFantasma = new THREE.MeshStandardMaterial({ name: 'fantasma', color: 0xf5f7f8, emissive: 0x9aa3a8, emissiveIntensity: 0.35, roughness: 0.6, transparent: true, opacity: 0.88, depthWrite: false });
@@ -242,7 +242,7 @@ export async function criarMaquete(opts = {}) {
     g.computeVertexNormals(); return g;
   })();
   function criarFantasma() {
-    const f = new THREE.Group(); f.name = 'Fantasma';
+    const f = new THREE.Group(); f.name = 'Fantasma'; f.userData.fantasma = true; f.userData.escalaNativa = ESC_PERS * 0.95;
     f.add(new THREE.Mesh(geoFantasma, matFantasma));
     for (const sx of [-1, 1]) {
       const o = new THREE.Mesh(new THREE.SphereGeometry(0.1, 14, 10), matOlho); o.scale.set(1, 1.15, 0.5); o.position.set(sx * 0.19, 1.98, 0.5); f.add(o);
@@ -258,15 +258,18 @@ export async function criarMaquete(opts = {}) {
     // Os fantasmas são irmãos das pessoas: recebem seu centro, sem herdar
     // a redução de escala dos personagens durante o impacto.
     if (fant) { fant.traverse(o=>{if(o.geometry&&o.geometry!==geoFantasma)o.geometry.dispose();if(o.material&&o.material!==matFantasma&&o.material!==matOlho)o.material.dispose();}); fant.clear(); fant.position.copy(centro); }
+    let esquerda=Infinity;
     for (let i = 0; i < n; i++) {
-      const p = modelo(preset); p.position.x = (i - (n - 1) / 2) * 0.85 * ESC_PERS; p.position.z = (i % 2) * 0.25 - 0.1; p.rotation.y = (i - (n - 1) / 2) * 0.12; grupo.add(p);
+      const p = modelo(preset); p.position.x = (i - (n - 1) / 2) * 0.85 * ESC_PERS; p.position.z = (i % 2) * 0.25 - 0.1; p.rotation.y = (i - (n - 1) / 2) * 0.12; esquerda=Math.min(esquerda,new THREE.Box3().setFromObject(p,true).min.x); grupo.add(p);
       const f = criarFantasma(); f.position.copy(p.position); f.userData.base = p.position.clone(); fant.add(f);
     }
+    grupo.userData.esquerda=centro.x+(Number.isFinite(esquerda)?esquerda:0);
   }
 
   const cidade = criarCidade(matTex('pedra', 0xffffff, 1), matTex('madeira', 0x586477, 1));
   root.add(cidade);
-  const {placa,alvos:alvosMenu}=criarPlaca(matTex('madeira',0x9d683c,1));root.add(placa);
+  const madeiraPlacas=matTex('madeira',0xc7a276,1,{roughness:.88});
+  const {placa,alvos:alvosMenu}=criarPlaca(madeiraPlacas);root.add(placa);
   const construcoes = [new THREE.Box3().setFromObject(estacao, true), new THREE.Box3().setFromObject(oficina, true),new THREE.Box3().setFromObject(placa,true), ...cidade.userData.volumes];
 
   // ---------- vegetação e pedras ----------
@@ -323,7 +326,7 @@ export async function criarMaquete(opts = {}) {
     if (instantaneo) estado.agulha = estado.agulhaAlvo;
   }
   const api = {
-    root, estado, S_DESVIO, alvosMenu, focos: { bonde, oficina, operador, estacao, placa },
+    root, estado, S_DESVIO, alvosMenu, madeiraPlacas, gruposCena:{principal:grupoPrincipal,ramal:grupoRamal}, focos: { bonde, oficina, operador, estacao, placa },
     get rota() { return estado.rota; },
     // troca a posição do desvio (só antes de o bonde passar pela agulha)
     alternarAlavanca() { if (estado.travado) return false; estado.rota = estado.rota === 'principal' ? 'ramal' : 'principal'; aplicarAlavanca(false); posicionarBonde(); return true; },

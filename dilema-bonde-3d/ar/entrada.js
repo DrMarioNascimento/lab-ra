@@ -1,7 +1,7 @@
-/* O caminho nativo não importa Three, não cria WebGL e não espera um download no toque. */
+/* Entrada nativa leve: prepara sob demanda; o segundo toque abre o arquivo pronto no gesto do Safari. */
 (async function () {
   'use strict';
-  const {lerConfig,salvarConfig,normalizar,sortear}=await import('../js/configuracao.js?v=20261107-ra11');
+  const {lerConfig,salvarConfig,novaEntrada,registrarEntrada,sortear}=await import('../js/configuracao.js?v=20261107-ra12');
   const $ = id => document.getElementById(id);
   const ios = /iPad|iPhone|iPod/.test(navigator.userAgent)
     || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -19,9 +19,14 @@
     // Nunca retirar rel="ar": um resultado negativo não deve transformar RA em navegação/download.
     trocar.hidden = false;
     if (ios && !suporta) status.textContent = 'Abra esta página no Safari para usar a realidade aumentada. Em navegadores internos de aplicativos, a RA pode não abrir.';
-    let preparando = false, url = null;
+    let preparando = false, pronta = false, url = null;
+    $('instrucaoAR').textContent='Toque na maquete para preparar uma nova combinação.';
+    $('paresAR').textContent='Os personagens e as quantidades variam a cada entrada.';
     link.addEventListener('click', event => {
       if (preparando) { event.preventDefault(); return; }
+      if(!pronta){event.preventDefault();gerar(novaEntrada(lerConfig(),configNativa)).catch(()=>{});return;}
+      // A próxima abertura prepara outra combinação; este toque continua nativo.
+      pronta=false;$('instrucaoAR').textContent='Na próxima entrada, toque para preparar outra combinação.';
       // Como na Célula Viva, sair pelo documento superior quando há iframe de mesma origem.
       let doc;
       try { if (window.top !== window && window.top.document) doc = window.top.document; } catch {}
@@ -32,16 +37,17 @@
       a.appendChild(doc.createElement('img')); a.hidden = true; doc.body.appendChild(a);
       a.click(); setTimeout(() => a.remove(), 4000);
     });
-    let configNativa=normalizar({qualidade:lerConfig().qualidade});
+    let configNativa=lerConfig();
     const gerar=async proximaConfig=> {
       if (preparando) return;
       preparando = true; trocar.disabled = true; trocar.textContent = 'Preparando personagens…';
       link.setAttribute('aria-disabled', 'true');
       status.textContent = 'Preparando a nova rodada. Aguarde antes de abrir a RA.';
       try {
-        const { prepararPersonagens } = await import('./personagens.js?v=20261107-ra11');
+        const { prepararPersonagens } = await import('./personagens.js?v=20261107-ra12');
         const proxima = await prepararPersonagens(proximaConfig);
-        configNativa=proximaConfig;
+        configNativa=registrarEntrada(proximaConfig);pronta=true;
+        $('instrucaoAR').textContent='Pronto. Toque na maquete para abrir em realidade aumentada.';
         const anterior = url; url = proxima.url;
         link.href = url + '#allowsContentScaling=1'; link.setAttribute('download', 'dilema-bonde.usdz');
         $('paresAR').textContent = proxima.descricao;
@@ -50,15 +56,16 @@
       } catch (error) {
         console.warn('[Bonde RA] Preparação indisponível:', error);
         // Mantém arquivo E descrição da última rodada válida, inclusive após falha de rede.
-        status.textContent = 'Não foi possível trocar os personagens. A rodada indicada abaixo continua disponível; tente novamente quando a conexão melhorar.';
+        pronta=!!url;
+        status.textContent = url?'Não foi possível trocar os personagens. A rodada indicada abaixo continua disponível; tente novamente quando a conexão melhorar.':'Não foi possível preparar a maquete. Toque novamente para tentar com uma conexão melhor.';
         throw error;
       } finally {
         preparando = false; trocar.disabled = false; trocar.textContent = 'Trocar personagens';
         link.removeAttribute('aria-disabled');
       }
     };
-    trocar.onclick=()=>gerar(sortear(configNativa)).catch(()=>{});
-    const {criarMenu}=await import('../js/menu.js?v=20261107-ra11');
+    trocar.onclick=()=>gerar(sortear(configNativa,{quantidades:true})).catch(()=>{});
+    const {criarMenu}=await import('../js/menu.js?v=20261107-ra12');
     criarMenu({modo:'nativo',config:()=>configNativa,aplicar:gerar});
     addEventListener('pagehide', e => { if (!e.persisted && url) URL.revokeObjectURL(url); });
     return;
@@ -72,11 +79,14 @@
   botao.onclick = async () => {
     if (botao.disabled) return;
     botao.disabled = true;
-    if (!app) {
+    if(app&&app.qualidade!==lerConfig().qualidade){location.reload();return;}
+    if (!app || app.precisaNova?.()) {
       estado.textContent = 'Preparando a maquete…';
       try {
-        const modulo = await import('./web.js?v=20261107-ra11');
-        app = await modulo.preparar({ config:salvarConfig({...lerConfig(),qualidade:qualidade.value}), informar: t => { estado.textContent = t; } });
+        const config=novaEntrada({...lerConfig(),qualidade:qualidade.value},app?.configAtual?.());
+        if(app)await app.prepararNova(config);
+        else {const modulo=await import('./web.js?v=20261107-ra12');app=await modulo.preparar({config,informar:t=>{estado.textContent=t;}});}
+        registrarEntrada(config);
         qualidade.disabled=true;botao.textContent = 'Abrir em realidade aumentada';
         estado.textContent = 'Pronto. Toque para abrir a câmera e aponte para a mesa ou o chão.';
       } catch (error) {

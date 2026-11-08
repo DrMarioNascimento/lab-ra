@@ -1,7 +1,7 @@
-import {mudaRodada} from './configuracao.js?v=20261107-ra11';
-import {criarRodada} from './rodada.js?v=20261107-ra11';
-import {criarMenu} from './menu.js?v=20261107-ra11';
-import {criarSom} from './som.js?v=20261107-ra11';
+import {mudaRodada} from './configuracao.js?v=20261107-ra12';
+import {criarRodada} from './rodada.js?v=20261107-ra12';
+import {criarMenu} from './menu.js?v=20261107-ra12';
+import {criarSom} from './som.js?v=20261107-ra12';
 export function ligarInterface({m,config,pai,modo='pc',status=()=>{},aoMenu=()=>{},aoConfig=()=>{}}){
   const $=id=>document.getElementById(id);let menu,continuar=false,travadoAnterior=false;
   const som=criarSom(()=>rodada.config());

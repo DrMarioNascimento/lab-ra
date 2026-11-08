@@ -1,8 +1,8 @@
-import { criarMaquete } from '../js/cena.js?v=20261107-ra11';
-import { montarUSDZ } from './quicklook.js?v=20261107-ra11';
+import { criarMaquete } from '../js/cena.js?v=20261107-ra12';
+import { montarUSDZ } from './quicklook.js?v=20261107-ra12';
 
-import {normalizar,grupos,PAPEIS} from '../js/configuracao.js?v=20261107-ra11';
-import {qualidadeDoAparelho} from '../js/qualidade.js?v=20261107-ra11';
+import {normalizar,grupos,textoGrupo} from '../js/configuracao.js?v=20261107-ra12';
+import {qualidadeDoAparelho} from '../js/qualidade.js?v=20261107-ra12';
 export async function prepararPersonagens(config) {
   const c=normalizar(config);
   const m=await criarMaquete({grupos:grupos(c),velocidade:c.velocidade,qualidade:qualidadeDoAparelho(c.qualidade),ra:true});
@@ -18,7 +18,7 @@ export async function prepararPersonagens(config) {
   try {
     const { usdz } = await montarUSDZ(m);
     return { url: URL.createObjectURL(new Blob([usdz], { type: 'model/vnd.usdz+zip' })),
-      descricao: `Trilho principal: ${c.nPrincipal} (${PAPEIS[c.principal]}). Ramal: ${c.nRamal} (${PAPEIS[c.ramal]}).` };
+      descricao: `Trilho principal: ${textoGrupo(c.principal,c.nPrincipal)}. Ramal: ${textoGrupo(c.ramal,c.nRamal)}.` };
   } finally {
     guardar(); geometrias.forEach(g => g.dispose()); materiais.forEach(mat => mat.dispose());
     texturas.forEach(t => { t.dispose(); t.source?.data?.close?.(); });

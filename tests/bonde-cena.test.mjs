@@ -164,3 +164,16 @@ test('cinco personagens no ramal preservam folga da oficina e recalculam o impac
 test('perfil Econômico conserva araucárias e cena abaixo de 400 mil triângulos',()=>{
  assert.equal(economica.root.userData.arvoresComuns,18);let n=0;economica.root.traverseVisible(o=>{if(o.isMesh)n+=(o.geometry.index?.count||o.geometry.attributes.position.count)/3*(o.isInstancedMesh?o.count:1);});assert(n<400000,'orçamento econômico: '+n);assert.equal(economica.root.getObjectByName('Araucarias').count,2);if(process.env.BONDE_METRICAS)console.log('Triângulos Econômica: '+n);
 });
+
+test('grupos e rótulos têm referências à esquerda da oficina também com cinco pessoas',async()=>{
+ for(const n of [1,3,5]){
+  await m.configurar({presetPrincipal:'trabalhador',nPrincipal:n,presetRamal:'desconhecidos',nRamal:n});
+  const oficina=new THREE.Box3().setFromObject(m.focos.oficina,true);
+  for(const g of Object.values(m.gruposCena)){const b=new THREE.Box3().setFromObject(g,true);assert(b.max.x+.5<oficina.min.x);assert(Math.abs(g.userData.esquerda-b.min.x)<.001);}
+ }
+ await m.configurar();m.reiniciar();
+});
+test('placa de madeira está no gramado frontal e preserva textura e relevo',()=>{
+ assert.equal(m.focos.placa.position.x,32);assert.equal(m.focos.placa.position.z,44);
+ for(const alvo of m.alvosMenu){assert(alvo.material.map);assert(alvo.geometry.parameters.options.bevelEnabled);}
+});

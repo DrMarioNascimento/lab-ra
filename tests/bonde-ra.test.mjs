@@ -19,7 +19,7 @@ async function harness({ua='iPhone',platform='',touch=0,ar=true,top=false,search
     addEventListener(k,f){this.events[k]=f;} appendChild(e){this.children.push(e);return e;}
     click(){clicked.push(this);} remove(){}
   }
-  const els=Object.fromEntries(['nativo','web','linkAR','statusAR','trocarAR','paresAR','comecar','estadoEntrada','voltarNativo','instalarRA','qualidadeEntrada'].map(id=>[id,new Element()]));
+  const els=Object.fromEntries(['nativo','web','linkAR','statusAR','trocarAR','paresAR','comecar','estadoEntrada','voltarNativo','instalarRA','qualidadeEntrada','instrucaoAR'].map(id=>[id,new Element()]));
   els.web.hidden=true;els.trocarAR.hidden=true;els.linkAR.href='maquete.usdz?v=20261107-ra1';els.linkAR.rel='ar';els.paresAR.textContent='rodada padrão';
   const doc={getElementById:id=>els[id],createElement:()=>new Element(),body:new Element()};
   const window={matchMedia:()=>({matches:displayMode})};window.top=top?{document:doc}:window;
@@ -45,7 +45,7 @@ test('detecção negativa em navegador interno não transforma RA em download co
   const {els}=await harness({ar:false});assert.equal(els.linkAR.rel,'ar');assert.match(els.statusAR.textContent,/Safari/);
 });
 test('iframe abre link AR pelo documento superior no mesmo toque',async()=>{
-  const {els,clicked}=await harness({top:true});let prevented=false;
+  const {els,clicked}=await harness({top:true,load:async()=>({prepararPersonagens:async()=>({url:'blob:pronta',descricao:'rodada'})})});await els.trocarAR.onclick();let prevented=false;
   els.linkAR.events.click({preventDefault(){prevented=true;}});
   assert(prevented);assert.equal(clicked.length,1);assert.equal(clicked[0].rel,'ar');assert.equal(clicked[0].children.length,1);
 });
@@ -115,4 +115,12 @@ test('motor: pedido XR síncrono, colocação, saída e reentrada liberam hit-te
     assert(ra.estado().temMira);assert.equal(ra.pose().elements[12],1);
     await ra.sair();assert.equal(ra.ativo(),false);assert.equal(cancelled,i+1);
   }
+});
+
+test('primeiro toque nativo prepara grupos variáveis e segundo abre o blob no gesto',async()=>{
+ let gerar=0;const h=await harness({load:async()=>({prepararPersonagens:async c=>{gerar++;assert.notEqual(c.principal,c.ramal);return {url:'blob:entrada'+gerar,descricao:'1 Trabalhador'};}})});
+ let bloqueado=false;h.els.linkAR.events.click({preventDefault(){bloqueado=true;}});assert(bloqueado);
+ await new Promise(r=>setImmediate(r));assert.equal(gerar,1);assert.equal(h.els.linkAR.href,'blob:entrada1#allowsContentScaling=1');
+ bloqueado=false;h.els.linkAR.events.click({preventDefault(){bloqueado=true;}});assert(!bloqueado);assert.equal(gerar,1);
+ h.els.linkAR.events.click({preventDefault(){}});await new Promise(r=>setImmediate(r));assert.equal(gerar,2);
 });

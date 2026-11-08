@@ -1,5 +1,5 @@
-import { normalizar,grupos,sortear,mudaRodada } from './configuracao.js?v=20261107-ra11';
-import { refletir } from './etica.js?v=20261107-ra11';
+import { normalizar,grupos,sortear,mudaRodada } from './configuracao.js?v=20261107-ra12';
+import { refletir } from './etica.js?v=20261107-ra12';
 export function criarRodada(m,config,{aoMudar=()=>{},aoResultado=()=>{},som=()=>{}}={}){
   let c=normalizar(config),fase='pronta',restante=c.pressao?3:c.tempo,pausada=false,bloqueios=new Set(),ocupada=false,resultado=null;
   const publicar=()=>aoMudar(api.estado());
