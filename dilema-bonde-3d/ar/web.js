@@ -1,13 +1,13 @@
 import * as THREE from 'three';
-import { criarMaquete } from '../js/cena.js?v=20261107-ra11';
-import motor from './rastreador.js?v=20261107-ra11';
-import { ligarGestos } from './gestos.js?v=20261107-ra11';
+import { criarMaquete } from '../js/cena.js?v=20261107-ra12';
+import motor from './rastreador.js?v=20261107-ra12';
+import { ligarGestos } from './gestos.js?v=20261107-ra12';
 import { criarAvisos } from './avisos.js?v=20261107-ra4';
 
-import {lerConfig,grupos} from '../js/configuracao.js?v=20261107-ra11';
-import {PERFIS,qualidadeDoAparelho,adaptarResolucao} from '../js/qualidade.js?v=20261107-ra11';
-import {ligarInterface} from '../js/interface.js?v=20261107-ra11';
-import {criarRotulos} from '../js/rotulos.js?v=20261107-ra11';
+import {lerConfig,grupos} from '../js/configuracao.js?v=20261107-ra12';
+import {PERFIS,qualidadeDoAparelho,adaptarResolucao} from '../js/qualidade.js?v=20261107-ra12';
+import {ligarInterface} from '../js/interface.js?v=20261107-ra12';
+import {criarRotulos} from '../js/rotulos.js?v=20261107-ra12';
 
 export async function preparar({ informar, config=lerConfig() }) {
   const qualidade=qualidadeDoAparelho(config.qualidade),perfil=PERFIS[qualidade];
@@ -32,7 +32,8 @@ export async function preparar({ informar, config=lerConfig() }) {
   base.add(m.root);
   const avisos = criarAvisos($('aviso'));
   const status = (t,opcoes) => avisos.mostrar(t,opcoes);
-  const rotulos=criarRotulos(m.root);rotulos.atualizar(config);
+  const rotulos=criarRotulos(m);rotulos.atualizar(config);
+  let novaPendente=false;
   let colocada=false,reposicionando=false,ultimo=null,entrando=false,rastreioPerdido=false;
   let ui;
   const colocar=$('colocar');
@@ -119,20 +120,24 @@ export async function preparar({ informar, config=lerConfig() }) {
     renderer.render(scene,camera);adaptar(!ui.menu.aberta());
   }
   function voltar() {
+    if(colocada)novaPendente=true;
     $('overlay').append(colocar);renderer.setAnimationLoop(null); canvas.hidden = true; $('overlay').hidden = true; $('inicio').hidden = false;
     gestos.limpar(); ancora.scale.setScalar(1); $('tamanho').textContent = '100%';
     avisos.ocultar(); ui.menu.fechar();
     ancora.visible = false; colocada = false; reposicionando = false; rastreioPerdido = false; ultimo = null; reiniciar();
-    $('comecar').disabled = false; redimensionar();
+    $('comecar').disabled = false;if(novaPendente)$('comecar').textContent='Preparar nova rodada';redimensionar();
     if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
   }
   async function sair() { await ra.sair(); voltar(); }
   $('sair').onclick = sair;
   addEventListener('pagehide', () => { avisos.ocultar(); ra.sair(); renderer.setAnimationLoop(null); });
   canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); sair(); informar('O contexto 3D foi interrompido. Recarregue a página para preparar a RA novamente.'); $('comecar').disabled = true; });
-  if(new URLSearchParams(location.search).has('auditoria'))window.__testeRA={ui,m,ancora,ra,renderer,camera};
+  if(new URLSearchParams(location.search).has('auditoria'))window.__testeRA={ui,m,ancora,ra,renderer,camera,rotulos};
   return {
     qualidade:config.qualidade,
+    precisaNova:()=>novaPendente,
+    configAtual:()=>ui.rodada.config(),
+    async prepararNova(c){await ui.rodada.nova(c);ui.menu.limparResultado();rotulos.atualizar(c);novaPendente=false;},
     async entrar() {
       entrando = true; canvas.hidden = false; $('overlay').hidden = false; $('inicio').hidden = true;
       redimensionar(); renderer.setClearColor(0x000000,0); ultimo = null;

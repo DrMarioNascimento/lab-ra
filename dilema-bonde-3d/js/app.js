@@ -1,13 +1,13 @@
-import {grupos} from './configuracao.js?v=20261107-ra11';
-import {PERFIS,qualidadeDoAparelho,adaptarResolucao} from './qualidade.js?v=20261107-ra11';
-import {ligarInterface} from './interface.js?v=20261107-ra11';
-import {criarRotulos} from './rotulos.js?v=20261107-ra11';
+import {grupos} from './configuracao.js?v=20261107-ra12';
+import {PERFIS,qualidadeDoAparelho,adaptarResolucao} from './qualidade.js?v=20261107-ra12';
+import {ligarInterface} from './interface.js?v=20261107-ra12';
+import {criarRotulos} from './rotulos.js?v=20261107-ra12';
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { criarMaquete } from './cena.js?v=20261107-ra11';
-import { criarNavegacao } from './navegacao.js?v=20261107-ra11';
+import { criarMaquete } from './cena.js?v=20261107-ra12';
+import { criarNavegacao } from './navegacao.js?v=20261107-ra12';
 
 export async function iniciar(config) {
 const qualidade=qualidadeDoAparelho(config.qualidade), perfil=PERFIS[qualidade];
@@ -41,7 +41,7 @@ const navegacao = criarNavegacao({camera,controls,canvas,maquete:m});
 document.getElementById('carregando').remove();
 
 
-const rotulos=criarRotulos(m.root);rotulos.atualizar(config);
+const rotulos=criarRotulos(m);rotulos.atualizar(config);
 const ui=ligarInterface({m,config,status:t=>document.getElementById('aviso').textContent=t,aoMenu:aberta=>{controls.enabled=!aberta;},aoConfig:c=>rotulos.atualizar(c)});
 document.getElementById('navegacao').hidden=false;ui.menu.controles.append(document.getElementById('navegacao'));
 const extras=document.createElement('p');extras.innerHTML='<button id="tela" type="button">Tela cheia</button> <a href="ar/">Abrir em realidade aumentada</a>';ui.menu.controles.append(extras);
@@ -60,5 +60,5 @@ document.addEventListener('visibilitychange',()=>ui.rodada.bloquear('oculta',doc
 renderer.setAnimationLoop(()=>{const dt=Math.min(.05,relogio.getDelta());ui.rodada.atualizar(dt);controls.update();renderer.render(scene,camera);adaptar(!document.hidden&&!ui.menu.aberta());});
 window.__maquete=m;window.__pronto=true;
 // Diagnóstico local usado pela auditoria de navegação e interface.
-if(new URLSearchParams(location.search).has('auditoria'))window.__testePC={camera,controls,navegacao,m,ui,renderer,scene};
+if(new URLSearchParams(location.search).has('auditoria'))window.__testePC={camera,controls,navegacao,m,ui,renderer,scene,rotulos};
 }

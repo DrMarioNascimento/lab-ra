@@ -85,7 +85,7 @@ for(const [tipo,maquete] of [['RA',m],['3D',m3d]])test(`cidade ${tipo} tem textu
   const cidade=m.root.getObjectByName('Cidade');assert(cidade);
   for(const face of ['Frente','Fundos','Direita','Esquerda'])assert(cidade.children.some(c=>c.name.startsWith('Cidade_Janelas_'+face)));
   for(const c of cidade.children.filter(c=>/^Cidade_Paredes|^Cidade_Telhados/.test(c.name)))assert(c.material.map);
-  const construcoes=[new THREE.Box3().setFromObject(m.focos.estacao,true),new THREE.Box3().setFromObject(m.focos.oficina,true),...cidade.userData.volumes];
+  const construcoes=[new THREE.Box3().setFromObject(m.focos.estacao,true),new THREE.Box3().setFromObject(m.focos.oficina,true),new THREE.Box3().setFromObject(m.focos.placa,true),...cidade.userData.volumes];
   m.root.updateMatrixWorld(true);
   for(const a of m.root.children.filter(o=>o.isInstancedMesh&&/^Arvores|^Araucarias/.test(o.name))) {
     for(let i=0;i<a.count;i++) {
@@ -163,4 +163,17 @@ test('cinco personagens no ramal preservam folga da oficina e recalculam o impac
 
 test('perfil Econômico conserva araucárias e cena abaixo de 400 mil triângulos',()=>{
  assert.equal(economica.root.userData.arvoresComuns,18);let n=0;economica.root.traverseVisible(o=>{if(o.isMesh)n+=(o.geometry.index?.count||o.geometry.attributes.position.count)/3*(o.isInstancedMesh?o.count:1);});assert(n<400000,'orçamento econômico: '+n);assert.equal(economica.root.getObjectByName('Araucarias').count,2);if(process.env.BONDE_METRICAS)console.log('Triângulos Econômica: '+n);
+});
+
+test('grupos e rótulos têm referências à esquerda da oficina também com cinco pessoas',async()=>{
+ for(const n of [1,3,5]){
+  await m.configurar({presetPrincipal:'trabalhador',nPrincipal:n,presetRamal:'desconhecidos',nRamal:n});
+  const oficina=new THREE.Box3().setFromObject(m.focos.oficina,true);
+  for(const g of Object.values(m.gruposCena)){const b=new THREE.Box3().setFromObject(g,true);assert(b.max.x+.5<oficina.min.x);assert(Math.abs(g.userData.esquerda-b.min.x)<.001);}
+ }
+ await m.configurar();m.reiniciar();
+});
+test('placa de madeira está no gramado frontal e preserva textura e relevo',()=>{
+ assert.equal(m.focos.placa.position.x,28);assert.equal(m.focos.placa.position.z,44);
+ for(const alvo of m.alvosMenu){assert(alvo.material.map);assert(alvo.geometry.parameters.options.bevelEnabled);}
 });

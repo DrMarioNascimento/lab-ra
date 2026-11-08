@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {normalizar,sortear,PADRAO} from '../dilema-bonde-3d/js/configuracao.js';
+import {normalizar,sortear,PADRAO,nomeGrupo,textoGrupo,novaEntrada,registrarEntrada} from '../dilema-bonde-3d/js/configuracao.js';
 import {criarRodada} from '../dilema-bonde-3d/js/rodada.js';
 import {resolverQualidade,adaptarResolucao,selecionarArvores} from '../dilema-bonde-3d/js/qualidade.js';
 import {refletir} from '../dilema-bonde-3d/js/etica.js';
@@ -32,3 +32,15 @@ test('som, rótulos e qualidade mudam sem reiniciar o tempo ou o percurso',async
 test('alterar tempo ou personagens prepara nova rodada',async()=>{const {r}=setup();r.play();r.atualizar(3);await r.ajustar({...r.config(),tempo:15,nPrincipal:2});assert.equal(r.estado().fase,'pronta');assert.equal(r.estado().tempo,15);});
 
 test('trava da agulha é publicada imediatamente para desativar os botões',()=>{const {m}=setup();const estados=[];const r=criarRodada(m,{...PADRAO,tempo:0},{aoMudar:e=>estados.push(e)});m.update=()=>{if(m.estado.rodando)m.estado.travado=true;};r.play();r.atualizar(.05);assert.equal(estados.at(-1).travado,true);});
+
+test('singular e plural cobrem todos os papéis; ramal vazio tem texto próprio',()=>{
+ const pares={trabalhador:['Trabalhador','Trabalhadores'],idoso:['Idoso','Idosos'],gestante:['Gestante','Gestantes'],criancas:['Criança','Crianças'],estudante:['Estudante','Estudantes'],cientista:['Cientista','Cientistas'],colega:['Colega de turma','Colegas de turma'],vinculo:['Vínculo afetivo','Vínculos afetivos'],desconhecidos:['Desconhecido','Desconhecidos']};
+ for(const [p,[singular,plural]] of Object.entries(pares)){assert.equal(nomeGrupo(p,1),singular);assert.equal(nomeGrupo(p,2),plural);assert.equal(textoGrupo(p,1),'1 '+singular);}
+ assert.equal(textoGrupo('trabalhador',0),'Ramal livre');
+});
+test('nova entrada alterna os dois papéis e as duas quantidades sem perder preferências',()=>{
+ const antigo=globalThis.localStorage,mem=new Map();globalThis.localStorage={getItem:k=>mem.get(k)||null,setItem:(k,v)=>mem.set(k,v)};
+ try{let c=normalizar({som:true,qualidade:'economica',tempo:20});registrarEntrada(c);for(let i=0;i<30;i++){const n=novaEntrada(c);assert(![c.principal,c.ramal].includes(n.principal));assert(![c.principal,c.ramal].includes(n.ramal));assert.notEqual(n.principal,n.ramal);assert.notEqual(n.nPrincipal,c.nPrincipal);assert.notEqual(n.nRamal,c.nRamal);assert(n.nPrincipal>=1&&n.nPrincipal<=5&&n.nRamal>=1&&n.nRamal<=5);assert(n.som);assert.equal(n.qualidade,'economica');assert.equal(n.tempo,20);registrarEntrada(n);c=n;}
+ const fixo=novaEntrada({...c,modo:'classico'});assert.equal(fixo.nPrincipal,3);assert.equal(fixo.nRamal,1);assert.equal(fixo.principal,'desconhecidos');assert.equal(fixo.ramal,'desconhecidos');
+ }finally{if(antigo===undefined)delete globalThis.localStorage;else globalThis.localStorage=antigo;}
+});

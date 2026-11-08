@@ -101,7 +101,7 @@ for lado in ['Frente','Fundos','Direita','Esquerda']:
 fantasmas = [p for p in maquete.GetChildren() if p.GetName().startswith('Fantasmas')]
 assert sorted(len(p.GetChildren()) for p in fantasmas) == [1,3]
 for p in fantasmas:
-    esperado = (4,.27,30) if len(p.GetChildren()) == 1 else (-8,.27,4)
+    esperado = (-14,.27,30) if len(p.GetChildren()) == 1 else (-10,.27,4)
     pos = UsdGeom.Xformable(p).GetLocalTransformation().ExtractTranslation()
     assert all(abs(a-b)<1e-8 for a,b in zip(pos,esperado)), 'Fantasmas fora do local do impacto'
     cache = UsdGeom.XformCache()
@@ -115,6 +115,24 @@ for p in fantasmas:
             assert alvo, 'Destino da animação ausente'
             destino = UsdGeom.Xformable(alvo).GetLocalTransformation().ExtractTranslation()
             assert (destino-repouso).GetLength()<1e-8, 'Animação do fantasma volta ao centro'
+# A entidade nativa nasce com volume normal dentro da base, sem ampliar o
+# contorno que o Quick Look usa para apoiar a maquete sobre a mesa.
+for grupo in fantasmas:
+    rota = 0 if len(grupo.GetChildren()) == 1 else 1
+    for f in grupo.GetChildren():
+        caixa = limites(f, maquete)
+        assert caixa.GetMin()[1] > -3 and caixa.GetMax()[1] < 0, 'Fantasma de repouso sai da base'
+        assert caixa.GetSize()[1] > 1, 'Fantasma nativo começa microscópico'
+        indice = f.GetName().removeprefix('rqbMovel_')
+        visiveis = []
+        for alvo in cena.GetChildren():
+            if alvo.GetName().startswith('rqbAlvo_'+str(rota)+'_') and alvo.GetName().endswith('_'+indice):
+                matriz = UsdGeom.Xformable(alvo).GetLocalTransformation()
+                escala = matriz.TransformDir(Gf.Vec3d(0,1,0)).GetLength()
+                if escala > .01: visiveis.append(matriz.ExtractTranslation()[1])
+        assert len(visiveis)>=5 and max(visiveis)-min(visiveis)>.03, 'Fantasma não ganha volume e altura durante o impacto'
+for nome in ['Rotulo_principal','Rotulo_ramal']:
+    assert maquete.GetChild(nome), 'Rótulo nativo ausente: '+nome
 for p in stage.Traverse():
     for rel in p.GetRelationships():
         for target in rel.GetTargets():

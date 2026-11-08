@@ -1,12 +1,37 @@
 import * as THREE from 'three';
-import {PAPEIS} from './configuracao.js?v=20261107-ra11';
-export function criarRotulos(root){
+import {textoGrupo} from './configuracao.js?v=20261107-ra12';
+
+// Placas baixas em pé, à esquerda do grupo e junto ao lado externo do trilho.
+// A posição usa a caixa real das pessoas, inclusive ao trocar tipo e quantidade.
+export function criarRotulos(m){
   const itens=[];
-  for(const [x,z] of [[4,30],[-8,4]]){
-    const canvas=document.createElement('canvas');canvas.width=512;canvas.height=96;
+  const metal=new THREE.MeshStandardMaterial({color:0x3f4c46,roughness:.85,metalness:.25});
+  for(const chave of ['principal','ramal']){
+    const placa=new THREE.Group();placa.name='Rotulo_'+chave;m.root.add(placa);
+    const canvas=document.createElement('canvas');canvas.width=512;canvas.height=128;
     const tex=new THREE.CanvasTexture(canvas);tex.colorSpace=THREE.SRGBColorSpace;
-    const material=new THREE.SpriteMaterial({map:tex,transparent:true,depthTest:false});
-    const sprite=new THREE.Sprite(material);sprite.scale.set(14,2.625,1);sprite.position.set(x,8,z);sprite.renderOrder=20;root.add(sprite);itens.push({canvas,tex,sprite});
+    const tabua=new THREE.Mesh(new THREE.BoxGeometry(1,1,.18),m.madeiraPlacas);placa.add(tabua);
+    const texto=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshStandardMaterial({map:tex,transparent:true,roughness:1,depthWrite:false}));texto.position.z=.13;placa.add(texto);
+    const postes=[-1,1].map(()=>{const p=new THREE.Mesh(new THREE.BoxGeometry(.12,1.2,.12),metal);placa.add(p);return p;});
+    itens.push({chave,placa,canvas,tex,tabua,texto,postes});
   }
-  return {atualizar(c){itens.forEach(({canvas,tex,sprite},i)=>{sprite.visible=c.rotulos;if(i)sprite.position.x=-8-Math.max(0,c.nRamal-3)*1.02;const ctx=canvas.getContext('2d');ctx.clearRect(0,0,512,96);ctx.fillStyle='#16223ae6';ctx.fillRect(0,0,512,96);ctx.fillStyle='#fff';ctx.font='700 34px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(i&&c.nRamal===0?'Ramal livre':`${i?c.nRamal:c.nPrincipal} · ${PAPEIS[i?c.ramal:c.principal]}`,256,48,490);tex.needsUpdate=true;});},remover(){itens.forEach(({tex,sprite})=>{sprite.removeFromParent();sprite.material.dispose();tex.dispose();});}};
+  return {
+    atualizar(c){for(const i of itens){
+      const n=i.chave==='principal'?c.nPrincipal:c.nRamal,papel=c[i.chave],rotulo=textoGrupo(papel,n);
+      const ctx=i.canvas.getContext('2d');ctx.font='800 38px sans-serif';
+      const comprimento=Math.ceil(ctx.measureText(rotulo).width+72);
+      // Armazenamento da textura permanece 512×128 depois do primeiro envio à GPU.
+      ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,512,128);ctx.save();ctx.scale(512/comprimento,1);
+      ctx.fillStyle='#243f44';ctx.fillRect(10,10,comprimento-20,108);
+      ctx.strokeStyle='#bd9561';ctx.lineWidth=3;ctx.strokeRect(13,13,comprimento-26,102);
+      ctx.fillStyle='#fff2d5';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(rotulo,comprimento/2,64);ctx.restore();
+      const altura=1.65,largura=Math.max(3.2,Math.min(10.8,comprimento/128*altura));
+      i.tabua.scale.set(largura,altura,1);i.texto.scale.set(largura*.95,altura*.95,1);
+      i.postes.forEach((p,j)=>p.position.set((j?1:-1)*(largura/2-.35),-.8,0));
+      const grupo=m.gruposCena[i.chave],esquerda=grupo.userData.esquerda;
+      i.placa.position.set(esquerda-.65-largura/2,1.65,grupo.position.z+(i.chave==='ramal'?-2.3:2.3));
+      i.placa.visible=c.rotulos;i.placa.userData.texto=rotulo;i.placa.userData.largura=largura;i.tex.needsUpdate=true;
+    }},
+    remover(){for(const i of itens){i.placa.removeFromParent();i.placa.traverse(o=>o.geometry?.dispose());i.texto.material.dispose();i.tex.dispose();}metal.dispose();}
+  };
 }

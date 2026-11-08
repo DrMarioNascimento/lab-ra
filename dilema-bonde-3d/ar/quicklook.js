@@ -8,13 +8,16 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { usdzComBotoes } from './ra-botoes-ios.js?v=20261107-ra7';
 
+import {criarRotulos} from '../js/rotulos.js?v=20261107-ra12';
+import {poseFantasmaNativo} from './fantasmas-usdz.js?v=20261107-ra12';
+
 const PASSO = 0.3;            // s entre poses gravadas
 const LARGURA_REAL = 1.2;
 const ARVORES_RA = 27; // Malhas otimizadas; mantém a mesma distribuição do visualizador web.
 
 function gravar(m) {
   const moveis = m.partesMoveis();
-  const capt = () => moveis.map(o => { o.updateMatrix(); return o.matrix.clone(); });
+  const capt = () => moveis.map(o => { o.updateMatrix(); return o.userData.fantasma?poseFantasmaNativo(o.matrix):o.matrix.clone(); });
   const assentar = (n = 45) => { for (let i = 0; i < n; i++) m.update(1 / 30); };
   const s0 = m.estado.s0;
   const inicio = () => { m.reiniciar(); m.irPara('principal', s0); assentar(); return capt(); };
@@ -29,6 +32,7 @@ function gravar(m) {
   };
   const manter = percurso('principal'), desviar = percurso('ramal');
   const repouso = inicio();
+  moveis.forEach((o,i)=>{if(o.userData.fantasma)repouso[i].decompose(o.position,o.quaternion,o.scale);});
   return { moveis, estados: [
     { rotulo: 'Manter o curso', passos: manter },
     { rotulo: 'Desviar o bonde', passos: desviar },
@@ -53,6 +57,7 @@ function geoSimples(g) {
 function matSimples(m) {
   if (!m.isMeshStandardMaterial) m = new THREE.MeshStandardMaterial({ color: m.color || 0xffffff, map: m.map || null, emissive: m.color || 0x000000, emissiveIntensity: 0.6, transparent: m.transparent, opacity: m.opacity });
   else { m = m.clone(); m.normalMap = null; m.aoMap = null; m.roughnessMap = null; m.metalnessMap = null; m.vertexColors = false; }
+  if(m.name==='fantasma'){m.transparent=false;m.opacity=1;}
   m.side = THREE.FrontSide; // Quick Look exporta apenas a face frontal.
   return m;
 }
@@ -98,6 +103,7 @@ function prepararCena(raiz) {
 }
 
 export async function montarUSDZ(m) {
+  if(!m.root.getObjectByName('Rotulo_principal'))criarRotulos(m).atualizar({rotulos:true,principal:m.estado.presets[0],ramal:m.estado.presets[1],nPrincipal:m.gruposCena.principal.children.length,nRamal:m.gruposCena.ramal.children.length});
   let t = performance.now(); const log = msg => { console.log('[RA]', msg, Math.round(performance.now() - t) + ' ms'); t = performance.now(); };
   const { moveis, estados } = gravar(m); log('percursos gravados: ' + estados.map(e => e.passos.length).join('/') + ' passos, ' + moveis.length + ' partes');
   prepararCena(m.root); let tri = 0; m.root.traverse(o => { if (o.isMesh) tri += (o.geometry.index ? o.geometry.index.count : o.geometry.attributes.position.count) / 3; }); log('cena preparada: ' + Math.round(tri) + ' triângulos');
