@@ -31,10 +31,25 @@
 .menu-painel .indicador{padding:10px 12px;background:#fff9ec;border:1px solid #d4c09d;border-radius:10px;box-shadow:inset 0 1px #fff,0 3px 0 #c8b38f}
 .menu-painel meter{height:20px;accent-color:#496e58}
 .menu-painel #ajudaRA{background:#e2e8dd;color:#294c40;border-color:#a7b7a8}
-#inicio>div,#carregando>div{border:2px solid #9e815b;border-radius:24px;background:linear-gradient(145deg,#304d60,#1b303f);box-shadow:inset 0 2px 0 #d2dfd038,0 7px 0 #10232f,0 16px 36px #0005;padding:24px}
-#carregando>div{max-width:calc(100vw - 24px)}
-#inicio #linkAR{background:linear-gradient(#cc9b52,#9a672c);box-shadow:inset 0 2px 0 #ffdc9a,0 5px 0 #63401e,0 10px 20px #0005}
-#inicio button:not(.secundario){background:linear-gradient(#4e7d99,#315a73);box-shadow:inset 0 2px 0 #b2d1df80,0 5px 0 #1c3b50,0 10px 20px #0004}
+/* Entrada clara compartilhada pelo PC e pela RA, incluindo os estados de carga. */
+#inicio,#carregando{background:radial-gradient(ellipse at top,#f5f7f4,#dce5e9);color:#263d40;color-scheme:light}
+#carregando{overflow-y:auto;padding:max(20px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(20px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+#inicio>div,#carregando>div{border:2px solid #baa17b;border-radius:24px;background:linear-gradient(145deg,#fffdf6,#f2e8d3);color:#263d40;box-shadow:inset 0 2px 0 #fff,0 6px 0 #bea988,0 14px 28px #344b5929;padding:24px}
+#carregando>div{width:min(100%,560px);margin:auto;text-align:center}
+#inicio h1,#carregando h1{color:#294b65;line-height:1.25}
+#carregando h1{margin:0 0 20px}
+#carregando p{line-height:1.5}
+#inicio small,#carregando small,#estadoEntrada,#statusAR,#estadoCarga{color:#4d625e}
+#estadoCarga{font-size:14px;margin-top:22px}
+#inicio a,#inicio a:visited,#carregando a,#carregando a:visited{color:#245874;text-underline-offset:3px}
+#inicio a:hover,#carregando a:hover{color:#173d53}
+#inicio .qualidade-entrada select,#carregando .qualidade-entrada select{border:1px solid #ab987c;box-shadow:inset 0 2px 4px #7052381a,0 1px 0 #fff}
+#inicio .opcao,#inicio #instalarRA{border:1px solid #baa17b;background:linear-gradient(#fffdf6,#eee3cc);box-shadow:inset 0 1px 0 #fff,0 3px 0 #c4b08c}
+#inicio #instalarRA summary{color:#294b65;min-height:44px;align-content:center}
+#inicio #linkAR{background:linear-gradient(#e1bd7f,#c39958);box-shadow:inset 0 2px 0 #fff0c8,0 5px 0 #977342,0 10px 18px #70523826}
+#inicio button:not(.secundario),#carregarMaquete{color:#fff;background:linear-gradient(#416d89,#315a73);box-shadow:inset 0 2px 0 #b2d1df80,0 5px 0 #23485e,0 9px 16px #344b5926;cursor:pointer}
+#inicio button:not(.secundario):active,#carregarMaquete:active{box-shadow:inset 0 1px 0 #b2d1df80,0 1px 0 #23485e}
+#inicio :focus-visible,#carregando :focus-visible{outline:3px solid #7e581b;outline-offset:4px}
 @media(hover:hover){.menu-painel button:not(:disabled):hover,.menu-botao:hover{filter:brightness(1.06)}}
-@media(max-width:560px){.menu-painel{padding:12px}.menu-painel header{padding:10px}.menu-painel details{padding:8px}.menu-grade{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}#inicio>div{padding:18px 13px}}
+@media(max-width:560px){.menu-painel{padding:12px}.menu-painel header{padding:10px}.menu-painel details{padding:8px}.menu-grade{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}#inicio>div,#carregando>div{padding:18px 13px}}
 @media(prefers-reduced-motion:reduce){.menu-painel button{transition:none}}
