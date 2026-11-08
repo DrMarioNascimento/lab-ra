@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { criarMaquete } from '../js/cena.js?v=20261107-ra12';
+import { criarMaquete } from '../js/cena.js?v=20261108-ra13';
 import motor from './rastreador.js?v=20261107-ra12';
 import { ligarGestos } from './gestos.js?v=20261107-ra12';
 import { criarAvisos } from './avisos.js?v=20261107-ra4';
@@ -20,7 +20,9 @@ export async function preparar({ informar, config=lerConfig() }) {
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.xr.enabled = true;
   renderer.xr.setFramebufferScaleFactor(perfil.framebuffer);
-  const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(60, 1, .001, 200);
+  // 2 cm preservam a aproximação do telefone e aumentam a precisão do depth
+  // buffer no WebXR; manter 200 m evita cortar a maquete muito ampliada.
+  const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(60, 1, .02, 200);
   scene.add(new THREE.HemisphereLight(0xf2f6ff, 0x6a7a50, 2));
   const sol = new THREE.DirectionalLight(0xfff1dc, 2.6); sol.position.set(-.6, 1.2, .8); scene.add(sol);
   const ancora = new THREE.Group(), base = new THREE.Group();

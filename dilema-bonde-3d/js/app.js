@@ -6,7 +6,7 @@ import {criarRotulos} from './rotulos.js?v=20261107-ra12';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { criarMaquete } from './cena.js?v=20261107-ra12';
+import { criarMaquete } from './cena.js?v=20261108-ra13';
 import { criarNavegacao } from './navegacao.js?v=20261107-ra12';
 
 export async function iniciar(config) {
