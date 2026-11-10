@@ -5,6 +5,7 @@ import { compute, fmtVar, VAR_META, PARAM_META, CURTO } from "../model.js";
 import { REPOUSO, EXERCICIO } from "../content/params-casos.js";
 import { esc } from "./metro.js";
 
+import { renderCabin } from "../journey.js";
 import { icon, PARADA_ICON } from "../visual.js";
 
 const VREP = compute(REPOUSO), VEX = compute(EXERCICIO);
@@ -45,7 +46,7 @@ function hipoteseForm(path, d, posto, { comLei = true } = {}) {
 
 function completo(d, posto) { return d && d.mec && d.papel && posto.vars.every((v) => d.prev?.[v]?.dir) && (d.porque || "").trim().length > 3; }
 
-export function renderAluno(st, id, loc) {
+export function renderAluno(st, id, loc, { individual = false } = {}) {
   const me = st.alunos[id];
   const caso = casoById(st.casoId);
   const g = me?.grupo ? st.grupos[me.grupo] : null;
@@ -91,7 +92,7 @@ export function renderAluno(st, id, loc) {
       const p = PARADAS[i];
       const r = resp.r[p.id];
       const naMochila = (v) => resp.mochila.some((x) => x.v === v);
-      b = `<div class="row" style="justify-content:space-between"><span class="chip">Parada ${i + 1} de ${PARADAS.length}</span><span class="chip">${icon("mochila", "inline")} ${resp.mochila.length}/3</span></div>
+      b = renderCabin(i, { compact: true, label: g && !individual ? `GRUPO ${g.i + 1} · ${g.cor.nome.toUpperCase()}` : "EXPLORAÇÃO INDIVIDUAL" }) + `<div class="trip-activity"><div class="row" style="justify-content:space-between"><span class="chip">Parada ${i + 1} de ${PARADAS.length}</span><span class="chip">${icon("mochila", "inline")} ${resp.mochila.length}/3</span></div>
         <div class="trip-step" aria-label="Parada ${i + 1} de ${PARADAS.length}">${PARADAS.map((_, k) => `<span class="${k <= i ? 'passed' : ''}"></span>`).join('')}</div><div class="trip-title">${icon(PARADA_ICON[p.id] || p.id)}<h2>${p.titulo}</h2></div><div class="row">${p.leis.map((l) => `<span class="chip law">${LEIS[l].nome}</span>`).join("")}</div>
         <p>${p.texto}</p><div class="card mono" style="padding:10px 12px;font-size:13px">${p.calc}</div>
         <table class="vals"><tr><th>Variável</th><th style="text-align:right">Repouso</th><th style="text-align:right">Exercício</th><th></th></tr>
@@ -100,7 +101,7 @@ export function renderAluno(st, id, loc) {
         <p class="muted" style="font-size:14px">${p.exercicio}</p>
         <div class="card"><b>${p.pergunta.q}</b>${p.pergunta.op.map((o, k) => `<button class="opt ${r == null ? "" : k === p.pergunta.certa ? "right" : r === k ? "wrong" : ""}" data-a="viagemResp" data-val="${k}" ${r != null ? "disabled" : ""}>${o}</button>`).join("")}
         ${r != null ? `<p class="${r === p.pergunta.certa ? "pill-ok" : "pill-bad"}">${r === p.pergunta.certa ? "Isso." : "Não foi dessa vez."}</p><p class="muted">${p.pergunta.fb}</p>` : ""}</div>
-        <div class="row"><button class="btn sec grow" data-a="parada" data-val="-1" ${i === 0 ? "disabled" : ""}>Anterior</button><button class="btn grow" data-a="parada" data-val="1" ${i === PARADAS.length - 1 ? "disabled" : ""}>Próxima</button></div>`;
+        <div class="row trip-navigation"><button class="btn sec grow" data-a="parada" data-val="-1" ${i === 0 ? "disabled" : ""}>Anterior</button><button class="btn grow" data-a="parada" data-val="1" ${i === PARADAS.length - 1 ? "disabled" : ""}>Próxima parada →</button></div>${i === PARADAS.length - 1 ? `<p class="pill-ok">Você chegou ao fim do percurso. Revise suas respostas e os valores da mochila.</p>` : ""}</div>`;
       break;
     }
     case "caso":

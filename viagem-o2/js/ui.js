@@ -1,3 +1,5 @@
+import { retainJourneys } from './journey.js';
+
 // Monta uma área que se redesenha a partir do estado, preservando foco e cursor dos campos.
 export function montar(root, render, onAction, onInput) {
   let last = "";
@@ -8,7 +10,9 @@ export function montar(root, render, onAction, onInput) {
     const key = ae && root.contains(ae) ? ae.dataset.key : null;
     const sel = key && "selectionStart" in ae ? [ae.selectionStart, ae.selectionEnd] : null;
     const scroll = root.scrollTop;
+    const restoreJourneys = retainJourneys(root);
     root.innerHTML = html;
+    restoreJourneys();
     last = html;
     root.scrollTop = scroll;
     if (key) {
