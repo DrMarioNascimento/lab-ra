@@ -23,7 +23,8 @@
     "biblioteca/fisiologia/musculo-sarcomero/README.md",
     "biblioteca/fisiologia/osso-vivo/README.md",
     "biblioteca/fisiologia/potencial-membrana/README.md",
-    "biblioteca/fisiologia/starling/README.md"
+    "biblioteca/fisiologia/starling/README.md",
+    "biblioteca/fisiologia/biceps-braquial/index.html"
   ],
   "dragon": [
     {
@@ -218,6 +219,11 @@
       "II",
       "Do músculo ao sarcômero",
       "musculo-sarcomero/"
+    ],
+    [
+      "II",
+      "Bíceps braquial",
+      "biceps-braquial/"
     ],
     [
       "III",
@@ -3004,6 +3010,51 @@
           "arquivo": "biblioteca/fisiologia/tela-cheia.js",
           "origem": "arquivo novo do Lab-RA: tela cheia simulada no iPhone",
           "sha256": "3476bbcac739f2b91116f74c83dfdf59f1efde2d7769c6acdeaf35f4c6f3472a"
+        }
+      ]
+    },
+    {
+      "data": "2026-11-10",
+      "tipo": "nova-experiencia",
+      "fonte": "DrMarioNascimento/fisiologia-interativa",
+      "commit_fonte": "a022cf159a3be76cba41ec46b595abaf1bb0f6fa",
+      "criterio": "Cópia da nova experiência ra/biceps-braquial/. style.css, app.js, modelo.glb, modelo.usdz e ra-previa.jpg idênticos à origem; index.html adaptado à biblioteca (tutor-origem.js do LAB-RA e sem ra-android.js, que não existe nesta cópia).",
+      "arquivos": [
+        {
+          "arquivo": "biblioteca/fisiologia/biceps-braquial/index.html",
+          "origem": "ra/biceps-braquial/index.html",
+          "sha256_anterior": null,
+          "sha256": "a92202fc6d7bf6be34fcda8de3ddbf28c971f4dfa3f73ed35f4d150d06b71f94"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/biceps-braquial/style.css",
+          "origem": "ra/biceps-braquial/style.css",
+          "sha256_anterior": null,
+          "sha256": "e1c5e972e56b49c2957fc418f6443547fbae1a182b6282c6177cbfe3c22d37ef"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/biceps-braquial/app.js",
+          "origem": "ra/biceps-braquial/app.js",
+          "sha256_anterior": null,
+          "sha256": "6adde0e23069a35b21a4ecb5cfdd352678243cfd1ad3007e846fdbd2591e0d24"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/biceps-braquial/modelo.glb",
+          "origem": "ra/biceps-braquial/modelo.glb",
+          "sha256_anterior": null,
+          "sha256": "a508b348091333a4bf6ec71707cc32cefc013e898af51e29d5508247132ac935"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/biceps-braquial/modelo.usdz",
+          "origem": "ra/biceps-braquial/modelo.usdz",
+          "sha256_anterior": null,
+          "sha256": "644ade5164e407bf984086ec9f0478ec07a78d1ad2e8274d075f1c8e483a50d3"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/biceps-braquial/ra-previa.jpg",
+          "origem": "ra/biceps-braquial/ra-previa.jpg",
+          "sha256_anterior": null,
+          "sha256": "e2c14c7dbece789e70bc9f1045b663d1e4bf2a07066b6875dc10771c773ed7e6"
         }
       ]
     }

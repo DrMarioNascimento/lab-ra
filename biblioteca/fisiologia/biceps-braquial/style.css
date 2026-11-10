@@ -1,0 +1,20 @@
+@import url('../juncao-neuromuscular/style.css?v=jun-encaixe-20261004');
+/* Bíceps braquial · RA — o que muda em relação à base comum das experiências. */
+.stage{background:radial-gradient(ellipse at 45% 45%,#2b4a57 0,#15303e 52%,#0d1e29 100%)}
+.leaders{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.leaders line{stroke:#c9dbe5;stroke-opacity:.55;stroke-width:1}
+.biceps-labels .lbl{position:absolute;display:flex;align-items:center;transition:opacity .25s;opacity:0}
+.biceps-labels .lbl.r{transform:translate(0,-50%)}.biceps-labels .lbl.l{transform:translate(-100%,-50%)}
+.biceps-labels .lbl span{position:static;display:block;white-space:nowrap}
+.biceps-labels .lbl b{display:block;font-size:9px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:2px}
+.biceps-labels .lbl.m span{font-style:italic}
+.biceps-labels .dot{position:absolute;width:9px;height:9px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px #0007;transform:translate(-50%,-50%);transition:opacity .25s;opacity:0}
+.legend-row{display:flex;flex-wrap:wrap;gap:6px 16px;margin:2px 0 6px;font-size:12px;color:var(--muted)}
+.legend-row span{display:inline-flex;align-items:center;gap:7px}.legend-row i{width:11px;height:11px;border-radius:50%;display:inline-block;box-shadow:0 0 0 1px #ffffff33}
+.journey-controls .button[aria-pressed="true"]{color:#ffe4a8;border-color:#bc974f;background:linear-gradient(#544a34,#272820)}
+.info-card.insertion{border-left-color:#2d6ad9}.info-card.action{border-left-color:#b0423a}
+.ra-ios{text-align:center}.ra-ios a{display:inline-block;padding:10px;border-radius:16px;background:linear-gradient(#e0473a,#b22a20);box-shadow:0 5px 0 #7a1a12,0 10px 20px #0005}
+.ra-ios a:active{transform:translateY(4px);box-shadow:0 1px 0 #7a1a12}
+.ra-ios img{display:block;width:min(165px,46vw);height:auto;border-radius:10px}
+.ra-box #launchAR{margin-top:12px}
+@media(max-width:650px){.biceps-labels .lbl span{font-size:9px}.biceps-labels .lbl b{font-size:8px}.legend-row{font-size:11px}.journey-controls .button{flex:1 1 44%;min-height:44px}}
