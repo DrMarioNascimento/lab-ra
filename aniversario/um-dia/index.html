@@ -150,7 +150,7 @@ h1,h2,.display{font-family:'Bricolage Grotesque',system-ui,sans-serif}
   <section class="section">
     <div class="card">
       <span class="ico" style="background:#FFE3C7"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#B4530F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span>
-      <div><h3>Quando</h3><p>Sábado, 28, ou domingo, 29 de novembro<br>Escolha o seu dia no formulário lá embaixo</p></div>
+      <div><h3>Quando</h3><p>Sábado, 28 de novembro</p></div>
     </div>
     <div class="card">
       <span class="ico" style="background:#D6EEDF"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2F6E50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span>
@@ -249,12 +249,6 @@ h1,h2,.display{font-family:'Bricolage Grotesque',system-ui,sans-serif}
           <button type="button" id="mais" aria-label="Aumentar">+</button>
         </div>
       </div>
-      <div class="f" id="wrapDias"><span id="lblDia">Qual dia você vem?</span>
-        <div class="chips dois" role="radiogroup" aria-labelledby="lblDia">
-          <button type="button" class="opt dia" role="radio" aria-checked="false" data-v="sábado (28)">Sábado 28</button>
-          <button type="button" class="opt dia" role="radio" aria-checked="false" data-v="domingo (29)">Domingo 29</button>
-        </div>
-      </div>
       <label class="f" id="wrapRestr"><span>Alguma restrição alimentar?</span><input id="fRestr" type="text" placeholder="Ex.: vegetariano, sem lactose"></label>
       <label class="f"><span>Recado pro aniversariante</span><textarea id="fMsg" rows="3" placeholder="Opcional"></textarea></label>
       <p class="err" id="fErr" role="alert"></p>
@@ -274,7 +268,7 @@ h1,h2,.display{font-family:'Bricolage Grotesque',system-ui,sans-serif}
   var d=Math.round((start-t)/86400000), el=document.getElementById('days'), lb=document.getElementById('daysLabel');
   if(d>1){el.textContent=d;lb.innerHTML='dias pra gente<br>subir a serra';}
   else if(d===1){el.textContent='1';lb.innerHTML='dia pra gente<br>subir a serra';}
-  else if(d>=-1){el.textContent='Já!';lb.innerHTML='É neste fim de semana.<br>Te vejo lá!';}
+  else if(d>=0){el.textContent='Já!';lb.innerHTML='É hoje!<br>Te vejo lá!';}
   else{el.textContent='Valeu!';lb.innerHTML='Obrigado por<br>ter vindo';}
 })();
 </script>
@@ -284,7 +278,7 @@ h1,h2,.display{font-family:'Bricolage Grotesque',system-ui,sans-serif}
   var f=document.getElementById('rsvpForm'), q=1, vem='';
   var qtd=document.getElementById('qtd'), err=document.getElementById('fErr');
   var opts=f.querySelectorAll('.seg .opt'), dias=f.querySelectorAll('.dia');
-  var hideIfNo=['wrapQtd','wrapDias','wrapRestr'].map(function(id){return document.getElementById(id);});
+  var hideIfNo=['wrapQtd','wrapRestr'].map(function(id){return document.getElementById(id);});
   opts.forEach(function(b){b.addEventListener('click',function(){
     vem=b.dataset.v; opts.forEach(function(o){o.setAttribute('aria-checked',o===b?'true':'false');});
     hideIfNo.forEach(function(w){w.hidden=(vem==='nao');}); err.textContent='';
@@ -300,13 +294,11 @@ h1,h2,.display{font-family:'Bricolage Grotesque',system-ui,sans-serif}
     var msg=document.getElementById('fMsg').value.trim(), L=[];
     if(vem==='nao'){L.push('Oi, Mário! Aqui é '+nome+'. Infelizmente não vou conseguir ir pra serra.');}
     else{
-      var ds=[].filter.call(dias,function(b){return b.getAttribute('aria-checked')==='true';}).map(function(b){return b.dataset.v;});
-      if(!ds.length){err.textContent='Escolhe o dia: sábado ou domingo.';return;}
       var r=document.getElementById('fRestr').value.trim();
       L.push('Oi, Mário! Aqui é '+nome+'.');
       L.push(vem==='sim'?'Confirmado: eu vou pra serra!':'Ainda é um talvez, mas tô tentando ir!');
       L.push('Pessoas: '+q+(q>1?' (contando comigo)':''));
-      L.push('Dia: '+ds.join(', '));
+      L.push('Dia: sábado (28)');
       if(r)L.push('Restrição alimentar: '+r);
     }
     if(msg)L.push('Recado: '+msg);
