@@ -4,6 +4,8 @@ import { casoById, CURSOS, PAPEIS } from "../content/casos.js";
 import { fmtVar, VAR_META, CURTO } from "../model.js";
 import { metroSVG, esc } from "./metro.js";
 
+import { icon, molecule, teamStyle, PARADA_ICON } from "../visual.js";
+
 const nomePosto = (id) => POSTOS.find((p) => p.id === id)?.nome || id;
 const curtoPosto = (id) => POSTOS.find((p) => p.id === id)?.curto || id;
 const mecNome = (id) => MECANISMOS.find((m) => m.id === id)?.nome || "—";
@@ -34,14 +36,14 @@ export function renderTelao(st) {
   let body = "";
   switch (st.fase) {
     case "entrada":
-      body = topo(st, "Embarque") + `<div class="grid" style="grid-template-columns: 1.1fr 1fr; flex:1">
-        <div class="card col" style="justify-content:center"><div class="fase">Código da sala</div><div class="mono" style="font-size:6cqw;font-weight:800;letter-spacing:.1em">${esc(st.codigo || "SIM-01")}</div>
-        <p class="big muted">Entre pelo celular e digite seu nome.</p><p class="muted">${CURSOS[caso.curso]} · caso escolhido pelo professor</p></div>
-        <div class="card"><h3>${st.ordem.length} a bordo</h3><div class="row" style="margin-top:1cqw;gap:.6cqw">${st.ordem.map((id) => `<span class="chip">${esc(st.alunos[id].nome)}</span>`).join("")}</div></div></div>`;
+      body = topo(st, "Todos a bordo.") + `<div class="grid welcome-grid">
+        <div class="card col welcome-code">${molecule('mini')}<div class="welcome-kicker">Código da sala</div><div class="mono room-code">${esc(st.codigo || "SIM-01")}</div>
+        <p class="big">A viagem começa em equipe.</p><p class="muted">Entre pelo celular e digite seu nome.</p><div class="welcome-route">${icon('ventilacao')}${icon('arterial')}${icon('coracao')}${icon('tecido')}<span>Do ar aos tecidos</span></div></div>
+        <div class="card welcome-students"><div class="boarding-count"><span>${st.ordem.length}</span><div><h3>viajantes a bordo</h3><p>Uma turma. Uma corrente.</p></div></div><div class="row" style="margin-top:1.3cqw;gap:.6cqw">${st.ordem.map((id) => `<span class="chip">${esc(st.alunos[id].nome)}</span>`).join("")}</div><p class="boarding-foot">${CURSOS[caso.curso]}<br>Aguarde a formação dos grupos.</p></div></div>`;
       break;
     case "grupos":
       body = topo(st, "Encontre seu grupo") + metroSVG(estacoesStatus(st, (g) => ({ status: Object.keys(g.achou).length === g.membros.length ? "✓" : `${Object.keys(g.achou).length}/${g.membros.length}` }))) +
-        `<div class="grid" style="grid-template-columns:repeat(${Math.min(gs.length, 4)},1fr)">${gs.map((g) => `<div class="card"><div class="row"><span class="badge" style="background:${g.cor.hex}">${g.i + 1}</span><b>${g.cor.nome}</b></div><div class="muted" style="margin-top:.4cqw">${esc(nomes(g))}</div></div>`).join("")}</div>`;
+        `<div class="grid" style="grid-template-columns:repeat(${Math.min(gs.length, 4)},1fr)">${gs.map((g) => `<div class="card group-card" style="${teamStyle(g)}"><div class="row"><span class="badge">${g.i + 1}</span>${icon(g.posto)}<b>${g.cor.nome}</b></div><div class="muted group-members" style="margin-top:.4cqw">${esc(nomes(g))}</div></div>`).join("")}</div>`;
       break;
     case "lider":
       body = topo(st, "Cada grupo escolhe seu líder") + `<p class="big muted">O grupo decide no celular: votação (ninguém vota em si mesmo) ou sorteio pelo sistema. Só o líder envia as respostas da equipe.</p>
@@ -56,7 +58,7 @@ export function renderTelao(st) {
         return { p, tot, ok };
       });
       body = topo(st, "A viagem de uma molécula de O₂") + `<p class="big muted">Revisão individual: em cada parada, as leis e os valores de repouso e de exercício. Você pode levar só 3 valores na mochila.</p>
-        <div class="grid" style="grid-template-columns:repeat(3,1fr);flex:1">${stats.map(({ p, tot, ok }, i) => `<div class="card"><div class="row"><span class="badge" style="background:#1e3a5f">${i + 1}</span><b>${p.titulo}</b></div>
+        <div class="grid trip-grid" style="grid-template-columns:repeat(3,1fr);flex:1">${stats.map(({ p, tot, ok }, i) => `<div class="card trip-card"><div class="row">${icon(PARADA_ICON[p.id] || p.id)}<b>${i + 1}. ${p.titulo}</b></div>
         <div class="row" style="margin-top:.5cqw">${p.leis.map((l) => `<span class="chip law">${LEIS[l].nome}</span>`).join("")}</div>
         <div class="row" style="margin-top:.6cqw;justify-content:space-between"><span class="muted">${tot} responderam</span><b class="mono">${tot ? Math.round((100 * ok) / tot) : 0}% acertos</b></div><div class="prog"><i style="width:${tot ? (100 * ok) / tot : 0}%"></i></div></div>`).join("")}</div>`;
       break;
@@ -135,5 +137,5 @@ export function renderTelao(st) {
     }
     default: body = topo(st, "");
   }
-  return `<div class="tin">${body}</div>`;
+  return `<div class="tin phase-${st.fase}">${body}</div>`;
 }

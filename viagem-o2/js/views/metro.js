@@ -6,6 +6,8 @@ export const POS = {
   distribuicao: [840, 220], tecido: [600, 345], retorno: [300, 345],
 };
 
+const iconsBase = new URL("../../assets/icons/", import.meta.url);
+
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
 // estacoes: { [postoId]: { cor, rotulo, valor, destaque, apagado, status } }
@@ -24,11 +26,11 @@ export function metroSVG(estacoes = {}, { trem = true, alt = 460, grande = false
     const lx = lado ? x + 36 : x;
     const anc = lado ? "start" : "middle";
     return `<g opacity="${op}">
-      ${e.destaque ? `<circle cx="${x}" cy="${y}" r="34" fill="none" stroke="${e.destaque}" stroke-width="4" opacity=".9"><animate attributeName="r" values="30;38;30" dur="1.8s" repeatCount="indefinite"/></circle>` : ""}
+      ${e.destaque ? `<circle cx="${x}" cy="${y}" r="34" fill="none" stroke="${e.destaque}" stroke-width="4" opacity=".9"></circle>` : ""}
       <circle cx="${x}" cy="${y + 4}" r="24" fill="#020812" opacity=".6"/>
       <circle cx="${x}" cy="${y}" r="24" fill="${cor}" stroke="#e8f1fb" stroke-width="4"/>
-      <circle cx="${x - 7}" cy="${y - 8}" r="7" fill="#fff" opacity=".35"/>
-      ${e.status ? `<text x="${x}" y="${y + 6}" text-anchor="middle" font-size="18" font-weight="800" fill="#fff">${esc(e.status)}</text>` : ""}
+      <image class="station-art" href="${iconsBase}${p.id}.svg" x="${x - 21}" y="${y - 24}" width="42" height="42"/>
+      ${e.status ? `<rect x="${x + 16}" y="${y + 7}" width="${e.status.length > 1 ? 38 : 23}" height="21" rx="7" fill="#071727" stroke="${cor}" stroke-width="1.5"/><text x="${x + (e.status.length > 1 ? 35 : 27.5)}" y="${y + 22}" text-anchor="middle" font-size="13" font-weight="800" fill="#fff">${esc(e.status)}</text>` : ""}
       <text class="st-label" x="${lx}" y="${ly}" text-anchor="${anc}">${esc(p.curto)}</text>
       ${e.rotulo ? `<text class="st-sub" x="${lx}" y="${ly + (grande ? 22 : 18)}" text-anchor="${anc}">${esc(e.rotulo)}</text>` : ""}
       ${e.valor ? `<text class="st-val" x="${lx}" y="${ly + (e.rotulo ? (grande ? 44 : 36) : (grande ? 22 : 18))}" text-anchor="${anc}">${esc(e.valor)}</text>` : ""}
@@ -41,7 +43,8 @@ export function metroSVG(estacoes = {}, { trem = true, alt = 460, grande = false
     <path d="${ven}" fill="none" stroke="var(--ven)" stroke-width="14" stroke-linecap="round"/>
     <text x="560" y="140" text-anchor="middle" class="st-sub">sangue arterial →</text>
     <text x="450" y="318" text-anchor="middle" class="st-sub">← sangue venoso</text>
-    ${trem ? `<g><circle r="11" fill="var(--o2)" stroke="#fff" stroke-width="3"><animateMotion dur="9s" repeatCount="indefinite" path="${loop}"/></circle></g>` : ""}
+    <text x="480" y="205" text-anchor="middle" class="schematic-label">LINHA O₂ · MAPA DE ESTAÇÕES</text><text x="480" y="233" text-anchor="middle" class="map-note">Do ar à utilização nos tecidos</text>
+    ${trem ? `<g class="o2-motion"><circle class="o2-traveller" cx="-6" r="8"/><circle class="o2-traveller" cx="6" cy="5" r="8"/><animateMotion dur="14s" repeatCount="indefinite" path="${loop}"/></g><g class="o2-still" style="display:none" transform="translate(470 95)"><circle class="o2-traveller" cx="-6" r="8"/><circle class="o2-traveller" cx="6" cy="5" r="8"/></g>` : ""}
     ${nodes}
   </svg>`;
 }

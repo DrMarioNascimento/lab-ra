@@ -5,6 +5,8 @@ import { compute, fmtVar, VAR_META, PARAM_META, CURTO } from "../model.js";
 import { REPOUSO, EXERCICIO } from "../content/params-casos.js";
 import { esc } from "./metro.js";
 
+import { icon, PARADA_ICON } from "../visual.js";
+
 const VREP = compute(REPOUSO), VEX = compute(EXERCICIO);
 const u = (v) => (VAR_META[v].unit ? " " + VAR_META[v].unit : "");
 const val = (v, r) => `${fmtVar(v, r[v])}${u(v)}`;
@@ -17,8 +19,8 @@ export function novoLocal() {
 
 function hd(st, me) {
   const g = me?.grupo ? st.grupos[me.grupo] : null;
-  return `<div class="hd">${g ? `<span class="badge" style="background:${g.cor.hex}">${g.i + 1}</span>` : `<span class="badge" style="background:#1e3a5f">O₂</span>`}
-    <div class="grow"><b>${esc(me?.nome || "Viagem do O₂")}</b><div class="faint" style="font-size:12px">${g ? `Grupo ${g.cor.nome}${g.lider === me.id ? " · líder" : ""}` : "Fisiologia em equipe"}</div></div></div>`;
+  return `<div class="hd">${g ? `<span class="badge" style="background:${g.cor.hex}">${g.i + 1}</span>` : icon("o2", "small")}
+    <div class="grow"><b>${esc(me?.nome || "Viagem do O₂")}</b><div class="faint" style="font-size:12px">${g ? `Grupo ${g.cor.nome}${g.lider === me.id ? " · líder" : ""}` : "Fisiologia em equipe"}</div></div>${g ? icon(g.posto, "small") : ""}</div>`;
 }
 
 const radio = (path, value, cur, label) => `<button class="opt ${cur === value ? "sel" : ""}" data-a="set" data-path="${path}" data-val="${esc(value)}">${label}</button>`;
@@ -59,11 +61,11 @@ export function renderAluno(st, id, loc) {
   }
 
   switch (st.fase) {
-    case "entrada": b = `<h2>Você está a bordo</h2><p class="muted">Aguarde o professor sortear os grupos.</p>`; break;
+    case "entrada": b = `<div class="card waiting-card">${icon('o2', 'large')}<p class="eyebrow">SUA VIAGEM COMEÇA AQUI</p><h2>Você está a bordo</h2><p class="muted">Aguarde o professor sortear os grupos.<br>Em breve, você terá uma estação na viagem do O₂.</p><div class="waiting-dots" aria-hidden="true"><i></i><i></i><i></i></div></div>`; break;
     case "grupos": {
       const achou = g.achou[id];
-      b = `<div class="card" style="background:${g.cor.hex};color:#fff;text-align:center;padding:26px"><div style="font-size:13px;letter-spacing:.12em;text-transform:uppercase;opacity:.9">Seu grupo</div><div style="font-size:34px;font-weight:800">${g.cor.nome}</div><div>Estação ${posto.curto}</div></div>
-        <p class="muted">Procure na sala quem tem esta mesma cor na tela:</p><div class="row">${g.membros.filter((m) => m !== id).map((m) => `<span class="chip">${esc(st.alunos[m].nome)}</span>`).join("")}</div>
+      b = `<div class="team-pass"><span class="team-no">${String(g.i + 1).padStart(2, '0')}</span><div class="eyebrow">SUA EQUIPE NA VIAGEM</div>${icon(posto.id, 'large')}<div class="team-name">${g.cor.nome}</div><div class="team-station">Estação ${posto.curto}</div><div class="team-stripe" aria-hidden="true"></div></div>
+        <p class="muted">Procure quem tem o mesmo número e a mesma cor na tela:</p><div class="row">${g.membros.filter((m) => m !== id).map((m) => `<span class="chip">${esc(st.alunos[m].nome)}</span>`).join("")}</div>
         ${achou ? `<p class="pill-ok">Pronto! Aguarde os demais.</p>` : `<button class="btn ok block" data-a="achei">Achei meu grupo</button>`}`;
       break;
     }
@@ -89,12 +91,12 @@ export function renderAluno(st, id, loc) {
       const p = PARADAS[i];
       const r = resp.r[p.id];
       const naMochila = (v) => resp.mochila.some((x) => x.v === v);
-      b = `<div class="row" style="justify-content:space-between"><span class="chip">Parada ${i + 1} de ${PARADAS.length}</span><span class="chip">🎒 ${resp.mochila.length}/3</span></div>
-        <h2>${p.titulo}</h2><div class="row">${p.leis.map((l) => `<span class="chip law">${LEIS[l].nome}</span>`).join("")}</div>
+      b = `<div class="row" style="justify-content:space-between"><span class="chip">Parada ${i + 1} de ${PARADAS.length}</span><span class="chip">${icon("mochila", "inline")} ${resp.mochila.length}/3</span></div>
+        <div class="trip-step" aria-label="Parada ${i + 1} de ${PARADAS.length}">${PARADAS.map((_, k) => `<span class="${k <= i ? 'passed' : ''}"></span>`).join('')}</div><div class="trip-title">${icon(PARADA_ICON[p.id] || p.id)}<h2>${p.titulo}</h2></div><div class="row">${p.leis.map((l) => `<span class="chip law">${LEIS[l].nome}</span>`).join("")}</div>
         <p>${p.texto}</p><div class="card mono" style="padding:10px 12px;font-size:13px">${p.calc}</div>
         <table class="vals"><tr><th>Variável</th><th style="text-align:right">Repouso</th><th style="text-align:right">Exercício</th><th></th></tr>
         ${p.valores.map((v) => `<tr><td>${VAR_META[v].label}</td><td class="n">${val(v, VREP)}</td><td class="n">${val(v, VEX)}</td>
-          <td style="width:44px"><button class="btn sm ${naMochila(v) ? "warn on" : "sec"}" title="Guardar na mochila" data-a="mochila" data-v="${v}" ${!naMochila(v) && resp.mochila.length >= 3 ? "disabled" : ""}>🎒</button></td></tr>`).join("")}</table>
+          <td style="width:44px"><button class="btn sm ${naMochila(v) ? "warn on" : "sec"}" title="Guardar na mochila" data-a="mochila" data-v="${v}" ${!naMochila(v) && resp.mochila.length >= 3 ? "disabled" : ""}> ${icon("mochila", "inline")}</button></td></tr>`).join("")}</table>
         <p class="muted" style="font-size:14px">${p.exercicio}</p>
         <div class="card"><b>${p.pergunta.q}</b>${p.pergunta.op.map((o, k) => `<button class="opt ${r == null ? "" : k === p.pergunta.certa ? "right" : r === k ? "wrong" : ""}" data-a="viagemResp" data-val="${k}" ${r != null ? "disabled" : ""}>${o}</button>`).join("")}
         ${r != null ? `<p class="${r === p.pergunta.certa ? "pill-ok" : "pill-bad"}">${r === p.pergunta.certa ? "Isso." : "Não foi dessa vez."}</p><p class="muted">${p.pergunta.fb}</p>` : ""}</div>
@@ -112,7 +114,7 @@ export function renderAluno(st, id, loc) {
       const mochila = st.resp[id].viagem.mochila;
       const topo = `<h2>Estação ${posto.curto}</h2><p>${esc(info.pista)}</p>
         ${info.ancora ? `<div class="anchor"><b>${fmtVar(info.ancora.v, real[info.ancora.v])}${u(info.ancora.v)}</b><span>${VAR_META[info.ancora.v].label}<br><span class="faint">${esc(info.ancora.fonte)}</span></span></div>` : ""}
-        ${mochila.length ? `<div class="card" style="padding:12px"><b>🎒 Sua mochila</b>${mochila.map((m) => `<div class="row" style="justify-content:space-between"><span>${VAR_META[m.v].label}</span><span class="mono">${m.valor}</span></div>`).join("")}</div>` : ""}`;
+        ${mochila.length ? `<div class="card" style="padding:12px"><b>${icon("mochila", "inline")} Sua mochila</b>${mochila.map((m) => `<div class="row" style="justify-content:space-between"><span>${VAR_META[m.v].label}</span><span class="mono">${m.valor}</span></div>`).join("")}</div>` : ""}`;
       if (!ind) {
         b = topo + `<div class="sep"></div><h3 style="color:var(--o2)">1. Sua resposta individual</h3>` + hipoteseForm("posto", loc.posto, posto) +
           `<button class="btn ok block" data-a="postoInd" ${completo(loc.posto, posto) ? "" : "disabled"}>Enviar minha resposta</button>`;
@@ -178,7 +180,8 @@ export function renderAluno(st, id, loc) {
     }
     default: b = "";
   }
-  return hd(st, me) + `<div class="bd">${b}</div>`;
+  const ribbon = g && st.fase !== 'grupos' ? `<div class="station-ribbon">${icon(posto.id, 'small')}<div><small>Sua estação</small><b>${posto.curto}</b></div><span class="group-number">${String(g.i + 1).padStart(2, '0')}</span></div>` : '';
+  return hd(st, me) + `<div class="bd">${ribbon}${b}</div>`;
 }
 
 // Converte cliques/entradas do celular em ações do motor (ou em mudanças locais).
