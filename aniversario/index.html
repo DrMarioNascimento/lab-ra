@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Você está convidado!">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Convite">
+<meta property="og:description" content="Você está convidado!">
+<meta property="og:url" content="https://lab-ra.dragongames.dev.br/aniversario/">
+<meta property="og:image" content="https://lab-ra.dragongames.dev.br/aniversario/convite-card.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Avatar do Mário e a palavra Convite">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="avatar.png">
+<link rel="apple-touch-icon" href="avatar.png">
+<title>Convite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{--ink:#17352B;--ink2:#3D5C50;--bg:#EEF5EE;--card:#FFFFFF;--line:#CFE1D4;--orange:#F28C28;--orangeDeep:#9A4A0B;--brown:#B4530F;--green:#2F6E50;--teal:#1E6E82;--sun:#FFC94D}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-text-size-adjust:100%}
+.wrap{max-width:480px;margin:0 auto;padding-bottom:40px}
+h1,h2,.display{font-family:'Bricolage Grotesque',system-ui,sans-serif}
+.hero{position:relative;height:340px;background:#BFE3F0;overflow:hidden}
+.hero svg.scene{display:none}
+.hero .bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 55%;display:block}
+.hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:70px;background:linear-gradient(rgba(23,53,43,0),rgba(23,53,43,.22));pointer-events:none}
+.hero .avatar{z-index:1}
+.avatar{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);width:184px;height:184px;border-radius:50%;background:#FFF7E6;border:6px solid #fff;overflow:hidden;box-shadow:0 10px 0 rgba(23,53,43,.18),0 18px 34px rgba(23,53,43,.25);animation:bob 4s ease-in-out infinite}
+.avatar img{width:100%;height:100%;object-fit:cover;display:block}
+@keyframes bob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-6px)}}
+.cloud{animation:drift 26s linear infinite}
+@keyframes drift{from{transform:translateX(-40px)}to{transform:translateX(420px)}}
+@media (prefers-reduced-motion:reduce){.avatar,.cloud{animation:none}}
+.intro{padding:24px 24px 0;text-align:center}
+.kicker{font-size:13px;font-weight:700;letter-spacing:.16em;color:var(--brown)}
+.intro h1{margin:10px 0 0;font-weight:800;font-size:clamp(38px,11vw,46px);line-height:1}
+.intro p{margin:14px 0 0;font-size:16px;line-height:1.6;color:var(--ink2)}
+.count{margin:24px 20px 0;padding:18px;border-radius:20px;background:var(--ink);color:#fff;box-shadow:0 7px 0 #0B1F18;display:flex;align-items:center;justify-content:center;gap:14px}
+.count b{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:52px;line-height:1;color:var(--sun)}
+.count span{font-size:15px;line-height:1.35;font-weight:600}
+.section{padding:28px 20px 0}
+.section h2{margin:0 0 12px;font-weight:800;font-size:24px}
+.card{background:var(--card);border-radius:18px;box-shadow:0 6px 0 var(--line);padding:18px;display:flex;gap:14px;align-items:flex-start}
+.card+.card{margin-top:14px}
+.ico{flex:none;width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 -3px 0 rgba(0,0,0,.12)}
+.card h3{margin:0 0 4px;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px}
+.card p{margin:0;font-size:15px;line-height:1.5;color:var(--ink2)}
+.map{display:flex;gap:16px;align-items:center;margin-top:14px;padding:16px;border-radius:18px;background:var(--card);box-shadow:0 6px 0 var(--line)}
+.map .qr{flex:none;width:118px;height:118px;padding:6px;border-radius:12px;background:#fff;border:2px solid var(--line)}
+.map .qr svg{width:100%;height:100%;display:block}
+.map p{margin:0 0 10px;font-size:14px;line-height:1.45;color:var(--ink2)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:12px 16px;border-radius:14px;font-weight:700;font-size:15px;text-decoration:none;transition:transform .08s ease,box-shadow .08s ease;cursor:pointer;border:0}
+.btn-green{background:var(--green);color:#fff;box-shadow:0 5px 0 #1A4433}
+.btn-green:active{transform:translateY(4px);box-shadow:0 1px 0 #1A4433}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.item{background:var(--card);border-radius:16px;box-shadow:0 5px 0 var(--line);padding:14px;display:flex;flex-direction:column;gap:8px;min-height:104px;transition:transform .08s ease,box-shadow .08s ease}
+.item:active{transform:translateY(3px);box-shadow:0 2px 0 var(--line)}
+.item .ico{width:40px;height:40px;border-radius:12px}
+.item strong{font-size:14px;line-height:1.3}
+.item small{font-size:12.5px;color:var(--ink2);line-height:1.35}
+.menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.dish{border-radius:20px;padding:18px 16px;color:#2B1606;box-shadow:0 7px 0 rgba(0,0,0,.18);display:flex;flex-direction:column;gap:6px;min-height:150px}
+.dish .big{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:23px;line-height:1.05}
+.dish small{font-size:13.5px;line-height:1.4}
+.rules{margin:30px 20px 0;padding:22px 20px;border-radius:20px;background:#FFF7E6;border:2px dashed #F2A541;transform:rotate(-1deg)}
+.rules h2{margin:0;font-size:22px;font-weight:800}
+.rules ol{margin:12px 0 0;padding-left:22px;font-size:15px;line-height:1.7;color:var(--ink2)}
+.cta{padding:34px 20px 0;text-align:center}
+.cta .btn{width:100%;min-height:60px;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:21px;border-radius:18px;background:var(--orange);color:#2B1606;box-shadow:0 7px 0 var(--orangeDeep),0 14px 24px rgba(23,53,43,.25)}
+.cta .btn:active{transform:translateY(5px);box-shadow:0 1px 0 var(--orangeDeep)}
+.cta small{display:block;margin-top:12px;font-size:13px;color:#4F6B60}
+.spons{position:relative;background:#fff;border-radius:20px;box-shadow:0 6px 0 var(--line);padding:22px 18px 18px;overflow:hidden}
+.spons h2{margin:0 0 4px}
+.stamp{position:absolute;top:16px;right:-34px;transform:rotate(18deg);background:#C62828;color:#fff;font-weight:800;font-size:11px;letter-spacing:.14em;padding:6px 40px;box-shadow:0 3px 0 #7F1515}
+.spons .sub{margin:0 0 14px;font-size:14.5px;line-height:1.5;color:var(--ink2);max-width:86%}
+.spons ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.spons li{display:flex;gap:12px;align-items:center;padding:12px;border-radius:14px;background:#F6FAF6;border:2px dashed var(--line)}
+.spons li b{display:block;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:18px}
+.spons li small{font-size:13px;color:var(--ink2);line-height:1.35}
+.spons li .ico{width:42px;height:42px;border-radius:12px}
+.spons .tag{margin-left:auto;flex:none;font-size:11px;font-weight:700;color:#9A4A0B;background:#FFE9CC;border-radius:999px;padding:4px 8px}
+.spons .fine{margin:12px 0 0;font-size:12px;color:#6B8579;font-style:italic}
+.form{background:#fff;border-radius:20px;box-shadow:0 6px 0 var(--line);padding:20px 18px;display:flex;flex-direction:column;gap:18px}
+.form .lead{margin:-4px 0 0;font-size:14px;color:var(--ink2)}
+.f{display:flex;flex-direction:column;gap:8px;margin:0}
+.f>span{font-weight:700;font-size:15px}
+.f input,.f textarea{font:inherit;font-size:16px;color:var(--ink);background:#F6FAF6;border:2px solid var(--line);border-radius:14px;padding:12px 14px;min-height:50px;width:100%;outline:none;resize:vertical}
+.f input:focus,.f textarea:focus{border-color:var(--green);background:#fff}
+.seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.opt{font:inherit;font-weight:700;font-size:14px;line-height:1.2;min-height:52px;padding:8px 6px;border-radius:14px;border:0;cursor:pointer;background:#EEF5EE;color:var(--ink);box-shadow:0 5px 0 var(--line);transition:transform .08s ease,box-shadow .08s ease,background .15s}
+.opt:active{transform:translateY(4px);box-shadow:0 1px 0 var(--line)}
+.opt[aria-pressed=true],.opt[aria-checked=true]{background:var(--green);color:#fff;box-shadow:0 5px 0 #1A4433}
+.chips{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.stepper{display:flex;align-items:center;gap:14px}
+.stepper button{width:52px;height:52px;border-radius:14px;border:0;font-size:26px;font-weight:800;color:#fff;background:var(--green);box-shadow:0 5px 0 #1A4433;cursor:pointer;transition:transform .08s ease,box-shadow .08s ease}
+.stepper button:active{transform:translateY(4px);box-shadow:0 1px 0 #1A4433}
+.stepper output{min-width:40px;text-align:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:32px}
+.err{margin:0;min-height:0;font-size:14px;font-weight:600;color:#B3261E}
+.err:empty{display:none}
+.send{width:100%;min-height:60px;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:21px;border-radius:18px;background:var(--orange);color:#2B1606;box-shadow:0 7px 0 var(--orangeDeep),0 14px 24px rgba(23,53,43,.25)}
+.send:active{transform:translateY(5px);box-shadow:0 1px 0 var(--orangeDeep)}
+.form .note{margin:-8px 0 0;text-align:center;font-size:13px;color:#4F6B60}
+[hidden]{display:none!important}
+.sign{padding:30px 20px 0;text-align:center;font-family:'Bricolage Grotesque',sans-serif;font-size:21px;color:var(--green)}
+</style>
+</head>
+<body>
+<main class="wrap">
+
+  <header class="hero">
+    <img class="bg" src="serra3d.jpg" alt="" aria-hidden="true">
+    <svg class="scene" viewBox="0 0 390 340" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9FD6EC"/><stop offset="1" stop-color="#E6F5EE"/></linearGradient>
+        <linearGradient id="m1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9CCBB0"/><stop offset="1" stop-color="#6FAA8B"/></linearGradient>
+        <linearGradient id="m2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5FA07D"/><stop offset="1" stop-color="#3B7E5D"/></linearGradient>
+        <linearGradient id="lake" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7FD0DD"/><stop offset="1" stop-color="#3B9BB2"/></linearGradient>
+        <radialGradient id="sunG"><stop offset="0" stop-color="#FFE48A"/><stop offset="1" stop-color="#FFC94D" stop-opacity="0"/></radialGradient>
+      </defs>
+      <rect width="390" height="340" fill="url(#sky)"/>
+      <circle cx="318" cy="70" r="70" fill="url(#sunG)"/>
+      <circle cx="318" cy="70" r="28" fill="#FFD25E"/>
+      <g class="cloud" fill="#fff" opacity=".92"><ellipse cx="40" cy="58" rx="34" ry="12"/><ellipse cx="64" cy="50" rx="22" ry="12"/></g>
+      <g fill="#fff" opacity=".8"><ellipse cx="190" cy="96" rx="26" ry="9"/><ellipse cx="206" cy="90" rx="16" ry="9"/></g>
+      <path d="M0 236 C40 200 60 160 96 158 C130 156 140 196 176 186 C210 176 214 118 252 120 C290 122 300 178 330 176 C356 174 370 196 390 206 L390 340 L0 340Z" fill="url(#m1)"/>
+      <path d="M0 270 C30 248 70 228 110 240 C150 252 170 222 210 212 C250 202 280 244 320 238 C350 234 372 244 390 250 L390 340 L0 340Z" fill="url(#m2)"/>
+      <g fill="#2F6E50"><path d="M24 296 l13 -40 l13 40z"/><path d="M44 300 l10 -30 l10 30z"/><path d="M330 294 l13 -42 l13 42z"/><path d="M352 300 l10 -30 l10 30z"/></g>
+      <g fill="#245C44" opacity=".55"><path d="M28 296 l9 -28 l4 28z"/><path d="M334 294 l9 -30 l4 30z"/></g>
+      <ellipse cx="195" cy="322" rx="240" ry="30" fill="url(#lake)"/>
+      <path d="M40 316 h40 M120 326 h56 M230 318 h44 M300 328 h40" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".55"/>
+    </svg>
+    <div class="avatar"><img src="avatar.png" alt="Avatar do Mário sorrindo"></div>
+  </header>
+
+  <section class="intro">
+    <div class="kicker">VOCÊ ESTÁ CONVIDADO!</div>
+    <h1>O Mário faz 54<br>e vai pro mato!</h1>
+    <p>Venha comemorar comigo, mas, de verdade, venha tirar um tempo pra você: desacelerar, respirar ar de serra e relaxar sem pressa.</p>
+  </section>
+
+  <div class="count" aria-live="polite"><b id="days">–</b><span id="daysLabel">dias pra gente<br>subir a serra</span></div>
+
+  <section class="section">
+    <div class="card">
+      <span class="ico" style="background:#FFE3C7"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#B4530F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span>
+      <div><h3>Quando</h3><p>Sexta, 27, a domingo, 29 de novembro</p></div>
+    </div>
+    <div class="card">
+      <span class="ico" style="background:#D6EEDF"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2F6E50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span>
+      <div><h3>Onde</h3><p>Casa de campo na Serra do Tabuleiro, área de preservação<br>Santo Amaro da Imperatriz · SC</p></div>
+    </div>
+    <div class="map">
+      <div class="qr"><svg role="img" aria-label="QR Code com a localização no mapa" viewBox="0 0 39 39" width="150" height="150" shape-rendering="crispEdges"><rect width="39" height="39" fill="#fff"/><path d="M1 1h1v1h-1zM2 1h1v1h-1zM3 1h1v1h-1zM4 1h1v1h-1zM5 1h1v1h-1zM6 1h1v1h-1zM7 1h1v1h-1zM9 1h1v1h-1zM11 1h1v1h-1zM12 1h1v1h-1zM13 1h1v1h-1zM14 1h1v1h-1zM15 1h1v1h-1zM16 1h1v1h-1zM17 1h1v1h-1zM19 1h1v1h-1zM20 1h1v1h-1zM21 1h1v1h-1zM22 1h1v1h-1zM26 1h1v1h-1zM27 1h1v1h-1zM31 1h1v1h-1zM32 1h1v1h-1zM33 1h1v1h-1zM34 1h1v1h-1zM35 1h1v1h-1zM36 1h1v1h-1zM37 1h1v1h-1zM1 2h1v1h-1zM7 2h1v1h-1zM9 2h1v1h-1zM16 2h1v1h-1zM19 2h1v1h-1zM20 2h1v1h-1zM31 2h1v1h-1zM37 2h1v1h-1zM1 3h1v1h-1zM3 3h1v1h-1zM4 3h1v1h-1zM5 3h1v1h-1zM7 3h1v1h-1zM9 3h1v1h-1zM10 3h1v1h-1zM11 3h1v1h-1zM12 3h1v1h-1zM13 3h1v1h-1zM14 3h1v1h-1zM16 3h1v1h-1zM19 3h1v1h-1zM22 3h1v1h-1zM26 3h1v1h-1zM27 3h1v1h-1zM29 3h1v1h-1zM31 3h1v1h-1zM33 3h1v1h-1zM34 3h1v1h-1zM35 3h1v1h-1zM37 3h1v1h-1zM1 4h1v1h-1zM3 4h1v1h-1zM4 4h1v1h-1zM5 4h1v1h-1zM7 4h1v1h-1zM11 4h1v1h-1zM16 4h1v1h-1zM17 4h1v1h-1zM18 4h1v1h-1zM19 4h1v1h-1zM21 4h1v1h-1zM22 4h1v1h-1zM25 4h1v1h-1zM26 4h1v1h-1zM29 4h1v1h-1zM31 4h1v1h-1zM33 4h1v1h-1zM34 4h1v1h-1zM35 4h1v1h-1zM37 4h1v1h-1zM1 5h1v1h-1zM3 5h1v1h-1zM4 5h1v1h-1zM5 5h1v1h-1zM7 5h1v1h-1zM9 5h1v1h-1zM11 5h1v1h-1zM12 5h1v1h-1zM13 5h1v1h-1zM15 5h1v1h-1zM19 5h1v1h-1zM20 5h1v1h-1zM22 5h1v1h-1zM23 5h1v1h-1zM26 5h1v1h-1zM27 5h1v1h-1zM29 5h1v1h-1zM31 5h1v1h-1zM33 5h1v1h-1zM34 5h1v1h-1zM35 5h1v1h-1zM37 5h1v1h-1zM1 6h1v1h-1zM7 6h1v1h-1zM11 6h1v1h-1zM14 6h1v1h-1zM15 6h1v1h-1zM21 6h1v1h-1zM22 6h1v1h-1zM23 6h1v1h-1zM24 6h1v1h-1zM26 6h1v1h-1zM27 6h1v1h-1zM31 6h1v1h-1zM37 6h1v1h-1zM1 7h1v1h-1zM2 7h1v1h-1zM3 7h1v1h-1zM4 7h1v1h-1zM5 7h1v1h-1zM6 7h1v1h-1zM7 7h1v1h-1zM9 7h1v1h-1zM11 7h1v1h-1zM13 7h1v1h-1zM15 7h1v1h-1zM17 7h1v1h-1zM19 7h1v1h-1zM21 7h1v1h-1zM23 7h1v1h-1zM25 7h1v1h-1zM27 7h1v1h-1zM29 7h1v1h-1zM31 7h1v1h-1zM32 7h1v1h-1zM33 7h1v1h-1zM34 7h1v1h-1zM35 7h1v1h-1zM36 7h1v1h-1zM37 7h1v1h-1zM12 8h1v1h-1zM13 8h1v1h-1zM15 8h1v1h-1zM18 8h1v1h-1zM19 8h1v1h-1zM21 8h1v1h-1zM26 8h1v1h-1zM28 8h1v1h-1zM29 8h1v1h-1zM1 9h1v1h-1zM4 9h1v1h-1zM5 9h1v1h-1zM6 9h1v1h-1zM7 9h1v1h-1zM8 9h1v1h-1zM9 9h1v1h-1zM10 9h1v1h-1zM11 9h1v1h-1zM12 9h1v1h-1zM15 9h1v1h-1zM16 9h1v1h-1zM20 9h1v1h-1zM24 9h1v1h-1zM25 9h1v1h-1zM30 9h1v1h-1zM33 9h1v1h-1zM35 9h1v1h-1zM36 9h1v1h-1zM37 9h1v1h-1zM2 10h1v1h-1zM3 10h1v1h-1zM6 10h1v1h-1zM10 10h1v1h-1zM15 10h1v1h-1zM17 10h1v1h-1zM18 10h1v1h-1zM19 10h1v1h-1zM23 10h1v1h-1zM24 10h1v1h-1zM26 10h1v1h-1zM27 10h1v1h-1zM28 10h1v1h-1zM30 10h1v1h-1zM32 10h1v1h-1zM33 10h1v1h-1zM34 10h1v1h-1zM35 10h1v1h-1zM36 10h1v1h-1zM4 11h1v1h-1zM5 11h1v1h-1zM6 11h1v1h-1zM7 11h1v1h-1zM8 11h1v1h-1zM10 11h1v1h-1zM14 11h1v1h-1zM15 11h1v1h-1zM16 11h1v1h-1zM17 11h1v1h-1zM22 11h1v1h-1zM24 11h1v1h-1zM25 11h1v1h-1zM28 11h1v1h-1zM29 11h1v1h-1zM31 11h1v1h-1zM37 11h1v1h-1zM1 12h1v1h-1zM2 12h1v1h-1zM3 12h1v1h-1zM4 12h1v1h-1zM6 12h1v1h-1zM8 12h1v1h-1zM13 12h1v1h-1zM14 12h1v1h-1zM15 12h1v1h-1zM17 12h1v1h-1zM18 12h1v1h-1zM20 12h1v1h-1zM23 12h1v1h-1zM24 12h1v1h-1zM25 12h1v1h-1zM29 12h1v1h-1zM32 12h1v1h-1zM33 12h1v1h-1zM34 12h1v1h-1zM35 12h1v1h-1zM36 12h1v1h-1zM37 12h1v1h-1zM4 13h1v1h-1zM6 13h1v1h-1zM7 13h1v1h-1zM8 13h1v1h-1zM11 13h1v1h-1zM12 13h1v1h-1zM13 13h1v1h-1zM16 13h1v1h-1zM17 13h1v1h-1zM19 13h1v1h-1zM20 13h1v1h-1zM21 13h1v1h-1zM24 13h1v1h-1zM25 13h1v1h-1zM28 13h1v1h-1zM29 13h1v1h-1zM31 13h1v1h-1zM37 13h1v1h-1zM3 14h1v1h-1zM5 14h1v1h-1zM9 14h1v1h-1zM10 14h1v1h-1zM11 14h1v1h-1zM12 14h1v1h-1zM15 14h1v1h-1zM16 14h1v1h-1zM23 14h1v1h-1zM24 14h1v1h-1zM27 14h1v1h-1zM28 14h1v1h-1zM29 14h1v1h-1zM30 14h1v1h-1zM33 14h1v1h-1zM34 14h1v1h-1zM3 15h1v1h-1zM4 15h1v1h-1zM7 15h1v1h-1zM8 15h1v1h-1zM10 15h1v1h-1zM11 15h1v1h-1zM12 15h1v1h-1zM16 15h1v1h-1zM19 15h1v1h-1zM20 15h1v1h-1zM22 15h1v1h-1zM23 15h1v1h-1zM28 15h1v1h-1zM30 15h1v1h-1zM31 15h1v1h-1zM33 15h1v1h-1zM34 15h1v1h-1zM35 15h1v1h-1zM36 15h1v1h-1zM37 15h1v1h-1zM1 16h1v1h-1zM3 16h1v1h-1zM5 16h1v1h-1zM6 16h1v1h-1zM8 16h1v1h-1zM9 16h1v1h-1zM10 16h1v1h-1zM13 16h1v1h-1zM17 16h1v1h-1zM20 16h1v1h-1zM21 16h1v1h-1zM24 16h1v1h-1zM28 16h1v1h-1zM31 16h1v1h-1zM32 16h1v1h-1zM34 16h1v1h-1zM35 16h1v1h-1zM36 16h1v1h-1zM37 16h1v1h-1zM2 17h1v1h-1zM4 17h1v1h-1zM5 17h1v1h-1zM7 17h1v1h-1zM12 17h1v1h-1zM14 17h1v1h-1zM15 17h1v1h-1zM16 17h1v1h-1zM18 17h1v1h-1zM19 17h1v1h-1zM23 17h1v1h-1zM26 17h1v1h-1zM31 17h1v1h-1zM35 17h1v1h-1zM37 17h1v1h-1zM1 18h1v1h-1zM2 18h1v1h-1zM3 18h1v1h-1zM9 18h1v1h-1zM10 18h1v1h-1zM13 18h1v1h-1zM14 18h1v1h-1zM21 18h1v1h-1zM28 18h1v1h-1zM30 18h1v1h-1zM32 18h1v1h-1zM35 18h1v1h-1zM7 19h1v1h-1zM8 19h1v1h-1zM14 19h1v1h-1zM15 19h1v1h-1zM17 19h1v1h-1zM20 19h1v1h-1zM23 19h1v1h-1zM24 19h1v1h-1zM26 19h1v1h-1zM28 19h1v1h-1zM31 19h1v1h-1zM33 19h1v1h-1zM34 19h1v1h-1zM37 19h1v1h-1zM2 20h1v1h-1zM3 20h1v1h-1zM4 20h1v1h-1zM5 20h1v1h-1zM6 20h1v1h-1zM8 20h1v1h-1zM9 20h1v1h-1zM10 20h1v1h-1zM14 20h1v1h-1zM16 20h1v1h-1zM17 20h1v1h-1zM21 20h1v1h-1zM23 20h1v1h-1zM26 20h1v1h-1zM29 20h1v1h-1zM30 20h1v1h-1zM32 20h1v1h-1zM33 20h1v1h-1zM34 20h1v1h-1zM37 20h1v1h-1zM4 21h1v1h-1zM7 21h1v1h-1zM10 21h1v1h-1zM13 21h1v1h-1zM18 21h1v1h-1zM21 21h1v1h-1zM23 21h1v1h-1zM24 21h1v1h-1zM25 21h1v1h-1zM29 21h1v1h-1zM30 21h1v1h-1zM31 21h1v1h-1zM32 21h1v1h-1zM33 21h1v1h-1zM1 22h1v1h-1zM3 22h1v1h-1zM5 22h1v1h-1zM8 22h1v1h-1zM10 22h1v1h-1zM12 22h1v1h-1zM13 22h1v1h-1zM16 22h1v1h-1zM17 22h1v1h-1zM18 22h1v1h-1zM19 22h1v1h-1zM20 22h1v1h-1zM23 22h1v1h-1zM24 22h1v1h-1zM25 22h1v1h-1zM27 22h1v1h-1zM28 22h1v1h-1zM30 22h1v1h-1zM33 22h1v1h-1zM35 22h1v1h-1zM36 22h1v1h-1zM2 23h1v1h-1zM3 23h1v1h-1zM4 23h1v1h-1zM6 23h1v1h-1zM7 23h1v1h-1zM8 23h1v1h-1zM9 23h1v1h-1zM10 23h1v1h-1zM12 23h1v1h-1zM15 23h1v1h-1zM16 23h1v1h-1zM17 23h1v1h-1zM22 23h1v1h-1zM23 23h1v1h-1zM24 23h1v1h-1zM28 23h1v1h-1zM29 23h1v1h-1zM32 23h1v1h-1zM34 23h1v1h-1zM37 23h1v1h-1zM2 24h1v1h-1zM3 24h1v1h-1zM5 24h1v1h-1zM6 24h1v1h-1zM10 24h1v1h-1zM11 24h1v1h-1zM12 24h1v1h-1zM15 24h1v1h-1zM19 24h1v1h-1zM23 24h1v1h-1zM24 24h1v1h-1zM28 24h1v1h-1zM32 24h1v1h-1zM33 24h1v1h-1zM34 24h1v1h-1zM35 24h1v1h-1zM37 24h1v1h-1zM2 25h1v1h-1zM3 25h1v1h-1zM5 25h1v1h-1zM6 25h1v1h-1zM7 25h1v1h-1zM8 25h1v1h-1zM10 25h1v1h-1zM14 25h1v1h-1zM18 25h1v1h-1zM20 25h1v1h-1zM21 25h1v1h-1zM25 25h1v1h-1zM28 25h1v1h-1zM29 25h1v1h-1zM30 25h1v1h-1zM31 25h1v1h-1zM32 25h1v1h-1zM36 25h1v1h-1zM37 25h1v1h-1zM1 26h1v1h-1zM2 26h1v1h-1zM4 26h1v1h-1zM5 26h1v1h-1zM6 26h1v1h-1zM8 26h1v1h-1zM9 26h1v1h-1zM11 26h1v1h-1zM13 26h1v1h-1zM15 26h1v1h-1zM19 26h1v1h-1zM21 26h1v1h-1zM22 26h1v1h-1zM23 26h1v1h-1zM24 26h1v1h-1zM27 26h1v1h-1zM28 26h1v1h-1zM29 26h1v1h-1zM33 26h1v1h-1zM35 26h1v1h-1zM1 27h1v1h-1zM2 27h1v1h-1zM4 27h1v1h-1zM6 27h1v1h-1zM7 27h1v1h-1zM9 27h1v1h-1zM12 27h1v1h-1zM13 27h1v1h-1zM14 27h1v1h-1zM15 27h1v1h-1zM16 27h1v1h-1zM19 27h1v1h-1zM20 27h1v1h-1zM27 27h1v1h-1zM28 27h1v1h-1zM30 27h1v1h-1zM31 27h1v1h-1zM33 27h1v1h-1zM35 27h1v1h-1zM36 27h1v1h-1zM37 27h1v1h-1zM1 28h1v1h-1zM3 28h1v1h-1zM4 28h1v1h-1zM5 28h1v1h-1zM6 28h1v1h-1zM11 28h1v1h-1zM12 28h1v1h-1zM15 28h1v1h-1zM17 28h1v1h-1zM20 28h1v1h-1zM21 28h1v1h-1zM25 28h1v1h-1zM27 28h1v1h-1zM29 28h1v1h-1zM30 28h1v1h-1zM33 28h1v1h-1zM35 28h1v1h-1zM37 28h1v1h-1zM1 29h1v1h-1zM5 29h1v1h-1zM6 29h1v1h-1zM7 29h1v1h-1zM10 29h1v1h-1zM11 29h1v1h-1zM13 29h1v1h-1zM16 29h1v1h-1zM17 29h1v1h-1zM20 29h1v1h-1zM21 29h1v1h-1zM23 29h1v1h-1zM25 29h1v1h-1zM26 29h1v1h-1zM28 29h1v1h-1zM29 29h1v1h-1zM30 29h1v1h-1zM31 29h1v1h-1zM32 29h1v1h-1zM33 29h1v1h-1zM35 29h1v1h-1zM9 30h1v1h-1zM10 30h1v1h-1zM13 30h1v1h-1zM15 30h1v1h-1zM16 30h1v1h-1zM17 30h1v1h-1zM18 30h1v1h-1zM20 30h1v1h-1zM21 30h1v1h-1zM29 30h1v1h-1zM33 30h1v1h-1zM35 30h1v1h-1zM1 31h1v1h-1zM2 31h1v1h-1zM3 31h1v1h-1zM4 31h1v1h-1zM5 31h1v1h-1zM6 31h1v1h-1zM7 31h1v1h-1zM9 31h1v1h-1zM11 31h1v1h-1zM12 31h1v1h-1zM15 31h1v1h-1zM16 31h1v1h-1zM18 31h1v1h-1zM19 31h1v1h-1zM20 31h1v1h-1zM23 31h1v1h-1zM24 31h1v1h-1zM26 31h1v1h-1zM27 31h1v1h-1zM29 31h1v1h-1zM31 31h1v1h-1zM33 31h1v1h-1zM37 31h1v1h-1zM1 32h1v1h-1zM7 32h1v1h-1zM9 32h1v1h-1zM12 32h1v1h-1zM14 32h1v1h-1zM20 32h1v1h-1zM24 32h1v1h-1zM26 32h1v1h-1zM28 32h1v1h-1zM29 32h1v1h-1zM33 32h1v1h-1zM1 33h1v1h-1zM3 33h1v1h-1zM4 33h1v1h-1zM5 33h1v1h-1zM7 33h1v1h-1zM9 33h1v1h-1zM10 33h1v1h-1zM12 33h1v1h-1zM13 33h1v1h-1zM14 33h1v1h-1zM15 33h1v1h-1zM17 33h1v1h-1zM19 33h1v1h-1zM20 33h1v1h-1zM21 33h1v1h-1zM24 33h1v1h-1zM25 33h1v1h-1zM28 33h1v1h-1zM29 33h1v1h-1zM30 33h1v1h-1zM31 33h1v1h-1zM32 33h1v1h-1zM33 33h1v1h-1zM36 33h1v1h-1zM37 33h1v1h-1zM1 34h1v1h-1zM3 34h1v1h-1zM4 34h1v1h-1zM5 34h1v1h-1zM7 34h1v1h-1zM9 34h1v1h-1zM10 34h1v1h-1zM11 34h1v1h-1zM13 34h1v1h-1zM15 34h1v1h-1zM20 34h1v1h-1zM23 34h1v1h-1zM27 34h1v1h-1zM31 34h1v1h-1zM34 34h1v1h-1zM37 34h1v1h-1zM1 35h1v1h-1zM3 35h1v1h-1zM4 35h1v1h-1zM5 35h1v1h-1zM7 35h1v1h-1zM10 35h1v1h-1zM12 35h1v1h-1zM18 35h1v1h-1zM19 35h1v1h-1zM24 35h1v1h-1zM26 35h1v1h-1zM27 35h1v1h-1zM29 35h1v1h-1zM30 35h1v1h-1zM33 35h1v1h-1zM37 35h1v1h-1zM1 36h1v1h-1zM7 36h1v1h-1zM10 36h1v1h-1zM11 36h1v1h-1zM12 36h1v1h-1zM16 36h1v1h-1zM18 36h1v1h-1zM19 36h1v1h-1zM25 36h1v1h-1zM27 36h1v1h-1zM29 36h1v1h-1zM30 36h1v1h-1zM33 36h1v1h-1zM34 36h1v1h-1zM35 36h1v1h-1zM36 36h1v1h-1zM37 36h1v1h-1zM1 37h1v1h-1zM2 37h1v1h-1zM3 37h1v1h-1zM4 37h1v1h-1zM5 37h1v1h-1zM6 37h1v1h-1zM7 37h1v1h-1zM9 37h1v1h-1zM10 37h1v1h-1zM11 37h1v1h-1zM12 37h1v1h-1zM14 37h1v1h-1zM15 37h1v1h-1zM17 37h1v1h-1zM21 37h1v1h-1zM25 37h1v1h-1zM29 37h1v1h-1zM32 37h1v1h-1zM35 37h1v1h-1zM37 37h1v1h-1z" fill="#17352B"/></svg></div>
+      <div>
+        <p>Aponte a câmera do celular pro código ou toque no botão pra abrir o caminho no mapa.</p>
+        <a class="btn btn-green" href="https://www.google.com/maps/search/?api=1&amp;query=Santo+Amaro+da+Imperatriz+SC">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 18-8-8 18-2-8z"/></svg>
+          Como chegar
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>O que tem na casa</h2>
+    <div class="grid">
+      <div class="item"><span class="ico" style="background:#D3EEF3"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1E6E82" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M2 16c2 0 2-1.5 4-1.5S8 16 10 16s2-1.5 4-1.5S16 16 18 16s2-1.5 4-1.5M2 20c2 0 2-1.5 4-1.5S8 20 10 20s2-1.5 4-1.5S16 20 18 20s2-1.5 4-1.5M8 12V5a2 2 0 0 1 4 0M12 12V5a2 2 0 0 1 4 0"/></svg></span><strong>Piscina coberta aquecida</strong><small>uns 32 °C, liberada o dia todo</small></div>
+      <div class="item"><span class="ico" style="background:#E5DDF6"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5B3FA0" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 13h18v3a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4z"/><path d="M8 9c0-1 1-1.5 1-2.5S8 5 8 4M12 9c0-1 1-1.5 1-2.5S12 5 12 4M16 9c0-1 1-1.5 1-2.5S16 5 16 4"/></svg></span><strong>Hidro e ofurô</strong><small>pra relaxar de verdade</small></div>
+      <div class="item"><span class="ico" style="background:#D6EEDF"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2F6E50" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="7"/><path d="M12 5v14M5 12h14M7 7l10 10M17 7 7 17"/></svg></span><strong>Lago com roda d'água</strong><small>bem na frente da casa</small></div>
+      <div class="item"><span class="ico" style="background:#D3EEF3"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1E6E82" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 4c4 2 2 6 6 8s2 6 6 8M10 4c4 2 2 6 6 8s2 6 4 8"/></svg></span><strong>Riacho no terreno</strong><small>barulhinho de água o tempo todo</small></div>
+      <div class="item"><span class="ico" style="background:#FFE3C7"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#B4530F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c1 3 4 4.5 4 8.5a4 4 0 0 1-8 0c0-2 1-3 1.5-4 .5 1.5 1.5 2 1.5 2S10 6 12 3z"/><path d="M5 21h14"/></svg></span><strong>Lareira e fogão a lenha</strong><small>pras noites frias da serra</small></div>
+      <div class="item"><span class="ico" style="background:#FFE0D6"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#A8401F" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 10h16l-2 6H6z"/><path d="M8 16l-2 5M16 16l2 5M9 6c0-1 1-1.5 1-2.5M14 6c0-1 1-1.5 1-2.5"/></svg></span><strong>Churrasqueira</strong><small>já sabe o que vem por aí</small></div>
+      <div class="item"><span class="ico" style="background:#E2EFD3"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A6B1F" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="8" cy="12" r="1.5"/><circle cx="14" cy="10" r="1.5"/><circle cx="15" cy="14.5" r="1.5"/></svg></span><strong>Sinuca e jogos de tabuleiro</strong><small>valendo a louça (ver combinados)</small></div>
+      <div class="item"><span class="ico" style="background:#DDE6F6"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D4F8F" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span><strong>Salinha de cinema</strong><small>TV de 65" e som caprichado</small></div>
+      <div class="item"><span class="ico" style="background:#FFF0C2"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8A6A00" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 6c4 8 14 8 18 0M3 6v3M21 6v3"/></svg></span><strong>Rede na varanda</strong><small>com vista pra serra</small></div>
+      <div class="item"><span class="ico" style="background:#EEE"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#444" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0"/><circle cx="12" cy="19.5" r="1"/></svg></span><strong>Wi-Fi rápido</strong><small>se precisar mesmo (ver combinados)</small></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Cardápio</h2>
+    <div class="menu">
+      <div class="dish" style="background:#FFD9A8">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#7A3A0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 2 20h20z"/><circle cx="10" cy="14" r="1.3"/><circle cx="14" cy="16" r="1.3"/><circle cx="12" cy="10" r="1.3"/></svg>
+        <span class="big">Pizza caseira</span>
+        <small>massa feita ali mesmo, no capricho</small>
+      </div>
+      <div class="dish" style="background:#FFC2A8">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#7A2A0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h16l-2 6H6z"/><path d="M9 5c0-1 1-1.5 1-2.5M14 5c0-1 1-1.5 1-2.5M8 15l-2 6M16 15l2 6"/></svg>
+        <span class="big">Churrasco</span>
+        <small>na churrasqueira da casa, sem hora pra acabar</small>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="spons">
+      <span class="stamp" aria-hidden="true">EM TRATATIVAS</span>
+      <h2>Patrocínio</h2>
+      <p class="sub">Ainda não confirmado, mas a assessoria do aniversariante segue firme nas negociações com:</p>
+      <ul>
+        <li><span class="ico" style="background:#FFDCDC"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#B3261E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2h4v3c0 1 1.5 2 1.5 4v11a2 2 0 0 1-2 2h-3a2 2 0 0 1-2-2V9c0-2 1.5-3 1.5-4z"/><path d="M8.5 12h7M8.5 16h7"/></svg></span><div><b>Coca-Cola</b><small>refri oficial do fim de semana (eles só não sabem ainda)</small></div><span class="tag">aguardando</span></li>
+        <li><span class="ico" style="background:#E5DDF6"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5B3FA0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M7 12c2-3 3 3 5 0s3 3 5 0"/><path d="M19 3 21 5"/></svg></span><div><b>Bordados feitos à mão</b><small>ponto por ponto, sem pressa, que nem o fim de semana</small></div><span class="tag">quase</span></li>
+        <li><span class="ico" style="background:#FFE3C7"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#B4530F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="9" width="14" height="6" rx="3"/><path d="M2 12h3M19 12h3"/></svg></span><div><b>Massa caseira</b><small>a base secreta da pizza do sábado</small></div><span class="tag">sovando</span></li>
+      </ul>
+      <p class="fine">*Patrocínio sujeito à aprovação dos patrocinadores, que ainda não foram avisados.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Leve na mala</h2>
+    <div class="card" style="display:block"><p>Roupa de banho (a piscina é quentinha), casaco pra noite, chinelo, protetor solar e muita disposição pra rir.</p></div>
+  </section>
+
+  <aside class="rules">
+    <h2>Combinados do aniversariante</h2>
+    <ol>
+      <li>Proibido falar de trabalho.</li>
+      <li>Celular só pra tirar foto.</li>
+      <li>Ninguém vai embora sem entrar na piscina.</li>
+      <li>Perdeu no jogo, lava a louça.</li>
+    </ol>
+  </aside>
+
+  <section class="section" id="rsvp">
+    <h2>Confirme sua presença</h2>
+    <form class="form" id="rsvpForm" novalidate>
+      <p class="lead">As vagas na casa são poucas, então confirma logo!</p>
+      <label class="f"><span>Seu nome</span><input id="fNome" type="text" autocomplete="name" placeholder="Como a gente te chama"></label>
+      <div class="f"><span id="lblVem">Você vem?</span>
+        <div class="seg" role="radiogroup" aria-labelledby="lblVem">
+          <button type="button" class="opt" role="radio" aria-checked="false" data-v="sim">Vou!</button>
+          <button type="button" class="opt" role="radio" aria-checked="false" data-v="talvez">Talvez</button>
+          <button type="button" class="opt" role="radio" aria-checked="false" data-v="nao">Não vou conseguir</button>
+        </div>
+      </div>
+      <div class="f" id="wrapQtd"><span id="lblQtd">Quantas pessoas, contando com você?</span>
+        <div class="stepper" aria-labelledby="lblQtd">
+          <button type="button" id="menos" aria-label="Diminuir">−</button>
+          <output id="qtd" aria-live="polite">1</output>
+          <button type="button" id="mais" aria-label="Aumentar">+</button>
+        </div>
+      </div>
+      <div class="f" id="wrapDias"><span>Quais dias você fica?</span>
+        <div class="chips">
+          <button type="button" class="opt dia" aria-pressed="true" data-v="sexta (27)">Sexta 27</button>
+          <button type="button" class="opt dia" aria-pressed="true" data-v="sábado (28)">Sábado 28</button>
+          <button type="button" class="opt dia" aria-pressed="true" data-v="domingo (29)">Domingo 29</button>
+        </div>
+      </div>
+      <label class="f" id="wrapRestr"><span>Alguma restrição alimentar?</span><input id="fRestr" type="text" placeholder="Ex.: vegetariano, sem lactose"></label>
+      <label class="f"><span>Recado pro aniversariante</span><textarea id="fMsg" rows="3" placeholder="Opcional"></textarea></label>
+      <p class="err" id="fErr" role="alert"></p>
+      <button class="btn send" type="submit">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2B1606" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+        Enviar confirmação
+      </button>
+      <p class="note">Abre o WhatsApp com a mensagem pronta: é só mandar pro Mário.</p>
+    </form>
+  </section>
+
+  <div class="sign">Te espero lá! — Mário</div>
+</main>
+<script>
+(function(){
+  var start=new Date(2026,10,27), n=new Date(), t=new Date(n.getFullYear(),n.getMonth(),n.getDate());
+  var d=Math.round((start-t)/86400000), el=document.getElementById('days'), lb=document.getElementById('daysLabel');
+  if(d>1){el.textContent=d;lb.innerHTML='dias pra gente<br>subir a serra';}
+  else if(d===1){el.textContent='1';lb.innerHTML='dia pra gente<br>subir a serra';}
+  else if(d>=-2){el.textContent='Já!';lb.innerHTML='É neste fim de semana.<br>Te vejo lá!';}
+  else{el.textContent='Valeu!';lb.innerHTML='Obrigado por<br>ter vindo';}
+})();
+</script>
+<script>
+(function(){
+  var WHATS=''; // número do Mário com DDI e DDD, só dígitos (ex.: 5548999999999)
+  var f=document.getElementById('rsvpForm'), q=1, vem='';
+  var qtd=document.getElementById('qtd'), err=document.getElementById('fErr');
+  var opts=f.querySelectorAll('.seg .opt'), dias=f.querySelectorAll('.dia');
+  var hideIfNo=['wrapQtd','wrapDias','wrapRestr'].map(function(id){return document.getElementById(id);});
+  opts.forEach(function(b){b.addEventListener('click',function(){
+    vem=b.dataset.v; opts.forEach(function(o){o.setAttribute('aria-checked',o===b?'true':'false');});
+    hideIfNo.forEach(function(w){w.hidden=(vem==='nao');}); err.textContent='';
+  });});
+  dias.forEach(function(b){b.addEventListener('click',function(){b.setAttribute('aria-pressed',b.getAttribute('aria-pressed')==='true'?'false':'true');});});
+  document.getElementById('menos').onclick=function(){if(q>1){q--;qtd.textContent=q;}};
+  document.getElementById('mais').onclick=function(){if(q<12){q++;qtd.textContent=q;}};
+  f.addEventListener('submit',function(e){
+    e.preventDefault();
+    var nome=document.getElementById('fNome').value.trim();
+    if(!nome){err.textContent='Coloca seu nome aí em cima.';document.getElementById('fNome').focus();return;}
+    if(!vem){err.textContent='Escolhe se você vem, talvez ou não.';return;}
+    var msg=document.getElementById('fMsg').value.trim(), L=[];
+    if(vem==='nao'){L.push('Oi, Mário! Aqui é '+nome+'. Infelizmente não vou conseguir ir pra serra.');}
+    else{
+      var ds=[].filter.call(dias,function(b){return b.getAttribute('aria-pressed')==='true';}).map(function(b){return b.dataset.v;});
+      if(!ds.length){err.textContent='Marca pelo menos um dia.';return;}
+      var r=document.getElementById('fRestr').value.trim();
+      L.push('Oi, Mário! Aqui é '+nome+'.');
+      L.push(vem==='sim'?'Confirmado: eu vou pra serra!':'Ainda é um talvez, mas tô tentando ir!');
+      L.push('Pessoas: '+q+(q>1?' (contando comigo)':''));
+      L.push('Dias: '+ds.join(', '));
+      if(r)L.push('Restrição alimentar: '+r);
+    }
+    if(msg)L.push('Recado: '+msg);
+    err.textContent='';
+    window.open('https://wa.me/'+WHATS+'?text='+encodeURIComponent(L.join('\n')),'_blank');
+  });
+})();
+</script>
+</body>
+</html>
