@@ -115,3 +115,20 @@ table.vals td.n { font-family: var(--mono); text-align: right; white-space: nowr
 .galeria { display: grid; gap: 12px; }
 h3.passo { color: #c4b5fd; margin-top: 6px; }
 .phone .row .btn.sm { text-align: left; }
+
+.entrada-opcoes { align-items: stretch; gap: 16px; }
+.entrada-opcoes > section { flex: 1 1 260px; }
+.entrada-simulador { margin-top: auto; display: grid; place-items: center; text-decoration: none; }
+.pendencias { color: #fde68a; padding-left: 20px; margin: 10px 0 0; font-size: 13px; line-height: 1.45; }
+.relato-label { color: var(--tx2); margin-top: 8px; font-size: 13px; }
+.filtro-turma { flex-wrap: nowrap; margin-top: 8px; }
+.filtro-turma select { width: auto; max-width: min(100%, 360px); min-width: 0; }
+.ph-wrap[hidden] { display: none; }
+.telao .previa-cena, .telao .aviso-desfecho { margin: 0; font-size: 1.5cqw; }
+.telao .aviso-desfecho { color: #fde68a; border-left: 3px solid var(--warn); padding-left: 1cqw; }
+.telao .tin[data-fase="linhas"], .telao .tin[data-fase="integracao"] { overflow: auto; padding-bottom: 4cqw; }
+.telao .confronto { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); flex: 1; min-height: 0; padding-bottom: 3cqw; }
+.telao .confronto.com-foco { grid-template-columns: minmax(0, 7fr) minmax(0, 3fr); }
+.telao #slot3d { padding: 0; overflow: hidden; position: relative; min-height: 0; }
+.telao .confronto-painel { min-height: 0; overflow: auto; font-size: 1.55cqw; padding: 0 .35cqw .8cqw 0; }
+.telao .confronto-painel h3 { font-size: 1.9cqw; }

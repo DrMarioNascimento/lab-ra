@@ -22,7 +22,7 @@ const locs = {}, pilotos = {};
 app.innerHTML = `
   <header class="row" style="padding:14px 16px 0;max-width:1800px;margin:0 auto">
     <span class="badge" style="background:linear-gradient(180deg,#a78bfa,#6d28d9)">◎</span>
-    <div class="grow"><b style="font-size:18px">Ângulos · Simulador de aula</b><div class="faint" style="font-size:12px">Telão em cima, turma embaixo. O professor comanda pelo painel ao lado (na sala real, pelo celular).</div></div>
+    <div class="grow"><b style="font-size:18px">Ângulos · Simulador de aula</b><div class="faint" style="font-size:12px">Telão em cima, turma embaixo. Use o painel do professor para conduzir a aula.</div></div>
     <label class="row muted" style="gap:6px">Alunos <input id="nAl" type="range" min="3" max="40" value="14" style="width:140px"><b id="nAlV" class="mono">14</b></label>
     <button class="btn sm ok on" id="auto">Piloto automático: ligado</button>
     <button class="btn sm sec" id="reset">Recomeçar</button>
@@ -30,7 +30,7 @@ app.innerHTML = `
   <div class="sim">
     <div><div class="telao" id="telao"><button class="btn sm sec fsbtn" id="fs">⛶ Tela cheia</button><div id="telaoIn"></div></div></div>
     <aside class="card" id="prof" style="max-height:calc(56.25vw * 0.78);overflow:auto"></aside>
-    <section class="turma"><div class="row" style="justify-content:space-between"><h3>Turma</h3><span class="faint">Desligue o piloto de um celular para clicar nele à mão.</span></div><div class="phones" id="phones"></div></section>
+    <section class="turma"><div class="row" style="justify-content:space-between"><h3>Turma</h3><span class="faint">Desligue o piloto de um celular para clicar nele à mão.</span></div><label class="row filtro-turma" for="filtroTurma">Mostrar <select id="filtroTurma"></select></label><p id="filtroVazio" class="muted" hidden>Este papel ainda não tem líder.</p><div class="phones" id="phones"></div></section>
   </div>`;
 
 // Telão, preservando o visor 3D entre redesenhos
@@ -68,12 +68,35 @@ function montarTurma() {
     const wrap = document.createElement("div"); wrap.className = "ph-wrap";
     wrap.innerHTML = `<div class="ph-cap">${g ? `<span class="badge" style="background:${cor};width:22px;height:22px;font-size:12px">${g.i + 1}</span>` : ""}<b class="grow">${esc(st.alunos[id]?.nome || id)}</b>
       <button class="btn sm ${pilotos[id] ? "ok on" : "sec"}" data-pilot="${id}">${pilotos[id] ? "piloto" : "manual"}</button></div><div class="ph-frame"><div class="ph-screen"></div></div>`;
+    wrap.dataset.grupo = g?.id ?? "";
+    wrap.dataset.aluno = id;
     box.appendChild(wrap);
     const m = montar(wrap.querySelector(".ph-screen"), () => `<div class="phone">${renderAluno(st, id, locs[id])}</div>`, (a, el) => acaoAluno(a, el, { st, id, loc: locs[id], dispatch }), (path, v) => setPath(locs[id], path, v));
     const f = () => m.draw(); subs.add(f); phoneSubs.push(f); m.draw(true);
     wrap.querySelector("[data-pilot]").onclick = (e) => { pilotos[id] = !pilotos[id]; e.target.className = `btn sm ${pilotos[id] ? "ok on" : "sec"}`; e.target.textContent = pilotos[id] ? "piloto" : "manual"; };
   }
+  const filtro = document.getElementById("filtroTurma");
+  filtro.innerHTML = '<option value="">Toda a turma</option>' + Object.values(st.grupos).map((g) =>
+    `<optgroup label="${esc(papelById(g.papel).nome)}">
+      <option value="${g.id}">${esc(papelById(g.papel).nome)} · todos</option>
+      <option value="lider:${g.id}">${esc(papelById(g.papel).nome)} · líder</option>
+    </optgroup>`).join("");
 }
+
+const filtroTurma = document.getElementById("filtroTurma");
+function filtrarTurma() {
+  const filtro = filtroTurma.value;
+  const alvo = filtro.startsWith("lider:") ? st.grupos[filtro.slice(6)] : null;
+  for (const wrap of document.querySelectorAll("#phones .ph-wrap")) {
+    wrap.hidden = alvo ? wrap.dataset.aluno !== alvo.lider : Boolean(filtro && wrap.dataset.grupo !== filtro);
+  }
+  document.getElementById("filtroVazio").hidden = Boolean(!alvo || alvo.lider);
+}
+filtroTurma.onchange = () => {
+  document.getElementById("phones").scrollLeft = 0;
+  filtrarTurma();
+};
+subs.add(filtrarTurma);
 
 function novaSala() {
   st = estadoInicial();

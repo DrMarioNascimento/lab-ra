@@ -30,13 +30,37 @@ export function papeisParaTurma(n) { return [...PAPEIS].sort((a, b) => a.priorid
 export const papelById = (id) => PAPEIS.find((p) => p.id === id);
 export const grupoDoPapel = (st, pid) => Object.values(st.grupos).find((g) => g.papel === pid);
 
-// Para quem vai o relato de um grupo: o papel de destino, ou o próximo presente na ordem de prioridade.
+// Um circuito dá a cada papel um remetente e um destinatário.
 export function destinoRelato(st, g) {
-  const p = papelById(g.papel);
-  const alvo = grupoDoPapel(st, p.enviaPara);
-  if (alvo && alvo.id !== g.id) return alvo.id;
-  const outros = Object.values(st.grupos).filter((x) => x.id !== g.id).sort((a, b) => papelById(a.papel).prioridade - papelById(b.papel).prioridade);
-  return outros[0]?.id || null;
+  const [primeiro, ...restantes] = Object.values(st.grupos).sort((a, b) => a.i - b.i);
+  if (!restantes.length) return null;
+  let atual = primeiro;
+  while (restantes.length) {
+    const preferido = papelById(atual.papel).enviaPara;
+    const indice = restantes.findIndex((x) => x.papel === preferido);
+    const [proximo] = restantes.splice(Math.max(0, indice), 1);
+    if (atual.id === g.id) return proximo.id;
+    atual = proximo;
+  }
+  return primeiro.id;
+}
+
+export function pendenciasAvanco(st) {
+  const grupos = Object.values(st.grupos);
+  const p = progresso(st);
+  const nomes = (campo) => grupos.filter((g) => !g[campo]).map((g) => papelById(g.papel).nome).join(", ");
+  switch (st.fase) {
+    case "grupos": return p.feito < p.total ? [`Confirmação de grupo pendente para ${p.total - p.feito} aluno(s).`] : [];
+    case "lider": return p.feito < p.total ? [`O sistema escolherá os líderes pendentes de ${nomes("lider")}.`] : [];
+    case "viagem": return p.feito < p.total ? [`Roteiro incompleto para ${p.total - p.feito} aluno(s).`] : [];
+    case "posto": return [
+      ...(p.ind < p.indTot ? [`Respostas individuais pendentes: ${p.indTot - p.ind}.`] : []),
+      ...(p.feito < p.total ? [`Deliberações pendentes: ${nomes("h1")}.`] : []),
+    ];
+    case "canais": return p.feito < p.total ? [`Confirmação dos canais pendente: ${nomes("ciente")}.`] : [];
+    case "laboratorio": return p.feito < p.total ? [`Decisão final pendente: ${nomes("h2")}.`] : [];
+    default: return [];
+  }
 }
 
 function sortearLider(g, rand) {
@@ -206,7 +230,7 @@ export function progresso(st) {
     case "lider": return { feito: gs.filter((g) => g.lider).length, total: gs.length, rot: "grupos com líder" };
     case "viagem": return { feito: ids.filter((id) => Object.keys(st.resp[id].viagem.r).length === PARADAS.length).length, total: ids.length, rot: "terminaram a viagem" };
     case "posto": return { feito: gs.filter((g) => g.h1).length, total: gs.length, rot: "papéis enviaram", ind: ids.filter((id) => st.resp[id].posto).length, indTot: ids.length };
-    case "canais": return { feito: gs.filter((g) => g.ciente).length, total: gs.length, rot: "leram os relatos" };
+    case "canais": return gs.length > 1 ? { feito: gs.filter((g) => g.ciente).length, total: gs.length, rot: "confirmaram os canais" } : { feito: 0, total: 0, rot: "" };
     case "laboratorio": return { feito: gs.filter((g) => g.h2).length, total: gs.length, rot: "papéis decidiram" };
     case "integracao": return { feito: ids.filter((id) => st.resp[id].saida).length, total: ids.length, rot: "bilhetes de saída" };
     default: return null;
