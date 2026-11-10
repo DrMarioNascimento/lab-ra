@@ -1,12 +1,14 @@
 // /simulador: telão em cima, turma embaixo. O "cérebro" da sala roda nesta página.
 import { estadoInicial, reduzir, FASES } from "./engine.js";
 import { renderTelao } from "./views/telao.js";
-import { renderAluno, acaoAluno, novoLocal } from "./views/aluno.js";
+import { renderAluno, acaoAluno, novoLocal } from "./views/aluno.js?v=cabine-20261110";
 import { renderProfessor, acaoProfessor } from "./views/professor.js";
-import { montar, setPath } from "./ui.js";
+import { montar, setPath } from "./ui.js?v=cabine-20261110";
 import { passoBot, NOMES } from "./bots.js";
 import { esc } from "./views/metro.js";
 
+import { renderCabin, retainJourneys } from "./journey.js";
+import { PARADAS } from "./content/viagem.js";
 import { icon, studentShell, teamStyle } from "./visual.js";
 
 let st = estadoInicial("B1");
@@ -30,7 +32,7 @@ app.innerHTML = `
     <button class="btn sm sec" id="reset">Recomeçar</button></div>
   </header>
   <div class="sim">
-    <div><div class="stage-heading"><span><i class="stage-dot"></i>TELÃO DA TURMA</span><b>Uma corrente. Todas as equipes.</b></div><div class="telao" id="telao"><div id="telaoIn"></div><button class="btn sm sec fsbtn" id="fs" title="Tela cheia">⛶ Tela cheia</button></div><ol class="phase-track" id="phaseTrack" aria-label="Etapas da aula"></ol></div>
+    <div><div class="stage-heading"><span><i class="stage-dot"></i>TELÃO DA TURMA</span><b>Uma corrente. Todas as equipes.</b></div><div class="telao" id="telao"><div id="telaoIn"></div><div id="cabineTelao" hidden></div><button class="btn sm sec fsbtn" id="fs" title="Tela cheia">⛶ Tela cheia</button></div><div class="projection-switch" id="journeyTools" hidden><button class="btn sm sec" id="journeyToggle" aria-pressed="true">Ver progresso da turma</button><a href="../cabine/">Explorar a viagem individual →</a></div><ol class="phase-track" id="phaseTrack" aria-label="Etapas da aula"></ol></div>
     <aside class="card" id="prof" aria-label="Painel do professor"></aside>
     <section class="turma"><div class="turma-header"><div><h2>Celulares da turma</h2><p>Desligue o piloto de um celular para responder por ele. Deslize para ver os demais.</p></div><div class="turma-tools"><button class="btn sm sec" id="phonesPrev" aria-label="Ver celulares anteriores">←</button><button class="btn sm sec" id="phonesNext" aria-label="Ver próximos celulares">→</button></div></div><div class="group-nav" id="groupNav" aria-label="Localizar grupo"></div><div class="phones" id="phones"></div></section>
   </div>`;
@@ -41,6 +43,32 @@ subs.add(() => {
   const k = FASES.findIndex(f => f.id === st.fase);
   document.getElementById('phaseTrack').innerHTML = FASES.map((f, i) => `<li class="${i === k ? 'current' : i < k ? 'done' : ''}" ${i === k ? 'aria-current="step"' : ''}><span>${String(i + 1).padStart(2, '0')}</span>${f.nome}</li>`).join('');
 });
+let projectedStop = 0, showCabin = true, lastJourneyPhase = st.fase;
+const cabinScreen = document.getElementById('cabineTelao');
+const journeyToggle = document.getElementById('journeyToggle');
+function drawProjectionJourney() {
+  if (st.fase !== lastJourneyPhase) { projectedStop = 0; showCabin = true; lastJourneyPhase = st.fase; }
+  const active = st.fase === 'viagem';
+  document.getElementById('journeyTools').hidden = !active;
+  cabinScreen.hidden = !active || !showCabin;
+  telaoIn.hidden = active && showCabin;
+  journeyToggle.textContent = showCabin ? 'Ver progresso da turma' : 'Voltar à cápsula';
+  journeyToggle.setAttribute('aria-pressed', String(showCabin));
+  if (!active) { cabinScreen.innerHTML = ''; return; }
+  if (!showCabin) return;
+  const restore = retainJourneys(cabinScreen);
+  cabinScreen.innerHTML = renderCabin(projectedStop, {label:'CÁPSULA DA TURMA'}) + `<nav class="projection-nav" aria-label="Percurso no telão"><p>${projectedStop + 1} de 9 · Cada aluno percorre as paradas no seu ritmo.</p><button class="btn sm sec" data-flight="-1" ${projectedStop === 0 ? 'disabled' : ''}>← Anterior</button><button class="btn sm" data-flight="1" ${projectedStop === PARADAS.length-1 ? 'disabled' : ''}>Próxima parada →</button></nav>`;
+  restore();
+}
+subs.add(drawProjectionJourney);
+cabinScreen.addEventListener('click', e => {
+  const b = e.target.closest('[data-flight]');
+  if (!b || b.disabled) return;
+  projectedStop = Math.max(0, Math.min(8, projectedStop + Number(b.dataset.flight)));
+  drawProjectionJourney();
+});
+journeyToggle.onclick = () => { showCabin = !showCabin; drawProjectionJourney(); };
+
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 for (const [button, direction] of [['phonesPrev', -1], ['phonesNext', 1]]) document.getElementById(button).onclick = () => {
   const box = document.getElementById('phones');
@@ -101,7 +129,11 @@ function montarTurma() {
     box.appendChild(wrap);
     const screen = wrap.querySelector(".ph-screen");
     const m = montar(screen, () => studentShell(st.grupos[st.alunos[id]?.grupo], renderAluno(st, id, locs[id])),
-      (a, el) => acaoAluno(a, el, { st, id, loc: locs[id], dispatch }),
+      (a, el) => {
+        const changed = acaoAluno(a, el, { st, id, loc: locs[id], dispatch });
+        if (a === 'parada') screen.scrollTop = 0;
+        return changed;
+      },
       (path, v) => setPath(locs[id], path, v));
     const f = () => m.draw();
     subs.add(f); phoneSubs.push(f);
