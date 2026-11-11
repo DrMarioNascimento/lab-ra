@@ -149,13 +149,16 @@ function buildLabels() {
   const bandIdx = VB.map((v, i) => i).filter(i => Math.abs(VB[i].y - midY) < 0.006);
   const antOf = list => list.reduce((m, i) => VB[i].z > VB[m].z ? i : m, list[0]);
   const [cabL, cabS] = duasCabecas(bandIdx, i => VB[i]);
+  // ponto da frente no MEIO de cada cabeça (o mais anterior de todos fica junto à divisão entre elas)
+  const meio = list => { const xs = list.map(i => VB[i].x), cx = xs.reduce((a, b) => a + b, 0) / xs.length, w = Math.max(...xs) - Math.min(...xs);
+    const c = list.filter(i => Math.abs(VB[i].x - cx) < 0.18 * w); return c.length ? c : list; };
   const at = (mesh, idx, off = V()) => ({ mesh, idx, off });
   LABELS = [
     { a: at(LTm, argBy(LT, v => v.y)), k: 'Origem · cabeça longa', t: 'Tubérculo supraglenoidal', c: '#e8472a', dx: -78, dy: -48, ign: [LTm] },
     { a: at(STm, argBy(ST, v => v.y)), k: 'Origem · cabeça curta', t: 'Processo coracoide', c: '#e8472a', dx: 80, dy: -22, ign: [STm] },
     { a: at(LTm, argBy(LT, v => -v.y)), k: 'Inserção', t: 'Tuberosidade do rádio', c: '#2d6ad9', dx: -82, dy: 38, ign: [LTm] },
-    { a: at(VBm, antOf(cabL), V(0, 0, 0.002)), t: 'Cabeça longa', c: '#b0423a', dx: -84, dy: -4, m: true, ign: [VBm] },
-    { a: at(VBm, antOf(cabS), V(0, 0, 0.002)), t: 'Cabeça curta', c: '#b0423a', dx: 84, dy: 10, m: true, ign: [VBm] },
+    { a: at(VBm, antOf(meio(cabL)), V(0, 0, 0.002)), t: 'Cabeça longa', c: '#b0423a', dx: -84, dy: -4, m: true, ign: [VBm] },
+    { a: at(VBm, antOf(meio(cabS)), V(0, 0, 0.002)), t: 'Cabeça curta', c: '#b0423a', dx: 84, dy: 10, m: true, ign: [VBm] },
   ];
   const ctr = mesh => { const w = worldPts(mesh); return { w, c: w.reduce((s, v) => s.add(v), V()).multiplyScalar(1 / w.length) }; };
   if (part.aponeurose_bicipital) { const { w, c } = ctr(part.aponeurose_bicipital); LABELS.push({ a: at(part.aponeurose_bicipital, nearestIdx(w, c.add(V(0, 0, 0.02)))), t: 'Aponeurose bicipital', c: '#e8d7b3', dx: 86, dy: 28, grp: 'conj', ign: [part.aponeurose_bicipital] }); }
