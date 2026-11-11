@@ -360,4 +360,6 @@ export const LENTES = [
   { id: "complexidade", nome: "Complexidade", q: "Que efeitos indiretos podem aparecer? Como acompanhar e corrigir?" },
 ];
 
+export const PREVIA = "São 19h numa academia de bairro, na última semana do Desafio 90 dias. A recepção está cheia e o salão está em uso. Cada papel vai observar a cena de um lugar diferente.";
+export const PERGUNTA_SAIDA = "Que informação fez você mudar ou manter sua decisão? O que ainda ficou incerto?";
 export const ABERTURA = "Academia de bairro, 19h, horário de pico na última semana do Desafio 90 dias. O prêmio do desafio é patrocinado por uma farmácia parceira. Cada um de vocês vê a academia do lugar onde está, e ninguém vê tudo.";

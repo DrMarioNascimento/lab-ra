@@ -1,6 +1,6 @@
 import { papelById, fotosDoGrupo, destinoRelato, desfecho, placarClassificacao } from "../engine.js";
 import { PARADAS } from "../content/roteiro.js";
-import { PESSOAS, FORA, FOTOS, CARTAS, ALTERNATIVAS, PAPEL_NA_SITUACAO, LENTES, DIMENSOES, ABERTURA, txt } from "../content/cena.js";
+import { PESSOAS, FORA, FOTOS, CARTAS, ALTERNATIVAS, PAPEL_NA_SITUACAO, LENTES, DIMENSOES, ABERTURA, PREVIA, PERGUNTA_SAIDA, txt } from "../content/cena.js";
 import { fotosDaCena } from "../scene3d.js";
 
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -107,6 +107,7 @@ export function renderAluno(st, id, loc) {
         <div class="card"><b>${pa.pergunta.q}</b>${pa.pergunta.op.map((o, k) => `<button class="opt ${resp == null ? "" : k === pa.pergunta.certa ? "right" : resp === k ? "wrong" : ""}" data-a="viagemResp" data-val="${k}" ${resp != null ? "disabled" : ""}>${o}</button>`).join("")}
         ${resp != null ? `<p class="${resp === pa.pergunta.certa ? "pill-ok" : "pill-bad"}">${resp === pa.pergunta.certa ? "Isso." : "Não foi dessa vez."}</p><p class="muted">${pa.pergunta.fb}</p>` : ""}</div>
         <div class="row"><button class="btn sec grow" data-a="parada" data-val="-1" ${i === 0 ? "disabled" : ""}>Anterior</button><button class="btn grow" data-a="parada" data-val="1" ${i === PARADAS.length - 1 ? "disabled" : ""}>Próxima</button></div>`;
+      if (loc.parada === 0) b = '<p class="muted">' + esc(PREVIA) + '</p>' + b;
       break;
     }
     case "cena":
@@ -129,6 +130,7 @@ export function renderAluno(st, id, loc) {
         const cartasGrupo = [...new Set(g.membros.flatMap((m) => st.resp[m].viagem.mochila))];
         const frasesGrupo = todas.flatMap((fid) => FOTOS[fid].frases.map((fr, i) => ({ k: `${fid}:${i}`, fr })));
         const rel = loc.gf.relato;
+        const destino = st.grupos[destinoRelato(st, g)];
         b = topo + `<div class="galeria">${todas.map((fid) => foto(st, fid, { sel: loc.gf.vejo, path: "gf.vejo" })).join("")}</div>` + ancora(st, p) +
           `<div class="card"><b>Respostas individuais (${membros.length}/${g.membros.length})</b>
           ${cont((o) => o.acao).map(([k, n]) => `<div class="row" style="justify-content:space-between"><span>${esc(txt(ALTERNATIVAS[p.id].find((a) => a.id === k)?.t, st.pers))}</span><b>${n}</b></div>`).join("")}<div class="sep"></div>
@@ -136,12 +138,12 @@ export function renderAluno(st, id, loc) {
           <span class="faint">Vulneráveis apontados:</span> ${cont((o) => [...(o.vulner || []), ...(o.vulnerFora || [])]).map(([k, n]) => `<span class="chip">${esc(PESSOAS[k]?.desc || FORA.find((f) => f.id === k)?.t)} · ${n}</span>`).join(" ") || "—"}</div>
           <h3 style="color:var(--o2)">Resposta do grupo (só você envia)</h3>` +
           blocoRoteiro(st, { id, path: "gf" }, loc.gf, todas, cartasGrupo, { grupo: true }) +
-          `<h3 class="passo">Relato para outro papel</h3><p class="faint" style="margin:0">Seu relato vai para: <b>${esc(papelById(st.grupos[destinoRelato(st, g)]?.papel)?.nome || "—")}</b>. Ele não vê as suas fotos, só o relato.</p>
+          (destino ? `<h3 class="passo">Relato para outro papel</h3><p class="faint" style="margin:0">Seu relato vai para: <b>${esc(papelById(destino.papel).nome)}</b>. Ele não vê as suas fotos, só o relato.</p>
           <p class="muted" style="margin:6px 0 0">O que vimos (até 3 frases):</p>
           ${frasesGrupo.map(({ k, fr }) => `<button class="opt ${rel.vimos.includes(k) ? "sel" : ""}" data-a="toggleMax" data-path="gf.relato.vimos" data-val="${k}" data-max="3">${esc(fr.t)}</button>`).join("")}
           <textarea data-in="gf.relato.naoSabemos" data-key="rel-ns" maxlength="140" placeholder="O que não sabemos">${esc(rel.naoSabemos)}</textarea>
-          <textarea data-in="gf.relato.preocupa" data-key="rel-pr" maxlength="140" placeholder="Quem nos preocupa e por quê">${esc(rel.preocupa)}</textarea>
-          <button class="btn ok block" data-a="h1" ${completo(loc.gf, todas, 2) && rel.vimos.length ? "" : "disabled"}>Enviar pelo grupo</button>`;
+          <textarea data-in="gf.relato.preocupa" data-key="rel-pr" maxlength="140" placeholder="Quem nos preocupa e por quê">${esc(rel.preocupa)}</textarea>` : "") +
+          `<button class="btn ok block" data-a="h1" ${completo(loc.gf, todas, Math.min(2, cartasGrupo.length)) && (!destino || rel.vimos.length) ? "" : "disabled"}>Enviar pelo grupo</button>`;
       } else {
         b = topo + `<p class="pill-ok">Sua resposta foi enviada. Agora o grupo vê todas as fotos do papel:</p><div class="galeria">${todas.map((fid) => foto(st, fid, { pontos: false })).join("")}</div>` + ancora(st, p) +
           (g.h1 ? `<div class="card"><b>O grupo enviou</b><p>${esc(txt(ALTERNATIVAS[p.id].find((a) => a.id === g.h1.acao)?.t, st.pers))}</p></div>` : `<p class="muted">Discutam. ${souLider ? "" : `Quem envia é ${esc(st.alunos[g.lider].nome)}.`}</p>`);
@@ -151,11 +153,11 @@ export function renderAluno(st, id, loc) {
     case "canais": {
       const recebidos = Object.values(st.grupos).filter((x) => x.relato && destinoRelato(st, x) === g.id);
       const para = st.grupos[destinoRelato(st, g)];
-      b = `<h2>Canais</h2><p class="muted">Vocês não viram estas fotos. Só receberam o que outro papel contou.</p>
-        ${recebidos.map((x) => `<div class="card"><b>✉ De: ${esc(papelById(x.papel).nome)}</b><div class="faint" style="font-size:12px;margin-top:6px">O que viram</div><ul style="margin:4px 0 0 18px;padding:0">${x.relato.vimos.map((k) => { const [f, i] = k.split(":"); return `<li>${esc(FOTOS[f].frases[+i].t)}</li>`; }).join("")}</ul>
-          ${x.relato.naoSabemos ? `<div class="faint" style="font-size:12px;margin-top:6px">O que não sabem</div><p style="margin:2px 0">${esc(x.relato.naoSabemos)}</p>` : ""}${x.relato.preocupa ? `<div class="faint" style="font-size:12px;margin-top:6px">Quem os preocupa</div><p style="margin:2px 0">${esc(x.relato.preocupa)}</p>` : ""}</div>`).join("") || `<p class="faint">Nenhum relato chegou para o seu papel.</p>`}
+      b = `<h2>Canais</h2><p class="muted">${para ? "Os relatos trazem a versão de outro papel, sem mostrar as fotos dele." : "Com um único papel, não há troca de relatos."}</p>
+        ${recebidos.map((x) => `<div class="card"><b>✉ De: ${esc(papelById(x.papel).nome)}</b><div class="relato-label">O que o outro papel disse ter visto</div><ul style="margin:4px 0 0 18px;padding:0">${x.relato.vimos.map((k) => { const [f, i] = k.split(":"); return `<li>${esc(FOTOS[f].frases[+i].t)}</li>`; }).join("")}</ul>
+          ${x.relato.naoSabemos ? `<div class="faint" style="font-size:12px;margin-top:6px">O que não sabem</div><p style="margin:2px 0">${esc(x.relato.naoSabemos)}</p>` : ""}${x.relato.preocupa ? `<div class="faint" style="font-size:12px;margin-top:6px">Quem os preocupa</div><p style="margin:2px 0">${esc(x.relato.preocupa)}</p>` : ""}</div>`).join("") || (para ? `<p class="muted">Nenhum relato chegou para o seu papel.</p>` : "")}
         ${g.relato && para ? `<p class="faint">O relato do seu grupo foi para: ${esc(papelById(para.papel).nome)}.</p>` : ""}
-        ${souLider && !g.ciente ? `<button class="btn block" data-a="ciente">Lemos os relatos</button>` : g.ciente ? `<p class="pill-ok">Relatos lidos.</p>` : ""}`;
+        ${para && souLider && !g.ciente ? `<button class="btn block" data-a="ciente">${recebidos.length ? "Lemos o relato" : "Cientes de que o relato não chegou"}</button>` : para && g.ciente ? `<p class="pill-ok">Etapa confirmada.</p>` : ""}`;
       break;
     }
     case "laboratorio": {
@@ -163,6 +165,7 @@ export function renderAluno(st, id, loc) {
       const alts = ALTERNATIVAS[p.id];
       if (!loc.lab.init) { loc.lab = { init: true, acoes: g.h1?.acao ? [g.h1.acao] : [] }; }
       const sim = desfecho(st, { papel: p.id, h2: { acoes: loc.lab.acoes } });
+      const cartasGrupo = [...new Set(g.membros.flatMap((m) => st.resp[m].viagem.mochila))];
       const ruins = Object.entries(sim).filter(([, v]) => v.estado === "mal");
       b = `<h2>Laboratório de decisões</h2><div class="card"><span class="chip law">Lente do grupo: ${lente.nome}</span><p style="margin:8px 0 0">${lente.q}</p></div>
         <h3 class="passo">Teste até 2 ações do seu papel</h3>${alts.map((al) => `<button class="opt ${loc.lab.acoes.includes(al.id) ? "sel" : ""}" data-a="labToggle" data-val="${al.id}">${esc(txt(al.t, st.pers))}</button>`).join("")}
@@ -171,9 +174,9 @@ export function renderAluno(st, id, loc) {
           ${ruins.length ? `<p class="faint" style="margin-top:8px">O que segue em risco não se resolve só pelo seu papel. Outro papel vai precisar agir.</p>` : ""}</div>
         ${souLider && !g.h2 ? `<h3 style="color:var(--o2)">Decisão do grupo</h3>${[["mantem", "Manter o que decidimos no posto"], ["ajusta", "Ajustar"], ["abandona", "Abandonar e trocar"]].map(([k, t]) => opt("h2.decisao", k, loc.h2.decisao, t)).join("")}
           <p class="faint" style="margin:0">As ações enviadas são as que estão marcadas acima.</p>
-          <div class="row">${[...new Set(g.membros.flatMap((m) => st.resp[m].viagem.mochila))].map((k) => chip("h2.cartas", k, loc.h2.cartas, "🎒 " + esc(CARTAS[k].nome))).join("")}</div>
+          <div class="row">${cartasGrupo.map((k) => chip("h2.cartas", k, loc.h2.cartas, "🎒 " + esc(CARTAS[k].nome))).join("")}</div>
           <textarea data-in="h2.porque" data-key="h2p" placeholder="O que fez vocês manterem ou mudarem?">${esc(loc.h2.porque || "")}</textarea>
-          <button class="btn ok block" data-a="h2" ${loc.h2.decisao && loc.lab.acoes.length && (loc.h2.cartas || []).length >= 2 && (loc.h2.porque || "").trim().length > 3 ? "" : "disabled"}>Enviar decisão do grupo</button>`
+          <button class="btn ok block" data-a="h2" ${loc.h2.decisao && loc.lab.acoes.length && (loc.h2.cartas || []).length >= Math.min(2, cartasGrupo.length) && (loc.h2.porque || "").trim().length > 3 ? "" : "disabled"}>Enviar decisão do grupo</button>`
           : g.h2 ? `<p class="pill-ok">O grupo decidiu: ${{ mantem: "manter", ajusta: "ajustar", abandona: "abandonar e trocar" }[g.h2.decisao]}.</p>` : `<p class="muted">Explorem juntos. Quem envia é ${esc(st.alunos[g.lider].nome)}.</p>`}`;
       break;
     }
@@ -185,7 +188,7 @@ export function renderAluno(st, id, loc) {
     }
     case "integracao": {
       const env = st.resp[id].saida;
-      b = `<h2>Bilhete de saída</h2>${env ? `<p class="pill-ok">Enviado.</p><p class="muted">${esc(env)}</p>` : `<p>O que você tratou como fato e era interpretação? Isso mudou a sua decisão?</p><textarea data-in="saida" data-key="saida">${esc(loc.saida)}</textarea><button class="btn ok block" data-a="saida" ${loc.saida.trim().length > 3 ? "" : "disabled"}>Enviar</button>`}`;
+      b = `<h2>Bilhete de saída</h2>${env ? `<p class="pill-ok">Enviado.</p><p class="muted">${esc(env)}</p>` : `<p>${esc(PERGUNTA_SAIDA)}</p><textarea data-in="saida" data-key="saida" maxlength="280" aria-label="${esc(PERGUNTA_SAIDA)}">${esc(loc.saida)}</textarea><button class="btn ok block" data-a="saida" ${loc.saida.trim().length > 3 ? "" : "disabled"}>Enviar</button>`}`;
       break;
     }
     default: b = "";

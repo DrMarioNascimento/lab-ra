@@ -1,4 +1,4 @@
-import { FASES, progresso, papeisParaTurma, papelById } from "../engine.js";
+import { FASES, progresso, papeisParaTurma, papelById, pendenciasAvanco } from "../engine.js";
 import { FOTOS, ALTERNATIVAS, txt } from "../content/cena.js";
 
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -7,6 +7,7 @@ export function renderProfessor(st) {
   const k = FASES.findIndex((f) => f.id === st.fase);
   const p = progresso(st);
   const gs = Object.values(st.grupos);
+  const pendencias = pendenciasAvanco(st);
   let extra = "";
   if (st.fase === "entrada") {
     const ps = st.ordem.length ? papeisParaTurma(st.ordem.length) : [];
@@ -23,7 +24,8 @@ export function renderProfessor(st) {
   return `<div class="col"><div class="row"><span class="badge" style="background:#7c3aed">P</span><div class="grow"><b>Professor</b><div class="faint" style="font-size:12px">Academia, 19h · Desafio 90 dias</div></div></div>
     <div class="card" style="padding:12px"><div class="faint" style="font-size:12px">Fase ${k + 1} de ${FASES.length}</div><h3>${FASES[k].nome}</h3>
     ${p && p.total ? `<div class="row" style="justify-content:space-between;margin-top:6px"><span class="muted">${p.rot}</span><b class="mono">${p.feito}/${p.total}</b></div>${p.indTot ? `<div class="faint" style="font-size:12px">individuais: ${p.ind}/${p.indTot}</div>` : ""}` : ""}
-    <div class="row" style="margin-top:10px"><button class="btn sec grow" data-a="fase" data-val="-1" ${k <= 1 ? "disabled" : ""}>Voltar</button><button class="btn grow" data-a="fase" data-val="1" ${k === 0 || k === FASES.length - 1 ? "disabled" : ""}>Avançar</button></div></div>${extra}</div>`;
+    ${pendencias.length ? '<ul class="pendencias">' + pendencias.map((aviso) => '<li>' + esc(aviso) + '</li>').join("") + '</ul>' : ""}
+    <div class="row" style="margin-top:10px"><button class="btn sec grow" data-a="fase" data-val="-1" ${k <= 1 ? "disabled" : ""}>Voltar</button><button class="btn grow" data-a="fase" data-val="1" data-key="avancar" ${k === 0 || k === FASES.length - 1 ? "disabled" : ""}>${pendencias.length ? "Avançar com pendências" : "Avançar"}</button></div></div>${extra}</div>`;
 }
 
 export function acaoProfessor(a, el, dispatch) {

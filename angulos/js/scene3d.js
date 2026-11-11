@@ -272,7 +272,7 @@ export function visor360(container, pers) {
   function quadro() {
     if (!vivo) return;
     const w = container.clientWidth || 640, h = container.clientHeight || 360;
-    if (r.domElement.width !== Math.floor(w * r.getPixelRatio())) { r.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }
+    if (r.domElement.width !== Math.floor(w * r.getPixelRatio()) || r.domElement.height !== Math.floor(h * r.getPixelRatio())) { r.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }
     if (modo.tipo === "girar") {
       if (!arrastando) modo.yaw += 0.0025;
       cam.position.copy(centro);
