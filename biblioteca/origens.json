@@ -3234,6 +3234,69 @@
           "sha256": "4873bbc19dc714b4957a2a4afd0554df81e9982d0f6f7d0bc521e577aa008a1d"
         }
       ]
+    },
+    {
+      "data": "2026-11-11",
+      "tipo": "atualizacao-da-origem",
+      "fonte": "DrMarioNascimento/fisiologia-interativa",
+      "commit_fonte": "3d86e61f8d513ee033aa4aa46994c4d2482795d2",
+      "criterio": "Correções do bíceps (rótulos das cabeças, ligamento anular, início do tendão distal) na RA Bíceps braquial e no nível 01 / ciclo 01 de Do músculo ao sarcômero. app.js, modelos e ciclo idênticos à origem; index.html com a adaptação da biblioteca; ATRIBUICAO.md só com o hash novo.",
+      "arquivos": [
+        {
+          "arquivo": "biblioteca/fisiologia/biceps-braquial/app.js",
+          "origem": "ra/biceps-braquial/app.js",
+          "sha256_anterior": "05df2f6a5a8894b3b08681093807f740d26726cd666b61a57b272220c4824be5",
+          "sha256": "93dfd1bccf1e1d256d71d5408dd850ffd0bf0e3cead2631b9ca802ec9deaa3af"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/biceps-braquial/index.html",
+          "origem": "ra/biceps-braquial/index.html",
+          "sha256_anterior": "f581fd21d1faa0599783bc229a9088ce477bfb2b499b5bd69307a466cd72b990",
+          "sha256": "43b526962fbafae7909114e8742be73e7e2eebffcb7bad9e3c4a54dfdc9f7444"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/biceps-braquial/modelo.glb",
+          "origem": "ra/biceps-braquial/modelo.glb",
+          "sha256_anterior": "12a008936bd556293b000531292b108b7fc85955e1e3d3dbd23b747a45a23930",
+          "sha256": "964177fcc8e51bd7e8aeb6cb7fc143f669d9e5f245712f0fd5e6f13ce7316d5c"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/biceps-braquial/modelo.usdz",
+          "origem": "ra/biceps-braquial/modelo.usdz",
+          "sha256_anterior": "365c236cd3a23bedf9ea2a065efa3684c0a15be60c58afb3193a1e1cc7233f88",
+          "sha256": "2fb44a70d7679c59f20c0d6c405c4e39158f2ef036d7bcfb4e0120a3e710efcc"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/assets/biceps-braquial-rosca.glb",
+          "origem": "ra/assets/biceps-braquial-rosca.glb",
+          "sha256_anterior": "4dfe7501cfd372e32ea9ca8cfe8499940972e6e2556c0fcbfb7c3d1f54fbfbd9",
+          "sha256": "95de43b8b2d4d6247ddeb4874304a39cd5e56aab9f769cdb4574c9dd0c926382"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/assets/ATRIBUICAO.md",
+          "origem": "ra/assets/ATRIBUICAO.md",
+          "sha256_anterior": "4873bbc19dc714b4957a2a4afd0554df81e9982d0f6f7d0bc521e577aa008a1d",
+          "sha256": "b680a467a47d24e3a2ad8096764e63a90dc60dda89306390ce0a34f84df5dfac"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/ciclos/nivel-1.glb",
+          "origem": "ra/musculo-sarcomero/ciclos/nivel-1.glb",
+          "sha256_anterior": "32ec3974a5608988f1360aa9856f0f167f0d8ffd005c37f87842c8c384abb75d",
+          "sha256": "d34d26afa5882aeec2c817ff623397bf2d6dc57a1bcc8caea28095675f350e64"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/ciclos/nivel-1.usdz",
+          "origem": "ra/musculo-sarcomero/ciclos/nivel-1.usdz",
+          "sha256_anterior": "5c3a75afebdd6bcfbf6447d254738787ac3831f029d9f376d035c629b5d6c4a7",
+          "sha256": "806eed9b7066738c513116927a23848c2026a131856dd9dd501626ac74e36bec"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/ciclos/nivel-1.validation.json",
+          "origem": "ra/musculo-sarcomero/ciclos/nivel-1.validation.json",
+          "sha256_anterior": "3ea72449ee4e377213773833338dfc7f66f750e8096602f3d86d81f8faf8fc9b",
+          "sha256": "d3f7280f1c0be5cc76af587266ed0b23e72d926764edf5707830691120cf3ad3"
+        }
+      ]
     }
   ],
   "ultima_sincronizacao_fisiologia": {

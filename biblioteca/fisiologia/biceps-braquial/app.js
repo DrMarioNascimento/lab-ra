@@ -90,7 +90,7 @@ const groups = { soft: [], conj: [], cart: [] }, part = {};
 let LABELS = [], ready = false, home = null, mixer = null, playing = true, clipTime = 0;
 const clock = new THREE.Clock();
 const loader = new GLTFLoader(); loader.setDRACOLoader(new DRACOLoader().setDecoderPath(DECODIFICADOR));
-loader.load('modelo.glb?v=movimento-20261110', gltf => {
+loader.load('modelo.glb?v=correcao-20261111', gltf => {
   const model = gltf.scene;
   model.traverse(o => {
     if (!o.isMesh) return;
@@ -128,6 +128,19 @@ function frame() {
 }
 
 /* ── Rótulos projetados (presos a vértices: acompanham o movimento) ───── */
+// As duas cabeças lado a lado: 2-médias no plano x-z da faixa do meio do ventre (a lateral, −x no braço direito, é a longa).
+const duasCabecas = (lista, P) => {
+  let a = lista.reduce((m, i) => P(i).x < P(m).x ? i : m, lista[0]), b = lista.reduce((m, i) => P(i).x > P(m).x ? i : m, lista[0]);
+  let ca = [P(a).x, P(a).z], cb = [P(b).x, P(b).z], A = [], B = [];
+  for (let it = 0; it < 15; it++) {
+    A = []; B = [];
+    for (const i of lista) { const p = P(i), da = (p.x - ca[0]) ** 2 + (p.z - ca[1]) ** 2, db = (p.x - cb[0]) ** 2 + (p.z - cb[1]) ** 2; (da <= db ? A : B).push(i); }
+    const m = L => [L.reduce((s, i) => s + P(i).x, 0) / L.length, L.reduce((s, i) => s + P(i).z, 0) / L.length];
+    if (A.length) ca = m(A); if (B.length) cb = m(B);
+  }
+  return ca[0] <= cb[0] ? [A, B] : [B, A];
+};
+
 const labelsEl = $('labels'), svg = $('leaders');
 function buildLabels() {
   const LTm = part.tendoes_cabeca_longa, STm = part.tendoes_cabeca_curta, VBm = part.ventres_biceps;
@@ -135,13 +148,14 @@ function buildLabels() {
   const vbb = new THREE.Box3().setFromPoints(VB), midY = (vbb.min.y + vbb.max.y) / 2, midX = (vbb.min.x + vbb.max.x) / 2;
   const bandIdx = VB.map((v, i) => i).filter(i => Math.abs(VB[i].y - midY) < 0.006);
   const antOf = list => list.reduce((m, i) => VB[i].z > VB[m].z ? i : m, list[0]);
+  const [cabL, cabS] = duasCabecas(bandIdx, i => VB[i]);
   const at = (mesh, idx, off = V()) => ({ mesh, idx, off });
   LABELS = [
     { a: at(LTm, argBy(LT, v => v.y)), k: 'Origem · cabeça longa', t: 'Tubérculo supraglenoidal', c: '#e8472a', dx: -78, dy: -48, ign: [LTm] },
     { a: at(STm, argBy(ST, v => v.y)), k: 'Origem · cabeça curta', t: 'Processo coracoide', c: '#e8472a', dx: 80, dy: -22, ign: [STm] },
     { a: at(LTm, argBy(LT, v => -v.y)), k: 'Inserção', t: 'Tuberosidade do rádio', c: '#2d6ad9', dx: -82, dy: 38, ign: [LTm] },
-    { a: at(VBm, antOf(bandIdx.filter(i => VB[i].x < midX)), V(0, 0, 0.002)), t: 'Cabeça longa', c: '#b0423a', dx: -84, dy: -4, m: true, ign: [VBm] },
-    { a: at(VBm, antOf(bandIdx.filter(i => VB[i].x >= midX)), V(0, 0, 0.002)), t: 'Cabeça curta', c: '#b0423a', dx: 84, dy: 10, m: true, ign: [VBm] },
+    { a: at(VBm, antOf(cabL), V(0, 0, 0.002)), t: 'Cabeça longa', c: '#b0423a', dx: -84, dy: -4, m: true, ign: [VBm] },
+    { a: at(VBm, antOf(cabS), V(0, 0, 0.002)), t: 'Cabeça curta', c: '#b0423a', dx: 84, dy: 10, m: true, ign: [VBm] },
   ];
   const ctr = mesh => { const w = worldPts(mesh); return { w, c: w.reduce((s, v) => s.add(v), V()).multiplyScalar(1 / w.length) }; };
   if (part.aponeurose_bicipital) { const { w, c } = ctr(part.aponeurose_bicipital); LABELS.push({ a: at(part.aponeurose_bicipital, nearestIdx(w, c.add(V(0, 0, 0.02)))), t: 'Aponeurose bicipital', c: '#e8d7b3', dx: 86, dy: 28, grp: 'conj', ign: [part.aponeurose_bicipital] }); }

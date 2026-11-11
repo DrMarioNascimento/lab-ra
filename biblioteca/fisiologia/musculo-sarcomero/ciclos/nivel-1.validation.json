@@ -7,27 +7,27 @@
   "iphone": {
     "motivo": "AR Quick Look não reproduz UsdSkelBlendShape; o movimento foi passado para articulações.",
     "pecas": 7,
-    "erroConferidoMaxRel": 0.067,
+    "erroConferidoMaxRel": 0.0703,
     "porPeca": [
       {
         "peca": "N19_tendoes_cabeca_longa",
-        "vertices": 8188,
+        "vertices": 7361,
         "articulacoes": 32,
         "excursao": 0.044704,
-        "erroMaxRel": 0.0359,
-        "erroP99Rel": 0.0177,
-        "erroConferido": 0.001606,
-        "erroConferidoRel": 0.0359
+        "erroMaxRel": 0.0285,
+        "erroP99Rel": 0.0097,
+        "erroConferido": 0.001274,
+        "erroConferidoRel": 0.0285
       },
       {
         "peca": "N20_tendoes_cabeca_curta",
-        "vertices": 5937,
+        "vertices": 5392,
         "articulacoes": 32,
         "excursao": 0.044702,
-        "erroMaxRel": 0.0218,
-        "erroP99Rel": 0.0028,
-        "erroConferido": 0.000975,
-        "erroConferidoRel": 0.0218
+        "erroMaxRel": 0.0201,
+        "erroP99Rel": 0.0009,
+        "erroConferido": 0.000897,
+        "erroConferidoRel": 0.0201
       },
       {
         "peca": "N32_aponeurose_bicipital",
@@ -54,10 +54,10 @@
         "vertices": 24275,
         "articulacoes": 32,
         "excursao": 0.044704,
-        "erroMaxRel": 0.067,
-        "erroP99Rel": 0.03,
-        "erroConferido": 0.002996,
-        "erroConferidoRel": 0.067
+        "erroMaxRel": 0.0703,
+        "erroP99Rel": 0.0301,
+        "erroConferido": 0.003145,
+        "erroConferidoRel": 0.0703
       },
       {
         "peca": "N35_fasciculos",
