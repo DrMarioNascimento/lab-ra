@@ -1,0 +1,84 @@
+{
+  "deformation": "UsdSkel joints (skinning)",
+  "meshes": 32,
+  "tracks": 9,
+  "duration": 8.0,
+  "validation": [],
+  "iphone": {
+    "motivo": "AR Quick Look não reproduz UsdSkelBlendShape; o movimento foi passado para articulações.",
+    "pecas": 7,
+    "erroConferidoMaxRel": 0.067,
+    "porPeca": [
+      {
+        "peca": "N19_tendoes_cabeca_longa",
+        "vertices": 8188,
+        "articulacoes": 32,
+        "excursao": 0.044704,
+        "erroMaxRel": 0.0359,
+        "erroP99Rel": 0.0177,
+        "erroConferido": 0.001606,
+        "erroConferidoRel": 0.0359
+      },
+      {
+        "peca": "N20_tendoes_cabeca_curta",
+        "vertices": 5937,
+        "articulacoes": 32,
+        "excursao": 0.044702,
+        "erroMaxRel": 0.0218,
+        "erroP99Rel": 0.0028,
+        "erroConferido": 0.000975,
+        "erroConferidoRel": 0.0218
+      },
+      {
+        "peca": "N32_aponeurose_bicipital",
+        "vertices": 560,
+        "articulacoes": 32,
+        "excursao": 0.045346,
+        "erroMaxRel": 0.0382,
+        "erroP99Rel": 0.024,
+        "erroConferido": 0.001733,
+        "erroConferidoRel": 0.0382
+      },
+      {
+        "peca": "N33_membrana_interossea",
+        "vertices": 7225,
+        "articulacoes": 32,
+        "excursao": 0.189169,
+        "erroMaxRel": 0.0234,
+        "erroP99Rel": 0.0065,
+        "erroConferido": 0.004428,
+        "erroConferidoRel": 0.0234
+      },
+      {
+        "peca": "N34_ventres_biceps",
+        "vertices": 24275,
+        "articulacoes": 32,
+        "excursao": 0.044704,
+        "erroMaxRel": 0.067,
+        "erroP99Rel": 0.03,
+        "erroConferido": 0.002996,
+        "erroConferidoRel": 0.067
+      },
+      {
+        "peca": "N35_fasciculos",
+        "vertices": 29760,
+        "articulacoes": 32,
+        "excursao": 0.027338,
+        "erroMaxRel": 0.0377,
+        "erroP99Rel": 0.0211,
+        "erroConferido": 0.001031,
+        "erroConferidoRel": 0.0377
+      },
+      {
+        "peca": "N36_epimisio",
+        "vertices": 1737,
+        "articulacoes": 32,
+        "excursao": 0.026551,
+        "erroMaxRel": 0.0172,
+        "erroP99Rel": 0.0111,
+        "erroConferido": 0.000457,
+        "erroConferidoRel": 0.0172
+      }
+    ]
+  }
+}

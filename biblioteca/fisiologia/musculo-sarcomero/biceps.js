@@ -1,29 +1,27 @@
-/* Nível 01 · o bíceps braquial modelado — 29/10/2026
+/* Nível 01 · o bíceps braquial em movimento — 11/11/2026
    ---------------------------------------------------------------------------
-   O músculo do 01 era desenhado por código: um ventre fusiforme entre dois
-   ossos genéricos. Agora o nível 01 é um músculo de verdade, o bíceps
-   braquial, com escápula, úmero, rádio e ulna (../assets/biceps-braquial.glb).
+   Substitui o bíceps de 29/10/2026 (biceps_SUBSTITUIDO_2026-11-11.js, arquivo
+   ../assets/biceps-braquial.glb, que continua no repositório).
 
-   O ARQUIVO. Veio do designer (biceps_tendoes_novos.glb) e foi corrigido antes
-   de entrar aqui:
-   • saiu uma peça solta (um cone branco a uns 20 cm do braço);
-   • o tendão distal antigo terminava no ar, à frente do rádio, sem tocar o
-     osso. Foi retirado e trocado por um tendão contínuo: nasce dentro do
-     ventre, desce à frente do cotovelo, mergulha entre rádio e ulna e se
-     prende achatado na tuberosidade do rádio, na face anteromedial, ~2,5 cm
-     abaixo da cabeça do rádio;
-   • mais leve: rádio e ulna vinham em cinco partes com os mesmos vértices
-     (juntadas), ossos simplificados sem perda visível, texturas no tamanho do
-     que cobrem e malha em Draco — de 6,0 MB para 0,9 MB. O USDZ que o iPhone
-     recebe fica em ~11,7 MB, menor que o do músculo por código (~12,7 MB).
+   O ARQUIVO (../assets/biceps-braquial-rosca.glb, 4 MB, Draco). Membro
+   superior direito em metros, +y para cima, +z anterior. Escápula, clavícula,
+   úmero, rádio, ulna, tendões das duas cabeças e membrana interóssea do
+   BodyParts3D (DBCLS, CC BY); ventres do modelo do autor encaixados nesse
+   trajeto; cartilagens articulares e ligamentos esquemáticos (a mesma base da
+   RA ../biceps-braquial/). Antebraço inteiro, aponeurose bicipital presente.
+   A janela no epimísio continua: uma elipse recortada na face anterior da
+   cabeça longa, com a borda do epimísio cortado e os fascículos por baixo —
+   é ela que liga este nível ao 02.
 
-   O QUE FICA IGUAL. `modelos.js` (aprovado) e `acabamento.js` continuam
-   montando o músculo por código. Ele é a reserva: se o GLB não chegar (rede,
-   aparelho), a página mostra o músculo de antes e segue funcionando.
+   O MOVIMENTO. Rosca direta: em 8 s o cotovelo vai de 0° a 100° de flexão e
+   volta (cosseno, pico aos 4 s — o mesmo instante em que o sarcômero do 05
+   chega a 1,9 µm). O antebraço gira como peça rígida em torno do eixo do
+   cotovelo; ventre, fascículos, borda do epimísio e tendões se deformam
+   (morph targets): o ventre encurta até 58% e engrossa, na medida que mantém
+   o comprimento dos tendões. Sem pronossupinação.
 
-   POSIÇÃO. Fica de pé, na posição anatômica (ombro em cima, cotovelo embaixo,
-   face anterior para a câmera): o giro da página é em torno do eixo vertical,
-   e um braço de pé gira como numa bancada. Na RA vai em tamanho real.        */
+   O QUE FICA IGUAL. `modelos.js` (aprovado) continua montando o músculo por
+   código como reserva: se o GLB não chegar em 20 s, volta o de antes.       */
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -33,29 +31,26 @@ const DECODIFICADOR = 'https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/l
 const ALTURA_NA_TELA = 6.4;            /* unidades da cena; o músculo antigo tinha ~5 de ventre */
 const ESPERA_MAX = 20000;              /* ms; passado isso, fica o músculo por código */
 
-/* Pontos dos rótulos, nas coordenadas do arquivo (metros, braço esquerdo:
-   +x medial, +y para cima, +z anterior). Tirados da própria malha. */
-const ROTULOS = [
-  ['ventre muscular', [-0.0278, 0.0582, 0.0324]],
-  ['fascículos', [-0.0346, 0.0119, 0.0431]],
-  ['epimísio', [-0.0712, -0.0327, 0.0138]],
-  ['cabeça longa', [-0.0289, 0.1311, 0.0134]],
-  ['origem da cabeça curta', [-0.0109, 0.1486, 0.0117]],    /* processo coracoide; um rótulo
-     só aqui: os dois tendões ficam a menos de 1 cm, e dois rótulos se sobrepunham */
-  ['articulação do cotovelo', [-0.0337, -0.0968, -0.0097]],
-  ['inserção', [-0.0590, -0.1270, -0.0160]],                 /* tuberosidade do rádio */
-  ['úmero', [-0.0610, -0.0800, -0.0130]],
-];
-const FOCO = [-0.0346, 0.0119, 0.0382];                       /* centro da janela no epimísio */
-
 export const TEXTO_BICEPS = {
   titulo: 'Músculo esquelético · bíceps braquial',
-  texto: 'O bíceps braquial inteiro. Duas cabeças nascem na escápula: a longa, no tubérculo supraglenoidal, com o tendão passando por dentro da cápsula do ombro; a curta, no processo coracoide. O ventre, envolvido pelo epimísio, cruza o ombro e o cotovelo, e o tendão distal se prende à tuberosidade do rádio. Ao encurtar, aproxima a inserção da origem: flexiona o cotovelo e supina o antebraço. Pela janela no epimísio já se veem os fascículos.',
-  tags: 'ventre muscular,epimísio,fascículos,cabeça longa,cabeça curta,origem,inserção,articulação',
+  texto: 'O bíceps braquial inteiro, em rosca direta. Duas cabeças nascem na escápula: a longa, no tubérculo supraglenoidal, com o tendão passando por dentro da cápsula do ombro; a curta, no processo coracoide. O ventre, envolvido pelo epimísio, cruza o ombro e o cotovelo, e o tendão distal se prende à tuberosidade do rádio. Ao contrair, o ventre encurta e engrossa e aproxima a inserção da origem: o cotovelo flexiona; ao relaxar, o cotovelo estende. Pela janela no epimísio já se veem os fascículos.',
+  tags: 'ventre muscular,epimísio,fascículos,cabeça longa,cabeça curta,origem,inserção,flexão do cotovelo',
 };
 
-/* Troca o conteúdo do nível 01 pelo bíceps. Devolve true se trocou.
-   Enquanto carrega, o músculo por código fica escondido; se falhar, volta. */
+/* posição atual de um vértice (com a deformação do instante), no mundo */
+function vpos(mesh, i, out) {
+  out.fromBufferAttribute(mesh.geometry.attributes.position, i);
+  const ma = mesh.geometry.morphAttributes.position, inf = mesh.morphTargetInfluences;
+  if (ma && inf) for (let k = 0; k < ma.length; k++) { const w = inf[k]; if (w) { out.x += ma[k].getX(i) * w; out.y += ma[k].getY(i) * w; out.z += ma[k].getZ(i) * w; } }
+  return mesh.localToWorld(out);
+}
+function indice(mesh, nota) {                 /* vértice de maior nota, na pose de repouso */
+  const p = mesh.geometry.attributes.position, v = new THREE.Vector3(); mesh.updateWorldMatrix(true, false);
+  let bi = 0, bv = -Infinity;
+  for (let i = 0; i < p.count; i++) { vpos(mesh, i, v); const s = nota(v); if (s > bv) { bv = s; bi = i; } }
+  return bi;
+}
+
 export async function montarBiceps(musculo, url) {
   const antigos = [...musculo.children];
   antigos.forEach(o => { o.visible = false; });
@@ -69,26 +64,64 @@ export async function montarBiceps(musculo, url) {
     ]);
     draco.dispose();
     const braco = gltf.scene; braco.name = 'biceps_braquial';
-    braco.traverse(o => { if (o.isMesh) { o.castShadow = !o.material.transparent; o.receiveShadow = true; } });
+    const parte = {};
+    const OSSOS = ['umero', 'radio', 'ulna', 'escapula', 'clavicula'];
+    braco.traverse(o => { if (o.isMesh && OSSOS.includes(o.name)) { o.material = o.material.clone(); o.material.color.set(0xd9c39b); o.material.roughness = .66; } });
+    braco.traverse(o => { if (o.isMesh) { parte[o.name] = o; o.castShadow = !o.material.transparent; o.receiveShadow = true; if (o.morphTargetInfluences) o.material.side = THREE.DoubleSide; } });
 
-    /* escala e centro: a caixa do arquivo vira a caixa da cena */
+    /* escala e centro: a caixa do arquivo (em repouso) vira a caixa da cena */
     braco.updateMatrixWorld(true);
     const caixa = new THREE.Box3().setFromObject(braco), tam = caixa.getSize(new THREE.Vector3());
     const esc = ALTURA_NA_TELA / tam.y, centro = caixa.getCenter(new THREE.Vector3());
     const pivo = new THREE.Group(); pivo.name = 'biceps_pivo';
     pivo.scale.setScalar(esc); pivo.position.copy(centro).multiplyScalar(-esc);
     pivo.add(braco);
-    const naCena = p => new THREE.Vector3(...p).sub(centro).multiplyScalar(esc);
-
     antigos.forEach(o => musculo.remove(o));
     musculo.add(pivo);
     musculo.updateMatrixWorld(true);
 
+    /* rótulos presos a vértices: acompanham a rosca */
+    const v = new THREE.Vector3(), cen = m => { m.geometry.computeBoundingBox(); return m.geometry.boundingBox.getCenter(new THREE.Vector3()).applyMatrix4(m.matrixWorld); };
+    const VB = parte.ventres_biceps, LT = parte.tendoes_cabeca_longa, ST = parte.tendoes_cabeca_curta;
+    const jan = cen(parte.fasciculos), vb = new THREE.Box3().setFromObject(VB);
+    const xm = (vb.min.x + vb.max.x) / 2, alt = f => vb.min.y + (vb.max.y - vb.min.y) * f;
+    /* âncoras espalhadas: lateral (−x) à esquerda do quadro, medial (+x) à direita */
+    const ancoras = [
+      ['ventre muscular', VB, indice(VB, p => -Math.abs(p.y - alt(.3)) * 60 + p.x * 2 + p.z)],
+      ['fascículos', parte.fasciculos, indice(parte.fasciculos, p => -p.distanceTo(jan) + p.z * .3)],
+      ['epimísio', VB, indice(VB, p => -Math.abs(p.y - alt(.2)) * 60 - p.x * 2 + p.z * .5)],
+      ['cabeça longa', VB, indice(VB, p => -Math.abs(p.y - alt(.9)) * 60 - p.x + p.z * .3)],
+      ['origem da cabeça curta', ST, indice(ST, p => p.y)],
+      ['articulação do cotovelo', parte.cartilagem_troclea_capitulo, indice(parte.cartilagem_troclea_capitulo, p => p.x + p.z * .3)],
+      ['inserção', LT, indice(LT, p => -p.y)],
+      ['úmero', parte.umero, indice(parte.umero, p => -Math.abs(p.y - (vb.min.y * .75 + vb.max.y * .25)) * 40 - p.x)],
+    ];
+    const rotulos = ancoras.map(([nome]) => [nome, new THREE.Vector3()]);
+    const inv = new THREE.Matrix4();
+    function atualizarRotulos() {
+      musculo.updateWorldMatrix(true, true); inv.copy(musculo.matrixWorld).invert();
+      ancoras.forEach(([, m, i], k) => { vpos(m, i, v); rotulos[k][1].copy(v).applyMatrix4(inv); });
+    }
+
+    /* rosca direta: o relógio fica com a página, que chama passo(dt) quando o
+       nível 01 está na tela */
+    const mixer = gltf.animations.length ? new THREE.AnimationMixer(braco) : null;
+    if (mixer) mixer.clipAction(gltf.animations[0]).play();
+    let tocando = true;
+    musculo.userData.movimento = {
+      passo(dt) { if (mixer && tocando) mixer.update(dt); atualizarRotulos(); },
+      alternar() { tocando = !tocando; return tocando; },
+      get tocando() { return tocando; },
+      tempo: () => (mixer ? mixer.time % 8 : 0),
+    };
+    atualizarRotulos();
+
     const t = tam.clone().multiplyScalar(esc * .5);
-    musculo.userData.quadro = { rh: Math.max(t.x, t.z), hv: t.y };
-    musculo.userData.foco = naCena(FOCO);
+    /* o antebraço sobe na flexão: o quadro reserva a frente para ele */
+    musculo.userData.quadro = { rh: Math.max(t.x, t.z, t.y * .55), hv: t.y };
+    musculo.userData.foco = jan.clone().applyMatrix4(inv.copy(musculo.matrixWorld).invert());
     musculo.userData.desvio = new THREE.Vector3();
-    musculo.userData.rotulos = ROTULOS.map(([nome, p]) => [nome, naCena(p)]);
+    musculo.userData.rotulos = rotulos;
     musculo.userData.tamanhoReal = Math.max(tam.x, tam.y, tam.z);      /* metros: RA em 1:1 */
     return true;
   } catch (err) {

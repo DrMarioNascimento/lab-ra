@@ -1,0 +1,74 @@
+{
+  "deformation": "UsdSkel joints (skinning)",
+  "meshes": 133,
+  "tracks": 22,
+  "duration": 8.0,
+  "validation": [],
+  "iphone": {
+    "motivo": "AR Quick Look não reproduz UsdSkelBlendShape; o movimento foi passado para articulações.",
+    "pecas": 6,
+    "erroConferidoMaxRel": 0.0,
+    "porPeca": [
+      {
+        "peca": "N3_movel_1",
+        "vertices": 1606,
+        "articulacoes": 32,
+        "excursao": 0.397059,
+        "erroMaxRel": 0.0,
+        "erroP99Rel": 0.0,
+        "erroConferido": 1e-06,
+        "erroConferidoRel": 0.0
+      },
+      {
+        "peca": "N4_movel_2",
+        "vertices": 343,
+        "articulacoes": 32,
+        "excursao": 0.397059,
+        "erroMaxRel": 0.0,
+        "erroP99Rel": 0.0,
+        "erroConferido": 2e-06,
+        "erroConferidoRel": 0.0
+      },
+      {
+        "peca": "N5_movel_3",
+        "vertices": 343,
+        "articulacoes": 32,
+        "excursao": 0.397059,
+        "erroMaxRel": 0.0,
+        "erroP99Rel": 0.0,
+        "erroConferido": 0.0,
+        "erroConferidoRel": 0.0
+      },
+      {
+        "peca": "N139_movel_1_avesso",
+        "vertices": 1606,
+        "articulacoes": 32,
+        "excursao": 0.397059,
+        "erroMaxRel": 0.0,
+        "erroP99Rel": 0.0,
+        "erroConferido": 1e-06,
+        "erroConferidoRel": 0.0
+      },
+      {
+        "peca": "N140_movel_2_avesso",
+        "vertices": 343,
+        "articulacoes": 32,
+        "excursao": 0.397059,
+        "erroMaxRel": 0.0,
+        "erroP99Rel": 0.0,
+        "erroConferido": 2e-06,
+        "erroConferidoRel": 0.0
+      },
+      {
+        "peca": "N141_movel_3_avesso",
+        "vertices": 343,
+        "articulacoes": 32,
+        "excursao": 0.397059,
+        "erroMaxRel": 0.0,
+        "erroP99Rel": 0.0,
+        "erroConferido": 0.0,
+        "erroConferidoRel": 0.0
+      }
+    ]
+  }
+}

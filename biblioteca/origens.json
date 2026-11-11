@@ -24,7 +24,10 @@
     "biblioteca/fisiologia/osso-vivo/README.md",
     "biblioteca/fisiologia/potencial-membrana/README.md",
     "biblioteca/fisiologia/starling/README.md",
-    "biblioteca/fisiologia/biceps-braquial/index.html"
+    "biblioteca/fisiologia/biceps-braquial/index.html",
+    "biblioteca/fisiologia/musculo-sarcomero/app.js",
+    "biblioteca/fisiologia/musculo-sarcomero/index.html",
+    "biblioteca/fisiologia/assets/ATRIBUICAO.md"
   ],
   "dragon": [
     {
@@ -3088,6 +3091,147 @@
           "origem": "ra/biceps-braquial/modelo.usdz",
           "sha256_anterior": "644ade5164e407bf984086ec9f0478ec07a78d1ad2e8274d075f1c8e483a50d3",
           "sha256": "365c236cd3a23bedf9ea2a065efa3684c0a15be60c58afb3193a1e1cc7233f88"
+        }
+      ]
+    },
+    {
+      "data": "2026-11-11",
+      "tipo": "atualizacao-da-origem",
+      "fonte": "DrMarioNascimento/fisiologia-interativa",
+      "commit_fonte": "7b5e2bd03fa7e74c6f08463210f4c145e550d454",
+      "criterio": "Do músculo ao sarcômero: nível 01 com o bíceps em rosca direta e ciclos em RA nos níveis 01 a 04. biceps.js, assets/biceps-braquial-rosca.glb e ciclos/nivel-1..4 idênticos à origem; app.js, index.html, README.md e assets/ATRIBUICAO.md receberam só as mesmas mudanças pontuais sobre a adaptação local (acabamento.js, seletor de versão do ciclo). Scripts de construção da biblioteca inalterados.",
+      "arquivos": [
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/biceps.js",
+          "origem": "ra/musculo-sarcomero/biceps.js",
+          "sha256_anterior": null,
+          "sha256": "43eff739ef34c38d2e73fbf30ad712aeb24e0d93b0d62e82aee3b9057fa18ba1"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/assets/biceps-braquial-rosca.glb",
+          "origem": "ra/assets/biceps-braquial-rosca.glb",
+          "sha256_anterior": null,
+          "sha256": "4dfe7501cfd372e32ea9ca8cfe8499940972e6e2556c0fcbfb7c3d1f54fbfbd9"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/ciclos/nivel-1.glb",
+          "origem": "ra/musculo-sarcomero/ciclos/nivel-1.glb",
+          "sha256_anterior": null,
+          "sha256": "32ec3974a5608988f1360aa9856f0f167f0d8ffd005c37f87842c8c384abb75d"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/ciclos/nivel-1.usdz",
+          "origem": "ra/musculo-sarcomero/ciclos/nivel-1.usdz",
+          "sha256_anterior": null,
+          "sha256": "5c3a75afebdd6bcfbf6447d254738787ac3831f029d9f376d035c629b5d6c4a7"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/ciclos/nivel-1.json",
+          "origem": "ra/musculo-sarcomero/ciclos/nivel-1.json",
+          "sha256_anterior": null,
+          "sha256": "34b0329a2a7985735ca479927626d3201b43bb51c4a7adcdff366d4ff2630fe8"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/ciclos/nivel-1.validation.json",
+          "origem": "ra/musculo-sarcomero/ciclos/nivel-1.validation.json",
+          "sha256_anterior": null,
+          "sha256": "3ea72449ee4e377213773833338dfc7f66f750e8096602f3d86d81f8faf8fc9b"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/ciclos/nivel-2.glb",
+          "origem": "ra/musculo-sarcomero/ciclos/nivel-2.glb",
+          "sha256_anterior": null,
+          "sha256": "f04070971b8feefd9c235babbf2065d4bdc741be4dd1f6efcc95bf3a2a0cf056"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/ciclos/nivel-2.usdz",
+          "origem": "ra/musculo-sarcomero/ciclos/nivel-2.usdz",
+          "sha256_anterior": null,
+          "sha256": "6282cfcd59fe3a4edc7eeb0e497528f452471d04bc55630f77a60169cf8e2c2d"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/ciclos/nivel-2.json",
+          "origem": "ra/musculo-sarcomero/ciclos/nivel-2.json",
+          "sha256_anterior": null,
+          "sha256": "639c4009885bafde19f8ccd23dd34844ccdea9b01d124365278bc8a8ea0a0679"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/ciclos/nivel-2.validation.json",
+          "origem": "ra/musculo-sarcomero/ciclos/nivel-2.validation.json",
+          "sha256_anterior": null,
+          "sha256": "3d5bffdb302554857d8ca25c3ac0214e9653c68a81ef10cbf1b5a50692153d89"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/ciclos/nivel-3.glb",
+          "origem": "ra/musculo-sarcomero/ciclos/nivel-3.glb",
+          "sha256_anterior": null,
+          "sha256": "2a6f61478103573d2b561c0adf83f90097c5a3a26ea4f0c0abcceb7cec867e9a"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/ciclos/nivel-3.usdz",
+          "origem": "ra/musculo-sarcomero/ciclos/nivel-3.usdz",
+          "sha256_anterior": null,
+          "sha256": "755ea6f03dc04d8297e726e62af98e75380c6c3fb8cec4738b0f6b76ac668ea5"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/ciclos/nivel-3.json",
+          "origem": "ra/musculo-sarcomero/ciclos/nivel-3.json",
+          "sha256_anterior": null,
+          "sha256": "69ea827d414672b016ee6534247a49b5565a22c58bdc9640335894c6b0da62cb"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/ciclos/nivel-3.validation.json",
+          "origem": "ra/musculo-sarcomero/ciclos/nivel-3.validation.json",
+          "sha256_anterior": null,
+          "sha256": "899a00eb83169fd1a275aeb53226f112c19da58b62b6d05707b9b33289f9ce64"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/ciclos/nivel-4.glb",
+          "origem": "ra/musculo-sarcomero/ciclos/nivel-4.glb",
+          "sha256_anterior": null,
+          "sha256": "055b4a341d9daa6dd310640f38722ca8959a34487d758057fd29c7b738fb09fa"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/ciclos/nivel-4.usdz",
+          "origem": "ra/musculo-sarcomero/ciclos/nivel-4.usdz",
+          "sha256_anterior": null,
+          "sha256": "caf19d540a826a77428c12a14e2d85a321438e9812a81f773101b8a8f15b8ca7"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/ciclos/nivel-4.json",
+          "origem": "ra/musculo-sarcomero/ciclos/nivel-4.json",
+          "sha256_anterior": null,
+          "sha256": "824d961606c81d3bb72393ea027eddbd657969c0437d6c177f5a479c398382f4"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/ciclos/nivel-4.validation.json",
+          "origem": "ra/musculo-sarcomero/ciclos/nivel-4.validation.json",
+          "sha256_anterior": null,
+          "sha256": "0b5d2a6ddf2b466270362dc46238a10e152fbe58ca065bc5bbe960d347496a06"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/app.js",
+          "origem": "ra/musculo-sarcomero/app.js",
+          "sha256_anterior": "ac882ac3f21f878777503b37e7395ac42fa3a24c2eba05ab02a38b10ad354c13",
+          "sha256": "639c0edfda9db381a0725293e1fd6c3967f72767471218491b9737918cd5bf34"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/index.html",
+          "origem": "ra/musculo-sarcomero/index.html",
+          "sha256_anterior": "e5e274a43b4e2967eedab18740a1012bb4b12e3cada9fd80c989df62d2e213d7",
+          "sha256": "0b918bffa14a42ff4a1be569ef26b01545f259280d10016bd1a13160b6e0fb05"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/README.md",
+          "origem": "ra/musculo-sarcomero/README.md",
+          "sha256_anterior": "6616948f3b83c2ad46a6c943f64700d4a489b54a9efccb0a9cf0e46891967d97",
+          "sha256": "d816cd0c517ba8a123538d5762a341c6b3dc4c014263b3c4ba152b1f21bb297c"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/assets/ATRIBUICAO.md",
+          "origem": "ra/assets/ATRIBUICAO.md",
+          "sha256_anterior": "6e961301db4594d668bbf0d16d7ee7859322ac3c776c9e113f1f026b7f5c6bc8",
+          "sha256": "4873bbc19dc714b4957a2a4afd0554df81e9982d0f6f7d0bc521e577aa008a1d"
         }
       ]
     }

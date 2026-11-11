@@ -34,7 +34,7 @@ import { usdzComBotoes } from '../ra-botoes-ios.js?v=volume-20261025';
 import { novaMitocondria } from '../mitocondria.js';
 import { criar } from './modelos.js?v=musculo-anatomico-20261003';
 import { aplicarAcabamento } from './acabamento.js?v=acabamento-20261028';
-import { montarBiceps, TEXTO_BICEPS } from './biceps.js?v=biceps-20261029';
+import { montarBiceps, TEXTO_BICEPS } from './biceps.js?v=rosca-20261111';
 
 const $ = id => document.getElementById(id);
 const canvas = $('scene'), stage = $('stage');
@@ -140,13 +140,14 @@ const sarc = modelos[4];
    montado acima e é a reserva: some enquanto o arquivo carrega e volta se ele
    não chegar. Até lá, rótulos e RA do 01 esperam (musculoPronto). */
 let musculoPronto = false;
-montarBiceps(modelos[0], new URL('../assets/biceps-braquial.glb?v=20261029', import.meta.url).href).then(trocou => {
+montarBiceps(modelos[0], new URL('../assets/biceps-braquial-rosca.glb?v=rosca-20261111', import.meta.url).href).then(trocou => {
   if (trocou) {
     dados[0][3] = TEXTO_BICEPS.titulo; dados[0][4] = TEXTO_BICEPS.texto; dados[0][5] = TEXTO_BICEPS.tags;
     TAM_REAL[0] = modelos[0].userData.tamanhoReal;
   }
   musculoPronto = true;
   if (atual === 0) { aplicarTextos(0); if (!transicao) resetCam(); prepararRA(); }
+  $('rosca').hidden = atual !== 0 || !modelos[0].userData.movimento;
 });
 
 const dados = [
@@ -188,6 +189,7 @@ function aplicarTextos(n) {
   E.prev.disabled = n === 0; E.next.disabled = n === 4; E.next.textContent = n === 4 ? 'Unidade contrátil ✓' : 'Aprofundar →';
   document.querySelectorAll('.step').forEach((b, i) => b.classList.toggle('active', i === n));
   E.contrBox.hidden = n < 3; E.labels.innerHTML = '';
+  $('rosca').hidden = n !== 0 || !modelos[0].userData.movimento;
 }
 
 function setStep(n, viaMergulho = false) {
@@ -448,6 +450,8 @@ const clock = new THREE.Clock();
 (function loop() {
   requestAnimationFrame(loop); const dt = clock.getDelta();
   if (girar && !transicao) root.rotation.y += dt * .08 * velocidadeGiro;
+  /* rosca direta do nível 01 (biceps.js): o relógio anda só com o 01 visível */
+  if (modelos[0].visible && modelos[0].userData.movimento) modelos[0].userData.movimento.passo(dt);
   if (transicao) {
     transicao.t = Math.min(1, transicao.t + dt * (transicao.mergulho ? 1.1 : 2.4)); const e = 1 - Math.pow(1 - transicao.t, 3);
     if (transicao.mergulho) {
@@ -605,4 +609,7 @@ const pedido = parseInt(new URLSearchParams(location.search).get('nivel'), 10);
 if (Number.isFinite(pedido) && pedido >= 1 && pedido <= 5) irDireto(pedido - 1); else prepararRA();
 
 import {instalarCicloPortatil} from '../ciclo-portatil.js?v=wifi-20261102';
-instalarCicloPortatil({experiencia:'musculo-sarcomero',nivel:()=>atual+1,niveis:[5]});
+instalarCicloPortatil({experiencia:'musculo-sarcomero',nivel:()=>atual+1,niveis:[1,2,3,4,5]});
+/* Rosca direta do 01: pausar e retomar. */
+$('rosca').onclick = () => { const m = modelos[0].userData.movimento; if (!m) return; const on = m.alternar(); $('rosca').setAttribute('aria-pressed', String(on)); $('rosca').textContent = on ? 'Pausar rosca direta' : 'Retomar rosca direta'; };
+window.__musculoCiclo = { modelos, miofibrila: L => { E.contr.value = L; aplicarMiofibrila(); } };

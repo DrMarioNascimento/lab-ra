@@ -64,3 +64,9 @@ SHA-256: aberta 16e2beb9b607e71dac8f441c2cd5e8e79d2314cc3d3cdea9f0cb88b95a343840
 Alterações em 29/10/2026: retirada de uma peça solta (`tendao_insercao_novo`); retirada do tendão distal antigo, que terminava sem tocar o rádio; tendão distal novo, criado para esta cena, da junção musculotendínea à tuberosidade do rádio; primitivas repetidas de rádio e ulna juntadas; ossos simplificados; texturas redimensionadas; compressão Draco. Medidas, posições e proporções das peças preservadas.
 
 SHA-256: `7ad721d8df74c6736ce52a620f5ffdb9d16318d677e30d16535100bb0e83b83a`.
+
+## Bíceps braquial em rosca direta (nível 01 de Do músculo ao sarcômero, 11/11/2026)
+
+`biceps-braquial-rosca.glb` substitui `biceps-braquial.glb` no nível 01 (o arquivo anterior continua aqui). Escápula, clavícula, úmero, rádio, ulna, tendões das duas cabeças do bíceps e membrana interóssea derivam de **BodyParts3D © The Database Center for Life Science (DBCLS)**, sob [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/); fonte e termos do atlas: [BodyParts3D](https://dbarchive.biosciencedbc.jp/en/bodyparts3d/download.html). Os ventres musculares vêm do modelo 3D do autor, espelhados para o lado direito e encaixados no trajeto do BodyParts3D. Cartilagens articulares, ligamentos (transverso do úmero, anular do rádio, coracoacromial, conoide, trapezoide, acromioclavicular, aponeurose bicipital), a janela no epimísio e os fascículos são modelagem esquemática do projeto. Animação: rosca direta de 8 s (0° → 100° → 0° de flexão do cotovelo), antebraço como nó rígido e deformações por morph targets reduzidos por PCA; Draco.
+
+SHA-256: `4dfe7501cfd372e32ea9ca8cfe8499940972e6e2556c0fcbfb7c3d1f54fbfbd9`.

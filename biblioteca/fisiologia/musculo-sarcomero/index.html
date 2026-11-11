@@ -22,7 +22,7 @@
   <p class="page-note">Explore cinco níveis de organização do músculo esquelético: músculo → fascículo → fibra muscular → miofibrila → sarcômero. Na miofibrila e no sarcômero, ajuste o comprimento, observe o deslizamento dos filamentos e acompanhe a tensão relativa.</p>
 
   <section class="ciclo-controls" aria-label="Rotação da peça tridimensional">
-    <div class="playback"><span class="eyebrow">Rotação da peça</span><button id="iniciar" class="primary" type="button">Iniciar giro</button><button id="pausar" type="button" disabled>Pausar giro</button><button id="restaurarParametros" type="button">Restaurar parâmetros</button></div>
+    <div class="playback"><span class="eyebrow">Rotação da peça</span><button id="iniciar" class="primary" type="button">Iniciar giro</button><button id="pausar" type="button" disabled>Pausar giro</button><button id="restaurarParametros" type="button">Restaurar parâmetros</button><button id="rosca" type="button" aria-pressed="true" hidden>Pausar rosca direta</button></div>
     <div class="execution-settings"><label class="ctrl speed-control"><span>Velocidade do giro <b id="velocidadeValor">1,00×</b></span><input id="velocidade" type="range" min="0.25" max="2" step="0.25" value="1" aria-label="Velocidade do giro" /></label></div>
     <p class="execution-note">O giro altera apenas a visualização. A contração é controlada pelo comprimento, por Contrair e por Relaxar nos níveis 04 e 05.</p>
     <p id="giroEstado" role="status">Giro pausado</p>
