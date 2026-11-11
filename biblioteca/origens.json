@@ -3057,6 +3057,39 @@
           "sha256": "e2c14c7dbece789e70bc9f1045b663d1e4bf2a07066b6875dc10771c773ed7e6"
         }
       ]
+    },
+    {
+      "data": "2026-11-10",
+      "tipo": "atualizacao-da-origem",
+      "fonte": "DrMarioNascimento/fisiologia-interativa",
+      "commit_fonte": "1fdfbf6d6da58d3ca49f0c9e8bc29337a349efe9",
+      "criterio": "Bíceps braquial com ciclo em movimento. app.js, modelo.glb e modelo.usdz idênticos à origem; index.html com a mesma adaptação da biblioteca (tutor-origem.js do LAB-RA, sem ra-android.js). Versões anteriores guardadas com _SUBSTITUIDO_2026-11-10.",
+      "arquivos": [
+        {
+          "arquivo": "biblioteca/fisiologia/biceps-braquial/app.js",
+          "origem": "ra/biceps-braquial/app.js",
+          "sha256_anterior": "6adde0e23069a35b21a4ecb5cfdd352678243cfd1ad3007e846fdbd2591e0d24",
+          "sha256": "05df2f6a5a8894b3b08681093807f740d26726cd666b61a57b272220c4824be5"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/biceps-braquial/index.html",
+          "origem": "ra/biceps-braquial/index.html",
+          "sha256_anterior": "a92202fc6d7bf6be34fcda8de3ddbf28c971f4dfa3f73ed35f4d150d06b71f94",
+          "sha256": "f581fd21d1faa0599783bc229a9088ce477bfb2b499b5bd69307a466cd72b990"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/biceps-braquial/modelo.glb",
+          "origem": "ra/biceps-braquial/modelo.glb",
+          "sha256_anterior": "a508b348091333a4bf6ec71707cc32cefc013e898af51e29d5508247132ac935",
+          "sha256": "12a008936bd556293b000531292b108b7fc85955e1e3d3dbd23b747a45a23930"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/biceps-braquial/modelo.usdz",
+          "origem": "ra/biceps-braquial/modelo.usdz",
+          "sha256_anterior": "644ade5164e407bf984086ec9f0478ec07a78d1ad2e8274d075f1c8e483a50d3",
+          "sha256": "365c236cd3a23bedf9ea2a065efa3684c0a15be60c58afb3193a1e1cc7233f88"
+        }
+      ]
     }
   ],
   "ultima_sincronizacao_fisiologia": {

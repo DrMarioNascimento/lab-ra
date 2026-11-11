@@ -10,6 +10,16 @@
    aponeurose_bicipital, membrana_interossea) e é por esse nome que a página
    escolhe material, rótulo e botão.
 
+   O MOVIMENTO (10/11/2026, ciclo de 8 s gravado no próprio GLB/USDZ):
+   0–1 s posição anatômica; 1–2,5 s pronação com o bíceps relaxado (o tendão se
+   enrola no rádio); 2,5–5 s contração: supinação + flexão do cotovelo até 95°,
+   com o ventre encurtando e engrossando; 5–5,5 s cotovelo fletido; 5,5–7,5 s
+   relaxamento e extensão; 7,5–8 s repouso. Antebraço e rádio giram como peças
+   rígidas (nós "antebraco" e "radio_pronossupinacao", eixos do cotovelo e da
+   pronossupinação); ventres, tendões, aponeurose e membrana interóssea se
+   deformam (morph targets no GLB; esqueleto no USDZ, que é o que o Quick Look
+   do iPhone reproduz). Amplitudes didáticas, em câmera lenta.
+
    A RA. iPhone/iPad: link rel="ar" escrito no HTML apontando para modelo.usdz
    (gerado do mesmo GLB) — abre o Quick Look no mesmo toque, sem conversão na
    hora. Android: model-viewer com o GLB (ra-android.js cuida dos aparelhos sem
@@ -17,6 +27,8 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+const DECODIFICADOR = 'https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/libs/draco/gltf/';
 
 const $ = id => document.getElementById(id);
 const V = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
@@ -74,58 +86,69 @@ function boxUV(geom, scale) {
 
 /* ── Modelo ───────────────────────────────────────────────────────────── */
 const BONES = ['umero', 'radio', 'ulna', 'escapula', 'clavicula'];
-const model = new THREE.Group(), part = {}, groups = { soft: [], conj: [], cart: [] };
-let LABELS = [], ready = false, home = null;
-
-new GLTFLoader().load('modelo.glb?v=20261110', gltf => {
-  gltf.scene.updateMatrixWorld(true);
-  const meshes = []; gltf.scene.traverse(o => { if (o.isMesh) meshes.push(o); });
-  for (const o of meshes) {
-    const name = o.name, g = o.geometry.clone().applyMatrix4(o.matrixWorld);
-    if (!g.attributes.normal) g.computeVertexNormals();
-    let m;
-    if (BONES.some(b => name.startsWith(b))) m = new THREE.Mesh(boxUV(g, 9), M.bone);
-    else if (name.startsWith('cartilagem')) { m = new THREE.Mesh(g, M.cartilage); groups.cart.push(m); }
-    else if (name.startsWith('tendoes')) { m = new THREE.Mesh(g, M.tendon.clone()); groups.soft.push(m); }
-    else if (name.startsWith('ventres')) { const vm = o.material.clone(); vm.side = THREE.DoubleSide; m = new THREE.Mesh(g, vm); groups.soft.push(m); }
-    else { m = new THREE.Mesh(g, M.ligament); groups.conj.push(m); }
-    m.name = name; model.add(m); part[name] = m;
-  }
-  scene.add(model);
-  buildLabels(); frame(); ready = true;
-  $('loadStatus').textContent = 'Membro superior direito';
-  for (const id of ['toggleLabels', 'toggleXray', 'toggleConj', 'toggleCart', 'resetView']) $(id).disabled = false;
+const groups = { soft: [], conj: [], cart: [] }, part = {};
+let LABELS = [], ready = false, home = null, mixer = null, playing = true, clipTime = 0;
+const clock = new THREE.Clock();
+const loader = new GLTFLoader(); loader.setDRACOLoader(new DRACOLoader().setDecoderPath(DECODIFICADOR));
+loader.load('modelo.glb?v=movimento-20261110', gltf => {
+  const model = gltf.scene;
+  model.traverse(o => {
+    if (!o.isMesh) return;
+    const name = o.name; part[name] = o;
+    if (BONES.some(b => name.startsWith(b))) { o.geometry = boxUV(o.geometry, 9); o.material = M.bone; }
+    else if (name.startsWith('cartilagem')) { o.material = M.cartilage; groups.cart.push(o); }
+    else if (name.startsWith('tendoes')) { o.material = M.tendon.clone(); groups.soft.push(o); }
+    else if (name.startsWith('ventres')) { o.material = o.material.clone(); o.material.side = THREE.DoubleSide; groups.soft.push(o); }
+    else { o.material = M.ligament; groups.conj.push(o); }
+  });
+  scene.add(model); window.__model = model;
+  if (gltf.animations.length) { mixer = new THREE.AnimationMixer(model); mixer.clipAction(gltf.animations[0]).play(); }
+  model.updateMatrixWorld(true);
+  buildLabels(model); frame(); ready = true;
+  for (const id of ['toggleLabels', 'toggleXray', 'toggleConj', 'toggleCart', 'resetView', 'toggleMove']) $(id).disabled = false;
 }, ev => { if (ev.total) $('loadStatus').textContent = `Carregando modelo… ${Math.round(ev.loaded / ev.total * 100)}%`; },
 () => { $('loadStatus').textContent = 'O modelo não carregou. Recarregue a página.'; });
 
-function pts(mesh) { const p = mesh.geometry.attributes.position, a = []; for (let i = 0; i < p.count; i++) a.push(V().fromBufferAttribute(p, i)); return a; }
-const top = a => a.reduce((m, v) => v.y > m.y ? v : m), bot = a => a.reduce((m, v) => v.y < m.y ? v : m);
-const center = mesh => { mesh.geometry.computeBoundingBox(); return mesh.geometry.boundingBox.getCenter(V()); };
+// Posição atual de um vértice, já com a deformação do instante (morph) e o movimento dos nós.
+function vpos(mesh, i, out = V()) {
+  const p = mesh.geometry.attributes.position; out.fromBufferAttribute(p, i);
+  const ma = mesh.geometry.morphAttributes.position, inf = mesh.morphTargetInfluences;
+  if (ma && inf) { const rel = mesh.geometry.morphTargetsRelative; for (let k = 0; k < ma.length; k++) { const w = inf[k]; if (!w) continue; const a = ma[k]; if (rel) { out.x += a.getX(i) * w; out.y += a.getY(i) * w; out.z += a.getZ(i) * w; } } }
+  return mesh.localToWorld(out);
+}
+const worldPts = mesh => { const p = mesh.geometry.attributes.position, a = []; for (let i = 0; i < p.count; i++) a.push(vpos(mesh, i)); return a; };
+const argBy = (a, f) => { let bi = 0, bv = -Infinity; a.forEach((v, i) => { const s = f(v); if (s > bv) { bv = s; bi = i; } }); return bi; };
+const nearestIdx = (a, q) => argBy(a, v => -v.distanceToSquared(q));
 
 function frame() {
-  const vb = new THREE.Box3().setFromObject(part.ventres_biceps), c = vb.getCenter(V()); c.y += 0.03;
-  const dir = V(-0.35, 0.18, 1).normalize(), wide = stage.clientWidth > 700;
-  home = { target: c.clone(), pos: c.clone().addScaledVector(dir, wide ? 0.78 : 0.95) };
+  const vb = new THREE.Box3().setFromObject(part.ventres_biceps), c = vb.getCenter(V()); c.y -= 0.02; c.z += 0.03;
+  const dir = V(-0.55, 0.16, 1).normalize(), wide = stage.clientWidth > 700;
+  home = { target: c.clone(), pos: c.clone().addScaledVector(dir, wide ? 0.84 : 1.05) };
   camera.position.copy(home.pos); controls.target.copy(home.target); controls.update();
 }
 
-/* ── Rótulos projetados ───────────────────────────────────────────────── */
+/* ── Rótulos projetados (presos a vértices: acompanham o movimento) ───── */
 const labelsEl = $('labels'), svg = $('leaders');
 function buildLabels() {
-  const LT = pts(part.tendoes_cabeca_longa), ST = pts(part.tendoes_cabeca_curta), VB = pts(part.ventres_biceps);
+  const LTm = part.tendoes_cabeca_longa, STm = part.tendoes_cabeca_curta, VBm = part.ventres_biceps;
+  const LT = worldPts(LTm), ST = worldPts(STm), VB = worldPts(VBm);
   const vbb = new THREE.Box3().setFromPoints(VB), midY = (vbb.min.y + vbb.max.y) / 2, midX = (vbb.min.x + vbb.max.x) / 2;
-  const band = VB.filter(v => Math.abs(v.y - midY) < 0.006), ant = a => a.reduce((m, v) => v.z > m.z ? v : m);
+  const bandIdx = VB.map((v, i) => i).filter(i => Math.abs(VB[i].y - midY) < 0.006);
+  const antOf = list => list.reduce((m, i) => VB[i].z > VB[m].z ? i : m, list[0]);
+  const at = (mesh, idx, off = V()) => ({ mesh, idx, off });
   LABELS = [
-    { p: top(LT), k: 'Origem · cabeça longa', t: 'Tubérculo supraglenoidal', c: '#e8472a', dx: -78, dy: -48, ign: [part.tendoes_cabeca_longa] },
-    { p: top(ST), k: 'Origem · cabeça curta', t: 'Processo coracoide', c: '#e8472a', dx: 80, dy: -22, ign: [part.tendoes_cabeca_curta] },
-    { p: bot(LT), k: 'Inserção', t: 'Tuberosidade do rádio', c: '#2d6ad9', dx: -82, dy: 38, ign: [part.tendoes_cabeca_longa] },
-    { p: ant(band.filter(v => v.x < midX)).add(V(0, 0, 0.002)), t: 'Cabeça longa', c: '#b0423a', dx: -84, dy: -4, m: true, ign: [part.ventres_biceps] },
-    { p: ant(band.filter(v => v.x >= midX)).add(V(0, 0, 0.002)), t: 'Cabeça curta', c: '#b0423a', dx: 84, dy: 10, m: true, ign: [part.ventres_biceps] },
+    { a: at(LTm, argBy(LT, v => v.y)), k: 'Origem · cabeça longa', t: 'Tubérculo supraglenoidal', c: '#e8472a', dx: -78, dy: -48, ign: [LTm] },
+    { a: at(STm, argBy(ST, v => v.y)), k: 'Origem · cabeça curta', t: 'Processo coracoide', c: '#e8472a', dx: 80, dy: -22, ign: [STm] },
+    { a: at(LTm, argBy(LT, v => -v.y)), k: 'Inserção', t: 'Tuberosidade do rádio', c: '#2d6ad9', dx: -82, dy: 38, ign: [LTm] },
+    { a: at(VBm, antOf(bandIdx.filter(i => VB[i].x < midX)), V(0, 0, 0.002)), t: 'Cabeça longa', c: '#b0423a', dx: -84, dy: -4, m: true, ign: [VBm] },
+    { a: at(VBm, antOf(bandIdx.filter(i => VB[i].x >= midX)), V(0, 0, 0.002)), t: 'Cabeça curta', c: '#b0423a', dx: 84, dy: 10, m: true, ign: [VBm] },
   ];
-  if (part.aponeurose_bicipital) LABELS.push({ p: center(part.aponeurose_bicipital).add(V(0, 0, 0.006)), t: 'Aponeurose bicipital', c: '#e8d7b3', dx: 86, dy: 28, grp: 'conj', ign: [part.aponeurose_bicipital] });
-  if (part.ligamento_transverso_umero) LABELS.push({ p: center(part.ligamento_transverso_umero).add(V(0, 0, 0.003)), t: 'Lig. transverso do úmero', c: '#e8d7b3', dx: -92, dy: 4, grp: 'conj', ign: [part.ligamento_transverso_umero, part.tendoes_cabeca_longa] });
-  if (part.ligamento_anular_radio) LABELS.push({ p: center(part.ligamento_anular_radio).add(V(-0.012, 0, 0.004)), t: 'Lig. anular do rádio', c: '#e8d7b3', dx: -88, dy: 2, grp: 'conj', ign: [part.ligamento_anular_radio] });
+  const ctr = mesh => { const w = worldPts(mesh); return { w, c: w.reduce((s, v) => s.add(v), V()).multiplyScalar(1 / w.length) }; };
+  if (part.aponeurose_bicipital) { const { w, c } = ctr(part.aponeurose_bicipital); LABELS.push({ a: at(part.aponeurose_bicipital, nearestIdx(w, c.add(V(0, 0, 0.02)))), t: 'Aponeurose bicipital', c: '#e8d7b3', dx: 86, dy: 28, grp: 'conj', ign: [part.aponeurose_bicipital] }); }
+  if (part.ligamento_transverso_umero) { const { w, c } = ctr(part.ligamento_transverso_umero); LABELS.push({ a: at(part.ligamento_transverso_umero, nearestIdx(w, c.add(V(0, 0, 0.01)))), t: 'Lig. transverso do úmero', c: '#e8d7b3', dx: -92, dy: 4, grp: 'conj', ign: [part.ligamento_transverso_umero, LTm] }); }
+  if (part.ligamento_anular_radio) { const { w, c } = ctr(part.ligamento_anular_radio); LABELS.push({ a: at(part.ligamento_anular_radio, nearestIdx(w, c.add(V(-0.02, 0, 0.01)))), t: 'Lig. anular do rádio', c: '#e8d7b3', dx: -88, dy: 2, grp: 'conj', ign: [part.ligamento_anular_radio] }); }
   for (const L of LABELS) {
+    L.p = V();
     L.el = document.createElement('div'); L.el.className = 'lbl ' + (L.dx < 0 ? 'l' : 'r') + (L.m ? ' m' : '');
     const s = document.createElement('span'); s.style.borderLeftColor = L.c;
     if (L.k) { const b = document.createElement('b'); b.style.color = L.c; b.textContent = L.k; s.append(b); }
@@ -135,20 +158,20 @@ function buildLabels() {
     labelsEl.append(L.el, L.dot); svg.append(L.line);
   }
 }
-const ray = new THREE.Raycaster(), tmp = V(), lastCam = new THREE.Matrix4();
+const ray = new THREE.Raycaster(), tmp = V();
 let lastOcc = 0, labelsOn = true, conjOn = true;
 function updateLabels(now) {
   const w = stage.clientWidth, h = stage.clientHeight;
-  const doOcc = !lastCam.equals(camera.matrixWorld) && now - lastOcc > 120;
-  if (doOcc) { lastOcc = now; lastCam.copy(camera.matrixWorld); }
+  const doOcc = now - lastOcc > 160; if (doOcc) lastOcc = now;
   for (const L of LABELS) {
+    vpos(L.a.mesh, L.a.idx, L.p).add(L.a.off);
     tmp.copy(L.p).project(camera);
     const x = (tmp.x + 1) / 2 * w, y = (1 - tmp.y) / 2 * h;
     const vis = labelsOn && tmp.z < 1 && (L.grp !== 'conj' || conjOn);
-    if (doOcc || L.occ === undefined) {
+    if (labelsOn && (doOcc || L.occ === undefined)) {
       const dist = camera.position.distanceTo(L.p);
       ray.set(camera.position, tmp.copy(L.p).sub(camera.position).normalize());
-      const hit = ray.intersectObject(model, true).find(hh => hh.object.visible && !L.ign.includes(hh.object));
+      const hit = ray.intersectObject(window.__model, true).find(hh => hh.object.visible && !L.ign.includes(hh.object));
       L.occ = !!hit && hit.distance < dist - 0.004;
     }
     const op = vis ? (L.occ ? 0.25 : 1) : 0;
@@ -158,7 +181,18 @@ function updateLabels(now) {
     L.line.setAttribute('x1', x); L.line.setAttribute('y1', y); L.line.setAttribute('x2', x + L.dx); L.line.setAttribute('y2', y + L.dy);
   }
 }
-renderer.setAnimationLoop(now => { controls.update(); renderer.render(scene, camera); if (ready) updateLabels(now); });
+const FASES = [[1, 'Posição anatômica · relaxado'], [2.5, 'Pronação · bíceps relaxado, tendão enrola no rádio'], [5, 'Contração · supinação + flexão do cotovelo'], [5.5, 'Cotovelo fletido · ventre curto e grosso'], [7.5, 'Relaxamento · extensão do cotovelo'], [8.01, 'Posição anatômica · relaxado']];
+let faseAtual = '';
+renderer.setAnimationLoop(now => {
+  const dt = clock.getDelta();
+  if (mixer && playing) { mixer.update(dt); clipTime = mixer.time % 8; }
+  controls.update(); renderer.render(scene, camera);
+  if (ready) {
+    updateLabels(now);
+    const f = (FASES.find(([t]) => clipTime < t) || FASES[0])[1];
+    if (f !== faseAtual) { faseAtual = f; $('loadStatus').textContent = f; }
+  }
+});
 
 /* ── Controles ────────────────────────────────────────────────────────── */
 const toggle = (id, fn) => { const b = $(id); b.onclick = () => { const on = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', on); fn(on); }; };
@@ -166,6 +200,7 @@ toggle('toggleLabels', on => { labelsOn = on; });
 toggle('toggleXray', on => { for (const m of groups.soft) { const mt = m.material; mt.transparent = on; mt.opacity = on ? 0.3 : 1; mt.depthWrite = !on; mt.needsUpdate = true; } });
 toggle('toggleConj', on => { conjOn = on; for (const m of groups.conj) m.visible = on; });
 toggle('toggleCart', on => { for (const m of groups.cart) m.visible = on; });
+toggle('toggleMove', on => { playing = on; $('toggleMove').textContent = on ? 'Pausar movimento' : 'Retomar movimento'; });
 $('resetView').onclick = () => { if (!home) return; camera.position.copy(home.pos); controls.target.copy(home.target); controls.update(); };
 $('fullscreen').onclick = async () => { try { if (document.fullscreenElement) await document.exitFullscreen(); else await stage.requestFullscreen(); } catch { $('fullscreen').textContent = 'Ampliar indisponível'; } };
 $('exitFullscreen').onclick = () => document.exitFullscreen();
