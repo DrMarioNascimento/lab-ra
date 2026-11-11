@@ -140,7 +140,7 @@ const sarc = modelos[4];
    montado acima e é a reserva: some enquanto o arquivo carrega e volta se ele
    não chegar. Até lá, rótulos e RA do 01 esperam (musculoPronto). */
 let musculoPronto = false;
-montarBiceps(modelos[0], new URL('../assets/biceps-braquial-rosca.glb?v=rosca-20261111', import.meta.url).href).then(trocou => {
+montarBiceps(modelos[0], new URL('../assets/biceps-braquial-rosca.glb?v=acabamento-20261111', import.meta.url).href).then(trocou => {
   if (trocou) {
     dados[0][3] = TEXTO_BICEPS.titulo; dados[0][4] = TEXTO_BICEPS.texto; dados[0][5] = TEXTO_BICEPS.tags;
     TAM_REAL[0] = modelos[0].userData.tamanhoReal;

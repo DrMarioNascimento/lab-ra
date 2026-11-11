@@ -90,7 +90,7 @@ const groups = { soft: [], conj: [], cart: [] }, part = {};
 let LABELS = [], ready = false, home = null, mixer = null, playing = true, clipTime = 0;
 const clock = new THREE.Clock();
 const loader = new GLTFLoader(); loader.setDRACOLoader(new DRACOLoader().setDecoderPath(DECODIFICADOR));
-loader.load('modelo.glb?v=correcao-20261111', gltf => {
+loader.load('modelo.glb?v=acabamento-20261111', gltf => {
   const model = gltf.scene;
   model.traverse(o => {
     if (!o.isMesh) return;

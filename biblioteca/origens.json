@@ -3318,6 +3318,75 @@
           "sha256": "bfddc4475ec8a31daf2e310c8632ef8cfd1007cbeb91485f3b41ace023dc5fb2"
         }
       ]
+    },
+    {
+      "data": "2026-11-11",
+      "tipo": "atualizacao-da-origem",
+      "fonte": "DrMarioNascimento/fisiologia-interativa",
+      "commit_fonte": "d63130c5ce20b294a1195b9cbf006e605d5ebadc",
+      "criterio": "Acabamento das junções miotendíneas do bíceps (RA Bíceps e nível 01): modelos e ciclos idênticos à origem; index.html da RA Bíceps com a adaptação da biblioteca e musculo-sarcomero/app.js com as edições próprias da biblioteca (só os ?v= mudaram).",
+      "arquivos": [
+        {
+          "arquivo": "biblioteca/fisiologia/biceps-braquial/modelo.glb",
+          "origem": "ra/biceps-braquial/modelo.glb",
+          "sha256_anterior": "964177fcc8e51bd7e8aeb6cb7fc143f669d9e5f245712f0fd5e6f13ce7316d5c",
+          "sha256": "b9cc02fb37f3e3dc9aa6a3aaf529f514c312514c08e5a9e9f96185f8f8b04d65"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/biceps-braquial/modelo.usdz",
+          "origem": "ra/biceps-braquial/modelo.usdz",
+          "sha256_anterior": "2fb44a70d7679c59f20c0d6c405c4e39158f2ef036d7bcfb4e0120a3e710efcc",
+          "sha256": "016708bfebc8bd7ab17caa1cc948375de53f6a0ffbdddee79841a2f925e816bb"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/biceps-braquial/app.js",
+          "origem": "ra/biceps-braquial/app.js",
+          "sha256_anterior": "e70338ebd44dc25601550a5a70445c24a0bdce5a7f5b9dee07cebbc9a930391e",
+          "sha256": "70fd781b641cb9c1f39ded304f7e1223d8f67cfed134140ff8626b583b47a608"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/biceps-braquial/index.html",
+          "origem": "ra/biceps-braquial/index.html",
+          "sha256_anterior": "bfddc4475ec8a31daf2e310c8632ef8cfd1007cbeb91485f3b41ace023dc5fb2",
+          "sha256": "756c993857bd2ec7074b6d1e3b19a2230a423ee21aed1e13103662997a21981d"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/assets/biceps-braquial-rosca.glb",
+          "origem": "ra/assets/biceps-braquial-rosca.glb",
+          "sha256_anterior": "95de43b8b2d4d6247ddeb4874304a39cd5e56aab9f769cdb4574c9dd0c926382",
+          "sha256": "50130922d77716b14f929a0c22cc6ccbb24ff3bf527290e50198cd4b9d36c655"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/app.js",
+          "origem": "ra/musculo-sarcomero/app.js",
+          "sha256_anterior": "639c0edfda9db381a0725293e1fd6c3967f72767471218491b9737918cd5bf34",
+          "sha256": "84d777bc9f5a3195e0ceca217cc4fb9b7ea25a5e8603c10daa572ff1b83fb3c8"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/assets/ATRIBUICAO.md",
+          "origem": "ra/assets/ATRIBUICAO.md",
+          "sha256_anterior": "b680a467a47d24e3a2ad8096764e63a90dc60dda89306390ce0a34f84df5dfac",
+          "sha256": "fe6561733aa30e3ede3b8f70f7901ae7ca5a3cfafba1e1846caca8ef1140a19e"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/ciclos/nivel-1.glb",
+          "origem": "ra/musculo-sarcomero/ciclos/nivel-1.glb",
+          "sha256_anterior": "d34d26afa5882aeec2c817ff623397bf2d6dc57a1bcc8caea28095675f350e64",
+          "sha256": "d1454c82e42198331cd92ae30ffd4b2ea8fb69d3386bf3eae48c9fac5df127a2"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/ciclos/nivel-1.usdz",
+          "origem": "ra/musculo-sarcomero/ciclos/nivel-1.usdz",
+          "sha256_anterior": "806eed9b7066738c513116927a23848c2026a131856dd9dd501626ac74e36bec",
+          "sha256": "919669b2ba9eb322c7e2f77cdcd6b8c976fd4ba957d17b5ff863816c30349b29"
+        },
+        {
+          "arquivo": "biblioteca/fisiologia/musculo-sarcomero/ciclos/nivel-1.validation.json",
+          "origem": "ra/musculo-sarcomero/ciclos/nivel-1.validation.json",
+          "sha256_anterior": "d3f7280f1c0be5cc76af587266ed0b23e72d926764edf5707830691120cf3ad3",
+          "sha256": "6628781a5f3cf67a63e62c934cc059182f93d36e72f9550ed95f98be07f86489"
+        }
+      ]
     }
   ],
   "ultima_sincronizacao_fisiologia": {
