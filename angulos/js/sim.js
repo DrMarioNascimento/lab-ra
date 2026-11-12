@@ -17,6 +17,19 @@ function dispatch(a) {
 }
 
 const app = document.getElementById("app");
+// Na entrada, escolher o cenário: Academia (esta pasta) ou Escola (pasta angulos-licenciatura).
+if (new URLSearchParams(location.search).get("cena") !== "academia") {
+  app.innerHTML = `<div class="col" style="align-items:center;justify-content:center;min-height:70vh;gap:18px;text-align:center">
+    <b style="font-size:24px">Onde acontece a cena?</b>
+    <div class="row" style="gap:16px;justify-content:center;flex-wrap:wrap">
+      <button class="btn block" id="cAcad" style="width:300px;padding:20px"><b style="font-size:20px">🏋️ Academia</b><br><span style="font-size:14px">Bacharelado</span></button>
+      <button class="btn warn block" id="cEsc" style="width:300px;padding:20px"><b style="font-size:20px">🏫 Escola</b><br><span style="font-size:14px">Licenciatura</span></button>
+    </div></div>`;
+  await new Promise((ok) => {
+    document.getElementById("cAcad").onclick = ok;
+    document.getElementById("cEsc").onclick = () => { location.href = "../../angulos-licenciatura/simulador/"; };
+  });
+}
 app.innerHTML = `<div class="col" style="align-items:center;justify-content:center;min-height:70vh;gap:12px"><b style="font-size:20px">Montando a academia em 3D…</b><div class="faint" id="carga">0%</div></div>`;
 await prepararCena((f) => { const el = document.getElementById("carga"); if (el) el.textContent = `${Math.round(f * 100)}%`; });
 let nAlunos = 14, auto = true;
