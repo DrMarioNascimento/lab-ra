@@ -1,6 +1,8 @@
-// Cena 3D da academia (three.js local). Personagens e objetos provisórios feitos de primitivas;
-// textos legíveis (cartaz, maquininha, celular, papéis) são texturas desenhadas em canvas.
+// Cena 3D da academia (three.js local). Personagens e equipamentos são modelos GLB (assets/modelos);
+// paredes, piso e textos legíveis (cartaz, maquininha, celular, papéis) são primitivas e texturas em canvas.
 import * as THREE from "../vendor/three.module.min.js";
+import { GLTFLoader } from "../vendor/GLTFLoader.js";
+import { MeshoptDecoder } from "../vendor/meshopt_decoder.module.js";
 import { FOTOS, PAPEIS, txt } from "./content/cena.js";
 
 const PESSOA_POS = {}; // id → THREE.Vector3 (pés)
@@ -41,60 +43,72 @@ function placa(w, h, textura, x, y, z, ry = 0, rx = 0) {
   return m;
 }
 
-function pessoa(id, { camisa, calca = "#1f2937", pele = "#c58c5c", cabelo = "#1b1b1b", altura = 1.75, x, z, ry = 0, colete, textoPeito, bracos = "baixo", grisalho, cabeloLongo }) {
-  const g = new THREE.Group();
-  const k = altura / 1.75;
-  const pernaM = mat(calca), corpoM = mat(camisa), peleM = mat(pele);
-  for (const s of [-1, 1]) {
-    const perna = new THREE.Mesh(new THREE.CapsuleGeometry(0.075 * k, 0.72 * k, 4, 8), pernaM);
-    perna.position.set(0.1 * s * k, 0.45 * k, 0); perna.castShadow = true; g.add(perna);
-  }
-  const tronco = new THREE.Mesh(new THREE.CapsuleGeometry(0.19 * k, 0.42 * k, 6, 12), colete ? mat(colete) : corpoM);
-  tronco.position.y = 1.12 * k; tronco.scale.z = 0.7; tronco.castShadow = true; g.add(tronco);
-  if (textoPeito) {
-    const t = placa(0.3 * k, 0.12 * k, tex([{ t: textoPeito, b: true, c: "#fff" }], { w: 256, h: 100, bg: colete || camisa, font: 52 }), 0, 1.2 * k, 0.142 * k);
-    g.add(t);
-  }
-  for (const s of [-1, 1]) {
-    const braco = new THREE.Mesh(new THREE.CapsuleGeometry(0.06 * k, 0.5 * k, 4, 8), corpoM);
-    if (bracos === "frente") { braco.position.set(0.25 * s * k, 1.22 * k, 0.18 * k); braco.rotation.x = -1.2; }
-    else if (bracos === "telefone" && s === 1) { braco.position.set(0.25 * k, 1.42 * k, 0.05); braco.rotation.z = 2.6; }
-    else if (bracos === "cima") { braco.position.set(0.24 * s * k, 1.55 * k, 0); braco.rotation.z = s * 0.25; }
-    else { braco.position.set(0.26 * s * k, 1.05 * k, 0); braco.rotation.z = s * 0.12; }
-    braco.castShadow = true; g.add(braco);
-  }
-  const cabeca = new THREE.Mesh(new THREE.SphereGeometry(0.12 * k, 16, 12), peleM);
-  cabeca.position.y = 1.58 * k; cabeca.castShadow = true; g.add(cabeca);
-  const cab = new THREE.Mesh(new THREE.SphereGeometry(0.125 * k, 16, 12, 0, Math.PI * 2, 0, Math.PI * (cabeloLongo ? 0.75 : 0.5)), mat(grisalho ? "#cbd5e1" : cabelo));
-  cab.position.y = 1.6 * k; cab.rotation.x = -0.25; g.add(cab);
-  g.position.set(x, 0, z); g.rotation.y = ry;
-  g.userData.cabeca = new THREE.Vector3(x, 1.6 * k, z);
-  if (id) PESSOA_POS[id] = g.userData.cabeca.clone();
-  return g;
+
+// ---------- modelos ----------
+const MODELOS = ["personal", "recep", "bia", "lara", "kaua", "colega", "joaquim", "dono", "homem", "mae", "treino",
+  "t1", "t2", "t3", "t4", "t5", "t6", "balcao", "supino", "torre", "suporte2", "halter", "halter2", "maquina", "bola", "envelope", "frasco"];
+const BIB = {};
+let carregando = null;
+export function prepararCena(aoProgresso) {
+  if (carregando) return carregando;
+  const ld = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+  let feitos = 0;
+  carregando = Promise.all(MODELOS.map((id) => ld.loadAsync(new URL(`../assets/modelos/${id}.glb`, import.meta.url).href).then((g) => {
+    g.scene.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+    BIB[id] = g.scene; feitos++; aoProgresso?.(feitos / MODELOS.length);
+  })));
+  return carregando;
+}
+export const cenaPronta = () => Object.keys(BIB).length === MODELOS.length;
+
+function modelo(id, x, z, ry = 0, { y = 0, s = 1 } = {}) {
+  const o = BIB[id].clone();
+  o.position.set(x, y, z); o.rotation.y = ry; o.scale.setScalar(s);
+  return o;
+}
+
+// Pessoa: modelo + ponto da cabeça (para os marcadores das fotos) + id para o teste de visibilidade.
+function pessoa(id, modeloId, x, z, ry, { y = 0, altura } = {}) {
+  const o = modelo(modeloId, x, z, ry, { y });
+  const box = new THREE.Box3().setFromObject(o);
+  const h = altura ?? box.max.y - y;
+  o.userData.pid = id;
+  o.traverse((m) => { if (m.isMesh) m.userData.pid = id; });
+  const cab = new THREE.Vector3(x, y + h * 0.9, z);
+  if (id) PESSOA_POS[id] = cab.clone();
+  o.userData.cabeca = cab;
+  return o;
+}
+
+// Ponto local (relativo a quem está em x,z virado para ry) → mundo.
+function local(x, z, ry, dx, dy, dz) {
+  const c = Math.cos(ry), s = Math.sin(ry);
+  return [x + dx * c + dz * s, dy, z - dx * s + dz * c];
 }
 
 export function construirCena(pers) {
+  for (const k of Object.keys(PESSOA_POS)) delete PESSOA_POS[k];
   const cena = new THREE.Scene();
   cena.background = new THREE.Color("#1e293b");
   cena.fog = new THREE.Fog("#1e293b", 30, 60);
 
-  cena.add(new THREE.HemisphereLight("#eef2ff", "#3f3a33", 1.15));
+  cena.add(new THREE.HemisphereLight("#eef2ff", "#3f3a33", 1.25));
   const luz = new THREE.DirectionalLight("#fff7e6", 1.5);
   luz.position.set(4, 12, 6); luz.castShadow = true;
-  luz.shadow.mapSize.set(1024, 1024);
+  luz.shadow.mapSize.set(2048, 2048); luz.shadow.bias = -0.0004; luz.shadow.normalBias = 0.02;
   Object.assign(luz.shadow.camera, { left: -16, right: 16, top: 12, bottom: -12 });
   cena.add(luz);
-  for (const [x, z] of [[-6, -3], [4, -3], [-6, 4], [5, 4]]) {
+  for (const [x, z] of [[-6, -3], [4, -3], [-6, 4], [5, 4], [0, -6], [8, -6]]) {
     const p = new THREE.PointLight("#fff1d6", 6, 12, 1.6); p.position.set(x, 3.6, z); cena.add(p);
   }
 
   // Piso, paredes e teto aberto
-  const piso = new THREE.Mesh(new THREE.PlaneGeometry(24, 17), mat("#3b3f46"));
-  piso.rotation.x = -Math.PI / 2; piso.position.set(0, 0, 0); piso.receiveShadow = true; cena.add(piso);
-  const borracha = new THREE.Mesh(new THREE.PlaneGeometry(6, 5), mat("#1f2125"));
-  borracha.rotation.x = -Math.PI / 2; borracha.position.set(8, 0.005, 2.5); cena.add(borracha);
+  const piso = new THREE.Mesh(new THREE.PlaneGeometry(24, 17), mat("#4a4e55"));
+  piso.rotation.x = -Math.PI / 2; piso.receiveShadow = true; cena.add(piso);
+  const borracha = new THREE.Mesh(new THREE.PlaneGeometry(7, 7), mat("#1f2125"));
+  borracha.rotation.x = -Math.PI / 2; borracha.position.set(8.2, 0.005, 2.2); borracha.receiveShadow = true; cena.add(borracha);
   const tapete = new THREE.Mesh(new THREE.PlaneGeometry(6, 5), mat("#2d5a4a"));
-  tapete.rotation.x = -Math.PI / 2; tapete.position.set(-7.2, 0.005, 5.2); cena.add(tapete);
+  tapete.rotation.x = -Math.PI / 2; tapete.position.set(-7.2, 0.005, 5.2); tapete.receiveShadow = true; cena.add(tapete);
   const parede = mat("#d6d3cd");
   cena.add(caixa(24, 4.2, 0.2, parede, 0, 2.1, -8.5));
   cena.add(caixa(24, 4.2, 0.2, parede, 0, 2.1, 8.5));
@@ -104,6 +118,8 @@ export function construirCena(pers) {
   const vidro = new THREE.Mesh(new THREE.BoxGeometry(0.06, 3, 5.2), new THREE.MeshStandardMaterial({ color: "#9bd3ff", transparent: true, opacity: 0.18, roughness: 0.1 }));
   vidro.position.set(-12, 1.5, 0.5); cena.add(vidro);
   cena.add(placa(3.6, 0.7, tex([{ t: "ACADEMIA MOVIMENTO", b: true, c: "#fff" }], { bg: "#0f766e", font: 54, h: 128 }), -11.88, 3.3, 0.5, Math.PI / 2));
+  // espelho da área de pesos
+  cena.add(caixa(0.04, 2.0, 5.5, new THREE.MeshStandardMaterial({ color: "#cbd5e1", roughness: 0.05, metalness: 0.9 }), 11.86, 1.3, 2.5));
 
   // Estacionamento (fora)
   const asfalto = new THREE.Mesh(new THREE.PlaneGeometry(12, 17), mat("#26282c"));
@@ -119,20 +135,29 @@ export function construirCena(pers) {
   carro.add(caixa(0.5, 0.35, 0.4, "#f1f5f9", 0.3, 1.05, 1.65));
   carro.add(caixa(0.45, 0.3, 0.38, "#e2e8f0", -0.05, 1.38, 1.55));
   carro.position.set(-16.4, 0, -2.6); carro.rotation.y = 0.15; cena.add(carro);
-  cena.add(pessoa("homem", { camisa: "#4b5563", x: -15.0, z: -0.5, ry: 0.6, bracos: "telefone" }));
+  cena.add(pessoa("homem", "homem", -15.0, -0.5, 0.6));
 
-  // Recepção
-  cena.add(caixa(4.2, 1.1, 0.8, "#e5e7eb", -0.6, 0.55, -6.9));
-  cena.add(caixa(4.4, 0.06, 1.0, "#94a3b8", -0.6, 1.13, -6.9));
-  cena.add(caixa(0.32, 0.4, 0.05, "#111827", 0.35, 1.36, -6.62, -0.5));
-  cena.add(placa(0.28, 0.19, tex([{ t: "R$ 480,00", b: true, c: "#22c55e", s: 64 }, { t: "APROVADO", s: 30, c: "#e2e8f0" }], { w: 300, h: 200, bg: "#020617" }), 0.35 - 0.0144, 1.42, -6.62 + 0.0263, -0.5));
-  const env = caixa(0.32, 0.22, 0.02, "#a16207", -0.95, 1.22, -6.05, 0.1); cena.add(env);
-  cena.add(pessoa("personal", { camisa: "#111111", textoPeito: "STAFF", x: -1.45, z: -6.0, ry: Math.PI / 2 + 0.3, bracos: "frente" }));
-  cena.add(pessoa("bia", { camisa: "#ec4899", calca: "#334155", cabeloLongo: true, cabelo: "#5b3a1e", pele: "#e0b48a", altura: 1.66, x: -0.4, z: -5.95, ry: -Math.PI / 2 - 0.3, bracos: "frente" }));
-  cena.add(pessoa("recep", { camisa: "#15803d", cabeloLongo: true, altura: 1.62, x: -0.2, z: -7.7, ry: Math.PI - 0.5 + Math.PI }));
+  // Recepção: dois módulos de balcão; o lado do cliente fica para +z
+  cena.add(modelo("balcao", -1.55, -6.95, Math.PI));
+  cena.add(modelo("balcao", 0.33, -6.95, Math.PI));
+  const tampo = 1.1;
+  cena.add(caixa(0.07, 0.03, 0.15, "#111827", 0.55, tampo + 0.015, -6.7, -0.4));
+  cena.add(caixa(0.06, 0.004, 0.08, "#020617", 0.55, tampo + 0.033, -6.72, -0.4));
+  cena.add(placa(0.055, 0.04, tex([{ t: "R$ 480,00", b: true, c: "#22c55e", s: 64 }, { t: "APROVADO", s: 30, c: "#e2e8f0" }], { w: 300, h: 200, bg: "#020617" }), 0.55, tampo + 0.036, -6.72, -0.4, -Math.PI / 2));
+  // a entrega: envelope entre as mãos e um pote branco sem rótulo sobre o balcão, ao lado
+  const pRy = Math.PI / 2, bRy = -Math.PI / 2;
+  cena.add(pessoa("personal", "personal", -1.42, -6.0, pRy));
+  cena.add(pessoa("bia", "bia", -0.42, -6.0, bRy));
+  const env = modelo("envelope", -0.92, -5.98, Math.PI / 2, { y: 1.0 }); env.rotation.order = "YXZ"; env.rotation.x = -1.25; cena.add(env);
+  cena.add(modelo("frasco", -0.98, -6.66, 0.4, { y: tampo }));
+  cena.add(pessoa("recep", "recep", 0.25, -7.65, 0));
   cena.add(placa(1.8, 1.2, tex([{ t: "DESAFIO 90 DIAS", b: true, s: 56, c: "#fde047" }, { t: "Prêmio: 1 ano de plano", c: "#fff" }, { t: "+ kit Farmácia Vitta", c: "#fff" }, { t: "(parceira oficial)", s: 26, c: "#cbd5e1" }], { w: 600, h: 400, bg: "#7c2d12", font: 40 }), 2.6, 1.8, -8.38));
   const prat = caixa(1.6, 1.6, 0.4, "#64748b", 4.6, 0.8, -8.15); cena.add(prat);
   for (let i = 0; i < 6; i++) { const pote = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.25, 12), mat(i % 2 ? "#f97316" : "#0ea5e9")); pote.position.set(4.0 + (i % 3) * 0.5, 0.95 + Math.floor(i / 3) * 0.55, -7.85); cena.add(pote); }
+
+  // Aparelhos de peito entre a área de treino e a recepção (um deles tapa a visão do balcão)
+  cena.add(modelo("maquina", 1.2, -3.45, Math.PI * 0.82));
+  cena.add(modelo("maquina", 4.6, -3.0, Math.PI));
 
   // Sala de avaliação
   const vidroSala = new THREE.Mesh(new THREE.BoxGeometry(0.06, 2.6, 4), new THREE.MeshStandardMaterial({ color: "#bfdbfe", transparent: true, opacity: 0.22 }));
@@ -147,19 +172,27 @@ export function construirCena(pers) {
   const planilha = ["DESAFIO 90 DIAS — % gordura", `${pers.n.bia}  31% → 24%`, `${pers.n.kaua}  18% → 9%`, "Marcela  28% → 26%", "Joel  25% → 23%", `${pers.n.colega}  21% → 19%`];
   cena.add(placa(1.4, 1.0, tex(planilha.map((t, i) => ({ t, b: i === 0, s: i === 0 ? 30 : 28 })), { w: 560, h: 400, align: "left", bg: "#ffffff", font: 28 }), 11.88, 1.6, -5.0, -Math.PI / 2));
 
-  // Pesos livres
-  cena.add(caixa(0.4, 0.42, 1.3, "#111827", 8.6, 0.21, 2.6));
-  cena.add(caixa(1.6, 2.2, 0.1, "#4b5563", 8.6, 1.1, 1.6));
-  const barra = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 1.9, 8), mat("#9ca3af", { metalness: 0.7 })); barra.rotation.z = Math.PI / 2; barra.position.set(8.6, 1.75, 2.6); cena.add(barra);
-  for (const s of [-1, 1]) { const anilha = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.06, 20), mat("#111")); anilha.rotation.z = Math.PI / 2; anilha.position.set(8.6 + s * 0.8, 1.75, 2.6); cena.add(anilha); }
-  cena.add(pessoa("kaua", { camisa: "#f97316", calca: "#111827", altura: 1.72, x: 8.6, z: 2.6, ry: -Math.PI / 2 - 0.4, bracos: "cima", pele: "#a86b3c" }));
-  cena.add(pessoa("colega", { camisa: "#0ea5e9", x: 6.8, z: 1.5, ry: 0.9, bracos: "frente" }));
-  cena.add(caixa(0.07, 0.13, 0.01, "#020617", 7.0, 1.3, 1.75, 0.9));
+  // Pesos livres: supino, torre de halteres, suporte e halteres no chão
+  cena.add(modelo("supino", 8.9, 2.4, -Math.PI / 2));
+  cena.add(pessoa("kaua", "kaua", 8.85, 3.75, Math.PI));
+  cena.add(pessoa("colega", "colega", 6.9, 2.6, Math.PI / 2 - 0.15));
+  {
+    const [hx, hy, hz] = local(6.9, 2.6, Math.PI / 2 - 0.15, 0.16, 1.35, 0.42);
+    const cel = caixa(0.075, 0.15, 0.01, "#020617", hx, hy, hz, Math.PI / 2 - 0.15); cena.add(cel);
+  }
+  cena.add(modelo("torre", 10.9, 0.2, -Math.PI / 2));
+  cena.add(modelo("torre", 10.9, 4.9, -Math.PI / 2));
+  cena.add(modelo("suporte2", 6.0, 0.0, 0.3));
+  cena.add(modelo("halter", 7.4, 4.9, 0.4));
+  cena.add(modelo("halter", 7.7, 5.0, 0.2));
+  cena.add(modelo("halter2", 9.7, 4.2, 1.2));
+  // banco com a mochila aberta e o mesmo tipo de pote branco
   cena.add(caixa(0.4, 0.42, 1.2, "#111827", 7.6, 0.21, 4.3));
-  cena.add(caixa(0.36, 0.22, 0.24, "#1e3a8a", 7.6, 0.53, 4.3));
-  cena.add(caixa(0.3, 0.02, 0.2, "#0b1220", 7.6, 0.645, 4.3));
-  const frasco = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.09, 12), new THREE.MeshStandardMaterial({ color: "#b45309", transparent: true, opacity: 0.85, roughness: 0.2 }));
-  frasco.position.set(7.66, 0.69, 4.28); cena.add(frasco);
+  const moch = new THREE.Group();
+  moch.add(caixa(0.36, 0.22, 0.24, "#1e3a8a", 0, 0.11, 0));
+  const aba = caixa(0.36, 0.02, 0.2, "#172554", 0, 0.24, -0.17); aba.rotation.x = 0.9; moch.add(aba);
+  moch.position.set(7.6, 0.42, 4.3); cena.add(moch);
+  cena.add(modelo("frasco", 7.64, 4.26, 0.2, { y: 0.56 }));
 
   // Corredor do vestiário
   cena.add(caixa(1.2, 2.2, 0.1, "#78716c", 6.4, 1.1, 8.4));
@@ -167,22 +200,37 @@ export function construirCena(pers) {
   const lixo = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.2, 0.6, 16, 1, true), mat("#334155", { side: THREE.DoubleSide })); lixo.position.set(5.6, 0.3, 6.9); cena.add(lixo);
   const cx = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.05, 0.08), [mat("#fff"), mat("#fff"), new THREE.MeshStandardMaterial({ map: tex([{ t: "...TERONA", b: true, s: 60, c: "#b91c1c" }, { t: "Farmácia São Luiz", s: 30, c: "#334155" }], { w: 400, h: 200, bg: "#ffffff" }) }), mat("#fff"), mat("#fff"), mat("#fff")]);
   cx.position.set(5.6, 0.62, 6.9); cx.rotation.set(0.2, 0.5 + Math.PI, 0.1); cena.add(cx);
-  cena.add(pessoa("joaquim", { camisa: "#a3a3a3", calca: "#3f3f46", grisalho: true, pele: "#d6a77a", x: 6.3, z: 7.5, ry: Math.PI + 0.5 + Math.PI }));
-  cena.add(caixa(0.25, 0.3, 0.1, "#ffffff", 6.55, 0.75, 7.75));
-  cena.add(placa(0.12, 0.12, tex([{ t: "+", b: true, s: 160, c: "#16a34a" }], { w: 200, h: 200, bg: "#ffffff" }), 6.55, 0.78, 7.81, 0));
+  const jRy = Math.PI + 0.5;
+  cena.add(pessoa("joaquim", "joaquim", 6.3, 7.5, jRy));
+  {
+    const [sx, , sz] = local(6.3, 7.5, jRy, -0.3, 0, 0.02);
+    const sac = new THREE.Group();
+    sac.add(caixa(0.26, 0.3, 0.1, "#ffffff", 0, 0, 0));
+    sac.add(placa(0.12, 0.12, tex([{ t: "+", b: true, s: 160, c: "#16a34a" }], { w: 200, h: 200, bg: "#ffffff" }), 0, 0.02, 0.051, 0));
+    sac.position.set(sx, 0.72, sz); sac.rotation.y = jRy; cena.add(sac);
+  }
 
   // Aula funcional
-  cena.add(pessoa("lara", { camisa: "#ffffff", colete: "#facc15", textoPeito: "ESTÁGIO", cabeloLongo: true, altura: 1.64, x: -6.2, z: 3.5, ry: Math.PI + 0.5 + Math.PI * 0, bracos: "cima" }));
-  const turmaCores = ["#ef4444", "#3b82f6", "#22c55e", "#a855f7", "#14b8a6", "#f43f5e", "#64748b", "#eab308", "#0ea5e9", "#84cc16"];
-  let soma = new THREE.Vector3(); let n = 0;
-  turmaCores.forEach((c, i) => {
-    const x = -9.2 + (i % 5) * 0.9, z = 5.2 + Math.floor(i / 5) * 1.3;
-    const p = pessoa(null, { camisa: c, x, z, ry: Math.PI * 0.85, altura: 1.6 + (i % 3) * 0.06, bracos: i % 2 ? "cima" : "baixo" });
-    cena.add(p); soma.add(p.userData.cabeca); n++;
-  });
-  PESSOA_POS.turma = soma.divideScalar(n);
+  cena.add(pessoa("lara", "lara", -6.2, 3.5, Math.PI - 0.35));
+  const turma = [["t1", -9.0, 5.4], ["t2", -8.0, 5.3], ["t4", -7.0, 5.5], ["t3", -9.3, 6.6], ["t5", -8.2, 6.7], ["t6", -7.1, 6.8]];
+  const soma = new THREE.Vector3();
+  for (const [mid, x, z] of turma) {
+    const ry = Math.atan2(-6.2 - x, 3.5 - z);
+    const p = pessoa(null, mid, x, z, ry); p.traverse((m) => { if (m.isMesh) m.userData.pid = "turma"; });
+    cena.add(p); soma.add(p.userData.cabeca);
+  }
+  PESSOA_POS.turma = soma.divideScalar(turma.length);
+  cena.add(modelo("bola", -9.8, 4.6, 0)); cena.add(modelo("bola", -6.6, 6.2, 0));
   cena.add(placa(1.4, 1.0, tex([{ t: "RANKING DESAFIO", b: true, c: "#fde047" }, `1º ${pers.n.kaua}`, `2º ${pers.n.bia}`, "3º Marcela"], { w: 500, h: 360, bg: "#1e293b", fg: "#f8fafc", font: 36 }), -4.6, 1.5, -1.6, 0.9));
   cena.add(caixa(0.06, 1.0, 0.06, "#334155", -4.6, 0.5, -1.6));
+  // praticante treinando na frente da vista para o balcão
+  cena.add(pessoa("treino", "treino", -2.75, -3.2, 0.75));
+  {
+    for (const lado of [-1, 1]) {
+      const [hx, , hz] = local(-2.75, -3.2, 0.75, 0.2 * lado, 0, 0.36);
+      const h = modelo("halter2", hx, hz, 0.75 + Math.PI / 2, { y: 1.08 }); cena.add(h);
+    }
+  }
 
   // Mezanino
   cena.add(caixa(5, 0.2, 4.6, "#57534e", -9.5, 3.2, -6.2));
@@ -192,17 +240,32 @@ export function construirCena(pers) {
   cena.add(caixa(1.4, 0.05, 0.7, "#78350f", -9.6, 4.05, -7.5));
   cena.add(caixa(1.3, 0.75, 0.6, "#451a03", -9.6, 3.67, -7.5));
   cena.add(placa(0.3, 0.4, tex([{ t: "CONTRATO DE", b: true, s: 30 }, { t: "PARCERIA", b: true, s: 30 }, { t: "Farmácia Vitta", s: 26, c: "#1d4ed8" }, "▬▬▬▬▬", "▬▬▬▬"], { w: 300, h: 400, bg: "#fafaf9", font: 26 }), -9.7, 4.08, -7.45, 0.3, -Math.PI / 2));
-  const dono = pessoa("dono", { camisa: "#e2e8f0", calca: "#1e293b", x: -10.6, z: -6.9, ry: 1.2, bracos: "telefone" });
-  dono.position.y = 3.3; dono.userData.cabeca.y += 3.3; PESSOA_POS.dono.y += 3.3; cena.add(dono);
+  cena.add(pessoa("dono", "dono", -10.6, -6.9, 1.2, { y: 3.3 }));
 
   // Mãe entrando
-  cena.add(pessoa("mae", { camisa: "#7c3aed", calca: "#1f2937", cabeloLongo: true, altura: 1.64, x: -11.2, z: 0.4, ry: Math.PI / 2 + 0.2 }));
+  cena.add(pessoa("mae", "mae", -10.3, 1.5, Math.PI / 2 + 0.25));
 
-  // Equipamentos de enchimento
-  for (let i = 0; i < 3; i++) cena.add(caixa(0.8, 1.4, 1.8, "#475569", -3 + i * 2.2, 0.7, 6.6));
-  for (let i = 0; i < 3; i++) cena.add(caixa(0.9, 1.2, 1.8, "#334155", 1 + i * 1.6, 0.6, -2.4));
+  // Outros aparelhos e pesos
+  cena.add(modelo("torre", -2.6, 6.9, Math.PI));
+  cena.add(modelo("suporte2", -1.0, 7.4, Math.PI));
+  cena.add(modelo("maquina", 1.6, 6.6, Math.PI));
 
   return cena;
+}
+
+// Pessoa visível de fato na foto (não tapada por aparelho ou por outra pessoa)?
+const ray = new THREE.Raycaster();
+function visivel(cena, cam, pid, p) {
+  const origem = cam.position;
+  let vistos = 0;
+  for (const dy of [0, -0.25, -0.55]) {
+    const alvo = p.clone(); alvo.y += dy;
+    const dir = alvo.clone().sub(origem); const dist = dir.length(); dir.normalize();
+    ray.set(origem, dir); ray.far = dist + 0.4;
+    const hit = ray.intersectObjects(cena.children, true).find((h) => h.object.isMesh && h.object.material && !h.object.material.transparent);
+    if (!hit || hit.object.userData.pid === pid || hit.distance > dist - 0.35) vistos++;
+  }
+  return vistos >= 1;
 }
 
 let cache = null;
@@ -212,7 +275,7 @@ export function fotosDaCena(pers) {
   const cena = construirCena(pers);
   const W = 900, H = 600;
   const r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
-  r.setSize(W, H, false); r.shadowMap.enabled = true; r.outputColorSpace = THREE.SRGBColorSpace;
+  r.setSize(W, H, false); r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap; r.outputColorSpace = THREE.SRGBColorSpace;
   const fotos = {};
   for (const [id, f] of Object.entries(FOTOS)) {
     const cam = new THREE.PerspectiveCamera(f.cam.fov, W / H, 0.05, 80);
@@ -221,9 +284,12 @@ export function fotosDaCena(pers) {
     r.render(cena, cam);
     const url = r.domElement.toDataURL("image/jpeg", 0.86);
     const pontos = {};
+    cena.updateMatrixWorld(true);
     for (const pid of f.pessoas) {
-      const p = PESSOA_POS[pid]?.clone();
-      if (!p) continue;
+      const p0 = PESSOA_POS[pid];
+      if (!p0) continue;
+      if (pid !== "turma" && !visivel(cena, cam, pid, p0)) continue;
+      const p = p0.clone();
       p.project(cam);
       if (p.z < 1 && Math.abs(p.x) <= 1.05 && Math.abs(p.y) <= 1.05) pontos[pid] = { x: (p.x + 1) / 2, y: (1 - p.y) / 2 };
     }

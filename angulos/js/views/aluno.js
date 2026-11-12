@@ -5,7 +5,7 @@ import { fotosDaCena } from "../scene3d.js";
 
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const TAGS = { fato: "Fato", interp: "Interpretação", incerto: "Incerteza" };
-const PREV = [["kaua", "o jovem de camiseta laranja"], ["bia", "a mulher de regata rosa"], ["lara", "a estagiária de colete amarelo"]];
+const PREV = [["kaua", "o jovem de camiseta laranja"], ["bia", "a mulher de legging rosa"], ["lara", "a estagiária de boné"]];
 
 export function novoLocal() {
   return { nome: "", parada: 0, ind: { classif: {}, vejo: [], fora: [], vulner: [], vulnerFora: [], deveres: [], prev: {}, cartas: [] }, gf: null, lab: { acoes: [] }, h2: {}, saida: "", verFoto: 0 };

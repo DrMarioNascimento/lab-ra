@@ -31,17 +31,18 @@ export function txt(s, pers) {
 
 // Pessoas da cena. O aluno não sabe os nomes: escolhe pela descrição. O nome aparece no confronto.
 export const PESSOAS = {
-  personal: { desc: "Homem de camiseta preta escrita STAFF", nome: "{personal}, personal" },
-  bia: { desc: "Mulher de regata rosa", nome: "{bia}, aluna" },
-  recep: { desc: "Recepcionista de uniforme verde", nome: "{recep}, recepcionista" },
-  kaua: { desc: "Jovem de camiseta laranja no supino", nome: "{kaua}, {kauaIdade} anos, aluno" },
-  colega: { desc: "Rapaz filmando com o celular", nome: "{colega}, aluno" },
-  joaquim: { desc: "Senhor grisalho com sacola", nome: "{joaquim}, aluno" },
-  lara: { desc: "Moça de colete amarelo", nome: "{lara}, estagiária" },
+  personal: { desc: "Homem de boné branco e camisa preta", nome: "{personal}, personal" },
+  bia: { desc: "Mulher de camiseta branca e legging rosa", nome: "{bia}, aluna" },
+  recep: { desc: "Recepcionista de camisa clara atrás do balcão", nome: "{recep}, recepcionista" },
+  kaua: { desc: "Jovem de camiseta laranja na área do supino", nome: "{kaua}, {kauaIdade} anos, aluno" },
+  colega: { desc: "Rapaz de jaqueta azul-clara filmando com o celular", nome: "{colega}, aluno" },
+  joaquim: { desc: "Senhor de jaqueta verde com sacola", nome: "{joaquim}, aluno" },
+  lara: { desc: "Moça de boné e calça de agasalho azul", nome: "{lara}, estagiária" },
   turma: { desc: "Alunos da aula funcional", nome: "Turma da aula funcional" },
-  dono: { desc: "Homem de camisa social no mezanino", nome: "{dono}, dono da academia" },
-  homem: { desc: "Homem ao lado do carro de porta-malas aberto", nome: "Fornecedor (não é aluno)" },
-  mae: { desc: "Mulher entrando pela porta de vidro", nome: "{mae}, mãe de {kaua}" },
+  dono: { desc: "Homem de jaqueta azul-marinho no mezanino", nome: "{dono}, dono da academia" },
+  homem: { desc: "Homem de camiseta vermelha ao lado do carro de porta-malas aberto", nome: "Fornecedor (não é aluno)" },
+  treino: { desc: "Aluno de camiseta roxa treinando com halteres", nome: "Aluno do horário, sem relação com o caso" },
+  mae: { desc: "Mulher de calça vinho entrando pela porta de vidro", nome: "{mae}, mãe de {kaua}" },
 };
 
 // Afetados que não aparecem nas fotos (passo 2).
@@ -95,7 +96,7 @@ export const PAPEIS = [
     id: "alunos", nome: "Alunos da academia", cor: "#fb7185", prioridade: 6,
     abertura: "Você treina nessa academia há dois anos e está na área de pesos livres.",
     ancora: { titulo: "Grupo de WhatsApp do Desafio", texto: "\"Quem quiser acelerar o resultado fala comigo no privado 😉\" — mensagem apagada há 2 dias" },
-    fotos: ["A1", "A2"], recebeDe: [], enviaPara: "tecnica",
+    fotos: ["A1", "A2", "A3"], recebeDe: [], enviaPara: "tecnica",
     gabarito: ["pode_proteger", "testemunha"],
   },
   {
@@ -120,10 +121,12 @@ export const PAPEL_NA_SITUACAO = {
 export const FOTOS = {
   R1: {
     titulo: "Balcão da recepção", pessoas: ["personal", "bia", "recep"],
-    cam: { pos: [-1.1, 1.6, -4.4], alvo: [-0.3, 1.1, -6.6], fov: 52 },
+    cam: { pos: [-0.35, 1.7, -3.3], alvo: [-0.75, 1.05, -6.6], fov: 48 },
     frases: [
-      { t: "O homem de camiseta STAFF e a mulher de rosa seguram um envelope pardo.", tag: "fato", real: true },
+      { t: "O homem de boné branco e a mulher de legging rosa seguram um envelope pardo.", tag: "fato", real: true },
+      { t: "Sobre o balcão, ao lado deles, há um pote branco sem rótulo.", tag: "fato", real: true },
       { t: "A maquininha de cartão mostra R$ 480,00.", tag: "fato", real: true },
+      { t: "O pote branco faz parte da venda.", tag: "interp", real: false, sobre: ["bia", "personal"] },
       { t: "O personal está vendendo algo para a mulher.", tag: "interp", real: false, sobre: ["bia", "personal"] },
       { t: "O envelope contém hormônios.", tag: "interp", real: false, sobre: ["bia"] },
       { t: "Não dá para saber o que tem dentro do envelope.", tag: "incerto", real: true },
@@ -173,7 +176,7 @@ export const FOTOS = {
     titulo: "Área de pesos livres", pessoas: ["kaua", "colega"],
     cam: { pos: [5.4, 1.6, 4.4], alvo: [8.5, 1.0, 2.3], fov: 50 },
     frases: [
-      { t: "Um jovem de camiseta laranja treina no supino enquanto outro filma.", tag: "fato", real: true },
+      { t: "Um jovem de camiseta laranja está no supino enquanto outro o filma com o celular.", tag: "fato", real: true },
       { t: "O jovem é menor de idade.", tag: "incerto", real: true, sobre: ["kaua"] },
       { t: "O jovem está usando anabolizante.", tag: "interp", real: true, sobre: ["kaua"] },
       { t: "O vídeo vai para as redes sociais.", tag: "interp", real: false },
@@ -183,10 +186,21 @@ export const FOTOS = {
     titulo: "Banco ao lado do supino", pessoas: ["kaua"],
     cam: { pos: [7.0, 1.1, 3.6], alvo: [7.6, 0.45, 4.3], fov: 42 },
     frases: [
-      { t: "Há uma mochila aberta com um frasco âmbar sem rótulo legível.", tag: "fato", real: true },
-      { t: "O frasco é de hormônio.", tag: "interp", real: true, sobre: ["kaua"] },
+      { t: "Há uma mochila aberta com um pote branco sem rótulo.", tag: "fato", real: true },
+      { t: "O pote é de hormônio.", tag: "interp", real: true, sobre: ["kaua"] },
       { t: "A mochila é do jovem de camiseta laranja.", tag: "interp", real: true, sobre: ["kaua"] },
-      { t: "Não dá para saber o que tem no frasco.", tag: "incerto", real: true },
+      { t: "Não dá para saber o que tem no pote.", tag: "incerto", real: true },
+    ],
+  },
+  A3: {
+    titulo: "Do aparelho de peito, olhando para a recepção", pessoas: ["personal", "bia", "recep"],
+    cam: { pos: [3.4, 1.45, -2.2], alvo: [-0.85, 1.0, -6.4], fov: 36 },
+    frases: [
+      { t: "A estrutura do aparelho tapa parte do balcão e do homem de boné branco.", tag: "fato", real: true },
+      { t: "A mulher de legging rosa está de frente para o homem de boné, junto ao balcão.", tag: "fato", real: true },
+      { t: "O homem de boné está escondendo alguma coisa.", tag: "interp", real: false, sobre: ["personal"] },
+      { t: "A mulher de legging rosa está comprando alguma coisa dele.", tag: "interp", real: false, sobre: ["bia"] },
+      { t: "Não dá para ver o que acontece entre os dois.", tag: "incerto", real: true },
     ],
   },
   E1: {
@@ -203,8 +217,10 @@ export const FOTOS = {
     titulo: "Quadro do ranking e a recepção ao fundo", pessoas: ["personal", "bia"],
     cam: { pos: [-6.0, 1.6, 2.4], alvo: [-1.0, 1.3, -6.0], fov: 46 },
     frases: [
+      { t: "Um aluno treinando com halteres fica na frente e tapa parte do balcão.", tag: "fato", real: true },
       { t: "Ao fundo, o supervisor está no balcão da recepção com uma aluna.", tag: "fato", real: true },
       { t: "O ranking do desafio destaca os primeiros colocados.", tag: "fato", real: true },
+      { t: "Não dá para ver o que eles têm nas mãos.", tag: "incerto", real: true },
       { t: "O supervisor está ocupado com algo mais importante que a aula.", tag: "interp", real: false, sobre: ["personal"] },
       { t: "Não dá para saber o que acontece no balcão.", tag: "incerto", real: true },
     ],
@@ -261,7 +277,7 @@ export const FOTOS = {
   },
   F2: {
     titulo: "Porta de vidro da entrada", pessoas: ["mae", "kaua"],
-    cam: { pos: [-13.6, 1.6, -0.6], alvo: [-6.0, 1.3, 1.4], fov: 52 },
+    cam: { pos: [-13.8, 1.7, -1.6], alvo: [-6.0, 1.2, 1.6], fov: 52 },
     frases: [
       { t: "Uma mulher entra pela porta de vidro olhando para a área de treino.", tag: "fato", real: true },
       { t: "Ao fundo, um jovem de laranja treina pesado.", tag: "fato", real: true },
@@ -295,8 +311,8 @@ export const CARTAS = {
 // Pessoas acompanhadas no "duas semanas depois". inicio = situação de partida (0 = bem; maior = pior).
 export const DIMENSOES = {
   kaua: { curto: "O jovem de camiseta laranja", nome: "{kaua} (menor de idade)", inicio: 3, limite: 1, bem: "{kaua} foi acolhido, a mãe soube a tempo e ele passou por avaliação médica. Os exames mostraram alterações, mas ele parou antes de algo grave.", mal: "Ninguém olhou por {kaua}. Duas semanas depois, a mãe chega à academia com exames alterados do filho e pergunta quem orientou o uso." },
-  bia: { curto: "A mulher de regata rosa", nome: "{bia} (aluna com laudo)", inicio: 1, limite: 0, bem: "O laudo de {bia} foi recolhido e ninguém falou dele. Ela segue treinando com o treino adaptado.", mal: "{bia} descobriu que o laudo dela circulou e que foi apontada como compradora de hormônio. Cancelou o plano." },
-  joaquim: { curto: "O senhor grisalho", nome: "{joaquim}", inicio: 1, limite: 0, bem: "A caixa com os dados de {joaquim} foi recolhida. O tratamento dele continua sendo assunto dele.", mal: "A caixa com o nome de {joaquim} virou piada no vestiário. Ele deixou de frequentar o horário da noite." },
+  bia: { curto: "A mulher de legging rosa", nome: "{bia} (aluna com laudo)", inicio: 1, limite: 0, bem: "O laudo de {bia} foi recolhido e ninguém falou dele. Ela segue treinando com o treino adaptado.", mal: "{bia} descobriu que o laudo dela circulou e que foi apontada como compradora de hormônio. Cancelou o plano." },
+  joaquim: { curto: "O senhor de jaqueta verde", nome: "{joaquim}", inicio: 1, limite: 0, bem: "A caixa com os dados de {joaquim} foi recolhida. O tratamento dele continua sendo assunto dele.", mal: "A caixa com o nome de {joaquim} virou piada no vestiário. Ele deixou de frequentar o horário da noite." },
   lara: { curto: "A estagiária", nome: "{lara} (estagiária)", inicio: 2, limite: 0, bem: "A supervisão do estágio foi reorganizada e {lara} voltou a ter um professor com ela.", mal: "{lara} seguiu sozinha com turmas cheias. Na semana seguinte um aluno se machucou na aula dela, sem supervisor por perto." },
   venda: { curto: "A suspeita de venda", nome: "A venda dentro da academia", inicio: 3, limite: 1, bem: "A apuração ouviu o personal, confirmou a venda e ele foi afastado. O caso foi comunicado ao CREF.", mal: "A venda continuou. Mais dois participantes do desafio compraram o \"kit\"." },
   processo: { curto: "Quem está sendo suspeito", nome: "Justiça com quem é suspeito", inicio: 0, limite: -1, invertido: true, bem: "As suspeitas foram apuradas com escuta das partes, sem exposição pública antes da hora.", mal: "Houve acusação pública antes de apurar. Pessoas inocentes foram expostas e o caso virou boato." },

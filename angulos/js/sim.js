@@ -5,7 +5,7 @@ import { renderAluno, acaoAluno, novoLocal } from "./views/aluno.js";
 import { renderProfessor, acaoProfessor } from "./views/professor.js";
 import { montar, setPath } from "./ui.js";
 import { passoBot, NOMES } from "./bots.js";
-import { visor360 } from "./scene3d.js";
+import { visor360, prepararCena } from "./scene3d.js";
 
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 let st = estadoInicial();
@@ -17,6 +17,8 @@ function dispatch(a) {
 }
 
 const app = document.getElementById("app");
+app.innerHTML = `<div class="col" style="align-items:center;justify-content:center;min-height:70vh;gap:12px"><b style="font-size:20px">Montando a academia em 3D…</b><div class="faint" id="carga">0%</div></div>`;
+await prepararCena((f) => { const el = document.getElementById("carga"); if (el) el.textContent = `${Math.round(f * 100)}%`; });
 let nAlunos = 14, auto = true;
 const locs = {}, pilotos = {};
 app.innerHTML = `
