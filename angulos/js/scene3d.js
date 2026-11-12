@@ -193,6 +193,15 @@ export function construirCena(pers) {
     difusor.rotation.x = Math.PI / 2; difusor.position.set(x, 4.035, -2.4); cena.add(difusor);
   }
 
+  // Acabamento perimetral e janelas altas da área de treino.
+  cena.add(caixa(23.7, 0.18, 0.035, "#34444a", 0, 0.11, 8.38));
+  cena.add(caixa(23.7, 0.06, 0.035, "#668183", 0, 2.15, 8.38));
+  for (const x of [-9.8, -5.8, -1.8, 2.2, 6.2, 10.2]) {
+    cena.add(caixa(2.5, 0.82, 0.04, "#344c52", x, 3.40, 8.37));
+    cena.add(caixa(2.32, 0.66, 0.05, new THREE.MeshStandardMaterial({ color: "#94b7bd", roughness: 0.4, metalness: 0.1 }), x, 3.40, 8.34));
+    cena.add(caixa(0.055, 0.66, 0.06, "#344c52", x, 3.40, 8.30));
+  }
+
   // Estacionamento (fora)
   const asfalto = new THREE.Mesh(new THREE.PlaneGeometry(12, 17), mat("#26282c"));
   asfalto.rotation.x = -Math.PI / 2; asfalto.position.set(-18, -0.01, 0); cena.add(asfalto);
@@ -451,3 +460,4 @@ export function visor360(container, pers) {
   quadro();
   return { irPara, girar: () => irPara(null), destruir: () => { vivo = false; window.removeEventListener("pointerup", soltarPonteiro); r.dispose(); r.domElement.remove(); } };
 }
+

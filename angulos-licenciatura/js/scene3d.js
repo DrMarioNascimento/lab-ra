@@ -167,7 +167,7 @@ export function construirCena(pers) {
   const borracha = new THREE.Mesh(new THREE.PlaneGeometry(7, 7), mat("#1f2125"));
   borracha.rotation.x = -Math.PI / 2; borracha.position.set(8.2, 0.005, 2.2); borracha.receiveShadow = true; cena.add(borracha);
   // quadra (piso azul com linhas)
-  const linhas = tex([""], { w: 700, h: 560, bg: "#1d4ed8", extra: (g) => { g.strokeStyle = "#f8fafc"; g.lineWidth = 8; g.strokeRect(20, 20, 660, 520); g.beginPath(); g.moveTo(350, 20); g.lineTo(350, 540); g.stroke(); g.beginPath(); g.arc(350, 280, 70, 0, Math.PI * 2); g.stroke(); g.strokeRect(20, 170, 90, 220); g.strokeRect(590, 170, 90, 220); } });
+  const linhas = tex([""], { w: 700, h: 560, bg: "#326c9b", extra: (g) => { g.globalAlpha = 0.08; for (let i = 0; i < 45; i++) { g.fillStyle = i % 2 ? "#ffffff" : "#193d60"; g.fillRect(0, (i * 97) % 560, 700, 1); } g.globalAlpha = 1; g.strokeStyle = "#f8fafc"; g.lineWidth = 8; g.strokeRect(20, 20, 660, 520); g.beginPath(); g.moveTo(350, 20); g.lineTo(350, 540); g.stroke(); g.beginPath(); g.arc(350, 280, 70, 0, Math.PI * 2); g.stroke(); g.strokeRect(20, 170, 90, 220); g.strokeRect(590, 170, 90, 220); } });
   const tapete = new THREE.Mesh(new THREE.PlaneGeometry(7, 5.6), new THREE.MeshStandardMaterial({ map: linhas, roughness: 0.7 }));
   tapete.rotation.x = -Math.PI / 2; tapete.position.set(-7.6, 0.005, 5.2); tapete.receiveShadow = true; cena.add(tapete);
   const parede = mat("#d6d3cd");
@@ -193,6 +193,29 @@ export function construirCena(pers) {
     cena.add(moldura);
     const difusor = new THREE.Mesh(new THREE.PlaneGeometry(1.95, 0.22), new THREE.MeshBasicMaterial({ color: "#fff8e7" }));
     difusor.rotation.x = Math.PI / 2; difusor.position.set(x, 4.035, -2.4); cena.add(difusor);
+  }
+
+  // Ginásio escolar: detalhes fixos na parede não alteram as pistas nem a circulação.
+  cena.add(caixa(23.7, 0.16, 0.035, "#647b88", 0, 0.10, 8.38));
+  cena.add(caixa(23.7, 0.08, 0.035, "#718fa3", 0, 2.05, 8.38));
+  for (const x of [-9.8, -5.8, -1.8, 2.2, 6.2, 10.2]) {
+    cena.add(caixa(2.5, 0.88, 0.04, "#708b9a", x, 3.38, 8.37));
+    cena.add(caixa(2.32, 0.72, 0.05, new THREE.MeshStandardMaterial({ color: "#c9e2eb", roughness: 0.38, metalness: 0.08 }), x, 3.38, 8.34));
+    cena.add(caixa(0.055, 0.72, 0.06, "#829aa5", x, 3.38, 8.30));
+  }
+  // Tabela e aro identificam a quadra; a rede é formada por fios leves.
+  cena.add(caixa(1.25, 0.78, 0.06, "#ecf1f1", -8.4, 3.06, 8.30));
+  cena.add(caixa(0.50, 0.04, 0.02, "#d86a45", -8.4, 3.02, 8.25));
+  cena.add(caixa(0.04, 0.30, 0.02, "#d86a45", -8.65, 3.17, 8.25));
+  cena.add(caixa(0.04, 0.30, 0.02, "#d86a45", -8.15, 3.17, 8.25));
+  const aro = new THREE.Mesh(new THREE.TorusGeometry(0.23, 0.018, 6, 24), mat("#e96a38"));
+  aro.rotation.x = Math.PI / 2; aro.position.set(-8.4, 2.98, 7.99); cena.add(aro);
+  const redeMat = mat("#e7ecea");
+  for (let i = 0; i < 8; i++) {
+    const a = i * Math.PI / 4;
+    const fio = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.34, 4), redeMat);
+    fio.position.set(-8.4 + Math.cos(a) * 0.16, 2.80, 7.99 + Math.sin(a) * 0.16);
+    fio.rotation.z = Math.cos(a) * 0.35; fio.rotation.x = -Math.sin(a) * 0.35; cena.add(fio);
   }
 
   // Estacionamento (fora)
@@ -458,3 +481,4 @@ export function visor360(container, pers) {
   quadro();
   return { irPara, girar: () => irPara(null), destruir: () => { vivo = false; window.removeEventListener("pointerup", soltarPonteiro); r.dispose(); r.domElement.remove(); } };
 }
+
