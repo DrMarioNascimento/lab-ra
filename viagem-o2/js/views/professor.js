@@ -1,4 +1,4 @@
-import { FASES, progresso, nGrupos, postosParaCaso } from "../engine.js";
+import { FASES, progresso, nGrupos, postosParaCaso } from "../engine.js?v=desfecho-20261111";
 import { POSTOS, MECANISMOS } from "../content/viagem.js";
 import { CASOS, CURSOS, casoById } from "../content/casos.js";
 import { esc } from "./metro.js";
@@ -28,7 +28,7 @@ export function renderProfessor(st) {
     <div class="row teacher-heading"><span class="badge">P</span><div class="grow"><b>Professor(a)</b><div class="faint" style="font-size:12px">${esc(caso.titulo)} · ${CURSOS[caso.curso]}</div></div></div>
     <div class="card teacher-phase" style="padding:12px"><div class="faint" style="font-size:12px">Fase ${k + 1} de ${FASES.length}</div><h3>${FASES[k].nome}</h3>
       ${p && p.total ? `<div class="row" style="justify-content:space-between;margin-top:6px"><span class="muted">${p.rot}</span><b class="mono">${p.feito}/${p.total}</b></div>${p.indTot ? `<div class="faint" style="font-size:12px">individuais: ${p.ind}/${p.indTot}</div>` : ""}` : ""}
-      <div class="row" style="margin-top:10px"><button class="btn sec grow" data-a="fase" data-val="-1" ${k <= 1 ? "disabled" : ""}>Voltar</button><button class="btn grow" data-a="fase" data-val="1" ${k === 0 || k === FASES.length - 1 ? "disabled" : ""}>Avançar</button></div></div>
+      <div class="row" style="margin-top:10px"><button class="btn sec grow" data-a="fase" data-val="-1" ${k <= 1 ? "disabled" : ""}>Voltar</button><button class="btn grow" data-a="fase" data-val="1" ${k === 0 || k === FASES.length - 1 ? "disabled" : ""}>${st.fase === "viagem" ? "Abrir o caso" : "Avançar"}</button></div>${st.fase === "integracao" ? `<p class="muted">Última etapa. Quando a turma enviar os bilhetes de saída, a atividade estará concluída.</p>` : ""}</div>
     ${extra}</div>`;
 }
 

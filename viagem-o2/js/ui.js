@@ -1,4 +1,4 @@
-import { retainJourneys } from './journey.js';
+import { retainJourneys } from './journey.js?v=desfecho-20261111';
 
 // Monta uma área que se redesenha a partir do estado, preservando foco e cursor dos campos.
 export function montar(root, render, onAction, onInput) {

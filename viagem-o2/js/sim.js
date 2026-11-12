@@ -1,13 +1,13 @@
 // /simulador: telão em cima, turma embaixo. O "cérebro" da sala roda nesta página.
-import { estadoInicial, reduzir, FASES } from "./engine.js";
-import { renderTelao } from "./views/telao.js";
-import { renderAluno, acaoAluno, novoLocal } from "./views/aluno.js?v=cabine-20261110";
-import { renderProfessor, acaoProfessor } from "./views/professor.js";
-import { montar, setPath } from "./ui.js?v=cabine-20261110";
+import { estadoInicial, reduzir, FASES } from "./engine.js?v=desfecho-20261111";
+import { renderTelao } from "./views/telao.js?v=desfecho-20261111";
+import { renderAluno, acaoAluno, novoLocal } from "./views/aluno.js?v=desfecho-20261111";
+import { renderProfessor, acaoProfessor } from "./views/professor.js?v=desfecho-20261111";
+import { montar, setPath } from "./ui.js?v=desfecho-20261111";
 import { passoBot, NOMES } from "./bots.js";
 import { esc } from "./views/metro.js";
 
-import { renderCabin, retainJourneys } from "./journey.js";
+import { renderCabin, retainJourneys } from "./journey.js?v=desfecho-20261111";
 import { PARADAS } from "./content/viagem.js";
 import { icon, studentShell, teamStyle } from "./visual.js";
 
@@ -131,7 +131,10 @@ function montarTurma() {
     const m = montar(screen, () => studentShell(st.grupos[st.alunos[id]?.grupo], renderAluno(st, id, locs[id])),
       (a, el) => {
         const changed = acaoAluno(a, el, { st, id, loc: locs[id], dispatch });
-        if (a === 'parada') screen.scrollTop = 0;
+        if (['parada', 'resumoViagem', 'reverParada'].includes(a)) {
+          screen.scrollTop = 0;
+          requestAnimationFrame(() => screen.querySelector('.trip-summary-title')?.focus({preventScroll:true}));
+        }
         return changed;
       },
       (path, v) => setPath(locs[id], path, v));
@@ -145,15 +148,21 @@ function montarTurma() {
 function novaSala() {
   const caso = st.casoId;
   st = estadoInicial(caso);
-  for (const k of Object.keys(locs)) delete locs[k];
+  for (const k of Object.keys(locs)) { delete locs[k]; delete pilotos[k]; }
   for (let i = 0; i < nAlunos; i++) dispatch({ t: "entrar", id: `a${i + 1}`, nome: NOMES[i] });
   montarTurma();
 }
 
 let faseAnt = st.fase;
-subs.add(() => { if (st.fase !== faseAnt) { if (faseAnt === "entrada") montarTurma(); faseAnt = st.fase; } });
+subs.add(() => {
+  document.getElementById("nAl").disabled = st.fase !== "entrada";
+  if (st.fase !== faseAnt) {
+    if (faseAnt === "entrada") montarTurma();
+    faseAnt = st.fase;
+  }
+});
 
-document.getElementById("nAl").oninput = (e) => { nAlunos = +e.target.value; document.getElementById("nAlV").textContent = nAlunos; if (st.fase === "entrada") novaSala(); };
+document.getElementById("nAl").oninput = (e) => { nAlunos = +e.target.value; document.getElementById("nAlV").textContent = nAlunos; novaSala(); };
 document.getElementById("reset").onclick = () => { faseAnt = "entrada"; novaSala(); };
 document.getElementById("auto").onclick = (e) => { auto = !auto; e.target.className = `btn sm ${auto ? "ok on" : "sec"}`; e.target.textContent = `Piloto automático: ${auto ? "ligado" : "desligado"}`; e.target.setAttribute("aria-pressed", String(auto)); };
 

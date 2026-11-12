@@ -1,7 +1,7 @@
 // Alunos simulados (piloto automático) para o /simulador.
 import { POSTOS, PARADAS, MECANISMOS, LEIS } from "./content/viagem.js";
 import { casoById } from "./content/casos.js";
-import { valoresDoCaso } from "./engine.js";
+import { valoresDoCaso } from "./engine.js?v=desfecho-20261111";
 import { direction, fmtVar, VAR_META } from "./model.js";
 import { REPOUSO, EXERCICIO } from "./content/params-casos.js";
 import { compute } from "./model.js";

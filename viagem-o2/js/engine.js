@@ -199,7 +199,7 @@ export function progresso(st) {
     case "lider": return { feito: gs.filter((g) => g.lider).length, total: gs.length, rot: "grupos com líder" };
     case "viagem": { const f = ids.filter((id) => Object.keys(st.resp[id].viagem.r).length === PARADAS.length).length; return { feito: f, total: ids.length, rot: "terminaram a viagem" }; }
     case "posto": return { feito: gs.filter((g) => g.h1).length, total: gs.length, rot: "equipes enviaram", ind: ids.filter((id) => st.resp[id].posto).length, indTot: ids.length };
-    case "telegrafo": return { feito: gs.filter((g) => g.bilhete).length, total: gs.length, rot: "bilhetes enviados" };
+    case "telegrafo": return gs.length < 2 ? null : { feito: gs.filter((g) => g.bilhete).length, total: gs.length, rot: "bilhetes enviados" };
     case "laboratorio": return { feito: gs.filter((g) => g.h2).length, total: gs.length, rot: "equipes decidiram" };
     case "integracao": return { feito: ids.filter((id) => st.resp[id].saida).length, total: ids.length, rot: "bilhetes de saída" };
     default: return null;

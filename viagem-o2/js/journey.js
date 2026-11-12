@@ -21,17 +21,29 @@ export function renderCabin(index = 0, { compact = false, label = 'EXPLORAÇÃO 
     <div class="cabin-frame" aria-hidden="true"><i></i><i></i></div>
     <header class="cabin-hud"><div><span class="cabin-kicker">${esc(label)}</span><b>${s.region}</b></div><span class="cabin-coordinate">${String(i+1).padStart(2,'0')}<small> / 09</small></span></header>
     <div class="cabin-destination"><span class="cabin-status" role="status">Você está em</span><h2>${p.titulo}</h2><p>${s.mission}</p></div>
-    <footer class="cabin-console"><div class="cabin-route" aria-label="Parada ${i+1} de 9">${PARADAS.map((_,k)=>`<i class="${k<=i?'visited':''}" ${k===i?'aria-current="step"':''}></i>`).join('')}</div><div class="cabin-buttons"><button type="button" data-cabin="skip" hidden>Pular viagem</button><button type="button" data-cabin="motion" aria-pressed="false">Reduzir movimento</button></div><p class="cabin-note">${s.note}</p></footer>
+    <footer class="cabin-console"><div class="cabin-route" aria-label="Parada ${i+1} de 9">${PARADAS.map((_,k)=>`<i class="${k<=i?'visited':''}" ${k===i?'aria-current="step"':''}></i>`).join('')}</div><div class="cabin-buttons"><button type="button" data-cabin="skip" hidden>Pular viagem</button><button type="button" data-cabin="replay" hidden>Rever movimento</button><button type="button" data-cabin="motion" aria-pressed="false">Reduzir movimento</button></div><p class="cabin-note">${s.note}</p></footer>
   </section>`;
 }
 let initialized = false;
 let preference = false;
 const media = () => window.matchMedia('(prefers-reduced-motion: reduce)');
 const reduced = () => preference || media().matches;
+const arrivalTimers = new WeakMap();
 function arrive(cabin) {
+  clearTimeout(arrivalTimers.get(cabin));
   cabin.classList.remove('travelling');
+  cabin.querySelector('[data-cabin="replay"]').hidden = reduced();
   cabin.querySelector('.cabin-status').textContent = 'Você chegou';
   cabin.querySelector('[data-cabin="skip"]').hidden = true;
+}
+function depart(cabin) {
+  if (reduced()) return;
+  clearTimeout(arrivalTimers.get(cabin));
+  cabin.classList.add('travelling');
+  cabin.querySelector('.cabin-status').textContent = 'Em viagem · aproximando de';
+  cabin.querySelector('[data-cabin="skip"]').hidden = false;
+  cabin.querySelector('[data-cabin="replay"]').hidden = true;
+  arrivalTimers.set(cabin, setTimeout(() => arrive(cabin), 3400));
 }
 function updateMotion() {
   document.documentElement.classList.toggle('voyage-still', reduced());
@@ -39,7 +51,9 @@ function updateMotion() {
     const b = c.querySelector('[data-cabin="motion"]');
     b.setAttribute('aria-pressed', String(reduced()));
     b.textContent = reduced() ? 'Movimento reduzido' : 'Reduzir movimento';
+    b.disabled = media().matches;
     if (reduced()) arrive(c);
+    c.querySelector('[data-cabin="replay"]').hidden = reduced() || c.classList.contains('travelling');
   }
 }
 export function initJourneys() {
@@ -51,7 +65,8 @@ export function initJourneys() {
     const b = e.target.closest('[data-cabin]');
     if (!b) return;
     if (b.dataset.cabin === 'skip') arrive(b.closest('.voyage-cabin'));
-    else { preference = !reduced(); try { localStorage.setItem('o2-motion-reduced', preference ? '1' : '0'); } catch {} updateMotion(); }
+    else if (b.dataset.cabin === 'replay') depart(b.closest('.voyage-cabin'));
+    else { preference = !preference; try { localStorage.setItem('o2-motion-reduced', preference ? '1' : '0'); } catch {} updateMotion(); }
   });
   document.addEventListener('animationend', e => {
     if (e.animationName === 'cabin-arrival') arrive(e.target.closest('.voyage-cabin'));
@@ -66,17 +81,13 @@ export function activateJourneys(root) {
   for (const c of root.querySelectorAll('.voyage-cabin:not([data-ready])')) {
     c.dataset.ready = 'true';
     // Wait for the actual landscape, and do not animate offscreen simulated phones.
-    const depart = () => {
+    const onLandscape = () => {
       if (!c.isConnected) return;
       const r = c.getBoundingClientRect();
-      if (!reduced() && r.width > 0 && r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth) {
-        c.classList.add('travelling');
-        c.querySelector('.cabin-status').textContent = 'Em viagem · aproximando de';
-        c.querySelector('[data-cabin="skip"]').hidden = false;
-      }
+      if (r.width > 0 && r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth) depart(c);
     };
     const picture = c.querySelector('img');
-    if (picture.complete) depart(); else picture.addEventListener('load', depart, {once:true});
+    if (picture.complete) onLandscape(); else picture.addEventListener('load', onLandscape, {once:true});
   }
   updateMotion();
 }

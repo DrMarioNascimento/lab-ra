@@ -1,11 +1,11 @@
-import { valoresDoCaso, placar } from "../engine.js";
+import { acertoViagem, valoresDoCaso, placar } from "../engine.js?v=desfecho-20261111";
 import { POSTOS, PARADAS, MECANISMOS, LEIS } from "../content/viagem.js";
 import { casoById, PAPEIS, paramsDoCaso } from "../content/casos.js";
 import { compute, fmtVar, VAR_META, PARAM_META, CURTO } from "../model.js";
 import { REPOUSO, EXERCICIO } from "../content/params-casos.js";
 import { esc } from "./metro.js";
 
-import { renderCabin } from "../journey.js";
+import { renderCabin } from "../journey.js?v=desfecho-20261111";
 import { icon, PARADA_ICON } from "../visual.js";
 
 const VREP = compute(REPOUSO), VEX = compute(EXERCICIO);
@@ -90,18 +90,27 @@ export function renderAluno(st, id, loc, { individual = false } = {}) {
       const resp = st.resp[id].viagem;
       const i = Math.min(loc.parada, PARADAS.length - 1);
       const p = PARADAS[i];
+      const { ok, tot } = acertoViagem(st.resp[id]);
+      if (loc.resumoViagem) {
+        b = `<section class="trip-activity" aria-label="Resumo da viagem"><h2 class="trip-summary-title" tabindex="-1">${tot === PARADAS.length ? "Viagem concluída" : "Resumo da viagem"}</h2>
+          <p>${tot} de ${PARADAS.length} respostas registradas · ${ok} acertos</p>
+          <div class="card"><h3>Sua mochila</h3>${resp.mochila.length ? resp.mochila.map(m => `<p><b>${VAR_META[m.v].label}</b><br><span class="mono">${esc(m.valor)}</span></p>`).join("") : "<p>Você ainda não guardou nenhum valor.</p>"}</div>
+          <h3>Rever paradas</h3>${PARADAS.map((parada, k) => `<button class="opt" data-a="reverParada" data-val="${k}">${k + 1}. ${parada.titulo} · ${resp.r[parada.id] == null ? "sem resposta" : "respondida"}</button>`).join("")}
+          ${individual ? `<a class="btn block" href="../">Voltar à atividade</a><button class="btn sec block" data-a="reiniciarViagem">Recomeçar viagem</button>` : `<p class="pill-ok">${tot === PARADAS.length ? "Aguarde o professor abrir o caso." : "Volte às paradas sem resposta para completar a viagem."}</p>`}</section>`;
+        break;
+      }
       const r = resp.r[p.id];
       const naMochila = (v) => resp.mochila.some((x) => x.v === v);
-      b = renderCabin(i, { compact: true, label: g && !individual ? `GRUPO ${g.i + 1} · ${g.cor.nome.toUpperCase()}` : "EXPLORAÇÃO INDIVIDUAL" }) + `<div class="trip-activity"><div class="row" style="justify-content:space-between"><span class="chip">Parada ${i + 1} de ${PARADAS.length}</span><span class="chip">${icon("mochila", "inline")} ${resp.mochila.length}/3</span></div>
+      b = renderCabin(i, { compact: true, label: g && !individual ? `GRUPO ${g.i + 1} · ${g.cor.nome.toUpperCase()}` : "EXPLORAÇÃO INDIVIDUAL" }) + `<div class="trip-activity"><div class="row" style="justify-content:space-between"><span class="chip">Parada ${i + 1} de ${PARADAS.length}</span><button class="btn sm sec" data-a="resumoViagem">${icon("mochila", "inline")} Mochila ${resp.mochila.length}/3</button></div>
         <div class="trip-step" aria-label="Parada ${i + 1} de ${PARADAS.length}">${PARADAS.map((_, k) => `<span class="${k <= i ? 'passed' : ''}"></span>`).join('')}</div><div class="trip-title">${icon(PARADA_ICON[p.id] || p.id)}<h2>${p.titulo}</h2></div><div class="row">${p.leis.map((l) => `<span class="chip law">${LEIS[l].nome}</span>`).join("")}</div>
         <p>${p.texto}</p><div class="card mono" style="padding:10px 12px;font-size:13px">${p.calc}</div>
         <table class="vals"><tr><th>Variável</th><th style="text-align:right">Repouso</th><th style="text-align:right">Exercício</th><th></th></tr>
         ${p.valores.map((v) => `<tr><td>${VAR_META[v].label}</td><td class="n">${val(v, VREP)}</td><td class="n">${val(v, VEX)}</td>
-          <td style="width:44px"><button class="btn sm ${naMochila(v) ? "warn on" : "sec"}" title="Guardar na mochila" data-a="mochila" data-v="${v}" ${!naMochila(v) && resp.mochila.length >= 3 ? "disabled" : ""}> ${icon("mochila", "inline")}</button></td></tr>`).join("")}</table>
+          <td style="width:44px"><button class="btn sm ${naMochila(v) ? "warn on" : "sec"}" title="Guardar na mochila" aria-label="${naMochila(v) ? "Retirar" : "Guardar"} ${VAR_META[v].label}" aria-pressed="${naMochila(v)}" data-a="mochila" data-v="${v}" ${!naMochila(v) && resp.mochila.length >= 3 ? "disabled" : ""}> ${icon("mochila", "inline")}</button></td></tr>`).join("")}</table>
         <p class="muted" style="font-size:14px">${p.exercicio}</p>
         <div class="card"><b>${p.pergunta.q}</b>${p.pergunta.op.map((o, k) => `<button class="opt ${r == null ? "" : k === p.pergunta.certa ? "right" : r === k ? "wrong" : ""}" data-a="viagemResp" data-val="${k}" ${r != null ? "disabled" : ""}>${o}</button>`).join("")}
         ${r != null ? `<p class="${r === p.pergunta.certa ? "pill-ok" : "pill-bad"}">${r === p.pergunta.certa ? "Isso." : "Não foi dessa vez."}</p><p class="muted">${p.pergunta.fb}</p>` : ""}</div>
-        <div class="row trip-navigation"><button class="btn sec grow" data-a="parada" data-val="-1" ${i === 0 ? "disabled" : ""}>Anterior</button><button class="btn grow" data-a="parada" data-val="1" ${i === PARADAS.length - 1 ? "disabled" : ""}>Próxima parada →</button></div>${i === PARADAS.length - 1 ? `<p class="pill-ok">Você chegou ao fim do percurso. Revise suas respostas e os valores da mochila.</p>` : ""}</div>`;
+        <div class="row trip-navigation"><button class="btn sec grow" data-a="parada" data-val="-1" ${i === 0 ? "disabled" : ""}>Anterior</button>${i === PARADAS.length - 1 ? `<button class="btn grow" data-a="resumoViagem">${tot === PARADAS.length ? "Concluir viagem" : "Ver resumo"}</button>` : `<button class="btn grow" data-a="parada" data-val="1">Próxima parada →</button>`}</div></div>`;
       break;
     }
     case "caso":
@@ -137,6 +146,10 @@ export function renderAluno(st, id, loc, { individual = false } = {}) {
     case "telegrafo": {
       const recebidos = Object.values(st.grupos).filter((x) => x.bilhete && x.bilhete.para === g.id);
       const outros = Object.values(st.grupos).filter((x) => x.id !== g.id);
+      if (!outros.length) {
+        b = `<h2>Telégrafo</h2><p>Há uma única estação nesta turma. Discutam a pista do posto com o grupo e aguardem a abertura do laboratório.</p>`;
+        break;
+      }
       b = `<h2>Telégrafo</h2><p class="muted">Um único bilhete, até 140 caracteres, para outra estação. O que ela precisa saber do seu posto?</p>
         ${recebidos.map((x) => `<div class="card"><b>✉ De ${POSTOS.find((p) => p.id === x.posto).curto}</b><p>${esc(x.bilhete.texto)}</p></div>`).join("") || `<p class="faint">Nenhum bilhete recebido ainda.</p>`}
         ${souLider && !g.bilhete ? `<div class="sep"></div><h3>Para qual estação?</h3>${outros.map((x) => radio("bilhete.para", x.id, loc.bilhete.para, `<span class="badge" style="background:${x.cor.hex};width:26px;height:26px;margin-right:8px">${x.i + 1}</span>${POSTOS.find((p) => p.id === x.posto).nome}`)).join("")}
@@ -175,7 +188,7 @@ export function renderAluno(st, id, loc, { individual = false } = {}) {
       break;
     case "integracao": {
       const enviada = st.resp[id].saida;
-      b = `<h2>Bilhete de saída</h2>${enviada ? `<p class="pill-ok">Enviado. Obrigado!</p><p class="muted">${esc(enviada)}</p>` : `<p>O que você lembrava errado da viagem, e isso mudou a sua explicação do caso?</p>
+      b = `<h2>Bilhete de saída</h2>${enviada ? `<p class="pill-ok">Bilhete enviado. Atividade concluída!</p><p class="muted">${esc(enviada)}</p>` : `<p>O que você lembrava errado da viagem, e isso mudou a sua explicação do caso?</p>
         <textarea data-in="saida" data-key="saida" placeholder="Responda com suas palavras">${esc(loc.saida)}</textarea><button class="btn ok block" data-a="saida" ${loc.saida.trim().length > 3 ? "" : "disabled"}>Enviar</button>`}`;
       break;
     }
@@ -196,6 +209,8 @@ export function acaoAluno(a, el, ctx) {
     case "metodo": dispatch({ t: "metodo", id, m: el.dataset.val }); return true;
     case "votoLider": dispatch({ t: "votoLider", id, alvo: el.dataset.val }); return true;
     case "parada": loc.parada = Math.max(0, Math.min(PARADAS.length - 1, loc.parada + +el.dataset.val)); return true;
+    case "resumoViagem": loc.resumoViagem = true; return true;
+    case "reverParada": loc.parada = Number(el.dataset.val); loc.resumoViagem = false; return true;
     case "viagemResp": dispatch({ t: "viagemResp", id, parada: PARADAS[loc.parada].id, op: +el.dataset.val }); return true;
     case "mochila": {
       const v = el.dataset.v;

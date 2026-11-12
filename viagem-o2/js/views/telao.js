@@ -1,4 +1,4 @@
-import { FASES, progresso, valoresDoCaso, contrafactual, resumoGrupo, placar, acertoViagem } from "../engine.js";
+import { FASES, progresso, valoresDoCaso, contrafactual, resumoGrupo, placar, acertoViagem } from "../engine.js?v=desfecho-20261111";
 import { POSTOS, PARADAS, MECANISMOS, LEIS } from "../content/viagem.js";
 import { casoById, CURSOS, PAPEIS } from "../content/casos.js";
 import { fmtVar, VAR_META, CURTO } from "../model.js";
@@ -75,7 +75,7 @@ export function renderTelao(st) {
     case "telegrafo": {
       const arcs = gs.filter((g) => g.bilhete).map((g) => `<div class="card row"><span class="badge" style="background:${g.cor.hex}">${g.i + 1}</span><b>${curtoPosto(g.posto)}</b><span style="font-size:2cqw">→</span><span class="badge" style="background:${st.grupos[g.bilhete.para].cor.hex}">${st.grupos[g.bilhete.para].i + 1}</span><b>${curtoPosto(st.grupos[g.bilhete.para].posto)}</b></div>`).join("");
       body = topo(st, "Telégrafo: um bilhete por estação") + `<p class="big muted">Cada líder pode mandar um único bilhete curto para outra estação. Escolham bem o que dizer.</p>
-        <div class="grid" style="grid-template-columns:1.3fr 1fr">${metroSVG(estacoesStatus(st, (g) => ({ status: g.bilhete ? "✉" : "…" })))}<div class="col">${arcs || `<p class="muted big">Aguardando bilhetes…</p>`}</div></div>`;
+        <div class="grid" style="grid-template-columns:1.3fr 1fr">${metroSVG(estacoesStatus(st, (g) => ({ status: g.bilhete ? "✉" : "…" })))}<div class="col">${arcs || `<p class="muted big">${Object.keys(st.grupos).length === 1 ? "Uma única estação. Discutam a pista do posto antes de avançar." : "Aguardando bilhetes…"}</p>`}</div></div>`;
       break;
     }
     case "laboratorio": {
