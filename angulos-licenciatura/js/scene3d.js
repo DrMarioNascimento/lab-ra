@@ -221,6 +221,24 @@ export function construirCena(pers) {
   // Estacionamento (fora)
   const asfalto = new THREE.Mesh(new THREE.PlaneGeometry(12, 17), mat("#26282c"));
   asfalto.rotation.x = -Math.PI / 2; asfalto.position.set(-18, -0.01, 0); cena.add(asfalto);
+  // Rua e fachada ao fundo, afastadas das pessoas e dos objetos observáveis do caso.
+  cena.add(caixa(0.22, 0.11, 17, "#9a9b96", -23.45, 0.045, 0));
+  const calcada = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 17), mat("#8b8e88"));
+  calcada.rotation.x = -Math.PI / 2; calcada.position.set(-24.45, 0.001, 0); calcada.receiveShadow = true; cena.add(calcada);
+  for (const z of [-7, -3.5, 0, 3.5, 7]) {
+    const linha = new THREE.Mesh(new THREE.PlaneGeometry(5.2, 0.055), mat("#bbbdb3"));
+    linha.rotation.x = -Math.PI / 2; linha.position.set(-20.4, 0.003, z); cena.add(linha);
+  }
+  // Fachadas discretas do outro lado da rua, sem letreiros ou personagens.
+  for (const [z, largura, altura, cor] of [[-6.4, 5.4, 4.9, "#a9a49a"], [-0.4, 5.8, 4.2, "#b9b3a7"], [5.6, 5.4, 5.1, "#aaa9a1"]]) {
+    cena.add(caixa(0.22, altura, largura, cor, -25.6, altura / 2, z));
+    for (const dz of [-1.3, 1.3]) {
+      cena.add(caixa(0.03, 1.05, 0.95, "#56676d", -25.47, 2.75, z + dz));
+      cena.add(caixa(0.04, 0.86, 0.76, "#a7c0c4", -25.44, 2.75, z + dz));
+      cena.add(caixa(0.05, 0.86, 0.035, "#6f858a", -25.41, 2.75, z + dz));
+    }
+    cena.add(caixa(0.03, 2.0, 1.0, "#676d68", -25.46, 1.0, z));
+  }
   const carro = new THREE.Group();
   carro.add(modelo("carro", 0, 0, -Math.PI / 2)); // traseira (porta-malas aberto) para +z
   carro.add(caixa(0.42, 0.3, 0.34, "#f1f5f9", -0.3, 0.78, 1.55));
