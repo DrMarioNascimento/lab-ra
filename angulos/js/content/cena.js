@@ -267,7 +267,7 @@ export const FOTOS = {
   },
   F1: {
     titulo: "Estacionamento", pessoas: ["homem"],
-    cam: { pos: [-12.6, 1.6, 1.0], alvo: [-15.8, 1.0, -1.4], fov: 50 },
+    cam: { pos: [-12.0, 1.6, 1.2], alvo: [-15.0, 1.0, -2.0], fov: 50 },
     frases: [
       { t: "Um homem ao celular está ao lado de um carro com o porta-malas aberto e caixas de isopor.", tag: "fato", real: true },
       { t: "O homem entrega produtos ilegais na academia.", tag: "interp", real: true, sobre: ["homem"] },

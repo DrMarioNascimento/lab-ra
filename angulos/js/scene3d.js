@@ -46,7 +46,7 @@ function placa(w, h, textura, x, y, z, ry = 0, rx = 0) {
 
 // ---------- modelos ----------
 const MODELOS = ["personal", "recep", "bia", "lara", "kaua", "colega", "joaquim", "dono", "homem", "mae", "treino",
-  "t1", "t2", "t3", "t4", "t5", "t6", "balcao", "supino", "torre", "suporte2", "halter", "halter2", "maquina", "bola", "envelope", "frasco"];
+  "t1", "t2", "t3", "t4", "t5", "t6", "balcao", "supino", "torre", "suporte2", "halter", "halter2", "maquina", "bola", "envelope", "frasco", "carro"];
 const BIB = {};
 let carregando = null;
 export function prepararCena(aoProgresso) {
@@ -78,6 +78,24 @@ function pessoa(id, modeloId, x, z, ry, { y = 0, altura } = {}) {
   if (id) PESSOA_POS[id] = cab.clone();
   o.userData.cabeca = cab;
   return o;
+}
+
+// Ponta da mão estendida à frente (lado +x do modelo), em coordenadas do mundo.
+const _v = new THREE.Vector3();
+function maoFrente(o) {
+  o.updateMatrixWorld(true);
+  const inv = new THREE.Matrix4().copy(o.matrixWorld).invert();
+  let melhor = null, mz = -1e9;
+  o.traverse((m) => {
+    if (!m.isMesh) return;
+    const pos = m.geometry.attributes.position;
+    for (let i = 0; i < pos.count; i += 2) {
+      _v.fromBufferAttribute(pos, i).applyMatrix4(m.matrixWorld);
+      const l = _v.clone().applyMatrix4(inv);
+      if (l.x > 0.05 && l.y > 0.7 && l.y < 1.4 && l.z > mz) { mz = l.z; melhor = _v.clone(); }
+    }
+  });
+  return melhor;
 }
 
 // Ponto local (relativo a quem está em x,z virado para ry) → mundo.
@@ -125,17 +143,12 @@ export function construirCena(pers) {
   const asfalto = new THREE.Mesh(new THREE.PlaneGeometry(12, 17), mat("#26282c"));
   asfalto.rotation.x = -Math.PI / 2; asfalto.position.set(-18, -0.01, 0); cena.add(asfalto);
   const carro = new THREE.Group();
-  carro.add(caixa(1.8, 0.7, 4.2, "#7f1d1d", 0, 0.6, 0));
-  carro.add(caixa(1.6, 0.6, 2.2, "#991b1b", 0, 1.2, -0.3));
-  for (const [x, z] of [[-0.85, 1.3], [0.85, 1.3], [-0.85, -1.3], [0.85, -1.3]]) {
-    const r = new THREE.Mesh(new THREE.CylinderGeometry(0.33, 0.33, 0.25, 16), mat("#111")); r.rotation.z = Math.PI / 2; r.position.set(x, 0.33, z); carro.add(r);
-  }
-  const tampa = caixa(1.7, 0.06, 1.0, "#7f1d1d", 0, 1.45, 2.3); tampa.rotation.x = -1.1; carro.add(tampa);
-  carro.add(caixa(0.5, 0.35, 0.4, "#f1f5f9", -0.4, 1.05, 1.6));
-  carro.add(caixa(0.5, 0.35, 0.4, "#f1f5f9", 0.3, 1.05, 1.65));
-  carro.add(caixa(0.45, 0.3, 0.38, "#e2e8f0", -0.05, 1.38, 1.55));
-  carro.position.set(-16.4, 0, -2.6); carro.rotation.y = 0.15; cena.add(carro);
-  cena.add(pessoa("homem", "homem", -15.0, -0.5, 0.6));
+  carro.add(modelo("carro", 0, 0, -Math.PI / 2)); // traseira (porta-malas aberto) para +z
+  carro.add(caixa(0.42, 0.3, 0.34, "#f1f5f9", -0.3, 0.78, 1.55));
+  carro.add(caixa(0.42, 0.3, 0.34, "#f1f5f9", 0.25, 0.78, 1.6));
+  carro.add(caixa(0.38, 0.26, 0.32, "#e2e8f0", -0.02, 1.06, 1.55));
+  carro.position.set(-16.4, 0, -2.6); carro.rotation.y = 0.85; cena.add(carro);
+  cena.add(pessoa("homem", "homem", -14.0, -2.3, 0.9));
 
   // Recepção: dois módulos de balcão; o lado do cliente fica para +z
   cena.add(modelo("balcao", -1.55, -6.95, Math.PI));
@@ -148,7 +161,16 @@ export function construirCena(pers) {
   const pRy = Math.PI / 2, bRy = -Math.PI / 2;
   cena.add(pessoa("personal", "personal", -1.42, -6.0, pRy));
   cena.add(pessoa("bia", "bia", -0.42, -6.0, bRy));
-  const env = modelo("envelope", -0.92, -5.98, Math.PI / 2, { y: 1.0 }); env.rotation.order = "YXZ"; env.rotation.x = -1.25; cena.add(env);
+  const bia = cena.children[cena.children.length - 1];
+  {
+    // envelope preso na mão estendida da aluna, saindo à frente dela em direção ao personal
+    const m = maoFrente(bia);
+    const f = new THREE.Vector3(Math.sin(bRy), 0, Math.cos(bRy));
+    const env = modelo("envelope", 0, 0, bRy + Math.PI / 2);
+    env.rotation.order = "YXZ"; env.rotation.x = -1.35;
+    env.position.copy(m).addScaledVector(f, 0.07); env.position.y -= 0.035;
+    cena.add(env);
+  }
   cena.add(modelo("frasco", -0.98, -6.66, 0.4, { y: tampo }));
   cena.add(pessoa("recep", "recep", 0.25, -7.65, 0));
   cena.add(placa(1.8, 1.2, tex([{ t: "DESAFIO 90 DIAS", b: true, s: 56, c: "#fde047" }, { t: "Prêmio: 1 ano de plano", c: "#fff" }, { t: "+ kit Farmácia Vitta", c: "#fff" }, { t: "(parceira oficial)", s: 26, c: "#cbd5e1" }], { w: 600, h: 400, bg: "#7c2d12", font: 40 }), 2.6, 1.8, -8.38));
