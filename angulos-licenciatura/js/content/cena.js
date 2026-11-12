@@ -68,7 +68,7 @@ export const PAPEIS = [
   {
     id: "tecnica", nome: "Professores de Educação Física", cor: "#f43f5e", prioridade: 2,
     abertura: "Você é professor de Educação Física da escola e passa pela sala de Educação Física para pegar material.",
-    ancora: { titulo: "Escala da quadra", texto: "15h30 · 5º ano · regente: {bia} · estagiária: {lara} (estágio supervisionado, supervisão presencial obrigatória)" },
+    ancora: { titulo: "Escala da quadra", texto: "15h30 · 5º ano · regente: {bia} · estagiária: {lara} (estágio supervisionado, com acompanhamento previsto no plano de estágio)" },
     fotos: ["T1", "T2", "T3"], recebeDe: ["alunos", "gestao"], enviaPara: "rt",
     gabarito: ["contribui", "pode_proteger"],
   },
@@ -89,7 +89,7 @@ export const PAPEIS = [
   {
     id: "rt", nome: "Coordenação pedagógica", cor: "#38bdf8", prioridade: 5,
     abertura: "Você é da coordenação pedagógica, responde pelos estágios e pelo acompanhamento dos alunos, e chega pelo corredor do vestiário.",
-    ancora: { titulo: "Lembrete na agenda da coordenação", texto: "Termos de estágio: supervisão presencial do professor regente. ECA: suspeita de risco a aluno menor de idade deve ser comunicada à família e ao Conselho Tutelar." },
+    ancora: { titulo: "Lembrete na agenda da coordenação", texto: "Confira os termos de estágio, o acompanhamento previsto e os protocolos de proteção da escola. Avalie a situação e os canais de encaminhamento adequados." },
     fotos: ["V1", "V2"], recebeDe: ["tecnica", "estagiarios"], enviaPara: "gestao",
     gabarito: ["pode_proteger"],
   },
@@ -355,7 +355,7 @@ export const ALTERNATIVAS = {
     { id: "v_acolher", t: "Procurar o aluno que pode estar usando hormônio, acolher, chamar a família e encaminhar à saúde", ef: { kaua: -2 } },
     { id: "v_assumir", t: "Ir agora para a quadra ou mandar um professor ficar com a estagiária", ef: { lara: -2 } },
     { id: "v_sigilo", t: "Recolher a caixa com dados da pessoa e preservar o sigilo", ef: { joaquim: -1 } },
-    { id: "v_apurar", t: "Levar à direção uma apuração com escuta das partes e comunicar o Conselho Tutelar sobre o risco ao menor", ef: { venda: -2, processo: 1 } },
+    { id: "v_apurar", t: "Levar à direção uma apuração com escuta das partes e avaliar os encaminhamentos de proteção cabíveis", ef: { venda: -2, processo: 1 } },
     { id: "v_denunciar", t: "Chamar a polícia na escola agora, sem apurar", ef: { venda: -1, processo: -1 }, alvo: "personal" },
   ],
   alunos: [

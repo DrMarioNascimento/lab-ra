@@ -62,7 +62,7 @@ export function reduzir(st, a) {
       if (s.fase !== "entrada" || s.alunos[a.id]) break;
       s.alunos[a.id] = { id: a.id, nome: a.nome.trim().slice(0, 24), grupo: null };
       s.ordem.push(a.id);
-      s.resp[a.id] = { viagem: { r: {}, mochila: [] }, posto: null, saida: "" };
+      s.resp[a.id] = { viagem: { r: {}, mochila: [], concluida: false }, posto: null, saida: "" };
       break;
     case "sortear": {
       if (s.fase !== "entrada" || !s.ordem.length) break;
@@ -97,11 +97,17 @@ export function reduzir(st, a) {
       if (g.membros.every((m) => g.votos[m])) g.lider = sortearLider(g, r);
       break;
     case "viagemResp": if (s.fase === "viagem") s.resp[a.id].viagem.r[a.parada] = a.op; break;
+    case "concluirViagem": {
+      const v = s.resp[a.id]?.viagem;
+      if (s.fase === "viagem" && v && PARADAS.every((p) => v.r[p.id] != null) && v.mochila.length >= 2) v.concluida = true;
+      break;
+    }
     case "mochila": {
       if (s.fase !== "viagem") break;
       const m = s.resp[a.id].viagem.mochila;
       const k = m.indexOf(a.carta);
       if (k >= 0) m.splice(k, 1); else if (m.length < 3) m.push(a.carta);
+      if (m.length < 2) s.resp[a.id].viagem.concluida = false;
       break;
     }
     case "postoInd": if (s.fase === "posto") s.resp[a.id].posto = a.dados; break;
@@ -204,7 +210,7 @@ export function progresso(st) {
     case "entrada": return { feito: ids.length, total: ids.length, rot: "entraram" };
     case "grupos": return { feito: gs.reduce((n, g) => n + Object.keys(g.achou).length, 0), total: ids.length, rot: "acharam o grupo" };
     case "lider": return { feito: gs.filter((g) => g.lider).length, total: gs.length, rot: "grupos com líder" };
-    case "viagem": return { feito: ids.filter((id) => Object.keys(st.resp[id].viagem.r).length === PARADAS.length).length, total: ids.length, rot: "terminaram a viagem" };
+    case "viagem": return { feito: ids.filter((id) => st.resp[id].viagem.concluida).length, total: ids.length, rot: "terminaram a viagem" };
     case "posto": return { feito: gs.filter((g) => g.h1).length, total: gs.length, rot: "papéis enviaram", ind: ids.filter((id) => st.resp[id].posto).length, indTot: ids.length };
     case "canais": return { feito: gs.filter((g) => g.ciente).length, total: gs.length, rot: "leram os relatos" };
     case "laboratorio": return { feito: gs.filter((g) => g.h2).length, total: gs.length, rot: "papéis decidiram" };

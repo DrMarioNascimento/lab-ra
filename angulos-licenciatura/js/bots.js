@@ -49,7 +49,15 @@ export function passoBot(st, id, loc, dispatch) {
       break;
     case "viagem": {
       const prox = PARADAS.find((pa) => r.viagem.r[pa.id] == null);
-      if (!prox || !chance(0.35)) break;
+      if (!prox) {
+        if (r.viagem.mochila.length < 2) {
+          const extra = PARADAS.flatMap((p) => p.cartas).find((c) => !r.viagem.mochila.includes(c));
+          if (extra) dispatch({ t: "mochila", id, carta: extra });
+        }
+        if (!r.viagem.concluida) dispatch({ t: "concluirViagem", id });
+        break;
+      }
+      if (!chance(0.35)) break;
       loc.parada = PARADAS.indexOf(prox);
       if (r.viagem.mochila.length < 3 && chance(0.45)) { const c = pick(prox.cartas); if (!r.viagem.mochila.includes(c)) dispatch({ t: "mochila", id, carta: c }); }
       dispatch({ t: "viagemResp", id, parada: prox.id, op: chance(0.72) ? prox.pergunta.certa : pick([0, 1, 2]) });

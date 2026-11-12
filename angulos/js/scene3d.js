@@ -326,7 +326,7 @@ export function fotosDaCena(pers) {
   const chave = JSON.stringify(pers);
   if (cache && cache.chave === chave) return cache.fotos;
   const cena = construirCena(pers);
-  const W = 900, H = 600;
+  const W = 1200, H = 800;
   const r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
   r.setSize(W, H, false); r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap; r.outputColorSpace = THREE.SRGBColorSpace;
   const fotos = {};
@@ -335,7 +335,7 @@ export function fotosDaCena(pers) {
     cam.position.set(...f.cam.pos); cam.lookAt(new THREE.Vector3(...f.cam.alvo)); cam.updateMatrixWorld();
     r.render(cena, cam);
     r.render(cena, cam);
-    const url = r.domElement.toDataURL("image/jpeg", 0.86);
+    const url = r.domElement.toDataURL("image/jpeg", 0.91);
     const pontos = {};
     cena.updateMatrixWorld(true);
     for (const pid of f.pessoas) {
@@ -377,7 +377,8 @@ export function visor360(container, pers) {
   let alvoAnim = null;
   let arrastando = null;
   r.domElement.addEventListener("pointerdown", (e) => { arrastando = { x: e.clientX, yaw: modo.yaw ?? 0 }; });
-  window.addEventListener("pointerup", () => (arrastando = null));
+  const soltarPonteiro = () => { arrastando = null; };
+  window.addEventListener("pointerup", soltarPonteiro);
   r.domElement.addEventListener("pointermove", (e) => { if (arrastando && modo.tipo === "girar") modo.yaw = arrastando.yaw - (e.clientX - arrastando.x) * 0.006; });
 
   function irPara(fotoId) {
@@ -409,5 +410,5 @@ export function visor360(container, pers) {
     requestAnimationFrame(quadro);
   }
   quadro();
-  return { irPara, girar: () => irPara(null), destruir: () => { vivo = false; r.dispose(); r.domElement.remove(); } };
+  return { irPara, girar: () => irPara(null), destruir: () => { vivo = false; window.removeEventListener("pointerup", soltarPonteiro); r.dispose(); r.domElement.remove(); } };
 }
