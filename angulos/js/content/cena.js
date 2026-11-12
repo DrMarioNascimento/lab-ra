@@ -228,9 +228,9 @@ export const FOTOS = {
   },
   G1: {
     titulo: "Vista do mezanino", pessoas: ["personal", "bia", "kaua", "lara", "turma"],
-    cam: { pos: [-6.9, 4.6, -4.1], alvo: [-1.5, 1.0, 2.5], fov: 72 },
+    cam: { pos: [-6.9, 3.75, -4.1], alvo: [-1.5, 1.0, 2.5], fov: 72 },
     frases: [
-      { t: "Do alto se vê o balcão, a aula funcional e a área de pesos.", tag: "fato", real: true },
+      { t: "Do alto se veem a aula funcional e a área de pesos.", tag: "fato", real: true },
       { t: "Tudo parece normal num horário de pico.", tag: "interp", real: false },
       { t: "Esta vista, sozinha, não comprova se a estagiária recebe supervisão.", tag: "incerto", real: true, sobre: ["lara"] },
       { t: "Não dá para saber o que cada pessoa está fazendo.", tag: "incerto", real: true },

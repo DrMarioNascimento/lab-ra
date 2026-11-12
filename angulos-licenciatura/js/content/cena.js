@@ -231,9 +231,9 @@ export const FOTOS = {
   },
   G1: {
     titulo: "Vista da janela da direção", pessoas: ["personal", "bia", "kaua", "lara", "turma"],
-    cam: { pos: [-6.9, 4.6, -4.1], alvo: [-1.5, 1.0, 2.5], fov: 72 },
+    cam: { pos: [-6.9, 3.75, -4.1], alvo: [-1.5, 1.0, 2.5], fov: 72 },
     frases: [
-      { t: "Da janela se vê a secretaria, a quadra e a sala de treino.", tag: "fato", real: true },
+      { t: "Da janela se veem a quadra e a sala de treino.", tag: "fato", real: true },
       { t: "Tudo parece normal numa tarde de treino.", tag: "interp", real: false },
       { t: "Esta vista, sozinha, não comprova se a estagiária recebe supervisão.", tag: "incerto", real: true, sobre: ["lara"] },
       { t: "Não dá para saber o que cada pessoa está fazendo.", tag: "incerto", real: true },
