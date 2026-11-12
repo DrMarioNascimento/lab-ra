@@ -229,16 +229,9 @@ export function construirCena(pers) {
     const linha = new THREE.Mesh(new THREE.PlaneGeometry(5.2, 0.055), mat("#bbbdb3"));
     linha.rotation.x = -Math.PI / 2; linha.position.set(-20.4, 0.003, z); cena.add(linha);
   }
-  // Fachadas discretas do outro lado da rua, sem letreiros ou personagens.
-  for (const [z, largura, altura, cor] of [[-6.4, 5.4, 4.9, "#a9a49a"], [-0.4, 5.8, 4.2, "#b9b3a7"], [5.6, 5.4, 5.1, "#aaa9a1"]]) {
-    cena.add(caixa(0.22, altura, largura, cor, -25.6, altura / 2, z));
-    for (const dz of [-1.3, 1.3]) {
-      cena.add(caixa(0.03, 1.05, 0.95, "#56676d", -25.47, 2.75, z + dz));
-      cena.add(caixa(0.04, 0.86, 0.76, "#a7c0c4", -25.44, 2.75, z + dz));
-      cena.add(caixa(0.05, 0.86, 0.035, "#6f858a", -25.41, 2.75, z + dz));
-    }
-    cena.add(caixa(0.03, 2.0, 1.0, "#676d68", -25.46, 1.0, z));
-  }
+  // Muro baixo e neutro separa o estacionamento do entorno.
+  cena.add(caixa(0.20, 1.45, 20, "#8a918d", -25.55, 0.725, 0));
+  cena.add(caixa(0.27, 0.08, 20, "#bdc0b8", -25.55, 1.49, 0));
   const carro = new THREE.Group();
   carro.add(modelo("carro", 0, 0, -Math.PI / 2)); // traseira (porta-malas aberto) para +z
   carro.add(caixa(0.42, 0.3, 0.34, "#f1f5f9", -0.3, 0.78, 1.55));
