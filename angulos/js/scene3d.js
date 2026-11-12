@@ -348,7 +348,12 @@ export function fotosDaCena(pers) {
     cam.position.set(...f.cam.pos); cam.lookAt(new THREE.Vector3(...f.cam.alvo)); cam.updateMatrixWorld();
     r.render(cena, cam);
     r.render(cena, cam);
-    const url = r.domElement.toDataURL("image/jpeg", 0.91);
+    // Evita replicar uma longa string base64 em cada celular do simulador.
+    const dados = r.domElement.toDataURL("image/jpeg", 0.91).split(",")[1];
+    const binario = atob(dados);
+    const bytes = new Uint8Array(binario.length);
+    for (let i = 0; i < binario.length; i++) bytes[i] = binario.charCodeAt(i);
+    const url = URL.createObjectURL(new Blob([bytes], { type: "image/jpeg" }));
     const pontos = {};
     cena.updateMatrixWorld(true);
     for (const pid of f.pessoas) {
@@ -362,6 +367,8 @@ export function fotosDaCena(pers) {
     fotos[id] = { url, pontos };
   }
   r.dispose();
+  r.forceContextLoss();
+  if (cache) for (const foto of Object.values(cache.fotos)) URL.revokeObjectURL(foto.url);
   cache = { chave, fotos };
   return fotos;
 }
