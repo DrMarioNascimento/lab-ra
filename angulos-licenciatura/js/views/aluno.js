@@ -42,10 +42,15 @@ function classifForm(path, fids, classif) {
   }).join("")).join("");
 }
 
-function pessoasDas(fids) { return [...new Set(fids.flatMap((f) => FOTOS[f].pessoas))]; }
+// Usar os marcadores realmente visíveis em cada foto, não apenas os personagens associados ao ângulo.
+function pessoasDas(fids, st) {
+  if (falhaGrafica) return [];
+  const fotos = fotosDaCena(st.pers);
+  return [...new Set(fids.flatMap((fid) => Object.keys(fotos[fid]?.pontos || {})))];
+}
 
 function blocoRoteiro(st, base, d, fids, mochila, { grupo = false } = {}) {
-  const pes = pessoasDas(fids);
+  const pes = pessoasDas(fids, st);
   const p = papelById(st.grupos[st.alunos[base.id].grupo].papel);
   const alts = ALTERNATIVAS[p.id];
   return `
@@ -124,7 +129,9 @@ export function renderAluno(st, id, loc) {
       const todas = fotosDoGrupo(g);
       const topo = `<h2>${esc(p.nome)}</h2><p class="muted">${esc(p.abertura)}</p>`;
       if (!ind) {
-        b = topo + foto(st, minha, { sel: loc.ind.vejo, path: "ind.vejo" }) + ancora(st, p) + `<div class="sep"></div><h3 style="color:var(--o2)">Sua resposta individual</h3>` +
+        const imagem = foto(st, minha, { sel: loc.ind.vejo, path: "ind.vejo" });
+        if (falhaGrafica) { b = topo + imagem; break; }
+        b = topo + imagem + ancora(st, p) + `<div class="sep"></div><h3 style="color:var(--o2)">Sua resposta individual</h3>` +
           blocoRoteiro(st, { id, path: "ind" }, loc.ind, [minha], mochila) +
           `<button class="btn ok block" data-a="postoInd" ${completo(loc.ind, [minha]) ? "" : "disabled"}>Enviar minha resposta</button>`;
       } else if (souLider && !g.h1) {
@@ -134,7 +141,9 @@ export function renderAluno(st, id, loc) {
         const cartasGrupo = [...new Set(g.membros.flatMap((m) => st.resp[m].viagem.mochila))];
         const frasesGrupo = todas.flatMap((fid) => FOTOS[fid].frases.map((fr, i) => ({ k: `${fid}:${i}`, fr })));
         const rel = loc.gf.relato;
-        b = topo + `<div class="galeria">${todas.map((fid) => foto(st, fid, { sel: loc.gf.vejo, path: "gf.vejo" })).join("")}</div>` + ancora(st, p) +
+        const imagens = todas.map((fid) => foto(st, fid, { sel: loc.gf.vejo, path: "gf.vejo" })).join("");
+        if (falhaGrafica) { b = topo + imagens; break; }
+        b = topo + `<div class="galeria">${imagens}</div>` + ancora(st, p) +
           `<div class="card"><b>Respostas individuais (${membros.length}/${g.membros.length})</b>
           ${cont((o) => o.acao).map(([k, n]) => `<div class="row" style="justify-content:space-between"><span>${esc(txt(ALTERNATIVAS[p.id].find((a) => a.id === k)?.t, st.pers))}</span><b>${n}</b></div>`).join("")}<div class="sep"></div>
           ${cont((o) => o.papel).map(([k, n]) => `<div class="row" style="justify-content:space-between"><span class="muted">${PAPEL_NA_SITUACAO[k]}</span><b>${n}</b></div>`).join("")}<div class="sep"></div>

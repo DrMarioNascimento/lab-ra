@@ -124,9 +124,9 @@ export const FOTOS = {
     titulo: "Balcão da secretaria", pessoas: ["personal", "bia", "recep"],
     cam: { pos: [-0.35, 1.7, -3.3], alvo: [-0.75, 1.05, -6.6], fov: 48 },
     frases: [
-      { t: "O homem de boné branco e a mulher de legging rosa seguram um envelope pardo.", tag: "fato", real: true },
+      { t: "A mulher de legging rosa segura um envelope pardo em frente ao homem de boné branco.", tag: "fato", real: true },
       { t: "Sobre o balcão, ao lado deles, há um pote branco sem rótulo.", tag: "fato", real: true },
-      { t: "Sobre o balcão há um recibo de R$ 480,00.", tag: "fato", real: true },
+      { t: "Não é possível ler o valor do recibo nesta imagem.", tag: "incerto", real: true },
       { t: "O pote branco faz parte da venda.", tag: "interp", real: false, sobre: ["bia", "personal"] },
       { t: "O homem de boné está vendendo algo para a mulher.", tag: "interp", real: false, sobre: ["bia", "personal"] },
       { t: "O envelope contém hormônios.", tag: "interp", real: false, sobre: ["bia"] },

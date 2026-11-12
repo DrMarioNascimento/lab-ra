@@ -162,6 +162,19 @@ export function construirCena(pers) {
   // espelho da área de pesos
   cena.add(caixa(0.04, 2.0, 5.5, new THREE.MeshStandardMaterial({ color: "#cbd5e1", roughness: 0.05, metalness: 0.9 }), 11.86, 1.3, 2.5));
 
+  // Acabamento da recepção e luminárias: cores sóbrias e materiais com profundidade.
+  const destaqueParede = mat("#718a91", { roughness: 0.9 });
+  cena.add(caixa(6.8, 2.3, 0.015, destaqueParede, -0.5, 2.25, -8.394));
+  cena.add(caixa(6.8, 0.10, 0.018, "#304e55", -0.5, 1.08, -8.383));
+  cena.add(caixa(6.8, 0.06, 0.018, "#d6ae74", -0.5, 3.40, -8.383));
+  for (const x of [-3.5, -1.5, 0.5]) cena.add(caixa(0.035, 2.2, 0.018, "#a8b9b3", x, 2.23, -8.383));
+  for (const x of [-8, 0, 8]) {
+    const moldura = caixa(2.2, 0.06, 0.36, "#384b50", x, 4.07, -2.4);
+    cena.add(moldura);
+    const difusor = new THREE.Mesh(new THREE.PlaneGeometry(1.95, 0.22), new THREE.MeshBasicMaterial({ color: "#fff3dc" }));
+    difusor.rotation.x = Math.PI / 2; difusor.position.set(x, 4.035, -2.4); cena.add(difusor);
+  }
+
   // Estacionamento (fora)
   const asfalto = new THREE.Mesh(new THREE.PlaneGeometry(12, 17), mat("#26282c"));
   asfalto.rotation.x = -Math.PI / 2; asfalto.position.set(-18, -0.01, 0); cena.add(asfalto);
