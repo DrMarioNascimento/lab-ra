@@ -222,7 +222,7 @@ export const FOTOS = {
     cam: { pos: [-6.0, 1.6, 2.4], alvo: [-1.0, 1.3, -6.0], fov: 46 },
     frases: [
       { t: "Um aluno treinando com halteres fica na frente e tapa parte do balcão.", tag: "fato", real: true },
-      { t: "Ao fundo, a professora regente está no balcão da secretaria com um homem de boné.", tag: "fato", real: true },
+      { t: "Ao fundo, uma mulher aparece junto ao balcão da secretaria.", tag: "fato", real: true },
       { t: "O quadro dos Jogos destaca o time da escola.", tag: "fato", real: true },
       { t: "Não dá para ver o que eles têm nas mãos.", tag: "incerto", real: true },
       { t: "A professora está ocupada com algo mais importante que a aula.", tag: "interp", real: false, sobre: ["bia"] },
@@ -235,7 +235,7 @@ export const FOTOS = {
     frases: [
       { t: "Da janela se vê a secretaria, a quadra e a sala de treino.", tag: "fato", real: true },
       { t: "Tudo parece normal numa tarde de treino.", tag: "interp", real: false },
-      { t: "A estagiária está sem supervisão.", tag: "fato", real: true, sobre: ["lara"] },
+      { t: "Esta vista, sozinha, não comprova se a estagiária recebe supervisão.", tag: "incerto", real: true, sobre: ["lara"] },
       { t: "Não dá para saber o que cada pessoa está fazendo.", tag: "incerto", real: true },
     ],
   },
