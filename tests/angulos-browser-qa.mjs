@@ -16,6 +16,7 @@ try {
   const avancar=page.getByRole('button',{name:'Avançar',exact:true});
   const fases=['grupos','lider','viagem','cena','posto','canais','laboratorio','confronto','linhas','integracao'];
   for (const fase of fases) {
+   console.log(`Testando ${course}, ${number} alunos: ${fase}`);
    await page.waitForFunction(f=>window.__sala?.st.fase===f,fase,{timeout:45000});
    if(fase==='posto') {
     await page.waitForSelector('.foto img',{timeout:180000});

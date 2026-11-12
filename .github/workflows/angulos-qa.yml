@@ -3,6 +3,9 @@ on:
   push:
     branches: [codex/angulos-percurso-observacao]
     paths: ["angulos/**", "angulos-licenciatura/**", "tests/angulos-browser-qa.mjs", ".github/workflows/angulos-qa.yml"]
+concurrency:
+  group: angulos-qa-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
@@ -20,7 +23,7 @@ jobs:
       - name: Iniciar servidor
         run: python3 -m http.server 8741 --bind 127.0.0.1 > /tmp/angulos-server.log 2>&1 &
       - name: Percorrer as duas versões no navegador
-        run: node tests/angulos-browser-qa.mjs
+        run: timeout 720s node tests/angulos-browser-qa.mjs
       - name: Guardar imagens do teste
         if: always()
         uses: actions/upload-artifact@v4

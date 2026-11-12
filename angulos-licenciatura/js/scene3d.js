@@ -347,11 +347,12 @@ export function fotosDaCena(pers) {
   const W = 1200, H = 800;
   const r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
   r.setSize(W, H, false); r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap; r.outputColorSpace = THREE.SRGBColorSpace;
+  // A cena das fotografias é estática: uma única atualização de sombras atende todos os ângulos.
+  r.shadowMap.autoUpdate = false; r.shadowMap.needsUpdate = true;
   const fotos = {};
   for (const [id, f] of Object.entries(FOTOS)) {
     const cam = new THREE.PerspectiveCamera(f.cam.fov, W / H, 0.05, 80);
     cam.position.set(...f.cam.pos); cam.lookAt(new THREE.Vector3(...f.cam.alvo)); cam.updateMatrixWorld();
-    r.render(cena, cam);
     r.render(cena, cam);
     // Evita replicar uma longa string base64 em cada celular do simulador.
     const dados = r.domElement.toDataURL("image/jpeg", 0.91).split(",")[1];
