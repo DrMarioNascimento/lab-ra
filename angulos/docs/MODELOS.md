@@ -25,8 +25,12 @@ Origem: pasta "Nova atividade etica" do professor (11 e 12/11/2026). Os modelos 
 | frasco | Frasco | pote no balcão e na mochila |
 | deitado | Jovem-academia-esqueleto (camiseta azul) | aluno deitado no banco do supino; único com esqueleto, pose tirada do fim da animação "Lie_Down" |
 | banco, celular, lixeira, sacola | os de mesmo nome | banco da mochila, celular do rapaz que filma, lixeiras do corredor, sacola de farmácia do senhor |
+| mesa1 | Mesa1 | mesa da sala de avaliação (receita e celular em cima) |
+| mesa2 | Mesa2 | mesa do dono no mezanino (contrato em cima) |
+| mochila | Mochila | mochila aberta no banco, com o pote |
+| prateleira | Prateleira2 | prateleira de suplementos da recepção |
 | carro | Carro | carro do fornecedor no estacionamento (porta-malas aberto, caixas dentro) |
 
-Não usados: Crianças (sem textura e fora do contexto da academia às 19h), Envelope2 (brasão de uma marca de terceiros), Balcao (substituído pelo balcao2), Prateleira (frascos de poção em estilo fantasia, não parecem suplementos), Mesa (carteira escolar; a sala de avaliação e o mezanino pedem mesa de escritório).
+Não usados: Crianças (sem textura e fora do contexto da academia às 19h), Envelope2 (brasão de uma marca de terceiros), Balcao (substituído pelo balcao2), Prateleira (frascos de poção em estilo fantasia; substituída pela Prateleira2), Mesa (carteira escolar; substituída por Mesa1 e Mesa2).
 
 Para substituir um modelo: gerar o GLB com o mesmo nome em `assets/modelos/` já em escala real (metros), com os pés em y = 0 e de frente para +z.

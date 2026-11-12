@@ -164,7 +164,7 @@ export const FOTOS = {
   },
   T3: {
     titulo: "Celular esquecido na sala", pessoas: [],
-    cam: { pos: [9.1, 1.12, -5.68], alvo: [9.3, 0.8, -6.2], fov: 34 },
+    cam: { pos: [8.6, 1.12, -6.33], alvo: [8.8, 0.8, -6.85], fov: 34 },
     frases: [
       { t: "Há um celular aceso com a mensagem \"chegou o seu ✓\".", tag: "fato", real: true },
       { t: "O celular é do personal.", tag: "interp", real: true, sobre: ["personal"] },
@@ -185,7 +185,7 @@ export const FOTOS = {
   },
   A2: {
     titulo: "Banco ao lado do supino", pessoas: ["kaua"],
-    cam: { pos: [7.0, 1.1, 3.6], alvo: [7.6, 0.45, 4.3], fov: 42 },
+    cam: { pos: [6.85, 1.25, 3.45], alvo: [7.6, 0.6, 4.3], fov: 42 },
     frases: [
       { t: "Há uma mochila aberta com um pote branco sem rótulo.", tag: "fato", real: true },
       { t: "O pote é de hormônio.", tag: "interp", real: true, sobre: ["kaua"] },

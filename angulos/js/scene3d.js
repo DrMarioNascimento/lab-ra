@@ -47,7 +47,7 @@ function placa(w, h, textura, x, y, z, ry = 0, rx = 0) {
 
 // ---------- modelos ----------
 const MODELOS = ["personal", "recep", "bia", "lara", "kaua", "colega", "joaquim", "dono", "homem", "mae", "treino",
-  "t1", "t2", "t3", "t4", "t5", "t6", "balcao", "supino", "torre", "suporte2", "halter", "halter2", "maquina", "bola", "envelope", "frasco", "carro", "deitado", "banco", "celular", "lixeira", "sacola"];
+  "t1", "t2", "t3", "t4", "t5", "t6", "balcao", "supino", "torre", "suporte2", "halter", "halter2", "maquina", "bola", "envelope", "frasco", "carro", "deitado", "banco", "celular", "lixeira", "sacola", "mesa1", "mesa2", "mochila", "prateleira"];
 const ANIM = {};
 const BIB = {};
 let carregando = null;
@@ -124,6 +124,9 @@ function local(x, z, ry, dx, dy, dz) {
 }
 
 export const DEIT = { x: 8.9, y: 0.45, z: 2.4, ry: 0 };
+const MESA1 = { x: 9.0, z: -6.45, ry: Math.PI / 2 };
+const MESA2 = { x: -9.6, z: -7.6, ry: Math.PI / 2 };
+const MOCH = { ry: -2.43, fx: 0.11, fy: 0.2 };
 export function construirCena(pers) {
   for (const k of Object.keys(PESSOA_POS)) delete PESSOA_POS[k];
   const cena = new THREE.Scene();
@@ -194,8 +197,7 @@ export function construirCena(pers) {
   cena.add(modelo("frasco", -0.98, -6.66, 0.4, { y: tampo }));
   cena.add(pessoa("recep", "recep", 0.25, -7.65, 0));
   cena.add(placa(1.8, 1.2, tex([{ t: "DESAFIO 90 DIAS", b: true, s: 56, c: "#fde047" }, { t: "Prêmio: 1 ano de plano", c: "#fff" }, { t: "+ kit Farmácia Vitta", c: "#fff" }, { t: "(parceira oficial)", s: 26, c: "#cbd5e1" }], { w: 600, h: 400, bg: "#7c2d12", font: 40 }), 2.6, 1.8, -8.38));
-  const prat = caixa(1.6, 1.6, 0.4, "#64748b", 4.6, 0.8, -8.15); cena.add(prat);
-  for (let i = 0; i < 6; i++) { const pote = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.25, 12), mat(i % 2 ? "#f97316" : "#0ea5e9")); pote.position.set(4.0 + (i % 3) * 0.5, 0.95 + Math.floor(i / 3) * 0.55, -7.85); cena.add(pote); }
+  cena.add(modelo("prateleira", 4.6, -8.05, 0));
 
   // Aparelhos de peito entre a área de treino e a recepção (um deles tapa a visão do balcão)
   cena.add(modelo("maquina", 1.2, -3.45, Math.PI * 0.82));
@@ -206,11 +208,10 @@ export function construirCena(pers) {
   vidroSala.position.set(7, 1.3, -6.5); cena.add(vidroSala);
   cena.add(caixa(3.0, 2.6, 0.12, "#cbd5e1", 9.5, 1.3, -4.5));
   cena.add(placa(1.1, 0.3, tex([{ t: "AVALIAÇÃO FÍSICA", b: true, c: "#0f172a" }], { h: 120, bg: "#e2e8f0" }), 9.5, 2.35, -4.43));
-  cena.add(caixa(1.8, 0.06, 0.9, "#a8a29e", 9.0, 0.76, -6.4));
-  for (const [x, z] of [[8.2, -6.0], [9.8, -6.0], [8.2, -6.8], [9.8, -6.8]]) cena.add(caixa(0.05, 0.75, 0.05, "#57534e", x, 0.38, z));
+  cena.add(modelo("mesa1", MESA1.x, MESA1.z, MESA1.ry));
   cena.add(placa(0.3, 0.42, tex(["Dr. M. A. Ferreira — CRM", "", "▬▬▬▬▬▬▬▬", "▬▬▬▬▬▬", "▬▬▬▬▬▬▬▬▬"], { w: 300, h: 420, bg: "#f8fafc", fg: "#64748b", font: 26, extra: (g) => { g.strokeStyle = "#1d4ed8"; g.lineWidth = 6; g.beginPath(); g.arc(200, 330, 55, 0, Math.PI * 2); g.stroke(); g.font = "700 20px Arial"; g.fillStyle = "#1d4ed8"; g.fillText("CARIMBO", 200, 330); } }), 8.6, 0.795, -6.3, 0.2, -Math.PI / 2));
-  cena.add(caixa(0.13, 0.012, 0.24, "#020617", 9.3, 0.795, -6.2, -0.4));
-  cena.add(placa(0.115, 0.22, tex([{ t: "chegou", s: 40, c: "#e2e8f0", b: true }, { t: "o seu ✓", s: 40, c: "#e2e8f0", b: true }], { w: 200, h: 400, bg: "#065f46", extra: (g) => { g.fillStyle = "#94a3b8"; g.font = "600 22px Arial"; g.fillText("19:02", 100, 40); } }), 9.3, 0.803, -6.2, -0.4, -Math.PI / 2));
+  cena.add(caixa(0.13, 0.012, 0.24, "#020617", 8.8, 0.795, -6.85, -0.4));
+  cena.add(placa(0.115, 0.22, tex([{ t: "chegou", s: 40, c: "#e2e8f0", b: true }, { t: "o seu ✓", s: 40, c: "#e2e8f0", b: true }], { w: 200, h: 400, bg: "#065f46", extra: (g) => { g.fillStyle = "#94a3b8"; g.font = "600 22px Arial"; g.fillText("19:02", 100, 40); } }), 8.8, 0.803, -6.85, -0.4, -Math.PI / 2));
   const planilha = ["DESAFIO 90 DIAS — % gordura", `${pers.n.bia}  31% → 24%`, `${pers.n.kaua}  18% → 9%`, "Marcela  28% → 26%", "Joel  25% → 23%", `${pers.n.colega}  21% → 19%`];
   cena.add(placa(1.4, 1.0, tex(planilha.map((t, i) => ({ t, b: i === 0, s: i === 0 ? 30 : 28 })), { w: 560, h: 400, align: "left", bg: "#ffffff", font: 28 }), 11.88, 1.6, -5.0, -Math.PI / 2));
 
@@ -242,11 +243,9 @@ export function construirCena(pers) {
   cena.add(modelo("halter2", 9.7, 4.2, 1.2));
   // banco com a mochila aberta e o mesmo tipo de pote branco
   cena.add(modelo("banco", 7.6, 4.3, Math.PI / 2));
-  const moch = new THREE.Group();
-  moch.add(caixa(0.36, 0.22, 0.24, "#1e3a8a", 0, 0.11, 0));
-  const aba = caixa(0.36, 0.02, 0.2, "#172554", 0, 0.24, -0.17); aba.rotation.x = 0.9; moch.add(aba);
-  moch.position.set(7.6, 0.45, 4.3); cena.add(moch);
-  cena.add(modelo("frasco", 7.64, 4.26, 0.2, { y: 0.59 }));
+  const mRy = MOCH.ry;
+  cena.add(modelo("mochila", 7.6, 4.3, mRy, { y: 0.45 }));
+  cena.add(modelo("frasco", 7.6 + Math.sin(mRy) * MOCH.fx, 4.3 + Math.cos(mRy) * MOCH.fx, 0.2, { y: 0.45 + MOCH.fy }));
 
   // Corredor do vestiário
   cena.add(caixa(1.2, 2.2, 0.1, "#78716c", 6.4, 1.1, 8.4));
@@ -292,8 +291,7 @@ export function construirCena(pers) {
   for (const [x, z] of [[-7.1, -4.0], [-7.1, -8.3]]) cena.add(caixa(0.2, 3.2, 0.2, "#44403c", x, 1.6, z));
   cena.add(caixa(0.05, 0.9, 4.6, "#a8a29e", -7.05, 3.75, -6.2));
   cena.add(caixa(5, 0.9, 0.05, "#a8a29e", -9.5, 3.75, -3.92));
-  cena.add(caixa(1.4, 0.05, 0.7, "#78350f", -9.6, 4.05, -7.5));
-  cena.add(caixa(1.3, 0.75, 0.6, "#451a03", -9.6, 3.67, -7.5));
+  cena.add(modelo("mesa2", MESA2.x, MESA2.z, MESA2.ry, { y: 3.3 }));
   cena.add(placa(0.3, 0.4, tex([{ t: "CONTRATO DE", b: true, s: 30 }, { t: "PARCERIA", b: true, s: 30 }, { t: "Farmácia Vitta", s: 26, c: "#1d4ed8" }, "▬▬▬▬▬", "▬▬▬▬"], { w: 300, h: 400, bg: "#fafaf9", font: 26 }), -9.7, 4.08, -7.45, 0.3, -Math.PI / 2));
   cena.add(pessoa("dono", "dono", -10.6, -6.9, 1.2, { y: 3.3 }));
 
