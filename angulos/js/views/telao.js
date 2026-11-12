@@ -1,6 +1,6 @@
 import { FASES, progresso, papelById, destinoRelato, corrente, desfecho, placarClassificacao, acertoViagem, grupoDoPapel } from "../engine.js";
 import { PARADAS } from "../content/roteiro.js";
-import { PAPEIS, PESSOAS, ALTERNATIVAS, DIMENSOES, PAPEL_NA_SITUACAO, ABERTURA, CARTAS, txt } from "../content/cena.js";
+import { PAPEIS, PESSOAS, ALTERNATIVAS, DIMENSOES, PAPEL_NA_SITUACAO, ABERTURA, CONCLUSAO, CARTAS, txt } from "../content/cena.js";
 
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const badge = (g, sz = "") => { const p = papelById(g.papel); return `<span class="badge" style="background:${p.cor};${sz}">${g.i + 1}</span>`; };
@@ -89,7 +89,7 @@ export function renderTelao(st) {
       const tot = vi.reduce((a, b) => a + b.tot, 0), ok = vi.reduce((a, b) => a + b.ok, 0);
       const res = desfecho(st);
       const bem = Object.values(res).filter((x) => x.estado === "bem").length;
-      body = topo(st, "A soma dos papéis") + `<div class="card"><table class="vals" style="font-size:1.15cqw"><tr><th></th><th>Papel</th><th>Como o grupo se viu</th><th>Leitura do caso</th><th>Fato × interp.</th><th>Laboratório</th></tr>${rows}</table></div>
+      body = topo(st, "A soma dos papéis") + `<div class="card"><p class="big">${esc(CONCLUSAO)}</p></div><div class="card"><table class="vals" style="font-size:1.15cqw"><tr><th></th><th>Papel</th><th>Como o grupo se viu</th><th>Leitura do caso</th><th>Fato × interp.</th><th>Laboratório</th></tr>${rows}</table></div>
         <div class="grid" style="grid-template-columns:repeat(3,1fr)"><div class="card"><h3>Viagem</h3><p class="big">${tot ? Math.round((100 * ok) / tot) : 0}% de acertos</p></div><div class="card"><h3>Duas semanas depois</h3><p class="big">${bem} de ${Object.keys(res).length} situações protegidas</p></div><div class="card"><h3>Bilhete de saída</h3><p class="muted">O que você tratou como fato e era interpretação?</p></div></div>`;
       break;
     }

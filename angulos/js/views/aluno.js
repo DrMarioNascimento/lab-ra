@@ -1,6 +1,6 @@
 import { papelById, fotosDoGrupo, destinoRelato, desfecho, placarClassificacao } from "../engine.js";
 import { PARADAS } from "../content/roteiro.js";
-import { PESSOAS, FORA, FOTOS, CARTAS, ALTERNATIVAS, PAPEL_NA_SITUACAO, LENTES, DIMENSOES, ABERTURA, txt } from "../content/cena.js";
+import { PESSOAS, FORA, FOTOS, CARTAS, ALTERNATIVAS, PAPEL_NA_SITUACAO, LENTES, DIMENSOES, ABERTURA, CONCLUSAO, txt } from "../content/cena.js";
 import { fotosDaCena } from "../scene3d.js";
 
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -185,7 +185,7 @@ export function renderAluno(st, id, loc) {
     }
     case "integracao": {
       const env = st.resp[id].saida;
-      b = `<h2>Bilhete de saída</h2>${env ? `<p class="pill-ok">Enviado.</p><p class="muted">${esc(env)}</p>` : `<p>O que você tratou como fato e era interpretação? Isso mudou a sua decisão?</p><textarea data-in="saida" data-key="saida">${esc(loc.saida)}</textarea><button class="btn ok block" data-a="saida" ${loc.saida.trim().length > 3 ? "" : "disabled"}>Enviar</button>`}`;
+      b = `<p class="big">${esc(CONCLUSAO)}</p><h2>Bilhete de saída</h2>${env ? `<p class="pill-ok">Enviado.</p><p class="muted">${esc(env)}</p>` : `<p>O que você tratou como fato e era interpretação? Isso mudou a sua decisão?</p><textarea data-in="saida" data-key="saida">${esc(loc.saida)}</textarea><button class="btn ok block" data-a="saida" ${loc.saida.trim().length > 3 ? "" : "disabled"}>Enviar</button>`}`;
       break;
     }
     default: b = "";

@@ -376,4 +376,5 @@ export const LENTES = [
   { id: "complexidade", nome: "Complexidade", q: "Que efeitos indiretos podem aparecer? Como acompanhar e corrigir?" },
 ];
 
-export const ABERTURA = "Academia de bairro, 19h, horário de pico na última semana do Desafio 90 dias. O prêmio do desafio é patrocinado por uma farmácia parceira. Cada um de vocês vê a academia do lugar onde está, e ninguém vê tudo.";
+export const ABERTURA = "Academia de bairro, 19h, horário de pico na última semana do Desafio 90 dias. O prêmio do desafio é patrocinado por uma farmácia parceira. Cada um de vocês está em um lugar da academia.";
+export const CONCLUSAO = "Cada um de vocês vê a academia do lugar onde está, e ninguém vê tudo.";
