@@ -31,6 +31,24 @@ function tex(linhas, { w = 512, h = 256, bg = "#f8fafc", fg = "#0f172a", font = 
 
 const mat = (color, o = {}) => new THREE.MeshStandardMaterial({ color, roughness: 0.8, metalness: 0.05, ...o });
 
+// Piso discreto em escala arquitetônica; o padrão é gerado localmente, sem imagens externas.
+function materialPiso(cor) {
+  const c = document.createElement("canvas"); c.width = c.height = 256;
+  const g = c.getContext("2d"); g.fillStyle = cor; g.fillRect(0, 0, 256, 256);
+  let seed = 3917;
+  for (let i = 0; i < 950; i++) {
+    seed = (seed * 1664525 + 1013904223) >>> 0; const x = seed % 256;
+    seed = (seed * 1664525 + 1013904223) >>> 0; const y = seed % 256;
+    g.fillStyle = i % 2 ? "rgba(255,255,255,0.035)" : "rgba(0,0,0,0.04)";
+    g.fillRect(x, y, 1 + (i % 2), 1);
+  }
+  g.strokeStyle = "rgba(0,0,0,0.12)"; g.lineWidth = 1;
+  g.strokeRect(0.5, 0.5, 255, 255);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+  t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(12, 8.5); t.anisotropy = 4;
+  return mat("#ffffff", { map: t, roughness: 0.92, metalness: 0 });
+}
+
 function caixa(w, h, d, m, x, y, z, ry = 0) {
   const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), typeof m === "object" && m.isMaterial ? m : mat(m));
   mesh.position.set(x, y, z); mesh.rotation.y = ry;
@@ -144,7 +162,7 @@ export function construirCena(pers) {
   }
 
   // Piso, paredes e teto aberto
-  const piso = new THREE.Mesh(new THREE.PlaneGeometry(24, 17), mat("#4a4e55"));
+  const piso = new THREE.Mesh(new THREE.PlaneGeometry(24, 17), materialPiso("#484f54"));
   piso.rotation.x = -Math.PI / 2; piso.receiveShadow = true; cena.add(piso);
   const borracha = new THREE.Mesh(new THREE.PlaneGeometry(7, 7), mat("#1f2125"));
   borracha.rotation.x = -Math.PI / 2; borracha.position.set(8.2, 0.005, 2.2); borracha.receiveShadow = true; cena.add(borracha);
@@ -387,7 +405,7 @@ export function visor360(container, pers) {
   const marcas = [];
   for (const p of PAPEIS) for (const fid of p.fotos) {
     const f = FOTOS[fid];
-    const cone = new THREE.Mesh(new THREE.ConeGeometry(0.22, 0.5, 4), new THREE.MeshBasicMaterial({ color: p.cor }));
+    const cone = new THREE.Mesh(new THREE.ConeGeometry(0.09, 0.22, 4), new THREE.MeshBasicMaterial({ color: p.cor, transparent: true, opacity: 0.8 }));
     const pos = new THREE.Vector3(...f.cam.pos), alvo = new THREE.Vector3(...f.cam.alvo);
     cone.position.copy(pos);
     cone.lookAt(alvo); cone.rotateX(Math.PI / 2);

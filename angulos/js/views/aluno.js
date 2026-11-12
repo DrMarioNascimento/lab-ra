@@ -28,7 +28,7 @@ function foto(st, fid, { pontos = true, sel = [], path } = {}) {
   catch (erro) { falhaGrafica = true; console.error("Não foi possível gerar as imagens 3D", erro); }
   if (!f) return `<div class="card pill-bad" role="alert">Não foi possível gerar esta imagem 3D neste dispositivo. Atualize a página ou tente outro navegador com aceleração gráfica. A observação depende da imagem.</div>`;
   const pts = pontos ? Object.entries(f.pontos).map(([pid, c]) => `<button class="hot ${sel.includes(pid) ? "on" : ""}" style="left:${c.x * 100}%;top:${c.y * 100}%" ${path ? `data-a="toggle" data-path="${path}" data-val="${pid}"` : ""} title="${esc(PESSOAS[pid].desc)}">${sel.includes(pid) ? "✓" : ""}</button>`).join("") : "";
-  return `<div class="foto-box"><label class="foto-zoom-controle"><input class="foto-zoom-input" type="checkbox"><span class="foto-zoom-abrir">⌕ Ampliar imagem</span><span class="foto-zoom-fechar">✕ Fechar imagem</span></label><div class="foto"><img src="${f.url}" alt="${esc(FOTOS[fid].titulo)}">${pts}</div></div><div class="faint" style="font-size:12px;margin-top:-6px">${esc(FOTOS[fid].titulo)}</div>`;
+  return `<div class="foto-box"><label class="foto-zoom-controle"><input class="foto-zoom-input" type="checkbox" data-preserve-checked data-key="zoom-${esc(fid)}"><span class="foto-zoom-abrir">⌕ Ampliar imagem</span><span class="foto-zoom-fechar">✕ Fechar imagem</span></label><div class="foto"><img src="${f.url}" alt="${esc(FOTOS[fid].titulo)}">${pts}</div></div><div class="faint" style="font-size:12px;margin-top:-6px">${esc(FOTOS[fid].titulo)}</div>`;
 }
 
 function ancora(st, p) {

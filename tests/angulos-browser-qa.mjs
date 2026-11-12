@@ -23,9 +23,28 @@ try {
     if(number===6){await page.locator('.foto img').first().screenshot({path:`angulos-qa/${course}-foto.png`});}
     const info=await page.locator('.foto img').first().evaluate(img=>({loaded:img.complete&&img.naturalWidth>0,w:img.naturalWidth,h:img.naturalHeight}));
     assert.ok(info.loaded&&info.w>=900,`${course}: foto indisponível ou pequena ${JSON.stringify(info)}`);
-    if(number===6){let label=page.locator('.foto-zoom-controle').first();await label.click();assert.equal(await label.locator('input').isChecked(),true);await page.screenshot({path:`angulos-qa/${course}-ampliada.png`});await label.click();}
+    if(number===6){
+      await page.locator('#auto').click();
+      const label=page.locator('.foto-zoom-controle').first();
+      await label.click();
+      assert.equal(await page.locator('.foto-zoom-input:checked').count(),1);
+      await page.screenshot({path:`angulos-qa/${course}-ampliada.png`});
+      await page.locator('.foto-box:has(.foto-zoom-input:checked) .foto-zoom-controle').click();
+      assert.equal(await page.locator('.foto-zoom-input:checked').count(),0);
+      await page.locator('#auto').click();
+    }
    }
-   if(fase==='confronto') {await page.waitForSelector('#slot3d canvas',{timeout:60000}); if(number===6)await page.locator('#telao').screenshot({path:`angulos-qa/${course}-confronto.png`});}
+   if(fase==='confronto') {
+    await page.waitForSelector('#slot3d canvas',{timeout:60000});
+    if(number===6){
+      const personagens=page.getByText('Personagens da cena',{exact:true});
+      assert.equal(await personagens.count(),1);
+      await page.locator('#telao').screenshot({path:`angulos-qa/${course}-confronto.png`});
+      await personagens.click();
+      assert.equal(await page.locator('#telao details').evaluate(el=>el.open),true);
+      await personagens.click();
+    }
+   }
    if(fase==='integracao') break;
    await page.waitForFunction(()=>{let s=window.__sala.st,g=Object.values(s.grupos),id=s.ordem;switch(s.fase){case 'grupos':return g.every(x=>Object.keys(x.achou).length===x.membros.length);case 'lider':return g.every(x=>x.lider);case 'viagem':return id.every(i=>s.resp[i].viagem.concluida);case 'posto':return g.every(x=>x.h1)&&id.every(i=>s.resp[i].posto);case 'canais':return g.every(x=>x.ciente);case 'laboratorio':return g.every(x=>x.h2);default:return true;}},null,{timeout:180000});
    await avancar.click({timeout:30000});
