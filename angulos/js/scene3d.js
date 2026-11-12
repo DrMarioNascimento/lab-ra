@@ -3,6 +3,7 @@
 import * as THREE from "../vendor/three.module.min.js";
 import { GLTFLoader } from "../vendor/GLTFLoader.js";
 import { MeshoptDecoder } from "../vendor/meshopt_decoder.module.js";
+import { clone as cloneSkinned } from "../vendor/SkeletonUtils.js";
 import { FOTOS, PAPEIS, txt } from "./content/cena.js";
 
 const PESSOA_POS = {}; // id → THREE.Vector3 (pés)
@@ -46,7 +47,8 @@ function placa(w, h, textura, x, y, z, ry = 0, rx = 0) {
 
 // ---------- modelos ----------
 const MODELOS = ["personal", "recep", "bia", "lara", "kaua", "colega", "joaquim", "dono", "homem", "mae", "treino",
-  "t1", "t2", "t3", "t4", "t5", "t6", "balcao", "supino", "torre", "suporte2", "halter", "halter2", "maquina", "bola", "envelope", "frasco", "carro"];
+  "t1", "t2", "t3", "t4", "t5", "t6", "balcao", "supino", "torre", "suporte2", "halter", "halter2", "maquina", "bola", "envelope", "frasco", "carro", "deitado", "banco", "celular", "lixeira", "sacola"];
+const ANIM = {};
 const BIB = {};
 let carregando = null;
 export function prepararCena(aoProgresso) {
@@ -55,7 +57,7 @@ export function prepararCena(aoProgresso) {
   let feitos = 0;
   carregando = Promise.all(MODELOS.map((id) => ld.loadAsync(new URL(`../assets/modelos/${id}.glb`, import.meta.url).href).then((g) => {
     g.scene.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
-    BIB[id] = g.scene; feitos++; aoProgresso?.(feitos / MODELOS.length);
+    BIB[id] = g.scene; ANIM[id] = g.animations; feitos++; aoProgresso?.(feitos / MODELOS.length);
   })));
   return carregando;
 }
@@ -98,12 +100,30 @@ function maoFrente(o) {
   return melhor;
 }
 
+// Mão caída ao lado do corpo (lado = +1 ou -1 no x do modelo), em coordenadas do mundo.
+function maoLado(o, lado) {
+  o.updateMatrixWorld(true);
+  const inv = new THREE.Matrix4().copy(o.matrixWorld).invert();
+  let melhor = null, mx = -1e9;
+  o.traverse((m) => {
+    if (!m.isMesh) return;
+    const pos = m.geometry.attributes.position;
+    for (let i = 0; i < pos.count; i += 2) {
+      _v.fromBufferAttribute(pos, i).applyMatrix4(m.matrixWorld);
+      const l = _v.clone().applyMatrix4(inv);
+      if (l.y > 0.6 && l.y < 0.95 && l.x * lado > mx) { mx = l.x * lado; melhor = _v.clone(); }
+    }
+  });
+  return melhor;
+}
+
 // Ponto local (relativo a quem está em x,z virado para ry) → mundo.
 function local(x, z, ry, dx, dy, dz) {
   const c = Math.cos(ry), s = Math.sin(ry);
   return [x + dx * c + dz * s, dy, z - dx * s + dz * c];
 }
 
+export const DEIT = { x: 8.9, y: 0.45, z: 2.4, ry: 0 };
 export function construirCena(pers) {
   for (const k of Object.keys(PESSOA_POS)) delete PESSOA_POS[k];
   const cena = new THREE.Scene();
@@ -196,11 +216,23 @@ export function construirCena(pers) {
 
   // Pesos livres: supino, torre de halteres, suporte e halteres no chão
   cena.add(modelo("supino", 8.9, 2.4, -Math.PI / 2));
+  {
+    // aluno deitado no banco do supino (modelo com esqueleto, quadro final da animação "deitar")
+    const d = cloneSkinned(BIB.deitado);
+    const clip = ANIM.deitado.find((a) => /Lie/i.test(a.name));
+    const mix = new THREE.AnimationMixer(d); const ac = mix.clipAction(clip); ac.play(); mix.setTime(clip.duration - 0.01);
+    d.position.set(DEIT.x, DEIT.y, DEIT.z); d.rotation.y = DEIT.ry;
+    d.traverse((m) => { if (m.isMesh) { m.castShadow = true; m.frustumCulled = false; } });
+    cena.add(d);
+  }
   cena.add(pessoa("kaua", "kaua", 8.85, 3.75, Math.PI));
   cena.add(pessoa("colega", "colega", 6.9, 2.6, Math.PI / 2 - 0.15));
   {
-    const [hx, hy, hz] = local(6.9, 2.6, Math.PI / 2 - 0.15, 0.16, 1.35, 0.42);
-    const cel = caixa(0.075, 0.15, 0.01, "#020617", hx, hy, hz, Math.PI / 2 - 0.15); cena.add(cel);
+    const col = cena.children[cena.children.length - 1];
+    const cRy = Math.PI / 2 - 0.15, m = maoFrente(col);
+    const cel = modelo("celular", 0, 0, cRy + Math.PI);
+    cel.position.copy(m).add(new THREE.Vector3(Math.sin(cRy), 0, Math.cos(cRy)).multiplyScalar(0.02)); cel.position.y -= 0.09;
+    cena.add(cel);
   }
   cena.add(modelo("torre", 10.9, 0.2, -Math.PI / 2));
   cena.add(modelo("torre", 10.9, 4.9, -Math.PI / 2));
@@ -209,27 +241,28 @@ export function construirCena(pers) {
   cena.add(modelo("halter", 7.7, 5.0, 0.2));
   cena.add(modelo("halter2", 9.7, 4.2, 1.2));
   // banco com a mochila aberta e o mesmo tipo de pote branco
-  cena.add(caixa(0.4, 0.42, 1.2, "#111827", 7.6, 0.21, 4.3));
+  cena.add(modelo("banco", 7.6, 4.3, Math.PI / 2));
   const moch = new THREE.Group();
   moch.add(caixa(0.36, 0.22, 0.24, "#1e3a8a", 0, 0.11, 0));
   const aba = caixa(0.36, 0.02, 0.2, "#172554", 0, 0.24, -0.17); aba.rotation.x = 0.9; moch.add(aba);
-  moch.position.set(7.6, 0.42, 4.3); cena.add(moch);
-  cena.add(modelo("frasco", 7.64, 4.26, 0.2, { y: 0.56 }));
+  moch.position.set(7.6, 0.45, 4.3); cena.add(moch);
+  cena.add(modelo("frasco", 7.64, 4.26, 0.2, { y: 0.59 }));
 
   // Corredor do vestiário
   cena.add(caixa(1.2, 2.2, 0.1, "#78716c", 6.4, 1.1, 8.4));
   cena.add(placa(1.0, 0.3, tex([{ t: "VESTIÁRIO", b: true }], { h: 120, bg: "#e7e5e4" }), 6.4, 2.45, 8.33, Math.PI));
-  const lixo = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.2, 0.6, 16, 1, true), mat("#334155", { side: THREE.DoubleSide })); lixo.position.set(5.6, 0.3, 6.9); cena.add(lixo);
+  cena.add(modelo("lixeira", 5.4, 7.0, 0));
   const cx = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.05, 0.08), [mat("#fff"), mat("#fff"), new THREE.MeshStandardMaterial({ map: tex([{ t: "...TERONA", b: true, s: 60, c: "#b91c1c" }, { t: "Farmácia São Luiz", s: 30, c: "#334155" }], { w: 400, h: 200, bg: "#ffffff" }) }), mat("#fff"), mat("#fff"), mat("#fff")]);
   cx.position.set(5.6, 0.62, 6.9); cx.rotation.set(0.2, 0.5 + Math.PI, 0.1); cena.add(cx);
   const jRy = Math.PI + 0.5;
   cena.add(pessoa("joaquim", "joaquim", 6.3, 7.5, jRy));
   {
-    const [sx, , sz] = local(6.3, 7.5, jRy, -0.3, 0, 0.02);
-    const sac = new THREE.Group();
-    sac.add(caixa(0.26, 0.3, 0.1, "#ffffff", 0, 0, 0));
-    sac.add(placa(0.12, 0.12, tex([{ t: "+", b: true, s: 160, c: "#16a34a" }], { w: 200, h: 200, bg: "#ffffff" }), 0, 0.02, 0.051, 0));
-    sac.position.set(sx, 0.72, sz); sac.rotation.y = jRy; cena.add(sac);
+    const jo = cena.children[cena.children.length - 1];
+    const m = maoLado(jo, -1);
+    const sac = modelo("sacola", 0, 0, jRy + Math.PI / 2);
+    sac.position.set(m.x, m.y - 0.36, m.z); cena.add(sac);
+    const cruz = placa(0.1, 0.1, tex([{ t: "+", b: true, s: 160, c: "#16a34a" }], { w: 200, h: 200, bg: "#f5e6c8" }), 0, 0, 0, 0);
+    cruz.position.set(m.x, m.y - 0.2, m.z).add(new THREE.Vector3(Math.sin(jRy), 0, Math.cos(jRy)).multiplyScalar(0.085)); cruz.rotation.y = jRy; cena.add(cruz);
   }
 
   // Aula funcional

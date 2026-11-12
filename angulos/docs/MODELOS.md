@@ -10,21 +10,23 @@ Origem: pasta "Nova atividade etica" do professor (11 e 12/11/2026). Os modelos 
 | personal | Professor1 | personal (boné branco, camisa preta) |
 | recep | Recepcionista | recepcionista |
 | bia | Professora2 (legging rosa) | aluna com laudo |
-| mae | Professora2 (calça vinho) | mãe do jovem |
+| mae | Mae | mãe do jovem |
 | lara | Estagiaria | estagiária |
-| kaua | Praticante (camiseta laranja) | jovem menor de idade |
+| kaua | Jovem-laranja | jovem menor de idade, em pé ao lado do supino |
 | homem | Praticante (camiseta vermelha) | fornecedor no estacionamento |
 | treino | Praticante (camiseta roxa) | aluno treinando na frente da vista (E2) |
 | colega | Professor-ou-praticante | rapaz filmando |
-| joaquim | Professor-ou-praticante (jaqueta verde) | senhor do vestiário |
-| dono | Professor-ou-praticante (jaqueta azul-marinho) | dono no mezanino |
+| joaquim | senhor | senhor grisalho do vestiário, com a sacola |
+| dono | Social | dono no mezanino |
 | t1 a t6 | vários, recoloridos | turma da aula funcional |
 | balcao | balcao2 | recepção (2 módulos) |
 | supino, maquina, torre, suporte2, halter, halter2, bola | os de mesmo nome | equipamentos |
 | envelope | Envelope1 (tingido de pardo) | na mão da aluna, na entrega no balcão |
 | frasco | Frasco | pote no balcão e na mochila |
+| deitado | Jovem-academia-esqueleto (camiseta azul) | aluno deitado no banco do supino; único com esqueleto, pose tirada do fim da animação "Lie_Down" |
+| banco, celular, lixeira, sacola | os de mesmo nome | banco da mochila, celular do rapaz que filma, lixeiras do corredor, sacola de farmácia do senhor |
 | carro | Carro | carro do fornecedor no estacionamento (porta-malas aberto, caixas dentro) |
 
-Não usados: Crianças (sem textura e fora do contexto da academia às 19h), Envelope2 (brasão de uma marca de terceiros), Balcao (substituído pelo balcao2).
+Não usados: Crianças (sem textura e fora do contexto da academia às 19h), Envelope2 (brasão de uma marca de terceiros), Balcao (substituído pelo balcao2), Prateleira (frascos de poção em estilo fantasia, não parecem suplementos), Mesa (carteira escolar; a sala de avaliação e o mezanino pedem mesa de escritório).
 
 Para substituir um modelo: gerar o GLB com o mesmo nome em `assets/modelos/` já em escala real (metros), com os pés em y = 0 e de frente para +z.
