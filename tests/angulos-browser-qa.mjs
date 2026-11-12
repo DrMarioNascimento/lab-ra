@@ -6,7 +6,7 @@ await fs.mkdir('angulos-qa', {recursive:true});
 const browser = await chromium.launch({headless:true,args:['--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
 let bad=[];
 try {
- for (const course of ['angulos','angulos-licenciatura']) for (const number of [6,35,40]) {
+ for (const course of (process.env.COURSE ? [process.env.COURSE] : ['angulos','angulos-licenciatura'])) for (const number of (process.env.N_ALUNOS ? [Number(process.env.N_ALUNOS)] : [6,35,40])) {
   const page=await browser.newPage({viewport:{width:1440,height:1000},deviceScaleFactor:1});
   page.on('pageerror', e=>bad.push(`${course}/${number}: ${e.message}`));
   page.on('console', e=>{if(e.type()==='error'&&!/fonts.googleapis|fonts.gstatic/.test(e.text()))bad.push(`${course}/${number}: ${e.text().slice(0,300)}`)});
