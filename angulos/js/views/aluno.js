@@ -194,7 +194,7 @@ export function renderAluno(st, id, loc) {
     case "confronto": case "linhas": {
       const pl = placarClassificacao(st.resp[id].posto?.classif);
       b = `<span class="chip">Olhe o telão</span><h2>${st.fase === "confronto" ? "A cena inteira" : "Duas semanas depois"}</h2>
-        <div class="card"><b>Você, na sua foto</b><p>Acertou ${pl.ok} de ${pl.tot} na separação entre fato, interpretação e incerteza.</p>${pl.interpComoFato ? `<p class="pill-bad">Marcou ${pl.interpComoFato} interpretação(ões) como fato.</p>` : `<p class="pill-ok">Não tratou interpretação como fato.</p>`}</div>`;
+        <div class="card"><b>Você, na sua foto</b><p>Acertou ${pl.ok} de ${pl.tot} na separação entre fato, interpretação e incerteza.</p>${!pl.tot ? `<p class="faint">Nenhuma classificação foi enviada.</p>` : pl.interpComoFato ? `<p class="pill-bad">Marcou ${pl.interpComoFato} interpretação(ões) como fato.</p>` : `<p class="pill-ok">Não tratou interpretação como fato.</p>`}</div>`;
       break;
     }
     case "integracao": {

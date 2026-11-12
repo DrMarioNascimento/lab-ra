@@ -208,8 +208,8 @@ export const FOTOS = {
     titulo: "Aula funcional", pessoas: ["lara", "turma"],
     cam: { pos: [-3.6, 1.7, 1.6], alvo: [-7.4, 0.9, 4.8], fov: 54 },
     frases: [
-      { t: "Uma estagiária conduz sozinha uma turma grande.", tag: "fato", real: true },
-      { t: "Não há professor supervisionando a aula.", tag: "fato", real: true },
+      { t: "Uma mulher conduz uma turma na área de aula funcional.", tag: "fato", real: true },
+      { t: "Esta imagem, sozinha, não comprova quem supervisiona a aula.", tag: "incerto", real: true },
       { t: "A estagiária não tem preparo para essa turma.", tag: "interp", real: false, sobre: ["lara"] },
       { t: "Não dá para saber por que o supervisor não está ali.", tag: "incerto", real: true },
     ],

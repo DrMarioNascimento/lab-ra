@@ -211,8 +211,8 @@ export const FOTOS = {
     titulo: "Aula na quadra", pessoas: ["lara", "turma"],
     cam: { pos: [-3.6, 1.7, 1.6], alvo: [-7.4, 0.9, 4.8], fov: 54 },
     frases: [
-      { t: "Uma estagiária conduz sozinha a turma de crianças.", tag: "fato", real: true },
-      { t: "Não há professor da escola acompanhando a aula.", tag: "fato", real: true },
+      { t: "Uma mulher conduz uma turma de crianças na quadra.", tag: "fato", real: true },
+      { t: "Esta imagem, sozinha, não comprova quem supervisiona a aula.", tag: "incerto", real: true },
       { t: "A estagiária não tem preparo para essa turma.", tag: "interp", real: false, sobre: ["lara"] },
       { t: "Não dá para saber por que a professora regente não está ali.", tag: "incerto", real: true },
     ],

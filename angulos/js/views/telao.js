@@ -80,17 +80,15 @@ export function renderTelao(st) {
     case "integracao": {
       const rows = PAPEIS.filter((p) => grupoDoPapel(st, p.id)).map((p) => {
         const g = grupoDoPapel(st, p.id);
-        const resp = g.h2?.papel || g.h1?.papel;
-        const ok = p.gabarito.includes(g.h1?.papel);
         const pl = placarClassificacao(g.h1?.classif);
-        return `<tr><td>${badge(g, "width:2cqw;height:2cqw")}</td><td><b>${esc(p.nome)}</b></td><td>${g.h1?.papel ? PAPEL_NA_SITUACAO[g.h1.papel].replace("Meu papel ", "") : "—"} <span class="${ok ? "pill-ok" : "pill-bad"}">${ok ? "✓" : "✗"}</span></td><td>${p.gabarito.map((k) => PAPEL_NA_SITUACAO[k].replace("Meu papel ", "")).join(" / ")}</td><td class="n">${pl.ok}/${pl.tot}</td><td>${g.h2 ? { mantem: "manteve", ajusta: "ajustou", abandona: "trocou" }[g.h2.decisao] : "—"}</td></tr>`;
+        return `<tr><td>${badge(g, "width:2cqw;height:2cqw")}</td><td><b>${esc(p.nome)}</b></td><td>${g.h1?.papel ? PAPEL_NA_SITUACAO[g.h1.papel].replace("Meu papel ", "") : "—"}</td><td>${p.gabarito.map((k) => PAPEL_NA_SITUACAO[k].replace("Meu papel ", "")).join(" / ")}</td><td class="n">${pl.ok}/${pl.tot}</td><td>${g.h2 ? { mantem: "manteve", ajusta: "ajustou", abandona: "trocou" }[g.h2.decisao] : "—"}</td></tr>`;
       }).join("");
       const vi = st.ordem.map((id) => acertoViagem(st.resp[id]));
       const tot = vi.reduce((a, b) => a + b.tot, 0), ok = vi.reduce((a, b) => a + b.ok, 0);
       const res = desfecho(st);
       const bem = Object.values(res).filter((x) => x.estado === "bem").length;
-      body = topo(st, "A soma dos papéis") + `<div class="card"><p class="big">${esc(CONCLUSAO)}</p></div><div class="card"><table class="vals" style="font-size:1.15cqw"><tr><th></th><th>Papel</th><th>Como o grupo se viu</th><th>Leitura do caso</th><th>Fato × interp.</th><th>Laboratório</th></tr>${rows}</table></div>
-        <div class="grid" style="grid-template-columns:repeat(3,1fr)"><div class="card"><h3>Viagem</h3><p class="big">${tot ? Math.round((100 * ok) / tot) : 0}% de acertos</p></div><div class="card"><h3>Duas semanas depois</h3><p class="big">${bem} de ${Object.keys(res).length} situações protegidas</p></div><div class="card"><h3>Bilhete de saída</h3><p class="muted">O que você tratou como fato e era interpretação?</p></div></div>`;
+      body = topo(st, "A soma dos papéis") + `<div class="card"><p class="big">${esc(CONCLUSAO)}</p></div><div class="card"><table class="vals" style="font-size:1.15cqw"><tr><th></th><th>Papel</th><th>Como o grupo se viu</th><th>Possibilidades para debate</th><th>Fato × interp.</th><th>Laboratório</th></tr>${rows}</table></div>
+        <div class="grid" style="grid-template-columns:repeat(3,1fr)"><div class="card"><h3>Viagem</h3><p class="big">${tot ? Math.round((100 * ok) / tot) : 0}% de acertos</p></div><div class="card"><h3>Duas semanas depois</h3><p class="big">${bem} de ${Object.keys(res).length} situações indicadas como protegidas no modelo</p><p class="muted">É uma projeção para discussão, não uma garantia sobre o caso real.</p></div><div class="card"><h3>Bilhete de saída</h3><p class="muted">O que você tratou como fato e era interpretação?</p></div></div>`;
       break;
     }
     default: body = topo(st, "");
