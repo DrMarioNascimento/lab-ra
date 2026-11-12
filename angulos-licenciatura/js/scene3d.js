@@ -417,7 +417,9 @@ export function visor360(container, pers) {
     cena.add(cone);
     marcas.push({ papel: p.id, foto: fid, pos, alvo, fov: f.cam.fov });
   }
-  let modo = { tipo: "girar", yaw: 0 };
+  // A quadra identifica a situação escolar na abertura; a rotação continua livre.
+  const yawInicial = -2.1;
+  let modo = { tipo: "girar", yaw: yawInicial };
   let alvoAnim = null;
   let arrastando = null;
   r.domElement.addEventListener("pointerdown", (e) => { arrastando = { x: e.clientX, yaw: modo.yaw ?? 0 }; });
@@ -427,7 +429,7 @@ export function visor360(container, pers) {
 
   function irPara(fotoId) {
     const m = marcas.find((x) => x.foto === fotoId);
-    if (!m) { modo = { tipo: "girar", yaw: modo.yaw ?? 0 }; alvoAnim = null; return; }
+    if (!m) { modo = { tipo: "girar", yaw: modo.yaw ?? yawInicial }; alvoAnim = null; return; }
     alvoAnim = { de: cam.position.clone(), deAlvo: cam.getWorldDirection(new THREE.Vector3()).add(cam.position), para: m.pos.clone(), paraAlvo: m.alvo.clone(), fov0: cam.fov, fov1: m.fov, t: 0 };
     modo = { tipo: "foto" };
   }

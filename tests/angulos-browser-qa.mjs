@@ -24,6 +24,20 @@ try {
     const info=await page.locator('.foto img').first().evaluate(img=>({loaded:img.complete&&img.naturalWidth>0,w:img.naturalWidth,h:img.naturalHeight}));
     assert.ok(info.loaded&&info.w>=900,`${course}: foto indisponível ou pequena ${JSON.stringify(info)}`);
     if(number===6){
+      const angulos = await page.evaluate(async () => {
+        const modulo = await import(new URL('../js/scene3d.js', location.href).href);
+        const fotos = modulo.fotosDaCena(window.__sala.st.pers);
+        const saida = {};
+        for (const [id, foto] of Object.entries(fotos)) {
+          const blob = await (await fetch(foto.url)).blob();
+          saida[id] = await new Promise((resolve, reject) => {
+            const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = reject; reader.readAsDataURL(blob);
+          });
+        }
+        return saida;
+      });
+      assert.equal(Object.keys(angulos).length,16,`${course}: número de ângulos`);
+      for (const [id, imagem] of Object.entries(angulos)) await fs.writeFile(`angulos-qa/${course}-angulo-${id}.jpg`,Buffer.from(imagem.split(',')[1],'base64'));
       await page.locator('#auto').click();
       const label=page.locator('.foto-zoom-controle').first();
       await label.click();
