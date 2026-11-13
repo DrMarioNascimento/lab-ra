@@ -1,7 +1,7 @@
 name: Limiar estático QA
 on:
   push:
-    branches: [codex/etica-valores]
+    branches: [codex/limiar-profundidade]
     paths: ["limiar-source/**", "limiar-etica/**", ".github/workflows/limiar-static-qa.yml"]
 permissions:
   contents: read
