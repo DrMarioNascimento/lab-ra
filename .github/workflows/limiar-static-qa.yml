@@ -12,7 +12,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          sparse-checkout: |\n            limiar-source\n            limiar-etica
+          sparse-checkout: |
+            limiar-source
+            limiar-etica
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -26,7 +28,10 @@ jobs:
         working-directory: limiar-source
         run: |
           python3 -m http.server 8742 --directory dist > /tmp/limiar.log 2>&1 &
-          node check.mjs\n          cd ..\n          python3 -m http.server 8743 > /tmp/etica.log 2>&1 &\n          node limiar-source/check-etica.mjs
+          node check.mjs
+          cd ..
+          python3 -m http.server 8743 > /tmp/etica.log 2>&1 &
+          node limiar-source/check-etica.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
