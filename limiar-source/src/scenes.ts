@@ -3,6 +3,8 @@ import type { Scene } from "./types";
 export const SCENES: Scene[] = [
   {
     id: "vigilia",
+    adjuncts: ["agua", "lanche"],
+    prediction: "adenosina-proxima",
     hour: "03:10",
     gap: 0,
     setPoint: 42,
@@ -14,6 +16,7 @@ export const SCENES: Scene[] = [
     choices: [
       {
         id: "vigilia-catecol",
+        dose: "intensidade",
         title: "Catecolamina",
         act: "Simpático e medula adrenal. Vigília em segundos.",
         gloss: "Glicogenólise agora. Fluxo renal cai. A adenosina não sai.",
@@ -21,6 +24,7 @@ export const SCENES: Scene[] = [
       },
       {
         id: "vigilia-hpa",
+        dose: "intensidade",
         title: "Eixo HPA",
         act: "CRH, ACTH, cortisol. O útil chega em dezenas de minutos.",
         gloss: "Segura IL-6. Não garante o minuto da triagem.",
@@ -37,6 +41,8 @@ export const SCENES: Scene[] = [
   },
   {
     id: "manha",
+    adjuncts: ["agua", "lanche", "freio"],
+    prediction: "cortisol-proximo",
     hour: "09:40",
     gap: 6.5,
     setPoint: 36,
@@ -48,6 +54,7 @@ export const SCENES: Scene[] = [
     choices: [
       {
         id: "manha-pulso",
+        dose: "intensidade",
         title: "Segundo pulso",
         act: "Outro pico de cortisol, com a curva já devendo cair.",
         gloss: "O feedback negativo ainda existe. O segundo pico atrasa a descida.",
@@ -55,6 +62,7 @@ export const SCENES: Scene[] = [
       },
       {
         id: "manha-vagal",
+        blocks: ["freio"],
         title: "Freio vagal",
         act: "Barorreflexo. A frequência cede sem um eixo novo.",
         gloss: "Não apaga o cortisol. Devolve vago.",
@@ -62,6 +70,7 @@ export const SCENES: Scene[] = [
       },
       {
         id: "manha-sustento",
+        dose: "intensidade",
         title: "Platô simpático",
         act: "Sem pico claro. Catecolamina média, a manhã inteira.",
         gloss: "Platô custa mais retorno do que um pico curto.",
@@ -71,6 +80,8 @@ export const SCENES: Scene[] = [
   },
   {
     id: "sirene",
+    adjuncts: ["agua"],
+    prediction: "renal-agora",
     hour: "11:41",
     gap: 2,
     setPoint: 30,
@@ -82,6 +93,8 @@ export const SCENES: Scene[] = [
     choices: [
       {
         id: "sirene-retorno",
+        dose: "intensidade",
+        blocks: ["freio"],
         title: "Ligar e desligar",
         act: "Descarga curta. O freio vagal entra quando a ameaça passa.",
         gloss: "Alostase com retorno. O fluxo cai e deve voltar.",
@@ -89,6 +102,8 @@ export const SCENES: Scene[] = [
       },
       {
         id: "sirene-sustenta",
+        dose: "intensidade",
+        blocks: ["freio"],
         title: "Ligar e manter",
         act: "A mesma descarga, sem o freio.",
         gloss: "Defesa certa. Retorno ausente.",
@@ -105,6 +120,8 @@ export const SCENES: Scene[] = [
   },
   {
     id: "tarde",
+    adjuncts: ["agua", "lanche", "freio"],
+    prediction: "creatinina-quando",
     hour: "16:20",
     gap: 4.6,
     setPoint: 22,
@@ -116,6 +133,7 @@ export const SCENES: Scene[] = [
     choices: [
       {
         id: "tarde-cafe",
+        dose: "xicaras",
         title: "Cafeína",
         act: "Bloqueia A1 e A2A. A adenosina fica. O aviso sai.",
         gloss: "Meia-vida ~5 h. Diurese leve se não houver habituação.",
@@ -123,6 +141,7 @@ export const SCENES: Scene[] = [
       },
       {
         id: "tarde-aine",
+        dose: "aine",
         title: "AINE",
         act: "Inibe a COX. A dor cede. A PGE2 aferente também.",
         gloss: "Em rim folgado, a TFG quase não se move. Em rim já contraído, move.",
@@ -130,6 +149,7 @@ export const SCENES: Scene[] = [
       },
       {
         id: "tarde-agua",
+        blocks: ["agua", "freio"],
         title: "Água e pausa",
         act: "Volume, prostaglandina intacta, freio vagal.",
         gloss: "A adenosina continua perceptível. O rim sai da zona de risco.",
@@ -139,6 +159,8 @@ export const SCENES: Scene[] = [
   },
   {
     id: "noite",
+    adjuncts: ["agua", "lanche"],
+    prediction: "il6-manha",
     hour: "23:48",
     gap: 7.5,
     setPoint: 12,
@@ -150,6 +172,7 @@ export const SCENES: Scene[] = [
     choices: [
       {
         id: "noite-eixo",
+        dose: "intensidade",
         title: "Cortisol no nadir",
         act: "O eixo sobe na hora em que devia calar.",
         gloss: "Quebra a inclinação. A manhã paga em IL-6 e em glicose.",
