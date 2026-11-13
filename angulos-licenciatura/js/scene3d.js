@@ -31,6 +31,24 @@ function tex(linhas, { w = 512, h = 256, bg = "#f8fafc", fg = "#0f172a", font = 
 
 const mat = (color, o = {}) => new THREE.MeshStandardMaterial({ color, roughness: 0.8, metalness: 0.05, ...o });
 
+// Piso discreto em escala arquitetônica; o padrão é gerado localmente, sem imagens externas.
+function materialPiso(cor) {
+  const c = document.createElement("canvas"); c.width = c.height = 256;
+  const g = c.getContext("2d"); g.fillStyle = cor; g.fillRect(0, 0, 256, 256);
+  let seed = 3917;
+  for (let i = 0; i < 950; i++) {
+    seed = (seed * 1664525 + 1013904223) >>> 0; const x = seed % 256;
+    seed = (seed * 1664525 + 1013904223) >>> 0; const y = seed % 256;
+    g.fillStyle = i % 2 ? "rgba(255,255,255,0.035)" : "rgba(0,0,0,0.04)";
+    g.fillRect(x, y, 1 + (i % 2), 1);
+  }
+  g.strokeStyle = "rgba(0,0,0,0.12)"; g.lineWidth = 1;
+  g.strokeRect(0.5, 0.5, 255, 255);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+  t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(12, 8.5); t.anisotropy = 4;
+  return mat("#ffffff", { map: t, roughness: 0.92, metalness: 0 });
+}
+
 function caixa(w, h, d, m, x, y, z, ry = 0) {
   const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), typeof m === "object" && m.isMaterial ? m : mat(m));
   mesh.position.set(x, y, z); mesh.rotation.y = ry;
@@ -144,12 +162,12 @@ export function construirCena(pers) {
   }
 
   // Piso, paredes e teto aberto
-  const piso = new THREE.Mesh(new THREE.PlaneGeometry(24, 17), mat("#4a4e55"));
+  const piso = new THREE.Mesh(new THREE.PlaneGeometry(24, 17), materialPiso("#788285"));
   piso.rotation.x = -Math.PI / 2; piso.receiveShadow = true; cena.add(piso);
   const borracha = new THREE.Mesh(new THREE.PlaneGeometry(7, 7), mat("#1f2125"));
   borracha.rotation.x = -Math.PI / 2; borracha.position.set(8.2, 0.005, 2.2); borracha.receiveShadow = true; cena.add(borracha);
   // quadra (piso azul com linhas)
-  const linhas = tex([""], { w: 700, h: 560, bg: "#1d4ed8", extra: (g) => { g.strokeStyle = "#f8fafc"; g.lineWidth = 8; g.strokeRect(20, 20, 660, 520); g.beginPath(); g.moveTo(350, 20); g.lineTo(350, 540); g.stroke(); g.beginPath(); g.arc(350, 280, 70, 0, Math.PI * 2); g.stroke(); g.strokeRect(20, 170, 90, 220); g.strokeRect(590, 170, 90, 220); } });
+  const linhas = tex([""], { w: 700, h: 560, bg: "#326c9b", extra: (g) => { g.globalAlpha = 0.08; for (let i = 0; i < 45; i++) { g.fillStyle = i % 2 ? "#ffffff" : "#193d60"; g.fillRect(0, (i * 97) % 560, 700, 1); } g.globalAlpha = 1; g.strokeStyle = "#f8fafc"; g.lineWidth = 8; g.strokeRect(20, 20, 660, 520); g.beginPath(); g.moveTo(350, 20); g.lineTo(350, 540); g.stroke(); g.beginPath(); g.arc(350, 280, 70, 0, Math.PI * 2); g.stroke(); g.strokeRect(20, 170, 90, 220); g.strokeRect(590, 170, 90, 220); } });
   const tapete = new THREE.Mesh(new THREE.PlaneGeometry(7, 5.6), new THREE.MeshStandardMaterial({ map: linhas, roughness: 0.7 }));
   tapete.rotation.x = -Math.PI / 2; tapete.position.set(-7.6, 0.005, 5.2); tapete.receiveShadow = true; cena.add(tapete);
   const parede = mat("#d6d3cd");
@@ -164,9 +182,56 @@ export function construirCena(pers) {
   // espelho da área de pesos
   cena.add(caixa(0.04, 2.0, 5.5, new THREE.MeshStandardMaterial({ color: "#cbd5e1", roughness: 0.05, metalness: 0.9 }), 11.86, 1.3, 2.5));
 
+  // Ambientação escolar: painéis, rodapés e luminárias mantêm livres as linhas de visão das fotos.
+  const destaqueParede = mat("#b8cdd5", { roughness: 0.92 });
+  cena.add(caixa(6.8, 2.3, 0.015, destaqueParede, -0.5, 2.25, -8.394));
+  cena.add(caixa(6.8, 0.10, 0.018, "#315782", -0.5, 1.08, -8.383));
+  cena.add(caixa(6.8, 0.06, 0.018, "#e9c770", -0.5, 3.40, -8.383));
+  for (const x of [-3.5, -1.5, 0.5]) cena.add(caixa(0.035, 2.2, 0.018, "#d9e6e7", x, 2.23, -8.383));
+  for (const x of [-8, 0, 8]) {
+    const moldura = caixa(2.2, 0.06, 0.36, "#d9e3e8", x, 4.07, -2.4);
+    cena.add(moldura);
+    const difusor = new THREE.Mesh(new THREE.PlaneGeometry(1.95, 0.22), new THREE.MeshBasicMaterial({ color: "#fff8e7" }));
+    difusor.rotation.x = Math.PI / 2; difusor.position.set(x, 4.035, -2.4); cena.add(difusor);
+  }
+
+  // Ginásio escolar: detalhes fixos na parede não alteram as pistas nem a circulação.
+  cena.add(caixa(23.7, 0.16, 0.035, "#647b88", 0, 0.10, 8.38));
+  cena.add(caixa(23.7, 0.08, 0.035, "#718fa3", 0, 2.05, 8.38));
+  for (const x of [-9.8, -5.8, -1.8, 2.2, 6.2, 10.2]) {
+    cena.add(caixa(2.5, 0.88, 0.04, "#708b9a", x, 3.38, 8.37));
+    cena.add(caixa(2.32, 0.72, 0.05, new THREE.MeshStandardMaterial({ color: "#c9e2eb", roughness: 0.38, metalness: 0.08 }), x, 3.38, 8.34));
+    cena.add(caixa(0.055, 0.72, 0.06, "#829aa5", x, 3.38, 8.30));
+  }
+  // Tabela e aro identificam a quadra; a rede é formada por fios leves.
+  cena.add(caixa(1.25, 0.78, 0.06, "#ecf1f1", -8.4, 3.06, 8.30));
+  cena.add(caixa(0.50, 0.04, 0.02, "#d86a45", -8.4, 3.02, 8.25));
+  cena.add(caixa(0.04, 0.30, 0.02, "#d86a45", -8.65, 3.17, 8.25));
+  cena.add(caixa(0.04, 0.30, 0.02, "#d86a45", -8.15, 3.17, 8.25));
+  const aro = new THREE.Mesh(new THREE.TorusGeometry(0.23, 0.018, 6, 24), mat("#e96a38"));
+  aro.rotation.x = Math.PI / 2; aro.position.set(-8.4, 2.98, 7.99); cena.add(aro);
+  const redeMat = mat("#e7ecea");
+  for (let i = 0; i < 8; i++) {
+    const a = i * Math.PI / 4;
+    const fio = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.34, 4), redeMat);
+    fio.position.set(-8.4 + Math.cos(a) * 0.16, 2.80, 7.99 + Math.sin(a) * 0.16);
+    fio.rotation.z = Math.cos(a) * 0.35; fio.rotation.x = -Math.sin(a) * 0.35; cena.add(fio);
+  }
+
   // Estacionamento (fora)
   const asfalto = new THREE.Mesh(new THREE.PlaneGeometry(12, 17), mat("#26282c"));
   asfalto.rotation.x = -Math.PI / 2; asfalto.position.set(-18, -0.01, 0); cena.add(asfalto);
+  // Rua e fachada ao fundo, afastadas das pessoas e dos objetos observáveis do caso.
+  cena.add(caixa(0.22, 0.11, 17, "#9a9b96", -23.45, 0.045, 0));
+  const calcada = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 17), mat("#8b8e88"));
+  calcada.rotation.x = -Math.PI / 2; calcada.position.set(-24.45, 0.001, 0); calcada.receiveShadow = true; cena.add(calcada);
+  for (const z of [-7, -3.5, 0, 3.5, 7]) {
+    const linha = new THREE.Mesh(new THREE.PlaneGeometry(5.2, 0.055), mat("#bbbdb3"));
+    linha.rotation.x = -Math.PI / 2; linha.position.set(-20.4, 0.003, z); cena.add(linha);
+  }
+  // Muro baixo e neutro separa o estacionamento do entorno.
+  cena.add(caixa(0.20, 1.45, 20, "#8a918d", -25.55, 0.725, 0));
+  cena.add(caixa(0.27, 0.08, 20, "#bdc0b8", -25.55, 1.49, 0));
   const carro = new THREE.Group();
   carro.add(modelo("carro", 0, 0, -Math.PI / 2)); // traseira (porta-malas aberto) para +z
   carro.add(caixa(0.42, 0.3, 0.34, "#f1f5f9", -0.3, 0.78, 1.55));
@@ -331,16 +396,22 @@ export function fotosDaCena(pers) {
   const chave = JSON.stringify(pers);
   if (cache && cache.chave === chave) return cache.fotos;
   const cena = construirCena(pers);
-  const W = 900, H = 600;
+  const W = 1200, H = 800;
   const r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
   r.setSize(W, H, false); r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap; r.outputColorSpace = THREE.SRGBColorSpace;
+  // A cena das fotografias é estática: uma única atualização de sombras atende todos os ângulos.
+  r.shadowMap.autoUpdate = false; r.shadowMap.needsUpdate = true;
   const fotos = {};
   for (const [id, f] of Object.entries(FOTOS)) {
     const cam = new THREE.PerspectiveCamera(f.cam.fov, W / H, 0.05, 80);
     cam.position.set(...f.cam.pos); cam.lookAt(new THREE.Vector3(...f.cam.alvo)); cam.updateMatrixWorld();
     r.render(cena, cam);
-    r.render(cena, cam);
-    const url = r.domElement.toDataURL("image/jpeg", 0.86);
+    // Evita replicar uma longa string base64 em cada celular do simulador.
+    const dados = r.domElement.toDataURL("image/jpeg", 0.91).split(",")[1];
+    const binario = atob(dados);
+    const bytes = new Uint8Array(binario.length);
+    for (let i = 0; i < binario.length; i++) bytes[i] = binario.charCodeAt(i);
+    const url = URL.createObjectURL(new Blob([bytes], { type: "image/jpeg" }));
     const pontos = {};
     cena.updateMatrixWorld(true);
     for (const pid of f.pessoas) {
@@ -354,6 +425,8 @@ export function fotosDaCena(pers) {
     fotos[id] = { url, pontos };
   }
   r.dispose();
+  r.forceContextLoss();
+  if (cache) for (const foto of Object.values(cache.fotos)) URL.revokeObjectURL(foto.url);
   cache = { chave, fotos };
   return fotos;
 }
@@ -371,23 +444,26 @@ export function visor360(container, pers) {
   const marcas = [];
   for (const p of PAPEIS) for (const fid of p.fotos) {
     const f = FOTOS[fid];
-    const cone = new THREE.Mesh(new THREE.ConeGeometry(0.22, 0.5, 4), new THREE.MeshBasicMaterial({ color: p.cor }));
+    const cone = new THREE.Mesh(new THREE.ConeGeometry(0.09, 0.22, 4), new THREE.MeshBasicMaterial({ color: p.cor, transparent: true, opacity: 0.8 }));
     const pos = new THREE.Vector3(...f.cam.pos), alvo = new THREE.Vector3(...f.cam.alvo);
     cone.position.copy(pos);
     cone.lookAt(alvo); cone.rotateX(Math.PI / 2);
     cena.add(cone);
     marcas.push({ papel: p.id, foto: fid, pos, alvo, fov: f.cam.fov });
   }
-  let modo = { tipo: "girar", yaw: 0 };
+  // A quadra identifica a situação escolar na abertura; a rotação continua livre.
+  const yawInicial = -2.1;
+  let modo = { tipo: "girar", yaw: yawInicial };
   let alvoAnim = null;
   let arrastando = null;
   r.domElement.addEventListener("pointerdown", (e) => { arrastando = { x: e.clientX, yaw: modo.yaw ?? 0 }; });
-  window.addEventListener("pointerup", () => (arrastando = null));
+  const soltarPonteiro = () => { arrastando = null; };
+  window.addEventListener("pointerup", soltarPonteiro);
   r.domElement.addEventListener("pointermove", (e) => { if (arrastando && modo.tipo === "girar") modo.yaw = arrastando.yaw - (e.clientX - arrastando.x) * 0.006; });
 
   function irPara(fotoId) {
     const m = marcas.find((x) => x.foto === fotoId);
-    if (!m) { modo = { tipo: "girar", yaw: modo.yaw ?? 0 }; alvoAnim = null; return; }
+    if (!m) { modo = { tipo: "girar", yaw: modo.yaw ?? yawInicial }; alvoAnim = null; return; }
     alvoAnim = { de: cam.position.clone(), deAlvo: cam.getWorldDirection(new THREE.Vector3()).add(cam.position), para: m.pos.clone(), paraAlvo: m.alvo.clone(), fov0: cam.fov, fov1: m.fov, t: 0 };
     modo = { tipo: "foto" };
   }
@@ -414,5 +490,6 @@ export function visor360(container, pers) {
     requestAnimationFrame(quadro);
   }
   quadro();
-  return { irPara, girar: () => irPara(null), destruir: () => { vivo = false; r.dispose(); r.domElement.remove(); } };
+  return { irPara, girar: () => irPara(null), destruir: () => { vivo = false; window.removeEventListener("pointerup", soltarPonteiro); r.dispose(); r.domElement.remove(); } };
 }
+

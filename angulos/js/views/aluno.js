@@ -21,10 +21,14 @@ function hd(st, me) {
 const opt = (path, value, cur, label) => `<button class="opt ${cur === value ? "sel" : ""}" data-a="set" data-path="${path}" data-val="${esc(value)}">${label}</button>`;
 const chip = (path, value, arr, label) => `<button class="btn sm ${arr?.includes(value) ? "warn on" : "sec"}" data-a="toggle" data-path="${path}" data-val="${esc(value)}">${label}</button>`;
 
+let falhaGrafica = false;
 function foto(st, fid, { pontos = true, sel = [], path } = {}) {
-  const f = fotosDaCena(st.pers)[fid];
+  let f;
+  try { if (!falhaGrafica) f = fotosDaCena(st.pers)[fid]; }
+  catch (erro) { falhaGrafica = true; console.error("Não foi possível gerar as imagens 3D", erro); }
+  if (!f) return `<div class="card pill-bad" role="alert">Não foi possível gerar esta imagem 3D neste dispositivo. Atualize a página ou tente outro navegador com aceleração gráfica. A observação depende da imagem.</div>`;
   const pts = pontos ? Object.entries(f.pontos).map(([pid, c]) => `<button class="hot ${sel.includes(pid) ? "on" : ""}" style="left:${c.x * 100}%;top:${c.y * 100}%" ${path ? `data-a="toggle" data-path="${path}" data-val="${pid}"` : ""} title="${esc(PESSOAS[pid].desc)}">${sel.includes(pid) ? "✓" : ""}</button>`).join("") : "";
-  return `<div class="foto"><img src="${f.url}" alt="${esc(FOTOS[fid].titulo)}">${pts}</div><div class="faint" style="font-size:12px;margin-top:-6px">${esc(FOTOS[fid].titulo)}</div>`;
+  return `<div class="foto-box"><label class="foto-zoom-controle"><input class="foto-zoom-input" type="checkbox" data-preserve-checked data-key="zoom-${esc(fid)}"><span class="foto-zoom-abrir">⌕ Ampliar imagem</span><span class="foto-zoom-fechar">✕ Fechar imagem</span></label><div class="foto"><img src="${f.url}" alt="${esc(FOTOS[fid].titulo)}">${pts}</div></div><div class="faint" style="font-size:12px;margin-top:-6px">${esc(FOTOS[fid].titulo)}</div>`;
 }
 
 function ancora(st, p) {
@@ -38,10 +42,15 @@ function classifForm(path, fids, classif) {
   }).join("")).join("");
 }
 
-function pessoasDas(fids) { return [...new Set(fids.flatMap((f) => FOTOS[f].pessoas))]; }
+// Usar os marcadores realmente visíveis em cada foto, não apenas os personagens associados ao ângulo.
+function pessoasDas(fids, st) {
+  if (falhaGrafica) return [];
+  const fotos = fotosDaCena(st.pers);
+  return [...new Set(fids.flatMap((fid) => Object.keys(fotos[fid]?.pontos || {})))];
+}
 
 function blocoRoteiro(st, base, d, fids, mochila, { grupo = false } = {}) {
-  const pes = pessoasDas(fids);
+  const pes = pessoasDas(fids, st);
   const p = papelById(st.grupos[st.alunos[base.id].grupo].papel);
   const alts = ALTERNATIVAS[p.id];
   return `
@@ -106,7 +115,8 @@ export function renderAluno(st, id, loc) {
         <div class="row">${pa.cartas.map((k) => `<button class="btn sm ${mochila.includes(k) ? "warn on" : "sec"}" data-a="mochila" data-val="${k}" ${!mochila.includes(k) && mochila.length >= 3 ? "disabled" : ""}>🎒 ${esc(CARTAS[k].nome)}</button>`).join("")}</div></div>
         <div class="card"><b>${pa.pergunta.q}</b>${pa.pergunta.op.map((o, k) => `<button class="opt ${resp == null ? "" : k === pa.pergunta.certa ? "right" : resp === k ? "wrong" : ""}" data-a="viagemResp" data-val="${k}" ${resp != null ? "disabled" : ""}>${o}</button>`).join("")}
         ${resp != null ? `<p class="${resp === pa.pergunta.certa ? "pill-ok" : "pill-bad"}">${resp === pa.pergunta.certa ? "Isso." : "Não foi dessa vez."}</p><p class="muted">${pa.pergunta.fb}</p>` : ""}</div>
-        <div class="row"><button class="btn sec grow" data-a="parada" data-val="-1" ${i === 0 ? "disabled" : ""}>Anterior</button><button class="btn grow" data-a="parada" data-val="1" ${i === PARADAS.length - 1 ? "disabled" : ""}>Próxima</button></div>`;
+        <div class="row"><button class="btn sec grow" data-a="parada" data-val="-1" ${i === 0 ? "disabled" : ""}>Anterior</button>${i < PARADAS.length - 1 ? `<button class="btn grow" data-a="parada" data-val="1">Próxima</button>` : `<button class="btn ok grow" data-a="concluirViagem" ${!PARADAS.every((p) => r[p.id] != null) || mochila.length < 2 || st.resp[id].viagem.concluida ? "disabled" : ""}>${st.resp[id].viagem.concluida ? "Viagem concluída ✓" : "Concluir viagem"}</button>`}</div>
+        ${i === PARADAS.length - 1 ? `<p class="faint">${st.resp[id].viagem.concluida ? "Pronto! Aguarde o professor. Você ainda pode voltar para revisar suas cartas." : "Responda às sete paradas e leve pelo menos duas cartas para concluir."}</p>` : ""}`;
       break;
     }
     case "cena":
@@ -119,7 +129,9 @@ export function renderAluno(st, id, loc) {
       const todas = fotosDoGrupo(g);
       const topo = `<h2>${esc(p.nome)}</h2><p class="muted">${esc(p.abertura)}</p>`;
       if (!ind) {
-        b = topo + foto(st, minha, { sel: loc.ind.vejo, path: "ind.vejo" }) + ancora(st, p) + `<div class="sep"></div><h3 style="color:var(--o2)">Sua resposta individual</h3>` +
+        const imagem = foto(st, minha, { sel: loc.ind.vejo, path: "ind.vejo" });
+        if (falhaGrafica) { b = topo + imagem; break; }
+        b = topo + imagem + ancora(st, p) + `<div class="sep"></div><h3 style="color:var(--o2)">Sua resposta individual</h3>` +
           blocoRoteiro(st, { id, path: "ind" }, loc.ind, [minha], mochila) +
           `<button class="btn ok block" data-a="postoInd" ${completo(loc.ind, [minha]) ? "" : "disabled"}>Enviar minha resposta</button>`;
       } else if (souLider && !g.h1) {
@@ -129,7 +141,9 @@ export function renderAluno(st, id, loc) {
         const cartasGrupo = [...new Set(g.membros.flatMap((m) => st.resp[m].viagem.mochila))];
         const frasesGrupo = todas.flatMap((fid) => FOTOS[fid].frases.map((fr, i) => ({ k: `${fid}:${i}`, fr })));
         const rel = loc.gf.relato;
-        b = topo + `<div class="galeria">${todas.map((fid) => foto(st, fid, { sel: loc.gf.vejo, path: "gf.vejo" })).join("")}</div>` + ancora(st, p) +
+        const imagens = todas.map((fid) => foto(st, fid, { sel: loc.gf.vejo, path: "gf.vejo" })).join("");
+        if (falhaGrafica) { b = topo + imagens; break; }
+        b = topo + `<div class="galeria">${imagens}</div>` + ancora(st, p) +
           `<div class="card"><b>Respostas individuais (${membros.length}/${g.membros.length})</b>
           ${cont((o) => o.acao).map(([k, n]) => `<div class="row" style="justify-content:space-between"><span>${esc(txt(ALTERNATIVAS[p.id].find((a) => a.id === k)?.t, st.pers))}</span><b>${n}</b></div>`).join("")}<div class="sep"></div>
           ${cont((o) => o.papel).map(([k, n]) => `<div class="row" style="justify-content:space-between"><span class="muted">${PAPEL_NA_SITUACAO[k]}</span><b>${n}</b></div>`).join("")}<div class="sep"></div>
@@ -180,7 +194,7 @@ export function renderAluno(st, id, loc) {
     case "confronto": case "linhas": {
       const pl = placarClassificacao(st.resp[id].posto?.classif);
       b = `<span class="chip">Olhe o telão</span><h2>${st.fase === "confronto" ? "A cena inteira" : "Duas semanas depois"}</h2>
-        <div class="card"><b>Você, na sua foto</b><p>Acertou ${pl.ok} de ${pl.tot} na separação entre fato, interpretação e incerteza.</p>${pl.interpComoFato ? `<p class="pill-bad">Marcou ${pl.interpComoFato} interpretação(ões) como fato.</p>` : `<p class="pill-ok">Não tratou interpretação como fato.</p>`}</div>`;
+        <div class="card"><b>Você, na sua foto</b><p>Acertou ${pl.ok} de ${pl.tot} na separação entre fato, interpretação e incerteza.</p>${!pl.tot ? `<p class="faint">Nenhuma classificação foi enviada.</p>` : pl.interpComoFato ? `<p class="pill-bad">Marcou ${pl.interpComoFato} interpretação(ões) como fato.</p>` : `<p class="pill-ok">Não tratou interpretação como fato.</p>`}</div>`;
       break;
     }
     case "integracao": {
@@ -209,6 +223,7 @@ export function acaoAluno(a, el, ctx) {
     case "metodo": dispatch({ t: "metodo", id, m: el.dataset.val }); return true;
     case "votoLider": dispatch({ t: "votoLider", id, alvo: el.dataset.val }); return true;
     case "parada": loc.parada = Math.max(0, Math.min(PARADAS.length - 1, loc.parada + +el.dataset.val)); return true;
+    case "concluirViagem": dispatch({ t: "concluirViagem", id }); return true;
     case "viagemResp": dispatch({ t: "viagemResp", id, parada: PARADAS[loc.parada].id, op: +el.dataset.val }); return true;
     case "mochila": dispatch({ t: "mochila", id, carta: el.dataset.val }); return true;
     case "postoInd": dispatch({ t: "postoInd", id, dados: structuredClone(loc.ind) }); return true;

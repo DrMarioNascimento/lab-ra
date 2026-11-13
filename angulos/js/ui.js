@@ -8,8 +8,13 @@ export function montar(root, render, onAction, onInput) {
     const key = ae && root.contains(ae) ? ae.dataset.key : null;
     const sel = key && "selectionStart" in ae ? [ae.selectionStart, ae.selectionEnd] : null;
     const scroll = root.scrollTop;
+    const checks = [...root.querySelectorAll('input[data-preserve-checked]:checked')].map((el) => el.dataset.key).filter(Boolean);
     root.innerHTML = html;
     last = html;
+    for (const k of checks) {
+      const input = root.querySelector(`input[data-preserve-checked][data-key="${CSS.escape(k)}"]`);
+      if (input) input.checked = true;
+    }
     root.scrollTop = scroll;
     if (key) {
       const el = root.querySelector(`[data-key="${CSS.escape(key)}"]`);

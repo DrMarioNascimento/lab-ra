@@ -68,7 +68,7 @@ export const PAPEIS = [
   {
     id: "tecnica", nome: "Professores de Educação Física", cor: "#f43f5e", prioridade: 2,
     abertura: "Você é professor de Educação Física da escola e passa pela sala de Educação Física para pegar material.",
-    ancora: { titulo: "Escala da quadra", texto: "15h30 · 5º ano · regente: {bia} · estagiária: {lara} (estágio supervisionado, supervisão presencial obrigatória)" },
+    ancora: { titulo: "Escala da quadra", texto: "15h30 · 5º ano · regente: {bia} · estagiária: {lara} (estágio supervisionado, com acompanhamento previsto no plano de estágio)" },
     fotos: ["T1", "T2", "T3"], recebeDe: ["alunos", "gestao"], enviaPara: "rt",
     gabarito: ["contribui", "pode_proteger"],
   },
@@ -89,7 +89,7 @@ export const PAPEIS = [
   {
     id: "rt", nome: "Coordenação pedagógica", cor: "#38bdf8", prioridade: 5,
     abertura: "Você é da coordenação pedagógica, responde pelos estágios e pelo acompanhamento dos alunos, e chega pelo corredor do vestiário.",
-    ancora: { titulo: "Lembrete na agenda da coordenação", texto: "Termos de estágio: supervisão presencial do professor regente. ECA: suspeita de risco a aluno menor de idade deve ser comunicada à família e ao Conselho Tutelar." },
+    ancora: { titulo: "Lembrete na agenda da coordenação", texto: "Confira os termos de estágio, o acompanhamento previsto e os protocolos de proteção da escola. Avalie a situação e os canais de encaminhamento adequados." },
     fotos: ["V1", "V2"], recebeDe: ["tecnica", "estagiarios"], enviaPara: "gestao",
     gabarito: ["pode_proteger"],
   },
@@ -124,9 +124,9 @@ export const FOTOS = {
     titulo: "Balcão da secretaria", pessoas: ["personal", "bia", "recep"],
     cam: { pos: [-0.35, 1.7, -3.3], alvo: [-0.75, 1.05, -6.6], fov: 48 },
     frases: [
-      { t: "O homem de boné branco e a mulher de legging rosa seguram um envelope pardo.", tag: "fato", real: true },
+      { t: "A mulher de legging rosa segura um envelope pardo em frente ao homem de boné branco.", tag: "fato", real: true },
       { t: "Sobre o balcão, ao lado deles, há um pote branco sem rótulo.", tag: "fato", real: true },
-      { t: "Sobre o balcão há um recibo de R$ 480,00.", tag: "fato", real: true },
+      { t: "Não é possível ler o valor do recibo nesta imagem.", tag: "incerto", real: true },
       { t: "O pote branco faz parte da venda.", tag: "interp", real: false, sobre: ["bia", "personal"] },
       { t: "O homem de boné está vendendo algo para a mulher.", tag: "interp", real: false, sobre: ["bia", "personal"] },
       { t: "O envelope contém hormônios.", tag: "interp", real: false, sobre: ["bia"] },
@@ -211,8 +211,8 @@ export const FOTOS = {
     titulo: "Aula na quadra", pessoas: ["lara", "turma"],
     cam: { pos: [-3.6, 1.7, 1.6], alvo: [-7.4, 0.9, 4.8], fov: 54 },
     frases: [
-      { t: "Uma estagiária conduz sozinha a turma de crianças.", tag: "fato", real: true },
-      { t: "Não há professor da escola acompanhando a aula.", tag: "fato", real: true },
+      { t: "Uma mulher conduz uma turma de crianças na quadra.", tag: "fato", real: true },
+      { t: "Esta imagem, sozinha, não comprova quem supervisiona a aula.", tag: "incerto", real: true },
       { t: "A estagiária não tem preparo para essa turma.", tag: "interp", real: false, sobre: ["lara"] },
       { t: "Não dá para saber por que a professora regente não está ali.", tag: "incerto", real: true },
     ],
@@ -222,7 +222,7 @@ export const FOTOS = {
     cam: { pos: [-6.0, 1.6, 2.4], alvo: [-1.0, 1.3, -6.0], fov: 46 },
     frases: [
       { t: "Um aluno treinando com halteres fica na frente e tapa parte do balcão.", tag: "fato", real: true },
-      { t: "Ao fundo, a professora regente está no balcão da secretaria com um homem de boné.", tag: "fato", real: true },
+      { t: "Ao fundo, uma mulher aparece junto ao balcão da secretaria.", tag: "fato", real: true },
       { t: "O quadro dos Jogos destaca o time da escola.", tag: "fato", real: true },
       { t: "Não dá para ver o que eles têm nas mãos.", tag: "incerto", real: true },
       { t: "A professora está ocupada com algo mais importante que a aula.", tag: "interp", real: false, sobre: ["bia"] },
@@ -231,11 +231,11 @@ export const FOTOS = {
   },
   G1: {
     titulo: "Vista da janela da direção", pessoas: ["personal", "bia", "kaua", "lara", "turma"],
-    cam: { pos: [-9.4, 5.2, -5.4], alvo: [1.0, 0.6, 1.0], fov: 62 },
+    cam: { pos: [-6.9, 3.75, -4.1], alvo: [-1.5, 1.0, 2.5], fov: 72 },
     frases: [
-      { t: "Da janela se vê a secretaria, a quadra e a sala de treino.", tag: "fato", real: true },
+      { t: "Da janela se veem a quadra e a sala de treino.", tag: "fato", real: true },
       { t: "Tudo parece normal numa tarde de treino.", tag: "interp", real: false },
-      { t: "A estagiária está sem supervisão.", tag: "fato", real: true, sobre: ["lara"] },
+      { t: "Esta vista, sozinha, não comprova se a estagiária recebe supervisão.", tag: "incerto", real: true, sobre: ["lara"] },
       { t: "Não dá para saber o que cada pessoa está fazendo.", tag: "incerto", real: true },
     ],
   },
@@ -355,7 +355,7 @@ export const ALTERNATIVAS = {
     { id: "v_acolher", t: "Procurar o aluno que pode estar usando hormônio, acolher, chamar a família e encaminhar à saúde", ef: { kaua: -2 } },
     { id: "v_assumir", t: "Ir agora para a quadra ou mandar um professor ficar com a estagiária", ef: { lara: -2 } },
     { id: "v_sigilo", t: "Recolher a caixa com dados da pessoa e preservar o sigilo", ef: { joaquim: -1 } },
-    { id: "v_apurar", t: "Levar à direção uma apuração com escuta das partes e comunicar o Conselho Tutelar sobre o risco ao menor", ef: { venda: -2, processo: 1 } },
+    { id: "v_apurar", t: "Levar à direção uma apuração com escuta das partes e avaliar os encaminhamentos de proteção cabíveis", ef: { venda: -2, processo: 1 } },
     { id: "v_denunciar", t: "Chamar a polícia na escola agora, sem apurar", ef: { venda: -1, processo: -1 }, alvo: "personal" },
   ],
   alunos: [

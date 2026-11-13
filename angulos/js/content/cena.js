@@ -123,9 +123,9 @@ export const FOTOS = {
     titulo: "Balcão da recepção", pessoas: ["personal", "bia", "recep"],
     cam: { pos: [-0.35, 1.7, -3.3], alvo: [-0.75, 1.05, -6.6], fov: 48 },
     frases: [
-      { t: "O homem de boné branco e a mulher de legging rosa seguram um envelope pardo.", tag: "fato", real: true },
+      { t: "A mulher de legging rosa segura um envelope pardo em frente ao homem de boné branco.", tag: "fato", real: true },
       { t: "Sobre o balcão, ao lado deles, há um pote branco sem rótulo.", tag: "fato", real: true },
-      { t: "A maquininha de cartão mostra R$ 480,00.", tag: "fato", real: true },
+      { t: "Não é possível ler o valor exibido pela maquininha nesta imagem.", tag: "incerto", real: true },
       { t: "O pote branco faz parte da venda.", tag: "interp", real: false, sobre: ["bia", "personal"] },
       { t: "O personal está vendendo algo para a mulher.", tag: "interp", real: false, sobre: ["bia", "personal"] },
       { t: "O envelope contém hormônios.", tag: "interp", real: false, sobre: ["bia"] },
@@ -208,8 +208,8 @@ export const FOTOS = {
     titulo: "Aula funcional", pessoas: ["lara", "turma"],
     cam: { pos: [-3.6, 1.7, 1.6], alvo: [-7.4, 0.9, 4.8], fov: 54 },
     frases: [
-      { t: "Uma estagiária conduz sozinha uma turma grande.", tag: "fato", real: true },
-      { t: "Não há professor supervisionando a aula.", tag: "fato", real: true },
+      { t: "Uma mulher conduz uma turma na área de aula funcional.", tag: "fato", real: true },
+      { t: "Esta imagem, sozinha, não comprova quem supervisiona a aula.", tag: "incerto", real: true },
       { t: "A estagiária não tem preparo para essa turma.", tag: "interp", real: false, sobre: ["lara"] },
       { t: "Não dá para saber por que o supervisor não está ali.", tag: "incerto", real: true },
     ],
@@ -219,7 +219,7 @@ export const FOTOS = {
     cam: { pos: [-6.0, 1.6, 2.4], alvo: [-1.0, 1.3, -6.0], fov: 46 },
     frases: [
       { t: "Um aluno treinando com halteres fica na frente e tapa parte do balcão.", tag: "fato", real: true },
-      { t: "Ao fundo, o supervisor está no balcão da recepção com uma aluna.", tag: "fato", real: true },
+      { t: "Ao fundo, uma mulher aparece junto ao balcão da recepção.", tag: "fato", real: true },
       { t: "O ranking do desafio destaca os primeiros colocados.", tag: "fato", real: true },
       { t: "Não dá para ver o que eles têm nas mãos.", tag: "incerto", real: true },
       { t: "O supervisor está ocupado com algo mais importante que a aula.", tag: "interp", real: false, sobre: ["personal"] },
@@ -228,11 +228,11 @@ export const FOTOS = {
   },
   G1: {
     titulo: "Vista do mezanino", pessoas: ["personal", "bia", "kaua", "lara", "turma"],
-    cam: { pos: [-9.4, 5.2, -5.4], alvo: [1.0, 0.6, 1.0], fov: 62 },
+    cam: { pos: [-6.9, 3.75, -4.1], alvo: [-1.5, 1.0, 2.5], fov: 72 },
     frases: [
-      { t: "Do alto se vê o balcão, a aula funcional e a área de pesos.", tag: "fato", real: true },
+      { t: "Do alto se veem a aula funcional e a área de pesos.", tag: "fato", real: true },
       { t: "Tudo parece normal num horário de pico.", tag: "interp", real: false },
-      { t: "A estagiária está sem supervisão.", tag: "fato", real: true, sobre: ["lara"] },
+      { t: "Esta vista, sozinha, não comprova se a estagiária recebe supervisão.", tag: "incerto", real: true, sobre: ["lara"] },
       { t: "Não dá para saber o que cada pessoa está fazendo.", tag: "incerto", real: true },
     ],
   },

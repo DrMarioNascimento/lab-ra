@@ -51,7 +51,7 @@ subs.add(() => {
   } else if (visor && st.fase !== "confronto") { visor.destruir(); visor = null; focoAtual = undefined; }
 });
 
-const prof = montar(document.getElementById("prof"), () => renderProfessor(st), (a, el) => acaoProfessor(a, el, dispatch), () => {});
+const prof = montar(document.getElementById("prof"), () => renderProfessor(st), (a, el) => acaoProfessor(a, el, dispatch, st), () => {});
 subs.add(() => prof.draw());
 
 document.getElementById("fs").onclick = () => { const t = document.getElementById("telao"); if (document.fullscreenElement) document.exitFullscreen(); else t.requestFullscreen?.(); };

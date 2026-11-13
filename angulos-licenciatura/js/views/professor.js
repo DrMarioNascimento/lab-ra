@@ -26,10 +26,17 @@ export function renderProfessor(st) {
     <div class="row" style="margin-top:10px"><button class="btn sec grow" data-a="fase" data-val="-1" ${k <= 1 ? "disabled" : ""}>Voltar</button><button class="btn grow" data-a="fase" data-val="1" ${k === 0 || k === FASES.length - 1 ? "disabled" : ""}>Avançar</button></div></div>${extra}</div>`;
 }
 
-export function acaoProfessor(a, el, dispatch) {
+export function acaoProfessor(a, el, dispatch, st) {
   switch (a) {
     case "sortear": dispatch({ t: "sortear", seed: Date.now() }); return true;
-    case "fase": dispatch({ t: "fase", dir: +el.dataset.val }); return true;
+    case "fase": {
+      const dir = +el.dataset.val, p = progresso(st);
+      if (dir > 0 && p?.total && (p.feito < p.total || (p.indTot && p.ind < p.indTot))) {
+        const individual = p.indTot ? ` Respostas individuais: ${p.ind}/${p.indTot}.` : "";
+        if (!window.confirm(`${p.feito} de ${p.total} ${p.rot}.${individual} Se avançar agora, os demais podem não concluir esta etapa. Deseja avançar mesmo assim?`)) return false;
+      }
+      dispatch({ t: "fase", dir }); return true;
+    }
     case "spot": dispatch({ t: "spot", g: el.dataset.val }); return true;
     case "foco": dispatch({ t: "foco", foto: el.dataset.val || null }); return true;
     default: return false;

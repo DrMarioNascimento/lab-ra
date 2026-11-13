@@ -4,7 +4,7 @@ export const PARADAS = [
   {
     id: "p1", titulo: "1. Fatos conhecidos e incertezas", cartas: ["complexidade"],
     texto: "Antes de julgar, separe o que se sabe do que se supõe. Descrever é dizer o que está presente; interpretar é atribuir sentido. Reconhecer a incerteza não paralisa a decisão: muda o cuidado com que se decide.",
-    pergunta: { q: "\"O personal estava vendendo algo para a aluna.\" Diante de uma foto em que os dois seguram um envelope, essa frase é…", op: ["um fato", "uma interpretação", "uma incerteza"], certa: 1, fb: "A foto mostra duas pessoas e um envelope. \"Vender\" é o sentido que atribuímos à cena." },
+    pergunta: { q: "\"O personal estava vendendo algo para a aluna.\" Diante de uma foto em que aparecem próximos a um envelope, essa frase é…", op: ["um fato", "uma interpretação", "uma incerteza"], certa: 1, fb: "A foto mostra duas pessoas e um envelope. \"Vender\" é o sentido que atribuímos à cena." },
   },
   {
     id: "p2", titulo: "2. Envolvidos e afetados", cartas: ["utilitarismo"],

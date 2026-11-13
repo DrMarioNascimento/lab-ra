@@ -1,0 +1,49 @@
+name: Teste visual e percurso de Ângulos
+on:
+  push:
+    branches: [codex/angulos-percurso-observacao]
+    paths: ["angulos/**", "angulos-licenciatura/**", "tests/angulos-browser-qa.mjs", ".github/workflows/angulos-qa.yml"]
+concurrency:
+  group: angulos-qa-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+jobs:
+  navegador:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        curso: [angulos, angulos-licenciatura]
+        alunos: [6, 35, 40]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /angulos/
+            /angulos-licenciatura/
+            /tests/angulos-browser-qa.mjs
+            /package.json
+            /package-lock.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Iniciar servidor
+        run: python3 -m http.server 8741 --bind 127.0.0.1 > /tmp/angulos-server.log 2>&1 &
+      - name: Percorrer as duas versões no navegador
+        env:
+          COURSE: ${{ matrix.curso }}
+          N_ALUNOS: ${{ matrix.alunos }}
+        run: timeout 600s node tests/angulos-browser-qa.mjs
+      - name: Guardar imagens do teste
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: angulos-telas-${{ matrix.curso }}-${{ matrix.alunos }}
+          path: angulos-qa/
+          if-no-files-found: ignore
