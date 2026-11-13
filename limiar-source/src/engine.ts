@@ -1,6 +1,15 @@
-import type { Body, Choice, Derived, Effect, RenalWord, Report, Trace } from "./types";
+import { LINK_BY_ID, SOURCE_LABEL, step, type NetContext, type Pull } from "./network";
+import { PROFILES } from "./profiles";
+import type { Body, Choice, Derived, Effect, Profile, RenalWord, Report, Trace } from "./types";
 
 export const INITIAL_BODY: Body = {
+  estresse: 12,
+  insulina: 18,
+  melatonina: 24,
+  linfocitos: 60,
+  potassio: 50,
+  carga: 0,
+  acc: {},
   vagal: 44,
   catecol: 16,
   pulse: 8,
@@ -22,8 +31,12 @@ function clamp(n: number, max = 100): number {
 }
 
 export function applyEffect(body: Body, effect: Effect): Body {
+  const stressBolus =
+    effect.estresse ??
+    0.5 * Math.max(0, effect.catecol ?? 0) + 0.6 * Math.max(0, effect.pulse ?? 0) - 0.3 * Math.max(0, effect.vagal ?? 0);
   const next: Body = {
     ...body,
+    estresse: clamp(body.estresse + stressBolus),
     vagal: clamp(body.vagal + (effect.vagal ?? 0)),
     catecol: clamp(body.catecol + (effect.catecol ?? 0)),
     pulse: clamp(body.pulse + (effect.pulse ?? 0)),
@@ -43,7 +56,16 @@ export function applyEffect(body: Body, effect: Effect): Body {
   return next;
 }
 
-export function derive(body: Body, setPoint: number): Derived {
+export function bodyFor(profile: Profile): Body {
+  return { ...INITIAL_BODY, ...profile.start, creat: profile.creatBasal };
+}
+
+/** TFG abaixo da qual a hora conta como falha, na escala deste perfil. */
+export function failLine(profile: Profile): number {
+  return profile.tfgCeiling * (47 / 66);
+}
+
+export function derive(body: Body, setPoint: number, profile: Profile = PROFILES.padrao): Derived {
   const cortisol = clamp(setPoint + body.pulse);
   const ang = clamp(body.catecol * 0.48 + Math.max(0, 68 - body.volemia) * 1.05);
   const stressed = ang > 32 || body.catecol > 34;
@@ -51,10 +73,14 @@ export function derive(body: Body, setPoint: number): Derived {
   const rbf = clamp(
     74 - body.catecol * 0.34 - ang * 0.33 + (body.volemia - 55) * 0.32 + pgHelp,
   );
-  const tfg = rbf >= 47 ? clamp(66 + (rbf - 47) * 0.18) : clamp(rbf * 0.9);
+  const floor = profile.renalFloor;
+  const tfg =
+    rbf >= floor
+      ? clamp(profile.tfgCeiling + (rbf - floor) * 0.18)
+      : clamp(profile.tfgCeiling * 0.641 * (rbf / floor));
   const fc = clamp(body.catecol * 0.62 + (100 - body.vagal) * 0.38);
   const pa = clamp(body.catecol * 0.4 + body.pulse * 0.28 + (100 - body.vagal) * 0.24);
-  const renal: RenalWord = tfg < 47 ? "falha" : rbf < 58 ? "carga" : "folga";
+  const renal: RenalWord = rbf < floor ? "falha" : rbf < floor + 11 ? "carga" : "folga";
   const renalLine =
     renal === "falha"
       ? "Fluxo saiu da faixa. A TFG acompanhou. Falha hemodinâmica, não necrose."
@@ -64,11 +90,11 @@ export function derive(body: Body, setPoint: number): Derived {
   const fcWord = fc < 28 ? "branda" : fc < 48 ? "de vigília" : fc < 68 ? "alta" : "muito alta";
   const paWord = pa < 32 ? "baixa" : pa < 50 ? "de vigília" : pa < 68 ? "sustentada" : "alta";
   let kLine: string | null = null;
-  if (tfg < 47) {
+  if (renal === "falha") {
     kLine =
       "TFG baixa: o rim excreta menos potássio. A catecolamina, se alta, empurra K+ para dentro da célula. Os dois efeitos não cabem no mesmo plasma.";
-  } else if (body.catecol > 42) {
-    kLine = "β2 empurra potássio para dentro da célula. O plasma pode cair sem o rim ter excretado nada.";
+  } else if (body.catecol > 42 || body.potassio < 40) {
+    kLine = "β2 e insulina empurram potássio para dentro da célula. O plasma pode cair sem o rim ter excretado nada.";
   }
   return { cortisol, ang, rbf, tfg, fc, pa, renal, renalLine, fcWord, paWord, kLine };
 }
@@ -78,46 +104,96 @@ export interface Passage {
   notices: string[];
 }
 
-/** Time between hours. Half-lives live here, not on the click. */
-export function passHours(body: Body, hours: number, setPointBefore: number): Passage {
-  const before = derive(body, setPointBefore);
-  const next: Body = { ...body };
+const DT = 0.05;
+const START_CLOCK = 3 + 10 / 60;
 
-  next.catecol = clamp(body.catecol * 0.5 ** (hours / 0.45));
-  next.pulse = clamp(body.pulse * 0.5 ** (hours / 1.5));
-  next.cafeina = clamp(body.cafeina * 0.5 ** (hours / 5));
+export function clockHourAt(t: number): number {
+  return (((START_CLOCK + t) % 24) + 24) % 24;
+}
 
-  if (next.pgLeft > 0) {
-    next.pgLeft = Math.max(0, body.pgLeft - hours);
-    if (next.pgLeft === 0) next.pg = true;
-  }
+export function contextAt(t: number, setPoint: number, profile: Profile, awake = true): NetContext {
+  return {
+    awake,
+    clockHour: clockHourAt(t),
+    setPoint,
+    failLine: failLine(profile),
+    volemiaDrift: profile.volemiaDrift,
+  };
+}
 
+/**
+ * Integra a rede por `hours`, em passos de 3 minutos.
+ * `onStep` recebe o corpo a cada passo, para as curvas.
+ */
+export function integrate(
+  body: Body,
+  hours: number,
+  setPoint: number,
+  profile: Profile,
+  t0: number,
+  onStep?: (b: Body, elapsed: number) => void,
+): { body: Body; worstTfg: number; sleep: number } {
   const sleep = Math.min(hours, body.sleepHours);
-  const awake = hours - sleep;
-  next.adenosina = clamp(body.adenosina + awake * 1.15 - sleep * 5.2);
-  next.sleepHours = 0;
-  if (sleep >= 5) next.vagal = clamp(body.vagal + 8 + sleep);
-  else next.vagal = clamp(body.vagal - awake * 0.4);
-
-  next.volemia = clamp(body.volemia - awake * 0.4 + sleep * 0.35);
-  const glucosePull = body.pulse > 18 ? awake * 0.45 : (78 - body.glicose) * (1 - 0.5 ** (hours / 2));
-  next.glicose = clamp(body.glicose + glucosePull, 160);
-
-  if (body.brake) {
-    next.vagal = clamp(next.vagal + 14);
-    next.catecol = clamp(next.catecol * 0.35);
-    next.brake = false;
+  let b: Body = { ...body, acc: { ...body.acc } };
+  if (b.brake) {
+    b.vagal = clamp(b.vagal + 14);
+    b.catecol = clamp(b.catecol * 0.35);
+    b.estresse = clamp(b.estresse * 0.6);
+    b.brake = false;
   }
+  let worstTfg = derive(b, setPoint, profile).tfg;
+  const steps = Math.max(1, Math.round(hours / DT));
+  const dt = hours / steps;
+  for (let i = 0; i < steps; i++) {
+    const elapsed = i * dt;
+    const awake = elapsed >= sleep;
+    const d = derive(b, setPoint, profile);
+    worstTfg = Math.min(worstTfg, d.tfg);
+    const c = contextAt(t0 + elapsed, setPoint, profile, awake);
+    b = step(b, d, c, dt, b.acc);
+    b.cafeina = clamp(b.cafeina * 0.5 ** (dt / 5));
+    if (b.pgLeft > 0) {
+      b.pgLeft = Math.max(0, b.pgLeft - dt);
+      if (b.pgLeft === 0) b.pg = true;
+    }
+    onStep?.(b, elapsed + dt);
+  }
+  worstTfg = Math.min(worstTfg, derive(b, setPoint, profile).tfg);
+  b.sleepHours = 0;
+  return { body: b, worstTfg, sleep };
+}
 
-  const il6Target = (next.pulse < 10 ? 3 : -2) + (next.adenosina > 78 ? 5 : 1) + (sleep >= 5 ? -8 : 2);
-  next.il6 = clamp(body.il6 * 0.72 + il6Target);
+/** Time between hours. Half-lives and couplings live here, not on the click. */
+export function passHours(
+  body: Body,
+  hours: number,
+  setPointBefore: number,
+  profile: Profile = PROFILES.padrao,
+  t0 = 0,
+): Passage {
+  const run = integrate(body, hours, setPointBefore, profile, t0);
+  const next = run.body;
+  const sleep = run.sleep;
 
-  const afterProbe = derive({ ...next, creat: body.creat }, setPointBefore);
-  const worst = Math.min(before.tfg, afterProbe.tfg);
-  const target = worst < 47 ? 8 + (47 - worst) * 0.55 : 8;
-  next.creat = clamp(Math.round((body.creat + (target - body.creat) * (worst < 47 ? 0.85 : 0.35)) * 10) / 10, 40);
+  const worst = run.worstTfg;
+  const line = failLine(profile);
+  const failed = worst < line;
+  const basal = profile.creatBasal;
+  const target = failed ? basal + (line - worst) * 0.55 : basal;
+  next.creat = clamp(Math.round((body.creat + (target - body.creat) * (failed ? 0.85 : 0.35)) * 10) / 10, 40);
 
   const ranked: string[] = [];
+  const top = topPullsBetween(body.acc, next.acc, 1)[0];
+  if (top) {
+    ranked.push(
+      `Neste intervalo, quem mais puxou: ${SOURCE_LABEL[top.link.from]} ${top.value > 0 ? "→ subiu" : "→ desceu"} ${SOURCE_LABEL[top.link.to].toLowerCase()}. ${top.link.mech}`,
+    );
+  }
+  if (body.pulse > 12 && next.linfocitos < body.linfocitos - 4) {
+    ranked.push(
+      `Cortisol alto, imunidade celular caiu: linfócitos/NK ${Math.round(body.linfocitos)} → ${Math.round(next.linfocitos)}.`,
+    );
+  }
   if (next.creat - body.creat >= 2) {
     ranked.push("A creatinina subiu entre as horas. Ela descreve a TFG de antes, não a desta hora.");
   }
@@ -137,11 +213,29 @@ export function passHours(body: Body, hours: number, setPointBefore: number): Pa
     ranked.push("O AINE saiu do COX. Se a TFG caiu, quem ainda conta isso é a creatinina, não a dor.");
   }
 
-  return { body: next, notices: ranked.slice(0, 2) };
+  return { body: next, notices: ranked.slice(0, 3) };
 }
 
-export function settleMorning(body: Body, setPointBefore: number): Passage {
-  const night = passHours(body, 8, setPointBefore);
+/** Ligações que mais pesaram entre dois acumulados. */
+export function topPullsBetween(
+  from: Record<string, number>,
+  to: Record<string, number>,
+  n: number,
+): Pull[] {
+  return Object.keys(to)
+    .map((id) => ({ link: LINK_BY_ID[id], value: (to[id] ?? 0) - (from[id] ?? 0) }))
+    .filter((p) => p.link && p.link.from !== "luz" && p.link.from !== "sono" && p.link.to !== "carga")
+    .sort((a, b) => Math.abs(b.value) - Math.abs(a.value))
+    .slice(0, n);
+}
+
+export function settleMorning(
+  body: Body,
+  setPointBefore: number,
+  profile: Profile = PROFILES.padrao,
+  t0 = 0,
+): Passage {
+  const night = passHours(body, 8, setPointBefore, profile, t0);
   const next = { ...night.body };
   if (body.curveBroken) {
     next.il6 = clamp(next.il6 + 10);
@@ -231,8 +325,11 @@ export function narrate(choice: Choice, before: Derived, after: Derived, bodyAft
     },
   };
 
-  const text = byId[choice.id];
-  const k = bodyAfter.catecol > 42 || after.tfg < 47 ? after.kLine : null;
+  const text = byId[choice.id] ?? {
+    now: `${choice.now ?? choice.act} ${renal}`,
+    later: choice.later ?? choice.gloss,
+  };
+  const k = bodyAfter.catecol > 42 || after.renal === "falha" ? after.kLine : null;
   return { now: k ? `${text.now} ${k}` : text.now, later: text.later };
 }
 
@@ -240,34 +337,151 @@ function round(n: number): number {
   return Math.round(n);
 }
 
+export type ReadingKey =
+  | "pressao"
+  | "hrv"
+  | "glicemia"
+  | "cortisol"
+  | "catecol"
+  | "il6"
+  | "creat"
+  | "volume"
+  | "sono"
+  | "estresse"
+  | "linfocitos"
+  | "potassio"
+  | "insulina"
+  | "melatonina"
+  | "carga"
+  | "rim";
+
+export type ReadingAccess = "leito" | "pedido" | "modelo";
+
 export interface Reading {
+  key: ReadingKey;
   label: string;
   value: string;
+  access: ReadingAccess;
+  /** O que este pedido é, na vida real. */
+  source: string;
 }
 
-export function readings(body: Body, d: Derived, hour: string): Reading[] {
+export function readings(body: Body, d: Derived, hour: string, profile: Profile = PROFILES.padrao): Reading[] {
   const masked = body.cafeina > 18;
   const dipping = hour.startsWith("23") && d.pa >= 50 && body.sleepHours === 0;
+  const perceived = clamp(body.adenosina - body.cafeina * 0.35);
+  const tfgFromCr = profile.tfgCeiling * (profile.creatBasal / Math.max(body.creat, 1));
   return [
-    { label: "Autônomo", value: `vago ${round(body.vagal)} · catecolamina ${round(body.catecol)}` },
-    { label: "HPA", value: `cortisol ${round(d.cortisol)} · excesso ${round(body.pulse)}` },
-    { label: "Metabólico", value: `glicose ${round(body.glicose)}` },
     {
-      label: "Sono",
-      value: masked ? `adenosina ${round(body.adenosina)} · café mascara` : `adenosina ${round(body.adenosina)}`,
-    },
-    { label: "Imune", value: `IL-6 ${round(body.il6)}` },
-    {
+      key: "pressao",
       label: "Pressão",
       value: dipping ? `FC ${d.fcWord} · PA ${d.paWord} · sem dipping` : `FC ${d.fcWord} · PA ${d.paWord}`,
+      access: "leito",
+      source: "Monitor",
     },
-    { label: "Rim", value: `fluxo ${round(d.rbf)} · TFG ${round(d.tfg)} · Cr ${round(body.creat)} · ${d.renal}` },
+    { key: "hrv", label: "Vago", value: `HRV ${round(body.vagal)}`, access: "leito", source: "Variabilidade da FC" },
+    { key: "glicemia", label: "Glicemia", value: `capilar ${round(body.glicose)}`, access: "leito", source: "Ponta de dedo" },
+    {
+      key: "cortisol",
+      label: "HPA",
+      value: `cortisol ${round(d.cortisol)} · excesso ${round(body.pulse)}`,
+      access: "pedido",
+      source: "Cortisol sérico",
+    },
+    {
+      key: "catecol",
+      label: "Simpático",
+      value: `catecolamina ${round(body.catecol)}`,
+      access: "pedido",
+      source: "Catecolaminas plasmáticas",
+    },
+    {
+      key: "estresse",
+      label: "Estresse",
+      value: `percebido ${round(body.estresse)}`,
+      access: "leito",
+      source: "Relato do próprio plantonista",
+    },
+    { key: "il6", label: "Inflamação", value: `IL-6 ${round(body.il6)}`, access: "pedido", source: "Interleucina-6" },
+    {
+      key: "linfocitos",
+      label: "Imunidade celular",
+      value: `linfócitos/NK ${round(body.linfocitos)}`,
+      access: "pedido",
+      source: "Hemograma com contagem de linfócitos",
+    },
+    {
+      key: "insulina",
+      label: "Insulina",
+      value: `insulina ${round(body.insulina)}`,
+      access: "pedido",
+      source: "Insulina sérica",
+    },
+    {
+      key: "potassio",
+      label: "Potássio",
+      value: `K+ ${round(body.potassio)}${body.potassio < 42 ? " · baixo" : body.potassio > 58 ? " · alto" : ""}`,
+      access: "pedido",
+      source: "Eletrólitos",
+    },
+    {
+      key: "creat",
+      label: "Creatinina",
+      value: `Cr ${round(body.creat)} · TFG estimada ${round(tfgFromCr)}`,
+      access: "pedido",
+      source: "Creatinina sérica",
+    },
+    { key: "volume", label: "Volume", value: `volemia ${round(body.volemia)}`, access: "pedido", source: "USG de veia cava" },
+    {
+      key: "sono",
+      label: "Sono",
+      value: masked
+        ? `sonolência ${round(perceived)} · café mascara`
+        : `sonolência ${round(perceived)}`,
+      access: "pedido",
+      source: "Escala de sonolência",
+    },
+    {
+      key: "melatonina",
+      label: "Melatonina",
+      value: `melatonina ${round(body.melatonina)}`,
+      access: "modelo",
+      source: "Não se dosa no plantão",
+    },
+    {
+      key: "carga",
+      label: "Carga alostática",
+      value: `acumulada ${round(body.carga)}`,
+      access: "modelo",
+      source: "Soma do que ficou fora do basal",
+    },
+    {
+      key: "rim",
+      label: "Rim real",
+      value: `fluxo ${round(d.rbf)} · TFG ${round(d.tfg)} · ${d.renal}`,
+      access: "modelo",
+      source: "Não se mede no plantão",
+    },
   ];
 }
 
-export function moved(before: Body, after: Body, d0: Derived, d1: Derived, hour: string): Reading[] {
-  const a = readings(before, d0, hour);
-  const b = readings(after, d1, hour);
+/** Leituras completas, sem esconder nada. Usadas na aula curta e no laudo. */
+export function fullReadings(body: Body, d: Derived, hour: string, profile: Profile = PROFILES.padrao): Reading[] {
+  return readings(body, d, hour, profile).map((row) =>
+    row.key === "sono" ? { ...row, value: `${row.value} · adenosina ${round(body.adenosina)}` } : row,
+  );
+}
+
+export function moved(
+  before: Body,
+  after: Body,
+  d0: Derived,
+  d1: Derived,
+  hour: string,
+  profile: Profile = PROFILES.padrao,
+): Reading[] {
+  const a = fullReadings(before, d0, hour, profile);
+  const b = fullReadings(after, d1, hour, profile);
   return b.filter((row, i) => row.value !== a[i]?.value);
 }
 
@@ -277,14 +491,21 @@ function worstRenal(trace: Trace[]): RenalWord {
   return "folga";
 }
 
-export function writeReport(body: Body, trace: Trace[], morningCortisol: number, eveningCortisol: number): Report {
-  const choiceIds = new Set(trace.map((t) => t.title));
-  const failedDefense = choiceIds.has("Não ligar");
-  const held = choiceIds.has("Platô simpático") || choiceIds.has("Ligar e manter") || choiceIds.has("Cortisol no nadir");
-  const broken = choiceIds.has("Cortisol no nadir");
-  const slept = choiceIds.has("Dormir") || choiceIds.has("Uma frase e dormir");
+export function writeReport(
+  body: Body,
+  trace: Trace[],
+  morningCortisol: number,
+  eveningCortisol: number,
+  profile: Profile = PROFILES.padrao,
+): Report {
+  const ids = new Set(trace.map((t) => t.id));
+  const failedDefense = ids.has("sirene-nao");
+  const held = ids.has("manha-sustento") || ids.has("sirene-sustenta") || ids.has("noite-eixo");
+  const broken = ids.has("noite-eixo");
+  const slept = ids.has("noite-sono") || ids.has("noite-frase");
   const renal = worstRenal(trace);
-  const creatUp = trace.some((t, i) => i > 0 && t.creat >= trace[0].creat + 2) || body.creat >= 11;
+  const basal = profile.creatBasal;
+  const creatUp = trace.some((t) => t.creat >= basal + 2) || body.creat >= basal + 3;
 
   let name = "Retorno";
   if (renal === "falha" || creatUp) name = "Falha hemodinâmica";
@@ -294,11 +515,15 @@ export function writeReport(body: Body, trace: Trace[], morningCortisol: number,
   else if (renal === "carga") name = "Carga renal";
   else if (body.adenosina > 62 || body.volemia < 46 || body.il6 > 32) name = "Dívida";
 
+  const questions: string[] = questionsFor({ failedDefense, renal });
+  if (profile.question) questions.push(profile.question);
+
   return {
     name,
     essay: essayFor(name),
+    profileEssay: profile.essay || null,
     horizons: horizonsFor(name, { slept, broken, renal, morningCortisol, eveningCortisol }),
-    questions: questionsFor({ failedDefense, renal }),
+    questions,
   };
 }
 
@@ -376,5 +601,8 @@ export const BRIDGE = [
   "Angiotensina II, em nível moderado, contrai sobretudo a eferente e ainda segura a TFG, com fração de filtração maior. O modelo não simula esse degrau. Simula o extremo: simpático alto, pouco volume e prostaglandina aferente bloqueada ao mesmo tempo. É nesse extremo que a TFG cai. Um AINE em pessoa hidratada, em repouso, quase não move a filtração. E um turno, mesmo neste extremo, não é doença renal crônica. É uma falha hemodinâmica que reverte se a condição desfaz.",
   "Cortisol alto o bastante para saturar a 11β-HSD2 e agir como mineralocorticoide no rim é excesso sustentado, não um susto. O jogo não finge essa saturação. O potássio que ele menciona é o outro: β2 empurra K+ para a célula na hora; TFG baixa faz o contrário, horas depois. O plasma de um minuto não separa os dois.",
   "Restrição de sono piora a tolerância à glicose no dia seguinte. Isso está medido. O jogo só desloca a glicose e a IL-6 da manhã para você ver a direção. Não calcula um índice glicêmico. E não usa a história, já não sustentada, de que raciocinar esvazia a glicose do sangue.",
+  "O corpo é uma rede. Treze variáveis — estresse, catecolamina, cortisol, vago, glicose, insulina, adenosina, melatonina, IL-6, linfócitos/NK, potássio, volume e carga alostática — correm atrás de um alvo com a sua meia-vida, integradas a cada 3 minutos. O alvo de cada uma é o basal mais a soma das ligações que chegam nela: o estresse puxa catecolamina e cortisol; o cortisol segura a IL-6 e derruba linfócitos; a adenosina sem sono sobe IL-6 e estresse; a insulina puxa a glicose de volta; o vago freia o simpático. São mais de 50 ligações, e são as mesmas que aparecem no mapa do laudo.",
+  "Na versão estendida, a maior parte do corpo fica escondida. À beira do leito há monitor, HRV e glicemia capilar. O resto se pede, com limite por noite. Fluxo renal e TFG real não se medem no plantão: o que se pede é a creatinina, e a TFG estimada a partir dela descreve o passado. A sonolência relatada é a adenosina menos o que a cafeína esconde.",
+  "Os perfis mudam o corpo de partida, não as regras. IECA estreita a faixa de autoregulação, porque a angiotensina deixa de segurar a eferente; o diurético encurta o volume. No idoso, a creatinina basal é baixa por menos massa muscular e a TFG de partida é menor. Na terceira noite, a adenosina e a IL-6 já começam altas e o nadir da noite já não desce tanto. Doses escalam a amplitude da resposta; a meia-vida não muda com a dose.",
   "A passagem de ética ainda não está aqui. Será a mesma noite, com o menu inteiro. A pergunta, então, é se o gesto que você defender cabe no corpo que esta passagem acabou de deixar.",
 ];
