@@ -1,7 +1,7 @@
 name: Limiar estático QA
 on:
   push:
-    branches: [codex/limiar-estatico]
+    branches: [codex/limiar-05]
     paths: ["limiar-source/**", ".github/workflows/limiar-static-qa.yml"]
 permissions:
   contents: read
