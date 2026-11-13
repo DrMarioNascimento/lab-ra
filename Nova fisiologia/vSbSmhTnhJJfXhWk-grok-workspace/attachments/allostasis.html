@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ALLOSTASIS — O Júri do Corpo</title>
+<style>
+:root {
+  --bg: #020617;
+  --card: #0f172a;
+  --border: #1e293b;
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --emerald: #34d399;
+  --sky: #38bdf8;
+  --red: #f87171;
+  --amber: #fbbf24;
+  --violet: #c084fc;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+.container { max-width: 520px; margin: 0 auto; padding: 16px; }
+.center { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; text-align: center; }
+h1 { font-size: 2rem; font-weight: 900; background: linear-gradient(90deg, var(--emerald), var(--sky), var(--violet)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.subtitle { color: var(--muted); margin-top: 4px; font-weight: 600; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin: 16px 0; }
+.card p { font-size: 0.9rem; color: #cbd5e1; margin-bottom: 12px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0; }
+.mini { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px; font-size: 0.75rem; }
+.btn {
+  width: 100%; padding: 16px; border: none; border-radius: 12px;
+  background: linear-gradient(90deg, #10b981, #0ea5e9);
+  color: #020617; font-weight: 700; font-size: 1rem; cursor: pointer;
+}
+.btn:active { opacity: 0.9; }
+.btn-secondary { background: #1e293b; color: var(--text); }
+.header-row { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+.option {
+  width: 100%; text-align: left; background: var(--card); border: 1px solid #334155;
+  border-radius: 12px; padding: 14px; margin-bottom: 10px; color: var(--text); cursor: pointer;
+  display: flex; align-items: flex-start; gap: 10px; font-size: 0.9rem;
+}
+.option:active { border-color: var(--sky); }
+.dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.hidden-box { border: 1px dashed #f8717166; background: #450a0a33; border-radius: 12px; padding: 14px; font-size: 0.75rem; color: #fca5a5; }
+.physio { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-top: 16px; }
+.physio h3 { font-size: 0.85rem; margin-bottom: 4px; }
+.bar-row { margin-bottom: 12px; }
+.bar-label { display: flex; justify-content: space-between; font-size: 0.7rem; margin-bottom: 4px; }
+.bar-track { height: 8px; background: #1e293b; border-radius: 4px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 4px; transition: width 0.6s; }
+.hint { font-size: 0.65rem; color: #64748b; margin-top: 2px; }
+.feedback { border-radius: 16px; padding: 16px; margin-bottom: 12px; }
+.profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
+.profile-item { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px; font-size: 0.75rem; }
+.emoji { font-size: 3rem; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const SCENARIOS = [
+  {
+    id: "triagem",
+    title: "Turno 1 — A Triagem às 3h",
+    context: "Você é o profissional de plantão num pronto-socorro lotado. Chegam dois casos ao mesmo tempo: um atleta amador com suspeita de cardiomiotia e um idoso com queda e confusão mental. Você tem recursos para atender um com atenção plena agora.",
+    twist: "Sua dívida de sono está alta. Sob privação de sono, o córtex pré-frontal reduz seu alcance empático: só quem tem HRV alta enxerga a terceira opção.",
+    options: [
+      { id: "a", label: "Atender o idoso e pedir ao atleta que espere sem explicação.", kind: "impulsiva", minHrv: 0, maxCortisol: 100, effects: { cortisol: 8, hrv: -4, load: 5 }, feedback: "Rápido e defensável, mas você tratou o atleta como objeto. Sem explicação, não houve consentimento informado: autonomia zerada." },
+      { id: "b", label: "Adiar ambos e chamar reforço, transferindo a decisão.", kind: "evitativa", minHrv: 0, maxCortisol: 100, effects: { cortisol: 10, hrv: -5, load: 8, sleepDebt: 2 }, feedback: "Evitar decisão também é uma decisão. Você ganhou tempo e perdeu confiança do time e dos pacientes." },
+      { id: "c", label: "Atender o idoso com atenção plena e fazer triagem honesta com o atleta: explicar riscos, obter consentimento e monitorá-lo à distância.", kind: "deliberativa", minHrv: 45, maxCortisol: 75, effects: { cortisol: -6, hrv: 5, load: 12, glucose: -8 }, feedback: "A opção de cuidado pleno custa energia cognitiva, mas reduz seu cortisol: agir com coerência regula o próprio corpo. Ética é regulação." }
+    ]
+  },
+  {
+    id: "doping",
+    title: "Turno 2 — O Segredo do Atleta",
+    context: "Você é fisiologista de um clube. Descobre em exame rotineiro um marcador que sugere uso de agente proibido pelo melhor atleta do time, semanas antes da final. Ele implora: 'minha carreira acabou se você abrir isso'. O clube pressiona você silenciosamente para arquivar.",
+    twist: "A pressão institucional dispara seu cortisol. Sob cortisol alto, opções que exigem confronto ético desaparecem do seu campo perceptivo.",
+    options: [
+      { id: "a", label: "Arquivar o exame e seguir o protocolo informal do clube.", kind: "evitativa", minHrv: 0, maxCortisol: 100, effects: { cortisol: 15, hrv: -10, sleepDebt: 8 }, feedback: "Compromisso: seu cortisol sobe: o corpo registra a traição de si mesmo como ameaça. Dissonância moral é carga alostática real." },
+      { id: "b", label: "Vazar anonimamente para a imprensa esportiva.", kind: "impulsiva", minHrv: 0, maxCortisol: 100, effects: { cortisol: 12, hrv: -6, load: 10 }, feedback: "Justiça às cegas: você negou ao atleta e ao clube o direito ao devido processo. Denúncia sem procedimento é vingança disfarçada." },
+      { id: "c", label: "Confrontar o atleta em conversa franca, documentar tudo e abrir o caso na comissão de ética com apoio de um par.", kind: "deliberativa", minHrv: 40, maxCortisol: 72, effects: { cortisol: -8, hrv: 6, load: 15, glucose: -10 }, feedback: "Confronto com procedimento: o mais caro metabolicamente, mas o único que protege todos, inclusive você. Coragem ética é função fisiológica, não apenas de caráter." }
+    ]
+  },
+  {
+    id: "jogo",
+    title: "Turno 3 — O Monetizador",
+    context: "Você lidera o design de um jogo mobile que será usado por adolescentes. O diretor exige uma mecânica de recompensa variável (loot boxes) que explora dopamina em menores, prometendo dobrar a receita. Seu time admira você. Você tem uma reunião decisiva em minutos.",
+    twist: "Sua carga cognitiva acumulada filtra o que você vê. Sob carga alta, o cérebro abandona escolhas que exigem argumentação complexa.",
+    options: [
+      { id: "a", label: "Implementar como pedido: 'todo mundo da indústria faz isso'.", kind: "evitativa", minHrv: 0, maxCortisol: 100, effects: { cortisol: 10, hrv: -8, sleepDebt: 6 }, feedback: "Conformidade com o dano: você terceirizou sua consciência para a indústria. O corpo cobrou em sono e HRV." },
+      { id: "b", label: "Sair da empresa no meio da reunião, em protesto dramático.", kind: "impulsiva", minHrv: 0, maxCortisol: 100, effects: { cortisol: 14, hrv: -4, load: 5 }, feedback: "Integridade limpa, impacto zero: você deixou o jogo ruim nas mãos de quem não se importa. Heroísmo sem estrategia não protege ninguém." },
+      { id: "c", label: "Negociar: propor mecânica alternativa de transparência total (odds visíveis, sem compra por menores) apresentando dados de retenção ética e leis comparadas.", kind: "deliberativa", minHrv: 50, maxCortisol: 70, effects: { cortisol: -5, hrv: 7, load: 18, glucose: -12 }, feedback: "A rota do designer ético: custa glicose e foco, mas converte o conflito em cooperação. Sistemas éticos são desenhados, não improvisados." }
+    ]
+  }
+];
+
+const kindColor = { deliberativa: "#34d399", impulsiva: "#f87171", evitativa: "#fbbf24" };
+const clamp = v => Math.max(0, Math.min(100, v));
+
+let phase = "intro";
+let idx = 0;
+let physio = { hrv: 72, cortisol: 22, sleepDebt: 30, load: 20, glucose: 85 };
+let picked = {};
+let showFeedback = false;
+let lastFeedback = null;
+let timer = null;
+
+function render() {
+  const app = document.getElementById("app");
+  if (phase === "intro") {
+    app.innerHTML = `
+      <div class="container center">
+        <div class="emoji">🫀⚖️🎮</div>
+        <h1>ALLOSTASIS</h1>
+        <p class="subtitle">O Júri do Corpo</p>
+        <div class="card">
+          <p>Simulador de <strong>ética incorporada</strong>. Sua fisiologia decide quais escolhas morais você consegue enxergar.</p>
+          <p>Cada dilema altera HRV, cortisol, sono, carga e glicose. Quando o corpo entra em sobrecarga, as opções <strong style="color:var(--emerald)">deliberativas</strong> desaparecem da tela.</p>
+        </div>
+        <div class="grid2">
+          <div class="mini"><strong style="color:var(--emerald)">HRV alta</strong> = mais opções visíveis</div>
+          <div class="mini"><strong style="color:var(--red)">Cortisol alto</strong> = opções deliberativas ocultas</div>
+        </div>
+        <button class="btn" onclick="start()">Assumir o plantão →</button>
+      </div>`;
+    return;
+  }
+  if (phase === "debrief") {
+    const p = getProfile();
+    app.innerHTML = `
+      <div class="container center">
+        <div class="emoji">${p.emoji}</div>
+        <h1>Fim do plantão</h1>
+        <p class="subtitle" style="color:var(--emerald)">${p.label}</p>
+        <div class="card"><p>${p.desc}</p></div>
+        <div class="profile-grid">
+          <div class="profile-item">Deliberativas: <strong style="color:var(--emerald)">${p.deliberativas}</strong></div>
+          <div class="profile-item">Impulsivas: <strong style="color:var(--red)">${p.impulsivas}</strong></div>
+          <div class="profile-item">Evitativas: <strong style="color:var(--amber)">${p.evitativas}</strong></div>
+          <div class="profile-item">Cegadas pelo corpo: <strong style="color:var(--violet)">${p.invisiveis}</strong></div>
+        </div>
+        <div class="card" style="font-size:0.8rem;color:var(--muted)">
+          <p style="font-weight:700;color:var(--text);margin-bottom:8px">O que este simulador argumenta</p>
+          Julgamento moral depende de um cérebro com sono, um coração com variabilidade, um metabolismo com glicose. Ética profissional é desenho de sistemas fisiológicos.
+        </div>
+        <button class="btn btn-secondary" onclick="restart()">Jogar de novo</button>
+      </div>`;
+    return;
+  }
+
+  // Game
+  const sc = SCENARIOS[idx];
+  const visible = sc.options.filter(o => physio.hrv >= o.minHrv && physio.cortisol <= o.maxCortisol);
+  const hidden = sc.options.length - visible.length;
+
+  let optionsHtml = "";
+  if (!showFeedback) {
+    optionsHtml = `<p style="font-size:0.7rem;color:var(--muted);margin-bottom:8px">O que SEU CORPO deixa você enxergar:</p>`;
+    visible.forEach(o => {
+      optionsHtml += `<button class="option" onclick="choose('${o.id}')"><span class="dot" style="background:${kindColor[o.kind]}"></span>${o.label}</button>`;
+    });
+    if (hidden > 0) optionsHtml += `<div class="hidden-box">🔒 ${hidden} opção(ões) oculta(s): sua fisiologia atual não sustenta escolhas de cuidado deliberativo.</div>`;
+    if (visible.length === 0) optionsHtml += `<div class="hidden-box" style="background:#450a0a66">Colapso alostático: nenhuma escolha enxergável. Recupere o corpo.</div>`;
+  } else {
+    optionsHtml = `
+      <div class="feedback" style="border:1px solid ${kindColor[lastFeedback.kind]}66">
+        <p style="font-size:0.7rem;font-weight:700;text-transform:uppercase;color:${kindColor[lastFeedback.kind]};margin-bottom:6px">Consequência ${lastFeedback.kind}</p>
+        <p style="font-size:0.9rem">${lastFeedback.fb}</p>
+      </div>
+      <button class="btn" onclick="next()">${idx + 1 >= SCENARIOS.length ? "Ver meu perfil →" : "Próximo turno →"}</button>`;
+  }
+
+  app.innerHTML = `
+    <div class="container">
+      <div class="header-row">
+        <span>Turno ${idx + 1} / ${SCENARIOS.length}</span>
+        <span>ALLOSTASIS</span>
+      </div>
+      <div class="card">
+        <h2 style="color:var(--sky);font-size:1.1rem;margin-bottom:10px">${sc.title}</h2>
+        <p>${sc.context}</p>
+        <p style="font-size:0.75rem;color:#fcd34d;font-style:italic;border-left:2px solid #f59e0b;padding-left:10px;margin-top:10px">⚠️ ${sc.twist}</p>
+      </div>
+      ${optionsHtml}
+      <div class="physio">
+        <h3>Telemetria corporal</h3>
+        <p style="font-size:0.65rem;color:var(--muted);margin-bottom:12px">Atualiza em tempo real. Ela filtra suas opções.</p>
+        ${bar("❤️ HRV", physio.hrv, "#34d399", "Alta = percepção moral ampla")}
+        ${bar("🧪 Cortisol", physio.cortisol, "#f87171", "Acima de ~70 cega opções deliberativas", true)}
+        ${bar("😴 Dívida de sono", physio.sleepDebt, "#c084fc", "Erosão silenciosa do pré-frontal", true)}
+        ${bar("🧠 Carga cognitiva", physio.load, "#38bdf8", "Argumentos complexos custam mais", true)}
+        ${bar("🍞 Glicose", physio.glucose, "#fbbf24", "Decidir consome metabolismo real")}
+        <p style="font-size:0.65rem;color:#64748b;margin-top:10px;border-top:1px solid var(--border);padding-top:10px">Entre decisões, cortisol cai e HRV sobe lentamente. Regular o corpo recupera a capacidade de ver escolhas melhores.</p>
+      </div>
+    </div>`;
+}
+
+function bar(label, value, color, hint, invert) {
+  const risk = invert ? value > 65 : value < 35;
+  return `<div class="bar-row">
+    <div class="bar-label"><span>${label}</span><span style="color:${risk ? '#f87171' : '#94a3b8'};font-weight:${risk ? '700' : '400'}">${Math.round(value)}</span></div>
+    <div class="bar-track"><div class="bar-fill" style="width:${value}%;background:${color}"></div></div>
+    <div class="hint">${hint}</div>
+  </div>`;
+}
+
+function start() {
+  phase = "game";
+  startRecovery();
+  render();
+}
+
+function startRecovery() {
+  if (timer) clearInterval(timer);
+  timer = setInterval(() => {
+    if (phase !== "game" || showFeedback) return;
+    physio.cortisol = clamp(physio.cortisol - 0.15);
+    physio.hrv = clamp(physio.hrv + 0.12);
+    physio.glucose = clamp(physio.glucose - 0.08);
+    physio.load = clamp(physio.load + 0.05);
+    render();
+  }, 900);
+}
+
+function choose(id) {
+  const sc = SCENARIOS[idx];
+  const opt = sc.options.find(o => o.id === id);
+  picked[sc.id] = id;
+  const e = opt.effects;
+  physio.hrv = clamp(physio.hrv + (e.hrv || 0));
+  physio.cortisol = clamp(physio.cortisol + (e.cortisol || 0));
+  physio.sleepDebt = clamp(physio.sleepDebt + (e.sleepDebt || 0));
+  physio.load = clamp(physio.load + (e.load || 0));
+  physio.glucose = clamp(physio.glucose + (e.glucose || 0));
+  lastFeedback = { fb: opt.feedback, kind: opt.kind };
+  showFeedback = true;
+  render();
+}
+
+function next() {
+  showFeedback = false;
+  if (idx + 1 >= SCENARIOS.length) {
+    phase = "debrief";
+    if (timer) clearInterval(timer);
+  } else {
+    idx++;
+  }
+  render();
+}
+
+function getProfile() {
+  let deliberativas = 0, impulsivas = 0, evitativas = 0;
+  SCENARIOS.forEach(sc => {
+    const c = picked[sc.id];
+    const o = sc.options.find(x => x.id === c);
+    if (o) {
+      if (o.kind === "deliberativa") deliberativas++;
+      else if (o.kind === "impulsiva") impulsivas++;
+      else evitativas++;
+    }
+  });
+  const invisíveis = 3 - (deliberativas + impulsivas + evitativas);
+  let label, desc, emoji;
+  if (deliberativas >= 2) {
+    label = "Regulador Allostático";
+    desc = "Você protegeu sua fisiologia e com ela sua visão moral. Escolheu deliberar sob pressão.";
+    emoji = "🧭";
+  } else if (evitativas >= 2) {
+    label = "Contador de Sobrevivência";
+    desc = "Você sobreviveu terceirizando o conflito. O corpo registrou cada adiamento como dívida.";
+    emoji = "⏳";
+  } else {
+    label = "Reativo de Alta Velocidade";
+    desc = "Você agiu rápido sempre que o corpo pediu. Coragem sem pausa vira dano colateral.";
+    emoji = "⚡";
+  }
+  return { deliberativas, impulsivas, evitativas, invisíveis, label, desc, emoji };
+}
+
+function restart() {
+  phase = "intro";
+  idx = 0;
+  physio = { hrv: 72, cortisol: 22, sleepDebt: 30, load: 20, glucose: 85 };
+  picked = {};
+  showFeedback = false;
+  lastFeedback = null;
+  if (timer) clearInterval(timer);
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
