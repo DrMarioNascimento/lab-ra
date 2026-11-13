@@ -33,16 +33,14 @@ export function Intro({
       <p className="text-xs tracking-widest text-accent uppercase">Fisiologia · a primeira passagem</p>
       <h1 className="mt-4 font-display text-6xl leading-none font-medium text-fg sm:text-7xl">Limiar</h1>
       <p className="mt-6 max-w-xl font-display text-2xl leading-snug font-medium text-fg italic">
-        O corpo, sistema por sistema. A ética fica para a outra passagem, com esta mesma noite.
+        O corpo, sistema por sistema, ao longo de uma jornada.
       </p>
       <div className="mt-6 max-w-xl space-y-4 text-base leading-relaxed text-muted">
         <p>
-          Em cada hora você não escolhe o certo moral: escolhe qual sistema responde. Antes de ver a consequência, você
-          prevê o que o modelo vai calcular. Algumas previsões só se conferem horas depois.
+          Em cada hora, escolha qual sistema responde e preveja o que acontecerá. Algumas respostas aparecem mais tarde.
         </p>
         <p>
-          O corpo é uma rede: o estresse puxa catecolamina e cortisol, o cortisol segura a inflamação e derruba a imunidade celular, a falta de sono sobe a IL-6, a insulina puxa a glicose de volta. Cada escolha mexe num nó; o resto se move sozinho, hora a hora. Catecolamina acaba em minutos. Cortisol, em horas. Cafeína, na outra metade do dia.
-          Creatinina só no compasso seguinte. IL-6 quando o cortisol já foi embora.
+          Cada escolha modifica uma parte do corpo. Observe como os sistemas se relacionam e como as respostas mudam ao longo do tempo.
         </p>
       </div>
 
