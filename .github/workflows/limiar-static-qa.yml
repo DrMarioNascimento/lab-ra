@@ -1,0 +1,36 @@
+name: Limiar estático QA
+on:
+  push:
+    branches: [codex/limiar-estatico]
+    paths: ["limiar-source/**", ".github/workflows/limiar-static-qa.yml"]
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: limiar-source
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+        working-directory: limiar-source
+      - run: npm run build
+        working-directory: limiar-source
+      - run: npx playwright install --with-deps chromium
+        working-directory: limiar-source
+      - name: Testar ciclos no navegador
+        working-directory: limiar-source
+        run: |
+          python3 -m http.server 8742 --directory dist > /tmp/limiar.log 2>&1 &
+          node check.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: limiar-estatico
+          path: |
+            limiar-source/dist/
+            limiar-source/preview-*.png
