@@ -12,7 +12,7 @@ try {
     const next=page.getByRole('button',{name:/Avançar as horas|Ver a manhã/});await next.click();steps++;
   }
   assert.ok(steps>0&&steps<30,'não chegou ao laudo');assert.deepEqual(errors,[]);
-  await page.getByRole('button',{name:'Outra noite'}).click();await page.getByRole('button',{name:'Entrar na noite'}).waitFor();
+  await page.getByRole('button',{name:'Outra noite'}).click();await page.getByRole('heading',{name:'A vigília'}).waitFor();
   if(choice===0)await page.screenshot({path:'preview-'+width+'.png',fullPage:true});
   console.log(width,choice,steps,'etapas ok');await page.close();
  }
