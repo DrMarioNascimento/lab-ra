@@ -1,0 +1,182 @@
+import type { Scene } from "./types";
+
+export const SCENES: Scene[] = [
+  {
+    id: "vigilia",
+    hour: "03:10",
+    gap: 0,
+    setPoint: 42,
+    kicker: "Madrugada",
+    title: "A vigília",
+    cause:
+      "Plantão de pé, última refeição já longe, adenosina alta. A triagem pede córtex acordado nos próximos minutos. O cortisol das 3h já vem subindo: é o começo da curva, não um pico de susto.",
+    demand: "Ou a medula responde agora, ou o eixo lento responde tarde, ou ninguém responde e a adenosina continua no comando.",
+    choices: [
+      {
+        id: "vigilia-catecol",
+        title: "Catecolamina",
+        act: "Simpático e medula adrenal. Vigília em segundos.",
+        gloss: "Glicogenólise agora. Fluxo renal cai. A adenosina não sai.",
+        effect: { catecol: 36, vagal: -16, glicose: 14, volemia: -5, adenosina: 3 },
+      },
+      {
+        id: "vigilia-hpa",
+        title: "Eixo HPA",
+        act: "CRH, ACTH, cortisol. O útil chega em dezenas de minutos.",
+        gloss: "Segura IL-6. Não garante o minuto da triagem.",
+        effect: { pulse: 22, il6: -4, glicose: 6, adenosina: 6, vagal: -4 },
+      },
+      {
+        id: "vigilia-silencio",
+        title: "Não montar",
+        act: "O vago fica. A pressão de sono também.",
+        gloss: "O rim nem é chamado. O risco é o microssono.",
+        effect: { vagal: 6, catecol: -8, adenosina: 8 },
+      },
+    ],
+  },
+  {
+    id: "manha",
+    hour: "09:40",
+    gap: 6.5,
+    setPoint: 36,
+    kicker: "Manhã",
+    title: "O segundo pulso",
+    cause:
+      "A curva do dia já deveria estar descendo depois do pico do despertar. Há uma conversa difícil pela frente. O pulso da madrugada, se houve, já perdeu a maior parte da meia-vida.",
+    demand: "Um pulso novo, um freio vagal, ou um simpático médio que não desliga.",
+    choices: [
+      {
+        id: "manha-pulso",
+        title: "Segundo pulso",
+        act: "Outro pico de cortisol, com a curva já devendo cair.",
+        gloss: "O feedback negativo ainda existe. O segundo pico atrasa a descida.",
+        effect: { pulse: 24, il6: -5, glicose: 8, vagal: -6 },
+      },
+      {
+        id: "manha-vagal",
+        title: "Freio vagal",
+        act: "Barorreflexo. A frequência cede sem um eixo novo.",
+        gloss: "Não apaga o cortisol. Devolve vago.",
+        effect: { vagal: 12, catecol: -10 },
+      },
+      {
+        id: "manha-sustento",
+        title: "Platô simpático",
+        act: "Sem pico claro. Catecolamina média, a manhã inteira.",
+        gloss: "Platô custa mais retorno do que um pico curto.",
+        effect: { catecol: 18, vagal: -14, volemia: -4, glicose: 6 },
+      },
+    ],
+  },
+  {
+    id: "sirene",
+    hour: "11:41",
+    gap: 2,
+    setPoint: 30,
+    kicker: "Sirene",
+    title: "A defesa",
+    cause:
+      "Alarme. A ameaça é de minutos. Aqui a descarga simpática é o sistema certo: frequência, glicose, sangue para o músculo. O erro novo é não desligar quando se está do lado de fora.",
+    demand: "Ligar e devolver o vago, ligar e manter, ou não ligar.",
+    choices: [
+      {
+        id: "sirene-retorno",
+        title: "Ligar e desligar",
+        act: "Descarga curta. O freio vagal entra quando a ameaça passa.",
+        gloss: "Alostase com retorno. O fluxo cai e deve voltar.",
+        effect: { catecol: 38, vagal: -18, glicose: 12, volemia: -4, brake: true },
+      },
+      {
+        id: "sirene-sustenta",
+        title: "Ligar e manter",
+        act: "A mesma descarga, sem o freio.",
+        gloss: "Defesa certa. Retorno ausente.",
+        effect: { catecol: 38, vagal: -22, glicose: 12, volemia: -5 },
+      },
+      {
+        id: "sirene-nao",
+        title: "Não ligar",
+        act: "Sem taquicardia, sem glicose de defesa.",
+        gloss: "Não é calma. É a defesa que não montou.",
+        effect: { vagal: 3, catecol: -6 },
+      },
+    ],
+  },
+  {
+    id: "tarde",
+    hour: "16:20",
+    gap: 4.6,
+    setPoint: 22,
+    kicker: "Tarde",
+    title: "Volume e COX",
+    cause:
+      "Reunião longa, cabeça doendo, muitas horas sem beber. A adenosina está honesta. Três saídas químicas diferentes: bloquear o receptor do sono, bloquear a prostaglandina do rim, ou repor volume.",
+    demand: "Cafeína mascara. AINE tira a dilatação de reserva. Água devolve o que a angiotensina estava usando de pretexto.",
+    choices: [
+      {
+        id: "tarde-cafe",
+        title: "Cafeína",
+        act: "Bloqueia A1 e A2A. A adenosina fica. O aviso sai.",
+        gloss: "Meia-vida ~5 h. Diurese leve se não houver habituação.",
+        effect: { cafeina: 72, catecol: 12, vagal: -8, volemia: -6, glicose: 4 },
+      },
+      {
+        id: "tarde-aine",
+        title: "AINE",
+        act: "Inibe a COX. A dor cede. A PGE2 aferente também.",
+        gloss: "Em rim folgado, a TFG quase não se move. Em rim já contraído, move.",
+        effect: { blockPgHours: 6, catecol: 30, vagal: -10, volemia: -4, il6: -6 },
+      },
+      {
+        id: "tarde-agua",
+        title: "Água e pausa",
+        act: "Volume, prostaglandina intacta, freio vagal.",
+        gloss: "A adenosina continua perceptível. O rim sai da zona de risco.",
+        effect: { volemia: 18, vagal: 10, catecol: -8 },
+      },
+    ],
+  },
+  {
+    id: "noite",
+    hour: "23:48",
+    gap: 7.5,
+    setPoint: 12,
+    kicker: "Nadir",
+    title: "A curva",
+    cause:
+      "Perto da meia-noite o cortisol deveria estar no chão. A adenosina, no teto, se o dia não teve sono. Montar o eixo agora não é uma defesa a mais. É achatar a curva: noite alta, manhã sem pico.",
+    demand: "Um pulso no nadir, uma descarga curta e dormir, ou só dormir.",
+    choices: [
+      {
+        id: "noite-eixo",
+        title: "Cortisol no nadir",
+        act: "O eixo sobe na hora em que devia calar.",
+        gloss: "Quebra a inclinação. A manhã paga em IL-6 e em glicose.",
+        effect: {
+          pulse: 36,
+          catecol: 16,
+          vagal: -14,
+          glicose: 12,
+          volemia: -3,
+          curveBroken: true,
+          sleepHours: 1,
+        },
+      },
+      {
+        id: "noite-frase",
+        title: "Uma frase e dormir",
+        act: "Descarga curta, sem pulso cheio. Depois o sono.",
+        gloss: "O nadir sobrevive. A noite de sono fica pela metade.",
+        effect: { catecol: 12, vagal: -6, pulse: 4, sleepHours: 5 },
+      },
+      {
+        id: "noite-sono",
+        title: "Dormir",
+        act: "O processo S descarrega. O cortisol fica baixo.",
+        gloss: "A curva segue inteira. A mensagem fica sem resposta.",
+        effect: { sleepHours: 7, vagal: 4, catecol: -6 },
+      },
+    ],
+  },
+];
