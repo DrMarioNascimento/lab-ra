@@ -27,7 +27,7 @@ function relogioAula(st) {
   const min = (Date.now() - inicioAula) / 60000, plano = st.fase === "fechamento" ? 37 : PLANO_FIM_ANO[st.ano] ?? 2;
   const atraso = st.fase !== "fechamento" && min > plano + 1;
   const mm = `${Math.floor(min)}:${String(Math.floor((min % 1) * 60)).padStart(2, "0")}`;
-  return `<div class="card" style="padding:10px 12px${atraso ? ";border-color:#f59e0b" : ""}"><div class="row"><b class="grow">Tempo de aula</b><b class="mono">${mm}</b></div><p class="faint" style="font-size:12px;margin:4px 0 0">${atraso ? `Atrasado: o plano fecha o ano ${st.ano} perto de ${plano} min. Ligue as conversas curtas${st.ano < 4 ? " ou desligue a carta do ano 4" : ""}.` : `Plano: o ano ${st.ano || 1} fecha perto de ${plano} min; o fechamento começa perto dos 37.`}</p></div>`;
+  return `<div class="card" style="padding:10px 12px${atraso ? ";border-color:#f59e0b" : ""}"><div class="row"><b class="grow">Tempo de aula</b><b class="mono">${mm}</b></div><p class="faint" style="font-size:12px;margin:4px 0 0">${atraso ? `Atrasado: o plano fecha o ano ${st.ano} perto de ${plano} min. Ligue as conversas curtas${st.ano < 4 ? " ou desligue a carta do ano 4" : ""}.` : st.fase === "fechamento" ? "Plano: o fechamento vai dos 37 aos 45 min; a aula acaba perto dos 47." : `Plano: o ano ${st.ano || 1} fecha perto de ${plano} min; o fechamento vai dos 37 aos 45.`}</p></div>`;
 }
 
 export function renderProfessor(st) {

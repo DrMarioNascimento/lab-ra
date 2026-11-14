@@ -131,3 +131,13 @@ No fim do ano 3, o motor guarda a vila (`snap3`). No fechamento, `contrafactual(
 - Pergunta 5 do fechamento em barras com porcentagem; painel da honestidade do ano 4 com a proposta pequena ao lado; "A situação é do jogo" nas cartas do ano 4.
 - Relógio da aula no painel de quem conduz, com o plano (anos fecham perto de 8, 15, 24, 31 e 37 min) e o aviso de atraso.
 - Participantes simulados no teto de lotes não dão lance (como o celular real).
+
+## R23 (14/11/2026, após os avaliadores EC e ED)
+- Telão das decisões do ano 5: com o aviso da proposta grande, o mapa (46% da largura) e o relógio (11%) ficam menores, e a frase do mercado vira "A meta já desconta os lances do mercado." Antes, com a grande aceita, a frase passava da TV (até 1.138 px em 1.080). O aviso da mata diz "faltam N pontos (cerca de M de replantio)".
+- Lance da família pela mediana de **todos** os membros (`lanceDaFamilia()` em `content/regras.js`): quem não envia conta 0% e "quer lote", como na simulação. Antes, só quem enviou contava (uma pessoa com 60% fazia a família pagar 74 por um lote de 12). O celular e o telão do mercado dizem isso; teste novo em `tests/partidas.mjs`.
+- Voto, fechamento e regras sem os rótulos "eficiência" e "equidade" (diziam que só o Monopólio é eficiente, e a Prosperidade dá patrimônio médio maior em 95 de 96 partidas pareadas).
+- Ano 3: o painel *O dinheiro* mostra só as moedas, sem o número de cada família (dava para fazer a conta da meta de equidade antes do voto).
+- Confiança: o palpite "em qual situação vai haver mais golpe?" tem as quatro situações como opções (antes, tipos de gente, como "quem pede ajuda na rua").
+- Pergunta de controle do ano 4 sobre o preço pago (14 + 10 = 24; na Prosperidade, 19).
+- Celular nas decisões dos anos 4 e 5: "ficou fora do mercado" (no teto ou por escolha) separado de "não levou lote"; o cartão da meta diz "Média da vila por pessoa".
+- Relógio da aula: o fechamento vai dos 37 aos 45 min; a aula acaba perto dos 47.

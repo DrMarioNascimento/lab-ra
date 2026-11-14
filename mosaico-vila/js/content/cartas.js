@@ -81,14 +81,15 @@ export const ANO4 = [
     sim: "Entrar no trato", nao: "Não entrar", bom: "Ele cumpriu: +2 para você.", ruim: "Ele ficou com a carroça. Você perdeu os 2.", ganhoBom: 2 },
 ];
 
-// Antes da revelação da confiança: "Quem você acha que mais dá golpe?" (o telão mostra só o total, com 5 ou mais respostas)
-export const QUEM_GOLPE = ["Quem pede ajuda na rua", "Quem compra fiado", "Quem vende com sinal", "Quem propõe sociedade", "Todos do mesmo jeito"];
 // Palpite de quantos aceitam (pequena e grande)
 export const FAIXAS_PCT = ["Menos de 25%", "25% a 50%", "Mais de 50%"];
 export const faixaDe = (p) => (p < 0.25 ? 0 : p <= 0.5 ? 1 : 2);
 
 // R16: na confiança, cada pessoa recebe uma das 4 situações; a partida guarda qual (só a pessoa vê a sua)
 export const CONFIANCA = ANO4.filter((c) => c.grupo === "confianca").map((c) => c.id);
+// Antes da revelação da confiança: "Em qual situação você acha que mais vai haver golpe?" (o telão mostra só o total, com 5 ou mais respostas).
+// R23: as opções são as situações do jogo, não tipos de gente ("quem pede ajuda na rua" ligava a carta a um grupo real).
+export const QUEM_GOLPE = [...CONFIANCA.map((id) => ANO4.find((c) => c.id === id).titulo), "Todas do mesmo jeito"];
 export function distribuirSituacoes(ordem, r) {
   const ids = [...ordem];
   for (let i = ids.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [ids[i], ids[j]] = [ids[j], ids[i]]; }

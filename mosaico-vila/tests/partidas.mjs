@@ -2,7 +2,7 @@
 // Uso: node tests/partidas.mjs
 import { estadoInicial, reduzir, FASES, progresso } from "../js/engine.js";
 import { passoBot, NOMES, perfilBot, papelBully } from "../js/bots.js";
-import { gini, fecharAno, progressoMeta, COLAPSO, tetoLotes } from "../js/content/regras.js";
+import { gini, fecharAno, progressoMeta, COLAPSO, tetoLotes, leilao, lanceDaFamilia } from "../js/content/regras.js";
 import { carta, cartaAno4, sortearCartas, PEQUENAS, GRANDES, ANO4, CONFIANCA } from "../js/content/cartas.js";
 import { renderTelao } from "../js/views/telao.js";
 import { renderAluno, novoLocal } from "../js/views/aluno.js";
@@ -195,6 +195,18 @@ ok(!confiaram || (golpes / confiaram > 0.1 && golpes / confiaram < 0.45), `golpe
   const v = { fams, mata: 2, teto: 20, publico: 0, acumulado: 0, colapsou: true, ano: 4 };
   const fx = fecharAno(v, { 1: { pub: 0, rep: 0, car: 3 }, 2: { pub: 0, rep: 0, car: 3 }, 3: { pub: 0, rep: 0, car: 3 }, 4: { pub: 0, rep: 0, car: 3 } }, { a: { total: 40, imposto: 0 } });
   ok(fx.mata >= 0 && fx.extr <= 2 + 0.2 * 2 + 1e-9 && fx.extrato.a.ganhoCarga < 18, `R19: com a mata quase no fim, as cargas tiram só o que existe (tiraram ${fx.extr.toFixed(2)}, renderam ${fx.extrato.a.ganhoCarga.toFixed(1)})`);
+}
+// R23: o lance da família conta todos os membros (como na simulação): quem não envia oferece 0% e não marca "sem lote"
+{
+  const f = { id: "a", membros: [1, 2, 3], caixa: 100, lotes: 1 };
+  const so1 = lanceDaFamilia(f, { 1: { lance: 0.6, lanceEnviado: true } });
+  ok(so1.lance === 0 && !so1.semLote, `R23: uma pessoa sozinha com 60% não decide o lance da família de 3 (mediana ${so1.lance})`);
+  const sem1 = lanceDaFamilia(f, { 1: { lance: 0, semLote: true, lanceEnviado: true } });
+  ok(!sem1.semLote, "R23: uma marcação de \"não queremos lote\" numa família de 3 não tira a família do mercado");
+  const sem2 = lanceDaFamilia(f, { 1: { lance: 0, semLote: true, lanceEnviado: true }, 2: { lance: 0, semLote: true, lanceEnviado: true } });
+  ok(sem2.semLote, "R23: com 2 de 3 marcando, a família fica fora do mercado");
+  const L = leilao({ a: f, b: { id: "b", membros: [4, 5, 6], caixa: 100, lotes: 1 } }, 1, { 1: { lance: 0.6, lanceEnviado: true } }, 4, "monopolio", 0, () => 0.5);
+  ok(L.vendidos.length === 1 && L.vendidos[0].preco <= 14 + 1e-9, `R23: sem maioria, ninguém paga além do mínimo (preço ${L.vendidos[0]?.preco})`);
 }
 const s = (k) => linhas.filter((l) => l[k]).length;
 console.log(`troca aprovada ${s("troca")}/15 · colapso ${s("colapso")}/15 · vitória coletiva ${s("vitoria")}/15 · desigualdade da renda sobe com o aluguel em ${rendaSobe}/15`);

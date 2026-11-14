@@ -79,6 +79,13 @@ export function propostaDaFamilia(f, props) {
   };
 }
 
+// R23: o lance da família conta TODOS os membros (como na simulação): quem não envia oferece 0% e não marca
+// "não queremos lote". Antes, uma pessoa que enviava 60% sozinha decidia o lance da família inteira.
+export function lanceDaFamilia(f, lances) {
+  const ps = f.membros.map((id) => lances[id] ?? { lance: 0, semLote: false });
+  return { lance: mediana(ps.map((p) => p.lance ?? 0)), semLote: 2 * ps.filter((p) => p.semLote).length > ps.length, enviaram: f.membros.filter((id) => lances[id]?.lanceEnviado).length };
+}
+
 // Fecha as contas do ano: aportes, cargas, mata, bem público. Devolve o novo estado da vila e o extrato.
 export function fecharAno(v, props, renda) {
   const fams = structuredClone(v.fams);
@@ -124,7 +131,7 @@ export function leilao(fams, livres, props, ano, regra, acrescimo, desempate) {
   const out = structuredClone(fams);
   const min = lanceMinimo(ano, acrescimo);
   const vendidos = [];
-  const pf = Object.fromEntries(Object.values(out).map((f) => [f.id, propostaDaFamilia(f, props)]));
+  const pf = Object.fromEntries(Object.values(out).map((f) => [f.id, lanceDaFamilia(f, props)]));
   const fr = Object.fromEntries(Object.values(out).map((f) => [f.id, pf[f.id].lance]));
   const semLote = Object.values(out).filter((f) => pf[f.id].semLote).map((f) => f.id);
   const noTeto = Object.values(out).filter((f) => !pf[f.id].semLote && f.lotes >= tetoLotes(f)).map((f) => f.id);

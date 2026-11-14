@@ -38,13 +38,14 @@ export const EXEMPLO_DO_ANO = {
        pergunta: "Família de 5 pessoas com 1 lote, no Monopólio. Quanto paga de aluguel por ano?", opcoes: ["Nada", "8", "16"], certa: 1,
        explica: "Precisa de 2 lotes e tem 1: falta 1 lote, que custa 8 por ano no Monopólio." },
   4: { linhas: ["Lance mínimo: 14 (6 + 2 × o ano, 4). Cada um propõe quanto do caixa pôr além dele; vale a mediana.", "O maior leva e paga ao banco. Na Prosperidade, conta metade do que se oferece além do mínimo.", "Lote vale 10 + 2 por nível do bem público e pode render aluguel."],
-       pergunta: "Duas famílias oferecem 30 e 22 pelo mesmo lote. O que acontece?", opcoes: ["Leva quem ofereceu 30", "O lote é dividido", "Leva quem tem mais gente"], certa: 0,
-       explica: "Lance fechado: o maior lance leva. Empate se decide no sorteio." },
+       // R23: a pergunta confere também quanto se paga (antes, só "o maior leva")
+       pergunta: "Lance mínimo 14. Uma família oferece 10 além do mínimo e faz o maior lance. No Monopólio, quanto ela paga pelo lote?", opcoes: ["14", "24", "Nada, se o lote não render"], certa: 1,
+       explica: "O maior lance leva e paga o lance inteiro ao banco: 14 + 10 = 24. Na Prosperidade, conta metade do que vai além do mínimo: 14 + 5 = 19." },
 };
 
 export const REGRAS_TXT = {
-  monopolio: { nome: "Monopólio", telao: "Aluguel de 8 · meta: patrimônio médio de 54 por pessoa (eficiência)", curto: "Aluguel de 8 por lote que falta, pago a quem tem lotes sobrando. Meta da vila: patrimônio médio de 54 por pessoa e mata em 30% ou mais (eficiência)." },
-  prosperidade: { nome: "Prosperidade", telao: "Aluguel de 2 + imposto para o bem público · meta: a família mais pobre com 70% da média (equidade)", curto: "Aluguel de 2; cada lote paga 1,5 e cada pessoa paga 1 ao bem público. Meta da vila: a família mais pobre com pelo menos 70% do patrimônio médio, por pessoa, e mata em 30% ou mais (equidade)." },
+  monopolio: { nome: "Monopólio", telao: "Aluguel de 8 · meta: patrimônio médio de 54 por pessoa", curto: "Aluguel de 8 por lote que falta, pago a quem tem lotes sobrando. Meta da vila: patrimônio médio de 54 por pessoa e mata em 30% ou mais." },
+  prosperidade: { nome: "Prosperidade", telao: "Aluguel de 2 + imposto para o bem público · meta: a família mais pobre com 70% da média", curto: "Aluguel de 2; cada lote paga 1,5 e cada pessoa paga 1 ao bem público. Meta da vila: a família mais pobre com pelo menos 70% do patrimônio médio, por pessoa, e mata em 30% ou mais." },
 };
 
 // Exemplo resolvido e pergunta de controle das duas regras, antes do voto (R8).

@@ -297,6 +297,7 @@ input[type=text], input[type=number], select, textarea { box-shadow: inset 0 3px
 /* Moedas por pessoa, com a marca da meta */
 .fila-moedas { position: relative; display: inline-flex; min-width: calc(var(--iso) * var(--n) + .12cqw * var(--n)); --iso: 3.6cqw; padding-top: .15cqw; }
 .iso-linha:first-of-type .fila-moedas { padding-top: 2.2cqw; }
+.sem-marca .iso-linha:first-of-type .fila-moedas { padding-top: .15cqw; }   /* R23: no ano 3 não há marca da meta acima das moedas */
 .fila-moedas .iso { --iso: inherit; }
 .fila-moedas + b { margin-left: 1.2cqw !important; font-size: 2.2cqw; }
 .marca-meta { position: absolute; top: 0; bottom: -.3cqw; width: 0; border-left: .3cqw dashed #fbbf24; }
@@ -336,8 +337,10 @@ input[type=text], input[type=number], select, textarea { box-shadow: inset 0 3px
 .telao .linha-grande { min-height: 0; overflow: hidden; }
 .telao .linha-grande .tempo2 { height: 100%; }
 .telao .linha-grande .tempo2 svg { min-height: 0; }
-.telao .lado.compacto { grid-template-columns: 50cqw minmax(0, 1fr); }
-.telao .lado.compacto .mapa-card { width: 50cqw; }
+.telao .lado.compacto { grid-template-columns: 46cqw minmax(0, 1fr); }
+.telao .lado.compacto .mapa-card { width: 46cqw; }   /* R23: cabe com o aviso de 3 linhas */
+.telao .lado.compacto .crono { width: 11cqw; height: 11cqw; }   /* R23: no ano 5, o aviso da proposta grande ocupa o alto; o cronômetro menor deixa o resto caber na TV */
+.telao .lado.compacto .crono::after { font-size: 4.2cqw; }
 
 /* R16: relógios de 90 s (conversa antes do voto) e 60 s (dupla do fechamento) */
 @keyframes conta90 { from { --s: 90; } to { --s: 0; } }
