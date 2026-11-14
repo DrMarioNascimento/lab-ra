@@ -1,0 +1,185 @@
+// Mosaico Vila · baralho de situações (R13). A cada partida, o sistema sorteia as cartas, como o impostor do
+// MOSAICO: a semente da partida refaz o mesmo sorteio. Muda quem propõe (segmento), de que lado a pessoa está e o
+// tamanho (poder); a proposta vem sempre do sistema, nunca de um colega.
+//
+// · Pequena (ano 2): cada pessoa decide por si e cada resposta vale para quem respondeu (+2 pontos pessoais).
+//   Cada "aceito" tira uma parte do estrago grande: se a turma inteira aceitar, o estrago é do mesmo tamanho do da grande.
+// · Grande (ano 5, antes das decisões do ano, para a turma ainda poder reagir): todos respondem; vale a resposta de UMA
+//   pessoa sorteada, que nunca aparece (+8 pontos pessoais). O estrago já pesa na renda do ano 5 (R14).
+// · Ano 4 (opcional): uma carta de honestidade (um erro a seu favor) ou de confiança (você decide antes de saber se a
+//   outra parte é honesta). Na confiança, cada pessoa recebe uma das 4 situações, sorteada (R16); em todas, a chance de
+//   má-fé é a mesma (1 em 4), quem confia arrisca 2 e, se a outra parte for honesta, ganha 2: nenhum tipo de pessoa é
+//   "mais perigoso" que outro, e o telão mostra isso com os números da própria turma.
+// Os ícones de cada carta são provisórios (cópias dos ícones 3D do jogo); os prompts dos definitivos estão em docs/ICONES-PROMPTS.md.
+
+export const GANHO_PEQUENA = 2, GANHO_GRANDE = 8, GANHO_HONESTIDADE = 3, RISCO_CONFIANCA = 2, CHANCE_GOLPE = 0.25;
+export const ESTRAGO_MATA = 0.2;    // estrago grande na mata: 20% do teto (devolver custa cerca de 10 pontos de replantio por família, perto de um nível do bem público)
+
+export const PEQUENAS = [
+  { id: "fiscal", segmento: "o fiscal da mata", de: "do fiscal da mata", lado: "paga", alvo: "mata", icone: "toco", titulo: "O fiscal da mata",
+    telao: "O fiscal da mata cobra 1 ponto para você tirar madeira sem registro, que rende 3. Saldo: +2 para quem aceita.",
+    texto: "O fiscal da mata cobra 1 ponto seu para fazer vista grossa: você tira madeira sem registro, que rende 3. Saldo: +2 pontos pessoais. Cada pessoa que aceita tira um pedaço da mata de todos; se a turma inteira aceitar, {efeito}.",
+    sim: "Pagar 1 ao fiscal", nao: "Não pagar",
+    presente: { texto: "O fiscal da mata pede um presente de 1 ponto seu, em troca de fazer vista grossa: você tira madeira sem registro, que rende 3. Saldo: +2 pontos pessoais. Cada pessoa que aceita tira um pedaço da mata de todos; se a turma inteira aceitar, {efeito}.", sim: "Dar o presente ao fiscal", nao: "Não dar o presente" } },
+  { id: "vizinho", segmento: "um vizinho", de: "de um vizinho", lado: "recebe", alvo: "mata", icone: "grupos", titulo: "A carga do vizinho",
+    telao: "Você ajuda a anotar as cargas. Um vizinho oferece 2 pontos para você não anotar a carga extra dele.",
+    texto: "Este ano, você ajuda a anotar as cargas de madeira da vila. Um vizinho oferece 2 pontos pessoais para você não anotar a carga extra dele. Cada pessoa que aceita tira um pedaço da mata de todos; se a turma inteira aceitar, {efeito}.",
+    sim: "Aceitar os 2", nao: "Recusar",
+    presente: { texto: "Este ano, você ajuda a anotar as cargas de madeira da vila. Um vizinho quer te dar um presente de 2 pontos pessoais, em troca de você não anotar a carga extra dele. Cada pessoa que aceita tira um pedaço da mata de todos; se a turma inteira aceitar, {efeito}.", sim: "Aceitar o presente", nao: "Recusar o presente" } },
+  { id: "serraria", segmento: "a serraria", de: "da serraria", lado: "recebe", alvo: "publico", icone: "arvore-dourada", titulo: "A madeira sem nota", carimbo: "Sonegação",   // R29: venda sem nota é sonegação, não corrupção
+    telao: "A serraria paga 2 a mais pela sua madeira sem nota. Sem nota, o imposto não chega ao bem público.",
+    texto: "A serraria oferece 2 pontos pessoais a mais se você vender a madeira sem nota. Sem nota, o imposto da venda não chega ao bem público. Cada pessoa que aceita tira um pedaço do bem público; se a turma inteira aceitar, {efeito}.",
+    sim: "Aceitar os 2 e vender sem nota", nao: "Recusar e vender com nota",   // R30: as duas falas dizem o ato no botão
+    presente: { texto: "A serraria quer te dar um presente de 2 pontos pessoais, em troca de você vender a madeira sem nota. Sem nota, o imposto da venda não chega ao bem público. Cada pessoa que aceita tira um pedaço do bem público; se a turma inteira aceitar, {efeito}.", sim: "Aceitar o presente e vender sem nota", nao: "Recusar e vender com nota" } },
+  { id: "taxa", segmento: "um funcionário da prefeitura", de: "de um funcionário da prefeitura", lado: "paga", alvo: "publico", icone: "moeda", titulo: "A taxa da praça",
+    telao: "Um funcionário cobra 1 ponto para tirar seu nome da taxa da praça, que custa 3. Saldo: +2 para quem aceita.",
+    texto: "Todo mundo paga 3 pontos de taxa para a praça. Um funcionário da prefeitura cobra 1 ponto seu para tirar o seu nome da lista. Saldo: +2 pontos pessoais. Cada pessoa que aceita tira um pedaço do bem público; se a turma inteira aceitar, {efeito}.",
+    sim: "Pagar 1 ao funcionário", nao: "Pagar a taxa",
+    presente: { texto: "Todo mundo paga 3 pontos de taxa para a praça. Um funcionário da prefeitura pede um presente de 1 ponto seu, em troca de tirar o seu nome da lista. Saldo: +2 pontos pessoais. Cada pessoa que aceita tira um pedaço do bem público; se a turma inteira aceitar, {efeito}.", sim: "Dar o presente ao funcionário", nao: "Pagar a taxa" } },
+  // R35: lixo, o avesso da mata (em vez de tirar do que é de todos, joga-se nele um custo que todos dividem)
+  { id: "entulho", segmento: "uma empresa de caçambas", de: "de uma empresa de caçambas", lado: "recebe", alvo: "mata", icone: "toco", titulo: "O entulho na beira da mata",
+    telao: "Você ajuda a fiscalizar a coleta de lixo. Uma empresa de caçambas oferece 2 pontos para você não registrar o entulho que ela despeja na beira da mata.",
+    texto: "Este ano, você ajuda a fiscalizar o lixo da vila. Uma empresa de caçambas oferece 2 pontos pessoais para você não registrar o entulho que ela joga na beira da mata. Cada pessoa que aceita deixa mais entulho na mata de todos; se a turma inteira aceitar, {efeito}.",
+    sim: "Aceitar os 2", nao: "Recusar",
+    presente: { texto: "Este ano, você ajuda a fiscalizar o lixo da vila. Uma empresa de caçambas quer te dar um presente de 2 pontos pessoais, em troca de você não registrar o entulho que ela joga na beira da mata. Cada pessoa que aceita deixa mais entulho na mata de todos; se a turma inteira aceitar, {efeito}.", sim: "Aceitar o presente", nao: "Recusar o presente" } },
+];
+
+export const GRANDES = [
+  { id: "alvara", segmento: "a construtora", de: "da construtora", lado: "recebe", alvo: "publico", icone: "alvara", titulo: "O alvará",
+    telao: "Uma construtora oferece 8 pontos pessoais para aprovar uma obra sem vistoria. Aprovada, {efeito}.",
+    texto: "Uma construtora oferece 8 pontos pessoais para você aprovar uma obra sem a vistoria. Se for aprovada, {efeito}.",   // R35: "para você", como na fala "presente"
+    sim: "Aceitaria os 8 e aprovaria", nao: "Recusaria", aceito: "A obra foi aprovada sem vistoria: {feito}.", recusado: "A obra não foi aprovada.",
+    presente: { texto: "Uma construtora quer te dar um presente de 8 pontos pessoais, em troca de você aprovar uma obra sem a vistoria. Se for aprovada, {efeito}.", sim: "Aceitaria o presente e aprovaria", nao: "Recusaria" } },   // R34: a grande também em duas falas
+  { id: "madeireira", segmento: "a madeireira", de: "da madeireira", lado: "recebe", alvo: "mata", icone: "toco", titulo: "A licença da madeireira",   // R35: provisório distinto (antes, as grandes repetiam a prancheta)
+    telao: "Uma madeireira de fora oferece 8 pontos pessoais para você assinar a licença de derrubar parte da mata. Assinada, {efeito}.",
+    texto: "Uma madeireira de fora oferece 8 pontos pessoais para você assinar a licença para ela derrubar parte da mata. Se for assinada, {efeito}.",
+    sim: "Aceitaria os 8 e assinaria", nao: "Não assinaria", aceito: "A licença foi assinada: {feito}.", recusado: "A licença não foi assinada.",
+    presente: { texto: "Uma madeireira de fora quer te dar um presente de 8 pontos pessoais, em troca de você assinar a licença para ela derrubar parte da mata. Se for assinada, {efeito}.", sim: "Aceitaria o presente e assinaria", nao: "Não assinaria" } },
+  { id: "escola", segmento: "a empresa da obra", de: "da empresa da obra", lado: "recebe", alvo: "publico", icone: "publico-4-escola", titulo: "O contrato da escola",
+    telao: "Você escolhe a empresa da reforma da escola. A mais cara oferece 8 pontos para ser escolhida; com ela, {efeito}.",
+    texto: "Você escolhe a empresa que vai reformar a escola. A mais cara te oferece 8 pontos pessoais para ser a escolhida. Com ela, a obra custa o dobro e {efeito}.",
+    sim: "Aceitaria os 8 e escolheria a mais cara", nao: "Escolheria a mais barata", aceito: "A empresa mais cara foi escolhida: {feito}.", recusado: "A empresa mais barata foi escolhida.",
+    presente: { texto: "Você escolhe a empresa que vai reformar a escola. A mais cara quer te dar um presente de 8 pontos pessoais, em troca de ser a escolhida. Com ela, a obra custa o dobro e {efeito}.", sim: "Aceitaria o presente e escolheria a mais cara", nao: "Escolheria a mais barata" } },
+  { id: "aterro", segmento: "a empresa de lixo", de: "da empresa de lixo", lado: "recebe", alvo: "mata", icone: "alvara", titulo: "O aterro sem licença",   // R35
+    telao: "Uma empresa de lixo oferece 8 pontos pessoais para você aprovar um aterro sem licença ao lado do rio da mata. Aprovado, {efeito}.",
+    texto: "Uma empresa de lixo oferece 8 pontos pessoais para você aprovar um aterro sem licença ao lado do rio que corta a mata. Se for aprovado, {efeito}.",
+    sim: "Aceitaria os 8 e aprovaria", nao: "Recusaria", aceito: "O aterro foi aprovado sem licença: {feito}.", recusado: "O aterro não foi aprovado.",
+    presente: { texto: "Uma empresa de lixo quer te dar um presente de 8 pontos pessoais, em troca de você aprovar um aterro sem licença ao lado do rio que corta a mata. Se for aprovado, {efeito}.", sim: "Aceitaria o presente e aprovaria", nao: "Recusaria" } },
+];
+
+// Ano 4 (opcional). tipo "dado": o Jogo da Mente; "honesto": ficar ou devolver; "confia": confiar antes de saber.
+export const ANO4 = [
+  { id: "dado", grupo: "honestidade", tipo: "dado", icone: "ideia", titulo: "O dado da sorte",   // R34: antes "O troco do mercado", que não tinha troco nem mercado
+    telao: "Pense num número de 1 a 6, sem digitar. O celular rola o dado. Acertou? 3 pontos pessoais.",
+    texto: "Pense num número de 1 a 6. Não digite. O celular vai rolar um dado. Se você acertar, ganha 3 pontos pessoais (não vão para a família)." },
+  { id: "extrato", grupo: "honestidade", tipo: "honesto", icone: "participar", titulo: "O extrato a mais",
+    telao: "O banco da vila errou e pôs 3 pontos a mais no seu placar. Ninguém vai conferir. Avisa ou fica?",
+    texto: "O banco da vila errou e pôs 3 pontos pessoais a mais no seu placar. Ninguém vai conferir. Você avisa o banco ou fica com os 3?",
+    sim: "Ficar com os 3", nao: "Avisar o banco" },
+  { id: "achado", grupo: "honestidade", tipo: "honesto", icone: "cedula", titulo: "O achado da praça",
+    telao: "Você acha 3 pontos caídos na praça, sem nome. Entrega no achados e perdidos ou fica?",
+    texto: "Você acha 3 pontos caídos na praça, sem nome de ninguém. Entrega no achados e perdidos da vila ou fica com eles?",
+    sim: "Ficar com os 3", nao: "Entregar" },
+  { id: "pedinte", grupo: "confianca", tipo: "confia", icone: "moeda", titulo: "O pedido na estrada",
+    telao: "Na estrada, uma pessoa pede 2 pontos para comer e promete um dia de trabalho na sua roça, que rende 4. Você ajuda?",
+    texto: "Na estrada da vila, uma pessoa pede 2 pontos para comer e promete voltar para um dia de trabalho na sua roça, que rende 4 pontos. Só depois você descobre se era necessidade de verdade ou golpe.",
+    sim: "Ajudar com 2", nao: "Não ajudar", bom: "Era necessidade de verdade: ela voltou, trabalhou, e o dia rendeu 4. +2 para você.", ruim: "Era golpe: alguém se passou por necessitado. Você perdeu os 2.",
+    ganhoBom: 2 },   // R16: o mesmo +2 / −2 das outras situações (com cada um numa situação, ninguém sai em desvantagem)
+  { id: "fiado", grupo: "confianca", tipo: "confia", icone: "cedula", titulo: "A venda fiado",
+    telao: "Um comprador bem de vida quer levar 2 pontos da sua madeira e pagar 4 na semana que vem. Você vende fiado?",
+    texto: "Um comprador bem de vida quer levar madeira sua que vale 2 pontos e pagar 4 na semana que vem. Só depois você descobre se ele paga ou dá calote.",
+    sim: "Vender fiado", nao: "Não vender", bom: "Ele pagou os 4: +2 para você.", ruim: "Calote: ele não pagou. Você perdeu os 2.", ganhoBom: 2 },
+  { id: "sinal", grupo: "confianca", tipo: "confia", icone: "participar", titulo: "O sinal adiantado",
+    telao: "Um comerciante vende uma ferramenta que rende 4. Pede 2 de sinal adiantado. Você paga?",
+    texto: "Um comerciante da feira vende uma ferramenta que rende 4 pontos. Ele pede 2 pontos de sinal adiantado. Só depois você descobre se ele entrega ou some com o sinal.",
+    sim: "Pagar o sinal", nao: "Não pagar", bom: "Ele entregou a ferramenta: +2 para você.", ruim: "Golpe: ele sumiu com o sinal. Você perdeu os 2.", ganhoBom: 2 },
+  { id: "carroca", grupo: "confianca", tipo: "confia", icone: "grupos", titulo: "A carroça dividida",
+    telao: "Um morador da vila vizinha propõe: cada um põe 2 numa carroça que rende 8, para dividir. Você entra?",
+    texto: "Um morador da vila vizinha propõe: cada um põe 2 pontos numa carroça que rende 8, e vocês dividem. Só depois você descobre se ele cumpre o trato ou fica com tudo.",
+    sim: "Entrar no trato", nao: "Não entrar", bom: "Ele cumpriu: +2 para você.", ruim: "Ele ficou com a carroça. Você perdeu os 2.", ganhoBom: 2 },
+];
+
+// Palpite de quantos aceitam (pequena e grande)
+export const FAIXAS_PCT = ["Menos de 25%", "25% a 50%", "Mais de 50%"];
+export const faixaDe = (p) => (p < 0.25 ? 0 : p <= 0.5 ? 1 : 2);
+
+// R16: na confiança, cada pessoa recebe uma das 4 situações; a partida guarda qual (só a pessoa vê a sua)
+export const CONFIANCA = ANO4.filter((c) => c.grupo === "confianca").map((c) => c.id);
+// Antes da revelação da confiança: "Em qual situação você acha que mais vai haver golpe?" (o telão mostra só o total, com 5 ou mais respostas).
+// R23: as opções são as situações do jogo, não tipos de gente ("quem pede ajuda na rua" ligava a carta a um grupo real).
+export const QUEM_GOLPE = [...CONFIANCA.map((id) => ANO4.find((c) => c.id === id).titulo), "Todas do mesmo jeito"];
+export function distribuirSituacoes(ordem, r) {
+  const ids = [...ordem];
+  for (let i = ids.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [ids[i], ids[j]] = [ids[j], ids[i]]; }
+  return Object.fromEntries(ids.map((id, k) => [id, CONFIANCA[k % CONFIANCA.length]]));
+}
+// R28: na proposta pequena, metade da turma lê a proposta como "presente em troca de" e a outra metade às claras
+// ("cobra", "oferece"); os pontos e o estrago são os mesmos. Na revelação, o telão compara as duas falas e diz o nome: corrupção.
+export const FALAS = ["presente", "claras"];
+export function distribuirFalas(ordem, r) {
+  const ids = [...ordem];
+  for (let i = ids.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [ids[i], ids[j]] = [ids[j], ids[i]]; }
+  return Object.fromEntries(ids.map((id, k) => [id, FALAS[k % 2]]));
+}
+export const falaDe = (st, id) => st.fala?.[id] || FALAS[Math.max(0, st.ordem.indexOf(id)) % 2];
+// A carta da pequena como cada pessoa a lê (a fala "presente" troca o texto e os botões; título, pontos e estrago iguais)
+export function cartaPequena(st, id) { return cartaComFala(st, id, st.cartas.pequena); }
+// R34: a grande também tem as duas falas; cada pessoa lê as duas propostas na mesma fala sorteada no ano 2
+export function cartaComFala(st, id, cid) {
+  const c = POR_ID[cid];
+  return falaDe(st, id) === "presente" && c.presente ? { ...c, ...c.presente } : c;
+}
+// A situação de cada pessoa no ano 4 (quem entrou depois do sorteio recebe uma pela posição na lista)
+export function cartaAno4(st, id) {
+  const c = POR_ID[st.cartas.ano4];
+  if (c.grupo !== "confianca") return c;
+  return POR_ID[st.situacao?.[id] || CONFIANCA[Math.max(0, st.ordem.indexOf(id)) % CONFIANCA.length]];
+}
+
+const POR_ID = Object.fromEntries([...PEQUENAS, ...GRANDES, ...ANO4].map((c) => [c.id, c]));
+export const carta = (id) => POR_ID[id];
+
+// Sorteio das cartas da partida, só a partir da semente (o mesmo código refaz a mesma partida).
+// O ano 4 alterna entre honestidade e confiança; pequena e grande nunca atingem o mesmo alvo duas vezes seguidas por acaso:
+// sorteia-se a grande entre as de alvo diferente do da pequena sempre que houver uma.
+export function sortearCartas(r) {
+  const pick = (xs) => xs[Math.floor(r() * xs.length)];
+  const pequena = pick(PEQUENAS);
+  const outras = GRANDES.filter((g) => g.alvo !== pequena.alvo);
+  const todas = pequena.id === "entulho" ? GRANDES.filter((g) => g.id !== "aterro") : GRANDES;   // R36: nunca duas empresas de lixo na mesma partida
+  const grande = r() < 0.5 && outras.length ? pick(outras) : pick(todas);
+  const grupo = r() < 0.5 ? "honestidade" : "confianca";
+  const ano4 = pick(ANO4.filter((c) => c.grupo === grupo));
+  return { pequena: pequena.id, grande: grande.id, ano4: ano4.id };
+}
+
+// R16: o estrago escrito com os números da partida ("a mata cai de 39% para 19%"; "o bem público cai do nível 2 para o 1"),
+// para ninguém decidir lendo um estrago menor que o real. {efeito} = o que aconteceria; {feito} = o que aconteceu.
+const pct1 = (x) => { const v = 100 * x, r = Math.round(v); if (![30, 50].includes(r)) return `${r}%`; const p = v < r - 1e-9 ? Math.floor(v * 10 + 1e-9) / 10 : v - r > 0.05 ? Math.round(v * 10) / 10 : r; return `${p.toLocaleString("pt-BR")}%`; };   // R26: abaixo do limiar, para baixo
+// R17: três tempos: "cai" (o que acontece), "caiu" (o que aconteceu) e "cairia" (se a turma inteira aceitasse)
+const VERBOS = { pres: ["cai", "perde"], pass: ["caiu", "perdeu"], cond: ["cairia", "perderia"] };
+// R18: na proposta pequena (que vem depois das decisões do ano 2), o estrago vai sem a mata e o nível de agora, que só
+// aparecem no "Como ficou a vila": "a mata perde 20 pontos (de 100 da mata cheia)"
+function efeitoCarta(c, { mata, teto, publico, rel, perdido, juntado }, tempo) {
+  const [cai, perde] = VERBOS[tempo];
+  // R26: no bem público, sem nível ainda, a proposta tira só o que a vila juntou (R25); sem o nível conhecido, o texto diz os dois casos
+  if (rel) return c.alvo === "mata" ? `a mata ${perde} ${Math.round(100 * ESTRAGO_MATA)} pontos (de 100 da mata cheia)`
+    : publico === 0 ? `o bem público ${perde} tudo o que juntou para o primeiro nível` : publico > 0 ? `o bem público ${perde} um nível inteiro (12 pontos por família)`
+    : `o bem público ${perde} um nível inteiro (12 pontos por família) ou, se ainda não tiver nível, o que juntou`;   // R34: dito como condição
+  if (c.alvo === "mata") {
+    const de = mata / (teto || 1), para = Math.max(0, de - ESTRAGO_MATA);
+    if (Math.round(100 * de) === Math.round(100 * para)) return `a mata, já em ${pct1(de)}, não tem mais o que perder`;   // R20: mata no fim
+    return `a mata ${cai} de ${pct1(de)} para ${pct1(para)}`;
+  }
+  if (publico > 0) return `o bem público ${cai} do nível ${publico} para o ${publico - 1}`;
+  // R27: no nível 0 sem nada juntado, não houve o que perder (antes: "perdeu os pontos que juntou" com 0 pontos)
+  if (tempo === "pass" && perdido != null && perdido < 0.5) return "o bem público ainda não tinha pontos juntados, e nada se perdeu";
+  // R31: no nível 0 sem nada juntado, a carta não promete uma perda que não vai acontecer
+  if (tempo !== "pass" && juntado != null && juntado < 0.5) return `o bem público, ainda sem pontos juntados, não ${tempo === "cond" ? "teria" : "tem"} o que perder agora`;
+  return `o bem público ${perde} os pontos que juntou para o primeiro nível`;
+}
+export function textoCarta(c, campo, ctx) {
+  const t = c[campo] || "";
+  return t.replace("{efeito}", ctx ? efeitoCarta(c, ctx, "pres") : "o estrago de uma proposta grande").replace("{feito}", ctx ? efeitoCarta(c, ctx, "pass") : "houve estrago")
+    .replace("{seria}", ctx ? efeitoCarta(c, ctx, "cond") : "o estrago seria o de uma proposta grande");
+}
