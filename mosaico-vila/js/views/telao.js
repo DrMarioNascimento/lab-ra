@@ -15,6 +15,8 @@ function topo(st, titulo) {
     ${p && p.total ? `<div style="width:22cqw"><div class="row" style="justify-content:space-between"><span class="muted">${p.rot}</span><b class="mono">${p.feito}/${p.total}</b></div><div class="prog"><i style="width:${(100 * p.feito) / p.total}%"></i></div></div>` : ""}</div>`;
 }
 
+// Ícone de cada ano no telão (a novidade do ano)
+const ICONE_ANO = { 1: "economia", 2: "arvore-redonda", 3: "sobrado", 4: "lote-venda", 5: "alvara" };
 const fams = (st) => Object.values(st.fams);
 const grade = (xs, fn, cols = 4) => `<div class="grid" style="grid-template-columns:repeat(${Math.min(xs.length, cols)},1fr)">${xs.map(fn).join("")}</div>`;
 
@@ -32,7 +34,7 @@ export function renderTelao(st) {
       const nov = NOVIDADE_DO_ANO[st.ano], ex = EXEMPLO_DO_ANO[st.ano];
       const rs = Object.values(st.renda || {});
       const aluguel = rs.reduce((a, r) => a + r.aluguel, 0), piso = rs.filter((r) => r.piso > 0).length;
-      body = topo(st, `Ano ${st.ano}: ${esc(nov.titulo)}`) + `<div class="card"><p class="big">${esc(nov.texto)}</p></div>` +
+      body = topo(st, `Ano ${st.ano}: ${esc(nov.titulo)}`) + `<div class="card row" style="flex-wrap:nowrap;gap:1.4cqw">${ico(ICONE_ANO[st.ano], "g")}<p class="big" style="margin:0">${esc(nov.texto)}</p></div>` +
         (ex ? `<div class="card revela"><h3 class="row">${ico("ideia")}Exemplo resolvido</h3><ol class="big" style="margin:.4cqw 0 0 1.4cqw;padding:0">${ex.linhas.map((l) => `<li style="margin:.3cqw 0">${esc(l)}</li>`).join("")}</ol><p class="muted">No celular, uma pergunta rápida para conferir (não vale ponto).</p></div>`
           : `<div class="card"><b>A vila neste ano</b><p class="big muted">${aluguel ? `${n0(aluguel)} pontos de aluguel vão mudar de mãos. ` : ""}${piso ? `${piso} família(s) receberam o piso de renda.` : "Nenhuma família precisou do piso de renda."}</p><p class="muted">Cada família vê o próprio extrato no celular.</p></div>`);
       break;
@@ -51,7 +53,7 @@ export function renderTelao(st) {
     }
     case "lances": {
       body = topo(st, "Mercado de lotes") + `<div class="grid" style="grid-template-columns:1.4fr 1fr;flex:1"><div class="card">${mapaVila(st)}</div><div class="col">
-        <div class="card"><h3 class="row">${ico("casa-neutra")}${st.lotes.filter((x) => !x).length} lotes livres · até 3 à venda</h3><p class="big muted">Lance fechado: cada um propõe quanto do caixa da família oferecer; vale a mediana. O maior lance leva; empate, sorteio.</p><p class="big">Lance mínimo: <b class="mono">${lanceMinimo(st.ano)}</b></p></div>
+        <div class="card"><h3 class="row">${ico("lote-sobrado", "g")}${st.lotes.filter((x) => !x).length} lotes livres · até 3 à venda</h3><p class="big muted">Lance fechado: cada um propõe quanto do caixa da família oferecer; vale a mediana. O maior lance leva; empate, sorteio.</p><p class="big">Lance mínimo: <b class="mono">${lanceMinimo(st.ano)}</b></p></div>
         <div class="card"><p class="muted">Quem já enviou dá um palpite: qual vai ser o lance vencedor?</p></div></div></div>`;
       break;
     }
@@ -125,7 +127,7 @@ function telaoResultado(st) {
     <div class="card"><b>Patrimônio das famílias, do maior para o menor</b><p class="faint" style="margin:.2cqw 0">Caixa + lotes (lote vale ${VALOR_LOTE(st.publico)}). Sem nome: a posição de cada família só no celular dela.</p>${barras(ranking)}
     <p class="muted" style="margin-top:.6cqw">Desigualdade do patrimônio entre famílias (Gini): ${giniAgora.toFixed(2).replace(".", ",")}</p></div></div><div class="col">${cartaoMeta(st)}
     <div class="card">${linhas.map((l, k) => `<p class="linha-revela" style="margin:.25cqw 0;font-size:1.4cqw;line-height:1.4;animation-delay:${0.4 + 0.5 * k}s">${esc(l)}</p>`).join("")}</div>
-    ${st.ano === 3 && st.renda ? (() => { const rs = Object.values(st.renda), pg = rs.reduce((a, r) => a + r.aluguel, 0), rc = rs.reduce((a, r) => a + r.recebido, 0), mx = Math.max(1, pg, rc); return `<div class="card"><b>Aluguel do ano 3</b><div class="row" style="margin-top:.3cqw;gap:.6cqw"><span style="min-width:9cqw">Pagaram</span><div class="barra"><i style="width:${(100 * pg) / mx}%;background:linear-gradient(90deg,#b91c1c,#f87171)"></i></div><b class="mono">${n0(pg)}</b></div><div class="row" style="margin-top:.3cqw;gap:.6cqw"><span style="min-width:9cqw">Receberam</span><div class="barra"><i style="width:${(100 * rc) / mx}%;background:linear-gradient(90deg,#15803d,#4ade80)"></i></div><b class="mono">${n0(rc)}</b></div></div>`; })() : ""}</div></div>`;
+    ${st.ano === 3 && st.renda ? (() => { const rs = Object.values(st.renda), pg = rs.reduce((a, r) => a + r.aluguel, 0), rc = rs.reduce((a, r) => a + r.recebido, 0), mx = Math.max(1, pg, rc); return `<div class="card"><b class="row">${ico("sobrado")}Aluguel do ano 3</b><div class="row" style="margin-top:.3cqw;gap:.6cqw"><span style="min-width:9cqw">Pagaram</span><div class="barra"><i style="width:${(100 * pg) / mx}%;background:linear-gradient(90deg,#b91c1c,#f87171)"></i></div><b class="mono">${n0(pg)}</b></div><div class="row" style="margin-top:.3cqw;gap:.6cqw"><span style="min-width:9cqw">Receberam</span><div class="barra"><i style="width:${(100 * rc) / mx}%;background:linear-gradient(90deg,#15803d,#4ade80)"></i></div><b class="mono">${n0(rc)}</b></div></div>`; })() : ""}</div></div>`;
 }
 
 // Cinco perguntas encadeadas, uma por tema, montadas com os dados da própria turma.

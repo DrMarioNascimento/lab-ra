@@ -28,6 +28,7 @@ export function mapaVila(st, { grande = true, destaque = null } = {}) {
       : `<image href="${ICO}toco.webp" x="${x - 9}" y="${y - 2}" width="18" height="18" opacity=".8"/>`);
   }
   const lotes = [];
+  let aVenda = st.fase === "lances" ? Math.min(3, st.lotes.filter((x) => !x).length) : 0;   // até 3 lotes livres vão a lance
   for (let k = 0; k < LOTES; k++) {
     const col = k % 6, lin = Math.floor(k / 6);
     const x = 520 + col * 44, y = 110 + lin * 62;
@@ -36,7 +37,9 @@ export function mapaVila(st, { grande = true, destaque = null } = {}) {
     const marcada = dono && destaque === dono.id;
     lotes.push(dono
       ? `<g transform="translate(${x} ${y})"><rect x="-19" y="-19" width="38" height="44" rx="7" fill="${marcada ? dono.cor2 : "#1b3352"}" opacity="${marcada ? ".55" : ".8"}"/><rect x="-19" y="21" width="38" height="4" rx="2" fill="#081526" opacity=".7"/><image href="${ICO}casa-${marcada ? dono.casa : "neutra"}.webp" x="-21" y="-20" width="42" height="42"/></g>`
-      : `<g transform="translate(${x} ${y})"><rect x="-19" y="-19" width="38" height="44" rx="7" fill="#0b1a2c" stroke="#3b5875" stroke-dasharray="4 4"/></g>`);
+      : aVenda-- > 0
+        ? `<g transform="translate(${x} ${y})"><rect x="-19" y="-19" width="38" height="44" rx="7" fill="#2a2208" stroke="#fbbf24" stroke-width="2" stroke-dasharray="5 3"/><image href="${ICO}lote-venda.webp" x="-21" y="-21" width="42" height="42"/></g>`
+        : `<g transform="translate(${x} ${y})"><rect x="-19" y="-19" width="38" height="44" rx="7" fill="#0b1a2c" stroke="#3b5875" stroke-dasharray="4 4"/></g>`);
   }
   const nivel = st.publico;
   const predios = [];
