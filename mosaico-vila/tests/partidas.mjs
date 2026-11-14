@@ -3,7 +3,7 @@
 import { estadoInicial, reduzir, FASES, progresso, estragar } from "../js/engine.js";
 import { passoBot, NOMES, perfilBot, papelBully } from "../js/bots.js";
 import { gini, fecharAno, progressoMeta, COLAPSO, tetoLotes, leilao, lanceDaFamilia } from "../js/content/regras.js";
-import { carta, cartaAno4, cartaPequena, distribuirFalas, falaDe, sortearCartas, PEQUENAS, GRANDES, ANO4, CONFIANCA } from "../js/content/cartas.js";
+import { carta, cartaAno4, cartaPequena, distribuirFalas, falaDe, sortearCartas, textoCarta, PEQUENAS, GRANDES, ANO4, CONFIANCA } from "../js/content/cartas.js";
 import { renderTelao } from "../js/views/telao.js";
 import { pctL, nL } from "../js/views/desenho.js";
 import { renderAluno, novoLocal } from "../js/views/aluno.js";
@@ -245,6 +245,11 @@ ok(pctL(0.2996) === "29,9%" && pctL(0.3002) === "30%" && pctL(0.304) === "30,4%"
   const e = estragar(st, "publico", 1);
   ok(e.niveis === 1 && st.publico === 4, `R30: a grande no nível 5 cai para o 4 (ficou no ${st.publico})`);
   for (const c of PEQUENAS) ok(/presente/i.test(c.presente.sim) && (c.id !== "serraria" || (/sem nota/.test(c.sim) && /sem nota/.test(c.presente.sim))), `R30: botões das duas falas de ${c.id} comparáveis`);
+}
+// R31: no nível 0 sem nada juntado, a proposta grande no bem público não promete perda
+{
+  const g = GRANDES.find((c) => c.alvo === "publico"), t0 = textoCarta(g, "texto", { mata: 10, teto: 20, publico: 0, juntado: 0 }), t1 = textoCarta(g, "texto", { mata: 10, teto: 20, publico: 0, juntado: 30 });
+  ok(/não tem o que perder/.test(t0) && /perde os pontos que juntou/.test(t1), `R31: nível 0 sem pontos (${t0.slice(-80)})`);
 }
 const s = (k) => linhas.filter((l) => l[k]).length;
 console.log(`troca aprovada ${s("troca")}/15 · colapso ${s("colapso")}/15 · vitória coletiva ${s("vitoria")}/15 · desigualdade da renda sobe com o aluguel em ${rendaSobe}/15`);

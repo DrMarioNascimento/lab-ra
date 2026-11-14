@@ -54,8 +54,8 @@ function palpiteFaixa(st, id, onde, pergunta) {
 
 // Carta sorteada (pequena, ano 4 ou grande): texto, aviso de sigilo e dois botões iguais (mesmo tamanho e mesma cor)
 function cartaCelular(c, aviso, a, st, valSim = "1", valNao = "0") {
-  return `<h2 class="row">${ico(c.icone, "g")}${esc(c.titulo)}</h2><p class="muted">${esc(textoCarta(c, "texto", st.fase === "pequena" ? { rel: true } : { mata: st.mata, teto: st.teto, publico: st.publico }))}</p><p class="faint">${aviso}</p>
-    <div class="row"><button class="btn sec grow" data-a="${a}" data-val="${valSim}">${esc(c.sim)}</button><button class="btn sec grow" data-a="${a}" data-val="${valNao}">${esc(c.nao)}</button></div>`;
+  return `<h2 class="row">${ico(c.icone, "g")}${esc(c.titulo)}</h2><p class="muted">${esc(textoCarta(c, "texto", st.fase === "pequena" ? { rel: true } : { mata: st.mata, teto: st.teto, publico: st.publico, juntado: st.acumulado }))}</p><p class="faint">${aviso}</p>
+    <div class="escolha"><button class="btn sec" data-a="${a}" data-val="${valSim}">${esc(c.sim)}</button><button class="btn sec" data-a="${a}" data-val="${valNao}">${esc(c.nao)}</button></div>`;
 }
 
 // R27: as linhas do extrato fecham com o caixa mostrado; o caixa de antes e a renda saem como já apareceram (cabeçalho e abertura),
@@ -178,7 +178,7 @@ export function renderAluno(st, id, loc) {
       if (c.tipo === "dado") {
         bd = `<h2 class="row">${ico(c.icone, "g")}${esc(c.titulo)}</h2><p class="muted">${esc(c.texto)}</p>` + (loc.face == null
           ? `<button class="btn block" data-a="rolar">Pensei. Rolar o dado</button>`
-          : `<div class="card" style="text-align:center"><div class="dado">${loc.face}</div><p class="muted">Você acertou o número que pensou?</p><div class="row"><button class="btn sec grow" data-a="mente" data-val="1">Acertei</button><button class="btn sec grow" data-a="mente" data-val="0">Não acertei</button></div></div>`);
+          : `<div class="card" style="text-align:center"><div class="dado">${loc.face}</div><p class="muted">Você acertou o número que pensou?</p><div class="escolha"><button class="btn sec" data-a="mente" data-val="1">Acertei</button><button class="btn sec" data-a="mente" data-val="0">Não acertei</button></div></div>`);
       } else if (c.tipo === "honesto") {
         bd = cartaCelular(c, "<b>Só você vê esta tela.</b> O banco e a praça são do jogo; os 3 pontos valem no seu placar pessoal, que ninguém mais vê.", "mente", st);
       } else {
@@ -189,7 +189,7 @@ export function renderAluno(st, id, loc) {
     case "pequena": {
       const c = cartaPequena(st, id);   // R28: a fala sorteada para esta pessoa ("presente em troca de" ou às claras)
       bd = st.pequena.votos[id] != null ? enviado("Resposta secreta enviada.") + palpiteFaixa(st, id, "pequena", "quantos % de quem responder vão aceitar?")
-        : cartaCelular(c, `<b>Responda sem mostrar a tela.</b> Cada resposta vale para quem respondeu. ${esc(c.segmento[0].toUpperCase() + c.segmento.slice(1))} é personagem do jogo; os ${GANHO_PEQUENA} pontos valem no seu placar pessoal, que só você vê.`, "pequena", st);
+        : cartaCelular(c, `<b>Responda sem mostrar a tela.</b> Cada resposta vale para quem respondeu; o telão mostra só o total da turma (se todos fizerem o mesmo, o total diz isso). ${esc(c.segmento[0].toUpperCase() + c.segmento.slice(1))} é personagem do jogo; os ${GANHO_PEQUENA} pontos valem no seu placar pessoal, que só você vê.`, "pequena", st);
       break;
     }
     case "lances": {
@@ -209,7 +209,7 @@ export function renderAluno(st, id, loc) {
     case "alvara": {
       const c = carta(st.cartas.grande);
       bd = st.alvara.votos[id] != null ? enviado("Resposta secreta enviada.") + palpiteFaixa(st, id, "alvara", "quantos % de quem responder aceitariam?")
-        : cartaCelular(c, `<b>Responda no seu lugar, longe da família.</b> Vale a resposta de uma pessoa sorteada; ninguém vai saber quem foi. ${esc(c.segmento[0].toUpperCase() + c.segmento.slice(1))} é personagem do jogo; os ${GANHO_GRANDE} pontos valem no seu placar pessoal.`, "alvara", st);
+        : cartaCelular(c, `<b>Responda no seu lugar, longe da família.</b> Vale a resposta de uma pessoa sorteada (sem resposta, vale não); ninguém vai saber quem foi, e o telão mostra só o total (se todos fizerem o mesmo, o total diz isso). ${esc(c.segmento[0].toUpperCase() + c.segmento.slice(1))} é personagem do jogo; os ${GANHO_GRANDE} pontos valem no seu placar pessoal.`, "alvara", st);
       break;
     }
     case "resultado": {

@@ -213,3 +213,12 @@ No fim do ano 3, o motor guarda a vila (`snap3`). No fechamento, `contrafactual(
 - Confiança: "No fim do ano, o telão mostra os golpes onde houver 5 ou mais confiando" (a tela termina com folga).
 - Mercado de lotes: mapa menor (`lado compacto`), lotes e lance mínimo num cartão só e as regras numa lista (`.regras-lote`).
 - Medição: os scripts conferem também o que sai por cima ou por baixo de uma caixa que recorta (o carimbo cortado não aparecia na varredura da R29).
+
+## R31 (14/11/2026, após os avaliadores ES e ET; a 75ª rodada não passou, mínima 4,25)
+- Botões das cartas em `.escolha` (grade de duas colunas, `align-items: stretch`): as duas respostas com a mesma largura e a mesma altura em qualquer celular (antes, `.row` centrava na vertical, e o botão com texto maior ficava mais alto). Vale também para "Acertei / Não acertei" do dado.
+- Proposta grande: "sem resposta, vale não" no telão e no celular (o motor já fazia assim).
+- Pequena e grande no celular: "o telão mostra só o total da turma (se todos fizerem o mesmo, o total diz isso)".
+- Pergunta 4: `acasoPG` compara, entre quem respondeu as duas, quem aceitou a pequena e recusaria a grande e quem fez o contrário; diferença até duas vezes a raiz da soma é "do tamanho que o acaso dá". Resultado igual: "o mesmo. Por que o tamanho da proposta não mudou a resposta?".
+- "E se" (`motivosMeta`): todos os motivos de a meta não ser batida. Pergunta 2: "pela meta de cada regra".
+- `efeitoCarta(…, { juntado })`: no nível 0 sem pontos juntados, a carta diz que o bem público "não tem o que perder agora".
+- Confiança: "No fim do ano: os golpes da turma (com 5 ou mais confiando) e, se cada situação tiver 5 ou mais, os de cada uma."

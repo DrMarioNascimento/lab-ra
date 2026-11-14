@@ -143,7 +143,7 @@ const pct1 = (x) => { const v = 100 * x, r = Math.round(v); if (![30, 50].includ
 const VERBOS = { pres: ["cai", "perde"], pass: ["caiu", "perdeu"], cond: ["cairia", "perderia"] };
 // R18: na proposta pequena (que vem depois das decisões do ano 2), o estrago vai sem a mata e o nível de agora, que só
 // aparecem no "Como ficou a vila": "a mata perde 20 pontos (de 100 da mata cheia)"
-function efeitoCarta(c, { mata, teto, publico, rel, perdido }, tempo) {
+function efeitoCarta(c, { mata, teto, publico, rel, perdido, juntado }, tempo) {
   const [cai, perde] = VERBOS[tempo];
   // R26: no bem público, sem nível ainda, a proposta tira só o que a vila juntou (R25); sem o nível conhecido, o texto diz os dois casos
   if (rel) return c.alvo === "mata" ? `a mata ${perde} ${Math.round(100 * ESTRAGO_MATA)} pontos (de 100 da mata cheia)`
@@ -157,6 +157,8 @@ function efeitoCarta(c, { mata, teto, publico, rel, perdido }, tempo) {
   if (publico > 0) return `o bem público ${cai} do nível ${publico} para o ${publico - 1}`;
   // R27: no nível 0 sem nada juntado, não houve o que perder (antes: "perdeu os pontos que juntou" com 0 pontos)
   if (tempo === "pass" && perdido != null && perdido < 0.5) return "o bem público ainda não tinha pontos juntados, e nada se perdeu";
+  // R31: no nível 0 sem nada juntado, a carta não promete uma perda que não vai acontecer
+  if (tempo !== "pass" && juntado != null && juntado < 0.5) return `o bem público, ainda sem pontos juntados, não ${tempo === "cond" ? "teria" : "tem"} o que perder agora`;
   return `o bem público ${perde} os pontos que juntou para o primeiro nível`;
 }
 export function textoCarta(c, campo, ctx) {
