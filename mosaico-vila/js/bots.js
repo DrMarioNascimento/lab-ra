@@ -67,7 +67,8 @@ export function passoBot(st, id, loc, dispatch) {
     case "lances": {
       const p = st.lances?.[st.ano]?.[id];
       // R15: o celular mostra o efeito do lance; quem precisa de moradia oferece mais, quem não precisa oferece pouco
-      if ((!p || !p.lanceEnviado) && chance(0.3)) {
+      const noTeto = fam && fam.lotes >= Math.ceil(fam.membros.length / 3) + 1;   // R22: no teto, o celular não deixa dar lance
+      if (!noTeto && (!p || !p.lanceEnviado) && chance(0.3)) {
         const precisa = fam && fam.lotes < Math.ceil(fam.membros.length / 3);
         // R16: quem não precisa de moradia às vezes marca "não queremos lote"
         const v = !precisa && chance(pf.tipo === "CC" ? 0.6 : 0.35) ? -1 : precisa ? unif(0.15, 0.4) : pf.tipo === "FR" ? unif(0.1, 0.3) : pf.tipo === "CC" ? unif(0, 0.1) : unif(0, 0.2);

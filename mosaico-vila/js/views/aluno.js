@@ -21,18 +21,18 @@ function hd(st, me) {
 function miniBarra(st0) {
   const st = vista(st0);   // R17: entre as decisões e o resultado, a vila de antes das decisões
   const m = progressoMeta(st.fams, st.publico, st.mata, st.teto, st.regra);
-  const meta = ["conversa", "voto"].includes(st.fase) || (st.fase === "resultado" && st.ano === 3) ? "duas metas" : m.regra === "prosperidade" ? `${pctL(m.valor)}/${Math.round(100 * m.alvo)}%` : `${nL(m.valor, m.alvo)}/${m.alvo}`;   // R20
+  const meta = st.ano === 3 ? "duas metas" : m.regra === "prosperidade" ? `${pctL(m.valor)}/${Math.round(100 * m.alvo)}%` : `${nL(m.valor, m.alvo)}/${m.alvo}`;   // R20
   return `<div class="mini-hud">${st.ano >= 2 ? `<span>${ico("arvore-redonda")}<b>${pctL(st.mata / st.teto)}</b></span>` : ""}<span>${ico("economia")}<b>nível ${st.publico}</b></span><span>${ico("meta")}<b>${meta}</b></span><span>${ico("balanca")}<b>${REGRAS_TXT[st.regra].nome}</b></span></div>`;
 }
 
 // R19 e R20: as duas metas no celular, na conversa e no voto: o número de hoje e para onde ele costuma ir
 function duasMetasCel() {
-  return `<div class="card"><b>As duas metas</b><p class="faint" style="margin:4px 0 0">Monopólio: patrimônio médio de ${VITORIA.patrimonioPorPessoa} por pessoa. Prosperidade: a mais pobre com ${Math.round(100 * VITORIA.pobreSobreMedia)}% da média. Nas duas, mata acima de 30%. As duas mudam muito nos anos 4 e 5, com aluguel, mercado, mata e propostas: o que decide é como a vila joga.</p></div>`;   // R20: sem o número de hoje
+  return `<div class="card"><b>As duas metas</b><p class="faint" style="margin:4px 0 0">Monopólio: patrimônio médio de ${VITORIA.patrimonioPorPessoa} por pessoa. Prosperidade: a mais pobre com ${Math.round(100 * VITORIA.pobreSobreMedia)}% da média. Nas duas, mata em 30% ou mais. As duas mudam muito nos anos 4 e 5, com aluguel, mercado, mata e propostas: o que decide é como a vila joga.</p></div>`;   // R20: sem o número de hoje
 }
 
 // R10: a mesma barra da meta do telão, no celular (meta da regra vigente, desde o ano 1)
 function metaCelular(st) {
-  if (st.fase === "resultado" && st.ano === 3) return `<div class="card"><b class="row">${ico("meta")}Metas</b><p class="faint" style="margin:4px 0 0">Logo depois, a turma conversa e vota a regra dos anos 4 e 5; as duas metas aparecem lado a lado no voto.</p></div>`;   // R21
+  if (st.ano === 3) return `<div class="card"><b class="row">${ico("meta")}Metas</b><p class="faint" style="margin:4px 0 0">Logo depois, a turma conversa e vota a regra dos anos 4 e 5; as duas metas aparecem lado a lado no voto.</p></div>`;   // R21
   const m = progressoMeta(st.fams, st.publico, st.mata, st.teto, st.regra);
   const frac = Math.max(0, Math.min(1, m.valor / m.alvo));
   const val = m.regra === "prosperidade" ? `${pctL(m.valor)} de ${Math.round(100 * m.alvo)}%` : `${nL(m.valor, m.alvo)} de ${m.alvo}`;
@@ -118,7 +118,7 @@ export function renderAluno(st, id, loc) {
       const r = st.renda[f.id], nov = NOVIDADE_DO_ANO[st.ano];
       bd = `<h2>${esc(nov.titulo)}</h2><p class="muted">${esc(nov.texto)}</p><div class="card"><b>Extrato da família</b><table class="vals">
         <tr><td>Renda (${f.membros.length} pessoas)</td><td class="n">+${n0(r.base + r.bonusMata - r.perdaMata)}</td></tr>
-        ${r.aluguel ? `<tr><td>Aluguel pago (falta ${r.falta} lote)</td><td class="n">−${n0(r.aluguel)}</td></tr>` : ""}
+        ${r.aluguel ? `<tr><td>Aluguel pago (falta${r.falta === 1 ? " 1 lote" : `m ${r.falta} lotes`})</td><td class="n">−${n0(r.aluguel)}</td></tr>` : ""}
         ${r.recebido ? `<tr><td>Aluguel recebido</td><td class="n">+${n0(r.recebido)}</td></tr>` : ""}
         ${r.imposto ? `<tr><td>Imposto da terra</td><td class="n">−${n0(r.imposto)}</td></tr>` : ""}
         ${r.piso ? `<tr><td>Piso de renda</td><td class="n">+${n0(r.piso)}</td></tr>` : ""}
@@ -220,7 +220,7 @@ export function renderAluno(st, id, loc) {
     }
     case "conversa":
       // R16: conversa de 90 s antes do voto; o celular confere a regra e espera o voto abrir
-      bd = `<h2 class="row">${ico("balanca", "g")}Antes do voto: conversem</h2><p class="muted">Com a família, ${st.curto ? 60 : 90} segundos: que vila vocês querem nos anos 4 e 5, a que faz o patrimônio médio crescer ou a que não deixa a família mais pobre para trás? Quem ganha e quem paga em cada uma? <b>Quando o relógio do telão acabar, quem conduz abre o voto.</b></p>${controle(st, id)}
+      bd = `<h2 class="row">${ico("balanca", "g")}Antes do voto: conversem</h2><p class="muted">Com a família, ${st.curto ? 60 : 90} segundos: qual meta vocês querem, patrimônio médio alto ou ninguém muito atrás? Qual regra ajuda mais nisso, e quem ganha e quem paga em cada uma? <b>Quando o relógio do telão acabar, quem conduz abre o voto.</b></p>${controle(st, id)}
         <div class="card"><b>${esc(REGRAS_TXT.monopolio.nome)}</b><p class="faint" style="margin:2px 0 6px">${esc(REGRAS_TXT.monopolio.curto)}</p><b>${esc(REGRAS_TXT.prosperidade.nome)}</b><p class="faint" style="margin:2px 0 0">${esc(REGRAS_TXT.prosperidade.curto)}</p></div>
         ${duasMetasCel()}`;   // R19 e R20
       break;

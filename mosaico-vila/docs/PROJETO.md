@@ -11,7 +11,7 @@ O Mosaico Vila é a proposta P7 da biblioteca de GDDs "Fundo Comum" (núcleo de 
 - Moradia (só a partir do ano 3, quando a regra entra): 1 lote a cada 3 pessoas. Quem não tem paga aluguel (8 no Monopólio, 2 na Prosperidade); o aluguel do ano é dividido entre as famílias com lotes sobrando, na proporção dos lotes que sobram a cada uma. Na Prosperidade, imposto de 1,5 por lote e contribuição de 1 por pessoa vão ao bem público.
 - Mercado a partir do ano 4: até 3 lotes livres por ano, lance fechado, lance mínimo 6 + 2 × ano; empate, sorteio.
 - Patrimônio = caixa + lotes × (10 + 2 × nível do bem público). É ele que aparece nas fileiras de casas do telão e conta nas metas.
-- Herança desigual de propósito: a Família Verde começa com 50% a mais de caixa e 3 lotes; a última família começa sem lote.
+- Herança desigual de propósito: uma família (a cor sai da semente, R19) começa com 50% a mais de caixa e 3 lotes; a última família começa sem lote.
 - Decisão da família: mediana das propostas de quem está nela (ninguém decide sozinho; quem não envia mantém a proposta anterior).
 - Metas coletivas das duas regras: Monopólio (eficiência) = patrimônio médio de 54 por pessoa e mata acima de 30%; Prosperidade (equidade) = a família mais pobre com pelo menos 70% do patrimônio médio e mata acima de 30%. Votação: maioria simples dos votos enviados; empate mantém a regra atual. A meta do Monopólio aparece desde o ano 1 (exemplo do ano 1 e barra no telão e no celular a cada "Como ficou a vila", `progressoMeta()` em `regras.js`); depois do voto, a barra mostra a meta da regra vigente. (R19: antes 50 e 75%; ver a seção R19.)
 - Placar de cada pessoa (só no celular dela, no fechamento) = patrimônio da família ÷ pessoas da família + pontos pessoais (os das cartas). Os pontos pessoais nunca entram no caixa, no patrimônio, nas metas ou no telão.
@@ -122,3 +122,12 @@ No fim do ano 3, o motor guarda a vila (`snap3`). No fechamento, `contrafactual(
 - Conversa e voto sem a taxa das metas nos testes (ela muda com o tamanho da turma); ano 3 sem a meta em número na barra, no *O dinheiro* e no celular.
 - Painel *A vila*: "desceu 21 pontos: de 41% para 20%", etiquetas em pontos; no bem público, contribuições e proposta lado a lado quando uma proposta mexeu nele. No ano 5, "o lote conta só no patrimônio".
 - Teste da barra de antes das decisões lendo só o número da mata (antes, falhava às vezes quando outro número da barra coincidia).
+
+## R22 (14/11/2026, após os avaliadores EA e EB)
+- Pergunta-guia neutra: "Qual meta vocês querem: patrimônio médio alto ou ninguém muito atrás? Qual regra ajuda mais nisso, e quem ganha e quem paga em cada uma?". A da R20 dizia que o Monopólio "faz o patrimônio médio crescer"; em 96 partidas refeitas na outra regra com as mesmas decisões, a Prosperidade deu patrimônio médio maior em 95 (58,0 contra 54,4), e a meta dela saiu em 55 contra 41.
+- "E se" do fechamento com o patrimônio médio na outra regra (`contrafactual()` devolve `pp`).
+- Ano 3 inteiro com "duas metas" na barra do telão e do celular.
+- Mata em pontos também na pequena e no colapso ("faltam 22 pontos de mata, cerca de 68 pontos do caixa em replantio"); "faltam 2 lotes"; "30% ou mais" em todos os textos.
+- Pergunta 5 do fechamento em barras com porcentagem; painel da honestidade do ano 4 com a proposta pequena ao lado; "A situação é do jogo" nas cartas do ano 4.
+- Relógio da aula no painel de quem conduz, com o plano (anos fecham perto de 8, 15, 24, 31 e 37 min) e o aviso de atraso.
+- Participantes simulados no teto de lotes não dão lance (como o celular real).

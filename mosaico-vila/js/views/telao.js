@@ -33,7 +33,7 @@ function barra(st0) {
   const dPub = fx ? st.publico - fx.nivelAntes : 0;
   const delta = (d) => (d ? `<em class="delta ${d > 0 ? "up" : "down"}">${d > 0 ? "+" : "−"}${Math.abs(d)}</em>` : "");
   const metaOk = m.valor >= m.alvo && m.mata >= VITORIA.mataMinima;
-  const noVoto = ["conversa", "voto"].includes(st.fase) || (st.fase === "resultado" && st.ano === 3);   // R20 e R21: perto do voto, a barra não mostra a meta de uma regra só
+  const noVoto = st.ano === 3;   // R20 a R22: no ano 3 inteiro (o ano do voto), a barra não mostra a meta de uma regra só   // R20 e R21: perto do voto, a barra não mostra a meta de uma regra só
   const valMeta = noVoto ? `<small>duas metas</small>` : m.regra === "prosperidade" ? `${pctL(m.valor)}<small>/${Math.round(100 * m.alvo)}%</small>` : `${nL(m.valor, m.alvo)}<small>/${m.alvo}</small>`;
   const livres = st.lotes.filter((x) => !x).length;
   const pips = (n, tot, fn) => Array.from({ length: tot }, (_, k) => `<i class="${fn(k + 1)}"></i>`).join("");
@@ -102,7 +102,7 @@ function bannerGrande(st) {
 function telaoCarta(st, c, rodape) {
   return topo(st, esc(c.titulo)) + `<div class="card destaque">${ico(c.icone, "xl")}<p class="enorme">${esc(textoCarta(c, "telao", st.fase === "pequena" ? { rel: true } : { mata: st.mata, teto: st.teto, publico: st.publico }))}</p></div>
     <div class="card como"><p class="big" style="margin:0">${rodape}</p></div>
-    <p class="rodape">A proposta é do jogo, não de um colega. Cada um responde no celular, sem mostrar a tela; o telão só mostra o total, com 5 ou mais respostas.</p>`;
+    <p class="rodape">${st.fase === "mente" ? "A situação é do jogo, não de um colega." : "A proposta é do jogo, não de um colega."} Cada um responde no celular, sem mostrar a tela; o telão só mostra o total, com 5 ou mais respostas.</p>`;
 }
 
 // R16: na confiança, o telão mostra as 4 situações; cada pessoa recebe uma no celular, e a regra é a mesma em todas
@@ -144,7 +144,7 @@ export function renderTelao(st) {
     }
     case "decidir":
       body = topo(st, "Cada família decide") + (st.ano === 5 ? bannerGrande(st) : "") + `<div class="lado ${st.ano === 5 && st.cartas ? "compacto" : ""}"><div class="card mapa-card">${mapaVila(st)}</div>
-        <div class="col centro">${cronometro(st, "Conversem na família", st.curto && st.ano >= 4 ? 30 : 45)}<p class="big" style="text-align:center;margin:0">Cada um envia a sua proposta.<br>Vale a mediana da família.</p></div></div>`;
+        <div class="col centro">${cronometro(st, "Conversem na família", st.curto && st.ano >= 4 ? 30 : 45)}<p class="big" style="text-align:center;margin:0">Cada um envia a sua proposta.<br>Vale a mediana da família.</p>${st.ano >= 4 && st.leilao?.ano === st.ano && st.leilao.vendidos.length ? `<p class="rodape" style="text-align:center;margin:0">Os lances do mercado já saíram do caixa: a barra da meta já conta isso.</p>` : ""}</div></div>`;   // R22
       break;
     case "pequena":
       { const c = carta(st.cartas.pequena), ef = textoCarta({ ...c, x: "{efeito}" }, "x", { rel: true });
@@ -174,7 +174,7 @@ export function renderTelao(st) {
       // R16: 90 s de conversa com uma pergunta-guia antes de o voto abrir
       // R17: o exemplo resolvido das duas regras vem logo no começo da conversa (antes, só aparecia no voto)
       body = topo(st, "Antes do voto: conversem") + `<div class="lado"><div class="col" style="min-height:0;gap:1cqw">
-        <div class="card"><p class="enorme" style="margin:0;font-size:2.3cqw">Que vila vocês querem: a que faz o patrimônio médio crescer ou a que não deixa a mais pobre para trás? Quem ganha e quem paga?</p></div>
+        <div class="card"><p class="enorme" style="margin:0;font-size:2.3cqw">Qual meta vocês querem: patrimônio médio alto ou ninguém muito atrás? Qual regra ajuda mais nisso, e quem ganha e quem paga em cada uma?</p></div>
         <div class="card" style="flex:1;min-height:0;overflow:hidden"><h3 class="row">${ico("ideia")}Exemplo resolvido: as duas regras</h3>${exemploLinhas(st, EXEMPLO_VOTO.linhas, 1.5, "compacto")}</div></div>
         <div class="col centro">${cronometro(st, "Conversem na família", st.curto ? 60 : 90)}${duasMetas()}</div></div>`;
       break;
@@ -262,7 +262,8 @@ function acertoPalpite(st, onde, p) {
   const pal = st.palpitePct[onde] || {}, np = Object.keys(pal).length;
   return agregadoOk(np) ? `<p class="rodape">Palpite da turma: ${pct(Object.values(pal).filter((v) => v === faixaDe(p)).length, np)}% acertaram a faixa (${esc(FAIXAS_PCT[faixaDe(p)].toLowerCase())}).</p>` : "";
 }
-const textoEstrago = (e) => (!e ? "" : e.alvo === "mata" ? `a mata perdeu <b>${Math.round(e.pct)}%</b>` : e.niveis ? `o bem público caiu <b>${e.niveis} nível</b>` : `o bem público perdeu <b>${n0(e.pontos)} pontos</b> do próximo nível`);
+// R22: a mata em pontos da mata cheia (como no painel A vila e nas cartas); o bem público em níveis ou pontos de contribuição
+const textoEstrago = (e) => (!e ? "" : e.alvo === "mata" ? `a mata perdeu <b>${Math.round(e.pct)} ${Math.round(e.pct) === 1 ? "ponto" : "pontos"}</b>` : e.niveis ? `o bem público caiu <b>${e.niveis} ${e.niveis === 1 ? "nível" : "níveis"}</b>` : `o bem público perdeu <b>${n0(e.pontos)} pontos de contribuição</b> do próximo nível`);
 
 // Painéis de "Como ficou a vila", com a duração de cada um (somam o tempo total da tela).
 export function paineisResultado(st) {
@@ -286,7 +287,7 @@ export function paineisResultado(st) {
   if (ePub && (ePub.niveis || ePub.pontos)) { const contrib = st.publico - fx.nivelAntes + (ePub.niveis || 0); fatos.push(`<div class="chips-iso"><span class="chip">${ico("economia")}contribuições ${contrib >= 0 ? "+" : "−"}${Math.abs(contrib)} nível</span><span class="chip mal">${ico("alvara")}proposta ${ePub.niveis ? `−${ePub.niveis} nível` : `−${Math.round(ePub.pontos)} pontos`}</span></div>`); }
   if (st.colapsou) {
     const falta = Math.max(0, COLAPSO * st.teto - st.mata);
-    fatos.push(st.ano < 5 ? fato("toco", `Mata abaixo de 30%: −4 por pessoa até voltar. Faltam <b>${Math.max(1, pp(falta))}%</b> (cerca de ${n0(Math.ceil((falta / 2) * 5))} pontos de replantio).`, "mal")
+    fatos.push(st.ano < 5 ? fato("toco", `Mata abaixo de 30%: −4 por pessoa até voltar. Faltam <b>${Math.max(1, pp(falta))} pontos</b> de mata (cerca de ${n0(Math.ceil((falta / 2) * 5))} pontos do caixa em replantio).`, "mal")
       : fato("toco", "A mata terminou abaixo de 30%: a meta pede mais que isso.", "mal"));
   } else if (st.colapsouAlguma) fatos.push(fato("arvore-redonda", "A mata voltou a passar dos 30%: o −4 acabou", "bom"));
   const prev = st.previsao[st.ano] || {}, np = Object.keys(prev).length;
@@ -353,7 +354,10 @@ export function paineisResultado(st) {
         <div class="card col" style="justify-content:center;gap:.6cqw"><b class="big">Quem a turma achou que mais dava golpe</b>${agregadoOk(q.length) ? QUEM_GOLPE.map((t, k) => `<div class="barra-rot"><span>${esc(t)}</span><div class="barra"><i style="width:${pct(qc[k] || 0, q.length)}%"></i></div><b class="mono">${pct(qc[k] || 0, q.length)}%</b></div>`).join("") : `<p class="rodape">Menos de 5 respostas.</p>`}</div></div>`;
     } else {
       const acaso = c.tipo === "dado" ? " (por acaso, cerca de 17%)" : "";
-      html = `<div class="card destaque">${ico(c.icone, "xl")}<p class="enorme">${agregadoOk(nv) ? `${esc(c.titulo)}: <b>${pct(sim, nv)}%</b> ${c.tipo === "dado" ? 'disseram "acertei"' : "ficaram com os 3"}${acaso}.` : "Menos de 5 respostas: o total fica guardado."}</p></div>`;
+      // R22: ao lado, a proposta pequena do ano 2 (as duas decisões de honestidade da turma, lado a lado)
+      const pqOk = agregadoOk(st.pequena?.n || 0), pqP = pqOk ? pct(st.pequena.aceitaram, st.pequena.n) : null;
+      html = `<div class="card destaque">${ico(c.icone, "xl")}<p class="enorme">${agregadoOk(nv) ? `${esc(c.titulo)}: <b>${pct(sim, nv)}%</b> ${c.tipo === "dado" ? 'disseram "acertei"' : "ficaram com os 3"}${acaso}.` : "Menos de 5 respostas: o total fica guardado."}</p></div>
+        ${agregadoOk(nv) && pqOk ? `<div class="card col fech-barras" style="gap:1cqw"><div><div class="row" style="justify-content:space-between;flex-wrap:nowrap"><span>Ano 2, proposta pequena: aceitaram</span><b class="mono">${pqP}%</b></div><div class="barra grande"><i style="width:${pqP}%"></i></div></div><div><div class="row" style="justify-content:space-between;flex-wrap:nowrap"><span>Ano 4, ${esc(c.titulo.toLowerCase())}: ${c.tipo === "dado" ? 'disseram "acertei"' : "ficaram com os 3"}</span><b class="mono">${pct(sim, nv)}%</b></div><div class="barra grande"><i style="width:${pct(sim, nv)}%"></i></div></div><p class="rodape">${c.tipo === "dado" ? "No dado, cerca de 17% acertariam por acaso." : "Aqui, ninguém conferia."} Cada resposta foi secreta.</p></div>` : ""}`;
     }
     paineis.push({ nome: c.grupo === "confianca" ? "Confiança" : c.titulo, carta: true, dur: extra, html });
   }
@@ -417,7 +421,7 @@ function perguntasFechamento(st) {
         ? `Na pequena, ${pq}% aceitaram (${fe}% do estrago de uma grande); na grande, ${pg}% aceitariam: quase o mesmo. Por que o tamanho da proposta quase não mudou a resposta?`
         : pq < pg
           ? `Na pequena, ${pq}% aceitaram (${fe}% do estrago de uma grande). Na grande, em que uma pessoa só decidiria, ${pg}% aceitariam. Por que mais gente toparia a grande?`
-          : `Na pequena, ${pq}% aceitaram (${fe}% do estrago de uma grande; com todos, seria igual). Na grande, ${pg}% aceitariam. Por que a pequena parece menos grave?`)
+          : `Na pequena, ${pq}% aceitaram (${fe}% do estrago de uma grande; se todos aceitassem, seria o estrago inteiro). Na grande, ${pg}% aceitariam. Por que a pequena parece menos grave?`)
       : "Das propostas: na pequena, cada um decidiu por si; na grande, uma pessoa tinha o poder. Qual pareceu mais grave, e por quê?",
     "Fora da vila: na profissão de vocês, onde estão a \"mata comum\" e as propostas pequenas?",
   ];
@@ -439,8 +443,12 @@ function teoria(st, k) {
 function apoioPergunta(st, k) {
   const o = st.outra;
   if (k === 0) return "Primeiro 1 minuto em dupla; depois, a turma.";
-  if (k === 1 && o) return `E se fosse ${ARTIGO[o.regra]}? Mesmas decisões: desigualdade final ${v2(o.gini)} (foi ${v2(st.historico.at(-1)?.gini ?? 0)}), meta ${o.meta ? "batida" : "não batida"}. É um "e se": na outra regra, vocês talvez decidissem diferente.`;
-  if (k === 4) return "Por exemplo: a agenda do posto, a praça onde se treina, a verba do clube. Quem cobra aluguel dela?";
+  if (k === 1 && o) return `E se fosse ${ARTIGO[o.regra]}? Mesmas decisões: patrimônio médio ${Math.round(o.pp ?? 0)} (foi ${Math.round(progressoMeta(st.fams, st.publico, st.mata, st.teto, "monopolio").valor)}), desigualdade final ${v2(o.gini)} (foi ${v2(st.historico.at(-1)?.gini ?? 0)}), meta ${o.meta ? "batida" : "não batida"}. É um "e se": na outra regra, vocês talvez decidissem diferente.`;
+  if (k === 4) {
+    const fin = Object.values(st.final), mot = contagem(fin.map((x) => x.motivo)), nM = MOTIVOS.reduce((a, m) => a + (mot[m] || 0), 0);
+    const top = MOTIVOS.slice().sort((a, b) => (mot[b] || 0) - (mot[a] || 0)).slice(0, 2);
+    return "Por exemplo: a agenda do posto, a praça onde se treina, a verba do clube. Quem ganha com elas sem fazer nada, e quem cuida delas?" + (agregadoOk(nM) ? ` Na turma, o que mais pesou: ${top.map((m) => `${m.toLowerCase()} (${pct(mot[m] || 0, nM)}%)`).join(" e ")}.` : "");
+  }
   if (k === 3 && st.cartas && !st.semTroco) {
     const c = carta(st.cartas.ano4), vals = Object.values(st.mente);
     if (agregadoOk(vals.length)) return c.tipo === "confia" ? `E no ano 4 (confiança): ${pct(vals.filter(Boolean).length, vals.length)}% confiaram, e a chance de golpe era a mesma em todas as situações.` : c.tipo === "dado" ? `E no ano 4 (${c.titulo}): ${pct(vals.filter(Boolean).length, vals.length)}% disseram "acertei"; por acaso, seriam cerca de 17%. Ninguém sabe quem acertou de verdade.` : `E no ano 4 (${c.titulo}): ${pct(vals.filter(Boolean).length, vals.length)}% ficaram com o que não era seu, sem ninguém para conferir.`;   // R17: no dado, quem acertou por acaso não é desonesto
@@ -459,7 +467,10 @@ function guiouTurma(st) {
   const fin = Object.values(st.final);
   if (!agregadoOk(fin.length)) return `<p class="rodape">O que guiou a turma aparece com 5 ou mais respostas.</p>`;
   const guias = contagem(fin.map((x) => x.guia)), motivos = contagem(fin.map((x) => x.motivo));
-  return `<div class="col fech-barras"><div><b>O que guiou (Platão e Hume)</b><p class="rodape">${GUIAS.map((g) => `${g} <b>${guias[g] || 0}</b>`).join(" · ")}</p></div><div><b>O que mais pesou</b><p class="rodape">${MOTIVOS.map((m) => `${m} <b>${motivos[m] || 0}</b>`).join(" · ")}</p></div></div>`;
+  const nG = GUIAS.reduce((a, g) => a + (guias[g] || 0), 0) || 1, nM = MOTIVOS.reduce((a, m) => a + (motivos[m] || 0), 0) || 1;
+  const top = MOTIVOS.slice().sort((a, b) => (motivos[b] || 0) - (motivos[a] || 0)).slice(0, 2);
+  // R22: barras com porcentagem (antes, contagens soltas em letra pequena)
+  return `<div class="col fech-barras" style="gap:.7cqw"><b>O que guiou a turma (Platão e Hume)</b>${GUIAS.map((g) => `<div class="barra-rot" style="grid-template-columns:11cqw 1fr 6cqw;font-size:2cqw"><span>${g}</span><div class="barra"><i style="width:${pct(guias[g] || 0, nG)}%"></i></div><b class="mono">${pct(guias[g] || 0, nG)}%</b></div>`).join("")}</div>`;   // R22: "o que mais pesou" fica ao lado, embaixo da pergunta 5
 }
 
 function telaoFechamento(st) {
