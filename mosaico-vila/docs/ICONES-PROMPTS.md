@@ -13,7 +13,7 @@
 - **Mercado de lotes** (`mercado-lotes.webp`, a barraca com dois lotes cercados) e **lote à venda** (`lote-alfinete.webp`, o piso de lotes com alfinete): substituem os dois ícones de pixel (`lote-sobrado_SUBSTITUIDO_2026-11-14.webp` e `lote-venda_SUBSTITUIDO_2026-11-14.webp`).
 - **Bem público, níveis 4 e 5** (`publico-4-escola.webp`, `publico-5-centro.webp`): a escola com relógio e a casa com sino, com as paredes em creme para não parecerem a casa da Família Azul.
 - **Moradia no celular da própria família** (`moradia-*.webp`): sem lote, a cabana; com o que precisa, a casa (1 lote) ou o sobrado (2); com um lote a mais, as geminadas térreas (precisa de 1) ou o sobrado com anexo (precisa de 2); 3 lotes precisando de 1, as geminadas. As casas são recoloridas na cor de cada família. O telão continua com a mesma casa para todas, para não marcar quem tem herança ou começou sem lote.
-- Ficaram guardados, sem uso no jogo: a capela (o bem público da vila é laico: praça, posto, academia, escola, centro comunitário), a cédula (o jogo usa uma moeda só, de 10 pontos, do começo ao fim) e o "sobrado + casa" (o sobrado com anexo já faz esse papel).
+- Ficaram guardados, sem uso no jogo: a capela (o bem público da vila é laico: praça, posto, academia, escola, centro comunitário) e o "sobrado + casa" (o sobrado com anexo já faz esse papel). (R33: a cédula, que ficava guardada, entrou na carta *O achado da praça*.)
 
 - R33: **meta** com o alvo com dardo enviado pelo professor (`meta.webp`; o anterior, cópia do MOSAICO Sala, em `meta_SUBSTITUIDO_2026-11-14.webp`); **sobrado** do aluguel no cinza-azulado da casa neutra (o azul parecia a Família Azul; anterior em `sobrado_SUBSTITUIDO_2026-11-14.webp`); a **cédula** (`cedula.webp`) entrou na carta *O achado da praça* e a moeda na *A taxa da praça*, no lugar das mãos repetidas. A moradia saiu do cabeçalho do celular e aparece só nas telas do mercado de lotes.
 
@@ -34,7 +34,7 @@ Propostas pequenas (ano 2)
 21. `carta-fiscal.webp` (hoje `toco`) · O fiscal da mata: prancheta de fiscal com um carimbo levantado e duas toras de madeira ao lado, uma moeda dourada escorregando por baixo da prancheta.
 22. `carta-vizinho.webp` (hoje `grupos`) · A carga do vizinho: caderno de anotações aberto com uma linha em branco e uma carroça pequena de toras ao fundo.
 23. `carta-serraria.webp` (hoje `arvore-dourada`) · A madeira sem nota: pilha de tábuas recém-serradas com uma nota fiscal rasgada ao meio no chão.
-24. `carta-taxa.webp` (hoje `economia`) · A taxa da praça: banco de praça com um envelope de cobrança e uma moeda saindo pela lateral.
+24. `carta-taxa.webp` (hoje `moeda`) · A taxa da praça: banco de praça com um envelope de cobrança e uma moeda saindo pela lateral.
 
 Propostas grandes (ano 5)
 25. `carta-alvara.webp` (hoje `alvara`) · O alvará: prancheta com carimbo "aprovado" e um capacete de obra ao lado (o item 18 da lista original).
@@ -44,7 +44,7 @@ Propostas grandes (ano 5)
 Honestidade (ano 4)
 28. `carta-dado.webp` (hoje `ideia`) · O troco do mercado: dado branco ao lado de um punhado de moedas (o item 17 da lista original).
 29. `carta-extrato.webp` (hoje `participar`) · O extrato a mais: celular mostrando um extrato com uma linha destacada em verde e três moedas saltando da tela.
-30. `carta-achado.webp` (hoje `economia`) · O achado da praça: três moedas douradas no chão de pedra da praça, com uma caixinha de achados e perdidos ao lado.
+30. `carta-achado.webp` (hoje `cedula`) · O achado da praça: três moedas douradas no chão de pedra da praça, com uma caixinha de achados e perdidos ao lado.
 
 Confiança (ano 4)
 31. `carta-pedido.webp` (hoje `economia`) · O pedido na estrada: duas mãos se encontrando, uma oferecendo duas moedas, sobre uma estrada de terra; sem rosto, roupa ou sinal de pobreza (para não retratar ninguém).
