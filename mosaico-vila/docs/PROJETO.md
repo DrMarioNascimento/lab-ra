@@ -203,3 +203,13 @@ No fim do ano 3, o motor guarda a vila (`snap3`). No fechamento, `contrafactual(
 - Pergunta 4: "A grande veio depois do carimbo do ano 2: a turma já sabia o nome." Com as falas, a linha de apoio fica com dois assuntos (sai a carta do ano 4, que teve o seu painel).
 - Mercado do ano 5 com a grande aceita: cartão compacto e o aviso "a barra já conta o estrago".
 - Palpites "de quem responder"; queda de nível pela pequena explicada; tela da confiança mais curta; barra de ícones em 2,15% e exemplos compactos em 1,95%.
+
+## R30 (14/11/2026, após os avaliadores EQ e ER; a 74ª rodada não passou, mínima 4,25)
+- `fecharAno`: no nível máximo do bem público, o acumulado zera (o que entra além não fica guardado; o celular diz "não sobe mais o bem público nem fica guardado"). Assim, a proposta grande no bem público derruba mesmo o nível 5 para o 4, como a carta e a revelação dizem; antes, a sobra guardada absorvia o estrago. Na simulação, `vila_sobra_some` (versão 46, r68).
+- `falasPequena`: a diferença entre as falas só vira pista de efeito da palavra quando passa de duas vezes o erro do sorteio (proporção conjunta); abaixo disso, "com tão poucas pessoas, diferença assim é comum por acaso"; com o mesmo resultado, "mesmo resultado nas duas falas" (`igual`).
+- Botões das duas falas com o mesmo ato: *A madeira sem nota* "Aceitar os 2 e vender sem nota" / "Aceitar o presente e vender sem nota"; *A taxa da praça* "Dar o presente ao funcionário".
+- Painel da pequena: carimbo `.md` (2,8%), coluna com `justify-content: safe center` (o alto nunca sai cortado), colunas .85/1,15, textos mais curtos; "Com a turma inteira…" sem repetir "o estrago de uma grande". `carimbo(txt, cls)` recebe a classe (a pergunta 4 usa `pq`).
+- Pergunta 4: o aviso do carimbo do ano 2 aparece em todos os casos; o "De onde vem" só cita a teoria do ano 4 quando a carta aparece na linha de apoio.
+- Confiança: "No fim do ano, o telão mostra os golpes onde houver 5 ou mais confiando" (a tela termina com folga).
+- Mercado de lotes: mapa menor (`lado compacto`), lotes e lance mínimo num cartão só e as regras numa lista (`.regras-lote`).
+- Medição: os scripts conferem também o que sai por cima ou por baixo de uma caixa que recorta (o carimbo cortado não aparecia na varredura da R29).

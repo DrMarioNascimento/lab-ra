@@ -236,6 +236,16 @@ ok(pctL(0.2996) === "29,9%" && pctL(0.3002) === "30%" && pctL(0.304) === "30,4%"
     ok(cartaPequena(st, "a").texto !== cartaPequena(st, "b").texto && cartaPequena(st, "a").alvo === cartaPequena(st, "b").alvo && cartaPequena(st, "a").titulo === cartaPequena(st, "b").titulo, `R28: ${c.id} muda só a fala`);
   }
 }
+// R30: no nível máximo, o que entra além não fica guardado, e a grande no bem público derruba o nível de verdade
+{
+  const fams = { a: { id: "a", membros: [1, 2], caixa: 50, lotes: 1 } };
+  const fx = fecharAno({ fams, mata: 10, teto: 20, publico: 5, acumulado: 0, colapsou: false, ano: 5 }, { 1: { pub: 50, rep: 0, car: 0 }, 2: { pub: 50, rep: 0, car: 0 } }, { a: { total: 60, imposto: 0 } });
+  ok(fx.publico === 5 && fx.acumulado === 0, `R30: no nível 5, nada fica guardado (acumulado ${fx.acumulado})`);
+  const st = { fams: { a: {}, b: {} }, publico: 5, acumulado: fx.acumulado, estragoPublico: 0 };
+  const e = estragar(st, "publico", 1);
+  ok(e.niveis === 1 && st.publico === 4, `R30: a grande no nível 5 cai para o 4 (ficou no ${st.publico})`);
+  for (const c of PEQUENAS) ok(/presente/i.test(c.presente.sim) && (c.id !== "serraria" || (/sem nota/.test(c.sim) && /sem nota/.test(c.presente.sim))), `R30: botões das duas falas de ${c.id} comparáveis`);
+}
 const s = (k) => linhas.filter((l) => l[k]).length;
 console.log(`troca aprovada ${s("troca")}/15 · colapso ${s("colapso")}/15 · vitória coletiva ${s("vitoria")}/15 · desigualdade da renda sobe com o aluguel em ${rendaSobe}/15`);
 console.log(falhas ? `${falhas} verificações falharam` : "todas as verificações passaram");

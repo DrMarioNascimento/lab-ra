@@ -385,8 +385,13 @@ input[type=text], input[type=number], select, textarea { box-shadow: inset 0 3px
   border-radius: .8cqw; padding: .35cqw 1.6cqw .45cqw; font: 900 3.6cqw/1 Sora, sans-serif; letter-spacing: .25cqw; text-transform: uppercase;
   transform: rotate(-3deg); box-shadow: 0 .5cqw 0 #7f1d1d, 0 0 2.2cqw rgba(239,68,68,.5); animation: carimbar .45s cubic-bezier(.2,1.6,.4,1) calc(var(--a, 0s) + .3s) both; }
 .telao .carimbo.pq { font-size: 2.2cqw; padding: .25cqw 1cqw .3cqw; }
+.telao .carimbo.md { font-size: 2.8cqw; padding: .3cqw 1.2cqw .4cqw; margin-top: .4cqw; }   /* R30: no painel da pequena, cabe sem cortar */
 @keyframes carimbar { from { transform: rotate(-3deg) scale(1.8); opacity: 0; } to { transform: rotate(-3deg) scale(1); opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .telao .carimbo { animation: none; } }
 .telao .falas-barras { gap: .8cqw; font-size: 2cqw; }
 .telao .falas-barras .barra.grande { height: 1.6cqw; margin-top: .4cqw; }
 .telao .fech-barras.fino .barra.grande { height: 1.3cqw; margin-top: .25cqw; }
+
+/* R30: regras do mercado de lotes, uma por linha */
+.telao .regras-lote { margin: 0; padding-left: 2.6cqw; font-size: 2cqw; line-height: 1.3; }
+.telao .regras-lote li { margin: .45cqw 0; }

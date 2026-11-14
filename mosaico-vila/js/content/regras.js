@@ -120,6 +120,7 @@ export function fecharAno(v, props, renda) {
   const nf = Object.keys(fams).length;
   const nivelAntes = publico;
   while (acumulado >= PONTOS_NIVEL * nf && publico < NIVEL_MAX) { acumulado -= PONTOS_NIVEL * nf; publico += 1; }
+  if (publico >= NIVEL_MAX) acumulado = 0;   // R30: no nível máximo, o que entra além não fica guardado (o celular já dizia isso), e uma proposta derruba o nível de verdade
   return { fams, mata, publico, acumulado, colapsou, extrato, extr, plant, mataAntes, nivelAntes };
 }
 

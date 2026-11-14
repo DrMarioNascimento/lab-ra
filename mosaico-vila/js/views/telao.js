@@ -109,7 +109,7 @@ function telaoCarta(st, c, rodape) {
 function telaoConfianca(st) {
   return topo(st, "Uma questão de confiança") + `<div class="grid" style="grid-template-columns:repeat(4,1fr);gap:1.2cqw">${CONFIANCA.map((id) => { const c = carta(id); return `<div class="card row" style="flex-wrap:nowrap;gap:.8cqw;padding:1cqw 1.2cqw">${ico(c.icone)}<b class="big" style="margin:0">${esc(c.titulo)}</b></div>`; }).join("")}</div>
     <div class="card destaque"><p class="enorme" style="font-size:3cqw">Cada pessoa recebe no celular <b>uma</b> destas situações. Em todas, você arrisca 2 antes de saber se a outra parte é honesta: honesta, +2; golpe, −2. <b>Não arriscar não custa nada.</b></p></div>
-    <div class="card como"><p class="big" style="margin:0">Depois, no celular: em qual situação vai haver mais golpe? No fim do ano, o telão mostra os golpes da turma (com 5 ou mais confiando) e por situação (com 5 ou mais em cada).</p></div>`;
+    <div class="card como"><p class="big" style="margin:0">Depois, no celular: em qual situação vai haver mais golpe? No fim do ano, o telão mostra os golpes onde houver 5 ou mais confiando.</p></div>`;
 }
 
 // R19: antes do voto, as duas metas com os números de hoje (não só a da regra vigente)
@@ -163,13 +163,14 @@ export function renderTelao(st) {
     }
     case "lances": {
       const livres = st.lotes.filter((x) => !x).length;
-      body = topo(st, "Mercado de lotes") + `<div class="lado"><div class="card mapa-card">${mapaVila(st)}</div><div class="col">
-        ${st.ano === 5 && st.alvara?.aceito
-          ? `<div class="card row" style="flex-wrap:nowrap;gap:1.2cqw">${ico("lote-sobrado", "g")}<div class="big"><b class="mono">${Math.min(3, livres)}</b> lotes à venda · lance mínimo <b class="mono">${lanceMinimo(st.ano)}</b></div></div>
-             <div class="card banner mal"><p class="big" style="margin:0">Proposta grande aceita: a barra já conta o estrago.</p></div>`   // R29: o estrago aparece na barra antes da explicação; o telão avisa
-          : `<div class="card row" style="flex-wrap:nowrap">${ico("lote-sobrado", "xl")}<div><b class="enorme mono">${Math.min(3, livres)}</b><div class="big">lotes à venda</div></div></div>
-        <div class="card"><div class="big">Lance mínimo</div><b class="enorme mono">${lanceMinimo(st.ano)}</b></div>`}
-        <p class="rodape">${st.ano === 5 ? "Voltem às famílias. " : ""}Lance fechado; o maior leva. Vale a mediana da família (quem não envia, 0%).${st.regra === "prosperidade" ? " Na Prosperidade, conta metade do que vai além do mínimo." : ""} Até a moradia + 1 lote.</p></div></div>`;   // R21: cabe na TV também na Prosperidade
+      // R30: as regras do mercado numa lista curta, uma por linha (antes, um parágrafo com cinco regras); lotes e lance mínimo num cartão só
+      const regras = ["Lance secreto; vale a <b>mediana da família</b> (sem lance, 0).", "O maior lance leva.",
+        ...(st.regra === "prosperidade" ? ["Na Prosperidade, o que passa do mínimo conta pela metade."] : []), "Cada família, até a moradia + 1 lote."];
+      body = topo(st, "Mercado de lotes") + `<div class="lado compacto"><div class="card mapa-card">${mapaVila(st, { menor: true })}</div><div class="col">
+        <div class="card row" style="flex-wrap:nowrap;gap:1.2cqw">${ico("lote-sobrado", "g")}<div class="big">${st.ano === 5 ? "Voltem às famílias: " : ""}<b class="mono">${Math.min(3, livres)}</b> lotes à venda · lance mínimo <b class="mono">${lanceMinimo(st.ano)}</b></div></div>
+        ${st.ano === 5 && st.alvara?.aceito ? `<div class="card banner mal"><p class="big" style="margin:0">Proposta grande aceita: a barra já conta o estrago.</p></div>` : ""}
+        <div class="card"><ol class="regras-lote">${regras.map((t) => `<li>${t}</li>`).join("")}</ol></div>
+        </div></div>`;   // R29: no ano 5 com a grande aceita, o telão avisa que a barra já conta o estrago
       break;
     }
     case "alvara":
@@ -357,11 +358,11 @@ export function paineisResultado(st) {
       : e?.alvo === "publico" && e.niveis ? `Somando os pequenos, o bem público perdeu <b>${n0(e.pontos)} pontos</b> (${Math.round(100 * fe)}% do estrago de uma grande) e, sem pontos de sobra, caiu ${e.niveis === 1 ? "1 nível" : `${e.niveis} níveis`}.`   // R29
       : `Somando os pequenos, ${textoEstrago(e)}${e?.alvo === "publico" && !e.niveis && st.publico === 0 ? "." : `: ${Math.round(100 * fe)}% do estrago de uma grande.`}`;
     // R27/R28: sem o "se a turma inteira aceitasse" quando todos aceitaram ou quando não havia o que perder
-    const seTodos = todos || semPerda ? "" : ` Com a turma inteira, ${textoCarta({ ...c, x: "{seria}" }, "x", { rel: true, publico: st.publico + (e?.niveis || 0) })}: o estrago de uma grande.`;
-    paineis.push({ nome: c.titulo, carta: true, dur: extra, html: `<div class="grid" style="grid-template-columns:1.05fr 1fr;flex:1;min-height:0">
+    const seTodos = todos || semPerda ? "" : ` Com a turma inteira, ${textoCarta({ ...c, x: "{seria}" }, "x", { rel: true, publico: st.publico + (e?.niveis || 0) })}.`;   // R30: o "% do estrago de uma grande" já veio na frase de cima
+    paineis.push({ nome: c.titulo, carta: true, dur: extra, html: `<div class="grid" style="grid-template-columns:.85fr 1.15fr;flex:1;min-height:0">
       <div class="card destaque col" style="justify-content:center;gap:1cqw;min-height:0">
         <p class="enorme" style="margin:0;font-size:2.6cqw">${ok ? `<b>${Math.round(100 * p)}%</b> de quem respondeu aceitou.` : "Menos de 5 respostas: o total fica guardado."}</p>
-        <p class="big" style="margin:0">${estrago}${seTodos}</p>${ok ? acertoPalpite(st, "pequena", p) : ""}</div>
+        <p class="big" style="margin:0;font-size:2.15cqw">${estrago}${seTodos}</p>${ok ? acertoPalpite(st, "pequena", p) : ""}</div>
       ${painelFalas(st)}</div>` });
   }
   if (st.ano === 4 && !st.semTroco && st.cartas) {
@@ -468,7 +469,8 @@ function perguntasFechamento(st) {
 // R15: de onde vem cada tema, para a turma (uma linha embaixo do gráfico)
 function teoria(st, k) {
   // R18: a referência do ano 4 conforme a carta que a turma jogou
-  const t4 = st.cartas && !st.semTroco ? carta(st.cartas.ano4).tipo : null;
+  // R30: só quando a carta do ano 4 aparece na linha de apoio (com as duas falas, ela sai da pergunta 4)
+  const t4 = k === 3 && st.cartas && !st.semTroco && !falasPequena(st).ok && agregadoOk(Object.values(st.mente || {}).length) ? carta(st.cartas.ano4).tipo : null;
   const ref4 = { dado: "; Jiang (2013): jogo da mente", honesto: "; Cohn e colegas (2019): carteiras perdidas", confia: "; Berg e colegas (1995): jogo da confiança" }[t4] || "";
   return ["Henry George: o valor da terra vem da comunidade; quem só tem o lote recebe sem fazer.",
     "Lizzie Magie (1904): o Jogo do Proprietário, avô do Banco Imobiliário, já tinha estas duas regras.",
@@ -488,14 +490,14 @@ function apoioPergunta(st, k) {
     return "Por exemplo: a agenda do posto, a praça onde se treina, a verba do clube. Quem ganha com elas sem fazer nada, e quem cuida delas?" + (agregadoOk(nM) ? ` Na turma, o que mais pesou: ${top.map((m) => `${m.toLowerCase()} (${pct(mot[m] || 0, nM)}%)`).join(" e ")}.` : "");
   }
   // R28: na pergunta 4, as duas falas da pequena (cada uma com 5 ou mais respostas) puxam a discussão
-  const F = k === 3 ? falasPequena(st) : null, falas = F?.ok ? `Na pequena, com “presente em troca de”, ${pct(F.P.a, F.P.n)}% aceitaram; às claras, ${pct(F.C.a, F.C.n)}%${F.acaso ? " (até uma pessoa de diferença: pode ser acaso)" : ""}. A palavra mudou a decisão? ` : "";
+  const F = k === 3 ? falasPequena(st) : null, falas = F?.ok ? `Na pequena, com “presente em troca de”, ${pct(F.P.a, F.P.n)}% aceitaram; às claras, ${pct(F.C.a, F.C.n)}%${F.igual ? ", o mesmo" : F.acaso ? ", diferença do tamanho que o acaso dá" : ", pista (não prova) de que a palavra pesou"}. A palavra muda decisões? ` : "";
   // R29: a grande veio depois do carimbo do ano 2, e a pergunta 4 diz isso; com as falas, a carta do ano 4 sai desta linha (três assuntos em 1,5 min era demais)
   const aviso = k === 3 && st.cartas ? "A grande veio depois do carimbo do ano 2: a turma já sabia o nome. " : "";
   if (k === 3 && (F?.ok || !(st.cartas && !st.semTroco))) return (aviso + falas).trim();
   if (k === 3 && st.cartas && !st.semTroco) {
     const c = carta(st.cartas.ano4), vals = Object.values(st.mente);
-    if (agregadoOk(vals.length)) return falas + (c.tipo === "confia" ? `E no ano 4 (confiança): ${pct(vals.filter(Boolean).length, vals.length)}% confiaram, e a chance de golpe era a mesma em todas as situações.` : c.tipo === "dado" ? `E no ano 4 (${c.titulo}): ${pct(vals.filter(Boolean).length, vals.length)}% disseram "acertei"; por acaso, seriam cerca de 17%. Ninguém sabe quem acertou de verdade.` : `E no ano 4 (${c.titulo}): ${pct(vals.filter(Boolean).length, vals.length)}% ficaram com o que não era seu, sem ninguém para conferir.`);   // R17: no dado, quem acertou por acaso não é desonesto
-    return falas.trim();
+    if (agregadoOk(vals.length)) return aviso + falas + (c.tipo === "confia" ? `E no ano 4 (confiança): ${pct(vals.filter(Boolean).length, vals.length)}% confiaram, e a chance de golpe era a mesma em todas as situações.` : c.tipo === "dado" ? `E no ano 4 (${c.titulo}): ${pct(vals.filter(Boolean).length, vals.length)}% disseram "acertei"; por acaso, seriam cerca de 17%. Ninguém sabe quem acertou de verdade.` : `E no ano 4 (${c.titulo}): ${pct(vals.filter(Boolean).length, vals.length)}% ficaram com o que não era seu, sem ninguém para conferir.`);   // R17: no dado, quem acertou por acaso não é desonesto
+    return (aviso + falas).trim();   // R30: o aviso do carimbo também quando uma fala teve menos de 5 e a carta do ano 4 entra
   }
   return "";
 }
@@ -504,19 +506,21 @@ function apoioPergunta(st, k) {
 function falasPequena(st) {
   const ids = Object.keys(st.pequena?.votos || {}), conta = (f) => { const xs = ids.filter((id) => falaDe(st, id) === f); return { n: xs.length, a: xs.filter((id) => st.pequena.votos[id]).length }; };
   const P = conta("presente"), C = conta("claras"), ok = agregadoOk(P.n) && agregadoOk(C.n);
-  // R29: diferença de até uma pessoa na base menor pode ser só acaso (a mesma regra da pergunta 4)
-  const acaso = ok && Math.abs(P.a / P.n - C.a / C.n) <= 1 / Math.min(P.n, C.n) + 1e-9;
-  return { P, C, ok, acaso };
+  // R30: a metade sorteada só mostra efeito da palavra se a diferença passar de duas vezes o erro do sorteio
+  // (antes, só até uma pessoa contava como acaso; sem efeito nenhum, diferenças maiores apareciam em quase metade das partidas)
+  const p = ok ? (P.a + C.a) / (P.n + C.n) : 0, erro = ok ? Math.sqrt(p * (1 - p) * (1 / P.n + 1 / C.n)) : 0;
+  const dif = ok ? Math.abs(P.a / P.n - C.a / C.n) : 0, igual = ok && dif < 0.005, acaso = ok && !igual && dif <= 2 * erro + 1e-9;
+  return { P, C, ok, acaso, igual };
 }
-const carimbo = (txt = "Corrupção") => `<div class="carimbo">${esc(txt)}</div>`;
+const carimbo = (txt = "Corrupção", cls = "") => `<div class="carimbo${cls ? ` ${cls}` : ""}">${esc(txt)}</div>`;
 function barrasFalas(F, grande = false) {
   return `<div class="col falas-barras">${[["“Presente em troca de”", F.P], ["Às claras (“cobra”, “oferece”)", F.C]].map(([rot, x]) => `<div><div class="row" style="justify-content:space-between;flex-wrap:nowrap"><b>${rot}</b><b class="mono">${pct(x.a, x.n)}%</b></div><div class="barra ${grande ? "grande" : ""}"><i style="width:${pct(x.a, x.n)}%;background:#f87171"></i></div></div>`).join("")}</div>`;
 }
 function painelFalas(st) {
   const F = falasPequena(st), c = carta(st.cartas.pequena);
-  return `<div class="card col" style="justify-content:center;gap:1cqw;min-height:0">${carimbo(c.carimbo || "Corrupção")}
-    <p class="big" style="margin:0">Metade leu <b>“presente em troca de”</b>; metade, às claras: mesmos pontos, mesmo estrago. O carimbo vai na proposta, não em quem aceitou.</p>
-    ${F.ok ? `${barrasFalas(F, true)}<p class="rodape" style="margin:0">${F.acaso ? "Diferença de até uma pessoa: pode ser só acaso." : "Aceitaram, em cada fala."} A palavra mudou a decisão?</p>` : `<p class="rodape" style="margin:0">A comparação das duas falas aparece com 5 ou mais respostas em cada uma.</p>`}</div>`;
+  return `<div class="card col" style="justify-content:safe center;gap:1cqw;min-height:0">${carimbo(c.carimbo || "Corrupção", "md")}
+    <p class="big" style="margin:0;font-size:2.15cqw">Metade leu <b>“presente em troca de”</b>; metade, às claras. Mesmos pontos, mesmo estrago: o carimbo é da proposta, não de quem aceitou.</p>
+    ${F.ok ? `${barrasFalas(F, true)}<p class="rodape" style="margin:0">${F.igual ? "Mesmo resultado nas duas falas. Fora do jogo, a palavra muda decisões?" : F.acaso ? "Com tão poucas pessoas, diferença assim é comum por acaso. A palavra muda decisões?" : "Diferença maior que a do acaso, mas é pista, não prova. A palavra mudou a decisão?"}</p>` : `<p class="rodape" style="margin:0">A comparação das duas falas aparece com 5 ou mais respostas em cada uma.</p>`}</div>`;
 }
 
 // R16: na pergunta 4, as duas propostas lado a lado (mesma base: quem respondeu); na 5, o que guiou a turma
@@ -544,7 +548,7 @@ function telaoFechamento(st) {
   const tam = qs[k].length + apoio.length, longa = tam > 170;
   return topo(st, "Fechamento") + `<div class="grid" style="grid-template-columns:1fr 1.25fr;flex:1;min-height:0">
     <div class="card col" style="min-height:0;gap:.7cqw;overflow:hidden"><h2 class="row" style="color:var(${st.vitoria ? "--ok" : "--warn"})">${ico(st.vitoria ? "trofeu" : "meta", "g")}${st.vitoria ? "A vila bateu a meta!" : "A vila não bateu a meta"}</h2>
-      ${k === 3 ? `<div class="row" style="gap:1.2cqw;align-items:center;flex-wrap:nowrap">${st.cartas && carta(st.cartas.pequena).carimbo ? carimbo(`${carta(st.cartas.pequena).carimbo} e corrupção`).replace('class="carimbo"', 'class="carimbo pq"') : `${carimbo().replace('class="carimbo"', 'class="carimbo pq"')}<span class="big" style="margin:0">as duas propostas</span>`}</div>` : `<p class="big" style="margin:0;font-size:2.1cqw">${vz.txt}</p>`}
+      ${k === 3 ? `<div class="row" style="gap:1.2cqw;align-items:center;flex-wrap:nowrap">${st.cartas && carta(st.cartas.pequena).carimbo ? carimbo(`${carta(st.cartas.pequena).carimbo} e corrupção`, "pq") : `${carimbo("Corrupção", "pq")}<span class="big" style="margin:0">as duas propostas</span>`}</div>` : `<p class="big" style="margin:0;font-size:2.1cqw">${vz.txt}</p>`}
       <div class="linha-media">${k === 3 ? barrasPropostas(st) : k === 4 ? guiouTurma(st) : linhaDoTempo(st.historico, { F: 30, alto: 240, so: k === 2 ? "mata" : "desig" })}</div><p class="rodape teoria">De onde vem: ${esc(teoria(st, k))}</p></div>
     <div class="col" style="min-height:0"><div class="card pergunta" style="flex:1;min-height:0;overflow:hidden"><div class="temas">${TEMAS.map((t, i) => `<span class="${i === k ? "agora" : i < k ? "feito" : ""}">${t}</span>`).join("")}</div>
       <p class="pergunta-txt ${tam > 250 ? "longa longa2" : longa ? "longa" : ""}">${esc(qs[k])}</p>${apoio ? `<p class="rodape apoio">${esc(apoio)}</p>` : ""}${k === 0 ? `<div class="crono-mini">${cronometro(st, "Dupla, depois da síntese", 60, 90)}</div>` : ""}</div>

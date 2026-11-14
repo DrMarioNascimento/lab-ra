@@ -29,13 +29,13 @@ export const PEQUENAS = [
   { id: "serraria", segmento: "a serraria", de: "da serraria", lado: "recebe", alvo: "publico", icone: "arvore-dourada", titulo: "A madeira sem nota", carimbo: "Sonegação",   // R29: venda sem nota é sonegação, não corrupção
     telao: "A serraria paga 2 a mais pela sua madeira sem nota. Sem nota, o imposto não chega ao bem público.",
     texto: "A serraria oferece 2 pontos pessoais a mais se você vender a madeira sem nota. Sem nota, o imposto da venda não chega ao bem público. Cada pessoa que aceita tira um pedaço do bem público; se a turma inteira aceitar, {efeito}.",
-    sim: "Vender sem nota", nao: "Vender com nota",
-    presente: { texto: "A serraria quer te dar um presente de 2 pontos pessoais, em troca de você vender a madeira sem nota. Sem nota, o imposto da venda não chega ao bem público. Cada pessoa que aceita tira um pedaço do bem público; se a turma inteira aceitar, {efeito}.", sim: "Aceitar o presente", nao: "Recusar e vender com nota" } },
+    sim: "Aceitar os 2 e vender sem nota", nao: "Recusar e vender com nota",   // R30: as duas falas dizem o ato no botão
+    presente: { texto: "A serraria quer te dar um presente de 2 pontos pessoais, em troca de você vender a madeira sem nota. Sem nota, o imposto da venda não chega ao bem público. Cada pessoa que aceita tira um pedaço do bem público; se a turma inteira aceitar, {efeito}.", sim: "Aceitar o presente e vender sem nota", nao: "Recusar e vender com nota" } },
   { id: "taxa", segmento: "um funcionário da prefeitura", de: "de um funcionário da prefeitura", lado: "paga", alvo: "publico", icone: "economia", titulo: "A taxa da praça",
     telao: "Um funcionário cobra 1 ponto para tirar seu nome da taxa da praça, que custa 3. Saldo: +2 para quem aceita.",
     texto: "Todo mundo paga 3 pontos de taxa para a praça. Um funcionário da prefeitura cobra 1 ponto seu para tirar o seu nome da lista. Saldo: +2 pontos pessoais. Cada pessoa que aceita tira um pedaço do bem público; se a turma inteira aceitar, {efeito}.",
     sim: "Pagar 1 ao funcionário", nao: "Pagar a taxa",
-    presente: { texto: "Todo mundo paga 3 pontos de taxa para a praça. Um funcionário da prefeitura pede um presente de 1 ponto seu, em troca de tirar o seu nome da lista. Saldo: +2 pontos pessoais. Cada pessoa que aceita tira um pedaço do bem público; se a turma inteira aceitar, {efeito}.", sim: "Dar o presente", nao: "Pagar a taxa" } },
+    presente: { texto: "Todo mundo paga 3 pontos de taxa para a praça. Um funcionário da prefeitura pede um presente de 1 ponto seu, em troca de tirar o seu nome da lista. Saldo: +2 pontos pessoais. Cada pessoa que aceita tira um pedaço do bem público; se a turma inteira aceitar, {efeito}.", sim: "Dar o presente ao funcionário", nao: "Pagar a taxa" } },
 ];
 
 export const GRANDES = [
@@ -147,7 +147,7 @@ function efeitoCarta(c, { mata, teto, publico, rel, perdido }, tempo) {
   const [cai, perde] = VERBOS[tempo];
   // R26: no bem público, sem nível ainda, a proposta tira só o que a vila juntou (R25); sem o nível conhecido, o texto diz os dois casos
   if (rel) return c.alvo === "mata" ? `a mata ${perde} ${Math.round(100 * ESTRAGO_MATA)} pontos (de 100 da mata cheia)`
-    : publico === 0 ? `o bem público ${perde} tudo o que juntou para o primeiro nível` : publico > 0 ? `o bem público ${perde} 12 pontos por família, um nível inteiro`
+    : publico === 0 ? `o bem público ${perde} tudo o que juntou para o primeiro nível` : publico > 0 ? `o bem público ${perde} um nível inteiro (12 pontos por família)`
     : `o bem público ${perde} um nível inteiro (12 pontos por família; sem nível ainda, o que juntou)`;
   if (c.alvo === "mata") {
     const de = mata / (teto || 1), para = Math.max(0, de - ESTRAGO_MATA);
