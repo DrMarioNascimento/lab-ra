@@ -94,8 +94,8 @@ function bannerGrande(st) {
   if (!st.cartas || st.alvara.aceitariam == null) return "";
   const c = carta(st.cartas.grande), vs = Object.values(st.alvara.votos), ok = agregadoOk(vs.length);
   const e = st.alvara.estrago, falta = Math.max(0, COLAPSO * st.teto - st.mata);
-  const efeito = !st.alvara.aceito ? "" : e?.alvo === "mata" ? (falta > 0 ? ` A mata ficou abaixo de 30%: ${Math.max(1, Math.round((100 * falta) / st.teto)) === 1 ? "falta 1 ponto" : `faltam ${Math.round((100 * falta) / st.teto)} pontos`} (cerca de ${n0(Math.ceil((falta / 2) * 5))} de replantio) para ela voltar.` : " Já conta neste ano: dá para replantar.") : e?.niveis ? " Já conta na renda deste ano." : " A vila perdeu o que juntou para o próximo nível; a renda deste ano não muda.";
-  return `<div class="card banner ${st.alvara.aceito ? "mal" : "bom"}">${fato(c.icone, `${esc(textoCarta(c, st.alvara.aceito ? "aceito" : "recusado", { ...st.alvara.antes, teto: st.teto }))}${efeito}${ok ? ` <span class="sub">${pct(vs.filter(Boolean).length, vs.length)}% aceitariam.</span>` : ""}`, st.alvara.aceito ? "mal" : "bom")}</div>`;
+  const efeito = !st.alvara.aceito ? "" : e?.alvo === "mata" ? (falta > 0 ? ` A mata ficou abaixo de 30%: ${Math.max(1, Math.round((100 * falta) / st.teto)) === 1 ? "falta 1 ponto" : `faltam ${Math.round((100 * falta) / st.teto)} pontos`} (cerca de ${n0(Math.ceil((falta / 2) * 5))} de replantio) para ela voltar.` : " Já conta neste ano: dá para replantar.") : e?.niveis ? " Já conta na renda deste ano." : (e?.pontos || 0) >= 0.5 ? " A vila perdeu o que juntou para o próximo nível; a renda deste ano não muda." : " A renda deste ano não muda.";
+  return `<div class="card banner ${st.alvara.aceito ? "mal" : "bom"}">${fato(c.icone, `${esc(textoCarta(c, st.alvara.aceito ? "aceito" : "recusado", { ...st.alvara.antes, teto: st.teto, perdido: st.alvara.estrago?.pontos }))}${efeito}${ok ? ` <span class="sub">${pct(vs.filter(Boolean).length, vs.length)}% aceitariam.</span>` : ""}`, st.alvara.aceito ? "mal" : "bom")}</div>`;
 }
 
 // Carta sorteada da etapa (pequena, ano 4 ou grande): o telão mostra a carta e como a resposta conta.
@@ -109,7 +109,7 @@ function telaoCarta(st, c, rodape) {
 function telaoConfianca(st) {
   return topo(st, "Uma questão de confiança") + `<div class="grid" style="grid-template-columns:repeat(4,1fr);gap:1.2cqw">${CONFIANCA.map((id) => { const c = carta(id); return `<div class="card row" style="flex-wrap:nowrap;gap:.8cqw;padding:1cqw 1.2cqw">${ico(c.icone)}<b class="big" style="margin:0">${esc(c.titulo)}</b></div>`; }).join("")}</div>
     <div class="card destaque"><p class="enorme" style="font-size:3cqw">Cada pessoa recebe no celular <b>uma</b> destas situações. Em todas, você arrisca 2 antes de saber se a outra parte é honesta: honesta, +2; golpe, −2. <b>Não arriscar não custa nada.</b></p></div>
-    <div class="card como"><p class="big" style="margin:0">Depois, no celular: em qual situação vai haver mais golpe? No fim do ano, o telão mostra quantos golpes houve em cada situação.</p></div>`;
+    <div class="card como"><p class="big" style="margin:0">Depois, no celular: em qual situação vai haver mais golpe? No fim do ano, o telão mostra quantos golpes a turma sofreu e, se cada situação tiver 5 ou mais pessoas confiando, quantos houve em cada uma.</p></div>`;
 }
 
 // R19: antes do voto, as duas metas com os números de hoje (não só a da regra vigente)
@@ -333,7 +333,7 @@ export function paineisResultado(st) {
     if (fora.length) acont.push(`<p class="rodape">${fora.join("; ")}.</p>`);
     const pal = st.palpite?.[st.ano] || {}, npl = Object.keys(pal).length;
     if (st.leilao.vendidos.length && agregadoOk(npl)) {
-      const maior = Math.max(...st.leilao.vendidos.map((v) => v.preco)), certo = maior <= 20 ? "até 20" : maior <= 40 ? "21 a 40" : "mais de 40";
+      const maior = Math.round(Math.max(...st.leilao.vendidos.map((v) => v.preco))), certo = maior <= 20 ? "até 20" : maior <= 40 ? "21 a 40" : "mais de 40";   // R27: pelo número que o telão mostra
       acont.push(`<p class="rodape">Palpite do lance vencedor: ${pct(Object.values(pal).filter((v) => v === certo).length, npl)}% acertaram (${certo}).</p>`);
     }
   }
@@ -380,7 +380,7 @@ export function paineisResultado(st) {
     const c = carta(st.cartas.grande), vs = Object.values(st.alvara.votos), ok = agregadoOk(vs.length), p = vs.length ? vs.filter(Boolean).length / vs.length : 0;
     const pq = st.pequena.n ? st.pequena.aceitaram / st.pequena.n : null;   // R16: mesma base (quem respondeu)
     paineis.push({ nome: c.titulo, carta: true, dur: extra, html: `<div class="card col" style="flex:1;justify-content:center;gap:1.3cqw">
-      ${fato(c.icone, esc(textoCarta(c, st.alvara.aceito ? "aceito" : "recusado", { ...st.alvara.antes, teto: st.teto })), st.alvara.aceito ? "mal" : "bom")}
+      ${fato(c.icone, esc(textoCarta(c, st.alvara.aceito ? "aceito" : "recusado", { ...st.alvara.antes, teto: st.teto, perdido: st.alvara.estrago?.pontos })), st.alvara.aceito ? "mal" : "bom")}
       ${ok ? fato("ideia", `<b>${Math.round(100 * p)}%</b> aceitariam os 8 pontos ${esc(c.de)}.`) : ""}
       ${pq != null && agregadoOk(st.pequena.n) && ok ? fato("balanca", `Na proposta pequena do ano 2, <b>${Math.round(100 * pq)}%</b> aceitaram; na grande, <b>${Math.round(100 * p)}%</b> aceitariam.`) : ""}
       ${ok ? acertoPalpite(st, "alvara", p) : ""}<p class="rodape">Na pequena, cada um decidiu por si; na grande, uma só pessoa sorteada tinha o poder, e ela nunca aparece.</p></div>` });
@@ -432,17 +432,19 @@ function perguntasFechamento(st) {
   // R16: as duas porcentagens sobre quem respondeu; o estrago da pequena sobre a turma inteira
   const pq = agregadoOk(st.pequena?.n || 0) ? pct(st.pequena.aceitaram, st.pequena.n) : null, pg = agregadoOk(vs.length) ? pct(vs.filter(Boolean).length, vs.length) : null;
   const fe = n ? Math.round((100 * (st.pequena?.aceitaram || 0)) / n) : 0;
+  // R27: "quase o mesmo" com menos de 5 pontos ou até uma pessoa de diferença na base menor (11 de 19 contra 10 de 19 não é diferença)
+  const nP = st.pequena?.n || 0, nG = vs.length, quase = pq != null && pg != null && (Math.abs(pq - pg) < 5 || Math.abs(st.pequena.aceitaram / nP - vs.filter(Boolean).length / nG) <= 1 / Math.min(nP, nG) + 1e-9);
   const semNivel = st.pequena?.estrago?.alvo === "publico" && !st.pequena.estrago.niveis && (st.pequena.estrago.pontos || 0) < PONTOS_NIVEL * Object.keys(st.fams).length * (fe / 100) - 0.5;   // R26: o estrago foi só o que a vila juntava
   return [
     H.length >= 3 ? (subiu ? "Quando o aluguel entrou (ano 3), a desigualdade subiu. Quem ganhou com isso, e sem fazer o quê?" : "Quando o aluguel entrou (ano 3), a desigualdade não subiu. O que segurou?") : "A desigualdade entre as famílias cresceu ou caiu? Por quê?",
     `Com o aluguel mordendo, a vila ${st.votoTrocou ? "trocou para a Prosperidade" : "ficou no Monopólio"}. Vocês votaram pelo próprio bolso, pela vila ou pela meta que parecia mais fácil?`,
     `Bolso ou vila também na mata: ${origem} ${st.colapsouAlguma ? (st.colapsou ? "Ela colapsou e não voltou." : mataMin < COLAPSO ? "Ela colapsou e voltou." : "Uma proposta a derrubou abaixo de 30% no meio do ano, e ela voltou.") : `O pior ano chegou a ${pctL(mataMin)}.`} Quem pagou a conta?`,
     pq != null && pg != null
-      ? (Math.abs(pq - pg) < 5
+      ? (quase
         ? `Na pequena, ${pq}% aceitaram${semNivel ? "" : ` (${fe}% do estrago de uma grande)`}; na grande, ${pg}% aceitariam: quase o mesmo. Por que o tamanho da proposta quase não mudou a resposta?`
         : pq < pg
           ? `Na pequena, ${pq}% aceitaram${semNivel ? "" : ` (${fe}% do estrago de uma grande)`}. Na grande, em que uma pessoa só decidiria, ${pg}% aceitariam. Por que mais gente toparia a grande?`
-          : `Na pequena, ${pq}% aceitaram${semNivel ? "" : ` (${fe}% do estrago de uma grande; se todos aceitassem, seria o estrago inteiro)`}. Na grande, ${pg}% aceitariam. Por que a pequena parece menos grave?`)
+          : `Na pequena, ${pq}% aceitaram${semNivel ? "" : fe >= 100 ? " (todos: o estrago inteiro de uma grande)" : ` (${fe}% do estrago de uma grande; se todos aceitassem, seria o estrago inteiro)`}. Na grande, ${pg}% aceitariam. Por que a pequena parece menos grave?`)
       : "Das propostas: na pequena, cada um decidiu por si; na grande, uma pessoa tinha o poder. Qual pareceu mais grave, e por quê?",
     "Fora da vila: na profissão de vocês, onde estão a \"mata comum\" e as propostas pequenas?",
   ];

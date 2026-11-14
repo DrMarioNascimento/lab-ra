@@ -178,3 +178,12 @@ No fim do ano 3, o motor guarda a vila (`snap3`). No fechamento, `contrafactual(
 - Etiquetas do bem público na mesma unidade (níveis ou pontos) e com plural.
 - Perto de 30%, 50%, 70% e da meta, um número que não chegou ao limiar aparece com uma casa decimal para baixo (29,96% → "29,9%"; 53,97 → "53,9").
 - Confiança: a chance de golpe só aparece no fim do ano (a tela de antes não diz mais "1 em 4").
+
+## R27 (14/11/2026, após os avaliadores EK e EL)
+- Tela da confiança: "no fim do ano, o telão mostra quantos golpes a turma sofreu e, se cada situação tiver 5 ou mais pessoas confiando, quantos houve em cada uma" (antes, prometia o número por situação sem a condição, que se cumpre em cerca de 7% das partidas).
+- `efeitoCarta()` com `perdido`: a grande no nível 0 sem nada juntado diz "ainda não tinha pontos juntados, e nada se perdeu"; o aviso do ano 5 diz só "a renda deste ano não muda".
+- Palpite do lance vencedor conferido pelo número arredondado que o telão mostra (20,3 aparece como 20 e conta como "até 20").
+- Pergunta 4: "quase o mesmo" com menos de 5 pontos ou até uma pessoa de diferença na base menor; com 100% de aceite, "(todos: o estrago inteiro de uma grande)".
+- Mercado: "Quem já levou um lote oferece, no próximo, metade da porcentagem, sobre o caixa que sobrou" (como o motor e a simulação fazem).
+- Projeção das cargas no celular limitada à madeira que existe, com aviso quando a mata está quase no fim.
+- Extrato: `linhasExtrato()` mantém o caixa de antes e a renda como já apareceram e põe o arredondamento nas outras linhas; a soma sempre fecha.
