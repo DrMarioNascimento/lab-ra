@@ -181,10 +181,13 @@ function avancar(s, r) {
     }
     case "pequena": {
       // cada "aceito" vale para quem aceitou (+2 pessoais) e tira 1/n do estrago grande (a turma inteira = o estrago da grande)
+      // R35: com menos de 5 respostas, a proposta não vale para ninguém (nem os pontos, nem o estrago): assim nada que o telão
+      // mostre depois, nem a mata nem o bem público, entrega a resposta de quem respondeu
       const c = carta(s.cartas.pequena), n = s.ordem.length;
-      const sim = s.ordem.filter((id) => s.pequena.votos[id]);
+      s.pequena.n = Object.keys(s.pequena.votos).length; s.pequena.valeu = agregadoOk(s.pequena.n);
+      const sim = s.pequena.valeu ? s.ordem.filter((id) => s.pequena.votos[id]) : [];
       for (const id of sim) s.pessoal[id] += GANHO_PEQUENA;
-      s.pequena.aceitaram = sim.length; s.pequena.n = Object.keys(s.pequena.votos).length;
+      s.pequena.aceitaram = sim.length;
       s.pequena.estrago = estragar(s, c.alvo, n ? sim.length / n : 0);
       if (s.fechamento) s.fechamento.estrago = s.pequena.estrago;
       break;
@@ -285,7 +288,7 @@ export function progresso(s) {
     case "mente": return { rot: "responderam", feito: Object.keys(s.mente).length, total: n };
     case "pequena": return { rot: "responderam", feito: Object.keys(s.pequena.votos).length, total: n };
     case "lances": return { rot: "lances enviados", feito: Object.values(s.lances[s.ano] || {}).filter((p) => p.lanceEnviado).length, total: n };
-    case "alvara": return { rot: "votaram", feito: Object.keys(s.alvara.votos).length, total: n };
+    case "alvara": return { rot: "responderam", feito: Object.keys(s.alvara.votos).length, total: n };
     case "abertura": return s.ano <= 4 ? { rot: "responderam a pergunta", feito: Object.keys(s.controle[s.ano] || {}).length, total: n } : { rot: "deram o palpite", feito: Object.keys(s.prev5).length, total: n };
     case "conversa": return { rot: "conferiram a regra", feito: Object.keys(s.controle.voto || {}).length, total: n };
     case "voto": return { rot: "votaram", feito: Object.keys(s.voto).length, total: n };

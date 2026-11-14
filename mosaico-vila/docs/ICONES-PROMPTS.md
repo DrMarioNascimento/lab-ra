@@ -35,11 +35,13 @@ Propostas pequenas (ano 2)
 22. `carta-vizinho.webp` (hoje `grupos`) · A carga do vizinho: caderno de anotações aberto com uma linha em branco e uma carroça pequena de toras ao fundo.
 23. `carta-serraria.webp` (hoje `arvore-dourada`) · A madeira sem nota: pilha de tábuas recém-serradas com uma nota fiscal rasgada ao meio no chão.
 24. `carta-taxa.webp` (hoje `moeda`) · A taxa da praça: banco de praça com um envelope de cobrança e uma moeda saindo pela lateral.
+35. `carta-entulho.webp` (hoje `toco`; R35) · O entulho na beira da mata: caçamba de entulho basculada na beira de um bosque, com tijolos quebrados e sacos espalhados no chão de terra, uma prancheta de fiscal virada para baixo ao lado; nada nojento, tom de brinquedo.
 
 Propostas grandes (ano 5)
 25. `carta-alvara.webp` (hoje `alvara`) · O alvará: prancheta com carimbo "aprovado" e um capacete de obra ao lado (o item 18 da lista original).
-26. `carta-madeireira.webp` (hoje `alvara`) · A licença da madeireira: papel de licença enrolado com fita vermelha, encostado num tronco grosso com uma motosserra estilizada (sem lâmina à mostra, tom de brinquedo).
-27. `carta-escola.webp` (hoje `alvara`) · O contrato da escola: prédio escolar pequeno com andaime e um contrato com duas assinaturas em cima de uma pilha de moedas.
+26. `carta-madeireira.webp` (hoje `toco`; R35: antes `alvara`) · A licença da madeireira: papel de licença enrolado com fita vermelha, encostado num tronco grosso com uma motosserra estilizada (sem lâmina à mostra, tom de brinquedo).
+27. `carta-escola.webp` (hoje `publico-4-escola`; R35: antes `alvara`) · O contrato da escola: prédio escolar pequeno com andaime e um contrato com duas assinaturas em cima de uma pilha de moedas.
+36. `carta-aterro.webp` (hoje `alvara`; R35) · O aterro sem licença: monte de sacos de lixo coberto por lona ao lado de um rio azul que entra num bosque, com uma placa de licença em branco fincada no chão; sem sujeira exagerada, tom de brinquedo.
 
 Honestidade (ano 4)
 28. `carta-dado.webp` (hoje `ideia`) · O dado da sorte: dado branco ao lado de um punhado de moedas (o item 17 da lista original).

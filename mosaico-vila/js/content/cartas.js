@@ -36,24 +36,35 @@ export const PEQUENAS = [
     texto: "Todo mundo paga 3 pontos de taxa para a praça. Um funcionário da prefeitura cobra 1 ponto seu para tirar o seu nome da lista. Saldo: +2 pontos pessoais. Cada pessoa que aceita tira um pedaço do bem público; se a turma inteira aceitar, {efeito}.",
     sim: "Pagar 1 ao funcionário", nao: "Pagar a taxa",
     presente: { texto: "Todo mundo paga 3 pontos de taxa para a praça. Um funcionário da prefeitura pede um presente de 1 ponto seu, em troca de tirar o seu nome da lista. Saldo: +2 pontos pessoais. Cada pessoa que aceita tira um pedaço do bem público; se a turma inteira aceitar, {efeito}.", sim: "Dar o presente ao funcionário", nao: "Pagar a taxa" } },
+  // R35: lixo, o avesso da mata (em vez de tirar do que é de todos, joga-se nele um custo que todos dividem)
+  { id: "entulho", segmento: "uma empresa de caçambas", de: "de uma empresa de caçambas", lado: "recebe", alvo: "mata", icone: "toco", titulo: "O entulho na beira da mata",
+    telao: "Você ajuda a fiscalizar a coleta de lixo. Uma empresa de caçambas oferece 2 pontos para você não registrar o entulho que ela despeja na beira da mata.",
+    texto: "Este ano, você ajuda a fiscalizar o lixo da vila. Uma empresa de caçambas oferece 2 pontos pessoais para você não registrar o entulho que ela joga na beira da mata. Cada pessoa que aceita tira um pedaço da mata de todos; se a turma inteira aceitar, {efeito}.",
+    sim: "Aceitar os 2", nao: "Recusar",
+    presente: { texto: "Este ano, você ajuda a fiscalizar o lixo da vila. Uma empresa de caçambas quer te dar um presente de 2 pontos pessoais, em troca de você não registrar o entulho que ela joga na beira da mata. Cada pessoa que aceita tira um pedaço da mata de todos; se a turma inteira aceitar, {efeito}.", sim: "Aceitar o presente", nao: "Recusar o presente" } },
 ];
 
 export const GRANDES = [
   { id: "alvara", segmento: "a construtora", de: "da construtora", lado: "recebe", alvo: "publico", icone: "alvara", titulo: "O alvará",
     telao: "Uma construtora oferece 8 pontos pessoais para aprovar uma obra sem vistoria. Aprovada, {efeito}.",
-    texto: "Uma construtora oferece 8 pontos pessoais a quem aprovar uma obra sem a vistoria. Se for aprovada, {efeito}.",
+    texto: "Uma construtora oferece 8 pontos pessoais para você aprovar uma obra sem a vistoria. Se for aprovada, {efeito}.",   // R35: "para você", como na fala "presente"
     sim: "Aceitaria os 8 e aprovaria", nao: "Recusaria", aceito: "A obra foi aprovada sem vistoria: {feito}.", recusado: "A obra não foi aprovada.",
     presente: { texto: "Uma construtora quer te dar um presente de 8 pontos pessoais, em troca de você aprovar uma obra sem a vistoria. Se for aprovada, {efeito}.", sim: "Aceitaria o presente e aprovaria", nao: "Recusaria" } },   // R34: a grande também em duas falas
-  { id: "madeireira", segmento: "a madeireira", de: "da madeireira", lado: "recebe", alvo: "mata", icone: "alvara", titulo: "A licença da madeireira",
+  { id: "madeireira", segmento: "a madeireira", de: "da madeireira", lado: "recebe", alvo: "mata", icone: "toco", titulo: "A licença da madeireira",   // R35: provisório distinto (antes, as grandes repetiam a prancheta)
     telao: "Uma madeireira de fora oferece 8 pontos pessoais para você assinar a licença de derrubar parte da mata. Assinada, {efeito}.",
-    texto: "Uma madeireira de fora oferece 8 pontos pessoais a quem assinar a licença para ela derrubar parte da mata. Se for assinada, {efeito}.",
+    texto: "Uma madeireira de fora oferece 8 pontos pessoais para você assinar a licença para ela derrubar parte da mata. Se for assinada, {efeito}.",
     sim: "Aceitaria os 8 e assinaria", nao: "Não assinaria", aceito: "A licença foi assinada: {feito}.", recusado: "A licença não foi assinada.",
     presente: { texto: "Uma madeireira de fora quer te dar um presente de 8 pontos pessoais, em troca de você assinar a licença para ela derrubar parte da mata. Se for assinada, {efeito}.", sim: "Aceitaria o presente e assinaria", nao: "Não assinaria" } },
-  { id: "escola", segmento: "a empresa da obra", de: "da empresa da obra", lado: "recebe", alvo: "publico", icone: "alvara", titulo: "O contrato da escola",
+  { id: "escola", segmento: "a empresa da obra", de: "da empresa da obra", lado: "recebe", alvo: "publico", icone: "publico-4-escola", titulo: "O contrato da escola",
     telao: "Você escolhe a empresa da reforma da escola. A mais cara oferece 8 pontos para ser escolhida; com ela, {efeito}.",
-    texto: "Você escolhe a empresa que vai reformar a escola. A mais cara oferece 8 pontos pessoais para ser a escolhida. Com ela, a obra custa o dobro e {efeito}.",
+    texto: "Você escolhe a empresa que vai reformar a escola. A mais cara te oferece 8 pontos pessoais para ser a escolhida. Com ela, a obra custa o dobro e {efeito}.",
     sim: "Aceitaria os 8 e escolheria a mais cara", nao: "Escolheria a mais barata", aceito: "A empresa mais cara foi escolhida: {feito}.", recusado: "A empresa mais barata foi escolhida.",
     presente: { texto: "Você escolhe a empresa que vai reformar a escola. A mais cara quer te dar um presente de 8 pontos pessoais, em troca de ser a escolhida. Com ela, a obra custa o dobro e {efeito}.", sim: "Aceitaria o presente e escolheria a mais cara", nao: "Escolheria a mais barata" } },
+  { id: "aterro", segmento: "a empresa de lixo", de: "da empresa de lixo", lado: "recebe", alvo: "mata", icone: "alvara", titulo: "O aterro sem licença",   // R35
+    telao: "Uma empresa de lixo oferece 8 pontos pessoais para você aprovar um aterro sem licença ao lado do rio da mata. Aprovado, {efeito}.",
+    texto: "Uma empresa de lixo oferece 8 pontos pessoais para você aprovar um aterro sem licença ao lado do rio que corta a mata. Se for aprovado, {efeito}.",
+    sim: "Aceitaria os 8 e aprovaria", nao: "Recusaria", aceito: "O aterro foi aprovado sem licença: {feito}.", recusado: "O aterro não foi aprovado.",
+    presente: { texto: "Uma empresa de lixo quer te dar um presente de 8 pontos pessoais, em troca de você aprovar um aterro sem licença ao lado do rio que corta a mata. Se for aprovado, {efeito}.", sim: "Aceitaria o presente e aprovaria", nao: "Recusaria" } },
 ];
 
 // Ano 4 (opcional). tipo "dado": o Jogo da Mente; "honesto": ficar ou devolver; "confia": confiar antes de saber.

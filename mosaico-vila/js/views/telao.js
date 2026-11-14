@@ -151,7 +151,7 @@ export function renderTelao(st) {
         // R28: o texto da proposta fica só no celular (metade da turma lê "presente em troca de", metade às claras); o telão não entrega a fala
         body = topo(st, esc(c.titulo)) + `<div class="card destaque">${ico(c.icone, "xl")}<p class="enorme">A proposta chegou no celular de cada um. Leia em silêncio e responda sem mostrar a tela.</p></div>
           <div class="card como"><p class="big" style="margin:0">Proposta pequena: <b>cada um decide por si</b> e cada resposta vale para quem respondeu. Se a turma inteira aceitar, ${esc(ef)}: o estrago de uma proposta grande.</p></div>
-          <p class="rodape">A proposta é do jogo, não de um colega. O telão só mostra totais de 5 ou mais respostas.</p>`; }
+          <p class="rodape">A proposta é do jogo, não de um colega. O telão só mostra totais de 5 ou mais respostas; com menos de 5, a proposta não vale.</p>`; }
       break;
     case "mente": {
       const c = carta(st.cartas.ano4);
@@ -295,7 +295,8 @@ export function paineisResultado(st) {
     fatos.push(fato("arvore-redonda", dmR ? `A mata ${dmR > 0 ? "subiu" : "desceu"} <b>${pts(dmR)}</b>: de ${pctL(fx.mataAntes / st.teto)} para ${pctL(st.mata / st.teto)}` : "A mata ficou como estava"));
     // R26: com a pequena respondida por menos de 5, o estrago dela não aparece sozinho (entregaria quantos aceitaram); com a mata cheia, o que passa de 100% não conta
     // R34: com menos de 5 respostas, a etiqueta é "natureza e proposta" sempre que a pequena foi na mata, aceitando alguém ou não (antes, mudava só quando alguém aceitava, e isso entregava a resposta)
-    const escondeProp = st.ano === 2 && st.cartas && carta(st.cartas.pequena).alvo === "mata" && !agregadoOk(st.pequena?.n || 0), cheia = st.mata >= st.teto - 1e-6;
+    // R35: com menos de 5 respostas, a pequena não vale (não tira nada), e não há o que esconder
+    const escondeProp = false, cheia = st.mata >= st.teto - 1e-6;
     const natV = escondeProp ? Math.round((natR - pp(corr)) * 10) / 10 : natR;
     const chipNat = cheia && natV < 0 ? `<span class="chip">${ico("arvore-dourada")}mata cheia: o que passou de 100% não conta</span>` : `<span class="chip">${ico("arvore-dourada")}${escondeProp ? "natureza e proposta" : "natureza"} ${natV >= 0 ? "+" : "−"}${n1(Math.abs(natV))}</span>`;
     fatos.push(`<div class="chips-iso"><span class="chip">${ico("toco")}cargas −${pp(fx.extr)}</span><span class="chip">${ico("arvore-cubos")}replantio +${pp(fx.plant)}</span>${corr && !escondeProp ? `<span class="chip mal">${ico("alvara")}proposta −${pp(corr)}</span>` : ""}${chipNat}</div>`);
@@ -359,7 +360,7 @@ export function paineisResultado(st) {
     const c = carta(st.cartas.pequena), n = st.ordem.length, p = st.pequena.n ? st.pequena.aceitaram / st.pequena.n : 0, fe = n ? st.pequena.aceitaram / n : 0, ok = agregadoOk(st.pequena.n);
     // R26: o "se todos aceitassem" no mesmo texto da carta (em pontos da mata cheia), sem uma mata que nenhuma tela mostrou; com menos de 5 respostas, nada que entregue a contagem
     const e = st.pequena.estrago, semPerda = e?.alvo === "publico" && !e.niveis && (e.pontos || 0) < 0.5, todos = st.pequena.aceitaram >= n;
-    const estrago = !ok ? "Com menos de 5 respostas, o estrago somado também fica guardado; a barra de cima já mostra a vila como ficou."
+    const estrago = !ok ? "Com menos de 5 respostas, a proposta não valeu para ninguém: nem os pontos, nem o estrago."   // R35
       : !st.pequena.aceitaram ? "Ninguém aceitou: nada se perdeu."
       : e?.alvo === "publico" && e.niveis ? `Somando os pequenos, o bem público perdeu <b>${n0(e.pontos)} pontos</b> (${Math.round(100 * fe)}% do estrago de uma grande) e, sem pontos de sobra, caiu ${e.niveis === 1 ? "1 nível" : `${e.niveis} níveis`}.`   // R29
       : `Somando os pequenos, ${textoEstrago(e)}${e?.alvo === "publico" && !e.niveis && st.publico === 0 ? "." : `: ${Math.round(100 * fe)}% do estrago de uma grande.`}`;
@@ -449,7 +450,8 @@ function perguntasFechamento(st) {
   const nfam = Object.keys(st.fams).length;
   // R26: se a pequena teve menos de 5 respostas, o estrago dela não aparece separado (entregaria quantos aceitaram)
   // R34: a mesma frase aceitando alguém ou não (antes, "as cargas e as propostas aceitas" só aparecia quando alguém aceitava)
-  const alvoPq = st.cartas ? carta(st.cartas.pequena).alvo : null, pqPoucos = !!st.cartas && !agregadoOk(st.pequena?.n || 0), juntaMata = pqPoucos && alvoPq === "mata", juntaPub = pqPoucos && alvoPq === "publico";
+  // R35: com menos de 5 respostas, a pequena não vale (não tira nada); as propostas que aparecem aqui são só as que valeram
+  const pqPoucos = false, juntaMata = false, juntaPub = false;
   const pubGrande = st.alvara?.aceito && st.alvara?.estrago?.alvo === "publico" ? Math.round(st.alvara.estrago.pontos || 0) : 0, pubVisto = juntaPub ? pubGrande : pub;
   const tirou = juntaMata ? `As cargas e as propostas aceitas tiraram ${cargas + prop}` : `As cargas tiraram ${cargas}${prop ? `, as propostas aceitas, ${prop}` : ""}`;
   const origem = `em pontos da mata cheia, ela foi de ${ini} para ${fim.toLocaleString("pt-BR")}. ${tirou}; a natureza e o replantio devolveram ${voltou.toLocaleString("pt-BR")}.` + (juntaPub ? (pubGrande ? ` E a proposta grande tirou ${pubGrande} pontos do bem público (um nível = ${PONTOS_NIVEL * nfam}); o que a pequena tirou fica guardado, porque ela teve menos de 5 respostas.` : " O que a proposta pequena tirou do bem público fica guardado, porque ela teve menos de 5 respostas.") : pub ? ` E as propostas tiraram ${pub} pontos do bem público (um nível = ${PONTOS_NIVEL * nfam}).` : "");

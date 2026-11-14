@@ -195,7 +195,7 @@ export function renderAluno(st, id, loc) {
     case "pequena": {
       const c = cartaPequena(st, id);   // R28: a fala sorteada para esta pessoa ("presente em troca de" ou às claras)
       bd = st.pequena.votos[id] != null ? enviado("Resposta secreta enviada.") + palpiteFaixa(st, id, "pequena", "quantos % de quem responder vão aceitar?")
-        : cartaCelular(c, `<b>Responda sem mostrar a tela.</b> O telão mostra só totais, nunca a resposta de alguém (se todos fizerem o mesmo, o total diz isso). ${esc(c.segmento[0].toUpperCase() + c.segmento.slice(1))} é do jogo; os ${GANHO_PEQUENA} pontos são só seus.`, "pequena", st);
+        : cartaCelular(c, `<b>Responda sem mostrar a tela.</b> O telão mostra só totais, nunca a resposta de alguém (se todos fizerem o mesmo, o total diz isso); com menos de 5 respostas, a proposta não vale. ${esc(c.segmento[0].toUpperCase() + c.segmento.slice(1))} é do jogo; os ${GANHO_PEQUENA} pontos são só seus.`, "pequena", st);
       break;
     }
     case "lances": {
@@ -250,9 +250,8 @@ export function renderAluno(st, id, loc) {
         ${duasMetasCel()}`;   // R19 e R20
       break;
     case "voto":
-      bd = st.voto[id] != null ? enviado("Voto secreto enviado.") + palpiteFaixa(st, id, "voto", "quantos % vão votar para trocar?") : `<h2 class="row">${ico("balanca", "g")}Que regra queremos?</h2><p class="muted"><b>Volte ao seu lugar para votar.</b> Vale para os anos 4 e 5. Voto secreto (o telão mostra só o total; se todos votarem igual, o total diz isso); vence a maioria, e empate mantém o Monopólio.</p>
-        <div class="opcoes-iguais"><button class="opt" data-a="voto" data-val="0"><b>Manter o Monopólio</b><span class="faint">${esc(REGRAS_TXT.monopolio.curto)}</span></button>
-        <button class="opt" data-a="voto" data-val="1"><b>Trocar para a Prosperidade</b><span class="faint">${esc(REGRAS_TXT.prosperidade.curto)}</span></button></div>${controle(st, id)}${duasMetasCel()}`;   // R33: as duas opções lado a lado, logo depois da regra; a conferência vem embaixo
+      bd = st.voto[id] != null ? enviado("Voto secreto enviado.") + palpiteFaixa(st, id, "voto", "quantos % vão votar para trocar?") : `<h2 class="row">${ico("balanca", "g")}Que regra queremos?</h2><p class="muted"><b>Volte ao seu lugar e vote sem mostrar a tela.</b> Vale para os anos 4 e 5. Voto secreto (o telão mostra só o total; se todos votarem igual, o total diz isso); vence a maioria, e empate mantém o Monopólio.</p>
+        <div class="opcoes-iguais">${(() => { const os = [`<button class="opt" data-a="voto" data-val="0"><b>Manter o Monopólio</b><span class="faint">${esc(REGRAS_TXT.monopolio.curto)}</span></button>`, `<button class="opt" data-a="voto" data-val="1"><b>Trocar para a Prosperidade</b><span class="faint">${esc(REGRAS_TXT.prosperidade.curto)}</span></button>`]; return (trocaOrdem("voto") ? os.reverse() : os).join(""); })()}</div>${controle(st, id)}${duasMetasCel()}`;   // R33: as duas opções lado a lado, logo depois da regra; a conferência vem embaixo
       break;
     case "fechamento": {
       const ja = st.final[id];

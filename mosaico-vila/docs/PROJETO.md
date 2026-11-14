@@ -247,3 +247,13 @@ No fim do ano 3, o motor guarda a vila (`snap3`). No fechamento, `contrafactual(
 - Relógio de quem conduz (`PLANO_FIM_ANO` 9, 14, 22, 29, 35; fechamento dos 35 aos 47,5) e página inicial ("cerca de 46 a 48 minutos") pela simulação r69.
 - Carta do dado: "O dado da sorte" (antes "O troco do mercado"). Confiança: *O pedido na estrada* com a moeda e *A venda fiado* com a cédula.
 - Carta da pequena no bem público: "perde um nível inteiro (12 pontos por família) ou, se ainda não tiver nível, o que juntou".
+
+## R35 (14/11/2026, pedido do professor depois da 79ª rodada, aprovada: o lixo, como carta, com os ajustes dos avaliadores FA e FB)
+- Cartas de lixo, sem mecânica nova: *O entulho na beira da mata* (`PEQUENAS`, id `entulho`, alvo mata) e *O aterro sem licença* (`GRANDES`, id `aterro`, alvo mata), as duas com as duas falas. O sorteio passa a 5 pequenas (3 na mata) e 4 grandes (2 e 2). Ícones provisórios (`toco` e `alvara`), com prompts em `ICONES-PROMPTS.md` (itens 35 e 36).
+- Grandes às claras falando com "você" (como o "presente"): "para você aprovar/assinar", "te oferece".
+- Ícones provisórios das grandes distintos: madeireira com `toco`, escola com `publico-4-escola`.
+- Com menos de 5 respostas, a pequena não vale para ninguém (`s.pequena.valeu`; nem +2, nem estrago): o telão diz isso, e o celular avisa antes. Nada no telão depende das respostas.
+- Voto: a ordem das duas opções também é sorteada por pessoa (`trocaOrdem("voto")`).
+- Contador da grande no painel de quem conduz: "responderam" (é resposta secreta, não voto).
+- Relógio de quem conduz: conta desde a entrada do primeiro aluno (como o plano), aparece também na entrada e no fechamento, e a sobra diz o pior caso ("de 1,5 a 2,5 min").
+- Testes da R35 em `tests/partidas.mjs` (pequena com 4 e 5 respostas, cartas de lixo no sorteio, "você" nas grandes, ordem do voto).

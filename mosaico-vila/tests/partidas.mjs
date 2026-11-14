@@ -266,6 +266,40 @@ for (const c of GRANDES) {
   const st = { cartas: { grande: c.id }, fala: { a: "presente", b: "claras" }, ordem: ["a", "b"] };
   ok(cartaComFala(st, "a", c.id).alvo === cartaComFala(st, "b", c.id).alvo && cartaComFala(st, "a", c.id).texto !== cartaComFala(st, "b", c.id).texto, `R34: ${c.id} muda só a fala`);
 }
+// R35: com menos de 5 respostas, a pequena não vale para ninguém (nem os 2 pontos, nem o estrago); com 5, vale
+for (const [nResp, valeu] of [[4, false], [5, true]]) {
+  let st = estadoInicial();
+  const dispatch = (a) => { st = reduzir(st, a); };
+  for (let i = 0; i < 12; i++) dispatch({ t: "entrar", id: `a${i + 1}`, nome: NOMES[i] });
+  dispatch({ t: "sortear", seed: 4242 });
+  let passos = 0;
+  while (st.fase !== "pequena" && passos++ < 60) dispatch({ t: "fase", dir: 1 });
+  ok(st.fase === "pequena", "R35: a partida chega à proposta pequena");
+  const ids = st.ordem.slice(0, nResp), antes = { ...st.pessoal }, mata0 = st.mata, pub0 = [st.publico, st.acumulado];
+  for (const id of ids) dispatch({ t: "pequena", id, aceita: true });
+  dispatch({ t: "fase", dir: 1 });
+  const ganhou = ids.every((id) => st.pessoal[id] === antes[id] + 2), estrago = st.mata < mata0 - 1e-9 || st.publico < pub0[0] || st.acumulado < pub0[1] - 1e-9;
+  ok(st.pequena.valeu === valeu && ganhou === valeu && estrago === valeu && st.pequena.aceitaram === (valeu ? nResp : 0), `R35: ${nResp} respostas, a pequena ${valeu ? "vale" : "não vale"} (pontos ${ganhou}, estrago ${estrago})`);
+}
+// R35: as cartas de lixo estão nos sorteios, com as duas falas, e a grande às claras também fala "para você"
+ok(PEQUENAS.some((c) => c.id === "entulho" && c.alvo === "mata") && GRANDES.some((c) => c.id === "aterro" && c.alvo === "mata"), "R35: o entulho (pequena) e o aterro (grande) entram nos sorteios, na mata");
+for (const c of GRANDES) ok(/para você|te oferece/.test(c.texto) && !/a quem/.test(c.texto), `R35: ${c.id} às claras fala com você, como o "presente"`);
+{
+  const vistos = new Set();
+  for (let k = 1; k < 400; k++) { const c = sortearCartas(rnd(k)); vistos.add(c.pequena); vistos.add(c.grande); }
+  ok(vistos.has("entulho") && vistos.has("aterro"), "R35: o sorteio chega às cartas de lixo");
+}
+// R35: a ordem das opções do voto também é sorteada por pessoa
+{
+  let st = estadoInicial();
+  const dispatch = (a) => { st = reduzir(st, a); };
+  for (let i = 0; i < 16; i++) dispatch({ t: "entrar", id: `a${i + 1}`, nome: NOMES[i] });
+  dispatch({ t: "sortear", seed: 77 });
+  let passos = 0;
+  while (st.fase !== "voto" && passos++ < 80) dispatch({ t: "fase", dir: 1 });
+  const primeiro = st.ordem.map((id) => { const h = renderAluno(st, id, novoLocal()); const i0 = h.indexOf('data-a="voto" data-val="0"'), i1 = h.indexOf('data-a="voto" data-val="1"'); return i0 >= 0 && i1 >= 0 ? (i0 < i1 ? 0 : 1) : -1; });
+  ok(st.fase === "voto" && primeiro.every((x) => x >= 0) && primeiro.includes(0) && primeiro.includes(1), `R35: opções do voto em ordem sorteada (${primeiro.join("")})`);
+}
 const s = (k) => linhas.filter((l) => l[k]).length;
 console.log(`troca aprovada ${s("troca")}/15 · colapso ${s("colapso")}/15 · vitória coletiva ${s("vitoria")}/15 · desigualdade da renda sobe com o aluguel em ${rendaSobe}/15`);
 console.log(falhas ? `${falhas} verificações falharam` : "todas as verificações passaram");
