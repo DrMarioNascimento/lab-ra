@@ -84,3 +84,13 @@ No fim do ano 3, o motor guarda a vila (`snap3`). No fechamento, `contrafactual(
 - Confiança: cada pessoa recebe uma das 4 situações (`distribuirSituacoes()` e `cartaAno4()`), com as mesmas contas (o pedinte honesto volta para trabalhar: +2); o telão mostra as quatro e, no fim do ano, os golpes de cada situação com os números da turma; "não arriscar não custa nada".
 - Etapa nova "Conversa antes do voto" (fase `conversa`, 90 s de relógio, pergunta-guia, pergunta de controle no celular); o voto abre depois. Relógio de 1 min em dupla na pergunta 1 do fechamento.
 - Testes novos: conversa logo antes do voto, teto de lotes, as 4 situações na turma, e uma partida com 8 de 20 celulares que nunca respondem (as telas não quebram e quem marca "não queremos lote" não compra).
+
+## R17 (14/11/2026, após os avaliadores DQ e DR)
+- Pergunta 4 do fechamento: com o dado, "X% disseram 'acertei'; por acaso, seriam cerca de 17%" (antes, "ficaram com o que não era seu", que contava como desonesto quem acertou por acaso).
+- Confiança: porcentagem de golpe por situação só quando cada uma teve 5 ou mais pessoas confiando; senão, só o total da turma contra 1 em 4.
+- `textoCarta()` com três tempos (`{efeito}` cai, `{feito}` caiu, `{seria}` cairia); mercado sem venda com o motivo real; rodapé do mercado curto (cabe na Prosperidade).
+- Pergunta 3: o saldo da mata em pontos da mata cheia (de quanto a quanto, o que as cargas e as propostas tiraram, o que voltou).
+- `vista()` no motor: na carta e no mercado, barra, mapa e celular mostram a vila de antes das decisões (`s.antes`).
+- Celular: "só para você" numa tela à parte (`loc.verPessoal`); aviso de tema na entrada (telão e celular).
+- Conversa antes do voto com o exemplo resolvido das duas regras; "Conversas curtas" no painel (`s.curto`: 60 s antes do voto, 30 s na família nos anos 4 e 5).
+- "Reduzir movimento": a sequência continua sem deslizar (as regras no fim de `style.css`); rótulos do mapa em 24 (cerca de 1,6% da TV).

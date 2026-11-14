@@ -116,7 +116,10 @@ export function reduzir(st, a) {
       break;
     }
     case "palpite": if (s.fase === "lances" && s.alunos[a.id]) (s.palpite[s.ano] ??= {})[a.id] = a.v; break;
-    case "config": if (typeof a.semTroco === "boolean" && !(s.ano >= 4 && s.fase !== "abertura")) s.semTroco = a.semTroco; break;
+    case "config":
+      if (typeof a.semTroco === "boolean" && !(s.ano >= 4 && s.fase !== "abertura")) s.semTroco = a.semTroco;
+      if (typeof a.curto === "boolean") s.curto = a.curto;   // R17: aula atrasada: conversa do voto em 60 s e da família em 30 s nos anos 4 e 5
+      break;
     case "lance": {
       if (s.fase !== "lances") break;
       const pr = (s.props[s.ano] ??= {})[a.id] ??= { pub: 0, rep: 0, car: 0 };
@@ -161,6 +164,7 @@ function avancar(s, r) {
       // R15: o lance não é herdado (nem a marca de lance enviado): quem não envia lance oferece 0% além do mínimo
       for (const id of s.ordem) if (!props[id]) { const ant = s.props[s.ano - 1]?.[id] || { pub: 0, rep: 0, car: 0 }; props[id] = { pub: ant.pub, rep: ant.rep, car: ant.car, lance: 0, auto: true }; }
       const fx = fecharAno(s, props, s.renda);
+      s.antes = { ano: s.ano, mata: s.mata, publico: s.publico, fams: s.fams };   // R17: a vila antes das decisões, até o "Como ficou a vila"
       Object.assign(s, { fams: fx.fams, mata: fx.mata, publico: fx.publico, acumulado: fx.acumulado, colapsou: fx.colapsou });
       // R14: a proposta grande do ano 5 veio antes das decisões; o resultado do ano conta o estrago dela
       if (s.ano === ANOS && s.alvara.antes) { fx.mataAntes = s.alvara.antes.mata; fx.nivelAntes = s.alvara.antes.publico; if (s.alvara.estrago) fx.estrago = s.alvara.estrago; }
@@ -279,6 +283,12 @@ export function progresso(s) {
     case "fechamento": return { rot: "responderam", feito: Object.keys(s.final).length, total: n };
     default: return null;
   }
+}
+
+// R17: entre as decisões e o "Como ficou a vila" (carta, mercado), telão e celular mostram a vila de antes das decisões,
+// para não estragar a revelação nem a previsão da mata
+export function vista(s) {
+  return ["pequena", "mente", "lances"].includes(s.fase) && s.antes?.ano === s.ano ? { ...s, mata: s.antes.mata, publico: s.antes.publico, fams: s.antes.fams } : s;
 }
 
 export const agregadoOk = (k) => k >= 5;   // o telão só mostra agregados de 5 ou mais pessoas

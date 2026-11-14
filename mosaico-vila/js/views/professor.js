@@ -30,7 +30,8 @@ export function renderProfessor(st) {
     extra = Object.values(st.fams).map((f) => `<div class="card" style="padding:10px 12px"><div class="row">${iconeFamilia(f, 26)}<b class="grow">${esc(f.nome)}</b><span class="mono">${n0(f.caixa)}</span></div>
       <div class="faint" style="font-size:12px;margin-top:4px">${f.membros.length} pessoas · ${f.lotes} lote(s)</div></div>`).join("");
     const podeTrocar = st.ano < 4 || (st.ano === 4 && st.fase === "abertura");
-    if (st.fase !== "fechamento") extra = cartasDaPartida(st) + `<div class="card" style="padding:10px 12px"><div class="row"><b class="grow">Carta do ano 4</b><button class="btn sm ${st.semTroco ? "sec" : "ok"}" data-a="troco" ${podeTrocar ? "" : "disabled"}>${st.semTroco ? "Desligada" : "Ligada"}</button></div><p class="faint" style="font-size:12px;margin:4px 0 0">Honestidade (como o troco do mercado) ou confiança. Ligada por padrão; desligue se a aula atrasar (economiza cerca de 1,5 min).</p></div>` + extra;
+    if (st.fase !== "fechamento") extra = cartasDaPartida(st) + `<div class="card" style="padding:10px 12px"><div class="row"><b class="grow">Carta do ano 4</b><button class="btn sm ${st.semTroco ? "sec" : "ok"}" data-a="troco" ${podeTrocar ? "" : "disabled"}>${st.semTroco ? "Desligada" : "Ligada"}</button></div><p class="faint" style="font-size:12px;margin:4px 0 0">Honestidade (como o troco do mercado) ou confiança. Ligada por padrão; desligue se a aula atrasar (economiza cerca de 1,5 min).</p></div>
+      <div class="card" style="padding:10px 12px"><div class="row"><b class="grow">Conversas curtas</b><button class="btn sm ${st.curto ? "ok" : "sec"}" data-a="curto">${st.curto ? "Ligadas" : "Desligadas"}</button></div><p class="faint" style="font-size:12px;margin:4px 0 0">Se ainda faltar tempo: conversa antes do voto em 60 s e conversa da família em 30 s nos anos 4 e 5 (economiza cerca de 2 min).</p></div>` + extra;
   }
   const anos = st.ano ? `Ano ${st.ano} de 5 · regra ${REGRAS_TXT[st.regra].nome}` : "Antes do ano 1";
   return `<div class="col"><div class="row"><span class="badge" style="background:#7c3aed">P</span><div class="grow"><b>Professor</b><div class="faint" style="font-size:12px">${anos}</div></div></div>
@@ -53,6 +54,7 @@ export function acaoProfessor(a, el, dispatch) {
     case "fase": dispatch({ t: "fase", dir: +el.dataset.val }); return true;
     case "pergunta": dispatch({ t: "pergunta", dir: +el.dataset.val }); return true;
     case "troco": dispatch({ t: "config", semTroco: !el.classList.contains("sec") }); return true;
+    case "curto": dispatch({ t: "config", curto: el.classList.contains("sec") }); return true;
     case "painel": dispatch({ t: "painel", k: el.dataset.val === "solta" ? null : +el.dataset.val }); return true;
     default: return false;
   }

@@ -120,14 +120,18 @@ export function sortearCartas(r) {
 // R16: o estrago escrito com os números da partida ("a mata cai de 39% para 19%"; "o bem público cai do nível 2 para o 1"),
 // para ninguém decidir lendo um estrago menor que o real. {efeito} = o que aconteceria; {feito} = o que aconteceu.
 const pct1 = (x) => { const v = 100 * x, r = Math.round(v); return Math.abs(v - r) > 0.05 && [30, 50].includes(r) ? `${(Math.round(v * 10) / 10).toLocaleString("pt-BR")}%` : `${r}%`; };
-function efeitoCarta(c, { mata, teto, publico }, feito) {
+// R17: três tempos: "cai" (o que acontece), "caiu" (o que aconteceu) e "cairia" (se a turma inteira aceitasse)
+const VERBOS = { pres: ["cai", "perde"], pass: ["caiu", "perdeu"], cond: ["cairia", "perderia"] };
+function efeitoCarta(c, { mata, teto, publico }, tempo) {
+  const [cai, perde] = VERBOS[tempo];
   if (c.alvo === "mata") {
     const de = mata / (teto || 1), para = Math.max(0, de - ESTRAGO_MATA);
-    return `a mata ${feito ? "caiu" : "cai"} de ${pct1(de)} para ${pct1(para)}`;
+    return `a mata ${cai} de ${pct1(de)} para ${pct1(para)}`;
   }
-  return publico > 0 ? `o bem público ${feito ? "caiu" : "cai"} do nível ${publico} para o ${publico - 1}` : `o bem público ${feito ? "perdeu" : "perde"} os pontos que juntou para o primeiro nível`;
+  return publico > 0 ? `o bem público ${cai} do nível ${publico} para o ${publico - 1}` : `o bem público ${perde} os pontos que juntou para o primeiro nível`;
 }
 export function textoCarta(c, campo, ctx) {
   const t = c[campo] || "";
-  return t.replace("{efeito}", ctx ? efeitoCarta(c, ctx, false) : "o estrago de uma proposta grande").replace("{feito}", ctx ? efeitoCarta(c, ctx, true) : "houve estrago");
+  return t.replace("{efeito}", ctx ? efeitoCarta(c, ctx, "pres") : "o estrago de uma proposta grande").replace("{feito}", ctx ? efeitoCarta(c, ctx, "pass") : "houve estrago")
+    .replace("{seria}", ctx ? efeitoCarta(c, ctx, "cond") : "o estrago seria o de uma proposta grande");
 }

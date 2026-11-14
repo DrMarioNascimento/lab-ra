@@ -105,7 +105,7 @@ table.vals td.n { font-family: var(--mono); text-align: right; white-space: nowr
 .ph-cap { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; font-size: 13px; }
 .group-sep { flex: 0 0 auto; width: 6px; border-radius: 6px; }
 @media (max-width: 1100px) { .sim { grid-template-columns: 1fr; } }
-@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+/* "Reduzir movimento": ver o fim do arquivo (R17) */
 
 /* ----- Mosaico Vila ----- */
 .telao.cheio { position: fixed; inset: 0; z-index: 50; width: 100vw; height: 100vh; aspect-ratio: auto; border-radius: 0; }
@@ -351,3 +351,17 @@ input[type=text], input[type=number], select, textarea { box-shadow: inset 0 3px
 .telao .fech-barras { gap: 1.1cqw; justify-content: center; height: 100%; overflow: hidden; font-size: 2cqw; }
 .telao .fech-barras .barra.grande { height: 1.6cqw; margin-top: .4cqw; }
 .telao .fech-barras .rodape { margin-top: .3cqw; }
+
+/* R17: com "reduzir movimento" ligado, nada se mexe, mas a sequência continua: cada painel, linha do exemplo e o extrato
+   do celular aparecem no seu tempo, sem deslizar; os relógios continuam contando (só o número muda). */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; }
+  .dado, .revela, .linha-revela, .hud .pulsa { animation: none !important; }
+  .telao .seq > .painel, .telao .seq-dots span, .passo-a-passo li, .surge, .espera { animation-duration: .01s !important; }
+  @keyframes pEntra { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes pSai { to { opacity: 0; visibility: hidden; } }
+  @keyframes lEntra { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes surge { from { opacity: 0; } to { opacity: 1; } }
+}
+@keyframes conta30 { from { --s: 30; } to { --s: 0; } }
+.crono.c30 { --s: 30; background: conic-gradient(#fbbf24 calc(var(--s) * 12deg), #1b3352 0); animation: conta30 30s linear var(--d) forwards; }

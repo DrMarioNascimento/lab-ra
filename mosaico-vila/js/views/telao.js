@@ -1,7 +1,7 @@
-import { nomeFase, progresso, agregadoOk, contagem } from "../engine.js";
+import { nomeFase, progresso, agregadoOk, contagem, vista } from "../engine.js";
 import { NOVIDADE_DO_ANO, EXEMPLO_DO_ANO, EXEMPLO_VOTO, REGRAS_TXT, MOTIVOS, GUIAS, NIVEIS_PUBLICO } from "../content/vila.js";
 import { carta, cartaAno4, CONFIANCA, textoCarta, QUEM_GOLPE, FAIXAS_PCT, faixaDe, CHANCE_GOLPE } from "../content/cartas.js";
-import { gini, lanceMinimo, VITORIA, VALOR_LOTE, patrimonio, COLAPSO, progressoMeta } from "../content/regras.js";
+import { gini, lanceMinimo, VITORIA, VALOR_LOTE, patrimonio, COLAPSO, progressoMeta, MATA_INICIO } from "../content/regras.js";
 import { iconeFamilia, mapaVila, linhaDoTempo, ico, fileira, unidade, pctL, nL } from "./desenho.js";
 
 // Telão para TV (R11): letra grande, uma ideia por tela, barra de ícones com o estado da vila sempre no mesmo lugar.
@@ -24,7 +24,8 @@ export function decorrido(st) {
 const ICONE_ANO = { 1: "economia", 2: "arvore-redonda", 3: "sobrado", 4: "lote-venda", 5: "alvara" };
 
 // Barra de ícones: o estado da vila, sempre no mesmo lugar. No resultado, o que mudou pisca e mostra +/−.
-function barra(st) {
+function barra(st0) {
+  const st = vista(st0);
   const fm = st.teto ? st.mata / st.teto : 0;
   const m = progressoMeta(st.fams, st.publico, st.mata, st.teto, st.regra);
   const fx = st.fase === "resultado" ? st.fechamento : null;
@@ -114,7 +115,7 @@ export function renderTelao(st) {
   let body = "";
   switch (st.fase) {
     case "entrada":
-      body = topo(st, "Mosaico Vila") + `<div class="grid" style="grid-template-columns:1.1fr 1fr;flex:1;min-height:0"><div class="card col" style="justify-content:center"><div class="row" style="gap:1.6cqw">${ico("app-mosaico-vila", "xl")}<div><div class="fase">Código da sala</div><div class="mono" style="font-size:7cqw;font-weight:800;letter-spacing:.1em">SIM-01</div></div></div><p class="big">Entre pelo celular. A turma vira uma vila; os grupos, famílias.</p></div>
+      body = topo(st, "Mosaico Vila") + `<div class="grid" style="grid-template-columns:1.1fr 1fr;flex:1;min-height:0"><div class="card col" style="justify-content:center"><div class="row" style="gap:1.6cqw">${ico("app-mosaico-vila", "xl")}<div><div class="fase">Código da sala</div><div class="mono" style="font-size:7cqw;font-weight:800;letter-spacing:.1em">SIM-01</div></div></div><p class="big">Entre pelo celular. A turma vira uma vila; os grupos, famílias.</p><p class="rodape">O jogo fala de dinheiro, aluguel, herança e propostas de corrupção, sempre de famílias e personagens inventados. Se algum tema pesar, dá para só observar ou falar com quem conduz.</p></div>
         <div class="card" style="overflow:hidden"><h2>${st.ordem.length} na sala</h2><div class="row" style="margin-top:1cqw;gap:.5cqw">${st.ordem.map((id) => `<span class="chip nome">${esc(st.alunos[id].nome)}</span>`).join("")}</div></div></div>`;
       break;
     case "familias": {
@@ -135,7 +136,7 @@ export function renderTelao(st) {
     }
     case "decidir":
       body = topo(st, "Cada família decide") + (st.ano === 5 ? bannerGrande(st) : "") + `<div class="lado ${st.ano === 5 && st.cartas ? "compacto" : ""}"><div class="card mapa-card">${mapaVila(st)}</div>
-        <div class="col centro">${cronometro(st, "Conversem na família")}<p class="big" style="text-align:center;margin:0">Cada um envia a sua proposta.<br>Vale a mediana da família.</p></div></div>`;
+        <div class="col centro">${cronometro(st, "Conversem na família", st.curto && st.ano >= 4 ? 30 : 45)}<p class="big" style="text-align:center;margin:0">Cada um envia a sua proposta.<br>Vale a mediana da família.</p></div></div>`;
       break;
     case "pequena":
       { const c = carta(st.cartas.pequena), ef = textoCarta({ ...c, x: "{efeito}" }, "x", { mata: st.mata, teto: st.teto, publico: st.publico });
@@ -151,10 +152,10 @@ export function renderTelao(st) {
     }
     case "lances": {
       const livres = st.lotes.filter((x) => !x).length;
-      body = topo(st, "Mercado de lotes") + `<div class="lado"><div class="card mapa-card">${mapaVila(st)}</div><div class="col">
+      body = topo(st, "Mercado de lotes") + `<div class="lado"><div class="card mapa-card">${mapaVila(vista(st))}</div><div class="col">
         <div class="card row" style="flex-wrap:nowrap">${ico("lote-sobrado", "xl")}<div><b class="enorme mono">${Math.min(3, livres)}</b><div class="big">lotes à venda</div></div></div>
         <div class="card"><div class="big">Lance mínimo</div><b class="enorme mono">${lanceMinimo(st.ano)}</b></div>
-        <p class="rodape">Lance fechado; vale a mediana da família; o maior leva. ${st.regra === "prosperidade" ? "Na Prosperidade, conta metade do que se oferece. " : ""}Quem já levou um lote oferece metade no próximo. Cada família compra até ter a moradia + 1 lote; quem não quer lote marca "não queremos".</p></div></div>`;
+        <p class="rodape">Lance fechado, mediana da família; o maior leva.${st.regra === "prosperidade" ? " Na Prosperidade, conta metade." : ""} Até a moradia + 1 lote; dá para marcar "não queremos". O resto está no celular.</p></div></div>`;
       break;
     }
     case "alvara":
@@ -163,11 +164,11 @@ export function renderTelao(st) {
     case "resultado": body = telaoResultado(st); break;
     case "conversa":
       // R16: 90 s de conversa com uma pergunta-guia antes de o voto abrir
-      body = topo(st, "Antes do voto: conversem") + `<div class="lado"><div class="card col" style="justify-content:center;gap:1.2cqw">
-        <p class="enorme" style="margin:0">Com o aluguel mordendo, qual regra deixa a vila mais perto da meta, e de quem?</p>
-        <div class="row" style="gap:1.2cqw;flex-wrap:nowrap"><div class="card" style="flex:1"><b class="big">Manter o ${esc(REGRAS_TXT.monopolio.nome)}</b><p class="rodape" style="margin:.3cqw 0 0">meta de eficiência</p></div><div class="card" style="flex:1"><b class="big">Trocar para a ${esc(REGRAS_TXT.prosperidade.nome)}</b><p class="rodape" style="margin:.3cqw 0 0">meta de equidade</p></div></div>
-        <p class="rodape">As regras e as metas inteiras estão no celular. O voto abre quando o relógio acabar; ele é secreto, cada um no próprio lugar.</p></div>
-        <div class="col centro">${cronometro(st, "Conversem na família", 90)}</div></div>`;
+      // R17: o exemplo resolvido das duas regras vem logo no começo da conversa (antes, só aparecia no voto)
+      body = topo(st, "Antes do voto: conversem") + `<div class="lado"><div class="col" style="min-height:0;gap:1cqw">
+        <div class="card"><p class="enorme" style="margin:0">Com o aluguel mordendo, qual regra deixa a vila mais perto da meta, e de quem?</p></div>
+        <div class="card" style="flex:1;min-height:0;overflow:hidden"><h3 class="row">${ico("ideia")}Exemplo resolvido: as duas regras</h3>${exemploLinhas(st, EXEMPLO_VOTO.linhas, 1.5, "compacto")}</div></div>
+        <div class="col centro">${cronometro(st, "Conversem na família", st.curto ? 60 : 90)}<p class="rodape" style="text-align:center">O voto abre quando o relógio acabar: secreto, cada um no próprio lugar.</p></div></div>`;
       break;
     case "voto":
       body = topo(st, "Que regra queremos para os anos 4 e 5?") + `<div class="grid" style="grid-template-columns:1fr 1fr">
@@ -186,7 +187,7 @@ export function renderTelao(st) {
 export function duracaoTelao(st) {
   if (st.fase === "abertura") { const ex = EXEMPLO_DO_ANO[st.ano]; if (!ex) return 8; const ls = linhasDe(ex, st); return 1.5 + passoExemplo(ls) * ls.length + 2; }
   if (st.fase === "voto") return 1.5 + passoExemplo(EXEMPLO_VOTO.linhas) * EXEMPLO_VOTO.linhas.length + 2;
-  if (st.fase === "conversa") return 90;
+  if (st.fase === "conversa") return st.curto ? 60 : 90;
   if (st.fase === "resultado") return tempoResultado(st).total;
   return 0;
 }
@@ -295,7 +296,7 @@ export function paineisResultado(st) {
   const acont = [];
   if (st.ano >= 4 && st.leilao) {
     const nv = st.leilao.vendidos.length, vl = VALOR_LOTE(st.publico);
-    acont.push(fato("lote-venda", nv ? `${nv === 1 ? "1 lote vendido" : `${nv} lotes vendidos`}. O maior lance foi <b>${n0(Math.max(...st.leilao.vendidos.map((v) => v.preco)))}</b>, por um lote que vale <b>${vl}</b> no patrimônio (10 + 2 × nível ${st.publico}).` : "Nenhum lote vendido: ninguém tinha caixa para o mínimo."));
+    acont.push(fato("lote-venda", nv ? `${nv === 1 ? "1 lote vendido" : `${nv} lotes vendidos`}. O maior lance foi <b>${n0(Math.max(...st.leilao.vendidos.map((v) => v.preco)))}</b>, por um lote que vale <b>${vl}</b> no patrimônio (10 + 2 × nível ${st.publico}).` : (st.leilao.semLote?.length || st.leilao.noTeto?.length ? "Nenhum lote vendido: as famílias ficaram de fora, por escolha ou porque já tinham a moradia + 1 lote, ou não tinham caixa para o mínimo." : "Nenhum lote vendido: ninguém tinha caixa para o mínimo.")));
     if (nv) acont.push(`<p class="rodape">O lance sai do caixa e vai para o banco: o patrimônio da família cai a diferença entre o lance e o valor do lote.</p>`);
     // R16: quem ficou de fora por escolha ou porque já tinha a moradia + 1 lote (só o número, sem nomes)
     const nS = st.leilao.semLote?.length || 0, nT = st.leilao.noTeto?.length || 0;
@@ -317,7 +318,7 @@ export function paineisResultado(st) {
     const e = st.pequena.estrago, antes = { mata: st.mata + (e?.mata || 0), teto: st.teto, publico: st.publico + (e?.niveis || 0) };
     paineis.push({ nome: c.titulo, carta: true, dur: extra, html: `<div class="card destaque">${ico(c.icone, "xl")}<div class="col" style="gap:1cqw">
       <p class="enorme">${ok ? `<b>${Math.round(100 * p)}%</b> de quem respondeu aceitou a proposta ${esc(c.de)}.` : "Menos de 5 respostas: o total fica guardado."}</p>
-      <p class="big" style="margin:0">${st.pequena.aceitaram ? `Somando os pequenos, ${textoEstrago(st.pequena.estrago)}: ${Math.round(100 * fe)}% do estrago de uma grande.` : "Ninguém aceitou: nada se perdeu."} Se a turma inteira aceitasse, ${textoCarta({ ...c, x: "{efeito}" }, "x", antes)}: o mesmo estrago de uma proposta grande.</p>
+      <p class="big" style="margin:0">${st.pequena.aceitaram ? `Somando os pequenos, ${textoEstrago(st.pequena.estrago)}: ${Math.round(100 * fe)}% do estrago de uma grande.` : "Ninguém aceitou: nada se perdeu."} Se a turma inteira aceitasse, ${textoCarta({ ...c, x: "{seria}" }, "x", antes)}: o mesmo estrago de uma proposta grande.</p>
       ${ok ? acertoPalpite(st, "pequena", p) : ""}</div></div>` });
   }
   if (st.ano === 4 && !st.semTroco && st.cartas) {
@@ -330,9 +331,11 @@ export function paineisResultado(st) {
       const q = Object.values(st.quem).filter((v) => v >= 0), qc = contagem(q);   // R15: "prefiro não responder" fica de fora
       html = `<div class="grid" style="grid-template-columns:1fr 1fr;flex:1;min-height:0">
         <div class="card col" style="justify-content:center;gap:1cqw;min-height:0;overflow:hidden">
-          <p class="big" style="margin:0">${agregadoOk(nv) ? `<b>${pct(sim, nv)}%</b> confiaram.` : ""} ${agregadoOk(confiaram.length) ? `Dos que confiaram, <b>${pct(honestos, confiaram.length)}%</b> encontraram gente honesta.` : ""}</p>
-          ${agregadoOk(confiaram.length) ? `<div class="col" style="gap:.4cqw">${porTipo.map((t) => `<div class="barra-rot"><span>${esc(t.c.titulo)}</span><div class="barra"><i style="width:${t.n ? pct(t.g, t.n) : 0}%;background:#f87171"></i></div><b class="mono">${t.g}/${t.n}</b></div>`).join("")}<p class="rodape" style="margin:0">Golpes sofridos / quem confiou, em cada situação.</p></div>` : ""}
-          <p class="big" style="color:#86efac;margin:0;font-weight:800">A chance de golpe era a mesma em todas: 1 em ${Math.round(1 / CHANCE_GOLPE)}.${agregadoOk(confiaram.length) ? " As diferenças são do acaso, com poucos casos." : ""}</p></div>
+          <p class="big" style="margin:0">${agregadoOk(nv) ? `<b>${pct(sim, nv)}%</b> confiaram.` : ""} ${agregadoOk(confiaram.length) ? `Dos que confiaram, <b>${pct(confiaram.length - honestos, confiaram.length)}%</b> sofreram golpe (a chance era 25%).` : ""}</p>
+          ${porTipo.every((t) => agregadoOk(t.n))
+            ? `<div class="col" style="gap:.4cqw">${porTipo.map((t) => `<div class="barra-rot"><span>${esc(t.c.titulo)}</span><div class="barra"><i style="width:${pct(t.g, t.n)}%;background:#f87171"></i></div><b class="mono">${pct(t.g, t.n)}%</b></div>`).join("")}<p class="rodape" style="margin:0">Golpes sofridos por quem confiou, em cada situação.</p></div>`
+            : agregadoOk(confiaram.length) ? `<p class="rodape" style="margin:0">Por situação, alguma teve menos de 5 pessoas confiando: com tão poucos casos, comparar seria só acaso, e vale o total da turma.</p>` : ""}
+          <p class="big" style="color:#86efac;margin:0;font-weight:800">A chance de golpe era a mesma em todas as situações: 1 em ${Math.round(1 / CHANCE_GOLPE)}.</p></div>
         <div class="card col" style="justify-content:center;gap:.6cqw"><b class="big">Quem a turma achou que mais dava golpe</b>${agregadoOk(q.length) ? QUEM_GOLPE.map((t, k) => `<div class="barra-rot"><span>${esc(t)}</span><div class="barra"><i style="width:${pct(qc[k] || 0, q.length)}%"></i></div><b class="mono">${pct(qc[k] || 0, q.length)}%</b></div>`).join("") : `<p class="rodape">Menos de 5 respostas.</p>`}</div></div>`;
     } else {
       const acaso = c.tipo === "dado" ? " (por acaso, cerca de 17%)" : "";
@@ -384,7 +387,9 @@ function perguntasFechamento(st) {
   const mataMin = Math.min(...H.map((x) => x.mata));
   const cargas = Math.round((100 * H.reduce((a, x) => a + (x.extr || 0), 0)) / (st.teto || 1)), prop = Math.round((100 * (st.estragoMata || 0)) / (st.teto || 1));
   const pub = Math.round(st.estragoPublico || 0);
-  const origem = (prop ? `As cargas tiraram ${cargas}% da mata nos cinco anos; as propostas aceitas, ${prop}%.` : `As cargas tiraram ${cargas}% da mata nos cinco anos.`) + (pub ? ` E as propostas tiraram ${pub} pontos do bem público.` : "");
+  // R17: o saldo da mata em pontos da mata cheia (1 ponto = 1%): o que saiu, o que voltou e de quanto a quanto ela foi
+  const ini = Math.round(100 * MATA_INICIO), fim = Math.round((100 * st.mata) / (st.teto || 1)), voltou = Math.max(0, fim - ini + cargas + prop);
+  const origem = `em pontos da mata cheia, ela foi de ${ini} para ${fim}. As cargas tiraram ${cargas}${prop ? `, as propostas aceitas, ${prop}` : ""}; a natureza e o replantio devolveram ${voltou}.` + (pub ? ` E as propostas tiraram ${pub} pontos do bem público.` : "");
   const vs = Object.values(st.alvara?.votos || {}), n = st.ordem.length;
   // R16: as duas porcentagens sobre quem respondeu; o estrago da pequena sobre a turma inteira
   const pq = agregadoOk(st.pequena?.n || 0) ? pct(st.pequena.aceitaram, st.pequena.n) : null, pg = agregadoOk(vs.length) ? pct(vs.filter(Boolean).length, vs.length) : null;
@@ -422,7 +427,7 @@ function apoioPergunta(st, k) {
   if (k === 4) return "Por exemplo: a agenda do posto, a praça onde se treina, a verba do clube. Quem cobra aluguel dela?";
   if (k === 3 && st.cartas && !st.semTroco) {
     const c = carta(st.cartas.ano4), vals = Object.values(st.mente);
-    if (agregadoOk(vals.length)) return c.tipo === "confia" ? `E no ano 4 (confiança): ${pct(vals.filter(Boolean).length, vals.length)}% confiaram, e a chance de golpe era a mesma em todas as situações.` : `E no ano 4 (${c.titulo}): ${pct(vals.filter(Boolean).length, vals.length)}% ficaram com o que não era seu, sem ninguém para conferir.`;
+    if (agregadoOk(vals.length)) return c.tipo === "confia" ? `E no ano 4 (confiança): ${pct(vals.filter(Boolean).length, vals.length)}% confiaram, e a chance de golpe era a mesma em todas as situações.` : c.tipo === "dado" ? `E no ano 4 (${c.titulo}): ${pct(vals.filter(Boolean).length, vals.length)}% disseram "acertei"; por acaso, seriam cerca de 17%. Ninguém sabe quem acertou de verdade.` : `E no ano 4 (${c.titulo}): ${pct(vals.filter(Boolean).length, vals.length)}% ficaram com o que não era seu, sem ninguém para conferir.`;   // R17: no dado, quem acertou por acaso não é desonesto
   }
   return "";
 }

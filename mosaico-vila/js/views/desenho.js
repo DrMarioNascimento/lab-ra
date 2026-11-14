@@ -81,11 +81,11 @@ export function mapaVila(st, { grande = true, destaque = null } = {}) {
     <text x="34" y="68" font-size="27" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Mata</text><text x="266" y="68" text-anchor="end" font-size="27" font-weight="700" fill="${corMata}" font-family="JetBrains Mono, monospace">${pctL(fm)}</text>
     ${arv.join("")}
     <rect x="290" y="40" width="200" height="390" rx="18" fill="#1a1f33" stroke="#2c3560"/>
-    <text x="304" y="68" font-size="27" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Bem público</text><text x="304" y="96" font-size="20" fill="#fbbf24" font-family="Sora, sans-serif">nível ${nivel} de 5</text>
+    <text x="304" y="68" font-size="27" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Bem público</text><text x="304" y="98" font-size="24" fill="#fbbf24" font-family="Sora, sans-serif">nível ${nivel} de 5</text>
     ${predios.join("")}
-    <text x="390" y="416" text-anchor="middle" font-size="19" fill="#9fb6cf" font-family="Sora, sans-serif">${esc(NIVEIS_PUBLICO[nivel])}</text>
+    <text x="390" y="418" text-anchor="middle" font-size="24" fill="#9fb6cf" font-family="Sora, sans-serif">${esc(NIVEIS_PUBLICO[nivel])}</text>
     <rect x="500" y="40" width="280" height="390" rx="18" fill="#10223b" stroke="#23415f"/>
-    <text x="514" y="68" font-size="27" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Lotes</text><text x="766" y="68" text-anchor="end" font-size="20" fill="#9fb6cf" font-family="Sora, sans-serif">${st.lotes.filter((x) => !x).length} livres</text>
+    <text x="514" y="68" font-size="27" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Lotes</text><text x="766" y="68" text-anchor="end" font-size="24" fill="#9fb6cf" font-family="Sora, sans-serif">${st.lotes.filter((x) => !x).length} livres</text>
     ${lotes.join("")}
   </svg>`;
 }

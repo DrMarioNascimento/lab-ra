@@ -130,6 +130,38 @@ ok(!confiaram || (golpes / confiaram > 0.1 && golpes / confiaram < 0.45), `golpe
   ok(semLoteOk, "R16: família que marcou \"não queremos lote\" não compra");
   ok(st.alvara.pessoa && (!mudos.has(st.alvara.pessoa) || st.alvara.aceito === false), "R16: se a pessoa sorteada não respondeu, conta como recusa");
 }
+// R17: textos que a turma lê. No dado, a pergunta 4 não chama de desonesto quem acertou por acaso; na confiança, nada por
+// situação com menos de 5; na carta e no mercado, a barra mostra a vila de antes das decisões; conversas curtas ligam
+{
+  const partida = (seed, n, ate) => {
+    let st = estadoInicial(); const d = (a) => { st = reduzir(st, a); };
+    for (let i = 0; i < n; i++) d({ t: "entrar", id: `a${i}`, nome: `P${i}` });
+    d({ t: "sortear", seed });
+    const locs = Object.fromEntries(st.ordem.map((id, i) => [id, { perfil: perfilBot(i + 1), papelBully: papelBully(i + 1), pub: 20, rep: 0, car: 0, lance: 30 }]));
+    while (!ate(st) && st.fase !== "fechamento") { for (let k = 0; k < 40; k++) for (const id of st.ordem) passoBot(st, id, locs[id], d); d({ t: "fase", dir: 1 }); }
+    for (let k = 0; k < 40; k++) for (const id of st.ordem) passoBot(st, id, locs[id], d);
+    return { get st() { return st; }, d };
+  };
+  // dado (semente 5): pergunta 4 do fechamento
+  const P = partida(5, 20, () => false);
+  ok(carta(P.st.cartas.ano4).tipo === "dado", "semente 5 sorteia o dado");
+  for (let k = 0; k < 3; k++) P.d({ t: "pergunta", dir: 1 });
+  const h4 = renderTelao(P.st);
+  ok(/por acaso/.test(h4) && !/ficaram com o que não era seu/.test(h4), "R17: no dado, a pergunta 4 fala em acaso, não em ficar com o que não era seu");
+  // confiança (semente 78) com 12 pessoas: nenhuma barra por situação (cada situação tem menos de 5)
+  const C = partida(78, 12, (st) => st.fase === "resultado" && st.ano === 4);
+  let html = "";
+  for (let k = 0; k < 6; k++) { C.d({ t: "painel", k }); html += renderTelao(C.st); }
+  const porTipo = CONFIANCA.map((cid) => Object.keys(C.st.golpe).filter((id) => cartaAno4(C.st, id).id === cid).length);
+  ok(porTipo.some((x) => x < 5) ? !/em cada situação\./.test(html) : true, `R17: com menos de 5 numa situação, nada por situação (${porTipo.join("/")})`);
+  // vista: no mercado do ano 4, a barra mostra a mata de antes das decisões
+  const M = partida(111, 20, (st) => st.fase === "lances" && st.ano === 4);
+  const antes = Math.round((100 * M.st.antes.mata) / M.st.teto), depois = Math.round((100 * M.st.mata) / M.st.teto);
+  const hud = renderTelao(M.st).match(/<div class="hud">([\s\S]*?)<\/div>\s*<\/div>\s*<\/div>/)?.[0] || renderTelao(M.st);
+  ok(antes === depois || hud.includes(`${antes}%`), `R17: no mercado, a barra mostra a mata de antes das decisões (${antes}% e não ${depois}%)`);
+  M.d({ t: "config", curto: true });
+  ok(M.st.curto === true, "R17: conversas curtas ligam");
+}
 // R13: com o mesmo número de aceites, o estrago da pequena com a turma inteira é igual ao da grande
 {
   let st = estadoInicial(); const d = (a) => { st = reduzir(st, a); };

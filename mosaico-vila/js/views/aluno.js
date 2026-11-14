@@ -1,4 +1,4 @@
-import { NOME_FASE } from "../engine.js";
+import { NOME_FASE, vista } from "../engine.js";
 import { NOVIDADE_DO_ANO, EXEMPLO_DO_ANO, EXEMPLO_VOTO, REGRAS_TXT, MOTIVOS, GUIAS, NIVEIS_PUBLICO } from "../content/vila.js";
 import { LIMITES, lanceMinimo, CARGA_RENDE, CARGA_TIRA, REPLANTA_POR, REPLANTA_DEVOLVE, patrimonio, VALOR_LOTE, progressoMeta, VITORIA, precisaLotes, tetoLotes } from "../content/regras.js";
 import { carta, cartaAno4, textoCarta, QUEM_GOLPE, FAIXAS_PCT, GANHO_PEQUENA, GANHO_GRANDE } from "../content/cartas.js";
@@ -18,7 +18,8 @@ function hd(st, me) {
 }
 
 // R11: a mesma barra de ícones do telão, pequena, no alto do celular
-function miniBarra(st) {
+function miniBarra(st0) {
+  const st = vista(st0);   // R17: entre as decisões e o resultado, a vila de antes das decisões
   const m = progressoMeta(st.fams, st.publico, st.mata, st.teto, st.regra);
   const meta = m.regra === "prosperidade" ? `${pctL(m.valor)}/${Math.round(100 * m.alvo)}%` : `${nL(m.valor, m.alvo)}/${m.alvo}`;
   return `<div class="mini-hud">${st.ano >= 2 ? `<span>${ico("arvore-redonda")}<b>${pctL(st.mata / st.teto)}</b></span>` : ""}<span>${ico("economia")}<b>nível ${st.publico}</b></span><span>${ico("meta")}<b>${meta}</b></span><span>${ico("balanca")}<b>${REGRAS_TXT[st.regra].nome}</b></span></div>`;
@@ -102,7 +103,7 @@ export function renderAluno(st, id, loc) {
   const f = me?.fam ? st.fams[me.fam] : null;
   let bd = "";
   switch (st.fase) {
-    case "entrada": bd = `<h2>Bem-vindo ao Mosaico Vila</h2><p class="muted">Você entrou como <b>${esc(me?.nome)}</b>. Aguarde o professor formar as famílias.</p>`; break;
+    case "entrada": bd = `<h2>Bem-vindo ao Mosaico Vila</h2><p class="muted">Você entrou como <b>${esc(me?.nome)}</b>. Aguarde o professor formar as famílias.</p><div class="card"><p class="muted" style="margin:0">O jogo fala de dinheiro, aluguel, herança e propostas de corrupção, sempre de famílias e personagens inventados. Os pontos são de mentira. Se algum tema pesar, você pode só observar ou falar com quem conduz.</p></div>`; break;
     case "familias":
       bd = `<div class="card col" style="align-items:center;text-align:center">${iconeFamilia(f, 72)}<h2>${esc(f.nome)}</h2><p class="muted">Procure as pessoas com este símbolo e sentem juntas.</p></div>
         ${me.achou ? enviado("Família encontrada.") : `<button class="btn ok block" data-a="achei">Achei minha família</button>`}`;
@@ -192,6 +193,8 @@ export function renderAluno(st, id, loc) {
       }
       const pal = st.palpite?.[st.ano]?.[id];
       if (pal && st.leilao?.vendidos?.length) { const maior = Math.max(...st.leilao.vendidos.map((v) => v.preco)), certo = maior <= 20 ? "até 20" : maior <= 40 ? "21 a 40" : "mais de 40"; pessoal.push(`Lance vencedor: ${n0(maior)}. Seu palpite (${pal}) ${pal === certo ? "acertou" : "não acertou"}.`); }
+      // R17: o que é só seu fica numa tela à parte, aberta com um toque (o extrato é olhado junto com a família)
+      if (loc.verPessoal === st.ano && pessoal.length) { bd = `<h2>Só para você</h2><div class="card">${pessoal.map((t) => `<p class="muted" style="margin:6px 0 0">${esc(t)}</p>`).join("")}</div><p class="faint">Ninguém mais vê esta tela.</p><button class="btn sec block" data-a="verPessoal" data-val="0">Voltar ao extrato da família</button>`; break; }
       const espera = `<div class="card espera" style="text-align:center;--a:${falta.toFixed(2)}s">${ico("telao", "g")}<p class="muted" style="margin:6px 0 0"><b>Olhe o telão:</b> primeiro a vila inteira. O extrato da sua família aparece aqui em seguida.</p></div>`;
       const extrato = `<div class="surge" style="--a:${falta.toFixed(2)}s"><h2>Como ficou a sua família</h2><div class="card"><table class="vals">
         ${fx ? `<tr><td>Renda do ano</td><td class="n">${n0(fx.renda)}</td></tr><tr><td>Para o bem público</td><td class="n">−${n0(fx.aPub)}</td></tr>${st.ano >= 2 ? `<tr><td>Replantio</td><td class="n">−${n0(fx.aRep)}</td></tr><tr><td>Cargas (${fx.cargas})</td><td class="n">+${n0(fx.ganhoCarga)}</td></tr>` : ""}` : ""}
@@ -199,13 +202,13 @@ export function renderAluno(st, id, loc) {
         <tr><td><b>Patrimônio</b></td><td class="n"><b>${n0(patrimonio(f, st.publico))}</b></td></tr>
         <tr><td>Patrimônio por pessoa</td><td class="n">${n0(porPessoa(st, f))}</td></tr>
         <tr><td>Posição por pessoa (só vocês veem)</td><td class="n">${posicao(st, f)}º de ${Object.keys(st.fams).length}</td></tr></table></div>
-        ${pessoal.length ? `<div class="card"><b>Só para você</b>${pessoal.map((t) => `<p class="muted" style="margin:6px 0 0">${esc(t)}</p>`).join("")}</div>` : ""}${metaCelular(st)}</div>`;
+        ${pessoal.length ? `<button class="btn sec block" data-a="verPessoal" data-val="${st.ano}">Ver o que é só seu (incline a tela)</button>` : ""}${metaCelular(st)}</div>`;
       bd = espera + extrato;
       break;
     }
     case "conversa":
       // R16: conversa de 90 s antes do voto; o celular confere a regra e espera o voto abrir
-      bd = `<h2 class="row">${ico("balanca", "g")}Antes do voto: conversem</h2><p class="muted">Com a família, 90 segundos: com o aluguel mordendo, qual regra deixa a vila mais perto da meta, e de quem? <b>O voto abre quando o relógio do telão acabar.</b></p>${controle(st, id)}
+      bd = `<h2 class="row">${ico("balanca", "g")}Antes do voto: conversem</h2><p class="muted">Com a família, ${st.curto ? 60 : 90} segundos: com o aluguel mordendo, qual regra deixa a vila mais perto da meta, e de quem? <b>O voto abre quando o relógio do telão acabar.</b></p>${controle(st, id)}
         <div class="card"><b>${esc(REGRAS_TXT.monopolio.nome)}</b><p class="faint" style="margin:2px 0 6px">${esc(REGRAS_TXT.monopolio.curto)}</p><b>${esc(REGRAS_TXT.prosperidade.nome)}</b><p class="faint" style="margin:2px 0 0">${esc(REGRAS_TXT.prosperidade.curto)}</p></div>`;
       break;
     case "voto":
@@ -241,6 +244,7 @@ export function acaoAluno(a, el, { id, loc, dispatch }) {
     case "palpite": dispatch({ t: "palpite", id, v: val }); return true;
     case "lance": dispatch({ t: "lance", id, v: loc.lance / 100 }); return true;
     case "semLote": dispatch({ t: "lance", id, v: -1 }); return true;
+    case "verPessoal": loc.verPessoal = +val || null; return true;   // o ano em que a pessoa abriu (no ano seguinte, volta ao extrato)
     case "alvara": dispatch({ t: "alvara", id, aceita: val === "1" }); return true;
     case "pequena": dispatch({ t: "pequena", id, aceita: val === "1" }); return true;
     case "quem": dispatch({ t: "quem", id, v: +val }); return true;
