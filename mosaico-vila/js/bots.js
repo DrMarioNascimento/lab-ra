@@ -99,5 +99,23 @@ export function passoBot(st, id, loc, dispatch) {
   }
 }
 
+// R38: vizinhos automáticos (modo de 2 a 11 pessoas). As famílias automáticas jogam como os participantes simulados; os parentes
+// automáticos de uma família com gente não decidem nada da família (a proposta, o lance e o voto vêm de quem chefia, copiados pelo
+// motor) e só respondem ao que é de cada um: perguntas de controle, cartas e palpites.
+export function passoAuto(st, id, loc, dispatch) {
+  const me = st.alunos[id];
+  if (!me?.auto) return;
+  if (me.parente) {
+    if (st.fase === "decidir") return;
+    if (st.fase === "lances") { if (st.lances?.[st.ano]?.[id]?.lanceEnviado && st.palpite?.[st.ano]?.[id] == null && chance(0.3)) dispatch({ t: "palpite", id, v: ["até 20", "21 a 40", "mais de 40"][Math.floor(Math.random() * 3)] }); return; }
+    if (st.fase === "voto") {
+      if (st.controle?.voto?.[id] == null && chance(0.4)) dispatch({ t: "controle", id, op: Math.random() < 0.85 ? 1 : 0 });
+      else if (st.voto[id] != null && st.palpitePct?.voto?.[id] == null && chance(0.35)) dispatch({ t: "palpitePct", id, v: Math.floor(Math.random() * 3) });
+      return;
+    }
+  }
+  passoBot(st, id, loc, dispatch);
+}
+
 // Papel diante do bullying (Salmivalli): não é usado na Vila (o módulo "Quem Defende?" fica fora dela), mantido para o simulador.
 export function papelBully(i) { const u = ((i * 2246822519) >>> 0) / 4294967296; return u < 0.2 ? "reforco" : u < 0.65 ? "fora" : u < 0.85 ? "defensor" : "indeciso"; }

@@ -275,3 +275,13 @@ No fim do ano 3, o motor guarda a vila (`snap3`). No fechamento, `contrafactual(
 - Relógio: fechamento explicado (10 min de roteiro, uns 12,5 de sala) e sugestão das conversas curtas na entrada com 20 ou mais.
 - Pergunta 4: "a diferença é de uma pessoa ou menos, o que não conta como mudança" (sem "com tão poucas respostas").
 - Testes da R37 (linhas da abertura e do fim do ano).
+
+## R38 (14/11/2026, pedido do professor: começar com 2 jogadores; modo de teste, ainda sem rodada de avaliação)
+- Modo vizinhos: de 2 a 11 pessoas, a vila se completa com vizinhos automáticos até ter pelo menos 4 famílias e 12 participantes (`planoVila(n)`, `MIN_PESSOAS = 2`; com 12 ou mais, nada muda).
+- Até 8 pessoas, cada uma chefia uma família diferente, com 2 parentes automáticos (`alunos[id].auto`, `.parente`). O motor copia para os parentes a proposta, o lance e o voto de quem chefia (`ACOES_DA_FAMILIA`); nas cartas, nos palpites e nas perguntas de controle, cada automático responde por si. As famílias que faltam são inteiras automáticas (`fams[id].automatica`) e jogam como os participantes simulados (`passoAuto` em `js/bots.js`).
+- De 9 a 11, as pessoas formam famílias de 3 ou 4, como antes, e uma família automática completa a vila.
+- As famílias com gente saem em posições sorteadas: a herança e a família sem lote podem cair em gente ou em automáticas.
+- Telas: o telão diz "com vizinhos automáticos" no topo; com uma pessoa por família, "Pensem na proposta" (decisões) e "Conversem entre vocês" (antes do voto). No celular: "você chefia esta família", "Já pensei: abrir minha proposta", "os parentes votam como você" e, nos avisos das cartas, que os totais somam pessoas e vizinhos automáticos.
+- /simulador: a turma vai de 2 a 40; os automáticos não têm celular na tela e jogam sempre (na sala real, quem os roda é o aparelho de quem conduz). O painel de quem conduz mostra quantos vizinhos automáticos completam a vila e marca as famílias automáticas.
+- Testes da R38: 2, 3, 5, 8, 9 e 11 pessoas (famílias, participantes, partida até o fechamento, parentes copiando proposta e voto, aviso no telão).
+- Ainda não medido: o tempo de uma partida de 2 (as etapas seguem os relógios da aula) e o efeito de os automáticos dominarem os totais e o voto.

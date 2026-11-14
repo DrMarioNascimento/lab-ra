@@ -45,6 +45,20 @@ export const NOME_FASE = {
 // 4 a 8 famílias a partir de 12 participantes (GDD); em turmas menores (só para testar), famílias de 3.
 export function nFamilias(n) { return n >= 12 ? Math.max(4, Math.min(8, Math.floor(n / 4))) : Math.max(1, Math.floor(n / 3)); }
 
+// R38: modo vizinhos. De 2 a 11 pessoas, a vila se completa com vizinhos automáticos até ter pelo menos 4 famílias e 12 pessoas.
+// Até 8 pessoas, cada uma chefia uma família diferente, com 2 parentes automáticos que seguem as decisões dela (propostas,
+// lances e voto); de 9 a 11, as pessoas formam famílias de 3, como antes. As famílias que faltam são inteiras automáticas.
+export const MIN_PESSOAS = 2;
+export function planoVila(nPessoas) {
+  if (nPessoas >= 12) return { vizinhos: false, nf: nFamilias(nPessoas), humanas: nFamilias(nPessoas), autos: 0 };
+  const humanas = nPessoas <= 8 ? nPessoas : Math.floor(nPessoas / 3), nf = Math.max(4, humanas);
+  const porFam = Array.from({ length: nf }, (_, k) => (k < humanas ? (nPessoas <= 8 ? 1 : Math.floor(nPessoas / humanas) + (k < nPessoas % humanas ? 1 : 0)) : 0));
+  return { vizinhos: true, nf, humanas, autos: porFam.reduce((a, h) => a + Math.max(0, 3 - h), 0) };
+}
+const ehAuto = (s, id) => !!s.alunos[id]?.auto;
+// os parentes automáticos de quem chefia a família copiam a ação dela (propostas, lances e voto)
+const ACOES_DA_FAMILIA = new Set(["propor", "lance", "voto"]);
+
 export function estadoInicial() {
   return {
     v: 0, k: 0, fase: "entrada", ano: 0, regra: "monopolio", alunos: {}, ordem: [], fams: {}, lotes: Array(LOTES).fill(null),
@@ -70,18 +84,35 @@ export function reduzir(st, a) {
       s.ordem.push(a.id); s.pessoal[a.id] = 0;
       break;
     case "sortear": {
-      if (s.fase !== "entrada" || s.ordem.length < 4) break;
+      if (s.fase !== "entrada" || s.ordem.length < MIN_PESSOAS) break;   // R38: a partir de 2 pessoas (antes, 4)
       s.seed = (a.seed ?? 1) >>> 0;
       const rr = rnd(s.seed);
       const ids = [...s.ordem];
       for (let i = ids.length - 1; i > 0; i--) { const j = Math.floor(rr() * (i + 1)); [ids[i], ids[j]] = [ids[j], ids[i]]; }
-      const nf = nFamilias(ids.length);
+      const plano = planoVila(ids.length), nf = plano.nf;
+      s.vizinhos = plano.vizinhos;
       s.fams = {};
       // R19: os nomes e as cores das famílias saem embaralhados pela semente: a herança não fica sempre com a mesma família
       const rn = rnd(s.seed ^ 0x3c6ef372), nomes = [...FAMILIAS];
       for (let i = nomes.length - 1; i > 0; i--) { const j = Math.floor(rn() * (i + 1)); [nomes[i], nomes[j]] = [nomes[j], nomes[i]]; }
       for (let i = 0; i < nf; i++) s.fams[`f${i}`] = { id: `f${i}`, i, ...nomes[i], membros: [], lotes: 1, caixa: 0, caixa0: 0 };
-      ids.forEach((id, k) => { const f = s.fams[`f${k % nf}`]; f.membros.push(id); s.alunos[id].fam = f.id; });
+      if (!plano.vizinhos) ids.forEach((id, k) => { const f = s.fams[`f${k % nf}`]; f.membros.push(id); s.alunos[id].fam = f.id; });
+      else {
+        // R38: as famílias com gente saem em posições sorteadas (a herança e a família sem lote podem ser de gente ou automáticas)
+        const pos = Array.from({ length: nf }, (_, k) => k);
+        for (let i = pos.length - 1; i > 0; i--) { const j = Math.floor(rr() * (i + 1)); [pos[i], pos[j]] = [pos[j], pos[i]]; }
+        ids.forEach((id, k) => { const f = s.fams[`f${pos[k % plano.humanas]}`]; f.membros.push(id); s.alunos[id].fam = f.id; });
+        let nv = 0;
+        for (const f of Object.values(s.fams)) {
+          const temGente = f.membros.length > 0;
+          f.automatica = !temGente;
+          while (f.membros.length < 3) {
+            const vid = `v${++nv}`;
+            s.alunos[vid] = { id: vid, nome: temGente ? `Parente ${nv}` : `Vizinho ${nv}`, fam: f.id, achou: true, auto: true, parente: temGente };
+            s.ordem.push(vid); s.pessoal[vid] = 0; f.membros.push(vid);
+          }
+        }
+      }
       // desigualdade inicial: a primeira família tem herança; a última começa sem lote
       for (const f of Object.values(s.fams)) f.caixa = 10 * f.membros.length;
       s.fams.f0.caixa *= 1.5;
@@ -156,6 +187,12 @@ export function reduzir(st, a) {
       break;
     }
     default: break;
+  }
+  // R38: no modo vizinhos, os parentes automáticos fazem o mesmo que quem chefia a família (proposta, lance e voto)
+  if (s.vizinhos && ACOES_DA_FAMILIA.has(a.t) && a.id && !ehAuto(s, a.id)) {
+    let out = s;
+    for (const pid of famDe(s, a.id)?.membros || []) if (s.alunos[pid]?.parente) out = reduzir(out, { ...a, id: pid });
+    return out;
   }
   return s;
 }

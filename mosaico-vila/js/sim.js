@@ -5,7 +5,7 @@ import { renderAluno, acaoAluno, novoLocal } from "./views/aluno.js";
 import { renderProfessor, acaoProfessor } from "./views/professor.js";
 import { iconeFamilia, ico } from "./views/desenho.js";
 import { montar, setPath } from "./ui.js";
-import { passoBot, NOMES, perfilBot, papelBully } from "./bots.js";
+import { passoBot, passoAuto, NOMES, perfilBot, papelBully } from "./bots.js";
 
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 let st = estadoInicial();
@@ -23,7 +23,7 @@ app.innerHTML = `
   <header class="row" style="padding:14px 16px 0;max-width:1800px;margin:0 auto">
     ${ico("app-mosaico-vila", "g")}
     <div class="grow"><b style="font-size:18px">Mosaico Vila · Simulador de aula</b><div class="faint" style="font-size:12px">Telão em cima, turma embaixo. O professor comanda pelo painel ao lado (na sala real, pelo celular).</div></div>
-    <label class="row muted" style="gap:6px">Participantes <input id="nAl" type="range" min="4" max="40" value="20" style="width:140px"><b id="nAlV" class="mono">20</b></label>
+    <label class="row muted" style="gap:6px">Participantes <input id="nAl" type="range" min="2" max="40" value="20" style="width:140px"><b id="nAlV" class="mono">20</b></label>
     <button class="btn sm ok on" id="auto">Piloto automático: ligado</button>
     <button class="btn sm sec" id="autoProf">Professor automático: desligado</button>
     <button class="btn sm sec" id="fundo">Ver do fundo da sala</button>
@@ -32,7 +32,7 @@ app.innerHTML = `
   <div class="sim">
     <div><div class="telao" id="telao"><button class="btn sm sec fsbtn" id="fs">⛶ Tela cheia</button><div id="telaoIn"></div></div><p class="fundo-nota">Assim fica o telão numa TV de 55" vista a uns 6 m: se der para ler aqui, dá para ler do fundo da sala.</p></div>
     <aside class="card" id="prof" style="max-height:calc(56.25vw * 0.78);overflow:auto"></aside>
-    <section class="turma"><div class="row" style="justify-content:space-between"><h3>Turma</h3><span class="faint">Desligue o piloto de um celular para clicar nele à mão.</span></div><div class="phones" id="phones"></div></section>
+    <section class="turma"><div class="row" style="justify-content:space-between"><h3>Turma</h3><span class="faint" id="vizNota"></span><span class="faint">Desligue o piloto de um celular para clicar nele à mão.</span></div><div class="phones" id="phones"></div></section>
   </div>`;
 
 const telaoIn = document.getElementById("telaoIn");
@@ -55,7 +55,10 @@ let phoneSubs = [];
 function montarTurma() {
   phoneSubs.forEach((f) => subs.delete(f)); phoneSubs = [];
   const box = document.getElementById("phones"); box.innerHTML = "";
-  const ordem = Object.keys(st.fams).length ? Object.values(st.fams).flatMap((f) => f.membros) : st.ordem;
+  // R38: os vizinhos automáticos não têm celular na tela; jogam sozinhos (ver o laço abaixo)
+  const ordem = (Object.keys(st.fams).length ? Object.values(st.fams).flatMap((f) => f.membros) : st.ordem).filter((id) => !st.alunos[id]?.auto);
+  const nAuto = st.ordem.filter((id) => st.alunos[id]?.auto).length;
+  document.getElementById("vizNota").textContent = nAuto ? `Vila completada com ${nAuto} vizinhos automáticos (sem celular na tela).` : "";
   for (const id of ordem) {
     const i = +id.slice(1);
     locs[id] ??= Object.assign(novoLocal(), { perfil: perfilBot(i), papelBully: papelBully(i) });
@@ -86,7 +89,16 @@ document.getElementById("fundo").onclick = (e) => { const on = document.querySel
 document.getElementById("auto").onclick = (e) => { auto = !auto; e.target.className = `btn sm ${auto ? "ok on" : "sec"}`; e.target.textContent = `Piloto automático: ${auto ? "ligado" : "desligado"}`; };
 document.getElementById("autoProf").onclick = (e) => { autoProf = !autoProf; e.target.className = `btn sm ${autoProf ? "ok on" : "sec"}`; e.target.textContent = `Professor automático: ${autoProf ? "ligado" : "desligado"}`; };
 
-setInterval(() => { if (!auto) return; for (const id of st.ordem) if (pilotos[id]) passoBot(st, id, locs[id], dispatch); }, 600);
+setInterval(() => { if (!auto) return; for (const id of st.ordem) if (pilotos[id] && !st.alunos[id]?.auto) passoBot(st, id, locs[id], dispatch); }, 600);
+// R38: os vizinhos automáticos jogam sempre, mesmo com o piloto desligado (na sala real, quem roda isto é o aparelho de quem conduz)
+setInterval(() => {
+  for (const id of st.ordem) {
+    if (!st.alunos[id]?.auto) continue;
+    const i = 500 + +id.slice(1);
+    locs[id] ??= Object.assign(novoLocal(), { perfil: perfilBot(i), papelBully: papelBully(i) });
+    passoAuto(st, id, locs[id], dispatch);
+  }
+}, 600);
 // Professor automático: avança quando todos enviaram (ou a cada 6 s nas telas só de leitura)
 let espera = 0;
 setInterval(() => {

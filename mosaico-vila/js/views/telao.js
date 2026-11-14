@@ -57,7 +57,7 @@ function rotuloFase(st) {
 
 function topo(st, titulo) {
   const p = progresso(st);
-  return `<div class="top"><div class="grow"><div class="fase">Mosaico Vila · ${esc(rotuloFase(st))}</div><h1>${titulo}</h1></div>
+  return `<div class="top"><div class="grow"><div class="fase">Mosaico Vila · ${esc(rotuloFase(st))}${st.vizinhos ? " · com vizinhos automáticos" : ""}</div><h1>${titulo}</h1></div>
     ${p && p.total ? `<div class="conta"><b class="mono">${p.feito}/${p.total}</b><span>${p.rot}</span><div class="prog"><i style="width:${(100 * p.feito) / p.total}%"></i></div></div>` : ""}</div>${st.ano ? barra(st) : ""}`;
 }
 
@@ -144,7 +144,7 @@ export function renderTelao(st) {
     }
     case "decidir":
       body = topo(st, "Cada família decide") + (st.ano === 5 ? bannerGrande(st) : "") + `<div class="lado ${st.ano === 5 && st.cartas ? "compacto" : ""}"><div class="card mapa-card">${mapaVila(st, { menor: st.ano === 5 && !!st.cartas })}</div>
-        <div class="col centro">${cronometro(st, "Conversem na família", st.curto && st.ano >= 4 ? 30 : 45)}<p class="big" style="text-align:center;margin:0">Cada um envia a sua proposta.<br>Vale a mediana da família.</p>${st.ano >= 4 && st.leilao?.ano === st.ano && st.leilao.vendidos.length ? `<p class="rodape" style="text-align:center;margin:0">A meta já desconta os lances do mercado.</p>` : ""}</div></div>`;   // R22
+        <div class="col centro">${cronometro(st, vizSozinhos(st) ? "Pensem na proposta" : "Conversem na família", st.curto && st.ano >= 4 ? 30 : 45)}<p class="big" style="text-align:center;margin:0">${vizSozinhos(st) ? "Cada pessoa decide pela sua família;<br>os parentes automáticos seguem." : "Cada um envia a sua proposta.<br>Vale a mediana da família."}</p>${st.ano >= 4 && st.leilao?.ano === st.ano && st.leilao.vendidos.length ? `<p class="rodape" style="text-align:center;margin:0">A meta já desconta os lances do mercado.</p>` : ""}</div></div>`;   // R22
       break;
     case "pequena":
       { const c = carta(st.cartas.pequena), ef = textoCarta({ ...c, x: "{efeito}" }, "x", { rel: true });
@@ -187,7 +187,7 @@ export function renderTelao(st) {
       body = topo(st, "Antes do voto: conversem") + `<div class="lado"><div class="col" style="min-height:0;gap:1cqw">
         <div class="card"><p class="enorme" style="margin:0;font-size:2.3cqw">Qual meta vocês querem: patrimônio médio alto ou ninguém muito atrás? Qual regra ajuda mais nisso, e quem ganha e quem paga em cada uma?</p></div>
         <div class="card" style="flex:1;min-height:0;overflow:hidden"><h3 class="row">${ico("ideia")}Exemplo resolvido: as duas regras</h3>${exemploLinhas(st, EXEMPLO_VOTO.linhas, 1.5, "compacto")}</div></div>
-        <div class="col centro">${cronometro(st, "Conversem na família", st.curto ? 60 : 90)}${duasMetas()}</div></div>`;
+        <div class="col centro">${cronometro(st, vizSozinhos(st) ? "Conversem entre vocês" : "Conversem na família", st.curto ? 60 : 90)}${duasMetas()}</div></div>`;
       break;
     case "voto":
       body = topo(st, "Que regra queremos para os anos 4 e 5?") + `<div class="grid" style="grid-template-columns:1fr 1fr">
@@ -269,6 +269,8 @@ function resultadoVoto(st) {
 }
 
 // Acerto do palpite de quantos aceitam (pequena e grande)
+// R38: no modo vizinhos, até 8 pessoas: cada uma chefia uma família com parentes automáticos
+const vizSozinhos = (st) => !!(st.vizinhos && Object.values(st.fams).some((f) => f.membros.some((m) => st.alunos[m]?.parente)));
 function acertoPalpite(st, onde, p) {
   const pal = st.palpitePct[onde] || {}, np = Object.keys(pal).length;
   return agregadoOk(np) ? `<p class="rodape">Palpite da turma: ${pct(Object.values(pal).filter((v) => v === faixaDe(p)).length, np)}% acertaram a faixa (${esc(FAIXAS_PCT[faixaDe(p)].toLowerCase())}).</p>` : "";

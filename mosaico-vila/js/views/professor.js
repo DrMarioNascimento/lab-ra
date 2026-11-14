@@ -1,4 +1,4 @@
-import { FASES, nomeFase, progresso, nFamilias } from "../engine.js";
+import { FASES, nomeFase, progresso, nFamilias, planoVila, MIN_PESSOAS } from "../engine.js";
 import { REGRAS_TXT } from "../content/vila.js";
 import { carta } from "../content/cartas.js";
 import { iconeFamilia, ico } from "./desenho.js";
@@ -48,12 +48,12 @@ export function renderProfessor(st) {
   const fase = FASES[st.k];
   let extra = "";
   if (st.fase === "entrada") {
-    const nf = st.ordem.length >= 4 ? nFamilias(st.ordem.length) : 0;
-    extra = `<div class="card" style="padding:12px"><b>${st.ordem.length} participantes → ${nf} famílias</b><p class="faint" style="margin:4px 0 0">Mínimo de 4 participantes.</p></div>
-      <button class="btn ok block" data-a="sortear" ${st.ordem.length >= 4 ? "" : "disabled"}>Formar as famílias</button>` + relogioAula(st) + ROTEIRO_PROFISSAO;
+    const pl = st.ordem.length >= MIN_PESSOAS ? planoVila(st.ordem.length) : null;   // R38: a partir de 2, com vizinhos automáticos abaixo de 12
+    extra = `<div class="card" style="padding:12px"><b>${st.ordem.length} participantes → ${pl ? `${pl.nf} famílias` : "faltam participantes"}</b><p class="faint" style="margin:4px 0 0">${pl?.vizinhos ? `Abaixo de 12, a vila se completa com ${pl.autos} vizinhos automáticos.${st.ordem.length <= 8 ? " Cada pessoa chefia uma família; os parentes automáticos seguem as decisões dela." : ""} Os totais do telão somam pessoas e vizinhos automáticos.` : `Mínimo de ${MIN_PESSOAS} participantes; de 12 a 40, só gente.`}</p></div>
+      <button class="btn ok block" data-a="sortear" ${pl ? "" : "disabled"}>Formar as famílias</button>` + relogioAula(st) + ROTEIRO_PROFISSAO;
   } else {
     extra = Object.values(st.fams).map((f) => `<div class="card" style="padding:10px 12px"><div class="row">${iconeFamilia(f, 26)}<b class="grow">${esc(f.nome)}</b><span class="mono">${n0(f.caixa)}</span></div>
-      <div class="faint" style="font-size:12px;margin-top:4px">${f.membros.length} pessoas · ${f.lotes === 1 ? "1 lote" : `${f.lotes} lotes`}</div></div>`).join("");
+      <div class="faint" style="font-size:12px;margin-top:4px">${f.membros.length} pessoas${st.vizinhos ? (f.automatica ? " · automática" : ` · ${f.membros.filter((m) => !st.alunos[m]?.auto).length === 1 ? "1 pessoa e parentes automáticos" : "gente"}`) : ""} · ${f.lotes === 1 ? "1 lote" : `${f.lotes} lotes`}</div></div>`).join("");   // R38
     const podeTrocar = st.ano < 4 || (st.ano === 4 && st.fase === "abertura");
     if (st.fase !== "fechamento") extra = relogioAula(st) + cartasDaPartida(st) + `<div class="card" style="padding:10px 12px"><div class="row"><b class="grow">Carta do ano 4</b><button class="btn sm ${st.semTroco ? "sec" : "ok"}" data-a="troco" ${podeTrocar ? "" : "disabled"}>${st.semTroco ? "Desligada" : "Ligada"}</button></div><p class="faint" style="font-size:12px;margin:4px 0 0">Honestidade (como o dado da sorte) ou confiança. Ligada por padrão; desligue se a aula atrasar (economiza cerca de 1 min).</p></div>
       <div class="card" style="padding:10px 12px"><div class="row"><b class="grow">Conversas curtas</b><button class="btn sm ${st.curto ? "ok" : "sec"}" data-a="curto">${st.curto ? "Ligadas" : "Desligadas"}</button></div><p class="faint" style="font-size:12px;margin:4px 0 0">Se ainda faltar tempo: conversa antes do voto em 60 s e conversa da família em 30 s nos anos 4 e 5 (economiza cerca de 1 min).</p></div>` + extra;

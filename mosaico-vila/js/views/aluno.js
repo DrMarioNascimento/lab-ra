@@ -68,6 +68,8 @@ function cartaCelular(c, aviso, a, st, valSim = "1", valNao = "0") {
 // R37: sinal sem "−0" e sem "+-"
 const sinal = (v) => (!v ? "0" : `${v > 0 ? "+" : "−"}${Math.abs(v).toLocaleString("pt-BR")}`);
 // R37: as linhas da abertura, inteiras, somando exatamente a renda do ano arredondada (o resto vai para a linha que tem fração)
+// R38: no modo vizinhos, quem está sozinho com parentes automáticos decide pela família
+const sozinho = (st, f) => !!(st.vizinhos && f && f.membros.some((m) => st.alunos[m]?.parente));
 export function linhasAbertura(r) {
   const brutaV = r.base + r.bonusMata - r.perdaMata, total = Math.round(r.total);
   const L = { bruta: Math.round(brutaV), aluguel: Math.round(r.aluguel || 0), recebido: Math.round(r.recebido || 0), imposto: Math.round(r.imposto || 0), piso: Math.round(r.piso || 0), total };
@@ -152,7 +154,7 @@ export function renderAluno(st, id, loc) {
   switch (st.fase) {
     case "entrada": bd = `<h2>Bem-vindo ao Mosaico Vila</h2><p class="muted">Você entrou como <b>${esc(me?.nome)}</b>. Aguarde o professor formar as famílias.</p><div class="card"><p class="muted" style="margin:0">O jogo fala de dinheiro, aluguel, herança e propostas de corrupção, sempre de famílias e personagens inventados. Os pontos são de mentira. Se algum tema pesar, você pode só observar ou falar com quem conduz.</p></div>`; break;
     case "familias":
-      bd = `<div class="card col" style="align-items:center;text-align:center">${iconeFamilia(f, 72)}<h2>${esc(f.nome)}</h2><p class="muted">Procure as pessoas com este símbolo e sentem juntas.</p></div>
+      bd = `<div class="card col" style="align-items:center;text-align:center">${iconeFamilia(f, 72)}<h2>${esc(f.nome)}</h2><p class="muted">${sozinho(st, f) ? "Você chefia esta família. Os 2 parentes automáticos seguem as suas decisões: a proposta do ano, o lance e o voto." : "Procure as pessoas com este símbolo e sentem juntas."}</p></div>
         ${me.achou ? enviado("Família encontrada.") : `<button class="btn ok block" data-a="achei">Achei minha família</button>`}`;
       break;
     case "abertura": {
@@ -180,7 +182,7 @@ export function renderAluno(st, id, loc) {
       const merc = st.ano >= 4 && st.leilao?.ano === st.ano ? `<div class="card"><p class="muted" style="margin:0">${levou.length ? `No mercado, a família levou ${levou.length === 1 ? "1 lote" : `${levou.length} lotes`} (pagou ${n0(levou.reduce((a, v) => a + v.preco, 0))}). O caixa abaixo já desconta.` : st.leilao.noTeto?.includes(f.id) ? "A família já tinha a moradia + 1 lote: ficou fora do mercado, sem pagar nada." : st.leilao.semLote?.includes(f.id) ? "A família escolheu ficar fora do mercado este ano: não pagou nada." : "No mercado, a família não levou lote e não pagou nada."}</p></div>` : "";
       // R18: primeiro a conversa da família (o relógio do telão), depois os controles; quem já conversou abre antes
       const segC = st.curto && st.ano >= 4 ? 30 : 45, falta = loc.abriu === st.ano ? -1 : segC - decorrido(st);
-      const conversa = falta > 0 ? `<div class="card espera" style="text-align:center;--a:${falta.toFixed(2)}s">${ico("grupos", "g")}<p class="muted" style="margin:6px 0 8px"><b>Conversem na família</b>, olhando uns para os outros: ${segC} s para combinar ${st.ano >= 2 ? "bem público, replantio e cargas" : "quanto vai para o bem público"}. A proposta abre aqui quando o relógio do telão acabar.</p><button class="btn sec block" data-a="abrir" data-val="${st.ano}">Já conversamos: abrir minha proposta</button></div>` : "";
+      const conversa = falta > 0 ? `<div class="card espera" style="text-align:center;--a:${falta.toFixed(2)}s">${ico("grupos", "g")}<p class="muted" style="margin:6px 0 8px">${sozinho(st, f) ? "<b>Pense na proposta da sua família</b> (os parentes automáticos seguem você)" : "<b>Conversem na família</b>, olhando uns para os outros"}: ${segC} s para combinar ${st.ano >= 2 ? "bem público, replantio e cargas" : "quanto vai para o bem público"}. A proposta abre aqui quando o relógio do telão acabar.</p><button class="btn sec block" data-a="abrir" data-val="${st.ano}">${sozinho(st, f) ? "Já pensei: abrir minha proposta" : "Já conversamos: abrir minha proposta"}</button></div>` : "";
       // R28: no ano 5, a proposta grande aceita pode mudar a renda do ano depois da abertura; o celular diz de quanto para quanto
       const rA = st.ano === 5 ? st.rendaAbertura?.[f.id]?.total : null, rN = st.renda?.[f.id]?.total;
       const rendaMudou = rA != null && rN != null && Math.round(rA) !== Math.round(rN) ? `<div class="card"><p class="muted" style="margin:0">A proposta grande mudou a renda da família neste ano: de ${n0(rA)} para ${n0(rN)} (${st.alvara?.alvo === "mata" ? "a mata caiu, e a renda da mata mudou" : "o bem público caiu um nível"}).</p></div>` : "";
@@ -203,11 +205,11 @@ export function renderAluno(st, id, loc) {
         break;
       }
       if (c.tipo === "dado") {
-        bd = `<h2 class="row">${ico(c.icone, "g")}${esc(c.titulo)}</h2><p class="muted">${esc(c.texto)}</p><p class="faint">O telão mostra só o total da turma (se todos fizerem o mesmo, o total diz isso).</p>` + (loc.face == null
+        bd = `<h2 class="row">${ico(c.icone, "g")}${esc(c.titulo)}</h2><p class="muted">${esc(c.texto)}</p><p class="faint">O telão mostra só o total da ${st.vizinhos ? "vila, que soma pessoas e vizinhos automáticos" : "turma"} (se todos fizerem o mesmo, o total diz isso).</p>` + (loc.face == null
           ? `<button class="btn block" data-a="rolar">Pensei. Rolar o dado</button>`
           : `<div class="card" style="text-align:center"><div class="dado">${loc.face}</div><p class="muted">Você acertou o número que pensou?</p>${doisBotoes("dado", "mente", ["1", "Acertei"], ["0", "Não acertei"])}</div>`);
       } else if (c.tipo === "honesto") {
-        bd = cartaCelular(c, "<b>Só você vê esta tela.</b> O banco e a praça são do jogo; os 3 pontos são só seus. O telão mostra só o total da turma (se todos fizerem o mesmo, o total diz isso).", "mente", st);
+        bd = cartaCelular(c, `<b>Só você vê esta tela.</b> O banco e a praça são do jogo; os 3 pontos são só seus. O telão mostra só o total da ${st.vizinhos ? "vila, que soma pessoas e vizinhos automáticos" : "turma"} (se todos fizerem o mesmo, o total diz isso).`, "mente", st);
       } else {
         bd = `<p class="faint" style="margin:0 0 6px">Cada pessoa recebeu uma das 4 situações do telão, sorteada. <b>Não arriscar não custa nada.</b></p>` + cartaCelular(c, "<b>Só você vê esta tela.</b> A outra pessoa é do jogo. Se arriscar, você põe 2; se ela for honesta, ganha 2; se não, perde os 2. Você só descobre no fim do ano, aqui no celular.", "mente", st);
       }
@@ -216,7 +218,7 @@ export function renderAluno(st, id, loc) {
     case "pequena": {
       const c = cartaPequena(st, id);   // R28: a fala sorteada para esta pessoa ("presente em troca de" ou às claras)
       bd = st.pequena.votos[id] != null ? enviado("Resposta secreta enviada.") + palpiteFaixa(st, id, "pequena", "quantos % de quem responder vão aceitar?")
-        : cartaCelular(c, `<b>Responda sem mostrar a tela.</b> O telão mostra só totais, nunca a resposta de alguém (se todos fizerem o mesmo, o total diz isso); com menos de 5 respostas, a proposta não vale. ${esc(c.segmento[0].toUpperCase() + c.segmento.slice(1))} é do jogo; os ${GANHO_PEQUENA} pontos são só seus.`, "pequena", st);
+        : cartaCelular(c, `<b>Responda sem mostrar a tela.</b> O telão mostra só totais${st.vizinhos ? ", que somam pessoas e vizinhos automáticos" : ""}, nunca a resposta de alguém (se todos fizerem o mesmo, o total diz isso); com menos de 5 respostas, a proposta não vale. ${esc(c.segmento[0].toUpperCase() + c.segmento.slice(1))} é do jogo; os ${GANHO_PEQUENA} pontos são só seus.`, "pequena", st);
       break;
     }
     case "lances": {
@@ -242,7 +244,7 @@ export function renderAluno(st, id, loc) {
     case "alvara": {
       const c = cartaComFala(st, id, st.cartas.grande);   // R34: a grande na fala sorteada para esta pessoa
       bd = st.alvara.votos[id] != null ? enviado("Resposta secreta enviada.") + palpiteFaixa(st, id, "alvara", "quantos % de quem responder aceitariam?")
-        : cartaCelular(c, `<b>Responda no seu lugar, longe da família.</b> Vale a resposta de uma pessoa sorteada, que ninguém vai saber quem é (sem resposta, vale não). O telão mostra só o total (se todos fizerem o mesmo, o total diz isso). ${esc(c.segmento[0].toUpperCase() + c.segmento.slice(1))} é do jogo; os ${GANHO_GRANDE} pontos são só seus.`, "alvara", st);
+        : cartaCelular(c, `<b>Responda no seu lugar, longe da família.</b> Vale a resposta de uma pessoa sorteada, que ninguém vai saber quem é (sem resposta, vale não). O telão mostra só o total${st.vizinhos ? ", que soma pessoas e vizinhos automáticos" : ""} (se todos fizerem o mesmo, o total diz isso). ${esc(c.segmento[0].toUpperCase() + c.segmento.slice(1))} é do jogo; os ${GANHO_GRANDE} pontos são só seus.`, "alvara", st);
       break;
     }
     case "resultado": {
@@ -277,7 +279,7 @@ export function renderAluno(st, id, loc) {
         ${duasMetasCel()}`;   // R19 e R20
       break;
     case "voto":
-      bd = st.voto[id] != null ? enviado("Voto secreto enviado.") + palpiteFaixa(st, id, "voto", "quantos % vão votar para trocar?") : `<h2 class="row">${ico("balanca", "g")}Que regra queremos?</h2><p class="muted"><b>Volte ao seu lugar e vote sem mostrar a tela.</b> Vale para os anos 4 e 5. Voto secreto (o telão mostra só o total; se todos votarem igual, o total diz isso); vence a maioria, e empate mantém o Monopólio.</p>
+      bd = st.voto[id] != null ? enviado("Voto secreto enviado.") + palpiteFaixa(st, id, "voto", "quantos % vão votar para trocar?") : `<h2 class="row">${ico("balanca", "g")}Que regra queremos?</h2><p class="muted"><b>Volte ao seu lugar e vote sem mostrar a tela.</b>${sozinho(st, f) ? " Os 2 parentes automáticos votam como você; os vizinhos automáticos votam por conta própria." : ""} Vale para os anos 4 e 5. Voto secreto (o telão mostra só o total; se todos votarem igual, o total diz isso); vence a maioria, e empate mantém o Monopólio.</p>
         <div class="opcoes-iguais">${(() => { const os = [`<button class="opt" data-a="voto" data-val="0"><b>Manter o Monopólio</b><span class="faint">${esc(REGRAS_TXT.monopolio.curto)}</span></button>`, `<button class="opt" data-a="voto" data-val="1"><b>Trocar para a Prosperidade</b><span class="faint">${esc(REGRAS_TXT.prosperidade.curto)}</span></button>`]; return (trocaOrdem("voto") ? os.reverse() : os).join(""); })()}</div>${controle(st, id)}${duasMetasCel()}`;   // R33: as duas opções lado a lado, logo depois da regra; a conferência vem embaixo
       break;
     case "fechamento": {

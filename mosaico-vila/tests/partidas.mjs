@@ -1,7 +1,7 @@
 // 15 partidas completas do Mosaico Vila sem tela: motor + participantes simulados (o mesmo código do /simulador).
 // Uso: node tests/partidas.mjs
-import { estadoInicial, reduzir, FASES, progresso, estragar } from "../js/engine.js";
-import { passoBot, NOMES, perfilBot, papelBully } from "../js/bots.js";
+import { estadoInicial, reduzir, FASES, progresso, estragar, planoVila } from "../js/engine.js";
+import { passoBot, passoAuto, NOMES, perfilBot, papelBully } from "../js/bots.js";
 import { gini, fecharAno, progressoMeta, COLAPSO, tetoLotes, leilao, lanceDaFamilia } from "../js/content/regras.js";
 import { carta, cartaAno4, cartaPequena, cartaComFala, distribuirFalas, falaDe, sortearCartas, textoCarta, PEQUENAS, GRANDES, ANO4, CONFIANCA } from "../js/content/cartas.js";
 import { renderTelao, falasPequena } from "../js/views/telao.js";
@@ -335,6 +335,29 @@ for (const [nResp, valeu] of [[4, false], [5, true]]) {
     if (E.gc !== 6 * cargas || E.A + E.R - E.pub - E.rep + E.gc !== Math.round(caixa)) ruins++;
   }
   ok(!ruins, `R37: extrato do fim fecha com o caixa e as cargas inteiras (${ruins} de 500 com erro)`);
+}
+// R38: modo vizinhos, de 2 a 11 pessoas: a vila se completa com vizinhos automáticos (4 famílias e 12 participantes ou mais)
+for (const nh of [2, 3, 5, 8, 9, 11]) {
+  let st = estadoInicial();
+  const dispatch = (a) => { st = reduzir(st, a); };
+  const locs = {};
+  for (let i = 0; i < nh; i++) { const id = `a${i + 1}`; dispatch({ t: "entrar", id, nome: NOMES[i] }); locs[id] = { perfil: perfilBot(i + 1), papelBully: papelBully(i + 1), pub: 20, rep: 0, car: 0, lance: 30 }; }
+  dispatch({ t: "sortear", seed: 300 + nh });
+  const pl = planoVila(nh), humanos = st.ordem.filter((id) => !st.alunos[id].auto), fams = Object.values(st.fams);
+  ok(st.vizinhos && fams.length === pl.nf && fams.length >= 4 && st.ordem.length >= 12 && fams.every((f) => f.membros.length >= 3), `R38: ${nh} pessoas → ${fams.length} famílias, ${st.ordem.length} participantes`);
+  if (nh <= 8) ok(new Set(humanos.map((id) => st.alunos[id].fam)).size === nh, `R38: com ${nh}, cada pessoa numa família diferente`);
+  for (const id of st.ordem) if (st.alunos[id].auto) locs[id] = { perfil: perfilBot(500 + +id.slice(1)), papelBully: "fora", pub: 20, rep: 0, car: 0, lance: 30 };
+  let passos = 0, copiou = true;
+  while (st.fase !== "fechamento" && passos < 400) {
+    for (let k = 0; k < 40; k++) for (const id of st.ordem) (st.alunos[id].auto ? passoAuto : passoBot)(st, id, locs[id], dispatch);
+    if (st.fase === "decidir" && nh <= 8) for (const h of humanos) { const f = st.fams[st.alunos[h].fam], ph = st.props[st.ano]?.[h]; for (const m of f.membros) if (st.alunos[m].parente && ph && JSON.stringify(st.props[st.ano]?.[m]) !== JSON.stringify(ph)) copiou = false; }
+    if (st.fase === "voto" && nh <= 8) for (const h of humanos) { const f = st.fams[st.alunos[h].fam]; for (const m of f.membros) if (st.alunos[m].parente && st.voto[h] != null && st.voto[m] !== st.voto[h]) copiou = false; }
+    dispatch({ t: "fase", dir: 1 }); passos++;
+  }
+  ok(st.fase === "fechamento" && st.historico.length === 5, `R38: a partida com ${nh} pessoas chega ao fechamento`);
+  if (nh <= 8) ok(copiou, `R38: com ${nh}, os parentes automáticos seguem a proposta e o voto de quem chefia`);
+  const tel = renderTelao(st);
+  ok(/vizinhos automáticos/.test(tel), `R38: o telão avisa que a vila tem vizinhos automáticos (${nh})`);
 }
 // R35: as cartas de lixo estão nos sorteios, com as duas falas, e a grande às claras também fala "para você"
 ok(PEQUENAS.some((c) => c.id === "entulho" && c.alvo === "mata") && GRANDES.some((c) => c.id === "aterro" && c.alvo === "mata"), "R35: o entulho (pequena) e o aterro (grande) entram nos sorteios, na mata");
