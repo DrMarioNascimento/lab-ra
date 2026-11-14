@@ -157,8 +157,8 @@ ok(!confiaram || (golpes / confiaram > 0.1 && golpes / confiaram < 0.45), `golpe
   // vista: na carta do ano 4 (depois das decisões), a barra mostra a mata de antes das decisões
   const M = partida(111, 20, (st) => st.fase === "mente" && st.ano === 4);
   const antes = Math.round((100 * M.st.antes.mata) / M.st.teto), depois = Math.round((100 * M.st.mata) / M.st.teto);
-  const hud = renderTelao(M.st).split('class="hud"')[1]?.split("</div>\n  </div>")[0] || "";
-  ok(antes === depois || (hud.includes(`${antes}%`) && !hud.includes(`${depois}%`)), `R17: na carta do ano 4, a barra mostra a mata de antes das decisões (${antes}% e não ${depois}%)`);
+  const mataHud = renderTelao(M.st).match(/<b>([0-9,]+)%(?:<em[^>]*>[^<]*<\/em>)?<\/b><span>mata/)?.[1];   // R21: só o número da mata na barra
+  ok(antes === depois || Math.round(parseFloat(String(mataHud).replace(",", "."))) === antes, `R17: na carta do ano 4, a barra mostra a mata de antes das decisões (${antes}% e não ${depois}%; barra: ${mataHud}%)`);
   // R18: o mercado vem antes das decisões, e os lances não contam como proposta enviada
   ok(FASES.findIndex((f) => f.id === "lances" && f.ano === 4) < FASES.findIndex((f) => f.id === "decidir" && f.ano === 4)
     && FASES.findIndex((f) => f.id === "alvara") < FASES.findIndex((f) => f.id === "lances" && f.ano === 5)

@@ -33,7 +33,7 @@ function barra(st0) {
   const dPub = fx ? st.publico - fx.nivelAntes : 0;
   const delta = (d) => (d ? `<em class="delta ${d > 0 ? "up" : "down"}">${d > 0 ? "+" : "−"}${Math.abs(d)}</em>` : "");
   const metaOk = m.valor >= m.alvo && m.mata >= VITORIA.mataMinima;
-  const noVoto = ["conversa", "voto"].includes(st.fase);   // R20: no voto, a barra não mostra a meta de uma regra só
+  const noVoto = ["conversa", "voto"].includes(st.fase) || (st.fase === "resultado" && st.ano === 3);   // R20 e R21: perto do voto, a barra não mostra a meta de uma regra só
   const valMeta = noVoto ? `<small>duas metas</small>` : m.regra === "prosperidade" ? `${pctL(m.valor)}<small>/${Math.round(100 * m.alvo)}%</small>` : `${nL(m.valor, m.alvo)}<small>/${m.alvo}</small>`;
   const livres = st.lotes.filter((x) => !x).length;
   const pips = (n, tot, fn) => Array.from({ length: tot }, (_, k) => `<i class="${fn(k + 1)}"></i>`).join("");
@@ -116,7 +116,7 @@ function telaoConfianca(st) {
 // R20: no voto, as duas metas lado a lado, sem o número de "hoje" (no fim do ano 3, a de equidade quase sempre parece batida
 // e a de eficiência quase nunca, e as duas mudam muito nos anos 4 e 5). O voto é sobre a vila que a turma quer.
 function duasMetas() {
-  return `<div class="card" style="width:100%;padding:1cqw 1.4cqw"><p class="rodape" style="margin:0"><b>As duas metas</b> estão no exemplo. Nos testes, cada uma saiu em cerca de metade das partidas.</p></div>`;
+  return `<div class="card" style="width:100%;padding:1cqw 1.4cqw"><p class="rodape" style="margin:0"><b>As duas metas</b> estão no exemplo. As duas mudam muito nos anos 4 e 5, com aluguel, mercado, mata e propostas.</p></div>`;
 }
 
 export function renderTelao(st) {
@@ -163,7 +163,7 @@ export function renderTelao(st) {
       body = topo(st, "Mercado de lotes") + `<div class="lado"><div class="card mapa-card">${mapaVila(st)}</div><div class="col">
         <div class="card row" style="flex-wrap:nowrap">${ico("lote-sobrado", "xl")}<div><b class="enorme mono">${Math.min(3, livres)}</b><div class="big">lotes à venda</div></div></div>
         <div class="card"><div class="big">Lance mínimo</div><b class="enorme mono">${lanceMinimo(st.ano)}</b></div>
-        <p class="rodape">Lance fechado, mediana da família; o maior leva.${st.regra === "prosperidade" ? " Na Prosperidade, conta metade do que se oferece além do mínimo." : ""} Até a moradia + 1 lote; dá para marcar "não queremos". O lote novo conta para o aluguel a partir do próximo ano.${st.ano === 5 ? " Voltem às famílias." : ""}</p></div></div>`;
+        <p class="rodape">${st.ano === 5 ? "Voltem às famílias. " : ""}Lance fechado; o maior leva.${st.regra === "prosperidade" ? " Na Prosperidade, conta metade do que vai além do mínimo." : ""} Até a moradia + 1 lote. As outras regras estão no celular.</p></div></div>`;   // R21: cabe na TV também na Prosperidade
       break;
     }
     case "alvara":
@@ -182,7 +182,7 @@ export function renderTelao(st) {
       body = topo(st, "Que regra queremos para os anos 4 e 5?") + `<div class="grid" style="grid-template-columns:1fr 1fr">
         <div class="card"><h2 class="row">${ico("balanca", "g")}Manter: ${REGRAS_TXT.monopolio.nome}</h2><p class="big" style="margin:.4cqw 0 0">${esc(REGRAS_TXT.monopolio.telao)}</p></div>
         <div class="card"><h2 class="row">${ico("balanca", "g")}Trocar: ${REGRAS_TXT.prosperidade.nome}</h2><p class="big" style="margin:.4cqw 0 0">${esc(REGRAS_TXT.prosperidade.telao)}</p></div></div>
-        <div class="card destaque"><p class="enorme" style="margin:0;font-size:3cqw">Votem agora no celular, cada um no próprio lugar. Nos testes, cada meta saiu em cerca de metade das partidas: votem na vila que vocês querem.</p></div>
+        <div class="card destaque"><p class="enorme" style="margin:0;font-size:3cqw">Votem agora no celular, cada um no próprio lugar. As duas metas mudam muito nos anos 4 e 5: votem na vila que vocês querem.</p></div>
         <p class="rodape">Voto secreto. Vence a maioria; empate mantém o Monopólio.</p>`;   // R19: o exemplo fica na conversa (antes, cortava aqui)
       break;
     case "fechamento": body = telaoFechamento(st); break;
@@ -232,8 +232,9 @@ function dinheiroPorPessoa(st, ranking) {
   const cab = Math.max(1, Math.ceil(maxPP / MOEDA));   // largura da fileira, em moedas
   const marca = `<i class="marca-meta" style="left:calc(var(--iso) * ${(alvoPP / MOEDA).toFixed(2)} + ${(0.12 * (alvoPP / MOEDA)).toFixed(2)}cqw)"><b>${m.regra === "prosperidade" ? `${Math.round(100 * m.alvo)}% da média` : `meta ${m.alvo}`}</b></i>`;
   const iso = ranking.length <= 5 ? 3.6 : ranking.length <= 6 ? 3.1 : 2.6;   // até 8 famílias cabem na tela
-  const linhas = ranking.map((f) => `<div class="iso-linha"><span class="fila-moedas" style="--n:${cab};--iso:${iso}cqw">${moedas(f.pp)}${marca}</span><b class="mono">${n0(f.pp)}</b></div>`).join("");
-  const metaTxt = m.regra === "prosperidade" ? `A família mais pobre tem <b>${pctL(m.valor)}</b> da média por pessoa (meta: ${Math.round(100 * m.alvo)}%).` : `Patrimônio médio: <b>${nL(m.valor, m.alvo)}</b> por pessoa (meta: ${m.alvo}).`;
+  const antesDoVoto = st.ano === 3;   // R21: logo antes do voto, nenhuma das duas metas em número (o número de hoje inclinava o voto)
+  const linhas = ranking.map((f) => `<div class="iso-linha"><span class="fila-moedas" style="--n:${cab};--iso:${iso}cqw">${moedas(f.pp)}${antesDoVoto ? "" : marca}</span><b class="mono">${n0(f.pp)}</b></div>`).join("");
+  const metaTxt = antesDoVoto ? "Logo depois, a turma conversa e vota a regra dos anos 4 e 5. As duas metas aparecem lado a lado no voto." : m.regra === "prosperidade" ? `A família mais pobre tem <b>${pctL(m.valor)}</b> da média por pessoa (meta: ${Math.round(100 * m.alvo)}%).` : `Patrimônio médio: <b>${nL(m.valor, m.alvo)}</b> por pessoa (meta: ${m.alvo}).`;
   return `<div class="grid" style="grid-template-columns:1.55fr 1fr;flex:1;min-height:0">
     <div class="card" style="min-height:0;overflow:hidden"><h2>Patrimônio por pessoa, por família</h2><p class="rodape" style="margin-bottom:.6cqw">${moedas(MOEDA, "p")} Cada moeda = ${MOEDA} pontos. Sem nome de família.</p>${linhas}</div>
     <div class="card col" style="justify-content:center;gap:1.2cqw">${ico("meta", "xl")}<p class="big" style="margin:0">${metaTxt}</p><p class="rodape">${m.mata >= VITORIA.mataMinima ? `E a mata precisa ficar em pelo menos ${Math.round(100 * VITORIA.mataMinima)}%: está em ${pctL(m.mata)}.` : `Mata em ${pctL(m.mata)}: precisa chegar a ${Math.round(100 * VITORIA.mataMinima)}%. Assim, meta não batida.`}</p></div></div>`;
@@ -253,7 +254,7 @@ function resultadoVoto(st) {
   if (!agregadoOk(vs.length)) return { html: `<div class="card">${fato("balanca", `Regra dos anos 4 e 5: <b>${REGRAS_TXT[st.regra].nome}</b>.`)}</div>`, palpite: "" };
   const p = vs.filter(Boolean).length / vs.length;
   const palpite = agregadoOk(np) ? `Palpite do voto: ${pct(Object.values(pal).filter((v) => v === faixaDe(p)).length, np)}% acertaram. ` : "";
-  return { html: `<div class="card">${fato("balanca", `Voto: <b>${Math.round(100 * p)}%</b> quiseram trocar → <b>${REGRAS_TXT[st.regra].nome}</b> nos anos 4 e 5.`)}</div>`, palpite };
+  return { html: `<div class="card">${fato("balanca", st.votoTrocou ? `Voto: <b>${Math.round(100 * p)}%</b> quiseram trocar: a <b>${REGRAS_TXT.prosperidade.nome}</b> vale nos anos 4 e 5.` : `Voto: <b>${Math.round(100 * p)}%</b> quiseram trocar; não passou: o <b>${REGRAS_TXT.monopolio.nome}</b> continua nos anos 4 e 5.`)}</div>`, palpite };
 }
 
 // Acerto do palpite de quantos aceitam (pequena e grande)
@@ -275,10 +276,14 @@ export function paineisResultado(st) {
   if (fx && st.ano >= 2) {
     // R18: a variação é a diferença dos números que a barra mostra, e a natureza é o resto: as etiquetas sempre fecham
     const corr = fx.estrago?.alvo === "mata" ? fx.estrago.mata : 0, dmR = pp(st.mata) - pp(fx.mataAntes), natR = dmR + pp(fx.extr) - pp(fx.plant) + pp(corr);
-    fatos.push(fato("arvore-redonda", dmR ? `A mata ${dmR > 0 ? "subiu" : "desceu"} <b>${Math.abs(dmR)}%</b>` : "A mata ficou como estava"));
-    fatos.push(`<div class="chips-iso"><span class="chip">${ico("toco")}cargas −${pp(fx.extr)}%</span><span class="chip">${ico("arvore-cubos")}replantio +${pp(fx.plant)}%</span>${corr ? `<span class="chip mal">${ico("alvara")}proposta −${pp(corr)}%</span>` : ""}<span class="chip">${ico("arvore-dourada")}natureza ${natR >= 0 ? "+" : "−"}${Math.abs(natR)}%</span></div>`);
+    // R21: a variação em pontos da mata cheia (de 41% para 20% são 21 pontos, não 21%)
+    fatos.push(fato("arvore-redonda", dmR ? `A mata ${dmR > 0 ? "subiu" : "desceu"} <b>${Math.abs(dmR)} ${Math.abs(dmR) === 1 ? "ponto" : "pontos"}</b>: de ${pp(fx.mataAntes)}% para ${pp(st.mata)}%` : "A mata ficou como estava"));
+    fatos.push(`<div class="chips-iso"><span class="chip">${ico("toco")}cargas −${pp(fx.extr)}</span><span class="chip">${ico("arvore-cubos")}replantio +${pp(fx.plant)}</span>${corr ? `<span class="chip mal">${ico("alvara")}proposta −${pp(corr)}</span>` : ""}<span class="chip">${ico("arvore-dourada")}natureza ${natR >= 0 ? "+" : "−"}${Math.abs(natR)}</span></div>`);
   }
   if (fx) fatos.push(st.publico > fx.nivelAntes ? fato("economia", `Bem público subiu para o nível <b>${st.publico}</b>: ${esc(NIVEIS_PUBLICO[st.publico])}`) : st.publico < fx.nivelAntes ? fato("economia", `Bem público caiu para o nível <b>${st.publico}</b>`, "mal") : fato("economia", `Bem público ficou no nível ${st.publico}`));
+  // R21: quando uma proposta mexeu no bem público neste ano, as duas forças lado a lado (como na mata)
+  const ePub = fx?.estrago?.alvo === "publico" ? fx.estrago : null;
+  if (ePub && (ePub.niveis || ePub.pontos)) { const contrib = st.publico - fx.nivelAntes + (ePub.niveis || 0); fatos.push(`<div class="chips-iso"><span class="chip">${ico("economia")}contribuições ${contrib >= 0 ? "+" : "−"}${Math.abs(contrib)} nível</span><span class="chip mal">${ico("alvara")}proposta ${ePub.niveis ? `−${ePub.niveis} nível` : `−${Math.round(ePub.pontos)} pontos`}</span></div>`); }
   if (st.colapsou) {
     const falta = Math.max(0, COLAPSO * st.teto - st.mata);
     fatos.push(st.ano < 5 ? fato("toco", `Mata abaixo de 30%: −4 por pessoa até voltar. Faltam <b>${Math.max(1, pp(falta))}%</b> (cerca de ${n0(Math.ceil((falta / 2) * 5))} pontos de replantio).`, "mal")

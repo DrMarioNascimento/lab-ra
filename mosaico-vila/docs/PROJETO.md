@@ -34,7 +34,7 @@ No fim do ano 3, o motor guarda a vila (`snap3`). No fechamento, `contrafactual(
 
 ## Anonimato e cuidado
 - Nenhuma escolha individual aparece no telão; agregados só com 5 respostas ou mais.
-- O telão não mostra extrato, caixa ou lote com nome ou cor de família (as famílias têm de 3 a 6 pessoas): os lotes aparecem numa cor neutra e o patrimônio por pessoa em moedas de 10 pontos, sem nome; cada família vê o próprio extrato e a própria posição só no celular.
+- O telão não mostra extrato, caixa ou lote com nome ou cor de família (as famílias têm de 3 a 5 pessoas): os lotes aparecem numa cor neutra e o patrimônio por pessoa em moedas de 10 pontos, sem nome; cada família vê o próprio extrato e a própria posição só no celular.
 - Nada de engano: o celular diz que o personagem da carta é do jogo e que os pontos valem no placar; o dado é rolado pelo sistema.
 - Personagens (fiscal, vizinho, serraria, construtora, madeireira, pessoa na estrada, comprador…) são fictícios e não representam ninguém da sala. Na confiança, a chance de golpe e a perda são iguais em todas as cartas, para nenhum tipo de pessoa parecer mais perigoso.
 
@@ -114,3 +114,11 @@ No fim do ano 3, o motor guarda a vila (`snap3`). No fechamento, `contrafactual(
 - Voto pela vila que a turma quer: pergunta-guia de valores ("a que faz o patrimônio médio crescer ou a que não deixa a família mais pobre para trás?"), as duas metas lado a lado sem o número de hoje (`duasMetas()` no telão, `duasMetasCel()` no celular, na conversa e no voto), barra com "duas metas" nessas duas etapas e a frase "nos testes, cada meta saiu em cerca de metade das partidas". O número de hoje inclinava o voto: no fim do ano 3, a meta de equidade estava batida em quase todas as partidas e a de eficiência em nenhuma.
 - `contrafactual()` devolve também o patrimônio médio e a razão da mais pobre.
 - "aceitariam" na barra da grande; escala da desigualdade a partir de 0,3; "6 + 2 × o ano"; "metade do que se oferece além do mínimo"; cartões das famílias em ordem alfabética; mata em 0% sem "cai de 0% para 0%"; nome do nível em 27.
+
+## R21 (14/11/2026, após os avaliadores DY e DZ)
+- Fechamento no celular: a parte da pessoa no patrimônio da família à vista; os pontos pessoais e o placar só depois de um toque (`loc.verPessoal = "fim"`).
+- Rodapé do mercado curto (cabe em 1920×1080 também na Prosperidade, anos 4 e 5), com "Voltem às famílias" no começo no ano 5; as sub-regras ficam no celular.
+- Resultado do voto: "X% quiseram trocar; não passou: o Monopólio continua" (ou "a Prosperidade vale").
+- Conversa e voto sem a taxa das metas nos testes (ela muda com o tamanho da turma); ano 3 sem a meta em número na barra, no *O dinheiro* e no celular.
+- Painel *A vila*: "desceu 21 pontos: de 41% para 20%", etiquetas em pontos; no bem público, contribuições e proposta lado a lado quando uma proposta mexeu nele. No ano 5, "o lote conta só no patrimônio".
+- Teste da barra de antes das decisões lendo só o número da mata (antes, falhava às vezes quando outro número da barra coincidia).

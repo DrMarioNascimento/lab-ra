@@ -21,17 +21,18 @@ function hd(st, me) {
 function miniBarra(st0) {
   const st = vista(st0);   // R17: entre as decisões e o resultado, a vila de antes das decisões
   const m = progressoMeta(st.fams, st.publico, st.mata, st.teto, st.regra);
-  const meta = ["conversa", "voto"].includes(st.fase) ? "duas metas" : m.regra === "prosperidade" ? `${pctL(m.valor)}/${Math.round(100 * m.alvo)}%` : `${nL(m.valor, m.alvo)}/${m.alvo}`;   // R20
+  const meta = ["conversa", "voto"].includes(st.fase) || (st.fase === "resultado" && st.ano === 3) ? "duas metas" : m.regra === "prosperidade" ? `${pctL(m.valor)}/${Math.round(100 * m.alvo)}%` : `${nL(m.valor, m.alvo)}/${m.alvo}`;   // R20
   return `<div class="mini-hud">${st.ano >= 2 ? `<span>${ico("arvore-redonda")}<b>${pctL(st.mata / st.teto)}</b></span>` : ""}<span>${ico("economia")}<b>nível ${st.publico}</b></span><span>${ico("meta")}<b>${meta}</b></span><span>${ico("balanca")}<b>${REGRAS_TXT[st.regra].nome}</b></span></div>`;
 }
 
 // R19 e R20: as duas metas no celular, na conversa e no voto: o número de hoje e para onde ele costuma ir
 function duasMetasCel() {
-  return `<div class="card"><b>As duas metas</b><p class="faint" style="margin:4px 0 0">Monopólio: patrimônio médio de ${VITORIA.patrimonioPorPessoa} por pessoa. Prosperidade: a mais pobre com ${Math.round(100 * VITORIA.pobreSobreMedia)}% da média. Nas duas, mata acima de 30%. Nos testes, cada meta saiu em cerca de metade das partidas: o que decide é como a vila joga os anos 4 e 5.</p></div>`;   // R20: sem o número de hoje
+  return `<div class="card"><b>As duas metas</b><p class="faint" style="margin:4px 0 0">Monopólio: patrimônio médio de ${VITORIA.patrimonioPorPessoa} por pessoa. Prosperidade: a mais pobre com ${Math.round(100 * VITORIA.pobreSobreMedia)}% da média. Nas duas, mata acima de 30%. As duas mudam muito nos anos 4 e 5, com aluguel, mercado, mata e propostas: o que decide é como a vila joga.</p></div>`;   // R20: sem o número de hoje
 }
 
 // R10: a mesma barra da meta do telão, no celular (meta da regra vigente, desde o ano 1)
 function metaCelular(st) {
+  if (st.fase === "resultado" && st.ano === 3) return `<div class="card"><b class="row">${ico("meta")}Metas</b><p class="faint" style="margin:4px 0 0">Logo depois, a turma conversa e vota a regra dos anos 4 e 5; as duas metas aparecem lado a lado no voto.</p></div>`;   // R21
   const m = progressoMeta(st.fams, st.publico, st.mata, st.teto, st.regra);
   const frac = Math.max(0, Math.min(1, m.valor / m.alvo));
   const val = m.regra === "prosperidade" ? `${pctL(m.valor)} de ${Math.round(100 * m.alvo)}%` : `${nL(m.valor, m.alvo)} de ${m.alvo}`;
@@ -183,7 +184,7 @@ export function renderAluno(st, id, loc) {
       bd = p?.lanceEnviado ? enviado(p.semLote ? "Enviado: não queremos lote este ano." : "Lance enviado.") + `<div class="card"><b>Enquanto a turma decide: qual vai ser o lance vencedor?</b><div class="row" style="margin-top:8px">${["até 20", "21 a 40", "mais de 40"].map((v) => `<button class="btn sm ${palp === v ? "on" : "sec"} grow" data-a="palpite" data-val="${v}">${v}</button>`).join("")}</div></div>` : `<h2 class="row">${ico("lote-sobrado", "g")}Mercado de lotes</h2><p class="muted">Lance fechado. Quanto do caixa da família (${n0(f.caixa)}) oferecer além do mínimo de ${lanceMinimo(st.ano)}?</p>
         <div class="card"><div class="row" style="justify-content:space-between"><b>Parte do caixa</b><b class="mono">${loc.lance}%</b></div><input type="range" min="0" max="60" step="5" value="${loc.lance}" data-in="lance" data-key="lance">${efeitoLance(st, f, loc)}</div>
         <p class="faint">A família precisa de ${precisaLotes(f)} lote(s) para morar; tem ${f.lotes}; pode comprar até ter ${tetoLotes(f)}. ${st.regra === "prosperidade" ? "Na Prosperidade, conta metade do que vocês oferecem além do mínimo. " : ""}Quem já levou um lote oferece, no próximo, metade do que ia além do mínimo.</p><button class="btn ok block" data-a="lance">Enviar lance</button>
-        <button class="btn sec block" data-a="semLote" style="margin-top:8px">Não queremos lote este ano</button><p class="faint" style="margin:4px 0 0">Vale o que a maioria da família marcar. Ficar de fora não custa nada. O lote novo conta para moradia e aluguel a partir do próximo ano.</p>`;
+        <button class="btn sec block" data-a="semLote" style="margin-top:8px">Não queremos lote este ano</button><p class="faint" style="margin:4px 0 0">Vale o que a maioria da família marcar. Ficar de fora não custa nada. ${st.ano >= 5 ? "No último ano, o lote novo conta só no patrimônio" : "O lote novo conta para moradia e aluguel a partir do próximo ano"}; o lance mínimo é 6 + 2 × o ano.</p>`;
       break;
     }
     case "alvara": {
@@ -232,7 +233,10 @@ export function renderAluno(st, id, loc) {
       const ja = st.final[id];
       // R10: placar da pessoa = a parte dela no patrimônio da família + os pontos pessoais; só ela vê
       const parte = patrimonio(f, st.publico) / f.membros.length, pes = st.pessoal[id] || 0;
-      bd = `<h2>Fechamento</h2><div class="card"><b>Seu placar (só você vê)</b><table class="vals" style="margin-top:6px"><tr><td>Sua parte no patrimônio da família (${n0(patrimonio(f, st.publico))} ÷ ${f.membros.length})</td><td class="n">${n0(parte)}</td></tr><tr><td>Seus pontos pessoais</td><td class="n">${n0(pes)}</td></tr><tr><td><b>Placar</b></td><td class="n"><b>${n0(parte + pes)}</b></td></tr></table><p class="faint" style="margin:6px 0 0">Os pontos pessoais não entram no caixa da família, nas metas nem no telão.</p></div>` +
+      // R21: os pontos pessoais (que podem entregar quem aceitou a proposta grande) ficam atrás de um toque
+      bd = `<h2>Fechamento</h2><div class="card"><b>A família</b><table class="vals" style="margin-top:6px"><tr><td>Sua parte no patrimônio da família (${n0(patrimonio(f, st.publico))} ÷ ${f.membros.length})</td><td class="n">${n0(parte)}</td></tr></table>` +
+        (loc.verPessoal === "fim" ? `<table class="vals" style="margin-top:6px"><tr><td>Seus pontos pessoais</td><td class="n">${n0(pes)}</td></tr><tr><td><b>Seu placar</b></td><td class="n"><b>${n0(parte + pes)}</b></td></tr></table><p class="faint" style="margin:6px 0 0">Os pontos pessoais não entram no caixa da família, nas metas nem no telão.</p><button class="btn sec block" data-a="verPessoal" data-val="0" style="margin-top:8px">Esconder</button>`
+          : `<button class="btn sec block" data-a="verPessoal" data-val="fim" style="margin-top:8px">Ver seu placar pessoal (incline a tela)</button>`) + `</div>` +
         (ja ? enviado("Obrigado!") : `<div class="card"><b>O que mais te guiou hoje?</b><div class="row" style="margin-top:6px">${GUIAS.map((g) => `<button class="btn sm ${loc.guia === g ? "on" : "sec"} grow" data-a="guia" data-val="${g}">${g}</button>`).join("")}</div>
           <b style="display:block;margin-top:10px">E o que mais pesou?</b><div class="row" style="margin-top:6px">${MOTIVOS.map((m) => `<button class="btn sm ${loc.motivo === m ? "on" : "sec"}" data-a="motivo" data-val="${m}">${m}</button>`).join("")}</div>
           <button class="btn ok block" style="margin-top:10px" data-a="final" ${loc.guia && loc.motivo ? "" : "disabled"}>Enviar</button></div>`);
@@ -257,7 +261,7 @@ export function acaoAluno(a, el, { id, loc, dispatch }) {
     case "lance": dispatch({ t: "lance", id, v: loc.lance / 100 }); return true;
     case "semLote": dispatch({ t: "lance", id, v: -1 }); return true;
     case "abrir": loc.abriu = +val; return true;
-    case "verPessoal": loc.verPessoal = +val || null; return true;   // o ano em que a pessoa abriu (no ano seguinte, volta ao extrato)
+    case "verPessoal": loc.verPessoal = val === "fim" ? "fim" : +val || null; return true;   // o ano em que a pessoa abriu (no ano seguinte, volta ao extrato)
     case "alvara": dispatch({ t: "alvara", id, aceita: val === "1" }); return true;
     case "pequena": dispatch({ t: "pequena", id, aceita: val === "1" }); return true;
     case "quem": dispatch({ t: "quem", id, v: +val }); return true;
