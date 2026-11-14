@@ -227,3 +227,12 @@ No fim do ano 3, o motor guarda a vila (`snap3`). No fechamento, `contrafactual(
 - `moeda.webp` (moeda dourada) no lugar de `moeda.svg`; `mercado-lotes.webp` (barraca e lotes) no lugar de `lote-sobrado.webp`; `lote-alfinete.webp` (piso de lotes com alfinete) no lugar de `lote-venda.webp`, no mapa, na barra de cima, no painel do mercado e na página inicial. Os anteriores ficaram com o sufixo `_SUBSTITUIDO_2026-11-14`.
 - Mapa: `PREDIO_3D` põe a escola (nível 4) e a casa com sino (nível 5) nas vagas do bem público, com as paredes em creme; os níveis 1 a 3 seguem desenhados até os ícones chegarem (prompts em `ICONES-PROMPTS.md`).
 - `moradiaDe(f)` e `iconeFamilia(f, tam, { moradia: true })`: só no cabeçalho do celular da família, a casa mostra a moradia de agora (cabana, casa, sobrado, geminadas térreas, sobrado com anexo, geminadas). O telão, a tela de achar a família e o painel de quem conduz seguem com a mesma casa para todas.
+
+## R33 (14/11/2026, após os avaliadores EW e EX; a 77ª rodada não passou, mínima 4,0)
+- `falasPequena`: as falas só aparecem com 10 ou mais respostas em cada uma e as duas entre 10% e 90% (sem incluir); sem faixas (R32 punha os extremos em faixa, mas o total exato da turma e o número da outra fala refaziam a conta). Escondida, a comparação diz só que aparece "com 10 ou mais respostas em cada uma e nenhuma perto de todos ou de ninguém".
+- Moradia (`iconeFamilia(f, 48, { moradia: true })`) só nas telas do mercado de lotes, que a família olha junta; o cabeçalho volta à casa igual para todas.
+- Voto: `.opcoes-iguais` põe "Manter" e "Trocar" lado a lado, com a mesma largura e altura, logo depois da regra; a conferência vem embaixo.
+- Avisos do celular mais curtos (pequena, grande e honestidade).
+- Ícones: `meta.webp` (alvo com dardo, do professor), `sobrado.webp` no cinza da casa neutra, `cedula.webp` no achado da praça, moeda na taxa da praça; os anteriores com `_SUBSTITUIDO_2026-11-14`. Recortes refeitos (lotes à venda, mercado, cabana, sobrado e geminadas térreas) com a caixa medida só no que é opaco.
+- Textos de casos raros: "a barra já conta o estrago" só com estrago (`estragoReal`); "Quem pagou a conta?" só quando a mata caiu, colapsou ou perdeu pontos para propostas; mercado: "a família ganha ou perde a diferença".
+- Simulação: versão 47 (`vila_leitura`), com tempo de leitura nas cartas do celular (r69).

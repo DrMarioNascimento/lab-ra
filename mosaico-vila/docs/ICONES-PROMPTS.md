@@ -15,6 +15,8 @@
 - **Moradia no celular da própria família** (`moradia-*.webp`): sem lote, a cabana; com o que precisa, a casa (1 lote) ou o sobrado (2); com um lote a mais, as geminadas térreas (precisa de 1) ou o sobrado com anexo (precisa de 2); 3 lotes precisando de 1, as geminadas. As casas são recoloridas na cor de cada família. O telão continua com a mesma casa para todas, para não marcar quem tem herança ou começou sem lote.
 - Ficaram guardados, sem uso no jogo: a capela (o bem público da vila é laico: praça, posto, academia, escola, centro comunitário), a cédula (o jogo usa uma moeda só, de 10 pontos, do começo ao fim) e o "sobrado + casa" (o sobrado com anexo já faz esse papel).
 
+- R33: **meta** com o alvo com dardo enviado pelo professor (`meta.webp`; o anterior, cópia do MOSAICO Sala, em `meta_SUBSTITUIDO_2026-11-14.webp`); **sobrado** do aluguel no cinza-azulado da casa neutra (o azul parecia a Família Azul; anterior em `sobrado_SUBSTITUIDO_2026-11-14.webp`); a **cédula** (`cedula.webp`) entrou na carta *O achado da praça* e a moeda na *A taxa da praça*, no lugar das mãos repetidas. A moradia saiu do cabeçalho do celular e aparece só nas telas do mercado de lotes.
+
 ### Para completar o bem público (mesmo estilo dos níveis 4 e 5)
 Estilo: ícone 3D brilhante, como as casas da vila: paredes creme lisas, acabamento dourado, telhado laranja-terracota, vista isométrica levemente de cima, iluminação suave de estúdio, fundo branco liso, sem texto, 1024 × 1024.
 - `publico-1-praca.webp` · Praça: canteiro redondo de grama com uma árvore pequena, um banco de praça de madeira laranja-terracota com pés dourados e um poste de luz dourado, sobre uma base de pedra creme.

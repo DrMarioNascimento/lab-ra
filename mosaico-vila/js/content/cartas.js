@@ -31,7 +31,7 @@ export const PEQUENAS = [
     texto: "A serraria oferece 2 pontos pessoais a mais se você vender a madeira sem nota. Sem nota, o imposto da venda não chega ao bem público. Cada pessoa que aceita tira um pedaço do bem público; se a turma inteira aceitar, {efeito}.",
     sim: "Aceitar os 2 e vender sem nota", nao: "Recusar e vender com nota",   // R30: as duas falas dizem o ato no botão
     presente: { texto: "A serraria quer te dar um presente de 2 pontos pessoais, em troca de você vender a madeira sem nota. Sem nota, o imposto da venda não chega ao bem público. Cada pessoa que aceita tira um pedaço do bem público; se a turma inteira aceitar, {efeito}.", sim: "Aceitar o presente e vender sem nota", nao: "Recusar e vender com nota" } },
-  { id: "taxa", segmento: "um funcionário da prefeitura", de: "de um funcionário da prefeitura", lado: "paga", alvo: "publico", icone: "economia", titulo: "A taxa da praça",
+  { id: "taxa", segmento: "um funcionário da prefeitura", de: "de um funcionário da prefeitura", lado: "paga", alvo: "publico", icone: "moeda", titulo: "A taxa da praça",
     telao: "Um funcionário cobra 1 ponto para tirar seu nome da taxa da praça, que custa 3. Saldo: +2 para quem aceita.",
     texto: "Todo mundo paga 3 pontos de taxa para a praça. Um funcionário da prefeitura cobra 1 ponto seu para tirar o seu nome da lista. Saldo: +2 pontos pessoais. Cada pessoa que aceita tira um pedaço do bem público; se a turma inteira aceitar, {efeito}.",
     sim: "Pagar 1 ao funcionário", nao: "Pagar a taxa",
@@ -62,7 +62,7 @@ export const ANO4 = [
     telao: "O banco da vila errou e pôs 3 pontos a mais no seu placar. Ninguém vai conferir. Avisa ou fica?",
     texto: "O banco da vila errou e pôs 3 pontos pessoais a mais no seu placar. Ninguém vai conferir. Você avisa o banco ou fica com os 3?",
     sim: "Ficar com os 3", nao: "Avisar o banco" },
-  { id: "achado", grupo: "honestidade", tipo: "honesto", icone: "economia", titulo: "O achado da praça",
+  { id: "achado", grupo: "honestidade", tipo: "honesto", icone: "cedula", titulo: "O achado da praça",
     telao: "Você acha 3 pontos caídos na praça, sem nome. Entrega no achados e perdidos ou fica?",
     texto: "Você acha 3 pontos caídos na praça, sem nome de ninguém. Entrega no achados e perdidos da vila ou fica com eles?",
     sim: "Ficar com os 3", nao: "Entregar" },

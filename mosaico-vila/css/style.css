@@ -399,3 +399,7 @@ input[type=text], input[type=number], select, textarea { box-shadow: inset 0 3px
 /* R31: as duas respostas de uma carta com o mesmo tamanho (largura e altura), qualquer que seja o texto e a largura do celular */
 .escolha { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: stretch; }
 .escolha .btn { width: 100%; min-width: 0; height: 100%; }
+
+/* R33: as duas opções do voto lado a lado, com a mesma largura e a mesma altura, qualquer que seja o texto */
+.opcoes-iguais { display: grid; grid-template-columns: 1fr 1fr; align-items: stretch; gap: 10px; margin: 6px 0; }
+.opcoes-iguais .opt { margin: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-start; gap: 4px; }

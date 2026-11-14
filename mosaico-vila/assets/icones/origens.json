@@ -8,7 +8,6 @@
  "forma-gota.webp": "mosaico-sala/assets/icones/grupo-gota.webp",
  "forma-coracao.webp": "mosaico-sala/assets/icones/grupo-coracao.webp",
  "balanca.webp": "mosaico-sala/assets/ilustracoes/3d/licenca.webp",
- "meta.webp": "mosaico-sala/assets/ilustracoes/3d/meta.webp",
  "trofeu.webp": "mosaico-sala/assets/ilustracoes/3d/trofeu.webp",
  "alvara.webp": "mosaico-sala/assets/ilustracoes/3d/atividade.webp",
  "ideia.webp": "mosaico-sala/assets/ilustracoes/3d/quiz-pensar.webp",
@@ -31,7 +30,6 @@
  "arvore-redonda.webp": "G:/Meu Drive/A_mobile/Cell/grok-2f2b7d31-6a18-4b34-a2cc-a9a10eadb16d.jpg (sem fundo)",
  "toco.webp": "tronco de arvore-redonda, em tom de madeira",
  "app-mosaico-vila.webp": "montagem: casa-azul + arvore-dourada + arvore-redonda",
- "sobrado.webp": "G:/Meu Drive/A_mobile/Cell/grok-32d98e6e-d3c3-493d-9cfe-ba6dc0e91fdb.jpg (sem fundo)",
  "arvore-cubos.webp": "G:/Meu Drive/A_mobile/Cell/grok-402f20c8-f0e7-4f16-a858-2884f22924c9.jpg (sem fundo e sem a placa)",
  "lote-sobrado_SUBSTITUIDO_2026-11-14.webp": "G:/Meu Drive/A_mobile/Cell/grok-abf6a432-c042-4033-89ce-1890db82d491.jpg (sem fundo e sem a placa)",
  "lote-venda_SUBSTITUIDO_2026-11-14.webp": "G:/Meu Drive/A_mobile/Cell/grok-ba5d0940-5c81-423d-985f-7dc720223a35.jpg (sem fundo e sem a placa)",
@@ -45,5 +43,10 @@
  "moradia-sobrado-<cor>.webp": "G:/Meu Drive/A_mobile/Cell/grok-32d98e6e-d3c3-493d-9cfe-ba6dc0e91fdb.jpg (sem fundo), paredes recoloridas na cor de cada família",
  "moradia-sobrado-anexo-<cor>.webp": "G:/Meu Drive/A_mobile/Cell/grok-647032ba-b06d-4a3b-8568-6c42f7edce6f.png, paredes recoloridas na cor de cada família",
  "moradia-geminadas-terreas-<cor>.webp": "G:/Meu Drive/A_mobile/Cell/grok-e520c8cc-5d95-422b-8cce-52a0b7a1836f.jpg (sem fundo), paredes recoloridas na cor de cada família",
- "moradia-geminadas-<cor>.webp": "G:/Meu Drive/A_mobile/Cell/grok-aaab94e3-3c98-4897-8488-b8f76bc7d214.png, paredes recoloridas na cor de cada família"
+ "moradia-geminadas-<cor>.webp": "G:/Meu Drive/A_mobile/Cell/grok-aaab94e3-3c98-4897-8488-b8f76bc7d214.png, paredes recoloridas na cor de cada família",
+ "sobrado_SUBSTITUIDO_2026-11-14.webp": "G:/Meu Drive/A_mobile/Cell/grok-32d98e6e-d3c3-493d-9cfe-ba6dc0e91fdb.jpg (sem fundo)",
+ "sobrado.webp": "G:/Meu Drive/A_mobile/Cell/grok-32d98e6e-d3c3-493d-9cfe-ba6dc0e91fdb.jpg (sem fundo, paredes no cinza-azulado da casa neutra, para o aluguel não parecer a Família Azul)",
+ "meta_SUBSTITUIDO_2026-11-14.webp": "mosaico-sala/assets/ilustracoes/3d/meta.webp",
+ "meta.webp": "alvo com dardo enviado pelo professor em 14/11/2026 (sem fundo)",
+ "cedula.webp": "G:/Meu Drive/A_mobile/Cell/grok-b91d5d8a-3a8f-43c1-8cc1-70f524efecc4.png"
 }
