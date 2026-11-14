@@ -359,11 +359,12 @@ export function paineisResultado(st) {
     // R16: a porcentagem é de quem respondeu (a mesma base da grande); o estrago conta a turma inteira (quem não respondeu recusou)
     const c = carta(st.cartas.pequena), n = st.ordem.length, p = st.pequena.n ? st.pequena.aceitaram / st.pequena.n : 0, fe = n ? st.pequena.aceitaram / n : 0, ok = agregadoOk(st.pequena.n);
     // R26: o "se todos aceitassem" no mesmo texto da carta (em pontos da mata cheia), sem uma mata que nenhuma tela mostrou; com menos de 5 respostas, nada que entregue a contagem
+    const semResp = st.pequena.n < n ? ", contando quem não respondeu como recusa" : "";   // R36: o % de cima é de quem respondeu; o estrago conta a turma inteira
     const e = st.pequena.estrago, semPerda = e?.alvo === "publico" && !e.niveis && (e.pontos || 0) < 0.5, todos = st.pequena.aceitaram >= n;
     const estrago = !ok ? "Com menos de 5 respostas, a proposta não valeu para ninguém: nem os pontos, nem o estrago."   // R35
       : !st.pequena.aceitaram ? "Ninguém aceitou: nada se perdeu."
-      : e?.alvo === "publico" && e.niveis ? `Somando os pequenos, o bem público perdeu <b>${n0(e.pontos)} pontos</b> (${Math.round(100 * fe)}% do estrago de uma grande) e, sem pontos de sobra, caiu ${e.niveis === 1 ? "1 nível" : `${e.niveis} níveis`}.`   // R29
-      : `Somando os pequenos, ${textoEstrago(e)}${e?.alvo === "publico" && !e.niveis && st.publico === 0 ? "." : `: ${Math.round(100 * fe)}% do estrago de uma grande.`}`;
+      : e?.alvo === "publico" && e.niveis ? `Somando os pequenos, o bem público perdeu <b>${n0(e.pontos)} pontos</b> (${Math.round(100 * fe)}% do estrago de uma grande${semResp}) e, sem pontos de sobra, caiu ${e.niveis === 1 ? "1 nível" : `${e.niveis} níveis`}.`   // R29
+      : `Somando os pequenos, ${textoEstrago(e)}${e?.alvo === "publico" && !e.niveis && st.publico === 0 ? "." : `: ${Math.round(100 * fe)}% do estrago de uma grande${semResp}.`}`;
     // R27/R28: sem o "se a turma inteira aceitasse" quando todos aceitaram ou quando não havia o que perder
     const seTodos = todos || semPerda ? "" : ` Com a turma inteira, ${textoCarta({ ...c, x: "{seria}" }, "x", { rel: true, publico: st.publico + (e?.niveis || 0) })}.`;   // R30: o "% do estrago de uma grande" já veio na frase de cima
     paineis.push({ nome: c.titulo, carta: true, dur: extra, html: `<div class="grid" style="grid-template-columns:.85fr 1.15fr;flex:1;min-height:0">
@@ -472,7 +473,7 @@ function perguntasFechamento(st) {
     `Bolso ou vila também na mata: ${origem} ${st.colapsouAlguma ? (st.colapsou ? "Ela colapsou e não voltou." : mataMin < COLAPSO ? "Ela colapsou e voltou." : "Uma proposta a derrubou abaixo de 30% no meio do ano, e ela voltou.") : `O pior ano chegou a ${pctL(mataMin)}.`} ${fim < ini || st.colapsouAlguma || pubVisto ? "Quem pagou a conta?" : "O que segurou a mata?"}`,   // R33: com a mata subindo sem estrago, "quem pagou a conta?" não cabia
     pq != null && pg != null
       ? (quase
-        ? `Na pequena, ${pq}% aceitaram${semNivel || !fe ? "" : ` (${fe}% do estrago de uma grande)`}; na grande, ${pg}% aceitariam: ${pq === pg ? "o mesmo. Por que o tamanho da proposta não mudou a resposta?" : "quase o mesmo. Por que o tamanho da proposta quase não mudou a resposta?"}`
+        ? `Na pequena, ${pq}% aceitaram${semNivel || !fe ? "" : ` (${fe}% do estrago de uma grande)`}; na grande, ${pg}% aceitariam: ${pq === pg ? "o mesmo. Por que o tamanho da proposta não mudou a resposta?" : Math.abs(pq - pg) < 5 ? "quase o mesmo. Por que o tamanho da proposta quase não mudou a resposta?" : "a diferença é de uma pessoa ou menos, o que, com tão poucas respostas, não conta como mudança. O tamanho da proposta muda a resposta?"}`   // R36: 100% contra 83% com 5 respostas não é "quase o mesmo"
         : acasoPG
         ? `Na pequena, ${pq}% aceitaram${semNivel || !fe ? "" : ` (${fe}% do estrago de uma grande)`}; na grande, ${pg}% aceitariam: diferença do tamanho que o acaso dá. O tamanho da proposta muda a resposta?`
         : pq < pg

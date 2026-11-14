@@ -257,3 +257,13 @@ No fim do ano 3, o motor guarda a vila (`snap3`). No fechamento, `contrafactual(
 - Contador da grande no painel de quem conduz: "responderam" (é resposta secreta, não voto).
 - Relógio de quem conduz: conta desde a entrada do primeiro aluno (como o plano), aparece também na entrada e no fechamento, e a sobra diz o pior caso ("de 1,5 a 2,5 min").
 - Testes da R35 em `tests/partidas.mjs` (pequena com 4 e 5 respostas, cartas de lixo no sorteio, "você" nas grandes, ordem do voto).
+
+## R36 (14/11/2026, após os avaliadores FC e FD; a 80ª rodada não passou, mínima 4,0)
+- Celular: com a pequena sem valer (menos de 5 respostas), a tela "Só para você" diz que a proposta não valeu, sem o "+2" (`st.pequena.valeu`).
+- Pergunta de controle do ano 4 na regra que vale (`EXEMPLO_DO_ANO[4].prosperidade`).
+- Painel da pequena: o estrago "conta quem não respondeu como recusa" quando faltou resposta; pergunta 4: "quase o mesmo" só com menos de 5 pontos de diferença.
+- Mercado: `progresso()` conta só quem pode dar lance (sem as famílias no teto de lotes); no celular, as regras ficam atrás do botão "Ver as regras do mercado" (`loc.regrasMerc`, `.regras-cel`).
+- Painel de quem conduz: rodapé por etapa (`RODAPE_ETAPA`); plano do relógio 9, 14, 22, 29, 35,5 e fechamento até 48 (simulação r71, 315 partidas); com 30 ou mais na entrada, sugere as conversas curtas.
+- Sorteio: com o entulho na pequena, o aterro não sai na grande. Carta do entulho: "cada pessoa que aceita deixa mais entulho na mata de todos".
+- Página inicial e README: "cerca de 47 a 49 minutos".
+- Testes da R36 em `tests/partidas.mjs`.

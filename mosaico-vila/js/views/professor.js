@@ -20,15 +20,24 @@ const n0 = (x) => Math.round(x).toLocaleString("pt-BR");
 
 // R22: relógio da aula para quem conduz, contra o plano (fim de cada ano, em minutos de sala; fechamento a partir dos ~35)
 let inicioAula = null;
-const PLANO_FIM_ANO = { 1: 9, 2: 14, 3: 22, 4: 29, 5: 35 };   // R24/R34: medido na simulação r69 (mediana × 1,25 para a sala, turmas de 12 a 40; com o tempo de leitura das cartas)
+// R36: o que acontece com quem não envia, etapa por etapa (antes, "mantém a proposta anterior" em todas, e no mercado o lance não passa de um ano para o outro)
+const RODAPE_ETAPA = {
+  decidir: "Quem não enviar até avançar mantém a proposta do ano anterior (bem público, replantio e cargas).",
+  lances: "Quem não enviar oferece 0% (o lance não passa de um ano para o outro). Famílias no teto de lotes não dão lance e não entram na conta.",
+  pequena: "Quem não responder conta como recusa; com menos de 5 respostas, a proposta não vale.",
+  alvara: "Se a pessoa sorteada não responder, vale não.",
+  voto: "Vale a maioria de quem votou; empate mantém o Monopólio.",
+  mente: "Quem não responder não ganha nem arrisca nada.",
+};
+const PLANO_FIM_ANO = { 1: 9, 2: 14, 3: 22, 4: 29, 5: 35.5 };   // R24/R34/R36: medido na simulação r71 (mediana × 1,25 de 315 partidas, turmas de 12 a 40; com o tempo de leitura das cartas e do mercado)
 function relogioAula(st) {
   // R35: o relógio conta desde a entrada do primeiro aluno, como o plano (antes, começava só nas famílias, uns 2 min depois)
   if (st.fase === "entrada" && !st.ordem.length) { inicioAula = null; return ""; }
   inicioAula ??= Date.now();
-  const min = (Date.now() - inicioAula) / 60000, plano = st.fase === "fechamento" ? 35 : PLANO_FIM_ANO[st.ano] ?? 2;
+  const min = (Date.now() - inicioAula) / 60000, plano = st.fase === "fechamento" ? 35.5 : PLANO_FIM_ANO[st.ano] ?? 2;
   const atraso = st.fase !== "fechamento" && min > plano + 1;
   const mm = `${Math.floor(min)}:${String(Math.floor((min % 1) * 60)).padStart(2, "0")}`;
-  return `<div class="card" style="padding:10px 12px${atraso ? ";border-color:#f59e0b" : ""}"><div class="row"><b class="grow">Tempo de aula</b><b class="mono">${mm}</b></div><p class="faint" style="font-size:12px;margin:4px 0 0">${atraso ? `Atrasado: o plano fecha o ano ${st.ano} perto de ${plano} min. Ligue as conversas curtas${st.ano < 4 ? " ou desligue a carta do ano 4" : ""}.` : st.fase === "fechamento" ? "Plano (contado desde a entrada): o fechamento (dupla, síntese de 1,5 min e 8,5 min de perguntas) vai dos 35 aos 47,5 min; sobram de 1,5 a 2,5 min, conforme a turma." : st.fase === "entrada" ? "Plano (contado desde a entrada): entrada e famílias em cerca de 2 min; o ano 1 fecha perto de 9 min." : `Plano (contado desde a entrada): o ano ${st.ano || 1} fecha perto de ${plano} min; o fechamento vai dos 35 aos 47,5.`}</p></div>`;
+  return `<div class="card" style="padding:10px 12px${atraso ? ";border-color:#f59e0b" : ""}"><div class="row"><b class="grow">Tempo de aula</b><b class="mono">${mm}</b></div><p class="faint" style="font-size:12px;margin:4px 0 0">${atraso ? `Atrasado: o plano fecha o ano ${st.ano} perto de ${String(plano).replace(".", ",")} min. Ligue as conversas curtas${st.ano < 4 ? " ou desligue a carta do ano 4" : ""}.` : st.fase === "fechamento" ? "Plano (contado desde a entrada): o fechamento (dupla, síntese de 1,5 min e 8,5 min de perguntas) vai dos 35,5 aos 48 min; sobram cerca de 2 min (1 no pior caso, nas turmas grandes sem as conversas curtas)." : st.fase === "entrada" ? `Plano (contado desde a entrada): entrada e famílias em cerca de 2 min; o ano 1 fecha perto de 9 min.${st.ordem.length >= 30 ? " Com 30 ou mais na sala, ligue as conversas curtas logo no ano 1: sem elas, a aula pode chegar a 49 min; com elas, fecha até os 48." : ""}` : `Plano (contado desde a entrada): o ano ${st.ano || 1} fecha perto de ${String(plano).replace(".", ",")} min; o fechamento vai dos 35,5 aos 48.`}</p></div>`;
 }
 
 // R24: o cenário profissional (opcional) do GDD, como roteiro de fala de quem conduz; a tela continua com os nomes da vila
@@ -55,7 +64,7 @@ export function renderProfessor(st) {
     <div class="card" style="padding:12px"><div class="faint" style="font-size:12px">Etapa ${st.k + 1} de ${FASES.length}</div><h3>${esc(nomeFase(st))}</h3>
     ${p && p.total ? `<div class="row" style="justify-content:space-between;margin-top:6px"><span class="muted">${p.rot}</span><b class="mono">${p.feito}/${p.total}</b></div><div class="prog" style="height:8px"><i style="width:${(100 * p.feito) / p.total}%"></i></div>` : ""}
     <div class="row" style="margin-top:10px"><button class="btn sec grow" data-a="fase" data-val="-1" ${st.k <= 1 || !st.pilha?.length ? "disabled" : ""}>Voltar</button><button class="btn grow${todos ? " ok pronto" : ""}" data-a="fase" data-val="1" ${st.k === 0 || st.fase === "fechamento" ? "disabled" : ""}>${todos ? "Todos enviaram: avançar" : "Avançar"}</button></div>${todos ? `<p class="faint" style="font-size:12px;margin:6px 0 0">Avance em poucos segundos: a turma já espera.</p>` : ""}
-    <p class="faint" style="font-size:12px;margin:8px 0 0">Quem não enviar até avançar mantém a proposta anterior.</p></div>${st.fase === "resultado" ? controlePaineis(st) : ""}${st.fase === "fechamento" ? `<div class="card" style="padding:12px"><b>Pergunta ${(st.pergunta || 0) + 1} de 5 no telão</b><div class="row" style="margin-top:8px"><button class="btn sec grow" data-a="pergunta" data-val="-1" ${(st.pergunta || 0) <= 0 ? "disabled" : ""}>◀ Anterior</button><button class="btn grow" data-a="pergunta" data-val="1" ${(st.pergunta || 0) >= 4 ? "disabled" : ""}>Próxima ▶</button></div></div>${(st.pergunta || 0) === 4 ? ROTEIRO_PROFISSAO : ""}${relogioAula(st)}` : ""}${extra}</div>`;
+    <p class="faint" style="font-size:12px;margin:8px 0 0">${RODAPE_ETAPA[st.fase] ?? ""}</p></div>${st.fase === "resultado" ? controlePaineis(st) : ""}${st.fase === "fechamento" ? `<div class="card" style="padding:12px"><b>Pergunta ${(st.pergunta || 0) + 1} de 5 no telão</b><div class="row" style="margin-top:8px"><button class="btn sec grow" data-a="pergunta" data-val="-1" ${(st.pergunta || 0) <= 0 ? "disabled" : ""}>◀ Anterior</button><button class="btn grow" data-a="pergunta" data-val="1" ${(st.pergunta || 0) >= 4 ? "disabled" : ""}>Próxima ▶</button></div></div>${(st.pergunta || 0) === 4 ? ROTEIRO_PROFISSAO : ""}${relogioAula(st)}` : ""}${extra}</div>`;
 }
 
 // R13: segurar um painel de "Como ficou a vila" ou ir e voltar entre eles (o telão para de passar sozinho)

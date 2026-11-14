@@ -112,7 +112,8 @@ function efeitoLance(st, f, loc) {
 function controle(st, id) {
   const noVoto = ["conversa", "voto"].includes(st.fase);
   const chave = noVoto ? "voto" : st.ano;
-  const ex = noVoto ? EXEMPLO_VOTO : EXEMPLO_DO_ANO[st.ano];
+  const ex0 = noVoto ? EXEMPLO_VOTO : EXEMPLO_DO_ANO[st.ano];
+  const ex = ex0?.prosperidade && st.regra === "prosperidade" ? { ...ex0, ...ex0.prosperidade } : ex0;   // R36: no ano 4, a pergunta do mercado na regra que vale
   if (!ex) return "";
   const resp = st.controle?.[chave]?.[id];
   if (resp == null) return `<div class="card"><b class="row" style="flex-wrap:nowrap;align-items:flex-start">${ico("ideia")}<span>Confira: ${esc(ex.pergunta)}</span></b>${ex.opcoes.map((o, k) => `<button class="opt" data-a="controle" data-val="${k}">${esc(o)}</button>`).join("")}<p class="faint" style="margin:4px 0 0">Não vale ponto.</p></div>`;
@@ -206,10 +207,16 @@ export function renderAluno(st, id, loc) {
           <div class="card"><b>Enquanto a turma decide: qual vai ser o lance vencedor?</b><div class="row" style="margin-top:8px">${["até 20", "21 a 40", "mais de 40"].map((v) => `<button class="btn sm ${palp === v ? "on" : "sec"} grow" data-a="palpite" data-val="${v}">${v}</button>`).join("")}</div></div>`;
         break;
       }
-      bd = p?.lanceEnviado ? enviado(p.semLote ? "Enviado: não queremos lote este ano." : "Lance enviado.") + `<div class="card"><b>Enquanto a turma decide: qual vai ser o lance vencedor?</b><div class="row" style="margin-top:8px">${["até 20", "21 a 40", "mais de 40"].map((v) => `<button class="btn sm ${palp === v ? "on" : "sec"} grow" data-a="palpite" data-val="${v}">${v}</button>`).join("")}</div></div>` : `<h2 class="row">${ico("mercado-lotes", "g")}Mercado de lotes</h2><p class="muted">Lance fechado. Quanto do caixa da família (${n0(f.caixa)}) oferecer além do mínimo de ${lanceMinimo(st.ano)}? Vale a mediana da família; quem não envia conta como 0%.</p>
+      bd = p?.lanceEnviado ? enviado(p.semLote ? "Enviado: não queremos lote este ano." : "Lance enviado.") + `<div class="card"><b>Enquanto a turma decide: qual vai ser o lance vencedor?</b><div class="row" style="margin-top:8px">${["até 20", "21 a 40", "mais de 40"].map((v) => `<button class="btn sm ${palp === v ? "on" : "sec"} grow" data-a="palpite" data-val="${v}">${v}</button>`).join("")}</div></div>` : `<h2 class="row">${ico("mercado-lotes", "g")}Mercado de lotes</h2><p class="muted">Lance fechado. Quanto do caixa da família (${n0(f.caixa)}) oferecer além do mínimo de ${lanceMinimo(st.ano)}?</p>
         <div class="card"><div class="row" style="justify-content:space-between"><b>Parte do caixa</b><b class="mono">${loc.lance}%</b></div><input type="range" min="0" max="60" step="5" value="${loc.lance}" data-in="lance" data-key="lance">${efeitoLance(st, f, loc)}</div>
-        <div class="row" style="flex-wrap:nowrap;align-items:flex-start;gap:12px">${iconeFamilia(f, 48, { moradia: true })}<p class="faint" style="margin:0">A família precisa de ${precisaLotes(f) === 1 ? "1 lote" : `${precisaLotes(f)} lotes`} para morar; tem ${f.lotes}; pode comprar até ter ${tetoLotes(f)}. ${st.regra === "prosperidade" ? "Na Prosperidade, conta metade do que vocês oferecem além do mínimo. " : ""}Quem já levou um lote oferece, no próximo, metade da porcentagem, sobre o caixa que sobrou.</p></div><button class="btn ok block" data-a="lance">Enviar lance</button>
-        <button class="btn sec block" data-a="semLote" style="margin-top:8px">Não queremos lote este ano</button><p class="faint" style="margin:4px 0 0">Vale se a maioria da família inteira marcar. Ficar de fora não custa nada. ${st.ano >= 5 ? "No último ano, o lote novo conta só no patrimônio" : "O lote novo conta para moradia e aluguel a partir do próximo ano"}; o lance mínimo é 6 + 2 × o ano.</p>`;
+        <div class="row" style="flex-wrap:nowrap;align-items:center;gap:12px">${iconeFamilia(f, 40, { moradia: true })}<p class="faint" style="margin:0">Precisam de ${precisaLotes(f) === 1 ? "1 lote" : `${precisaLotes(f)} lotes`} para morar; têm ${f.lotes}; podem ter até ${tetoLotes(f)}.</p></div><button class="btn ok block" data-a="lance">Enviar lance</button>
+        <button class="btn sec block" data-a="semLote" style="margin-top:8px">Não queremos lote este ano</button>
+        <button class="btn sec sm block" data-a="regrasMerc" style="margin-top:8px">${loc.regrasMerc ? "Esconder as regras do mercado ▴" : "Ver as regras do mercado ▾"}</button>${loc.regrasMerc ? `<div class="card regras-cel"><ul class="faint">
+          <li>Vale a mediana da família; quem não envia conta como 0%.</li>
+          <li>O maior lance leva e paga ao banco${st.regra === "prosperidade" ? "; na Prosperidade, conta metade do que vocês oferecem além do mínimo" : ""}. O lance mínimo é 6 + 2 × o ano.</li>
+          <li>Quem já levou um lote oferece, no próximo, metade da porcentagem, sobre o caixa que sobrou.</li>
+          <li>"Não queremos lote" vale se a maioria da família inteira marcar; ficar de fora não custa nada.</li>
+          <li>${st.ano >= 5 ? "No último ano, o lote novo conta só no patrimônio." : "O lote novo conta para moradia e aluguel a partir do próximo ano."}</li></ul></div>` : ""}`;   // R36: na tela, só o controle, o efeito e uma linha; as regras atrás de "ver as regras"
       break;
     }
     case "alvara": {
@@ -223,7 +230,7 @@ export function renderAluno(st, id, loc) {
       const fx = st.fechamento?.extrato?.[f.id];
       const tr = tempoResultado(st), falta = st.painel != null ? (st.painel >= tr.n - 1 ? -10 : 999) : tr.ultimo - decorrido(st);   // atraso negativo: a animação já andou
       const pessoal = [];
-      if (st.ano === 2 && st.pequena.votos[id] != null) pessoal.push(st.pequena.votos[id] ? `Você aceitou a proposta: +${GANHO_PEQUENA} no seu placar pessoal.` : "Você recusou a proposta.");
+      if (st.ano === 2 && st.pequena.votos[id] != null) pessoal.push(st.pequena.valeu === false ? "Com menos de 5 respostas, a proposta não valeu: ninguém ganhou os pontos e nada se perdeu." : st.pequena.votos[id] ? `Você aceitou a proposta: +${GANHO_PEQUENA} no seu placar pessoal.` : "Você recusou a proposta.");   // R36: o +2 só quando a proposta valeu
       if (st.ano === 4 && st.cartas && st.mente[id] != null) {
         const c = cartaAno4(st, id);
         if (c.tipo === "confia") pessoal.push(st.mente[id] ? (st.golpe[id] ? c.ruim : c.bom) : "Você não arriscou: nada mudou no seu placar.");
@@ -285,6 +292,7 @@ export function acaoAluno(a, el, { id, loc, dispatch }) {
     case "lance": dispatch({ t: "lance", id, v: loc.lance / 100 }); return true;
     case "semLote": dispatch({ t: "lance", id, v: -1 }); return true;
     case "abrir": loc.abriu = +val; return true;
+    case "regrasMerc": loc.regrasMerc = !loc.regrasMerc; return true;   // R36: as regras do mercado atrás de um botão
     case "verPessoal": loc.verPessoal = val === "fim" ? "fim" : +val || null; return true;   // o ano em que a pessoa abriu (no ano seguinte, volta ao extrato)
     case "alvara": dispatch({ t: "alvara", id, aceita: val === "1" }); return true;
     case "pequena": dispatch({ t: "pequena", id, aceita: val === "1" }); return true;

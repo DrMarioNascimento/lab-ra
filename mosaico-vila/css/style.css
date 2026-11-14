@@ -406,3 +406,8 @@ input[type=text], input[type=number], select, textarea { box-shadow: inset 0 3px
 /* R33: as duas opções do voto lado a lado, com a mesma largura e a mesma altura, qualquer que seja o texto */
 .opcoes-iguais { display: grid; grid-template-columns: 1fr 1fr; align-items: stretch; gap: 10px; margin: 6px 0; }
 .opcoes-iguais .opt { margin: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-start; gap: 4px; }
+
+/* R36: regras do mercado no celular atrás de "ver as regras" */
+.regras-cel { margin-top: 8px; padding: 10px 12px; }
+.regras-cel ul { margin: 0; padding-left: 18px; font-size: 13px; }
+.regras-cel li { margin: 3px 0; }

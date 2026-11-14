@@ -39,9 +39,9 @@ export const PEQUENAS = [
   // R35: lixo, o avesso da mata (em vez de tirar do que é de todos, joga-se nele um custo que todos dividem)
   { id: "entulho", segmento: "uma empresa de caçambas", de: "de uma empresa de caçambas", lado: "recebe", alvo: "mata", icone: "toco", titulo: "O entulho na beira da mata",
     telao: "Você ajuda a fiscalizar a coleta de lixo. Uma empresa de caçambas oferece 2 pontos para você não registrar o entulho que ela despeja na beira da mata.",
-    texto: "Este ano, você ajuda a fiscalizar o lixo da vila. Uma empresa de caçambas oferece 2 pontos pessoais para você não registrar o entulho que ela joga na beira da mata. Cada pessoa que aceita tira um pedaço da mata de todos; se a turma inteira aceitar, {efeito}.",
+    texto: "Este ano, você ajuda a fiscalizar o lixo da vila. Uma empresa de caçambas oferece 2 pontos pessoais para você não registrar o entulho que ela joga na beira da mata. Cada pessoa que aceita deixa mais entulho na mata de todos; se a turma inteira aceitar, {efeito}.",
     sim: "Aceitar os 2", nao: "Recusar",
-    presente: { texto: "Este ano, você ajuda a fiscalizar o lixo da vila. Uma empresa de caçambas quer te dar um presente de 2 pontos pessoais, em troca de você não registrar o entulho que ela joga na beira da mata. Cada pessoa que aceita tira um pedaço da mata de todos; se a turma inteira aceitar, {efeito}.", sim: "Aceitar o presente", nao: "Recusar o presente" } },
+    presente: { texto: "Este ano, você ajuda a fiscalizar o lixo da vila. Uma empresa de caçambas quer te dar um presente de 2 pontos pessoais, em troca de você não registrar o entulho que ela joga na beira da mata. Cada pessoa que aceita deixa mais entulho na mata de todos; se a turma inteira aceitar, {efeito}.", sim: "Aceitar o presente", nao: "Recusar o presente" } },
 ];
 
 export const GRANDES = [
@@ -146,7 +146,8 @@ export function sortearCartas(r) {
   const pick = (xs) => xs[Math.floor(r() * xs.length)];
   const pequena = pick(PEQUENAS);
   const outras = GRANDES.filter((g) => g.alvo !== pequena.alvo);
-  const grande = r() < 0.5 && outras.length ? pick(outras) : pick(GRANDES);
+  const todas = pequena.id === "entulho" ? GRANDES.filter((g) => g.id !== "aterro") : GRANDES;   // R36: nunca duas empresas de lixo na mesma partida
+  const grande = r() < 0.5 && outras.length ? pick(outras) : pick(todas);
   const grupo = r() < 0.5 ? "honestidade" : "confianca";
   const ano4 = pick(ANO4.filter((c) => c.grupo === grupo));
   return { pequena: pequena.id, grande: grande.id, ano4: ano4.id };

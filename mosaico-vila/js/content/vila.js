@@ -40,7 +40,10 @@ export const EXEMPLO_DO_ANO = {
   4: { linhas: ["Lance mínimo: 14 (6 + 2 × o ano, 4). Cada um propõe quanto do caixa pôr além dele; vale a mediana.", "O maior leva e paga ao banco. Na Prosperidade, conta metade do que se oferece além do mínimo.", "Lote vale 10 + 2 por nível do bem público e pode render aluguel."],
        // R23: a pergunta confere também quanto se paga (antes, só "o maior leva")
        pergunta: "Lance mínimo 14. Uma família oferece 10 além do mínimo e faz o maior lance. No Monopólio, quanto ela paga pelo lote?", opcoes: ["14", "24", "Nada, se o lote não render"], certa: 1,
-       explica: "O maior lance leva e paga o lance inteiro ao banco: 14 + 10 = 24. Na Prosperidade, conta metade do que vai além do mínimo: 14 + 5 = 19." },
+       explica: "O maior lance leva e paga o lance inteiro ao banco: 14 + 10 = 24. Na Prosperidade, conta metade do que vai além do mínimo: 14 + 5 = 19.",
+       // R36: com a Prosperidade valendo, a pergunta é da Prosperidade (antes, perguntava do Monopólio em qualquer regra)
+       prosperidade: { pergunta: "Lance mínimo 14. Uma família oferece 10 além do mínimo e faz o maior lance. Na Prosperidade, quanto ela paga pelo lote?", opcoes: ["14", "19", "24"], certa: 1,
+         explica: "Na Prosperidade, conta metade do que vai além do mínimo: 14 + 5 = 19. No Monopólio, seria o lance inteiro: 14 + 10 = 24." } },
 };
 
 export const REGRAS_TXT = {

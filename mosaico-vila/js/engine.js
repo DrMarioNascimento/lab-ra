@@ -2,7 +2,7 @@
 import { FAMILIAS, EVENTOS } from "./content/vila.js";
 import { carta, cartaAno4, distribuirSituacoes, distribuirFalas, sortearCartas, GANHO_PEQUENA, GANHO_GRANDE, GANHO_HONESTIDADE, RISCO_CONFIANCA, CHANCE_GOLPE, ESTRAGO_MATA } from "./content/cartas.js";
 import {
-  ANOS, LOTES, TETO_FAMILIA, MATA_INICIO, LIMITES, ANO_MERCADO, COLAPSO, PONTOS_NIVEL, rendaDoAno, fecharAno, leilao, gini, vitoriaColetiva, lanceMinimo, patrimonio, contrafactual,
+  ANOS, LOTES, TETO_FAMILIA, MATA_INICIO, LIMITES, ANO_MERCADO, COLAPSO, PONTOS_NIVEL, rendaDoAno, fecharAno, leilao, gini, vitoriaColetiva, lanceMinimo, patrimonio, contrafactual, tetoLotes,
 } from "./content/regras.js";
 
 export function rnd(seed) {
@@ -287,7 +287,10 @@ export function progresso(s) {
     case "decidir": return { rot: "propostas enviadas", feito: Object.values(s.props[s.ano] || {}).filter((p) => !p.auto).length, total: n };
     case "mente": return { rot: "responderam", feito: Object.keys(s.mente).length, total: n };
     case "pequena": return { rot: "responderam", feito: Object.keys(s.pequena.votos).length, total: n };
-    case "lances": return { rot: "lances enviados", feito: Object.values(s.lances[s.ano] || {}).filter((p) => p.lanceEnviado).length, total: n };
+    case "lances": {   // R36: quem está numa família no teto (moradia + 1 lote) não pode dar lance e não entra na conta (antes, o contador parava em 16/20)
+      const podem = s.ordem.filter((id) => { const f = s.fams[s.alunos[id]?.fam]; return f && f.lotes < tetoLotes(f); });
+      return { rot: "lances enviados", feito: podem.filter((id) => s.lances[s.ano]?.[id]?.lanceEnviado).length, total: podem.length };
+    }
     case "alvara": return { rot: "responderam", feito: Object.keys(s.alvara.votos).length, total: n };
     case "abertura": return s.ano <= 4 ? { rot: "responderam a pergunta", feito: Object.keys(s.controle[s.ano] || {}).length, total: n } : { rot: "deram o palpite", feito: Object.keys(s.prev5).length, total: n };
     case "conversa": return { rot: "conferiram a regra", feito: Object.keys(s.controle.voto || {}).length, total: n };

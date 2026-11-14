@@ -281,6 +281,46 @@ for (const [nResp, valeu] of [[4, false], [5, true]]) {
   const ganhou = ids.every((id) => st.pessoal[id] === antes[id] + 2), estrago = st.mata < mata0 - 1e-9 || st.publico < pub0[0] || st.acumulado < pub0[1] - 1e-9;
   ok(st.pequena.valeu === valeu && ganhou === valeu && estrago === valeu && st.pequena.aceitaram === (valeu ? nResp : 0), `R35: ${nResp} respostas, a pequena ${valeu ? "vale" : "não vale"} (pontos ${ganhou}, estrago ${estrago})`);
 }
+// R36: com a pequena sem valer, o celular não promete o +2
+{
+  let st = estadoInicial();
+  const dispatch = (a) => { st = reduzir(st, a); };
+  for (let i = 0; i < 12; i++) dispatch({ t: "entrar", id: `a${i + 1}`, nome: NOMES[i] });
+  dispatch({ t: "sortear", seed: 34 });
+  let passos = 0;
+  while (st.fase !== "pequena" && passos++ < 60) dispatch({ t: "fase", dir: 1 });
+  const ids = st.ordem.slice(0, 4);
+  for (const id of ids) dispatch({ t: "pequena", id, aceita: true });
+  while (st.fase !== "resultado" && passos++ < 80) dispatch({ t: "fase", dir: 1 });
+  const telas = ids.map((id) => { const loc = novoLocal(); loc.verPessoal = st.ano; return renderAluno(st, id, loc); }).join(" ");
+  ok(st.pequena.valeu === false && !/Você aceitou a proposta: \+2/.test(telas) && /não valeu/.test(telas), "R36: com 4 respostas, o celular diz que a proposta não valeu (sem +2)");
+}
+// R36: no mercado, quem está numa família no teto não entra na conta do "todos enviaram"
+{
+  let st = estadoInicial();
+  const dispatch = (a) => { st = reduzir(st, a); };
+  for (let i = 0; i < 20; i++) dispatch({ t: "entrar", id: `a${i + 1}`, nome: NOMES[i] });
+  dispatch({ t: "sortear", seed: 77 });
+  let passos = 0;
+  while (st.fase !== "lances" && passos++ < 120) dispatch({ t: "fase", dir: 1 });
+  const noTeto = st.ordem.filter((id) => { const f = st.fams[st.alunos[id].fam]; return f.lotes >= tetoLotes(f); });
+  const p = progresso(st);
+  ok(st.fase === "lances" && p.total === st.ordem.length - noTeto.length, `R36: o total do mercado conta só quem pode dar lance (${p.total} de ${st.ordem.length}; ${noTeto.length} no teto)`);
+}
+// R36: a pergunta de controle do mercado é da regra que vale; e nunca duas empresas de lixo na mesma partida
+{
+  for (const trocar of [true, false]) {
+    let st = estadoInicial();
+    const dispatch = (a) => { st = reduzir(st, a); };
+    for (let i = 0; i < 12; i++) dispatch({ t: "entrar", id: `a${i + 1}`, nome: NOMES[i] });
+    dispatch({ t: "sortear", seed: 5 });
+    let passos = 0;
+    while (!(st.fase === "abertura" && st.ano === 4) && passos++ < 120) { if (st.fase === "voto") for (const id of st.ordem) dispatch({ t: "voto", id, trocar }); dispatch({ t: "fase", dir: 1 }); }
+    const h = renderAluno(st, st.ordem[0], novoLocal());
+    ok(new RegExp(trocar ? "Na Prosperidade, quanto ela paga" : "No Monopólio, quanto ela paga").test(h), `R36: a pergunta do mercado na regra que vale (${st.regra})`);
+  }
+  for (let k = 1; k < 3000; k++) { const c = sortearCartas(rnd(k)); if (c.pequena === "entulho" && c.grande === "aterro") { ok(false, `R36: entulho e aterro juntos (semente ${k})`); break; } }
+}
 // R35: as cartas de lixo estão nos sorteios, com as duas falas, e a grande às claras também fala "para você"
 ok(PEQUENAS.some((c) => c.id === "entulho" && c.alvo === "mata") && GRANDES.some((c) => c.id === "aterro" && c.alvo === "mata"), "R35: o entulho (pequena) e o aterro (grande) entram nos sorteios, na mata");
 for (const c of GRANDES) ok(/para você|te oferece/.test(c.texto) && !/a quem/.test(c.texto), `R35: ${c.id} às claras fala com você, como o "presente"`);
