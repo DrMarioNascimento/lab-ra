@@ -189,6 +189,13 @@ ok(!confiaram || (golpes / confiaram > 0.1 && golpes / confiaram < 0.45), `golpe
   const fy = fecharAno({ ...v, mata: 7, colapsou: false }, { 1: { pub: 0, rep: 0, car: 3 }, 2: { pub: 0, rep: 0, car: 3 } }, renda);
   ok(fy.colapsou, "mata abaixo de 30% colapsa");
 }
+// R19: as cargas nunca tiram mais do que a mata tem (acima disso, cada carga rende e tira só a sua parte)
+{
+  const fams = { a: { id: "a", membros: [1, 2, 3, 4], caixa: 50, lotes: 2 } };
+  const v = { fams, mata: 2, teto: 20, publico: 0, acumulado: 0, colapsou: true, ano: 4 };
+  const fx = fecharAno(v, { 1: { pub: 0, rep: 0, car: 3 }, 2: { pub: 0, rep: 0, car: 3 }, 3: { pub: 0, rep: 0, car: 3 }, 4: { pub: 0, rep: 0, car: 3 } }, { a: { total: 40, imposto: 0 } });
+  ok(fx.mata >= 0 && fx.extr <= 2 + 0.2 * 2 + 1e-9 && fx.extrato.a.ganhoCarga < 18, `R19: com a mata quase no fim, as cargas tiram só o que existe (tiraram ${fx.extr.toFixed(2)}, renderam ${fx.extrato.a.ganhoCarga.toFixed(1)})`);
+}
 const s = (k) => linhas.filter((l) => l[k]).length;
 console.log(`troca aprovada ${s("troca")}/15 · colapso ${s("colapso")}/15 · vitória coletiva ${s("vitoria")}/15 · desigualdade da renda sobe com o aluguel em ${rendaSobe}/15`);
 console.log(falhas ? `${falhas} verificações falharam` : "todas as verificações passaram");

@@ -19,7 +19,7 @@ export function quebra(txt, max) {
 export function nL(v, alvo) {
   return Math.round(v) === alvo && Math.abs(v - alvo) > 0.05 ? (Math.round(v * 10) / 10).toLocaleString("pt-BR") : String(Math.round(v));
 }
-export function pctL(frac, limites = [0.3, 0.5, 0.75]) {
+export function pctL(frac, limites = [0.3, 0.5, 0.7]) {   // R19: a meta da Prosperidade passou a 70%
   const v = 100 * frac, r = Math.round(v);
   for (const L of limites) if (Math.abs(v - 100 * L) < 1 && r === Math.round(100 * L) && Math.abs(v - r) > 0.05) return `${(Math.round(v * 10) / 10).toLocaleString("pt-BR")}%`;
   return `${r}%`;
@@ -87,7 +87,7 @@ export function mapaVila(st, { grande = true, destaque = null } = {}) {
     <text x="34" y="68" font-size="27" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Mata</text><text x="266" y="68" text-anchor="end" font-size="27" font-weight="700" fill="${corMata}" font-family="JetBrains Mono, monospace">${pctL(fm)}</text>
     ${arv.join("")}
     <rect x="290" y="40" width="200" height="390" rx="18" fill="#1a1f33" stroke="#2c3560"/>
-    <text x="304" y="68" font-size="27" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Bem público</text><text x="304" y="100" font-size="26" fill="#fbbf24" font-family="Sora, sans-serif">nível ${nivel} de 5</text>
+    <text x="304" y="68" font-size="27" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Bem público</text><text x="304" y="100" font-size="27" fill="#fbbf24" font-family="Sora, sans-serif">nível ${nivel} de 5</text>
     ${predios.join("")}
     ${quebra(NIVEIS_PUBLICO[nivel], 11).map((l, k, ls) => `<text x="390" y="${420 - (ls.length - 1 - k) * 28}" text-anchor="middle" font-size="26" fill="#9fb6cf" font-family="Sora, sans-serif">${esc(l)}</text>`).join("")}
     <rect x="500" y="40" width="280" height="390" rx="18" fill="#10223b" stroke="#23415f"/>
@@ -103,7 +103,7 @@ export function linhaDoTempo(hist, { F = 26, alto = 240, so = null } = {}) {
   // R14: margem à direita para o valor do último ano (antes ficava cortado) e letra ajustável (o fechamento usa 30)
   const W = 600, H = alto, x0 = 70, x = (k) => x0 + (k * (W - x0 - 120)) / 4;
   const eixoX = (y) => `<line x1="${x0}" x2="${W - 110}" y1="${y}" y2="${y}" stroke="#2b4a6b" stroke-width="2"/>` +
-    [1, 2, 3, 4, 5].map((a, k) => `<text x="${x(k)}" y="${y + F + 4}" text-anchor="middle" font-size="${F - 4}" fill="#a9bdd3" font-family="Sora, sans-serif">${k ? a : "ano 1"}</text>`).join("");
+    [1, 2, 3, 4, 5].map((a, k) => `<text x="${x(k)}" y="${y + F + 4}" text-anchor="middle" font-size="${F - 1}" fill="#a9bdd3" font-family="Sora, sans-serif">${k ? a : "ano 1"}</text>`).join("");
   const caminho = (vals, y) => vals.map((v, k) => `${k ? "L" : "M"}${x(k).toFixed(1)} ${y(v).toFixed(1)}`).join(" ");
   const ponto = (vals, y, cor, fmt) => { const k = vals.length - 1; return `<circle cx="${x(k)}" cy="${y(vals[k])}" r="7" fill="${cor}"/><text x="${x(k) + 12}" y="${y(vals[k]) + 8}" font-size="${F}" font-weight="700" fill="${cor}" font-family="Sora, sans-serif">${fmt(vals[k])}</text>`; };
   // Mata
@@ -111,7 +111,7 @@ export function linhaDoTempo(hist, { F = 26, alto = 240, so = null } = {}) {
   const mata = hist.map((h) => h.mata);
   const svgM = `<svg class="metro" viewBox="0 0 ${W} ${H}" role="img" aria-label="Mata por ano">
     <text x="0" y="${F}" font-size="${F}" font-weight="700" fill="#34d399" font-family="Sora, sans-serif">Mata</text>
-    ${[0.3, 0.5].map((v) => `<line x1="${x0}" x2="${W - 110}" y1="${ym(v)}" y2="${ym(v)}" stroke="${v < 0.4 ? "#fb7185" : "#fbbf24"}" stroke-opacity=".55" stroke-width="2" stroke-dasharray="6 6"/><text x="${x0 - 8}" y="${v < 0.4 ? ym(v) + F - 6 : ym(v) - 2}" text-anchor="end" font-size="${F - 4}" fill="${v < 0.4 ? "#fca5a5" : "#fde68a"}" font-family="Sora, sans-serif">${100 * v}%</text>`).join("")}
+    ${[0.3, 0.5].map((v) => `<line x1="${x0}" x2="${W - 110}" y1="${ym(v)}" y2="${ym(v)}" stroke="${v < 0.4 ? "#fb7185" : "#fbbf24"}" stroke-opacity=".55" stroke-width="2" stroke-dasharray="6 6"/><text x="${x0 - 8}" y="${v < 0.4 ? ym(v) + F - 6 : ym(v) - 2}" text-anchor="end" font-size="${F - 1}" fill="${v < 0.4 ? "#fca5a5" : "#fde68a"}" font-family="Sora, sans-serif">${100 * v}%</text>`).join("")}
     ${eixoX(H - 40)}<path d="${caminho(mata, ym)}" fill="none" stroke="#34d399" stroke-width="5" stroke-linejoin="round"/>${ponto(mata, ym, "#34d399", (v) => pctL(v))}</svg>`;
   // Desigualdades
   const yg = (v) => 56 + (1 - Math.max(0, Math.min(1, v / 0.5))) * (H - 96);
@@ -119,7 +119,7 @@ export function linhaDoTempo(hist, { F = 26, alto = 240, so = null } = {}) {
   const fmt = (v) => v.toFixed(2).replace(".", ",");
   const svgG = `<svg class="metro" viewBox="0 0 ${W} ${H}" role="img" aria-label="Desigualdade por ano">
     <text x="0" y="${F}" font-size="${F - 2}" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Desigualdade</text><text x="${Math.round(F * 7.2)}" y="${F}" font-size="${F - 2}" font-weight="700" fill="#fca5a5" font-family="Sora, sans-serif">— patrimônio</text><text x="${Math.round(F * 14.6)}" y="${F}" font-size="${F - 2}" font-weight="700" fill="#fde68a" font-family="Sora, sans-serif">··· renda</text>
-    <text x="${x0 - 8}" y="${yg(0) + 8}" text-anchor="end" font-size="${F - 4}" fill="#a9bdd3" font-family="Sora, sans-serif">0</text><text x="${x0 - 8}" y="${yg(0.5) + 8}" text-anchor="end" font-size="${F - 4}" fill="#a9bdd3" font-family="Sora, sans-serif">0,5</text>
+    <text x="${x0 - 8}" y="${yg(0) + 8}" text-anchor="end" font-size="${F - 1}" fill="#a9bdd3" font-family="Sora, sans-serif">0</text><text x="${x0 - 8}" y="${yg(0.5) + 8}" text-anchor="end" font-size="${F - 1}" fill="#a9bdd3" font-family="Sora, sans-serif">0,5</text>
     ${eixoX(H - 40)}<path d="${caminho(gp, yg)}" fill="none" stroke="#fb7185" stroke-width="5"/><path d="${caminho(gr, yg)}" fill="none" stroke="#fbbf24" stroke-width="5" stroke-dasharray="3 9" stroke-linecap="round"/>
     ${ponto(gp, yg, "#fb7185", fmt)}</svg>`;
   // R14: no fechamento, só o gráfico da pergunta da vez (maior, com letra de TV)

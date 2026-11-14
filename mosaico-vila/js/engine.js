@@ -77,7 +77,10 @@ export function reduzir(st, a) {
       for (let i = ids.length - 1; i > 0; i--) { const j = Math.floor(rr() * (i + 1)); [ids[i], ids[j]] = [ids[j], ids[i]]; }
       const nf = nFamilias(ids.length);
       s.fams = {};
-      for (let i = 0; i < nf; i++) s.fams[`f${i}`] = { id: `f${i}`, i, ...FAMILIAS[i], membros: [], lotes: 1, caixa: 0, caixa0: 0 };
+      // R19: os nomes e as cores das famílias saem embaralhados pela semente: a herança não fica sempre com a mesma família
+      const rn = rnd(s.seed ^ 0x3c6ef372), nomes = [...FAMILIAS];
+      for (let i = nomes.length - 1; i > 0; i--) { const j = Math.floor(rn() * (i + 1)); [nomes[i], nomes[j]] = [nomes[j], nomes[i]]; }
+      for (let i = 0; i < nf; i++) s.fams[`f${i}`] = { id: `f${i}`, i, ...nomes[i], membros: [], lotes: 1, caixa: 0, caixa0: 0 };
       ids.forEach((id, k) => { const f = s.fams[`f${k % nf}`]; f.membros.push(id); s.alunos[id].fam = f.id; });
       // desigualdade inicial: a primeira família tem herança; a última começa sem lote
       for (const f of Object.values(s.fams)) f.caixa = 10 * f.membros.length;
@@ -200,7 +203,7 @@ function avancar(s, r) {
     case "lances": {
       const livres = s.lotes.filter((x) => !x).length;
       const L = leilao(s.fams, livres, s.lances[s.ano] || {}, s.ano, s.regra, 0, () => r());
-      s.fams = L.fams; s.leilao = { ...L, minimo: lanceMinimo(s.ano) };
+      s.fams = L.fams; s.leilao = { ...L, minimo: lanceMinimo(s.ano), ano: s.ano };
       for (const v of L.vendidos) { const i = s.lotes.indexOf(null); if (i >= 0) s.lotes[i] = v.fam; }
       break;
     }

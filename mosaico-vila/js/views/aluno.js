@@ -11,7 +11,7 @@ const n0 = (x) => Math.round(x).toLocaleString("pt-BR");
 export function novoLocal() { return { pub: 20, rep: 0, car: 0, lance: 0, face: null, guia: null, motivo: null }; }
 
 function hd(st, me) {
-  const f = me?.fam ? st.fams[me.fam] : null;
+  const f = me?.fam ? vista(st).fams[me.fam] : null;   // R19: nas cartas dos anos 2 e 4, o caixa de antes das decisões (como a barra)
   return `<div class="hd">${f ? iconeFamilia(f, 34) : ico("app-mosaico-vila", "m")}
     <div class="grow"><b>${esc(me?.nome || "Mosaico Vila")}</b><div class="faint" style="font-size:12px">${f ? `${esc(f.nome)} · caixa ${n0(f.caixa)}` : "Mosaico Vila"}</div></div>
     ${st.ano ? `<span class="chip">Ano ${st.ano}</span>` : ""}${st.ano ? miniBarra(st) : ""}</div>`;
@@ -126,10 +126,13 @@ export function renderAluno(st, id, loc) {
         bd = enviado("Proposta enviada.") + (st.ano >= 2 ? `<div class="card"><b>Enquanto a turma decide: a mata vai…</b><div class="row" style="margin-top:8px">${["sobe", "fica", "desce"].map((v) => `<button class="btn sm ${prev === v ? "on" : "sec"} grow" data-a="prever" data-val="${v}">${v === "sobe" ? "Subir" : v === "fica" ? "Ficar igual" : "Descer"}</button>`).join("")}</div></div>` : "");
         break;
       }
+      // R19: a família sabe o que levou no mercado antes de decidir (o mercado agora vem antes das decisões)
+      const levou = st.leilao?.ano === st.ano ? st.leilao.vendidos.filter((v) => v.fam === f.id) : [];
+      const merc = st.ano >= 4 && st.leilao?.ano === st.ano ? `<div class="card"><p class="muted" style="margin:0">${levou.length ? `No mercado, a família levou ${levou.length === 1 ? "1 lote" : `${levou.length} lotes`} (pagou ${n0(levou.reduce((a, v) => a + v.preco, 0))}). O caixa abaixo já desconta.` : "No mercado, a família não levou lote."}</p></div>` : "";
       // R18: primeiro a conversa da família (o relógio do telão), depois os controles; quem já conversou abre antes
       const segC = st.curto && st.ano >= 4 ? 30 : 45, falta = loc.abriu === st.ano ? -1 : segC - decorrido(st);
       const conversa = falta > 0 ? `<div class="card espera" style="text-align:center;--a:${falta.toFixed(2)}s">${ico("grupos", "g")}<p class="muted" style="margin:6px 0 8px"><b>Conversem na família</b>, olhando uns para os outros: ${segC} s para combinar ${st.ano >= 2 ? "bem público, replantio e cargas" : "quanto vai para o bem público"}. A proposta abre aqui quando o relógio do telão acabar.</p><button class="btn sec block" data-a="abrir" data-val="${st.ano}">Já conversamos: abrir minha proposta</button></div>` : "";
-      bd = conversa + `<div class="${falta > 0 ? "surge trava" : ""}" style="--a:${Math.max(0, falta).toFixed(2)}s"><h2>Sua proposta para a família</h2><p class="faint">Vale a mediana das propostas da família.</p>
+      bd = merc + conversa + `<div class="${falta > 0 ? "surge trava" : ""}" style="--a:${Math.max(0, falta).toFixed(2)}s"><h2>Sua proposta para a família</h2><p class="faint">Vale a mediana das propostas da família.</p>
         <div class="card"><div class="row" style="justify-content:space-between"><b class="row">${ico("economia")}Bem público</b><b class="mono">${loc.pub}% da renda</b></div><input type="range" min="0" max="${LIMITES.pub}" step="5" value="${loc.pub}" data-in="pub" data-key="pub"><p class="faint" style="margin:0">Nível ${st.publico}: ${esc(NIVEIS_PUBLICO[st.publico])}</p></div>
         ${st.ano >= 2 ? `<div class="card"><div class="row" style="justify-content:space-between"><b class="row">${ico("arvore-cubos")}Replantar a mata</b><b class="mono">${loc.rep}% da renda</b></div><input type="range" min="0" max="${LIMITES.rep}" step="5" value="${loc.rep}" data-in="rep" data-key="rep"><p class="faint" style="margin:0">Cada 5 pontos devolvem ${pcMata(st, REPLANTA_DEVOLVE)} à mata.</p></div>
         <div class="card"><b class="row">${ico("arvore-redonda")}Cargas de madeira</b><p class="faint" style="margin:2px 0 8px">Cada carga rende ${CARGA_RENDE} à família e tira ${pcMata(st, CARGA_TIRA)} da mata. Mata hoje: ${pctL(st.mata / st.teto)} (50% ou mais: +2 de renda por pessoa; abaixo de 30%: −4).</p><div class="dirs">${[0, 1, 2, 3].map((k) => `<button class="btn ${loc.car === k ? "warn on" : "sec"}" data-a="car" data-val="${k}">${k}</button>`).join("")}</div></div>` : ""}
@@ -175,7 +178,7 @@ export function renderAluno(st, id, loc) {
       bd = p?.lanceEnviado ? enviado(p.semLote ? "Enviado: não queremos lote este ano." : "Lance enviado.") + `<div class="card"><b>Enquanto a turma decide: qual vai ser o lance vencedor?</b><div class="row" style="margin-top:8px">${["até 20", "21 a 40", "mais de 40"].map((v) => `<button class="btn sm ${palp === v ? "on" : "sec"} grow" data-a="palpite" data-val="${v}">${v}</button>`).join("")}</div></div>` : `<h2 class="row">${ico("lote-sobrado", "g")}Mercado de lotes</h2><p class="muted">Lance fechado. Quanto do caixa da família (${n0(f.caixa)}) oferecer além do mínimo de ${lanceMinimo(st.ano)}?</p>
         <div class="card"><div class="row" style="justify-content:space-between"><b>Parte do caixa</b><b class="mono">${loc.lance}%</b></div><input type="range" min="0" max="60" step="5" value="${loc.lance}" data-in="lance" data-key="lance">${efeitoLance(st, f, loc)}</div>
         <p class="faint">A família precisa de ${precisaLotes(f)} lote(s) para morar; tem ${f.lotes}; pode comprar até ter ${tetoLotes(f)}. ${st.regra === "prosperidade" ? "Na Prosperidade, conta metade do que vocês oferecem além do mínimo. " : ""}Quem já levou um lote oferece, no próximo, metade do que ia além do mínimo.</p><button class="btn ok block" data-a="lance">Enviar lance</button>
-        <button class="btn sec block" data-a="semLote" style="margin-top:8px">Não queremos lote este ano</button><p class="faint" style="margin:4px 0 0">Vale o que a maioria da família marcar. Ficar de fora não custa nada.</p>`;
+        <button class="btn sec block" data-a="semLote" style="margin-top:8px">Não queremos lote este ano</button><p class="faint" style="margin:4px 0 0">Vale o que a maioria da família marcar. Ficar de fora não custa nada. O lote novo conta para moradia e aluguel a partir do próximo ano.</p>`;
       break;
     }
     case "alvara": {
@@ -212,7 +215,8 @@ export function renderAluno(st, id, loc) {
     case "conversa":
       // R16: conversa de 90 s antes do voto; o celular confere a regra e espera o voto abrir
       bd = `<h2 class="row">${ico("balanca", "g")}Antes do voto: conversem</h2><p class="muted">Com a família, ${st.curto ? 60 : 90} segundos: com o aluguel mordendo, qual regra deixa a vila mais perto da meta, e de quem? <b>Quando o relógio do telão acabar, quem conduz abre o voto.</b></p>${controle(st, id)}
-        <div class="card"><b>${esc(REGRAS_TXT.monopolio.nome)}</b><p class="faint" style="margin:2px 0 6px">${esc(REGRAS_TXT.monopolio.curto)}</p><b>${esc(REGRAS_TXT.prosperidade.nome)}</b><p class="faint" style="margin:2px 0 0">${esc(REGRAS_TXT.prosperidade.curto)}</p></div>`;
+        <div class="card"><b>${esc(REGRAS_TXT.monopolio.nome)}</b><p class="faint" style="margin:2px 0 6px">${esc(REGRAS_TXT.monopolio.curto)}</p><b>${esc(REGRAS_TXT.prosperidade.nome)}</b><p class="faint" style="margin:2px 0 0">${esc(REGRAS_TXT.prosperidade.curto)}</p></div>
+        <div class="card"><b>As duas metas, hoje</b><p class="faint" style="margin:4px 0 0">${(() => { const mo = progressoMeta(st.fams, st.publico, st.mata, st.teto, "monopolio"), pr = progressoMeta(st.fams, st.publico, st.mata, st.teto, "prosperidade"); return `Monopólio: patrimônio médio de ${nL(mo.valor, mo.alvo)} (meta ${mo.alvo}). Prosperidade: a mais pobre com ${pctL(pr.valor)} da média (meta ${Math.round(100 * pr.alvo)}%). Nos anos 4 e 5, aluguel, mercado e mata mexem nos dois.`; })()}</p></div>`;   // R19
       break;
     case "voto":
       bd = st.voto[id] != null ? enviado("Voto secreto enviado.") + palpiteFaixa(st, id, "voto", "quantos % vão votar para trocar?") : `<h2 class="row">${ico("balanca", "g")}Que regra queremos?</h2><p class="muted"><b>Volte ao seu lugar para votar.</b> Vale para os anos 4 e 5. Voto secreto; vence a maioria dos votos, e empate mantém o Monopólio.</p>${controle(st, id)}

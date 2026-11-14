@@ -21,7 +21,7 @@ export const IMPOSTO_LOTE = 1.5;         // só na Prosperidade, vai ao bem púb
 export const PISO_PESSOA = 6;            // piso de renda por pessoa
 export const NIVEL_MAX = 5;
 export const PONTOS_NIVEL = 12;          // × número de famílias para subir um nível
-export const VITORIA = { pobreSobreMedia: 0.75, mataMinima: 0.3, patrimonioPorPessoa: 50 };   // R7: meta das duas regras; R14: equidade em 75%; R15: eficiência em 50 por pessoa (com 42 ela já estava batida no voto) (com 60% ela quase nunca falhava)
+export const VITORIA = { pobreSobreMedia: 0.7, mataMinima: 0.3, patrimonioPorPessoa: 54 };   // R19: 54 e 70% (com 50 e 75%, o Monopólio passava quase sempre e a Prosperidade metade das vezes)   // R7: meta das duas regras; R14: equidade em 75%; R15: eficiência em 50 por pessoa (com 42 ela já estava batida no voto) (com 60% ela quase nunca falhava)
 export const LIMITES = { pub: 50, rep: 30, car: 3 };
 
 export const lanceMinimo = (ano, acrescimo = 0) => 6 + 2 * ano + acrescimo;
@@ -85,23 +85,29 @@ export function fecharAno(v, props, renda) {
   let { mata, publico, acumulado, colapsou } = v;
   const teto = v.teto;
   let extr = 0, plant = 0;
-  const extrato = {};
+  const extrato = {}, ps = {};
   for (const f of Object.values(fams)) {
-    const p = propostaDaFamilia(f, props);
-    const r = renda[f.id].total;
-    const base = Math.max(0, r);
+    const p = (ps[f.id] = propostaDaFamilia(f, props));
+    const base = Math.max(0, renda[f.id].total);
+    plant += ((base * p.rep) / 100 / REPLANTA_POR) * REPLANTA_DEVOLVE;
+    extr += CARGA_TIRA * p.car;
+  }
+  // R19: ninguém tira madeira que não existe: se as cargas passam do que a mata tem, cada carga rende e tira só a sua parte
+  const regen = v.ano >= 2 ? REGENERA * mata * (1 - mata / teto) : 0, disponivel = mata + regen + plant;
+  const fator = v.ano >= 2 && extr > disponivel ? Math.max(0, disponivel) / extr : 1;
+  extr *= fator;
+  for (const f of Object.values(fams)) {
+    const p = ps[f.id], r = renda[f.id].total, base = Math.max(0, r);
     const aPub = (base * p.pub) / 100, aRep = (base * p.rep) / 100;
     acumulado += aPub;
-    plant += (aRep / REPLANTA_POR) * REPLANTA_DEVOLVE;
-    extr += CARGA_TIRA * p.car;
-    const ganhoCarga = CARGA_RENDE * p.car;
+    const ganhoCarga = CARGA_RENDE * p.car * fator;
     f.caixa += r - aPub - aRep + ganhoCarga;
     extrato[f.id] = { renda: r, aPub, aRep, cargas: p.car, ganhoCarga, proposta: p };
   }
   acumulado += Object.values(renda).reduce((a, x) => a + x.imposto, 0);
   const mataAntes = mata;
   if (v.ano >= 2) {
-    mata = Math.max(0, mata + REGENERA * mata * (1 - mata / teto) - extr + plant);
+    mata = Math.max(0, mata + regen - extr + plant);
     colapsou = mata < COLAPSO * teto;     // R10: o colapso dura enquanto a mata estiver abaixo de 30%; replantando, ela volta
   }
   const nf = Object.keys(fams).length;
@@ -143,7 +149,7 @@ export function leilao(fams, livres, props, ano, regra, acrescimo, desempate) {
 export const patrimonio = (f, publico) => f.caixa + f.lotes * VALOR_LOTE(publico);
 
 // Meta coletiva de cada regra (R7). Monopólio: eficiência (patrimônio médio por pessoa e mata).
-// Prosperidade: equidade (a família mais pobre com 75% da média, por pessoa, e mata).
+// Prosperidade: equidade (a família mais pobre com 70% da média, por pessoa, e mata; R19).
 export function vitoriaColetiva(v) {
   const fs = Object.values(v.fams);
   const pat = fs.map((f) => patrimonio(f, v.publico));

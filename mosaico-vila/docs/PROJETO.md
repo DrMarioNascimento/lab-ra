@@ -13,7 +13,7 @@ O Mosaico Vila é a proposta P7 da biblioteca de GDDs "Fundo Comum" (núcleo de 
 - Patrimônio = caixa + lotes × (10 + 2 × nível do bem público). É ele que aparece nas fileiras de casas do telão e conta nas metas.
 - Herança desigual de propósito: a Família Verde começa com 50% a mais de caixa e 3 lotes; a última família começa sem lote.
 - Decisão da família: mediana das propostas de quem está nela (ninguém decide sozinho; quem não envia mantém a proposta anterior).
-- Metas coletivas das duas regras: Monopólio (eficiência) = patrimônio médio de 50 por pessoa e mata acima de 30%; Prosperidade (equidade) = a família mais pobre com pelo menos 75% do patrimônio médio e mata acima de 30%. Votação: maioria simples dos votos enviados; empate mantém a regra atual. A meta do Monopólio aparece desde o ano 1 (exemplo do ano 1 e barra no telão e no celular a cada "Como ficou a vila", `progressoMeta()` em `regras.js`); depois do voto, a barra mostra a meta da regra vigente.
+- Metas coletivas das duas regras: Monopólio (eficiência) = patrimônio médio de 54 por pessoa e mata acima de 30%; Prosperidade (equidade) = a família mais pobre com pelo menos 70% do patrimônio médio e mata acima de 30%. Votação: maioria simples dos votos enviados; empate mantém a regra atual. A meta do Monopólio aparece desde o ano 1 (exemplo do ano 1 e barra no telão e no celular a cada "Como ficou a vila", `progressoMeta()` em `regras.js`); depois do voto, a barra mostra a meta da regra vigente. (R19: antes 50 e 75%; ver a seção R19.)
 - Placar de cada pessoa (só no celular dela, no fechamento) = patrimônio da família ÷ pessoas da família + pontos pessoais (os das cartas). Os pontos pessoais nunca entram no caixa, no patrimônio, nas metas ou no telão.
 
 ## Cada regra nova
@@ -102,3 +102,10 @@ No fim do ano 3, o motor guarda a vila (`snap3`). No fechamento, `contrafactual(
 - Mapa: nome do nível em até duas linhas (`quebra()`), rótulos em 26.
 - "De onde vem" da pergunta 4 conforme a carta (Jiang no dado, Cohn e colegas no achado e no extrato, Berg e colegas na confiança).
 - Relógio da dupla começa depois dos 90 s da síntese; "quem conduz abre o voto"; no celular, os controles da proposta aparecem quando acaba a conversa da família (`.surge.trava`), com "Já conversamos" para abrir antes.
+
+## R19 (14/11/2026, após os avaliadores DU e DV)
+- Metas recalibradas (`VITORIA`): Monopólio 54 por pessoa, Prosperidade 70%. Com 50 e 75% e o mercado antes das decisões, o Monopólio passava quase sempre e a Prosperidade quase nunca. Em 64 partidas do protótipo: meta inteira do Monopólio em 20 de 34, da Prosperidade em 13 de 30; no voto, o patrimônio médio fica entre 42 e 47 e a mais pobre entre 70% e 90% da média. Simulação: versão 45, r66 (Monopólio 4 de 8, Prosperidade 4 de 7).
+- Conversa e voto mostram as duas metas com os números de hoje (`duasMetas()`, `metaHoje()` no telão; o mesmo no celular).
+- `fecharAno()`: as cargas nunca tiram mais do que a mata tem (acima disso, cada carga rende e tira a sua parte), e a "natureza" do painel deixa de ser um resto impossível.
+- Nomes e cores das famílias embaralhados pela semente (a herança muda de cor); cabeçalho do celular com o caixa de antes das decisões nas cartas; o celular diz o que a família levou no mercado; deixas "voltem às famílias"; "1 família recebeu o piso".
+- Telão: referências curtas no "De onde vem", confiança e conversa sem passar da TV, rótulos dos gráficos em F − 1 e do mapa em 26 a 27.

@@ -107,8 +107,18 @@ function telaoCarta(st, c, rodape) {
 // R16: na confiança, o telão mostra as 4 situações; cada pessoa recebe uma no celular, e a regra é a mesma em todas
 function telaoConfianca(st) {
   return topo(st, "Uma questão de confiança") + `<div class="grid" style="grid-template-columns:repeat(4,1fr);gap:1.2cqw">${CONFIANCA.map((id) => { const c = carta(id); return `<div class="card row" style="flex-wrap:nowrap;gap:.8cqw;padding:1cqw 1.2cqw">${ico(c.icone)}<b class="big" style="margin:0">${esc(c.titulo)}</b></div>`; }).join("")}</div>
-    <div class="card destaque"><p class="enorme">Cada pessoa recebe no celular <b>uma</b> destas situações. Em todas, você arrisca 2 antes de saber se a outra parte é honesta: honesta, +2; golpe, −2. <b>Não arriscar não custa nada.</b></p></div>
-    <div class="card como"><p class="big" style="margin:0">Depois, no celular: quem você acha que mais dá golpe? No fim do ano, o telão mostra quantos sofreram golpe contra a chance de 1 em 4 (por situação, só se cada uma tiver 5 ou mais pessoas confiando).</p></div>`;
+    <div class="card destaque"><p class="enorme" style="font-size:3cqw">Cada pessoa recebe no celular <b>uma</b> destas situações. Em todas, você arrisca 2 antes de saber se a outra parte é honesta: honesta, +2; golpe, −2. <b>Não arriscar não custa nada.</b></p></div>
+    <div class="card como"><p class="big" style="margin:0">Depois, no celular: quem mais dá golpe? No fim do ano, o telão compara os golpes da turma com a chance de 1 em 4.</p></div>`;
+}
+
+// R19: antes do voto, as duas metas com os números de hoje (não só a da regra vigente)
+function metaHoje(st, regra) {
+  const m = progressoMeta(st.fams, st.publico, st.mata, st.teto, regra);
+  return regra === "prosperidade" ? `a mais pobre tem ${pctL(m.valor)} da média (meta ${Math.round(100 * m.alvo)}%)` : `patrimônio médio de ${nL(m.valor, m.alvo)} (meta ${m.alvo})`;
+}
+function duasMetas(st) {
+  const mo = progressoMeta(st.fams, st.publico, st.mata, st.teto, "monopolio"), pr = progressoMeta(st.fams, st.publico, st.mata, st.teto, "prosperidade");
+  return `<div class="card" style="width:100%;padding:1cqw 1.4cqw"><p class="rodape" style="margin:0"><b>As duas metas, hoje</b><br>Monopólio: média de ${nL(mo.valor, mo.alvo)} (meta ${mo.alvo})<br>Prosperidade: a mais pobre com ${pctL(pr.valor)} (meta ${Math.round(100 * pr.alvo)}%)<br>Aluguel, mercado e mata ainda mexem nos dois.</p></div>`;
 }
 
 export function renderTelao(st) {
@@ -130,8 +140,8 @@ export function renderTelao(st) {
       const aluguel = rs.reduce((a, r) => a + r.aluguel, 0), piso = rs.filter((r) => r.piso > 0).length;
       const v4 = st.ano === 4 ? resultadoVoto(st) : null;
       body = topo(st, `Ano ${st.ano}: ${esc(nov.titulo)}`) + (v4 ? v4.html : "") + `<div class="card destaque">${ico(ICONE_ANO[st.ano], v4 ? "g" : "xl")}<p class="${v4 ? "big" : "enorme"}" style="margin:0">${esc(nov.telao || nov.texto)}</p></div>` +
-        (ex ? `<div class="card" style="flex:1;min-height:0"><h3 class="row">${ico("ideia")}Exemplo resolvido</h3>${exemploLinhas(st, linhasDe(ex, st), 1.5, v4 || linhasDe(ex, st).length >= 4 ? "compacto" : "")}</div><p class="rodape">${v4?.palpite || ""}No celular: ${v4 ? "pergunta rápida" : "uma pergunta rápida para conferir"} (não vale ponto).</p>`
-          : `<div class="card"><p class="big" style="margin:0">${aluguel ? `${n0(aluguel)} pontos de aluguel vão mudar de mãos. ` : ""}${piso ? `${piso} família(s) receberam o piso de renda.` : "Nenhuma família precisou do piso de renda."}</p></div><p class="rodape">Cada família vê o próprio extrato no celular.</p>`);
+        (ex ? `<div class="card" style="flex:1;min-height:0"><h3 class="row">${ico("ideia")}Exemplo resolvido</h3>${exemploLinhas(st, linhasDe(ex, st), 1.5, v4 || linhasDe(ex, st).length >= 4 ? "compacto" : "")}</div><p class="rodape">${v4?.palpite || ""}${v4 ? "Voltem às famílias. " : ""}No celular: ${v4 ? "pergunta rápida" : "uma pergunta rápida para conferir"} (não vale ponto).</p>`
+          : `<div class="card"><p class="big" style="margin:0">${aluguel ? `${n0(aluguel)} pontos de aluguel vão mudar de mãos. ` : ""}${piso ? (piso === 1 ? "1 família recebeu o piso de renda." : `${piso} famílias receberam o piso de renda.`) : "Nenhuma família precisou do piso de renda."}</p></div><p class="rodape">Cada família vê o próprio extrato no celular.</p>`);
       break;
     }
     case "decidir":
@@ -155,7 +165,7 @@ export function renderTelao(st) {
       body = topo(st, "Mercado de lotes") + `<div class="lado"><div class="card mapa-card">${mapaVila(st)}</div><div class="col">
         <div class="card row" style="flex-wrap:nowrap">${ico("lote-sobrado", "xl")}<div><b class="enorme mono">${Math.min(3, livres)}</b><div class="big">lotes à venda</div></div></div>
         <div class="card"><div class="big">Lance mínimo</div><b class="enorme mono">${lanceMinimo(st.ano)}</b></div>
-        <p class="rodape">Lance fechado, mediana da família; o maior leva.${st.regra === "prosperidade" ? " Na Prosperidade, conta metade." : ""} Até a moradia + 1 lote; dá para marcar "não queremos". O resto está no celular.</p></div></div>`;
+        <p class="rodape">Lance fechado, mediana da família; o maior leva.${st.regra === "prosperidade" ? " Na Prosperidade, conta metade." : ""} Até a moradia + 1 lote; dá para marcar "não queremos". O lote novo conta para o aluguel a partir do próximo ano.${st.ano === 5 ? " Voltem às famílias." : ""}</p></div></div>`;
       break;
     }
     case "alvara":
@@ -166,16 +176,16 @@ export function renderTelao(st) {
       // R16: 90 s de conversa com uma pergunta-guia antes de o voto abrir
       // R17: o exemplo resolvido das duas regras vem logo no começo da conversa (antes, só aparecia no voto)
       body = topo(st, "Antes do voto: conversem") + `<div class="lado"><div class="col" style="min-height:0;gap:1cqw">
-        <div class="card"><p class="enorme" style="margin:0">Com o aluguel mordendo, qual regra deixa a vila mais perto da meta, e de quem?</p></div>
+        <div class="card"><p class="enorme" style="margin:0;font-size:2.6cqw">Com o aluguel mordendo, qual regra deixa a vila mais perto da meta, e de quem?</p></div>
         <div class="card" style="flex:1;min-height:0;overflow:hidden"><h3 class="row">${ico("ideia")}Exemplo resolvido: as duas regras</h3>${exemploLinhas(st, EXEMPLO_VOTO.linhas, 1.5, "compacto")}</div></div>
-        <div class="col centro">${cronometro(st, "Conversem na família", st.curto ? 60 : 90)}<p class="rodape" style="text-align:center">Quando o relógio acabar, quem conduz abre o voto: secreto, cada um no próprio lugar.</p></div></div>`;
+        <div class="col centro">${cronometro(st, "Conversem na família", st.curto ? 60 : 90)}${duasMetas(st)}</div></div>`;
       break;
     case "voto":
       body = topo(st, "Que regra queremos para os anos 4 e 5?") + `<div class="grid" style="grid-template-columns:1fr 1fr">
-        <div class="card"><h2 class="row">${ico("balanca", "g")}Manter: ${REGRAS_TXT.monopolio.nome}</h2><p class="big" style="margin:.4cqw 0 0">${esc(REGRAS_TXT.monopolio.telao)}</p></div>
-        <div class="card"><h2 class="row">${ico("balanca", "g")}Trocar: ${REGRAS_TXT.prosperidade.nome}</h2><p class="big" style="margin:.4cqw 0 0">${esc(REGRAS_TXT.prosperidade.telao)}</p></div></div>
-        <div class="card" style="flex:1;min-height:0;overflow:hidden"><h3 class="row">${ico("ideia")}Exemplo resolvido</h3>${exemploLinhas(st, EXEMPLO_VOTO.linhas, 1.5, "compacto")}</div>
-        <p class="rodape">Voto secreto, cada um no próprio lugar. Vence a maioria; empate mantém o Monopólio.</p>`;
+        <div class="card"><h2 class="row">${ico("balanca", "g")}Manter: ${REGRAS_TXT.monopolio.nome}</h2><p class="big" style="margin:.4cqw 0 0">${esc(REGRAS_TXT.monopolio.telao)}</p><p class="rodape" style="margin:.3cqw 0 0">Hoje: ${metaHoje(st, "monopolio")}</p></div>
+        <div class="card"><h2 class="row">${ico("balanca", "g")}Trocar: ${REGRAS_TXT.prosperidade.nome}</h2><p class="big" style="margin:.4cqw 0 0">${esc(REGRAS_TXT.prosperidade.telao)}</p><p class="rodape" style="margin:.3cqw 0 0">Hoje: ${metaHoje(st, "prosperidade")}</p></div></div>
+        <div class="card destaque"><p class="enorme" style="margin:0;font-size:3cqw">Votem agora no celular, cada um no próprio lugar.</p></div>
+        <p class="rodape">Voto secreto. Vence a maioria; empate mantém o Monopólio.</p>`;   // R19: o exemplo fica na conversa (antes, cortava aqui)
       break;
     case "fechamento": body = telaoFechamento(st); break;
     default: body = topo(st, "Mosaico Vila");
@@ -186,8 +196,8 @@ export function renderTelao(st) {
 // Quanto tempo as animações do telão pedem em cada fase (o simulador espera isso antes de avançar sozinho).
 export function duracaoTelao(st) {
   if (st.fase === "abertura") { const ex = EXEMPLO_DO_ANO[st.ano]; if (!ex) return 8; const ls = linhasDe(ex, st); return 1.5 + passoExemplo(ls) * ls.length + 2; }
-  if (st.fase === "voto") return 1.5 + passoExemplo(EXEMPLO_VOTO.linhas) * EXEMPLO_VOTO.linhas.length + 2;
-  if (st.fase === "conversa") return st.curto ? 60 : 90;
+  if (st.fase === "voto") return 6;
+  if (st.fase === "conversa") return Math.max(st.curto ? 60 : 90, 1.5 + passoExemplo(EXEMPLO_VOTO.linhas) * EXEMPLO_VOTO.linhas.length + 2);
   if (st.fase === "resultado") return tempoResultado(st).total;
   return 0;
 }
@@ -414,11 +424,11 @@ function perguntasFechamento(st) {
 function teoria(st, k) {
   // R18: a referência do ano 4 conforme a carta que a turma jogou
   const t4 = st.cartas && !st.semTroco ? carta(st.cartas.ano4).tipo : null;
-  const ref4 = { dado: "; Jiang (2013): o jogo da mente", honesto: "; Cohn e colegas (2019): carteiras perdidas pelo mundo", confia: "; Berg e colegas (1995): o jogo da confiança" }[t4] || "";
+  const ref4 = { dado: "; Jiang (2013): jogo da mente", honesto: "; Cohn e colegas (2019): carteiras perdidas", confia: "; Berg e colegas (1995): jogo da confiança" }[t4] || "";
   return ["Henry George: o valor da terra vem da comunidade; quem só tem o lote recebe sem fazer.",
     "Lizzie Magie (1904): o Jogo do Proprietário, avô do Banco Imobiliário, já tinha estas duas regras.",
     "Elinor Ostrom: comunidades cuidam do comum quando fazem regras e conversam.",
-    `Abbink e colegas (2002): experimentos de propina${ref4}.`,
+    `Abbink e colegas (2002): propina${ref4}.`,
     "Elinor Ostrom (pescas, pastos, canais): o comum também está em postos, praças e clubes."][k] || "";
 }
 
