@@ -187,3 +187,11 @@ No fim do ano 3, o motor guarda a vila (`snap3`). No fechamento, `contrafactual(
 - Mercado: "Quem já levou um lote oferece, no próximo, metade da porcentagem, sobre o caixa que sobrou" (como o motor e a simulação fazem).
 - Projeção das cargas no celular limitada à madeira que existe, com aviso quando a mata está quase no fim.
 - Extrato: `linhasExtrato()` mantém o caixa de antes e a renda como já apareceram e põe o arredondamento nas outras linhas; a soma sempre fecha.
+
+## R28 (14/11/2026, pedido do professor; a R27 passou na 72ª rodada, com mínima 4,5)
+- Proposta pequena em duas falas: `distribuirFalas()` e `cartaPequena()` em `content/cartas.js` (metade da turma lê "presente em troca de", metade às claras; mesmos pontos, estrago e título). Cada carta pequena tem `presente: { texto, sim, nao }`.
+- O telão da proposta pequena mostra só o título e a regra (o texto fica no celular, para não entregar a fala).
+- Revelação: painel da carta com a explicação das duas falas, o carimbo vermelho "Corrupção" (`.carimbo`, com animação e versão sem movimento) e as barras de cada fala quando cada uma teve 5 ou mais respostas. Carimbo também na grande (ano 5) e na pergunta 4 ("As duas eram corrupção"); as duas falas entram na linha de apoio da pergunta 4.
+- Celular: quanto falta para o próximo nível do bem público, e aviso no nível máximo; por que a renda do ano 5 mudou depois da proposta grande.
+- Confiança: "com 5 ou mais pessoas confiando, o telão mostra quantos golpes a turma sofreu; com 5 ou mais em cada situação, também por situação".
+- Pergunta 1: "a desigualdade subiu pouco" para subidas pequenas; extrato sem "−-0"; aviso da grande no nível 0 sem repetir a carta.

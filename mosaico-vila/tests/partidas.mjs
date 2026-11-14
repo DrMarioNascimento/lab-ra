@@ -3,7 +3,7 @@
 import { estadoInicial, reduzir, FASES, progresso, estragar } from "../js/engine.js";
 import { passoBot, NOMES, perfilBot, papelBully } from "../js/bots.js";
 import { gini, fecharAno, progressoMeta, COLAPSO, tetoLotes, leilao, lanceDaFamilia } from "../js/content/regras.js";
-import { carta, cartaAno4, sortearCartas, PEQUENAS, GRANDES, ANO4, CONFIANCA } from "../js/content/cartas.js";
+import { carta, cartaAno4, cartaPequena, distribuirFalas, falaDe, sortearCartas, PEQUENAS, GRANDES, ANO4, CONFIANCA } from "../js/content/cartas.js";
 import { renderTelao } from "../js/views/telao.js";
 import { pctL, nL } from "../js/views/desenho.js";
 import { renderAluno, novoLocal } from "../js/views/aluno.js";
@@ -223,6 +223,17 @@ ok(!confiaram || (golpes / confiaram > 0.1 && golpes / confiaram < 0.45), `golpe
 }
 // R26: perto do limiar, quem não chegou nele não aparece como se tivesse chegado
 ok(pctL(0.2996) === "29,9%" && pctL(0.3002) === "30%" && pctL(0.304) === "30,4%" && nL(53.97, 54) === "53,9" && nL(54.02, 54) === "54", `R26: limiares (${pctL(0.2996)}, ${nL(53.97, 54)})`);
+// R28: metade da turma lê a pequena como "presente em troca de" e metade às claras; os pontos e o alvo são os mesmos
+{
+  const ordem = Array.from({ length: 13 }, (_, k) => `p${k}`), fala = distribuirFalas(ordem, rnd(7));
+  const nP = Object.values(fala).filter((f) => f === "presente").length;
+  ok(nP === 7 || nP === 6, `R28: falas divididas ao meio (${nP} de 13 com "presente")`);
+  for (const c of PEQUENAS) {
+    ok(c.presente && /presente/.test(c.presente.texto) && /em troca de/.test(c.presente.texto), `R28: a fala "presente" de ${c.id} diz "presente" e "em troca de"`);
+    const st = { cartas: { pequena: c.id }, fala: { a: "presente", b: "claras" }, ordem: ["a", "b"] };
+    ok(cartaPequena(st, "a").texto !== cartaPequena(st, "b").texto && cartaPequena(st, "a").alvo === cartaPequena(st, "b").alvo && cartaPequena(st, "a").titulo === cartaPequena(st, "b").titulo, `R28: ${c.id} muda só a fala`);
+  }
+}
 const s = (k) => linhas.filter((l) => l[k]).length;
 console.log(`troca aprovada ${s("troca")}/15 · colapso ${s("colapso")}/15 · vitória coletiva ${s("vitoria")}/15 · desigualdade da renda sobe com o aluguel em ${rendaSobe}/15`);
 console.log(falhas ? `${falhas} verificações falharam` : "todas as verificações passaram");

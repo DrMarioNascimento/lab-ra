@@ -1,6 +1,6 @@
 // Mosaico Vila · motor da sala: estado único + redutor puro (mesma casca da Ângulos e da Viagem do O₂).
 import { FAMILIAS, EVENTOS } from "./content/vila.js";
-import { carta, cartaAno4, distribuirSituacoes, sortearCartas, GANHO_PEQUENA, GANHO_GRANDE, GANHO_HONESTIDADE, RISCO_CONFIANCA, CHANCE_GOLPE, ESTRAGO_MATA } from "./content/cartas.js";
+import { carta, cartaAno4, distribuirSituacoes, distribuirFalas, sortearCartas, GANHO_PEQUENA, GANHO_GRANDE, GANHO_HONESTIDADE, RISCO_CONFIANCA, CHANCE_GOLPE, ESTRAGO_MATA } from "./content/cartas.js";
 import {
   ANOS, LOTES, TETO_FAMILIA, MATA_INICIO, LIMITES, ANO_MERCADO, COLAPSO, PONTOS_NIVEL, rendaDoAno, fecharAno, leilao, gini, vitoriaColetiva, lanceMinimo, patrimonio, contrafactual,
 } from "./content/regras.js";
@@ -93,6 +93,7 @@ export function reduzir(st, a) {
       s.teto = TETO_FAMILIA * nf; s.mata = MATA_INICIO * s.teto;
       s.cartas = sortearCartas(rnd(s.seed ^ 0x5bd1e995));   // R13: cartas da partida, só da semente (como o impostor)
       s.situacao = distribuirSituacoes(s.ordem, rnd(s.seed ^ 0x2c1b3c6d));   // R16: na confiança, uma situação por pessoa
+      s.fala = distribuirFalas(s.ordem, rnd(s.seed ^ 0x1f83d9ab));   // R28: na pequena, "presente em troca de" ou às claras, metade cada
       s.k = 1; s.fase = "familias";
       break;
     }
@@ -216,6 +217,7 @@ function avancar(s, r) {
       s.alvara.antes = { mata: s.mata, publico: s.publico };
       if (s.alvara.aceito) {
         s.pessoal[s.alvara.pessoa] += GANHO_GRANDE; s.alvara.estrago = estragar(s, c.alvo, 1);
+        s.rendaAbertura = s.renda;   // R28: para o celular dizer que a renda mudou
         s.renda = rendaDoAno(s.fams, s);   // R14: o estrago já pesa na renda do ano 5 (nível a menos ou mata abaixo de 50%/30%)
       }
       break;

@@ -19,19 +19,23 @@ export const PEQUENAS = [
   { id: "fiscal", segmento: "o fiscal da mata", de: "do fiscal da mata", lado: "paga", alvo: "mata", icone: "toco", titulo: "O fiscal da mata",
     telao: "O fiscal da mata cobra 1 ponto para você tirar madeira sem registro, que rende 3. Saldo: +2 para quem aceita.",
     texto: "O fiscal da mata cobra 1 ponto seu para fazer vista grossa: você tira madeira sem registro, que rende 3. Saldo: +2 pontos pessoais. Cada pessoa que aceita tira um pedaço da mata de todos; se a turma inteira aceitar, {efeito}.",
-    sim: "Pagar 1 ao fiscal", nao: "Não pagar" },
+    sim: "Pagar 1 ao fiscal", nao: "Não pagar",
+    presente: { texto: "Você pode dar um presente de 1 ponto ao fiscal da mata, em troca de ele fazer vista grossa: você tira madeira sem registro, que rende 3. Saldo: +2 pontos pessoais. Cada pessoa que aceita tira um pedaço da mata de todos; se a turma inteira aceitar, {efeito}.", sim: "Dar o presente ao fiscal", nao: "Não dar o presente" } },
   { id: "vizinho", segmento: "um vizinho", de: "de um vizinho", lado: "recebe", alvo: "mata", icone: "grupos", titulo: "A carga do vizinho",
     telao: "Você ajuda a anotar as cargas. Um vizinho oferece 2 pontos para você não anotar a carga extra dele.",
     texto: "Este ano, você ajuda a anotar as cargas de madeira da vila. Um vizinho oferece 2 pontos pessoais para você não anotar a carga extra dele. Cada pessoa que aceita tira um pedaço da mata de todos; se a turma inteira aceitar, {efeito}.",
-    sim: "Aceitar os 2", nao: "Recusar" },
+    sim: "Aceitar os 2", nao: "Recusar",
+    presente: { texto: "Este ano, você ajuda a anotar as cargas de madeira da vila. Um vizinho quer te dar um presente de 2 pontos pessoais, em troca de você não anotar a carga extra dele. Cada pessoa que aceita tira um pedaço da mata de todos; se a turma inteira aceitar, {efeito}.", sim: "Aceitar o presente", nao: "Recusar o presente" } },
   { id: "serraria", segmento: "a serraria", de: "da serraria", lado: "recebe", alvo: "publico", icone: "arvore-dourada", titulo: "A madeira sem nota",
     telao: "A serraria paga 2 a mais pela sua madeira sem nota. Sem nota, o imposto não chega ao bem público.",
     texto: "A serraria oferece 2 pontos pessoais a mais se você vender a madeira sem nota. Sem nota, o imposto da venda não chega ao bem público. Cada pessoa que aceita tira um pedaço do bem público; se a turma inteira aceitar, {efeito}.",
-    sim: "Vender sem nota", nao: "Vender com nota" },
+    sim: "Vender sem nota", nao: "Vender com nota",
+    presente: { texto: "A serraria quer te dar um presente de 2 pontos pessoais, em troca de você vender a madeira sem nota. Sem nota, o imposto da venda não chega ao bem público. Cada pessoa que aceita tira um pedaço do bem público; se a turma inteira aceitar, {efeito}.", sim: "Aceitar o presente", nao: "Recusar e vender com nota" } },
   { id: "taxa", segmento: "um funcionário da prefeitura", de: "de um funcionário da prefeitura", lado: "paga", alvo: "publico", icone: "economia", titulo: "A taxa da praça",
     telao: "Um funcionário cobra 1 ponto para tirar seu nome da taxa da praça, que custa 3. Saldo: +2 para quem aceita.",
     texto: "Todo mundo paga 3 pontos de taxa para a praça. Um funcionário da prefeitura cobra 1 ponto seu para tirar o seu nome da lista. Saldo: +2 pontos pessoais. Cada pessoa que aceita tira um pedaço do bem público; se a turma inteira aceitar, {efeito}.",
-    sim: "Pagar 1 ao funcionário", nao: "Pagar a taxa" },
+    sim: "Pagar 1 ao funcionário", nao: "Pagar a taxa",
+    presente: { texto: "Todo mundo paga 3 pontos de taxa para a praça. Você pode dar um presente de 1 ponto a um funcionário da prefeitura, em troca de ele tirar o seu nome da lista. Saldo: +2 pontos pessoais. Cada pessoa que aceita tira um pedaço do bem público; se a turma inteira aceitar, {efeito}.", sim: "Dar o presente", nao: "Pagar a taxa" } },
 ];
 
 export const GRANDES = [
@@ -94,6 +98,20 @@ export function distribuirSituacoes(ordem, r) {
   const ids = [...ordem];
   for (let i = ids.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [ids[i], ids[j]] = [ids[j], ids[i]]; }
   return Object.fromEntries(ids.map((id, k) => [id, CONFIANCA[k % CONFIANCA.length]]));
+}
+// R28: na proposta pequena, metade da turma lê a proposta como "presente em troca de" e a outra metade às claras
+// ("cobra", "oferece"); os pontos e o estrago são os mesmos. Na revelação, o telão compara as duas falas e diz o nome: corrupção.
+export const FALAS = ["presente", "claras"];
+export function distribuirFalas(ordem, r) {
+  const ids = [...ordem];
+  for (let i = ids.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [ids[i], ids[j]] = [ids[j], ids[i]]; }
+  return Object.fromEntries(ids.map((id, k) => [id, FALAS[k % 2]]));
+}
+export const falaDe = (st, id) => st.fala?.[id] || FALAS[Math.max(0, st.ordem.indexOf(id)) % 2];
+// A carta da pequena como cada pessoa a lê (a fala "presente" troca o texto e os botões; título, pontos e estrago iguais)
+export function cartaPequena(st, id) {
+  const c = POR_ID[st.cartas.pequena];
+  return falaDe(st, id) === "presente" && c.presente ? { ...c, ...c.presente } : c;
 }
 // A situação de cada pessoa no ano 4 (quem entrou depois do sorteio recebe uma pela posição na lista)
 export function cartaAno4(st, id) {

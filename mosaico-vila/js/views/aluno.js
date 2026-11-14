@@ -1,7 +1,7 @@
 import { NOME_FASE, vista } from "../engine.js";
 import { NOVIDADE_DO_ANO, EXEMPLO_DO_ANO, EXEMPLO_VOTO, REGRAS_TXT, MOTIVOS, GUIAS, NIVEIS_PUBLICO } from "../content/vila.js";
-import { LIMITES, lanceMinimo, CARGA_RENDE, CARGA_TIRA, REPLANTA_POR, REPLANTA_DEVOLVE, patrimonio, VALOR_LOTE, progressoMeta, VITORIA, precisaLotes, tetoLotes } from "../content/regras.js";
-import { carta, cartaAno4, textoCarta, QUEM_GOLPE, FAIXAS_PCT, GANHO_PEQUENA, GANHO_GRANDE } from "../content/cartas.js";
+import { LIMITES, lanceMinimo, CARGA_RENDE, CARGA_TIRA, REPLANTA_POR, REPLANTA_DEVOLVE, patrimonio, VALOR_LOTE, progressoMeta, VITORIA, precisaLotes, tetoLotes, PONTOS_NIVEL, NIVEL_MAX } from "../content/regras.js";
+import { carta, cartaAno4, cartaPequena, textoCarta, QUEM_GOLPE, FAIXAS_PCT, GANHO_PEQUENA, GANHO_GRANDE } from "../content/cartas.js";
 import { iconeFamilia, ico, pctL, nL } from "./desenho.js";
 import { decorrido, tempoResultado } from "./telao.js";
 
@@ -69,7 +69,7 @@ function linhasExtrato(f, fx, ano) {
   for (const [, k] of ordem) { if (falta <= 0) break; base[k] += 1; falta -= 1; }
   for (const [, k] of ordem.slice().reverse()) { if (falta >= 0) break; base[k] -= 1; falta += 1; }
   if (falta) base[0] += falta;
-  return { A, R, pub: -base[0], rep: ano >= 2 ? -base[1] : 0, gc: ano >= 2 ? base[2] : 0 };
+  return { A: A || 0, R: R || 0, pub: -base[0] || 0, rep: ano >= 2 ? -base[1] || 0 : 0, gc: ano >= 2 ? base[2] || 0 : 0 };   // || 0: nada de "−-0"
 }
 
 // Efeito da proposta, na hora, se a família inteira propusesse o mesmo.
@@ -154,8 +154,11 @@ export function renderAluno(st, id, loc) {
       // R18: primeiro a conversa da família (o relógio do telão), depois os controles; quem já conversou abre antes
       const segC = st.curto && st.ano >= 4 ? 30 : 45, falta = loc.abriu === st.ano ? -1 : segC - decorrido(st);
       const conversa = falta > 0 ? `<div class="card espera" style="text-align:center;--a:${falta.toFixed(2)}s">${ico("grupos", "g")}<p class="muted" style="margin:6px 0 8px"><b>Conversem na família</b>, olhando uns para os outros: ${segC} s para combinar ${st.ano >= 2 ? "bem público, replantio e cargas" : "quanto vai para o bem público"}. A proposta abre aqui quando o relógio do telão acabar.</p><button class="btn sec block" data-a="abrir" data-val="${st.ano}">Já conversamos: abrir minha proposta</button></div>` : "";
-      bd = merc + conversa + `<div class="${falta > 0 ? "surge trava" : ""}" style="--a:${Math.max(0, falta).toFixed(2)}s"><h2>Sua proposta para a família</h2><p class="faint">Vale a mediana das propostas da família.</p>
-        <div class="card"><div class="row" style="justify-content:space-between"><b class="row">${ico("economia")}Bem público</b><b class="mono">${loc.pub}% da renda</b></div><input type="range" min="0" max="${LIMITES.pub}" step="5" value="${loc.pub}" data-in="pub" data-key="pub"><p class="faint" style="margin:0">Nível ${st.publico}: ${esc(NIVEIS_PUBLICO[st.publico])}</p></div>
+      // R28: no ano 5, a proposta grande aceita pode mudar a renda do ano depois da abertura; o celular diz de quanto para quanto
+      const rA = st.ano === 5 ? st.rendaAbertura?.[f.id]?.total : null, rN = st.renda?.[f.id]?.total;
+      const rendaMudou = rA != null && rN != null && Math.round(rA) !== Math.round(rN) ? `<div class="card"><p class="muted" style="margin:0">A proposta grande mudou a renda da família neste ano: de ${n0(rA)} para ${n0(rN)} (${st.alvara?.alvo === "mata" ? "a mata caiu, e a renda da mata mudou" : "o bem público caiu um nível"}).</p></div>` : "";
+      bd = merc + rendaMudou + conversa + `<div class="${falta > 0 ? "surge trava" : ""}" style="--a:${Math.max(0, falta).toFixed(2)}s"><h2>Sua proposta para a família</h2><p class="faint">Vale a mediana das propostas da família.</p>
+        <div class="card"><div class="row" style="justify-content:space-between"><b class="row">${ico("economia")}Bem público</b><b class="mono">${loc.pub}% da renda</b></div><input type="range" min="0" max="${LIMITES.pub}" step="5" value="${loc.pub}" data-in="pub" data-key="pub"><p class="faint" style="margin:0">Nível ${st.publico}: ${esc(NIVEIS_PUBLICO[st.publico])}. ${st.publico >= NIVEL_MAX ? "É o nível máximo: o que entrar agora não sobe mais o bem público." : `Faltam ${n0(Math.max(0, PONTOS_NIVEL * Object.keys(st.fams).length - (st.acumulado || 0)))} pontos da vila para o nível ${st.publico + 1}.`}</p></div>
         ${st.ano >= 2 ? `<div class="card"><div class="row" style="justify-content:space-between"><b class="row">${ico("arvore-cubos")}Replantar a mata</b><b class="mono">${loc.rep}% da renda</b></div><input type="range" min="0" max="${LIMITES.rep}" step="5" value="${loc.rep}" data-in="rep" data-key="rep"><p class="faint" style="margin:0">Cada 5 pontos devolvem ${pcMata(st, REPLANTA_DEVOLVE)} à mata.${st.mata >= 0.9 * st.teto ? " A mata está quase cheia: o que passar de 100% não conta." : ""}</p></div>
         <div class="card"><b class="row">${ico("arvore-redonda")}Cargas de madeira</b><p class="faint" style="margin:2px 0 8px">Cada carga rende ${CARGA_RENDE} à família e tira ${pcMata(st, CARGA_TIRA)} da mata. Mata hoje: ${pctL(st.mata / st.teto)} (50% ou mais: +2 de renda por pessoa; abaixo de 30%: −4).</p><div class="dirs">${[0, 1, 2, 3].map((k) => `<button class="btn ${loc.car === k ? "warn on" : "sec"}" data-a="car" data-val="${k}">${k}</button>`).join("")}</div></div>` : ""}
         ${projecao(st, f, loc)}
@@ -184,7 +187,7 @@ export function renderAluno(st, id, loc) {
       break;
     }
     case "pequena": {
-      const c = carta(st.cartas.pequena);
+      const c = cartaPequena(st, id);   // R28: a fala sorteada para esta pessoa ("presente em troca de" ou às claras)
       bd = st.pequena.votos[id] != null ? enviado("Resposta secreta enviada.") + palpiteFaixa(st, id, "pequena", "quantos % da turma vão aceitar?")
         : cartaCelular(c, `<b>Responda sem mostrar a tela.</b> Cada resposta vale para quem respondeu. ${esc(c.segmento[0].toUpperCase() + c.segmento.slice(1))} é personagem do jogo; os ${GANHO_PEQUENA} pontos valem no seu placar pessoal, que só você vê.`, "pequena", st);
       break;
