@@ -80,10 +80,11 @@ export function mapaVila(st, { grande = true, destaque = null } = {}) {
 
 // R13: linha do tempo em dois gráficos empilhados, cada um na sua escala e com letra grande:
 // a mata (0 a 100%, com as linhas de 30% e 50%) e as duas desigualdades (0 a 0,5).
-export function linhaDoTempo(hist) {
+export function linhaDoTempo(hist, { F = 26, alto = 240, so = null } = {}) {
   if (!hist.length) return "";
-  const W = 600, H = 200, F = 26, x0 = 70, x = (k) => x0 + (k * (W - x0 - 40)) / 4;
-  const eixoX = (y) => `<line x1="${x0}" x2="${W - 20}" y1="${y}" y2="${y}" stroke="#2b4a6b" stroke-width="2"/>` +
+  // R14: margem à direita para o valor do último ano (antes ficava cortado) e letra ajustável (o fechamento usa 30)
+  const W = 600, H = alto, x0 = 70, x = (k) => x0 + (k * (W - x0 - 120)) / 4;
+  const eixoX = (y) => `<line x1="${x0}" x2="${W - 110}" y1="${y}" y2="${y}" stroke="#2b4a6b" stroke-width="2"/>` +
     [1, 2, 3, 4, 5].map((a, k) => `<text x="${x(k)}" y="${y + F + 4}" text-anchor="middle" font-size="${F - 4}" fill="#a9bdd3" font-family="Sora, sans-serif">${k ? a : "ano 1"}</text>`).join("");
   const caminho = (vals, y) => vals.map((v, k) => `${k ? "L" : "M"}${x(k).toFixed(1)} ${y(v).toFixed(1)}`).join(" ");
   const ponto = (vals, y, cor, fmt) => { const k = vals.length - 1; return `<circle cx="${x(k)}" cy="${y(vals[k])}" r="7" fill="${cor}"/><text x="${x(k) + 12}" y="${y(vals[k]) + 8}" font-size="${F}" font-weight="700" fill="${cor}" font-family="Sora, sans-serif">${fmt(vals[k])}</text>`; };
@@ -92,16 +93,18 @@ export function linhaDoTempo(hist) {
   const mata = hist.map((h) => h.mata);
   const svgM = `<svg class="metro" viewBox="0 0 ${W} ${H}" role="img" aria-label="Mata por ano">
     <text x="0" y="${F}" font-size="${F}" font-weight="700" fill="#34d399" font-family="Sora, sans-serif">Mata</text>
-    ${[0.3, 0.5].map((v) => `<line x1="${x0}" x2="${W - 20}" y1="${ym(v)}" y2="${ym(v)}" stroke="${v < 0.4 ? "#fb7185" : "#fbbf24"}" stroke-opacity=".55" stroke-width="2" stroke-dasharray="6 6"/><text x="${x0 - 8}" y="${ym(v) + 8}" text-anchor="end" font-size="${F - 4}" fill="${v < 0.4 ? "#fca5a5" : "#fde68a"}" font-family="Sora, sans-serif">${100 * v}%</text>`).join("")}
+    ${[0.3, 0.5].map((v) => `<line x1="${x0}" x2="${W - 110}" y1="${ym(v)}" y2="${ym(v)}" stroke="${v < 0.4 ? "#fb7185" : "#fbbf24"}" stroke-opacity=".55" stroke-width="2" stroke-dasharray="6 6"/><text x="${x0 - 8}" y="${v < 0.4 ? ym(v) + F - 6 : ym(v) - 2}" text-anchor="end" font-size="${F - 4}" fill="${v < 0.4 ? "#fca5a5" : "#fde68a"}" font-family="Sora, sans-serif">${100 * v}%</text>`).join("")}
     ${eixoX(H - 40)}<path d="${caminho(mata, ym)}" fill="none" stroke="#34d399" stroke-width="5" stroke-linejoin="round"/>${ponto(mata, ym, "#34d399", (v) => `${Math.round(100 * v)}%`)}</svg>`;
   // Desigualdades
   const yg = (v) => 56 + (1 - Math.max(0, Math.min(1, v / 0.5))) * (H - 96);
   const gp = hist.map((h) => h.gini), gr = hist.map((h) => h.giniRenda ?? 0);
   const fmt = (v) => v.toFixed(2).replace(".", ",");
   const svgG = `<svg class="metro" viewBox="0 0 ${W} ${H}" role="img" aria-label="Desigualdade por ano">
-    <text x="0" y="${F}" font-size="${F}" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Desigualdade</text><text x="200" y="${F}" font-size="${F}" font-weight="700" fill="#fca5a5" font-family="Sora, sans-serif">— patrimônio</text><text x="400" y="${F}" font-size="${F}" font-weight="700" fill="#fde68a" font-family="Sora, sans-serif">··· renda</text>
+    <text x="0" y="${F}" font-size="${F - 2}" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Desigualdade</text><text x="${Math.round(F * 7.2)}" y="${F}" font-size="${F - 2}" font-weight="700" fill="#fca5a5" font-family="Sora, sans-serif">— patrimônio</text><text x="${Math.round(F * 14.6)}" y="${F}" font-size="${F - 2}" font-weight="700" fill="#fde68a" font-family="Sora, sans-serif">··· renda</text>
     <text x="${x0 - 8}" y="${yg(0) + 8}" text-anchor="end" font-size="${F - 4}" fill="#a9bdd3" font-family="Sora, sans-serif">0</text><text x="${x0 - 8}" y="${yg(0.5) + 8}" text-anchor="end" font-size="${F - 4}" fill="#a9bdd3" font-family="Sora, sans-serif">0,5</text>
     ${eixoX(H - 40)}<path d="${caminho(gp, yg)}" fill="none" stroke="#fb7185" stroke-width="5"/><path d="${caminho(gr, yg)}" fill="none" stroke="#fbbf24" stroke-width="5" stroke-dasharray="3 9" stroke-linecap="round"/>
     ${ponto(gp, yg, "#fb7185", fmt)}</svg>`;
+  // R14: no fechamento, só o gráfico da pergunta da vez (maior, com letra de TV)
+  if (so) return `<div class="tempo1">${so === "mata" ? svgM : svgG}</div>`;
   return `<div class="tempo2">${svgM}${svgG}</div>`;
 }

@@ -42,6 +42,7 @@ for (const n of TAM) {
   ok(!Object.values(st.renda || {}).some((r) => r.total < 0), `piso de renda: nenhuma família com renda negativa no último ano (n=${n})`);
   ok(st.historico.every((h, k) => k === 0 || h.ano === st.historico[k - 1].ano + 1), `anos em sequência (n=${n})`);
   const comTroco = n !== 26;   // R13: a carta do ano 4 vem ligada; a partida de 26 testa o professor desligando
+  ok(visitadas.indexOf("alvara:5") < visitadas.indexOf("decidir:5"), `R14: proposta grande antes das decisões do ano 5 (n=${n})`);
   ok(["pequena:2", "voto:3", "alvara:5"].every((e) => visitadas.includes(e)) && visitadas.includes("mente:4") === comTroco, `pequena no ano 2, voto no 3, carta do ano 4 (se ligada), grande no 5 (n=${n})`);
   // R13: cartas sorteadas pela semente: a mesma semente refaz as mesmas cartas
   const c0 = sortearCartas(rnd((1000 + n) ^ 0x5bd1e995));

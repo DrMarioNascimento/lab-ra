@@ -15,8 +15,9 @@ export function rnd(seed) {
 export function montarFases() {
   const f = [{ id: "entrada" }, { id: "familias" }];
   for (let ano = 1; ano <= ANOS; ano++) {
-    f.push({ id: "abertura", ano }, { id: "decidir", ano });
-    if (EVENTOS[ano]) f.push({ id: EVENTOS[ano].id, ano });
+    // R14: no ano 5, a proposta grande vem antes das decisões, para a turma ainda poder reagir (replantar, contribuir)
+    if (ano === ANOS) f.push({ id: "abertura", ano }, { id: EVENTOS[ano].id, ano }, { id: "decidir", ano });
+    else { f.push({ id: "abertura", ano }, { id: "decidir", ano }); if (EVENTOS[ano]) f.push({ id: EVENTOS[ano].id, ano }); }
     if (ano >= ANO_MERCADO) f.push({ id: "lances", ano });
     f.push({ id: "resultado", ano });
     if (ano === 3) f.push({ id: "voto", ano });
@@ -148,6 +149,8 @@ function avancar(s, r) {
       for (const id of s.ordem) if (!props[id]) props[id] = { ...(s.props[s.ano - 1]?.[id] || { pub: 0, rep: 0, car: 0, lance: 0.3 }), auto: true };
       const fx = fecharAno(s, props, s.renda);
       Object.assign(s, { fams: fx.fams, mata: fx.mata, publico: fx.publico, acumulado: fx.acumulado, colapsou: fx.colapsou });
+      // R14: a proposta grande do ano 5 veio antes das decisões; o resultado do ano conta o estrago dela
+      if (s.ano === ANOS && s.alvara.antes) { fx.mataAntes = s.alvara.antes.mata; fx.nivelAntes = s.alvara.antes.publico; if (s.alvara.estrago) fx.estrago = s.alvara.estrago; }
       if (fx.colapsou) s.colapsouAlguma = true;
       s.fechamento = fx;
       break;
@@ -187,13 +190,19 @@ function avancar(s, r) {
       s.alvara.aceitariam = vs.filter(Boolean).length;
       s.alvara.aceito = !!s.alvara.votos[s.alvara.pessoa];
       s.alvara.alvo = c.alvo;
-      if (s.alvara.aceito) { s.pessoal[s.alvara.pessoa] += GANHO_GRANDE; s.alvara.estrago = estragar(s, c.alvo, 1); if (s.fechamento) s.fechamento.estrago = s.alvara.estrago; }
+      s.alvara.antes = { mata: s.mata, publico: s.publico };
+      if (s.alvara.aceito) {
+        s.pessoal[s.alvara.pessoa] += GANHO_GRANDE; s.alvara.estrago = estragar(s, c.alvo, 1);
+        s.renda = rendaDoAno(s.fams, s);   // R14: o estrago já pesa na renda do ano 5 (nível a menos ou mata abaixo de 50%/30%)
+      }
       break;
     }
     case "resultado": {
       // R10: a desigualdade da renda do ano (por pessoa, depois do aluguel) entra no histórico ao lado da do patrimônio
       const giniRenda = s.renda ? gini(Object.values(s.fams).map((f) => (s.renda[f.id]?.total ?? 0) / f.membros.length)) : 0;
-      s.historico.push({ ano: s.ano, gini: gini(Object.values(s.fams).map((f) => patrimonio(f, s.publico))), giniRenda, mata: s.mata / s.teto, publico: s.publico, regra: s.regra,
+      // R14: a desigualdade do patrimônio também é por pessoa (as famílias têm de 3 a 6 pessoas)
+      s.historico.push({ ano: s.ano, gini: gini(Object.values(s.fams).map((f) => patrimonio(f, s.publico) / f.membros.length)), giniRenda, mata: s.mata / s.teto, publico: s.publico, regra: s.regra,
+        extr: s.fechamento?.extr || 0, plant: s.fechamento?.plant || 0,
         caixa: Object.fromEntries(Object.values(s.fams).map((f) => [f.id, f.caixa])), lotes: Object.fromEntries(Object.values(s.fams).map((f) => [f.id, f.lotes])) });
       break;
     }
@@ -226,6 +235,7 @@ function avancar(s, r) {
 function estragar(s, alvo, frac) {
   if (alvo === "mata") {
     const antes = s.mata;
+    s.estragoMata = (s.estragoMata || 0) + Math.min(antes, ESTRAGO_MATA * s.teto * frac);
     s.mata = Math.max(0, s.mata - ESTRAGO_MATA * s.teto * frac);
     s.colapsou = s.mata < COLAPSO * s.teto;
     if (s.colapsou) s.colapsouAlguma = true;

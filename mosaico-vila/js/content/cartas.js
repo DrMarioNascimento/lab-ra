@@ -4,7 +4,8 @@
 //
 // · Pequena (ano 2): cada pessoa decide por si e cada resposta vale para quem respondeu (+2 pontos pessoais).
 //   Cada "aceito" tira uma parte do estrago grande: se a turma inteira aceitar, o estrago é do mesmo tamanho do da grande.
-// · Grande (ano 5): todos respondem; vale a resposta de UMA pessoa sorteada, que nunca aparece (+8 pontos pessoais).
+// · Grande (ano 5, antes das decisões do ano, para a turma ainda poder reagir): todos respondem; vale a resposta de UMA
+//   pessoa sorteada, que nunca aparece (+8 pontos pessoais). O estrago já pesa na renda do ano 5 (R14).
 // · Ano 4 (opcional): uma carta de honestidade (um erro a seu favor) ou de confiança (você decide antes de saber se a
 //   outra parte é honesta). Na confiança, a chance de má-fé é a mesma em todas as cartas (1 em 4) e quem confiou perde
 //   sempre o mesmo (os 2 que arriscou): nenhum tipo de pessoa é "mais perigoso" que outro.
@@ -14,34 +15,34 @@ export const GANHO_PEQUENA = 2, GANHO_GRANDE = 8, GANHO_HONESTIDADE = 3, RISCO_C
 export const ESTRAGO_MATA = 0.2;    // estrago grande na mata: 20% do teto (devolver custa cerca de 10 pontos de replantio por família, perto de um nível do bem público)
 
 export const PEQUENAS = [
-  { id: "fiscal", segmento: "o fiscal da mata", lado: "paga", alvo: "mata", icone: "toco", titulo: "O fiscal da mata",
+  { id: "fiscal", segmento: "o fiscal da mata", de: "do fiscal da mata", lado: "paga", alvo: "mata", icone: "toco", titulo: "O fiscal da mata",
     telao: "O fiscal da mata cobra 1 ponto para você tirar madeira sem registro, que rende 3. Saldo: +2 para quem aceita.",
     texto: "O fiscal da mata cobra 1 ponto seu para fazer vista grossa: você tira madeira sem registro, que rende 3. Saldo: +2 pontos pessoais. Cada pessoa que aceita tira um pouco da mata de todos; se a turma inteira aceitar, a mata perde 20%.",
     sim: "Pagar 1 ao fiscal", nao: "Não pagar" },
-  { id: "vizinho", segmento: "um vizinho", lado: "recebe", alvo: "mata", icone: "grupos", titulo: "A carga do vizinho",
+  { id: "vizinho", segmento: "um vizinho", de: "de um vizinho", lado: "recebe", alvo: "mata", icone: "grupos", titulo: "A carga do vizinho",
     telao: "Você ajuda a anotar as cargas. Um vizinho oferece 2 pontos para você não anotar a carga extra dele.",
     texto: "Este ano, você ajuda a anotar as cargas de madeira da vila. Um vizinho oferece 2 pontos pessoais para você não anotar a carga extra dele. Cada pessoa que aceita tira um pouco da mata de todos; se a turma inteira aceitar, a mata perde 20%.",
     sim: "Aceitar os 2", nao: "Recusar" },
-  { id: "serraria", segmento: "a serraria", lado: "recebe", alvo: "publico", icone: "arvore-dourada", titulo: "A madeira sem nota",
+  { id: "serraria", segmento: "a serraria", de: "da serraria", lado: "recebe", alvo: "publico", icone: "arvore-dourada", titulo: "A madeira sem nota",
     telao: "A serraria paga 2 a mais pela sua madeira sem nota. Sem nota, o imposto não chega ao bem público.",
     texto: "A serraria oferece 2 pontos pessoais a mais se você vender a madeira sem nota. Sem nota, o imposto da venda não chega ao bem público. Cada pessoa que aceita tira um pouco do bem público; se a turma inteira aceitar, ele perde o equivalente a um nível.",
     sim: "Vender sem nota", nao: "Vender com nota" },
-  { id: "taxa", segmento: "um funcionário da prefeitura", lado: "paga", alvo: "publico", icone: "economia", titulo: "A taxa da praça",
+  { id: "taxa", segmento: "um funcionário da prefeitura", de: "de um funcionário da prefeitura", lado: "paga", alvo: "publico", icone: "economia", titulo: "A taxa da praça",
     telao: "Um funcionário cobra 1 ponto para tirar seu nome da taxa da praça, que custa 3. Saldo: +2 para quem aceita.",
     texto: "Todo mundo paga 3 pontos de taxa para a praça. Um funcionário da prefeitura cobra 1 ponto seu para tirar o seu nome da lista. Saldo: +2 pontos pessoais. Cada pessoa que aceita tira um pouco do bem público; se a turma inteira aceitar, ele perde o equivalente a um nível.",
     sim: "Pagar 1 ao funcionário", nao: "Pagar a taxa" },
 ];
 
 export const GRANDES = [
-  { id: "alvara", segmento: "a construtora", lado: "recebe", alvo: "publico", icone: "alvara", titulo: "O alvará",
+  { id: "alvara", segmento: "a construtora", de: "da construtora", lado: "recebe", alvo: "publico", icone: "alvara", titulo: "O alvará",
     telao: "Uma construtora oferece 8 pontos pessoais para aprovar uma obra sem vistoria. Aprovada, o bem público de todos perde um nível.",
     texto: "Uma construtora oferece 8 pontos pessoais a quem aprovar uma obra sem a vistoria. Se for aprovada, o bem público de todos perde um nível.",
     sim: "Aceitaria", nao: "Recusaria", aceito: "A obra foi aprovada sem vistoria: o bem público perdeu um nível.", recusado: "A obra não foi aprovada." },
-  { id: "madeireira", segmento: "a madeireira", lado: "recebe", alvo: "mata", icone: "alvara", titulo: "A licença da madeireira",
+  { id: "madeireira", segmento: "a madeireira", de: "da madeireira", lado: "recebe", alvo: "mata", icone: "alvara", titulo: "A licença da madeireira",
     telao: "Uma madeireira de fora oferece 8 pontos pessoais para você assinar a licença de derrubar um quinto da mata.",
     texto: "Uma madeireira de fora oferece 8 pontos pessoais a quem assinar a licença para ela derrubar um quinto da mata. Se for assinada, a mata de todos perde 20%.",
     sim: "Assinaria", nao: "Não assinaria", aceito: "A licença foi assinada: a mata perdeu 20%.", recusado: "A licença não foi assinada." },
-  { id: "escola", segmento: "a empresa da obra", lado: "recebe", alvo: "publico", icone: "alvara", titulo: "O contrato da escola",
+  { id: "escola", segmento: "a empresa da obra", de: "da empresa da obra", lado: "recebe", alvo: "publico", icone: "alvara", titulo: "O contrato da escola",
     telao: "Você escolhe a empresa da reforma da escola. A mais cara oferece 8 pontos para ser escolhida; com ela, o bem público perde um nível.",
     texto: "Você escolhe a empresa que vai reformar a escola. A mais cara oferece 8 pontos pessoais para ser a escolhida. Com ela, a obra custa o dobro e o bem público de todos perde um nível.",
     sim: "Escolheria a mais cara", nao: "Escolheria a mais barata", aceito: "A empresa mais cara foi escolhida: o bem público perdeu um nível.", recusado: "A empresa mais barata foi escolhida." },

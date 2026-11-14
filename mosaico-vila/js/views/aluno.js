@@ -8,7 +8,7 @@ import { decorrido, tempoResultado } from "./telao.js";
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const n0 = (x) => Math.round(x).toLocaleString("pt-BR");
 
-export function novoLocal() { return { pub: 20, rep: 0, car: 0, lance: 30, face: null, guia: null, motivo: null }; }
+export function novoLocal() { return { pub: 20, rep: 0, car: 0, lance: 0, face: null, guia: null, motivo: null }; }
 
 function hd(st, me) {
   const f = me?.fam ? st.fams[me.fam] : null;
@@ -32,7 +32,9 @@ function metaCelular(st) {
   return `<div class="card"><b class="row">${ico("meta")}Meta da vila (${REGRAS_TXT[m.regra].nome})</b><div class="row" style="margin-top:6px;gap:8px"><span class="faint" style="min-width:42%">${m.regra === "prosperidade" ? "Mais pobre / média" : "Patrimônio por pessoa"}</span><div class="barra"><i style="width:${100 * frac}%"></i></div><b class="mono">${val}</b></div><p class="faint" style="margin:4px 0 0">Mata: ${Math.round(100 * m.mata)}% (mínimo ${Math.round(100 * VITORIA.mataMinima)}%).</p></div>`;
 }
 
-const posicao = (st, f) => 1 + Object.values(st.fams).filter((g) => patrimonio(g, st.publico) > patrimonio(f, st.publico)).length;
+// R14: posição pelo patrimônio por pessoa (as famílias têm de 3 a 6 pessoas)
+const porPessoa = (st, f) => patrimonio(f, st.publico) / f.membros.length;
+const posicao = (st, f) => 1 + Object.values(st.fams).filter((g) => porPessoa(st, g) > porPessoa(st, f)).length;
 const enviado = (txt = "Enviado. Aguarde a turma.") => `<div class="card" style="text-align:center"><b class="pill-ok">✓ ${txt}</b></div>`;
 // R13: mata em % da vila (a mesma unidade do telão)
 const pcMata = (st, x) => `${(Math.round((1000 * x) / (st.teto || 1)) / 10).toLocaleString("pt-BR")}%`;
@@ -60,6 +62,14 @@ function projecao(st, f, loc) {
     <tr><td>Renda do ano</td><td class="n">${n0(r)}</td></tr><tr><td>Vai para o bem público</td><td class="n">${n0(pub)}</td></tr>
     ${st.ano >= 2 ? `<tr><td>Replantio</td><td class="n">${n0(rep)}</td></tr><tr><td>Madeira vendida</td><td class="n">+${n0(CARGA_RENDE * car)}</td></tr><tr><td>Efeito na mata (só da sua família)</td><td class="n">${mata >= 0 ? "+" : "−"}${pcMata(st, Math.abs(mata))}</td></tr>` : ""}
     <tr><td><b>Fica no caixa</b></td><td class="n"><b>${fica >= 0 ? "+" : ""}${n0(fica)}</b></td></tr></table></div>`;
+}
+
+// R14: o lance mostra o efeito na hora: quantos pontos, quanto vale o lote e quanto o patrimônio da família muda se levar
+function efeitoLance(st, f, loc) {
+  const min = lanceMinimo(st.ano), parte = (loc.lance / 100) * (st.regra === "prosperidade" ? 0.5 : 1);
+  const lance = Math.min(f.caixa, min + f.caixa * parte), vale = VALOR_LOTE(st.publico), dif = vale - lance;
+  if (f.caixa < min) return `<p class="faint" style="margin:6px 0 0">O caixa da família (${n0(f.caixa)}) não chega ao mínimo de ${min}: vocês ficam de fora este ano.</p>`;
+  return `<table class="vals" style="margin-top:6px"><tr><td>Lance da família (se todos propuserem isto)</td><td class="n">${n0(lance)}</td></tr><tr><td>O lote vale no patrimônio</td><td class="n">${vale}</td></tr><tr><td><b>Patrimônio da família, se levar</b></td><td class="n"><b>${dif >= 0 ? "+" : "−"}${n0(Math.abs(dif))}</b></td></tr></table><p class="faint" style="margin:4px 0 0">O lance vai para o banco. O lote ainda pode render aluguel e dar moradia.</p>`;
 }
 
 // Pergunta de controle da regra nova (anos 1 a 3): quem erra vê a explicação; não vale ponto.
@@ -145,8 +155,8 @@ export function renderAluno(st, id, loc) {
       const p = st.props[st.ano]?.[id];
       const palp = st.palpite?.[st.ano]?.[id];
       bd = p?.lanceEnviado ? enviado("Lance enviado.") + `<div class="card"><b>Enquanto a turma decide: qual vai ser o lance vencedor?</b><div class="row" style="margin-top:8px">${["até 20", "21 a 40", "mais de 40"].map((v) => `<button class="btn sm ${palp === v ? "on" : "sec"} grow" data-a="palpite" data-val="${v}">${v}</button>`).join("")}</div></div>` : `<h2 class="row">${ico("lote-sobrado", "g")}Mercado de lotes</h2><p class="muted">Lance fechado. Quanto do caixa da família (${n0(f.caixa)}) oferecer além do mínimo de ${lanceMinimo(st.ano)}?</p>
-        <div class="card"><div class="row" style="justify-content:space-between"><b>Parte do caixa</b><b class="mono">${loc.lance}%</b></div><input type="range" min="0" max="60" step="5" value="${loc.lance}" data-in="lance" data-key="lance"></div>
-        <p class="faint">A família precisa de ${Math.ceil(f.membros.length / 3)} lote(s) para morar; tem ${f.lotes}.</p><button class="btn ok block" data-a="lance">Enviar lance</button>`;
+        <div class="card"><div class="row" style="justify-content:space-between"><b>Parte do caixa</b><b class="mono">${loc.lance}%</b></div><input type="range" min="0" max="60" step="5" value="${loc.lance}" data-in="lance" data-key="lance">${efeitoLance(st, f, loc)}</div>
+        <p class="faint">A família precisa de ${Math.ceil(f.membros.length / 3)} lote(s) para morar; tem ${f.lotes}. ${st.regra === "prosperidade" ? "Na Prosperidade, conta metade do que vocês oferecem além do mínimo. " : ""}Quem já levou um lote oferece metade no próximo.</p><button class="btn ok block" data-a="lance">Enviar lance</button>`;
       break;
     }
     case "alvara": {
@@ -172,7 +182,8 @@ export function renderAluno(st, id, loc) {
         ${fx ? `<tr><td>Renda do ano</td><td class="n">${n0(fx.renda)}</td></tr><tr><td>Para o bem público</td><td class="n">−${n0(fx.aPub)}</td></tr>${st.ano >= 2 ? `<tr><td>Replantio</td><td class="n">−${n0(fx.aRep)}</td></tr><tr><td>Cargas (${fx.cargas})</td><td class="n">+${n0(fx.ganhoCarga)}</td></tr>` : ""}` : ""}
         <tr><td>Caixa</td><td class="n">${n0(f.caixa)}</td></tr><tr><td>Lotes (${VALOR_LOTE(st.publico)} cada)</td><td class="n">${f.lotes}</td></tr>
         <tr><td><b>Patrimônio</b></td><td class="n"><b>${n0(patrimonio(f, st.publico))}</b></td></tr>
-        <tr><td>Posição da família (só vocês veem)</td><td class="n">${posicao(st, f)}º de ${Object.keys(st.fams).length}</td></tr></table></div>
+        <tr><td>Patrimônio por pessoa</td><td class="n">${n0(porPessoa(st, f))}</td></tr>
+        <tr><td>Posição por pessoa (só vocês veem)</td><td class="n">${posicao(st, f)}º de ${Object.keys(st.fams).length}</td></tr></table></div>
         ${pessoal.length ? `<div class="card"><b>Só para você</b>${pessoal.map((t) => `<p class="muted" style="margin:6px 0 0">${esc(t)}</p>`).join("")}</div>` : ""}${metaCelular(st)}</div>`;
       bd = espera + extrato;
       break;

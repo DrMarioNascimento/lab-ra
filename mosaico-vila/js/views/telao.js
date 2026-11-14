@@ -1,7 +1,7 @@
 import { nomeFase, progresso, agregadoOk, contagem } from "../engine.js";
 import { NOVIDADE_DO_ANO, EXEMPLO_DO_ANO, EXEMPLO_VOTO, REGRAS_TXT, MOTIVOS, GUIAS, NIVEIS_PUBLICO } from "../content/vila.js";
 import { carta, QUEM_GOLPE, FAIXAS_PCT, faixaDe, CHANCE_GOLPE } from "../content/cartas.js";
-import { gini, lanceMinimo, VITORIA, patrimonio, COLAPSO, progressoMeta } from "../content/regras.js";
+import { gini, lanceMinimo, VITORIA, VALOR_LOTE, patrimonio, COLAPSO, progressoMeta } from "../content/regras.js";
 import { iconeFamilia, mapaVila, linhaDoTempo, ico, fileira, unidade } from "./desenho.js";
 
 // Telão para TV (R11): letra grande, uma ideia por tela, barra de ícones com o estado da vila sempre no mesmo lugar.
@@ -87,6 +87,15 @@ function sequencia(st, paineis) {
 
 const fato = (icone, texto, cls = "") => `<div class="fato ${cls}">${ico(icone)}<span>${texto}</span></div>`;
 
+// R14: no ano 5, a proposta grande vem antes das decisões; o telão das decisões abre com o que aconteceu, para a turma reagir.
+function bannerGrande(st) {
+  if (!st.cartas || st.alvara.aceitariam == null) return "";
+  const c = carta(st.cartas.grande), vs = Object.values(st.alvara.votos), ok = agregadoOk(vs.length);
+  const e = st.alvara.estrago, falta = Math.max(0, COLAPSO * st.teto - st.mata);
+  const efeito = !st.alvara.aceito ? "" : e?.alvo === "mata" ? (falta > 0 ? ` A mata está abaixo de 30%: faltam ${Math.max(1, Math.round((100 * falta) / st.teto))}% (cerca de ${n0(Math.ceil((falta / 2) * 5))} pontos de replantio) para ela voltar.` : " Já conta neste ano: dá para replantar.") : " Já conta na renda deste ano.";
+  return `<div class="card banner ${st.alvara.aceito ? "mal" : "bom"}">${fato(c.icone, `${esc(st.alvara.aceito ? c.aceito : c.recusado)}${efeito}${ok ? ` <span class="sub">${pct(vs.filter(Boolean).length, vs.length)}% aceitariam.</span>` : ""}`, st.alvara.aceito ? "mal" : "bom")}</div>`;
+}
+
 // Carta sorteada da etapa (pequena, ano 4 ou grande): o telão mostra a carta e como a resposta conta.
 function telaoCarta(st, c, rodape) {
   return topo(st, esc(c.titulo)) + `<div class="card destaque">${ico(c.icone, "xl")}<p class="enorme">${esc(c.telao)}</p></div>
@@ -113,12 +122,12 @@ export function renderTelao(st) {
       const aluguel = rs.reduce((a, r) => a + r.aluguel, 0), piso = rs.filter((r) => r.piso > 0).length;
       const v4 = st.ano === 4 ? resultadoVoto(st) : null;
       body = topo(st, `Ano ${st.ano}: ${esc(nov.titulo)}`) + (v4 ? v4.html : "") + `<div class="card destaque">${ico(ICONE_ANO[st.ano], v4 ? "g" : "xl")}<p class="${v4 ? "big" : "enorme"}" style="margin:0">${esc(nov.telao || nov.texto)}</p></div>` +
-        (ex ? `<div class="card" style="flex:1;min-height:0"><h3 class="row">${ico("ideia")}Exemplo resolvido</h3>${exemploLinhas(st, linhasDe(ex, st), 1.5, v4 || linhasDe(ex, st).length >= 4 ? "compacto" : "")}</div><p class="rodape">${v4?.palpite || ""}No celular: uma pergunta rápida para conferir (não vale ponto).</p>`
+        (ex ? `<div class="card" style="flex:1;min-height:0"><h3 class="row">${ico("ideia")}Exemplo resolvido</h3>${exemploLinhas(st, linhasDe(ex, st), 1.5, v4 || linhasDe(ex, st).length >= 4 ? "compacto" : "")}</div><p class="rodape">${v4?.palpite || ""}No celular: ${v4 ? "pergunta rápida" : "uma pergunta rápida para conferir"} (não vale ponto).</p>`
           : `<div class="card"><p class="big" style="margin:0">${aluguel ? `${n0(aluguel)} pontos de aluguel vão mudar de mãos. ` : ""}${piso ? `${piso} família(s) receberam o piso de renda.` : "Nenhuma família precisou do piso de renda."}</p></div><p class="rodape">Cada família vê o próprio extrato no celular.</p>`);
       break;
     }
     case "decidir":
-      body = topo(st, "Cada família decide") + `<div class="lado"><div class="card mapa-card">${mapaVila(st)}</div>
+      body = topo(st, "Cada família decide") + (st.ano === 5 ? bannerGrande(st) : "") + `<div class="lado"><div class="card mapa-card">${mapaVila(st)}</div>
         <div class="col centro">${cronometro(st, "Conversem na família")}<p class="big" style="text-align:center;margin:0">Cada um envia a sua proposta.<br>Vale a mediana da família.</p></div></div>`;
       break;
     case "pequena":
@@ -136,7 +145,7 @@ export function renderTelao(st) {
       body = topo(st, "Mercado de lotes") + `<div class="lado"><div class="card mapa-card">${mapaVila(st)}</div><div class="col">
         <div class="card row" style="flex-wrap:nowrap">${ico("lote-sobrado", "xl")}<div><b class="enorme mono">${Math.min(3, livres)}</b><div class="big">lotes à venda</div></div></div>
         <div class="card"><div class="big">Lance mínimo</div><b class="enorme mono">${lanceMinimo(st.ano)}</b></div>
-        <p class="rodape">Lance fechado. Vale a mediana da família. O maior lance leva; empate, sorteio.</p></div></div>`;
+        <p class="rodape">Lance fechado; vale a mediana da família; o maior leva. ${st.regra === "prosperidade" ? "Na Prosperidade, conta metade do que se oferece. " : ""}Quem já levou um lote oferece metade no próximo.</p></div></div>`;
       break;
     }
     case "alvara":
@@ -166,7 +175,7 @@ export function duracaoTelao(st) {
 
 // Tempo de "Como ficou a vila": 30 s (75 s no ano 3), mais o painel da carta do ano (15 s no ano 2, 20 s no ano 4, 40 s no ano 5).
 // O celular mostra o extrato da família quando começa o último painel (R13: primeiro a vila, depois a própria família).
-const EXTRA_CARTA = { 2: 15, 4: 20, 5: 40 };
+const EXTRA_CARTA = { 2: 15, 4: 20, 5: 20 };   // R14: no ano 5, a grande já foi revelada antes das decisões (20 s), e o painel do fim do ano recapitula
 export function tempoResultado(st) {
   const extra = st.ano === 4 && st.semTroco ? 0 : EXTRA_CARTA[st.ano] || 0;
   const total = (st.ano === 3 ? 75 : 30) + extra;
@@ -195,13 +204,13 @@ function dinheiroPorPessoa(st, ranking) {
   const alvoPP = m.regra === "prosperidade" ? m.alvo * mediaPP : m.alvo;
   const maxPP = Math.max(alvoPP, ...ranking.map((f) => f.pp));
   const cab = Math.max(1, Math.ceil(maxPP / MOEDA));   // largura da fileira, em moedas
-  const marca = `<i class="marca-meta" style="left:calc(var(--iso) * ${(alvoPP / MOEDA).toFixed(2)} + ${(0.12 * (alvoPP / MOEDA)).toFixed(2)}cqw)"><b>${m.regra === "prosperidade" ? "60% da média" : `meta ${m.alvo}`}</b></i>`;
+  const marca = `<i class="marca-meta" style="left:calc(var(--iso) * ${(alvoPP / MOEDA).toFixed(2)} + ${(0.12 * (alvoPP / MOEDA)).toFixed(2)}cqw)"><b>${m.regra === "prosperidade" ? `${Math.round(100 * m.alvo)}% da média` : `meta ${m.alvo}`}</b></i>`;
   const iso = ranking.length <= 5 ? 3.6 : ranking.length <= 6 ? 3.1 : 2.6;   // até 8 famílias cabem na tela
   const linhas = ranking.map((f) => `<div class="iso-linha"><span class="fila-moedas" style="--n:${cab};--iso:${iso}cqw">${moedas(f.pp)}${marca}</span><b class="mono">${n0(f.pp)}</b></div>`).join("");
   const metaTxt = m.regra === "prosperidade" ? `A família mais pobre tem <b>${Math.round(100 * m.valor)}%</b> da média por pessoa (meta: ${Math.round(100 * m.alvo)}%).` : `Patrimônio médio: <b>${n0(m.valor)}</b> por pessoa (meta: ${m.alvo}).`;
   return `<div class="grid" style="grid-template-columns:1.55fr 1fr;flex:1;min-height:0">
     <div class="card" style="min-height:0;overflow:hidden"><h2>Patrimônio por pessoa, por família</h2><p class="rodape" style="margin-bottom:.6cqw">${moedas(MOEDA, "p")} Cada moeda = ${MOEDA} pontos. Sem nome de família.</p>${linhas}</div>
-    <div class="card col" style="justify-content:center;gap:1.2cqw">${ico("meta", "xl")}<p class="big" style="margin:0">${metaTxt}</p><p class="rodape">E a mata acima de ${Math.round(100 * VITORIA.mataMinima)}% (está em ${Math.round(100 * m.mata)}%).</p></div></div>`;
+    <div class="card col" style="justify-content:center;gap:1.2cqw">${ico("meta", "xl")}<p class="big" style="margin:0">${metaTxt}</p><p class="rodape">${m.mata >= VITORIA.mataMinima ? `E a mata precisa ficar acima de ${Math.round(100 * VITORIA.mataMinima)}%: está em ${Math.round(100 * m.mata)}%.` : `Mata em ${Math.round(100 * m.mata)}%: precisa passar de ${Math.round(100 * VITORIA.mataMinima)}%. Assim, meta não batida.`}</p></div></div>`;
 }
 
 // A desigualdade em palavras: quantas vezes o patrimônio por pessoa da família mais rica cabe no da mais pobre.
@@ -217,7 +226,7 @@ function resultadoVoto(st) {
   const vs = Object.values(st.voto), pal = st.palpitePct.voto || {}, np = Object.keys(pal).length;
   if (!agregadoOk(vs.length)) return { html: `<div class="card">${fato("balanca", `Regra dos anos 4 e 5: <b>${REGRAS_TXT[st.regra].nome}</b>.`)}</div>`, palpite: "" };
   const p = vs.filter(Boolean).length / vs.length;
-  const palpite = agregadoOk(np) ? `Palpite do voto: ${pct(Object.values(pal).filter((v) => v === faixaDe(p)).length, np)}% acertaram a faixa. ` : "";
+  const palpite = agregadoOk(np) ? `Palpite do voto: ${pct(Object.values(pal).filter((v) => v === faixaDe(p)).length, np)}% acertaram. ` : "";
   return { html: `<div class="card">${fato("balanca", `Voto: <b>${Math.round(100 * p)}%</b> quiseram trocar → <b>${REGRAS_TXT[st.regra].nome}</b> nos anos 4 e 5.`)}</div>`, palpite };
 }
 
@@ -231,7 +240,7 @@ const textoEstrago = (e) => (!e ? "" : e.alvo === "mata" ? `a mata perdeu <b>${M
 // Painéis de "Como ficou a vila", com a duração de cada um (somam o tempo total da tela).
 export function paineisResultado(st) {
   const fx = st.fechamento, H = st.historico;
-  const giniPat = gini(fams(st).map((f) => patrimonio(f, st.publico)));
+  const giniPat = gini(fams(st).map((f) => patrimonio(f, st.publico) / f.membros.length));   // R14: por pessoa
   const giniRenda = st.renda ? gini(fams(st).map((f) => (st.renda[f.id]?.total ?? 0) / f.membros.length)) : 0;
   const pp = (x) => Math.round((100 * x) / st.teto);
 
@@ -245,7 +254,8 @@ export function paineisResultado(st) {
   if (fx) fatos.push(st.publico > fx.nivelAntes ? fato("economia", `Bem público subiu para o nível <b>${st.publico}</b>: ${esc(NIVEIS_PUBLICO[st.publico])}`) : st.publico < fx.nivelAntes ? fato("economia", `Bem público caiu para o nível <b>${st.publico}</b>`, "mal") : fato("economia", `Bem público ficou no nível ${st.publico}`));
   if (st.colapsou) {
     const falta = Math.max(0, COLAPSO * st.teto - st.mata);
-    fatos.push(fato("toco", `Mata abaixo de 30%: −4 de renda por pessoa até ela voltar. Faltam <b>${Math.max(1, pp(falta))}%</b>: cerca de ${n0(Math.ceil((falta / 2) * 5))} pontos de replantio na vila.`, "mal"));
+    fatos.push(st.ano < 5 ? fato("toco", `Mata abaixo de 30%: −4 por pessoa até voltar. Faltam <b>${Math.max(1, pp(falta))}%</b> (cerca de ${n0(Math.ceil((falta / 2) * 5))} pontos de replantio).`, "mal")
+      : fato("toco", "A mata terminou abaixo de 30%: a meta pede mais que isso.", "mal"));
   } else if (st.colapsouAlguma) fatos.push(fato("arvore-redonda", "A mata voltou a passar dos 30%: o −4 acabou", "bom"));
   const prev = st.previsao[st.ano] || {}, np = Object.keys(prev).length;
   if (st.ano >= 2 && agregadoOk(np) && fx) { const real = st.mata > fx.mataAntes + 0.5 ? "sobe" : st.mata < fx.mataAntes - 0.5 ? "desce" : "fica"; fatos.push(`<p class="rodape">Previsão da mata: ${pct(Object.values(prev).filter((v) => v === real).length, np)}% acertaram.</p>`); }
@@ -267,7 +277,9 @@ export function paineisResultado(st) {
   // 3. Acontecimentos do ano (mercado e palpite do lance)
   const acont = [];
   if (st.ano >= 4 && st.leilao) {
-    acont.push(fato("lote-venda", `${st.leilao.vendidos.length} lote(s) vendido(s) no mercado${st.leilao.vendidos.length ? `; o maior lance foi <b>${n0(Math.max(...st.leilao.vendidos.map((v) => v.preco)))}</b>` : ""}.`));
+    const nv = st.leilao.vendidos.length, vl = VALOR_LOTE(st.publico);
+    acont.push(fato("lote-venda", nv ? `${nv === 1 ? "1 lote vendido" : `${nv} lotes vendidos`}. O maior lance foi <b>${n0(Math.max(...st.leilao.vendidos.map((v) => v.preco)))}</b>, por um lote que vale <b>${vl}</b> no patrimônio (10 + 2 × nível ${st.publico}).` : "Nenhum lote vendido: ninguém tinha caixa para o mínimo."));
+    if (nv) acont.push(`<p class="rodape">O lance sai do caixa e vai para o banco: o patrimônio da família cai a diferença entre o lance e o valor do lote.</p>`);
     const pal = st.palpite?.[st.ano] || {}, npl = Object.keys(pal).length;
     if (st.leilao.vendidos.length && agregadoOk(npl)) {
       const maior = Math.max(...st.leilao.vendidos.map((v) => v.preco)), certo = maior <= 20 ? "até 20" : maior <= 40 ? "21 a 40" : "mais de 40";
@@ -281,8 +293,8 @@ export function paineisResultado(st) {
   if (st.ano === 2 && st.cartas && st.pequena.aceitaram != null) {
     const c = carta(st.cartas.pequena), n = st.ordem.length, p = n ? st.pequena.aceitaram / n : 0, ok = agregadoOk(st.pequena.n);
     paineis.push({ nome: c.titulo, carta: true, dur: extra, html: `<div class="card destaque">${ico(c.icone, "xl")}<div class="col" style="gap:1cqw">
-      <p class="enorme">${ok ? `<b>${Math.round(100 * p)}%</b> da turma aceitou a proposta de ${esc(c.segmento)}.` : "Menos de 5 respostas: o total fica guardado."}</p>
-      <p class="big" style="margin:0">${st.pequena.aceitaram ? `Somando os pequenos, ${textoEstrago(st.pequena.estrago)}.` : "Ninguém aceitou: nada se perdeu."} Se a turma inteira aceitasse, ${c.alvo === "mata" ? "a mata perderia 20%" : "o bem público perderia um nível"}: o mesmo estrago de uma proposta grande.</p>
+      <p class="enorme">${ok ? `<b>${Math.round(100 * p)}%</b> da turma aceitou a proposta ${esc(c.de)}.` : "Menos de 5 respostas: o total fica guardado."}</p>
+      <p class="big" style="margin:0">${st.pequena.aceitaram ? `Somando os pequenos, ${textoEstrago(st.pequena.estrago)}: ${Math.round(100 * p)}% do estrago de uma grande.` : "Ninguém aceitou: nada se perdeu."} Se a turma inteira aceitasse, ${c.alvo === "mata" ? "a mata perderia 20%" : "o bem público perderia um nível"}: o mesmo estrago de uma proposta grande.</p>
       ${ok ? acertoPalpite(st, "pequena", p) : ""}</div></div>` });
   }
   if (st.ano === 4 && !st.semTroco && st.cartas) {
@@ -303,13 +315,14 @@ export function paineisResultado(st) {
     paineis.push({ nome: c.titulo, carta: true, dur: extra, html });
   }
   if (st.ano === 5 && st.cartas && st.alvara.aceitariam != null) {
+    // R14: a grande foi revelada antes das decisões (bannerGrande); aqui, a recapitulação ao lado da pequena
     const c = carta(st.cartas.grande), vs = Object.values(st.alvara.votos), ok = agregadoOk(vs.length), p = vs.length ? vs.filter(Boolean).length / vs.length : 0;
-    paineis.push({ nome: c.titulo, carta: true, dur: extra / 2, html: `<div class="card destaque">${ico(c.icone, "xl")}<div class="col" style="gap:1cqw"><p class="enorme">${ok ? `<b>${Math.round(100 * p)}%</b> aceitariam os 8 pontos de ${esc(c.segmento)}.` : "Menos de 5 respostas: o total fica guardado."}</p>${ok ? acertoPalpite(st, "alvara", p) : ""}<p class="rodape">Valeu a resposta de uma pessoa sorteada, que nunca aparece.</p></div></div>` });
     const pq = st.pequena.n ? st.pequena.aceitaram / st.ordem.length : null;
-    paineis.push({ nome: "O que aconteceu", carta: true, dur: extra / 2, html: `<div class="card col" style="flex:1;justify-content:center;gap:1.4cqw">
+    paineis.push({ nome: c.titulo, carta: true, dur: extra, html: `<div class="card col" style="flex:1;justify-content:center;gap:1.3cqw">
       ${fato(c.icone, esc(st.alvara.aceito ? c.aceito : c.recusado), st.alvara.aceito ? "mal" : "bom")}
+      ${ok ? fato("ideia", `<b>${Math.round(100 * p)}%</b> aceitariam os 8 pontos ${esc(c.de)}.`) : ""}
       ${pq != null && agregadoOk(st.pequena.n) && ok ? fato("balanca", `Na proposta pequena do ano 2, <b>${Math.round(100 * pq)}%</b> aceitaram; na grande, <b>${Math.round(100 * p)}%</b> aceitariam.`) : ""}
-      <p class="rodape">Na pequena, cada um decidiu por si; na grande, uma só pessoa tinha o poder.</p></div>` });
+      ${ok ? acertoPalpite(st, "alvara", p) : ""}<p class="rodape">Na pequena, cada um decidiu por si; na grande, uma só pessoa sorteada tinha o poder, e ela nunca aparece.</p></div>` });
   }
 
   // 5. O dinheiro: patrimônio por pessoa em moedas, e a meta
@@ -336,39 +349,52 @@ function telaoResultado(st) {
   return topo(st, `Como ficou a vila no ano ${st.ano}`) + sequencia(st, paineisResultado(st));
 }
 
-// Cinco perguntas encadeadas, uma por tema, montadas com os dados da própria turma.
+// Cinco perguntas encadeadas, uma por tema, montadas com os dados da própria turma; R14: cada uma puxa a anterior.
 const TEMAS = ["Aluguel", "Voto", "Mata", "Honestidade", "Profissão"];
+const ARTIGO = { monopolio: "o Monopólio", prosperidade: "a Prosperidade" };
 function perguntasFechamento(st) {
-  const H = st.historico, g = (k) => H[k]?.gini ?? 0;
-  const subiu = H.length >= 3 && g(2) > g(1) + 0.005;
+  const H = st.historico, g = (k) => H[k]?.gini ?? 0, gr = (k) => H[k]?.giniRenda ?? 0;
+  const subiu = H.length >= 3 && (gr(2) > gr(1) + 0.01 || g(2) > g(1) + 0.005);
   const mataMin = Math.min(...H.map((x) => x.mata));
+  const cargas = Math.round((100 * H.reduce((a, x) => a + (x.extr || 0), 0)) / (st.teto || 1)), prop = Math.round((100 * (st.estragoMata || 0)) / (st.teto || 1));
+  const origem = prop ? `As cargas tiraram ${cargas}% da mata nos cinco anos; as propostas aceitas, ${prop}%.` : `As cargas tiraram ${cargas}% da mata nos cinco anos.`;
+  const vs = Object.values(st.alvara?.votos || {}), n = st.ordem.length;
+  const pq = agregadoOk(st.pequena?.n || 0) ? Math.round((100 * st.pequena.aceitaram) / n) : null, pg = agregadoOk(vs.length) ? pct(vs.filter(Boolean).length, vs.length) : null;
   return [
     H.length >= 3 ? (subiu ? "Quando o aluguel entrou (ano 3), a desigualdade subiu. Quem ganhou com isso, e sem fazer o quê?" : "Quando o aluguel entrou (ano 3), a desigualdade não subiu. O que segurou?") : "A desigualdade entre as famílias cresceu ou caiu? Por quê?",
-    `Na votação, ${st.votoTrocou ? "a vila trocou para a Prosperidade (meta: ninguém muito atrás)" : "a vila ficou no Monopólio (meta: patrimônio médio alto)"}. Vocês escolheram eficiência ou equidade? Votaram pelo próprio bolso ou pela vila?`,
-    st.colapsouAlguma ? (st.colapsou ? "A mata colapsou e não voltou. Quem pagou a conta, e quem tirou madeira antes?" : "A mata colapsou e voltou. Quem pagou o replantio, e quem tirou madeira antes?") : `A mata chegou a ${Math.round(100 * mataMin)}% no pior ano. O que segurou a mão de quem queria tirar mais?`,
-    (() => {
-      // R13: a pequena (cada um por si) ao lado da grande (uma pessoa com o poder), com os dados da turma
-      const vs = Object.values(st.alvara?.votos || {}), n = st.ordem.length;
-      const cp = st.cartas ? carta(st.cartas.pequena) : null, cg = st.cartas ? carta(st.cartas.grande) : null;
-      const pq = agregadoOk(st.pequena?.n || 0) ? Math.round((100 * st.pequena.aceitaram) / n) : null, pg = agregadoOk(vs.length) ? pct(vs.filter(Boolean).length, vs.length) : null;
-      if (pq != null && pg != null) return `Pequena: ${pq}% aceitaram. Grande: ${pg}% aceitariam. Somada, a pequena faz o mesmo estrago. Por que ela parece menos grave?`;
-      return "Na proposta pequena, cada um decidiu por si; na grande, uma pessoa tinha o poder. Qual pareceu mais grave, e por quê?";
-    })(),
-    "Na profissão de vocês, o que é a \"mata comum\" (a agenda do posto, a praça onde se treina, a verba do clube) e quem cobra aluguel dela?",
+    `Com o aluguel mordendo, a vila ${st.votoTrocou ? "trocou para a Prosperidade (equidade)" : "ficou no Monopólio (eficiência)"}. Vocês votaram pelo próprio bolso ou pela vila?`,
+    `Bolso ou vila também na mata: ${origem} ${st.colapsouAlguma ? (st.colapsou ? "Ela colapsou e não voltou." : "Ela colapsou e voltou.") : `O pior ano chegou a ${Math.round(100 * mataMin)}%.`} Quem pagou a conta?`,
+    pq != null && pg != null
+      ? `Na pequena, ${pq}% aceitaram: ${pq}% do estrago de uma grande (com todos, seria igual). Na grande, ${pg}% aceitariam. Por que a pequena parece menos grave?`
+      : "Das propostas: na pequena, cada um decidiu por si; na grande, uma pessoa tinha o poder. Qual pareceu mais grave, e por quê?",
+    "Fora da vila: na profissão de vocês, onde estão a \"mata comum\" e as propostas pequenas?",
   ];
+}
+
+// Ligação de cada pergunta com a anterior e com o resto da partida (uma linha embaixo da pergunta)
+function apoioPergunta(st, k) {
+  const o = st.outra;
+  if (k === 0) return "Primeiro 1 minuto em dupla; depois, a turma.";
+  if (k === 1 && o) return `E se fosse ${ARTIGO[o.regra]}? Mesmas decisões: desigualdade final ${v2(o.gini)} (foi ${v2(st.historico.at(-1)?.gini ?? 0)}), meta ${o.meta ? "batida" : "não batida"}. É um "e se": na outra regra, vocês talvez decidissem diferente.`;
+  if (k === 4) return "Por exemplo: a agenda do posto, a praça onde se treina, a verba do clube. Quem cobra aluguel dela?";
+  if (k === 3 && st.cartas && !st.semTroco) {
+    const c = carta(st.cartas.ano4), vals = Object.values(st.mente);
+    if (agregadoOk(vals.length)) return c.tipo === "confia" ? `E no ano 4 (${c.titulo}): ${pct(vals.filter(Boolean).length, vals.length)}% confiaram, e a chance de golpe era a mesma para todo tipo de pessoa.` : `E no ano 4 (${c.titulo}): ${pct(vals.filter(Boolean).length, vals.length)}% ficaram com o que não era seu, sem ninguém para conferir.`;
+  }
+  return "";
 }
 
 function telaoFechamento(st) {
   const ranking = porPatrimonio(st), vz = vezes(ranking);
-  const o = st.outra, k = st.pergunta || 0, qs = perguntasFechamento(st);
-  const outra = o ? `<p class="rodape">E se fosse a ${REGRAS_TXT[o.regra].nome}? Mesmas decisões: desigualdade final ${v2(o.gini)} (foi ${v2(st.historico.at(-1)?.gini ?? 0)}), meta ${o.meta ? "batida" : "não batida"}. É um "e se".</p>` : "";
+  const k = st.pergunta || 0, qs = perguntasFechamento(st), apoio = apoioPergunta(st, k);
   const fin = Object.values(st.final);
   const guias = contagem(fin.map((x) => x.guia)), motivos = contagem(fin.map((x) => x.motivo));
+  const longa = qs[k].length + apoio.length > 170;
   return topo(st, "Fechamento") + `<div class="grid" style="grid-template-columns:1fr 1.25fr;flex:1;min-height:0">
     <div class="card col" style="min-height:0;gap:.7cqw;overflow:hidden"><h2 class="row" style="color:var(${st.vitoria ? "--ok" : "--warn"})">${ico(st.vitoria ? "trofeu" : "meta", "g")}${st.vitoria ? "A vila bateu a meta!" : "A vila não bateu a meta"}</h2>
-      <p class="big" style="margin:0;font-size:2.1cqw">Regra ${REGRAS_TXT[st.regra].nome}. ${vz.txt}</p>
-      <div class="linha-media">${linhaDoTempo(st.historico)}</div>${outra}</div>
-    <div class="col" style="min-height:0"><div class="card pergunta" style="flex:1"><div class="temas">${TEMAS.map((t, i) => `<span class="${i === k ? "agora" : i < k ? "feito" : ""}">${t}</span>`).join("")}</div>
-      <p class="pergunta-txt">${esc(qs[k])}</p>${k === 0 ? `<p class="rodape">Primeiro 1 minuto em dupla; depois, a turma.</p>` : ""}</div>
-      ${agregadoOk(fin.length) ? `<div class="card guiou"><p><b>Guiou:</b> ${GUIAS.map((g) => `${g} ${guias[g] || 0}`).join(" · ")}</p><p><b>Pesou:</b> ${MOTIVOS.map((m) => `${m} ${motivos[m] || 0}`).join(" · ")}</p></div>` : ""}</div></div>`;
+      <p class="big" style="margin:0;font-size:2.1cqw">${vz.txt}</p>
+      <div class="linha-media">${linhaDoTempo(st.historico, { F: 30, alto: 240, so: k === 2 ? "mata" : "desig" })}</div></div>
+    <div class="col" style="min-height:0"><div class="card pergunta" style="flex:1;min-height:0;overflow:hidden"><div class="temas">${TEMAS.map((t, i) => `<span class="${i === k ? "agora" : i < k ? "feito" : ""}">${t}</span>`).join("")}</div>
+      <p class="pergunta-txt ${longa ? "longa" : ""}">${esc(qs[k])}</p>${apoio ? `<p class="rodape apoio">${esc(apoio)}</p>` : ""}</div>
+      ${agregadoOk(fin.length) && k === 4 ? `<div class="card guiou"><p><b>Guiou:</b> ${GUIAS.map((g) => `${g} ${guias[g] || 0}`).join(" · ")}</p><p><b>Pesou:</b> ${MOTIVOS.map((m) => `${m} ${motivos[m] || 0}`).join(" · ")}</p></div>` : ""}</div></div>`;
 }

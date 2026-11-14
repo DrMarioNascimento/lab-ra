@@ -21,7 +21,7 @@ export const IMPOSTO_LOTE = 1.5;         // só na Prosperidade, vai ao bem púb
 export const PISO_PESSOA = 6;            // piso de renda por pessoa
 export const NIVEL_MAX = 5;
 export const PONTOS_NIVEL = 12;          // × número de famílias para subir um nível
-export const VITORIA = { pobreSobreMedia: 0.6, mataMinima: 0.3, patrimonioPorPessoa: 42 };   // R7: meta das duas regras
+export const VITORIA = { pobreSobreMedia: 0.75, mataMinima: 0.3, patrimonioPorPessoa: 42 };   // R7: meta das duas regras; R14: equidade em 75% (com 60% ela quase nunca falhava)
 export const LIMITES = { pub: 50, rep: 30, car: 3 };
 
 export const lanceMinimo = (ano, acrescimo = 0) => 6 + 2 * ano + acrescimo;
@@ -136,7 +136,7 @@ export function leilao(fams, livres, props, ano, regra, acrescimo, desempate) {
 export const patrimonio = (f, publico) => f.caixa + f.lotes * VALOR_LOTE(publico);
 
 // Meta coletiva de cada regra (R7). Monopólio: eficiência (patrimônio médio por pessoa e mata).
-// Prosperidade: equidade (a família mais pobre com 60% da média e mata).
+// Prosperidade: equidade (a família mais pobre com 75% da média, por pessoa, e mata).
 export function vitoriaColetiva(v) {
   const fs = Object.values(v.fams);
   const pat = fs.map((f) => patrimonio(f, v.publico));
@@ -162,13 +162,17 @@ export function contrafactual(snap, props, grande, desempate = () => 0.5) {
     colapsou: snap.colapsou, teto: snap.teto, regra: outra, livres: snap.livres };
   for (const ano of [4, 5]) {
     const p = props[ano] || {};
+    // R14: a proposta grande do ano 5 vem antes das decisões e já pesa na renda do ano
+    if (ano === 5 && g.aceito) {
+      if (g.alvo === "mata") { v.mata = Math.max(0, v.mata - ESTRAGO_MATA * v.teto); v.colapsou = v.mata < COLAPSO * v.teto; }
+      else v.publico = Math.max(0, v.publico - 1);
+    }
     const renda = rendaDoAno(v.fams, { ...v, ano });
     const fx = fecharAno({ ...v, ano }, p, renda);
     Object.assign(v, { fams: fx.fams, mata: fx.mata, publico: fx.publico, acumulado: fx.acumulado, colapsou: fx.colapsou });
     if (v.livres > 0) { const L = leilao(v.fams, v.livres, p, ano, outra, 0, desempate); v.fams = L.fams; v.livres -= L.vendidos.length; }
-    if (ano === 5 && g.aceito) { if (g.alvo === "mata") v.mata = Math.max(0, v.mata - ESTRAGO_MATA * v.teto); else v.publico = Math.max(0, v.publico - 1); }
   }
-  return { regra: outra, gini: gini(Object.values(v.fams).map((f) => patrimonio(f, v.publico))), meta: vitoriaColetiva(v), mata: v.mata / v.teto };
+  return { regra: outra, gini: gini(Object.values(v.fams).map((f) => patrimonio(f, v.publico) / f.membros.length)), meta: vitoriaColetiva(v), mata: v.mata / v.teto };
 }
 
 // R10: quanto a vila está da meta da regra vigente (o telão e o celular mostram desde o ano 1).
