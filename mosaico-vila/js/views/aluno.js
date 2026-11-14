@@ -12,7 +12,7 @@ export function novoLocal() { return { pub: 20, rep: 0, car: 0, lance: 0, face: 
 
 function hd(st, me) {
   const f = me?.fam ? vista(st).fams[me.fam] : null;   // R19: nas cartas dos anos 2 e 4, o caixa de antes das decisões (como a barra)
-  return `<div class="hd">${f ? iconeFamilia(f, 34) : ico("app-mosaico-vila", "m")}
+  return `<div class="hd">${f ? iconeFamilia(f, 34, { moradia: true }) : ico("app-mosaico-vila", "m")}
     <div class="grow"><b>${esc(me?.nome || "Mosaico Vila")}</b><div class="faint" style="font-size:12px">${f ? `${esc(f.nome)} · caixa ${n0(f.caixa)}` : "Mosaico Vila"}</div></div>
     ${st.ano ? `<span class="chip">Ano ${st.ano}</span>` : ""}${st.ano ? miniBarra(st) : ""}</div>`;
 }
@@ -176,11 +176,11 @@ export function renderAluno(st, id, loc) {
         break;
       }
       if (c.tipo === "dado") {
-        bd = `<h2 class="row">${ico(c.icone, "g")}${esc(c.titulo)}</h2><p class="muted">${esc(c.texto)}</p>` + (loc.face == null
+        bd = `<h2 class="row">${ico(c.icone, "g")}${esc(c.titulo)}</h2><p class="muted">${esc(c.texto)}</p><p class="faint">O telão mostra só o total da turma (se todos fizerem o mesmo, o total diz isso).</p>` + (loc.face == null
           ? `<button class="btn block" data-a="rolar">Pensei. Rolar o dado</button>`
           : `<div class="card" style="text-align:center"><div class="dado">${loc.face}</div><p class="muted">Você acertou o número que pensou?</p><div class="escolha"><button class="btn sec" data-a="mente" data-val="1">Acertei</button><button class="btn sec" data-a="mente" data-val="0">Não acertei</button></div></div>`);
       } else if (c.tipo === "honesto") {
-        bd = cartaCelular(c, "<b>Só você vê esta tela.</b> O banco e a praça são do jogo; os 3 pontos valem no seu placar pessoal, que ninguém mais vê.", "mente", st);
+        bd = cartaCelular(c, "<b>Só você vê esta tela.</b> O banco e a praça são do jogo; os 3 pontos valem no seu placar pessoal, que ninguém mais vê. O telão mostra só o total da turma (se todos fizerem o mesmo, o total diz isso).", "mente", st);
       } else {
         bd = `<p class="faint" style="margin:0 0 6px">Cada pessoa recebeu uma das 4 situações do telão, sorteada. <b>Não arriscar não custa nada.</b></p>` + cartaCelular(c, "<b>Só você vê esta tela.</b> A outra pessoa é do jogo. Se arriscar, você põe 2; se ela for honesta, ganha 2; se não, perde os 2. Você só descobre no fim do ano, aqui no celular.", "mente", st);
       }
@@ -189,18 +189,18 @@ export function renderAluno(st, id, loc) {
     case "pequena": {
       const c = cartaPequena(st, id);   // R28: a fala sorteada para esta pessoa ("presente em troca de" ou às claras)
       bd = st.pequena.votos[id] != null ? enviado("Resposta secreta enviada.") + palpiteFaixa(st, id, "pequena", "quantos % de quem responder vão aceitar?")
-        : cartaCelular(c, `<b>Responda sem mostrar a tela.</b> Cada resposta vale para quem respondeu; o telão mostra só o total da turma (se todos fizerem o mesmo, o total diz isso). ${esc(c.segmento[0].toUpperCase() + c.segmento.slice(1))} é personagem do jogo; os ${GANHO_PEQUENA} pontos valem no seu placar pessoal, que só você vê.`, "pequena", st);
+        : cartaCelular(c, `<b>Responda sem mostrar a tela.</b> Cada resposta vale para quem respondeu; o telão mostra só totais de 5 ou mais pessoas, nunca a resposta de alguém (se todos fizerem o mesmo, o total diz isso). ${esc(c.segmento[0].toUpperCase() + c.segmento.slice(1))} é personagem do jogo; os ${GANHO_PEQUENA} pontos valem no seu placar pessoal, que só você vê.`, "pequena", st);
       break;
     }
     case "lances": {
       const p = st.lances?.[st.ano]?.[id];
       const palp = st.palpite?.[st.ano]?.[id];
       if (!p?.lanceEnviado && f.lotes >= tetoLotes(f)) {   // R16: a família já tem a moradia + 1 lote
-        bd = `<h2 class="row">${ico("lote-sobrado", "g")}Mercado de lotes</h2><div class="card"><p class="muted" style="margin:0">A família tem ${f.lotes === 1 ? "1 lote" : `${f.lotes} lotes`} e precisa de ${precisaLotes(f)} para morar. Cada família compra até ter a moradia + 1 lote: <b>vocês ficam de fora deste mercado</b>. O lote de vocês ainda pode render aluguel.</p></div>
+        bd = `<h2 class="row">${ico("mercado-lotes", "g")}Mercado de lotes</h2><div class="card"><p class="muted" style="margin:0">A família tem ${f.lotes === 1 ? "1 lote" : `${f.lotes} lotes`} e precisa de ${precisaLotes(f)} para morar. Cada família compra até ter a moradia + 1 lote: <b>vocês ficam de fora deste mercado</b>. O lote de vocês ainda pode render aluguel.</p></div>
           <div class="card"><b>Enquanto a turma decide: qual vai ser o lance vencedor?</b><div class="row" style="margin-top:8px">${["até 20", "21 a 40", "mais de 40"].map((v) => `<button class="btn sm ${palp === v ? "on" : "sec"} grow" data-a="palpite" data-val="${v}">${v}</button>`).join("")}</div></div>`;
         break;
       }
-      bd = p?.lanceEnviado ? enviado(p.semLote ? "Enviado: não queremos lote este ano." : "Lance enviado.") + `<div class="card"><b>Enquanto a turma decide: qual vai ser o lance vencedor?</b><div class="row" style="margin-top:8px">${["até 20", "21 a 40", "mais de 40"].map((v) => `<button class="btn sm ${palp === v ? "on" : "sec"} grow" data-a="palpite" data-val="${v}">${v}</button>`).join("")}</div></div>` : `<h2 class="row">${ico("lote-sobrado", "g")}Mercado de lotes</h2><p class="muted">Lance fechado. Quanto do caixa da família (${n0(f.caixa)}) oferecer além do mínimo de ${lanceMinimo(st.ano)}? Vale a mediana da família; quem não envia conta como 0%.</p>
+      bd = p?.lanceEnviado ? enviado(p.semLote ? "Enviado: não queremos lote este ano." : "Lance enviado.") + `<div class="card"><b>Enquanto a turma decide: qual vai ser o lance vencedor?</b><div class="row" style="margin-top:8px">${["até 20", "21 a 40", "mais de 40"].map((v) => `<button class="btn sm ${palp === v ? "on" : "sec"} grow" data-a="palpite" data-val="${v}">${v}</button>`).join("")}</div></div>` : `<h2 class="row">${ico("mercado-lotes", "g")}Mercado de lotes</h2><p class="muted">Lance fechado. Quanto do caixa da família (${n0(f.caixa)}) oferecer além do mínimo de ${lanceMinimo(st.ano)}? Vale a mediana da família; quem não envia conta como 0%.</p>
         <div class="card"><div class="row" style="justify-content:space-between"><b>Parte do caixa</b><b class="mono">${loc.lance}%</b></div><input type="range" min="0" max="60" step="5" value="${loc.lance}" data-in="lance" data-key="lance">${efeitoLance(st, f, loc)}</div>
         <p class="faint">A família precisa de ${precisaLotes(f) === 1 ? "1 lote" : `${precisaLotes(f)} lotes`} para morar; tem ${f.lotes}; pode comprar até ter ${tetoLotes(f)}. ${st.regra === "prosperidade" ? "Na Prosperidade, conta metade do que vocês oferecem além do mínimo. " : ""}Quem já levou um lote oferece, no próximo, metade da porcentagem, sobre o caixa que sobrou.</p><button class="btn ok block" data-a="lance">Enviar lance</button>
         <button class="btn sec block" data-a="semLote" style="margin-top:8px">Não queremos lote este ano</button><p class="faint" style="margin:4px 0 0">Vale se a maioria da família inteira marcar. Ficar de fora não custa nada. ${st.ano >= 5 ? "No último ano, o lote novo conta só no patrimônio" : "O lote novo conta para moradia e aluguel a partir do próximo ano"}; o lance mínimo é 6 + 2 × o ano.</p>`;
@@ -244,7 +244,7 @@ export function renderAluno(st, id, loc) {
         ${duasMetasCel()}`;   // R19 e R20
       break;
     case "voto":
-      bd = st.voto[id] != null ? enviado("Voto secreto enviado.") + palpiteFaixa(st, id, "voto", "quantos % vão votar para trocar?") : `<h2 class="row">${ico("balanca", "g")}Que regra queremos?</h2><p class="muted"><b>Volte ao seu lugar para votar.</b> Vale para os anos 4 e 5. Voto secreto; vence a maioria dos votos, e empate mantém o Monopólio.</p>${controle(st, id)}
+      bd = st.voto[id] != null ? enviado("Voto secreto enviado.") + palpiteFaixa(st, id, "voto", "quantos % vão votar para trocar?") : `<h2 class="row">${ico("balanca", "g")}Que regra queremos?</h2><p class="muted"><b>Volte ao seu lugar para votar.</b> Vale para os anos 4 e 5. Voto secreto (o telão mostra só o total; se todos votarem igual, o total diz isso); vence a maioria dos votos, e empate mantém o Monopólio.</p>${controle(st, id)}
         <button class="opt" data-a="voto" data-val="0"><b>Manter o Monopólio</b><br><span class="faint">${esc(REGRAS_TXT.monopolio.curto)}</span></button>
         <button class="opt" data-a="voto" data-val="1"><b>Trocar para a Prosperidade</b><br><span class="faint">${esc(REGRAS_TXT.prosperidade.curto)}</span></button>${duasMetasCel()}`;
       break;

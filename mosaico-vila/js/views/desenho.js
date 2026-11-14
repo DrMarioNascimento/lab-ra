@@ -1,7 +1,7 @@
 // Desenhos: ícones 3D (assets/icones) das famílias, o mapa da vila no telão e a linha do tempo.
 // Casas e árvores vêm da pasta Cell do autor; formas e ícones de apoio são cópias próprias dos ícones 3D do MOSAICO Sala (ver assets/icones/origens.json).
 import { NIVEIS_PUBLICO } from "../content/vila.js";
-import { LOTES } from "../content/regras.js";
+import { LOTES, precisaLotes } from "../content/regras.js";
 
 export const ICO = new URL("../../assets/icones/", import.meta.url).href;
 // Ícone 3D de apoio (balança, meta, troféu...): <img> com sombra; tamanhos pelo CSS (.ico3, .g, .xl).
@@ -53,9 +53,22 @@ export function unidade(maior, maxIcones = 12) {
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
 // Ícone da família: a casa 3D na cor dela, com a forma 3D no canto (para ninguém depender só da cor).
-export function iconeFamilia(f, tam = 34) {
-  return `<span class="ico-fam" style="--t:${tam}px" role="img" aria-label="${esc(f.nome)}"><img class="casa" src="${ICO}casa-${f.casa || "neutra"}.webp" alt="" draggable="false"><img class="forma" src="${ICO}forma-${f.forma}.webp" alt="" draggable="false"></span>`;
+// R32: no celular da própria família (moradia: true), a casa mostra a moradia de agora: sem lote, cabana; com o que precisa, casa (1 lote)
+// ou sobrado (2); com um lote a mais, geminadas térreas (precisa de 1) ou sobrado com anexo (precisa de 2); 3 lotes precisando de 1, geminadas.
+// O telão continua com a mesma casa para todas, para não marcar quem tem herança ou começou sem lote.
+export function moradiaDe(f) {
+  const n = f.lotes || 0, p = precisaLotes(f), c = f.casa || "neutra";
+  if (!n) return "moradia-cabana";
+  if (n <= p) return n === 2 ? `moradia-sobrado-${c}` : `casa-${c}`;
+  if (p === 1) return n === 2 ? `moradia-geminadas-terreas-${c}` : `moradia-geminadas-${c}`;
+  return `moradia-sobrado-anexo-${c}`;
 }
+export function iconeFamilia(f, tam = 34, { moradia = false } = {}) {
+  return `<span class="ico-fam" style="--t:${tam}px" role="img" aria-label="${esc(f.nome)}"><img class="casa" src="${ICO}${moradia && f.casa ? moradiaDe(f) : `casa-${f.casa || "neutra"}`}.webp" alt="" draggable="false"><img class="forma" src="${ICO}forma-${f.forma}.webp" alt="" draggable="false"></span>`;
+}
+
+// R32: prédios 3D do bem público (nível 4, Escola de esportes; nível 5, Centro comunitário); os níveis 1 a 3 seguem desenhados até os ícones ficarem prontos
+const PREDIO_3D = { 4: "publico-4-escola", 5: "publico-5-centro" };
 
 // Mapa da vila: a mata à esquerda, o bem público ao centro, os 24 lotes à direita.
 export function mapaVila(st, { grande = true, destaque = null, menor = false } = {}) {
@@ -82,14 +95,14 @@ export function mapaVila(st, { grande = true, destaque = null, menor = false } =
     lotes.push(dono
       ? `<g transform="translate(${x} ${y})"><rect x="-19" y="-19" width="38" height="44" rx="7" fill="${marcada ? dono.cor2 : "#1b3352"}" opacity="${marcada ? ".55" : ".8"}"/><rect x="-19" y="21" width="38" height="4" rx="2" fill="#081526" opacity=".7"/><image href="${ICO}casa-${marcada ? dono.casa : "neutra"}.webp" x="-21" y="-20" width="42" height="42"/></g>`
       : aVenda-- > 0
-        ? `<g transform="translate(${x} ${y})"><rect x="-19" y="-19" width="38" height="44" rx="7" fill="#2a2208" stroke="#fbbf24" stroke-width="2" stroke-dasharray="5 3"/><image href="${ICO}lote-venda.webp" x="-21" y="-21" width="42" height="42"/></g>`
+        ? `<g transform="translate(${x} ${y})"><rect x="-19" y="-19" width="38" height="44" rx="7" fill="#2a2208" stroke="#fbbf24" stroke-width="2" stroke-dasharray="5 3"/><image href="${ICO}lote-alfinete.webp" x="-21" y="-21" width="42" height="42"/></g>`
         : `<g transform="translate(${x} ${y})"><rect x="-19" y="-19" width="38" height="44" rx="7" fill="#0b1a2c" stroke="#3b5875" stroke-dasharray="4 4"/></g>`);
   }
   const nivel = st.publico;
   const predios = [];
   for (let k = 1; k <= 5; k++) {
     const on = k <= nivel, x = 345 + ((k - 1) % 2) * 90, y = 150 + Math.floor((k - 1) / 2) * 84;
-    predios.push(`<g transform="translate(${x} ${y})" opacity="${on ? 1 : 0.3}"><rect x="-32" y="-26" width="64" height="52" rx="8" fill="${on ? "url(#predio)" : "#1b3555"}" stroke="${on ? "#fde68a" : "#2a4a6e"}"/><path d="M-16 -2 L0 -16 L16 -2 Z" fill="${on ? "#fff7d6" : "#2a4a6e"}"/><rect x="-11" y="-2" width="22" height="16" rx="2" fill="${on ? "#fff7d6" : "#2a4a6e"}"/><text y="23" text-anchor="middle" font-size="14" font-weight="700" fill="${on ? "#3b2405" : "#6f89a6"}" font-family="Sora, sans-serif">${k}</text></g>`);
+    predios.push(`<g transform="translate(${x} ${y})" opacity="${on ? 1 : 0.3}"><rect x="-32" y="-26" width="64" height="52" rx="8" fill="${on ? "url(#predio)" : "#1b3555"}" stroke="${on ? "#fde68a" : "#2a4a6e"}"/>${PREDIO_3D[k] ? `<image href="${ICO}${PREDIO_3D[k]}.webp" x="-25" y="-33" width="50" height="50"/>` : `<path d="M-16 -2 L0 -16 L16 -2 Z" fill="${on ? "#fff7d6" : "#2a4a6e"}"/><rect x="-11" y="-2" width="22" height="16" rx="2" fill="${on ? "#fff7d6" : "#2a4a6e"}"/>`}<text y="23" text-anchor="middle" font-size="14" font-weight="700" fill="${on ? "#3b2405" : "#6f89a6"}" font-family="Sora, sans-serif">${k}</text></g>`);
   }
   const corMata = fm < 0.3 ? "#fb7185" : fm < 0.5 ? "#fbbf24" : "#34d399";   // R13: as mesmas faixas da barra (30% e 50%)
   return `<svg class="metro mapa ${grande ? "grande" : ""}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Mapa da vila: mata em ${Math.round(fm * 100)}%, bem público nível ${nivel}">

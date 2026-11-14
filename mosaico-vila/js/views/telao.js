@@ -21,7 +21,7 @@ export function decorrido(st) {
 }
 
 // Ícone da novidade de cada ano
-const ICONE_ANO = { 1: "economia", 2: "arvore-redonda", 3: "sobrado", 4: "lote-venda", 5: "alvara" };
+const ICONE_ANO = { 1: "economia", 2: "arvore-redonda", 3: "sobrado", 4: "lote-alfinete", 5: "alvara" };
 
 // Barra de ícones: o estado da vila, sempre no mesmo lugar. No resultado, o que mudou pisca e mostra +/−.
 function barra(st0) {
@@ -43,7 +43,7 @@ function barra(st0) {
     ${st.ano >= 2 ? `<div class="slot ${fm < COLAPSO ? "mal" : fm < 0.5 ? "atencao" : ""} ${dMata ? "pulsa" : ""}">${ico("arvore-redonda")}<div><b>${pctL(fm)}${delta(dMata)}</b><span>mata</span></div></div>` : ""}
     <div class="slot ${dPub ? "pulsa" : ""}">${ico("economia")}<div><b class="niv">${pips(st.publico, 5, (k) => (k <= st.publico ? "on" : ""))}${delta(dPub)}</b><span>bem público</span></div></div>
     <div class="slot ${metaOk && !noVoto ? "ok" : ""}">${ico("meta")}<div><b>${valMeta}</b><span>meta da vila</span></div></div>
-    ${st.ano >= 3 ? `<div class="slot">${ico("lote-venda")}<div><b>${livres}</b><span>lotes livres</span></div></div>` : ""}
+    ${st.ano >= 3 ? `<div class="slot">${ico("lote-alfinete")}<div><b>${livres}</b><span>lotes livres</span></div></div>` : ""}
   </div>`;
 }
 
@@ -151,7 +151,7 @@ export function renderTelao(st) {
         // R28: o texto da proposta fica só no celular (metade da turma lê "presente em troca de", metade às claras); o telão não entrega a fala
         body = topo(st, esc(c.titulo)) + `<div class="card destaque">${ico(c.icone, "xl")}<p class="enorme">A proposta chegou no celular de cada um. Leia em silêncio e responda sem mostrar a tela.</p></div>
           <div class="card como"><p class="big" style="margin:0">Proposta pequena: <b>cada um decide por si</b> e cada resposta vale para quem respondeu. Se a turma inteira aceitar, ${esc(ef)}: o estrago de uma proposta grande.</p></div>
-          <p class="rodape">A proposta é do jogo, não de um colega. O telão só mostra o total, com 5 ou mais respostas.</p>`; }
+          <p class="rodape">A proposta é do jogo, não de um colega. O telão só mostra totais de 5 ou mais respostas.</p>`; }
       break;
     case "mente": {
       const c = carta(st.cartas.ano4);
@@ -167,7 +167,7 @@ export function renderTelao(st) {
       const regras = ["Lance secreto; vale a <b>mediana da família</b> (sem lance, 0).", "O maior lance leva.",
         ...(st.regra === "prosperidade" ? ["Na Prosperidade, o que passa do mínimo conta pela metade."] : []), "Cada família, até a moradia + 1 lote."];
       body = topo(st, "Mercado de lotes") + `<div class="lado compacto"><div class="card mapa-card">${mapaVila(st, { menor: true })}</div><div class="col">
-        <div class="card row" style="flex-wrap:nowrap;gap:1.2cqw">${ico("lote-sobrado", "g")}<div class="big">${st.ano === 5 ? "Voltem às famílias: " : ""}<b class="mono">${Math.min(3, livres)}</b> lotes à venda · lance mínimo <b class="mono">${lanceMinimo(st.ano)}</b></div></div>
+        <div class="card row" style="flex-wrap:nowrap;gap:1.2cqw">${ico("mercado-lotes", "g")}<div class="big">${st.ano === 5 ? "Voltem às famílias: " : ""}<b class="mono">${Math.min(3, livres)}</b> lotes à venda · lance mínimo <b class="mono">${lanceMinimo(st.ano)}</b></div></div>
         ${st.ano === 5 && st.alvara?.aceito ? `<div class="card banner mal"><p class="big" style="margin:0">Proposta grande aceita: a barra já conta o estrago.</p></div>` : ""}
         <div class="card"><ol class="regras-lote">${regras.map((t) => `<li>${t}</li>`).join("")}</ol></div>
         </div></div>`;   // R29: no ano 5 com a grande aceita, o telão avisa que a barra já conta o estrago
@@ -228,7 +228,7 @@ const porPatrimonio = (st) => fams(st).map((f) => ({ pat: patrimonio(f, st.publi
 
 // R13: unidade fixa no jogo inteiro: cada moeda vale 10 pontos (casas só querem dizer lotes).
 const MOEDA = 10;
-const moedas = (valor, cls = "") => fileira("moeda.svg", Math.max(0, valor), MOEDA, cls);
+const moedas = (valor, cls = "") => fileira("moeda.webp", Math.max(0, valor), MOEDA, cls);
 
 // O dinheiro: patrimônio por pessoa de cada família, em moedas, com a marca da meta.
 function dinheiroPorPessoa(st, ranking) {
@@ -311,7 +311,8 @@ export function paineisResultado(st) {
       : fato("toco", "A mata terminou abaixo de 30%: a meta pede mais que isso.", "mal"));
   } else if (st.colapsouAlguma) fatos.push(fato("arvore-redonda", "A mata voltou a passar dos 30%: o −4 acabou", "bom"));
   const prev = st.previsao[st.ano] || {}, np = Object.keys(prev).length;
-  if (st.ano >= 2 && agregadoOk(np) && fx) { const ref = fx.mataPrev ?? fx.mataAntes, real = st.mata > ref + 0.5 ? "sobe" : st.mata < ref - 0.5 ? "desce" : "fica"; /* R26: no ano 5, contra a mata que a turma via ao prever (já depois da proposta grande) */ fatos.push(`<p class="rodape">Previsão da mata: ${pct(Object.values(prev).filter((v) => v === real).length, np)}% acertaram.</p>`); }
+  if (st.ano >= 2 && agregadoOk(np) && fx) { const ref = fx.mataPrev ?? fx.mataAntes, real = st.mata > ref + 0.5 ? "sobe" : st.mata < ref - 0.5 ? "desce" : "fica"; /* R26: no ano 5, contra a mata que a turma via ao prever (já depois da proposta grande) */ const desde = st.ano === 5 && fx.mataPrev != null && Math.abs(fx.mataPrev - fx.mataAntes) > 0.5 ? ` (a partir de ${pctL(ref / st.teto)}, a mata da hora do palpite)` : "";   // R32
+    fatos.push(`<p class="rodape">Previsão da mata: ${pct(Object.values(prev).filter((v) => v === real).length, np)}% acertaram${desde}.</p>`); }
   const cheio = fatos.length >= 5;   // R24: com colapso, previsão e proposta no bem público, o mapa menor dá largura ao texto (antes, a última linha era cortada)
   const paineis = [{ nome: "A vila", dur: 10, html: `<div class="lado${cheio ? " compacto" : ""}"><div class="card mapa-card">${mapaVila(st, { menor: cheio })}</div><div class="col" style="justify-content:center${cheio ? ";gap:.8cqw" : ""}">${fatos.join("")}</div></div>` }];
 
@@ -332,7 +333,7 @@ export function paineisResultado(st) {
   const acont = [];
   if (st.ano >= 4 && st.leilao) {
     const nv = st.leilao.vendidos.length, vl = VALOR_LOTE(st.publico);
-    acont.push(fato("lote-venda", nv ? `${nv === 1 ? "1 lote vendido" : `${nv} lotes vendidos`}. O maior lance foi <b>${n0(Math.max(...st.leilao.vendidos.map((v) => v.preco)))}</b>, por um lote que vale <b>${vl}</b> no patrimônio (10 + 2 × nível ${st.publico}).` : (st.leilao.semLote?.length || st.leilao.noTeto?.length ? "Nenhum lote vendido: as famílias ficaram de fora, por escolha ou porque já tinham a moradia + 1 lote, ou não tinham caixa para o mínimo." : "Nenhum lote vendido: ninguém tinha caixa para o mínimo.")));
+    acont.push(fato("lote-alfinete", nv ? `${nv === 1 ? "1 lote vendido" : `${nv} lotes vendidos`}. O maior lance foi <b>${n0(Math.max(...st.leilao.vendidos.map((v) => v.preco)))}</b>, por um lote que vale <b>${vl}</b> no patrimônio (10 + 2 × nível ${st.publico}).` : (st.leilao.semLote?.length || st.leilao.noTeto?.length ? "Nenhum lote vendido: as famílias ficaram de fora, por escolha ou porque já tinham a moradia + 1 lote, ou não tinham caixa para o mínimo." : "Nenhum lote vendido: ninguém tinha caixa para o mínimo.")));
     if (nv) acont.push(`<p class="rodape">O lance sai do caixa e vai para o banco: o patrimônio da família cai a diferença entre o lance e o valor do lote.</p>`);
     // R16: quem ficou de fora por escolha ou porque já tinha a moradia + 1 lote (só o número, sem nomes)
     const nS = st.leilao.semLote?.length || 0, nT = st.leilao.noTeto?.length || 0;
@@ -505,9 +506,10 @@ function apoioPergunta(st, k) {
     return "Por exemplo: a agenda do posto, a praça onde se treina, a verba do clube. Quem ganha com elas sem fazer nada, e quem cuida delas?" + (agregadoOk(nM) ? ` Na turma, o que mais pesou: ${top.map((m) => `${m.toLowerCase()} (${pct(mot[m] || 0, nM)}%)`).join(" e ")}.` : "");
   }
   // R28: na pergunta 4, as duas falas da pequena (cada uma com 5 ou mais respostas) puxam a discussão
-  const F = k === 3 ? falasPequena(st) : null, falas = F?.ok ? `Na pequena, com “presente em troca de”, ${pct(F.P.a, F.P.n)}% aceitaram; às claras, ${pct(F.C.a, F.C.n)}%${F.igual ? ", o mesmo" : F.acaso ? ", diferença do tamanho que o acaso dá" : ", pista (não prova) de que a palavra pesou"}. A palavra muda decisões? ` : "";
+  const F = k === 3 ? falasPequena(st) : null, falas = F?.ok ? `Na pequena, com “presente em troca de”, ${pctFala(F.P).txt} aceitaram; às claras, ${pctFala(F.C).txt}${F.igual ? ", o mesmo" : F.acaso ? ", diferença do tamanho que o acaso dá" : ", pista (não prova) de que a palavra pesou"}. A palavra muda decisões? ` : "";
   // R29: a grande veio depois do carimbo do ano 2, e a pergunta 4 diz isso; com as falas, a carta do ano 4 sai desta linha (três assuntos em 1,5 min era demais)
-  const aviso = k === 3 && st.cartas ? "A grande veio depois do carimbo do ano 2: a turma já sabia o nome. " : "";
+  // R32: na madeira sem nota, o carimbo do ano 2 foi "Sonegação", não "Corrupção"
+  const aviso = k === 3 && st.cartas ? (carta(st.cartas.pequena).carimbo ? `A grande veio depois do carimbo “${carta(st.cartas.pequena).carimbo}” do ano 2: a turma já tinha visto um carimbo. ` : "A grande veio depois do carimbo do ano 2: a turma já sabia o nome. ") : "";
   if (k === 3 && (F?.ok || !(st.cartas && !st.semTroco))) return (aviso + falas).trim();
   if (k === 3 && st.cartas && !st.semTroco) {
     const c = carta(st.cartas.ano4), vals = Object.values(st.mente);
@@ -520,22 +522,26 @@ function apoioPergunta(st, k) {
 // R28: as duas falas da proposta pequena ("presente em troca de" e às claras), por quem respondeu; cada fala só com 5 ou mais respostas
 function falasPequena(st) {
   const ids = Object.keys(st.pequena?.votos || {}), conta = (f) => { const xs = ids.filter((id) => falaDe(st, id) === f); return { n: xs.length, a: xs.filter((id) => st.pequena.votos[id]).length }; };
-  const P = conta("presente"), C = conta("claras"), ok = agregadoOk(P.n) && agregadoOk(C.n);
+  // R32: cada fala só aparece com 10 ou mais respostas, e os extremos em faixa ("90% ou mais"), para quem souber a fala de um colega não descobrir a resposta dele
+  const P = conta("presente"), C = conta("claras"), ok = P.n >= FALA_MIN && C.n >= FALA_MIN;
   // R30: a metade sorteada só mostra efeito da palavra se a diferença passar de duas vezes o erro do sorteio
   // (antes, só até uma pessoa contava como acaso; sem efeito nenhum, diferenças maiores apareciam em quase metade das partidas)
   const p = ok ? (P.a + C.a) / (P.n + C.n) : 0, erro = ok ? Math.sqrt(p * (1 - p) * (1 / P.n + 1 / C.n)) : 0;
-  const dif = ok ? Math.abs(P.a / P.n - C.a / C.n) : 0, igual = ok && dif < 0.005, acaso = ok && !igual && dif <= 2 * erro + 1e-9;
+  const faixa = ok && [P, C].some((x) => pctFala(x).faixa);
+  const dif = ok ? Math.abs(P.a / P.n - C.a / C.n) : 0, igual = ok && !faixa && dif < 0.005, acaso = ok && !igual && dif <= 2 * erro + 1e-9;
   return { P, C, ok, acaso, igual };
 }
+const FALA_MIN = 10;
+function pctFala(x) { const p = pct(x.a, x.n); return p >= 90 ? { txt: "90% ou mais", w: 90, faixa: true } : p <= 10 ? { txt: "10% ou menos", w: 10, faixa: true } : { txt: `${p}%`, w: p, faixa: false }; }
 const carimbo = (txt = "Corrupção", cls = "") => `<div class="carimbo${cls ? ` ${cls}` : ""}">${esc(txt)}</div>`;
 function barrasFalas(F, grande = false) {
-  return `<div class="col falas-barras">${[["“Presente em troca de”", F.P], ["Às claras (“cobra”, “oferece”)", F.C]].map(([rot, x]) => `<div><div class="row" style="justify-content:space-between;flex-wrap:nowrap"><b>${rot}</b><b class="mono">${pct(x.a, x.n)}%</b></div><div class="barra ${grande ? "grande" : ""}"><i style="width:${pct(x.a, x.n)}%;background:#f87171"></i></div></div>`).join("")}</div>`;
+  return `<div class="col falas-barras">${[["“Presente em troca de”", F.P], ["Às claras (“cobra”, “oferece”)", F.C]].map(([rot, x]) => `<div><div class="row" style="justify-content:space-between;flex-wrap:nowrap"><b>${rot}</b><b class="mono">${pctFala(x).txt}</b></div><div class="barra ${grande ? "grande" : ""}"><i style="width:${pctFala(x).w}%;background:#f87171"></i></div></div>`).join("")}</div>`;
 }
 function painelFalas(st) {
   const F = falasPequena(st), c = carta(st.cartas.pequena);
   return `<div class="card col" style="justify-content:safe center;gap:1cqw;min-height:0">${carimbo(c.carimbo || "Corrupção", "md")}
     <p class="big" style="margin:0;font-size:2.15cqw">Metade leu <b>“presente em troca de”</b>; metade, às claras. Mesmos pontos, mesmo estrago: o carimbo é da proposta, não de quem aceitou.</p>
-    ${F.ok ? `${barrasFalas(F, true)}<p class="rodape" style="margin:0">${F.igual ? "Mesmo resultado nas duas falas. Fora do jogo, a palavra muda decisões?" : F.acaso ? "Com tão poucas pessoas, diferença assim é comum por acaso. A palavra muda decisões?" : "Diferença maior que a do acaso, mas é pista, não prova. A palavra mudou a decisão?"}</p>` : `<p class="rodape" style="margin:0">A comparação das duas falas aparece com 5 ou mais respostas em cada uma.</p>`}</div>`;
+    ${F.ok ? `${barrasFalas(F, true)}<p class="rodape" style="margin:0">${F.igual ? "Mesmo resultado nas duas falas. Fora do jogo, a palavra muda decisões?" : F.acaso ? "Com tão poucas pessoas, diferença assim é comum por acaso. A palavra muda decisões?" : "Diferença maior que a do acaso, mas é pista, não prova. A palavra mudou a decisão?"}</p>` : `<p class="rodape" style="margin:0">A comparação das duas falas aparece com 10 ou mais respostas em cada uma.</p>`}</div>`;
 }
 
 // R16: na pergunta 4, as duas propostas lado a lado (mesma base: quem respondeu); na 5, o que guiou a turma

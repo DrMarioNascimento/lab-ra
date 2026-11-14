@@ -150,7 +150,7 @@ ok(!confiaram || (golpes / confiaram > 0.1 && golpes / confiaram < 0.45), `golpe
   const h4 = renderTelao(P.st);
   // R29: com as duas falas da pequena, a linha de apoio da pergunta 4 fica com as falas e o aviso do carimbo (a carta do ano 4 já teve o seu painel)
   ok((/por acaso/.test(h4) || /presente em troca de/.test(h4)) && !/ficaram com o que não era seu/.test(h4), "R17/R29: no dado, a pergunta 4 nunca chama ninguém de desonesto");
-  ok(/já sabia o nome/.test(h4), "R29: a pergunta 4 avisa que a grande veio depois do carimbo do ano 2");
+  ok(/já sabia o nome|já tinha visto um carimbo/.test(h4), "R29/R32: a pergunta 4 avisa que a grande veio depois do carimbo do ano 2");
   // confiança (semente 78) com 12 pessoas: nenhuma barra por situação (cada situação tem menos de 5)
   const C = partida(78, 12, (st) => st.fase === "resultado" && st.ano === 4);
   let html = "";

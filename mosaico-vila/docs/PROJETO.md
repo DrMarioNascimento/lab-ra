@@ -222,3 +222,8 @@ No fim do ano 3, o motor guarda a vila (`snap3`). No fechamento, `contrafactual(
 - "E se" (`motivosMeta`): todos os motivos de a meta não ser batida. Pergunta 2: "pela meta de cada regra".
 - `efeitoCarta(…, { juntado })`: no nível 0 sem pontos juntados, a carta diz que o bem público "não tem o que perder agora".
 - Confiança: "No fim do ano: os golpes da turma (com 5 ou mais confiando) e, se cada situação tiver 5 ou mais, os de cada uma."
+
+## R32 (14/11/2026, ícones novos da pasta Cell, escolhidos pelo professor)
+- `moeda.webp` (moeda dourada) no lugar de `moeda.svg`; `mercado-lotes.webp` (barraca e lotes) no lugar de `lote-sobrado.webp`; `lote-alfinete.webp` (piso de lotes com alfinete) no lugar de `lote-venda.webp`, no mapa, na barra de cima, no painel do mercado e na página inicial. Os anteriores ficaram com o sufixo `_SUBSTITUIDO_2026-11-14`.
+- Mapa: `PREDIO_3D` põe a escola (nível 4) e a casa com sino (nível 5) nas vagas do bem público, com as paredes em creme; os níveis 1 a 3 seguem desenhados até os ícones chegarem (prompts em `ICONES-PROMPTS.md`).
+- `moradiaDe(f)` e `iconeFamilia(f, tam, { moradia: true })`: só no cabeçalho do celular da família, a casa mostra a moradia de agora (cabana, casa, sobrado, geminadas térreas, sobrado com anexo, geminadas). O telão, a tela de achar a família e o painel de quem conduz seguem com a mesma casa para todas.

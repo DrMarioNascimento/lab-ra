@@ -8,8 +8,22 @@
 - **Ícone do app** (`app-mosaico-vila.webp`): montagem da casa azul com as duas árvores.
 - Origem de cada arquivo: `assets/icones/origens.json`.
 
+## Leva de 14/11/2026 (R32, pasta Cell)
+- **Moeda** (`moeda.webp`): a moeda dourada substitui a provisória em SVG (`moeda_SUBSTITUIDO_2026-11-14.svg`) no aluguel e no dinheiro do telão.
+- **Mercado de lotes** (`mercado-lotes.webp`, a barraca com dois lotes cercados) e **lote à venda** (`lote-alfinete.webp`, o piso de lotes com alfinete): substituem os dois ícones de pixel (`lote-sobrado_SUBSTITUIDO_2026-11-14.webp` e `lote-venda_SUBSTITUIDO_2026-11-14.webp`).
+- **Bem público, níveis 4 e 5** (`publico-4-escola.webp`, `publico-5-centro.webp`): a escola com relógio e a casa com sino, com as paredes em creme para não parecerem a casa da Família Azul.
+- **Moradia no celular da própria família** (`moradia-*.webp`): sem lote, a cabana; com o que precisa, a casa (1 lote) ou o sobrado (2); com um lote a mais, as geminadas térreas (precisa de 1) ou o sobrado com anexo (precisa de 2); 3 lotes precisando de 1, as geminadas. As casas são recoloridas na cor de cada família. O telão continua com a mesma casa para todas, para não marcar quem tem herança ou começou sem lote.
+- Ficaram guardados, sem uso no jogo: a capela (o bem público da vila é laico: praça, posto, academia, escola, centro comunitário), a cédula (o jogo usa uma moeda só, de 10 pontos, do começo ao fim) e o "sobrado + casa" (o sobrado com anexo já faz esse papel).
+
+### Para completar o bem público (mesmo estilo dos níveis 4 e 5)
+Estilo: ícone 3D brilhante, como as casas da vila: paredes creme lisas, acabamento dourado, telhado laranja-terracota, vista isométrica levemente de cima, iluminação suave de estúdio, fundo branco liso, sem texto, 1024 × 1024.
+- `publico-1-praca.webp` · Praça: canteiro redondo de grama com uma árvore pequena, um banco de praça de madeira laranja-terracota com pés dourados e um poste de luz dourado, sobre uma base de pedra creme.
+- `publico-2-posto.webp` · Posto de saúde: prédio térreo de paredes creme e telhado laranja-terracota, com uma cruz verde na fachada e porta dourada.
+- `publico-3-academia.webp` · Academia ao ar livre: dois aparelhos de ginástica de praça (simulador de caminhada e barra) verdes com detalhes dourados, sobre uma base de piso creme.
+Ao salvar, acrescentar o nível em `PREDIO_3D` (`js/views/desenho.js`).
+
 ## Ainda provisórios (SVG no código)
-Os prédios do bem público (itens 9 a 13 abaixo) continuam desenhados em SVG no mapa. A **moeda** do aluguel no telão (`assets/icones/moeda.svg`) também é provisória. Prompt para gerar: *"Moeda de ouro 3D estilizada, vista levemente de cima, com uma casinha em relevo no centro, borda grossa com brilho, estilo ícone de jogo mobile, iluminação suave, fundo branco liso, sem texto, 1024 × 1024"* — salvar como `assets/icones/moeda.webp` e trocar `"moeda.svg"` por `"moeda"` em `telao.js`. Os itens 1 a 8, 14 a 16 e 20 já foram resolvidos acima; 17 a 19 estão cobertos pelos ícones de apoio (alvará e balança), e o troco do mercado usa o dado do próprio celular.
+Os prédios dos níveis 1 a 3 do bem público (itens 9 a 11 abaixo) continuam desenhados em SVG no mapa; os níveis 4 e 5 já são 3D (R32). A moeda já está em 3D (R32). Os itens 1 a 8, 14 a 16 e 20 já foram resolvidos acima; 17 a 19 estão cobertos pelos ícones de apoio (alvará e balança), e o troco do mercado usa o dado do próprio celular.
 
 ## Cartas sorteadas (R13, 14/11/2026): provisórias, com prompts para os definitivos
 Por ora, cada carta usa uma cópia de um ícone 3D que o jogo já tem (entre parênteses). Estilo comum: o da lista original abaixo (ícone 3D brilhante, iluminação suave de estúdio, levemente de cima, cores saturadas, fundo branco liso para recortar, sem texto, 1024 × 1024). Salvar em `assets/icones/` com o nome indicado e trocar o campo `icone` da carta em `js/content/cartas.js`.
