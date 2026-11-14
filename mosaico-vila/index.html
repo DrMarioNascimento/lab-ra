@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mosaico Vila · comunidade, recursos e regras</title>
+<link rel="icon" href="assets/icones/app-mosaico-vila-180.png">
+<link rel="apple-touch-icon" href="assets/icones/app-mosaico-vila-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .capa { display: grid; grid-template-columns: auto 1fr; gap: 22px; align-items: center; padding: 22px;
+    background: radial-gradient(520px 260px at 0% 0%, #1d4b3a 0%, transparent 70%), linear-gradient(180deg, var(--card2), var(--card)); }
+  .capa h1 { font-size: 34px; }
+  .vitrine { display: flex; gap: 6px; align-items: flex-end; margin-top: 10px; }
+  .vitrine img { width: 44px; height: 44px; object-fit: contain; filter: drop-shadow(0 4px 3px rgba(0,0,0,.4)); }
+  .portas { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+  .porta h2 { display: flex; align-items: center; gap: 10px; }
+  .passos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 8px; }
+  .passo { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 13px; background: #132a46;
+    box-shadow: 0 4px 0 #0a1a2d, inset 0 1px 0 rgba(255,255,255,.07); font-size: 14px; }
+  .passo b { display: block; font-size: 12px; color: var(--o2); letter-spacing: .08em; text-transform: uppercase; }
+  @media (max-width: 640px) { .passos { grid-template-columns: repeat(2, 1fr); } }
+  .capa .ico3.xl { width: 128px; height: 128px; }
+  @media (max-width: 560px) { .capa { grid-template-columns: 1fr; text-align: center; } .capa .ico3.xl { margin: 0 auto; } .vitrine { justify-content: center; } }
+</style>
+</head>
+<body>
+<main style="max-width:920px;margin:0 auto;padding:28px 18px" class="col">
+  <section class="card capa">
+    <img class="ico3 xl" src="assets/icones/app-mosaico-vila.webp" alt="">
+    <div>
+      <h1>Mosaico Vila</h1>
+      <p class="muted">A turma é uma vila; os grupos, famílias. Casas, bem público, uma mata que se regenera e uma regra de mercado que a turma pode trocar.</p>
+      <div class="vitrine" aria-hidden="true">
+        <img src="assets/icones/casa-verde.webp" alt=""><img src="assets/icones/casa-azul.webp" alt=""><img src="assets/icones/casa-ambar.webp" alt=""><img src="assets/icones/casa-rubi.webp" alt="">
+        <img src="assets/icones/arvore-dourada.webp" alt=""><img src="assets/icones/arvore-redonda.webp" alt=""><img src="assets/icones/arvore-dourada.webp" alt="">
+      </div>
+    </div>
+  </section>
+  <div class="portas">
+    <div class="card col porta"><h2><img class="ico3 g" src="assets/icones/participar.webp" alt="">Participar</h2><p class="muted">Digite o código que aparece no telão.</p>
+      <input type="text" placeholder="Código da sala" disabled><button class="btn block" disabled>Entrar</button><p class="faint">A sala real entra com o Firebase.</p></div>
+    <div class="card col porta"><h2><img class="ico3 g" src="assets/icones/conduzir.webp" alt="">Conduzir</h2><p class="muted">Área do professor (login Google da lista de mestres).</p>
+      <button class="btn warn block" disabled>Abrir sala</button>
+      <a class="btn ok block" href="simulador/index.html" style="display:flex;align-items:center;justify-content:center;text-decoration:none"><img class="ico3" src="assets/icones/simulador.webp" alt="">Simular aula no PC</a></div>
+  </div>
+  <div class="card col"><h2 class="row"><img class="ico3 g" src="assets/icones/ideia.webp" alt="">Como é uma partida</h2>
+    <p class="muted">Cinco anos e fechamento, cerca de 40 minutos. Uma novidade por ano, com exemplo resolvido no telão e pergunta rápida no celular.</p>
+    <div class="passos">
+      <div class="passo"><img class="ico3 m" src="assets/icones/economia.webp" alt=""><div><b>Ano 1</b>Renda e bem público</div></div>
+      <div class="passo"><img class="ico3 m" src="assets/icones/arvore-redonda.webp" alt=""><div><b>Ano 2</b>A mata comum</div></div>
+      <div class="passo"><img class="ico3 m" src="assets/icones/casa-neutra.webp" alt=""><div><b>Ano 3</b>Moradia e aluguel</div></div>
+      <div class="passo"><img class="ico3 m" src="assets/icones/balanca.webp" alt=""><div><b>Votação</b>Monopólio ou Prosperidade</div></div>
+      <div class="passo"><img class="ico3 m" src="assets/icones/casa-ambar.webp" alt=""><div><b>Ano 4</b>Mercado de lotes</div></div>
+      <div class="passo"><img class="ico3 m" src="assets/icones/alvara.webp" alt=""><div><b>Ano 5</b>O alvará</div></div>
+    </div>
+  </div>
+  <p class="faint">Prof. Mário César Nascimento, PhD</p>
+</main>
+</body>
+</html>
