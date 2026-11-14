@@ -9,7 +9,32 @@
 - Origem de cada arquivo: `assets/icones/origens.json`.
 
 ## Ainda provisórios (SVG no código)
-Os prédios do bem público (itens 9 a 13 abaixo) continuam desenhados em SVG no mapa. Os itens 1 a 8, 14 a 16 e 20 já foram resolvidos acima; 17 a 19 estão cobertos pelos ícones de apoio (alvará e balança), e o troco do mercado usa o dado do próprio celular.
+Os prédios do bem público (itens 9 a 13 abaixo) continuam desenhados em SVG no mapa. A **moeda** do aluguel no telão (`assets/icones/moeda.svg`) também é provisória. Prompt para gerar: *"Moeda de ouro 3D estilizada, vista levemente de cima, com uma casinha em relevo no centro, borda grossa com brilho, estilo ícone de jogo mobile, iluminação suave, fundo branco liso, sem texto, 1024 × 1024"* — salvar como `assets/icones/moeda.webp` e trocar `"moeda.svg"` por `"moeda"` em `telao.js`. Os itens 1 a 8, 14 a 16 e 20 já foram resolvidos acima; 17 a 19 estão cobertos pelos ícones de apoio (alvará e balança), e o troco do mercado usa o dado do próprio celular.
+
+## Cartas sorteadas (R13, 14/11/2026): provisórias, com prompts para os definitivos
+Por ora, cada carta usa uma cópia de um ícone 3D que o jogo já tem (entre parênteses). Estilo comum: o da lista original abaixo (ícone 3D brilhante, iluminação suave de estúdio, levemente de cima, cores saturadas, fundo branco liso para recortar, sem texto, 1024 × 1024). Salvar em `assets/icones/` com o nome indicado e trocar o campo `icone` da carta em `js/content/cartas.js`.
+
+Propostas pequenas (ano 2)
+21. `carta-fiscal.webp` (hoje `toco`) · O fiscal da mata: prancheta de fiscal com um carimbo levantado e duas toras de madeira ao lado, uma moeda dourada escorregando por baixo da prancheta.
+22. `carta-vizinho.webp` (hoje `grupos`) · A carga do vizinho: caderno de anotações aberto com uma linha em branco e uma carroça pequena de toras ao fundo.
+23. `carta-serraria.webp` (hoje `arvore-dourada`) · A madeira sem nota: pilha de tábuas recém-serradas com uma nota fiscal rasgada ao meio no chão.
+24. `carta-taxa.webp` (hoje `economia`) · A taxa da praça: banco de praça com um envelope de cobrança e uma moeda saindo pela lateral.
+
+Propostas grandes (ano 5)
+25. `carta-alvara.webp` (hoje `alvara`) · O alvará: prancheta com carimbo "aprovado" e um capacete de obra ao lado (o item 18 da lista original).
+26. `carta-madeireira.webp` (hoje `alvara`) · A licença da madeireira: papel de licença enrolado com fita vermelha, encostado num tronco grosso com uma motosserra estilizada (sem lâmina à mostra, tom de brinquedo).
+27. `carta-escola.webp` (hoje `alvara`) · O contrato da escola: prédio escolar pequeno com andaime e um contrato com duas assinaturas em cima de uma pilha de moedas.
+
+Honestidade (ano 4)
+28. `carta-dado.webp` (hoje `ideia`) · O troco do mercado: dado branco ao lado de um punhado de moedas (o item 17 da lista original).
+29. `carta-extrato.webp` (hoje `participar`) · O extrato a mais: celular mostrando um extrato com uma linha destacada em verde e três moedas saltando da tela.
+30. `carta-achado.webp` (hoje `economia`) · O achado da praça: três moedas douradas no chão de pedra da praça, com uma caixinha de achados e perdidos ao lado.
+
+Confiança (ano 4)
+31. `carta-pedido.webp` (hoje `economia`) · O pedido na estrada: duas mãos se encontrando, uma oferecendo duas moedas, sobre uma estrada de terra; sem rosto, roupa ou sinal de pobreza (para não retratar ninguém).
+32. `carta-fiado.webp` (hoje `grupos`) · A venda fiado: carrinho de toras de madeira com uma caderneta de fiado aberta em cima.
+33. `carta-sinal.webp` (hoje `participar`) · O sinal adiantado: ferramenta (enxada ou serrote) numa banca de feira, com duas moedas na frente e uma etiqueta de "sinal" sem texto legível.
+34. `carta-carroca.webp` (hoje `grupos`) · A carroça dividida: carroça de madeira com duas pilhas iguais de moedas, uma em cada lado do banco.
 
 ## Lista original
 

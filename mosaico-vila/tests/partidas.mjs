@@ -3,12 +3,16 @@
 import { estadoInicial, reduzir, FASES, progresso } from "../js/engine.js";
 import { passoBot, NOMES, perfilBot, papelBully } from "../js/bots.js";
 import { gini, fecharAno, progressoMeta, COLAPSO } from "../js/content/regras.js";
+import { carta, sortearCartas, PEQUENAS, GRANDES, ANO4 } from "../js/content/cartas.js";
+import { rnd } from "../js/engine.js";
 
 const TAM = [12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40];
 let falhas = 0;
 let rendaSobe = 0;
 const ok = (c, msg) => { if (!c) { falhas++; console.log("FALHOU:", msg); } };
 const linhas = [];
+const vistas = new Set();
+let confiaram = 0, golpes = 0;
 for (const n of TAM) {
   let st = estadoInicial();
   const dispatch = (a) => { st = reduzir(st, a); };
@@ -17,7 +21,7 @@ for (const n of TAM) {
   dispatch({ t: "sortear", seed: 1000 + n });
   let passos = 0;
   const visitadas = [], alugueis = [];
-  if (n === 26) dispatch({ t: "config", semTroco: false });
+  if (n === 26) dispatch({ t: "config", semTroco: true });   // R13: a carta do ano 4 vem ligada; uma partida testa o professor desligando
   while (st.fase !== "fechamento" && passos < 5000) {
     visitadas.push(`${st.fase}:${st.ano}`);
     if (st.fase === "abertura") alugueis.push([st.ano, Object.values(st.renda).reduce((a, r) => a + r.aluguel, 0)]);
@@ -37,14 +41,23 @@ for (const n of TAM) {
   ok(membros === n, `todos numa família (n=${n})`);
   ok(!Object.values(st.renda || {}).some((r) => r.total < 0), `piso de renda: nenhuma família com renda negativa no último ano (n=${n})`);
   ok(st.historico.every((h, k) => k === 0 || h.ano === st.historico[k - 1].ano + 1), `anos em sequência (n=${n})`);
-  const comTroco = n === 26;   // uma das partidas testa o professor ligando o troco (desligado por padrão)
-  ok(["voto:3", "alvara:5"].every((e) => visitadas.includes(e)) && visitadas.includes("mente:4") === comTroco, `voto no ano 3, troco no 4 (só se ligado), alvará no 5 (n=${n})`);
+  const comTroco = n !== 26;   // R13: a carta do ano 4 vem ligada; a partida de 26 testa o professor desligando
+  ok(["pequena:2", "voto:3", "alvara:5"].every((e) => visitadas.includes(e)) && visitadas.includes("mente:4") === comTroco, `pequena no ano 2, voto no 3, carta do ano 4 (se ligada), grande no 5 (n=${n})`);
+  // R13: cartas sorteadas pela semente: a mesma semente refaz as mesmas cartas
+  const c0 = sortearCartas(rnd((1000 + n) ^ 0x5bd1e995));
+  ok(JSON.stringify(c0) === JSON.stringify(st.cartas), `cartas reproduzíveis pela semente (n=${n})`);
+  for (const c of Object.values(st.cartas)) vistas.add(c);
+  ok(st.pequena.aceitaram != null && st.pequena.aceitaram <= n, `pequena: contagem de quem aceitou (n=${n})`);
+  ok(Object.entries(st.pequena.votos).every(([id, v]) => !v || st.pessoal[id] >= 2 || carta(st.cartas.ano4).tipo === "confia"), `pequena: os 2 pontos são pessoais (n=${n})`);
+  ok(!st.pequena.aceitaram || st.pequena.estrago, `pequena: estrago aplicado quando alguém aceita (n=${n})`);
+  ok(!st.pequena.estrago || st.pequena.estrago.alvo !== "mata" || st.pequena.estrago.pct <= 20 + 1e-9, `pequena: estrago na mata no máximo 20% (n=${n})`);
+  if (comTroco && carta(st.cartas.ano4).tipo === "confia") { const ids = Object.keys(st.golpe); confiaram += ids.length; golpes += ids.filter((id) => st.golpe[id]).length; }
   ok(!visitadas.some((v) => v.startsWith("lances:") && +v.split(":")[1] < 4), `mercado só a partir do ano 4 (n=${n})`);
   ok(!comTroco || Object.values(st.pessoal).some((x) => x > 0) || Object.values(st.mente).every((x) => !x), `troco vai para pontos pessoais (n=${n})`);
   ok(!visitadas.some((v) => v.startsWith("boato")), `sem boato (n=${n})`);
   ok(alugueis.every(([ano, v]) => ano >= 3 || v === 0), `aluguel só a partir do ano 3 (n=${n})`);
   ok(st.alvara.aceitariam != null && st.alvara.aceitariam <= n && st.ordem.includes(st.alvara.pessoa), `alvará: uma pessoa sorteada e a contagem de quem aceitaria (n=${n})`);
-  ok(!st.alvara.aceito || st.pessoal[st.alvara.pessoa] >= 8, `alvará: os 8 pontos são pessoais (n=${n})`);
+  ok(!st.alvara.aceito || st.pessoal[st.alvara.pessoa] >= 8 - 2, `alvará: os 8 pontos são pessoais (a confiança do ano 4 pode ter tirado 2) (n=${n})`);
   ok(Object.keys(st.controle.voto || {}).length > 0, `pergunta de controle antes do voto (n=${n})`);
   ok(st.outra && st.outra.regra !== st.regra && Number.isFinite(st.outra.gini), `a vila na outra regra calculada (n=${n})`);
   ok([1, 2, 3, 4].every((a) => Object.keys(st.controle[a] || {}).length > 0), `perguntas de controle respondidas nos anos 1 a 4 (n=${n})`);
@@ -61,6 +74,23 @@ for (const n of TAM) {
 }
 console.table(linhas);
 ok(rendaSobe >= 12, `a desigualdade da renda sobe quando o aluguel entra em pelo menos 12 de 15 partidas (foram ${rendaSobe})`);
+// R13: o baralho varia entre partidas (pelo menos 8 cartas diferentes em 15 partidas) e a chance de golpe fica perto de 1 em 4
+ok(vistas.size >= 8, `cartas variam entre partidas (${vistas.size} diferentes de ${PEQUENAS.length + GRANDES.length + ANO4.length})`);
+console.log(`cartas vistas: ${[...vistas].join(", ")} · confiança: ${golpes}/${confiaram} golpes`);
+ok(!confiaram || (golpes / confiaram > 0.1 && golpes / confiaram < 0.45), `golpe perto de 1 em 4 (${golpes}/${confiaram})`);
+// R13: com o mesmo número de aceites, o estrago da pequena com a turma inteira é igual ao da grande
+{
+  let st = estadoInicial(); const d = (a) => { st = reduzir(st, a); };
+  for (let i = 0; i < 12; i++) d({ t: "entrar", id: `a${i}`, nome: `P${i}` });
+  d({ t: "sortear", seed: 7 });
+  while (st.fase !== "pequena") { if (st.fase === "decidir") for (const id of st.ordem) d({ t: "propor", id, p: { pub: 0, rep: 0, car: 0 } }); d({ t: "fase", dir: 1 }); }
+  const antes = { mata: st.mata, pub: st.publico, acc: st.acumulado };
+  for (const id of st.ordem) d({ t: "pequena", id, aceita: true });
+  d({ t: "fase", dir: 1 });
+  const c = carta(st.cartas.pequena);
+  ok(c.alvo === "mata" ? Math.abs(antes.mata - st.mata - 0.2 * st.teto) < 1e-6 || st.mata === 0 : antes.pub - st.publico === 1 || (antes.pub === 0 && st.acumulado === 0), `pequena com a turma inteira = estrago grande (${c.id})`);
+  ok(st.ordem.every((id) => st.pessoal[id] === 2), "pequena: +2 para cada um que aceitou");
+}
 // R10: a mata colapsada volta quando o replantio a leva de novo acima de 30% (e o −4 acaba)
 {
   const fams = { a: { id: "a", membros: [1, 2, 3, 4], caixa: 50, lotes: 2 } };

@@ -156,3 +156,166 @@ a.card:hover { transform: translateY(-2px); }
 input[type=text], input[type=number], select, textarea { box-shadow: inset 0 3px 6px rgba(0,0,0,.35), 0 1px 0 rgba(255,255,255,.05); }
 .prog, .barra { box-shadow: inset 0 2px 3px rgba(0,0,0,.45); }
 .btn .ico3 { width: 24px; height: 24px; margin: -4px 6px -4px -4px; }
+
+/* ===== R11: telão para TV — letra grande, barra de ícones, uma ideia por tela ===== */
+.telao .tin { font-size: 1.9cqw; gap: 1.1cqw; padding: 1.7cqw 2.3cqw; }
+.telao h1 { font-size: 3.2cqw; line-height: 1.1; }
+.telao h2 { font-size: 2.6cqw; line-height: 1.15; }
+.telao h3 { font-size: 2.2cqw; }
+.telao .fase { font-size: 1.5cqw; }
+.telao .big { font-size: 2.3cqw; line-height: 1.35; }
+.telao .enorme { font-size: 3.3cqw; line-height: 1.22; font-weight: 700; margin: 0; }
+.telao .rodape { font-size: 1.9cqw; line-height: 1.35; color: #cbd5e1; margin: 0; }
+.telao .muted { color: #cbd5e1; }
+.telao .chip { font-size: 1.6cqw; padding: .35cqw 1cqw; display: inline-flex; align-items: center; gap: .5cqw; }
+.telao .chip.nome { font-size: 1.35cqw; }
+.telao .chip .ico3 { width: 2.4cqw; height: 2.4cqw; }
+.telao .card { padding: 1.3cqw 1.6cqw; }
+.telao .ico3 { width: 3cqw; height: 3cqw; }
+.telao .ico3.g { width: 4.4cqw; height: 4.4cqw; }
+.telao .ico3.xl { width: 9cqw; height: 9cqw; }
+.telao .centro { align-items: center; justify-content: center; }
+.telao .card.destaque { display: flex; align-items: center; gap: 1.8cqw; }
+.telao .conta { min-width: 17cqw; text-align: right; }
+.telao .conta b { font-size: 2.6cqw; display: block; }
+.telao .conta span { display: block; font-size: 1.5cqw; color: #a9bdd3; margin-bottom: .3cqw; }
+.telao .fam b { font-size: 2.2cqw; }
+.telao .fam .conta-fam { margin-left: auto; font-size: 1.9cqw; color: #a9bdd3; }
+.telao .fam .nomes { font-size: 1.6cqw; color: #cbd5e1; margin: .5cqw 0; }
+
+/* Barra de ícones: o estado da vila, sempre no mesmo lugar */
+.hud { display: flex; gap: .9cqw; }
+.hud { justify-content: space-between; }
+.hud .slot { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: .7cqw; padding: .6cqw .9cqw; border-radius: 1.1cqw;
+  background: linear-gradient(180deg, #183455, #10243d); box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 .45cqw 0 #071423, 0 .8cqw 1.4cqw rgba(0,0,0,.35); }
+.hud .slot .ico3 { width: 3.7cqw; height: 3.7cqw; }
+.hud .slot b { display: flex; align-items: center; font-size: 2.25cqw; line-height: 1.1; white-space: nowrap; font-family: Sora, sans-serif; font-variant-numeric: tabular-nums; }
+.hud .slot b small { font-size: 1.6cqw; color: #a9bdd3; margin-left: .15cqw; }
+.hud .slot span { display: block; font-size: 1.45cqw; color: #a9bdd3; white-space: nowrap; }
+.hud .slot.ano { flex: 0 1 auto; padding-right: 1.4cqw; }
+.hud .slot.ano .pips { display: flex; gap: .3cqw; margin-top: .35cqw; }
+.hud .slot.mal { background: linear-gradient(180deg, #5a1a24, #2c0d14); }
+.hud .slot.atencao { background: linear-gradient(180deg, #4a3810, #271c06); }
+.hud .slot.ok { background: linear-gradient(180deg, #14532d, #0b2e19); }
+.hud .pips i, .hud .niv i { display: inline-block; width: 1.1cqw; height: 1.1cqw; border-radius: 50%; background: #2a4366; box-shadow: inset 0 -2px 0 rgba(0,0,0,.35); }
+.hud .pips i.feito { background: #4ade80; } .hud .pips i.agora { background: #fbbf24; box-shadow: 0 0 0 .3cqw rgba(251,191,36,.3); }
+.hud .niv { gap: .25cqw; } .hud .niv i { width: 1.3cqw; height: 1.8cqw; border-radius: .35cqw; }
+.hud .niv i.on { background: linear-gradient(180deg, #fde68a, #b45309); }
+.hud .delta { font-style: normal; font-size: 1.5cqw; margin-left: .5cqw; padding: .05cqw .5cqw; border-radius: 99px; font-family: Sora, sans-serif; }
+.hud .delta.up { background: #14532d; color: #86efac; } .hud .delta.down { background: #5b1d1d; color: #fca5a5; }
+.hud .pulsa { animation: pulsa 1.1s ease 3; }
+@keyframes pulsa { 50% { transform: translateY(-.3cqw) scale(1.04); box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 .45cqw 0 #071423, 0 0 0 .4cqw rgba(251,191,36,.45); } }
+
+/* Mapa do tamanho certo, sem sobra */
+.telao .lado { display: grid; grid-template-columns: 58cqw minmax(0, 1fr); gap: 1.4cqw; flex: 1; min-height: 0; align-items: center; }
+.telao .mapa-card { width: 58cqw; aspect-ratio: 800 / 450; padding: .3cqw; display: flex; align-items: center; justify-content: center; }
+.telao .mapa-card svg { width: 100%; height: 100%; }
+
+/* Revelações em sequência (o último painel fica) */
+.telao .seq { display: grid; flex: 1; min-height: 0; }
+.telao .seq > .painel { grid-area: 1 / 1; min-height: 0; display: flex; flex-direction: column; gap: 1.1cqw; opacity: 0;
+  animation: pEntra .6s ease var(--a) forwards, pSai .45s ease var(--b) forwards; }
+.telao .seq > .painel.ultimo { animation: pEntra .6s ease var(--a) forwards; }
+@keyframes pEntra { from { opacity: 0; transform: translateY(1cqw); } to { opacity: 1; transform: none; } }
+@keyframes pSai { to { opacity: 0; transform: translateY(-1cqw); visibility: hidden; } }
+.telao .seq-dots { display: flex; gap: .8cqw; justify-content: center; }
+.telao .seq-dots span { font-size: 1.5cqw; padding: .25cqw 1.1cqw; border-radius: 99px; background: #132a46; color: #7f97b2;
+  animation: dOn .3s ease var(--a) forwards, dOff .3s ease var(--b) forwards; }
+.telao .seq-dots span.ultimo { animation: dOn .3s ease var(--a) forwards; }
+@keyframes dOn { to { background: #fbbf24; color: #1b1300; } }
+@keyframes dOff { to { background: #1d3a5c; color: #cbd5e1; } }
+
+/* Fatos do ano, com ícone */
+.telao .fato { display: flex; align-items: center; gap: 1.1cqw; font-size: 2.3cqw; line-height: 1.25; }
+.telao .fato .ico3 { width: 4.4cqw; height: 4.4cqw; }
+.telao .fato.mal { color: #fca5a5; } .telao .fato.bom { color: #86efac; }
+.telao .chips-iso { display: flex; flex-wrap: wrap; gap: .6cqw; }
+
+/* Isotype: fileiras de ícones */
+.iso { display: inline-flex; align-items: flex-end; --iso: 3.1cqw; gap: .12cqw; flex-wrap: nowrap; }
+.iso-i { display: inline-block; width: var(--iso); height: var(--iso); overflow: hidden; flex: 0 0 auto; }
+.iso-i img { width: var(--iso); height: var(--iso); object-fit: contain; filter: drop-shadow(0 .2cqw .15cqw rgba(0,0,0,.45)); }
+.iso.g { --iso: 4.6cqw; } .iso-linha.p .iso { --iso: 2cqw; }
+.iso-linha { display: flex; align-items: center; gap: 1cqw; margin: .2cqw 0; }
+.iso-linha > b { font-size: 2cqw; margin-left: auto; }
+.iso-linha.p > b { font-size: 1.6cqw; }
+.iso-linha .rot-iso { min-width: 15cqw; font-size: 1.9cqw; color: #cbd5e1; }
+.telao .barra.grande { height: 2cqw; flex: none; width: 100%; }
+
+/* Exemplo resolvido linha a linha */
+.passo-a-passo { margin: .4cqw 0 0; padding-left: 2.6cqw; font-size: 2.3cqw; line-height: 1.32; }
+.passo-a-passo li { opacity: 0; margin: .35cqw 0; animation: lEntra .5s ease var(--a) forwards, lDim .5s ease var(--b) forwards; }
+.passo-a-passo li.ultimo { animation: lEntra .5s ease var(--a) forwards; }
+@keyframes lEntra { from { opacity: 0; transform: translateX(-1cqw); } to { opacity: 1; transform: none; } }
+@keyframes lDim { from { opacity: 1; font-size: 1em; } to { opacity: .55; font-size: 1.9cqw; } }   /* R13: a linha apagada nunca fica abaixo de 1,9 cqw */
+.passo-a-passo li { font-size: 1em; }
+.passo-a-passo.compacto { font-size: 2.05cqw; line-height: 1.28; }
+
+/* Cronômetro grande, contado pelo CSS (45 s) */
+@property --s { syntax: "<integer>"; inherits: false; initial-value: 45; }
+.crono-wrap { display: flex; flex-direction: column; align-items: center; gap: 1cqw; }
+.crono { --s: 45; width: 15cqw; height: 15cqw; border-radius: 50%; display: grid; place-items: center; counter-reset: s var(--s);
+  background: conic-gradient(#fbbf24 calc(var(--s) * 8deg), #1b3352 0); animation: conta45 45s linear var(--d) forwards;
+  box-shadow: inset 0 0 0 1.5cqw #0e2238, 0 .6cqw 0 #071423, 0 1.2cqw 2cqw rgba(0,0,0,.4); }
+.crono::after { content: counter(s); font: 800 5.6cqw/1 "JetBrains Mono", ui-monospace, monospace; color: #fff; }
+@keyframes conta45 { from { --s: 45; } to { --s: 0; } }
+
+/* Linha do tempo maior */
+.telao .linha-grande svg { width: 100%; height: 100%; max-height: 30cqw; }
+.telao .linha-media svg { width: 100%; height: 13cqw; }
+.telao .linha-grande .st-sub, .telao .linha-media .st-sub { font-size: 17px; }
+
+/* Fechamento: uma pergunta por vez */
+.telao .temas { display: flex; gap: .6cqw; flex-wrap: wrap; }
+.telao .temas span { font-size: 1.6cqw; padding: .3cqw 1cqw; border-radius: 99px; background: #132a46; color: #7f97b2; box-shadow: 0 .25cqw 0 #071423; }
+.telao .temas span.feito { background: #1d3a5c; color: #cbd5e1; }
+.telao .temas span.agora { background: #fbbf24; color: #1b1300; font-weight: 700; }
+.telao .pergunta-txt { font-size: 3cqw; line-height: 1.3; font-weight: 600; margin: 1.4cqw 0 .8cqw; }
+
+/* Prévia "fundo da sala": o telão no tamanho aparente de uma TV de 55" vista a uns 6 m (cerca de 40% da largura do monitor a 60 cm) */
+.sim.fundo .telao:not(.cheio):not(:fullscreen) { width: 460px; margin: 40px auto; }   /* R13: tamanho fixo, que não depende da tela de quem testa */
+.sim.fundo .fundo-nota { display: block; }
+.fundo-nota { display: none; text-align: center; margin: -28px 0 10px; font-size: 13px; color: var(--tx2); }
+
+/* Barra pequena no celular */
+.phone .hd { flex-wrap: wrap; }
+.mini-hud { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px; }
+.mini-hud span { display: inline-flex; align-items: center; gap: 3px; padding: 2px 7px 2px 3px; border-radius: 99px; background: #132a46; box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 2px 0 #071423; font-size: 12px; white-space: nowrap; }
+.mini-hud .ico3 { width: 20px; height: 20px; }
+.mini-hud b { font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* ===== R13: cartas sorteadas, painéis com controle, moedas de 10, dois gráficos, letra mínima ===== */
+/* Rótulos do telão nunca abaixo de 1,6 cqw; linhas de texto, 1,9 cqw */
+.telao .fase, .telao .conta span, .hud .slot span, .hud .delta, .telao .seq-dots span, .telao .chip.nome { font-size: 1.6cqw; }
+.telao .card.como { border: 2px solid rgba(251,191,36,.45); }
+.telao .chip.mal { color: #fecaca; background: #3a1620; }
+/* Painel segurado por quem conduz: fica parado */
+.telao .seq.fixo > .painel { opacity: 1; animation: none; }
+.telao .seq-dots.fixo span { animation: none; }
+.telao .seq-dots.fixo span.feito { background: #1d3a5c; color: #cbd5e1; }
+.telao .seq-dots.fixo span.agora { background: #fbbf24; color: #1b1300; }
+/* Moedas por pessoa, com a marca da meta */
+.fila-moedas { position: relative; display: inline-flex; min-width: calc(var(--iso) * var(--n) + .12cqw * var(--n)); --iso: 3.6cqw; padding-top: .15cqw; }
+.iso-linha:first-of-type .fila-moedas { padding-top: 2.2cqw; }
+.fila-moedas .iso { --iso: inherit; }
+.fila-moedas + b { margin-left: 1.2cqw !important; font-size: 2.2cqw; }
+.marca-meta { position: absolute; top: 0; bottom: -.3cqw; width: 0; border-left: .3cqw dashed #fbbf24; }
+.marca-meta b { position: absolute; top: -.2cqw; left: .5cqw; font-size: 1.6cqw; color: #fde68a; white-space: nowrap; font-style: normal; }
+.iso-linha + .iso-linha .marca-meta b { display: none; }
+.iso.p { --iso: 2.2cqw; vertical-align: middle; }
+/* Quem a turma achou que mais dava golpe */
+.barra-rot { display: grid; grid-template-columns: 25cqw 1fr 5cqw; align-items: center; gap: .8cqw; font-size: 1.7cqw; }
+.barra-rot .barra { height: 1.4cqw; }
+.barra-rot b { text-align: right; }
+/* Linha do tempo em dois gráficos */
+.tempo2 { display: grid; grid-template-rows: 1fr 1fr; gap: .6cqw; height: 100%; min-height: 0; }
+.tempo2 svg { width: 100%; height: 100%; min-height: 0; }
+.telao .linha-grande { display: flex; flex-direction: column; }
+.telao .linha-media .tempo2 svg { height: 10.5cqw; }
+/* Celular: primeiro o telão, depois o extrato (no tempo do último painel) */
+.surge { opacity: 0; animation: surge .45s ease var(--a) forwards; }
+@keyframes surge { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.espera { max-height: 260px; overflow: hidden; animation: espSome .35s ease var(--a) forwards; }
+@keyframes espSome { to { opacity: 0; max-height: 0; padding-top: 0; padding-bottom: 0; margin: 0; border-width: 0; } }
+.telao .guiou p { margin: 0; font-size: 1.9cqw; line-height: 1.35; }
+.fila-moedas + b { align-self: flex-end; }

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Provisório (moeda de pontos da vila). Prompt do 3D definitivo em docs/ICONES-PROMPTS.md -->
+  <defs>
+    <radialGradient id="f" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#fff3b0"/><stop offset=".45" stop-color="#f6c343"/><stop offset="1" stop-color="#a86b0c"/></radialGradient>
+    <linearGradient id="b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c98a14"/><stop offset="1" stop-color="#6b4206"/></linearGradient>
+  </defs>
+  <ellipse cx="32" cy="38" rx="27" ry="21" fill="url(#b)"/>
+  <ellipse cx="32" cy="31" rx="27" ry="21" fill="url(#f)" stroke="#8a5a0a" stroke-width="1.5"/>
+  <ellipse cx="32" cy="31" rx="19.5" ry="14.5" fill="none" stroke="#b77e12" stroke-width="2" opacity=".7"/>
+  <path d="M22 33 L32 23 L42 33 Z M25.5 32 h13 v8 h-13 Z" fill="#9a6408" opacity=".85"/>
+  <ellipse cx="25" cy="22" rx="8" ry="3.2" fill="#fff" opacity=".45" transform="rotate(-18 25 22)"/>
+</svg>

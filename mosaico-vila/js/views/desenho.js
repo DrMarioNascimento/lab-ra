@@ -7,6 +7,19 @@ export const ICO = new URL("../../assets/icones/", import.meta.url).href;
 // Ícone 3D de apoio (balança, meta, troféu...): <img> com sombra; tamanhos pelo CSS (.ico3, .g, .xl).
 export const ico = (nome, cls = "", alt = "") => `<img class="ico3 ${cls}" src="${ICO}${nome}.webp" alt="${String(alt).replace(/"/g, "&quot;")}" draggable="false">`;
 
+// Isotype: fileira de ícones iguais, cada um valendo "unidade" (o último pode vir pela metade, cortado).
+export function fileira(nome, valor, unidade, cls = "") {
+  const n = Math.max(0, valor / unidade), cheios = Math.floor(n + 1e-9), resto = n - cheios;
+  const src = nome.includes(".") ? `${ICO}${nome}` : `${ICO}${nome}.webp`;
+  const um = (w) => `<span class="iso-i" style="${w < 1 ? `width:calc(var(--iso) * ${w.toFixed(2)})` : ""}"><img src="${src}" alt="" draggable="false"></span>`;
+  return `<span class="iso ${cls}">${Array.from({ length: cheios }, () => um(1)).join("")}${resto >= 0.15 ? um(resto) : ""}</span>`;
+}
+// Unidade "redonda" para que a maior fileira tenha no máximo maxIcones ícones.
+export function unidade(maior, maxIcones = 12) {
+  for (const u of [1, 2, 5, 10, 20, 25, 50, 100, 200, 500]) if (maior / u <= maxIcones) return u;
+  return Math.ceil(maior / maxIcones);
+}
+
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
 // Ícone da família: a casa 3D na cor dela, com a forma 3D no canto (para ninguém depender só da cor).
@@ -45,40 +58,50 @@ export function mapaVila(st, { grande = true, destaque = null } = {}) {
   const predios = [];
   for (let k = 1; k <= 5; k++) {
     const on = k <= nivel, x = 345 + ((k - 1) % 2) * 90, y = 150 + Math.floor((k - 1) / 2) * 84;
-    predios.push(`<g transform="translate(${x} ${y})" opacity="${on ? 1 : 0.3}"><rect x="-32" y="-26" width="64" height="52" rx="8" fill="${on ? "url(#predio)" : "#1b3555"}" stroke="${on ? "#fde68a" : "#2a4a6e"}"/><path d="M-16 -2 L0 -16 L16 -2 Z" fill="${on ? "#fff7d6" : "#2a4a6e"}"/><rect x="-11" y="-2" width="22" height="16" rx="2" fill="${on ? "#fff7d6" : "#2a4a6e"}"/><text y="23" text-anchor="middle" font-size="11" font-weight="700" fill="${on ? "#3b2405" : "#6f89a6"}" font-family="Sora, sans-serif">${k}</text></g>`);
+    predios.push(`<g transform="translate(${x} ${y})" opacity="${on ? 1 : 0.3}"><rect x="-32" y="-26" width="64" height="52" rx="8" fill="${on ? "url(#predio)" : "#1b3555"}" stroke="${on ? "#fde68a" : "#2a4a6e"}"/><path d="M-16 -2 L0 -16 L16 -2 Z" fill="${on ? "#fff7d6" : "#2a4a6e"}"/><rect x="-11" y="-2" width="22" height="16" rx="2" fill="${on ? "#fff7d6" : "#2a4a6e"}"/><text y="23" text-anchor="middle" font-size="14" font-weight="700" fill="${on ? "#3b2405" : "#6f89a6"}" font-family="Sora, sans-serif">${k}</text></g>`);
   }
-  const corMata = fm < 0.15 ? "#fb7185" : fm < 0.3 ? "#fbbf24" : "#34d399";
-  return `<svg class="metro ${grande ? "grande" : ""}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Mapa da vila: mata em ${Math.round(fm * 100)}%, bem público nível ${nivel}">
+  const corMata = fm < 0.3 ? "#fb7185" : fm < 0.5 ? "#fbbf24" : "#34d399";   // R13: as mesmas faixas da barra (30% e 50%)
+  return `<svg class="metro mapa ${grande ? "grande" : ""}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Mapa da vila: mata em ${Math.round(fm * 100)}%, bem público nível ${nivel}">
     <defs>
       <linearGradient id="predio" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fcd34d"/><stop offset="1" stop-color="#b45309"/></linearGradient>
     </defs>
     <rect x="20" y="40" width="260" height="390" rx="18" fill="#0d2a1c" stroke="#1f5135"/>
-    <text x="34" y="68" font-size="20" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Mata comum</text><text x="266" y="68" text-anchor="end" font-size="20" font-weight="700" fill="${corMata}" font-family="JetBrains Mono, monospace">${Math.round(fm * 100)}%</text>
+    <text x="34" y="68" font-size="27" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Mata</text><text x="266" y="68" text-anchor="end" font-size="27" font-weight="700" fill="${corMata}" font-family="JetBrains Mono, monospace">${Math.round(fm * 100)}%</text>
     ${arv.join("")}
     <rect x="290" y="40" width="200" height="390" rx="18" fill="#1a1f33" stroke="#2c3560"/>
-    <text x="304" y="68" font-size="20" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Bem público</text><text x="304" y="92" font-size="15" fill="#fbbf24" font-family="Sora, sans-serif">nível ${nivel} de 5</text>
+    <text x="304" y="68" font-size="27" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Bem público</text><text x="304" y="96" font-size="20" fill="#fbbf24" font-family="Sora, sans-serif">nível ${nivel} de 5</text>
     ${predios.join("")}
-    <text x="390" y="412" text-anchor="middle" font-size="15" fill="#9fb6cf" font-family="Sora, sans-serif">${esc(NIVEIS_PUBLICO[nivel])}</text>
+    <text x="390" y="416" text-anchor="middle" font-size="19" fill="#9fb6cf" font-family="Sora, sans-serif">${esc(NIVEIS_PUBLICO[nivel])}</text>
     <rect x="500" y="40" width="280" height="390" rx="18" fill="#10223b" stroke="#23415f"/>
-    <text x="514" y="68" font-size="20" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Lotes</text><text x="766" y="68" text-anchor="end" font-size="15" fill="#9fb6cf" font-family="Sora, sans-serif">${st.lotes.filter((x) => !x).length} livres · ${st.lotes.filter(Boolean).length} ocupados</text>
+    <text x="514" y="68" font-size="27" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Lotes</text><text x="766" y="68" text-anchor="end" font-size="20" fill="#9fb6cf" font-family="Sora, sans-serif">${st.lotes.filter((x) => !x).length} livres</text>
     ${lotes.join("")}
   </svg>`;
 }
 
-// Linha do tempo pequena (mata e desigualdade por ano).
+// R13: linha do tempo em dois gráficos empilhados, cada um na sua escala e com letra grande:
+// a mata (0 a 100%, com as linhas de 30% e 50%) e as duas desigualdades (0 a 0,5).
 export function linhaDoTempo(hist) {
   if (!hist.length) return "";
-  const W = 520, H = 170, x = (k) => 40 + (k * (W - 70)) / 4, y = (v) => H - 30 - v * (H - 55);
-  const lm = hist.map((h, k) => `${k ? "L" : "M"}${x(k).toFixed(1)} ${y(h.mata).toFixed(1)}`).join(" ");
-  const lg = hist.map((h, k) => `${k ? "L" : "M"}${x(k).toFixed(1)} ${y(Math.min(1, h.gini * 2)).toFixed(1)}`).join(" ");
-  // R10: a desigualdade da renda do ano (por pessoa, depois do aluguel) ao lado da do patrimônio
-  const lr = hist.map((h, k) => `${k ? "L" : "M"}${x(k).toFixed(1)} ${y(Math.min(1, (h.giniRenda ?? 0) * 2)).toFixed(1)}`).join(" ");
-  return `<svg class="metro" viewBox="0 0 ${W} ${H}" role="img" aria-label="Mata e desigualdade por ano">
-    <line x1="40" x2="${W - 20}" y1="${H - 30}" y2="${H - 30}" stroke="#23415f"/>
-    ${[1, 2, 3, 4, 5].map((a, k) => `<text x="${x(k)}" y="${H - 10}" text-anchor="middle" class="st-sub">ano ${a}</text>`).join("")}
-    <path d="${lm}" fill="none" stroke="#34d399" stroke-width="3"/><path d="${lg}" fill="none" stroke="#fb7185" stroke-width="3" stroke-dasharray="6 4"/><path d="${lr}" fill="none" stroke="#fbbf24" stroke-width="3" stroke-dasharray="2 4"/>
-    <line x1="40" x2="${W - 20}" y1="${y(0.3).toFixed(1)}" y2="${y(0.3).toFixed(1)}" stroke="#34d399" stroke-opacity=".35" stroke-dasharray="3 5"/>
-    <text x="${W - 18}" y="${(y(0.3) - 3).toFixed(1)}" text-anchor="end" class="st-sub" style="fill:#34d399;opacity:.7">30%</text>
-    <text x="44" y="18" class="st-sub" style="fill:#34d399">— mata</text><text x="120" y="18" class="st-sub" style="fill:#fb7185">- - desigualdade do patrimônio</text><text x="335" y="18" class="st-sub" style="fill:#fbbf24">··· desigualdade da renda</text>
-  </svg>`;
+  const W = 600, H = 200, F = 26, x0 = 70, x = (k) => x0 + (k * (W - x0 - 40)) / 4;
+  const eixoX = (y) => `<line x1="${x0}" x2="${W - 20}" y1="${y}" y2="${y}" stroke="#2b4a6b" stroke-width="2"/>` +
+    [1, 2, 3, 4, 5].map((a, k) => `<text x="${x(k)}" y="${y + F + 4}" text-anchor="middle" font-size="${F - 4}" fill="#a9bdd3" font-family="Sora, sans-serif">${k ? a : "ano 1"}</text>`).join("");
+  const caminho = (vals, y) => vals.map((v, k) => `${k ? "L" : "M"}${x(k).toFixed(1)} ${y(v).toFixed(1)}`).join(" ");
+  const ponto = (vals, y, cor, fmt) => { const k = vals.length - 1; return `<circle cx="${x(k)}" cy="${y(vals[k])}" r="7" fill="${cor}"/><text x="${x(k) + 12}" y="${y(vals[k]) + 8}" font-size="${F}" font-weight="700" fill="${cor}" font-family="Sora, sans-serif">${fmt(vals[k])}</text>`; };
+  // Mata
+  const ym = (v) => 56 + (1 - Math.max(0, Math.min(1, v))) * (H - 96);
+  const mata = hist.map((h) => h.mata);
+  const svgM = `<svg class="metro" viewBox="0 0 ${W} ${H}" role="img" aria-label="Mata por ano">
+    <text x="0" y="${F}" font-size="${F}" font-weight="700" fill="#34d399" font-family="Sora, sans-serif">Mata</text>
+    ${[0.3, 0.5].map((v) => `<line x1="${x0}" x2="${W - 20}" y1="${ym(v)}" y2="${ym(v)}" stroke="${v < 0.4 ? "#fb7185" : "#fbbf24"}" stroke-opacity=".55" stroke-width="2" stroke-dasharray="6 6"/><text x="${x0 - 8}" y="${ym(v) + 8}" text-anchor="end" font-size="${F - 4}" fill="${v < 0.4 ? "#fca5a5" : "#fde68a"}" font-family="Sora, sans-serif">${100 * v}%</text>`).join("")}
+    ${eixoX(H - 40)}<path d="${caminho(mata, ym)}" fill="none" stroke="#34d399" stroke-width="5" stroke-linejoin="round"/>${ponto(mata, ym, "#34d399", (v) => `${Math.round(100 * v)}%`)}</svg>`;
+  // Desigualdades
+  const yg = (v) => 56 + (1 - Math.max(0, Math.min(1, v / 0.5))) * (H - 96);
+  const gp = hist.map((h) => h.gini), gr = hist.map((h) => h.giniRenda ?? 0);
+  const fmt = (v) => v.toFixed(2).replace(".", ",");
+  const svgG = `<svg class="metro" viewBox="0 0 ${W} ${H}" role="img" aria-label="Desigualdade por ano">
+    <text x="0" y="${F}" font-size="${F}" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Desigualdade</text><text x="200" y="${F}" font-size="${F}" font-weight="700" fill="#fca5a5" font-family="Sora, sans-serif">— patrimônio</text><text x="400" y="${F}" font-size="${F}" font-weight="700" fill="#fde68a" font-family="Sora, sans-serif">··· renda</text>
+    <text x="${x0 - 8}" y="${yg(0) + 8}" text-anchor="end" font-size="${F - 4}" fill="#a9bdd3" font-family="Sora, sans-serif">0</text><text x="${x0 - 8}" y="${yg(0.5) + 8}" text-anchor="end" font-size="${F - 4}" fill="#a9bdd3" font-family="Sora, sans-serif">0,5</text>
+    ${eixoX(H - 40)}<path d="${caminho(gp, yg)}" fill="none" stroke="#fb7185" stroke-width="5"/><path d="${caminho(gr, yg)}" fill="none" stroke="#fbbf24" stroke-width="5" stroke-dasharray="3 9" stroke-linecap="round"/>
+    ${ponto(gp, yg, "#fb7185", fmt)}</svg>`;
+  return `<div class="tempo2">${svgM}${svgG}</div>`;
 }

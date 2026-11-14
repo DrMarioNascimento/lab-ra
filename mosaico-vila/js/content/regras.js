@@ -1,4 +1,5 @@
 // Mosaico Vila · regras do jogo (as mesmas da simulação em Python, vila_regras.py).
+import { ESTRAGO_MATA } from "./cartas.js";
 // Funções puras: nenhuma depende de tela, relógio ou sorteio.
 
 export const ANOS = 5;
@@ -151,8 +152,10 @@ export function vitoriaColetiva(v) {
 }
 
 // "A vila na outra regra" (R9): refaz os anos 4 e 5 na regra que a turma não escolheu, com as mesmas propostas,
-// os mesmos lances e o mesmo alvará. Devolve a desigualdade final (Gini do patrimônio) e se a meta seria batida.
-export function contrafactual(snap, props, alvaraAceito, desempate = () => 0.5) {
+// os mesmos lances e a mesma proposta grande (R13: o estrago pode ser no bem público ou na mata). Devolve a desigualdade
+// final (Gini do patrimônio) e se a meta seria batida.
+export function contrafactual(snap, props, grande, desempate = () => 0.5) {
+  const g = typeof grande === "object" && grande ? grande : { aceito: !!grande, alvo: "publico" };
   if (!snap) return null;
   const outra = snap.regra === "monopolio" ? "prosperidade" : "monopolio";
   let v = { fams: structuredClone(snap.fams), mata: snap.mata, publico: snap.publico, acumulado: snap.acumulado,
@@ -163,7 +166,7 @@ export function contrafactual(snap, props, alvaraAceito, desempate = () => 0.5) 
     const fx = fecharAno({ ...v, ano }, p, renda);
     Object.assign(v, { fams: fx.fams, mata: fx.mata, publico: fx.publico, acumulado: fx.acumulado, colapsou: fx.colapsou });
     if (v.livres > 0) { const L = leilao(v.fams, v.livres, p, ano, outra, 0, desempate); v.fams = L.fams; v.livres -= L.vendidos.length; }
-    if (ano === 5 && alvaraAceito) v.publico = Math.max(0, v.publico - 1);
+    if (ano === 5 && g.aceito) { if (g.alvo === "mata") v.mata = Math.max(0, v.mata - ESTRAGO_MATA * v.teto); else v.publico = Math.max(0, v.publico - 1); }
   }
   return { regra: outra, gini: gini(Object.values(v.fams).map((f) => patrimonio(f, v.publico))), meta: vitoriaColetiva(v), mata: v.mata / v.teto };
 }

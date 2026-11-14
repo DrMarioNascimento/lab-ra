@@ -1,6 +1,6 @@
 // /simulador: telão em cima, turma embaixo. O "cérebro" da sala roda nesta página (na sala real, no celular de quem conduz).
 import { estadoInicial, reduzir, progresso } from "./engine.js";
-import { renderTelao } from "./views/telao.js";
+import { renderTelao, duracaoTelao } from "./views/telao.js";
 import { renderAluno, acaoAluno, novoLocal } from "./views/aluno.js";
 import { renderProfessor, acaoProfessor } from "./views/professor.js";
 import { iconeFamilia, ico } from "./views/desenho.js";
@@ -26,10 +26,11 @@ app.innerHTML = `
     <label class="row muted" style="gap:6px">Participantes <input id="nAl" type="range" min="4" max="40" value="20" style="width:140px"><b id="nAlV" class="mono">20</b></label>
     <button class="btn sm ok on" id="auto">Piloto automático: ligado</button>
     <button class="btn sm sec" id="autoProf">Professor automático: desligado</button>
+    <button class="btn sm sec" id="fundo">Ver do fundo da sala</button>
     <button class="btn sm sec" id="reset">Recomeçar</button>
   </header>
   <div class="sim">
-    <div><div class="telao" id="telao"><button class="btn sm sec fsbtn" id="fs">⛶ Tela cheia</button><div id="telaoIn"></div></div></div>
+    <div><div class="telao" id="telao"><button class="btn sm sec fsbtn" id="fs">⛶ Tela cheia</button><div id="telaoIn"></div></div><p class="fundo-nota">Assim fica o telão numa TV de 55" vista a uns 6 m: se der para ler aqui, dá para ler do fundo da sala.</p></div>
     <aside class="card" id="prof" style="max-height:calc(56.25vw * 0.78);overflow:auto"></aside>
     <section class="turma"><div class="row" style="justify-content:space-between"><h3>Turma</h3><span class="faint">Desligue o piloto de um celular para clicar nele à mão.</span></div><div class="phones" id="phones"></div></section>
   </div>`;
@@ -81,6 +82,7 @@ subs.add(() => { if (st.fase !== faseAnt) { if (faseAnt === "entrada") montarTur
 
 document.getElementById("nAl").oninput = (e) => { nAlunos = +e.target.value; document.getElementById("nAlV").textContent = nAlunos; if (st.fase === "entrada") novaSala(); };
 document.getElementById("reset").onclick = () => { faseAnt = "entrada"; novaSala(); };
+document.getElementById("fundo").onclick = (e) => { const on = document.querySelector(".sim").classList.toggle("fundo"); e.target.className = `btn sm ${on ? "ok on" : "sec"}`; };
 document.getElementById("auto").onclick = (e) => { auto = !auto; e.target.className = `btn sm ${auto ? "ok on" : "sec"}`; e.target.textContent = `Piloto automático: ${auto ? "ligado" : "desligado"}`; };
 document.getElementById("autoProf").onclick = (e) => { autoProf = !autoProf; e.target.className = `btn sm ${autoProf ? "ok on" : "sec"}`; e.target.textContent = `Professor automático: ${autoProf ? "ligado" : "desligado"}`; };
 
@@ -94,7 +96,10 @@ setInterval(() => {
   const p = progresso(st);
   const cheio = p && p.total > 0 && p.feito >= p.total;
   espera += 1;
-  if ((cheio && espera >= 2) || (!(p && p.total) && espera >= 6) || espera >= 40) { espera = 0; dispatch({ t: "fase", dir: 1 }); }
+  // R11: nas telas com revelações em sequência ou exemplo linha a linha, espera as animações do telão terminarem
+  const minimo = duracaoTelao(st);
+  if (espera < minimo) return;
+  if ((cheio && espera >= 2) || (!(p && p.total) && espera >= 6) || espera >= Math.max(40, minimo)) { espera = 0; dispatch({ t: "fase", dir: 1 }); }
 }, 1000);
 
 novaSala();

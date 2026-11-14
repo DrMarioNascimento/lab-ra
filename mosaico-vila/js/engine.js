@@ -1,7 +1,8 @@
 // Mosaico Vila · motor da sala: estado único + redutor puro (mesma casca da Ângulos e da Viagem do O₂).
 import { FAMILIAS, EVENTOS } from "./content/vila.js";
+import { carta, sortearCartas, GANHO_PEQUENA, GANHO_GRANDE, GANHO_HONESTIDADE, RISCO_CONFIANCA, CHANCE_GOLPE, ESTRAGO_MATA } from "./content/cartas.js";
 import {
-  ANOS, LOTES, TETO_FAMILIA, MATA_INICIO, LIMITES, ANO_MERCADO, rendaDoAno, fecharAno, leilao, gini, vitoriaColetiva, lanceMinimo, patrimonio, contrafactual,
+  ANOS, LOTES, TETO_FAMILIA, MATA_INICIO, LIMITES, ANO_MERCADO, COLAPSO, PONTOS_NIVEL, rendaDoAno, fecharAno, leilao, gini, vitoriaColetiva, lanceMinimo, patrimonio, contrafactual,
 } from "./content/regras.js";
 
 export function rnd(seed) {
@@ -9,7 +10,8 @@ export function rnd(seed) {
   return () => { s = (s + 0x6d2b79f5) >>> 0; let t = Math.imul(s ^ (s >>> 15), 1 | s); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 }
 
-// Sequência de fases: uma regra nova por ano (1 a 4); votação no fim do ano 3; alvará no ano 5; troco opcional no ano 4.
+// Sequência de fases: uma regra nova por ano (1 a 4); votação no fim do ano 3. R13: proposta pequena no ano 2, carta
+// opcional (honestidade ou confiança) no ano 4 e proposta grande no ano 5, sorteadas a cada partida (content/cartas.js).
 export function montarFases() {
   const f = [{ id: "entrada" }, { id: "familias" }];
   for (let ano = 1; ano <= ANOS; ano++) {
@@ -23,9 +25,14 @@ export function montarFases() {
   return f;
 }
 export const FASES = montarFases();
+// Nome da etapa: nas etapas de carta, o título da carta sorteada.
+export function nomeFase(s) {
+  const c = s.cartas && { pequena: s.cartas.pequena, mente: s.cartas.ano4, alvara: s.cartas.grande }[s.fase];
+  return c ? carta(c).titulo : NOME_FASE[s.fase] || "";
+}
 export const NOME_FASE = {
-  entrada: "Entrada", familias: "Famílias", abertura: "Renda do ano", decidir: "Decisões da família", mente: "O troco do mercado",
-  lances: "Mercado de lotes", alvara: "O alvará",
+  entrada: "Entrada", familias: "Famílias", abertura: "Renda do ano", decidir: "Decisões da família", pequena: "Uma proposta pequena",
+  mente: "Carta do ano 4", lances: "Mercado de lotes", alvara: "Uma proposta grande",
   resultado: "Como ficou a vila", voto: "Que regra queremos?", fechamento: "Fechamento",
 };
 
@@ -37,8 +44,9 @@ export function estadoInicial() {
     v: 0, k: 0, fase: "entrada", ano: 0, regra: "monopolio", alunos: {}, ordem: [], fams: {}, lotes: Array(LOTES).fill(null),
     mata: 0, teto: 0, publico: 0, acumulado: 0, colapsou: false, colapsouAlguma: false, renda: null, fechamento: null,
     props: {}, previsao: {}, mente: {}, dado: {}, alvara: { pessoa: null, votos: {}, aceito: null, aceitariam: null },
-    voto: {}, votoTrocou: null, leilao: null, pessoal: {}, historico: [], final: {}, pulados: {},
-    controle: {}, palpite: {}, semTroco: true,
+    pequena: { votos: {}, aceitaram: null, n: 0, estrago: null }, golpe: {}, quem: {}, palpitePct: {}, prev5: {},
+    voto: {}, votoTrocou: null, votoPct: null, leilao: null, pessoal: {}, historico: [], final: {}, pulados: {},
+    controle: {}, palpite: {}, semTroco: false, cartas: null, painel: null,
   };
 }
 
@@ -74,6 +82,7 @@ export function reduzir(st, a) {
       let li = 0;
       for (const f of Object.values(s.fams)) for (let k = 0; k < f.lotes; k++) s.lotes[li++] = f.id;
       s.teto = TETO_FAMILIA * nf; s.mata = MATA_INICIO * s.teto;
+      s.cartas = sortearCartas(rnd(s.seed ^ 0x5bd1e995));   // R13: cartas da partida, só da semente (como o impostor)
       s.k = 1; s.fase = "familias";
       break;
     }
@@ -89,7 +98,15 @@ export function reduzir(st, a) {
       break;
     }
     case "prever": if (s.fase === "decidir") (s.previsao[s.ano] ??= {})[a.id] = a.v; break;
-    case "mente": if (s.fase === "mente" && s.mente[a.id] == null) { s.mente[a.id] = !!a.acertei; s.dado[a.id] = a.face; } break;
+    // carta do ano 4: "acertei" no dado, "ficar" na honestidade, "confiar" na confiança (todas pessoais e secretas)
+    case "mente": if (s.fase === "mente" && s.alunos[a.id] && s.mente[a.id] == null) { s.mente[a.id] = !!a.acertei; if (a.face) s.dado[a.id] = a.face; } break;
+    case "quem": if (s.fase === "mente" && s.alunos[a.id] && s.quem[a.id] == null) s.quem[a.id] = +a.v; break;
+    case "pequena": if (s.fase === "pequena" && s.alunos[a.id] && s.pequena.votos[a.id] == null) s.pequena.votos[a.id] = !!a.aceita; break;
+    // microtarefas: palpite de quantos % aceitam (pequena e grande), de quantos % votam para trocar e da desigualdade no ano 5
+    case "palpitePct": if (["pequena", "alvara", "voto"].includes(s.fase) && s.alunos[a.id]) ((s.palpitePct[s.fase] ??= {})[a.id] ??= +a.v); break;
+    case "prev5": if (s.fase === "abertura" && s.ano === 5 && s.alunos[a.id] && s.prev5[a.id] == null) s.prev5[a.id] = a.v; break;
+    // R13: quem conduz pode segurar um painel de "Como ficou a vila" ou ir e voltar entre eles
+    case "painel": if (s.fase === "resultado") s.painel = a.k == null ? null : Math.max(0, Math.min(9, +a.k)); break;
     case "controle": {
       const chave = s.fase === "abertura" ? s.ano : s.fase === "voto" ? "voto" : null;   // R8: também antes do voto
       if (chave != null && s.alunos[a.id]) ((s.controle[chave] ??= {})[a.id] ??= +a.op);
@@ -108,6 +125,8 @@ export function reduzir(st, a) {
     case "alvara": if (s.fase === "alvara" && s.alunos[a.id] && s.alvara.votos[a.id] == null) s.alvara.votos[a.id] = !!a.aceita; break;
     case "voto": if (s.fase === "voto" && s.voto[a.id] == null) s.voto[a.id] = !!a.trocar; break;
     case "final": if (s.fase === "fechamento") s.final[a.id] = { guia: a.guia, motivo: a.motivo }; break;
+    // fechamento: o telão mostra uma pergunta por vez; quem conduz passa de uma para outra
+    case "pergunta": if (s.fase === "fechamento") s.pergunta = Math.max(0, Math.min(4, (s.pergunta || 0) + (a.dir === -1 ? -1 : 1))); break;
     case "fase": {
       if (a.dir === 1) avancar(s, r);
       else if (a.dir === -1 && s.k > 1 && !["decidir", "lances", "resultado", "voto", "abertura"].includes(fase.id)) { s.k -= 1; s.fase = FASES[s.k].id; }
@@ -133,9 +152,26 @@ function avancar(s, r) {
       s.fechamento = fx;
       break;
     }
+    case "pequena": {
+      // cada "aceito" vale para quem aceitou (+2 pessoais) e tira 1/n do estrago grande (a turma inteira = o estrago da grande)
+      const c = carta(s.cartas.pequena), n = s.ordem.length;
+      const sim = s.ordem.filter((id) => s.pequena.votos[id]);
+      for (const id of sim) s.pessoal[id] += GANHO_PEQUENA;
+      s.pequena.aceitaram = sim.length; s.pequena.n = Object.keys(s.pequena.votos).length;
+      s.pequena.estrago = estragar(s, c.alvo, n ? sim.length / n : 0);
+      if (s.fechamento) s.fechamento.estrago = s.pequena.estrago;
+      break;
+    }
     case "mente": {
-      // R7: "acertei" vale 3 pontos pessoais, não vai para o caixa da família (o caixa de 3 a 6 pessoas revelaria os relatos)
-      for (const id of s.ordem) if (s.mente[id]) s.pessoal[id] += 3;
+      // R7: os pontos são pessoais, nunca do caixa da família (o caixa de 3 a 6 pessoas revelaria os relatos)
+      const c = carta(s.cartas.ano4);
+      for (const id of s.ordem) {
+        if (!s.mente[id]) continue;
+        if (c.tipo !== "confia") { s.pessoal[id] += GANHO_HONESTIDADE; continue; }
+        // confiança: cada um encontra uma pessoa diferente; a chance de má-fé é a mesma (1 em 4) em todas as cartas
+        s.golpe[id] = r() < CHANCE_GOLPE;
+        s.pessoal[id] += s.golpe[id] ? -RISCO_CONFIANCA : c.ganhoBom;
+      }
       break;
     }
     case "lances": {
@@ -147,10 +183,11 @@ function avancar(s, r) {
     }
     case "alvara": {
       // vale a resposta da pessoa sorteada (quem não respondeu conta como "recusaria"); os 8 pontos são pessoais
-      const vs = Object.values(s.alvara.votos);
+      const vs = Object.values(s.alvara.votos), c = carta(s.cartas.grande);
       s.alvara.aceitariam = vs.filter(Boolean).length;
       s.alvara.aceito = !!s.alvara.votos[s.alvara.pessoa];
-      if (s.alvara.aceito) { s.pessoal[s.alvara.pessoa] += 8; s.publico = Math.max(0, s.publico - 1); }
+      s.alvara.alvo = c.alvo;
+      if (s.alvara.aceito) { s.pessoal[s.alvara.pessoa] += GANHO_GRANDE; s.alvara.estrago = estragar(s, c.alvo, 1); if (s.fechamento) s.fechamento.estrago = s.alvara.estrago; }
       break;
     }
     case "resultado": {
@@ -164,6 +201,7 @@ function avancar(s, r) {
       // maioria simples dos votos enviados; empate mantém a regra atual
       const vs = Object.values(s.voto);
       s.votoTrocou = vs.length > 0 && vs.filter(Boolean).length * 2 > vs.length;
+      s.votoPct = vs.length ? vs.filter(Boolean).length / vs.length : null;
       if (s.votoTrocou) s.regra = "prosperidade";
       // R9: guarda a vila no fim do ano 3 para refazer os anos 4 e 5 na outra regra, no fechamento
       s.snap3 = { fams: structuredClone(s.fams), mata: s.mata, publico: s.publico, acumulado: s.acumulado, colapsou: s.colapsou,
@@ -173,13 +211,31 @@ function avancar(s, r) {
     default: break;
   }
   s.k += 1;
-  if (FASES[s.k]?.id === "mente" && s.semTroco) s.k += 1;   // troco desligado (padrão); o professor pode ligá-lo
+  s.painel = null;
+  if (FASES[s.k]?.id === "mente" && s.semTroco) s.k += 1;   // carta do ano 4 desligada pelo professor (se a aula atrasar)
   const prox = FASES[s.k];
   s.fase = prox.id;
   if (prox.ano) s.ano = prox.ano;
   if (prox.id === "abertura") s.renda = rendaDoAno(s.fams, s);
   if (prox.id === "alvara") s.alvara = { pessoa: s.ordem[Math.floor(r() * s.ordem.length)], votos: {}, aceito: null, aceitariam: null };
-  if (prox.id === "fechamento") { s.vitoria = vitoriaColetiva(s); s.outra = contrafactual(s.snap3, s.props, s.alvara.aceito); }
+  if (prox.id === "fechamento") { s.vitoria = vitoriaColetiva(s); s.outra = contrafactual(s.snap3, s.props, { aceito: s.alvara.aceito, alvo: s.alvara.alvo }); }
+}
+
+// Estrago de uma proposta aceita (frac = parte do estrago grande: 1 na grande; aceites ÷ turma na pequena).
+// Mata: 20% do teto. Bem público: 12 × famílias pontos (um nível inteiro); se faltar acumulado, cai de nível.
+function estragar(s, alvo, frac) {
+  if (alvo === "mata") {
+    const antes = s.mata;
+    s.mata = Math.max(0, s.mata - ESTRAGO_MATA * s.teto * frac);
+    s.colapsou = s.mata < COLAPSO * s.teto;
+    if (s.colapsou) s.colapsouAlguma = true;
+    return { alvo, mata: antes - s.mata, pct: (100 * (antes - s.mata)) / s.teto };
+  }
+  const nf = Object.keys(s.fams).length, nivel0 = s.publico, pontos = PONTOS_NIVEL * nf * frac;
+  s.acumulado -= pontos;
+  while (s.acumulado < 0 && s.publico > 0) { s.publico -= 1; s.acumulado += PONTOS_NIVEL * nf; }
+  s.acumulado = Math.max(0, s.acumulado);
+  return { alvo, pontos, niveis: nivel0 - s.publico };
 }
 
 // ---------- Seletores ----------
@@ -190,9 +246,10 @@ export function progresso(s) {
     case "familias": return { rot: "acharam a família", feito: s.ordem.filter((id) => s.alunos[id].achou).length, total: n };
     case "decidir": return { rot: "propostas enviadas", feito: Object.values(s.props[s.ano] || {}).filter((p) => !p.auto).length, total: n };
     case "mente": return { rot: "responderam", feito: Object.keys(s.mente).length, total: n };
+    case "pequena": return { rot: "responderam", feito: Object.keys(s.pequena.votos).length, total: n };
     case "lances": return { rot: "lances enviados", feito: Object.values(s.props[s.ano] || {}).filter((p) => p.lanceEnviado).length, total: n };
     case "alvara": return { rot: "votaram", feito: Object.keys(s.alvara.votos).length, total: n };
-    case "abertura": return s.ano <= 4 ? { rot: "responderam a pergunta", feito: Object.keys(s.controle[s.ano] || {}).length, total: n } : null;
+    case "abertura": return s.ano <= 4 ? { rot: "responderam a pergunta", feito: Object.keys(s.controle[s.ano] || {}).length, total: n } : { rot: "deram o palpite", feito: Object.keys(s.prev5).length, total: n };
     case "voto": return { rot: "votaram", feito: Object.keys(s.voto).length, total: n };
     case "fechamento": return { rot: "responderam", feito: Object.keys(s.final).length, total: n };
     default: return null;

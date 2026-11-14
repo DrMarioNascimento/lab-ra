@@ -1,4 +1,5 @@
 import { EXEMPLO_DO_ANO } from "./content/vila.js";
+import { carta } from "./content/cartas.js";
 // Participantes simulados (piloto automático) do /simulador do Mosaico Vila.
 // A política é a mesma da simulação em Python (vila_regras.py · proposta), com os tipos de
 // Fischbacher, Gächter e Fehr (2001): 50% cooperam de forma condicional, 30% são caronas, 20% outros.
@@ -39,14 +40,26 @@ export function passoBot(st, id, loc, dispatch) {
       break;
     }
     case "mente": {
-      if (st.mente[id] != null || !chance(0.35)) break;
-      const face = 1 + Math.floor(Math.random() * 6);
-      const acerto = Math.random() < 1 / 6;
+      const c = carta(st.cartas.ano4);
+      if (st.mente[id] != null) {
+        // depois de responder à confiança: quem acha que mais dá golpe (com algum estereótipo, como numa turma real)
+        if (c.tipo === "confia" && st.quem[id] == null && chance(0.35)) dispatch({ t: "quem", id, v: Math.random() < 0.35 ? 0 : Math.random() < 0.4 ? 4 : 1 + Math.floor(Math.random() * 3) });
+        break;
+      }
+      if (!chance(0.35)) break;
       const mente = clip(0.1 + 0.14 * (3.4 - pf.hh) + 0.08, 0, 0.7);
-      dispatch({ t: "mente", id, face, acertei: acerto || Math.random() < mente });
+      if (c.tipo === "dado") { const face = 1 + Math.floor(Math.random() * 6); dispatch({ t: "mente", id, face, acertei: Math.random() < 1 / 6 || Math.random() < mente }); }
+      else if (c.tipo === "honesto") dispatch({ t: "mente", id, acertei: Math.random() < mente });
+      else dispatch({ t: "mente", id, acertei: Math.random() < clip((c.id === "pedinte" ? 0.45 : 0.55) + (pf.tipo === "CC" ? 0.15 : -0.05) + 0.2 * (pf.uni - 0.5)) });
+      break;
+    }
+    case "pequena": {
+      if (st.pequena.votos[id] == null) { if (chance(0.35)) dispatch({ t: "pequena", id, aceita: Math.random() < clip(0.42 + (3.1 - pf.hh) * 0.25) }); }
+      else if (st.palpitePct?.pequena?.[id] == null && chance(0.35)) dispatch({ t: "palpitePct", id, v: Math.floor(Math.random() * 3) });
       break;
     }
     case "abertura": {
+      if (st.ano === 5) { if (st.prev5?.[id] == null && chance(0.35)) dispatch({ t: "prev5", id, v: chance(0.55) ? "sobe" : "desce" }); break; }
       const ex = EXEMPLO_DO_ANO[st.ano];
       if (ex && st.controle?.[st.ano]?.[id] == null && chance(0.35)) dispatch({ t: "controle", id, op: Math.random() < 0.85 ? ex.certa : (ex.certa + 1) % ex.opcoes.length });
       break;
@@ -57,10 +70,14 @@ export function passoBot(st, id, loc, dispatch) {
       else if (p?.lanceEnviado && st.palpite?.[st.ano]?.[id] == null && chance(0.3)) dispatch({ t: "palpite", id, v: ["até 20", "21 a 40", "mais de 40"][Math.floor(Math.random() * 3)] });
       break;
     }
-    case "alvara": if (st.alvara.votos[id] == null && chance(0.3)) dispatch({ t: "alvara", id, aceita: Math.random() < clip(0.5 + (3.1 - pf.hh) * 0.25) }); break;
+    case "alvara":
+      if (st.alvara.votos[id] == null) { if (chance(0.3)) dispatch({ t: "alvara", id, aceita: Math.random() < clip(0.5 + (3.1 - pf.hh) * 0.25) }); }
+      else if (st.palpitePct?.alvara?.[id] == null && chance(0.35)) dispatch({ t: "palpitePct", id, v: Math.floor(Math.random() * 3) });
+      break;
     case "voto": {
       if (st.controle?.voto?.[id] == null && chance(0.4)) { dispatch({ t: "controle", id, op: Math.random() < 0.85 ? 1 : 0 }); break; }
-      if (st.voto[id] != null || !chance(0.35)) break;
+      if (st.voto[id] != null) { if (st.palpitePct?.voto?.[id] == null && chance(0.35)) dispatch({ t: "palpitePct", id, v: Math.floor(Math.random() * 3) }); break; }
+      if (!chance(0.35)) break;
       const caixas = Object.values(st.fams).map((f) => f.caixa).sort((a, b) => a - b);
       const pobre = fam && fam.caixa <= caixas[Math.floor(caixas.length / 2) - (caixas.length % 2 ? 0 : 1)];
       const pr = 0.35 + (pobre ? 0.35 : -0.1) + 0.3 * (pf.uni - 0.5) + (pf.tipo === "CC" ? 0.15 : -0.1);
