@@ -21,8 +21,13 @@ function hd(st, me) {
 function miniBarra(st0) {
   const st = vista(st0);   // R17: entre as decisões e o resultado, a vila de antes das decisões
   const m = progressoMeta(st.fams, st.publico, st.mata, st.teto, st.regra);
-  const meta = m.regra === "prosperidade" ? `${pctL(m.valor)}/${Math.round(100 * m.alvo)}%` : `${nL(m.valor, m.alvo)}/${m.alvo}`;
+  const meta = ["conversa", "voto"].includes(st.fase) ? "duas metas" : m.regra === "prosperidade" ? `${pctL(m.valor)}/${Math.round(100 * m.alvo)}%` : `${nL(m.valor, m.alvo)}/${m.alvo}`;   // R20
   return `<div class="mini-hud">${st.ano >= 2 ? `<span>${ico("arvore-redonda")}<b>${pctL(st.mata / st.teto)}</b></span>` : ""}<span>${ico("economia")}<b>nível ${st.publico}</b></span><span>${ico("meta")}<b>${meta}</b></span><span>${ico("balanca")}<b>${REGRAS_TXT[st.regra].nome}</b></span></div>`;
+}
+
+// R19 e R20: as duas metas no celular, na conversa e no voto: o número de hoje e para onde ele costuma ir
+function duasMetasCel() {
+  return `<div class="card"><b>As duas metas</b><p class="faint" style="margin:4px 0 0">Monopólio: patrimônio médio de ${VITORIA.patrimonioPorPessoa} por pessoa. Prosperidade: a mais pobre com ${Math.round(100 * VITORIA.pobreSobreMedia)}% da média. Nas duas, mata acima de 30%. Nos testes, cada meta saiu em cerca de metade das partidas: o que decide é como a vila joga os anos 4 e 5.</p></div>`;   // R20: sem o número de hoje
 }
 
 // R10: a mesma barra da meta do telão, no celular (meta da regra vigente, desde o ano 1)
@@ -214,14 +219,14 @@ export function renderAluno(st, id, loc) {
     }
     case "conversa":
       // R16: conversa de 90 s antes do voto; o celular confere a regra e espera o voto abrir
-      bd = `<h2 class="row">${ico("balanca", "g")}Antes do voto: conversem</h2><p class="muted">Com a família, ${st.curto ? 60 : 90} segundos: com o aluguel mordendo, qual regra deixa a vila mais perto da meta, e de quem? <b>Quando o relógio do telão acabar, quem conduz abre o voto.</b></p>${controle(st, id)}
+      bd = `<h2 class="row">${ico("balanca", "g")}Antes do voto: conversem</h2><p class="muted">Com a família, ${st.curto ? 60 : 90} segundos: que vila vocês querem nos anos 4 e 5, a que faz o patrimônio médio crescer ou a que não deixa a família mais pobre para trás? Quem ganha e quem paga em cada uma? <b>Quando o relógio do telão acabar, quem conduz abre o voto.</b></p>${controle(st, id)}
         <div class="card"><b>${esc(REGRAS_TXT.monopolio.nome)}</b><p class="faint" style="margin:2px 0 6px">${esc(REGRAS_TXT.monopolio.curto)}</p><b>${esc(REGRAS_TXT.prosperidade.nome)}</b><p class="faint" style="margin:2px 0 0">${esc(REGRAS_TXT.prosperidade.curto)}</p></div>
-        <div class="card"><b>As duas metas, hoje</b><p class="faint" style="margin:4px 0 0">${(() => { const mo = progressoMeta(st.fams, st.publico, st.mata, st.teto, "monopolio"), pr = progressoMeta(st.fams, st.publico, st.mata, st.teto, "prosperidade"); return `Monopólio: patrimônio médio de ${nL(mo.valor, mo.alvo)} (meta ${mo.alvo}). Prosperidade: a mais pobre com ${pctL(pr.valor)} da média (meta ${Math.round(100 * pr.alvo)}%). Nos anos 4 e 5, aluguel, mercado e mata mexem nos dois.`; })()}</p></div>`;   // R19
+        ${duasMetasCel()}`;   // R19 e R20
       break;
     case "voto":
       bd = st.voto[id] != null ? enviado("Voto secreto enviado.") + palpiteFaixa(st, id, "voto", "quantos % vão votar para trocar?") : `<h2 class="row">${ico("balanca", "g")}Que regra queremos?</h2><p class="muted"><b>Volte ao seu lugar para votar.</b> Vale para os anos 4 e 5. Voto secreto; vence a maioria dos votos, e empate mantém o Monopólio.</p>${controle(st, id)}
         <button class="opt" data-a="voto" data-val="0"><b>Manter o Monopólio</b><br><span class="faint">${esc(REGRAS_TXT.monopolio.curto)}</span></button>
-        <button class="opt" data-a="voto" data-val="1"><b>Trocar para a Prosperidade</b><br><span class="faint">${esc(REGRAS_TXT.prosperidade.curto)}</span></button>`;
+        <button class="opt" data-a="voto" data-val="1"><b>Trocar para a Prosperidade</b><br><span class="faint">${esc(REGRAS_TXT.prosperidade.curto)}</span></button>${duasMetasCel()}`;
       break;
     case "fechamento": {
       const ja = st.final[id];

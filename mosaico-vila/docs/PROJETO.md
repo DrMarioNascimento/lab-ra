@@ -109,3 +109,8 @@ No fim do ano 3, o motor guarda a vila (`snap3`). No fechamento, `contrafactual(
 - `fecharAno()`: as cargas nunca tiram mais do que a mata tem (acima disso, cada carga rende e tira a sua parte), e a "natureza" do painel deixa de ser um resto impossível.
 - Nomes e cores das famílias embaralhados pela semente (a herança muda de cor); cabeçalho do celular com o caixa de antes das decisões nas cartas; o celular diz o que a família levou no mercado; deixas "voltem às famílias"; "1 família recebeu o piso".
 - Telão: referências curtas no "De onde vem", confiança e conversa sem passar da TV, rótulos dos gráficos em F − 1 e do mapa em 26 a 27.
+
+## R20 (14/11/2026, após os avaliadores DW e DX)
+- Voto pela vila que a turma quer: pergunta-guia de valores ("a que faz o patrimônio médio crescer ou a que não deixa a família mais pobre para trás?"), as duas metas lado a lado sem o número de hoje (`duasMetas()` no telão, `duasMetasCel()` no celular, na conversa e no voto), barra com "duas metas" nessas duas etapas e a frase "nos testes, cada meta saiu em cerca de metade das partidas". O número de hoje inclinava o voto: no fim do ano 3, a meta de equidade estava batida em quase todas as partidas e a de eficiência em nenhuma.
+- `contrafactual()` devolve também o patrimônio médio e a razão da mais pobre.
+- "aceitariam" na barra da grande; escala da desigualdade a partir de 0,3; "6 + 2 × o ano"; "metade do que se oferece além do mínimo"; cartões das famílias em ordem alfabética; mata em 0% sem "cai de 0% para 0%"; nome do nível em 27.

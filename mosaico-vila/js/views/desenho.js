@@ -89,7 +89,7 @@ export function mapaVila(st, { grande = true, destaque = null } = {}) {
     <rect x="290" y="40" width="200" height="390" rx="18" fill="#1a1f33" stroke="#2c3560"/>
     <text x="304" y="68" font-size="27" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Bem público</text><text x="304" y="100" font-size="27" fill="#fbbf24" font-family="Sora, sans-serif">nível ${nivel} de 5</text>
     ${predios.join("")}
-    ${quebra(NIVEIS_PUBLICO[nivel], 11).map((l, k, ls) => `<text x="390" y="${420 - (ls.length - 1 - k) * 28}" text-anchor="middle" font-size="26" fill="#9fb6cf" font-family="Sora, sans-serif">${esc(l)}</text>`).join("")}
+    ${quebra(NIVEIS_PUBLICO[nivel], 11).map((l, k, ls) => `<text x="390" y="${420 - (ls.length - 1 - k) * 29}" text-anchor="middle" font-size="27" fill="#9fb6cf" font-family="Sora, sans-serif">${esc(l)}</text>`).join("")}
     <rect x="500" y="40" width="280" height="390" rx="18" fill="#10223b" stroke="#23415f"/>
     <text x="514" y="68" font-size="27" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Lotes</text><text x="766" y="68" text-anchor="end" font-size="26" fill="#9fb6cf" font-family="Sora, sans-serif">${st.lotes.filter((x) => !x).length} livres</text>
     ${lotes.join("")}
@@ -114,12 +114,13 @@ export function linhaDoTempo(hist, { F = 26, alto = 240, so = null } = {}) {
     ${[0.3, 0.5].map((v) => `<line x1="${x0}" x2="${W - 110}" y1="${ym(v)}" y2="${ym(v)}" stroke="${v < 0.4 ? "#fb7185" : "#fbbf24"}" stroke-opacity=".55" stroke-width="2" stroke-dasharray="6 6"/><text x="${x0 - 8}" y="${v < 0.4 ? ym(v) + F - 6 : ym(v) - 2}" text-anchor="end" font-size="${F - 1}" fill="${v < 0.4 ? "#fca5a5" : "#fde68a"}" font-family="Sora, sans-serif">${100 * v}%</text>`).join("")}
     ${eixoX(H - 40)}<path d="${caminho(mata, ym)}" fill="none" stroke="#34d399" stroke-width="5" stroke-linejoin="round"/>${ponto(mata, ym, "#34d399", (v) => pctL(v))}</svg>`;
   // Desigualdades
-  const yg = (v) => 56 + (1 - Math.max(0, Math.min(1, v / 0.5))) * (H - 96);
   const gp = hist.map((h) => h.gini), gr = hist.map((h) => h.giniRenda ?? 0);
+  const topo = Math.max(0.3, Math.ceil(10 * 1.15 * Math.max(...gp, ...gr, 0)) / 10);   // R20: escala até 0,3 (ou mais, se precisar): as subidas aparecem
+  const yg = (v) => 56 + (1 - Math.max(0, Math.min(1, v / topo))) * (H - 96);
   const fmt = (v) => v.toFixed(2).replace(".", ",");
   const svgG = `<svg class="metro" viewBox="0 0 ${W} ${H}" role="img" aria-label="Desigualdade por ano">
     <text x="0" y="${F}" font-size="${F - 2}" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Desigualdade</text><text x="${Math.round(F * 7.2)}" y="${F}" font-size="${F - 2}" font-weight="700" fill="#fca5a5" font-family="Sora, sans-serif">— patrimônio</text><text x="${Math.round(F * 14.6)}" y="${F}" font-size="${F - 2}" font-weight="700" fill="#fde68a" font-family="Sora, sans-serif">··· renda</text>
-    <text x="${x0 - 8}" y="${yg(0) + 8}" text-anchor="end" font-size="${F - 1}" fill="#a9bdd3" font-family="Sora, sans-serif">0</text><text x="${x0 - 8}" y="${yg(0.5) + 8}" text-anchor="end" font-size="${F - 1}" fill="#a9bdd3" font-family="Sora, sans-serif">0,5</text>
+    <text x="${x0 - 8}" y="${yg(0) + 8}" text-anchor="end" font-size="${F - 1}" fill="#a9bdd3" font-family="Sora, sans-serif">0</text><text x="${x0 - 8}" y="${yg(topo) + 8}" text-anchor="end" font-size="${F - 1}" fill="#a9bdd3" font-family="Sora, sans-serif">${String(topo).replace(".", ",")}</text>
     ${eixoX(H - 40)}<path d="${caminho(gp, yg)}" fill="none" stroke="#fb7185" stroke-width="5"/><path d="${caminho(gr, yg)}" fill="none" stroke="#fbbf24" stroke-width="5" stroke-dasharray="3 9" stroke-linecap="round"/>
     ${ponto(gp, yg, "#fb7185", fmt)}</svg>`;
   // R14: no fechamento, só o gráfico da pergunta da vez (maior, com letra de TV)

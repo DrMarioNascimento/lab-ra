@@ -129,6 +129,7 @@ function efeitoCarta(c, { mata, teto, publico, rel }, tempo) {
   if (rel) return c.alvo === "mata" ? `a mata ${perde} ${Math.round(100 * ESTRAGO_MATA)} pontos (de 100 da mata cheia)` : `o bem público ${perde} 12 pontos por família, um nível inteiro`;
   if (c.alvo === "mata") {
     const de = mata / (teto || 1), para = Math.max(0, de - ESTRAGO_MATA);
+    if (Math.round(100 * de) === Math.round(100 * para)) return `a mata, já em ${pct1(de)}, não tem mais o que perder`;   // R20: mata no fim
     return `a mata ${cai} de ${pct1(de)} para ${pct1(para)}`;
   }
   return publico > 0 ? `o bem público ${cai} do nível ${publico} para o ${publico - 1}` : `o bem público ${perde} os pontos que juntou para o primeiro nível`;

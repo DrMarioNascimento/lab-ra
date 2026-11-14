@@ -186,7 +186,9 @@ export function contrafactual(snap, props, grande, desempate = () => 0.5, lances
     const fx = fecharAno({ ...v, ano }, p, renda);
     Object.assign(v, { fams: fx.fams, mata: fx.mata, publico: fx.publico, acumulado: fx.acumulado, colapsou: fx.colapsou });
   }
-  return { regra: outra, gini: gini(Object.values(v.fams).map((f) => patrimonio(f, v.publico) / f.membros.length)), meta: vitoriaColetiva(v), mata: v.mata / v.teto };
+  const fs = Object.values(v.fams), ppf = fs.map((f) => patrimonio(f, v.publico) / f.membros.length), media = ppf.reduce((a, b) => a + b, 0) / ppf.length;
+  const pp = fs.reduce((a, f) => a + patrimonio(f, v.publico), 0) / fs.reduce((a, f) => a + f.membros.length, 0);
+  return { regra: outra, gini: gini(ppf), meta: vitoriaColetiva(v), mata: v.mata / v.teto, pp, razao: media > 0 ? Math.min(...ppf) / media : 0 };
 }
 
 // R10: quanto a vila está da meta da regra vigente (o telão e o celular mostram desde o ano 1).

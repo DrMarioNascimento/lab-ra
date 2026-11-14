@@ -33,7 +33,8 @@ function barra(st0) {
   const dPub = fx ? st.publico - fx.nivelAntes : 0;
   const delta = (d) => (d ? `<em class="delta ${d > 0 ? "up" : "down"}">${d > 0 ? "+" : "−"}${Math.abs(d)}</em>` : "");
   const metaOk = m.valor >= m.alvo && m.mata >= VITORIA.mataMinima;
-  const valMeta = m.regra === "prosperidade" ? `${pctL(m.valor)}<small>/${Math.round(100 * m.alvo)}%</small>` : `${nL(m.valor, m.alvo)}<small>/${m.alvo}</small>`;
+  const noVoto = ["conversa", "voto"].includes(st.fase);   // R20: no voto, a barra não mostra a meta de uma regra só
+  const valMeta = noVoto ? `<small>duas metas</small>` : m.regra === "prosperidade" ? `${pctL(m.valor)}<small>/${Math.round(100 * m.alvo)}%</small>` : `${nL(m.valor, m.alvo)}<small>/${m.alvo}</small>`;
   const livres = st.lotes.filter((x) => !x).length;
   const pips = (n, tot, fn) => Array.from({ length: tot }, (_, k) => `<i class="${fn(k + 1)}"></i>`).join("");
   return `<div class="hud">
@@ -41,7 +42,7 @@ function barra(st0) {
     <div class="slot">${ico("balanca")}<div><b>${REGRAS_TXT[st.regra].nome}</b><span>regra</span></div></div>
     ${st.ano >= 2 ? `<div class="slot ${fm < COLAPSO ? "mal" : fm < 0.5 ? "atencao" : ""} ${dMata ? "pulsa" : ""}">${ico("arvore-redonda")}<div><b>${pctL(fm)}${delta(dMata)}</b><span>mata</span></div></div>` : ""}
     <div class="slot ${dPub ? "pulsa" : ""}">${ico("economia")}<div><b class="niv">${pips(st.publico, 5, (k) => (k <= st.publico ? "on" : ""))}${delta(dPub)}</b><span>bem público</span></div></div>
-    <div class="slot ${metaOk ? "ok" : ""}">${ico("meta")}<div><b>${valMeta}</b><span>meta da vila</span></div></div>
+    <div class="slot ${metaOk && !noVoto ? "ok" : ""}">${ico("meta")}<div><b>${valMeta}</b><span>meta da vila</span></div></div>
     ${st.ano >= 3 ? `<div class="slot">${ico("lote-venda")}<div><b>${livres}</b><span>lotes livres</span></div></div>` : ""}
   </div>`;
 }
@@ -112,13 +113,10 @@ function telaoConfianca(st) {
 }
 
 // R19: antes do voto, as duas metas com os números de hoje (não só a da regra vigente)
-function metaHoje(st, regra) {
-  const m = progressoMeta(st.fams, st.publico, st.mata, st.teto, regra);
-  return regra === "prosperidade" ? `a mais pobre tem ${pctL(m.valor)} da média (meta ${Math.round(100 * m.alvo)}%)` : `patrimônio médio de ${nL(m.valor, m.alvo)} (meta ${m.alvo})`;
-}
-function duasMetas(st) {
-  const mo = progressoMeta(st.fams, st.publico, st.mata, st.teto, "monopolio"), pr = progressoMeta(st.fams, st.publico, st.mata, st.teto, "prosperidade");
-  return `<div class="card" style="width:100%;padding:1cqw 1.4cqw"><p class="rodape" style="margin:0"><b>As duas metas, hoje</b><br>Monopólio: média de ${nL(mo.valor, mo.alvo)} (meta ${mo.alvo})<br>Prosperidade: a mais pobre com ${pctL(pr.valor)} (meta ${Math.round(100 * pr.alvo)}%)<br>Aluguel, mercado e mata ainda mexem nos dois.</p></div>`;
+// R20: no voto, as duas metas lado a lado, sem o número de "hoje" (no fim do ano 3, a de equidade quase sempre parece batida
+// e a de eficiência quase nunca, e as duas mudam muito nos anos 4 e 5). O voto é sobre a vila que a turma quer.
+function duasMetas() {
+  return `<div class="card" style="width:100%;padding:1cqw 1.4cqw"><p class="rodape" style="margin:0"><b>As duas metas</b> estão no exemplo. Nos testes, cada uma saiu em cerca de metade das partidas.</p></div>`;
 }
 
 export function renderTelao(st) {
@@ -129,7 +127,7 @@ export function renderTelao(st) {
         <div class="card" style="overflow:hidden"><h2>${st.ordem.length} na sala</h2><div class="row" style="margin-top:1cqw;gap:.5cqw">${st.ordem.map((id) => `<span class="chip nome">${esc(st.alunos[id].nome)}</span>`).join("")}</div></div></div>`;
       break;
     case "familias": {
-      const fs = fams(st), cols = Math.min(fs.length, 4);
+      const fs = fams(st).slice().sort((x, y) => x.nome.localeCompare(y.nome, "pt-BR")), cols = Math.min(fs.length, 4);   // R20: em ordem alfabética (a herança não fica sempre no primeiro cartão)
       body = topo(st, "Encontre a sua família") + `<div class="grid" style="grid-template-columns:repeat(${cols},1fr);flex:1;min-height:0;align-content:start">${fs.map((f) => `<div class="card fam"><div class="row" style="flex-wrap:nowrap">${iconeFamilia(f, 44)}<b>${esc(f.nome.replace("Família ", ""))}</b><span class="mono conta-fam">${f.membros.filter((m) => st.alunos[m].achou).length}/${f.membros.length}</span></div><p class="nomes">${f.membros.map((m) => esc(st.alunos[m].nome)).join(", ")}</p></div>`).join("")}</div>
         <p class="rodape">As famílias não começam iguais: uma tem herança e outra começa sem lote. Quem ficou onde foi sorteio, não mérito. Cada família vê a própria situação no celular.</p>`;
       break;
@@ -140,7 +138,7 @@ export function renderTelao(st) {
       const aluguel = rs.reduce((a, r) => a + r.aluguel, 0), piso = rs.filter((r) => r.piso > 0).length;
       const v4 = st.ano === 4 ? resultadoVoto(st) : null;
       body = topo(st, `Ano ${st.ano}: ${esc(nov.titulo)}`) + (v4 ? v4.html : "") + `<div class="card destaque">${ico(ICONE_ANO[st.ano], v4 ? "g" : "xl")}<p class="${v4 ? "big" : "enorme"}" style="margin:0">${esc(nov.telao || nov.texto)}</p></div>` +
-        (ex ? `<div class="card" style="flex:1;min-height:0"><h3 class="row">${ico("ideia")}Exemplo resolvido</h3>${exemploLinhas(st, linhasDe(ex, st), 1.5, v4 || linhasDe(ex, st).length >= 4 ? "compacto" : "")}</div><p class="rodape">${v4?.palpite || ""}${v4 ? "Voltem às famílias. " : ""}No celular: ${v4 ? "pergunta rápida" : "uma pergunta rápida para conferir"} (não vale ponto).</p>`
+        (ex ? `<div class="card" style="flex:1;min-height:0"><h3 class="row">${ico("ideia")}Exemplo resolvido</h3>${exemploLinhas(st, linhasDe(ex, st), 1.5, v4 || linhasDe(ex, st).length >= 4 ? "compacto" : "")}</div><p class="rodape">${v4?.palpite || ""}${v4 ? "Voltem às famílias. No celular: pergunta rápida." : "No celular: uma pergunta rápida para conferir (não vale ponto)."}</p>`
           : `<div class="card"><p class="big" style="margin:0">${aluguel ? `${n0(aluguel)} pontos de aluguel vão mudar de mãos. ` : ""}${piso ? (piso === 1 ? "1 família recebeu o piso de renda." : `${piso} famílias receberam o piso de renda.`) : "Nenhuma família precisou do piso de renda."}</p></div><p class="rodape">Cada família vê o próprio extrato no celular.</p>`);
       break;
     }
@@ -165,7 +163,7 @@ export function renderTelao(st) {
       body = topo(st, "Mercado de lotes") + `<div class="lado"><div class="card mapa-card">${mapaVila(st)}</div><div class="col">
         <div class="card row" style="flex-wrap:nowrap">${ico("lote-sobrado", "xl")}<div><b class="enorme mono">${Math.min(3, livres)}</b><div class="big">lotes à venda</div></div></div>
         <div class="card"><div class="big">Lance mínimo</div><b class="enorme mono">${lanceMinimo(st.ano)}</b></div>
-        <p class="rodape">Lance fechado, mediana da família; o maior leva.${st.regra === "prosperidade" ? " Na Prosperidade, conta metade." : ""} Até a moradia + 1 lote; dá para marcar "não queremos". O lote novo conta para o aluguel a partir do próximo ano.${st.ano === 5 ? " Voltem às famílias." : ""}</p></div></div>`;
+        <p class="rodape">Lance fechado, mediana da família; o maior leva.${st.regra === "prosperidade" ? " Na Prosperidade, conta metade do que se oferece além do mínimo." : ""} Até a moradia + 1 lote; dá para marcar "não queremos". O lote novo conta para o aluguel a partir do próximo ano.${st.ano === 5 ? " Voltem às famílias." : ""}</p></div></div>`;
       break;
     }
     case "alvara":
@@ -176,15 +174,15 @@ export function renderTelao(st) {
       // R16: 90 s de conversa com uma pergunta-guia antes de o voto abrir
       // R17: o exemplo resolvido das duas regras vem logo no começo da conversa (antes, só aparecia no voto)
       body = topo(st, "Antes do voto: conversem") + `<div class="lado"><div class="col" style="min-height:0;gap:1cqw">
-        <div class="card"><p class="enorme" style="margin:0;font-size:2.6cqw">Com o aluguel mordendo, qual regra deixa a vila mais perto da meta, e de quem?</p></div>
+        <div class="card"><p class="enorme" style="margin:0;font-size:2.3cqw">Que vila vocês querem: a que faz o patrimônio médio crescer ou a que não deixa a mais pobre para trás? Quem ganha e quem paga?</p></div>
         <div class="card" style="flex:1;min-height:0;overflow:hidden"><h3 class="row">${ico("ideia")}Exemplo resolvido: as duas regras</h3>${exemploLinhas(st, EXEMPLO_VOTO.linhas, 1.5, "compacto")}</div></div>
-        <div class="col centro">${cronometro(st, "Conversem na família", st.curto ? 60 : 90)}${duasMetas(st)}</div></div>`;
+        <div class="col centro">${cronometro(st, "Conversem na família", st.curto ? 60 : 90)}${duasMetas()}</div></div>`;
       break;
     case "voto":
       body = topo(st, "Que regra queremos para os anos 4 e 5?") + `<div class="grid" style="grid-template-columns:1fr 1fr">
-        <div class="card"><h2 class="row">${ico("balanca", "g")}Manter: ${REGRAS_TXT.monopolio.nome}</h2><p class="big" style="margin:.4cqw 0 0">${esc(REGRAS_TXT.monopolio.telao)}</p><p class="rodape" style="margin:.3cqw 0 0">Hoje: ${metaHoje(st, "monopolio")}</p></div>
-        <div class="card"><h2 class="row">${ico("balanca", "g")}Trocar: ${REGRAS_TXT.prosperidade.nome}</h2><p class="big" style="margin:.4cqw 0 0">${esc(REGRAS_TXT.prosperidade.telao)}</p><p class="rodape" style="margin:.3cqw 0 0">Hoje: ${metaHoje(st, "prosperidade")}</p></div></div>
-        <div class="card destaque"><p class="enorme" style="margin:0;font-size:3cqw">Votem agora no celular, cada um no próprio lugar.</p></div>
+        <div class="card"><h2 class="row">${ico("balanca", "g")}Manter: ${REGRAS_TXT.monopolio.nome}</h2><p class="big" style="margin:.4cqw 0 0">${esc(REGRAS_TXT.monopolio.telao)}</p></div>
+        <div class="card"><h2 class="row">${ico("balanca", "g")}Trocar: ${REGRAS_TXT.prosperidade.nome}</h2><p class="big" style="margin:.4cqw 0 0">${esc(REGRAS_TXT.prosperidade.telao)}</p></div></div>
+        <div class="card destaque"><p class="enorme" style="margin:0;font-size:3cqw">Votem agora no celular, cada um no próprio lugar. Nos testes, cada meta saiu em cerca de metade das partidas: votem na vila que vocês querem.</p></div>
         <p class="rodape">Voto secreto. Vence a maioria; empate mantém o Monopólio.</p>`;   // R19: o exemplo fica na conversa (antes, cortava aqui)
       break;
     case "fechamento": body = telaoFechamento(st); break;
@@ -450,7 +448,7 @@ function barrasPropostas(st) {
   const vs = Object.values(st.alvara?.votos || {});
   if (!agregadoOk(st.pequena?.n || 0) || !agregadoOk(vs.length)) return `<p class="rodape">Menos de 5 respostas numa das propostas: os totais ficam guardados.</p>`;
   const linhas = [["Pequena: cada um por si", st.pequena.aceitaram, st.pequena.n], ["Grande: uma pessoa sorteada", vs.filter(Boolean).length, vs.length]];
-  return `<div class="col fech-barras">${linhas.map(([rot, a, n]) => `<div><div class="row" style="justify-content:space-between;flex-wrap:nowrap"><b>${rot}</b><b class="mono">${pct(a, n)}%</b></div><div class="barra grande"><i style="width:${pct(a, n)}%"></i></div><p class="rodape">aceitaram ${a} de ${n} que responderam</p></div>`).join("")}</div>`;
+  return `<div class="col fech-barras">${linhas.map(([rot, a, n]) => `<div><div class="row" style="justify-content:space-between;flex-wrap:nowrap"><b>${rot}</b><b class="mono">${pct(a, n)}%</b></div><div class="barra grande"><i style="width:${pct(a, n)}%"></i></div><p class="rodape">${rot.startsWith("Grande") ? "aceitariam" : "aceitaram"} ${a} de ${n} que responderam</p></div>`).join("")}</div>`;
 }
 function guiouTurma(st) {
   const fin = Object.values(st.final);

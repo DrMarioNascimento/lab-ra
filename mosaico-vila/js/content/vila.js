@@ -20,7 +20,7 @@ export const NOVIDADE_DO_ANO = {
   2: { titulo: "A mata entra no jogo", telao: "Madeira rende agora. Mata em 50% ou mais: +2 de renda por pessoa. Abaixo de 30%: −4 por pessoa, para todos.", texto: "A mata da vila se regenera um pouco a cada ano. Cada carga de madeira rende 6 pontos à família e tira mata de todos; replantar devolve. Com a mata em 50% ou mais, cada pessoa ganha +2 de renda por ano (esse bônus já valia no ano 1). Abaixo de 30%, ela colapsa: −4 por pessoa, para todos, até ela voltar." },
   3: { titulo: "Moradia", telao: "Cada família precisa de 1 lote a cada 3 pessoas. Quem não tem paga aluguel. No fim do ano, a turma vota a regra.", texto: "A partir de agora, cada família precisa de 1 lote a cada 3 pessoas. Quem não tem paga aluguel a quem tem lotes sobrando. No fim deste ano, a turma vota a regra dos anos 4 e 5." },
   4: { titulo: "Abre o mercado de lotes", telao: "Até 3 lotes livres vão a lance fechado por ano. O maior lance leva.", texto: "A cada ano, até 3 lotes livres vão a lance fechado. O maior lance leva e paga o próprio lance ao banco da vila (o lote não tinha dono; o dinheiro sai do jogo). Lote também é patrimônio: vale 10 + 2 por nível do bem público." },
-  5: { titulo: "O último ano", telao: "Último ano. Antes de fechar as contas, chega uma proposta grande. No celular: a desigualdade vai subir ou descer?", texto: "As contas fecham no fim deste ano. Antes, chega uma proposta grande." },
+  5: { titulo: "O último ano", telao: "Último ano. Antes de fechar as contas, chega uma proposta grande. No celular: a desigualdade do patrimônio vai subir ou descer?", texto: "As contas fecham no fim deste ano. Antes, chega uma proposta grande." },
 };
 
 // Exemplo resolvido de cada regra nova (telão) e pergunta de controle (celular, com explicação para quem errar).
@@ -37,7 +37,7 @@ export const EXEMPLO_DO_ANO = {
   3: { linhas: ["Família de 5 pessoas precisa de 2 lotes (1 a cada 3 pessoas). Se tem 1, falta 1.", "No Monopólio, cada lote que falta custa 8 por ano, pagos a quem tem lote sobrando.", "Quem tem lote sobrando recebe esse aluguel sem fazer nada a mais."],
        pergunta: "Família de 5 pessoas com 1 lote, no Monopólio. Quanto paga de aluguel por ano?", opcoes: ["Nada", "8", "16"], certa: 1,
        explica: "Precisa de 2 lotes e tem 1: falta 1 lote, que custa 8 por ano no Monopólio." },
-  4: { linhas: ["Lance mínimo: 14 (6 + 2 × 4). Cada um propõe quanto do caixa pôr além dele; vale a mediana.", "O maior leva e paga ao banco. Na Prosperidade, conta metade; quem já levou oferece metade do que ia além do mínimo.", "Lote vale 10 + 2 por nível do bem público e pode render aluguel."],
+  4: { linhas: ["Lance mínimo: 14 (6 + 2 × o ano, 4). Cada um propõe quanto do caixa pôr além dele; vale a mediana.", "O maior leva e paga ao banco. Na Prosperidade, conta metade; quem já levou oferece metade do que ia além do mínimo.", "Lote vale 10 + 2 por nível do bem público e pode render aluguel."],
        pergunta: "Duas famílias oferecem 30 e 22 pelo mesmo lote. O que acontece?", opcoes: ["Leva quem ofereceu 30", "O lote é dividido", "Leva quem tem mais gente"], certa: 0,
        explica: "Lance fechado: o maior lance leva. Empate se decide no sorteio." },
 };
