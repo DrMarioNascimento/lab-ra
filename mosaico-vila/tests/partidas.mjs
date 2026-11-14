@@ -102,7 +102,7 @@ ok(!confiaram || (golpes / confiaram > 0.1 && golpes / confiaram < 0.45), `golpe
   const depois = JSON.stringify({ c: Object.values(st.fams).map((f) => f.caixa), m: st.mata, a: st.acumulado, h: st.historico.length });
   ok(antes === depois, `Voltar e Avançar não refazem as contas (${antes} = ${depois})`);
   // ninguém manda lance nos anos 4 e 5: os lotes saem pelo mínimo
-  while (st.fase !== "fechamento") { if (st.fase === "decidir" && st.ano === 4) for (const id of st.ordem) d({ t: "propor", id, p: { pub: 20, rep: 5, car: 1 } }); if (st.fase === "lances") { const pr = Object.values(st.props[st.ano] || {}); ok(pr.every((p) => !p.lanceEnviado), `ano ${st.ano}: ninguém começa com lance enviado`); } d({ t: "fase", dir: 1 });
+  while (st.fase !== "fechamento") { if (st.fase === "decidir" && st.ano === 4) for (const id of st.ordem) d({ t: "propor", id, p: { pub: 20, rep: 5, car: 1 } }); if (st.fase === "lances") { const pr = Object.values(st.lances[st.ano] || {}); ok(pr.every((p) => !p.lanceEnviado), `ano ${st.ano}: ninguém começa com lance enviado`); } d({ t: "fase", dir: 1 });
     if (st.fase === "resultado" && st.leilao && st.ano >= 4) ok(st.leilao.vendidos.every((v) => v.preco <= st.leilao.minimo + 1e-9), `ano ${st.ano}: sem lance enviado, o lote sai pelo mínimo`); }
 }
 // R16: celulares que não respondem (8 de 20 nunca enviam nada): a partida anda até o fim e as telas não quebram;
@@ -154,11 +154,15 @@ ok(!confiaram || (golpes / confiaram > 0.1 && golpes / confiaram < 0.45), `golpe
   for (let k = 0; k < 6; k++) { C.d({ t: "painel", k }); html += renderTelao(C.st); }
   const porTipo = CONFIANCA.map((cid) => Object.keys(C.st.golpe).filter((id) => cartaAno4(C.st, id).id === cid).length);
   ok(porTipo.some((x) => x < 5) ? !/em cada situação\./.test(html) : true, `R17: com menos de 5 numa situação, nada por situação (${porTipo.join("/")})`);
-  // vista: no mercado do ano 4, a barra mostra a mata de antes das decisões
-  const M = partida(111, 20, (st) => st.fase === "lances" && st.ano === 4);
+  // vista: na carta do ano 4 (depois das decisões), a barra mostra a mata de antes das decisões
+  const M = partida(111, 20, (st) => st.fase === "mente" && st.ano === 4);
   const antes = Math.round((100 * M.st.antes.mata) / M.st.teto), depois = Math.round((100 * M.st.mata) / M.st.teto);
-  const hud = renderTelao(M.st).match(/<div class="hud">([\s\S]*?)<\/div>\s*<\/div>\s*<\/div>/)?.[0] || renderTelao(M.st);
-  ok(antes === depois || hud.includes(`${antes}%`), `R17: no mercado, a barra mostra a mata de antes das decisões (${antes}% e não ${depois}%)`);
+  const hud = renderTelao(M.st).split('class="hud"')[1]?.split("</div>\n  </div>")[0] || "";
+  ok(antes === depois || (hud.includes(`${antes}%`) && !hud.includes(`${depois}%`)), `R17: na carta do ano 4, a barra mostra a mata de antes das decisões (${antes}% e não ${depois}%)`);
+  // R18: o mercado vem antes das decisões, e os lances não contam como proposta enviada
+  ok(FASES.findIndex((f) => f.id === "lances" && f.ano === 4) < FASES.findIndex((f) => f.id === "decidir" && f.ano === 4)
+    && FASES.findIndex((f) => f.id === "alvara") < FASES.findIndex((f) => f.id === "lances" && f.ano === 5)
+    && FASES.findIndex((f) => f.id === "lances" && f.ano === 5) < FASES.findIndex((f) => f.id === "decidir" && f.ano === 5), "R18: mercado antes das decisões (no ano 5, depois da grande)");
   M.d({ t: "config", curto: true });
   ok(M.st.curto === true, "R17: conversas curtas ligam");
 }

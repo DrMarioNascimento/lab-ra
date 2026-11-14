@@ -151,7 +151,7 @@ export function vitoriaColetiva(v) {
   const pessoas = fs.reduce((a, f) => a + f.membros.length, 0);
   const mataOk = v.mata >= VITORIA.mataMinima * v.teto;
   if (v.regra === "prosperidade") {
-    // R11: compara patrimônio por pessoa (as famílias têm de 3 a 6 pessoas)
+    // R11: compara patrimônio por pessoa (as famílias têm de 3 a 5 pessoas em turmas de 12 a 40)
     const pp = fs.map((f) => patrimonio(f, v.publico) / f.membros.length), mpp = pp.reduce((a, b) => a + b, 0) / pp.length;
     return Math.min(...pp) >= VITORIA.pobreSobreMedia * mpp && mataOk;
   }
@@ -161,7 +161,7 @@ export function vitoriaColetiva(v) {
 // "A vila na outra regra" (R9): refaz os anos 4 e 5 na regra que a turma não escolheu, com as mesmas propostas,
 // os mesmos lances e a mesma proposta grande (R13: o estrago pode ser no bem público ou na mata). Devolve a desigualdade
 // final (Gini do patrimônio) e se a meta seria batida.
-export function contrafactual(snap, props, grande, desempate = () => 0.5) {
+export function contrafactual(snap, props, grande, desempate = () => 0.5, lances = props) {
   const g = typeof grande === "object" && grande ? grande : { aceito: !!grande, alvo: "publico" };
   if (!snap) return null;
   const outra = snap.regra === "monopolio" ? "prosperidade" : "monopolio";
@@ -175,9 +175,10 @@ export function contrafactual(snap, props, grande, desempate = () => 0.5) {
       else v.publico = Math.max(0, v.publico - 1);
     }
     const renda = rendaDoAno(v.fams, { ...v, ano });
+    // R18: o mercado vem antes das decisões (a renda do ano já foi calculada na abertura)
+    if (v.livres > 0) { const L = leilao(v.fams, v.livres, lances[ano] || {}, ano, outra, 0, desempate); v.fams = L.fams; v.livres -= L.vendidos.length; }
     const fx = fecharAno({ ...v, ano }, p, renda);
     Object.assign(v, { fams: fx.fams, mata: fx.mata, publico: fx.publico, acumulado: fx.acumulado, colapsou: fx.colapsou });
-    if (v.livres > 0) { const L = leilao(v.fams, v.livres, p, ano, outra, 0, desempate); v.fams = L.fams; v.livres -= L.vendidos.length; }
   }
   return { regra: outra, gini: gini(Object.values(v.fams).map((f) => patrimonio(f, v.publico) / f.membros.length)), meta: vitoriaColetiva(v), mata: v.mata / v.teto };
 }

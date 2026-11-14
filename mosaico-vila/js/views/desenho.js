@@ -10,6 +10,12 @@ export const ico = (nome, cls = "", alt = "") => `<img class="ico3 ${cls}" src="
 // R15: porcentagem sem enganar no limiar: perto de 30%, 50% ou 75%, mostra uma casa decimal (29,6% em vez de 30%),
 // para a turma nunca ver o número da meta e ouvir que não bateu.
 // R16: o valor da meta do Monopólio perto de 50 ganha uma casa decimal ("49,8/50"), para ninguém ler "50/50" sem ter batido
+// R18: quebra um rótulo do mapa em linhas curtas, para caber na coluna (o nome do nível do bem público)
+export function quebra(txt, max) {
+  const ls = [];
+  for (const w of String(txt).split(" ")) { const u = ls.length ? `${ls[ls.length - 1]} ${w}` : w; if (ls.length && u.length <= max) ls[ls.length - 1] = u; else ls.push(w); }
+  return ls;
+}
 export function nL(v, alvo) {
   return Math.round(v) === alvo && Math.abs(v - alvo) > 0.05 ? (Math.round(v * 10) / 10).toLocaleString("pt-BR") : String(Math.round(v));
 }
@@ -81,11 +87,11 @@ export function mapaVila(st, { grande = true, destaque = null } = {}) {
     <text x="34" y="68" font-size="27" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Mata</text><text x="266" y="68" text-anchor="end" font-size="27" font-weight="700" fill="${corMata}" font-family="JetBrains Mono, monospace">${pctL(fm)}</text>
     ${arv.join("")}
     <rect x="290" y="40" width="200" height="390" rx="18" fill="#1a1f33" stroke="#2c3560"/>
-    <text x="304" y="68" font-size="27" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Bem público</text><text x="304" y="98" font-size="24" fill="#fbbf24" font-family="Sora, sans-serif">nível ${nivel} de 5</text>
+    <text x="304" y="68" font-size="27" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Bem público</text><text x="304" y="100" font-size="26" fill="#fbbf24" font-family="Sora, sans-serif">nível ${nivel} de 5</text>
     ${predios.join("")}
-    <text x="390" y="418" text-anchor="middle" font-size="24" fill="#9fb6cf" font-family="Sora, sans-serif">${esc(NIVEIS_PUBLICO[nivel])}</text>
+    ${quebra(NIVEIS_PUBLICO[nivel], 11).map((l, k, ls) => `<text x="390" y="${420 - (ls.length - 1 - k) * 28}" text-anchor="middle" font-size="26" fill="#9fb6cf" font-family="Sora, sans-serif">${esc(l)}</text>`).join("")}
     <rect x="500" y="40" width="280" height="390" rx="18" fill="#10223b" stroke="#23415f"/>
-    <text x="514" y="68" font-size="27" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Lotes</text><text x="766" y="68" text-anchor="end" font-size="24" fill="#9fb6cf" font-family="Sora, sans-serif">${st.lotes.filter((x) => !x).length} livres</text>
+    <text x="514" y="68" font-size="27" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Lotes</text><text x="766" y="68" text-anchor="end" font-size="26" fill="#9fb6cf" font-family="Sora, sans-serif">${st.lotes.filter((x) => !x).length} livres</text>
     ${lotes.join("")}
   </svg>`;
 }

@@ -15,10 +15,14 @@ export function rnd(seed) {
 export function montarFases() {
   const f = [{ id: "entrada" }, { id: "familias" }];
   for (let ano = 1; ano <= ANOS; ano++) {
-    // R14: no ano 5, a proposta grande vem antes das decisões, para a turma ainda poder reagir (replantar, contribuir)
-    if (ano === ANOS) f.push({ id: "abertura", ano }, { id: EVENTOS[ano].id, ano }, { id: "decidir", ano });
-    else { f.push({ id: "abertura", ano }, { id: "decidir", ano }); if (EVENTOS[ano]) f.push({ id: EVENTOS[ano].id, ano }); }
+    // R14: no ano 5, a proposta grande vem antes das decisões, para a turma ainda poder reagir (replantar, contribuir).
+    // R18: o mercado vem antes das decisões (no ano 5, depois da grande): o lance usa o caixa do começo do ano e a vila que
+    // todos veem; ninguém vê a vila nova antes do "Como ficou a vila"
+    f.push({ id: "abertura", ano });
+    if (ano === ANOS) f.push({ id: EVENTOS[ano].id, ano });
     if (ano >= ANO_MERCADO) f.push({ id: "lances", ano });
+    f.push({ id: "decidir", ano });
+    if (ano !== ANOS && EVENTOS[ano]) f.push({ id: EVENTOS[ano].id, ano });
     f.push({ id: "resultado", ano });
     if (ano === 3) f.push({ id: "conversa", ano }, { id: "voto", ano });   // R16: 90 s de conversa com pergunta-guia; o voto abre depois
   }
@@ -45,7 +49,7 @@ export function estadoInicial() {
   return {
     v: 0, k: 0, fase: "entrada", ano: 0, regra: "monopolio", alunos: {}, ordem: [], fams: {}, lotes: Array(LOTES).fill(null),
     mata: 0, teto: 0, publico: 0, acumulado: 0, colapsou: false, colapsouAlguma: false, renda: null, fechamento: null,
-    props: {}, previsao: {}, mente: {}, dado: {}, alvara: { pessoa: null, votos: {}, aceito: null, aceitariam: null },
+    props: {}, lances: {}, previsao: {}, mente: {}, dado: {}, alvara: { pessoa: null, votos: {}, aceito: null, aceitariam: null },
     pequena: { votos: {}, aceitaram: null, n: 0, estrago: null }, golpe: {}, quem: {}, palpitePct: {}, prev5: {},
     voto: {}, votoTrocou: null, votoPct: null, leilao: null, pessoal: {}, historico: [], final: {}, pulados: {},
     controle: {}, palpite: {}, semTroco: false, cartas: null, painel: null,
@@ -96,7 +100,6 @@ export function reduzir(st, a) {
       const lim = (x, m) => Math.max(0, Math.min(m, Math.round(Number(x) || 0)));
       (s.props[s.ano] ??= {})[a.id] = {
         pub: lim(p.pub, LIMITES.pub), rep: s.ano >= 2 ? lim(p.rep, LIMITES.rep) : 0, car: s.ano >= 2 ? lim(p.car, LIMITES.car) : 0,
-        lance: s.props[s.ano]?.[a.id]?.lance ?? 0,   // R15: quem não envia lance oferece só o mínimo (0%), como o controle mostra
       };
       break;
     }
@@ -122,7 +125,7 @@ export function reduzir(st, a) {
       break;
     case "lance": {
       if (s.fase !== "lances") break;
-      const pr = (s.props[s.ano] ??= {})[a.id] ??= { pub: 0, rep: 0, car: 0 };
+      const pr = (s.lances[s.ano] ??= {})[a.id] ??= {};   // R18: os lances ficam à parte (o mercado vem antes das propostas)
       pr.semLote = Number(a.v) < 0;   // R16: "não queremos lote este ano"
       pr.lance = pr.semLote ? 0 : Math.max(0, Math.min(0.6, Number(a.v) || 0));
       pr.lanceEnviado = true;
@@ -196,7 +199,7 @@ function avancar(s, r) {
     }
     case "lances": {
       const livres = s.lotes.filter((x) => !x).length;
-      const L = leilao(s.fams, livres, s.props[s.ano] || {}, s.ano, s.regra, 0, () => r());
+      const L = leilao(s.fams, livres, s.lances[s.ano] || {}, s.ano, s.regra, 0, () => r());
       s.fams = L.fams; s.leilao = { ...L, minimo: lanceMinimo(s.ano) };
       for (const v of L.vendidos) { const i = s.lotes.indexOf(null); if (i >= 0) s.lotes[i] = v.fam; }
       break;
@@ -244,7 +247,7 @@ function avancar(s, r) {
   if (prox.ano) s.ano = prox.ano;
   if (prox.id === "abertura") s.renda = rendaDoAno(s.fams, s);
   if (prox.id === "alvara") s.alvara = { pessoa: s.ordem[Math.floor(r() * s.ordem.length)], votos: {}, aceito: null, aceitariam: null };
-  if (prox.id === "fechamento") { s.vitoria = vitoriaColetiva(s); s.outra = contrafactual(s.snap3, s.props, { aceito: s.alvara.aceito, alvo: s.alvara.alvo }); }
+  if (prox.id === "fechamento") { s.vitoria = vitoriaColetiva(s); s.outra = contrafactual(s.snap3, s.props, { aceito: s.alvara.aceito, alvo: s.alvara.alvo }, undefined, s.lances); }
 }
 
 // Estrago de uma proposta aceita (frac = parte do estrago grande: 1 na grande; aceites ÷ turma na pequena).
@@ -275,7 +278,7 @@ export function progresso(s) {
     case "decidir": return { rot: "propostas enviadas", feito: Object.values(s.props[s.ano] || {}).filter((p) => !p.auto).length, total: n };
     case "mente": return { rot: "responderam", feito: Object.keys(s.mente).length, total: n };
     case "pequena": return { rot: "responderam", feito: Object.keys(s.pequena.votos).length, total: n };
-    case "lances": return { rot: "lances enviados", feito: Object.values(s.props[s.ano] || {}).filter((p) => p.lanceEnviado).length, total: n };
+    case "lances": return { rot: "lances enviados", feito: Object.values(s.lances[s.ano] || {}).filter((p) => p.lanceEnviado).length, total: n };
     case "alvara": return { rot: "votaram", feito: Object.keys(s.alvara.votos).length, total: n };
     case "abertura": return s.ano <= 4 ? { rot: "responderam a pergunta", feito: Object.keys(s.controle[s.ano] || {}).length, total: n } : { rot: "deram o palpite", feito: Object.keys(s.prev5).length, total: n };
     case "conversa": return { rot: "conferiram a regra", feito: Object.keys(s.controle.voto || {}).length, total: n };
@@ -288,7 +291,7 @@ export function progresso(s) {
 // R17: entre as decisões e o "Como ficou a vila" (carta, mercado), telão e celular mostram a vila de antes das decisões,
 // para não estragar a revelação nem a previsão da mata
 export function vista(s) {
-  return ["pequena", "mente", "lances"].includes(s.fase) && s.antes?.ano === s.ano ? { ...s, mata: s.antes.mata, publico: s.antes.publico, fams: s.antes.fams } : s;
+  return ["pequena", "mente"].includes(s.fase) && s.antes?.ano === s.ano ? { ...s, mata: s.antes.mata, publico: s.antes.publico, fams: s.antes.fams } : s;
 }
 
 export const agregadoOk = (k) => k >= 5;   // o telão só mostra agregados de 5 ou mais pessoas

@@ -65,7 +65,7 @@ export function passoBot(st, id, loc, dispatch) {
       break;
     }
     case "lances": {
-      const p = st.props[st.ano]?.[id];
+      const p = st.lances?.[st.ano]?.[id];
       // R15: o celular mostra o efeito do lance; quem precisa de moradia oferece mais, quem não precisa oferece pouco
       if ((!p || !p.lanceEnviado) && chance(0.3)) {
         const precisa = fam && fam.lotes < Math.ceil(fam.membros.length / 3);

@@ -37,7 +37,7 @@ export const EXEMPLO_DO_ANO = {
   3: { linhas: ["Família de 5 pessoas precisa de 2 lotes (1 a cada 3 pessoas). Se tem 1, falta 1.", "No Monopólio, cada lote que falta custa 8 por ano, pagos a quem tem lote sobrando.", "Quem tem lote sobrando recebe esse aluguel sem fazer nada a mais."],
        pergunta: "Família de 5 pessoas com 1 lote, no Monopólio. Quanto paga de aluguel por ano?", opcoes: ["Nada", "8", "16"], certa: 1,
        explica: "Precisa de 2 lotes e tem 1: falta 1 lote, que custa 8 por ano no Monopólio." },
-  4: { linhas: ["Lance mínimo: 14 (6 + 2 × 4). Cada um propõe quanto do caixa pôr além dele; vale a mediana.", "O maior leva e paga ao banco. Na Prosperidade, conta metade; quem já levou oferece metade no próximo.", "Lote vale 10 + 2 por nível do bem público e pode render aluguel."],
+  4: { linhas: ["Lance mínimo: 14 (6 + 2 × 4). Cada um propõe quanto do caixa pôr além dele; vale a mediana.", "O maior leva e paga ao banco. Na Prosperidade, conta metade; quem já levou oferece metade do que ia além do mínimo.", "Lote vale 10 + 2 por nível do bem público e pode render aluguel."],
        pergunta: "Duas famílias oferecem 30 e 22 pelo mesmo lote. O que acontece?", opcoes: ["Leva quem ofereceu 30", "O lote é dividido", "Leva quem tem mais gente"], certa: 0,
        explica: "Lance fechado: o maior lance leva. Empate se decide no sorteio." },
 };

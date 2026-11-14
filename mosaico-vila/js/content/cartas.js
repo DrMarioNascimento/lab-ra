@@ -122,8 +122,11 @@ export function sortearCartas(r) {
 const pct1 = (x) => { const v = 100 * x, r = Math.round(v); return Math.abs(v - r) > 0.05 && [30, 50].includes(r) ? `${(Math.round(v * 10) / 10).toLocaleString("pt-BR")}%` : `${r}%`; };
 // R17: três tempos: "cai" (o que acontece), "caiu" (o que aconteceu) e "cairia" (se a turma inteira aceitasse)
 const VERBOS = { pres: ["cai", "perde"], pass: ["caiu", "perdeu"], cond: ["cairia", "perderia"] };
-function efeitoCarta(c, { mata, teto, publico }, tempo) {
+// R18: na proposta pequena (que vem depois das decisões do ano 2), o estrago vai sem a mata e o nível de agora, que só
+// aparecem no "Como ficou a vila": "a mata perde 20 pontos (de 100 da mata cheia)"
+function efeitoCarta(c, { mata, teto, publico, rel }, tempo) {
   const [cai, perde] = VERBOS[tempo];
+  if (rel) return c.alvo === "mata" ? `a mata ${perde} ${Math.round(100 * ESTRAGO_MATA)} pontos (de 100 da mata cheia)` : `o bem público ${perde} 12 pontos por família, um nível inteiro`;
   if (c.alvo === "mata") {
     const de = mata / (teto || 1), para = Math.max(0, de - ESTRAGO_MATA);
     return `a mata ${cai} de ${pct1(de)} para ${pct1(para)}`;

@@ -29,7 +29,7 @@ function barra(st0) {
   const fm = st.teto ? st.mata / st.teto : 0;
   const m = progressoMeta(st.fams, st.publico, st.mata, st.teto, st.regra);
   const fx = st.fase === "resultado" ? st.fechamento : null;
-  const dMata = fx && st.ano >= 2 ? Math.round((100 * (st.mata - fx.mataAntes)) / st.teto) : 0;
+  const dMata = fx && st.ano >= 2 ? Math.round((100 * st.mata) / st.teto) - Math.round((100 * fx.mataAntes) / st.teto) : 0;   // R18: igual ao painel A vila
   const dPub = fx ? st.publico - fx.nivelAntes : 0;
   const delta = (d) => (d ? `<em class="delta ${d > 0 ? "up" : "down"}">${d > 0 ? "+" : "−"}${Math.abs(d)}</em>` : "");
   const metaOk = m.valor >= m.alvo && m.mata >= VITORIA.mataMinima;
@@ -69,7 +69,7 @@ function exemploLinhas(st, linhas, ini = 1.5, cls = "") {
 }
 
 // Cronômetro grande (conversa de 45 s), contado pelo próprio CSS.
-const cronometro = (st, rot, seg = 45) => `<div class="crono-wrap"><div class="crono c${seg}" style="--d:${(-decorrido(st)).toFixed(2)}s"></div><b class="big">${rot}</b></div>`;
+const cronometro = (st, rot, seg = 45, inicio = 0) => `<div class="crono-wrap"><div class="crono c${seg}" style="--d:${(inicio - decorrido(st)).toFixed(2)}s"></div><b class="big">${rot}</b></div>`;   // R18: "inicio" atrasa o relógio (a dupla começa depois da síntese)
 
 // Revelações em sequência: cada painel aparece no seu tempo; o último fica.
 function sequencia(st, paineis) {
@@ -99,7 +99,7 @@ function bannerGrande(st) {
 
 // Carta sorteada da etapa (pequena, ano 4 ou grande): o telão mostra a carta e como a resposta conta.
 function telaoCarta(st, c, rodape) {
-  return topo(st, esc(c.titulo)) + `<div class="card destaque">${ico(c.icone, "xl")}<p class="enorme">${esc(textoCarta(c, "telao", { mata: st.mata, teto: st.teto, publico: st.publico }))}</p></div>
+  return topo(st, esc(c.titulo)) + `<div class="card destaque">${ico(c.icone, "xl")}<p class="enorme">${esc(textoCarta(c, "telao", st.fase === "pequena" ? { rel: true } : { mata: st.mata, teto: st.teto, publico: st.publico }))}</p></div>
     <div class="card como"><p class="big" style="margin:0">${rodape}</p></div>
     <p class="rodape">A proposta é do jogo, não de um colega. Cada um responde no celular, sem mostrar a tela; o telão só mostra o total, com 5 ou mais respostas.</p>`;
 }
@@ -108,7 +108,7 @@ function telaoCarta(st, c, rodape) {
 function telaoConfianca(st) {
   return topo(st, "Uma questão de confiança") + `<div class="grid" style="grid-template-columns:repeat(4,1fr);gap:1.2cqw">${CONFIANCA.map((id) => { const c = carta(id); return `<div class="card row" style="flex-wrap:nowrap;gap:.8cqw;padding:1cqw 1.2cqw">${ico(c.icone)}<b class="big" style="margin:0">${esc(c.titulo)}</b></div>`; }).join("")}</div>
     <div class="card destaque"><p class="enorme">Cada pessoa recebe no celular <b>uma</b> destas situações. Em todas, você arrisca 2 antes de saber se a outra parte é honesta: honesta, +2; golpe, −2. <b>Não arriscar não custa nada.</b></p></div>
-    <div class="card como"><p class="big" style="margin:0">Depois, no celular: quem você acha que mais dá golpe? No fim do ano, o telão mostra os golpes de cada situação, com os números da turma.</p></div>`;
+    <div class="card como"><p class="big" style="margin:0">Depois, no celular: quem você acha que mais dá golpe? No fim do ano, o telão mostra quantos sofreram golpe contra a chance de 1 em 4 (por situação, só se cada uma tiver 5 ou mais pessoas confiando).</p></div>`;
 }
 
 export function renderTelao(st) {
@@ -139,7 +139,7 @@ export function renderTelao(st) {
         <div class="col centro">${cronometro(st, "Conversem na família", st.curto && st.ano >= 4 ? 30 : 45)}<p class="big" style="text-align:center;margin:0">Cada um envia a sua proposta.<br>Vale a mediana da família.</p></div></div>`;
       break;
     case "pequena":
-      { const c = carta(st.cartas.pequena), ef = textoCarta({ ...c, x: "{efeito}" }, "x", { mata: st.mata, teto: st.teto, publico: st.publico });
+      { const c = carta(st.cartas.pequena), ef = textoCarta({ ...c, x: "{efeito}" }, "x", { rel: true });
         body = telaoCarta(st, c, `Proposta pequena: <b>cada um decide por si</b> e cada resposta vale para quem respondeu. Se a turma inteira aceitar, ${esc(ef)}: o estrago de uma proposta grande.`); }
       break;
     case "mente": {
@@ -152,7 +152,7 @@ export function renderTelao(st) {
     }
     case "lances": {
       const livres = st.lotes.filter((x) => !x).length;
-      body = topo(st, "Mercado de lotes") + `<div class="lado"><div class="card mapa-card">${mapaVila(vista(st))}</div><div class="col">
+      body = topo(st, "Mercado de lotes") + `<div class="lado"><div class="card mapa-card">${mapaVila(st)}</div><div class="col">
         <div class="card row" style="flex-wrap:nowrap">${ico("lote-sobrado", "xl")}<div><b class="enorme mono">${Math.min(3, livres)}</b><div class="big">lotes à venda</div></div></div>
         <div class="card"><div class="big">Lance mínimo</div><b class="enorme mono">${lanceMinimo(st.ano)}</b></div>
         <p class="rodape">Lance fechado, mediana da família; o maior leva.${st.regra === "prosperidade" ? " Na Prosperidade, conta metade." : ""} Até a moradia + 1 lote; dá para marcar "não queremos". O resto está no celular.</p></div></div>`;
@@ -168,7 +168,7 @@ export function renderTelao(st) {
       body = topo(st, "Antes do voto: conversem") + `<div class="lado"><div class="col" style="min-height:0;gap:1cqw">
         <div class="card"><p class="enorme" style="margin:0">Com o aluguel mordendo, qual regra deixa a vila mais perto da meta, e de quem?</p></div>
         <div class="card" style="flex:1;min-height:0;overflow:hidden"><h3 class="row">${ico("ideia")}Exemplo resolvido: as duas regras</h3>${exemploLinhas(st, EXEMPLO_VOTO.linhas, 1.5, "compacto")}</div></div>
-        <div class="col centro">${cronometro(st, "Conversem na família", st.curto ? 60 : 90)}<p class="rodape" style="text-align:center">O voto abre quando o relógio acabar: secreto, cada um no próprio lugar.</p></div></div>`;
+        <div class="col centro">${cronometro(st, "Conversem na família", st.curto ? 60 : 90)}<p class="rodape" style="text-align:center">Quando o relógio acabar, quem conduz abre o voto: secreto, cada um no próprio lugar.</p></div></div>`;
       break;
     case "voto":
       body = topo(st, "Que regra queremos para os anos 4 e 5?") + `<div class="grid" style="grid-template-columns:1fr 1fr">
@@ -265,9 +265,10 @@ export function paineisResultado(st) {
   // 1. A vila: mapa grande e o que mudou na mata e no bem público
   const fatos = [];
   if (fx && st.ano >= 2) {
-    const dm = st.mata - fx.mataAntes, corr = fx.estrago?.alvo === "mata" ? fx.estrago.mata : 0, nat = dm + fx.extr - fx.plant + corr;
-    fatos.push(fato("arvore-redonda", `A mata ${dm >= 0 ? "subiu" : "desceu"} <b>${Math.abs(pp(dm))}%</b>`));
-    fatos.push(`<div class="chips-iso"><span class="chip">${ico("toco")}cargas −${pp(fx.extr)}%</span><span class="chip">${ico("arvore-cubos")}replantio +${pp(fx.plant)}%</span>${corr ? `<span class="chip mal">${ico("alvara")}proposta −${pp(corr)}%</span>` : ""}<span class="chip">${ico("arvore-dourada")}natureza ${nat >= 0 ? "+" : "−"}${Math.abs(pp(nat))}%</span></div>`);
+    // R18: a variação é a diferença dos números que a barra mostra, e a natureza é o resto: as etiquetas sempre fecham
+    const corr = fx.estrago?.alvo === "mata" ? fx.estrago.mata : 0, dmR = pp(st.mata) - pp(fx.mataAntes), natR = dmR + pp(fx.extr) - pp(fx.plant) + pp(corr);
+    fatos.push(fato("arvore-redonda", dmR ? `A mata ${dmR > 0 ? "subiu" : "desceu"} <b>${Math.abs(dmR)}%</b>` : "A mata ficou como estava"));
+    fatos.push(`<div class="chips-iso"><span class="chip">${ico("toco")}cargas −${pp(fx.extr)}%</span><span class="chip">${ico("arvore-cubos")}replantio +${pp(fx.plant)}%</span>${corr ? `<span class="chip mal">${ico("alvara")}proposta −${pp(corr)}%</span>` : ""}<span class="chip">${ico("arvore-dourada")}natureza ${natR >= 0 ? "+" : "−"}${Math.abs(natR)}%</span></div>`);
   }
   if (fx) fatos.push(st.publico > fx.nivelAntes ? fato("economia", `Bem público subiu para o nível <b>${st.publico}</b>: ${esc(NIVEIS_PUBLICO[st.publico])}`) : st.publico < fx.nivelAntes ? fato("economia", `Bem público caiu para o nível <b>${st.publico}</b>`, "mal") : fato("economia", `Bem público ficou no nível ${st.publico}`));
   if (st.colapsou) {
@@ -411,11 +412,13 @@ function perguntasFechamento(st) {
 
 // R15: de onde vem cada tema, para a turma (uma linha embaixo do gráfico)
 function teoria(st, k) {
-  const conf = st.cartas && !st.semTroco && carta(st.cartas.ano4).grupo === "confianca";
+  // R18: a referência do ano 4 conforme a carta que a turma jogou
+  const t4 = st.cartas && !st.semTroco ? carta(st.cartas.ano4).tipo : null;
+  const ref4 = { dado: "; Jiang (2013): o jogo da mente", honesto: "; Cohn e colegas (2019): carteiras perdidas pelo mundo", confia: "; Berg e colegas (1995): o jogo da confiança" }[t4] || "";
   return ["Henry George: o valor da terra vem da comunidade; quem só tem o lote recebe sem fazer.",
     "Lizzie Magie (1904): o Jogo do Proprietário, avô do Banco Imobiliário, já tinha estas duas regras.",
     "Elinor Ostrom: comunidades cuidam do comum quando fazem regras e conversam.",
-    `Abbink e colegas (2002): experimentos de propina${conf ? "; Berg e colegas (1995): o jogo da confiança" : "; Jiang (2013): o jogo da mente"}.`,
+    `Abbink e colegas (2002): experimentos de propina${ref4}.`,
     "Elinor Ostrom (pescas, pastos, canais): o comum também está em postos, praças e clubes."][k] || "";
 }
 
@@ -457,6 +460,6 @@ function telaoFechamento(st) {
       <p class="big" style="margin:0;font-size:2.1cqw">${vz.txt}</p>
       <div class="linha-media">${k === 3 ? barrasPropostas(st) : k === 4 ? guiouTurma(st) : linhaDoTempo(st.historico, { F: 30, alto: 240, so: k === 2 ? "mata" : "desig" })}</div><p class="rodape teoria">De onde vem: ${esc(teoria(st, k))}</p></div>
     <div class="col" style="min-height:0"><div class="card pergunta" style="flex:1;min-height:0;overflow:hidden"><div class="temas">${TEMAS.map((t, i) => `<span class="${i === k ? "agora" : i < k ? "feito" : ""}">${t}</span>`).join("")}</div>
-      <p class="pergunta-txt ${longa ? "longa" : ""}">${esc(qs[k])}</p>${apoio ? `<p class="rodape apoio">${esc(apoio)}</p>` : ""}${k === 0 ? `<div class="crono-mini">${cronometro(st, "1 min em dupla", 60)}</div>` : ""}</div>
+      <p class="pergunta-txt ${longa ? "longa" : ""}">${esc(qs[k])}</p>${apoio ? `<p class="rodape apoio">${esc(apoio)}</p>` : ""}${k === 0 ? `<div class="crono-mini">${cronometro(st, "1 min em dupla, depois da síntese", 60, 90)}</div>` : ""}</div>
       </div></div>`;
 }

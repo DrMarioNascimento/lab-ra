@@ -94,3 +94,11 @@ No fim do ano 3, o motor guarda a vila (`snap3`). No fechamento, `contrafactual(
 - Celular: "só para você" numa tela à parte (`loc.verPessoal`); aviso de tema na entrada (telão e celular).
 - Conversa antes do voto com o exemplo resolvido das duas regras; "Conversas curtas" no painel (`s.curto`: 60 s antes do voto, 30 s na família nos anos 4 e 5).
 - "Reduzir movimento": a sequência continua sem deslizar (as regras no fim de `style.css`); rótulos do mapa em 24 (cerca de 1,6% da TV).
+
+## R18 (14/11/2026, após os avaliadores DS e DT)
+- O mercado vem logo depois da abertura dos anos 4 e 5 (no ano 5, depois da proposta grande), antes das decisões (`montarFases`). Os lances ficam à parte (`s.lances`), para não contarem como proposta; o contrafactual faz o leilão antes de fechar o ano. Simulação: versão 44 (`mercado_antes`), r65.
+- Proposta pequena com o estrago sem a mata e o nível de agora (`textoCarta(..., { rel: true })`): "a mata perde 20 pontos (de 100 da mata cheia)".
+- Painel *A vila*: a variação é a diferença dos números da barra, e a natureza é o resto (as etiquetas fecham).
+- Mapa: nome do nível em até duas linhas (`quebra()`), rótulos em 26.
+- "De onde vem" da pergunta 4 conforme a carta (Jiang no dado, Cohn e colegas no achado e no extrato, Berg e colegas na confiança).
+- Relógio da dupla começa depois dos 90 s da síntese; "quem conduz abre o voto"; no celular, os controles da proposta aparecem quando acaba a conversa da família (`.surge.trava`), com "Já conversamos" para abrir antes.

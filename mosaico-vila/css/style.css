@@ -365,3 +365,6 @@ input[type=text], input[type=number], select, textarea { box-shadow: inset 0 3px
 }
 @keyframes conta30 { from { --s: 30; } to { --s: 0; } }
 .crono.c30 { --s: 30; background: conic-gradient(#fbbf24 calc(var(--s) * 12deg), #1b3352 0); animation: conta30 30s linear var(--d) forwards; }
+/* R18: os controles da proposta ficam escondidos (e sem toque) durante a conversa da família */
+.surge.trava { visibility: hidden; animation-name: surgeT; }
+@keyframes surgeT { from { opacity: 0; visibility: visible; } to { opacity: 1; visibility: visible; } }
