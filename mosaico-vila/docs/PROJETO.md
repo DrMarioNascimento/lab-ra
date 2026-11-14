@@ -155,3 +155,13 @@ No fim do ano 3, o motor guarda a vila (`snap3`). No fechamento, `contrafactual(
 - Plano de tempo medido na simulação (× 1,25): anos fecham perto de 9, 14, 22, 28 e 34 min; fechamento dos 34 aos 47. Desligar a carta do ano 4 economiza cerca de 1 min (0,85 simulado).
 - O Avançar de quem conduz acende quando todos enviaram ("Todos enviaram: avançar"); a simulação supõe o avanço uns 5 s depois do último envio.
 - Confiança no celular: "Cada pessoa recebeu uma das 4 situações do telão, sorteada."
+
+## R25 (14/11/2026, após os avaliadores EG e EH)
+- `estragar()` (engine) conta só os pontos que existiam no bem público: no nível 0, com 20 pontos juntos, a proposta tira 20, não 60. O `contrafactual()` e a simulação (`vila_regras.py`) fazem o mesmo na proposta grande. Teste novo.
+- A mata não passa do teto (`fecharAno()` e simulação). A simulação r67 dá os mesmos números da r66 (os participantes simulados nunca passam de 70%). Teste novo.
+- Painel *A vila* e pergunta 3: mata com uma casa decimal perto de 30%, 50% e 70% (como a barra); a variação é a diferença dos números mostrados.
+- "Falta 1 ponto" no singular (aviso do ano 5 e painel *A vila*).
+- "E se": o motivo de cada meta não batida (mata, a família mais pobre abaixo de 70% ou o patrimônio abaixo de 54).
+- Pergunta 3: o bem público em pontos de contribuição, com o tamanho de um nível; "colapsou e voltou" só quando o gráfico mostra o colapso (senão, "uma proposta a derrubou abaixo de 30% no meio do ano").
+- Resultado do voto do ano 4 numa linha ("Não passou: fica o Monopólio."), e o exemplo do ano 4 cabe no cartão.
+- Ícone do toco provisório novo (o anterior parecia um sino), guardado o anterior como `toco_SUBSTITUIDO_2026-11-14.webp`.

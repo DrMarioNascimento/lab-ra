@@ -255,7 +255,7 @@ function avancar(s, r) {
 
 // Estrago de uma proposta aceita (frac = parte do estrago grande: 1 na grande; aceites ÷ turma na pequena).
 // Mata: 20% do teto. Bem público: 12 × famílias pontos (um nível inteiro); se faltar acumulado, cai de nível.
-function estragar(s, alvo, frac) {
+export function estragar(s, alvo, frac) {
   if (alvo === "mata") {
     const antes = s.mata;
     s.estragoMata = (s.estragoMata || 0) + Math.min(antes, ESTRAGO_MATA * s.teto * frac);
@@ -264,7 +264,8 @@ function estragar(s, alvo, frac) {
     if (s.colapsou) s.colapsouAlguma = true;
     return { alvo, mata: antes - s.mata, pct: (100 * (antes - s.mata)) / s.teto };
   }
-  const nf = Object.keys(s.fams).length, nivel0 = s.publico, pontos = PONTOS_NIVEL * nf * frac;
+  // R25: o estrago conta só o que existia (no nível 0, com 20 pontos juntos, a proposta tira 20, não 60)
+  const nf = Object.keys(s.fams).length, nivel0 = s.publico, pontos = Math.min(PONTOS_NIVEL * nf * frac, s.acumulado + s.publico * PONTOS_NIVEL * nf);
   s.estragoPublico = (s.estragoPublico || 0) + pontos;
   s.acumulado -= pontos;
   while (s.acumulado < 0 && s.publico > 0) { s.publico -= 1; s.acumulado += PONTOS_NIVEL * nf; }

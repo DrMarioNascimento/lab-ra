@@ -325,6 +325,7 @@ input[type=text], input[type=number], select, textarea { box-shadow: inset 0 3px
 .telao .card.banner.bom { border: 2px solid rgba(134,239,172,.5); }
 .telao .fato .sub { color: #cbd5e1; font-weight: 400; }
 .telao .pergunta-txt.longa { font-size: 2.6cqw; }
+.telao .pergunta-txt.longa2 { font-size: 2.25cqw; line-height: 1.28; }   /* R25: pergunta 3 com cargas, propostas na mata e no bem público e colapso */
 .telao .rodape.apoio { color: #fde68a; }
 .telao .linha-media { flex: 1; min-height: 0; }
 .telao .linha-media .tempo2 svg { height: 100%; }

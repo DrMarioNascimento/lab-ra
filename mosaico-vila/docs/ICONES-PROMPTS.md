@@ -2,7 +2,7 @@
 
 ## Já no jogo (13/11/2026)
 - **Casas das famílias** (`casa-<cor>.webp`) e **casa neutra** dos lotes: a casa 3D da pasta Cell do autor, sem fundo e com as paredes na cor de cada família.
-- **Árvores da mata** (`arvore-dourada.webp`, `arvore-redonda.webp`) e **toco** (`toco.webp`, o tronco da árvore redonda em tom de madeira): da pasta Cell.
+- **Árvores da mata** (`arvore-dourada.webp`, `arvore-redonda.webp`) e **toco** (`toco.webp`): R25: toco desenhado à parte (topo com anéis, casca e raízes), provisório; o anterior, que parecia um sino de bronze, ficou em `toco_SUBSTITUIDO_2026-11-14.webp`. As árvores vêm da pasta Cell.
 - **Mercado e moradia** (segunda leva da pasta Cell): `lote-venda.webp` (casinha numa ilha de grama) marca no mapa os lotes à venda no mercado e o ano 4; `lote-sobrado.webp` é o ícone do mercado de lotes no telão e no celular; `sobrado.webp` (casa de dois andares) marca a moradia e o aluguel do ano 3; `arvore-cubos.webp` marca o replantio.
 - **Formas das famílias** (`forma-*.webp`, no canto da casa) e **ícones de apoio** (balança, meta, troféu, alvará, ideia, economia, grupos, participar, conduzir, simulador, telão): cópias próprias dos ícones 3D do MOSAICO Sala. A Família Lima passou da folha para o coração, que já existe em 3D.
 - **Ícone do app** (`app-mosaico-vila.webp`): montagem da casa azul com as duas árvores.

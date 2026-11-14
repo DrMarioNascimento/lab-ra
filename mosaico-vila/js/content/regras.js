@@ -114,7 +114,7 @@ export function fecharAno(v, props, renda) {
   acumulado += Object.values(renda).reduce((a, x) => a + x.imposto, 0);
   const mataAntes = mata;
   if (v.ano >= 2) {
-    mata = Math.max(0, mata + regen - extr + plant);
+    mata = Math.min(teto, Math.max(0, mata + regen - extr + plant));   // R25: a mata não passa do teto (mata cheia = 100%)
     colapsou = mata < COLAPSO * teto;     // R10: o colapso dura enquanto a mata estiver abaixo de 30%; replantando, ela volta
   }
   const nf = Object.keys(fams).length;
@@ -185,7 +185,7 @@ export function contrafactual(snap, props, grande, desempate = () => 0.5, lances
     // R14: a proposta grande do ano 5 vem antes das decisões e já pesa na renda do ano
     if (ano === 5 && g.aceito) {
       if (g.alvo === "mata") { v.mata = Math.max(0, v.mata - ESTRAGO_MATA * v.teto); v.colapsou = v.mata < COLAPSO * v.teto; }
-      else v.publico = Math.max(0, v.publico - 1);
+      else { const nf = Object.keys(v.fams).length, cheio = PONTOS_NIVEL * nf; v.acumulado -= Math.min(cheio, v.acumulado + v.publico * cheio); while (v.acumulado < 0 && v.publico > 0) { v.publico -= 1; v.acumulado += cheio; } v.acumulado = Math.max(0, v.acumulado); }   // R25: igual ao motor (no nível 0, perde o que juntou)
     }
     const renda = rendaDoAno(v.fams, { ...v, ano });
     // R18: o mercado vem antes das decisões (a renda do ano já foi calculada na abertura)

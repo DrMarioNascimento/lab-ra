@@ -1,6 +1,6 @@
 // 15 partidas completas do Mosaico Vila sem tela: motor + participantes simulados (o mesmo código do /simulador).
 // Uso: node tests/partidas.mjs
-import { estadoInicial, reduzir, FASES, progresso } from "../js/engine.js";
+import { estadoInicial, reduzir, FASES, progresso, estragar } from "../js/engine.js";
 import { passoBot, NOMES, perfilBot, papelBully } from "../js/bots.js";
 import { gini, fecharAno, progressoMeta, COLAPSO, tetoLotes, leilao, lanceDaFamilia } from "../js/content/regras.js";
 import { carta, cartaAno4, sortearCartas, PEQUENAS, GRANDES, ANO4, CONFIANCA } from "../js/content/cartas.js";
@@ -207,6 +207,18 @@ ok(!confiaram || (golpes / confiaram > 0.1 && golpes / confiaram < 0.45), `golpe
   ok(sem2.semLote, "R23: com 2 de 3 marcando, a família fica fora do mercado");
   const L = leilao({ a: f, b: { id: "b", membros: [4, 5, 6], caixa: 100, lotes: 1 } }, 1, { 1: { lance: 0.6, lanceEnviado: true } }, 4, "monopolio", 0, () => 0.5);
   ok(L.vendidos.length === 1 && L.vendidos[0].preco <= 14 + 1e-9, `R23: sem maioria, ninguém paga além do mínimo (preço ${L.vendidos[0]?.preco})`);
+}
+// R25: o estrago no bem público conta só o que existia; a mata não passa do teto
+{
+  const st = { fams: { a: {}, b: {}, c: {}, d: {}, e: {} }, publico: 0, acumulado: 20, estragoPublico: 0 };
+  const e = estragar(st, "publico", 1);
+  ok(e.pontos === 20 && st.estragoPublico === 20 && st.acumulado === 0, `R25: no nível 0 com 20 pontos juntos, a grande tira 20 (tirou ${e.pontos})`);
+  const st2 = { fams: { a: {}, b: {}, c: {}, d: {}, e: {} }, publico: 2, acumulado: 10, estragoPublico: 0 };
+  const e2 = estragar(st2, "publico", 1);
+  ok(e2.niveis === 1 && st2.publico === 1 && st2.acumulado === 10, "R25: com nível, a grande tira um nível e mantém o que estava juntando");
+  const fams = { a: { id: "a", membros: [1, 2, 3, 4], caixa: 50, lotes: 2 } };
+  const fx = fecharAno({ fams, mata: 19, teto: 20, publico: 0, acumulado: 0, colapsou: false, ano: 4 }, { 1: { pub: 0, rep: 30, car: 0 }, 2: { pub: 0, rep: 30, car: 0 }, 3: { pub: 0, rep: 30, car: 0 }, 4: { pub: 0, rep: 30, car: 0 } }, { a: { total: 40, imposto: 0 } });
+  ok(fx.mata <= 20 + 1e-9, `R25: a mata não passa do teto (ficou em ${fx.mata.toFixed(2)} de 20)`);
 }
 const s = (k) => linhas.filter((l) => l[k]).length;
 console.log(`troca aprovada ${s("troca")}/15 · colapso ${s("colapso")}/15 · vitória coletiva ${s("vitoria")}/15 · desigualdade da renda sobe com o aluguel em ${rendaSobe}/15`);

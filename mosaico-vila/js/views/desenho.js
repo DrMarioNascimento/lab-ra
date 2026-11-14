@@ -19,6 +19,12 @@ export function quebra(txt, max) {
 export function nL(v, alvo) {
   return Math.round(v) === alvo && Math.abs(v - alvo) > 0.05 ? (Math.round(v * 10) / 10).toLocaleString("pt-BR") : String(Math.round(v));
 }
+// R25: o número que pctL() mostra (para as variações serem a diferença dos números que a turma vê)
+export function pctNum(frac, limites = [0.3, 0.5, 0.7]) {
+  const v = 100 * frac, r = Math.round(v);
+  for (const L of limites) if (Math.abs(v - 100 * L) < 1 && r === Math.round(100 * L) && Math.abs(v - r) > 0.05) return Math.round(v * 10) / 10;
+  return r;
+}
 export function pctL(frac, limites = [0.3, 0.5, 0.7]) {   // R19: a meta da Prosperidade passou a 70%
   const v = 100 * frac, r = Math.round(v);
   for (const L of limites) if (Math.abs(v - 100 * L) < 1 && r === Math.round(100 * L) && Math.abs(v - r) > 0.05) return `${(Math.round(v * 10) / 10).toLocaleString("pt-BR")}%`;
