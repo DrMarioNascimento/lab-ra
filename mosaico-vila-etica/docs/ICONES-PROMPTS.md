@@ -1,5 +1,12 @@
 # Ícones 3D
 
+## Pendentes agora (14/11/2026), em ordem de prioridade: 23 ícones
+Estilo de todos: ícone 3D brilhante, iluminação suave de estúdio, levemente de cima, cores saturadas, fundo branco liso para recortar, sem texto, 1024 × 1024.
+1. **Bem público, níveis 1 a 3** (`publico-1-praca`, `publico-2-posto`, `publico-3-academia`): aparecem no mapa da vila em toda tela de resultado e de decisão; hoje são desenhos simples, ao lado dos níveis 4 e 5 já em 3D. Prompts em "Para completar o bem público", abaixo.
+2. **Toco da mata** (`toco.webp`, provisório): aparece na mata a cada carga cortada. Prompt: toco de árvore cortada com anéis no topo, casca marrom e raízes curtas, sobre um pouco de grama; sem machado, tom de brinquedo.
+3. **Momento do Lazer e glossário** (itens 37 a 39, no fim): `lazer-memoria`, `lazer-genius`, `glossario`.
+4. **Cartas sorteadas** (16, itens 21 a 36): primeiro as que hoje repetem o mesmo ícone: toco (fiscal, madeireira, entulho), alvará (alvará, aterro), grupos (vizinho, carroça), moeda (taxa, pedido), cédula (achado, fiado), participar (extrato, sinal).
+
 ## Já no jogo (13/11/2026)
 - **Casas das famílias** (`casa-<cor>.webp`) e **casa neutra** dos lotes: a casa 3D da pasta Cell do autor, sem fundo e com as paredes na cor de cada família.
 - **Árvores da mata** (`arvore-dourada.webp`, `arvore-redonda.webp`) e **toco** (`toco.webp`): R25: toco desenhado à parte (topo com anéis, casca e raízes), provisório; o anterior, que parecia um sino de bronze, ficou em `toco_SUBSTITUIDO_2026-11-14.webp`. As árvores vêm da pasta Cell.

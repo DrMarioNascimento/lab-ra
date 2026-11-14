@@ -285,3 +285,8 @@ No fim do ano 3, o motor guarda a vila (`snap3`). No fechamento, `contrafactual(
 - /simulador: a turma vai de 2 a 40; os automáticos não têm celular na tela e jogam sempre (na sala real, quem os roda é o aparelho de quem conduz). O painel de quem conduz mostra quantos vizinhos automáticos completam a vila e marca as famílias automáticas.
 - Testes da R38: 2, 3, 5, 8, 9 e 11 pessoas (famílias, participantes, partida até o fechamento, parentes copiando proposta e voto, aviso no telão).
 - Ainda não medido: o tempo de uma partida de 2 (as etapas seguem os relógios da aula) e o efeito de os automáticos dominarem os totais e o voto.
+
+## Toque e profundidade (14/11/2026)
+- Auditoria de todos os elementos clicáveis (celular, professor, simulador e página inicial): botões, opções, cartas e verbetes já tinham volume e afundam no clique.
+- **Slider** (bem público, replantio e lance): o redesenho do celular recriava o slider no meio do arrasto, e o arrasto parava depois do primeiro passo (no PC e no toque). Agora o redesenho espera o dedo sair e só o número ao lado acompanha (`js/ui.js`, `data-eco`). O slider ganhou trilho afundado, parte preenchida e botão 3D que afunda ao arrastar, com 32 px no celular.
+- **iPhone**: o Safari só aplica o `:active` com um ouvinte de toque na página; sem ele, nenhum botão afundava ao toque. Entrou o ouvinte em `js/ui.js` e `ontouchstart` na página inicial; o realce cinza do toque saiu e o brilho de hover ficou só para mouse (no iPhone ele grudava depois do toque).

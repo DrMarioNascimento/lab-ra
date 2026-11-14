@@ -295,3 +295,9 @@ No fim do ano 3, o motor guarda a vila (`snap3`). No fechamento, `contrafactual(
 - `js/views/lazer.js`: memória (12 pares do glossário já aberto, posições por pessoa, cores neutras por lado para a cor não entregar o par) e Genius (8 botões, cor fixa por categoria, termo que muda a cada rodada, velocidade "calma" do Mosaico Sala, som por Web Audio); `tickLazer` no /simulador (fecha pares, acende a sequência, encerra em 55 s).
 - Relógio de quem conduz: 9, 14, 23, 29,5, 36; fechamento dos 36 aos 48,5 (simulação com o lazer de 60 s e as conversas curtas: mediana 48,2, pior 49,6; com 90 s, o pior passava de 50).
 - Ícones provisórios do lazer (`lazer-memoria`, `lazer-genius`) com prompts em `docs/ICONES-PROMPTS.md` (37 a 39).
+
+## Toque e profundidade (14/11/2026)
+- Auditoria de todos os elementos clicáveis (celular, professor, simulador e página inicial): botões, opções, cartas e verbetes já tinham volume e afundam no clique.
+- **Slider** (bem público, replantio e lance): o redesenho do celular recriava o slider no meio do arrasto, e o arrasto parava depois do primeiro passo (no PC e no toque). Agora o redesenho espera o dedo sair e só o número ao lado acompanha (`js/ui.js`, `data-eco`). O slider ganhou trilho afundado, parte preenchida e botão 3D que afunda ao arrastar, com 32 px no celular.
+- **iPhone**: o Safari só aplica o `:active` com um ouvinte de toque na página; sem ele, nenhum botão afundava ao toque. Entrou o ouvinte em `js/ui.js` e `ontouchstart` na página inicial; o realce cinza do toque saiu e o brilho de hover ficou só para mouse (no iPhone ele grudava depois do toque).
+- **Lazer**: as cartas da memória e os botões do Genius crescem até ocupar a altura do celular (no celular pequeno, o tamanho de antes).

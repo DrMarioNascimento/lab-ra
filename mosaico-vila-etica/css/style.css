@@ -25,7 +25,7 @@ p { line-height: 1.55; margin: 0.4em 0; }
   transform: translateY(0); transition: transform .08s, box-shadow .08s, filter .15s;
   text-shadow: 0 1px 0 rgba(0,0,0,.25);
 }
-.btn:hover { filter: brightness(1.07); }
+@media (hover: hover) { .btn:hover { filter: brightness(1.07); } }   /* no iPhone o hover grudava depois do toque */
 .btn:active, .btn.on { transform: translateY(4px); box-shadow: 0 1px 0 var(--c2), 0 3px 8px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.25); }
 .btn:disabled { filter: grayscale(.8) brightness(.7); cursor: not-allowed; }
 .btn.sec { --c: #2a4a6e; --c2: #162c45; }
@@ -56,7 +56,19 @@ input[type=text], textarea, input[type=number], select {
   width: 100%; font: inherit; color: var(--tx); background: #0b1a2c; border: 1px solid var(--line); border-radius: 12px; padding: 11px 12px; min-height: 46px;
 }
 textarea { min-height: 80px; resize: vertical; }
-input[type=range] { width: 100%; height: 34px; accent-color: #60a5fa; }
+/* Slider 3D: trilho afundado e botão com volume, que afunda ao arrastar */
+input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 34px; background: transparent; cursor: pointer; touch-action: pan-y; }
+input[type=range]::-webkit-slider-runnable-track { height: 10px; border-radius: 999px; background: #0b1a2c; box-shadow: inset 0 2px 3px rgba(0,0,0,.6), 0 1px 0 rgba(255,255,255,.07); }
+input[type=range]::-moz-range-track { height: 10px; border-radius: 999px; background: #0b1a2c; box-shadow: inset 0 2px 3px rgba(0,0,0,.6), 0 1px 0 rgba(255,255,255,.07); }
+input[type=range]::-moz-range-progress { height: 10px; border-radius: 999px; background: #3b82f6; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 26px; height: 26px; margin-top: -8px; border: 0; border-radius: 50%;
+  background: linear-gradient(180deg, #bfdbfe, #3b82f6 60%); box-shadow: 0 4px 0 #1e40af, 0 6px 10px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.7); transition: transform .08s, box-shadow .08s; }
+input[type=range]::-moz-range-thumb { width: 26px; height: 26px; border: 0; border-radius: 50%;
+  background: linear-gradient(180deg, #bfdbfe, #3b82f6 60%); box-shadow: 0 4px 0 #1e40af, 0 6px 10px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.7); transition: transform .08s, box-shadow .08s; }
+input[type=range]:active::-webkit-slider-thumb { transform: translateY(3px); box-shadow: 0 1px 0 #1e40af, 0 2px 4px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.5); }
+input[type=range]:active::-moz-range-thumb { transform: translateY(3px); box-shadow: 0 1px 0 #1e40af, 0 2px 4px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.5); }
+input[type=range]:focus-visible { outline: 2px solid #60a5fa; outline-offset: 4px; border-radius: 999px; }
+button, .btn, .opt, a, input[type=range] { -webkit-tap-highlight-color: transparent; }
 .dirs { display: flex; gap: 6px; }
 .dirs .btn { flex: 1; font-size: 20px; padding: 6px; min-height: 44px; }
 
@@ -117,7 +129,10 @@ table.vals td.n { font-family: var(--mono); text-align: right; white-space: nowr
 .telao table.vals { font-size: 1.05cqw; }
 .telao table.vals td { padding: .3cqw .4cqw; }
 .telao .metro.grande .st-label { font-size: 20px; }
-.phone input[type=range] { height: 40px; }
+.phone input[type=range] { height: 44px; }
+.phone input[type=range]::-webkit-slider-runnable-track { background: linear-gradient(90deg, #2563eb, #60a5fa var(--p, 0%), #0b1a2c var(--p, 0%)); }
+.phone input[type=range]::-webkit-slider-thumb { width: 32px; height: 32px; margin-top: -11px; }
+.phone input[type=range]::-moz-range-thumb { width: 32px; height: 32px; }
 .phone .opt b { font-size: 15px; }
 .revela { animation: revela .7s ease-out both; }
 @keyframes revela { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: none; } }
@@ -152,7 +167,7 @@ h2.row, h3.row, b.row { gap: 8px; flex-wrap: nowrap; }
 .chip { box-shadow: 0 2px 0 rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.14); }
 .anchor { box-shadow: 0 4px 0 #120c02, inset 0 1px 0 rgba(255,255,255,.08); }
 .card { transition: transform .12s, box-shadow .12s; }
-a.card:hover { transform: translateY(-2px); }
+@media (hover: hover) { a.card:hover { transform: translateY(-2px); } }
 input[type=text], input[type=number], select, textarea { box-shadow: inset 0 3px 6px rgba(0,0,0,.35), 0 1px 0 rgba(255,255,255,.05); }
 .prog, .barra { box-shadow: inset 0 2px 3px rgba(0,0,0,.45); }
 .btn .ico3 { width: 24px; height: 24px; margin: -4px 6px -4px -4px; }
@@ -469,3 +484,12 @@ input[type=text], input[type=number], select, textarea { box-shadow: inset 0 3px
 .telao .fase-conc .fase { flex: none; }
 .telao .fase-conc .chip.conceito { padding: .1cqw .8cqw; flex: none; }
 .telao .titulo-conc .chip.conceito { flex: none; }
+
+/* toque: cartas da memória e verbetes do glossário afundam com a mesma animação dos botões */
+.phone .mem, .phone .glos-item { transition: transform .08s, box-shadow .08s; }
+.phone .mem, .phone .gen, .phone .glos-item { -webkit-tap-highlight-color: transparent; }
+/* Lazer: as cartas e os botões crescem para ocupar a altura do celular (cqh = altura da tela do celular;
+   sem contêiner, vale a altura visível do navegador). No celular pequeno ficam no tamanho mínimo de antes. */
+.ph-screen { container-type: size; }
+.phone .mem { aspect-ratio: auto; height: clamp(56px, calc((100cqh - 178px) / 6), 124px); }
+.phone .gen { min-height: clamp(92px, calc((100cqh - 184px) / 4), 160px); }
