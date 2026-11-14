@@ -31,7 +31,7 @@ export function Intro({
   return (
     <article>
       <p className="text-xs tracking-widest text-accent uppercase">Fisiologia · a primeira passagem</p>
-      <h1 className="mt-4 font-display text-6xl leading-none font-medium text-fg sm:text-7xl">Limiar</h1>
+      <h1 className="mt-4 font-display text-6xl leading-none font-medium text-fg sm:text-7xl">Alostase</h1>
       <p className="mt-6 max-w-xl font-display text-2xl leading-snug font-medium text-fg italic">
         O corpo, sistema por sistema, ao longo de uma jornada.
       </p>
