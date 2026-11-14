@@ -5,6 +5,7 @@ import { passoBot, NOMES, perfilBot, papelBully } from "../js/bots.js";
 import { gini, fecharAno, progressoMeta, COLAPSO, tetoLotes, leilao, lanceDaFamilia } from "../js/content/regras.js";
 import { carta, cartaAno4, sortearCartas, PEQUENAS, GRANDES, ANO4, CONFIANCA } from "../js/content/cartas.js";
 import { renderTelao } from "../js/views/telao.js";
+import { pctL, nL } from "../js/views/desenho.js";
 import { renderAluno, novoLocal } from "../js/views/aluno.js";
 import { rnd } from "../js/engine.js";
 
@@ -220,6 +221,8 @@ ok(!confiaram || (golpes / confiaram > 0.1 && golpes / confiaram < 0.45), `golpe
   const fx = fecharAno({ fams, mata: 19, teto: 20, publico: 0, acumulado: 0, colapsou: false, ano: 4 }, { 1: { pub: 0, rep: 30, car: 0 }, 2: { pub: 0, rep: 30, car: 0 }, 3: { pub: 0, rep: 30, car: 0 }, 4: { pub: 0, rep: 30, car: 0 } }, { a: { total: 40, imposto: 0 } });
   ok(fx.mata <= 20 + 1e-9, `R25: a mata não passa do teto (ficou em ${fx.mata.toFixed(2)} de 20)`);
 }
+// R26: perto do limiar, quem não chegou nele não aparece como se tivesse chegado
+ok(pctL(0.2996) === "29,9%" && pctL(0.3002) === "30%" && pctL(0.304) === "30,4%" && nL(53.97, 54) === "53,9" && nL(54.02, 54) === "54", `R26: limiares (${pctL(0.2996)}, ${nL(53.97, 54)})`);
 const s = (k) => linhas.filter((l) => l[k]).length;
 console.log(`troca aprovada ${s("troca")}/15 · colapso ${s("colapso")}/15 · vitória coletiva ${s("vitoria")}/15 · desigualdade da renda sobe com o aluguel em ${rendaSobe}/15`);
 console.log(falhas ? `${falhas} verificações falharam` : "todas as verificações passaram");

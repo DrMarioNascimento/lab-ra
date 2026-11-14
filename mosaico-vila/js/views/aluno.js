@@ -44,7 +44,7 @@ const porPessoa = (st, f) => patrimonio(f, st.publico) / f.membros.length;
 const posicao = (st, f) => 1 + Object.values(st.fams).filter((g) => porPessoa(st, g) > porPessoa(st, f)).length;
 const enviado = (txt = "Enviado. Aguarde a turma.") => `<div class="card" style="text-align:center"><b class="pill-ok">✓ ${txt}</b></div>`;
 // R13: mata em % da vila (a mesma unidade do telão)
-const pcMata = (st, x) => `${(Math.round((1000 * x) / (st.teto || 1)) / 10).toLocaleString("pt-BR")}%`;
+const pcMata = (st, x) => { const v = (100 * x) / (st.teto || 1), r = Math.round(v * 10) / 10; return `${([30, 50, 70].includes(r) && v < r - 1e-9 ? Math.floor(v * 10 + 1e-9) / 10 : r).toLocaleString("pt-BR")}%`; };   // R26: 29,96% não vira "30%"
 
 // Microtarefa enquanto a turma responde: em que faixa vai ficar a porcentagem (o telão mostra o acerto depois)
 function palpiteFaixa(st, id, onde, pergunta) {
@@ -67,7 +67,7 @@ function projecao(st, f, loc) {
   const mata = st.ano >= 2 ? (rep / REPLANTA_POR) * REPLANTA_DEVOLVE - CARGA_TIRA * car : 0;
   return `<div class="card proj"><b>Se a família seguir a sua proposta</b><table class="vals">
     <tr><td>Renda do ano</td><td class="n">${n0(r)}</td></tr><tr><td>Vai para o bem público</td><td class="n">${n0(pub)}</td></tr>
-    ${st.ano >= 2 ? `<tr><td>Replantio</td><td class="n">${n0(rep)}</td></tr><tr><td>Madeira vendida</td><td class="n">+${n0(CARGA_RENDE * car)}</td></tr><tr><td>Efeito na mata (só da sua família)</td><td class="n">${mata >= 0 ? "+" : "−"}${pcMata(st, Math.abs(mata))}</td></tr>` : ""}
+    ${st.ano >= 2 ? `<tr><td>Replantio</td><td class="n">${n0(rep)}</td></tr><tr><td>Madeira vendida</td><td class="n">+${n0(CARGA_RENDE * car)}</td></tr><tr><td>Efeito na mata (só da sua família)${mata > 0 && st.mata >= 0.98 * st.teto ? "; a mata está cheia e não passa de 100%" : ""}</td><td class="n">${mata >= 0 ? "+" : "−"}${pcMata(st, Math.abs(mata))}</td></tr>` : ""}
     <tr><td><b>Fica no caixa</b></td><td class="n"><b>${fica >= 0 ? "+" : ""}${n0(fica)}</b></td></tr></table></div>`;
 }
 
@@ -140,7 +140,7 @@ export function renderAluno(st, id, loc) {
       const conversa = falta > 0 ? `<div class="card espera" style="text-align:center;--a:${falta.toFixed(2)}s">${ico("grupos", "g")}<p class="muted" style="margin:6px 0 8px"><b>Conversem na família</b>, olhando uns para os outros: ${segC} s para combinar ${st.ano >= 2 ? "bem público, replantio e cargas" : "quanto vai para o bem público"}. A proposta abre aqui quando o relógio do telão acabar.</p><button class="btn sec block" data-a="abrir" data-val="${st.ano}">Já conversamos: abrir minha proposta</button></div>` : "";
       bd = merc + conversa + `<div class="${falta > 0 ? "surge trava" : ""}" style="--a:${Math.max(0, falta).toFixed(2)}s"><h2>Sua proposta para a família</h2><p class="faint">Vale a mediana das propostas da família.</p>
         <div class="card"><div class="row" style="justify-content:space-between"><b class="row">${ico("economia")}Bem público</b><b class="mono">${loc.pub}% da renda</b></div><input type="range" min="0" max="${LIMITES.pub}" step="5" value="${loc.pub}" data-in="pub" data-key="pub"><p class="faint" style="margin:0">Nível ${st.publico}: ${esc(NIVEIS_PUBLICO[st.publico])}</p></div>
-        ${st.ano >= 2 ? `<div class="card"><div class="row" style="justify-content:space-between"><b class="row">${ico("arvore-cubos")}Replantar a mata</b><b class="mono">${loc.rep}% da renda</b></div><input type="range" min="0" max="${LIMITES.rep}" step="5" value="${loc.rep}" data-in="rep" data-key="rep"><p class="faint" style="margin:0">Cada 5 pontos devolvem ${pcMata(st, REPLANTA_DEVOLVE)} à mata.</p></div>
+        ${st.ano >= 2 ? `<div class="card"><div class="row" style="justify-content:space-between"><b class="row">${ico("arvore-cubos")}Replantar a mata</b><b class="mono">${loc.rep}% da renda</b></div><input type="range" min="0" max="${LIMITES.rep}" step="5" value="${loc.rep}" data-in="rep" data-key="rep"><p class="faint" style="margin:0">Cada 5 pontos devolvem ${pcMata(st, REPLANTA_DEVOLVE)} à mata.${st.mata >= 0.9 * st.teto ? " A mata está quase cheia: o que passar de 100% não conta." : ""}</p></div>
         <div class="card"><b class="row">${ico("arvore-redonda")}Cargas de madeira</b><p class="faint" style="margin:2px 0 8px">Cada carga rende ${CARGA_RENDE} à família e tira ${pcMata(st, CARGA_TIRA)} da mata. Mata hoje: ${pctL(st.mata / st.teto)} (50% ou mais: +2 de renda por pessoa; abaixo de 30%: −4).</p><div class="dirs">${[0, 1, 2, 3].map((k) => `<button class="btn ${loc.car === k ? "warn on" : "sec"}" data-a="car" data-val="${k}">${k}</button>`).join("")}</div></div>` : ""}
         ${projecao(st, f, loc)}
         <button class="btn ok block" data-a="propor">Enviar proposta</button></div>`;
@@ -209,7 +209,7 @@ export function renderAluno(st, id, loc) {
       if (loc.verPessoal === st.ano && pessoal.length) { bd = `<h2>Só para você</h2><div class="card">${pessoal.map((t) => `<p class="muted" style="margin:6px 0 0">${esc(t)}</p>`).join("")}</div><p class="faint">Ninguém mais vê esta tela.</p><button class="btn sec block" data-a="verPessoal" data-val="0">Voltar ao extrato da família</button>`; break; }
       const espera = `<div class="card espera" style="text-align:center;--a:${falta.toFixed(2)}s">${ico("telao", "g")}<p class="muted" style="margin:6px 0 0"><b>Olhe o telão:</b> primeiro a vila inteira. O extrato da sua família aparece aqui em seguida.</p></div>`;
       const extrato = `<div class="surge" style="--a:${falta.toFixed(2)}s"><h2>Como ficou a sua família</h2><div class="card"><table class="vals">
-        ${fx ? `<tr><td>Renda do ano</td><td class="n">${n0(fx.renda)}</td></tr><tr><td>Para o bem público</td><td class="n">−${n0(fx.aPub)}</td></tr>${st.ano >= 2 ? `<tr><td>Replantio</td><td class="n">−${n0(fx.aRep)}</td></tr><tr><td>Cargas (${fx.cargas})</td><td class="n">+${n0(fx.ganhoCarga)}</td></tr>` : ""}` : ""}
+        ${fx ? `<tr><td>Caixa antes das decisões</td><td class="n">${n0(Math.round(f.caixa) - (Math.round(fx.renda) - Math.round(fx.aPub) - (st.ano >= 2 ? Math.round(fx.aRep) - Math.round(fx.ganhoCarga) : 0)))}</td></tr><tr><td>Renda do ano</td><td class="n">+${n0(fx.renda)}</td></tr><tr><td>Para o bem público</td><td class="n">−${n0(fx.aPub)}</td></tr>${st.ano >= 2 ? `<tr><td>Replantio</td><td class="n">−${n0(fx.aRep)}</td></tr><tr><td>Cargas (${fx.cargas})</td><td class="n">+${n0(fx.ganhoCarga)}</td></tr>` : ""}` : ""}
         <tr><td>Caixa</td><td class="n">${n0(f.caixa)}</td></tr><tr><td>Lotes (${VALOR_LOTE(st.publico)} cada)</td><td class="n">${f.lotes}</td></tr>
         <tr><td><b>Patrimônio</b></td><td class="n"><b>${n0(patrimonio(f, st.publico))}</b></td></tr>
         <tr><td>Patrimônio por pessoa</td><td class="n">${n0(porPessoa(st, f))}</td></tr>

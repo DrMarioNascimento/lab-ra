@@ -16,19 +16,25 @@ export function quebra(txt, max) {
   for (const w of String(txt).split(" ")) { const u = ls.length ? `${ls[ls.length - 1]} ${w}` : w; if (ls.length && u.length <= max) ls[ls.length - 1] = u; else ls.push(w); }
   return ls;
 }
+// R26: perto de um limiar, um número que arredonda para o limiar sem chegar nele aparece com uma casa decimal, para baixo
+// (29,96% vira "29,9%", não "30%"; 53,97 vira "53,9", não "54"); acima do limiar, a casa decimal só quando passa de 0,05.
+function perto(v, L) {
+  if (Math.round(v) !== L || Math.abs(v - L) >= 1) return null;
+  if (v < L - 1e-9) return Math.floor(v * 10 + 1e-9) / 10;
+  return v - L > 0.05 ? Math.round(v * 10) / 10 : null;
+}
 export function nL(v, alvo) {
-  return Math.round(v) === alvo && Math.abs(v - alvo) > 0.05 ? (Math.round(v * 10) / 10).toLocaleString("pt-BR") : String(Math.round(v));
+  const p = perto(v, alvo);
+  return p != null ? p.toLocaleString("pt-BR") : String(Math.round(v));
 }
 // R25: o número que pctL() mostra (para as variações serem a diferença dos números que a turma vê)
 export function pctNum(frac, limites = [0.3, 0.5, 0.7]) {
-  const v = 100 * frac, r = Math.round(v);
-  for (const L of limites) if (Math.abs(v - 100 * L) < 1 && r === Math.round(100 * L) && Math.abs(v - r) > 0.05) return Math.round(v * 10) / 10;
-  return r;
+  const v = 100 * frac;
+  for (const L of limites) { const p = perto(v, Math.round(100 * L)); if (p != null) return p; }
+  return Math.round(v);
 }
 export function pctL(frac, limites = [0.3, 0.5, 0.7]) {   // R19: a meta da Prosperidade passou a 70%
-  const v = 100 * frac, r = Math.round(v);
-  for (const L of limites) if (Math.abs(v - 100 * L) < 1 && r === Math.round(100 * L) && Math.abs(v - r) > 0.05) return `${(Math.round(v * 10) / 10).toLocaleString("pt-BR")}%`;
-  return `${r}%`;
+  return `${pctNum(frac, limites).toLocaleString("pt-BR")}%`;
 }
 
 // Isotype: fileira de ícones iguais, cada um valendo "unidade" (o último pode vir pela metade, cortado).

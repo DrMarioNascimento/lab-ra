@@ -165,3 +165,16 @@ No fim do ano 3, o motor guarda a vila (`snap3`). No fechamento, `contrafactual(
 - Pergunta 3: o bem público em pontos de contribuição, com o tamanho de um nível; "colapsou e voltou" só quando o gráfico mostra o colapso (senão, "uma proposta a derrubou abaixo de 30% no meio do ano").
 - Resultado do voto do ano 4 numa linha ("Não passou: fica o Monopólio."), e o exemplo do ano 4 cabe no cartão.
 - Ícone do toco provisório novo (o anterior parecia um sino), guardado o anterior como `toco_SUBSTITUIDO_2026-11-14.webp`.
+
+## R26 (14/11/2026, após os avaliadores EI e EJ)
+- Previsão da mata do ano 5 conferida contra a mata que a turma via ao prever (já depois da proposta grande), não contra a de antes dela (`fx.mataPrev`).
+- Proposta pequena com menos de 5 respostas: o estrago somado também fica guardado (o painel da carta, as etiquetas do painel *A vila* e a pergunta 3 não o mostram separado, porque entregaria quantos aceitaram).
+- "Se a turma inteira aceitasse" no texto da carta, em pontos da mata cheia (antes, "de 60% para 40%", uma mata que nenhuma tela mostrava).
+- Mata cheia: a etiqueta diz "mata cheia: o que passou de 100% não conta" no lugar de uma natureza negativa; o celular avisa no replantio quando a mata passa de 90%.
+- Extrato da família começa pelo caixa de antes das decisões, e as linhas fecham com o caixa mostrado.
+- Simulação: o estrago real no bem público também no ramo da proposta grande antes das decisões (o que a r67 usa); a r67 refeita dá os mesmos números.
+- Carta da pequena no bem público: sem nível, "perde tudo o que juntou para o primeiro nível"; sem o nível conhecido (a carta vem antes da revelação), o texto diz os dois casos. O "% do estrago de uma grande" some quando o estrago foi só o que a vila juntava.
+- Aviso do ano 5: com a grande no bem público no nível 0, "a renda deste ano não muda" (antes, "já conta na renda").
+- Etiquetas do bem público na mesma unidade (níveis ou pontos) e com plural.
+- Perto de 30%, 50%, 70% e da meta, um número que não chegou ao limiar aparece com uma casa decimal para baixo (29,96% → "29,9%"; 53,97 → "53,9").
+- Confiança: a chance de golpe só aparece no fim do ano (a tela de antes não diz mais "1 em 4").

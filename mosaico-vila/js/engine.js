@@ -173,7 +173,7 @@ function avancar(s, r) {
       s.antes = { ano: s.ano, mata: s.mata, publico: s.publico, fams: s.fams };   // R17: a vila antes das decisões, até o "Como ficou a vila"
       Object.assign(s, { fams: fx.fams, mata: fx.mata, publico: fx.publico, acumulado: fx.acumulado, colapsou: fx.colapsou });
       // R14: a proposta grande do ano 5 veio antes das decisões; o resultado do ano conta o estrago dela
-      if (s.ano === ANOS && s.alvara.antes) { fx.mataAntes = s.alvara.antes.mata; fx.nivelAntes = s.alvara.antes.publico; if (s.alvara.estrago) fx.estrago = s.alvara.estrago; }
+      if (s.ano === ANOS && s.alvara.antes) { fx.mataPrev = fx.mataAntes; fx.mataAntes = s.alvara.antes.mata; fx.nivelAntes = s.alvara.antes.publico; if (s.alvara.estrago) fx.estrago = s.alvara.estrago; }
       if (fx.colapsou) s.colapsouAlguma = true;
       s.fechamento = fx;
       break;
