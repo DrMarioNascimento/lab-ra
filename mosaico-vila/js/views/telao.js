@@ -174,7 +174,11 @@ export function renderTelao(st) {
       break;
     }
     case "alvara":
-      body = telaoCarta(st, carta(st.cartas.grande), "Proposta grande: cada um responde longe da família, mas <b>vale a resposta de uma pessoa sorteada</b>, que nunca aparece (sem resposta, vale não).");
+      { const c = carta(st.cartas.grande), ef = textoCarta({ ...c, x: "{efeito}" }, "x", { mata: st.mata, teto: st.teto, publico: st.publico, juntado: st.acumulado });
+        // R34: como na pequena, o texto da grande fica só no celular (cada um lê na fala sorteada no ano 2); o telão mostra o estrago com os números da partida
+        body = topo(st, esc(c.titulo)) + `<div class="card destaque">${ico(c.icone, "xl")}<p class="enorme">A proposta chegou no celular de cada um. Leia em silêncio e responda no seu lugar, longe da família.</p></div>
+          <div class="card como"><p class="big" style="margin:0">Proposta grande: vale a resposta de <b>uma pessoa sorteada</b>, que nunca aparece (sem resposta, vale não). Se for aceita, ${esc(ef)}.</p></div>
+          <p class="rodape">A proposta é do jogo, não de um colega. O telão só mostra totais de 5 ou mais respostas.</p>`; }
       break;
     case "resultado": body = telaoResultado(st); break;
     case "conversa":
@@ -290,7 +294,8 @@ export function paineisResultado(st) {
     // R21: a variação em pontos da mata cheia (de 41% para 20% são 21 pontos, não 21%)
     fatos.push(fato("arvore-redonda", dmR ? `A mata ${dmR > 0 ? "subiu" : "desceu"} <b>${pts(dmR)}</b>: de ${pctL(fx.mataAntes / st.teto)} para ${pctL(st.mata / st.teto)}` : "A mata ficou como estava"));
     // R26: com a pequena respondida por menos de 5, o estrago dela não aparece sozinho (entregaria quantos aceitaram); com a mata cheia, o que passa de 100% não conta
-    const escondeProp = st.ano === 2 && corr && !agregadoOk(st.pequena?.n || 0), cheia = st.mata >= st.teto - 1e-6;
+    // R34: com menos de 5 respostas, a etiqueta é "natureza e proposta" sempre que a pequena foi na mata, aceitando alguém ou não (antes, mudava só quando alguém aceitava, e isso entregava a resposta)
+    const escondeProp = st.ano === 2 && st.cartas && carta(st.cartas.pequena).alvo === "mata" && !agregadoOk(st.pequena?.n || 0), cheia = st.mata >= st.teto - 1e-6;
     const natV = escondeProp ? Math.round((natR - pp(corr)) * 10) / 10 : natR;
     const chipNat = cheia && natV < 0 ? `<span class="chip">${ico("arvore-dourada")}mata cheia: o que passou de 100% não conta</span>` : `<span class="chip">${ico("arvore-dourada")}${escondeProp ? "natureza e proposta" : "natureza"} ${natV >= 0 ? "+" : "−"}${n1(Math.abs(natV))}</span>`;
     fatos.push(`<div class="chips-iso"><span class="chip">${ico("toco")}cargas −${pp(fx.extr)}</span><span class="chip">${ico("arvore-cubos")}replantio +${pp(fx.plant)}</span>${corr && !escondeProp ? `<span class="chip mal">${ico("alvara")}proposta −${pp(corr)}</span>` : ""}${chipNat}</div>`);
@@ -395,10 +400,11 @@ export function paineisResultado(st) {
     // R14: a grande foi revelada antes das decisões (bannerGrande); aqui, a recapitulação ao lado da pequena
     const c = carta(st.cartas.grande), vs = Object.values(st.alvara.votos), ok = agregadoOk(vs.length), p = vs.length ? vs.filter(Boolean).length / vs.length : 0;
     const pq = st.pequena.n ? st.pequena.aceitaram / st.pequena.n : null;   // R16: mesma base (quem respondeu)
-    paineis.push({ nome: c.titulo, carta: true, dur: extra, html: `<div class="card col" style="flex:1;justify-content:center;gap:.9cqw">${carimbo()}
+    paineis.push({ nome: c.titulo, carta: true, dur: extra, html: `<div class="card col" style="flex:1;justify-content:center;gap:.9cqw">${carimbo("Corrupção", "", `grande-${st.seed}`)}
       ${fato(c.icone, esc(textoCarta(c, st.alvara.aceito ? "aceito" : "recusado", { ...st.alvara.antes, teto: st.teto, perdido: st.alvara.estrago?.pontos })), st.alvara.aceito ? "mal" : "bom")}
-      ${ok ? fato("ideia", `<b>${Math.round(100 * p)}%</b> aceitariam os 8 pontos ${esc(c.de)}.`) : ""}
+      ${ok && !(pq != null && agregadoOk(st.pequena.n)) ? fato("ideia", `<b>${Math.round(100 * p)}%</b> aceitariam os 8 pontos ${esc(c.de)}.`) : ""}
       ${pq != null && agregadoOk(st.pequena.n) && ok ? fato("balanca", `Na proposta pequena do ano 2, <b>${Math.round(100 * pq)}%</b> aceitaram; na grande, <b>${Math.round(100 * p)}%</b> aceitariam.`) : ""}
+      ${linhaFalasGrande(st)}
       ${ok ? acertoPalpite(st, "alvara", p) : ""}<p class="rodape">Na pequena, cada um decidiu por si; na grande, uma só pessoa sorteada tinha o poder, e ela nunca aparece.</p></div>` });
   }
 
@@ -442,9 +448,11 @@ function perguntasFechamento(st) {
   const voltou = Math.max(0, Math.round((fim - ini + cargas + prop) * 10) / 10);
   const nfam = Object.keys(st.fams).length;
   // R26: se a pequena teve menos de 5 respostas, o estrago dela não aparece separado (entregaria quantos aceitaram)
-  const pqPoucos = !agregadoOk(st.pequena?.n || 0) && st.pequena?.aceitaram, juntaMata = pqPoucos && st.pequena?.estrago?.alvo === "mata", juntaPub = pqPoucos && st.pequena?.estrago?.alvo === "publico";
+  // R34: a mesma frase aceitando alguém ou não (antes, "as cargas e as propostas aceitas" só aparecia quando alguém aceitava)
+  const alvoPq = st.cartas ? carta(st.cartas.pequena).alvo : null, pqPoucos = !!st.cartas && !agregadoOk(st.pequena?.n || 0), juntaMata = pqPoucos && alvoPq === "mata", juntaPub = pqPoucos && alvoPq === "publico";
+  const pubGrande = st.alvara?.aceito && st.alvara?.estrago?.alvo === "publico" ? Math.round(st.alvara.estrago.pontos || 0) : 0, pubVisto = juntaPub ? pubGrande : pub;
   const tirou = juntaMata ? `As cargas e as propostas aceitas tiraram ${cargas + prop}` : `As cargas tiraram ${cargas}${prop ? `, as propostas aceitas, ${prop}` : ""}`;
-  const origem = `em pontos da mata cheia, ela foi de ${ini} para ${fim.toLocaleString("pt-BR")}. ${tirou}; a natureza e o replantio devolveram ${voltou.toLocaleString("pt-BR")}.` + (pub ? (juntaPub ? " E as propostas também tiraram pontos do bem público." : ` E as propostas tiraram ${pub} pontos do bem público (um nível = ${PONTOS_NIVEL * nfam}).`) : "");
+  const origem = `em pontos da mata cheia, ela foi de ${ini} para ${fim.toLocaleString("pt-BR")}. ${tirou}; a natureza e o replantio devolveram ${voltou.toLocaleString("pt-BR")}.` + (juntaPub ? (pubGrande ? ` E a proposta grande tirou ${pubGrande} pontos do bem público (um nível = ${PONTOS_NIVEL * nfam}); o que a pequena tirou fica guardado, porque ela teve menos de 5 respostas.` : " O que a proposta pequena tirou do bem público fica guardado, porque ela teve menos de 5 respostas.") : pub ? ` E as propostas tiraram ${pub} pontos do bem público (um nível = ${PONTOS_NIVEL * nfam}).` : "");
   const vs = Object.values(st.alvara?.votos || {}), n = st.ordem.length;
   // R16: as duas porcentagens sobre quem respondeu; o estrago da pequena sobre a turma inteira
   const pq = agregadoOk(st.pequena?.n || 0) ? pct(st.pequena.aceitaram, st.pequena.n) : null, pg = agregadoOk(vs.length) ? pct(vs.filter(Boolean).length, vs.length) : null;
@@ -459,7 +467,7 @@ function perguntasFechamento(st) {
   return [
     H.length >= 3 ? (subiu ? (pouco ? "Quando o aluguel entrou (ano 3), a desigualdade subiu pouco. Quem ganhou com isso, e o que segurou o resto?" : "Quando o aluguel entrou (ano 3), a desigualdade subiu. Quem ganhou com isso, e sem fazer o quê?") : "Quando o aluguel entrou (ano 3), a desigualdade não subiu. O que segurou?") : "A desigualdade entre as famílias cresceu ou caiu? Por quê?",
     `Com o aluguel mordendo, a vila ${st.votoTrocou ? "trocou para a Prosperidade" : "ficou no Monopólio"}. Vocês votaram pelo próprio bolso, pela vila ou pela meta de cada regra?`,
-    `Bolso ou vila também na mata: ${origem} ${st.colapsouAlguma ? (st.colapsou ? "Ela colapsou e não voltou." : mataMin < COLAPSO ? "Ela colapsou e voltou." : "Uma proposta a derrubou abaixo de 30% no meio do ano, e ela voltou.") : `O pior ano chegou a ${pctL(mataMin)}.`} ${fim < ini || st.colapsouAlguma || pub ? "Quem pagou a conta?" : "O que segurou a mata?"}`,   // R33: com a mata subindo sem estrago, "quem pagou a conta?" não cabia
+    `Bolso ou vila também na mata: ${origem} ${st.colapsouAlguma ? (st.colapsou ? "Ela colapsou e não voltou." : mataMin < COLAPSO ? "Ela colapsou e voltou." : "Uma proposta a derrubou abaixo de 30% no meio do ano, e ela voltou.") : `O pior ano chegou a ${pctL(mataMin)}.`} ${fim < ini || st.colapsouAlguma || pubVisto ? "Quem pagou a conta?" : "O que segurou a mata?"}`,   // R33: com a mata subindo sem estrago, "quem pagou a conta?" não cabia
     pq != null && pg != null
       ? (quase
         ? `Na pequena, ${pq}% aceitaram${semNivel || !fe ? "" : ` (${fe}% do estrago de uma grande)`}; na grande, ${pg}% aceitariam: ${pq === pg ? "o mesmo. Por que o tamanho da proposta não mudou a resposta?" : "quase o mesmo. Por que o tamanho da proposta quase não mudou a resposta?"}`
@@ -480,6 +488,13 @@ function motivosMeta(o) {
   const regra = o.regra === "prosperidade" ? `a família mais pobre com ${pctL(o.razao)} da média; a meta pede 70%` : `a meta pede ${VITORIA.patrimonioPorPessoa}`;
   if (o.regra === "prosperidade" ? o.razao < VITORIA.pobreSobreMedia : (o.pp ?? 0) < VITORIA.patrimonioPorPessoa) m.push(regra);
   return m.length ? m : [regra];
+}
+
+// R34: as duas falas da grande, numa linha (só quando aparecem, pelas mesmas regras da pequena)
+function linhaFalasGrande(st) {
+  const F = falasGrande(st);
+  if (!F.ok) return "";   // as regras de quando as falas aparecem já foram ditas no painel da pequena
+  return `<p class="rodape" style="margin:0">Na grande, com “presente em troca de”, ${pct(F.P.a, F.P.n)}% aceitariam; às claras, ${pct(F.C.a, F.C.n)}%: ${F.igual ? "o mesmo" : F.acaso ? "diferença do tamanho que o acaso dá" : "pista, não prova, de que a palavra pesou"}.</p>`;
 }
 
 // R33: a grande aceita só "já conta" na barra quando tirou alguma coisa (no nível 0 sem pontos, nada se perdeu)
@@ -523,8 +538,11 @@ function apoioPergunta(st, k) {
 }
 
 // R28: as duas falas da proposta pequena ("presente em troca de" e às claras), por quem respondeu; cada fala só com 5 ou mais respostas
-export function falasPequena(st) {
-  const ids = Object.keys(st.pequena?.votos || {}), conta = (f) => { const xs = ids.filter((id) => falaDe(st, id) === f); return { n: xs.length, a: xs.filter((id) => st.pequena.votos[id]).length }; };
+export function falasPequena(st) { return falasDe(st, st.pequena?.votos || {}); }
+// R34: a grande também tem as duas falas, com as mesmas regras (10 ou mais em cada uma, as duas entre 10% e 90%)
+export function falasGrande(st) { return falasDe(st, st.alvara?.votos || {}); }
+function falasDe(st, votos) {
+  const ids = Object.keys(votos), conta = (f) => { const xs = ids.filter((id) => falaDe(st, id) === f); return { n: xs.length, a: xs.filter((id) => votos[id]).length }; };
   // R33: cada fala só aparece com 10 ou mais respostas e com as duas longe dos extremos (entre 10% e 90%, sem incluir): com uma fala
   // inteira fazendo o mesmo, o total exato da turma e o número da outra fala entregavam a conta (R32 punha só os extremos em faixa,
   // e 75% no total com 50% na outra fala davam 10 de 10). Escondida, a comparação não diz qual fala nem de que lado ficou
@@ -538,13 +556,19 @@ export function falasPequena(st) {
 }
 const FALA_MIN = 10;
 function pctFala(x) { const p = pct(x.a, x.n); return { txt: `${p}%`, w: p }; }
-const carimbo = (txt = "Corrupção", cls = "") => `<div class="carimbo${cls ? ` ${cls}` : ""}">${esc(txt)}</div>`;
+// R34: o carimbo bate uma vez só em cada lugar; nos redesenhos seguintes do telão (cada envio, cada clique), fica parado
+const carimbados = new Set();
+const carimbo = (txt = "Corrupção", cls = "", chave = "") => {
+  const parado = chave && carimbados.has(chave);
+  if (chave) carimbados.add(chave);
+  return `<div class="carimbo${cls ? ` ${cls}` : ""}${parado ? " parado" : ""}">${esc(txt)}</div>`;
+};
 function barrasFalas(F, grande = false) {
   return `<div class="col falas-barras">${[["“Presente em troca de”", F.P], ["Às claras (“cobra”, “oferece”)", F.C]].map(([rot, x]) => `<div><div class="row" style="justify-content:space-between;flex-wrap:nowrap"><b>${rot}</b><b class="mono">${pctFala(x).txt}</b></div><div class="barra ${grande ? "grande" : ""}"><i style="width:${pctFala(x).w}%;background:#f87171"></i></div></div>`).join("")}</div>`;
 }
 function painelFalas(st) {
   const F = falasPequena(st), c = carta(st.cartas.pequena);
-  return `<div class="card col" style="justify-content:safe center;gap:1cqw;min-height:0">${carimbo(c.carimbo || "Corrupção", "md")}
+  return `<div class="card col" style="justify-content:safe center;gap:1cqw;min-height:0">${carimbo(c.carimbo || "Corrupção", "md", `pequena-${st.seed}`)}
     <p class="big" style="margin:0;font-size:2.15cqw">Metade leu <b>“presente em troca de”</b>; metade, às claras. Mesmos pontos, mesmo estrago: o carimbo é da proposta, não de quem aceitou.</p>
     ${F.ok ? `${barrasFalas(F, true)}<p class="rodape" style="margin:0">${F.igual ? "Mesmo resultado nas duas falas. Fora do jogo, a palavra muda decisões?" : F.acaso ? "Com tão poucas pessoas, diferença assim é comum por acaso. A palavra muda decisões?" : "Diferença maior que a do acaso, mas é pista, não prova. A palavra mudou a decisão?"}</p>` : `<p class="rodape" style="margin:0">A comparação das duas falas aparece com 10 ou mais respostas em cada uma e nenhuma perto de todos ou de ninguém, para não entregar respostas.</p>`}</div>`;
 }
@@ -574,7 +598,7 @@ function telaoFechamento(st) {
   const tam = qs[k].length + apoio.length, longa = tam > 170;
   return topo(st, "Fechamento") + `<div class="grid" style="grid-template-columns:1fr 1.25fr;flex:1;min-height:0">
     <div class="card col" style="min-height:0;gap:.7cqw;overflow:hidden"><h2 class="row" style="color:var(${st.vitoria ? "--ok" : "--warn"})">${ico(st.vitoria ? "trofeu" : "meta", "g")}${st.vitoria ? "A vila bateu a meta!" : "A vila não bateu a meta"}</h2>
-      ${k === 3 ? `<div class="row" style="gap:1.2cqw;align-items:center;flex-wrap:nowrap">${st.cartas && carta(st.cartas.pequena).carimbo ? carimbo(`${carta(st.cartas.pequena).carimbo} e corrupção`, "pq") : `${carimbo("Corrupção", "pq")}<span class="big" style="margin:0">as duas propostas</span>`}</div>` : `<p class="big" style="margin:0;font-size:2.1cqw">${vz.txt}</p>`}
+      ${k === 3 ? `<div class="row" style="gap:1.2cqw;align-items:center;flex-wrap:nowrap">${st.cartas && carta(st.cartas.pequena).carimbo ? carimbo(`${carta(st.cartas.pequena).carimbo} e corrupção`, "pq longo", `q4-${st.seed}`) : `${carimbo("Corrupção", "pq", `q4-${st.seed}`)}<span class="big" style="margin:0">as duas propostas</span>`}</div>` : `<p class="big" style="margin:0;font-size:2.1cqw">${vz.txt}</p>`}
       <div class="linha-media">${k === 3 ? barrasPropostas(st) : k === 4 ? guiouTurma(st) : linhaDoTempo(st.historico, { F: 30, alto: 240, so: k === 2 ? "mata" : "desig" })}</div><p class="rodape teoria">De onde vem: ${esc(teoria(st, k))}</p></div>
     <div class="col" style="min-height:0"><div class="card pergunta" style="flex:1;min-height:0;overflow:hidden"><div class="temas">${TEMAS.map((t, i) => `<span class="${i === k ? "agora" : i < k ? "feito" : ""}">${t}</span>`).join("")}</div>
       <p class="pergunta-txt ${tam > 250 ? "longa longa2" : longa ? "longa" : ""}">${esc(qs[k])}</p>${apoio ? `<p class="rodape apoio">${esc(apoio)}</p>` : ""}${k === 0 ? `<div class="crono-mini">${cronometro(st, "Dupla, depois da síntese", 60, 90)}</div>` : ""}</div>

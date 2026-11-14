@@ -1,7 +1,7 @@
 import { NOME_FASE, vista } from "../engine.js";
 import { NOVIDADE_DO_ANO, EXEMPLO_DO_ANO, EXEMPLO_VOTO, REGRAS_TXT, MOTIVOS, GUIAS, NIVEIS_PUBLICO } from "../content/vila.js";
 import { LIMITES, lanceMinimo, CARGA_RENDE, CARGA_TIRA, REPLANTA_POR, REPLANTA_DEVOLVE, patrimonio, VALOR_LOTE, progressoMeta, VITORIA, precisaLotes, tetoLotes, PONTOS_NIVEL, NIVEL_MAX } from "../content/regras.js";
-import { carta, cartaAno4, cartaPequena, textoCarta, QUEM_GOLPE, FAIXAS_PCT, GANHO_PEQUENA, GANHO_GRANDE } from "../content/cartas.js";
+import { carta, cartaAno4, cartaPequena, cartaComFala, textoCarta, QUEM_GOLPE, FAIXAS_PCT, GANHO_PEQUENA, GANHO_GRANDE } from "../content/cartas.js";
 import { iconeFamilia, ico, pctL, nL } from "./desenho.js";
 import { decorrido, tempoResultado } from "./telao.js";
 
@@ -10,10 +10,11 @@ const n0 = (x) => Math.round(x).toLocaleString("pt-BR");
 
 export function novoLocal() { return { pub: 20, rep: 0, car: 0, lance: 0, face: null, guia: null, motivo: null }; }
 
+// R34: no voto e na proposta grande, cada um responde longe da família: o cabeçalho não mostra o caixa a quem senta ao lado
 function hd(st, me) {
   const f = me?.fam ? vista(st).fams[me.fam] : null;   // R19: nas cartas dos anos 2 e 4, o caixa de antes das decisões (como a barra)
   return `<div class="hd">${f ? iconeFamilia(f, 34) : ico("app-mosaico-vila", "m")}
-    <div class="grow"><b>${esc(me?.nome || "Mosaico Vila")}</b><div class="faint" style="font-size:12px">${f ? `${esc(f.nome)} · caixa ${n0(f.caixa)}` : "Mosaico Vila"}</div></div>
+    <div class="grow"><b>${esc(me?.nome || "Mosaico Vila")}</b><div class="faint" style="font-size:12px">${f ? (["voto", "alvara"].includes(st.fase) ? esc(f.nome) : `${esc(f.nome)} · caixa ${n0(f.caixa)}`) : "Mosaico Vila"}</div></div>
     ${st.ano ? `<span class="chip">Ano ${st.ano}</span>` : ""}${st.ano ? miniBarra(st) : ""}</div>`;
 }
 
@@ -53,9 +54,13 @@ function palpiteFaixa(st, id, onde, pergunta) {
 }
 
 // Carta sorteada (pequena, ano 4 ou grande): texto, aviso de sigilo e dois botões iguais (mesmo tamanho e mesma cor)
+// R34: a ordem dos dois botões de cada carta é sorteada por pessoa (fixa para ela), para a posição do dedo, vista de lado, não entregar a resposta
+let idAtual = "";
+const trocaOrdem = (chave) => { let h = 2166136261; for (const ch of `${idAtual}|${chave}`) h = Math.imul(h ^ ch.charCodeAt(0), 16777619); return (h >>> 0) % 2 === 1; };
+const doisBotoes = (chave, a, sim, nao) => { const bs = [sim, nao].map(([v, t]) => `<button class="btn sec" data-a="${a}" data-val="${v}">${esc(t)}</button>`); return `<div class="escolha">${(trocaOrdem(chave) ? bs.reverse() : bs).join("")}</div>`; };
 function cartaCelular(c, aviso, a, st, valSim = "1", valNao = "0") {
   return `<h2 class="row">${ico(c.icone, "g")}${esc(c.titulo)}</h2><p class="muted">${esc(textoCarta(c, "texto", st.fase === "pequena" ? { rel: true } : { mata: st.mata, teto: st.teto, publico: st.publico, juntado: st.acumulado }))}</p><p class="faint">${aviso}</p>
-    <div class="escolha"><button class="btn sec" data-a="${a}" data-val="${valSim}">${esc(c.sim)}</button><button class="btn sec" data-a="${a}" data-val="${valNao}">${esc(c.nao)}</button></div>`;
+    ${doisBotoes(c.id, a, [valSim, c.sim], [valNao, c.nao])}`;
 }
 
 // R27: as linhas do extrato fecham com o caixa mostrado; o caixa de antes e a renda saem como já apareceram (cabeçalho e abertura),
@@ -121,6 +126,7 @@ function prev5(st, id) {
 }
 
 export function renderAluno(st, id, loc) {
+  idAtual = id;
   const me = st.alunos[id];
   const f = me?.fam ? st.fams[me.fam] : null;
   let bd = "";
@@ -178,7 +184,7 @@ export function renderAluno(st, id, loc) {
       if (c.tipo === "dado") {
         bd = `<h2 class="row">${ico(c.icone, "g")}${esc(c.titulo)}</h2><p class="muted">${esc(c.texto)}</p><p class="faint">O telão mostra só o total da turma (se todos fizerem o mesmo, o total diz isso).</p>` + (loc.face == null
           ? `<button class="btn block" data-a="rolar">Pensei. Rolar o dado</button>`
-          : `<div class="card" style="text-align:center"><div class="dado">${loc.face}</div><p class="muted">Você acertou o número que pensou?</p><div class="escolha"><button class="btn sec" data-a="mente" data-val="1">Acertei</button><button class="btn sec" data-a="mente" data-val="0">Não acertei</button></div></div>`);
+          : `<div class="card" style="text-align:center"><div class="dado">${loc.face}</div><p class="muted">Você acertou o número que pensou?</p>${doisBotoes("dado", "mente", ["1", "Acertei"], ["0", "Não acertei"])}</div>`);
       } else if (c.tipo === "honesto") {
         bd = cartaCelular(c, "<b>Só você vê esta tela.</b> O banco e a praça são do jogo; os 3 pontos são só seus. O telão mostra só o total da turma (se todos fizerem o mesmo, o total diz isso).", "mente", st);
       } else {
@@ -207,7 +213,7 @@ export function renderAluno(st, id, loc) {
       break;
     }
     case "alvara": {
-      const c = carta(st.cartas.grande);
+      const c = cartaComFala(st, id, st.cartas.grande);   // R34: a grande na fala sorteada para esta pessoa
       bd = st.alvara.votos[id] != null ? enviado("Resposta secreta enviada.") + palpiteFaixa(st, id, "alvara", "quantos % de quem responder aceitariam?")
         : cartaCelular(c, `<b>Responda no seu lugar, longe da família.</b> Vale a resposta de uma pessoa sorteada, que ninguém vai saber quem é (sem resposta, vale não). O telão mostra só o total (se todos fizerem o mesmo, o total diz isso). ${esc(c.segmento[0].toUpperCase() + c.segmento.slice(1))} é do jogo; os ${GANHO_GRANDE} pontos são só seus.`, "alvara", st);
       break;

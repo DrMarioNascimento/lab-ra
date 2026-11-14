@@ -25,7 +25,7 @@ Estilo: ícone 3D brilhante, como as casas da vila: paredes creme lisas, acabame
 Ao salvar, acrescentar o nível em `PREDIO_3D` (`js/views/desenho.js`).
 
 ## Ainda provisórios (SVG no código)
-Os prédios dos níveis 1 a 3 do bem público (itens 9 a 11 abaixo) continuam desenhados em SVG no mapa; os níveis 4 e 5 já são 3D (R32). A moeda já está em 3D (R32). Os itens 1 a 8, 14 a 16 e 20 já foram resolvidos acima; 17 a 19 estão cobertos pelos ícones de apoio (alvará e balança), e o troco do mercado usa o dado do próprio celular.
+Os prédios dos níveis 1 a 3 do bem público (itens 9 a 11 abaixo) continuam desenhados em SVG no mapa; os níveis 4 e 5 já são 3D (R32). A moeda já está em 3D (R32). Os itens 1 a 8, 14 a 16 e 20 já foram resolvidos acima; 17 a 19 estão cobertos pelos ícones de apoio (alvará e balança), e o dado da sorte usa o dado do próprio celular.
 
 ## Cartas sorteadas (R13, 14/11/2026): provisórias, com prompts para os definitivos
 Por ora, cada carta usa uma cópia de um ícone 3D que o jogo já tem (entre parênteses). Estilo comum: o da lista original abaixo (ícone 3D brilhante, iluminação suave de estúdio, levemente de cima, cores saturadas, fundo branco liso para recortar, sem texto, 1024 × 1024). Salvar em `assets/icones/` com o nome indicado e trocar o campo `icone` da carta em `js/content/cartas.js`.
@@ -42,13 +42,13 @@ Propostas grandes (ano 5)
 27. `carta-escola.webp` (hoje `alvara`) · O contrato da escola: prédio escolar pequeno com andaime e um contrato com duas assinaturas em cima de uma pilha de moedas.
 
 Honestidade (ano 4)
-28. `carta-dado.webp` (hoje `ideia`) · O troco do mercado: dado branco ao lado de um punhado de moedas (o item 17 da lista original).
+28. `carta-dado.webp` (hoje `ideia`) · O dado da sorte: dado branco ao lado de um punhado de moedas (o item 17 da lista original).
 29. `carta-extrato.webp` (hoje `participar`) · O extrato a mais: celular mostrando um extrato com uma linha destacada em verde e três moedas saltando da tela.
 30. `carta-achado.webp` (hoje `cedula`) · O achado da praça: três moedas douradas no chão de pedra da praça, com uma caixinha de achados e perdidos ao lado.
 
 Confiança (ano 4)
-31. `carta-pedido.webp` (hoje `economia`) · O pedido na estrada: duas mãos se encontrando, uma oferecendo duas moedas, sobre uma estrada de terra; sem rosto, roupa ou sinal de pobreza (para não retratar ninguém).
-32. `carta-fiado.webp` (hoje `grupos`) · A venda fiado: carrinho de toras de madeira com uma caderneta de fiado aberta em cima.
+31. `carta-pedido.webp` (hoje `moeda`) · O pedido na estrada: duas mãos se encontrando, uma oferecendo duas moedas, sobre uma estrada de terra; sem rosto, roupa ou sinal de pobreza (para não retratar ninguém).
+32. `carta-fiado.webp` (hoje `cedula`) · A venda fiado: carrinho de toras de madeira com uma caderneta de fiado aberta em cima.
 33. `carta-sinal.webp` (hoje `participar`) · O sinal adiantado: ferramenta (enxada ou serrote) numa banca de feira, com duas moedas na frente e uma etiqueta de "sinal" sem texto legível.
 34. `carta-carroca.webp` (hoje `grupos`) · A carroça dividida: carroça de madeira com duas pilhas iguais de moedas, uma em cada lado do banco.
 
@@ -79,7 +79,7 @@ Estilo comum: ícone 3D brilhante, cantos arredondados, iluminação suave de es
 16. `lote-livre.png` · Lote vazio cercado, com placa em branco.
 
 ## Acontecimentos
-17. `evento-troco.png` · O troco do mercado: dado branco ao lado de um punhado de moedas.
+17. `evento-troco.png` · O dado da sorte: dado branco ao lado de um punhado de moedas.
 18. `evento-alvara.png` · O alvará: prancheta com carimbo e um capacete de obra ao lado.
 19. `evento-voto.png` · A votação: urna transparente com uma cédula entrando.
 

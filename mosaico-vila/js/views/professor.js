@@ -18,16 +18,16 @@ function cartasDaPartida(st) {
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const n0 = (x) => Math.round(x).toLocaleString("pt-BR");
 
-// R22: relógio da aula para quem conduz, contra o plano (fim de cada ano, em minutos de sala; fechamento a partir dos ~34)
+// R22: relógio da aula para quem conduz, contra o plano (fim de cada ano, em minutos de sala; fechamento a partir dos ~35)
 let inicioAula = null;
-const PLANO_FIM_ANO = { 1: 9, 2: 14, 3: 22, 4: 28, 5: 34 };   // R24: medido na simulação (× 1,25 para a sala), turmas de 12 a 40
+const PLANO_FIM_ANO = { 1: 9, 2: 14, 3: 22, 4: 29, 5: 35 };   // R24/R34: medido na simulação r69 (mediana × 1,25 para a sala, turmas de 12 a 40; com o tempo de leitura das cartas)
 function relogioAula(st) {
   if (st.fase === "entrada") { inicioAula = null; return ""; }
   inicioAula ??= Date.now();
-  const min = (Date.now() - inicioAula) / 60000, plano = st.fase === "fechamento" ? 34 : PLANO_FIM_ANO[st.ano] ?? 2;
+  const min = (Date.now() - inicioAula) / 60000, plano = st.fase === "fechamento" ? 35 : PLANO_FIM_ANO[st.ano] ?? 2;
   const atraso = st.fase !== "fechamento" && min > plano + 1;
   const mm = `${Math.floor(min)}:${String(Math.floor((min % 1) * 60)).padStart(2, "0")}`;
-  return `<div class="card" style="padding:10px 12px${atraso ? ";border-color:#f59e0b" : ""}"><div class="row"><b class="grow">Tempo de aula</b><b class="mono">${mm}</b></div><p class="faint" style="font-size:12px;margin:4px 0 0">${atraso ? `Atrasado: o plano fecha o ano ${st.ano} perto de ${plano} min. Ligue as conversas curtas${st.ano < 4 ? " ou desligue a carta do ano 4" : ""}.` : st.fase === "fechamento" ? "Plano: o fechamento (dupla, síntese de 1,5 min e 8,5 min de perguntas) vai dos 34 aos 47 min; sobram cerca de 3 min." : `Plano: o ano ${st.ano || 1} fecha perto de ${plano} min; o fechamento vai dos 34 aos 47.`}</p></div>`;
+  return `<div class="card" style="padding:10px 12px${atraso ? ";border-color:#f59e0b" : ""}"><div class="row"><b class="grow">Tempo de aula</b><b class="mono">${mm}</b></div><p class="faint" style="font-size:12px;margin:4px 0 0">${atraso ? `Atrasado: o plano fecha o ano ${st.ano} perto de ${plano} min. Ligue as conversas curtas${st.ano < 4 ? " ou desligue a carta do ano 4" : ""}.` : st.fase === "fechamento" ? "Plano: o fechamento (dupla, síntese de 1,5 min e 8,5 min de perguntas) vai dos 35 aos 47,5 min; sobram cerca de 2,5 min." : `Plano: o ano ${st.ano || 1} fecha perto de ${plano} min; o fechamento vai dos 35 aos 47,5.`}</p></div>`;
 }
 
 // R24: o cenário profissional (opcional) do GDD, como roteiro de fala de quem conduz; a tela continua com os nomes da vila
@@ -45,7 +45,7 @@ export function renderProfessor(st) {
     extra = Object.values(st.fams).map((f) => `<div class="card" style="padding:10px 12px"><div class="row">${iconeFamilia(f, 26)}<b class="grow">${esc(f.nome)}</b><span class="mono">${n0(f.caixa)}</span></div>
       <div class="faint" style="font-size:12px;margin-top:4px">${f.membros.length} pessoas · ${f.lotes === 1 ? "1 lote" : `${f.lotes} lotes`}</div></div>`).join("");
     const podeTrocar = st.ano < 4 || (st.ano === 4 && st.fase === "abertura");
-    if (st.fase !== "fechamento") extra = relogioAula(st) + cartasDaPartida(st) + `<div class="card" style="padding:10px 12px"><div class="row"><b class="grow">Carta do ano 4</b><button class="btn sm ${st.semTroco ? "sec" : "ok"}" data-a="troco" ${podeTrocar ? "" : "disabled"}>${st.semTroco ? "Desligada" : "Ligada"}</button></div><p class="faint" style="font-size:12px;margin:4px 0 0">Honestidade (como o troco do mercado) ou confiança. Ligada por padrão; desligue se a aula atrasar (economiza cerca de 1 min).</p></div>
+    if (st.fase !== "fechamento") extra = relogioAula(st) + cartasDaPartida(st) + `<div class="card" style="padding:10px 12px"><div class="row"><b class="grow">Carta do ano 4</b><button class="btn sm ${st.semTroco ? "sec" : "ok"}" data-a="troco" ${podeTrocar ? "" : "disabled"}>${st.semTroco ? "Desligada" : "Ligada"}</button></div><p class="faint" style="font-size:12px;margin:4px 0 0">Honestidade (como o dado da sorte) ou confiança. Ligada por padrão; desligue se a aula atrasar (economiza cerca de 1 min).</p></div>
       <div class="card" style="padding:10px 12px"><div class="row"><b class="grow">Conversas curtas</b><button class="btn sm ${st.curto ? "ok" : "sec"}" data-a="curto">${st.curto ? "Ligadas" : "Desligadas"}</button></div><p class="faint" style="font-size:12px;margin:4px 0 0">Se ainda faltar tempo: conversa antes do voto em 60 s e conversa da família em 30 s nos anos 4 e 5 (economiza cerca de 1 min).</p></div>` + extra;
   }
   const anos = st.ano ? `Ano ${st.ano} de 5 · regra ${REGRAS_TXT[st.regra].nome}` : "Antes do ano 1";

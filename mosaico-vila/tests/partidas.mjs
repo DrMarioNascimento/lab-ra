@@ -3,7 +3,7 @@
 import { estadoInicial, reduzir, FASES, progresso, estragar } from "../js/engine.js";
 import { passoBot, NOMES, perfilBot, papelBully } from "../js/bots.js";
 import { gini, fecharAno, progressoMeta, COLAPSO, tetoLotes, leilao, lanceDaFamilia } from "../js/content/regras.js";
-import { carta, cartaAno4, cartaPequena, distribuirFalas, falaDe, sortearCartas, textoCarta, PEQUENAS, GRANDES, ANO4, CONFIANCA } from "../js/content/cartas.js";
+import { carta, cartaAno4, cartaPequena, cartaComFala, distribuirFalas, falaDe, sortearCartas, textoCarta, PEQUENAS, GRANDES, ANO4, CONFIANCA } from "../js/content/cartas.js";
 import { renderTelao, falasPequena } from "../js/views/telao.js";
 import { pctL, nL } from "../js/views/desenho.js";
 import { renderAluno, novoLocal } from "../js/views/aluno.js";
@@ -258,6 +258,13 @@ ok(pctL(0.2996) === "29,9%" && pctL(0.3002) === "30%" && pctL(0.304) === "30,4%"
     for (let k = 0; k < nC; k++) { const id = `c${k}`; ordem.push(id); fala[id] = "claras"; votos[id] = k < pC; }
     return falasPequena({ pequena: { votos }, fala, ordem }).ok; };
   ok(!caso(5, 10, 10, 10) && !caso(0, 20, 3, 20) && !caso(4, 9, 5, 10) && caso(6, 10, 4, 10) && caso(8, 10, 2, 10), "R33: falas escondidas quando uma metade fica perto de todos ou de ninguém");
+}
+// R34: a grande também tem as duas falas, com o mesmo ato nos botões e o mesmo estrago
+for (const c of GRANDES) {
+  ok(c.presente && /presente/.test(c.presente.texto) && /em troca de/.test(c.presente.texto) && /\{efeito\}/.test(c.presente.texto), `R34: a fala "presente" de ${c.id}`);
+  ok(/^Aceitaria os 8/.test(c.sim) && /^Aceitaria o presente/.test(c.presente.sim) && c.sim.replace("os 8", "o presente") === c.presente.sim && c.nao === c.presente.nao, `R34: botões da grande ${c.id} com o mesmo ato`);
+  const st = { cartas: { grande: c.id }, fala: { a: "presente", b: "claras" }, ordem: ["a", "b"] };
+  ok(cartaComFala(st, "a", c.id).alvo === cartaComFala(st, "b", c.id).alvo && cartaComFala(st, "a", c.id).texto !== cartaComFala(st, "b", c.id).texto, `R34: ${c.id} muda só a fala`);
 }
 const s = (k) => linhas.filter((l) => l[k]).length;
 console.log(`troca aprovada ${s("troca")}/15 · colapso ${s("colapso")}/15 · vitória coletiva ${s("vitoria")}/15 · desigualdade da renda sobe com o aluguel em ${rendaSobe}/15`);

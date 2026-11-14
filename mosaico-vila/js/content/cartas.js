@@ -42,20 +42,23 @@ export const GRANDES = [
   { id: "alvara", segmento: "a construtora", de: "da construtora", lado: "recebe", alvo: "publico", icone: "alvara", titulo: "O alvará",
     telao: "Uma construtora oferece 8 pontos pessoais para aprovar uma obra sem vistoria. Aprovada, {efeito}.",
     texto: "Uma construtora oferece 8 pontos pessoais a quem aprovar uma obra sem a vistoria. Se for aprovada, {efeito}.",
-    sim: "Aceitaria", nao: "Recusaria", aceito: "A obra foi aprovada sem vistoria: {feito}.", recusado: "A obra não foi aprovada." },
+    sim: "Aceitaria os 8 e aprovaria", nao: "Recusaria", aceito: "A obra foi aprovada sem vistoria: {feito}.", recusado: "A obra não foi aprovada.",
+    presente: { texto: "Uma construtora quer te dar um presente de 8 pontos pessoais, em troca de você aprovar uma obra sem a vistoria. Se for aprovada, {efeito}.", sim: "Aceitaria o presente e aprovaria", nao: "Recusaria" } },   // R34: a grande também em duas falas
   { id: "madeireira", segmento: "a madeireira", de: "da madeireira", lado: "recebe", alvo: "mata", icone: "alvara", titulo: "A licença da madeireira",
     telao: "Uma madeireira de fora oferece 8 pontos pessoais para você assinar a licença de derrubar parte da mata. Assinada, {efeito}.",
     texto: "Uma madeireira de fora oferece 8 pontos pessoais a quem assinar a licença para ela derrubar parte da mata. Se for assinada, {efeito}.",
-    sim: "Assinaria", nao: "Não assinaria", aceito: "A licença foi assinada: {feito}.", recusado: "A licença não foi assinada." },
+    sim: "Aceitaria os 8 e assinaria", nao: "Não assinaria", aceito: "A licença foi assinada: {feito}.", recusado: "A licença não foi assinada.",
+    presente: { texto: "Uma madeireira de fora quer te dar um presente de 8 pontos pessoais, em troca de você assinar a licença para ela derrubar parte da mata. Se for assinada, {efeito}.", sim: "Aceitaria o presente e assinaria", nao: "Não assinaria" } },
   { id: "escola", segmento: "a empresa da obra", de: "da empresa da obra", lado: "recebe", alvo: "publico", icone: "alvara", titulo: "O contrato da escola",
     telao: "Você escolhe a empresa da reforma da escola. A mais cara oferece 8 pontos para ser escolhida; com ela, {efeito}.",
     texto: "Você escolhe a empresa que vai reformar a escola. A mais cara oferece 8 pontos pessoais para ser a escolhida. Com ela, a obra custa o dobro e {efeito}.",
-    sim: "Escolheria a mais cara", nao: "Escolheria a mais barata", aceito: "A empresa mais cara foi escolhida: {feito}.", recusado: "A empresa mais barata foi escolhida." },
+    sim: "Aceitaria os 8 e escolheria a mais cara", nao: "Escolheria a mais barata", aceito: "A empresa mais cara foi escolhida: {feito}.", recusado: "A empresa mais barata foi escolhida.",
+    presente: { texto: "Você escolhe a empresa que vai reformar a escola. A mais cara quer te dar um presente de 8 pontos pessoais, em troca de ser a escolhida. Com ela, a obra custa o dobro e {efeito}.", sim: "Aceitaria o presente e escolheria a mais cara", nao: "Escolheria a mais barata" } },
 ];
 
 // Ano 4 (opcional). tipo "dado": o Jogo da Mente; "honesto": ficar ou devolver; "confia": confiar antes de saber.
 export const ANO4 = [
-  { id: "dado", grupo: "honestidade", tipo: "dado", icone: "ideia", titulo: "O troco do mercado",
+  { id: "dado", grupo: "honestidade", tipo: "dado", icone: "ideia", titulo: "O dado da sorte",   // R34: antes "O troco do mercado", que não tinha troco nem mercado
     telao: "Pense num número de 1 a 6, sem digitar. O celular rola o dado. Acertou? 3 pontos pessoais.",
     texto: "Pense num número de 1 a 6. Não digite. O celular vai rolar um dado. Se você acertar, ganha 3 pontos pessoais (não vão para a família)." },
   { id: "extrato", grupo: "honestidade", tipo: "honesto", icone: "participar", titulo: "O extrato a mais",
@@ -66,12 +69,12 @@ export const ANO4 = [
     telao: "Você acha 3 pontos caídos na praça, sem nome. Entrega no achados e perdidos ou fica?",
     texto: "Você acha 3 pontos caídos na praça, sem nome de ninguém. Entrega no achados e perdidos da vila ou fica com eles?",
     sim: "Ficar com os 3", nao: "Entregar" },
-  { id: "pedinte", grupo: "confianca", tipo: "confia", icone: "economia", titulo: "O pedido na estrada",
+  { id: "pedinte", grupo: "confianca", tipo: "confia", icone: "moeda", titulo: "O pedido na estrada",
     telao: "Na estrada, uma pessoa pede 2 pontos para comer e promete um dia de trabalho na sua roça, que rende 4. Você ajuda?",
     texto: "Na estrada da vila, uma pessoa pede 2 pontos para comer e promete voltar para um dia de trabalho na sua roça, que rende 4 pontos. Só depois você descobre se era necessidade de verdade ou golpe.",
     sim: "Ajudar com 2", nao: "Não ajudar", bom: "Era necessidade de verdade: ela voltou, trabalhou, e o dia rendeu 4. +2 para você.", ruim: "Era golpe: alguém se passou por necessitado. Você perdeu os 2.",
     ganhoBom: 2 },   // R16: o mesmo +2 / −2 das outras situações (com cada um numa situação, ninguém sai em desvantagem)
-  { id: "fiado", grupo: "confianca", tipo: "confia", icone: "grupos", titulo: "A venda fiado",
+  { id: "fiado", grupo: "confianca", tipo: "confia", icone: "cedula", titulo: "A venda fiado",
     telao: "Um comprador bem de vida quer levar 2 pontos da sua madeira e pagar 4 na semana que vem. Você vende fiado?",
     texto: "Um comprador bem de vida quer levar madeira sua que vale 2 pontos e pagar 4 na semana que vem. Só depois você descobre se ele paga ou dá calote.",
     sim: "Vender fiado", nao: "Não vender", bom: "Ele pagou os 4: +2 para você.", ruim: "Calote: ele não pagou. Você perdeu os 2.", ganhoBom: 2 },
@@ -109,8 +112,10 @@ export function distribuirFalas(ordem, r) {
 }
 export const falaDe = (st, id) => st.fala?.[id] || FALAS[Math.max(0, st.ordem.indexOf(id)) % 2];
 // A carta da pequena como cada pessoa a lê (a fala "presente" troca o texto e os botões; título, pontos e estrago iguais)
-export function cartaPequena(st, id) {
-  const c = POR_ID[st.cartas.pequena];
+export function cartaPequena(st, id) { return cartaComFala(st, id, st.cartas.pequena); }
+// R34: a grande também tem as duas falas; cada pessoa lê as duas propostas na mesma fala sorteada no ano 2
+export function cartaComFala(st, id, cid) {
+  const c = POR_ID[cid];
   return falaDe(st, id) === "presente" && c.presente ? { ...c, ...c.presente } : c;
 }
 // A situação de cada pessoa no ano 4 (quem entrou depois do sorteio recebe uma pela posição na lista)
@@ -148,7 +153,7 @@ function efeitoCarta(c, { mata, teto, publico, rel, perdido, juntado }, tempo) {
   // R26: no bem público, sem nível ainda, a proposta tira só o que a vila juntou (R25); sem o nível conhecido, o texto diz os dois casos
   if (rel) return c.alvo === "mata" ? `a mata ${perde} ${Math.round(100 * ESTRAGO_MATA)} pontos (de 100 da mata cheia)`
     : publico === 0 ? `o bem público ${perde} tudo o que juntou para o primeiro nível` : publico > 0 ? `o bem público ${perde} um nível inteiro (12 pontos por família)`
-    : `o bem público ${perde} um nível inteiro (12 pontos por família; sem nível ainda, o que juntou)`;
+    : `o bem público ${perde} um nível inteiro (12 pontos por família) ou, se ainda não tiver nível, o que juntou`;   // R34: dito como condição
   if (c.alvo === "mata") {
     const de = mata / (teto || 1), para = Math.max(0, de - ESTRAGO_MATA);
     if (Math.round(100 * de) === Math.round(100 * para)) return `a mata, já em ${pct1(de)}, não tem mais o que perder`;   // R20: mata no fim
