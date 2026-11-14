@@ -6,7 +6,7 @@ import { gini, fecharAno, progressoMeta, COLAPSO, tetoLotes, leilao, lanceDaFami
 import { carta, cartaAno4, cartaPequena, cartaComFala, distribuirFalas, falaDe, sortearCartas, textoCarta, PEQUENAS, GRANDES, ANO4, CONFIANCA } from "../js/content/cartas.js";
 import { renderTelao, falasPequena } from "../js/views/telao.js";
 import { pctL, nL } from "../js/views/desenho.js";
-import { renderAluno, novoLocal } from "../js/views/aluno.js";
+import { renderAluno, novoLocal, linhasAbertura, linhasExtrato } from "../js/views/aluno.js";
 import { rnd } from "../js/engine.js";
 
 const TAM = [12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40];
@@ -320,6 +320,21 @@ for (const [nResp, valeu] of [[4, false], [5, true]]) {
     ok(new RegExp(trocar ? "Na Prosperidade, quanto ela paga" : "No Monopólio, quanto ela paga").test(h), `R36: a pergunta do mercado na regra que vale (${st.regra})`);
   }
   for (let k = 1; k < 3000; k++) { const c = sortearCartas(rnd(k)); if (c.pequena === "entulho" && c.grande === "aterro") { ok(false, `R36: entulho e aterro juntos (semente ${k})`); break; } }
+}
+// R37: as linhas da abertura somam a renda do ano (como no extrato do fim); as cargas inteiras ficam inteiras
+{
+  const r = { base: 32, bonusMata: 8, perdaMata: 0, aluguel: 0, recebido: 10, imposto: 8.5, piso: 0, total: 41.5 };
+  const L = linhasAbertura(r);
+  ok(L.bruta - L.aluguel + L.recebido - L.imposto + L.piso === L.total && L.total === 42, `R37: abertura soma a renda do ano (${JSON.stringify(L)})`);
+  let ruins = 0;
+  for (let k = 0; k < 500; k++) {
+    const rr = rnd(900 + k), renda = 20 + Math.round(rr() * 600) / 10, aPub = Math.round(rr() * renda * 40) / 100, aRep = Math.round(rr() * renda * 30) / 100, cargas = Math.floor(rr() * 4);
+    const fx = { renda, aPub, aRep, ganhoCarga: 6 * cargas, cargas };
+    const caixa = 50 + rr() * 100, f = { caixa };
+    const E = linhasExtrato(f, fx, 3);
+    if (E.gc !== 6 * cargas || E.A + E.R - E.pub - E.rep + E.gc !== Math.round(caixa)) ruins++;
+  }
+  ok(!ruins, `R37: extrato do fim fecha com o caixa e as cargas inteiras (${ruins} de 500 com erro)`);
 }
 // R35: as cartas de lixo estão nos sorteios, com as duas falas, e a grande às claras também fala "para você"
 ok(PEQUENAS.some((c) => c.id === "entulho" && c.alvo === "mata") && GRANDES.some((c) => c.id === "aterro" && c.alvo === "mata"), "R35: o entulho (pequena) e o aterro (grande) entram nos sorteios, na mata");

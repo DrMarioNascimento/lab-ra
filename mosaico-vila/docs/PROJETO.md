@@ -267,3 +267,11 @@ No fim do ano 3, o motor guarda a vila (`snap3`). No fechamento, `contrafactual(
 - Sorteio: com o entulho na pequena, o aterro não sai na grande. Carta do entulho: "cada pessoa que aceita deixa mais entulho na mata de todos".
 - Página inicial e README: "cerca de 47 a 49 minutos".
 - Testes da R36 em `tests/partidas.mjs`.
+
+## R37 (14/11/2026, após os avaliadores FE e FF; a 81ª rodada não passou, mínima 4,0)
+- Painel da pequena: a base do estrago ("o estrago conta como recusa quem não respondeu") num rodapé, colunas iguais (1fr 1fr) e letra de 1,95cqw no texto longo; medido com 10% e 20% sem responder (cerca de 4.800 telas, nenhum corte; a versão R36 cortava 13 em 912).
+- Extrato do celular: `linhasAbertura(r)` faz as linhas da abertura somarem a renda do ano (linha "Renda do ano"); `linhasExtrato` só arredonda as linhas com fração (as cargas inteiras ficam inteiras); `sinal()` sem "−0".
+- Botões pequenos do celular com 44 px (`.phone .btn.sm`).
+- Relógio: fechamento explicado (10 min de roteiro, uns 12,5 de sala) e sugestão das conversas curtas na entrada com 20 ou mais.
+- Pergunta 4: "a diferença é de uma pessoa ou menos, o que não conta como mudança" (sem "com tão poucas respostas").
+- Testes da R37 (linhas da abertura e do fim do ano).

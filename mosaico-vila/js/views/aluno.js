@@ -65,15 +65,33 @@ function cartaCelular(c, aviso, a, st, valSim = "1", valNao = "0") {
 
 // R27: as linhas do extrato fecham com o caixa mostrado; o caixa de antes e a renda saem como já apareceram (cabeçalho e abertura),
 // e o arredondamento vai para as outras linhas (cada uma a menos de 1 ponto do valor exato)
-function linhasExtrato(f, fx, ano) {
+// R37: sinal sem "−0" e sem "+-"
+const sinal = (v) => (!v ? "0" : `${v > 0 ? "+" : "−"}${Math.abs(v).toLocaleString("pt-BR")}`);
+// R37: as linhas da abertura, inteiras, somando exatamente a renda do ano arredondada (o resto vai para a linha que tem fração)
+export function linhasAbertura(r) {
+  const brutaV = r.base + r.bonusMata - r.perdaMata, total = Math.round(r.total);
+  const L = { bruta: Math.round(brutaV), aluguel: Math.round(r.aluguel || 0), recebido: Math.round(r.recebido || 0), imposto: Math.round(r.imposto || 0), piso: Math.round(r.piso || 0), total };
+  let resto = total - (L.bruta - L.aluguel + L.recebido - L.imposto + L.piso);
+  if (resto) {
+    const fr = (x) => Math.abs(x - Math.round(x));
+    const cand = [["imposto", -1, fr(r.imposto || 0)], ["recebido", 1, fr(r.recebido || 0)], ["piso", 1, fr(r.piso || 0)]].filter(([k, , f]) => f > 1e-9 && r[k]).sort((a, b) => b[2] - a[2]);
+    const [k, sg] = cand[0] || ["bruta", 1];
+    L[k] += sg * resto;
+  }
+  return L;
+}
+export function linhasExtrato(f, fx, ano) {
   const gc = ano >= 2 ? fx.ganhoCarga : 0, rep = ano >= 2 ? fx.aRep : 0;
   const A = Math.round(f.caixa - (fx.renda - fx.aPub - rep + gc)), R = Math.round(fx.renda), alvo = Math.round(f.caixa) - A - R;
   const vals = ano >= 2 ? [-fx.aPub, -rep, gc] : [-fx.aPub], base = vals.map((v) => Math.floor(v + 1e-9));
   let falta = alvo - base.reduce((a, b) => a + b, 0);
-  const ordem = vals.map((v, k) => [v - Math.floor(v + 1e-9), k]).sort((a, b) => b[0] - a[0]);
+  // R37: o arredondamento só vai para as linhas que têm fração (bem público e replantio são porcentagens); as cargas inteiras
+  // ficam inteiras (antes, "Cargas (2) +11" quando cada carga rende 6)
+  const comFracao = vals.map((v, k) => [v - Math.floor(v + 1e-9), k]).filter(([fr]) => fr > 1e-9);
+  const ordem = (comFracao.length ? comFracao : [[0, 0]]).sort((a, b) => b[0] - a[0]);
   for (const [, k] of ordem) { if (falta <= 0) break; base[k] += 1; falta -= 1; }
   for (const [, k] of ordem.slice().reverse()) { if (falta >= 0) break; base[k] -= 1; falta += 1; }
-  if (falta) base[0] += falta;
+  if (falta) base[ordem[0][1]] += falta;
   return { A: A || 0, R: R || 0, pub: -base[0] || 0, rep: ano >= 2 ? -base[1] || 0 : 0, gc: ano >= 2 ? base[2] || 0 : 0 };   // || 0: nada de "−-0"
 }
 
@@ -139,12 +157,14 @@ export function renderAluno(st, id, loc) {
       break;
     case "abertura": {
       const r = st.renda[f.id], nov = NOVIDADE_DO_ANO[st.ano];
+      const L = linhasAbertura(r);   // R37: as linhas da abertura somam a renda do ano que o extrato do fim mostra
       bd = `<h2>${esc(nov.titulo)}</h2><p class="muted">${esc(nov.texto)}</p><div class="card"><b>Extrato da família</b><table class="vals">
-        <tr><td>Renda (${f.membros.length} pessoas)</td><td class="n">+${n0(r.base + r.bonusMata - r.perdaMata)}</td></tr>
-        ${r.aluguel ? `<tr><td>Aluguel pago (falta${r.falta === 1 ? " 1 lote" : `m ${r.falta} lotes`})</td><td class="n">−${n0(r.aluguel)}</td></tr>` : ""}
-        ${r.recebido ? `<tr><td>Aluguel recebido</td><td class="n">+${n0(r.recebido)}</td></tr>` : ""}
-        ${r.imposto ? `<tr><td>Imposto ao bem público (lotes e pessoas)</td><td class="n">−${n0(r.imposto)}</td></tr>` : ""}
-        ${r.piso ? `<tr><td>Piso de renda</td><td class="n">+${n0(r.piso)}</td></tr>` : ""}
+        <tr><td>Renda (${f.membros.length} pessoas)</td><td class="n">${sinal(L.bruta)}</td></tr>
+        ${r.aluguel ? `<tr><td>Aluguel pago (falta${r.falta === 1 ? " 1 lote" : `m ${r.falta} lotes`})</td><td class="n">${sinal(-L.aluguel)}</td></tr>` : ""}
+        ${r.recebido ? `<tr><td>Aluguel recebido</td><td class="n">${sinal(L.recebido)}</td></tr>` : ""}
+        ${r.imposto ? `<tr><td>Imposto ao bem público (lotes e pessoas)</td><td class="n">${sinal(-L.imposto)}</td></tr>` : ""}
+        ${r.piso ? `<tr><td>Piso de renda</td><td class="n">${sinal(L.piso)}</td></tr>` : ""}
+        ${r.aluguel || r.recebido || r.imposto || r.piso ? `<tr><td><b>Renda do ano</b></td><td class="n"><b>${sinal(L.total)}</b></td></tr>` : ""}
         <tr><td>Lotes</td><td class="n">${f.lotes}</td></tr></table></div>${st.ano >= 3 ? `<p class="faint">Regra: ${REGRAS_TXT[st.regra].nome}. ${esc(REGRAS_TXT[st.regra].curto)}</p>` : ""}${st.ano === 5 ? prev5(st, id) : controle(st, id)}`;
       break;
     }
@@ -241,7 +261,7 @@ export function renderAluno(st, id, loc) {
       if (loc.verPessoal === st.ano && pessoal.length) { bd = `<h2>Só para você</h2><div class="card">${pessoal.map((t) => `<p class="muted" style="margin:6px 0 0">${esc(t)}</p>`).join("")}</div><p class="faint">Ninguém mais vê esta tela.</p><button class="btn sec block" data-a="verPessoal" data-val="0">Voltar ao extrato da família</button>`; break; }
       const espera = `<div class="card espera" style="text-align:center;--a:${falta.toFixed(2)}s">${ico("telao", "g")}<p class="muted" style="margin:6px 0 0"><b>Olhe o telão:</b> primeiro a vila inteira. O extrato da sua família aparece aqui em seguida.</p></div>`;
       const extrato = `<div class="surge" style="--a:${falta.toFixed(2)}s"><h2>Como ficou a sua família</h2><div class="card"><table class="vals">
-        ${fx ? (() => { const L = linhasExtrato(f, fx, st.ano); return `<tr><td>Caixa antes das decisões</td><td class="n">${L.A.toLocaleString("pt-BR")}</td></tr><tr><td>Renda do ano</td><td class="n">+${L.R.toLocaleString("pt-BR")}</td></tr><tr><td>Para o bem público</td><td class="n">−${L.pub.toLocaleString("pt-BR")}</td></tr>${st.ano >= 2 ? `<tr><td>Replantio</td><td class="n">−${L.rep.toLocaleString("pt-BR")}</td></tr><tr><td>Cargas (${fx.cargas})</td><td class="n">+${L.gc.toLocaleString("pt-BR")}</td></tr>` : ""}`; })() : ""}
+        ${fx ? (() => { const L = linhasExtrato(f, fx, st.ano); return `<tr><td>Caixa antes das decisões</td><td class="n">${L.A.toLocaleString("pt-BR")}</td></tr><tr><td>Renda do ano (como na abertura)</td><td class="n">${sinal(L.R)}</td></tr><tr><td>Para o bem público</td><td class="n">${sinal(-L.pub)}</td></tr>${st.ano >= 2 ? `<tr><td>Replantio</td><td class="n">${sinal(-L.rep)}</td></tr><tr><td>Cargas (${fx.cargas})</td><td class="n">${sinal(L.gc)}</td></tr>` : ""}`; })() : ""}
         <tr><td>Caixa</td><td class="n">${n0(f.caixa)}</td></tr><tr><td>Lotes (${VALOR_LOTE(st.publico)} cada)</td><td class="n">${f.lotes}</td></tr>
         <tr><td><b>Patrimônio</b></td><td class="n"><b>${n0(patrimonio(f, st.publico))}</b></td></tr>
         <tr><td>Patrimônio por pessoa</td><td class="n">${n0(porPessoa(st, f))}</td></tr>

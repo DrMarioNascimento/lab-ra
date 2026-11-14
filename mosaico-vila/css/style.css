@@ -411,3 +411,5 @@ input[type=text], input[type=number], select, textarea { box-shadow: inset 0 3px
 .regras-cel { margin-top: 8px; padding: 10px 12px; }
 .regras-cel ul { margin: 0; padding-left: 18px; font-size: 13px; }
 .regras-cel li { margin: 3px 0; }
+/* R37: no celular, alvo de toque de pelo menos 44 px também nos botões pequenos (palpites, fechamento, regras do mercado) */
+.phone .btn.sm { min-height: 44px; }
