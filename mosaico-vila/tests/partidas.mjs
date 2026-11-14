@@ -4,7 +4,7 @@ import { estadoInicial, reduzir, FASES, progresso, estragar } from "../js/engine
 import { passoBot, NOMES, perfilBot, papelBully } from "../js/bots.js";
 import { gini, fecharAno, progressoMeta, COLAPSO, tetoLotes, leilao, lanceDaFamilia } from "../js/content/regras.js";
 import { carta, cartaAno4, cartaPequena, distribuirFalas, falaDe, sortearCartas, textoCarta, PEQUENAS, GRANDES, ANO4, CONFIANCA } from "../js/content/cartas.js";
-import { renderTelao } from "../js/views/telao.js";
+import { renderTelao, falasPequena } from "../js/views/telao.js";
 import { pctL, nL } from "../js/views/desenho.js";
 import { renderAluno, novoLocal } from "../js/views/aluno.js";
 import { rnd } from "../js/engine.js";
@@ -250,6 +250,14 @@ ok(pctL(0.2996) === "29,9%" && pctL(0.3002) === "30%" && pctL(0.304) === "30,4%"
 {
   const g = GRANDES.find((c) => c.alvo === "publico"), t0 = textoCarta(g, "texto", { mata: 10, teto: 20, publico: 0, juntado: 0 }), t1 = textoCarta(g, "texto", { mata: 10, teto: 20, publico: 0, juntado: 30 });
   ok(/não tem o que perder/.test(t0) && /perde os pontos que juntou/.test(t1), `R31: nível 0 sem pontos (${t0.slice(-80)})`);
+}
+// R33: as falas só aparecem com 10 ou mais em cada uma e as duas longe dos extremos (o total exato refazia a conta)
+{
+  const caso = (pP, nP, pC, nC) => { const votos = {}, fala = {}, ordem = [];
+    for (let k = 0; k < nP; k++) { const id = `p${k}`; ordem.push(id); fala[id] = "presente"; votos[id] = k < pP; }
+    for (let k = 0; k < nC; k++) { const id = `c${k}`; ordem.push(id); fala[id] = "claras"; votos[id] = k < pC; }
+    return falasPequena({ pequena: { votos }, fala, ordem }).ok; };
+  ok(!caso(5, 10, 10, 10) && !caso(0, 20, 3, 20) && !caso(4, 9, 5, 10) && caso(6, 10, 4, 10) && caso(8, 10, 2, 10), "R33: falas escondidas quando uma metade fica perto de todos ou de ninguém");
 }
 const s = (k) => linhas.filter((l) => l[k]).length;
 console.log(`troca aprovada ${s("troca")}/15 · colapso ${s("colapso")}/15 · vitória coletiva ${s("vitoria")}/15 · desigualdade da renda sobe com o aluguel em ${rendaSobe}/15`);

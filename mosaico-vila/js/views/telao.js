@@ -523,7 +523,7 @@ function apoioPergunta(st, k) {
 }
 
 // R28: as duas falas da proposta pequena ("presente em troca de" e às claras), por quem respondeu; cada fala só com 5 ou mais respostas
-function falasPequena(st) {
+export function falasPequena(st) {
   const ids = Object.keys(st.pequena?.votos || {}), conta = (f) => { const xs = ids.filter((id) => falaDe(st, id) === f); return { n: xs.length, a: xs.filter((id) => st.pequena.votos[id]).length }; };
   // R33: cada fala só aparece com 10 ou mais respostas e com as duas longe dos extremos (entre 10% e 90%, sem incluir): com uma fala
   // inteira fazendo o mesmo, o total exato da turma e o número da outra fala entregavam a conta (R32 punha só os extremos em faixa,
