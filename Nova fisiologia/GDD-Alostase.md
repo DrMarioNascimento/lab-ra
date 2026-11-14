@@ -1,6 +1,8 @@
 # GDD · Alostase
 
-Versão 0.3 · 13 de novembro de 2026\n\n> Documento histórico da versão 0.3. A experiência de fisiologia passou a se chamar Alostase; o projeto de ética é independente. Alguns trechos descrevem propostas anteriores e não devem ser tomados como estado atual.
+Versão 0.3 · 13 de novembro de 2026
+
+> Documento histórico da versão 0.3. A experiência de fisiologia passou a se chamar Alostase; o projeto de ética é independente. Alguns trechos descrevem propostas anteriores e não devem ser tomados como estado atual.
 
 Documento do que o protótipo faz hoje e do que ficou combinado e ainda não existe. Quando os dois discordam, vale o que está marcado como **no ar**.
 
