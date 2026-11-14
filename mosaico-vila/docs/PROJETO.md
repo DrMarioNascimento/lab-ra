@@ -74,3 +74,13 @@ No fim do ano 3, o motor guarda a vila (`snap3`). No fechamento, `contrafactual(
 - Voltar de quem conduz restaura um retrato do estado guardado a cada avanço (`s.pilha`, até 6 passos): as contas nunca rodam duas vezes.
 - `pctL()` em `desenho.js`: perto de 30%, 50% e 75%, uma casa decimal (29,6%).
 - Fechamento: pergunta 4 conforme o dado, pergunta 3 com o estrago no bem público (`s.estragoPublico`), "De onde vem" (`teoria()`), gráfico e mapa sem invadir os nomes dos painéis; "prefiro não responder" no quem mais dá golpe.
+
+## R16 (14/11/2026, após os avaliadores DO e DP)
+- Estrago das cartas com os números da partida (`textoCarta()` em `content/cartas.js`, marcas `{efeito}` e `{feito}`): "a mata cai de 39% para 19%", "o bem público cai do nível 2 para o 1".
+- Pequena e grande sobre a mesma base (quem respondeu); o estrago da pequena continua contado sobre a turma inteira. Pergunta 4 com faixa de "quase o mesmo" (diferença menor que 10 pontos) e duas barras ao lado (`barrasPropostas()`); "o que guiou a turma" ao lado da pergunta 5 (`guiouTurma()`), com Ostrom no "De onde vem".
+- Mercado: botão "Não queremos lote este ano" (lance −1 vira `semLote`; vale a maioria da família), teto de moradia + 1 lote por família (`tetoLotes()` em `content/regras.js`) e efeito para até 3 lotes no celular. O painel *Mercado* diz quantas famílias ficaram de fora, sem nomes.
+- "Como ficou a vila": cada painel fica pelo menos 10 s; `tempoResultado()` soma os painéis (anos 4 e 5: 40 s, mais a carta).
+- Meta do Monopólio com uma casa decimal perto de 50 (`nL()` em `desenho.js`).
+- Confiança: cada pessoa recebe uma das 4 situações (`distribuirSituacoes()` e `cartaAno4()`), com as mesmas contas (o pedinte honesto volta para trabalhar: +2); o telão mostra as quatro e, no fim do ano, os golpes de cada situação com os números da turma; "não arriscar não custa nada".
+- Etapa nova "Conversa antes do voto" (fase `conversa`, 90 s de relógio, pergunta-guia, pergunta de controle no celular); o voto abre depois. Relógio de 1 min em dupla na pergunta 1 do fechamento.
+- Testes novos: conversa logo antes do voto, teto de lotes, as 4 situações na turma, e uma partida com 8 de 20 celulares que nunca respondem (as telas não quebram e quem marca "não queremos lote" não compra).

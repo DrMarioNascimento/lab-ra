@@ -338,3 +338,16 @@ input[type=text], input[type=number], select, textarea { box-shadow: inset 0 3px
 .telao .linha-grande .tempo2 svg { min-height: 0; }
 .telao .lado.compacto { grid-template-columns: 50cqw minmax(0, 1fr); }
 .telao .lado.compacto .mapa-card { width: 50cqw; }
+
+/* R16: relógios de 90 s (conversa antes do voto) e 60 s (dupla do fechamento) */
+@keyframes conta90 { from { --s: 90; } to { --s: 0; } }
+@keyframes conta60 { from { --s: 60; } to { --s: 0; } }
+.crono.c90 { --s: 90; background: conic-gradient(#fbbf24 calc(var(--s) * 4deg), #1b3352 0); animation: conta90 90s linear var(--d) forwards; }
+.crono.c60 { --s: 60; background: conic-gradient(#fbbf24 calc(var(--s) * 6deg), #1b3352 0); animation: conta60 60s linear var(--d) forwards; }
+.crono-mini { margin-top: auto; display: flex; justify-content: flex-end; }
+.crono-mini .crono { width: 8cqw; height: 8cqw; box-shadow: inset 0 0 0 .8cqw #0e2238, 0 .4cqw 0 #071423; }
+.crono-mini .crono::after { font-size: 3cqw; }
+.crono-mini .crono-wrap { flex-direction: row; gap: 1cqw; }
+.telao .fech-barras { gap: 1.1cqw; justify-content: center; height: 100%; overflow: hidden; font-size: 2cqw; }
+.telao .fech-barras .barra.grande { height: 1.6cqw; margin-top: .4cqw; }
+.telao .fech-barras .rodape { margin-top: .3cqw; }

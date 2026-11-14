@@ -1,6 +1,6 @@
 // Mosaico Vila · motor da sala: estado único + redutor puro (mesma casca da Ângulos e da Viagem do O₂).
 import { FAMILIAS, EVENTOS } from "./content/vila.js";
-import { carta, sortearCartas, GANHO_PEQUENA, GANHO_GRANDE, GANHO_HONESTIDADE, RISCO_CONFIANCA, CHANCE_GOLPE, ESTRAGO_MATA } from "./content/cartas.js";
+import { carta, cartaAno4, distribuirSituacoes, sortearCartas, GANHO_PEQUENA, GANHO_GRANDE, GANHO_HONESTIDADE, RISCO_CONFIANCA, CHANCE_GOLPE, ESTRAGO_MATA } from "./content/cartas.js";
 import {
   ANOS, LOTES, TETO_FAMILIA, MATA_INICIO, LIMITES, ANO_MERCADO, COLAPSO, PONTOS_NIVEL, rendaDoAno, fecharAno, leilao, gini, vitoriaColetiva, lanceMinimo, patrimonio, contrafactual,
 } from "./content/regras.js";
@@ -20,7 +20,7 @@ export function montarFases() {
     else { f.push({ id: "abertura", ano }, { id: "decidir", ano }); if (EVENTOS[ano]) f.push({ id: EVENTOS[ano].id, ano }); }
     if (ano >= ANO_MERCADO) f.push({ id: "lances", ano });
     f.push({ id: "resultado", ano });
-    if (ano === 3) f.push({ id: "voto", ano });
+    if (ano === 3) f.push({ id: "conversa", ano }, { id: "voto", ano });   // R16: 90 s de conversa com pergunta-guia; o voto abre depois
   }
   f.push({ id: "fechamento" });
   return f;
@@ -29,12 +29,13 @@ export const FASES = montarFases();
 // Nome da etapa: nas etapas de carta, o título da carta sorteada.
 export function nomeFase(s) {
   const c = s.cartas && { pequena: s.cartas.pequena, mente: s.cartas.ano4, alvara: s.cartas.grande }[s.fase];
+  if (c && carta(c).grupo === "confianca") return "Uma questão de confiança";   // R16: cada um recebe uma situação
   return c ? carta(c).titulo : NOME_FASE[s.fase] || "";
 }
 export const NOME_FASE = {
   entrada: "Entrada", familias: "Famílias", abertura: "Renda do ano", decidir: "Decisões da família", pequena: "Uma proposta pequena",
   mente: "Carta do ano 4", lances: "Mercado de lotes", alvara: "Uma proposta grande",
-  resultado: "Como ficou a vila", voto: "Que regra queremos?", fechamento: "Fechamento",
+  resultado: "Como ficou a vila", conversa: "Conversa antes do voto", voto: "Que regra queremos?", fechamento: "Fechamento",
 };
 
 // 4 a 8 famílias a partir de 12 participantes (GDD); em turmas menores (só para testar), famílias de 3.
@@ -84,6 +85,7 @@ export function reduzir(st, a) {
       for (const f of Object.values(s.fams)) for (let k = 0; k < f.lotes; k++) s.lotes[li++] = f.id;
       s.teto = TETO_FAMILIA * nf; s.mata = MATA_INICIO * s.teto;
       s.cartas = sortearCartas(rnd(s.seed ^ 0x5bd1e995));   // R13: cartas da partida, só da semente (como o impostor)
+      s.situacao = distribuirSituacoes(s.ordem, rnd(s.seed ^ 0x2c1b3c6d));   // R16: na confiança, uma situação por pessoa
       s.k = 1; s.fase = "familias";
       break;
     }
@@ -109,7 +111,7 @@ export function reduzir(st, a) {
     // R13: quem conduz pode segurar um painel de "Como ficou a vila" ou ir e voltar entre eles
     case "painel": if (s.fase === "resultado") s.painel = a.k == null ? null : Math.max(0, Math.min(9, +a.k)); break;
     case "controle": {
-      const chave = s.fase === "abertura" ? s.ano : s.fase === "voto" ? "voto" : null;   // R8: também antes do voto
+      const chave = s.fase === "abertura" ? s.ano : ["conversa", "voto"].includes(s.fase) ? "voto" : null;   // R8: também antes do voto
       if (chave != null && s.alunos[a.id]) ((s.controle[chave] ??= {})[a.id] ??= +a.op);
       break;
     }
@@ -118,7 +120,8 @@ export function reduzir(st, a) {
     case "lance": {
       if (s.fase !== "lances") break;
       const pr = (s.props[s.ano] ??= {})[a.id] ??= { pub: 0, rep: 0, car: 0 };
-      pr.lance = Math.max(0, Math.min(0.6, Number(a.v) || 0));
+      pr.semLote = Number(a.v) < 0;   // R16: "não queremos lote este ano"
+      pr.lance = pr.semLote ? 0 : Math.max(0, Math.min(0.6, Number(a.v) || 0));
       pr.lanceEnviado = true;
       break;
     }
@@ -177,9 +180,9 @@ function avancar(s, r) {
     }
     case "mente": {
       // R7: os pontos são pessoais, nunca do caixa da família (o caixa de 3 a 6 pessoas revelaria os relatos)
-      const c = carta(s.cartas.ano4);
       for (const id of s.ordem) {
         if (!s.mente[id]) continue;
+        const c = cartaAno4(s, id);   // R16: na confiança, a situação da própria pessoa
         if (c.tipo !== "confia") { s.pessoal[id] += GANHO_HONESTIDADE; continue; }
         // confiança: cada um encontra uma pessoa diferente; a chance de má-fé é a mesma (1 em 4) em todas as cartas
         s.golpe[id] = r() < CHANCE_GOLPE;
@@ -271,6 +274,7 @@ export function progresso(s) {
     case "lances": return { rot: "lances enviados", feito: Object.values(s.props[s.ano] || {}).filter((p) => p.lanceEnviado).length, total: n };
     case "alvara": return { rot: "votaram", feito: Object.keys(s.alvara.votos).length, total: n };
     case "abertura": return s.ano <= 4 ? { rot: "responderam a pergunta", feito: Object.keys(s.controle[s.ano] || {}).length, total: n } : { rot: "deram o palpite", feito: Object.keys(s.prev5).length, total: n };
+    case "conversa": return { rot: "conferiram a regra", feito: Object.keys(s.controle.voto || {}).length, total: n };
     case "voto": return { rot: "votaram", feito: Object.keys(s.voto).length, total: n };
     case "fechamento": return { rot: "responderam", feito: Object.keys(s.final).length, total: n };
     default: return null;

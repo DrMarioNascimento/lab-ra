@@ -75,6 +75,7 @@ export function propostaDaFamilia(f, props) {
   return {
     pub: mediana(ps.map((p) => p.pub)), rep: mediana(ps.map((p) => p.rep)),
     car: Math.round(mediana(ps.map((p) => p.car))), lance: mediana(ps.map((p) => p.lance ?? 0)), n: ps.length,
+    semLote: 2 * ps.filter((p) => p.semLote).length > ps.length,   // R16: a maioria da família marcou "não queremos lote"
   };
 }
 
@@ -110,15 +111,21 @@ export function fecharAno(v, props, renda) {
 }
 
 // Mercado de lotes: até 3 lotes livres; vence o maior lance (limitado ao caixa e ao mínimo).
+// R16: cada família compra até ter a moradia + 1 lote (TETO_LOTES); quem marcou "não queremos lote" fica de fora.
+export const precisaLotes = (f) => Math.ceil(f.membros.length / 3);
+export const tetoLotes = (f) => precisaLotes(f) + 1;
 export function leilao(fams, livres, props, ano, regra, acrescimo, desempate) {
   const out = structuredClone(fams);
   const min = lanceMinimo(ano, acrescimo);
   const vendidos = [];
-  const fr = Object.fromEntries(Object.values(out).map((f) => [f.id, propostaDaFamilia(f, props).lance]));
+  const pf = Object.fromEntries(Object.values(out).map((f) => [f.id, propostaDaFamilia(f, props)]));
+  const fr = Object.fromEntries(Object.values(out).map((f) => [f.id, pf[f.id].lance]));
+  const semLote = Object.values(out).filter((f) => pf[f.id].semLote).map((f) => f.id);
+  const noTeto = Object.values(out).filter((f) => !pf[f.id].semLote && f.lotes >= tetoLotes(f)).map((f) => f.id);
   for (let k = 0; k < Math.min(3, livres); k++) {
     let melhor = null, valor = -1;
     for (const f of Object.values(out)) {
-      if (f.caixa < min) continue;
+      if (f.caixa < min || pf[f.id].semLote || f.lotes >= tetoLotes(f)) continue;
       const parte = regra === "monopolio" ? fr[f.id] : fr[f.id] * 0.5;
       const oferta = Math.min(f.caixa, min + f.caixa * parte);
       const comDesempate = oferta + desempate(f.id) * 0.01;
@@ -129,7 +136,7 @@ export function leilao(fams, livres, props, ano, regra, acrescimo, desempate) {
     melhor.caixa -= preco; melhor.lotes += 1; fr[melhor.id] *= 0.5;
     vendidos.push({ fam: melhor.id, preco });
   }
-  return { fams: out, vendidos };
+  return { fams: out, vendidos, semLote, noTeto };
 }
 
 // Patrimônio = caixa + lotes × valor do lote.

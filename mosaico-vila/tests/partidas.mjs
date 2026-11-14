@@ -2,8 +2,10 @@
 // Uso: node tests/partidas.mjs
 import { estadoInicial, reduzir, FASES, progresso } from "../js/engine.js";
 import { passoBot, NOMES, perfilBot, papelBully } from "../js/bots.js";
-import { gini, fecharAno, progressoMeta, COLAPSO } from "../js/content/regras.js";
-import { carta, sortearCartas, PEQUENAS, GRANDES, ANO4 } from "../js/content/cartas.js";
+import { gini, fecharAno, progressoMeta, COLAPSO, tetoLotes } from "../js/content/regras.js";
+import { carta, cartaAno4, sortearCartas, PEQUENAS, GRANDES, ANO4, CONFIANCA } from "../js/content/cartas.js";
+import { renderTelao } from "../js/views/telao.js";
+import { renderAluno, novoLocal } from "../js/views/aluno.js";
 import { rnd } from "../js/engine.js";
 
 const TAM = [12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40];
@@ -19,6 +21,7 @@ for (const n of TAM) {
   const locs = {};
   for (let i = 0; i < n; i++) { const id = `a${i + 1}`; dispatch({ t: "entrar", id, nome: NOMES[i] }); locs[id] = { perfil: perfilBot(i + 1), papelBully: papelBully(i + 1), pub: 20, rep: 0, car: 0, lance: 30 }; }
   dispatch({ t: "sortear", seed: 1000 + n });
+  const lotes0 = Object.fromEntries(Object.values(st.fams).map((f) => [f.id, f.lotes]));
   let passos = 0;
   const visitadas = [], alugueis = [];
   if (n === 26) dispatch({ t: "config", semTroco: true });   // R13: a carta do ano 4 vem ligada; uma partida testa o professor desligando
@@ -43,6 +46,13 @@ for (const n of TAM) {
   ok(st.historico.every((h, k) => k === 0 || h.ano === st.historico[k - 1].ano + 1), `anos em sequência (n=${n})`);
   const comTroco = n !== 26;   // R13: a carta do ano 4 vem ligada; a partida de 26 testa o professor desligando
   ok(visitadas.indexOf("alvara:5") < visitadas.indexOf("decidir:5"), `R14: proposta grande antes das decisões do ano 5 (n=${n})`);
+  ok(visitadas.indexOf("conversa:3") >= 0 && visitadas.indexOf("conversa:3") === visitadas.indexOf("voto:3") - 1, `R16: conversa logo antes do voto (n=${n})`);
+  ok(Object.values(st.fams).every((f) => f.lotes <= Math.max(lotes0[f.id], tetoLotes(f))), `R16: nenhuma família compra além da moradia + 1 lote (n=${n})`);
+  if (carta(st.cartas.ano4).grupo === "confianca") {
+    const tipos = st.ordem.map((id) => cartaAno4(st, id).id);
+    ok(CONFIANCA.every((c) => tipos.includes(c)), `R16: na confiança, as 4 situações aparecem na turma (n=${n})`);
+    ok(tipos.every((c) => carta(c).ganhoBom === 2), `R16: o mesmo +2 em todas as situações (n=${n})`);
+  }
   ok(["pequena:2", "voto:3", "alvara:5"].every((e) => visitadas.includes(e)) && visitadas.includes("mente:4") === comTroco, `pequena no ano 2, voto no 3, carta do ano 4 (se ligada), grande no 5 (n=${n})`);
   // R13: cartas sorteadas pela semente: a mesma semente refaz as mesmas cartas
   const c0 = sortearCartas(rnd((1000 + n) ^ 0x5bd1e995));
@@ -94,6 +104,31 @@ ok(!confiaram || (golpes / confiaram > 0.1 && golpes / confiaram < 0.45), `golpe
   // ninguém manda lance nos anos 4 e 5: os lotes saem pelo mínimo
   while (st.fase !== "fechamento") { if (st.fase === "decidir" && st.ano === 4) for (const id of st.ordem) d({ t: "propor", id, p: { pub: 20, rep: 5, car: 1 } }); if (st.fase === "lances") { const pr = Object.values(st.props[st.ano] || {}); ok(pr.every((p) => !p.lanceEnviado), `ano ${st.ano}: ninguém começa com lance enviado`); } d({ t: "fase", dir: 1 });
     if (st.fase === "resultado" && st.leilao && st.ano >= 4) ok(st.leilao.vendidos.every((v) => v.preco <= st.leilao.minimo + 1e-9), `ano ${st.ano}: sem lance enviado, o lote sai pelo mínimo`); }
+}
+// R16: celulares que não respondem (8 de 20 nunca enviam nada): a partida anda até o fim e as telas não quebram;
+// e quem marca "não queremos lote" fica de fora do mercado
+{
+  let st = estadoInicial(); const d = (a) => { st = reduzir(st, a); };
+  for (let i = 0; i < 20; i++) d({ t: "entrar", id: `a${i}`, nome: `P${i}` });
+  d({ t: "sortear", seed: 31 });
+  const mudos = new Set(st.ordem.filter((_, k) => k % 5 < 2)), locs = Object.fromEntries(st.ordem.map((id, i) => [id, { perfil: perfilBot(i + 1), papelBully: papelBully(i + 1), pub: 20, rep: 0, car: 0, lance: 30 }]));
+  let erros = 0, passos = 0, semLoteOk = true;
+  const tela = () => { try { renderTelao(st); for (const id of st.ordem.slice(0, 6)) renderAluno(st, id, novoLocal()); } catch (e) { erros++; console.log("tela quebrou em", st.fase, st.ano, e.message); } };
+  while (st.fase !== "fechamento" && passos++ < 200) {
+    if (st.fase === "lances" && st.ano === 4) { for (const id of st.ordem) if (!mudos.has(id)) d({ t: "lance", id, v: -1 }); }
+    for (let k = 0; k < 40; k++) for (const id of st.ordem) if (!mudos.has(id)) passoBot(st, id, locs[id], d);
+    tela();
+    const ano = st.ano, fase = st.fase;
+    d({ t: "fase", dir: 1 });
+    if (fase === "lances" && ano === 4) {
+      const fora = new Set(st.leilao.semLote);
+      semLoteOk = st.leilao.vendidos.every((v) => !fora.has(v.fam)) && fora.size > 0;
+    }
+  }
+  tela();
+  ok(st.fase === "fechamento" && erros === 0, `R16: com 8 celulares mudos, a partida chega ao fim sem tela quebrada (${erros} erros)`);
+  ok(semLoteOk, "R16: família que marcou \"não queremos lote\" não compra");
+  ok(st.alvara.pessoa && (!mudos.has(st.alvara.pessoa) || st.alvara.aceito === false), "R16: se a pessoa sorteada não respondeu, conta como recusa");
 }
 // R13: com o mesmo número de aceites, o estrago da pequena com a turma inteira é igual ao da grande
 {

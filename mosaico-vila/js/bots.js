@@ -1,5 +1,5 @@
 import { EXEMPLO_DO_ANO } from "./content/vila.js";
-import { carta } from "./content/cartas.js";
+import { carta, cartaAno4 } from "./content/cartas.js";
 // Participantes simulados (piloto automático) do /simulador do Mosaico Vila.
 // A política é a mesma da simulação em Python (vila_regras.py · proposta), com os tipos de
 // Fischbacher, Gächter e Fehr (2001): 50% cooperam de forma condicional, 30% são caronas, 20% outros.
@@ -40,7 +40,7 @@ export function passoBot(st, id, loc, dispatch) {
       break;
     }
     case "mente": {
-      const c = carta(st.cartas.ano4);
+      const c = cartaAno4(st, id);
       if (st.mente[id] != null) {
         // depois de responder à confiança: quem acha que mais dá golpe (com algum estereótipo, como numa turma real)
         if (c.tipo === "confia" && st.quem[id] == null && chance(0.35)) dispatch({ t: "quem", id, v: Math.random() < 0.35 ? 0 : Math.random() < 0.4 ? 4 : 1 + Math.floor(Math.random() * 3) });
@@ -69,7 +69,8 @@ export function passoBot(st, id, loc, dispatch) {
       // R15: o celular mostra o efeito do lance; quem precisa de moradia oferece mais, quem não precisa oferece pouco
       if ((!p || !p.lanceEnviado) && chance(0.3)) {
         const precisa = fam && fam.lotes < Math.ceil(fam.membros.length / 3);
-        const v = precisa ? unif(0.15, 0.4) : pf.tipo === "FR" ? unif(0.1, 0.3) : pf.tipo === "CC" ? unif(0, 0.1) : unif(0, 0.2);
+        // R16: quem não precisa de moradia às vezes marca "não queremos lote"
+        const v = !precisa && chance(pf.tipo === "CC" ? 0.6 : 0.35) ? -1 : precisa ? unif(0.15, 0.4) : pf.tipo === "FR" ? unif(0.1, 0.3) : pf.tipo === "CC" ? unif(0, 0.1) : unif(0, 0.2);
         dispatch({ t: "lance", id, v });
       }
       else if (p?.lanceEnviado && st.palpite?.[st.ano]?.[id] == null && chance(0.3)) dispatch({ t: "palpite", id, v: ["até 20", "21 a 40", "mais de 40"][Math.floor(Math.random() * 3)] });
@@ -78,6 +79,9 @@ export function passoBot(st, id, loc, dispatch) {
     case "alvara":
       if (st.alvara.votos[id] == null) { if (chance(0.3)) dispatch({ t: "alvara", id, aceita: Math.random() < clip(0.5 + (3.1 - pf.hh) * 0.25) }); }
       else if (st.palpitePct?.alvara?.[id] == null && chance(0.35)) dispatch({ t: "palpitePct", id, v: Math.floor(Math.random() * 3) });
+      break;
+    case "conversa":   // R16: durante a conversa, cada um confere a regra no celular
+      if (st.controle?.voto?.[id] == null && chance(0.3)) dispatch({ t: "controle", id, op: Math.random() < 0.85 ? 1 : 0 });
       break;
     case "voto": {
       if (st.controle?.voto?.[id] == null && chance(0.4)) { dispatch({ t: "controle", id, op: Math.random() < 0.85 ? 1 : 0 }); break; }

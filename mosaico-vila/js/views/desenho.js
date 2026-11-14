@@ -9,6 +9,10 @@ export const ico = (nome, cls = "", alt = "") => `<img class="ico3 ${cls}" src="
 
 // R15: porcentagem sem enganar no limiar: perto de 30%, 50% ou 75%, mostra uma casa decimal (29,6% em vez de 30%),
 // para a turma nunca ver o número da meta e ouvir que não bateu.
+// R16: o valor da meta do Monopólio perto de 50 ganha uma casa decimal ("49,8/50"), para ninguém ler "50/50" sem ter batido
+export function nL(v, alvo) {
+  return Math.round(v) === alvo && Math.abs(v - alvo) > 0.05 ? (Math.round(v * 10) / 10).toLocaleString("pt-BR") : String(Math.round(v));
+}
 export function pctL(frac, limites = [0.3, 0.5, 0.75]) {
   const v = 100 * frac, r = Math.round(v);
   for (const L of limites) if (Math.abs(v - 100 * L) < 1 && r === Math.round(100 * L) && Math.abs(v - r) > 0.05) return `${(Math.round(v * 10) / 10).toLocaleString("pt-BR")}%`;

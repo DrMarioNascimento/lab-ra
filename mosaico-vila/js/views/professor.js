@@ -12,7 +12,7 @@ function cartasDaPartida(st) {
   const p = carta(st.cartas.pequena), q = carta(st.cartas.ano4), g = carta(st.cartas.grande);
   const linha = (ano, c, extra) => `<div class="row" style="flex-wrap:nowrap;margin-top:6px">${ico(c.icone)}<div><b>Ano ${ano} · ${c.titulo}</b><div class="faint" style="font-size:12px">${extra}</div></div></div>`;
   return `<div class="card" style="padding:10px 12px"><b>Cartas desta partida</b><p class="faint" style="font-size:12px;margin:2px 0 0">Sorteadas pela semente da partida; a turma só vê cada uma na hora.</p>
-    ${linha(2, p, `pequena · ${p.segmento} · ${LADO[p.lado]} · ${ALVO[p.alvo]}`)}${linha(4, q, `${q.grupo === "confianca" ? "confiança (1 em 4 de golpe, igual para todos)" : "honestidade"}${st.semTroco ? " · desligada" : ""}`)}${linha(5, g, `grande · ${g.segmento} · ${ALVO[g.alvo]}`)}</div>`;
+    ${linha(2, p, `pequena · ${p.segmento} · ${LADO[p.lado]} · ${ALVO[p.alvo]}`)}${linha(4, q.grupo === "confianca" ? { ...q, titulo: "Uma questão de confiança" } : q, `${q.grupo === "confianca" ? "confiança: cada pessoa recebe uma das 4 situações (1 em 4 de golpe, igual em todas)" : "honestidade"}${st.semTroco ? " · desligada" : ""}`)}${linha(5, g, `grande · ${g.segmento} · ${ALVO[g.alvo]}`)}</div>`;
 }
 
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));

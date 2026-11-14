@@ -1,8 +1,8 @@
 import { NOME_FASE } from "../engine.js";
 import { NOVIDADE_DO_ANO, EXEMPLO_DO_ANO, EXEMPLO_VOTO, REGRAS_TXT, MOTIVOS, GUIAS, NIVEIS_PUBLICO } from "../content/vila.js";
-import { LIMITES, lanceMinimo, CARGA_RENDE, CARGA_TIRA, REPLANTA_POR, REPLANTA_DEVOLVE, patrimonio, VALOR_LOTE, progressoMeta, VITORIA } from "../content/regras.js";
-import { carta, QUEM_GOLPE, FAIXAS_PCT, GANHO_PEQUENA, GANHO_GRANDE } from "../content/cartas.js";
-import { iconeFamilia, ico, pctL } from "./desenho.js";
+import { LIMITES, lanceMinimo, CARGA_RENDE, CARGA_TIRA, REPLANTA_POR, REPLANTA_DEVOLVE, patrimonio, VALOR_LOTE, progressoMeta, VITORIA, precisaLotes, tetoLotes } from "../content/regras.js";
+import { carta, cartaAno4, textoCarta, QUEM_GOLPE, FAIXAS_PCT, GANHO_PEQUENA, GANHO_GRANDE } from "../content/cartas.js";
+import { iconeFamilia, ico, pctL, nL } from "./desenho.js";
 import { decorrido, tempoResultado } from "./telao.js";
 
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -20,7 +20,7 @@ function hd(st, me) {
 // R11: a mesma barra de ícones do telão, pequena, no alto do celular
 function miniBarra(st) {
   const m = progressoMeta(st.fams, st.publico, st.mata, st.teto, st.regra);
-  const meta = m.regra === "prosperidade" ? `${pctL(m.valor)}/${Math.round(100 * m.alvo)}%` : `${n0(m.valor)}/${m.alvo}`;
+  const meta = m.regra === "prosperidade" ? `${pctL(m.valor)}/${Math.round(100 * m.alvo)}%` : `${nL(m.valor, m.alvo)}/${m.alvo}`;
   return `<div class="mini-hud">${st.ano >= 2 ? `<span>${ico("arvore-redonda")}<b>${pctL(st.mata / st.teto)}</b></span>` : ""}<span>${ico("economia")}<b>nível ${st.publico}</b></span><span>${ico("meta")}<b>${meta}</b></span><span>${ico("balanca")}<b>${REGRAS_TXT[st.regra].nome}</b></span></div>`;
 }
 
@@ -28,7 +28,7 @@ function miniBarra(st) {
 function metaCelular(st) {
   const m = progressoMeta(st.fams, st.publico, st.mata, st.teto, st.regra);
   const frac = Math.max(0, Math.min(1, m.valor / m.alvo));
-  const val = m.regra === "prosperidade" ? `${pctL(m.valor)} de ${Math.round(100 * m.alvo)}%` : `${n0(m.valor)} de ${m.alvo}`;
+  const val = m.regra === "prosperidade" ? `${pctL(m.valor)} de ${Math.round(100 * m.alvo)}%` : `${nL(m.valor, m.alvo)} de ${m.alvo}`;
   return `<div class="card"><b class="row">${ico("meta")}Meta da vila (${REGRAS_TXT[m.regra].nome})</b><div class="row" style="margin-top:6px;gap:8px"><span class="faint" style="min-width:42%">${m.regra === "prosperidade" ? "Mais pobre / média" : "Patrimônio por pessoa"}</span><div class="barra"><i style="width:${100 * frac}%"></i></div><b class="mono">${val}</b></div><p class="faint" style="margin:4px 0 0">Mata: ${pctL(m.mata)} (mínimo ${Math.round(100 * VITORIA.mataMinima)}%).</p></div>`;
 }
 
@@ -46,8 +46,8 @@ function palpiteFaixa(st, id, onde, pergunta) {
 }
 
 // Carta sorteada (pequena, ano 4 ou grande): texto, aviso de sigilo e dois botões iguais (mesmo tamanho e mesma cor)
-function cartaCelular(c, aviso, a, valSim = "1", valNao = "0") {
-  return `<h2 class="row">${ico(c.icone, "g")}${esc(c.titulo)}</h2><p class="muted">${esc(c.texto)}</p><p class="faint">${aviso}</p>
+function cartaCelular(c, aviso, a, st, valSim = "1", valNao = "0") {
+  return `<h2 class="row">${ico(c.icone, "g")}${esc(c.titulo)}</h2><p class="muted">${esc(textoCarta(c, "texto", { mata: st.mata, teto: st.teto, publico: st.publico }))}</p><p class="faint">${aviso}</p>
     <div class="row"><button class="btn sec grow" data-a="${a}" data-val="${valSim}">${esc(c.sim)}</button><button class="btn sec grow" data-a="${a}" data-val="${valNao}">${esc(c.nao)}</button></div>`;
 }
 
@@ -64,18 +64,27 @@ function projecao(st, f, loc) {
     <tr><td><b>Fica no caixa</b></td><td class="n"><b>${fica >= 0 ? "+" : ""}${n0(fica)}</b></td></tr></table></div>`;
 }
 
-// R14: o lance mostra o efeito na hora: quantos pontos, quanto vale o lote e quanto o patrimônio da família muda se levar
+// R14: o lance mostra o efeito na hora: quantos pontos, quanto vale o lote e quanto o patrimônio da família muda se levar.
+// R16: até 3 lotes (quem leva um oferece metade no próximo), dentro do teto da família (moradia + 1 lote).
 function efeitoLance(st, f, loc) {
-  const min = lanceMinimo(st.ano), parte = (loc.lance / 100) * (st.regra === "prosperidade" ? 0.5 : 1);
-  const lance = Math.min(f.caixa, min + f.caixa * parte), vale = VALOR_LOTE(st.publico), dif = vale - lance;
+  const min = lanceMinimo(st.ano), vale = VALOR_LOTE(st.publico), cabem = Math.min(3, st.lotes.filter((x) => !x).length, tetoLotes(f) - f.lotes);
   if (f.caixa < min) return `<p class="faint" style="margin:6px 0 0">O caixa da família (${n0(f.caixa)}) não chega ao mínimo de ${min}: vocês ficam de fora este ano.</p>`;
-  return `<table class="vals" style="margin-top:6px"><tr><td>Lance da família (se todos propuserem isto)</td><td class="n">${n0(lance)}</td></tr><tr><td>O lote vale no patrimônio</td><td class="n">${vale}</td></tr><tr><td><b>Patrimônio da família, se levar</b></td><td class="n"><b>${dif >= 0 ? "+" : "−"}${n0(Math.abs(dif))}</b></td></tr></table><p class="faint" style="margin:4px 0 0">O lance vai para o banco. O lote ainda pode render aluguel e dar moradia.</p>`;
+  let caixa = f.caixa, parte = (loc.lance / 100) * (st.regra === "prosperidade" ? 0.5 : 1), soma = 0;
+  const linhas = [];
+  for (let k = 0; k < cabem && caixa >= min; k++) {
+    const lance = Math.min(caixa, min + caixa * parte);
+    soma += vale - lance; caixa -= lance; parte *= 0.5;
+    linhas.push(`<tr><td>${k + 1}º lote: lance ${n0(lance)}, vale ${vale}</td><td class="n">${soma >= 0 ? "+" : "−"}${n0(Math.abs(soma))}</td></tr>`);
+  }
+  if (!linhas.length) return `<p class="faint" style="margin:6px 0 0">Não há lote que a família possa levar este ano.</p>`;
+  return `<table class="vals" style="margin-top:6px"><tr><td><b>Se a família levar…</b> (se todos propuserem isto)</td><td class="n"><b>patrimônio (soma)</b></td></tr>${linhas.join("")}</table><p class="faint" style="margin:4px 0 0">O lance vai para o banco; o lote entra no patrimônio pelo valor dele e ainda pode render aluguel e dar moradia.</p>`;
 }
 
 // Pergunta de controle da regra nova (anos 1 a 3): quem erra vê a explicação; não vale ponto.
 function controle(st, id) {
-  const chave = st.fase === "voto" ? "voto" : st.ano;
-  const ex = st.fase === "voto" ? EXEMPLO_VOTO : EXEMPLO_DO_ANO[st.ano];
+  const noVoto = ["conversa", "voto"].includes(st.fase);
+  const chave = noVoto ? "voto" : st.ano;
+  const ex = noVoto ? EXEMPLO_VOTO : EXEMPLO_DO_ANO[st.ano];
   if (!ex) return "";
   const resp = st.controle?.[chave]?.[id];
   if (resp == null) return `<div class="card"><b class="row" style="flex-wrap:nowrap;align-items:flex-start">${ico("ideia")}<span>Confira: ${esc(ex.pergunta)}</span></b>${ex.opcoes.map((o, k) => `<button class="opt" data-a="controle" data-val="${k}">${esc(o)}</button>`).join("")}<p class="faint" style="margin:4px 0 0">Não vale ponto.</p></div>`;
@@ -125,7 +134,7 @@ export function renderAluno(st, id, loc) {
       break;
     }
     case "mente": {
-      const c = carta(st.cartas.ano4);
+      const c = cartaAno4(st, id);   // R16: na confiança, a situação sorteada para esta pessoa
       if (st.mente[id] != null) {
         bd = enviado("Resposta secreta enviada.");
         if (c.tipo === "confia") {
@@ -139,30 +148,36 @@ export function renderAluno(st, id, loc) {
           ? `<button class="btn block" data-a="rolar">Pensei. Rolar o dado</button>`
           : `<div class="card" style="text-align:center"><div class="dado">${loc.face}</div><p class="muted">Você acertou o número que pensou?</p><div class="row"><button class="btn sec grow" data-a="mente" data-val="1">Acertei</button><button class="btn sec grow" data-a="mente" data-val="0">Não acertei</button></div></div>`);
       } else if (c.tipo === "honesto") {
-        bd = cartaCelular(c, "<b>Só você vê esta tela.</b> O banco e a praça são do jogo; os 3 pontos valem no seu placar pessoal, que ninguém mais vê.", "mente");
+        bd = cartaCelular(c, "<b>Só você vê esta tela.</b> O banco e a praça são do jogo; os 3 pontos valem no seu placar pessoal, que ninguém mais vê.", "mente", st);
       } else {
-        bd = cartaCelular(c, "<b>Só você vê esta tela.</b> A outra pessoa é do jogo, e cada um encontra uma diferente. Você só descobre se ela foi honesta no fim do ano, aqui no celular.", "mente");
+        bd = `<p class="faint" style="margin:0 0 6px">Cada pessoa da turma recebeu uma situação diferente. <b>Não arriscar não custa nada.</b></p>` + cartaCelular(c, "<b>Só você vê esta tela.</b> A outra pessoa é do jogo. Se arriscar, você põe 2; se ela for honesta, ganha 2; se não, perde os 2. Você só descobre no fim do ano, aqui no celular.", "mente", st);
       }
       break;
     }
     case "pequena": {
       const c = carta(st.cartas.pequena);
       bd = st.pequena.votos[id] != null ? enviado("Resposta secreta enviada.") + palpiteFaixa(st, id, "pequena", "quantos % da turma vão aceitar?")
-        : cartaCelular(c, `<b>Responda sem mostrar a tela.</b> Cada resposta vale para quem respondeu. ${esc(c.segmento[0].toUpperCase() + c.segmento.slice(1))} é personagem do jogo; os ${GANHO_PEQUENA} pontos valem no seu placar pessoal, que só você vê.`, "pequena");
+        : cartaCelular(c, `<b>Responda sem mostrar a tela.</b> Cada resposta vale para quem respondeu. ${esc(c.segmento[0].toUpperCase() + c.segmento.slice(1))} é personagem do jogo; os ${GANHO_PEQUENA} pontos valem no seu placar pessoal, que só você vê.`, "pequena", st);
       break;
     }
     case "lances": {
       const p = st.props[st.ano]?.[id];
       const palp = st.palpite?.[st.ano]?.[id];
-      bd = p?.lanceEnviado ? enviado("Lance enviado.") + `<div class="card"><b>Enquanto a turma decide: qual vai ser o lance vencedor?</b><div class="row" style="margin-top:8px">${["até 20", "21 a 40", "mais de 40"].map((v) => `<button class="btn sm ${palp === v ? "on" : "sec"} grow" data-a="palpite" data-val="${v}">${v}</button>`).join("")}</div></div>` : `<h2 class="row">${ico("lote-sobrado", "g")}Mercado de lotes</h2><p class="muted">Lance fechado. Quanto do caixa da família (${n0(f.caixa)}) oferecer além do mínimo de ${lanceMinimo(st.ano)}?</p>
+      if (!p?.lanceEnviado && f.lotes >= tetoLotes(f)) {   // R16: a família já tem a moradia + 1 lote
+        bd = `<h2 class="row">${ico("lote-sobrado", "g")}Mercado de lotes</h2><div class="card"><p class="muted" style="margin:0">A família tem ${f.lotes} lote(s) e precisa de ${precisaLotes(f)} para morar. Cada família compra até ter a moradia + 1 lote: <b>vocês ficam de fora deste mercado</b>. O lote de vocês ainda pode render aluguel.</p></div>
+          <div class="card"><b>Enquanto a turma decide: qual vai ser o lance vencedor?</b><div class="row" style="margin-top:8px">${["até 20", "21 a 40", "mais de 40"].map((v) => `<button class="btn sm ${palp === v ? "on" : "sec"} grow" data-a="palpite" data-val="${v}">${v}</button>`).join("")}</div></div>`;
+        break;
+      }
+      bd = p?.lanceEnviado ? enviado(p.semLote ? "Enviado: não queremos lote este ano." : "Lance enviado.") + `<div class="card"><b>Enquanto a turma decide: qual vai ser o lance vencedor?</b><div class="row" style="margin-top:8px">${["até 20", "21 a 40", "mais de 40"].map((v) => `<button class="btn sm ${palp === v ? "on" : "sec"} grow" data-a="palpite" data-val="${v}">${v}</button>`).join("")}</div></div>` : `<h2 class="row">${ico("lote-sobrado", "g")}Mercado de lotes</h2><p class="muted">Lance fechado. Quanto do caixa da família (${n0(f.caixa)}) oferecer além do mínimo de ${lanceMinimo(st.ano)}?</p>
         <div class="card"><div class="row" style="justify-content:space-between"><b>Parte do caixa</b><b class="mono">${loc.lance}%</b></div><input type="range" min="0" max="60" step="5" value="${loc.lance}" data-in="lance" data-key="lance">${efeitoLance(st, f, loc)}</div>
-        <p class="faint">A família precisa de ${Math.ceil(f.membros.length / 3)} lote(s) para morar; tem ${f.lotes}. ${st.regra === "prosperidade" ? "Na Prosperidade, conta metade do que vocês oferecem além do mínimo. " : ""}Quem já levou um lote oferece metade no próximo.</p><button class="btn ok block" data-a="lance">Enviar lance</button>`;
+        <p class="faint">A família precisa de ${precisaLotes(f)} lote(s) para morar; tem ${f.lotes}; pode comprar até ter ${tetoLotes(f)}. ${st.regra === "prosperidade" ? "Na Prosperidade, conta metade do que vocês oferecem além do mínimo. " : ""}Quem já levou um lote oferece metade no próximo.</p><button class="btn ok block" data-a="lance">Enviar lance</button>
+        <button class="btn sec block" data-a="semLote" style="margin-top:8px">Não queremos lote este ano</button><p class="faint" style="margin:4px 0 0">Vale o que a maioria da família marcar. Ficar de fora não custa nada.</p>`;
       break;
     }
     case "alvara": {
       const c = carta(st.cartas.grande);
       bd = st.alvara.votos[id] != null ? enviado("Resposta secreta enviada.") + palpiteFaixa(st, id, "alvara", "quantos % da turma aceitariam?")
-        : cartaCelular(c, `<b>Responda no seu lugar, longe da família.</b> Vale a resposta de uma pessoa sorteada; ninguém vai saber quem foi. ${esc(c.segmento[0].toUpperCase() + c.segmento.slice(1))} é personagem do jogo; os ${GANHO_GRANDE} pontos valem no seu placar pessoal.`, "alvara");
+        : cartaCelular(c, `<b>Responda no seu lugar, longe da família.</b> Vale a resposta de uma pessoa sorteada; ninguém vai saber quem foi. ${esc(c.segmento[0].toUpperCase() + c.segmento.slice(1))} é personagem do jogo; os ${GANHO_GRANDE} pontos valem no seu placar pessoal.`, "alvara", st);
       break;
     }
     case "resultado": {
@@ -172,7 +187,7 @@ export function renderAluno(st, id, loc) {
       const pessoal = [];
       if (st.ano === 2 && st.pequena.votos[id] != null) pessoal.push(st.pequena.votos[id] ? `Você aceitou a proposta: +${GANHO_PEQUENA} no seu placar pessoal.` : "Você recusou a proposta.");
       if (st.ano === 4 && st.cartas && st.mente[id] != null) {
-        const c = carta(st.cartas.ano4);
+        const c = cartaAno4(st, id);
         if (c.tipo === "confia") pessoal.push(st.mente[id] ? (st.golpe[id] ? c.ruim : c.bom) : "Você não arriscou: nada mudou no seu placar.");
       }
       const pal = st.palpite?.[st.ano]?.[id];
@@ -188,6 +203,11 @@ export function renderAluno(st, id, loc) {
       bd = espera + extrato;
       break;
     }
+    case "conversa":
+      // R16: conversa de 90 s antes do voto; o celular confere a regra e espera o voto abrir
+      bd = `<h2 class="row">${ico("balanca", "g")}Antes do voto: conversem</h2><p class="muted">Com a família, 90 segundos: com o aluguel mordendo, qual regra deixa a vila mais perto da meta, e de quem? <b>O voto abre quando o relógio do telão acabar.</b></p>${controle(st, id)}
+        <div class="card"><b>${esc(REGRAS_TXT.monopolio.nome)}</b><p class="faint" style="margin:2px 0 6px">${esc(REGRAS_TXT.monopolio.curto)}</p><b>${esc(REGRAS_TXT.prosperidade.nome)}</b><p class="faint" style="margin:2px 0 0">${esc(REGRAS_TXT.prosperidade.curto)}</p></div>`;
+      break;
     case "voto":
       bd = st.voto[id] != null ? enviado("Voto secreto enviado.") + palpiteFaixa(st, id, "voto", "quantos % vão votar para trocar?") : `<h2 class="row">${ico("balanca", "g")}Que regra queremos?</h2><p class="muted"><b>Volte ao seu lugar para votar.</b> Vale para os anos 4 e 5. Voto secreto; vence a maioria dos votos, e empate mantém o Monopólio.</p>${controle(st, id)}
         <button class="opt" data-a="voto" data-val="0"><b>Manter o Monopólio</b><br><span class="faint">${esc(REGRAS_TXT.monopolio.curto)}</span></button>
@@ -220,6 +240,7 @@ export function acaoAluno(a, el, { id, loc, dispatch }) {
     case "controle": dispatch({ t: "controle", id, op: +val }); return true;
     case "palpite": dispatch({ t: "palpite", id, v: val }); return true;
     case "lance": dispatch({ t: "lance", id, v: loc.lance / 100 }); return true;
+    case "semLote": dispatch({ t: "lance", id, v: -1 }); return true;
     case "alvara": dispatch({ t: "alvara", id, aceita: val === "1" }); return true;
     case "pequena": dispatch({ t: "pequena", id, aceita: val === "1" }); return true;
     case "quem": dispatch({ t: "quem", id, v: +val }); return true;
