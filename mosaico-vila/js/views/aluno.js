@@ -120,7 +120,7 @@ export function renderAluno(st, id, loc) {
         <tr><td>Renda (${f.membros.length} pessoas)</td><td class="n">+${n0(r.base + r.bonusMata - r.perdaMata)}</td></tr>
         ${r.aluguel ? `<tr><td>Aluguel pago (falta${r.falta === 1 ? " 1 lote" : `m ${r.falta} lotes`})</td><td class="n">−${n0(r.aluguel)}</td></tr>` : ""}
         ${r.recebido ? `<tr><td>Aluguel recebido</td><td class="n">+${n0(r.recebido)}</td></tr>` : ""}
-        ${r.imposto ? `<tr><td>Imposto da terra</td><td class="n">−${n0(r.imposto)}</td></tr>` : ""}
+        ${r.imposto ? `<tr><td>Imposto ao bem público (lotes e pessoas)</td><td class="n">−${n0(r.imposto)}</td></tr>` : ""}
         ${r.piso ? `<tr><td>Piso de renda</td><td class="n">+${n0(r.piso)}</td></tr>` : ""}
         <tr><td>Lotes</td><td class="n">${f.lotes}</td></tr></table></div>${st.ano >= 3 ? `<p class="faint">Regra: ${REGRAS_TXT[st.regra].nome}. ${esc(REGRAS_TXT[st.regra].curto)}</p>` : ""}${st.ano === 5 ? prev5(st, id) : controle(st, id)}`;
       break;
@@ -163,7 +163,7 @@ export function renderAluno(st, id, loc) {
       } else if (c.tipo === "honesto") {
         bd = cartaCelular(c, "<b>Só você vê esta tela.</b> O banco e a praça são do jogo; os 3 pontos valem no seu placar pessoal, que ninguém mais vê.", "mente", st);
       } else {
-        bd = `<p class="faint" style="margin:0 0 6px">Cada pessoa da turma recebeu uma situação diferente. <b>Não arriscar não custa nada.</b></p>` + cartaCelular(c, "<b>Só você vê esta tela.</b> A outra pessoa é do jogo. Se arriscar, você põe 2; se ela for honesta, ganha 2; se não, perde os 2. Você só descobre no fim do ano, aqui no celular.", "mente", st);
+        bd = `<p class="faint" style="margin:0 0 6px">Cada pessoa recebeu uma das 4 situações do telão, sorteada. <b>Não arriscar não custa nada.</b></p>` + cartaCelular(c, "<b>Só você vê esta tela.</b> A outra pessoa é do jogo. Se arriscar, você põe 2; se ela for honesta, ganha 2; se não, perde os 2. Você só descobre no fim do ano, aqui no celular.", "mente", st);
       }
       break;
     }
@@ -177,13 +177,13 @@ export function renderAluno(st, id, loc) {
       const p = st.lances?.[st.ano]?.[id];
       const palp = st.palpite?.[st.ano]?.[id];
       if (!p?.lanceEnviado && f.lotes >= tetoLotes(f)) {   // R16: a família já tem a moradia + 1 lote
-        bd = `<h2 class="row">${ico("lote-sobrado", "g")}Mercado de lotes</h2><div class="card"><p class="muted" style="margin:0">A família tem ${f.lotes} lote(s) e precisa de ${precisaLotes(f)} para morar. Cada família compra até ter a moradia + 1 lote: <b>vocês ficam de fora deste mercado</b>. O lote de vocês ainda pode render aluguel.</p></div>
+        bd = `<h2 class="row">${ico("lote-sobrado", "g")}Mercado de lotes</h2><div class="card"><p class="muted" style="margin:0">A família tem ${f.lotes === 1 ? "1 lote" : `${f.lotes} lotes`} e precisa de ${precisaLotes(f)} para morar. Cada família compra até ter a moradia + 1 lote: <b>vocês ficam de fora deste mercado</b>. O lote de vocês ainda pode render aluguel.</p></div>
           <div class="card"><b>Enquanto a turma decide: qual vai ser o lance vencedor?</b><div class="row" style="margin-top:8px">${["até 20", "21 a 40", "mais de 40"].map((v) => `<button class="btn sm ${palp === v ? "on" : "sec"} grow" data-a="palpite" data-val="${v}">${v}</button>`).join("")}</div></div>`;
         break;
       }
       bd = p?.lanceEnviado ? enviado(p.semLote ? "Enviado: não queremos lote este ano." : "Lance enviado.") + `<div class="card"><b>Enquanto a turma decide: qual vai ser o lance vencedor?</b><div class="row" style="margin-top:8px">${["até 20", "21 a 40", "mais de 40"].map((v) => `<button class="btn sm ${palp === v ? "on" : "sec"} grow" data-a="palpite" data-val="${v}">${v}</button>`).join("")}</div></div>` : `<h2 class="row">${ico("lote-sobrado", "g")}Mercado de lotes</h2><p class="muted">Lance fechado. Quanto do caixa da família (${n0(f.caixa)}) oferecer além do mínimo de ${lanceMinimo(st.ano)}? Vale a mediana da família; quem não envia conta como 0%.</p>
         <div class="card"><div class="row" style="justify-content:space-between"><b>Parte do caixa</b><b class="mono">${loc.lance}%</b></div><input type="range" min="0" max="60" step="5" value="${loc.lance}" data-in="lance" data-key="lance">${efeitoLance(st, f, loc)}</div>
-        <p class="faint">A família precisa de ${precisaLotes(f)} lote(s) para morar; tem ${f.lotes}; pode comprar até ter ${tetoLotes(f)}. ${st.regra === "prosperidade" ? "Na Prosperidade, conta metade do que vocês oferecem além do mínimo. " : ""}Quem já levou um lote oferece, no próximo, metade do que ia além do mínimo.</p><button class="btn ok block" data-a="lance">Enviar lance</button>
+        <p class="faint">A família precisa de ${precisaLotes(f) === 1 ? "1 lote" : `${precisaLotes(f)} lotes`} para morar; tem ${f.lotes}; pode comprar até ter ${tetoLotes(f)}. ${st.regra === "prosperidade" ? "Na Prosperidade, conta metade do que vocês oferecem além do mínimo. " : ""}Quem já levou um lote oferece, no próximo, metade do que ia além do mínimo.</p><button class="btn ok block" data-a="lance">Enviar lance</button>
         <button class="btn sec block" data-a="semLote" style="margin-top:8px">Não queremos lote este ano</button><p class="faint" style="margin:4px 0 0">Vale se a maioria da família inteira marcar. Ficar de fora não custa nada. ${st.ano >= 5 ? "No último ano, o lote novo conta só no patrimônio" : "O lote novo conta para moradia e aluguel a partir do próximo ano"}; o lance mínimo é 6 + 2 × o ano.</p>`;
       break;
     }

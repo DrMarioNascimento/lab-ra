@@ -46,8 +46,9 @@ export function iconeFamilia(f, tam = 34) {
 }
 
 // Mapa da vila: a mata à esquerda, o bem público ao centro, os 24 lotes à direita.
-export function mapaVila(st, { grande = true, destaque = null } = {}) {
+export function mapaVila(st, { grande = true, destaque = null, menor = false } = {}) {
   const W = 800, H = 450;
+  const fr = menor ? 29 : 27, frL = menor ? 29 : 26;   // R24: no mapa menor do ano 5 (46% da largura), os rótulos crescem para ficar em 1,6% da TV
   const fm = st.teto ? st.mata / st.teto : 0;
   const nArv = Math.round(fm * 40);
   const arv = [];
@@ -84,14 +85,14 @@ export function mapaVila(st, { grande = true, destaque = null } = {}) {
       <linearGradient id="predio" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fcd34d"/><stop offset="1" stop-color="#b45309"/></linearGradient>
     </defs>
     <rect x="20" y="40" width="260" height="390" rx="18" fill="#0d2a1c" stroke="#1f5135"/>
-    <text x="34" y="68" font-size="27" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Mata</text><text x="266" y="68" text-anchor="end" font-size="27" font-weight="700" fill="${corMata}" font-family="JetBrains Mono, monospace">${pctL(fm)}</text>
+    <text x="34" y="68" font-size="${fr}" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Mata</text><text x="266" y="68" text-anchor="end" font-size="${fr}" font-weight="700" fill="${corMata}" font-family="JetBrains Mono, monospace">${pctL(fm)}</text>
     ${arv.join("")}
     <rect x="290" y="40" width="200" height="390" rx="18" fill="#1a1f33" stroke="#2c3560"/>
-    <text x="304" y="68" font-size="27" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Bem público</text><text x="304" y="100" font-size="27" fill="#fbbf24" font-family="Sora, sans-serif">nível ${nivel} de 5</text>
+    <text x="${menor ? 299 : 304}" y="68" font-size="${fr}" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif"${menor ? ' letter-spacing="-0.6"' : ""}>Bem público</text><text x="304" y="100" font-size="${fr}" fill="#fbbf24" font-family="Sora, sans-serif">nível ${nivel} de 5</text>
     ${predios.join("")}
-    ${quebra(NIVEIS_PUBLICO[nivel], 11).map((l, k, ls) => `<text x="390" y="${420 - (ls.length - 1 - k) * 29}" text-anchor="middle" font-size="27" fill="#9fb6cf" font-family="Sora, sans-serif">${esc(l)}</text>`).join("")}
+    ${quebra(NIVEIS_PUBLICO[nivel], 11).map((l, k, ls) => `<text x="390" y="${420 - (ls.length - 1 - k) * (fr + 2)}" text-anchor="middle" font-size="${fr}" fill="#9fb6cf" font-family="Sora, sans-serif">${esc(l)}</text>`).join("")}
     <rect x="500" y="40" width="280" height="390" rx="18" fill="#10223b" stroke="#23415f"/>
-    <text x="514" y="68" font-size="27" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Lotes</text><text x="766" y="68" text-anchor="end" font-size="26" fill="#9fb6cf" font-family="Sora, sans-serif">${st.lotes.filter((x) => !x).length} livres</text>
+    <text x="514" y="68" font-size="${fr}" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Lotes</text><text x="766" y="68" text-anchor="end" font-size="${frL}" fill="#9fb6cf" font-family="Sora, sans-serif">${st.lotes.filter((x) => !x).length} livres</text>
     ${lotes.join("")}
   </svg>`;
 }

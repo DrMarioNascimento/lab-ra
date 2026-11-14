@@ -141,3 +141,17 @@ No fim do ano 3, o motor guarda a vila (`snap3`). No fechamento, `contrafactual(
 - Pergunta de controle do ano 4 sobre o preço pago (14 + 10 = 24; na Prosperidade, 19).
 - Celular nas decisões dos anos 4 e 5: "ficou fora do mercado" (no teto ou por escolha) separado de "não levou lote"; o cartão da meta diz "Média da vila por pessoa".
 - Relógio da aula: o fechamento vai dos 37 aos 45 min; a aula acaba perto dos 47.
+
+## R24 (14/11/2026, após os avaliadores EE e EF)
+- "E se" da pergunta 2 com uma casa decimal perto da meta (`nL`), como a barra e o painel: "53,6", não "54" com "meta não batida".
+- Mapa menor do ano 5 (`mapaVila(st, { menor: true })`): rótulos em 29 unidades, 1,62% da TV (a R23 os deixara em 1,51%).
+- Plano de tempo: o fechamento vai dos 37 aos 47 min (síntese de 1,5 min + 8,5 min de perguntas); sobram cerca de 3 min.
+- Pergunta 4: "quase o mesmo" só com menos de 5 pontos de diferença (antes, 10).
+- Roteiro do cenário profissional (Complexo Esportivo do Bairro) no painel de quem conduz, na entrada e na pergunta 5.
+- Textos: "1 lote"/"N lotes" em vez de "lote(s)"; "Imposto ao bem público (lotes e pessoas)" no extrato; relógio da dupla com rótulo próprio.
+- Painel *A vila*: com cinco linhas ou mais (colapso, previsão, proposta no bem público), o mapa fica menor e o texto ganha largura (antes, a última linha era cortada).
+- "E se" diz "não batida (mata abaixo de 30%)" quando é a mata que derruba a meta na outra regra.
+- Rodapé das barras (pergunta 4 e honestidade do ano 4) em 1,9% da TV.
+- Plano de tempo medido na simulação (× 1,25): anos fecham perto de 9, 14, 22, 28 e 34 min; fechamento dos 34 aos 47. Desligar a carta do ano 4 economiza cerca de 1 min (0,85 simulado).
+- O Avançar de quem conduz acende quando todos enviaram ("Todos enviaram: avançar"); a simulação supõe o avanço uns 5 s depois do último envio.
+- Confiança no celular: "Cada pessoa recebeu uma das 4 situações do telão, sorteada."

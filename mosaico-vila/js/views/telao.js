@@ -143,7 +143,7 @@ export function renderTelao(st) {
       break;
     }
     case "decidir":
-      body = topo(st, "Cada família decide") + (st.ano === 5 ? bannerGrande(st) : "") + `<div class="lado ${st.ano === 5 && st.cartas ? "compacto" : ""}"><div class="card mapa-card">${mapaVila(st)}</div>
+      body = topo(st, "Cada família decide") + (st.ano === 5 ? bannerGrande(st) : "") + `<div class="lado ${st.ano === 5 && st.cartas ? "compacto" : ""}"><div class="card mapa-card">${mapaVila(st, { menor: st.ano === 5 && !!st.cartas })}</div>
         <div class="col centro">${cronometro(st, "Conversem na família", st.curto && st.ano >= 4 ? 30 : 45)}<p class="big" style="text-align:center;margin:0">Cada um envia a sua proposta.<br>Vale a mediana da família.</p>${st.ano >= 4 && st.leilao?.ano === st.ano && st.leilao.vendidos.length ? `<p class="rodape" style="text-align:center;margin:0">A meta já desconta os lances do mercado.</p>` : ""}</div></div>`;   // R22
       break;
     case "pequena":
@@ -292,7 +292,8 @@ export function paineisResultado(st) {
   } else if (st.colapsouAlguma) fatos.push(fato("arvore-redonda", "A mata voltou a passar dos 30%: o −4 acabou", "bom"));
   const prev = st.previsao[st.ano] || {}, np = Object.keys(prev).length;
   if (st.ano >= 2 && agregadoOk(np) && fx) { const real = st.mata > fx.mataAntes + 0.5 ? "sobe" : st.mata < fx.mataAntes - 0.5 ? "desce" : "fica"; fatos.push(`<p class="rodape">Previsão da mata: ${pct(Object.values(prev).filter((v) => v === real).length, np)}% acertaram.</p>`); }
-  const paineis = [{ nome: "A vila", dur: 10, html: `<div class="lado"><div class="card mapa-card">${mapaVila(st)}</div><div class="col" style="justify-content:center">${fatos.join("")}</div></div>` }];
+  const cheio = fatos.length >= 5;   // R24: com colapso, previsão e proposta no bem público, o mapa menor dá largura ao texto (antes, a última linha era cortada)
+  const paineis = [{ nome: "A vila", dur: 10, html: `<div class="lado${cheio ? " compacto" : ""}"><div class="card mapa-card">${mapaVila(st, { menor: cheio })}</div><div class="col" style="justify-content:center${cheio ? ";gap:.8cqw" : ""}">${fatos.join("")}</div></div>` }];
 
   // 2. O aluguel (ano 3): as moedas que mudaram de mãos e a desigualdade da renda por pessoa, antes e depois
   if (st.ano === 3 && st.renda) {
@@ -417,7 +418,7 @@ function perguntasFechamento(st) {
     `Com o aluguel mordendo, a vila ${st.votoTrocou ? "trocou para a Prosperidade" : "ficou no Monopólio"}. Vocês votaram pelo próprio bolso, pela vila ou pela meta que parecia mais fácil?`,
     `Bolso ou vila também na mata: ${origem} ${st.colapsouAlguma ? (st.colapsou ? "Ela colapsou e não voltou." : "Ela colapsou e voltou.") : `O pior ano chegou a ${Math.round(100 * mataMin)}%.`} Quem pagou a conta?`,
     pq != null && pg != null
-      ? (Math.abs(pq - pg) < 10
+      ? (Math.abs(pq - pg) < 5
         ? `Na pequena, ${pq}% aceitaram (${fe}% do estrago de uma grande); na grande, ${pg}% aceitariam: quase o mesmo. Por que o tamanho da proposta quase não mudou a resposta?`
         : pq < pg
           ? `Na pequena, ${pq}% aceitaram (${fe}% do estrago de uma grande). Na grande, em que uma pessoa só decidiria, ${pg}% aceitariam. Por que mais gente toparia a grande?`
@@ -443,7 +444,7 @@ function teoria(st, k) {
 function apoioPergunta(st, k) {
   const o = st.outra;
   if (k === 0) return "Primeiro 1 minuto em dupla; depois, a turma.";
-  if (k === 1 && o) return `E se fosse ${ARTIGO[o.regra]}? Mesmas decisões: patrimônio médio ${Math.round(o.pp ?? 0)} (foi ${Math.round(progressoMeta(st.fams, st.publico, st.mata, st.teto, "monopolio").valor)}), desigualdade final ${v2(o.gini)} (foi ${v2(st.historico.at(-1)?.gini ?? 0)}), meta ${o.meta ? "batida" : "não batida"}. É um "e se": na outra regra, vocês talvez decidissem diferente.`;
+  if (k === 1 && o) return `E se fosse ${ARTIGO[o.regra]}? Mesmas decisões: patrimônio médio ${nL(o.pp ?? 0, VITORIA.patrimonioPorPessoa)} (foi ${nL(progressoMeta(st.fams, st.publico, st.mata, st.teto, "monopolio").valor, VITORIA.patrimonioPorPessoa)}), desigualdade final ${v2(o.gini)} (foi ${v2(st.historico.at(-1)?.gini ?? 0)}), meta ${o.meta ? "batida" : o.mata < VITORIA.mataMinima ? "não batida (mata abaixo de 30%)" : "não batida"}. É um "e se": na outra regra, vocês talvez decidissem diferente.`;
   if (k === 4) {
     const fin = Object.values(st.final), mot = contagem(fin.map((x) => x.motivo)), nM = MOTIVOS.reduce((a, m) => a + (mot[m] || 0), 0);
     const top = MOTIVOS.slice().sort((a, b) => (mot[b] || 0) - (mot[a] || 0)).slice(0, 2);
@@ -484,6 +485,6 @@ function telaoFechamento(st) {
       <p class="big" style="margin:0;font-size:2.1cqw">${vz.txt}</p>
       <div class="linha-media">${k === 3 ? barrasPropostas(st) : k === 4 ? guiouTurma(st) : linhaDoTempo(st.historico, { F: 30, alto: 240, so: k === 2 ? "mata" : "desig" })}</div><p class="rodape teoria">De onde vem: ${esc(teoria(st, k))}</p></div>
     <div class="col" style="min-height:0"><div class="card pergunta" style="flex:1;min-height:0;overflow:hidden"><div class="temas">${TEMAS.map((t, i) => `<span class="${i === k ? "agora" : i < k ? "feito" : ""}">${t}</span>`).join("")}</div>
-      <p class="pergunta-txt ${longa ? "longa" : ""}">${esc(qs[k])}</p>${apoio ? `<p class="rodape apoio">${esc(apoio)}</p>` : ""}${k === 0 ? `<div class="crono-mini">${cronometro(st, "1 min em dupla, depois da síntese", 60, 90)}</div>` : ""}</div>
+      <p class="pergunta-txt ${longa ? "longa" : ""}">${esc(qs[k])}</p>${apoio ? `<p class="rodape apoio">${esc(apoio)}</p>` : ""}${k === 0 ? `<div class="crono-mini">${cronometro(st, "Dupla, depois da síntese", 60, 90)}</div>` : ""}</div>
       </div></div>`;
 }
