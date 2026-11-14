@@ -195,3 +195,11 @@ No fim do ano 3, o motor guarda a vila (`snap3`). No fechamento, `contrafactual(
 - Celular: quanto falta para o próximo nível do bem público, e aviso no nível máximo; por que a renda do ano 5 mudou depois da proposta grande.
 - Confiança: "com 5 ou mais pessoas confiando, o telão mostra quantos golpes a turma sofreu; com 5 ou mais em cada situação, também por situação".
 - Pergunta 1: "a desigualdade subiu pouco" para subidas pequenas; extrato sem "−-0"; aviso da grande no nível 0 sem repetir a carta.
+
+## R29 (14/11/2026, após a 73ª rodada, aprovada; ajustes pedidos pelo professor)
+- Fala "presente" nas cartas em que você paga: quem propõe continua pedindo ("o fiscal da mata pede um presente de 1 ponto seu, em troca de fazer vista grossa"), como no "cobra"; a comparação das falas não mistura mais a palavra com a iniciativa.
+- `carimbo: "Sonegação"` em *A madeira sem nota* (venda sem nota é sonegação); na pergunta 4, o carimbo vira "Sonegação e corrupção" quando a pequena foi essa.
+- Painel da pequena: "o carimbo vai na proposta, não em quem aceitou"; aviso de acaso com até uma pessoa de diferença entre as falas (`falasPequena().acaso`); 25 s.
+- Pergunta 4: "A grande veio depois do carimbo do ano 2: a turma já sabia o nome." Com as falas, a linha de apoio fica com dois assuntos (sai a carta do ano 4, que teve o seu painel).
+- Mercado do ano 5 com a grande aceita: cartão compacto e o aviso "a barra já conta o estrago".
+- Palpites "de quem responder"; queda de nível pela pequena explicada; tela da confiança mais curta; barra de ícones em 2,15% e exemplos compactos em 1,95%.

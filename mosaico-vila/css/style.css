@@ -189,7 +189,7 @@ input[type=text], input[type=number], select, textarea { box-shadow: inset 0 3px
 .hud .slot { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: .7cqw; padding: .6cqw .9cqw; border-radius: 1.1cqw;
   background: linear-gradient(180deg, #183455, #10243d); box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 .45cqw 0 #071423, 0 .8cqw 1.4cqw rgba(0,0,0,.35); }
 .hud .slot .ico3 { width: 3.7cqw; height: 3.7cqw; }
-.hud .slot b { display: flex; align-items: center; font-size: 2.25cqw; line-height: 1.1; white-space: nowrap; font-family: Sora, sans-serif; font-variant-numeric: tabular-nums; }
+.hud .slot b { display: flex; align-items: center; font-size: 2.15cqw; line-height: 1.1; white-space: nowrap; font-family: Sora, sans-serif; font-variant-numeric: tabular-nums; }
 .hud .slot b small { font-size: 1.6cqw; color: #a9bdd3; margin-left: .15cqw; }
 .hud .slot span { display: block; font-size: 1.45cqw; color: #a9bdd3; white-space: nowrap; }
 .hud .slot.ano { flex: 0 1 auto; padding-right: 1.4cqw; }
@@ -249,7 +249,7 @@ input[type=text], input[type=number], select, textarea { box-shadow: inset 0 3px
 @keyframes lEntra { from { opacity: 0; transform: translateX(-1cqw); } to { opacity: 1; transform: none; } }
 @keyframes lDim { from { opacity: 1; font-size: 1em; } to { opacity: .55; font-size: 1.9cqw; } }   /* R13: a linha apagada nunca fica abaixo de 1,9 cqw */
 .passo-a-passo li { font-size: 1em; }
-.passo-a-passo.compacto { font-size: 2.05cqw; line-height: 1.28; }
+.passo-a-passo.compacto { font-size: 1.95cqw; line-height: 1.26; }   /* R29: a última linha cabia por pouco nos anos 1 e 4 */
 
 /* Cronômetro grande, contado pelo CSS (45 s) */
 @property --s { syntax: "<integer>"; inherits: false; initial-value: 45; }

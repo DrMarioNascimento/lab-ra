@@ -20,13 +20,13 @@ export const PEQUENAS = [
     telao: "O fiscal da mata cobra 1 ponto para você tirar madeira sem registro, que rende 3. Saldo: +2 para quem aceita.",
     texto: "O fiscal da mata cobra 1 ponto seu para fazer vista grossa: você tira madeira sem registro, que rende 3. Saldo: +2 pontos pessoais. Cada pessoa que aceita tira um pedaço da mata de todos; se a turma inteira aceitar, {efeito}.",
     sim: "Pagar 1 ao fiscal", nao: "Não pagar",
-    presente: { texto: "Você pode dar um presente de 1 ponto ao fiscal da mata, em troca de ele fazer vista grossa: você tira madeira sem registro, que rende 3. Saldo: +2 pontos pessoais. Cada pessoa que aceita tira um pedaço da mata de todos; se a turma inteira aceitar, {efeito}.", sim: "Dar o presente ao fiscal", nao: "Não dar o presente" } },
+    presente: { texto: "O fiscal da mata pede um presente de 1 ponto seu, em troca de fazer vista grossa: você tira madeira sem registro, que rende 3. Saldo: +2 pontos pessoais. Cada pessoa que aceita tira um pedaço da mata de todos; se a turma inteira aceitar, {efeito}.", sim: "Dar o presente ao fiscal", nao: "Não dar o presente" } },
   { id: "vizinho", segmento: "um vizinho", de: "de um vizinho", lado: "recebe", alvo: "mata", icone: "grupos", titulo: "A carga do vizinho",
     telao: "Você ajuda a anotar as cargas. Um vizinho oferece 2 pontos para você não anotar a carga extra dele.",
     texto: "Este ano, você ajuda a anotar as cargas de madeira da vila. Um vizinho oferece 2 pontos pessoais para você não anotar a carga extra dele. Cada pessoa que aceita tira um pedaço da mata de todos; se a turma inteira aceitar, {efeito}.",
     sim: "Aceitar os 2", nao: "Recusar",
     presente: { texto: "Este ano, você ajuda a anotar as cargas de madeira da vila. Um vizinho quer te dar um presente de 2 pontos pessoais, em troca de você não anotar a carga extra dele. Cada pessoa que aceita tira um pedaço da mata de todos; se a turma inteira aceitar, {efeito}.", sim: "Aceitar o presente", nao: "Recusar o presente" } },
-  { id: "serraria", segmento: "a serraria", de: "da serraria", lado: "recebe", alvo: "publico", icone: "arvore-dourada", titulo: "A madeira sem nota",
+  { id: "serraria", segmento: "a serraria", de: "da serraria", lado: "recebe", alvo: "publico", icone: "arvore-dourada", titulo: "A madeira sem nota", carimbo: "Sonegação",   // R29: venda sem nota é sonegação, não corrupção
     telao: "A serraria paga 2 a mais pela sua madeira sem nota. Sem nota, o imposto não chega ao bem público.",
     texto: "A serraria oferece 2 pontos pessoais a mais se você vender a madeira sem nota. Sem nota, o imposto da venda não chega ao bem público. Cada pessoa que aceita tira um pedaço do bem público; se a turma inteira aceitar, {efeito}.",
     sim: "Vender sem nota", nao: "Vender com nota",
@@ -35,7 +35,7 @@ export const PEQUENAS = [
     telao: "Um funcionário cobra 1 ponto para tirar seu nome da taxa da praça, que custa 3. Saldo: +2 para quem aceita.",
     texto: "Todo mundo paga 3 pontos de taxa para a praça. Um funcionário da prefeitura cobra 1 ponto seu para tirar o seu nome da lista. Saldo: +2 pontos pessoais. Cada pessoa que aceita tira um pedaço do bem público; se a turma inteira aceitar, {efeito}.",
     sim: "Pagar 1 ao funcionário", nao: "Pagar a taxa",
-    presente: { texto: "Todo mundo paga 3 pontos de taxa para a praça. Você pode dar um presente de 1 ponto a um funcionário da prefeitura, em troca de ele tirar o seu nome da lista. Saldo: +2 pontos pessoais. Cada pessoa que aceita tira um pedaço do bem público; se a turma inteira aceitar, {efeito}.", sim: "Dar o presente", nao: "Pagar a taxa" } },
+    presente: { texto: "Todo mundo paga 3 pontos de taxa para a praça. Um funcionário da prefeitura pede um presente de 1 ponto seu, em troca de tirar o seu nome da lista. Saldo: +2 pontos pessoais. Cada pessoa que aceita tira um pedaço do bem público; se a turma inteira aceitar, {efeito}.", sim: "Dar o presente", nao: "Pagar a taxa" } },
 ];
 
 export const GRANDES = [
