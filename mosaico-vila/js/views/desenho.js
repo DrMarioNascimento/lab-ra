@@ -7,6 +7,14 @@ export const ICO = new URL("../../assets/icones/", import.meta.url).href;
 // Ícone 3D de apoio (balança, meta, troféu...): <img> com sombra; tamanhos pelo CSS (.ico3, .g, .xl).
 export const ico = (nome, cls = "", alt = "") => `<img class="ico3 ${cls}" src="${ICO}${nome}.webp" alt="${String(alt).replace(/"/g, "&quot;")}" draggable="false">`;
 
+// R15: porcentagem sem enganar no limiar: perto de 30%, 50% ou 75%, mostra uma casa decimal (29,6% em vez de 30%),
+// para a turma nunca ver o número da meta e ouvir que não bateu.
+export function pctL(frac, limites = [0.3, 0.5, 0.75]) {
+  const v = 100 * frac, r = Math.round(v);
+  for (const L of limites) if (Math.abs(v - 100 * L) < 1 && r === Math.round(100 * L) && Math.abs(v - r) > 0.05) return `${(Math.round(v * 10) / 10).toLocaleString("pt-BR")}%`;
+  return `${r}%`;
+}
+
 // Isotype: fileira de ícones iguais, cada um valendo "unidade" (o último pode vir pela metade, cortado).
 export function fileira(nome, valor, unidade, cls = "") {
   const n = Math.max(0, valor / unidade), cheios = Math.floor(n + 1e-9), resto = n - cheios;
@@ -66,7 +74,7 @@ export function mapaVila(st, { grande = true, destaque = null } = {}) {
       <linearGradient id="predio" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fcd34d"/><stop offset="1" stop-color="#b45309"/></linearGradient>
     </defs>
     <rect x="20" y="40" width="260" height="390" rx="18" fill="#0d2a1c" stroke="#1f5135"/>
-    <text x="34" y="68" font-size="27" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Mata</text><text x="266" y="68" text-anchor="end" font-size="27" font-weight="700" fill="${corMata}" font-family="JetBrains Mono, monospace">${Math.round(fm * 100)}%</text>
+    <text x="34" y="68" font-size="27" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Mata</text><text x="266" y="68" text-anchor="end" font-size="27" font-weight="700" fill="${corMata}" font-family="JetBrains Mono, monospace">${pctL(fm)}</text>
     ${arv.join("")}
     <rect x="290" y="40" width="200" height="390" rx="18" fill="#1a1f33" stroke="#2c3560"/>
     <text x="304" y="68" font-size="27" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Bem público</text><text x="304" y="96" font-size="20" fill="#fbbf24" font-family="Sora, sans-serif">nível ${nivel} de 5</text>
@@ -94,7 +102,7 @@ export function linhaDoTempo(hist, { F = 26, alto = 240, so = null } = {}) {
   const svgM = `<svg class="metro" viewBox="0 0 ${W} ${H}" role="img" aria-label="Mata por ano">
     <text x="0" y="${F}" font-size="${F}" font-weight="700" fill="#34d399" font-family="Sora, sans-serif">Mata</text>
     ${[0.3, 0.5].map((v) => `<line x1="${x0}" x2="${W - 110}" y1="${ym(v)}" y2="${ym(v)}" stroke="${v < 0.4 ? "#fb7185" : "#fbbf24"}" stroke-opacity=".55" stroke-width="2" stroke-dasharray="6 6"/><text x="${x0 - 8}" y="${v < 0.4 ? ym(v) + F - 6 : ym(v) - 2}" text-anchor="end" font-size="${F - 4}" fill="${v < 0.4 ? "#fca5a5" : "#fde68a"}" font-family="Sora, sans-serif">${100 * v}%</text>`).join("")}
-    ${eixoX(H - 40)}<path d="${caminho(mata, ym)}" fill="none" stroke="#34d399" stroke-width="5" stroke-linejoin="round"/>${ponto(mata, ym, "#34d399", (v) => `${Math.round(100 * v)}%`)}</svg>`;
+    ${eixoX(H - 40)}<path d="${caminho(mata, ym)}" fill="none" stroke="#34d399" stroke-width="5" stroke-linejoin="round"/>${ponto(mata, ym, "#34d399", (v) => pctL(v))}</svg>`;
   // Desigualdades
   const yg = (v) => 56 + (1 - Math.max(0, Math.min(1, v / 0.5))) * (H - 96);
   const gp = hist.map((h) => h.gini), gr = hist.map((h) => h.giniRenda ?? 0);

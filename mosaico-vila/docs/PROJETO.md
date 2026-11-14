@@ -13,7 +13,7 @@ O Mosaico Vila é a proposta P7 da biblioteca de GDDs "Fundo Comum" (núcleo de 
 - Patrimônio = caixa + lotes × (10 + 2 × nível do bem público). É ele que aparece nas fileiras de casas do telão e conta nas metas.
 - Herança desigual de propósito: a Família Verde começa com 50% a mais de caixa e 3 lotes; a última família começa sem lote.
 - Decisão da família: mediana das propostas de quem está nela (ninguém decide sozinho; quem não envia mantém a proposta anterior).
-- Metas coletivas das duas regras: Monopólio (eficiência) = patrimônio médio de 42 por pessoa e mata acima de 30%; Prosperidade (equidade) = a família mais pobre com pelo menos 60% do patrimônio médio e mata acima de 30%. Votação: maioria simples dos votos enviados; empate mantém a regra atual. A meta do Monopólio aparece desde o ano 1 (exemplo do ano 1 e barra no telão e no celular a cada "Como ficou a vila", `progressoMeta()` em `regras.js`); depois do voto, a barra mostra a meta da regra vigente.
+- Metas coletivas das duas regras: Monopólio (eficiência) = patrimônio médio de 50 por pessoa e mata acima de 30%; Prosperidade (equidade) = a família mais pobre com pelo menos 75% do patrimônio médio e mata acima de 30%. Votação: maioria simples dos votos enviados; empate mantém a regra atual. A meta do Monopólio aparece desde o ano 1 (exemplo do ano 1 e barra no telão e no celular a cada "Como ficou a vila", `progressoMeta()` em `regras.js`); depois do voto, a barra mostra a meta da regra vigente.
 - Placar de cada pessoa (só no celular dela, no fechamento) = patrimônio da família ÷ pessoas da família + pontos pessoais (os das cartas). Os pontos pessoais nunca entram no caixa, no patrimônio, nas metas ou no telão.
 
 ## Cada regra nova
@@ -67,3 +67,10 @@ No fim do ano 3, o motor guarda a vila (`snap3`). No fechamento, `contrafactual(
 - Meta da Prosperidade em 75% (`VITORIA.pobreSobreMedia`); desigualdade do patrimônio e posição da família por pessoa. Em 60 partidas do protótipo, a meta foi batida em 20 de 37 no Monopólio e 15 de 23 na Prosperidade.
 - Lance com o efeito na hora (`efeitoLance()` em `aluno.js`), começando em 0%, e as regras do mercado à vista; painel Mercado com preço e valor do lote.
 - Fechamento: perguntas encadeadas com o dado real, linha de apoio por pergunta (`apoioPergunta()`: o "e se" na 2, a carta do ano 4 na 4), um gráfico grande por pergunta (`linhaDoTempo(…, { so })`), "o que guiou" na última; cartas com a forma contraída (`de`), regra com artigo.
+
+## R15 (14/11/2026, após os avaliadores DM e DN)
+- Meta do Monopólio em 50 por pessoa (`VITORIA.patrimonioPorPessoa`): com 42, ela já estava batida no voto. Nas 60 partidas do protótipo, o patrimônio médio fica entre 41 e 48 por pessoa no voto e entre 46 e 58 no fim do Monopólio.
+- Lance: quem não envia oferece 0% (só o mínimo) e o lance não é herdado do ano anterior (`propor` e `decidir` no motor); os participantes simulados reagem ao efeito mostrado (quem precisa de moradia oferece mais).
+- Voltar de quem conduz restaura um retrato do estado guardado a cada avanço (`s.pilha`, até 6 passos): as contas nunca rodam duas vezes.
+- `pctL()` em `desenho.js`: perto de 30%, 50% e 75%, uma casa decimal (29,6%).
+- Fechamento: pergunta 4 conforme o dado, pergunta 3 com o estrago no bem público (`s.estragoPublico`), "De onde vem" (`teoria()`), gráfico e mapa sem invadir os nomes dos painéis; "prefiro não responder" no quem mais dá golpe.

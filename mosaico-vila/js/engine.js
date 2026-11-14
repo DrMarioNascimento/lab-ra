@@ -94,14 +94,14 @@ export function reduzir(st, a) {
       const lim = (x, m) => Math.max(0, Math.min(m, Math.round(Number(x) || 0)));
       (s.props[s.ano] ??= {})[a.id] = {
         pub: lim(p.pub, LIMITES.pub), rep: s.ano >= 2 ? lim(p.rep, LIMITES.rep) : 0, car: s.ano >= 2 ? lim(p.car, LIMITES.car) : 0,
-        lance: s.props[s.ano]?.[a.id]?.lance ?? 0.3,
+        lance: s.props[s.ano]?.[a.id]?.lance ?? 0,   // R15: quem não envia lance oferece só o mínimo (0%), como o controle mostra
       };
       break;
     }
     case "prever": if (s.fase === "decidir") (s.previsao[s.ano] ??= {})[a.id] = a.v; break;
     // carta do ano 4: "acertei" no dado, "ficar" na honestidade, "confiar" na confiança (todas pessoais e secretas)
     case "mente": if (s.fase === "mente" && s.alunos[a.id] && s.mente[a.id] == null) { s.mente[a.id] = !!a.acertei; if (a.face) s.dado[a.id] = a.face; } break;
-    case "quem": if (s.fase === "mente" && s.alunos[a.id] && s.quem[a.id] == null) s.quem[a.id] = +a.v; break;
+    case "quem": if (s.fase === "mente" && s.alunos[a.id] && s.quem[a.id] == null) s.quem[a.id] = +a.v; break;   // −1 = prefere não responder
     case "pequena": if (s.fase === "pequena" && s.alunos[a.id] && s.pequena.votos[a.id] == null) s.pequena.votos[a.id] = !!a.aceita; break;
     // microtarefas: palpite de quantos % aceitam (pequena e grande), de quantos % votam para trocar e da desigualdade no ano 5
     case "palpitePct": if (["pequena", "alvara", "voto"].includes(s.fase) && s.alunos[a.id]) ((s.palpitePct[s.fase] ??= {})[a.id] ??= +a.v); break;
@@ -129,8 +129,17 @@ export function reduzir(st, a) {
     // fechamento: o telão mostra uma pergunta por vez; quem conduz passa de uma para outra
     case "pergunta": if (s.fase === "fechamento") s.pergunta = Math.max(0, Math.min(4, (s.pergunta || 0) + (a.dir === -1 ? -1 : 1))); break;
     case "fase": {
-      if (a.dir === 1) avancar(s, r);
-      else if (a.dir === -1 && s.k > 1 && !["decidir", "lances", "resultado", "voto", "abertura"].includes(fase.id)) { s.k -= 1; s.fase = FASES[s.k].id; }
+      // R15: antes de cada avanço, um retrato do estado; Voltar restaura o retrato (as contas nunca rodam duas vezes)
+      if (a.dir === 1) {
+        if (s.fase === "fechamento" || s.k === 0) break;
+        const { pilha, ...sem } = s;
+        s.pilha = [...(pilha || []), structuredClone(sem)].slice(-6);   // até 6 passos para trás (o estado viaja inteiro na sala real)
+        avancar(s, r);
+      } else if (a.dir === -1 && s.pilha?.length && s.k > 1) {
+        const pilha = s.pilha.slice(0, -1), ant = s.pilha.at(-1);
+        for (const k of Object.keys(s)) delete s[k];
+        Object.assign(s, ant, { pilha, v: st.v + 1 });
+      }
       break;
     }
     default: break;
@@ -146,7 +155,8 @@ function avancar(s, r) {
     case "decidir": {
       // quem não enviou repete a proposta do ano anterior (ou zero no primeiro ano)
       const props = (s.props[s.ano] ??= {});
-      for (const id of s.ordem) if (!props[id]) props[id] = { ...(s.props[s.ano - 1]?.[id] || { pub: 0, rep: 0, car: 0, lance: 0.3 }), auto: true };
+      // R15: o lance não é herdado (nem a marca de lance enviado): quem não envia lance oferece 0% além do mínimo
+      for (const id of s.ordem) if (!props[id]) { const ant = s.props[s.ano - 1]?.[id] || { pub: 0, rep: 0, car: 0 }; props[id] = { pub: ant.pub, rep: ant.rep, car: ant.car, lance: 0, auto: true }; }
       const fx = fecharAno(s, props, s.renda);
       Object.assign(s, { fams: fx.fams, mata: fx.mata, publico: fx.publico, acumulado: fx.acumulado, colapsou: fx.colapsou });
       // R14: a proposta grande do ano 5 veio antes das decisões; o resultado do ano conta o estrago dela
@@ -242,6 +252,7 @@ function estragar(s, alvo, frac) {
     return { alvo, mata: antes - s.mata, pct: (100 * (antes - s.mata)) / s.teto };
   }
   const nf = Object.keys(s.fams).length, nivel0 = s.publico, pontos = PONTOS_NIVEL * nf * frac;
+  s.estragoPublico = (s.estragoPublico || 0) + pontos;
   s.acumulado -= pontos;
   while (s.acumulado < 0 && s.publico > 0) { s.publico -= 1; s.acumulado += PONTOS_NIVEL * nf; }
   s.acumulado = Math.max(0, s.acumulado);

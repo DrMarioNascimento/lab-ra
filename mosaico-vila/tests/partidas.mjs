@@ -79,6 +79,22 @@ ok(rendaSobe >= 12, `a desigualdade da renda sobe quando o aluguel entra em pelo
 ok(vistas.size >= 8, `cartas variam entre partidas (${vistas.size} diferentes de ${PEQUENAS.length + GRANDES.length + ANO4.length})`);
 console.log(`cartas vistas: ${[...vistas].join(", ")} · confiança: ${golpes}/${confiaram} golpes`);
 ok(!confiaram || (golpes / confiaram > 0.1 && golpes / confiaram < 0.45), `golpe perto de 1 em 4 (${golpes}/${confiaram})`);
+// R15: Voltar restaura o retrato do estado (as contas não rodam duas vezes) e o lance de quem não envia é 0%
+{
+  let st = estadoInicial(); const d = (a) => { st = reduzir(st, a); };
+  for (let i = 0; i < 20; i++) d({ t: "entrar", id: `a${i}`, nome: `P${i}` });
+  d({ t: "sortear", seed: 9 });
+  while (!(st.fase === "pequena")) { if (st.fase === "decidir") for (const id of st.ordem) d({ t: "propor", id, p: { pub: 20, rep: 5, car: 1 } }); d({ t: "fase", dir: 1 }); }
+  for (const id of st.ordem) d({ t: "pequena", id, aceita: false });
+  d({ t: "fase", dir: 1 });
+  const antes = JSON.stringify({ c: Object.values(st.fams).map((f) => f.caixa), m: st.mata, a: st.acumulado, h: st.historico.length });
+  d({ t: "fase", dir: -1 }); d({ t: "fase", dir: -1 }); d({ t: "fase", dir: 1 }); d({ t: "fase", dir: 1 });
+  const depois = JSON.stringify({ c: Object.values(st.fams).map((f) => f.caixa), m: st.mata, a: st.acumulado, h: st.historico.length });
+  ok(antes === depois, `Voltar e Avançar não refazem as contas (${antes} = ${depois})`);
+  // ninguém manda lance nos anos 4 e 5: os lotes saem pelo mínimo
+  while (st.fase !== "fechamento") { if (st.fase === "decidir" && st.ano === 4) for (const id of st.ordem) d({ t: "propor", id, p: { pub: 20, rep: 5, car: 1 } }); if (st.fase === "lances") { const pr = Object.values(st.props[st.ano] || {}); ok(pr.every((p) => !p.lanceEnviado), `ano ${st.ano}: ninguém começa com lance enviado`); } d({ t: "fase", dir: 1 });
+    if (st.fase === "resultado" && st.leilao && st.ano >= 4) ok(st.leilao.vendidos.every((v) => v.preco <= st.leilao.minimo + 1e-9), `ano ${st.ano}: sem lance enviado, o lote sai pelo mínimo`); }
+}
 // R13: com o mesmo número de aceites, o estrago da pequena com a turma inteira é igual ao da grande
 {
   let st = estadoInicial(); const d = (a) => { st = reduzir(st, a); };

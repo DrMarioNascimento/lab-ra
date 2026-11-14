@@ -66,7 +66,12 @@ export function passoBot(st, id, loc, dispatch) {
     }
     case "lances": {
       const p = st.props[st.ano]?.[id];
-      if ((!p || !p.lanceEnviado) && chance(0.3)) dispatch({ t: "lance", id, v: unif(0.2, 0.6) });
+      // R15: o celular mostra o efeito do lance; quem precisa de moradia oferece mais, quem não precisa oferece pouco
+      if ((!p || !p.lanceEnviado) && chance(0.3)) {
+        const precisa = fam && fam.lotes < Math.ceil(fam.membros.length / 3);
+        const v = precisa ? unif(0.15, 0.4) : pf.tipo === "FR" ? unif(0.1, 0.3) : pf.tipo === "CC" ? unif(0, 0.1) : unif(0, 0.2);
+        dispatch({ t: "lance", id, v });
+      }
       else if (p?.lanceEnviado && st.palpite?.[st.ano]?.[id] == null && chance(0.3)) dispatch({ t: "palpite", id, v: ["até 20", "21 a 40", "mais de 40"][Math.floor(Math.random() * 3)] });
       break;
     }

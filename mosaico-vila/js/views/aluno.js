@@ -2,7 +2,7 @@ import { NOME_FASE } from "../engine.js";
 import { NOVIDADE_DO_ANO, EXEMPLO_DO_ANO, EXEMPLO_VOTO, REGRAS_TXT, MOTIVOS, GUIAS, NIVEIS_PUBLICO } from "../content/vila.js";
 import { LIMITES, lanceMinimo, CARGA_RENDE, CARGA_TIRA, REPLANTA_POR, REPLANTA_DEVOLVE, patrimonio, VALOR_LOTE, progressoMeta, VITORIA } from "../content/regras.js";
 import { carta, QUEM_GOLPE, FAIXAS_PCT, GANHO_PEQUENA, GANHO_GRANDE } from "../content/cartas.js";
-import { iconeFamilia, ico } from "./desenho.js";
+import { iconeFamilia, ico, pctL } from "./desenho.js";
 import { decorrido, tempoResultado } from "./telao.js";
 
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -20,16 +20,16 @@ function hd(st, me) {
 // R11: a mesma barra de ícones do telão, pequena, no alto do celular
 function miniBarra(st) {
   const m = progressoMeta(st.fams, st.publico, st.mata, st.teto, st.regra);
-  const meta = m.regra === "prosperidade" ? `${Math.round(100 * m.valor)}%/${Math.round(100 * m.alvo)}%` : `${n0(m.valor)}/${m.alvo}`;
-  return `<div class="mini-hud">${st.ano >= 2 ? `<span>${ico("arvore-redonda")}<b>${Math.round((100 * st.mata) / st.teto)}%</b></span>` : ""}<span>${ico("economia")}<b>nível ${st.publico}</b></span><span>${ico("meta")}<b>${meta}</b></span><span>${ico("balanca")}<b>${REGRAS_TXT[st.regra].nome}</b></span></div>`;
+  const meta = m.regra === "prosperidade" ? `${pctL(m.valor)}/${Math.round(100 * m.alvo)}%` : `${n0(m.valor)}/${m.alvo}`;
+  return `<div class="mini-hud">${st.ano >= 2 ? `<span>${ico("arvore-redonda")}<b>${pctL(st.mata / st.teto)}</b></span>` : ""}<span>${ico("economia")}<b>nível ${st.publico}</b></span><span>${ico("meta")}<b>${meta}</b></span><span>${ico("balanca")}<b>${REGRAS_TXT[st.regra].nome}</b></span></div>`;
 }
 
 // R10: a mesma barra da meta do telão, no celular (meta da regra vigente, desde o ano 1)
 function metaCelular(st) {
   const m = progressoMeta(st.fams, st.publico, st.mata, st.teto, st.regra);
   const frac = Math.max(0, Math.min(1, m.valor / m.alvo));
-  const val = m.regra === "prosperidade" ? `${Math.round(100 * m.valor)}% de ${Math.round(100 * m.alvo)}%` : `${n0(m.valor)} de ${m.alvo}`;
-  return `<div class="card"><b class="row">${ico("meta")}Meta da vila (${REGRAS_TXT[m.regra].nome})</b><div class="row" style="margin-top:6px;gap:8px"><span class="faint" style="min-width:42%">${m.regra === "prosperidade" ? "Mais pobre / média" : "Patrimônio por pessoa"}</span><div class="barra"><i style="width:${100 * frac}%"></i></div><b class="mono">${val}</b></div><p class="faint" style="margin:4px 0 0">Mata: ${Math.round(100 * m.mata)}% (mínimo ${Math.round(100 * VITORIA.mataMinima)}%).</p></div>`;
+  const val = m.regra === "prosperidade" ? `${pctL(m.valor)} de ${Math.round(100 * m.alvo)}%` : `${n0(m.valor)} de ${m.alvo}`;
+  return `<div class="card"><b class="row">${ico("meta")}Meta da vila (${REGRAS_TXT[m.regra].nome})</b><div class="row" style="margin-top:6px;gap:8px"><span class="faint" style="min-width:42%">${m.regra === "prosperidade" ? "Mais pobre / média" : "Patrimônio por pessoa"}</span><div class="barra"><i style="width:${100 * frac}%"></i></div><b class="mono">${val}</b></div><p class="faint" style="margin:4px 0 0">Mata: ${pctL(m.mata)} (mínimo ${Math.round(100 * VITORIA.mataMinima)}%).</p></div>`;
 }
 
 // R14: posição pelo patrimônio por pessoa (as famílias têm de 3 a 6 pessoas)
@@ -119,7 +119,7 @@ export function renderAluno(st, id, loc) {
       bd = `<h2>Sua proposta para a família</h2><p class="faint">Vale a mediana das propostas da família.</p>
         <div class="card"><div class="row" style="justify-content:space-between"><b class="row">${ico("economia")}Bem público</b><b class="mono">${loc.pub}% da renda</b></div><input type="range" min="0" max="${LIMITES.pub}" step="5" value="${loc.pub}" data-in="pub" data-key="pub"><p class="faint" style="margin:0">Nível ${st.publico}: ${esc(NIVEIS_PUBLICO[st.publico])}</p></div>
         ${st.ano >= 2 ? `<div class="card"><div class="row" style="justify-content:space-between"><b class="row">${ico("arvore-cubos")}Replantar a mata</b><b class="mono">${loc.rep}% da renda</b></div><input type="range" min="0" max="${LIMITES.rep}" step="5" value="${loc.rep}" data-in="rep" data-key="rep"><p class="faint" style="margin:0">Cada 5 pontos devolvem ${pcMata(st, REPLANTA_DEVOLVE)} à mata.</p></div>
-        <div class="card"><b class="row">${ico("arvore-redonda")}Cargas de madeira</b><p class="faint" style="margin:2px 0 8px">Cada carga rende ${CARGA_RENDE} à família e tira ${pcMata(st, CARGA_TIRA)} da mata. Mata hoje: ${Math.round((100 * st.mata) / st.teto)}% (50% ou mais: +2 de renda por pessoa; abaixo de 30%: −4).</p><div class="dirs">${[0, 1, 2, 3].map((k) => `<button class="btn ${loc.car === k ? "warn on" : "sec"}" data-a="car" data-val="${k}">${k}</button>`).join("")}</div></div>` : ""}
+        <div class="card"><b class="row">${ico("arvore-redonda")}Cargas de madeira</b><p class="faint" style="margin:2px 0 8px">Cada carga rende ${CARGA_RENDE} à família e tira ${pcMata(st, CARGA_TIRA)} da mata. Mata hoje: ${pctL(st.mata / st.teto)} (50% ou mais: +2 de renda por pessoa; abaixo de 30%: −4).</p><div class="dirs">${[0, 1, 2, 3].map((k) => `<button class="btn ${loc.car === k ? "warn on" : "sec"}" data-a="car" data-val="${k}">${k}</button>`).join("")}</div></div>` : ""}
         ${projecao(st, f, loc)}
         <button class="btn ok block" data-a="propor">Enviar proposta</button>`;
       break;
@@ -130,7 +130,7 @@ export function renderAluno(st, id, loc) {
         bd = enviado("Resposta secreta enviada.");
         if (c.tipo === "confia") {
           const q = st.quem[id];
-          bd += `<div class="card"><b>Enquanto a turma responde: quem você acha que mais dá golpe?</b><div class="col" style="margin-top:8px;gap:6px">${QUEM_GOLPE.map((t, k) => `<button class="btn sm ${q === k ? "on" : "sec"}" data-a="quem" data-val="${k}" ${q != null ? "disabled" : ""}>${esc(t)}</button>`).join("")}</div>${q != null ? `<p class="faint" style="margin:6px 0 0">Enviado. O telão mostra o total da turma e quanto era a chance de verdade.</p>` : ""}</div>`;
+          bd += `<div class="card"><b>Enquanto a turma responde: quem você acha que mais dá golpe?</b><div class="col" style="margin-top:8px;gap:6px">${QUEM_GOLPE.map((t, k) => `<button class="btn sm ${q === k ? "on" : "sec"}" data-a="quem" data-val="${k}" ${q != null ? "disabled" : ""}>${esc(t)}</button>`).join("")}<button class="btn sm ${q === -1 ? "on" : "sec"}" data-a="quem" data-val="-1" ${q != null ? "disabled" : ""}>Prefiro não responder</button></div>${q != null ? `<p class="faint" style="margin:6px 0 0">Enviado. O telão mostra o total da turma e quanto era a chance de verdade.</p>` : ""}</div>`;
         }
         break;
       }

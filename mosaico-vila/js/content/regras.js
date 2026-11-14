@@ -21,7 +21,7 @@ export const IMPOSTO_LOTE = 1.5;         // só na Prosperidade, vai ao bem púb
 export const PISO_PESSOA = 6;            // piso de renda por pessoa
 export const NIVEL_MAX = 5;
 export const PONTOS_NIVEL = 12;          // × número de famílias para subir um nível
-export const VITORIA = { pobreSobreMedia: 0.75, mataMinima: 0.3, patrimonioPorPessoa: 42 };   // R7: meta das duas regras; R14: equidade em 75% (com 60% ela quase nunca falhava)
+export const VITORIA = { pobreSobreMedia: 0.75, mataMinima: 0.3, patrimonioPorPessoa: 50 };   // R7: meta das duas regras; R14: equidade em 75%; R15: eficiência em 50 por pessoa (com 42 ela já estava batida no voto) (com 60% ela quase nunca falhava)
 export const LIMITES = { pub: 50, rep: 30, car: 3 };
 
 export const lanceMinimo = (ano, acrescimo = 0) => 6 + 2 * ano + acrescimo;

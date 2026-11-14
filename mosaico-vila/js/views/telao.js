@@ -2,7 +2,7 @@ import { nomeFase, progresso, agregadoOk, contagem } from "../engine.js";
 import { NOVIDADE_DO_ANO, EXEMPLO_DO_ANO, EXEMPLO_VOTO, REGRAS_TXT, MOTIVOS, GUIAS, NIVEIS_PUBLICO } from "../content/vila.js";
 import { carta, QUEM_GOLPE, FAIXAS_PCT, faixaDe, CHANCE_GOLPE } from "../content/cartas.js";
 import { gini, lanceMinimo, VITORIA, VALOR_LOTE, patrimonio, COLAPSO, progressoMeta } from "../content/regras.js";
-import { iconeFamilia, mapaVila, linhaDoTempo, ico, fileira, unidade } from "./desenho.js";
+import { iconeFamilia, mapaVila, linhaDoTempo, ico, fileira, unidade, pctL } from "./desenho.js";
 
 // Telão para TV (R11): letra grande, uma ideia por tela, barra de ícones com o estado da vila sempre no mesmo lugar.
 // Detalhes e contas ficam no celular de cada um.
@@ -32,13 +32,13 @@ function barra(st) {
   const dPub = fx ? st.publico - fx.nivelAntes : 0;
   const delta = (d) => (d ? `<em class="delta ${d > 0 ? "up" : "down"}">${d > 0 ? "+" : "−"}${Math.abs(d)}</em>` : "");
   const metaOk = m.valor >= m.alvo && m.mata >= VITORIA.mataMinima;
-  const valMeta = m.regra === "prosperidade" ? `${Math.round(100 * m.valor)}%<small>/${Math.round(100 * m.alvo)}%</small>` : `${n0(m.valor)}<small>/${m.alvo}</small>`;
+  const valMeta = m.regra === "prosperidade" ? `${pctL(m.valor)}<small>/${Math.round(100 * m.alvo)}%</small>` : `${n0(m.valor)}<small>/${m.alvo}</small>`;
   const livres = st.lotes.filter((x) => !x).length;
   const pips = (n, tot, fn) => Array.from({ length: tot }, (_, k) => `<i class="${fn(k + 1)}"></i>`).join("");
   return `<div class="hud">
     <div class="slot ano"><div><b>Ano ${st.ano}</b><span class="pips">${pips(st.ano, 5, (a) => (a < st.ano ? "feito" : a === st.ano ? "agora" : ""))}</span></div></div>
     <div class="slot">${ico("balanca")}<div><b>${REGRAS_TXT[st.regra].nome}</b><span>regra</span></div></div>
-    ${st.ano >= 2 ? `<div class="slot ${fm < COLAPSO ? "mal" : fm < 0.5 ? "atencao" : ""} ${dMata ? "pulsa" : ""}">${ico("arvore-redonda")}<div><b>${Math.round(100 * fm)}%${delta(dMata)}</b><span>mata</span></div></div>` : ""}
+    ${st.ano >= 2 ? `<div class="slot ${fm < COLAPSO ? "mal" : fm < 0.5 ? "atencao" : ""} ${dMata ? "pulsa" : ""}">${ico("arvore-redonda")}<div><b>${pctL(fm)}${delta(dMata)}</b><span>mata</span></div></div>` : ""}
     <div class="slot ${dPub ? "pulsa" : ""}">${ico("economia")}<div><b class="niv">${pips(st.publico, 5, (k) => (k <= st.publico ? "on" : ""))}${delta(dPub)}</b><span>bem público</span></div></div>
     <div class="slot ${metaOk ? "ok" : ""}">${ico("meta")}<div><b>${valMeta}</b><span>meta da vila</span></div></div>
     ${st.ano >= 3 ? `<div class="slot">${ico("lote-venda")}<div><b>${livres}</b><span>lotes livres</span></div></div>` : ""}
@@ -127,7 +127,7 @@ export function renderTelao(st) {
       break;
     }
     case "decidir":
-      body = topo(st, "Cada família decide") + (st.ano === 5 ? bannerGrande(st) : "") + `<div class="lado"><div class="card mapa-card">${mapaVila(st)}</div>
+      body = topo(st, "Cada família decide") + (st.ano === 5 ? bannerGrande(st) : "") + `<div class="lado ${st.ano === 5 && st.cartas ? "compacto" : ""}"><div class="card mapa-card">${mapaVila(st)}</div>
         <div class="col centro">${cronometro(st, "Conversem na família")}<p class="big" style="text-align:center;margin:0">Cada um envia a sua proposta.<br>Vale a mediana da família.</p></div></div>`;
       break;
     case "pequena":
@@ -207,10 +207,10 @@ function dinheiroPorPessoa(st, ranking) {
   const marca = `<i class="marca-meta" style="left:calc(var(--iso) * ${(alvoPP / MOEDA).toFixed(2)} + ${(0.12 * (alvoPP / MOEDA)).toFixed(2)}cqw)"><b>${m.regra === "prosperidade" ? `${Math.round(100 * m.alvo)}% da média` : `meta ${m.alvo}`}</b></i>`;
   const iso = ranking.length <= 5 ? 3.6 : ranking.length <= 6 ? 3.1 : 2.6;   // até 8 famílias cabem na tela
   const linhas = ranking.map((f) => `<div class="iso-linha"><span class="fila-moedas" style="--n:${cab};--iso:${iso}cqw">${moedas(f.pp)}${marca}</span><b class="mono">${n0(f.pp)}</b></div>`).join("");
-  const metaTxt = m.regra === "prosperidade" ? `A família mais pobre tem <b>${Math.round(100 * m.valor)}%</b> da média por pessoa (meta: ${Math.round(100 * m.alvo)}%).` : `Patrimônio médio: <b>${n0(m.valor)}</b> por pessoa (meta: ${m.alvo}).`;
+  const metaTxt = m.regra === "prosperidade" ? `A família mais pobre tem <b>${pctL(m.valor)}</b> da média por pessoa (meta: ${Math.round(100 * m.alvo)}%).` : `Patrimônio médio: <b>${n0(m.valor)}</b> por pessoa (meta: ${m.alvo}).`;
   return `<div class="grid" style="grid-template-columns:1.55fr 1fr;flex:1;min-height:0">
     <div class="card" style="min-height:0;overflow:hidden"><h2>Patrimônio por pessoa, por família</h2><p class="rodape" style="margin-bottom:.6cqw">${moedas(MOEDA, "p")} Cada moeda = ${MOEDA} pontos. Sem nome de família.</p>${linhas}</div>
-    <div class="card col" style="justify-content:center;gap:1.2cqw">${ico("meta", "xl")}<p class="big" style="margin:0">${metaTxt}</p><p class="rodape">${m.mata >= VITORIA.mataMinima ? `E a mata precisa ficar acima de ${Math.round(100 * VITORIA.mataMinima)}%: está em ${Math.round(100 * m.mata)}%.` : `Mata em ${Math.round(100 * m.mata)}%: precisa passar de ${Math.round(100 * VITORIA.mataMinima)}%. Assim, meta não batida.`}</p></div></div>`;
+    <div class="card col" style="justify-content:center;gap:1.2cqw">${ico("meta", "xl")}<p class="big" style="margin:0">${metaTxt}</p><p class="rodape">${m.mata >= VITORIA.mataMinima ? `E a mata precisa ficar em pelo menos ${Math.round(100 * VITORIA.mataMinima)}%: está em ${pctL(m.mata)}.` : `Mata em ${pctL(m.mata)}: precisa chegar a ${Math.round(100 * VITORIA.mataMinima)}%. Assim, meta não batida.`}</p></div></div>`;
 }
 
 // A desigualdade em palavras: quantas vezes o patrimônio por pessoa da família mais rica cabe no da mais pobre.
@@ -302,7 +302,7 @@ export function paineisResultado(st) {
     let html;
     if (c.tipo === "confia") {
       const confiaram = Object.keys(st.golpe), honestos = confiaram.filter((id) => !st.golpe[id]).length;
-      const q = Object.values(st.quem), qc = contagem(q);
+      const q = Object.values(st.quem).filter((v) => v >= 0), qc = contagem(q);   // R15: "prefiro não responder" fica de fora
       html = `<div class="grid" style="grid-template-columns:1fr 1fr;flex:1;min-height:0">
         <div class="card col" style="justify-content:center;gap:1cqw"><h2 class="row">${ico(c.icone, "g")}${esc(c.titulo)}</h2>
           <p class="big" style="margin:0">${agregadoOk(nv) ? `<b>${pct(sim, nv)}%</b> confiaram.` : ""} ${agregadoOk(confiaram.length) ? `Dos que confiaram, <b>${pct(honestos, confiaram.length)}%</b> encontraram gente honesta.` : ""}</p>
@@ -357,18 +357,31 @@ function perguntasFechamento(st) {
   const subiu = H.length >= 3 && (gr(2) > gr(1) + 0.01 || g(2) > g(1) + 0.005);
   const mataMin = Math.min(...H.map((x) => x.mata));
   const cargas = Math.round((100 * H.reduce((a, x) => a + (x.extr || 0), 0)) / (st.teto || 1)), prop = Math.round((100 * (st.estragoMata || 0)) / (st.teto || 1));
-  const origem = prop ? `As cargas tiraram ${cargas}% da mata nos cinco anos; as propostas aceitas, ${prop}%.` : `As cargas tiraram ${cargas}% da mata nos cinco anos.`;
+  const pub = Math.round(st.estragoPublico || 0);
+  const origem = (prop ? `As cargas tiraram ${cargas}% da mata nos cinco anos; as propostas aceitas, ${prop}%.` : `As cargas tiraram ${cargas}% da mata nos cinco anos.`) + (pub ? ` E as propostas tiraram ${pub} pontos do bem público.` : "");
   const vs = Object.values(st.alvara?.votos || {}), n = st.ordem.length;
   const pq = agregadoOk(st.pequena?.n || 0) ? Math.round((100 * st.pequena.aceitaram) / n) : null, pg = agregadoOk(vs.length) ? pct(vs.filter(Boolean).length, vs.length) : null;
   return [
     H.length >= 3 ? (subiu ? "Quando o aluguel entrou (ano 3), a desigualdade subiu. Quem ganhou com isso, e sem fazer o quê?" : "Quando o aluguel entrou (ano 3), a desigualdade não subiu. O que segurou?") : "A desigualdade entre as famílias cresceu ou caiu? Por quê?",
-    `Com o aluguel mordendo, a vila ${st.votoTrocou ? "trocou para a Prosperidade (equidade)" : "ficou no Monopólio (eficiência)"}. Vocês votaram pelo próprio bolso ou pela vila?`,
+    `Com o aluguel mordendo, a vila ${st.votoTrocou ? "trocou para a Prosperidade (equidade)" : "ficou no Monopólio (eficiência)"}. Vocês votaram pelo próprio bolso, pela vila ou pela meta que parecia mais fácil?`,
     `Bolso ou vila também na mata: ${origem} ${st.colapsouAlguma ? (st.colapsou ? "Ela colapsou e não voltou." : "Ela colapsou e voltou.") : `O pior ano chegou a ${Math.round(100 * mataMin)}%.`} Quem pagou a conta?`,
     pq != null && pg != null
-      ? `Na pequena, ${pq}% aceitaram: ${pq}% do estrago de uma grande (com todos, seria igual). Na grande, ${pg}% aceitariam. Por que a pequena parece menos grave?`
+      ? (pq < pg
+        ? `Na pequena, ${pq}% aceitaram: ${pq}% do estrago de uma grande. Na grande, em que uma pessoa só decidiria, ${pg}% aceitariam. Por que mais gente toparia a grande?`
+        : `Na pequena, ${pq}% aceitaram: ${pq}% do estrago de uma grande (com todos, seria igual). Na grande, ${pg}% aceitariam. Por que a pequena parece menos grave?`)
       : "Das propostas: na pequena, cada um decidiu por si; na grande, uma pessoa tinha o poder. Qual pareceu mais grave, e por quê?",
     "Fora da vila: na profissão de vocês, onde estão a \"mata comum\" e as propostas pequenas?",
   ];
+}
+
+// R15: de onde vem cada tema, para a turma (uma linha embaixo do gráfico)
+function teoria(st, k) {
+  const conf = st.cartas && !st.semTroco && carta(st.cartas.ano4).grupo === "confianca";
+  return ["Henry George: o valor da terra vem da comunidade; quem só tem o lote recebe sem fazer.",
+    "Lizzie Magie (1904): o Jogo do Proprietário, avô do Banco Imobiliário, já tinha estas duas regras.",
+    "Elinor Ostrom: comunidades cuidam do comum quando fazem regras e conversam.",
+    `Abbink e colegas (2002): experimentos de propina${conf ? "; Berg e colegas (1995): o jogo da confiança" : "; Jiang (2013): o jogo da mente"}.`,
+    "Platão e Hume: impulso, emoção ou razão, o que guiou vocês."][k] || "";
 }
 
 // Ligação de cada pergunta com a anterior e com o resto da partida (uma linha embaixo da pergunta)
@@ -393,7 +406,7 @@ function telaoFechamento(st) {
   return topo(st, "Fechamento") + `<div class="grid" style="grid-template-columns:1fr 1.25fr;flex:1;min-height:0">
     <div class="card col" style="min-height:0;gap:.7cqw;overflow:hidden"><h2 class="row" style="color:var(${st.vitoria ? "--ok" : "--warn"})">${ico(st.vitoria ? "trofeu" : "meta", "g")}${st.vitoria ? "A vila bateu a meta!" : "A vila não bateu a meta"}</h2>
       <p class="big" style="margin:0;font-size:2.1cqw">${vz.txt}</p>
-      <div class="linha-media">${linhaDoTempo(st.historico, { F: 30, alto: 240, so: k === 2 ? "mata" : "desig" })}</div></div>
+      <div class="linha-media">${linhaDoTempo(st.historico, { F: 30, alto: 240, so: k === 2 ? "mata" : "desig" })}</div><p class="rodape teoria">De onde vem: ${esc(teoria(st, k))}</p></div>
     <div class="col" style="min-height:0"><div class="card pergunta" style="flex:1;min-height:0;overflow:hidden"><div class="temas">${TEMAS.map((t, i) => `<span class="${i === k ? "agora" : i < k ? "feito" : ""}">${t}</span>`).join("")}</div>
       <p class="pergunta-txt ${longa ? "longa" : ""}">${esc(qs[k])}</p>${apoio ? `<p class="rodape apoio">${esc(apoio)}</p>` : ""}</div>
       ${agregadoOk(fin.length) && k === 4 ? `<div class="card guiou"><p><b>Guiou:</b> ${GUIAS.map((g) => `${g} ${guias[g] || 0}`).join(" · ")}</p><p><b>Pesou:</b> ${MOTIVOS.map((m) => `${m} ${motivos[m] || 0}`).join(" · ")}</p></div>` : ""}</div></div>`;
