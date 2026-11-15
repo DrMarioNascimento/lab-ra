@@ -449,7 +449,7 @@ input[type=text], input[type=number], select, textarea { box-shadow: inset 0 3px
 .phone .glos-item:active { transform: translateY(2px); box-shadow: 0 1px 0 #0b1a30; }
 .phone .glos-item.aberto { border-color: #a78bfa; }
 .phone .glos-def { color: #c7d6ee; font-size: 14px; line-height: 1.45; }
-/* Momento do Lazer: memória (24 cartas) e Genius (8 botões), com volume e reação ao toque */
+/* Momento do Lazer: memória (24 cartas) e Acerte a sequência (8 botões), com volume e reação ao toque */
 .phone .lz-topo { justify-content: space-between; }
 .phone .mem-grade { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; }
 .phone .mem { aspect-ratio: 1 / 1; min-height: 0; padding: 4px; border: 0; border-radius: 10px; cursor: pointer; font: inherit; color: #fff; display: flex; align-items: center; justify-content: center; text-align: center; overflow: hidden;
