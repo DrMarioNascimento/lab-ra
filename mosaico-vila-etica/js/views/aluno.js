@@ -38,7 +38,7 @@ function telaGlossario(st, loc) {
       ${vs.map((v) => `<button class="glos-item ${loc.verb === v.id ? "aberto" : ""}" data-a="verb" data-val="${v.id}"><span class="row" style="gap:6px"><b>${esc(v.termo)}</b>${v.autor ? `<span class="faint">${esc(v.autor)}</span>` : ""}${novos.has(v.id) ? `<span class="novo">novo</span>` : ""}<span class="grow"></span><span aria-hidden="true">${loc.verb === v.id ? "▴" : "▾"}</span></span>${loc.verb === v.id ? `<span class="glos-def">${esc(v.def)}</span>` : ""}</button>`).join("")}</div>`;
   }).join("");
   const faltam = GLOSSARIO.length - abertos.length;
-  return `<h2 class="row">${ico("ideia", "g")}Glossário de ética</h2><p class="faint" style="margin:0">${abertos.length} verbetes abertos${faltam ? `; ${faltam} se abrem conforme a vila avança` : ""}. Toque num termo para ver a definição.</p>${grupos}
+  return `<h2 class="row">${ico("glossario", "g")}Glossário de ética</h2><p class="faint" style="margin:0">${abertos.length} verbetes abertos${faltam ? `; ${faltam} se abrem conforme a vila avança` : ""}. Toque num termo para ver a definição.</p>${grupos}
     <button class="btn ok block" data-a="glos">Voltar ao jogo</button>`;
 }
 

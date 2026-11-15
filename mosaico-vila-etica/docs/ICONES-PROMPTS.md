@@ -1,11 +1,10 @@
 # Ícones 3D
 
-## Pendentes agora (14/11/2026), em ordem de prioridade: 23 ícones
+## Pendentes agora (14/11/2026), em ordem de prioridade: 20 ícones
 Estilo de todos: ícone 3D brilhante, iluminação suave de estúdio, levemente de cima, cores saturadas, fundo branco liso para recortar, sem texto, 1024 × 1024.
 1. **Bem público, níveis 1 a 3** (`publico-1-praca`, `publico-2-posto`, `publico-3-academia`): aparecem no mapa da vila em toda tela de resultado e de decisão; hoje são desenhos simples, ao lado dos níveis 4 e 5 já em 3D. Prompts em "Para completar o bem público", abaixo.
 2. **Toco da mata** (`toco.webp`, provisório): aparece na mata a cada carga cortada. Prompt: toco de árvore cortada com anéis no topo, casca marrom e raízes curtas, sobre um pouco de grama; sem machado, tom de brinquedo.
-3. **Momento do Lazer e glossário** (itens 37 a 39, no fim): `lazer-memoria`, `lazer-genius`, `glossario`.
-4. **Cartas sorteadas** (16, itens 21 a 36): primeiro as que hoje repetem o mesmo ícone: toco (fiscal, madeireira, entulho), alvará (alvará, aterro), grupos (vizinho, carroça), moeda (taxa, pedido), cédula (achado, fiado), participar (extrato, sinal).
+3. **Cartas sorteadas** (16, itens 21 a 36): primeiro as que hoje repetem o mesmo ícone: toco (fiscal, madeireira, entulho), alvará (alvará, aterro), grupos (vizinho, carroça), moeda (taxa, pedido), cédula (achado, fiado), participar (extrato, sinal).
 
 ## Já no jogo (13/11/2026)
 - **Casas das famílias** (`casa-<cor>.webp`) e **casa neutra** dos lotes: a casa 3D da pasta Cell do autor, sem fundo e com as paredes na cor de cada família.
@@ -95,7 +94,10 @@ Estilo comum: ícone 3D brilhante, cantos arredondados, iluminação suave de es
 ## App
 20. `app-mosaico-vila.png` · Ícone do app "Mosaico Vila": três casinhas de cores diferentes em volta de uma árvore, sobre uma base redonda de grama, em verde e dourado.
 
-## Mosaico Vila Ética (14/11/2026): provisórios, com prompts para os definitivos
+## Mosaico Vila Ética (14/11/2026)
+- Resolvidos com a pasta Cell atualizada (14/11, noite): `lazer.webp` (guarda-sol, controle e bola: o Momento do Lazer), `lazer-memoria.webp` (duas cartas com seta), `lazer-genius.webp` (disco de Genius) e `glossario.webp` (livro aberto azul). Os provisórios ficaram com o sufixo `_SUBSTITUIDO_2026-11-14`. Os prompts abaixo ficam como registro.
+
+### Prompts originais (já resolvidos)
 Estilo comum da lista original (ícone 3D brilhante, iluminação suave de estúdio, levemente de cima, cores saturadas, fundo branco liso para recortar, sem texto, 1024 × 1024). Salvar em `mosaico-vila-etica/assets/icones/`.
 37. `lazer-memoria.webp` (hoje cópia de `participar`) · Momento do Lazer, jogo da memória: quatro cartas de baralho em leque, duas viradas mostrando um livro aberto e uma balança dourada, duas de costas com um ponto de interrogação em relevo.
 38. `lazer-genius.webp` (hoje cópia de `simulador`) · Momento do Lazer, Genius: um disco redondo de brinquedo com oito gomos coloridos (azul, ciano, verde, rosa-vermelho, âmbar, lilás, laranja, pink), um deles aceso e brilhando.

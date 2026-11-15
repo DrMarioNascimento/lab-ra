@@ -456,7 +456,7 @@ export function paineisResultado(st) {
 function faixaConceitos(ids, extra = "") {
   const vs = ids.map(verbete).filter(Boolean);
   if (!vs.length) return "";
-  return `<div class="conceitos"><span class="conc-rot">${ico("ideia")}Conceitos</span>${vs.map((v) => `<span class="chip conceito" style="--c:${CATEGORIAS[v.cat]?.cor || "#a78bfa"}"><b>${esc(v.termo)}</b>${v.autor && !/\d/.test(v.autor) ? ` · ${esc(v.autor)}` : ""}</span>`).join("")}<span class="conc-fim">${extra || "no glossário do celular"}</span></div>`;
+  return `<div class="conceitos"><span class="conc-rot">${ico("glossario")}Conceitos</span>${vs.map((v) => `<span class="chip conceito" style="--c:${CATEGORIAS[v.cat]?.cor || "#a78bfa"}"><b>${esc(v.termo)}</b>${v.autor && !/\d/.test(v.autor) ? ` · ${esc(v.autor)}` : ""}</span>`).join("")}<span class="conc-fim">${extra || "no glossário do celular"}</span></div>`;
 }
 // Ética: o conceito de cada painel do "Como ficou a vila"
 function conceitoPainel(st, nome) {

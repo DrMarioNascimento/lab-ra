@@ -60,10 +60,10 @@ function exibicao(g, t) {
 export function renderLazer(st, id, loc) {
   const tipo = st.lazer?.tipo || "memoria", lz = loc.lz && loc.lz.tipo === tipo ? loc.lz : null, t = agora();
   const meu = st.lazer?.res?.[id]?.pontos || 0;
-  const cab = `<h2 class="row">${ico(tipo === "memoria" ? "lazer-memoria" : "lazer-genius", "g")}Momento do Lazer</h2>`;   // ícones provisórios (ver docs/ICONES-PROMPTS.md)
+  const cab = `<h2 class="row">${ico("lazer", "g")}Momento do Lazer</h2>`;
   if (!lz) {
     return cab + `<div class="card"><p class="muted" style="margin:0">Desde a Idade Média, o trabalho virou virtude e o ócio, vício (a preguiça): daí a dificuldade de aceitar o lazer. Aqui, o lazer também ensina.</p></div>
-      <div class="card"><b>${tipo === "memoria" ? `Jogo da memória: ${PARES_MEMORIA} pares` : `Genius: ${BOTOES_GENIUS} botões`}</b>
+      <div class="card"><b class="row">${ico(tipo === "memoria" ? "lazer-memoria" : "lazer-genius")}${tipo === "memoria" ? `Jogo da memória: ${PARES_MEMORIA} pares` : `Genius: ${BOTOES_GENIUS} botões`}</b>
       <p class="muted" style="margin:6px 0 0">${tipo === "memoria" ? "Ache os pares: cada termo com a sua pista. Os termos são os do glossário que a vila já abriu." : "Repita a sequência de cores. A cor de cada botão é uma categoria do glossário e fica fixa; o termo dentro dela muda a cada rodada."}</p>
       <p class="faint" style="margin:6px 0 0">Quem chega a ${ALVO_LAZER} ${tipo === "memoria" ? "pares" : "rodadas"} dá 1 ponto ao bem público da vila (menos, proporcional). Você tem ${TEMPO_LAZER} s.</p></div>
       <button class="btn ok block" data-a="lz-comecar">Começar</button>`;
