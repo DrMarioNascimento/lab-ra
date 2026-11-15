@@ -1,6 +1,6 @@
 // Mosaico Vila Ética · Momento do Lazer (entre o ano 3 e o ano 4, cerca de 1,5 min).
-// Uma atividade por partida, sorteada pela semente: o jogo da memória ou o Genius, como no Mosaico Sala, sempre com o
-// máximo de cartas e botões que cabe na tela do celular (memória: 12 pares, 24 cartas; Genius: 8 botões).
+// Uma atividade por partida, sorteada pela semente: o jogo da memória ou o Acerte a sequência, como no Mosaico Sala, sempre com o
+// máximo de cartas e botões que cabe na tela do celular (memória: 12 pares, 24 cartas; Acerte a sequência: 8 botões).
 // Cada celular joga sozinho; o motor recebe só o melhor resultado (pares achados ou rodadas completas).
 import { GLOSSARIO, CATEGORIAS, ORDEM_CATEGORIAS, desbloqueados } from "../content/glossario.js";
 import { rnd, ALVO_LAZER } from "../engine.js";
@@ -10,13 +10,13 @@ export const PARES_MEMORIA = 12;          // o máximo do Mosaico Sala (2 a 12 p
 export const BOTOES_GENIUS = 8;           // o máximo do Mosaico Sala (2 a 8 botões)
 export const TEMPO_LAZER = 55;            // segundos de jogo em cada celular (o telão conta 60)
 const VIRA_ERRO = 1000;                   // ms que um par errado fica aberto
-// velocidade "calma" do Genius do Mosaico Sala: o tom encurta conforme a sequência cresce
+// velocidade "calma" do Acerte a sequência do Mosaico Sala: o tom encurta conforme a sequência cresce
 const TONS = [[5, 650], [13, 520], [Infinity, 420]], PAUSA = 160;
 const duracaoTom = (n) => TONS.find(([ate]) => n <= ate)[1];
 // notas dos botões (escala de dó, como no Mosaico Sala para 5 a 8 botões) e o "zumbido" do erro
 export const FREQ = [261.63, 293.66, 329.63, 392.0, 440.0, 523.25, 587.33, 659.25], TOM_ERRO = 42;
 
-const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&", "<": "<", ">": ">", '"': """ }[c]));
 const hash = (s) => { let h = 2166136261; for (const ch of String(s)) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 function embaralhar(xs, r) { const l = [...xs]; for (let i = l.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [l[i], l[j]] = [l[j], l[i]]; } return l; }
 const agora = () => (typeof performance !== "undefined" ? performance.now() : Date.now());
@@ -32,7 +32,7 @@ function novaMemoria(st, id) {
   return { tipo: "memoria", ini: agora(), cartas, achados: [], abertas: [], fechaEm: 0, fim: false };
 }
 
-// ---------- Genius: cor fixa por categoria, texto que muda a cada ciclo ----------
+// ---------- Acerte a sequência: cor fixa por categoria, texto que muda a cada ciclo ----------
 const POR_CAT = Object.fromEntries(ORDEM_CATEGORIAS.map((c) => [c, GLOSSARIO.filter((v) => v.cat === c)]));
 export function rotulosDoCiclo(st, ciclo) {
   return ORDEM_CATEGORIAS.slice(0, BOTOES_GENIUS).map((c, k) => {
@@ -63,7 +63,7 @@ export function renderLazer(st, id, loc) {
   const cab = `<h2 class="row">${ico("lazer", "g")}Momento do Lazer</h2>`;
   if (!lz) {
     return cab + `<div class="card"><p class="muted" style="margin:0">Desde a Idade Média, o trabalho virou virtude e o ócio, vício (a preguiça): daí a dificuldade de aceitar o lazer. Aqui, o lazer também ensina.</p></div>
-      <div class="card"><b class="row">${ico(tipo === "memoria" ? "lazer-memoria" : "lazer-genius")}${tipo === "memoria" ? `Jogo da memória: ${PARES_MEMORIA} pares` : `Genius: ${BOTOES_GENIUS} botões`}</b>
+      <div class="card"><b class="row">${ico(tipo === "memoria" ? "lazer-memoria" : "lazer-genius")}${tipo === "memoria" ? `Jogo da memória: ${PARES_MEMORIA} pares` : `Acerte a sequência: ${BOTOES_GENIUS} botões`}</b>
       <p class="muted" style="margin:6px 0 0">${tipo === "memoria" ? "Ache os pares: cada termo com a sua pista. Os termos são os do glossário que a vila já abriu." : "Repita a sequência de cores. A cor de cada botão é uma categoria do glossário e fica fixa; o termo dentro dela muda a cada rodada."}</p>
       <p class="faint" style="margin:6px 0 0">Quem chega a ${ALVO_LAZER} ${tipo === "memoria" ? "pares" : "rodadas"} dá 1 ponto ao bem público da vila (menos, proporcional). Você tem ${TEMPO_LAZER} s.</p></div>
       <button class="btn ok block" data-a="lz-comecar">Começar</button>`;
@@ -78,7 +78,7 @@ export function renderLazer(st, id, loc) {
     return `<div class="row lz-topo"><b>Lazer · pares ${lz.achados.length}/${PARES_MEMORIA}</b><span class="mono">${lz.fim ? "fim" : `0:${String(resta).padStart(2, "0")}`}</span></div>
       <div class="mem-grade">${cartas}</div>${lz.fim ? `<div class="card"><b>${lz.achados.length >= ALVO_LAZER ? "Você chegou à meta: 1 ponto para o bem público." : `Você achou ${lz.achados.length} pares.`}</b><p class="faint" style="margin:4px 0 0">Os termos estão no glossário, no topo da tela.</p></div>` : ""}`;
   }
-  // Genius
+  // Acerte a sequência
   const ex = exibicao(lz, t), rot = rotulosDoCiclo(st, lz.seq.length - 1);
   const botoes = ORDEM_CATEGORIAS.slice(0, BOTOES_GENIUS).map((c, k) => {
     const cat = CATEGORIAS[c], v = rot[k], aceso = ex.modo === "mostra" && ex.aceso === k || lz.toque?.k === k && t - lz.toque.t < 220;
@@ -162,7 +162,7 @@ export function tickLazer(st, id, loc, dispatch) {
   return som;
 }
 
-// Som de um tom (Web Audio), como o Genius; silencioso onde não houver áudio
+// Som de um tom (Web Audio), como o Acerte a sequência; silencioso onde não houver áudio
 let ctxAudio = null;
 export function tocar(freq, ms = 260) {
   try {
