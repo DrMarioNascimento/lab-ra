@@ -401,7 +401,7 @@ for (const c of GRANDES) ok(/para você|te oferece/.test(c.texto) && !/a quem/.t
     const esperado = Math.round(8 + 4 * 2 / ALVO_LAZER);
     ok(st.lazer.bonus.pontos === esperado && Math.abs(st.acumulado - acum0 - esperado) < 1e-9 && st.lazerFeito && st.fase === "abertura" && st.ano === 4, `Ética: bônus do lazer ${st.lazer.bonus.pontos} (esperado ${esperado}) no bem público`);
   }
-  ok(tipos.has("memoria") && tipos.has("genius"), "Ética: a semente sorteia memória ou Genius");
+  ok(tipos.has("memoria") && tipos.has("genius"), "Ética: a semente sorteia memória ou Acerte a sequência");
 }
 // Ética: o glossário se abre conforme a partida avança, e cada verbete tem pista e categoria
 {

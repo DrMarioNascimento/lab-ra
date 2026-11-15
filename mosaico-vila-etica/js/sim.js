@@ -102,7 +102,7 @@ setInterval(() => {
     passoAuto(st, id, locs[id], dispatch);
   }
 }, 600);
-// Ética: o relógio do Momento do Lazer (fecha pares errados, acende o Genius, encerra o tempo); só os celulares manuais tocam som
+// Ética: o relógio do Momento do Lazer (fecha pares errados, acende o Acerte a sequência, encerra o tempo); só os celulares manuais tocam som
 setInterval(() => {
   if (st.fase !== "lazer") return;
   for (const id of Object.keys(desenhos)) {

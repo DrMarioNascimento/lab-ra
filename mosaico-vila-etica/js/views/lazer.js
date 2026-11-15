@@ -16,7 +16,7 @@ const duracaoTom = (n) => TONS.find(([ate]) => n <= ate)[1];
 // notas dos botões (escala de dó, como no Mosaico Sala para 5 a 8 botões) e o "zumbido" do erro
 export const FREQ = [261.63, 293.66, 329.63, 392.0, 440.0, 523.25, 587.33, 659.25], TOM_ERRO = 42;
 
-const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&", "<": "<", ">": ">", '"': """ }[c]));
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const hash = (s) => { let h = 2166136261; for (const ch of String(s)) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 function embaralhar(xs, r) { const l = [...xs]; for (let i = l.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [l[i], l[j]] = [l[j], l[i]]; } return l; }
 const agora = () => (typeof performance !== "undefined" ? performance.now() : Date.now());

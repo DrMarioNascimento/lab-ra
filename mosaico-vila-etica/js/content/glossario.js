@@ -4,7 +4,7 @@
 // Código de Ética do CONFEF. As definições são resumos curtos, em palavras próprias.
 //
 // Campos: id, termo, autor (opcional), def (a definição do acordeão), pista (o outro lado da carta da memória, até 34
-// caracteres), cat (categoria: a cor fixa do botão no Genius) e ano (quando o verbete se desbloqueia: 0 = formação das
+// caracteres), cat (categoria: a cor fixa do botão no Acerte a sequência) e ano (quando o verbete se desbloqueia: 0 = formação das
 // famílias, 1 a 5 = abertura do ano, 3.5 = Momento do Lazer, 6 = fechamento).
 
 export const CATEGORIAS = {

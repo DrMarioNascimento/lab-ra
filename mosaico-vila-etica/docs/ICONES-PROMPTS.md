@@ -95,10 +95,10 @@ Estilo comum: ícone 3D brilhante, cantos arredondados, iluminação suave de es
 20. `app-mosaico-vila.png` · Ícone do app "Mosaico Vila": três casinhas de cores diferentes em volta de uma árvore, sobre uma base redonda de grama, em verde e dourado.
 
 ## Mosaico Vila Ética (14/11/2026)
-- Resolvidos com a pasta Cell atualizada (14/11, noite): `lazer.webp` (guarda-sol, controle e bola: o Momento do Lazer), `lazer-memoria.webp` (duas cartas com seta), `lazer-genius.webp` (disco de Genius) e `glossario.webp` (livro aberto azul). Os provisórios ficaram com o sufixo `_SUBSTITUIDO_2026-11-14`. Os prompts abaixo ficam como registro.
+- Resolvidos com a pasta Cell atualizada (14/11, noite): `lazer.webp` (guarda-sol, controle e bola: o Momento do Lazer), `lazer-memoria.webp` (duas cartas com seta), `lazer-genius.webp` (disco do Acerte a sequência) e `glossario.webp` (livro aberto azul). Os provisórios ficaram com o sufixo `_SUBSTITUIDO_2026-11-14`. Os prompts abaixo ficam como registro.
 
 ### Prompts originais (já resolvidos)
 Estilo comum da lista original (ícone 3D brilhante, iluminação suave de estúdio, levemente de cima, cores saturadas, fundo branco liso para recortar, sem texto, 1024 × 1024). Salvar em `mosaico-vila-etica/assets/icones/`.
 37. `lazer-memoria.webp` (hoje cópia de `participar`) · Momento do Lazer, jogo da memória: quatro cartas de baralho em leque, duas viradas mostrando um livro aberto e uma balança dourada, duas de costas com um ponto de interrogação em relevo.
-38. `lazer-genius.webp` (hoje cópia de `simulador`) · Momento do Lazer, Genius: um disco redondo de brinquedo com oito gomos coloridos (azul, ciano, verde, rosa-vermelho, âmbar, lilás, laranja, pink), um deles aceso e brilhando.
+38. `lazer-genius.webp` (hoje cópia de `simulador`) · Momento do Lazer, Acerte a sequência: um disco redondo de brinquedo com oito gomos coloridos (azul, ciano, verde, rosa-vermelho, âmbar, lilás, laranja, pink), um deles aceso e brilhando.
 39. `glossario.webp` (hoje `ideia`) · Glossário de ética: um livro grosso de capa roxa com marcador dourado, um pergaminho enrolado ao lado e uma pena.
