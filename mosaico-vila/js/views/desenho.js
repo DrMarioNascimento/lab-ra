@@ -68,7 +68,7 @@ export function iconeFamilia(f, tam = 34, { moradia = false } = {}) {
 }
 
 // R32: prédios 3D do bem público (nível 4, Escola de esportes; nível 5, Centro comunitário); os níveis 1 a 3 seguem desenhados até os ícones ficarem prontos
-const PREDIO_3D = { 4: "publico-4-escola", 5: "publico-5-centro" };
+const PREDIO_3D = { 1: "publico-1-praca", 2: "publico-2-posto", 3: "publico-3-academia", 4: "publico-4-escola", 5: "publico-5-centro" };
 
 // R39: níveis 1 a 3 do bem público, ainda provisórios (os 3D estão em docs/ICONES-PROMPTS.md): cada um com sua silhueta (praça, posto, academia),
 // nas cores do estilo dos níveis 4 e 5 (creme, terracota, dourado, verde); apagados, ficam num tom só.
