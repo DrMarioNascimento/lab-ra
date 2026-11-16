@@ -87,18 +87,20 @@ function exemploLinhas(st, linhas, ini = 1.5, cls = "") {
 const cronometro = (st, rot, seg = 45, inicio = 0) => `<div class="crono-wrap"><div class="crono c${seg}" style="--d:${(inicio - decorrido(st)).toFixed(2)}s"></div><b class="big">${rot}</b></div>`;   // R18: "inicio" atrasa o relógio (a dupla começa depois da síntese)
 
 // Revelações em sequência: cada painel aparece no seu tempo; o último fica.
+// R40: tema de cada painel (só para a cor da placa no CSS)
+const temaDe = (n) => ({ "A vila": "vila", "O aluguel": "aluguel", "Mercado": "mercado", "O dinheiro": "dinheiro", "A desigualdade": "desigualdade" }[n] || "carta");
 function sequencia(st, paineis) {
   // R13: quem conduz pode segurar um painel (ou ir e voltar); aí ele fica parado na tela
   if (st.painel != null) {
     const k = Math.min(st.painel, paineis.length - 1);
     const ck = st.fase === "resultado" ? conceitoPainel(st, paineis[k].nome) : null;   // Ética: o conceito do painel atual
-    return `<div class="seq fixo"><div class="painel">${paineis[k].html}</div></div><div class="seq-dots fixo">${paineis.map((p, i) => `<span class="${i === k ? "agora" : i < k ? "feito" : ""}">${esc(p.nome)}</span>`).join("")}${ck ? `<span class="conc-dot">${esc(etiqueta(ck))}</span>` : ""}</div>`;
+    return `<div class="seq fixo"><div class="painel" data-tema="${temaDe(paineis[k].nome)}">${paineis[k].html}</div></div><div class="seq-dots fixo">${paineis.map((p, i) => `<span class="${i === k ? "agora" : i < k ? "feito" : ""}">${esc(p.nome)}</span>`).join("")}${ck ? `<span class="conc-dot">${esc(etiqueta(ck))}</span>` : ""}</div>`;
   }
   const t = decorrido(st);
   let acc = 0;
   const tempos = paineis.map((p) => { const a = acc - t; acc += p.dur; return [a, acc - t]; });
   const ult = (k) => (k === paineis.length - 1 ? "ultimo" : "");
-  return `<div class="seq">${paineis.map((p, k) => `<div class="painel ${ult(k)}" style="--a:${tempos[k][0].toFixed(2)}s;--b:${tempos[k][1].toFixed(2)}s">${p.html}</div>`).join("")}</div>
+  return `<div class="seq">${paineis.map((p, k) => `<div class="painel ${ult(k)}" data-tema="${temaDe(p.nome)}" style="--a:${tempos[k][0].toFixed(2)}s;--b:${tempos[k][1].toFixed(2)}s">${p.html}</div>`).join("")}</div>
     <div class="seq-dots">${paineis.map((p, k) => { const ck = st.fase === "resultado" ? conceitoPainel(st, p.nome) : null; return `<span class="${ult(k)}" style="--a:${tempos[k][0].toFixed(2)}s;--b:${tempos[k][1].toFixed(2)}s">${esc(p.nome)}${ck ? `<em class="conc-dot">${esc(etiqueta(ck))}</em>` : ""}</span>`; }).join("")}</div>`;
 }
 

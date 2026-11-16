@@ -544,3 +544,118 @@ body { background: radial-gradient(1100px 560px at 50% -140px, #123057 0%, rgba(
 /* R39: cartas do jogo da memória no celular: texto legível (mín. 13px) */
 .phone .mem span { font-size: 13px; }
 .phone .novo, .phone .glos-btn .cnt { font-size: 12.5px; }
+
+/* ===== R40 (16/11/2026): direção artística — "a maquete da vila ao entardecer" =====
+   Só pintura (céu, luz, material, sombra): nenhum texto, regra ou medida de letra muda. Nenhuma imagem nova: morros, estrelas e
+   texturas são gradientes do CSS. As peças 3D (casas, árvores, prédios) passam a ser as miniaturas de uma maquete iluminada por lampião. */
+:root { --tx3: #9bb1ca; --lampiao: #fbbf24; --placa1: #1d3d68; --placa2: #12284a; --base: #040b17; --fio: rgba(160, 200, 255, .20); }
+
+/* --- Céu do telão: noite no alto, horizonte quente, três morros em silhueta na frente --- */
+.telao { background:
+    radial-gradient(ellipse 46% 15% at 16% 104%, #071730 0 97%, transparent 100%),
+    radial-gradient(ellipse 52% 12% at 74% 105%, #091c38 0 97%, transparent 100%),
+    radial-gradient(ellipse 34% 9% at 46% 104%, #0c2242 0 97%, transparent 100%),
+    radial-gradient(ellipse 120% 50% at 50% 106%, var(--hz), transparent 72%),
+    radial-gradient(ellipse 90% 60% at 50% -18%, var(--ceu) 0%, transparent 70%),
+    linear-gradient(180deg, #071326 0%, #0b1d3a 58%, #13233f 100%); }
+.telao { --hz: rgba(251, 191, 36, .42); }
+.telao[data-ano="2"] { --hz: rgba(251, 146, 60, .42); }
+.telao[data-ano="3"] { --hz: rgba(244, 114, 182, .36); }
+.telao[data-ano="4"] { --hz: rgba(167, 139, 250, .40); }
+.telao[data-ano="5"] { --hz: rgba(99, 102, 241, .46); }
+
+/* --- Placas (cartões): luz de cima, fio claro na borda, base grossa; a placa principal de cada tela recebe a luz do lampião --- */
+.card { background: linear-gradient(180deg, var(--placa1), var(--placa2)); border: 1px solid var(--fio); border-bottom-color: rgba(0, 0, 0, .35);
+  box-shadow: 0 6px 0 var(--base), 0 14px 26px rgba(0, 0, 0, .42), inset 0 1px 0 rgba(255, 255, 255, .13), inset 0 -10px 18px rgba(4, 11, 23, .22); }
+.telao .card { box-shadow: 0 .5cqw 0 var(--base), 0 1.2cqw 2.2cqw rgba(0, 0, 0, .42), inset 0 1px 0 rgba(255, 255, 255, .14), inset 0 -1cqw 1.8cqw rgba(4, 11, 23, .22); }
+.telao .card.destaque { border-left: .4cqw solid var(--lampiao);
+  background: radial-gradient(ellipse 34% 150% at 0% 50%, rgba(251, 191, 36, .22), transparent 72%), linear-gradient(180deg, #214474, #132b50); }
+.telao .card.destaque .ico3 { filter: drop-shadow(0 .5cqw .5cqw rgba(0, 0, 0, .5)) drop-shadow(0 0 1.4cqw rgba(251, 191, 36, .28)); }
+.telao .card.como { border: 2px solid rgba(251, 191, 36, .55); background: linear-gradient(180deg, #2a2a3f, #171c33); }
+.telao .card.banner.mal { background: linear-gradient(180deg, #3b1a2b, #1f1223); }
+.telao .card.banner.bom { background: linear-gradient(180deg, #123f3a, #0c2530); }
+.telao .mapa-card { background: linear-gradient(180deg, #17335a, #0e2140); }
+
+/* --- Título do telão: etiqueta com fio dourado, título com mais peso --- */
+.telao .fase { display: inline-flex; align-items: center; gap: .7cqw; letter-spacing: .16em; }
+.telao .fase::before { content: ""; flex: none; width: 2.2cqw; height: .3cqw; border-radius: 99px; background: linear-gradient(90deg, var(--lampiao), #f59e0b); box-shadow: 0 0 .8cqw rgba(251, 191, 36, .6); }
+.telao .card .fase::before { display: none; }
+.telao h1 { font-weight: 800; letter-spacing: -.02em; text-shadow: 0 .18cqw 0 rgba(0, 0, 0, .35); }
+.telao .conta b { font-variant-numeric: tabular-nums; }
+.prog { background: #0a1730; }
+.prog > i { background: linear-gradient(90deg, #38bdf8, #818cf8 60%, #c084fc); box-shadow: 0 0 .8cqw rgba(129, 140, 248, .55); }
+
+/* --- Barra de estado: peças de jogo (ficha com borda clara e base), cada estado com a sua cor --- */
+.hud .slot { border: 1px solid var(--fio); border-bottom-color: rgba(0, 0, 0, .4); background: linear-gradient(180deg, #1e3f6b, #112646);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .16), 0 .5cqw 0 var(--base), 0 1cqw 1.6cqw rgba(0, 0, 0, .4); }
+.hud .slot .ico3 { filter: drop-shadow(0 .3cqw .3cqw rgba(0, 0, 0, .5)); }
+.hud .slot.ano { background: linear-gradient(180deg, #4353b8, #232f73); border-color: rgba(199, 210, 254, .35); }
+.hud .slot.mal { background: linear-gradient(180deg, #7a2233, #3a101b); border-color: rgba(254, 202, 202, .35); }
+.hud .slot.atencao { background: linear-gradient(180deg, #5a4210, #2c1f08); border-color: rgba(253, 230, 138, .35); }
+.hud .slot.ok { background: linear-gradient(180deg, #145a33, #0b3220); border-color: rgba(134, 239, 172, .4); }
+.hud .slot:has(img[src*="/meta."]) { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .16), 0 .5cqw 0 var(--base), 0 1cqw 1.6cqw rgba(0, 0, 0, .4), 0 0 0 .2cqw rgba(251, 191, 36, .7), 0 0 1.6cqw rgba(251, 191, 36, .18); }
+.hud .slot.ok span, .hud .slot.mal span, .hud .slot.atencao span { color: #d5e2f0; }
+.hud .pips i { background: #16224f; box-shadow: inset 0 -2px 0 rgba(0, 0, 0, .35), inset 0 1px 0 rgba(255, 255, 255, .12); }
+.hud .niv i { background: #0e1d38; box-shadow: inset 0 2px 3px rgba(0, 0, 0, .55); }
+.hud .niv i.on { background: linear-gradient(180deg, #fde68a, #f59e0b 55%, #b45309); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .6), 0 0 .6cqw rgba(251, 191, 36, .45); }
+
+/* --- Abas dos painéis e temas do fechamento: peças com base; a da vez acende --- */
+.telao .seq-dots span, .telao .temas span { background: linear-gradient(180deg, #1a365c, #10233f); color: #9db3cd; border: 1px solid rgba(160, 200, 255, .14); box-shadow: 0 .3cqw 0 var(--base); }
+.telao .seq-dots.fixo span.feito, .telao .temas span.feito { background: linear-gradient(180deg, #264a78, #183255); color: #dbe7f5; }
+.telao .seq-dots.fixo span.agora, .telao .temas span.agora { background: linear-gradient(180deg, #fde68a, #fbbf24 55%, #f59e0b); color: #1b1300; border-color: #fff3c4; box-shadow: 0 .3cqw 0 #92400e, 0 0 1.4cqw rgba(251, 191, 36, .4); }
+.telao .chip { border: 1px solid rgba(160, 200, 255, .16); }
+
+/* --- Relógio: mostrador com aro de metal e vidro --- */
+.telao .crono { box-shadow: inset 0 0 0 1.5cqw #0c1c36, inset 0 0 0 1.75cqw rgba(160, 200, 255, .22), 0 .7cqw 0 var(--base), 0 1.4cqw 2.4cqw rgba(0, 0, 0, .5); }
+.crono-mini .crono { box-shadow: inset 0 0 0 .8cqw #0c1c36, inset 0 0 0 .95cqw rgba(160, 200, 255, .22), 0 .4cqw 0 var(--base); }
+.telao .crono::after { text-shadow: 0 .2cqw 0 rgba(0, 0, 0, .35); }
+
+/* --- Mapa: o desenho ocupa a placa inteira (sem a sobra de cima e dos lados) --- */
+.telao .mapa-card { aspect-ratio: 780 / 410; padding: .5cqw; }
+
+/* --- Botões: desligado fica afundado e fosco (não parece clicável) --- */
+.btn:disabled { filter: grayscale(.85) brightness(.66); transform: translateY(3px); box-shadow: 0 2px 0 var(--c2), inset 0 1px 0 rgba(255, 255, 255, .12); text-shadow: none; }
+.btn.sm:disabled { transform: translateY(2px); box-shadow: 0 1px 0 var(--c2); }
+
+/* --- Celular: cabeçalho com a mesma luz do telão, placas com fio claro, respostas com mais corpo --- */
+.phone { background: radial-gradient(ellipse 120% 34% at 50% 0%, #15335c 0%, transparent 72%), linear-gradient(180deg, #0c1c36, #0a1528); }
+.phone .hd { background: linear-gradient(180deg, rgba(22, 48, 84, .96), rgba(12, 28, 54, .96)); border-bottom: 1px solid rgba(160, 200, 255, .16); box-shadow: 0 6px 14px rgba(0, 0, 0, .3); }
+.mini-hud span { background: linear-gradient(180deg, #1c3a63, #122846); border: 1px solid rgba(160, 200, 255, .14); }
+.opt { background: linear-gradient(180deg, #1d3d68, #14294a); border: 1px solid rgba(160, 200, 255, .16); border-bottom-color: rgba(0, 0, 0, .35); box-shadow: 0 4px 0 var(--base), inset 0 1px 0 rgba(255, 255, 255, .1); transition: transform .08s, box-shadow .08s; }
+.opt:active { box-shadow: 0 1px 0 var(--base); }
+.opt.sel { background: linear-gradient(180deg, #2a62a4, #1d4b7a); box-shadow: 0 2px 0 var(--base), 0 0 0 2px #7cb7ff inset, 0 0 16px rgba(96, 165, 250, .35); }
+.anchor { background: linear-gradient(180deg, #33250a, #1f1604); border: 1px solid #7a5a12; }
+.phone .glos-btn { font-size: 13px; }
+.phone .novo, .phone .glos-btn .cnt { font-size: 13px; }
+
+/* --- Simulador: moldura do celular com aro e reflexo --- */
+.ph-frame { background: linear-gradient(160deg, #101b2e, #02060c 40%); box-shadow: 0 0 0 2px #2a4266, 0 0 0 3px #060d18, 0 18px 40px rgba(0, 0, 0, .55), inset 0 1px 0 rgba(255, 255, 255, .12); }
+
+/* --- Celular: o cartão de espera ("Conversem na família") mostrava o botão cortado em telas estreitas --- */
+.espera { max-height: 460px; }
+
+/* --- Barra de estado com 6 fichas (anos 3 a 5): no pior caso ("Prosperidade" + mata com variação + bem público com variação) o texto
+   encostava na ficha vizinha. As fichas ficam mais justas (ícone, respiro e número um pouco menores; os rótulos seguem em 1,6 cqw). --- */
+.hud:has(.slot:nth-child(6)) { gap: .6cqw; }
+.hud:has(.slot:nth-child(6)) .slot { padding: .6cqw .65cqw; gap: .5cqw; flex-shrink: 0; }
+.hud:has(.slot:nth-child(6)) .slot .ico3 { width: 3.1cqw; height: 3.1cqw; }
+.hud:has(.slot:nth-child(6)) .slot b { font-size: 2cqw; }
+.hud:has(.slot:nth-child(6)) .slot.ano b { font-size: 2.3cqw; }
+.hud:has(.slot:nth-child(6)) .slot.ano { padding-right: 1cqw; }
+.hud:has(.slot:nth-child(6)) .delta { margin-left: .35cqw; padding: .05cqw .4cqw; }
+
+/* --- Palpite já enviado: a resposta escolhida continua colorida e ganha um aro; as outras ficam foscas (antes, as três ficavam cinza) --- */
+.btn.on:disabled { filter: none; cursor: default; text-shadow: 0 1px 0 rgba(0, 0, 0, .25);
+  box-shadow: 0 1px 0 var(--c2), inset 0 0 0 2px rgba(191, 219, 254, .9), 0 0 14px rgba(96, 165, 250, .35); }
+
+/* --- Cor por assunto (as placas eram todas do mesmo azul): a frase principal de cada tela é uma placa quente, de lampião;
+   em "Como ficou a vila", cada painel tem a cor do seu assunto. O azul fica para o que é leitura de apoio. --- */
+.telao .card.destaque { border-left: .4cqw solid var(--lampiao); border-color: rgba(253, 230, 138, .32); border-left-color: var(--lampiao); border-bottom-color: rgba(0, 0, 0, .4);
+  background: radial-gradient(ellipse 36% 160% at 0% 50%, rgba(251, 191, 36, .30), transparent 72%), linear-gradient(180deg, #5b3f16, #33230d); }
+.telao .painel[data-tema="aluguel"] .card { background: linear-gradient(180deg, #57301f, #2e1910); border-color: rgba(253, 186, 116, .28); border-bottom-color: rgba(0, 0, 0, .4); }
+.telao .painel[data-tema="mercado"] .card { background: linear-gradient(180deg, #185058, #0d2d35); border-color: rgba(153, 246, 228, .26); border-bottom-color: rgba(0, 0, 0, .4); }
+.telao .painel[data-tema="dinheiro"] .card { background: linear-gradient(180deg, #17573f, #0c3024); border-color: rgba(134, 239, 172, .26); border-bottom-color: rgba(0, 0, 0, .4); }
+.telao .painel[data-tema="desigualdade"] .card { background: linear-gradient(180deg, #4b2459, #281331); border-color: rgba(240, 171, 252, .26); border-bottom-color: rgba(0, 0, 0, .4); }
+.telao .painel[data-tema="carta"] .card { background: linear-gradient(180deg, #372d74, #1c1743); border-color: rgba(196, 181, 253, .28); border-bottom-color: rgba(0, 0, 0, .4); }
+.telao .painel[data-tema="carta"] .card.destaque { background: radial-gradient(ellipse 36% 160% at 0% 50%, rgba(251, 191, 36, .30), transparent 72%), linear-gradient(180deg, #5b3f16, #33230d); }
+.telao .card:has(.temas) { background: linear-gradient(180deg, #372d74, #1c1743); border-color: rgba(196, 181, 253, .28); border-bottom-color: rgba(0, 0, 0, .4); }

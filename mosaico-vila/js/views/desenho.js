@@ -102,34 +102,35 @@ export function mapaVila(st, { grande = true, destaque = null, menor = false } =
     const dono = st.lotes[k] ? st.fams[st.lotes[k]] : null;
     const marcada = dono && destaque === dono.id;
     lotes.push(dono
-      ? `<g transform="translate(${x} ${y})"><rect x="-19" y="-19" width="38" height="44" rx="7" fill="${marcada ? dono.cor2 : "#1b3352"}" opacity="${marcada ? ".55" : ".8"}"/><rect x="-19" y="21" width="38" height="4" rx="2" fill="#081526" opacity=".7"/><image href="${ICO}casa-${marcada ? dono.casa : "neutra"}.webp" x="-21" y="-20" width="42" height="42"/></g>`
+      ? `<g transform="translate(${x} ${y})"><rect x="-19" y="-19" width="38" height="44" rx="7" fill="${marcada ? dono.cor2 : "#2b6d68"}" opacity="${marcada ? ".6" : ".9"}"/><rect x="-19" y="21" width="38" height="4" rx="2" fill="#061a1c" opacity=".75"/><image href="${ICO}casa-${marcada ? dono.casa : "neutra"}.webp" x="-21" y="-20" width="42" height="42"/></g>`
       : aVenda-- > 0
         ? `<g transform="translate(${x} ${y})"><rect x="-19" y="-19" width="38" height="44" rx="7" fill="#2a2208" stroke="#fbbf24" stroke-width="2" stroke-dasharray="5 3"/><image href="${ICO}lote-alfinete.webp" x="-21" y="-21" width="42" height="42"/></g>`
-        : `<g transform="translate(${x} ${y})"><rect x="-19" y="-19" width="38" height="44" rx="7" fill="#0b1a2c" stroke="#3b5875" stroke-dasharray="4 4"/></g>`);
+        : `<g transform="translate(${x} ${y})"><rect x="-19" y="-19" width="38" height="44" rx="7" fill="#ffffff" fill-opacity=".05" stroke="#7fb0bd" stroke-opacity=".75" stroke-dasharray="4 4"/></g>`);
   }
   const nivel = st.publico;
   const predios = [];
   for (let k = 1; k <= 5; k++) {
     const on = k <= nivel, x = 345 + ((k - 1) % 2) * 90, y = 150 + Math.floor((k - 1) / 2) * 84;
-    predios.push(`<g transform="translate(${x} ${y})" opacity="${on ? 1 : 0.3}"><rect x="-32" y="-26" width="64" height="52" rx="8" fill="${on ? "url(#predio)" : "#1b3555"}" stroke="${on ? "#fde68a" : "#2a4a6e"}"/>${PREDIO_3D[k] ? `<image href="${ICO}${PREDIO_3D[k]}.webp" x="-25" y="-33" width="50" height="50"/>` : `${glifoPublico(k, on)}`}<text y="23" text-anchor="middle" font-size="14" font-weight="700" fill="${on ? "#3b2405" : "#6f89a6"}" font-family="Sora, sans-serif">${k}</text></g>`);
+    predios.push(`<g transform="translate(${x} ${y})"><rect x="-32" y="-26" width="64" height="52" rx="8" fill="${on ? "url(#predio)" : "#0f1430"}" fill-opacity="${on ? 1 : 0.45}" stroke="${on ? "#fde68a" : "#8b97de"}" stroke-opacity="${on ? 1 : 0.6}"${on ? "" : ' stroke-dasharray="5 4"'}/>${PREDIO_3D[k] ? `<image href="${ICO}${PREDIO_3D[k]}.webp" x="-25" y="-33" width="50" height="50"${on ? "" : ' filter="url(#apagado)" opacity=".6"'}/>` : `${glifoPublico(k, on)}`}<text y="23" text-anchor="middle" font-size="18" font-weight="800" fill="${on ? "#3b2405" : "#c3caf5"}" font-family="Sora, sans-serif">${k}</text></g>`);
   }
   const corMata = fm < 0.3 ? "#fb7185" : fm < 0.5 ? "#fbbf24" : "#34d399";   // R13: as mesmas faixas da barra (30% e 50%)
-  return `<svg class="metro mapa ${grande ? "grande" : ""}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Mapa da vila: mata em ${Math.round(fm * 100)}%, bem público nível ${nivel}">
+  return `<svg class="metro mapa ${grande ? "grande" : ""}" viewBox="10 30 780 410" role="img" aria-label="Mapa da vila: mata em ${Math.round(fm * 100)}%, bem público nível ${nivel}">
     <defs>
       <linearGradient id="predio" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fcd34d"/><stop offset="1" stop-color="#b45309"/></linearGradient>
-      <linearGradient id="gMata" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#14502f"/><stop offset="1" stop-color="#0a2217"/></linearGradient>
-      <linearGradient id="gPub" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#262d52"/><stop offset="1" stop-color="#141a30"/></linearGradient>
-      <linearGradient id="gLot" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#173050"/><stop offset="1" stop-color="#0e1f35"/></linearGradient>
+      <linearGradient id="gMata" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#145231"/><stop offset=".22" stop-color="#1b6a3d"/><stop offset="1" stop-color="#0b2a1a"/></linearGradient>
+      <linearGradient id="gPub" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f3a7a"/><stop offset="1" stop-color="#171d3f"/></linearGradient>
+      <linearGradient id="gLot" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1c4d56"/><stop offset="1" stop-color="#0f2933"/></linearGradient>
+      <filter id="apagado" x="0" y="0" width="1" height="1"><feColorMatrix type="matrix" values=".22 .34 .14 0 .14  .24 .36 .18 0 .18  .32 .44 .30 0 .36  0 0 0 1 0"/></filter>
     </defs>
-    <rect x="20" y="40" width="260" height="390" rx="18" fill="url(#gMata)" stroke="#2b7a4d"/>
+    <rect x="20" y="40" width="260" height="390" rx="18" fill="url(#gMata)" stroke="#44a871" stroke-width="1.5"/>
     <text x="34" y="68" font-size="${fr}" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Mata</text><text x="266" y="68" text-anchor="end" font-size="${fr}" font-weight="700" fill="${corMata}" font-family="JetBrains Mono, monospace">${pctL(fm)}</text>
     ${arv.join("")}
-    <rect x="290" y="40" width="200" height="390" rx="18" fill="url(#gPub)" stroke="#3c4883"/>
+    <rect x="290" y="40" width="200" height="390" rx="18" fill="url(#gPub)" stroke="#6673c9" stroke-width="1.5"/>
     <text x="${menor ? 299 : 304}" y="68" font-size="${fr}" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif"${menor ? ' letter-spacing="-0.6"' : ""}>Bem público</text><text x="304" y="100" font-size="${fr}" fill="#fbbf24" font-family="Sora, sans-serif">nível ${nivel} de 5</text>
     ${predios.join("")}
-    ${quebra(NIVEIS_PUBLICO[nivel], 11).map((l, k, ls) => `<text x="390" y="${420 - (ls.length - 1 - k) * (fr + 2)}" text-anchor="middle" font-size="${fr}" fill="#9fb6cf" font-family="Sora, sans-serif">${esc(l)}</text>`).join("")}
-    <rect x="500" y="40" width="280" height="390" rx="18" fill="url(#gLot)" stroke="#2f5379"/>
-    <text x="514" y="68" font-size="${fr}" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Lotes</text><text x="766" y="68" text-anchor="end" font-size="${frL}" fill="#9fb6cf" font-family="Sora, sans-serif">${st.lotes.filter((x) => !x).length} livres</text>
+    ${quebra(NIVEIS_PUBLICO[nivel], 11).map((l, k, ls) => `<text x="390" y="${420 - (ls.length - 1 - k) * (fr + 2)}" text-anchor="middle" font-size="${fr}" fill="#b9cbdd" font-family="Sora, sans-serif">${esc(l)}</text>`).join("")}
+    <rect x="500" y="40" width="280" height="390" rx="18" fill="url(#gLot)" stroke="#4a96a0" stroke-width="1.5"/>
+    <text x="514" y="68" font-size="${fr}" font-weight="700" fill="#e8f1fb" font-family="Sora, sans-serif">Lotes</text><text x="766" y="68" text-anchor="end" font-size="${frL}" fill="#b9cbdd" font-family="Sora, sans-serif">${st.lotes.filter((x) => !x).length} livres</text>
     ${lotes.join("")}
   </svg>`;
 }
