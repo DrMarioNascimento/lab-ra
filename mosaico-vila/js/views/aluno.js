@@ -13,17 +13,24 @@ export function novoLocal() { return { pub: 20, rep: 0, car: 0, lance: 0, face: 
 // R34: no voto e na proposta grande, cada um responde longe da família: o cabeçalho não mostra o caixa a quem senta ao lado
 function hd(st, me) {
   const f = me?.fam ? vista(st).fams[me.fam] : null;   // R19: nas cartas dos anos 2 e 4, o caixa de antes das decisões (como a barra)
-  return `<div class="hd">${f ? iconeFamilia(f, 34) : ico("app-mosaico-vila", "m")}
-    <div class="grow"><b>${esc(me?.nome || "Mosaico Vila")}</b><div class="faint" style="font-size:12px">${f ? (["voto", "alvara"].includes(st.fase) ? esc(f.nome) : `${esc(f.nome)} · caixa ${n0(f.caixa)}`) : "Mosaico Vila"}</div></div>
-    <button class="btn sm sec info-btn" data-a="manual" aria-label="Como jogar">i</button>${st.ano ? `<span class="chip">Ano ${st.ano}</span>` : ""}${st.ano ? miniBarra(st) : ""}</div>`;
+  return `<div class="hd painel"><div class="p-topo">${f ? iconeFamilia(f, 36) : ico("app-mosaico-vila", "m")}
+    <div class="p-quem"><b>${esc(me?.nome || "Mosaico Vila")}</b><span class="p-fam">${f ? esc(f.nome) : "Mosaico Vila"}${st.ano ? ` · ano ${st.ano}` : ""}</span></div>
+    <button class="btn sm sec info-btn" data-a="manual" aria-label="Como jogar">i</button></div>${st.ano ? faixaPainel(st, f) : ""}</div>`;
 }
 
-// R11: a mesma barra de ícones do telão, pequena, no alto do celular
-function miniBarra(st0) {
+// R42: painel superior do celular. Linha 1: quem sou (casa da família, nome, família e ano) e as ferramentas (glossário, "i").
+// Linha 2: uma faixa de mostradores, sempre na mesma ordem: saldo da família em pontos, mata, bem público e meta (com o nome da regra).
+// R34: no voto e na proposta grande, cada um responde longe da família: o painel não mostra o saldo a quem senta ao lado.
+function faixaPainel(st0, f) {
   const st = vista(st0);   // R17: entre as decisões e o resultado, a vila de antes das decisões
   const m = progressoMeta(st.fams, st.publico, st.mata, st.teto, st.regra);
-  const meta = st.ano === 3 ? "duas metas" : m.regra === "prosperidade" ? `${pctL(m.valor)}/${Math.round(100 * m.alvo)}%` : `${nL(m.valor, m.alvo)}/${m.alvo}`;   // R20
-  return `<div class="mini-hud">${st.ano >= 2 ? `<span>${ico("arvore-redonda")}<b>${pctL(st.mata / st.teto)}</b></span>` : ""}<span>${ico("economia")}<b>nível ${st.publico}</b></span><span>${ico("meta")}<b>${meta}</b></span><span>${ico("balanca")}<b>${REGRAS_TXT[st.regra].nome}</b></span></div>`;
+  const meta = st.ano === 3 ? "duas metas" : m.regra === "prosperidade" ? `${pctL(m.valor)}<small>/${Math.round(100 * m.alvo)}%</small>` : `${nL(m.valor, m.alvo)}<small>/${m.alvo}</small>`;   // R20
+  const anos = `<div class="p-anos" aria-hidden="true">${Array.from({ length: 5 }, (_, k) => `<i class="${k + 1 < st.ano ? "feito" : k + 1 === st.ano ? "agora" : ""}"></i>`).join("")}</div>`;
+  const fm = st.teto ? st.mata / st.teto : 0;
+  const saldo = f && !["voto", "alvara"].includes(st.fase) ? `<div class="p-cel saldo" aria-label="Saldo da família: ${n0(f.caixa)} pontos"><b>${ico("moeda")}<span class="p-val">${n0(f.caixa)}</span></b><span>pontos</span></div>` : "";
+  const mata = st.ano >= 2 ? `<div class="p-cel ${fm < 0.3 ? "mal" : fm < 0.5 ? "atencao" : ""}"><b>${pctL(fm)}</b><span>mata</span></div>` : "";
+  const niv = Array.from({ length: 5 }, (_, k) => `<i class="${k < st.publico ? "on" : ""}"></i>`).join("");
+  return `${anos}<div class="p-faixa">${saldo}${mata}<div class="p-cel" aria-label="Bem público: nível ${st.publico} de 5"><b class="p-niv">${niv}</b><span>bem público</span></div><div class="p-cel"><b>${ico("meta")}<span class="p-val">${meta}</span></b><span>${REGRAS_TXT[st.regra].nome}</span></div></div>`;
 }
 
 // R19 e R20: as duas metas no celular, na conversa e no voto: o número de hoje e para onde ele costuma ir

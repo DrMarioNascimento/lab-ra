@@ -670,6 +670,42 @@ body { background: radial-gradient(1100px 560px at 50% -140px, #123057 0%, rgba(
 .phone .man-bloco p, .phone .man-bloco li { font-size: 14px; line-height: 1.45; color: #dbe7f5; margin: 0; }
 .phone .man-bloco ul, .phone .man-bloco ol { margin: 0; padding-left: 18px; }
 .phone .man-bloco li + li { margin-top: 5px; }
-/* Com a barrinha de estado (do ano 1 em diante), o "i" desce para a ponta direita da segunda linha: a primeira fica para o nome e a família */
-.phone .hd:has(.mini-hud) .mini-hud { order: 4; flex-basis: calc(100% - 54px); }
-.phone .hd:has(.mini-hud) .info-btn { order: 5; margin-left: auto; align-self: center; }
+
+/* ===== R42: painel superior do celular (o cartão de visitas do jogo, sempre visível) =====
+   Linha 1: quem sou e as ferramentas. Linha 2: faixa de mostradores (saldo em pontos, mata, bem público, meta e regra).
+   Mostrador é afundado (não se aperta); botão é saliente (aperta). Nada quebra de linha: o que não couber encurta com reticências. */
+.phone .hd.painel { display: block; padding: 6px 12px 8px; }
+.phone .p-topo { display: flex; align-items: center; gap: 8px; min-height: 44px; }
+.phone .p-quem { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 1px; line-height: 1.2; }
+.phone .p-quem b { font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.phone .p-quem .p-fam { font-size: 13px; color: var(--tx2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.phone .p-topo .glos-btn { margin-left: 0; display: inline-flex; align-items: center; gap: 4px; padding: 4px 9px 4px 6px; font-size: 13px; }
+.phone .p-topo .glos-btn .ico3 { width: 26px; height: 26px; margin: 0; }
+@media (max-width: 429px) { .phone .glos-txt { display: none; } }
+@container (max-width: 429px) { .phone .glos-txt { display: none; } }
+.phone .p-anos { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-top: 5px; }
+.phone .p-anos i { height: 4px; border-radius: 99px; background: #1b2c5e; box-shadow: inset 0 1px 1px rgba(0, 0, 0, .5); }
+.phone .p-anos i.feito { background: #4ade80; }
+.phone .p-anos i.agora { background: var(--lampiao); box-shadow: 0 0 8px rgba(251, 191, 36, .6); }
+.phone .p-faixa { display: flex; margin-top: 5px; border-radius: 12px; overflow: hidden; background: #091630; border: 1px solid rgba(160, 200, 255, .16);
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, .55), 0 1px 0 rgba(255, 255, 255, .08); }
+.phone .p-cel { flex: 1 1 auto; min-width: 0; padding: 4px 4px 5px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 1px; }
+.phone .p-cel + .p-cel { border-left: 1px solid rgba(160, 200, 255, .14); }
+.phone .p-cel b { display: flex; align-items: center; gap: 3px; min-height: 20px; font-size: 15px; line-height: 1.2; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.phone .p-cel b .p-val { font: inherit; color: inherit; overflow: visible; }
+.phone .p-cel b small { font-size: 13px; font-weight: 600; color: #a9bdd3; }
+.phone .p-cel > span { max-width: 100%; font-size: 13px; line-height: 1.2; color: #a9bdd3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.phone .p-cel .ico3 { width: 16px; height: 16px; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .5)); }
+.phone .p-cel.saldo { flex-grow: 1.3; background: linear-gradient(180deg, rgba(251, 191, 36, .24), rgba(251, 191, 36, .09)); }
+.phone .p-cel.saldo b { font-size: 17px; color: #fde68a; }
+.phone .p-cel.saldo > span { color: #f1dc9c; }
+.phone .p-cel.atencao { background: rgba(249, 115, 22, .16); }
+.phone .p-cel.atencao b { color: #fdba74; }
+.phone .p-cel.mal { background: rgba(244, 63, 94, .24); }
+.phone .p-cel.mal b { color: #fecdd3; }
+.phone .p-niv { gap: 2px !important; }
+.phone .p-niv i { width: 8px; height: 13px; border-radius: 2px; background: #2a3d7c; box-shadow: inset 0 1px 2px rgba(0, 0, 0, .55), 0 0 0 1px rgba(160, 200, 255, .22); }
+.phone .p-niv i.on { background: linear-gradient(180deg, #fde68a, #f59e0b 55%, #b45309); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .6); }
+/* Simulador: o celular simulado passa a ter a largura de um celular de verdade (360 px de tela; antes, 280) */
+.ph-wrap { width: 380px; }
+.ph-frame { width: 380px; height: 680px; }
