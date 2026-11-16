@@ -1,8 +1,8 @@
-# GDD · Percurso Ético "Um dia"
+# GDD · Percurso / Limiar Ético — "Um dia"
 
 Versão 0.1 · 15/11/2026 · documento de projeto (não é conteúdo para o aluno)
 Autoria da concepção: Prof. Dr. Mário César Nascimento
-Nome do jogo: em aberto. "Limiar Ética" é o nome do protótipo atual; "Percurso Ético" é o nome de trabalho.
+Nome do jogo, por enquanto: **Percurso / Limiar Ético** (decisão do professor em 15/11/2026).
 
 Este documento registra o desenho combinado em conversa de 15/11/2026. Nada foi programado a partir dele ainda.
 
@@ -11,6 +11,8 @@ Este documento registra o desenho combinado em conversa de 15/11/2026. Nada foi 
 ## 1. Visão
 
 Um percurso ético de um dia inteiro. O jogador vive um dia comum em que exigências legítimas se cruzam (o trabalho, a universidade, a família, um evento que precisa acontecer) e toma decisões ao longo das horas.
+
+A proposta é um **aulão prático e exemplificado**: reunir os conceitos e as teorias da disciplina e levá-los para situações do dia a dia.
 
 O objetivo não é acertar. É **mostrar os conceitos em ação**: em que momento a pessoa agiu mais por impulso, por emoção ou por razão; quando buscou o certo e quando buscou o desfecho; quanta liberdade real tinha. No fim, o dia aparece como curvas e como uma leitura pela escala ética, para a pessoa comparar e argumentar.
 
@@ -114,6 +116,7 @@ Três fontes, combinadas:
 - O quadro-síntese de sete perguntas aplicado ao próprio percurso.
 - Perguntas para argumentar: o que você manteria, o que mudaria, o que consegue justificar publicamente.
 - Sem nota e sem gabarito.
+- **Nada é salvo.** O percurso aparece na tela e some ao fechar (decisão do professor em 15/11/2026).
 
 ## 10. Modos
 
@@ -143,10 +146,8 @@ Os dois podem conviver no mesmo lugar.
 
 ## 13. Decisões em aberto
 
-- Nome do jogo.
 - Só individual, ou também com versão de sala (telão e celulares).
 - Lista final de curvas.
-- Salvar ou não o percurso (o Percursos Éticos atual exporta o registro).
 - Onde publicar: LAB-RA primeiro e depois o site de Ética, ou direto no site.
 - Usar ou não os quatro personagens de "A Academia" como elenco, respeitando a regra de nomes únicos.
 - Quantos dias diferentes existirão, e se o sistema sorteia o dia.
