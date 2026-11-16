@@ -1,6 +1,6 @@
 # GDD · Percurso / Limiar Ético — "Um dia"
 
-Versão 0.1 · 15/11/2026 · documento de projeto (não é conteúdo para o aluno)
+Versão 0.2 · 15/11/2026 · documento de projeto (não é conteúdo para o aluno)
 Autoria da concepção: Prof. Dr. Mário César Nascimento
 Nome do jogo, por enquanto: **Percurso / Limiar Ético** (decisão do professor em 15/11/2026).
 
@@ -15,6 +15,10 @@ Um percurso ético de um dia inteiro. O jogador vive um dia comum em que exigên
 A proposta é um **aulão prático e exemplificado**: reunir os conceitos e as teorias da disciplina e levá-los para situações do dia a dia.
 
 O objetivo não é acertar. É **mostrar os conceitos em ação**: em que momento a pessoa agiu mais por impulso, por emoção ou por razão; quando buscou o certo e quando buscou o desfecho; quanta liberdade real tinha. No fim, o dia aparece como curvas e como uma leitura pela escala ética, para a pessoa comparar e argumentar.
+
+**A leitura é sutil.** Durante o dia o jogador não vê rótulos nem conceitos: ele só decide, como decidiria na vida. É no final que descobre que característica teve cada decisão (mais emotiva, mais racional, mais voltada ao dever ou ao desfecho). Se as alternativas viessem rotuladas, a pessoa escolheria o que parece mais bonito.
+
+Nem todos os conceitos cabem num dia só. Cada dia cobre uma parte, e o conjunto dos dias cobre a matéria.
 
 ## 2. De onde parte
 
@@ -72,16 +76,29 @@ Diálogo bem-humorado entre quatro personagens numa academia, cada um com uma ma
 
 ## 5. Fluxo de cada cena
 
-1. **Relembrar o conceito** em jogo (curto, do texto-base ou do glossário).
-2. **Entender o cenário:** fatos, quem está envolvido, o que não se sabe.
-3. **Marcar o primeiro impulso:** o que dá vontade de fazer agora.
-4. **Decidir.**
-5. **Ver o desfecho**, que depende também do que foi feito antes.
-6. **Comparar e argumentar:** impulso e decisão lado a lado, o que as outras lentes diriam, o que a pessoa consegue justificar.
+Durante o dia:
+
+1. **Entender o cenário:** fatos, quem está envolvido, o que não se sabe. Buscar mais informação (abrir os fatos, ouvir outro personagem) é opcional.
+2. **Decidir.**
+3. **Ver o desfecho**, que depende também do que foi feito antes.
+
+Nenhum conceito aparece antes nem logo depois da decisão. Se cada cena revelasse a leitura, da segunda em diante o jogador já estaria jogando para a curva.
+
+No fim do dia, a revelação:
+
+4. **Ver as curvas** e a característica de cada decisão.
+5. **Conhecer o conceito** por trás de cada uma.
+6. **Comparar e argumentar:** o que as outras lentes diriam, o que a pessoa consegue justificar, e onde ela discorda da leitura.
+
+Regras de escrita das alternativas:
+
+- São escritas como **ações**, nunca como motivos.
+- Todas são plausíveis. Nenhuma pode parecer "a resposta emocional" ou "a resposta certa".
+- Não há rótulo, cor ou ordem fixa que denuncie o tipo de cada uma.
 
 ## 6. As curvas
 
-O dia aparece numa linha do tempo, com um ponto por decisão. Tocar no ponto abre o conceito daquela cena.
+As curvas aparecem só na revelação final. O dia é mostrado numa linha do tempo, com um ponto por decisão; tocar no ponto abre o conceito daquela cena.
 
 | Curva | O que mostra | Base |
 |---|---|---|
@@ -95,13 +112,17 @@ A lista final de curvas é decisão em aberto. Candidatas a acrescentar: empatia
 
 ## 7. Como a leitura é feita
 
-Três fontes, combinadas:
+Tudo é captado de forma discreta, sem perguntar nada ao jogador:
 
-- **Peso de autoria:** cada alternativa é escrita para encarnar um tipo de justificativa, e o professor define o peso dela em cada curva.
-- **Impulso e decisão:** a distância entre o primeiro impulso marcado e a decisão tomada.
+- **Peso de autoria:** cada alternativa encarna um tipo de justificativa, e o professor define o peso dela em cada curva.
 - **Tempo de resposta**, como na decisão cronometrada do Bonde.
+- **Busca de informação:** se a pessoa abriu os fatos ou ouviu outro personagem antes de decidir. Procurar informação é sinal de deliberação.
 
-É uma leitura interpretativa do percurso, não uma medida da pessoa. O jogo diz isso de forma clara, e o fechamento fala de escolhas e tensões, nunca de caráter.
+O "primeiro impulso" não é perguntado neste modo. A pergunta faria a pessoa parar e refletir, e mudaria a decisão que se quer observar.
+
+A mesma ação pode nascer da razão ou da emoção. Por isso a revelação diz "esta escolha tem característica de...", e convida o jogador a discordar e explicar o próprio motivo. Essa contestação é a argumentação que o jogo quer provocar.
+
+É uma leitura interpretativa do percurso, não uma medida da pessoa. O fechamento fala de escolhas e tensões, nunca de caráter.
 
 ## 8. Acúmulo, meta e corpo
 
@@ -115,13 +136,14 @@ Três fontes, combinadas:
 - As curvas do dia e a leitura pela escala.
 - O quadro-síntese de sete perguntas aplicado ao próprio percurso.
 - Perguntas para argumentar: o que você manteria, o que mudaria, o que consegue justificar publicamente.
+- Espaço para o jogador contestar a leitura de cada decisão.
 - Sem nota e sem gabarito.
 - **Nada é salvo.** O percurso aparece na tela e some ao fechar (decisão do professor em 15/11/2026).
 
 ## 10. Modos
 
 - **Casos:** o Percursos Éticos atual, com histórias independentes.
-- **Um dia:** o percurso encadeado descrito aqui.
+- **Um dia:** o percurso encadeado descrito aqui. A primeira partida é espontânea; as seguintes já são conscientes. Com dias diferentes sorteados, o aluno compara como decide sem saber e como decide sabendo.
 
 Os dois podem conviver no mesmo lugar.
 
@@ -137,7 +159,7 @@ Os dois podem conviver no mesmo lugar.
 
 ## 12. Etapas de construção
 
-1. Conferir os slides e fechar a lista de conceitos e de curvas.
+1. Conferir os slides e montar a tabela de conceitos: de um lado os conceitos e teorias, do outro a cena do cotidiano que exemplifica cada um, distribuídos pelos dias.
 2. Escrever o dia-piloto: fio principal, cenas, alternativas e pesos.
 3. Motor do dia com variáveis de estado e desfechos.
 4. Linha do tempo com as curvas e a escala.
@@ -157,4 +179,6 @@ Os dois podem conviver no mesmo lugar.
 - **Sobreposição** com o Casos Éticos, que também tem caminhos e escala. A diferença a preservar: aqui o resultado é a curva de um dia contínuo.
 - **Rotular pessoas.** As curvas podem ser lidas como diagnóstico de caráter.
 - **Peso de autoria.** Um dia encadeado exige muito texto bem escrito.
-- **Teoria decorativa.** O conceito precisa explicar a decisão que acabou de ser tomada, e não aparecer como verbete solto.
+- **Teoria decorativa.** Na revelação, o conceito precisa explicar a decisão que foi tomada, e não aparecer como verbete solto.
+- **Alternativa que se denuncia.** Se o jogador percebe qual é a opção "racional", a sutileza acaba.
+- **Rejogo.** Depois da primeira revelação o jogador conhece o mecanismo; a variedade de dias e cenas precisa sustentar as partidas seguintes.
