@@ -1,6 +1,6 @@
 :root {
   --bg: #07111f; --bg2: #0c1a2e; --card: #10223b; --card2: #16304f; --line: #23415f;
-  --tx: #e8f1fb; --tx2: #9fb6cf; --tx3: #6f89a6;
+  --tx: #e8f1fb; --tx2: #9fb6cf; --tx3: #8aa2bd;   /* tx3 clareado (antes #6f89a6, 4,4:1 no cartão): agora acima de 5:1 em todos os fundos (WCAG AA) */
   --art: #f43f5e; --ven: #6366f1; --o2: #fbbf24; --ok: #34d399; --bad: #fb7185; --warn: #fbbf24;
   --r: 16px; --font: "Sora", system-ui, sans-serif; --mono: "JetBrains Mono", ui-monospace, monospace;
 }
@@ -29,9 +29,9 @@ p { line-height: 1.55; margin: 0.4em 0; }
 .btn:active, .btn.on { transform: translateY(4px); box-shadow: 0 1px 0 var(--c2), 0 3px 8px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.25); }
 .btn:disabled { filter: grayscale(.8) brightness(.7); cursor: not-allowed; }
 .btn.sec { --c: #2a4a6e; --c2: #162c45; }
-.btn.ok { --c: #10b981; --c2: #047857; }
-.btn.warn { --c: #f59e0b; --c2: #b45309; }
-.btn.red { --c: #f43f5e; --c2: #9f1239; }
+.btn.ok { --c: #10b981; --c2: #047857; color: #04261b; text-shadow: 0 1px 0 rgba(255,255,255,.28); }   /* texto escuro sobre o verde vivo: 6,4:1 (branco dava 2,5:1) */
+.btn.warn { --c: #f59e0b; --c2: #b45309; color: #2b1700; text-shadow: 0 1px 0 rgba(255,255,255,.3); }   /* 8:1 (branco dava 2,2:1) */
+.btn.red { --c: #d4143f; --c2: #8c0f2e; }   /* vermelho um pouco mais fundo: texto branco acima de 4,5:1 */
 .btn.sm { padding: 7px 12px; min-height: 36px; font-size: 13px; border-radius: 11px; box-shadow: 0 3px 0 var(--c2), 0 5px 10px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.3); }
 .btn.sm:active, .btn.sm.on { transform: translateY(2px); box-shadow: 0 1px 0 var(--c2); }
 .btn.block { width: 100%; }
@@ -56,6 +56,9 @@ input[type=text], textarea, input[type=number], select {
   width: 100%; font: inherit; color: var(--tx); background: #0b1a2c; border: 1px solid var(--line); border-radius: 12px; padding: 11px 12px; min-height: 46px;
 }
 textarea { min-height: 80px; resize: vertical; }
+input::placeholder, textarea::placeholder { color: #8fa7c2; opacity: 1; }   /* o cinza padrão do navegador dava 3,8:1 */
+/* Foco por teclado visível em tudo que se clica (antes só o slider tinha) */
+button:focus-visible, .btn:focus-visible, .opt:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid #93c5fd; outline-offset: 3px; }
 /* Slider 3D: trilho afundado e botão com volume, que afunda ao arrastar */
 input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 34px; background: transparent; cursor: pointer; touch-action: pan-y; }
 input[type=range]::-webkit-slider-runnable-track { height: 10px; border-radius: 999px; background: #0b1a2c; box-shadow: inset 0 2px 3px rgba(0,0,0,.6), 0 1px 0 rgba(255,255,255,.07); }
@@ -108,7 +111,9 @@ table.vals td.n { font-family: var(--mono); text-align: right; white-space: nowr
 .sep { height: 1px; background: #1b3352; margin: 4px 0; }
 
 /* ----- Simulador ----- */
-.sim { display: grid; grid-template-columns: 1fr 340px; gap: 16px; padding: 16px; max-width: 1800px; margin: 0 auto; }
+/* minmax(0,1fr) + min-width:0: sem isso, a fileira de celulares (20 × 314 px) alargava a coluna e o telão chegava a 6274 px em janelas de até 1100 px */
+.sim { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; padding: 16px; max-width: 1800px; margin: 0 auto; }
+.sim > * { min-width: 0; }
 .sim .turma { grid-column: 1 / -1; }
 .phones { display: flex; gap: 14px; overflow-x: auto; padding: 8px 4px 18px; }
 .ph-wrap { flex: 0 0 auto; width: 300px; }
@@ -116,7 +121,7 @@ table.vals td.n { font-family: var(--mono); text-align: right; white-space: nowr
 .ph-screen { width: 100%; height: 100%; border-radius: 26px; overflow: auto; background: var(--bg2); }
 .ph-cap { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; font-size: 13px; }
 .group-sep { flex: 0 0 auto; width: 6px; border-radius: 6px; }
-@media (max-width: 1100px) { .sim { grid-template-columns: 1fr; } }
+@media (max-width: 1100px) { .sim { grid-template-columns: minmax(0, 1fr); } }
 /* "Reduzir movimento": ver o fim do arquivo (R17) */
 
 /* ----- Mosaico Vila ----- */
@@ -493,3 +498,49 @@ input[type=text], input[type=number], select, textarea { box-shadow: inset 0 3px
 .ph-screen { container-type: size; }
 .phone .mem { aspect-ratio: auto; height: clamp(56px, calc((100cqh - 178px) / 6), 124px); }
 .phone .gen { min-height: clamp(92px, calc((100cqh - 184px) / 4), 160px); }
+
+/* ===== R39 (16/11/2026): avaliação visual — tela cheia que ocupa a tela toda, botão de tela cheia legível ===== */
+/* Em tela cheia o fundo do telão cobre a tela inteira; o conteúdo (desenhado em 16:9) ocupa a maior caixa 16:9 que cabe e fica centrado,
+   para não cortar em telas 16:10, 4:3 ou ultralargas (as unidades cqw passam a medir esta caixa). */
+.telao:fullscreen, .telao.cheio { display: grid; place-items: center; border-radius: 0; box-shadow: none; border: 0; }
+.telao:fullscreen > #telaoIn, .telao.cheio > #telaoIn { position: relative; width: min(100vw, 177.7778vh); aspect-ratio: 16 / 9; container-type: inline-size; }
+.telao .fsbtn.btn.sm { right: 1.2cqw; bottom: 1.2cqw; min-height: 44px; padding: 8px 18px; font-size: max(14px, 1.3cqw); opacity: 0; pointer-events: none; transition: opacity .25s; }
+/* O botão só aparece quando o mouse ou o dedo mexe no telão (some em 2,5 s, ver sim.js) ou ao receber foco: não cobre o texto da TV */
+.telao.mostra-fs .fsbtn.btn.sm, .telao .fsbtn.btn.sm:focus-visible { opacity: .95; pointer-events: auto; }
+@media (hover: none) { .telao .fsbtn.btn.sm { opacity: .9; pointer-events: auto; } }
+.telao:fullscreen > .fsbtn, .telao.cheio > .fsbtn { right: 20px; bottom: 20px; }
+
+/* ===== R39: direção artística — "a vila vista ao entardecer" =====
+   Só pintura (luz, moldura, sombras): nenhuma medida do telão muda. O céu esfria de um ano para o outro (data-ano, posto por sim.js). */
+@property --hz { syntax: "<color>"; inherits: true; initial-value: rgba(251, 191, 36, .34); }
+@property --ceu { syntax: "<color>"; inherits: true; initial-value: #14395f; }
+body { background: radial-gradient(1100px 560px at 50% -140px, #123057 0%, rgba(18, 48, 87, 0) 70%), var(--bg); background-repeat: no-repeat; }
+.telao { --hz: rgba(251, 191, 36, .34); --ceu: #14395f;
+  background: radial-gradient(ellipse 92% 68% at 50% 124%, var(--hz), transparent 66%), radial-gradient(1200px 620px at 50% -12%, var(--ceu) 0%, transparent 66%), linear-gradient(180deg, #0a1b33, var(--bg));
+  box-shadow: 0 0 0 6px #040a14, 0 0 0 7px #2a4a6e, 0 26px 60px rgba(0, 0, 0, .55), 0 0 90px rgba(56, 130, 246, .10);
+  transition: --hz 1.2s ease, --ceu 1.2s ease; }
+.telao[data-ano="2"] { --hz: rgba(251, 146, 60, .34); --ceu: #17386a; }
+.telao[data-ano="3"] { --hz: rgba(244, 114, 182, .28); --ceu: #1a3469; }
+.telao[data-ano="4"] { --hz: rgba(167, 139, 250, .34); --ceu: #1b3068; }
+.telao[data-ano="5"] { --hz: rgba(99, 102, 241, .40); --ceu: #172a62; }
+.telao:fullscreen, .telao.cheio { box-shadow: none; }
+/* Barra de ícones: o ano em índigo (não confunde com o âmbar de "atenção") e a meta da vila com aro dourado */
+.hud .slot.ano { background: linear-gradient(180deg, #2f3f86, #19244f); }
+.hud .slot.ano b { font-size: 2.5cqw; }
+.hud .slot:has(img[src*="/meta."]) { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .14), 0 .45cqw 0 #071423, 0 .8cqw 1.4cqw rgba(0, 0, 0, .35), 0 0 0 .18cqw rgba(251, 191, 36, .6); }
+/* Relógio com brilho quente; painéis do telão com luz de cima mais firme */
+.telao .crono { filter: drop-shadow(0 0 1.2cqw rgba(251, 191, 36, .30)); }
+.telao .card { box-shadow: 0 .4cqw 0 #081526, 0 1cqw 2cqw rgba(0, 0, 0, .35), inset 0 1px 0 rgba(255, 255, 255, .10), inset 0 -2px 6px rgba(0, 0, 0, .18); }
+/* Celular: a barrinha de estado sobe de 12 para 13 px */
+.mini-hud span { font-size: 13px; }
+
+/* R39: celular — letra mínima de 13 px nos rótulos de cabeçalho e alvo de toque de 48 px nas respostas (eram 12 px e 43 px) */
+.phone .hd .faint { font-size: 13px !important; }
+.phone .chip { font-size: 13px; }
+.opt { min-height: 48px; }
+/* iPhone/iPad: a tela cheia simulada (.cheio) usa a altura visível de verdade (dvh), sem a faixa do endereço */
+.telao.cheio { height: 100vh; height: 100dvh; }
+.telao:fullscreen > #telaoIn, .telao.cheio > #telaoIn { width: min(100vw, 177.7778vh); width: min(100vw, 177.7778dvh); }
+/* R39: cartas do jogo da memória no celular: texto legível (mín. 13px) */
+.phone .mem span { font-size: 13px; }
+.phone .novo, .phone .glos-btn .cnt { font-size: 12.5px; }

@@ -36,7 +36,7 @@ app.innerHTML = `
   </div>`;
 
 const telaoIn = document.getElementById("telaoIn");
-subs.add(() => { telaoIn.innerHTML = renderTelao(st); });
+subs.add(() => { telaoIn.innerHTML = renderTelao(st); document.getElementById("telao").dataset.ano = st.ano || 1; });   // R39: o céu do telão esfria a cada ano (ver CSS)
 const prof = montar(document.getElementById("prof"), () => renderProfessor(st), (a, el) => acaoProfessor(a, el, dispatch), () => {});
 subs.add(() => prof.draw());
 
@@ -48,6 +48,10 @@ fs.onclick = () => {
   else telao.classList.add("cheio");
   setTimeout(atualizarFs, 50);
 };
+// R39: o botão de tela cheia só aparece quando o mouse ou o dedo mexe no telão (e some em 2,5 s), para não cobrir o texto da TV
+let fsTimer = 0;
+const mostraFs = () => { telao.classList.add("mostra-fs"); clearTimeout(fsTimer); fsTimer = setTimeout(() => telao.classList.remove("mostra-fs"), 2500); };
+["mousemove", "touchstart", "pointerdown"].forEach((ev) => telao.addEventListener(ev, mostraFs, { passive: true }));
 function atualizarFs() { fs.textContent = document.fullscreenElement || telao.classList.contains("cheio") ? "✕ Sair da tela cheia" : "⛶ Tela cheia"; }
 document.addEventListener("fullscreenchange", atualizarFs);
 

@@ -11,11 +11,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <style>
-  .capa { display: grid; grid-template-columns: auto 1fr; gap: 22px; align-items: center; padding: 22px;
+  .capa { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 22px; align-items: center; padding: 22px;
     background: radial-gradient(520px 260px at 0% 0%, #1d4b3a 0%, transparent 70%), linear-gradient(180deg, var(--card2), var(--card)); }
   .capa h1 { font-size: 34px; }
-  .vitrine { display: flex; gap: 6px; align-items: flex-end; margin-top: 10px; }
+  .vitrine { display: flex; flex-wrap: wrap; gap: 6px; align-items: flex-end; margin-top: 10px; }
   .vitrine img { width: 44px; height: 44px; object-fit: contain; filter: drop-shadow(0 4px 3px rgba(0,0,0,.4)); }
+  .vitrine { position: relative; padding-bottom: 12px; }
+  .vitrine::after { content: ""; position: absolute; left: -8px; right: -8px; bottom: 0; height: 10px; border-radius: 50%; background: radial-gradient(ellipse at 50% 50%, rgba(52,211,153,.38), rgba(52,211,153,0) 72%); }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) { .vitrine img { transition: transform .18s; } .vitrine img:hover { transform: translateY(-4px); } }
   .portas { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
   .porta h2 { display: flex; align-items: center; gap: 10px; }
   .passos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 8px; }
@@ -24,7 +27,8 @@
   .passo b { display: block; font-size: 12px; color: var(--o2); letter-spacing: .08em; text-transform: uppercase; }
   @media (max-width: 640px) { .passos { grid-template-columns: repeat(2, 1fr); } }
   .capa .ico3.xl { width: 128px; height: 128px; }
-  @media (max-width: 560px) { .capa { grid-template-columns: 1fr; text-align: center; } .capa .ico3.xl { margin: 0 auto; } .vitrine { justify-content: center; } }
+  @media (max-width: 560px) { .capa { grid-template-columns: minmax(0, 1fr); text-align: center; } .capa .ico3.xl { margin: 0 auto; } .vitrine { justify-content: center; } }
+  @media (max-width: 420px) { main { padding: 18px 12px !important; } .capa { padding: 18px; } .capa h1 { font-size: 30px; } .passo { padding: 8px 10px; gap: 8px; font-size: 13px; } .passo .ico3.m { width: 30px; height: 30px; } .vitrine img { width: 40px; height: 40px; } }
 </style>
 </head>
 <body ontouchstart="">
