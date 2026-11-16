@@ -19,7 +19,7 @@ function hd(st, me) {
   if (st.fase === "lazer") return `<div class="hd">${f ? iconeFamilia(f, 28) : ico("app-mosaico-vila", "m")}<div class="grow"><b>${esc(me?.nome || "")}</b></div>${botaoGlossario(st)}</div>`;
   return `<div class="hd">${f ? iconeFamilia(f, 34) : ico("app-mosaico-vila", "m")}
     <div class="grow"><b>${esc(me?.nome || "Mosaico Vila Ética")}</b><div class="faint linha-fam" style="font-size:12px">${f ? (["voto", "alvara"].includes(st.fase) ? esc(f.nome) : `${esc(f.nome)} · caixa ${n0(f.caixa)}`) : "Mosaico Vila Ética"}${st.ano ? ` · ano ${st.ano}` : ""}</div></div>
-    ${botaoGlossario(st)}${st.ano ? miniBarra(st) : ""}</div>`;   // Ética: o glossário na 1ª linha, no lugar do selo do ano (o ano vai na linha da família)
+    <button class="btn sm sec info-btn" data-a="manual" aria-label="Como jogar">i</button>${botaoGlossario(st)}${st.ano ? miniBarra(st) : ""}</div>`;   // Ética: o glossário na 1ª linha, no lugar do selo do ano (o ano vai na linha da família)
 }
 
 // Ética: o glossário técnico, sempre à mão no topo do celular; os verbetes se abrem conforme a partida avança
@@ -168,6 +168,19 @@ function controle(st, id) {
 function prev5(st, id) {
   const v = st.prev5?.[id];
   return `<div class="card"><b class="row" style="flex-wrap:nowrap;align-items:flex-start">${ico("ideia")}<span>Palpite: neste último ano, a desigualdade do patrimônio vai…</span></b><div class="row" style="margin-top:8px">${["sobe", "desce"].map((x) => `<button class="btn sm ${v === x ? "on" : "sec"} grow" data-a="prev5" data-val="${x}" ${v ? "disabled" : ""}>${x === "sobe" ? "Subir" : "Descer"}</button>`).join("")}</div>${v ? `<p class="faint" style="margin:6px 0 0">O telão mostra no fim do ano quantos acertaram.</p>` : ""}</div>`;
+}
+
+// R41: manual do jogador. Abre sozinho na entrada (enquanto a pessoa espera) e fica no "i" do cabeçalho; "Entendi" fecha.
+const manualAberto = (st, loc) => loc.manual === true || (loc.manual === undefined && st.fase === "entrada");
+function telaManual() {
+  return `<h2 class="row">${ico("ideia", "g")}Mosaico Vila Ética: como jogar</h2>
+    <div class="card man-gancho"><b>E se a sua família pudesse ganhar mais, mas a vila perdesse com isso? O que você faria, sabendo que ninguém vai ver a sua resposta?</b><p>Em cinco anos você vai descobrir. E vai descobrir também o que a turma fez.</p></div>
+    <div class="card man-bloco"><h3>A proposta</h3><p>Todos os participantes formam uma vila e cada grupo é uma família (sorteada). A vila inteira ganha ou perde junta. Não existe família vencedora.</p></div>
+    <div class="card man-bloco"><h3>Para ganhar, no fim do ano 5</h3><ul><li>bater a <b>meta</b> da regra em vigor (o telão mostra qual é e quanto falta);</li><li>manter a <b>mata</b> em 30% ou mais.</li></ul></div>
+    <div class="card man-bloco"><h3>O que você faz a cada ano</h3><ol><li>Olha o telão: ele explica a novidade do ano com um exemplo.</li><li>Responde a pergunta rápida no celular (não vale ponto).</li><li>Conversa com a família e envia a <b>sua</b> proposta. Vale a mediana da família.</li><li>Vê no telão como a vila ficou.</li></ol></div>
+    <div class="card man-bloco"><h3>O que você decide</h3><ul><li><b>Bem público:</b> quanto da renda vai para ele. Cada nível novo aumenta a renda de todas as famílias.</li><li><b>Mata (a partir do ano 2):</b> tirar madeira rende para a sua família e gasta a mata de todos; replantar devolve um pouco.</li><li><b>Moradia (ano 3):</b> cada família precisa de 1 lote a cada 3 pessoas; quem não tem paga aluguel. No fim do ano, a turma vota a regra dos anos 4 e 5.</li><li><b>Lotes (ano 4 em diante):</b> lotes livres vão a lance fechado; o maior lance leva.</li></ul></div>
+    <div class="card man-bloco"><h3>Vale saber</h3><ul><li>As famílias não começam iguais; foi sorteio.</li><li>Suas respostas são secretas: o telão só mostra totais.</li><li>Nem tudo está neste manual. Em alguns anos, algo chega só no seu celular. Leia em silêncio e responda sem mostrar a tela.</li><li>Se algum tema pesar, você pode só observar ou falar com quem conduz.</li></ul></div><div class="card man-bloco"><h3>Só nesta versão</h3><ul><li>O celular tem um <b>glossário</b> com os conceitos que aparecem no telão.</li><li>Depois do voto há o <b>Momento do Lazer</b>, um minijogo que rende pontos para o bem público.</li></ul></div>
+    <button class="btn ok block" data-a="manual">Entendi</button><p class="faint" style="text-align:center;margin:0">Para reler, toque no <b>i</b> no alto da tela.</p>`;
 }
 
 export function renderAluno(st, id, loc) {
@@ -323,12 +336,14 @@ export function renderAluno(st, id, loc) {
     default: bd = `<p class="muted">${esc(NOME_FASE[st.fase] || "")}</p>`;
   }
   if (loc.glos && desbloqueados(st).length) bd = telaGlossario(st, loc);   // Ética: o glossário por cima da etapa (o jogo continua ao voltar)
+  if (manualAberto(st, loc)) bd = telaManual();   // R41: o manual por cima da etapa (o jogo continua ao fechar)
   return hd(st, me) + `<div class="bd">${bd}</div>`;
 }
 
 export function acaoAluno(a, el, { st, id, loc, dispatch }) {
   const val = el.dataset.val;
   switch (a) {
+    case "manual": loc.manual = !manualAberto(st, loc); if (!loc.manual) loc.glos = false; return true;   // R41: abre e fecha o manual
     case "achei": dispatch({ t: "achei", id }); return true;
     case "car": loc.car = +val; return true;
     case "propor": dispatch({ t: "propor", id, p: { pub: loc.pub, rep: loc.rep, car: loc.car } }); return true;

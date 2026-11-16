@@ -591,3 +591,17 @@ body { background: radial-gradient(1100px 560px at 50% -140px, #123057 0%, rgba(
 .telao .painel[data-tema="carta"] .card { background: linear-gradient(180deg, #372d74, #1c1743); border-color: rgba(196, 181, 253, .28); border-bottom-color: rgba(0, 0, 0, .4); }
 .telao .painel[data-tema="carta"] .card.destaque { background: radial-gradient(ellipse 36% 160% at 0% 50%, rgba(251, 191, 36, .30), transparent 72%), linear-gradient(180deg, #5b3f16, #33230d); }
 .telao .card:has(.temas) { background: linear-gradient(180deg, #372d74, #1c1743); border-color: rgba(196, 181, 253, .28); border-bottom-color: rgba(0, 0, 0, .4); }
+
+/* ===== R41: manual do jogador no celular (abre na entrada; depois, no "i" do cabeçalho) ===== */
+.phone .info-btn { flex: none; width: 44px; min-width: 44px; min-height: 44px; padding: 0; border-radius: 50%; font: italic 800 20px/1 Georgia, "Times New Roman", serif; --c: #2f6fd6; --c2: #1b4391; }
+.phone .man-gancho { border-left: 4px solid var(--lampiao); background: radial-gradient(ellipse 60% 140% at 0% 40%, rgba(251, 191, 36, .26), transparent 72%), linear-gradient(180deg, #5b3f16, #33230d); border-color: rgba(253, 230, 138, .32); border-left-color: var(--lampiao); }
+.phone .man-gancho b { display: block; font-size: 17px; line-height: 1.3; }
+.phone .man-gancho p { margin: 8px 0 0; color: #fde68a; font-size: 14px; }
+.phone .man-bloco { padding: 12px 14px; }
+.phone .man-bloco h3 { font-size: 15px; color: var(--lampiao); letter-spacing: .02em; margin-bottom: 4px; }
+.phone .man-bloco p, .phone .man-bloco li { font-size: 14px; line-height: 1.45; color: #dbe7f5; margin: 0; }
+.phone .man-bloco ul, .phone .man-bloco ol { margin: 0; padding-left: 18px; }
+.phone .man-bloco li + li { margin-top: 5px; }
+/* Com a barrinha de estado (do ano 1 em diante), o "i" desce para a ponta direita da segunda linha: a primeira fica para o nome e a família */
+.phone .hd:has(.mini-hud) .mini-hud { order: 4; flex-basis: calc(100% - 54px); }
+.phone .hd:has(.mini-hud) .info-btn { order: 5; margin-left: auto; align-self: center; }
