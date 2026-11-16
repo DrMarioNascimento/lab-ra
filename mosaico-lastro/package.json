@@ -1,0 +1,9 @@
+{
+  "name": "lastro",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node tests/engine.test.mjs && node tests/teams.test.mjs && node tests/life.test.mjs"
+  }
+}

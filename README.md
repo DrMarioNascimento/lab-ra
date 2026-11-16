@@ -56,3 +56,7 @@ Sincronizada a revisão 5de49509f8c214dc1a0108a8feb9b20fda3e43b7 do Fisiologia I
 ## Auditoria da implantação
 
 A auditoria de 25/10/2026 corrigiu relevo em objetos com vários materiais e carimbos de cache. Evidências, escopo e limites em [AUDITORIA-RA-2026-10-25.md](AUDITORIA-RA-2026-10-25.md).
+
+## Mosaico Lastro — recuperação de 15/11/2026
+
+A versão mais recente do Mosaico Lastro foi incorporada ao repositório em [mosaico-lastro/](mosaico-lastro/), com motor, interface, proposta e testes. [Abrir a experiência](https://lab-ra.dragongames.dev.br/mosaico-lastro/) · [Proposta completa](https://lab-ra.dragongames.dev.br/mosaico-lastro/proposta.html). O card da biblioteca passa a abrir esta cópia local. Origem e orientações em [mosaico-lastro/README.md](mosaico-lastro/README.md).
