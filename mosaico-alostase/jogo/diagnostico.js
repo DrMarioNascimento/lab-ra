@@ -1,11 +1,11 @@
 // Mosaico Alostase · tela do modo Diagnóstico: o aluno monta a rotina, o jogo mostra o esperado.
 import { simularDia } from '../motor/motor.js';
 import { explicar, hhmm, rotuloGlicemia } from './prognostico.js';
-import { escolhasPadrao, conferir, montarRotina, leitura, passo, NIVEIS, DURACOES, ALCOOL } from './rotina-montada.js';
+import { escolhasPadrao, conferir, montarRotina, leitura, custoDoDia, passo, NIVEIS, DURACOES, ALCOOL } from './rotina-montada.js';
 import { simularSemana, conferirSemana, diaDaSemana } from '../motor/semana.js';
 import { P } from '../motor/parametros.js';
 import { PERFIS, iniciar, metas, pisoDosCompromissos } from './perfis.js';
-import { $, fmt, esc, linhaDoTempo, grafico, VARS, CORV } from './ui.js';
+import { $, fmt, esc, linhaDoTempo, grafico, cartaoCusto, NOTA_SONO, VARS, CORV } from './ui.js';
 
 const livrePadrao = () => { const e = escolhasPadrao(); e.dormir = 0.5; e.acordar = 9; e.cafe.hora = 9.5; e.almoco.hora = 13.5; e.jantar.hora = 20; e.trabalho.on = false; return e; };
 const TIPOS = { A: { nome: 'Dia útil', e: escolhasPadrao() }, B: { nome: 'Dia livre', e: livrePadrao() } };
@@ -72,12 +72,12 @@ function telaDia(tela, voltar, opc = null) {
   let h = rotina.sono[0].fim;
   tela.innerHTML = `
     <p class="aviso">Aqui, diagnóstico é a leitura que o modelo faz da rotina. Não é diagnóstico clínico nem o seu corpo.</p>
-    ${opc ? `<h2>${esc(opc.titulo)}</h2>` : ''}
+    ${opc ? `<h2>${esc(opc.titulo)}</h2>` : (() => { const c = custoDoDia(rotina, dia); return cartaoCusto('O que este dia custa', c.numeros, c.frase); })()}
     <section class="card fixo"><div id="lt"></div>
       <input type="range" id="hr" min="0" max="23.5" step="0.5" value="${h}" aria-label="Hora do dia">
       <div class="leitura" id="vals"></div></section>
     <section class="card"><div class="rotulo">Por quê, nesta hora</div><ul class="porque" id="pq"></ul></section>
-    ${['cortisol', 'glicemia', 'pressaoSono'].map((k) => `<section class="card"><h3 style="color:${CORV[k]}">${k === 'glicemia' ? 'Glicemia de jejum e pós-prandial' : VARS[k].nome} (${VARS[k].unidade})</h3><div id="g-${k}"></div></section>`).join('')}
+    ${['cortisol', 'glicemia', 'pressaoSono'].map((k) => `<section class="card"><h3 style="color:${CORV[k]}">${k === 'glicemia' ? 'Glicemia de jejum e pós-prandial' : VARS[k].nome} (${VARS[k].unidade})</h3><div id="g-${k}"></div>${k === 'pressaoSono' ? NOTA_SONO : ''}</section>`).join('')}
     <section class="card"><div class="rotulo">O que esta rotina mostra</div><ul class="porque">${notas.map((n) => `<li>${esc(n)}</li>`).join('')}</ul></section>
     ${opc ? '<button class="btn ok block" id="semana">Voltar à semana</button>' : '<button class="btn ok block" id="semana">Ver a semana inteira</button><button class="btn sec block" id="ajusta">Ajustar a rotina</button>'}
     <button class="link" id="sai">Trocar de modo</button>`;
@@ -87,7 +87,7 @@ function telaDia(tela, voltar, opc = null) {
     $('#vals').innerHTML = `<div class="hora-atual"><b class="mono">${hhmm(h)}</b><span>${p.dormindo ? 'dormindo' : 'acordado'}</span></div>
       <div class="valor cort"><b>${fmt(p.cortisol, 1)}</b><span>Cortisol, µg/dL</span></div>
       <div class="valor glic"><b>${fmt(p.glicemia, 0)}</b><span>${rotuloGlicemia(rotina, h)}, mg/dL</span></div>
-      <div class="valor sono"><b>${fmt(p.pressaoSono, 2)}</b><span>Pressão de sono</span></div>`;
+      <div class="valor sono"><b>${fmt(p.pressaoSono, 2)}</b><span>Necessidade de sono</span></div>`;
     $('#pq').innerHTML = [...explicar(rotina, h, 'cortisol'), ...explicar(rotina, h, 'glicemia')].map((f) => `<li>${esc(f)}</li>`).join('');
     for (const k of ['cortisol', 'glicemia', 'pressaoSono']) $(`#g-${k}`).innerHTML = grafico(dia, k, { hora: h });
   };
@@ -135,15 +135,13 @@ function telaSemana(tela, voltar) {
         : `Com até ${fmt(maisLongo, 1)} horas acordado por dia, a sexta chega com ${fmt(sexta, 1)} horas de dívida de sono${semEstudo ? ', antes de estudar um minuto' : ''}.`;
       if (piso && piso.pisoNaSexta >= 0.5) frase += ` Só os compromissos já deixam ${fmt(piso.horasDePeUtil, 1)} horas de pé por dia útil: mesmo dormindo no minuto em que o último acaba, ${fmt(piso.pisoNaSexta, 1)} horas dessa dívida são inevitáveis.`;
       else if (piso && sexta >= 0.5) frase += ' Os compromissos sozinhos caberiam no dia: esta dívida vem das escolhas de horário.';
-      const destaque = `<section class="card destaque"><div class="rotulo">O que esta semana custa</div>
-        <div class="tres"><div class="valor"><b>${fmt(maisLongo, 1)} h</b><span>acordado no dia mais longo</span></div><div class="valor"><b>${fmt(mediaSono, 1)} h</b><span>de sono por noite útil</span></div><div class="valor ${sexta >= 0.5 ? 'deve' : ''}"><b>${fmt(sexta, 1)} h</b><span>de dívida na sexta</span></div></div>
-        <p class="frase">${esc(frase)}</p></section>`;
+      const destaque = cartaoCusto('O que esta semana custa', [{ valor: `${fmt(maisLongo, 1)} h`, rotulo: 'acordado no dia mais longo' }, { valor: `${fmt(mediaSono, 1)} h`, rotulo: 'de sono por noite útil' }, { valor: `${fmt(sexta, 1)} h`, rotulo: 'de dívida na sexta', deve: sexta >= 0.5 }], frase);
       corpo = `${destaque}
         <section class="card"><div class="rotulo">Dia a dia · toque para ver hora a hora</div>
           <div class="tabela"><div class="cab"><span>Dia</span><span>Sono</span><span>Acordado</span><span>Dívida</span></div>
           ${sem.resumo.map((r, d) => `<button class="lin-dia" data-dia="${d}"><span><b>${DIAS[d]}</b></span><span class="mono">${fmt(r.horasSono, 1)} h</span><span class="mono">${fmt(r.horasAcordado, 1)} h</span><span class="mono ${r.dividaAcumulada >= 0.5 ? 'deve' : ''}">${fmt(r.dividaAcumulada, 1)} h</span></button>`).join('')}</div></section>
         <section class="card"><h3 style="color:#fb7185">Dívida de sono acumulada (horas)</h3>${graficoSemana(sem, 'divida', '#fb7185', maxD, 'Dívida de sono acumulada por dia')}</section>
-        <section class="card"><h3 style="color:${CORV.pressaoSono}">Pressão de sono (de 0 a 1)</h3>${graficoSemana(sem, 'pressaoSono', CORV.pressaoSono, 1, 'Pressão de sono ao longo da semana')}</section>
+        <section class="card"><h3 style="color:${CORV.pressaoSono}">Necessidade de sono (de 0 a 1)</h3>${graficoSemana(sem, 'pressaoSono', CORV.pressaoSono, 1, 'Necessidade de sono ao longo da semana')}${NOTA_SONO}</section>
         <section class="card"><div class="rotulo">O que esta semana mostra</div><ul class="porque">${notas.map((n) => `<li>${esc(n)}</li>`).join('')}</ul></section>`;
       tela._sem = { sem, rotinas };
     }
@@ -173,7 +171,7 @@ function telaSemana(tela, voltar) {
     if (t) { const y = scrollY; SEMANA[+t.dataset.troca] = SEMANA[+t.dataset.troca] === 'A' ? 'B' : 'A'; desenha(); scrollTo(0, y); }
     else if (d && tela._sem) {
       const i = +d.dataset.dia, { sem, rotinas } = tela._sem, r = sem.resumo[i], dia = diaDaSemana(sem, i);
-      const notas = [`Sono da noite anterior: ${fmt(r.horasSono, 1)} h. Tempo acordado neste dia: ${fmt(r.horasAcordado, 1)} h.`, `Dívida de sono acumulada até aqui: ${fmt(r.dividaAcumulada, 1)} h.`, `Pressão de sono ao acordar: ${fmt(r.pressaoAoAcordar, 2)}.`];
+      const notas = [`Sono da noite anterior: ${fmt(r.horasSono, 1)} h. Tempo acordado neste dia: ${fmt(r.horasAcordado, 1)} h.`, `Dívida de sono acumulada até aqui: ${fmt(r.dividaAcumulada, 1)} h.`, `Necessidade de sono ao acordar: ${fmt(r.pressaoAoAcordar, 2)}.`];
       if (r.remPerdidoMin) notas.push(`Álcool nesta noite: cerca de ${fmt(r.remPerdidoMin, 0)} minutos de sono REM a menos.`);
       telaDia(tela, voltar, { rotina: rotinas[i], dia, notas, titulo: `${DIAS[i]} · ${rotinas[i].nome}` });
     }

@@ -73,11 +73,20 @@ export function montarRotina(e) {
   return { id: 'montada', nome: 'Minha rotina', sono: [{ inicio: e.dormir, fim: e.acordar }], refeicoes, jornadas, alcoolGkg: ALCOOL.find((a) => a.id === e.alcool).gkg };
 }
 
-/** Pressão de sono ao acordar, comparada com a mesma rotina dormindo 8 horas. */
+/** Necessidade de sono ao acordar, comparada com a mesma rotina dormindo 8 horas. */
 export function residuoSono(rotina, dia = simularDia(rotina)) {
   const s = rotina.sono[rotina.sono.length - 1], em = (d, h) => d.pontos.find((p) => Math.abs(p.hora - mod24(h)) < 1e-6).pressaoSono;
   const ref = simularDia({ ...rotina, sono: [{ inicio: mod24(s.fim - 8), fim: s.fim }], alcoolGkg: 0 });
   return { aoAcordar: em(dia, s.fim), comOitoHoras: em(ref, s.fim), aoDeitar: em(dia, s.inicio), horas: dia.sonoQualidade.horas };
+}
+
+/** O que este dia custa em sono: horas acordado, horas de sono e o saldo contra o limite de 15,84 h. */
+export function custoDoDia(rotina, dia = simularDia(rotina)) {
+  const sono = dia.sonoQualidade.horas, acordado = 24 - sono, saldo = acordado - 15.84, f = (v, c = 1) => v.toFixed(c).replace('.', ',');
+  const frase = saldo < 0.25 ? `Com ${f(acordado)} horas acordado, este dia cabe no limite de 15,84 horas: repetido a semana toda, não deixa dívida de sono.`
+    : `São ${f(acordado)} horas acordado e ${f(sono)} de sono. Este dia sozinho deixa ${f(saldo)} horas de dívida; cinco dias iguais somam ${f(saldo * 5)} horas.`;
+  return { sono, acordado, saldo, frase,
+    numeros: [{ valor: `${f(acordado)} h`, rotulo: 'acordado' }, { valor: `${f(sono)} h`, rotulo: 'de sono' }, { valor: `${saldo > 0 ? '+' : ''}${f(Math.max(0, saldo))} h`, rotulo: 'de dívida neste dia', deve: saldo >= 0.25 }] };
 }
 
 /** O que a rotina mostra: só fatos que saem do motor. */
@@ -87,7 +96,7 @@ export function leitura(rotina, dia = simularDia(rotina)) {
   const q = dia.sonoQualidade;
   if (q.remPerdidoMin) notas.push(`O álcool tirou cerca de ${f(q.remPerdidoMin, 0)} minutos de sono REM e atrasou o primeiro REM em ${f(q.atrasoRemMin, 0)} minutos.`);
   const r = residuoSono(rotina, dia);
-  if (r.aoAcordar - r.comOitoHoras > 0.05) notas.push(`Com ${f(r.horas, r.horas % 1 ? 1 : 0)} horas de sono, a pressão de sono ao acordar fica em ${f(r.aoAcordar, 2)}; com 8 horas ficaria em ${f(r.comOitoHoras, 2)}.`);
+  if (r.aoAcordar - r.comOitoHoras > 0.05) notas.push(`Com ${f(r.horas, r.horas % 1 ? 1 : 0)} horas de sono, a necessidade de sono ao acordar fica em ${f(r.aoAcordar, 2)}; com 8 horas ficaria em ${f(r.comOitoHoras, 2)}.`);
   for (const j of rotina.jornadas.filter((x) => x.tipo === 'exercicio')) {
     const p = dia.pontos.find((x) => Math.abs(x.hora - mod24(j.fim)) < 1e-6), pct = Math.round((p.cortisol / p.cortisolBase - 1) * 100);
     notas.push(pct > 0 ? `Ao fim do exercício o cortisol fica ${pct}% acima do esperado para o horário (${f(p.cortisol)} contra ${f(p.cortisolBase)} µg/dL).` : 'O exercício leve não tira o cortisol da curva do horário.');

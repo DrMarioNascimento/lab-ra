@@ -4,7 +4,7 @@ import { VARIAVEIS, hhmm } from './prognostico.js';
 export const $ = (s) => document.querySelector(s);
 export const fmt = (v, casas) => v.toFixed(casas).replace('.', ',');
 export const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-export const VARS = { ...VARIAVEIS, pressaoSono: { nome: 'Pressão de sono', unidade: 'de 0 a 1', min: 0, max: 1, casas: 2 } };
+export const VARS = { ...VARIAVEIS, pressaoSono: { nome: 'Necessidade de sono', unidade: 'de 0 a 1', min: 0, max: 1, casas: 2 } };
 export const CORV = { cortisol: '#f59e0b', glicemia: '#38bdf8', pressaoSono: '#c4b5fd' };
 
 export const CLASSE = { trabalho: 'trab', estudo: 'trab', 'trabalho-noturno': 'trab', exercicio: 'ex', 'noite-ativa': 'noite', prova: 'prova', compromisso: 'fixo' };
@@ -34,6 +34,14 @@ export function listaDaRotina(r) {
   return `<ul class="itens">${it.map((x) => `<li><span class="pt" style="background:${COR[x.c]}"></span><span class="h">${x.t}</span><span>${esc(x.n)}</span></li>`).join('')}</ul>`;
 }
 
+
+/** Cartão de destaque: três números grandes e uma frase. */
+export function cartaoCusto(titulo, numeros, frase) {
+  return `<section class="card destaque"><div class="rotulo">${esc(titulo)}</div>
+    <div class="tres">${numeros.map((n) => `<div class="valor ${n.deve ? 'deve' : ''}"><b>${n.valor}</b><span>${esc(n.rotulo)}</span></div>`).join('')}</div>
+    <p class="frase">${esc(frase)}</p></section>`;
+}
+export const NOTA_SONO = '<p class="muted nota" style="margin:6px 0 0">Sobe enquanto a pessoa está acordada e cai enquanto dorme. Não é pressão arterial.</p>';
 
 /** Curva do dia. opcoes: { palpites: [{hora, palpite, valor}], hora: marcador } */
 export function grafico(dia, variavel, opcoes = {}) {

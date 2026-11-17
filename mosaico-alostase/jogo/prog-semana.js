@@ -1,6 +1,6 @@
 // Mosaico Alostase · modo Prognóstico, semana 1: estimativas de hora em dias diferentes e a dívida de sono ao fim do dia.
 import { novaPartidaSemana, pontuar, VARIAVEIS, DIVIDA, NOMES_DIAS, hhmm, momentoGlicemia, rotuloGlicemia } from './prognostico.js';
-import { $, fmt, esc, linhaDoTempo, listaDaRotina } from './ui.js';
+import { $, fmt, esc, linhaDoTempo, listaDaRotina, cartaoCusto, NOTA_SONO } from './ui.js';
 import { graficoSemana } from './diagnostico.js';
 import { P } from '../motor/parametros.js';
 
@@ -88,10 +88,11 @@ export function jogarSemana(ctx, semana, nPerguntas, semente) {
     placar.hidden = true;
     tela.innerHTML = `
       <section class="card total"><div class="rotulo">Fim da semana</div><b>${total}</b><span class="muted">de ${p.perguntas.length * 100} pontos · ${naFaixa} de ${p.perguntas.length} dentro da faixa</span></section>
+      ${cartaoCusto('O que esta semana custa', [{ valor: `${fmt(Math.max(...sem.resumo.map((r) => r.horasAcordado)), 1)} h`, rotulo: 'acordado no dia mais longo' }, { valor: `${fmt(Math.min(...sem.resumo.map((r) => r.horasSono)), 1)} h`, rotulo: 'na noite mais curta' }, { valor: `${fmt(pico, 1)} h`, rotulo: 'de dívida no pior dia', deve: pico >= 0.5 }], notas[0])}
       <section class="card"><h3 class="cor-divida">Dívida de sono acumulada (horas)</h3>${graficoSemana(sem, 'divida', '#fb7185', maxD, 'Dívida de sono por dia e seus palpites', pal)}
         <div class="legenda"><span><i style="background:#fb7185"></i>Esperado</span><span><i style="background:#fff;height:8px;width:8px;border-radius:50%"></i>Seus palpites</span></div></section>
-      <section class="card"><h3 style="color:#c4b5fd">Pressão de sono (de 0 a 1)</h3>${graficoSemana(sem, 'pressaoSono', '#c4b5fd', 1, 'Pressão de sono ao longo da semana')}</section>
-      <section class="card"><div class="rotulo">O que esta semana mostra</div><ul class="porque">${notas.map((n) => `<li>${esc(n)}</li>`).join('')}</ul></section>
+      <section class="card"><h3 style="color:#c4b5fd">Necessidade de sono (de 0 a 1)</h3>${graficoSemana(sem, 'pressaoSono', '#c4b5fd', 1, 'Necessidade de sono ao longo da semana')}${NOTA_SONO}</section>
+      <section class="card"><div class="rotulo">O que esta semana mostra</div><ul class="porque">${notas.slice(1).map((n) => `<li>${esc(n)}</li>`).join('') || '<li>Semana sem acúmulo: é a referência para comparar com as outras.</li>'}</ul></section>
       <p class="aviso">Modelo médio de adulto saudável. Não é o seu corpo e não serve de diagnóstico.</p>
       <button class="btn ok block" id="de-novo">Jogar outra semana</button>`;
     $('#de-novo').onclick = voltar; scrollTo(0, 0);

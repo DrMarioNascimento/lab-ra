@@ -1,8 +1,8 @@
 // Mosaico Alostase · tela do modo Prognóstico.
 import { ROTINAS } from './rotinas.js';
 import { novaPartida, pontuar, VARIAVEIS, TEMPOS, hhmm, momentoGlicemia, rotuloGlicemia } from './prognostico.js';
-import { leitura } from './rotina-montada.js';
-import { $, fmt, esc, linhaDoTempo, listaDaRotina, grafico, CORV } from './ui.js';
+import { leitura, custoDoDia } from './rotina-montada.js';
+import { $, fmt, esc, linhaDoTempo, listaDaRotina, grafico, cartaoCusto, CORV } from './ui.js';
 import { telaEntradaDiag } from './diagnostico.js';
 import { SEMANAS } from './semanas.js';
 import { jogarSemana } from './prog-semana.js';
@@ -12,12 +12,12 @@ const E = { tempo: 1, rotina: 'sorteio', escala: 'dia', semana: 'sorteio', parti
 
 // manual: abre na entrada, fica no "i"
 const manual = $('#manual'), refs = $('#refs');
-$('#abre-manual').onclick = () => manual.showModal();
+$('#abre-manual').onclick = () => { manual.showModal(); manual.scrollTop = 0; };
 $('#fecha-manual').onclick = () => { manual.close(); try { localStorage.setItem('ma-manual', '1'); } catch (e) { /* sem armazenamento */ } };
 $('#abre-refs').onclick = () => { manual.close(); refs.showModal(); refs.scrollTop = 0; };
 $('#fecha-refs').onclick = () => refs.close();
 let jaViu = false; try { jaViu = localStorage.getItem('ma-manual') === '1'; } catch (e) { /* segue */ }
-if (!jaViu) manual.showModal();
+if (!jaViu) { manual.showModal(); manual.scrollTop = 0; }
 
 function telaModos() {
   placar.hidden = true; sub.textContent = 'Fisiologia da rotina';
@@ -152,6 +152,7 @@ function telaFim() {
   placar.hidden = true;
   tela.innerHTML = `
     <section class="card total"><div class="rotulo">Fim do dia</div><b>${total}</b><span class="muted">de ${maximo} pontos · ${naFaixa} de ${p.perguntas.length} dentro da faixa</span></section>
+    ${(() => { const c = custoDoDia(p.rotina, p.dia); return cartaoCusto('O que este dia custa', c.numeros, c.frase); })()}
     ${['cortisol', 'glicemia'].map((k) => `<section class="card"><h3 class="cor-${k}">${k === 'glicemia' ? 'Glicemia de jejum e pós-prandial' : VARIAVEIS[k].nome} (${VARIAVEIS[k].unidade})</h3>${grafico(p.dia, k, { palpites: E.respostas.filter((x) => x.variavel === k) })}
       <div class="legenda"><span><i style="background:${CORV[k]}"></i>Esperado</span><span><i style="background:#fff;height:8px;width:8px;border-radius:50%"></i>Seus palpites</span></div></section>`).join('')}
     ${notas.length ? `<section class="card"><div class="rotulo">O que este dia mostra</div><ul class="porque">${notas.map((n) => `<li>${esc(n)}</li>`).join('')}</ul></section>` : ''}

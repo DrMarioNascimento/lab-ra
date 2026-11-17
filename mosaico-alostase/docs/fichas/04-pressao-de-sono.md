@@ -4,6 +4,8 @@
 
 **Estado da ficha: parcial.** Nenhuma fonte desta ficha foi lida inteira ainda; os dois números do motor estão marcados como provisórios.
 
+**Nome na tela (decisão de 17/11/2026):** "necessidade de sono", com a nota "não é pressão arterial". O termo técnico "pressão de sono" confundia com pressão arterial e fica só nesta ficha e no código.
+
 ## 1. O que as fontes dizem
 
 | Ponto | O que a fonte diz | Leitura |
