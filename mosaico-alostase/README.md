@@ -9,8 +9,10 @@ Jogo pedagógico de fisiologia da rotina. Terceira versão, criada em 17/11/2026
 
 - `docs/GDD-mosaico-alostase-v0.4.md`: o desenho do jogo.
 - `docs/fichas/`: fichas de literatura das variáveis (versão de projeto; não aparecem para o aluno).
-- `base/alostase-motor/` e `base/lastro/`: cópias dos dois protótipos, tiradas em 17/11/2026, como ponto de partida. O código novo ainda não começou.
+- `motor/`: motor de um dia, hora a hora (cortisol, glicemia e pressão de sono), sem interface. `parametros.js` traz cada número com a origem; `PENDENCIAS` lista o que o motor ainda não calcula. Para conferir: `cd motor && npm test`.
+- `docs/motor-um-dia-conferencia.png`: as curvas das três rotinas de exemplo.
+- `base/alostase-motor/` e `base/lastro/`: cópias dos dois protótipos, tiradas em 17/11/2026, como ponto de partida.
 
 ## Situação
 
-Em desenho. Nenhum número do jogo entra no motor antes da ficha de literatura correspondente.
+Fichas em andamento e primeira versão do motor de um dia. Nenhum número entra no motor sem origem declarada; ainda não há tela de jogo.

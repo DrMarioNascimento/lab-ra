@@ -76,10 +76,15 @@ Pontos de rigor já identificados, a confirmar nas fichas:
 
 **Nenhum número deste documento foi conferido na literatura.** Os valores entram só depois das fichas.
 
-Fichas abertas em 17/11/2026, as duas ainda parciais (em `docs/fichas/`):
+Fichas abertas em 17/11/2026 (em `docs/fichas/`), todas ainda com partes por ler:
 
-- `01-cortisol.md`: curva de 24 h, resposta a refeição, exercício e estresse, variabilidade, médio e longo prazo.
+- `01-cortisol.md`: curva de 24 h e exercício fechados; estresse psicológico e longo prazo parciais.
 - `02-trabalho-noturno-e-vida-noturna.md`: base da jornada noturna e da noite ativa.
+- `03-glicemia.md`: base e refeição de 50 g de carboidrato fechadas.
+- `04-pressao-de-sono.md`: provisória.
+- `05-exercicio-como-jornada.md`: aberta só para o cortisol.
+
+A frase acima vale para este documento. No motor (`motor/parametros.js`), cada número traz a origem e até onde a fonte foi lida.
 
 ### 4.5 Evidência de longo prazo
 
@@ -224,7 +229,7 @@ Um personagem em Three.js cujo corpo mostra o estado do momento: postura caída 
 ## 15. Etapas de construção
 
 1. Fichas de literatura das primeiras variáveis e das jornadas (em andamento: cortisol; trabalho noturno e vida noturna).
-2. Motor de um dia, hora a hora, com o primeiro lote de variáveis e a meta externa.
+2. Motor de um dia, hora a hora, com o primeiro lote de variáveis e a meta externa. **Primeira versão em `motor/` (17/11/2026):** cortisol, glicemia e pressão de sono, com as jornadas de exercício, noturna e noite ativa; ainda sem meta externa e sem estresse psicológico.
 3. Modo Prognóstico em um dia (exige menos interface e valida as curvas).
 4. Modo Diagnóstico.
 5. Semana: acúmulos e juros das dívidas.
