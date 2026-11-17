@@ -129,3 +129,19 @@ dialog ol { padding-left: 20px; line-height: 1.5; font-size: 15px; } dialog li {
 .sono b { color: #c4b5fd; }
 .fixo { position: sticky; top: 56px; z-index: 3; }
 @media (max-width: 350px) { .leitura { grid-template-columns: 1fr 1fr; } .passo b { min-width: 54px; } .chave { min-width: 84px; } }
+
+/* semana */
+.dias { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+.dias .btn { padding: 4px 0; min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; font-size: 13px; }
+.dias .btn small { font-size: 11px; font-weight: 600; opacity: .9; }
+.dias .btn.livre { --c: #7c3aed; --c2: #4c1d95; }
+.tabela { display: grid; gap: 6px; }
+.tabela .cab, .lin-dia { display: grid; grid-template-columns: 1fr 1fr 1.2fr 1fr; align-items: center; gap: 6px; text-align: right; }
+.tabela .cab { font-size: 11px; color: var(--tx2); text-transform: uppercase; letter-spacing: .05em; padding: 0 12px; }
+.tabela .cab span:first-child, .lin-dia span:first-child { text-align: left; }
+.lin-dia { width: 100%; min-height: 44px; padding: 6px 12px; border: 0; border-radius: 12px; cursor: pointer; font: inherit; font-size: 14px; color: var(--tx);
+  background: #132a46; box-shadow: 0 4px 0 #0a1a2d, inset 0 1px 0 rgba(255,255,255,.06); transition: transform .08s; }
+.lin-dia:active { transform: translateY(3px); box-shadow: 0 1px 0 #0a1a2d; }
+.lin-dia .deve { color: #fda4af; font-weight: 700; }
+#tela > h2 { padding: 0 4px; }
+.btn.sec.block + .link, .btn.block + .btn.block { margin-top: 0; }

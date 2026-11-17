@@ -21,6 +21,8 @@ Divergência a resolver: a queda clássica é de 4,2 h; o ajuste de 2010 dá 1,2
 - Sem unidade clínica: não há medida de rotina que o aluno conheça. Por isso a proposta é classificar como **observável** (aparece na revelação, não vale ponto no slider).
 - Álcool: entra na qualidade do sono, pela ficha 02 (REM perdido), não na pressão de sono.
 
+Atualização (semana 1): a dívida ao longo de dias está na ficha 07. O modelo de dois processos estabiliza em poucos dias e não reproduz o déficit que continua crescendo; por isso a semana mostra a pressão de sono e a dívida lado a lado.
+
 ## 3. O que falta
 
 1. Ler inteiros Rusterholz (2010) e Borbély (2016) e decidir as constantes.

@@ -84,6 +84,7 @@ Fichas abertas em 17/11/2026 (em `docs/fichas/`), todas ainda com partes por ler
 - `04-pressao-de-sono.md`: provisória.
 - `05-exercicio-como-jornada.md`: aberta só para o cortisol.
 - `06-estresse-psicologico.md`: direção, condições e tempo fechados; sem tamanho em unidade real, por isso fora do motor.
+- `07-divida-de-sono-e-semana.md`: acúmulo da dívida fechado; efeito sobre cortisol e glicemia fora do motor.
 
 A frase acima vale para este documento. No motor (`motor/parametros.js`), cada número traz a origem e até onde a fonte foi lida.
 
@@ -233,7 +234,7 @@ Um personagem em Three.js cujo corpo mostra o estado do momento: postura caída 
 2. Motor de um dia, hora a hora, com o primeiro lote de variáveis e a meta externa. **Primeira versão em `motor/` (17/11/2026):** cortisol, glicemia e pressão de sono, com as jornadas de exercício, noturna e noite ativa; ainda sem meta externa e sem estresse psicológico.
 3. Modo Prognóstico em um dia (exige menos interface e valida as curvas). **Primeira versão jogável em `index.html` (17/11/2026):** seis rotinas, cortisol e glicemia no slider, âncora ao acordar, revelação com faixa e raciocínio, curva do dia no fim. Faltam: modo de hora em hora completo, uma variável só, sala de aula.
 4. Modo Diagnóstico. **Primeira versão em `index.html` (17/11/2026):** o aluno monta sono, refeições, jornada, exercício e álcool; o jogo mostra cortisol, glicemia e pressão de sono hora a hora, com o porquê de cada hora e a leitura da rotina. Ainda sem meta externa, contas e moeda (seções 5 a 7).
-5. Semana: acúmulos e juros das dívidas.
+5. Semana: acúmulos e juros das dívidas. **Primeira versão (17/11/2026), dentro do modo Diagnóstico:** sete dias com dois tipos de dia (útil e livre), dívida de sono em horas de vigília em excesso, pressão de sono contínua e REM perdido somado. As curvas de cortisol e glicemia ainda não mudam com a dívida. Falta a semana no modo Prognóstico.
 6. Meses: adaptações.
 7. Personagem 3D.
 8. Sala de aula com telão e `/simulador`.

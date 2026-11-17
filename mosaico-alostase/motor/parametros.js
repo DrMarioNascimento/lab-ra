@@ -51,6 +51,13 @@ export const P = {
     tauQuedaH:  { valor: 4.2,   leitura: 'resumo', fonte: 'Daan 1984, citado em revisão', nota: 'constante de tempo dormindo' },
   },
 
+  dividaSono: {
+    unidade: 'horas de vigília em excesso, acumuladas',
+    vigiliaCriticaH: { valor: 15.84, ep: 0.73, leitura: 'completo', fonte: 'Van Dongen 2003', nota: 'acima disso, cada hora acordado acumula; equivale a 8,16 h de sono por dia' },
+    umaNoiteSemDormirH: { valor: 24.2, leitura: 'modelagem', fonte: 'Van Dongen 2003', nota: 'conta desta base: 40 h acordado menos 15,84. Confere com o artigo: 14 dias de 6 h na cama (cerca de 30 h de excesso) equivalem a 1 noite sem dormir, e 14 dias de 4 h (cerca de 58 h), a 2 noites' },
+    pagamento: { leitura: 'modelagem', nota: 'dia com menos de 15,84 h acordado abate a dívida hora por hora. O artigo não mede a recuperação; Belenky 2003 sugere que ela é mais lenta do que isso' },
+  },
+
   alcool: {
     remPerdidoMinPorGkg: { valor: 40.4, leitura: 'completo', fonte: 'Gardiner 2025' },
     atrasoRemMinPorGkg:  { valor: 30.1, leitura: 'completo', fonte: 'Gardiner 2025' },
@@ -67,4 +74,7 @@ export const PENDENCIAS = [
   'Jornada noturna sobre a glicemia (+6% no laboratório, lido só no resumo).',
   'Sono curto sobre a sensibilidade à insulina no dia seguinte.',
   'Deslocamento do relógio depois de várias noites seguidas.',
+  'Dívida de sono sobre o cortisol e a glicemia do dia seguinte: direção lida (Spiegel 1999, só resumo), sem número para o motor.',
+  'Lapsos de atenção por hora de dívida: o artigo dá a forma da curva (expoente 0,67), não o coeficiente.',
+  'Virada de turno (do dia para a noite) dentro da mesma semana.',
 ];

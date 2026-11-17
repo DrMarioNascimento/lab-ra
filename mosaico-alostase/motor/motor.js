@@ -49,6 +49,26 @@ export function fatorExercicio(vo2, duracaoMin) {
 const dentro = (h, ini, fim) => (ini <= fim ? h >= ini && h < fim : h >= ini || h < fim);
 const durH = (ini, fim) => mod24(fim - ini) || 24;
 
+/** Efeito do exercício sobre o cortisol, em µg/dL acima da curva, "min" minutos depois do início da sessão. */
+export function efeitoExercicioCortisol(j, min, deslocamentoRelogioH = 0) {
+  const e = P.cortisol.exercicio;
+  const dur = durH(j.inicio, j.fim) * 60;
+  const fator = fatorExercicio(j.vo2, dur);
+  if (fator === 1 || min < 0) return 0;
+  const alvo = cortisolBase(j.fim - deslocamentoRelogioH) * (fator - 1);
+  const plato = e.platoPosMin.valor * Math.max(0, Math.min(1, (j.vo2 - 60) / 20));
+  if (min <= dur) return alvo * Math.max(0, (min - e.duracaoMinimaMin.valor) / Math.max(1, dur - e.duracaoMinimaMin.valor));
+  if (min <= dur + plato) return alvo;
+  return alvo * Math.pow(0.5, (min - dur - plato) / e.meiaVidaVoltaMin.valor);
+}
+
+/** Subida da glicemia, em mg/dL acima da base, "min" minutos depois da refeição. */
+export function efeitoRefeicaoGlicemia(m, min) {
+  if (min <= 0) return 0;
+  const g = P.glicemia, u = min / g.tempoPicoMin.valor;
+  return g.subidaPor50g.valor * (m.carboG / 50) * u * Math.exp(1 - u);
+}
+
 /**
  * Simula um dia. A rotina é repetida no dia anterior para a pressão de sono
  * e os efeitos que atravessam a meia-noite começarem no lugar certo.
@@ -63,26 +83,12 @@ const durH = (ini, fim) => mod24(fim - ini) || 24;
  */
 export function simularDia(rotina) {
   const r = { deslocamentoRelogioH: 0, sono: [], refeicoes: [], jornadas: [], alcoolGkg: 0, ...rotina };
-  const g = P.glicemia, s = P.pressaoSono, e = P.cortisol.exercicio;
+  const g = P.glicemia, s = P.pressaoSono;
   const dormindo = (h) => r.sono.some((b) => dentro(h, mod24(b.inicio), mod24(b.fim)));
   const exercicios = r.jornadas.filter((j) => j.tipo === 'exercicio');
 
-  // efeito do exercício no cortisol, em minutos desde o início da sessão
-  const efeitoEx = (j, min) => {
-    const dur = durH(j.inicio, j.fim) * 60;
-    const fator = fatorExercicio(j.vo2, dur);
-    if (fator === 1 || min < 0) return 0;
-    const alvo = cortisolBase(j.fim - r.deslocamentoRelogioH) * (fator - 1);
-    const plato = e.platoPosMin.valor * Math.max(0, Math.min(1, (j.vo2 - 60) / 20));
-    if (min <= dur) return alvo * Math.max(0, (min - e.duracaoMinimaMin.valor) / Math.max(1, dur - e.duracaoMinimaMin.valor));
-    if (min <= dur + plato) return alvo;
-    return alvo * Math.pow(0.5, (min - dur - plato) / e.meiaVidaVoltaMin.valor);
-  };
-  const efeitoRefeicao = (m, min) => {
-    if (min <= 0) return 0;
-    const u = min / g.tempoPicoMin.valor;
-    return g.subidaPor50g.valor * (m.carboG / 50) * u * Math.exp(1 - u);
-  };
+  const efeitoEx = (j, min) => efeitoExercicioCortisol(j, min, r.deslocamentoRelogioH);
+  const efeitoRefeicao = efeitoRefeicaoGlicemia;
 
   let S = 0.5;
   const pontos = [];

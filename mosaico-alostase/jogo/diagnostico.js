@@ -2,9 +2,15 @@
 import { simularDia } from '../motor/motor.js';
 import { explicar, hhmm } from './prognostico.js';
 import { escolhasPadrao, conferir, montarRotina, leitura, passo, NIVEIS, DURACOES, ALCOOL } from './rotina-montada.js';
+import { simularSemana, conferirSemana, diaDaSemana } from '../motor/semana.js';
+import { P } from '../motor/parametros.js';
 import { $, fmt, esc, linhaDoTempo, grafico, VARS, CORV } from './ui.js';
 
-let E = escolhasPadrao();
+const livrePadrao = () => { const e = escolhasPadrao(); e.dormir = 0.5; e.acordar = 9; e.cafe.hora = 9.5; e.almoco.hora = 13.5; e.jantar.hora = 20; e.trabalho.on = false; return e; };
+const TIPOS = { A: { nome: 'Dia útil', e: escolhasPadrao() }, B: { nome: 'Dia livre', e: livrePadrao() } };
+const SEMANA = ['A', 'A', 'A', 'A', 'A', 'B', 'B'];
+const DIAS = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+let alvo = 'A', E = TIPOS.A.e;
 const pega = (caminho) => caminho.split('.').reduce((o, k) => o[k], E);
 const poe = (caminho, v) => { const ks = caminho.split('.'); const u = ks.pop(); ks.reduce((o, k) => o[k], E)[u] = v; };
 
@@ -13,12 +19,13 @@ const liga = (rot, caminho) => `<button class="btn sec sm chave ${pega(caminho) 
 const seg = (caminho, lista, rotulo) => `<div class="seg" role="group" aria-label="${rotulo}">${lista.map((o) => `<button class="btn sec sm ${String(pega(caminho)) === String(o.id) ? 'on' : ''}" data-s="${caminho}" data-v="${o.id}" aria-pressed="${String(pega(caminho)) === String(o.id)}">${o.nome}</button>`).join('')}</div>`;
 const refeicao = (rot, k) => `<div class="lin"><span>${liga(rot, `${k}.on`)}</span>${E[k].on ? `<span class="passo"><button class="btn sec sm" data-h="${k}.hora" data-d="-1" aria-label="${rot}: antes">−</button><b class="mono">${hhmm(E[k].hora)}</b><button class="btn sec sm" data-h="${k}.hora" data-d="1" aria-label="${rot}: depois">+</button></span>` : '<span class="muted">fora</span>'}</div>`;
 
-export function telaMontar(tela, voltar) {
+export function telaMontar(tela, voltar, qual = 'A', depois = null) {
+  alvo = qual; E = TIPOS[alvo].e;
   const desenha = () => {
     const erros = conferir(E), horasSono = ((E.acordar - E.dormir) % 24 + 24) % 24 || 24;
     const previa = erros.length ? null : montarRotina(E);
     tela.innerHTML = `
-      <section class="card">${previa ? linhaDoTempo(previa) : '<p class="aviso">Acerte os horários para ver a linha do tempo.</p>'}</section>
+      <section class="card"><div class="rotulo">Montando: ${TIPOS[alvo].nome.toLowerCase()}</div>${previa ? linhaDoTempo(previa) : '<p class="aviso">Acerte os horários para ver a linha do tempo.</p>'}</section>
       <section class="card"><div class="rotulo">Sono · ${fmt(horasSono, horasSono % 1 ? 1 : 0)} h</div>${hora('Dormir', 'dormir')}${hora('Acordar', 'acordar')}</section>
       <section class="card"><div class="rotulo">Refeições · 50 g de carboidrato cada</div>${refeicao('Café', 'cafe')}${refeicao('Almoço', 'almoco')}${refeicao('Jantar', 'jantar')}${refeicao('Lanche', 'lanche')}</section>
       <section class="card"><div class="rotulo">Trabalho ou estudo</div><div class="lin"><span>${liga('Tem jornada', 'trabalho.on')}</span><span class="muted">${E.trabalho.on ? '' : 'dia livre'}</span></div>${E.trabalho.on ? hora('Começa', 'trabalho.inicio') + hora('Termina', 'trabalho.fim') : ''}</section>
@@ -26,11 +33,11 @@ export function telaMontar(tela, voltar) {
         ${E.exercicio.nivel !== 'nenhum' ? hora('Começa', 'exercicio.hora') + `<div class="lin"><span>Duração</span>${seg('exercicio.dur', DURACOES.map((d) => ({ id: d, nome: `${d} min` })), 'Duração do exercício')}</div>` : ''}</section>
       <section class="card"><div class="rotulo">Álcool antes de dormir</div>${seg('alcool', ALCOOL, 'Álcool antes de dormir')}</section>
       ${erros.length ? `<div class="aviso">${erros.map(esc).join('<br>')}</div>` : ''}
-      <button class="btn ok block" id="ver" ${erros.length ? 'disabled' : ''}>Ver o dia</button>
+      <button class="btn ok block" id="ver" ${erros.length ? 'disabled' : ''}>${depois ? 'Voltar à semana' : 'Ver o dia'}</button>
       <button class="link" id="zera">Voltar à rotina padrão</button>
       <button class="link" id="sai">Trocar de modo</button>`;
-    $('#ver').onclick = () => telaDia(tela, voltar);
-    $('#zera').onclick = () => { E = escolhasPadrao(); desenha(); };
+    $('#ver').onclick = () => (depois ? depois() : telaDia(tela, voltar));
+    $('#zera').onclick = () => { TIPOS[alvo].e = E = alvo === 'A' ? escolhasPadrao() : livrePadrao(); desenha(); };
     $('#sai').onclick = voltar;
   };
   tela.onclick = (ev) => {
@@ -44,18 +51,19 @@ export function telaMontar(tela, voltar) {
   desenha(); scrollTo(0, 0);
 }
 
-function telaDia(tela, voltar) {
-  const rotina = montarRotina(E), dia = simularDia(rotina), notas = leitura(rotina, dia);
-  let h = E.acordar;
+function telaDia(tela, voltar, opc = null) {
+  const rotina = opc ? opc.rotina : montarRotina(E), dia = opc ? opc.dia : simularDia(rotina), notas = opc ? opc.notas : leitura(rotina, dia);
+  let h = rotina.sono[0].fim;
   tela.innerHTML = `
     <p class="aviso">Aqui, diagnóstico é a leitura que o modelo faz da rotina. Não é diagnóstico clínico nem o seu corpo.</p>
+    ${opc ? `<h2>${esc(opc.titulo)}</h2>` : ''}
     <section class="card fixo"><div id="lt"></div>
       <input type="range" id="hr" min="0" max="23.5" step="0.5" value="${h}" aria-label="Hora do dia">
       <div class="leitura" id="vals"></div></section>
     <section class="card"><div class="rotulo">Por quê, nesta hora</div><ul class="porque" id="pq"></ul></section>
     ${['cortisol', 'glicemia', 'pressaoSono'].map((k) => `<section class="card"><h3 style="color:${CORV[k]}">${VARS[k].nome} (${VARS[k].unidade})</h3><div id="g-${k}"></div></section>`).join('')}
     <section class="card"><div class="rotulo">O que esta rotina mostra</div><ul class="porque">${notas.map((n) => `<li>${esc(n)}</li>`).join('')}</ul></section>
-    <button class="btn ok block" id="ajusta">Ajustar a rotina</button>
+    ${opc ? '<button class="btn ok block" id="semana">Voltar à semana</button>' : '<button class="btn ok block" id="semana">Ver a semana inteira</button><button class="btn sec block" id="ajusta">Ajustar a rotina</button>'}
     <button class="link" id="sai">Trocar de modo</button>`;
   const pinta = () => {
     const p = dia.pontos.find((x) => Math.abs(x.hora - h) < 1e-6);
@@ -69,7 +77,68 @@ function telaDia(tela, voltar) {
   };
   tela.onclick = null;
   $('#hr').oninput = (ev) => { h = +ev.target.value; pinta(); };
-  $('#ajusta').onclick = () => telaMontar(tela, voltar);
+  if ($('#ajusta')) $('#ajusta').onclick = () => telaMontar(tela, voltar, 'A');
+  $('#semana').onclick = () => telaSemana(tela, voltar);
   $('#sai').onclick = voltar;
   pinta(); scrollTo(0, 0);
+}
+
+function graficoSemana(sem, chave, cor, max, rot) {
+  const W = 340, H = 130, L = 34, R = 8, T = 8, B = 22, X = (t) => L + (t / 168) * (W - L - R), Y = (v) => T + (1 - v / max) * (H - T - B);
+  const linha = chave === 'divida'
+    ? sem.resumo.map((r, d) => { const y = Y(r.dividaAcumulada), w = (W - L - R) / 7; return `<rect x="${(X(d * 24) + 3).toFixed(1)}" y="${y.toFixed(1)}" width="${(w - 6).toFixed(1)}" height="${(H - B - y).toFixed(1)}" rx="3" fill="${cor}"/>`; }).join('')
+    : `<path d="${sem.pontos.filter((_, i) => i % 3 === 0).map((p, i) => `${i ? 'L' : 'M'}${X(p.t).toFixed(1)},${Y(p[chave]).toFixed(1)}`).join('')}" fill="none" stroke="${cor}" stroke-width="2" stroke-linejoin="round"/>`;
+  const dias = DIAS.map((n, d) => `<text x="${X(d * 24 + 12)}" y="${H - 6}" text-anchor="middle" font-size="10" fill="#a9bfd6" font-family="JetBrains Mono, monospace">${n}</text>${d ? `<line x1="${X(d * 24)}" x2="${X(d * 24)}" y1="${T}" y2="${H - B}" stroke="#23415f"/>` : ''}`).join('');
+  const ticks = [0, max / 2, max].map((v) => `<text x="${L - 5}" y="${Y(v) + 4}" text-anchor="end" font-size="10" fill="#a9bfd6" font-family="JetBrains Mono, monospace">${fmt(v, max <= 1 ? 1 : 0)}</text><line x1="${L}" x2="${W - R}" y1="${Y(v)}" y2="${Y(v)}" stroke="#23415f"/>`).join('');
+  return `<svg class="graf" viewBox="0 0 ${W} ${H}" role="img" aria-label="${rot}">${ticks}${dias}${linha}</svg>`;
+}
+
+function telaSemana(tela, voltar) {
+  tela.onclick = null;
+  const desenha = () => {
+    const errosTipo = { A: conferir(TIPOS.A.e), B: conferir(TIPOS.B.e) };
+    const rotinas = SEMANA.map((k) => ({ ...montarRotina(TIPOS[k].e), nome: TIPOS[k].nome }));
+    const erros = [...(errosTipo.A.length ? ['O dia útil tem horários a acertar.'] : []), ...(errosTipo.B.length ? ['O dia livre tem horários a acertar.'] : [])];
+    if (!erros.length) erros.push(...conferirSemana(rotinas));
+    const sem = erros.length ? null : simularSemana(rotinas);
+    const noite = P.dividaSono.umaNoiteSemDormirH.valor;
+    let corpo = `<div class="aviso">${erros.map(esc).join('<br>')}</div>`;
+    if (sem) {
+      const maxD = Math.max(8, sem.dividaFinal, ...sem.resumo.map((r) => r.dividaAcumulada)) * 1.1, u = sem.resumo[6], notas = [];
+      notas.push(sem.dividaFinal < 0.5 ? 'A semana fecha sem dívida de sono: os dias acordados não passam de 15,84 horas, o limite acima do qual a vigília acumula.' : `A semana fecha com ${fmt(sem.dividaFinal, 1)} horas de vigília em excesso. Uma noite inteira sem dormir equivale a cerca de ${fmt(noite, 0)} horas: você chegou a ${fmt(sem.noitesSemDormirEquivalentes * 100, 0)}% disso.`);
+      if (sem.dividaFinal >= 0.5) notas.push('Em laboratório, quem dorme pouco por vários dias sente o sono estabilizar, mas a atenção continua piorando: a sensação engana.');
+      if (u.remAcumuladoMin) notas.push(`O álcool tirou cerca de ${fmt(u.remAcumuladoMin, 0)} minutos de sono REM na semana.`);
+      const ativos = sem.resumo.filter((r) => r.sonoNaFaseAtiva).length;
+      if (ativos) notas.push(`Em ${ativos} de 7 dias o sono começa com o cortisol acima da média do dia. Em estudos de campo, duas noites seguidas de trabalho noturno não bastam para o relógio se ajustar.`);
+      notas.push('As curvas de cortisol e glicemia de cada dia ainda não mudam com a dívida: sabe-se a direção (pior tolerância à glicose, cortisol mais alto à noite), mas falta número para o modelo.');
+      corpo = `
+        <section class="card"><div class="rotulo">Dia a dia · toque para ver hora a hora</div>
+          <div class="tabela"><div class="cab"><span>Dia</span><span>Sono</span><span>Acordado</span><span>Dívida</span></div>
+          ${sem.resumo.map((r, d) => `<button class="lin-dia" data-dia="${d}"><span><b>${DIAS[d]}</b></span><span class="mono">${fmt(r.horasSono, 1)} h</span><span class="mono">${fmt(r.horasAcordado, 1)} h</span><span class="mono ${r.dividaAcumulada >= 0.5 ? 'deve' : ''}">${fmt(r.dividaAcumulada, 1)} h</span></button>`).join('')}</div></section>
+        <section class="card"><h3 style="color:#fb7185">Dívida de sono acumulada (horas)</h3>${graficoSemana(sem, 'divida', '#fb7185', maxD, 'Dívida de sono acumulada por dia')}</section>
+        <section class="card"><h3 style="color:${CORV.pressaoSono}">Pressão de sono (de 0 a 1)</h3>${graficoSemana(sem, 'pressaoSono', CORV.pressaoSono, 1, 'Pressão de sono ao longo da semana')}</section>
+        <section class="card"><div class="rotulo">O que esta semana mostra</div><ul class="porque">${notas.map((n) => `<li>${esc(n)}</li>`).join('')}</ul></section>`;
+      tela._sem = { sem, rotinas };
+    }
+    tela.innerHTML = `
+      <section class="card"><div class="rotulo">Semana 1 · toque num dia para trocar o tipo</div>
+        <div class="dias">${SEMANA.map((k, d) => `<button class="btn sec sm ${k === 'B' ? 'livre' : ''}" data-troca="${d}" aria-label="${DIAS[d]}: ${TIPOS[k].nome}. Tocar para trocar"><b>${DIAS[d]}</b><small>${k === 'A' ? 'útil' : 'livre'}</small></button>`).join('')}</div>
+        <div class="grade c2" style="margin-top:12px"><button class="btn sec sm" id="ed-a">Editar dia útil</button><button class="btn sec sm" id="ed-b">Editar dia livre</button></div>
+      </section>${corpo}
+      <button class="link" id="sai">Trocar de modo</button>`;
+    $('#ed-a').onclick = () => telaMontar(tela, voltar, 'A', () => telaSemana(tela, voltar));
+    $('#ed-b').onclick = () => telaMontar(tela, voltar, 'B', () => telaSemana(tela, voltar));
+    $('#sai').onclick = voltar;
+  };
+  tela.onclick = (ev) => {
+    const t = ev.target.closest('[data-troca]'), d = ev.target.closest('[data-dia]');
+    if (t) { const y = scrollY; SEMANA[+t.dataset.troca] = SEMANA[+t.dataset.troca] === 'A' ? 'B' : 'A'; desenha(); scrollTo(0, y); }
+    else if (d && tela._sem) {
+      const i = +d.dataset.dia, { sem, rotinas } = tela._sem, r = sem.resumo[i], dia = diaDaSemana(sem, i);
+      const notas = [`Sono da noite anterior: ${fmt(r.horasSono, 1)} h. Tempo acordado neste dia: ${fmt(r.horasAcordado, 1)} h.`, `Dívida de sono acumulada até aqui: ${fmt(r.dividaAcumulada, 1)} h.`, `Pressão de sono ao acordar: ${fmt(r.pressaoAoAcordar, 2)}.`];
+      if (r.remPerdidoMin) notas.push(`Álcool nesta noite: cerca de ${fmt(r.remPerdidoMin, 0)} minutos de sono REM a menos.`);
+      telaDia(tela, voltar, { rotina: rotinas[i], dia, notas, titulo: `${DIAS[i]} · ${rotinas[i].nome}` });
+    }
+  };
+  desenha(); scrollTo(0, 0);
 }
