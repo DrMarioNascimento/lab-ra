@@ -52,5 +52,6 @@ export function grafico(dia, variavel, opcoes = {}) {
     const p = pts.reduce((a, b) => (Math.abs(b.hora - opcoes.hora) < Math.abs(a.hora - opcoes.hora) ? b : a));
     marca = `<line x1="${X(p.hora)}" x2="${X(p.hora)}" y1="${T}" y2="${H - B}" stroke="#fff" stroke-width="1.5" opacity=".7"/><circle cx="${X(p.hora)}" cy="${Y(p[variavel])}" r="5" fill="${CORV[variavel]}" stroke="#fff" stroke-width="2"/>`;
   }
-  return `<svg class="graf" viewBox="0 0 ${W} ${H}" role="img" aria-label="Curva esperada de ${v.nome} ao longo do dia">${ticks}${hx}<path d="${linha}" fill="none" stroke="${CORV[variavel]}" stroke-width="2.5" stroke-linejoin="round"/>${marca}${bolas}</svg>`;
+  const ref = variavel === 'glicemia' && max > 140 ? `<line x1="${L}" x2="${W - R}" y1="${Y(140)}" y2="${Y(140)}" stroke="#fbbf24" stroke-width="1" stroke-dasharray="4 4"/><text x="${W - R - 2}" y="${Y(140) - 4}" text-anchor="end" font-size="10" fill="#fbbf24" font-family="JetBrains Mono, monospace">140</text>` : '';
+  return `<svg class="graf" viewBox="0 0 ${W} ${H}" role="img" aria-label="Curva esperada de ${v.nome} ao longo do dia">${ticks}${ref}${hx}<path d="${linha}" fill="none" stroke="${CORV[variavel]}" stroke-width="2.5" stroke-linejoin="round"/>${marca}${bolas}</svg>`;
 }

@@ -56,3 +56,12 @@ test('partida: valor do motor dentro da própria faixa e dentro do slider; racio
 });
 
 test('hora por extenso', () => { assert.equal(hhmm(7.5), '7h30'); assert.equal(hhmm(18), '18h'); assert.equal(hhmm(24.5), '0h30'); });
+
+test('glicemia: o jogo diz se é pós-prandial, de jejum ou entre refeições', async () => {
+  const { momentoGlicemia, rotuloGlicemia, explicar } = await import('./prognostico.js');
+  const r = ROTINAS[0];                                  // café 7h30, almoço 12h30, jantar 19h30
+  assert.equal(momentoGlicemia(r, 8.5), 'pós-prandial'); assert.equal(momentoGlicemia(r, 11.5), 'entre refeições');
+  assert.equal(momentoGlicemia(r, 7), 'de jejum'); assert.equal(rotuloGlicemia(r, 13), 'Glicemia pós-prandial'); assert.equal(rotuloGlicemia(r, 17), 'Glicemia');
+  assert.ok(explicar(r, 8.5, 'glicemia').join(' ').includes('2 horas depois da sobrecarga'));
+  assert.ok(explicar(r, 7, 'glicemia').join(' ').includes('jejum'));
+});

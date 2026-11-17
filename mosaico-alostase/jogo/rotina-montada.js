@@ -93,7 +93,7 @@ export function leitura(rotina, dia = simularDia(rotina)) {
     notas.push(pct > 0 ? `Ao fim do exercício o cortisol fica ${pct}% acima do esperado para o horário (${f(p.cortisol)} contra ${f(p.cortisolBase)} µg/dL).` : 'O exercício leve não tira o cortisol da curva do horário.');
   }
   const picoG = Math.max(...dia.pontos.map((p) => p.glicemia));
-  notas.push(rotina.refeicoes.length ? `Depois de cada refeição a glicemia sobe e volta em cerca de 3 horas; o maior pico do dia chega a ${f(picoG, 0)} mg/dL.` : 'Sem refeições, a glicemia fica na base o dia todo: o modelo não derruba a glicemia de pessoa saudável por horas sem comer.');
+  notas.push(rotina.refeicoes.length ? `A glicemia pós-prandial sobe e volta em cerca de 3 horas; o maior pico do dia chega a ${f(picoG, 0)} mg/dL. Passar de 140 logo depois de comer é esperado em pessoa saudável: o que conta é voltar à base.` : 'Sem refeições, a glicemia fica na base o dia todo: o modelo não derruba a glicemia de pessoa saudável por horas sem comer.');
   if (rotina.jornadas.some((j) => j.tipo === 'trabalho-noturno')) notas.push('Nas primeiras noites de trabalho noturno a curva do cortisol não acompanha a rotina nova.');
   return notas;
 }

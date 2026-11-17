@@ -1,6 +1,6 @@
 // Mosaico Alostase · tela do modo Prognóstico.
 import { ROTINAS } from './rotinas.js';
-import { novaPartida, pontuar, VARIAVEIS, TEMPOS, hhmm } from './prognostico.js';
+import { novaPartida, pontuar, VARIAVEIS, TEMPOS, hhmm, momentoGlicemia, rotuloGlicemia } from './prognostico.js';
 import { leitura } from './rotina-montada.js';
 import { $, fmt, esc, linhaDoTempo, listaDaRotina, grafico, CORV } from './ui.js';
 import { telaEntradaDiag } from './diagnostico.js';
@@ -80,7 +80,7 @@ function telaRotina() {
     <section class="card"><div class="rotulo">Ao acordar, às ${hhmm(p.ancora.hora)}</div>
       <div class="ancoras">
         <div class="valor cort"><b>${fmt(p.ancora.cortisol, 1)}</b><span>Cortisol, µg/dL</span></div>
-        <div class="valor glic"><b>${fmt(p.ancora.glicemia, 0)}</b><span>Glicemia, mg/dL</span></div>
+        <div class="valor glic"><b>${fmt(p.ancora.glicemia, 0)}</b><span>${rotuloGlicemia(r, p.ancora.hora)}, mg/dL</span></div>
       </div>
       <p class="muted nota">Este é o ponto de partida. Serão ${p.perguntas.length} estimativas ao longo do dia.</p>
     </section>
@@ -101,7 +101,7 @@ function telaPergunta() {
     <section class="card">${linhaDoTempo(p.rotina, q.hora)}</section>
     <section class="card pergunta">
       <div class="rotulo">Estimativa ${E.i + 1} de ${p.perguntas.length}</div>
-      <h2>Às ${hhmm(q.hora)}, quanto está <span class="cor-${q.variavel}">${v.nome === 'Cortisol' ? 'o cortisol' : 'a glicemia'}</span>?</h2>
+      <h2>Às ${hhmm(q.hora)}, quanto está <span class="cor-${q.variavel}">${v.nome === 'Cortisol' ? 'o cortisol' : (momentoGlicemia(p.rotina, q.hora) === 'entre refeições' ? 'a glicemia' : `a glicemia ${momentoGlicemia(p.rotina, q.hora)}`)}</span>?</h2>
       <p class="muted nota">Último valor conhecido: <b class="mono">${fmt(ref.valor, v.casas)} ${v.unidade}</b> às ${hhmm(ref.hora)}.</p>
       <div class="numero"><b id="num" class="cor-${q.variavel}">${fmt(ref.valor, v.casas)}</b><span>${v.unidade}</span></div>
       <input type="range" id="sl" min="${v.min}" max="${v.max}" step="${v.passo}" value="${ref.valor}" aria-label="${v.nome} em ${v.unidade}">
@@ -128,7 +128,7 @@ function telaRevelacao() {
   atualizaPlacar();
   tela.innerHTML = `
     <section class="card">
-      <div class="rotulo">${v.nome} às ${hhmm(x.hora)}</div>
+      <div class="rotulo">${x.variavel === 'glicemia' ? rotuloGlicemia(p.rotina, x.hora) : v.nome} às ${hhmm(x.hora)}</div>
       <div class="resultado"><h2>${frase}</h2><span class="pontos ${cls}">+${x.pontos}</span></div>
       <div class="regua" role="img" aria-label="Esperado ${fmt(x.valor, v.casas)}, faixa de ${fmt(x.faixa[0], v.casas)} a ${fmt(x.faixa[1], v.casas)}, seu palpite ${fmt(x.palpite, v.casas)} ${v.unidade}">
         <span class="trilho"></span>
@@ -152,7 +152,7 @@ function telaFim() {
   placar.hidden = true;
   tela.innerHTML = `
     <section class="card total"><div class="rotulo">Fim do dia</div><b>${total}</b><span class="muted">de ${maximo} pontos · ${naFaixa} de ${p.perguntas.length} dentro da faixa</span></section>
-    ${['cortisol', 'glicemia'].map((k) => `<section class="card"><h3 class="cor-${k}">${VARIAVEIS[k].nome} (${VARIAVEIS[k].unidade})</h3>${grafico(p.dia, k, { palpites: E.respostas.filter((x) => x.variavel === k) })}
+    ${['cortisol', 'glicemia'].map((k) => `<section class="card"><h3 class="cor-${k}">${k === 'glicemia' ? 'Glicemia de jejum e pós-prandial' : VARIAVEIS[k].nome} (${VARIAVEIS[k].unidade})</h3>${grafico(p.dia, k, { palpites: E.respostas.filter((x) => x.variavel === k) })}
       <div class="legenda"><span><i style="background:${CORV[k]}"></i>Esperado</span><span><i style="background:#fff;height:8px;width:8px;border-radius:50%"></i>Seus palpites</span></div></section>`).join('')}
     ${notas.length ? `<section class="card"><div class="rotulo">O que este dia mostra</div><ul class="porque">${notas.map((n) => `<li>${esc(n)}</li>`).join('')}</ul></section>` : ''}
     <p class="aviso">Modelo médio de adulto saudável. Não é o seu corpo e não serve de diagnóstico.</p>

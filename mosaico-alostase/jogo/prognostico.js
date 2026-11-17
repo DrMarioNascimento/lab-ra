@@ -67,6 +67,14 @@ export function pontuar(palpite, [min, max]) {
   return Math.max(0, Math.round(100 * (1 - fora / (max - min))));
 }
 
+/** Em que momento a glicemia está: pós-prandial (até 3 h depois de comer), de jejum (8 h ou mais) ou entre refeições. */
+export function momentoGlicemia(rotina, h) {
+  const mins = rotina.refeicoes.map((m) => Math.round(mod24(mod24(h) - mod24(m.hora)) * 60)).filter((x) => x > 0);
+  const ult = mins.length ? Math.min(...mins) : Infinity;
+  return ult <= 180 ? 'pós-prandial' : ult >= 480 ? 'de jejum' : 'entre refeições';
+}
+export const rotuloGlicemia = (rotina, h) => { const m = momentoGlicemia(rotina, h); return m === 'entre refeições' ? 'Glicemia' : `Glicemia ${m}`; };
+
 /** Raciocínio mostrado na revelação: o que aconteceu antes, há quanto tempo, o que se espera. */
 export function explicar(rotina, h, variavel) {
   const frases = [], c = P.cortisol, hr = mod24(h);
@@ -75,10 +83,11 @@ export function explicar(rotina, h, variavel) {
     const ult = rotina.refeicoes.map((m) => ({ m, min: haMin(m.hora) })).filter((x) => x.min > 0).sort((a, b) => a.min - b.min)[0];
     if (ult && ult.min <= 240) {
       frases.push(`${ult.m.nome} foi há ${ult.min >= 60 ? `${Math.floor(ult.min / 60)} h${ult.min % 60 ? ` ${ult.min % 60} min` : ''}` : `${ult.min} min`}.`);
-      frases.push(ult.min <= 80 ? 'A glicemia chega ao pico perto de 50 minutos depois de comer.' : ult.min <= 180 ? 'O pico já passou: a glicemia está voltando para o valor de antes da refeição.' : 'Passadas umas 3 horas, a glicemia está quase de volta à base.');
+      frases.push(ult.min <= 80 ? 'É glicemia pós-prandial: ela chega ao pico perto de 50 minutos depois de comer.' : ult.min <= 180 ? 'É glicemia pós-prandial, com o pico já passado: está voltando para o valor de antes da refeição.' : 'Passadas umas 3 horas, a glicemia está quase de volta à base.');
+      if (ult.min <= 100) frases.push('Em adultos jovens saudáveis, com monitor contínuo, o pico depois de 50 g de carboidrato ficou em média em 143 mg/dL. Passar de 140 por alguns minutos, logo depois de comer, é resposta esperada; o limite de 140 dos critérios clínicos vale para 2 horas depois da sobrecarga de glicose.');
     } else {
       frases.push('Não houve refeição nas últimas horas.');
-      frases.push('Em pessoa saudável a glicemia é bem defendida: fica perto da base mesmo sem comer por algumas horas.');
+      frases.push(momentoGlicemia(rotina, h) === 'de jejum' ? 'É glicemia de jejum. Em pessoa saudável ela é bem defendida e fica perto da base.' : 'Em pessoa saudável a glicemia é bem defendida: fica perto da base mesmo sem comer por algumas horas.');
     }
     return frases;
   }

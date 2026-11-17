@@ -1,5 +1,5 @@
 // Mosaico Alostase · modo Prognóstico, semana 1: estimativas de hora em dias diferentes e a dívida de sono ao fim do dia.
-import { novaPartidaSemana, pontuar, VARIAVEIS, DIVIDA, NOMES_DIAS, hhmm } from './prognostico.js';
+import { novaPartidaSemana, pontuar, VARIAVEIS, DIVIDA, NOMES_DIAS, hhmm, momentoGlicemia, rotuloGlicemia } from './prognostico.js';
 import { $, fmt, esc, linhaDoTempo, listaDaRotina } from './ui.js';
 import { graficoSemana } from './diagnostico.js';
 import { P } from '../motor/parametros.js';
@@ -22,7 +22,7 @@ export function jogarSemana(ctx, semana, nPerguntas, semente) {
       <section class="card"><div class="rotulo">Semana de hoje</div><h2>${esc(semana.nome)}</h2><p class="muted">${esc(semana.resumo)}</p>${faixaDias(-1)}</section>
       <section class="card"><div class="rotulo">Segunda-feira · ${esc(semana.dias[0].nome)}</div>${linhaDoTempo(semana.dias[0])}${listaDaRotina(semana.dias[0])}</section>
       <section class="card"><div class="rotulo">Ponto de partida, segunda às ${hhmm(p.ancora.hora)}</div>
-        <div class="ancoras"><div class="valor cort"><b>${fmt(p.ancora.cortisol, 1)}</b><span>Cortisol, µg/dL</span></div><div class="valor glic"><b>${fmt(p.ancora.glicemia, 0)}</b><span>Glicemia, mg/dL</span></div></div>
+        <div class="ancoras"><div class="valor cort"><b>${fmt(p.ancora.cortisol, 1)}</b><span>Cortisol, µg/dL</span></div><div class="valor glic"><b>${fmt(p.ancora.glicemia, 0)}</b><span>${rotuloGlicemia(semana.dias[0], p.ancora.hora)}, mg/dL</span></div></div>
         <p class="nota"><b>Dívida de sono: 0 h.</b> O corpo aguenta cerca de ${fmt(P.dividaSono.vigiliaCriticaH.valor, 2)} horas acordado por dia. O que passa disso vira dívida e soma de um dia para o outro.</p>
         <p class="muted nota">Serão ${p.perguntas.length} estimativas ao longo da semana.</p></section>
       <button class="btn ok block" id="vai">Começar</button><button class="link" id="volta">Trocar de semana</button>`;
@@ -33,7 +33,7 @@ export function jogarSemana(ctx, semana, nPerguntas, semente) {
     const q = p.perguntas[i], v = def(q), rot = semana.dias[q.dia];
     const ant = R.filter((x) => x.variavel === q.variavel).slice(-1)[0];
     const ref = ant ? { valor: ant.valor, quando: ant.tipo === 'divida' ? `ao fim de ${NOMES_DIAS[ant.dia]}` : `${NOMES_DIAS[ant.dia]}, ${hhmm(ant.hora)}` } : { valor: p.ancora[q.variavel], quando: q.tipo === 'divida' ? 'no começo da semana' : `segunda, ${hhmm(p.ancora.hora)}` };
-    const titulo = q.tipo === 'divida' ? `Ao fim de ${NOMES_DIAS[q.dia]}, quanta <span class="cor-divida">dívida de sono</span> acumulada?` : `${Dia(q.dia)}, às ${hhmm(q.hora)}: quanto está <span class="cor-${q.variavel}">${q.variavel === 'cortisol' ? 'o cortisol' : 'a glicemia'}</span>?`;
+    const titulo = q.tipo === 'divida' ? `Ao fim de ${NOMES_DIAS[q.dia]}, quanta <span class="cor-divida">dívida de sono</span> acumulada?` : `${Dia(q.dia)}, às ${hhmm(q.hora)}: quanto está <span class="cor-${q.variavel}">${q.variavel === 'cortisol' ? 'o cortisol' : (momentoGlicemia(rot, q.hora) === 'entre refeições' ? 'a glicemia' : `a glicemia ${momentoGlicemia(rot, q.hora)}`)}</span>?`;
     const r = p.sem.resumo[q.dia];
     mostraPlacar();
     tela.innerHTML = `
@@ -62,7 +62,7 @@ export function jogarSemana(ctx, semana, nPerguntas, semente) {
     const ultima = i === p.perguntas.length - 1;
     mostraPlacar();
     tela.innerHTML = `
-      <section class="card"><div class="rotulo">${v.nome} · ${x.tipo === 'divida' ? `fim de ${NOMES_DIAS[x.dia]}` : `${NOMES_DIAS[x.dia]}, ${hhmm(x.hora)}`}</div>
+      <section class="card"><div class="rotulo">${x.variavel === 'glicemia' ? rotuloGlicemia(semana.dias[x.dia], x.hora) : v.nome} · ${x.tipo === 'divida' ? `fim de ${NOMES_DIAS[x.dia]}` : `${NOMES_DIAS[x.dia]}, ${hhmm(x.hora)}`}</div>
         <div class="resultado"><h2>${frase}</h2><span class="pontos ${cls}">+${x.pontos}</span></div>
         <div class="regua" role="img" aria-label="Esperado ${fmt(x.valor, v.casas)}, faixa de ${fmt(x.faixa[0], v.casas)} a ${fmt(x.faixa[1], v.casas)}, seu palpite ${fmt(x.palpite, v.casas)} ${v.unidade}">
           <span class="trilho"></span><span class="faixa" style="left:${pos(x.faixa[0])}%;width:${Math.max(1, pos(x.faixa[1]) - pos(x.faixa[0]))}%"></span>
