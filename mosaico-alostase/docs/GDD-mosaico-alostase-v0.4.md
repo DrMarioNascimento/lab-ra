@@ -232,7 +232,7 @@ Um personagem em Three.js cujo corpo mostra o estado do momento: postura caída 
 1. Fichas de literatura das primeiras variáveis e das jornadas (em andamento: cortisol; trabalho noturno e vida noturna).
 2. Motor de um dia, hora a hora, com o primeiro lote de variáveis e a meta externa. **Primeira versão em `motor/` (17/11/2026):** cortisol, glicemia e pressão de sono, com as jornadas de exercício, noturna e noite ativa; ainda sem meta externa e sem estresse psicológico.
 3. Modo Prognóstico em um dia (exige menos interface e valida as curvas). **Primeira versão jogável em `index.html` (17/11/2026):** seis rotinas, cortisol e glicemia no slider, âncora ao acordar, revelação com faixa e raciocínio, curva do dia no fim. Faltam: modo de hora em hora completo, uma variável só, sala de aula.
-4. Modo Diagnóstico.
+4. Modo Diagnóstico. **Primeira versão em `index.html` (17/11/2026):** o aluno monta sono, refeições, jornada, exercício e álcool; o jogo mostra cortisol, glicemia e pressão de sono hora a hora, com o porquê de cada hora e a leitura da rotina. Ainda sem meta externa, contas e moeda (seções 5 a 7).
 5. Semana: acúmulos e juros das dívidas.
 6. Meses: adaptações.
 7. Personagem 3D.

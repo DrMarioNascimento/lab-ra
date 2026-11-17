@@ -1,11 +1,11 @@
 // Mosaico Alostase · tela do modo Prognóstico.
 import { ROTINAS } from './rotinas.js';
 import { novaPartida, pontuar, VARIAVEIS, TEMPOS, hhmm } from './prognostico.js';
+import { leitura } from './rotina-montada.js';
+import { $, fmt, esc, linhaDoTempo, listaDaRotina, grafico, CORV } from './ui.js';
+import { telaMontar } from './diagnostico.js';
 
-const $ = (s) => document.querySelector(s);
-const tela = $('#tela'), placar = $('#placar');
-const fmt = (v, casas) => v.toFixed(casas).replace('.', ',');
-const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const tela = $('#tela'), placar = $('#placar'), sub = $('#sub');
 const E = { tempo: 1, rotina: 'sorteio', partida: null, i: 0, respostas: [] };
 
 // manual: abre na entrada, fica no "i"
@@ -17,35 +17,23 @@ $('#fecha-refs').onclick = () => refs.close();
 let jaViu = false; try { jaViu = localStorage.getItem('ma-manual') === '1'; } catch (e) { /* segue */ }
 if (!jaViu) manual.showModal();
 
-const CLASSE = { trabalho: 'trab', estudo: 'trab', 'trabalho-noturno': 'trab', exercicio: 'ex', 'noite-ativa': 'noite', prova: 'prova' };
-const COR = { sono: '#4c1d95', trab: '#1e40af', ex: '#b45309', noite: '#9d174d', prova: '#b91c1c', ref: '#34d399' };
-
-function blocos(ini, fim, cls) {                       // parte o bloco que atravessa a meia-noite
-  const a = ((ini % 24) + 24) % 24, b = ((fim % 24) + 24) % 24;
-  const um = (x, y) => `<span class="bl ${cls}" style="left:${(x / 24) * 100}%;width:${Math.max(0.8, ((y - x) / 24) * 100)}%"></span>`;
-  return a < b ? um(a, b) : um(a, 24) + (b > 0 ? um(0, b) : '');
-}
-function linhaDoTempo(r, agora) {
-  let h = '';
-  for (const s of r.sono) h += blocos(s.inicio, s.fim, 'sono');
-  for (const j of r.jornadas) h += blocos(j.inicio, j.fim, CLASSE[j.tipo] || 'trab');
-  for (const m of r.refeicoes) h += `<span class="ref" style="left:${(m.hora / 24) * 100}%"></span>`;
-  if (agora != null) h += `<span class="agora" style="left:${(agora / 24) * 100}%"></span>`;
-  return `<div class="linha" role="img" aria-label="Linha do tempo de 24 horas da rotina">${h}</div><div class="horas"><span>0h</span><span>6h</span><span>12h</span><span>18h</span><span>24h</span></div>`;
-}
-function listaDaRotina(r) {
-  const it = [];
-  for (const s of r.sono) it.push({ h: s.inicio, t: `${hhmm(s.inicio)} a ${hhmm(s.fim)}`, n: 'Sono', c: 'sono' });
-  for (const j of r.jornadas) it.push({ h: j.inicio, t: `${hhmm(j.inicio)} a ${hhmm(j.fim)}`, c: CLASSE[j.tipo] || 'trab',
-    n: j.tipo === 'exercicio' ? `${j.nome} (${Math.round((((j.fim - j.inicio) % 24) + 24) % 24 * 60)} min, ${j.vo2}% do VO2máx)` : j.nome });
-  for (const m of r.refeicoes) it.push({ h: m.hora, t: hhmm(m.hora), n: `${m.nome} (${m.carboG} g de carboidrato)`, c: 'ref' });
-  if (r.alcoolGkg) it.push({ h: 23.9, t: 'Na festa', n: `Álcool: ${fmt(r.alcoolGkg, 2)} g por kg de peso`, c: 'noite' });
-  it.sort((a, b) => a.h - b.h);
-  return `<ul class="itens">${it.map((x) => `<li><span class="pt" style="background:${COR[x.c]}"></span><span class="h">${x.t}</span><span>${esc(x.n)}</span></li>`).join('')}</ul>`;
+function telaModos() {
+  placar.hidden = true; sub.textContent = 'Fisiologia da rotina';
+  tela.innerHTML = `
+    <section class="card modo"><div class="rotulo">Modo Prognóstico</div><h2>O jogo dá a rotina, você estima</h2>
+      <p class="muted">A cada hora sorteada, diga onde estão o cortisol e a glicemia. Vale ponto.</p>
+      <button class="btn ok block" id="m-prog">Jogar o Prognóstico</button></section>
+    <section class="card modo"><div class="rotulo">Modo Diagnóstico</div><h2>Você monta a rotina, o jogo mostra</h2>
+      <p class="muted">Escolha sono, refeições, trabalho, treino e noite. Veja o esperado, hora a hora.</p>
+      <button class="btn block" id="m-diag">Montar uma rotina</button></section>
+    <p class="aviso">O organismo do jogo é um modelo médio de adulto saudável. Não é o seu corpo e não serve de diagnóstico clínico.</p>`;
+  $('#m-prog').onclick = telaInicio;
+  $('#m-diag').onclick = () => { sub.textContent = 'Modo Diagnóstico'; telaMontar(tela, telaModos); };
+  scrollTo(0, 0);
 }
 
 function telaInicio() {
-  placar.hidden = true;
+  placar.hidden = true; sub.textContent = 'Modo Prognóstico';
   tela.innerHTML = `
     <section class="card"><h2>Quanto tempo você tem?</h2>
       <p class="muted">O tempo define quantas estimativas o jogo pede.</p>
@@ -57,7 +45,9 @@ function telaInicio() {
         ${ROTINAS.map((r) => `<button class="btn sec ${E.rotina === r.id ? 'on' : ''}" data-r="${r.id}">${esc(r.nome)}</button>`).join('')}
       </div>
     </section>
-    <button class="btn ok block" id="vai">Ver a rotina</button>`;
+    <button class="btn ok block" id="vai">Ver a rotina</button>
+    <button class="link" id="modos">Trocar de modo</button>`;
+  $('#modos').onclick = telaModos;
   $('#tempos').onclick = (e) => { const b = e.target.closest('[data-k]'); if (b) { E.tempo = +b.dataset.k; telaInicio(); } };
   $('#rotinas').onclick = (e) => { const b = e.target.closest('[data-r]'); if (b) { E.rotina = b.dataset.r; telaInicio(); } };
   $('#vai').onclick = () => {
@@ -143,36 +133,20 @@ function telaRevelacao() {
   scrollTo(0, 0);
 }
 
-function grafico(variavel) {
-  const p = E.partida, v = VARIAVEIS[variavel], W = 340, H = 150, L = 34, R = 8, T = 8, B = 22;
-  const pts = p.dia.pontos, vals = pts.map((q) => q[variavel]);
-  const pal = E.respostas.filter((x) => x.variavel === variavel);
-  const max = Math.max(...vals, ...pal.map((x) => x.palpite)) * 1.1, min = variavel === 'glicemia' ? Math.min(70, ...pal.map((x) => x.palpite)) : 0;
-  const X = (h) => L + (h / 24) * (W - L - R), Y = (val) => T + (1 - (val - min) / (max - min)) * (H - T - B);
-  const linha = pts.map((q, i) => `${i ? 'L' : 'M'}${X(q.hora).toFixed(1)},${Y(q[variavel]).toFixed(1)}`).join('');
-  const cor = variavel === 'cortisol' ? '#f59e0b' : '#38bdf8';
-  const ticks = [min, (min + max) / 2, max].map((t) => `<text x="${L - 5}" y="${Y(t) + 4}" text-anchor="end" font-size="10" fill="#a9bfd6" font-family="JetBrains Mono, monospace">${fmt(t, 0)}</text><line x1="${L}" x2="${W - R}" y1="${Y(t)}" y2="${Y(t)}" stroke="#23415f" stroke-width="1"/>`).join('');
-  const hx = [0, 6, 12, 18, 24].map((h) => `<text x="${X(h)}" y="${H - 6}" text-anchor="${h === 0 ? 'start' : h === 24 ? 'end' : 'middle'}" font-size="10" fill="#a9bfd6" font-family="JetBrains Mono, monospace">${h}h</text>`).join('');
-  const bolas = pal.map((x) => `<circle cx="${X(x.hora)}" cy="${Y(x.palpite)}" r="5" fill="#fff" stroke="#07111f" stroke-width="2"><title>${hhmm(x.hora)}: você ${fmt(x.palpite, v.casas)}, esperado ${fmt(x.valor, v.casas)}</title></circle>`).join('');
-  return `<svg class="graf" viewBox="0 0 ${W} ${H}" role="img" aria-label="Curva esperada de ${v.nome} no dia e seus palpites">${ticks}${hx}<path d="${linha}" fill="none" stroke="${cor}" stroke-width="2.5" stroke-linejoin="round"/>${bolas}</svg>`;
-}
-
 function telaFim() {
   const p = E.partida, total = somaPontos(), maximo = p.perguntas.length * 100, naFaixa = E.respostas.filter((x) => x.pontos === 100).length;
-  const q = p.dia.sonoQualidade, notas = [];
-  for (const a of p.dia.alertas) notas.push(a.texto);
-  if (q.remPerdidoMin) notas.push(`Nesta noite, o álcool tirou cerca de ${fmt(q.remPerdidoMin, 0)} minutos de sono REM e atrasou o primeiro REM em ${fmt(q.atrasoRemMin, 0)} minutos.`);
-  if (q.horas < 7) notas.push(`Foram ${fmt(q.horas, 0)} horas de sono: a pressão de sono não chega a zerar e o dia seguinte começa devendo.`);
+  const notas = leitura(p.rotina, p.dia);
   if (p.rotina.jornadas.some((j) => j.tipo === 'prova')) notas.push('Em volta da prova o jogo não pediu o cortisol: avaliação diante de outras pessoas costuma elevá-lo, com pico de 20 a 40 minutos depois do início, mas o tamanho varia muito de pessoa para pessoa.');
   placar.hidden = true;
   tela.innerHTML = `
     <section class="card total"><div class="rotulo">Fim do dia</div><b>${total}</b><span class="muted">de ${maximo} pontos · ${naFaixa} de ${p.perguntas.length} dentro da faixa</span></section>
-    ${['cortisol', 'glicemia'].map((k) => `<section class="card"><h3 class="cor-${k}">${VARIAVEIS[k].nome} (${VARIAVEIS[k].unidade})</h3>${grafico(k)}
-      <div class="legenda"><span><i style="background:${k === 'cortisol' ? '#f59e0b' : '#38bdf8'}"></i>Esperado</span><span><i style="background:#fff;height:8px;width:8px;border-radius:50%"></i>Seus palpites</span></div></section>`).join('')}
+    ${['cortisol', 'glicemia'].map((k) => `<section class="card"><h3 class="cor-${k}">${VARIAVEIS[k].nome} (${VARIAVEIS[k].unidade})</h3>${grafico(p.dia, k, { palpites: E.respostas.filter((x) => x.variavel === k) })}
+      <div class="legenda"><span><i style="background:${CORV[k]}"></i>Esperado</span><span><i style="background:#fff;height:8px;width:8px;border-radius:50%"></i>Seus palpites</span></div></section>`).join('')}
     ${notas.length ? `<section class="card"><div class="rotulo">O que este dia mostra</div><ul class="porque">${notas.map((n) => `<li>${esc(n)}</li>`).join('')}</ul></section>` : ''}
     <p class="aviso">Modelo médio de adulto saudável. Não é o seu corpo e não serve de diagnóstico.</p>
-    <button class="btn ok block" id="de-novo">Jogar outra rotina</button>`;
-  $('#de-novo').onclick = telaInicio; scrollTo(0, 0);
+    <button class="btn ok block" id="de-novo">Jogar outra rotina</button>
+    <button class="link" id="modos">Trocar de modo</button>`;
+  $('#de-novo').onclick = telaInicio; $('#modos').onclick = telaModos; scrollTo(0, 0);
 }
 
-telaInicio();
+telaModos();

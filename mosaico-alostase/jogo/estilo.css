@@ -109,3 +109,23 @@ dialog::backdrop { background: rgba(3,8,16,.78); }
 dialog ol { padding-left: 20px; line-height: 1.5; font-size: 15px; } dialog li { margin: 5px 0; }
 .refs { padding-left: 18px; font-size: 13px; line-height: 1.45; color: var(--tx2); }
 @media (max-width: 350px) { .numero b { font-size: 38px; } .marca small { display: none; } .topo:has(.placar:not([hidden])) .selo { display: none; } .placar { font-size: 12px; padding: 6px 8px; } .grade.c4 { grid-template-columns: 1fr 1fr; } .itens .h { min-width: 84px; } }
+
+/* modo Diagnóstico */
+.modo h2 { margin-bottom: 4px; } .modo .btn { margin-top: 10px; }
+.lin { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 48px; font-size: 15px; }
+.lin + .lin { border-top: 1px solid rgba(255,255,255,.06); }
+.passo { display: flex; align-items: center; gap: 8px; }
+.passo b { min-width: 62px; text-align: center; font-size: 17px; }
+.passo .btn { width: 44px; min-height: 40px; padding: 0; font-size: 20px; }
+.chave { min-width: 96px; }
+.seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 8px; }
+.seg .btn { padding: 6px 4px; }
+.lin .seg { flex: 1; max-width: 220px; }
+.btn:disabled { filter: grayscale(.8) brightness(.7); cursor: not-allowed; }
+.leitura { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 4px; }
+.leitura .valor { padding: 8px; } .leitura .valor b { font-size: 18px; } .leitura .valor span { font-size: 11px; display: block; line-height: 1.2; }
+.hora-atual { display: flex; flex-direction: column; justify-content: center; align-items: center; border-radius: 13px; background: #1d4ed8; box-shadow: 0 3px 0 #172f7a, inset 0 1px 0 rgba(255,255,255,.3); }
+.hora-atual b { font-size: 18px; } .hora-atual span { font-size: 11px; }
+.sono b { color: #c4b5fd; }
+.fixo { position: sticky; top: 56px; z-index: 3; }
+@media (max-width: 350px) { .leitura { grid-template-columns: 1fr 1fr; } .passo b { min-width: 54px; } .chave { min-width: 84px; } }

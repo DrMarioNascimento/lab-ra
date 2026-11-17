@@ -88,7 +88,7 @@ export function explicar(rotina, h, variavel) {
   const ex = rotina.jornadas.filter((j) => j.tipo === 'exercicio').map((j) => ({ j, min: haMin(j.fim) })).filter((x) => x.min >= 0 && x.min <= 180).sort((a, b) => a.min - b.min)[0];
   if (ex) {
     if (ex.j.vo2 <= 40) frases.push(`${ex.j.nome}: exercício leve não eleva o cortisol.`);
-    else frases.push(`${ex.j.nome} terminou há ${ex.min} min. Exercício intenso eleva o cortisol acima do esperado para o horário, e o efeito ainda não passou.`);
+    else frases.push(`${ex.j.nome} ${ex.min < 5 ? 'acabou de terminar' : `terminou há ${ex.min} min`}. Exercício acima de 60% do VO2máx eleva o cortisol além do esperado para o horário, e o efeito ainda não passou.`);
   }
   if (rotina.jornadas.some((j) => j.tipo === 'trabalho-noturno')) frases.push('Nas primeiras noites de plantão o relógio do corpo não muda: a curva segue o horário antigo.');
   return frases;
