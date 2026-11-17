@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { PERFIS, iniciar, metas, META_ATIVIDADE_MIN } from './perfis.js';
+import { PERFIS, iniciar, metas, META_ATIVIDADE_MIN, pisoDosCompromissos } from './perfis.js';
 import { conferir, montarRotina } from './rotina-montada.js';
 import { conferirSemana, simularSemana } from '../motor/semana.js';
 
@@ -38,4 +38,20 @@ test('metas: estudo soma as horas da semana; exercício intenso vale o dobro; le
   const m = metas(p, semana(t));
   assert.equal(m.ativMin, 5 * 60); assert.ok(m.ativOk); assert.equal(m.estudoH, 5 * 2 + 2 * 2.5); assert.equal(m.estudoOk, true);
   assert.equal(META_ATIVIDADE_MIN, 150);
+});
+
+test('piso dos compromissos: quem trabalha e estuda à noite fica 16,5 h de pé e deve no mínimo 3,3 h na sexta', () => {
+  const p = pisoDosCompromissos(PERFIS.find((x) => x.id === 'trabalho-faculdade'));
+  assert.equal(p.horasDePeUtil, 16.5); assert.ok(Math.abs(p.pisoNaSexta - 5 * 0.66) < 0.01); assert.equal(p.pisoNoDomingo, 0);
+  const q = pisoDosCompromissos(PERFIS.find((x) => x.id === 'manha-estagio'));
+  assert.equal(q.horasDePeUtil, 12); assert.equal(q.pisoNaSexta, 0);
+  const r = pisoDosCompromissos(PERFIS.find((x) => x.id === 'eventos-fim-de-semana'));
+  assert.equal(r.horasDePeLivre, 12); assert.equal(r.pisoNoDomingo, 0);
+});
+
+test('eventos esportivos no fim de semana: a noite de sexta para sábado encurta', () => {
+  const p = PERFIS.find((x) => x.id === 'eventos-fim-de-semana'), t = iniciar(p);
+  const s = simularSemana(semana(t).map(montarRotina));
+  assert.ok(s.resumo[5].horasSono < 6, `sábado com ${s.resumo[5].horasSono} h de sono`);
+  assert.ok(p.B.fixos.some((f) => f.nome.includes('evento esportivo')));
 });

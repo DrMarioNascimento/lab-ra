@@ -136,7 +136,9 @@ Três perfis de partida, **cenários inventados para criar o conflito, a ajustar
 |---|---|---|---|
 | Aula de manhã, estágio à tarde | Ocupado das 6h30 às 18h30 | Livre | 15 h |
 | Trabalha de dia, faculdade à noite | Ocupado das 7h às 23h30, com uma hora de intervalo | Livre | 10 h |
-| Aula na semana, plantão no fim de semana | Ocupado das 7h às 13h | Plantão das 7h às 19h, mais deslocamento | 20 h |
+| Aula na semana, eventos esportivos no fim de semana (definido pelo professor em 17/11/2026) | Ocupado das 7h às 13h | Trabalho em evento esportivo das 6h às 16h, mais deslocamento | 20 h |
+
+**O custo precisa estar à vista** (orientação do professor em 17/11/2026: "é esse tipo de coisa que precisa se ver"). A tela da semana abre com o cartão "O que esta semana custa": horas acordado no dia mais longo, sono por noite útil, dívida na sexta e uma frase que junta os três. No desafio, a frase separa o que é preço dos compromissos (o piso de dívida, mesmo dormindo assim que o último compromisso acaba) do que vem das escolhas do aluno. Cada perfil mostra, já no botão, quantas horas de pé os compromissos impõem.
 
 O que ainda não existe desta seção e das seções 5 e 6: renda, contas de Estresse, Energia e Treino, juros, cobrança entre contas e a moeda.
 

@@ -4,7 +4,7 @@ import { explicar, hhmm } from './prognostico.js';
 import { escolhasPadrao, conferir, montarRotina, leitura, passo, NIVEIS, DURACOES, ALCOOL } from './rotina-montada.js';
 import { simularSemana, conferirSemana, diaDaSemana } from '../motor/semana.js';
 import { P } from '../motor/parametros.js';
-import { PERFIS, iniciar, metas } from './perfis.js';
+import { PERFIS, iniciar, metas, pisoDosCompromissos } from './perfis.js';
 import { $, fmt, esc, linhaDoTempo, grafico, VARS, CORV } from './ui.js';
 
 const livrePadrao = () => { const e = escolhasPadrao(); e.dormir = 0.5; e.acordar = 9; e.cafe.hora = 9.5; e.almoco.hora = 13.5; e.jantar.hora = 20; e.trabalho.on = false; return e; };
@@ -19,7 +19,7 @@ export function telaEntradaDiag(tela, voltar) {
   tela.innerHTML = `
     <section class="card modo"><div class="rotulo">Rotina livre</div><h2>Monte o dia do seu jeito</h2><p class="muted">Sem compromissos fixos e sem meta. Bom para explorar.</p><button class="btn block" id="livre">Montar uma rotina</button></section>
     <section class="card modo"><div class="rotulo">Desafio da semana</div><h2>Cumpra a meta devendo o mínimo de sono</h2><p class="muted">Escolha um perfil. O dia já vem com compromissos; você decide o resto.</p>
-      <div class="grade" style="margin-top:10px">${PERFIS.map((p) => `<button class="btn sec" data-p="${p.id}">${esc(p.nome)}</button>`).join('')}</div></section>
+      <div class="grade" style="margin-top:10px">${PERFIS.map((p) => { const c = pisoDosCompromissos(p), h = Math.max(c.horasDePeUtil, c.horasDePeLivre); return `<button class="btn sec perfil" data-p="${p.id}"><b>${esc(p.nome)}</b><small>Compromissos: até ${fmt(h, 1)} h de pé por dia</small></button>`; }).join('')}</div></section>
     <button class="link" id="sai">Trocar de modo</button>`;
   $('#livre').onclick = () => { perfil = null; TIPOS.A.e = escolhasPadrao(); TIPOS.B.e = livrePadrao(); telaMontar(tela, voltar, 'A'); };
   $('#sai').onclick = voltar;
@@ -128,7 +128,17 @@ function telaSemana(tela, voltar) {
       const ativos = sem.resumo.filter((r) => r.sonoNaFaseAtiva).length;
       if (ativos) notas.push(`Em ${ativos} de 7 dias o sono começa com o cortisol acima da média do dia. Em estudos de campo, duas noites seguidas de trabalho noturno não bastam para o relógio se ajustar.`);
       notas.push('As curvas de cortisol e glicemia de cada dia ainda não mudam com a dívida: sabe-se a direção (pior tolerância à glicose, cortisol mais alto à noite), mas falta número para o modelo.');
-      corpo = `
+      const uteis = sem.resumo.filter((_, d) => SEMANA[d] === 'A'), maisLongo = Math.max(...sem.resumo.map((r) => r.horasAcordado)), sexta = sem.resumo[4].dividaAcumulada;
+      const semEstudo = perfil && SEMANA.every((k) => !TIPOS[k].e.trabalho.on), piso = perfil ? pisoDosCompromissos(perfil, SEMANA) : null;
+      const mediaSono = uteis.length ? uteis.reduce((t, r) => t + r.horasSono, 0) / uteis.length : sem.resumo.reduce((t, r) => t + r.horasSono, 0) / 7;
+      let frase = sexta < 0.5 && sem.dividaFinal < 0.5 ? 'Esta semana cabe no corpo: nenhum dia passa do limite de 15,84 horas acordado.'
+        : `Com até ${fmt(maisLongo, 1)} horas acordado por dia, a sexta chega com ${fmt(sexta, 1)} horas de dívida de sono${semEstudo ? ', antes de estudar um minuto' : ''}.`;
+      if (piso && piso.pisoNaSexta >= 0.5) frase += ` Só os compromissos já deixam ${fmt(piso.horasDePeUtil, 1)} horas de pé por dia útil: mesmo dormindo no minuto em que o último acaba, ${fmt(piso.pisoNaSexta, 1)} horas dessa dívida são inevitáveis.`;
+      else if (piso && sexta >= 0.5) frase += ' Os compromissos sozinhos caberiam no dia: esta dívida vem das escolhas de horário.';
+      const destaque = `<section class="card destaque"><div class="rotulo">O que esta semana custa</div>
+        <div class="tres"><div class="valor"><b>${fmt(maisLongo, 1)} h</b><span>acordado no dia mais longo</span></div><div class="valor"><b>${fmt(mediaSono, 1)} h</b><span>de sono por noite útil</span></div><div class="valor ${sexta >= 0.5 ? 'deve' : ''}"><b>${fmt(sexta, 1)} h</b><span>de dívida na sexta</span></div></div>
+        <p class="frase">${esc(frase)}</p></section>`;
+      corpo = `${destaque}
         <section class="card"><div class="rotulo">Dia a dia · toque para ver hora a hora</div>
           <div class="tabela"><div class="cab"><span>Dia</span><span>Sono</span><span>Acordado</span><span>Dívida</span></div>
           ${sem.resumo.map((r, d) => `<button class="lin-dia" data-dia="${d}"><span><b>${DIAS[d]}</b></span><span class="mono">${fmt(r.horasSono, 1)} h</span><span class="mono">${fmt(r.horasAcordado, 1)} h</span><span class="mono ${r.dividaAcumulada >= 0.5 ? 'deve' : ''}">${fmt(r.dividaAcumulada, 1)} h</span></button>`).join('')}</div></section>
