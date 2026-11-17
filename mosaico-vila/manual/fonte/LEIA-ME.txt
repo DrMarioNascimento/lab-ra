@@ -1,0 +1,9 @@
+Fonte do Manual do Mosaico Vila (v1.0, 17/11/2026).
+
+manual.html  texto e desenho do manual
+img/         figuras (capturas do simulador) e cópias dos ícones do jogo
+pdf.py       gera o PDF com Playwright (python3 pdf.py), a partir desta pasta
+
+As fontes Sora e JetBrains Mono precisam estar numa pasta "fontes" ao lado do manual.html
+(arquivos .woff2) para o PDF sair com a mesma letra do jogo.
+Não aparece para o participante.

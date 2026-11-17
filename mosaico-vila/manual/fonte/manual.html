@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Mosaico Vila — Manual</title>
+<style>
+@font-face{font-family:Sora;font-weight:400;src:url(fontes/sora-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:Sora;font-weight:500;src:url(fontes/sora-latin-500-normal.woff2) format("woff2")}
+@font-face{font-family:Sora;font-weight:600;src:url(fontes/sora-latin-600-normal.woff2) format("woff2")}
+@font-face{font-family:Sora;font-weight:700;src:url(fontes/sora-latin-700-normal.woff2) format("woff2")}
+@font-face{font-family:"JetBrains Mono";font-weight:600;src:url(fontes/jetbrains-mono-latin-600-normal.woff2) format("woff2")}
+@page{size:A4;margin:17mm 16mm 18mm}
+:root{--tinta:#172338;--suave:#4c5a70;--linha:#d5dce8;--noite:#12233f;--ouro:#c98a12;--ouro2:#f3c04a;--mata:#1f8a4c;--azul:#2563eb;--roxo:#6d3fc4;--rubi:#c2334d}
+*{box-sizing:border-box}
+html{font-family:Sora,system-ui,sans-serif;color:var(--tinta);font-size:9.6pt;line-height:1.5}
+body{margin:0}
+h1,h2,h3,h4{margin:0;line-height:1.2}
+h2{font-size:17pt;font-weight:700;padding-bottom:5px;border-bottom:2px solid var(--ouro2);margin:0 0 10px;break-after:avoid}
+h2 .n{color:var(--ouro)}
+h3{font-size:11.5pt;font-weight:700;color:var(--noite);margin:14px 0 5px;break-after:avoid}
+p{margin:0 0 7px}
+b{font-weight:600}
+section{break-before:page}
+section.junto{break-before:auto;margin-top:18px}
+.mono{font-family:"JetBrains Mono",monospace}
+/* capa */
+.capa{break-before:auto}
+.capa h1{font-size:30pt;font-weight:700;letter-spacing:-.01em;display:flex;align-items:center;gap:12px}
+.capa h1 img{width:54px;height:54px}
+.capa h1 span{color:var(--ouro)}
+.capa .sub{font-size:12.5pt;color:var(--suave);margin:6px 0 14px}
+.capa .tela{border-radius:12px;border:1px solid #0b1730;box-shadow:0 5px 0 #0b1730}
+.fichas{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.ficha{border:1px solid var(--linha);border-radius:10px;padding:9px 12px;border-bottom-width:3px}
+.ficha small{display:block;font-size:7.6pt;letter-spacing:.08em;text-transform:uppercase;color:var(--suave);font-weight:600}
+.ficha b{font-size:10.5pt}
+.assin{display:flex;justify-content:space-between;align-items:flex-end;margin-top:16px;font-size:8.6pt;color:var(--suave)}
+.assin .autor{font-size:11pt;color:var(--tinta);font-weight:600;text-align:right}
+/* caixas */
+.cx{border-radius:10px;padding:9px 13px;margin:9px 0;border:1px solid;border-left-width:5px;break-inside:avoid}
+.cx>small{display:block;font-size:7.6pt;letter-spacing:.1em;text-transform:uppercase;font-weight:700;margin-bottom:2px}
+.cx p:last-child{margin-bottom:0}
+.cx.azul{background:#eef4ff;border-color:#b9cdf5}.cx.azul>small{color:var(--azul)}
+.cx.verde{background:#ecf8f0;border-color:#b5dec5}.cx.verde>small{color:var(--mata)}
+.cx.ouro{background:#fdf5e0;border-color:#ecd18c}.cx.ouro>small{color:#9a6a08}
+.cx.roxo{background:#f3eefc;border-color:#cdbdee}.cx.roxo>small{color:var(--roxo)}
+.cx.rubi{background:#fdeef1;border-color:#f0bcc6}.cx.rubi>small{color:var(--rubi)}
+/* passos */
+ol.passos{list-style:none;margin:6px 0 8px;padding:0;counter-reset:p}
+ol.passos li{counter-increment:p;position:relative;padding:2px 0 5px 28px;break-inside:avoid}
+ol.passos li::before{content:counter(p);position:absolute;left:0;top:2px;width:19px;height:19px;border-radius:50%;background:var(--noite);color:#fff;font-size:8pt;font-weight:700;display:grid;place-items:center}
+ul{margin:4px 0 8px;padding-left:18px}li{margin-bottom:2px}
+/* tabelas */
+table{width:100%;border-collapse:collapse;margin:8px 0 10px;font-size:8.8pt}tr{break-inside:avoid}
+th{background:var(--noite);color:#fff;text-align:left;font-weight:600;padding:6px 8px;font-size:8.2pt}
+td{padding:5px 8px;border-bottom:1px solid var(--linha);vertical-align:top}
+tr:nth-child(even) td{background:#f6f8fc}
+td.c,th.c{text-align:center}
+/* figuras */
+figure{margin:9px auto 10px;break-inside:avoid;max-width:122mm}.duo figure,.capa figure{max-width:none;margin:0}figure.larga{max-width:150mm}
+figure img{width:100%;display:block;border-radius:9px;border:1px solid #0b1730}
+figcaption{font-size:8pt;color:var(--suave);margin-top:4px}
+figcaption b{color:var(--tinta)}
+.duo{display:grid;grid-template-columns:1fr 35mm;gap:12px;align-items:start;margin:8px 0;break-inside:avoid}
+.cels{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.cels figure{margin:0}.cels img{border-radius:12px}
+/* ícones */
+.ic{width:26px;height:26px;vertical-align:-7px;margin-right:5px}
+h3 .ic{width:30px;height:30px;vertical-align:-8px}
+.grade{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0}
+.cartao{border:1px solid var(--linha);border-bottom-width:3px;border-radius:10px;padding:8px 10px;break-inside:avoid;display:flex;gap:9px;align-items:flex-start}
+.cartao img{width:34px;height:34px;flex:none}
+.cartao b{display:block;font-size:9.4pt}
+.cartao span{font-size:8.3pt;color:var(--suave);line-height:1.35;display:block}
+.niveis{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:8px 0}
+.niveis div{text-align:center;border:1px solid var(--linha);border-bottom-width:3px;border-radius:10px;padding:7px 4px;font-size:8.2pt}
+.niveis img{width:44px;height:44px;display:block;margin:0 auto 3px}
+.niveis b{display:block;font-size:7.4pt;color:var(--ouro);letter-spacing:.06em}
+.casas{display:flex;gap:6px;margin:6px 0 8px;flex-wrap:wrap}
+.casas span{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--linha);border-radius:999px;padding:2px 9px 2px 4px;font-size:8.3pt}
+.casas img{width:22px;height:22px}
+.ano{display:flex;gap:12px;align-items:flex-start;border-top:1px solid var(--linha);padding-top:10px;margin-top:12px;break-inside:avoid}
+.ano .sel{flex:none;width:58px;text-align:center}
+.ano .sel b{display:block;background:var(--noite);color:#fff;border-radius:9px;padding:6px 0;font-size:10pt;box-shadow:0 3px 0 #0b1730}
+.ano .sel img{width:38px;height:38px;margin-top:7px}
+.ano h3{margin-top:0}
+.sum{list-style:none;padding:0;margin:8px 0}
+.sum li{display:flex;gap:6px;align-items:baseline;padding:5px 0;border-bottom:1px dotted #b9c3d4;font-size:10.2pt}
+.sum li b{flex:none;width:26px;color:var(--ouro)}
+.sum li span{flex:1}
+.sum li i{font-style:normal;color:var(--suave);font-size:9pt}
+.carimbo{display:inline-block;border:2px solid var(--rubi);color:var(--rubi);font-weight:700;letter-spacing:.08em;padding:0 6px;border-radius:4px;transform:rotate(-3deg);font-size:8.6pt}
+</style>
+</head>
+<body>
+
+<section class="capa">
+  <h1><img src="img/app-mosaico-vila.webp" alt=""> Mosaico <span>Vila</span></h1>
+  <p class="sub">Manual de quem conduz: da entrada na sala ao fechamento, com as regras, os números e as conversas que o jogo provoca.</p>
+  <img class="tela" src="img/capa.jpg" alt="Telão do Mosaico Vila mostrando a mata, o bem público e os lotes no fim do ano 1" style="width:100%">
+  <div class="cx ouro" style="margin-top:14px"><small>A pergunta do jogo</small>
+    <p>E se a sua família pudesse ganhar mais, mas a vila perdesse com isso? O que você faria, sabendo que ninguém vai ver a sua resposta? Em cinco anos de jogo, cada pessoa descobre o que faz. A turma inteira descobre o que fez junta.</p></div>
+  <div class="fichas">
+    <div class="ficha"><small>Para quem</small><b>12 a 40 pessoas, em 4 a 8 famílias</b></div>
+    <div class="ficha"><small>Duração</small><b>Cerca de 47 a 49 minutos</b></div>
+    <div class="ficha"><small>Do que precisa</small><b>Uma TV ou telão e um celular por pessoa</b></div>
+    <div class="ficha"><small>Situação</small><b>Protótipo em testes; sala com celulares ainda não aberta</b></div>
+  </div>
+  <div class="assin"><div><b>Versão 1.0</b> · 17 de novembro de 2026<br>Corresponde ao protótipo publicado nesta data. Telas e regras ainda podem mudar.</div>
+  <div class="autor">Prof. Mário César Nascimento, PhD<br><span style="font-weight:400;font-size:8.6pt;color:var(--suave)">Autor e desenvolvedor do Mosaico Vila</span></div></div>
+</section>
+
+<section>
+  <h2>Sumário</h2>
+  <ul class="sum">
+    <li><b>1</b><span>O que é o Mosaico Vila</span><i>a proposta, em seis passos</i></li>
+    <li><b>2</b><span>Antes de jogar</span><i>sala, tempo e número de pessoas</i></li>
+    <li><b>3</b><span>As três telas</span><i>telão, celular e painel de quem conduz</i></li>
+    <li><b>4</b><span>A vila e as famílias</span><i>pontos, renda e patrimônio</i></li>
+    <li><b>5</b><span>Os cinco anos</span><i>uma novidade por ano</i></li>
+    <li><b>6</b><span>As duas regras e a votação</span><i>Monopólio ou Prosperidade</i></li>
+    <li><b>7</b><span>As cartas da partida</span><i>propostas, honestidade e confiança</i></li>
+    <li><b>8</b><span>Conduzir a partida</span><i>passo a passo no painel</i></li>
+    <li><b>9</b><span>O fechamento</span><i>a meta, cinco perguntas e o placar pessoal</i></li>
+    <li><b>10</b><span>Anonimato e cuidado</span><i>o que o telão nunca mostra</i></li>
+    <li><b>11</b><span>Os números do jogo</span><i>tabela de consulta</i></li>
+    <li><b>12</b><span>Experimentar no simulador</span><i>a aula inteira no computador</i></li>
+    <li><b>13</b><span>Dúvidas comuns</span><i>o que os participantes mais perguntam</i></li>
+  </ul>
+  <div class="cx azul"><small>Como este manual fala</small>
+    <p><b>Você</b> é quem conduz a partida. <b>Participantes</b> são as pessoas que jogam pelo celular. <b>Família</b> é o grupo em que cada participante cai por sorteio, e a <b>vila</b> é a turma inteira. O <b>telão</b> é a TV ou o projetor que todos veem.</p></div>
+  <div class="cx verde"><small>Resumo para os participantes</small>
+    <p>Quem entra na sala recebe no celular uma versão curta das regras, com o botão "Entendi", que depois fica no botão <b>i</b>. Este manual é a versão completa, para quem conduz ou quer entender a proposta a fundo.</p></div>
+</section>
+
+<section>
+  <h2><span class="n">1.</span> O que é o Mosaico Vila</h2>
+  <p>O Mosaico Vila é um jogo de turma sobre escolhas que parecem pequenas e somam grande. Todos os participantes formam uma vila e cada grupo é uma família, sorteada. Durante cinco anos de jogo, cada família recebe renda e decide o que fazer com ela: guardar, pôr no bem público, tirar madeira da mata, replantar, comprar lotes.</p>
+  <p>O telão mostra a vila inteira: a mata, o bem público, os lotes e a meta. O celular mostra só o que é da pessoa e da família dela. A cada ano entra uma regra nova, sempre com um exemplo resolvido no telão e uma pergunta rápida no celular. No caminho, o jogo faz algumas propostas que testam a honestidade de cada um, e no fim a turma conversa sobre o que aconteceu.</p>
+  <h3>A partida em seis passos</h3>
+  <ol class="passos">
+    <li><b>Entrada.</b> Os participantes entram pelo celular com o código do telão e leem o resumo das regras.</li>
+    <li><b>Famílias.</b> Você forma as famílias; cada pessoa descobre a sua e se senta com ela.</li>
+    <li><b>Anos 1 a 3.</b> Renda e bem público, depois a mata, depois moradia e aluguel. <i>Seção 5</i></li>
+    <li><b>Votação.</b> No fim do ano 3, a turma escolhe a regra dos anos 4 e 5. <i>Seção 6</i></li>
+    <li><b>Anos 4 e 5.</b> Abre o mercado de lotes e chega a proposta grande. <i>Seções 5 e 7</i></li>
+    <li><b>Fechamento.</b> A vila bateu a meta? Cinco perguntas para conversar. <i>Seção 9</i></li>
+  </ol>
+  <div class="cx verde"><small>Ideia-chave</small>
+    <p>Ninguém ganha sozinho. A vila inteira ganha ou perde junta, conforme a meta da regra em vigor, e nenhuma escolha individual aparece no telão. Isso deixa cada pessoa livre para decidir como decidiria de verdade, e dá à turma números próprios para discutir bem comum, desigualdade, corrupção e confiança.</p></div>
+  <div class="cx ouro"><small>Onde o jogo está hoje</small>
+    <p>O Mosaico Vila é um protótipo em testes. A aula inteira já roda no <b>simulador</b>, no computador, com telão, celulares simulados e painel de quem conduz (seção 12). A sala com os celulares reais dos participantes ainda não está aberta. Este manual descreve a partida como ela acontece no simulador e como vai acontecer na sala.</p></div>
+</section>
+
+<section>
+  <h2><span class="n">2.</span> Antes de jogar</h2>
+  <table>
+    <tr><th style="width:26%">Item</th><th>O que considerar</th></tr>
+    <tr><td><b>Pessoas</b></td><td>De 12 a 40 participantes. O jogo forma de 4 a 8 famílias, uma a cada 4 pessoas, com 3 a 5 pessoas em cada.</td></tr>
+    <tr><td><b>Grupos pequenos</b></td><td>De 2 a 11 pessoas há um modo em teste: a vila se completa com vizinhos automáticos até ter pelo menos 4 famílias e 12 pessoas.</td></tr>
+    <tr><td><b>Tempo</b></td><td>Cerca de 47 a 49 minutos, da entrada ao fechamento. O painel mostra o tempo de aula e avisa se a partida atrasar.</td></tr>
+    <tr><td><b>Telão</b></td><td>Uma TV ou projetor que todos enxerguem. As letras foram dimensionadas para TV; o telão tem botão de tela cheia.</td></tr>
+    <tr><td><b>Celulares</b></td><td>Um por pessoa, com navegador. Não há aplicativo para instalar nem cadastro.</td></tr>
+    <tr><td><b>Sala</b></td><td>As famílias sentam juntas para conversar. Em três momentos (proposta pequena, votação e proposta grande) cada pessoa responde no próprio lugar, sem mostrar a tela.</td></tr>
+  </table>
+  <div class="cx rubi"><small>Avise antes de começar</small>
+    <p>O jogo fala de dinheiro, aluguel, herança e propostas de corrupção, sempre com famílias e personagens inventados. Se algum tema pesar, a pessoa pode só observar ou falar com você. Esse aviso aparece também no telão, na tela de entrada.</p></div>
+  <h3>Cenário profissional (opcional, só na fala)</h3>
+  <p>Se quiser aproximar o jogo da área da turma, você pode contar a vila como o <b>Complexo Esportivo do Bairro</b>: as famílias são equipes, o bem público é o programa gratuito de atividade física e a mata é o parque onde todos treinam. As telas continuam com os nomes da vila; o cenário entra só na sua fala, e o roteiro fica no painel de quem conduz.</p>
+  <figure><img src="img/entrada.jpg" alt="Telão na entrada, com o código da sala e a lista de quem entrou">
+    <figcaption><b>Figura 1.</b> Telão na entrada: o código da sala, quem já entrou e o aviso sobre os temas do jogo.</figcaption></figure>
+</section>
+
+<section>
+  <h2><span class="n">3.</span> As três telas</h2>
+  <figure class="larga"><img src="img/sim.jpg" alt="Simulador com o telão em cima, a turma embaixo e o painel de quem conduz à direita">
+    <figcaption><b>Figura 2.</b> As três telas juntas no simulador: o telão (em cima), os celulares da turma (embaixo) e o painel de quem conduz (à direita).</figcaption></figure>
+  <div class="grade">
+    <div class="cartao"><img src="img/simulador.webp" alt=""><div><b>Telão</b><span>A vila inteira: o que mudou no ano, exemplos resolvidos e resultados da turma. Nunca mostra a escolha de uma pessoa.</span></div></div>
+    <div class="cartao"><img src="img/participar.webp" alt=""><div><b>Celular</b><span>O que é da pessoa e da família: extrato, decisões, perguntas e as propostas. No topo, um painel fixo com os números.</span></div></div>
+    <div class="cartao"><img src="img/conduzir.webp" alt=""><div><b>Painel de quem conduz</b><span>Avançar e voltar etapas, segurar um resultado na tela, ver o tempo de aula e as cartas sorteadas.</span></div></div>
+  </div>
+  <h3>A faixa de ícones</h3>
+  <p>O telão e o celular têm a mesma faixa no topo. Quando um número muda no ano, ele pisca e mostra quanto subiu ou desceu.</p>
+  <table>
+    <tr><th style="width:24%">Ícone</th><th>O que mostra</th></tr>
+    <tr><td><b>Ano</b></td><td>Em que ano a vila está, de 1 a 5.</td></tr>
+    <tr><td><img class="ic" src="img/balanca.webp" alt=""><b>Regra</b></td><td>Monopólio ou Prosperidade. A vila começa no Monopólio.</td></tr>
+    <tr><td><img class="ic" src="img/arvore-redonda.webp" alt=""><b>Mata</b></td><td>Quanto da mata está de pé, em porcentagem. Aparece a partir do ano 2.</td></tr>
+    <tr><td><img class="ic" src="img/publico-1-praca.webp" alt=""><b>Bem público</b></td><td>O nível atual, de 0 a 5, em cinco quadradinhos.</td></tr>
+    <tr><td><img class="ic" src="img/meta.webp" alt=""><b>Meta da vila</b></td><td>Quanto a vila tem e quanto precisa ter, conforme a regra em vigor.</td></tr>
+    <tr><td><img class="ic" src="img/lote-alfinete.webp" alt=""><b>Lotes livres</b></td><td>Quantos lotes ainda não têm dono. Aparece a partir do ano 3.</td></tr>
+    <tr><td><img class="ic" src="img/moeda.webp" alt=""><b>Pontos</b> (só no celular)</td><td>O saldo da família. É a moeda do jogo: tudo se ganha e se paga em pontos.</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2><span class="n">4.</span> A vila e as famílias</h2>
+  <p>As famílias são sorteadas pelo jogo. Cada uma tem cor, forma e casa próprias, para ser reconhecida também por quem não distingue cores:</p>
+  <div class="casas">
+    <span><img src="img/casa-verde.webp" alt="">Verde</span><span><img src="img/casa-azul.webp" alt="">Azul</span><span><img src="img/casa-ambar.webp" alt="">Âmbar</span><span><img src="img/casa-rubi.webp" alt="">Rubi</span><span><img src="img/casa-violeta.webp" alt="">Violeta</span><span><img src="img/casa-ciano.webp" alt="">Ciano</span><span><img src="img/casa-coral.webp" alt="">Coral</span><span><img src="img/casa-lima.webp" alt="">Lima</span>
+  </div>
+  <div class="duo">
+    <div>
+      <h3><img class="ic" src="img/moeda.webp" alt="">Pontos, renda e patrimônio</h3>
+      <ul>
+        <li><b>Pontos</b> são o saldo da família, o caixa dela.</li>
+        <li><b>Renda</b> é o que a família recebe no começo de cada ano: 8 pontos por pessoa, mais 2 por pessoa para cada nível do bem público. A mata pode somar ou tirar (seção 5).</li>
+        <li><b>Patrimônio</b> é o saldo mais o valor dos lotes. Cada lote vale 10 pontos, mais 2 por nível do bem público. É o patrimônio que conta nas metas.</li>
+      </ul>
+      <h3><img class="ic" src="img/grupos.webp" alt="">Quem decide pela família</h3>
+      <p>Cada pessoa envia a sua proposta pelo celular. Vale a <b>mediana</b> da família, o valor do meio: ninguém decide sozinho e uma proposta extrema não arrasta as outras. Antes de enviar, a família tem 45 segundos de conversa, com relógio no telão.</p>
+    </div>
+    <figure><img src="img/c-familia.jpg" alt="Celular mostrando a família sorteada" style="border-radius:14px">
+      <figcaption><b>Figura 3.</b> Cada pessoa vê no celular a família em que caiu.</figcaption></figure>
+  </div>
+  <div class="cx roxo"><small>As famílias não começam iguais</small>
+    <p>É de propósito. Uma família começa com mais pontos e três lotes, como uma herança, e outra começa sem lote nenhum. Quem ficou onde foi sorteio, não mérito, e o telão diz isso. Cada família vê a própria situação só no celular. Esse ponto de partida desigual é o que dá matéria para a conversa sobre aluguel e desigualdade no fechamento.</p></div>
+  <figure><img src="img/familias.jpg" alt="Telão com as famílias formadas e os nomes de quem está em cada uma">
+    <figcaption><b>Figura 4.</b> Telão depois do sorteio: as famílias e quem está em cada uma.</figcaption></figure>
+</section>
+
+<section>
+  <h2><span class="n">5.</span> Os cinco anos</h2>
+  <p>Cada ano tem o mesmo ritmo: o telão apresenta a novidade com um exemplo resolvido, o celular faz uma pergunta para conferir (não vale ponto; quem erra vê a explicação), a família conversa e decide, e o telão mostra como ficou a vila.</p>
+
+  <div class="ano"><div class="sel"><b>Ano 1</b><img src="img/publico-1-praca.webp" alt=""></div><div>
+    <h3>A vila começa: renda e bem público</h3>
+    <p>Cada família decide quanto da renda do ano vai para o bem público, até metade dela. O resto fica no saldo. Quando a soma das contribuições enche um nível, o bem público sobe, e cada nível novo aumenta a renda de <b>todas</b> as famílias em 2 pontos por pessoa, por ano, inclusive das que não puseram nada.</p>
+    <div class="niveis">
+      <div><img src="img/publico-1-praca.webp" alt=""><b>NÍVEL 1</b>Praça</div>
+      <div><img src="img/publico-2-posto.webp" alt=""><b>NÍVEL 2</b>Posto de saúde</div>
+      <div><img src="img/publico-3-academia.webp" alt=""><b>NÍVEL 3</b>Academia ao ar livre</div>
+      <div><img src="img/publico-4-escola.webp" alt=""><b>NÍVEL 4</b>Escola de esportes</div>
+      <div><img src="img/publico-5-centro.webp" alt=""><b>NÍVEL 5</b>Centro comunitário</div>
+    </div>
+    <p>Para subir um nível, a vila precisa juntar 12 pontos por família. Com 5 famílias, são 60 pontos por nível.</p>
+  </div></div>
+  <figure><img src="img/ano1.jpg" alt="Telão do ano 1 com a novidade e o exemplo resolvido">
+    <figcaption><b>Figura 5.</b> Abertura do ano 1: a novidade em destaque e o exemplo resolvido, linha a linha.</figcaption></figure>
+
+  <div class="ano"><div class="sel"><b>Ano 2</b><img src="img/arvore-redonda.webp" alt=""></div><div>
+    <h3>A mata entra no jogo</h3>
+    <p>A mata é de todos e começa em 70%. Ela se regenera um pouco a cada ano. Cada família pode tirar até 3 <b>cargas de madeira</b> por ano: cada carga rende 6 pontos à família e tira um pedaço da mata. Também pode <b>replantar</b>, com até 30% da renda: cada 5 pontos replantados devolvem à mata o equivalente a uma carga.</p>
+    <ul>
+      <li>Mata em <b>50% ou mais</b>: cada pessoa da vila ganha 2 pontos a mais de renda por ano.</li>
+      <li>Mata <b>abaixo de 30%</b>: ela colapsa, e cada pessoa perde 4 pontos de renda por ano, até ela voltar. Replantando, a mata se recupera e a perda acaba.</li>
+    </ul>
+    <p>Depois das decisões do ano 2 chega a <b>proposta pequena</b>, a primeira carta da partida (seção 7).</p>
+  </div></div>
+
+  <div class="ano"><div class="sel"><b>Ano 3</b><img src="img/moradia-cabana.webp" alt=""></div><div>
+    <h3>Moradia e aluguel</h3>
+    <p>A partir daqui, cada família precisa de 1 lote a cada 3 pessoas (uma família de 5 precisa de 2). Quem não tem lote suficiente paga <b>aluguel</b> por lote que falta, todo ano. Esse dinheiro vai para as famílias com lote sobrando, na proporção do que sobra a cada uma. Ninguém fica abaixo de 6 pontos de renda por pessoa: é o piso.</p>
+    <p>No fim do ano, o telão mostra quantos pontos de aluguel mudaram de mãos e como ficou a desigualdade da renda. Em seguida vem a votação da regra (seção 6).</p>
+  </div></div>
+  <figure><img src="img/ano3.jpg" alt="Telão mostrando quantos pontos de aluguel mudaram de mãos no ano 3">
+    <figcaption><b>Figura 6.</b> "Como ficou a vila" no ano 3: o aluguel em moedas e a desigualdade da renda antes e depois dele.</figcaption></figure>
+
+  <div class="ano"><div class="sel"><b>Ano 4</b><img src="img/mercado-lotes.webp" alt=""></div><div>
+    <h3>Abre o mercado de lotes</h3>
+    <p>A cada ano, até 3 lotes livres vão a <b>lance fechado</b>. O lance mínimo é 14 no ano 4 e 16 no ano 5. Cada pessoa propõe quanto do saldo a família põe além do mínimo, e vale a mediana (quem não envia conta como zero). O maior lance leva o lote e paga ao banco da vila; esse dinheiro sai do jogo.</p>
+    <ul>
+      <li>Cada família compra até ter a moradia de que precisa mais 1 lote.</li>
+      <li>A família pode marcar "não queremos lote" e ficar de fora.</li>
+      <li>Na Prosperidade, o que passa do mínimo conta pela metade.</li>
+    </ul>
+    <p>Depois das decisões do ano 4 pode entrar a carta de honestidade ou de confiança (seção 7).</p>
+  </div></div>
+
+  <figure><img src="img/ano4.jpg" alt="Telão do mercado de lotes no ano 4">
+    <figcaption><b>Figura 7.</b> Mercado de lotes: quantos lotes estão à venda, o lance mínimo e as regras do lance.</figcaption></figure>
+
+  <div class="ano"><div class="sel"><b>Ano 5</b><img src="img/meta.webp" alt=""></div><div>
+    <h3>O último ano</h3>
+    <p>Logo na abertura chega a <b>proposta grande</b> (seção 7), antes das decisões, para a turma ainda poder reagir: replantar, contribuir. Depois vêm o último mercado de lotes e as últimas decisões. As contas fecham e a vila descobre se bateu a meta.</p>
+  </div></div>
+</section>
+
+<section class="junto">
+  <h2><span class="n">6.</span> As duas regras e a votação</h2>
+  <p>A vila começa no <b>Monopólio</b>. No fim do ano 3, depois de sentir o aluguel, a turma vota se mantém essa regra ou troca para a <b>Prosperidade</b>. A regra escolhida vale para os anos 4 e 5.</p>
+  <table>
+    <tr><th style="width:26%"></th><th><img class="ic" src="img/sobrado.webp" alt="">Monopólio</th><th><img class="ic" src="img/economia.webp" alt="">Prosperidade</th></tr>
+    <tr><td><b>Aluguel</b></td><td>8 pontos por lote que falta, por ano</td><td>2 pontos por lote que falta, por ano</td></tr>
+    <tr><td><b>Imposto</b></td><td>Não há</td><td>1,5 ponto por lote e 1 ponto por pessoa, por ano, para o bem público</td></tr>
+    <tr><td><b>Lance no mercado</b></td><td>Conta o lance inteiro</td><td>O que passa do mínimo conta pela metade</td></tr>
+    <tr><td><b>Meta da vila</b></td><td>Patrimônio médio de 54 pontos por pessoa</td><td>A família mais pobre com pelo menos 70% do patrimônio médio, por pessoa</td></tr>
+    <tr><td><b>Nas duas</b></td><td colspan="2" class="c">A mata precisa terminar em 30% ou mais</td></tr>
+    <tr><td><b>O que a meta mede</b></td><td>Eficiência: quanto a vila juntou</td><td>Equidade: se ninguém ficou muito para trás</td></tr>
+  </table>
+  <h3><img class="ic" src="img/balanca.webp" alt="">Como é a votação</h3>
+  <ol class="passos">
+    <li>O telão mostra um exemplo resolvido das duas regras e o celular faz uma pergunta para conferir.</li>
+    <li>A turma conversa por 90 segundos, com uma pergunta-guia no telão.</li>
+    <li>Cada pessoa vota no próprio lugar, longe da família, sem mostrar a tela.</li>
+    <li>Vence a maioria de quem votou. Empate mantém o Monopólio.</li>
+  </ol>
+  <div class="duo">
+    <figure><img src="img/voto.jpg" alt="Telão da votação com as duas regras lado a lado">
+      <figcaption><b>Figura 8.</b> A votação no telão: as duas regras lado a lado e a lembrança de que as metas mudam.</figcaption></figure>
+    <figure><img src="img/c-voto.jpg" alt="Celular na votação" style="border-radius:14px">
+      <figcaption><b>Figura 9.</b> O voto no celular.</figcaption></figure>
+  </div>
+  <div class="cx azul"><small>A vila na outra regra</small>
+    <p>No fechamento, o jogo refaz os anos 4 e 5 na regra que a turma <b>não</b> escolheu, com as mesmas decisões, e mostra como a desigualdade teria ficado e se a meta seria batida. O telão avisa que é um "e se", não uma previsão.</p></div>
+</section>
+
+<section>
+  <h2><span class="n">7.</span> As cartas da partida</h2>
+  <p>Em três momentos, o jogo faz uma proposta a cada pessoa. As cartas são sorteadas a cada partida, então a turma nunca sabe qual virá: muda quem propõe, de que lado a pessoa está e o tamanho do estrago. A proposta vem sempre do jogo, nunca de um colega, e os personagens são inventados.</p>
+  <table>
+    <tr><th style="width:17%">Quando</th><th style="width:22%">Carta</th><th>Como funciona</th><th style="width:19%">Pontos pessoais</th></tr>
+    <tr><td><b>Ano 2</b><br>depois das decisões</td><td><img class="ic" src="img/toco.webp" alt=""><b>Proposta pequena</b></td><td>Cada um decide por si. Cada "aceito" faz uma pequena parte de um estrago grande, na mata ou no bem público. Se a turma inteira aceitar, o estrago é o de uma proposta grande.</td><td>+2 para quem aceita</td></tr>
+    <tr><td><b>Ano 4</b><br>opcional</td><td><img class="ic" src="img/cedula.webp" alt=""><b>Honestidade</b> ou <b>confiança</b></td><td><b>Honestidade:</b> um erro a favor da pessoa, que ninguém vai conferir; ela fica ou devolve. <b>Confiança:</b> a pessoa decide confiar antes de saber se a outra parte é honesta.</td><td>Honestidade: +3 para quem fica. Confiança: arrisca 2 e, se a outra parte for honesta, ganha 2</td></tr>
+    <tr><td><b>Ano 5</b><br>na abertura</td><td><img class="ic" src="img/alvara.webp" alt=""><b>Proposta grande</b></td><td>Todos respondem, mas vale a resposta de <b>uma pessoa sorteada</b>, que nunca é revelada. Se ela aceitar, o bem público perde um nível ou a mata perde 20 pontos (de 100 da mata cheia).</td><td>+8 para a pessoa sorteada, se aceitar</td></tr>
+  </table>
+  <div class="cx ouro"><small>Pontos pessoais</small>
+    <p>Os pontos das cartas são da pessoa, não da família. Eles nunca entram no saldo, no patrimônio, nas metas ou no telão. Aparecem só no placar pessoal, no celular de cada um, no fechamento. Assim nenhum número da família entrega o que alguém respondeu.</p></div>
+  <h3>As duas falas e o carimbo</h3>
+  <p>Na proposta pequena, metade da turma lê a proposta como um <b>"presente em troca de"</b> alguma coisa, e a outra metade lê às claras, com as palavras "cobra" e "oferece". Os pontos e o estrago são os mesmos. Na revelação, o telão compara as duas falas e dá o nome: <span class="carimbo">CORRUPÇÃO</span>. A pergunta que fica para a turma é se a palavra muda a decisão.</p>
+  <div class="duo">
+    <figure><img src="img/corrupcao.jpg" alt="Telão revelando quantos aceitaram a proposta pequena e o carimbo corrupção">
+      <figcaption><b>Figura 10.</b> Revelação da proposta pequena: quantos aceitaram, quanto a mata perdeu e a comparação das duas falas.</figcaption></figure>
+    <figure><img src="img/c-pequena.jpg" alt="Celular com a proposta pequena" style="border-radius:14px">
+      <figcaption><b>Figura 11.</b> A proposta no celular.</figcaption></figure>
+  </div>
+  <h3>As cartas que podem sair</h3>
+  <table>
+    <tr><th style="width:24%">Grupo</th><th>Cartas</th></tr>
+    <tr><td><b>Pequenas</b> (ano 2)</td><td>O fiscal da mata · A carga do vizinho · A madeira sem nota (carimbo "sonegação") · A taxa da praça · O entulho na beira da mata</td></tr>
+    <tr><td><b>Honestidade</b> (ano 4)</td><td>O dado da sorte · O extrato a mais · O achado da praça</td></tr>
+    <tr><td><b>Confiança</b> (ano 4)</td><td>O pedido na estrada · A venda fiado · O sinal adiantado · A carroça dividida. Cada pessoa recebe uma das quatro, e em todas a chance de má-fé é a mesma, 1 em 4.</td></tr>
+    <tr><td><b>Grandes</b> (ano 5)</td><td>O alvará · A licença da madeireira · O contrato da escola · O aterro sem licença</td></tr>
+  </table>
+  <div class="cx verde"><small>Por que a confiança tem a mesma chance em todas</small>
+    <p>Para nenhum tipo de pessoa parecer mais perigoso que outro. Depois de responder, o celular pergunta em qual situação a turma acha que houve mais golpe, e o telão mostra, com os números da própria turma, que a chance era igual em todas.</p></div>
+</section>
+
+<section>
+  <h2><span class="n">8.</span> Conduzir a partida</h2>
+  <p>Você conduz pelo painel. Ele mostra a etapa atual, quantos já responderam e os botões do momento.</p>
+  <table>
+    <tr><th style="width:27%">No painel</th><th>O que faz</th></tr>
+    <tr><td><b>Formar as famílias</b></td><td>Sorteia as famílias e as cartas da partida. Use quando todos tiverem entrado.</td></tr>
+    <tr><td><b>Avançar</b> e <b>Voltar</b></td><td>Passa para a próxima etapa ou retorna à anterior. Quando todos enviaram, o botão avisa: "Todos enviaram: avançar".</td></tr>
+    <tr><td><b>Segurar</b> e <b>Soltar</b></td><td>Em "Como ficou a vila", os painéis passam sozinhos. Segure um deles na tela para conversar e solte quando a turma tiver visto. As setas ◀ e ▶ escolhem o painel.</td></tr>
+    <tr><td><b>Tempo de aula</b></td><td>Conta desde a entrada e compara com o plano. Se a partida atrasar, o cartão fica destacado e sugere o que encurtar.</td></tr>
+    <tr><td><b>Cartas desta partida</b></td><td>Mostra as cartas sorteadas para os anos 2, 4 e 5. Só você vê; a turma conhece cada carta na hora.</td></tr>
+    <tr><td><b>Carta do ano 4</b></td><td>Ligada por padrão. Desligue se a aula atrasar: economiza cerca de 1 minuto.</td></tr>
+    <tr><td><b>Conversas curtas</b></td><td>Reduz a conversa antes do voto para 60 segundos e a conversa da família para 30 segundos nos anos 4 e 5. Economiza cerca de 1 minuto.</td></tr>
+    <tr><td><b>◀ Anterior</b> e <b>Próxima ▶</b></td><td>No fechamento, trocam a pergunta que está no telão.</td></tr>
+  </table>
+  <div class="duo">
+    <figure><img src="img/decidir.jpg" alt="Telão durante a decisão das famílias, com o relógio de conversa">
+      <figcaption><b>Figura 12.</b> Decisões da família: o relógio da conversa e, no canto, quantas propostas chegaram.</figcaption></figure>
+    <figure><img src="img/c-decidir.jpg" alt="Celular na etapa de decisão" style="border-radius:14px">
+      <figcaption><b>Figura 13.</b> A conversa da família no celular.</figcaption></figure>
+  </div>
+  <h3>Um ano, passo a passo</h3>
+  <ol class="passos">
+    <li><b>Abertura.</b> Leia com a turma a novidade e o exemplo resolvido no telão. Os participantes respondem à pergunta de conferência no celular.</li>
+    <li><b>Mercado</b> (anos 4 e 5). Cada pessoa envia o lance da família.</li>
+    <li><b>Decisões.</b> A família conversa por 45 segundos e cada pessoa envia a sua proposta. O telão mostra quantas propostas já chegaram.</li>
+    <li><b>Carta</b> (anos 2 e 4; no ano 5 ela vem logo depois da abertura). Peça silêncio e que ninguém mostre a tela.</li>
+    <li><b>Como ficou a vila.</b> O telão revela, em sequência, a vila, a carta, o dinheiro e a desigualdade. Segure o painel que render conversa.</li>
+  </ol>
+  <div class="cx azul"><small>Quem não responde</small>
+    <p>O jogo não trava por causa de uma pessoa. Nas decisões da família, quem não envia mantém a proposta anterior. Na votação, vale a maioria de quem votou. Nas cartas, quem não responde não ganha nem arrisca nada, e se a pessoa sorteada na proposta grande não responder, vale "não".</p></div>
+</section>
+
+<section class="junto">
+  <h2><span class="n">9.</span> O fechamento</h2>
+  <p>Depois do ano 5, o telão diz se a vila bateu a meta da regra em vigor e abre cinco perguntas, uma por vez. Para cada uma, o formato sugerido no telão é <b>1 minuto em dupla e, depois, a turma</b>. As perguntas usam os números da própria partida, por isso mudam de turma para turma.</p>
+  <table>
+    <tr><th style="width:17%">Pergunta</th><th>Sobre o que conversa</th><th style="width:33%">De onde vem a ideia</th></tr>
+    <tr><td><b>Aluguel</b></td><td>Quando o aluguel entrou, o que aconteceu com a desigualdade? Quem ganhou com isso, e sem fazer o quê?</td><td>Henry George: o valor da terra vem da comunidade.</td></tr>
+    <tr><td><b>Voto</b></td><td>Por que a turma manteve ou trocou a regra, e como a vila teria ficado na outra.</td><td>Lizzie Magie (1904): o Jogo do Proprietário já tinha estas duas regras.</td></tr>
+    <tr><td><b>Mata</b></td><td>O que as cargas tiraram, o que a natureza e o replantio devolveram, e o que segurou ou não a mata.</td><td>Elinor Ostrom: comunidades cuidam do comum quando fazem regras e conversam.</td></tr>
+    <tr><td><b>Honestidade</b></td><td>Na pequena, cada um decidiu por si; na grande, uma pessoa tinha o poder. O tamanho da proposta mudou a resposta? E a palavra?</td><td>Abbink e colegas (2002 e 2006): propina e a palavra. Conforme a carta do ano 4, também Jiang (2013), Cohn e colegas (2019) ou Berg e colegas (1995).</td></tr>
+    <tr><td><b>Profissão</b></td><td>Onde isso aparece fora do jogo: a agenda do posto, a praça onde se treina, a verba do clube. Quem ganha sem fazer nada, e quem cuida?</td><td>Elinor Ostrom: o comum também está em postos, praças e clubes.</td></tr>
+  </table>
+  <h3><img class="ic" src="img/ideia.webp" alt="">O placar pessoal e a pergunta final</h3>
+  <p>No celular, cada pessoa vê o seu placar: a parte dela no patrimônio da família mais os pontos pessoais das cartas. Só ela vê. Em seguida, o celular faz duas perguntas rápidas: <b>o que mais te guiou hoje</b> (impulso, emoção ou razão) e <b>o que mais pesou</b> (ganho, carreira, relações, o que é certo ou como me vejo). O telão mostra só o total da turma.</p>
+  <div class="cx verde"><small>Dica de condução</small>
+    <p>Você não precisa passar pelas cinco perguntas. Se o tempo estiver curto, escolha duas: a do aluguel costuma render mais quando a desigualdade subiu, e a da honestidade quando as duas propostas tiveram respostas diferentes.</p></div>
+  <div class="duo">
+    <figure><img src="img/fech.jpg" alt="Telão do fechamento com o resultado da meta e a primeira pergunta">
+      <figcaption><b>Figura 14.</b> Fechamento: à esquerda, o resultado da meta e a linha do tempo da desigualdade; à direita, a pergunta da vez.</figcaption></figure>
+    <figure><img src="img/c-fech.jpg" alt="Celular no fechamento" style="border-radius:14px">
+      <figcaption><b>Figura 15.</b> O fechamento no celular.</figcaption></figure>
+  </div>
+</section>
+
+<section class="junto">
+  <h2><span class="n">10.</span> Anonimato e cuidado</h2>
+  <p>O jogo trata de temas sensíveis e foi desenhado para que ninguém seja exposto.</p>
+  <ul>
+    <li><b>Nenhuma escolha individual aparece no telão.</b> Só totais da turma, e só com 5 respostas ou mais. Com menos de 5, o total não aparece e a proposta pequena não vale.</li>
+    <li><b>O telão não mostra o saldo de nenhuma família.</b> Os lotes aparecem numa cor neutra e o patrimônio em moedas, sem nome. Cada família vê o próprio extrato só no celular.</li>
+    <li><b>A pessoa sorteada na proposta grande nunca é revelada.</b> Como os pontos são pessoais, nenhum número de família entrega a resposta de ninguém.</li>
+    <li><b>Não há engano.</b> O celular diz que o personagem da carta é do jogo e que os pontos valem no placar. O dado da sorte é rolado pelo sistema.</li>
+    <li><b>Os personagens são fictícios</b> (fiscal, vizinho, serraria, construtora, madeireira) e não representam ninguém da sala.</li>
+    <li><b>Quem preferir só observar pode.</b> O aviso está na tela de entrada.</li>
+  </ul>
+  <div class="cx rubi"><small>Na sua fala</small>
+    <p>Evite perguntar quem aceitou ou quem votou em quê. A conversa funciona melhor em cima dos totais da turma, que o telão já mostra. Se alguém quiser contar a própria escolha, é decisão da pessoa.</p></div>
+
+  <h2 style="margin-top:22px"><span class="n">11.</span> Os números do jogo</h2>
+  <table>
+    <tr><th style="width:36%">Regra</th><th>Valor</th></tr>
+    <tr><td>Renda por pessoa, por ano</td><td>8 pontos, mais 2 por nível do bem público</td></tr>
+    <tr><td>Piso de renda</td><td>6 pontos por pessoa, depois de aluguel e imposto</td></tr>
+    <tr><td>Contribuição ao bem público</td><td>Até 50% da renda do ano</td></tr>
+    <tr><td>Nível do bem público</td><td>12 pontos por família para subir; 5 níveis</td></tr>
+    <tr><td>Mata</td><td>Começa em 70%; bônus de +2 por pessoa com 50% ou mais; colapso abaixo de 30%, com −4 por pessoa</td></tr>
+    <tr><td>Carga de madeira</td><td>Até 3 por família, por ano; cada uma rende 6 pontos</td></tr>
+    <tr><td>Replantio</td><td>Até 30% da renda; cada 5 pontos devolvem o equivalente a uma carga</td></tr>
+    <tr><td>Moradia (a partir do ano 3)</td><td>1 lote a cada 3 pessoas</td></tr>
+    <tr><td>Aluguel por lote que falta</td><td>8 no Monopólio; 2 na Prosperidade</td></tr>
+    <tr><td>Imposto na Prosperidade</td><td>1,5 por lote e 1 por pessoa, para o bem público</td></tr>
+    <tr><td>Mercado (anos 4 e 5)</td><td>Até 3 lotes por ano; lance mínimo de 14 no ano 4 e 16 no ano 5; cada família compra até a moradia mais 1 lote</td></tr>
+    <tr><td>Valor do lote no patrimônio</td><td>10 pontos, mais 2 por nível do bem público</td></tr>
+    <tr><td>Meta do Monopólio</td><td>Patrimônio médio de 54 por pessoa e mata em 30% ou mais</td></tr>
+    <tr><td>Meta da Prosperidade</td><td>Família mais pobre com 70% da média, por pessoa, e mata em 30% ou mais</td></tr>
+    <tr><td>Pontos pessoais das cartas</td><td>Pequena +2; honestidade +3; confiança ±2; grande +8</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2><span class="n">12.</span> Experimentar no simulador</h2>
+  <p>O simulador roda a aula inteira no computador, sem celulares: o telão em cima, a turma embaixo e o painel de quem conduz ao lado. Serve para conhecer o jogo, ensaiar a condução e mostrar a proposta a outras pessoas.</p>
+  <ol class="passos">
+    <li>Abra a página do Mosaico Vila e clique em <b>Simular aula no PC</b>.</li>
+    <li>Em <b>Participantes</b>, escolha o tamanho da turma simulada.</li>
+    <li>Clique em <b>Formar as famílias</b> e conduza com <b>Avançar</b>, como na sala.</li>
+    <li>Use os botões do topo conforme a tabela abaixo.</li>
+  </ol>
+  <table>
+    <tr><th style="width:32%">Botão</th><th>O que faz</th></tr>
+    <tr><td><b>Piloto automático</b></td><td>Os celulares simulados respondem sozinhos. Desligue o piloto de um celular para clicar nele à mão e ver o jogo como participante.</td></tr>
+    <tr><td><b>Professor automático</b></td><td>O simulador avança as etapas sozinho, esperando as animações do telão. Bom para assistir a uma partida inteira.</td></tr>
+    <tr><td><b>Ver do fundo da sala</b></td><td>Mostra o telão no tamanho aparente de uma TV vista do fundo da sala, para conferir se as letras se leem.</td></tr>
+    <tr><td><b>Recomeçar</b></td><td>Volta à entrada e sorteia uma partida nova, com outras cartas.</td></tr>
+  </table>
+  <div class="cx ouro"><small>O que o simulador não mostra</small>
+    <p>Os participantes simulados decidem por sorteio, dentro de um modelo. Eles não reproduzem a emoção da turma, a qualidade da conversa nem o cansaço de uma aula real. O jogo ainda não foi testado com uma turma de verdade nem em aparelhos físicos.</p></div>
+
+  <h2 style="margin-top:22px"><span class="n">13.</span> Dúvidas comuns</h2>
+  <table>
+    <tr><th style="width:38%">Pergunta</th><th>Resposta</th></tr>
+    <tr><td>"Os pontos são dinheiro?"</td><td>São a moeda do jogo. Tudo se ganha e se paga em pontos.</td></tr>
+    <tr><td>"Minha família ganha se tiver mais pontos?"</td><td>Não há família vencedora. A vila inteira ganha ou perde, conforme a meta.</td></tr>
+    <tr><td>"Por que a outra família começou com mais?"</td><td>Foi sorteio. A herança desigual faz parte do jogo e é assunto do fechamento.</td></tr>
+    <tr><td>"Eu pus 40% e a família pôs 20%. Por quê?"</td><td>Vale a mediana da família, o valor do meio entre as propostas enviadas.</td></tr>
+    <tr><td>"Alguém vai saber o que eu respondi na proposta?"</td><td>Não. O telão mostra só totais, e só com 5 respostas ou mais.</td></tr>
+    <tr><td>"A mata colapsou. Acabou?"</td><td>Não. Replantando, ela volta acima de 30% e a perda de renda termina.</td></tr>
+    <tr><td>"Dá para trocar a regra de novo no ano 5?"</td><td>Não. A votação acontece uma vez, no fim do ano 3, e vale para os anos 4 e 5.</td></tr>
+    <tr><td>"Onde vejo as regras de novo?"</td><td>No botão <b>i</b>, no alto do celular, a qualquer momento.</td></tr>
+  </table>
+</section>
+
+</body>
+</html>
