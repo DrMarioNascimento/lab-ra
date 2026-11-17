@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #14110e;
+  --color-surface: #1e1915;
+  --color-raise: #28221c;
+  --color-fg: #f4eee6;
+  --color-muted: #b3a89c;
+  --color-faint: #7a7168;
+  --color-line: #3a322b;
+  --color-accent: #d4654a;
+  --color-accent-dim: #3c221c;
+  --color-cool: #8fb3cf;
+  --color-cool-dim: #1d2a33;
+  --font-display: "Fraunces", "Iowan Old Style", Palatino, "Palatino Linotype", serif;
+  --font-sans: "Outfit", "Avenir Next", "Segoe UI", sans-serif;
+  --radius-card: 1.15rem;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    background: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    font-weight: 400;
+    line-height: 1.5;
+    text-rendering: optimizeLegibility;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  ::selection {
+    background: var(--color-accent);
+    color: var(--color-bg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Profundidade e resposta tátil para as superfícies do Limiar. */
+body { background: radial-gradient(ellipse at 14% -8%, #70413480, transparent 38%), radial-gradient(ellipse at 100% 30%, #31546b4d, transparent 44%), #14110e; background-attachment: fixed; }
+.bg-surface, .bg-raise { background-image: linear-gradient(155deg, #ffffff0f, transparent 48%, #00000020); box-shadow: inset 0 1px 0 #ffffff22, inset 0 -1px 0 #00000050, 0 14px 30px #00000038; }
+.rounded-card.border { border-color: #91786a80; }
+button, label:has(input[type="radio"]) { -webkit-tap-highlight-color: transparent; }
+button:not(:disabled), label:has(input[type="radio"]) { transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease, filter .16s ease; }
+button.rounded-full:not(:disabled) { box-shadow: inset 0 1px 0 #ffffff55, 0 4px 0 #080606aa, 0 9px 18px #0005; }
+button.bg-accent:not(:disabled) { background-image: linear-gradient(180deg,#ffb493,#d4654a 56%,#a63f2f); color:#21130f; font-weight:700; text-shadow:0 1px #ffffff35; }
+button.w-full.rounded-card:not(:disabled), label:has(input[type="radio"]) { box-shadow: inset 0 1px 0 #ffffff26, inset 0 -3px 0 #0005, 0 8px 18px #0004; }
+button:not(:disabled):active, label:has(input[type="radio"]):active { transform: translateY(2px); box-shadow: inset 0 2px 5px #0005, 0 2px 5px #0005; }
+@media (hover:hover) { button:not(:disabled):hover, label:has(input[type="radio"]):hover { filter:brightness(1.1); } }
+@media (prefers-reduced-motion:reduce) { button:not(:disabled),label:has(input[type="radio"]) { transition:none; } }
