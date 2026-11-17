@@ -63,6 +63,18 @@ Na versão 0.1 esta divisão se chamava "estimáveis e observáveis". Em 17/11/2
 
 A classificação de cada variável sai da ficha de literatura.
 
+### 4.4 Fichas de literatura (pendente)
+
+Cada variável entra no motor com uma ficha: curva basal de 24 h, resposta a cada estímulo (refeição, exercício por intensidade e duração, estresse psicológico, privação de sono, meditação ou relaxamento), variabilidade entre pessoas e referências. As fichas ficam na versão de projeto; no jogo publicado aparecem só as referências, em "Autoria e referências".
+
+Pontos de rigor já identificados, a confirmar nas fichas:
+
+- Em pessoa saudável a glicemia é bem defendida entre as refeições; as grandes variações são pós-prandiais. O alerta de "trabalhar sem comer" precisa ser calibrado para não exagerar o efeito. Talvez o alerta mais fiel venha do glicogênio hepático.
+- O efeito agudo de meditação e relaxamento sobre cortisol e pressão existe, mas é modesto e variável. Pede faixas e perfis, não um número único.
+- As interações entre variáveis são menos quantificadas que cada curva isolada. As escolhas de modelagem nessas ligações devem ser declaradas.
+
+**Nenhum número deste documento foi conferido na literatura.** Os valores entram só depois das fichas.
+
 ## 5. Contas, dívida e crédito
 
 Cada conta acumula dívida ou crédito conforme a rotina.
