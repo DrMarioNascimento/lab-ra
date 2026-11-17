@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mosaico Alostase · Prognóstico</title>
+<meta name="description" content="Jogo de fisiologia da rotina: estime como o corpo está em cada hora do dia.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="jogo/estilo.css?v=1">
+</head>
+<body>
+<header class="topo">
+  <div class="marca"><span class="selo">MA</span><div><strong>Mosaico Alostase</strong><small id="sub">Modo Prognóstico</small></div></div>
+  <div class="topo-dir"><span class="placar mono" id="placar" hidden></span><button class="btn sec sm redondo" id="abre-manual" aria-label="Como jogar">i</button></div>
+</header>
+<main id="tela" aria-live="polite"></main>
+
+<dialog id="manual" aria-labelledby="manual-t">
+  <h2 id="manual-t">Seu corpo tem hora marcada</h2>
+  <p>O mesmo treino, de manhã e à noite, encontra um corpo diferente. Você consegue dizer onde ele está agora?</p>
+  <ol>
+    <li>Leia a rotina do dia: sono, refeições, trabalho e treino.</li>
+    <li>O jogo dá o valor ao acordar. Daí em diante, a cada hora sorteada, arraste o controle até o valor que você espera.</li>
+    <li>Confirme e veja o esperado, a faixa aceita e o porquê.</li>
+  </ol>
+  <p class="aviso">O organismo do jogo é um modelo médio de adulto saudável. Não é o seu corpo e não serve de diagnóstico.</p>
+  <button class="btn ok block" id="fecha-manual">Entendi</button>
+  <button class="link" id="abre-refs">Autoria e referências</button>
+</dialog>
+
+<dialog id="refs" aria-labelledby="refs-t">
+  <h2 id="refs-t">Autoria e referências</h2>
+  <p>Concepção: Prof. Mário César Nascimento, PhD.</p>
+  <ul class="refs">
+    <li>Debono M e colegas. Modified-release hydrocortisone to provide circadian cortisol profiles. J Clin Endocrinol Metab, 2009.</li>
+    <li>VanBruggen MD e colegas. The relationship between serum and salivary cortisol levels in response to different intensities of exercise. Int J Sports Physiol Perform, 2011.</li>
+    <li>Hill EE e colegas. Exercise and circulating cortisol levels: the intensity threshold effect. J Endocrinol Invest, 2008.</li>
+    <li>Freckmann G e colegas. Continuous glucose profiles in healthy people with fixed meal times and under everyday life conditions. J Diabetes Sci Technol, 2022.</li>
+    <li>Gardiner C e colegas. The effect of alcohol on subsequent sleep in healthy adults: a systematic review and meta-analysis. Sleep Med Rev, 2025.</li>
+    <li>Borbély AA e colegas. The two-process model of sleep regulation: a reappraisal. J Sleep Res, 2016.</li>
+    <li>Dickerson SS, Kemeny ME. Acute stressors and cortisol responses. Psychol Bull, 2004.</li>
+    <li>Jensen MA e colegas. The effect of the number of consecutive night shifts on diurnal rhythms in cortisol, melatonin and heart rate variability. Int Arch Occup Environ Health, 2016.</li>
+  </ul>
+  <button class="btn sec block" id="fecha-refs">Fechar</button>
+</dialog>
+<script type="module" src="jogo/app.js?v=1"></script>
+</body>
+</html>

@@ -83,6 +83,7 @@ Fichas abertas em 17/11/2026 (em `docs/fichas/`), todas ainda com partes por ler
 - `03-glicemia.md`: base e refeição de 50 g de carboidrato fechadas.
 - `04-pressao-de-sono.md`: provisória.
 - `05-exercicio-como-jornada.md`: aberta só para o cortisol.
+- `06-estresse-psicologico.md`: direção, condições e tempo fechados; sem tamanho em unidade real, por isso fora do motor.
 
 A frase acima vale para este documento. No motor (`motor/parametros.js`), cada número traz a origem e até onde a fonte foi lida.
 
@@ -230,7 +231,7 @@ Um personagem em Three.js cujo corpo mostra o estado do momento: postura caída 
 
 1. Fichas de literatura das primeiras variáveis e das jornadas (em andamento: cortisol; trabalho noturno e vida noturna).
 2. Motor de um dia, hora a hora, com o primeiro lote de variáveis e a meta externa. **Primeira versão em `motor/` (17/11/2026):** cortisol, glicemia e pressão de sono, com as jornadas de exercício, noturna e noite ativa; ainda sem meta externa e sem estresse psicológico.
-3. Modo Prognóstico em um dia (exige menos interface e valida as curvas).
+3. Modo Prognóstico em um dia (exige menos interface e valida as curvas). **Primeira versão jogável em `index.html` (17/11/2026):** seis rotinas, cortisol e glicemia no slider, âncora ao acordar, revelação com faixa e raciocínio, curva do dia no fim. Faltam: modo de hora em hora completo, uma variável só, sala de aula.
 4. Modo Diagnóstico.
 5. Semana: acúmulos e juros das dívidas.
 6. Meses: adaptações.

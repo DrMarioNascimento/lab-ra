@@ -60,7 +60,7 @@ export const P = {
 
 // O que o motor ainda NÃO calcula, por falta de ficha com número lido.
 export const PENDENCIAS = [
-  'Estresse psicológico (prova, apresentação) sobre o cortisol: direção conhecida, tamanho não lido.',
+  'Estresse psicológico (prova, apresentação) sobre o cortisol: direção, condições e tempo lidos (ficha 06); falta tamanho em soro. O jogo não pede o cortisol em volta da prova.',
   'Refeição sobre o cortisol: aumento observado depois do almoço, não quantificado.',
   'Exercício sobre a glicemia.',
   'Exercício com mais de 30 min ou acima de 80% do VO2máx sobre o cortisol.',
