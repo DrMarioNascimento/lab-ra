@@ -1,11 +1,14 @@
 // Mosaico Alostase · regras do modo Prognóstico (sem tela).
 import { simularDia, faixaCortisol, faixaGlicemia } from '../motor/motor.js';
 import { P } from '../motor/parametros.js';
+import { simularSemana, diaDaSemana } from '../motor/semana.js';
 
 export const VARIAVEIS = {
   cortisol: { nome: 'Cortisol', unidade: 'µg/dL', min: 0, max: 30, passo: 0.1, casas: 1 },
   glicemia: { nome: 'Glicemia', unidade: 'mg/dL', min: 60, max: 200, passo: 1, casas: 0 },
 };
+export const DIVIDA = { nome: 'Dívida de sono', unidade: 'h', min: 0, max: 40, passo: 0.5, casas: 1 };
+export const NOMES_DIAS = ['segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado', 'domingo'];
 export const TEMPOS = [{ min: 5, perguntas: 5 }, { min: 10, perguntas: 10 }, { min: 20, perguntas: 19 }, { min: 40, perguntas: 36 }];
 
 const mod24 = (h) => ((h % 24) + 24) % 24;
@@ -102,4 +105,37 @@ export function novaPartida(rotina, nPerguntas, semente = 1) {
     return { ...q, valor, faixa: faixa(q.variavel, valor), raciocinio: explicar(rotina, q.hora, q.variavel) };
   });
   return { rotina, dia, ancora: ancora(rotina, dia), perguntas };
+}
+
+/** Faixa da dívida: o erro-padrão da vigília crítica (0,73 h por dia) somado pelos dias corridos. */
+export function faixaDivida(valor, diasCorridos) {
+  const t = P.dividaSono.vigiliaCriticaH.ep * diasCorridos;
+  return [+Math.max(0, valor - t).toFixed(1), +(valor + t).toFixed(1)];
+}
+
+/** Partida de uma semana: a cada dia sorteado, uma estimativa de hora e variável e, ao fim do dia, a dívida de sono. */
+export function novaPartidaSemana(semana, nPerguntas, semente = 1) {
+  const rnd = gerador(semente), sem = simularSemana(semana.dias), critica = P.dividaSono.vigiliaCriticaH.valor;
+  const f = (v, c = 1) => v.toFixed(c).replace('.', ',');
+  const ordem = [0, 1, 2, 3, 4, 5, 6].sort(() => rnd() - 0.5);
+  const nDiv = Math.min(7, Math.max(2, Math.ceil(nPerguntas / 2))), nHora = Math.max(0, nPerguntas - nDiv);
+  const diasDiv = ordem.slice(0, nDiv).sort((a, b) => a - b);
+  const perguntas = [];
+  for (const d of diasDiv) {
+    const r = sem.resumo[d], antes = d ? sem.resumo[d - 1].dividaAcumulada : 0;
+    perguntas.push({ tipo: 'divida', variavel: 'divida', dia: d, ordem: d * 100 + 99, valor: r.dividaAcumulada, faixa: faixaDivida(r.dividaAcumulada, d + 1),
+      raciocinio: [`Neste dia foram ${f(r.horasAcordado)} h acordado: ${r.saldo >= 0 ? `${f(r.saldo)} h a mais` : `${f(-r.saldo)} h a menos`} que o limite de ${f(critica, 2)} h.`,
+        d ? `Somando à dívida de ${f(antes)} h que vinha de antes, fica ${f(r.dividaAcumulada)} h.` : `É o primeiro dia: a dívida começa do zero e fica em ${f(r.dividaAcumulada)} h.`,
+        r.saldo < 0 && antes > 0 ? 'Dia mais curto abate a dívida. Na vida real a recuperação costuma ser mais lenta do que esta conta.' : null].filter(Boolean) });
+  }
+  for (let i = 0; i < nHora; i++) {
+    const d = ordem[i % 7], rotina = semana.dias[d], q = sortearPerguntas(rotina, 3, semente + i * 7 + d)[i % 3];
+    if (!q || perguntas.some((x) => x.dia === d && x.hora === q.hora && x.variavel === q.variavel)) continue;
+    const p = diaDaSemana(sem, d).pontos.find((x) => Math.abs(x.hora - q.hora) < 1e-6), valor = p[q.variavel];
+    // hora depois da meia-noite pertence ao fim do período acordado
+    perguntas.push({ tipo: 'hora', variavel: q.variavel, hora: q.hora, dia: d, ordem: d * 100 + q.ordem, valor, faixa: faixa(q.variavel, valor), raciocinio: explicar(rotina, q.hora, q.variavel) });
+  }
+  perguntas.sort((a, b) => a.ordem - b.ordem);
+  const d0 = diaDaSemana(sem, 0).pontos, h0 = horaDeAcordar(semana.dias[0]), p0 = d0.find((x) => Math.abs(x.hora - h0) < 1e-6);
+  return { semana, sem, perguntas, ancora: { hora: h0, cortisol: p0.cortisol, glicemia: p0.glicemia, divida: 0 } };
 }

@@ -83,14 +83,15 @@ function telaDia(tela, voltar, opc = null) {
   pinta(); scrollTo(0, 0);
 }
 
-function graficoSemana(sem, chave, cor, max, rot) {
+export function graficoSemana(sem, chave, cor, max, rot, palpites = []) {
   const W = 340, H = 130, L = 34, R = 8, T = 8, B = 22, X = (t) => L + (t / 168) * (W - L - R), Y = (v) => T + (1 - v / max) * (H - T - B);
   const linha = chave === 'divida'
     ? sem.resumo.map((r, d) => { const y = Y(r.dividaAcumulada), w = (W - L - R) / 7; return `<rect x="${(X(d * 24) + 3).toFixed(1)}" y="${y.toFixed(1)}" width="${(w - 6).toFixed(1)}" height="${(H - B - y).toFixed(1)}" rx="3" fill="${cor}"/>`; }).join('')
     : `<path d="${sem.pontos.filter((_, i) => i % 3 === 0).map((p, i) => `${i ? 'L' : 'M'}${X(p.t).toFixed(1)},${Y(p[chave]).toFixed(1)}`).join('')}" fill="none" stroke="${cor}" stroke-width="2" stroke-linejoin="round"/>`;
   const dias = DIAS.map((n, d) => `<text x="${X(d * 24 + 12)}" y="${H - 6}" text-anchor="middle" font-size="10" fill="#a9bfd6" font-family="JetBrains Mono, monospace">${n}</text>${d ? `<line x1="${X(d * 24)}" x2="${X(d * 24)}" y1="${T}" y2="${H - B}" stroke="#23415f"/>` : ''}`).join('');
   const ticks = [0, max / 2, max].map((v) => `<text x="${L - 5}" y="${Y(v) + 4}" text-anchor="end" font-size="10" fill="#a9bfd6" font-family="JetBrains Mono, monospace">${fmt(v, max <= 1 ? 1 : 0)}</text><line x1="${L}" x2="${W - R}" y1="${Y(v)}" y2="${Y(v)}" stroke="#23415f"/>`).join('');
-  return `<svg class="graf" viewBox="0 0 ${W} ${H}" role="img" aria-label="${rot}">${ticks}${dias}${linha}</svg>`;
+  const bolas = palpites.map((x) => `<circle cx="${X(x.dia * 24 + 12)}" cy="${Y(Math.min(max, x.palpite))}" r="5" fill="#fff" stroke="#07111f" stroke-width="2"/>`).join('');
+  return `<svg class="graf" viewBox="0 0 ${W} ${H}" role="img" aria-label="${rot}">${ticks}${dias}${linha}${bolas}</svg>`;
 }
 
 function telaSemana(tela, voltar) {

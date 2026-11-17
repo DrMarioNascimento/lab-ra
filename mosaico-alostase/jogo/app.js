@@ -4,9 +4,11 @@ import { novaPartida, pontuar, VARIAVEIS, TEMPOS, hhmm } from './prognostico.js'
 import { leitura } from './rotina-montada.js';
 import { $, fmt, esc, linhaDoTempo, listaDaRotina, grafico, CORV } from './ui.js';
 import { telaMontar } from './diagnostico.js';
+import { SEMANAS } from './semanas.js';
+import { jogarSemana } from './prog-semana.js';
 
 const tela = $('#tela'), placar = $('#placar'), sub = $('#sub');
-const E = { tempo: 1, rotina: 'sorteio', partida: null, i: 0, respostas: [] };
+const E = { tempo: 1, rotina: 'sorteio', escala: 'dia', semana: 'sorteio', partida: null, i: 0, respostas: [] };
 
 // manual: abre na entrada, fica no "i"
 const manual = $('#manual'), refs = $('#refs');
@@ -39,19 +41,29 @@ function telaInicio() {
       <p class="muted">O tempo define quantas estimativas o jogo pede.</p>
       <div class="grade c4" id="tempos">${TEMPOS.map((t, k) => `<button class="btn sec ${k === E.tempo ? 'on' : ''}" data-k="${k}" aria-pressed="${k === E.tempo}">${t.min} min</button>`).join('')}</div>
     </section>
-    <section class="card"><h2>Qual rotina?</h2>
+    <section class="card"><h2>Um dia ou a semana?</h2>
+      <div class="grade c2" id="escala" style="margin-top:10px"><button class="btn sec ${E.escala === 'dia' ? 'on' : ''}" data-e="dia" aria-pressed="${E.escala === 'dia'}">Um dia</button><button class="btn sec ${E.escala === 'semana' ? 'on' : ''}" data-e="semana" aria-pressed="${E.escala === 'semana'}">Semana 1</button></div>
+    </section>
+    ${E.escala === 'dia' ? `<section class="card"><h2>Qual rotina?</h2>
       <div class="grade" id="rotinas" style="margin-top:10px">
         <button class="btn sec ${E.rotina === 'sorteio' ? 'on' : ''}" data-r="sorteio">Sortear uma rotina</button>
         ${ROTINAS.map((r) => `<button class="btn sec ${E.rotina === r.id ? 'on' : ''}" data-r="${r.id}">${esc(r.nome)}</button>`).join('')}
       </div>
-    </section>
-    <button class="btn ok block" id="vai">Ver a rotina</button>
+    </section>` : `<section class="card"><h2>Qual semana?</h2>
+      <div class="grade" id="rotinas" style="margin-top:10px">
+        <button class="btn sec ${E.semana === 'sorteio' ? 'on' : ''}" data-w="sorteio">Sortear uma semana</button>
+        ${SEMANAS.map((r) => `<button class="btn sec ${E.semana === r.id ? 'on' : ''}" data-w="${r.id}">${esc(r.nome)}</button>`).join('')}
+      </div>
+    </section>`}
+    <button class="btn ok block" id="vai">${E.escala === 'dia' ? 'Ver a rotina' : 'Ver a semana'}</button>
     <button class="link" id="modos">Trocar de modo</button>`;
   $('#modos').onclick = telaModos;
   $('#tempos').onclick = (e) => { const b = e.target.closest('[data-k]'); if (b) { E.tempo = +b.dataset.k; telaInicio(); } };
-  $('#rotinas').onclick = (e) => { const b = e.target.closest('[data-r]'); if (b) { E.rotina = b.dataset.r; telaInicio(); } };
+  $('#escala').onclick = (e) => { const b = e.target.closest('[data-e]'); if (b) { E.escala = b.dataset.e; telaInicio(); } };
+  $('#rotinas').onclick = (e) => { const b = e.target.closest('[data-r],[data-w]'); if (!b) return; if (b.dataset.r) E.rotina = b.dataset.r; else E.semana = b.dataset.w; const y = scrollY; telaInicio(); scrollTo(0, y); };
   $('#vai').onclick = () => {
     const semente = (Date.now() % 100000) + 1;
+    if (E.escala === 'semana') { const w = E.semana === 'sorteio' ? SEMANAS[semente % SEMANAS.length] : SEMANAS.find((x) => x.id === E.semana); jogarSemana({ tela, placar, voltar: telaInicio }, w, TEMPOS[E.tempo].perguntas, semente); return; }
     const r = E.rotina === 'sorteio' ? ROTINAS[semente % ROTINAS.length] : ROTINAS.find((x) => x.id === E.rotina);
     E.partida = novaPartida(r, TEMPOS[E.tempo].perguntas, semente); E.i = 0; E.respostas = [];
     telaRotina();
