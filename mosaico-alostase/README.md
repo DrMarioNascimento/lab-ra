@@ -8,6 +8,7 @@ Jogo pedagógico de fisiologia da rotina. Terceira versão, criada em 17/11/2026
 ## O que há aqui
 
 - `docs/GDD-mosaico-alostase-v0.4.md`: o desenho do jogo.
+- `docs/ANDAMENTO.md`: onde o trabalho parou, decisões, suposições a conferir e próximo passo.
 - `docs/fichas/`: fichas de literatura das variáveis (versão de projeto; não aparecem para o aluno).
 - `index.html` e `jogo/`: modos Prognóstico e Diagnóstico, de um dia e da semana 1, primeira versão jogável (celular). O Diagnóstico tem o "Desafio da semana": perfis com compromissos fixos, meta de estudo e de atividade física, e a dívida de sono como custo. Endereço: `lab-ra.dragongames.dev.br/mosaico-alostase/`. Ainda não está ligado a nenhuma página do LAB-RA.
 - `motor/`: motor de um dia, hora a hora (cortisol, glicemia e pressão de sono), sem interface. `parametros.js` traz cada número com a origem; `PENDENCIAS` lista o que o motor ainda não calcula. Para conferir: `npm test` nesta pasta.
