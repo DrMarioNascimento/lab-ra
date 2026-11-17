@@ -7,8 +7,8 @@ export const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '
 export const VARS = { ...VARIAVEIS, pressaoSono: { nome: 'Pressão de sono', unidade: 'de 0 a 1', min: 0, max: 1, casas: 2 } };
 export const CORV = { cortisol: '#f59e0b', glicemia: '#38bdf8', pressaoSono: '#c4b5fd' };
 
-export const CLASSE = { trabalho: 'trab', estudo: 'trab', 'trabalho-noturno': 'trab', exercicio: 'ex', 'noite-ativa': 'noite', prova: 'prova' };
-export const COR = { sono: '#4c1d95', trab: '#1e40af', ex: '#b45309', noite: '#9d174d', prova: '#b91c1c', ref: '#34d399' };
+export const CLASSE = { trabalho: 'trab', estudo: 'trab', 'trabalho-noturno': 'trab', exercicio: 'ex', 'noite-ativa': 'noite', prova: 'prova', compromisso: 'fixo' };
+export const COR = { sono: '#4c1d95', trab: '#1e40af', ex: '#b45309', noite: '#9d174d', prova: '#b91c1c', fixo: '#475569', ref: '#34d399' };
 
 function blocos(ini, fim, cls) {                       // parte o bloco que atravessa a meia-noite
   const a = ((ini % 24) + 24) % 24, b = ((fim % 24) + 24) % 24;

@@ -4,13 +4,28 @@ import { explicar, hhmm } from './prognostico.js';
 import { escolhasPadrao, conferir, montarRotina, leitura, passo, NIVEIS, DURACOES, ALCOOL } from './rotina-montada.js';
 import { simularSemana, conferirSemana, diaDaSemana } from '../motor/semana.js';
 import { P } from '../motor/parametros.js';
+import { PERFIS, iniciar, metas } from './perfis.js';
 import { $, fmt, esc, linhaDoTempo, grafico, VARS, CORV } from './ui.js';
 
 const livrePadrao = () => { const e = escolhasPadrao(); e.dormir = 0.5; e.acordar = 9; e.cafe.hora = 9.5; e.almoco.hora = 13.5; e.jantar.hora = 20; e.trabalho.on = false; return e; };
 const TIPOS = { A: { nome: 'Dia útil', e: escolhasPadrao() }, B: { nome: 'Dia livre', e: livrePadrao() } };
 const SEMANA = ['A', 'A', 'A', 'A', 'A', 'B', 'B'];
 const DIAS = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
-let alvo = 'A', E = TIPOS.A.e;
+let alvo = 'A', E = TIPOS.A.e, perfil = null;
+
+/** Entrada do modo: rotina livre ou desafio com perfil. */
+export function telaEntradaDiag(tela, voltar) {
+  tela.onclick = null;
+  tela.innerHTML = `
+    <section class="card modo"><div class="rotulo">Rotina livre</div><h2>Monte o dia do seu jeito</h2><p class="muted">Sem compromissos fixos e sem meta. Bom para explorar.</p><button class="btn block" id="livre">Montar uma rotina</button></section>
+    <section class="card modo"><div class="rotulo">Desafio da semana</div><h2>Cumpra a meta devendo o mínimo de sono</h2><p class="muted">Escolha um perfil. O dia já vem com compromissos; você decide o resto.</p>
+      <div class="grade" style="margin-top:10px">${PERFIS.map((p) => `<button class="btn sec" data-p="${p.id}">${esc(p.nome)}</button>`).join('')}</div></section>
+    <button class="link" id="sai">Trocar de modo</button>`;
+  $('#livre').onclick = () => { perfil = null; TIPOS.A.e = escolhasPadrao(); TIPOS.B.e = livrePadrao(); telaMontar(tela, voltar, 'A'); };
+  $('#sai').onclick = voltar;
+  tela.querySelectorAll('[data-p]').forEach((b) => { b.onclick = () => { perfil = PERFIS.find((x) => x.id === b.dataset.p); const t = iniciar(perfil); TIPOS.A.e = t.A; TIPOS.B.e = t.B; telaSemana(tela, voltar); }; });
+  scrollTo(0, 0);
+}
 const pega = (caminho) => caminho.split('.').reduce((o, k) => o[k], E);
 const poe = (caminho, v) => { const ks = caminho.split('.'); const u = ks.pop(); ks.reduce((o, k) => o[k], E)[u] = v; };
 
@@ -28,7 +43,8 @@ export function telaMontar(tela, voltar, qual = 'A', depois = null) {
       <section class="card"><div class="rotulo">Montando: ${TIPOS[alvo].nome.toLowerCase()}</div>${previa ? linhaDoTempo(previa) : '<p class="aviso">Acerte os horários para ver a linha do tempo.</p>'}</section>
       <section class="card"><div class="rotulo">Sono · ${fmt(horasSono, horasSono % 1 ? 1 : 0)} h</div>${hora('Dormir', 'dormir')}${hora('Acordar', 'acordar')}</section>
       <section class="card"><div class="rotulo">Refeições · 50 g de carboidrato cada</div>${refeicao('Café', 'cafe')}${refeicao('Almoço', 'almoco')}${refeicao('Jantar', 'jantar')}${refeicao('Lanche', 'lanche')}</section>
-      <section class="card"><div class="rotulo">Trabalho ou estudo</div><div class="lin"><span>${liga('Tem jornada', 'trabalho.on')}</span><span class="muted">${E.trabalho.on ? '' : 'dia livre'}</span></div>${E.trabalho.on ? hora('Começa', 'trabalho.inicio') + hora('Termina', 'trabalho.fim') : ''}</section>
+      ${(E.fixos || []).length ? `<section class="card"><div class="rotulo">Compromissos fixos deste dia</div><ul class="fixos">${E.fixos.map((f) => `<li><span class="h">${hhmm(f.inicio)} a ${hhmm(f.fim)}</span><span>${esc(f.nome)}</span></li>`).join('')}</ul></section>` : ''}
+      <section class="card"><div class="rotulo">${perfil ? 'Estudo · conta para a meta' : 'Trabalho ou estudo'}</div><div class="lin"><span>${liga(perfil ? 'Tem estudo' : 'Tem jornada', 'trabalho.on')}</span><span class="muted">${E.trabalho.on ? '' : (perfil ? 'sem estudo' : 'dia livre')}</span></div>${E.trabalho.on ? hora('Começa', 'trabalho.inicio') + hora('Termina', 'trabalho.fim') : ''}</section>
       <section class="card"><div class="rotulo">Exercício</div>${seg('exercicio.nivel', NIVEIS, 'Intensidade do exercício')}
         ${E.exercicio.nivel !== 'nenhum' ? hora('Começa', 'exercicio.hora') + `<div class="lin"><span>Duração</span>${seg('exercicio.dur', DURACOES.map((d) => ({ id: d, nome: `${d} min` })), 'Duração do exercício')}</div>` : ''}</section>
       <section class="card"><div class="rotulo">Álcool antes de dormir</div>${seg('alcool', ALCOOL, 'Álcool antes de dormir')}</section>
@@ -37,8 +53,8 @@ export function telaMontar(tela, voltar, qual = 'A', depois = null) {
       <button class="link" id="zera">Voltar à rotina padrão</button>
       <button class="link" id="sai">Trocar de modo</button>`;
     $('#ver').onclick = () => (depois ? depois() : telaDia(tela, voltar));
-    $('#zera').onclick = () => { TIPOS[alvo].e = E = alvo === 'A' ? escolhasPadrao() : livrePadrao(); desenha(); };
-    $('#sai').onclick = voltar;
+    $('#zera').onclick = () => { TIPOS[alvo].e = E = perfil ? iniciar(perfil)[alvo] : (alvo === 'A' ? escolhasPadrao() : livrePadrao()); desenha(); };
+    $('#sai').onclick = () => telaEntradaDiag(tela, voltar);
   };
   tela.onclick = (ev) => {
     const b = ev.target.closest('[data-h],[data-l],[data-s]'); if (!b || !tela.querySelector('#ver')) return;
@@ -121,7 +137,18 @@ function telaSemana(tela, voltar) {
         <section class="card"><div class="rotulo">O que esta semana mostra</div><ul class="porque">${notas.map((n) => `<li>${esc(n)}</li>`).join('')}</ul></section>`;
       tela._sem = { sem, rotinas };
     }
-    tela.innerHTML = `
+    let painel = '';
+    if (perfil) {
+      const m = metas(perfil, SEMANA.map((k) => TIPOS[k].e)), pc = (a, b) => Math.min(100, (a / b) * 100);
+      painel = `<section class="card"><div class="rotulo">Desafio · ${esc(perfil.nome)}</div><p class="muted nota" style="margin-top:0">${esc(perfil.resumo)}</p>
+        <div class="meta">
+          <div class="item ${m.estudoOk ? 'ok' : ''}"><span>Estudo na semana</span><b>${fmt(m.estudoH, 1)} de ${perfil.metaEstudoH} h</b><span class="barra"><i style="width:${pc(m.estudoH, perfil.metaEstudoH)}%"></i></span></div>
+          <div class="item ${m.ativOk ? 'ok' : ''}"><span>Atividade física (intensa vale o dobro)</span><b>${m.ativMin} de ${m.metaAtivMin} min</b><span class="barra"><i style="width:${pc(m.ativMin, m.metaAtivMin)}%"></i></span></div>
+        </div>
+        <p style="margin:10px 0 0"><span class="selo-meta ${m.cumpriu ? 'ok' : ''}">${m.cumpriu ? 'Meta cumprida' : 'Meta em aberto'}</span> ${sem ? `<span class="nota" style="white-space:nowrap">Dívida ao fim: <b class="mono">${fmt(sem.dividaFinal, 1)} h</b></span>` : ''}</p>
+        ${m.cumpriu && sem ? `<p class="muted nota">${sem.dividaFinal < 0.5 ? 'Você fechou a semana sem dever sono. Confira o que ficou de fora do dia para isso caber.' : 'Agora tente cumprir a mesma meta com menos dívida.'}</p>` : ''}</section>`;
+    }
+    tela.innerHTML = `${painel}
       <section class="card"><div class="rotulo">Semana 1 · toque num dia para trocar o tipo</div>
         <div class="dias">${SEMANA.map((k, d) => `<button class="btn sec sm ${k === 'B' ? 'livre' : ''}" data-troca="${d}" aria-label="${DIAS[d]}: ${TIPOS[k].nome}. Tocar para trocar"><b>${DIAS[d]}</b><small>${k === 'A' ? 'útil' : 'livre'}</small></button>`).join('')}</div>
         <div class="grade c2" style="margin-top:12px"><button class="btn sec sm" id="ed-a">Editar dia útil</button><button class="btn sec sm" id="ed-b">Editar dia livre</button></div>
@@ -129,7 +156,7 @@ function telaSemana(tela, voltar) {
       <button class="link" id="sai">Trocar de modo</button>`;
     $('#ed-a').onclick = () => telaMontar(tela, voltar, 'A', () => telaSemana(tela, voltar));
     $('#ed-b').onclick = () => telaMontar(tela, voltar, 'B', () => telaSemana(tela, voltar));
-    $('#sai').onclick = voltar;
+    $('#sai').onclick = () => telaEntradaDiag(tela, voltar);
   };
   tela.onclick = (ev) => {
     const t = ev.target.closest('[data-troca]'), d = ev.target.closest('[data-dia]');

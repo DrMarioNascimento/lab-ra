@@ -3,7 +3,7 @@ import { ROTINAS } from './rotinas.js';
 import { novaPartida, pontuar, VARIAVEIS, TEMPOS, hhmm } from './prognostico.js';
 import { leitura } from './rotina-montada.js';
 import { $, fmt, esc, linhaDoTempo, listaDaRotina, grafico, CORV } from './ui.js';
-import { telaMontar } from './diagnostico.js';
+import { telaEntradaDiag } from './diagnostico.js';
 import { SEMANAS } from './semanas.js';
 import { jogarSemana } from './prog-semana.js';
 
@@ -27,10 +27,10 @@ function telaModos() {
       <button class="btn ok block" id="m-prog">Jogar o Prognóstico</button></section>
     <section class="card modo"><div class="rotulo">Modo Diagnóstico</div><h2>Você monta a rotina, o jogo mostra</h2>
       <p class="muted">Escolha sono, refeições, trabalho, treino e noite. Veja o esperado, hora a hora.</p>
-      <button class="btn block" id="m-diag">Montar uma rotina</button></section>
+      <button class="btn block" id="m-diag">Abrir o Diagnóstico</button></section>
     <p class="aviso">O organismo do jogo é um modelo médio de adulto saudável. Não é o seu corpo e não serve de diagnóstico clínico.</p>`;
   $('#m-prog').onclick = telaInicio;
-  $('#m-diag').onclick = () => { sub.textContent = 'Modo Diagnóstico'; telaMontar(tela, telaModos); };
+  $('#m-diag').onclick = () => { sub.textContent = 'Modo Diagnóstico'; telaEntradaDiag(tela, telaModos); };
   scrollTo(0, 0);
 }
 

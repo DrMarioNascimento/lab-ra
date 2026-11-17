@@ -123,6 +123,23 @@ O jogo precisa de algo que puxe contra a fisiologia. A meta é da vida cotidiana
 
 No protótipo atual do Mosaico Lastro, o plano padrão vence sem nenhuma decisão. A meta externa e a calibração existem para corrigir isso.
 
+**Primeira versão (17/11/2026), no modo Diagnóstico, como "Desafio da semana":**
+
+- O aluno escolhe um **perfil**. O dia já vem com compromissos fixos (aulas, trabalho, deslocamento); ele decide sono, refeições, estudo, exercício e álcool.
+- **Meta semanal dupla:** horas de estudo (definidas pelo perfil) e 150 minutos de atividade física, com a intensa valendo o dobro (recomendação da OMS, 2020).
+- **Pontuação sem câmbio:** primeiro cumprir a meta; depois, fechar a semana com a menor dívida de sono. Não há saldo único nem moeda ainda.
+- Sono, estudo e exercício não podem cair em cima de compromisso fixo.
+
+Três perfis de partida, **cenários inventados para criar o conflito, a ajustar pelo professor**:
+
+| Perfil | Dia útil | Fim de semana | Meta de estudo |
+|---|---|---|---|
+| Aula de manhã, estágio à tarde | Ocupado das 6h30 às 18h30 | Livre | 15 h |
+| Trabalha de dia, faculdade à noite | Ocupado das 7h às 23h30, com uma hora de intervalo | Livre | 10 h |
+| Aula na semana, plantão no fim de semana | Ocupado das 7h às 13h | Plantão das 7h às 19h, mais deslocamento | 20 h |
+
+O que ainda não existe desta seção e das seções 5 e 6: renda, contas de Estresse, Energia e Treino, juros, cobrança entre contas e a moeda.
+
 ## 8. Modos de jogo
 
 Decisão de 17/11/2026: os modos se chamam **Prognóstico** e **Diagnóstico**. Na versão 0.1 eram "Estimativa" e "Rotina".

@@ -44,6 +44,12 @@ export function conferir(e) {
     const ini = e.exercicio.hora, fim = ini + e.exercicio.dur / 60;
     if (dorme(ini) || dorme(fim - 0.01)) erros.push('O exercício está em hora de sono.');
   }
+  const fixos = e.fixos || [], flex = (e.rotuloFlex || 'O trabalho ou estudo');
+  const emFixo = (h) => fixos.find((f) => dentro(mod24(h), mod24(f.inicio), mod24(f.fim)));
+  for (const f of fixos) for (let h = f.inicio, k = 0; k < dur(f.inicio, f.fim) * 2; k++, h += 0.5) if (dorme(h)) { erros.push(`O sono está em cima de um compromisso (${f.nome.toLowerCase()}).`); break; }
+  if (e.exercicio.nivel !== 'nenhum') { const f = emFixo(e.exercicio.hora) || emFixo(e.exercicio.hora + e.exercicio.dur / 60 - 0.01); if (f) erros.push(`O exercício está em cima de um compromisso (${f.nome.toLowerCase()}).`); }
+  if (e.trabalho.on) for (let h = e.trabalho.inicio, k = 0; k < dur(e.trabalho.inicio, e.trabalho.fim) * 2; k++, h += 0.5) { const f = emFixo(h); if (f) { erros.push(`${flex === 'Estudo' ? 'O estudo' : flex} está em cima de um compromisso (${f.nome.toLowerCase()}).`); break; } }
+  if (e.trabalho.on && e.exercicio.nivel !== 'nenhum') { const a = e.exercicio.hora, b = a + e.exercicio.dur / 60 - 0.01; if (dentro(mod24(a), e.trabalho.inicio, e.trabalho.fim) || dentro(mod24(b), e.trabalho.inicio, e.trabalho.fim)) { if (fixos.length) erros.push('O exercício está em cima do estudo.'); } }
   if (e.trabalho.on) {
     if (dur(e.trabalho.inicio, e.trabalho.fim) > 16) erros.push('O trabalho ou estudo não pode passar de 16 horas.');
     for (let h = e.trabalho.inicio, k = 0; k < dur(e.trabalho.inicio, e.trabalho.fim) * 2; k++, h += 0.5) if (dorme(h)) { erros.push('O trabalho ou estudo está em hora de sono.'); break; }
@@ -57,10 +63,10 @@ export function montarRotina(e) {
   const nomes = { cafe: 'Café da manhã', almoco: 'Almoço', jantar: 'Jantar', lanche: 'Lanche' };
   for (const k of Object.keys(nomes)) if (e[k].on) refeicoes.push({ hora: mod24(e[k].hora), carboG: 50, nome: nomes[k] });
   refeicoes.sort((a, b) => a.hora - b.hora);
-  const jornadas = [];
+  const jornadas = (e.fixos || []).map((f) => ({ tipo: 'compromisso', nome: f.nome, inicio: f.inicio, fim: f.fim }));
   if (e.trabalho.on) {
     const { inicio, fim } = e.trabalho, noturno = inicio > fim || inicio >= 20 || fim <= 6;
-    jornadas.push({ tipo: noturno ? 'trabalho-noturno' : 'trabalho', nome: noturno ? 'Trabalho noturno' : 'Trabalho ou estudo', inicio, fim });
+    jornadas.push({ tipo: noturno ? 'trabalho-noturno' : 'trabalho', nome: noturno ? 'Trabalho noturno' : (e.rotuloFlex || 'Trabalho ou estudo'), inicio, fim });
   }
   const nv = NIVEIS.find((n) => n.id === e.exercicio.nivel);
   if (nv.vo2) jornadas.push({ tipo: 'exercicio', nome: `Exercício ${nv.nome.toLowerCase()}`, inicio: e.exercicio.hora, fim: mod24(e.exercicio.hora + e.exercicio.dur / 60), vo2: nv.vo2 });

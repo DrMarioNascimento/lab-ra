@@ -150,3 +150,14 @@ dialog ol { padding-left: 20px; line-height: 1.5; font-size: 15px; } dialog li {
 .dias.so-leitura .dia small { font-size: 11px; color: var(--tx2); font-family: var(--mono); }
 .dias.so-leitura .dia.on { background: #1d4ed8; box-shadow: 0 3px 0 #172f7a, inset 0 1px 0 rgba(255,255,255,.3); }
 .dias.so-leitura .dia.on small { color: #dbeafe; }
+.bl.fixo { background: #475569; }
+.meta { display: grid; gap: 8px; }
+.meta .item { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; align-items: center; font-size: 14px; }
+.meta .barra { grid-column: 1 / -1; height: 10px; border-radius: 999px; background: #0b1a2c; box-shadow: inset 0 2px 3px rgba(0,0,0,.6); overflow: hidden; }
+.meta .barra i { display: block; height: 100%; border-radius: 999px; background: #fbbf24; }
+.meta .ok .barra i { background: #34d399; }
+.meta .item b { font-family: var(--mono); }
+.selo-meta { display: inline-block; padding: 5px 10px; border-radius: 10px; font-weight: 700; font-size: 13px; background: #2a2208; color: #fde68a; }
+.selo-meta.ok { background: #0f3d33; color: #a7f3d0; }
+.fixos { list-style: none; margin: 0; padding: 0; font-size: 14px; display: grid; gap: 4px; }
+.fixos li { display: flex; gap: 8px; } .fixos .h { font-family: var(--mono); font-size: 12px; color: var(--tx2); min-width: 100px; }
