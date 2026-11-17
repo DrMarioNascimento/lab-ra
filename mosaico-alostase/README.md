@@ -7,7 +7,7 @@ Jogo pedagógico de fisiologia da rotina. Terceira versão, criada em 17/11/2026
 
 ## O que há aqui
 
-- `docs/GDD-mosaico-alostase-v0.3.md`: o desenho do jogo.
+- `docs/GDD-mosaico-alostase-v0.4.md`: o desenho do jogo.
 - `docs/fichas/`: fichas de literatura das variáveis (versão de projeto; não aparecem para o aluno).
 - `base/alostase-motor/` e `base/lastro/`: cópias dos dois protótipos, tiradas em 17/11/2026, como ponto de partida. O código novo ainda não começou.
 
