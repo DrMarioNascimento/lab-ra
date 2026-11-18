@@ -1,6 +1,6 @@
 # Mosaico Alostase · andamento
 
-Versão de projeto, não aparece para o aluno. Atualizado em 17/11/2026, 18h45.
+Versão de projeto, não aparece para o aluno. Atualizado em 18/11/2026, 21h.
 
 Endereço: `lab-ra.dragongames.dev.br/mosaico-alostase/` · card 08 na biblioteca do LAB-RA.
 
@@ -13,7 +13,7 @@ Dia de trabalho de 17/11/2026: o projeto saiu do GDD e virou protótipo jogável
 | Parte | Estado |
 |---|---|
 | GDD | v0.4 (`docs/GDD-mosaico-alostase-v0.4.md`) |
-| Fichas de literatura | 00 a 07 em `docs/fichas/`, todas com partes ainda por ler |
+| Fichas de literatura | 00 a 08 em `docs/fichas/`, todas com partes ainda por ler (a 08, de frequência cardíaca e pressão, só com resumos) |
 | Motor de um dia | Cortisol (soro), glicemia e necessidade de sono; exercício, jornada noturna, noite ativa com álcool |
 | Motor da semana 1 | Sete dias contínuos; dívida de sono em horas de vigília em excesso; REM perdido somado |
 | Modo Prognóstico | Um dia (6 rotinas) e semana 1 (4 semanas prontas) |
@@ -53,14 +53,9 @@ Dia de trabalho de 17/11/2026: o projeto saiu do GDD e virou protótipo jogável
 - Ícones 3D: o jogo não tem nenhum; falta a lista de prompts.
 - Incluir o Mosaico Alostase no Acervo (depende do gerador no PC).
 
-## Próximo passo combinado
+## Próximo passo
 
-**Frequência cardíaca e pressão arterial**, com ficha antes de qualquer número. Fontes já localizadas, nenhuma lida inteira:
-
-- Degaute e colegas, 1991: perfil de 24 h de pressão e frequência cardíaca em 31 homens jovens, com registro de sono.
-- Phillips e colegas, 2023: frequência cardíaca de repouso ao longo de 24 h (433 pessoas; 54,5 bpm de dia e 50,5 à noite, lido só no resumo).
-- Hipotensão pós-exercício: revisão de Marques-Silvestre e colegas; Brito, Queiroz e Forjaz, 2014.
-- Swain e colegas: relação entre % da frequência cardíaca de reserva e % do VO2 de reserva.
+**Frequência cardíaca e pressão arterial:** a ficha 08 (18/11/2026) está escrita só com resumos. Sustentado: forma bimodal de 24 h, amplitudes relativas e a divisão sono/postura versus ritmo endógeno. Médias de pressão em normotensos e efeito crônico do trabalho noturno (+2 a +3 mmHg) já têm resumo. Falta: Degaute inteiro, média por faixa de 18 a 30 anos, frequência pós-exercício e frequência/pressão no sono diurno. **Nada entrou no motor.** Decisão pendente do professor: só perfil saudável ou também hipertenso?
 
 Depois, pela ordem sugerida: conta de Treino; sala de aula com telão e `/simulador`; semanas 2 a 8 e meses por último.
 
