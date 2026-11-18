@@ -141,6 +141,16 @@ export const CENA_EIXOS = {
     medico: ['papel', 'cuidado'],
     emergencia: ['responsabilidade', 'cuidado']
   }
+  ,evento: {
+    autorizacao: ['responsabilidade', 'cuidado'], onibus: ['cuidado', 'responsabilidade'], calor: ['cuidado', 'responsabilidade'],
+    times: ['justica', 'cuidado'], serie: ['justica', 'coleguismo'], patrocinador: ['cuidado', 'decisao'],
+    joelho: ['papel', 'cuidado'], placar: ['veracidade', 'justica'], tio: ['responsabilidade', 'cuidado'], relatorio: ['veracidade', 'responsabilidade']
+  }
+  ,estagio: {
+    presenca: ['veracidade', 'coleguismo'], favores: ['papel', 'justica'], relatorio: ['veracidade', 'decisao'],
+    mae: ['veracidade', 'cuidado', 'papel'], rede: ['privacidade', 'coleguismo'], prova: ['justica', 'cuidado'],
+    atestado: ['privacidade', 'justica'], castigo: ['cuidado', 'responsabilidade'], tcc: ['responsabilidade', 'privacidade'], contato: ['papel', 'cuidado']
+  }
 };
 
 // Mapa do dia: para cada eixo, as cenas jogadas que o tocaram (principal primeiro).

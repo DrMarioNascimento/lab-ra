@@ -16,7 +16,7 @@ function aluno(dia, k, texto = 'Eu ouviria os dois lados antes de decidir.') {
   return { id: 'a' + k, nome: 'Aluno ' + k, avatar: '🦊', dia, enviado: true, dadosJson: JSON.stringify(resumo(est)), aplicacao: texto };
 }
 
-for (const dia of ['escola', 'bairro', 'academia', 'pesquisa', 'clube', 'reabilitacao']) {
+for (const dia of ['escola', 'bairro', 'academia', 'pesquisa', 'clube', 'reabilitacao', 'evento', 'estagio']) {
   const D = DIAS[dia];
   ok(`[${dia}] com menos de ${MIN_TURMA} envios nada é liberado`, () => {
     const a = agregar([1, 2, 3, 4].map(k => aluno(dia, k)), D, dia);

@@ -1,16 +1,16 @@
 // Limiar Ético · Um dia — interface.
-import { SINTESE, MOTIVOS, VERSAO, CONDICOES, BASE_ESTRESSE, NOME_NIVEL } from './dados.js?v=2.2';
-import { DIAS, ORDEM_DIAS } from './dias.js?v=2.2';
-import { GLOSSARIO } from './glossario.js?v=2.2';
-import { gerarRetorno } from './retorno.js?v=2.2';
-import { mapaDoDia } from './programa.js?v=2.2';
-import { MANUAL } from './manual.js?v=2.2';
-import { abrirSalvar, blocosDe } from './salvar.js?v=2.2';
-import { agregar, enviosDoDia, MIN_TURMA } from './estatistica.js?v=2.2';
-import { conectar, gerarCodigo, limparCodigo, novoId } from './sala.js?v=2.2';
-import { novoEstado, sortearNiveis, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=2.2';
+import { SINTESE, MOTIVOS, VERSAO, CONDICOES, BASE_ESTRESSE, NOME_NIVEL } from './dados.js?v=2.3';
+import { DIAS, ORDEM_DIAS } from './dias.js?v=2.3';
+import { GLOSSARIO } from './glossario.js?v=2.3';
+import { gerarRetorno } from './retorno.js?v=2.3';
+import { mapaDoDia } from './programa.js?v=2.3';
+import { MANUAL } from './manual.js?v=2.3';
+import { abrirSalvar, blocosDe } from './salvar.js?v=2.3';
+import { agregar, enviosDoDia, MIN_TURMA } from './estatistica.js?v=2.3';
+import { conectar, gerarCodigo, limparCodigo, novoId } from './sala.js?v=2.3';
+import { novoEstado, sortearNiveis, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=2.3';
 
-import { PARES, EXIGENCIAS, prepararRodadas, cruzarRodadas } from './retomadas.js?v=2.2';
+import { PARES, EXIGENCIAS, prepararRodadas, cruzarRodadas } from './retomadas.js?v=2.3';
 
 const app = document.querySelector('#app');
 const topo = document.querySelector('#topo');
@@ -199,7 +199,7 @@ function escolher(i) {
   foco();
 }
 
-import { graficoLinhas, graficoCertoDesfecho, graficoMargem, graficoEscala, COR, NOME, COR_CERTO, COR_DESFECHO } from './graficos.js?v=2.2';
+import { graficoLinhas, graficoCertoDesfecho, graficoMargem, graficoEscala, COR, NOME, COR_CERTO, COR_DESFECHO } from './graficos.js?v=2.3';
 
 /* ---------- Revelação ---------- */
 function sinaisDe(p) {

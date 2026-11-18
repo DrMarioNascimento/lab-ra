@@ -1,6 +1,6 @@
 // Limiar Ético · estatística da turma (funções puras). Recebe os envios dos alunos e devolve agregados.
 // Regra de proteção: nada aparece com menos de MIN_TURMA respostas (cena, opção, eixo ou turma).
-import { EIXOS, CENA_EIXOS } from './programa.js?v=2.2';
+import { EIXOS, CENA_EIXOS } from './programa.js?v=2.3';
 
 export const MIN_TURMA = 5;
 

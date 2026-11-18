@@ -79,6 +79,16 @@ export const FATORES_CENA = {
     medico: ['carga', 'controle', 'jornada'],
     emergencia: ['ambiente', 'controle']
   }
+  ,evento: {
+    autorizacao: ['carga', 'lideranca'], onibus: ['carga', 'ambiente'], calor: ['ambiente', 'carga'],
+    times: ['violencia', 'lideranca'], serie: ['lideranca', 'controle'], patrocinador: ['lideranca', 'carga'],
+    joelho: ['carga', 'controle'], placar: ['lideranca', 'carga'], tio: ['carga', 'controle'], relatorio: ['lideranca', 'carga']
+  }
+  ,estagio: {
+    presenca: ['carga'], favores: ['lideranca', 'carga', 'controle'], relatorio: ['lideranca', 'carga'],
+    mae: ['lideranca', 'carga'], rede: ['violencia', 'lideranca'], prova: ['controle', 'carga'],
+    atestado: ['lideranca', 'violencia'], castigo: ['violencia', 'lideranca', 'carga'], tcc: ['carga', 'controle'], contato: ['carga', 'controle']
+  }
 };
 
 export function cobertura(dia) {

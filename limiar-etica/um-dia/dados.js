@@ -4,7 +4,7 @@
 // cor = pesos nas cinco correntes: U utilitarismo, V virtudes, I intenção, X existencialismo, C complexidade.
 // ef = efeitos nas variáveis do dia. margem = quanta escolha real a cena dava (0 a 1).
 
-export const VERSAO = '2.2';
+export const VERSAO = '2.3';
 
 export const CORRENTES = {
   U: 'Utilitarismo',

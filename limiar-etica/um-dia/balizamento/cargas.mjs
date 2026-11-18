@@ -121,6 +121,30 @@ export const CARGAS_DIAS = {
     medico: [3, 3, 3, 3, 3, 3, 2, 3, 3, 3],
     emergencia: [2, 3, 2, 2, 3, 3, 2, 3, 2, 3]
   }
+  ,evento: {
+    autorizacao: [2, 3, 3, 3, 3, 3, 2, 3, 2, 3],
+    onibus: [2, 3, 3, 2, 2, 3, 3, 3, 2, 3],
+    calor: [2, 3, 3, 2, 2, 3, 3, 3, 3, 3],
+    times: [2, 2, 3, 3, 2, 2, 2, 3, 2, 3],
+    serie: [2, 2, 2, 2, 2, 2, 2, 2, 3, 2],
+    patrocinador: [2, 2, 2, 3, 3, 2, 2, 3, 2, 3],
+    joelho: [3, 3, 3, 3, 3, 3, 2, 3, 3, 3],
+    placar: [2, 2, 3, 3, 3, 2, 2, 3, 3, 3],
+    tio: [3, 3, 3, 3, 2, 3, 2, 3, 2, 3],
+    relatorio: [2, 2, 2, 2, 2, 3, 3, 2, 2, 3]
+  }
+  ,estagio: {
+    presenca: [2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+    favores: [2, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+    relatorio: [2, 3, 3, 3, 3, 3, 2, 3, 3, 3],
+    mae: [2, 3, 3, 3, 3, 3, 2, 3, 2, 3],
+    rede: [2, 2, 2, 2, 2, 2, 3, 2, 3, 2],
+    prova: [2, 3, 3, 2, 3, 3, 2, 3, 2, 3],
+    atestado: [2, 2, 3, 2, 2, 2, 3, 3, 3, 3],
+    castigo: [3, 3, 3, 3, 3, 3, 2, 3, 3, 3],
+    tcc: [2, 3, 3, 3, 3, 3, 2, 3, 2, 3],
+    contato: [2, 3, 3, 3, 3, 3, 2, 3, 2, 3]
+  }
 };
 export const ALAVANCAS_DIAS = {
   escola: {
@@ -178,6 +202,14 @@ export const ALAVANCAS_DIAS = {
     ritmo: [0, 5, 9],
     medico: [0, 5, 9],
     emergencia: [1, 5, 9]
+  }
+  ,evento: {
+    autorizacao: [0, 5, 9], onibus: [0, 5, 9], calor: [0, 5, 9], times: [0, 5, 9], serie: [0, 5, 9],
+    patrocinador: [0, 5, 9], joelho: [0, 5, 9], placar: [0, 5, 9], tio: [0, 5, 9], relatorio: [0, 5, 9]
+  }
+  ,estagio: {
+    presenca: [0, 5, 9], favores: [0, 5, 9], relatorio: [0, 5, 9], mae: [0, 5, 9], rede: [0, 5, 9],
+    prova: [0, 5, 9], atestado: [0, 5, 9], castigo: [0, 5, 9], tcc: [0, 5, 9], contato: [0, 5, 9]
   }
 };
 

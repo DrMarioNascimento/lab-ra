@@ -20,7 +20,7 @@ for (const k of ORDEM_DIAS) {
   const D = DIAS[k];
   const todas = [...D.CENAS, ...(D.completo ? [CENA_FINAL, CENA_NEGADA] : [])];
 
-  const N = { empresa: 10, escola: 10, bairro: 11, academia: 10, pesquisa: 10, clube: 10, reabilitacao: 10 }[k];
+  const N = { empresa: 10, escola: 10, bairro: 11, academia: 10, pesquisa: 10, clube: 10, reabilitacao: 10, evento: 10, estagio: 10 }[k];
   ok(`[${k}] ${N} cenas, com contexto nos três níveis e sem palavras de estresse`, () => {
     const ids = D.CENAS.map(c => c.id);
     assert.equal(ids.length, N);
@@ -110,7 +110,7 @@ ok('o dia da empresa continua com retomada e volta (11 decisões), o bairro tem 
   assert.equal(novoEstado(null, 'empresa').fila.length, 11);
   assert.equal(novoEstado(null, 'escola').fila.length, 10);
   assert.equal(novoEstado(null, 'bairro').fila.length, 11);
-  for (const k of ['academia', 'pesquisa', 'clube', 'reabilitacao']) assert.equal(novoEstado(null, k).fila.length, 10, k);
+  for (const k of ['academia', 'pesquisa', 'clube', 'reabilitacao', 'evento', 'estagio']) assert.equal(novoEstado(null, k).fila.length, 10, k);
 });
 
 ok('todo conceito do retorno existe no glossário, com definição', () => {
@@ -127,7 +127,7 @@ ok('o balizamento por nível do dia da empresa sobe do baixo ao alto em todas as
 });
 
 ok('o aluno não carrega o balizamento nem usa nomes da régua nas páginas', () => {
-  for (const arq of ['../app.js', '../dados.js', '../motor.js', '../retorno.js', '../retomadas.js', '../glossario.js', '../dias.js', '../dia-escola.js', '../dia-bairro.js', '../dia-academia.js', '../dia-pesquisa.js', '../dia-clube.js', '../dia-reabilitacao.js', '../index.html']) {
+  for (const arq of ['../app.js', '../dados.js', '../motor.js', '../retorno.js', '../retomadas.js', '../glossario.js', '../dias.js', '../dia-escola.js', '../dia-bairro.js', '../dia-academia.js', '../dia-pesquisa.js', '../dia-clube.js', '../dia-reabilitacao.js', '../dia-evento.js', '../dia-estagio.js', '../index.html']) {
     assert.ok(!/balizamento|cargas\.mjs|ALAVANCAS|FAIXAS/i.test(readFileSync(new URL(arq, import.meta.url), 'utf8')), arq);
   }
 });

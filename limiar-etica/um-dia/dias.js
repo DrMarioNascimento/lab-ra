@@ -1,12 +1,14 @@
 // Limiar Ético · registro dos dias jogáveis. O dia da empresa é o completo (com retomadas e cenas condicionais);
 // os outros são dias simples (escola, academia, laboratório, clube e reabilitação com dez cenas, bairro com onze), com o mesmo sorteio por nível e o mesmo retorno.
-import * as E from './dados.js?v=2.2';
-import * as ESCOLA from './dia-escola.js?v=2.2';
-import * as BAIRRO from './dia-bairro.js?v=2.2';
-import * as ACADEMIA from './dia-academia.js?v=2.2';
-import * as PESQUISA from './dia-pesquisa.js?v=2.2';
-import * as CLUBE from './dia-clube.js?v=2.2';
-import * as REAB from './dia-reabilitacao.js?v=2.2';
+import * as E from './dados.js?v=2.3';
+import * as ESCOLA from './dia-escola.js?v=2.3';
+import * as BAIRRO from './dia-bairro.js?v=2.3';
+import * as ACADEMIA from './dia-academia.js?v=2.3';
+import * as PESQUISA from './dia-pesquisa.js?v=2.3';
+import * as CLUBE from './dia-clube.js?v=2.3';
+import * as REAB from './dia-reabilitacao.js?v=2.3';
+import * as EVEN from './dia-evento.js?v=2.3';
+import * as ESTA from './dia-estagio.js?v=2.3';
 
 export const DIAS = {
   empresa: {
@@ -43,6 +45,16 @@ export const DIAS = {
     id: 'reabilitacao', completo: false, instituicao: 'o programa',
     nome: 'Um dia na reabilitação cardiovascular', resumo: 'Hospital-escola: segurança do exercício, sintomas, medicação, informação à família, prontuário e vagas.',
     ABERTURA: REAB.ABERTURA, CENAS: REAB.CENAS, CONTEXTOS: REAB.CONTEXTOS, VALORES: REAB.VALORES, APLICACAO: REAB.APLICACAO, FECHAMENTO: REAB.FECHAMENTO
+  },
+  evento: {
+    id: 'evento', completo: false, instituicao: 'a escola',
+    nome: 'Um dia no evento da escola', resumo: 'Passeio e festival esportivo: autorizações, transporte, calor, times, regras, patrocínio, primeiros socorros, resultado e relatório.',
+    ABERTURA: EVEN.ABERTURA, CENAS: EVEN.CENAS, CONTEXTOS: EVEN.CONTEXTOS, VALORES: EVEN.VALORES, APLICACAO: EVEN.APLICACAO, FECHAMENTO: EVEN.FECHAMENTO
+  },
+  estagio: {
+    id: 'estagio', completo: false, instituicao: 'a escola',
+    nome: 'Um dia no estágio', resumo: 'Estagiário na escola: presença, tarefas fora do plano, relatório, família, redes sociais, adaptação, castigo, pesquisa e limites.',
+    ABERTURA: ESTA.ABERTURA, CENAS: ESTA.CENAS, CONTEXTOS: ESTA.CONTEXTOS, VALORES: ESTA.VALORES, APLICACAO: ESTA.APLICACAO, FECHAMENTO: ESTA.FECHAMENTO
   }
 };
-export const ORDEM_DIAS = ['empresa', 'escola', 'bairro', 'academia', 'pesquisa', 'clube', 'reabilitacao'];
+export const ORDEM_DIAS = ['empresa', 'escola', 'bairro', 'academia', 'pesquisa', 'clube', 'reabilitacao', 'evento', 'estagio'];

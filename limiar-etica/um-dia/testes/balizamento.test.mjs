@@ -32,7 +32,7 @@ ok('o dia tem ao menos uma cena em faixa limite e uma leve', () => {
   assert.ok(f.includes('limite') && f.includes('leve'));
 });
 
-for (const d of ['escola', 'bairro', 'academia', 'pesquisa', 'clube', 'reabilitacao']) {
+for (const d of ['escola', 'bairro', 'academia', 'pesquisa', 'clube', 'reabilitacao', 'evento', 'estagio']) {
   ok(`[${d}] toda cena tem dez notas inteiras de 0 a 4 e o nível sobe de baixo a alto (diferença de ao menos 4)`, () => {
     for (const c of DIAS[d].CENAS) {
       const notas = CARGAS_DIAS[d][c.id];
