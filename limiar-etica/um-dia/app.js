@@ -1,6 +1,8 @@
 // Limiar Ético · Um dia — interface.
-import { ABERTURA, SINTESE, MOTIVOS, APLICACAO, VERSAO, CENAS, CENAS_COM_URGENCIA } from './dados.js?v=0.5';
-import { novoEstado, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=0.5';
+import { ABERTURA, SINTESE, MOTIVOS, APLICACAO, VERSAO, CENAS, CENAS_COM_URGENCIA } from './dados.js?v=0.6';
+import { novoEstado, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=0.6';
+
+import { PARES, prepararRodadas, cruzarRodadas } from './retomadas.js?v=0.6';
 
 const app = document.querySelector('#app');
 const topo = document.querySelector('#topo');
@@ -10,6 +12,7 @@ const COR_CERTO = '#6250d6', COR_DESFECHO = '#a86d0a';
 
 let est = null;
 let urgencias = new Map();
+let retomadas = null;
 let visao = null;          // dados da cena em exibição
 let rev = null;            // dados da revelação
 const contestacoes = {};   // índice da decisão -> motivo escolhido (só em memória)
@@ -55,7 +58,7 @@ function telaAbertura() {
         ${arcoCapa()}
         <h1>${esc(ABERTURA.titulo)}</h1>
         ${ABERTURA.texto.map(p => `<p>${esc(p)}</p>`).join('')}
-        <p>Ao final, você poderá reconhecer padrões nas suas escolhas, comparar sua justificativa com as leituras do percurso e aplicar um conceito em outra situação. A atividade leva de 15 a 20 minutos. As respostas ficam nesta página e desaparecem ao fechá-la.</p>
+        <p>Ao final, você poderá reconhecer padrões nas suas escolhas, comparar sua justificativa com as leituras do percurso e aplicar um conceito em outra situação. Reserve cerca de 25 minutos para a atividade. As respostas ficam nesta página e desaparecem ao fechá-la.</p>
         <div class="acoes"><button class="btn principal" data-acao="comecar">Começar o dia</button></div>
       </section>
       <p class="versao entra" style="--n:2">Versão ${esc(VERSAO)}</p>
@@ -331,6 +334,75 @@ function abaDecisoes(E) {
     </section></div>`;
 }
 
+function telaRetomadas() {
+  const { rodada, pos, rodadas, consultou } = retomadas;
+  const caso = rodadas[rodada][pos];
+  const { forma } = caso;
+  const opcoes = PARES[caso.par].opcoes;
+  topo.hidden = true;
+  app.innerHTML = `
+    <div class="cena-grade">
+      <section class="cartao pagina entra">
+        <h2>${esc(forma.titulo)}</h2>
+        <p class="cena-texto">${esc(forma.texto)}${caso.urgente ? ' ' + esc(forma.urgencia) : ''}</p>
+        ${consultou
+          ? `<div class="info nova" tabindex="-1" id="fato-retomada"><p>${esc(forma.fato)}</p></div>`
+          : `<button class="btn secundario" data-acao="consultar-retomada">${esc(forma.rotulo)}</button>`}
+      </section>
+      <section class="lado" aria-label="O que você faz?">
+        <p class="etiqueta entra">O que você faz?</p>
+        <div class="opcoes">${caso.ordem.map(i => `<button class="btn entra" data-acao="responder-retomada" data-i="${i}">${esc(opcoes[i])}</button>`).join('')}</div>
+      </section>
+    </div>`;
+}
+
+function apresentarRetomada() {
+  telaRetomadas();
+  foco();
+}
+
+function responderRetomada(escolha) {
+  const { rodada, pos, rodadas, consultou, registros } = retomadas;
+  registros[rodada].push({ ...rodadas[rodada][pos], escolha, consultou });
+  retomadas.consultou = false;
+  retomadas.pos++;
+  if (retomadas.pos < rodadas[rodada].length) {
+    apresentarRetomada();
+  } else if (rodada === 0) {
+    telaCena();
+  } else {
+    rev = { dados: resumo(est), aba: 'curvas', sel: 0, abertas: {}, respostaAplicacao: '', anima: true, estreia: true };
+    telaRevelacao();
+    foco();
+  }
+}
+
+function relatorioRepeticao(E) {
+  const pares = cruzarRodadas(...retomadas.registros);
+  const grupos = [
+    ['Com urgência na história', pares.filter(p => p.urgente)],
+    ['Sem o acréscimo de urgência', pares.filter(p => !p.urgente)]
+  ];
+  return `<section class="cartao ${E}" style="--n:2">
+    <h3>O que se repetiu nas suas decisões</h3>
+    <p>Antes e depois do dia, você respondeu a situações diferentes com conflitos semelhantes. Em cada par, a condição foi a mesma nas duas situações. Agora você pode ver onde seu modo de agir ou de buscar informação se repetiu.</p>
+    <div class="par">${grupos.map(([titulo, itens]) => `<div>
+      <h4>${titulo}</h4>
+      <p>Mesma estratégia em ${itens.filter(p => p.repetiuEscolha).length} de ${itens.length} pares.
+        Mesmo comportamento de consulta em ${itens.filter(p => p.repetiuConsulta).length} de ${itens.length}.</p>
+      ${itens.map(p => `<details class="conceito">
+        <summary>${esc(p.tema)} · ${p.repetiuEscolha ? 'estratégia repetida' : 'estratégia diferente'}</summary>
+        <ol>${[p.antes, p.depois].map(registro => `<li>
+          <strong>${esc(registro.forma.titulo)}</strong>
+          <p>${esc(PARES[registro.par].opcoes[registro.escolha])}</p>
+          <p class="suave pequeno">${registro.consultou ? 'Consultou a informação adicional.' : 'Seguiu sem abrir a informação adicional.'}</p>
+        </li>`).join('')}</ol>
+      </details>`).join('')}
+    </div>`).join('')}</div>
+    <p class="suave pequeno">As situações têm contextos diferentes e aconteceram na mesma sessão. O relatório descreve a repetição das escolhas e consultas nesses casos.</p>
+  </section>`;
+}
+
 function relatorioTensao(E) {
   const pontos = rev.dados.pontos;
   const conflito = pontos.find(p => p.cenaId === 'horario');
@@ -386,6 +458,7 @@ function abaSintese(E) {
       </ul>
       <p class="suave pequeno" style="margin-top:12px">Compare os pesos das alternativas com os motivos que você relatou. Pense onde convergem e onde a mesma ação pode ter justificativas diferentes.</p>
     </section>
+    ${relatorioRepeticao(E)}
     ${relatorioTensao(E)}
     <div class="par">
       <section class="cartao ${E}" style="--n:2">
@@ -473,11 +546,21 @@ function acao(alvo) {
       return [cena.id, cena.trecho];
     }));
     for (const k of Object.keys(contestacoes)) delete contestacoes[k];
-    telaCena();
-  } else if (a === 'info') abrirInfo();
+    retomadas = { rodadas: prepararRodadas(), registros: [[], []], rodada: 0, pos: 0, consultou: false };
+    apresentarRetomada();
+  } else if (a === 'consultar-retomada') {
+    retomadas.consultou = true;
+    telaRetomadas();
+    document.querySelector('#fato-retomada')?.focus();
+  } else if (a === 'responder-retomada') responderRetomada(i);
+  else if (a === 'info') abrirInfo();
   else if (a === 'escolher') escolher(i);
   else if (a === 'seguir') telaCena();
-  else if (a === 'revelar') { rev = { dados: resumo(est), aba: 'curvas', sel: 0, abertas: {}, respostaAplicacao: '', anima: true, estreia: true }; telaRevelacao(); foco(); }
+  else if (a === 'revelar') {
+    retomadas.rodada = 1;
+    retomadas.pos = 0;
+    apresentarRetomada();
+  }
   else if (a === 'aba') { rev.aba = alvo.dataset.aba; rev.anima = true; telaRevelacao(); foco(); }
   else if (a === 'sel') mantendoRolagem(() => { rev.sel = i; });
   else if (a === 'contestar') mantendoRolagem(() => { rev.abertas[i] = true; });

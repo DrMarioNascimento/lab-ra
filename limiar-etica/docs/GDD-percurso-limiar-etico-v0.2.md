@@ -210,3 +210,10 @@ A relação com a tensão aparece apenas na síntese após a última decisão. O
 ## 17. Conflito entre trabalho e faculdade · versão 0.5
 
 A cena “Até que horas” reúne uma escala de trabalho que se estende até a madrugada, risco de nova advertência, entrega em grupo e prova decisiva na manhã seguinte. Esses fatos aparecem no momento da decisão. A síntese final recupera o conflito, a escolha, a consulta opcional e a consequência narrativa. A leitura se limita ao comportamento que a atividade registra.
+
+
+## 18. Repetição de decisões dentro da sessão · versão 0.6
+
+O dia-piloto é precedido e seguido por quatro casos breves. Cada rodada inclui um caso de cada par: trabalho e estudo, informação e exposição, limites e ajuda, consentimento e finalidade. Em cada sessão, dois temas são sorteados para conter urgência nas duas rodadas, e dois usam as versões sem esse acréscimo. A forma inicial, a ordem dos casos e a ordem das ações são sorteadas. As ações correspondem a estratégias equivalentes dentro de cada par. A consulta opcional permanece disponível em ambas as formas. Os casos emparelhados avançam sem consequência ou interpretação entre as respostas.
+
+A síntese compara a repetição da estratégia escolhida e do comportamento de consulta em cada par e por condição. É uma checagem exploratória de repetição na mesma sessão. Para um teste–reteste formal, é preciso pilotar a equivalência das formas, definir um intervalo entre aplicações, documentar os efeitos de ordem e prever um protocolo de análise e coleta.
