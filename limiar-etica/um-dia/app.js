@@ -1,6 +1,6 @@
 // Limiar Ético · Um dia — interface.
-import { ABERTURA, SINTESE, MOTIVOS, APLICACAO, VERSAO, CENAS } from './dados.js?v=0.3';
-import { novoEstado, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=0.3';
+import { ABERTURA, SINTESE, MOTIVOS, APLICACAO, VERSAO, CENAS, CENAS_COM_URGENCIA } from './dados.js?v=0.4';
+import { novoEstado, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=0.4';
 
 const app = document.querySelector('#app');
 const topo = document.querySelector('#topo');
@@ -9,6 +9,7 @@ const NOME = { razao: 'Razão', emocao: 'Emoção', impulso: 'Impulso' };
 const COR_CERTO = '#6250d6', COR_DESFECHO = '#a86d0a';
 
 let est = null;
+let urgencias = new Map();
 let visao = null;          // dados da cena em exibição
 let rev = null;            // dados da revelação
 const contestacoes = {};   // índice da decisão -> motivo escolhido (só em memória)
@@ -115,7 +116,7 @@ function telaCena() {
       <section class="cartao pagina entra">
         <span class="aba-hora">${PERIODO[faseDe(cena.hora)]}</span>
         <h2>${esc(cena.titulo)}</h2>
-        <p class="cena-texto">${esc(cena.texto)}</p>
+        <p class="cena-texto">${esc([cena.texto, urgencias.get(cena.id)].filter(Boolean).join(' '))}</p>
         ${botaoInfo}
       </section>
       <section class="lado" aria-label="O que você faz?">
@@ -330,6 +331,32 @@ function abaDecisoes(E) {
     </section></div>`;
 }
 
+function relatorioTensao(E) {
+  const pontos = rev.dados.pontos;
+  const marcadas = new Set(CENAS_COM_URGENCIA.flat().map(cena => cena.id));
+  const grupos = [
+    ['Com urgência na história', pontos.filter(p => urgencias.has(p.cenaId))],
+    ['Sem o acréscimo de urgência', pontos.filter(p => marcadas.has(p.cenaId) && !urgencias.has(p.cenaId))]
+  ];
+  return `<section class="cartao ${E}" style="--n:2">
+    <h3>Como você decidiu em situações de tensão</h3>
+    <p>Em duas cenas, a história acrescentou um sinal de urgência. Veja o que você fez nessas cenas e nas outras duas em que esse elemento variava.</p>
+    <div class="par">
+      ${grupos.map(([titulo, cenas]) => `<div>
+        <h4>${titulo}</h4>
+        <p>Informação consultada em ${cenas.filter(p => p.abriuInfo).length} de ${cenas.length} cenas.</p>
+        <ul class="limpa">${cenas.map(p => `<li>
+          <strong>${esc(p.titulo)}</strong>
+          ${urgencias.has(p.cenaId) ? `<p>${esc(urgencias.get(p.cenaId))}</p>` : ''}
+          <p>${esc(p.escolha)}</p>
+          <p class="suave pequeno">${p.abriuInfo ? 'Consultou a informação disponível' : 'Seguiu sem abrir a informação adicional'}</p>
+        </li>`).join('')}</ul>
+      </div>`).join('')}
+    </div>
+    <p class="suave pequeno">As cenas envolvem decisões diferentes. Use a comparação para refletir sobre suas escolhas e sobre o que chamou sua atenção.</p>
+  </section>`;
+}
+
 function abaSintese(E) {
   const r = rev.dados;
   const motivos = MOTIVOS.map((texto, i) => ({
@@ -352,6 +379,7 @@ function abaSintese(E) {
       </ul>
       <p class="suave pequeno" style="margin-top:12px">Compare os pesos das alternativas com os motivos que você relatou. Pense onde convergem e onde a mesma ação pode ter justificativas diferentes.</p>
     </section>
+    ${relatorioTensao(E)}
     <div class="par">
       <section class="cartao ${E}" style="--n:2">
         <h3>Sete perguntas para rever o dia</h3>
@@ -433,6 +461,10 @@ function acao(alvo) {
   const a = alvo.dataset.acao, i = Number(alvo.dataset.i);
   if (a === 'comecar' || a === 'recomecar') {
     est = novoEstado(); rev = null; topo.innerHTML = '';
+    urgencias = new Map(CENAS_COM_URGENCIA.map(par => {
+      const cena = par[Math.floor(Math.random() * par.length)];
+      return [cena.id, cena.trecho];
+    }));
     for (const k of Object.keys(contestacoes)) delete contestacoes[k];
     telaCena();
   } else if (a === 'info') abrirInfo();

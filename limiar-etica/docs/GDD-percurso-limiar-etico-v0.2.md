@@ -198,3 +198,10 @@ O Lab-RA abre **Um dia** pelo card do Limiar Ético e oferece o protótipo de ci
 2. Criar versões pareadas de dilemas, mudando uma condição por vez, como pressão de tempo, relação de poder ou presença de uma pessoa afetada. Fixar o núcleo do percurso quando a comparação entre participantes exigir exposição equivalente e registrar quais cenas e informações estiveram disponíveis.
 3. Fazer entrevistas cognitivas e um piloto para verificar a compreensão das instruções e se alguma alternativa soa claramente mais desejável. Revisar as atribuições dos pesos com avaliadores independentes e documentar as discordâncias.
 4. Para uma coleta futura, definir o protocolo de participação e o plano de gestão dos dados antes de habilitar armazenamento ou exportação. A versão atual funciona como atividade pedagógica exploratória, com leitura individual do percurso.
+
+
+## 16. Urgência narrativa e devolutiva · versão 0.4
+
+Em cada sessão, um elemento de urgência narrativa é sorteado para uma cena de cada par. Os pares abrangem decisões de trabalho e decisões que envolvem conciliar necessidades de outras pessoas. O elemento aparece como uma informação da história, com as mesmas alternativas e a mesma possibilidade de consultar os fatos nas duas versões de cada cena. Nas cenas selecionadas, nenhuma janela de informação é reduzida pela condição sorteada.
+
+A relação com a tensão aparece apenas na síntese após a última decisão. O relatório apresenta as quatro cenas, as escolhas e as consultas de informação. Os relatos dizem respeito a condutas no percurso. Para investigar o efeito da urgência, comparar a mesma cena entre participantes alocados às duas versões, em um piloto com protocolo definido. A comparação individual reúne dilemas diferentes e serve para reflexão.

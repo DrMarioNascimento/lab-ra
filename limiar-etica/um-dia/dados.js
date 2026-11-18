@@ -4,7 +4,7 @@
 // cor = pesos nas cinco correntes: U utilitarismo, V virtudes, I intenção, X existencialismo, C complexidade.
 // ef = efeitos nas variáveis do dia. margem = quanta escolha real a cena dava (0 a 1).
 
-export const VERSAO = '0.3';
+export const VERSAO = '0.4';
 
 export const CORRENTES = {
   U: 'Utilitarismo',
@@ -131,7 +131,7 @@ export const CENAS = [
   },
   {
     id: 'verba', hora: '14h00', titulo: 'A verba', margem: 0.5,
-    texto: 'Um fornecedor cancelou e ficou um buraco no orçamento. A chefia pede a sua proposta em dez minutos. Dá para cortar a oficina adaptada, que atende doze pessoas com deficiência e custa caro, ou reduzir quinze por cento de tudo, o que piora o lanche e o som para os quatrocentos.',
+    texto: 'Um fornecedor cancelou e ficou um buraco no orçamento. A chefia pede uma proposta para reorganizar os gastos. Dá para cortar a oficina adaptada, que atende doze pessoas com deficiência e custa caro, ou reduzir quinze por cento de tudo, o que piora o lanche e o som para os quatrocentos.',
     info: { rotulo: 'Ligar para a instituição dos doze', texto: 'O transporte deles já está pago e a caminho.' },
     opcoes: [
       { t: 'Propor cortar a oficina.',
@@ -313,3 +313,16 @@ export const APLICACAO = {
   pergunta: 'O que você faria? Explique o que muda entre os dois usos e aplique à sua decisão a distinção entre intenção, meio e consequência.',
   leitura: 'A intenção de ampliar o acesso pode ser legítima. A postagem pública é outro meio: muda o público, o alcance e a exposição da colega. A autorização para um uso específico não se estende automaticamente ao outro. Que efeito cada alternativa teria para a colega e para quem quer acompanhar a discussão?'
 };
+
+
+// Em cada par, a urgência narrativa aparece em apenas uma cena por sessão.
+export const CENAS_COM_URGENCIA = [
+  [
+    { id: 'numero', trecho: 'A pessoa da recepção avisa que o cliente já está esperando pelo relatório na sala ao lado.' },
+    { id: 'verba', trecho: 'A equipe de compras avisa que precisa da proposta agora para fechar os pedidos.' }
+  ],
+  [
+    { id: 'troca', trecho: 'A colega mostra a escala. O atendimento dela é o próximo a começar.' },
+    { id: 'ligacao', trecho: 'A sua irmã avisa que o carro que leva sua mãe já está a caminho.' }
+  ]
+];
