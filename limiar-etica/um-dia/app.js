@@ -1,19 +1,19 @@
 // Limiar Ético · Um dia — interface.
-import { SINTESE, MOTIVOS, VERSAO, CONDICOES, BASE_ESTRESSE, NOME_NIVEL } from './dados.js?v=1.5';
-import { DIAS, ORDEM_DIAS } from './dias.js?v=1.5';
-import { GLOSSARIO } from './glossario.js?v=1.5';
-import { gerarRetorno } from './retorno.js?v=1.5';
-import { mapaDoDia } from './programa.js?v=1.5';
-import { MANUAL } from './manual.js?v=1.5';
-import { novoEstado, sortearNiveis, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=1.5';
+import { SINTESE, MOTIVOS, VERSAO, CONDICOES, BASE_ESTRESSE, NOME_NIVEL } from './dados.js?v=1.6';
+import { DIAS, ORDEM_DIAS } from './dias.js?v=1.6';
+import { GLOSSARIO } from './glossario.js?v=1.6';
+import { gerarRetorno } from './retorno.js?v=1.6';
+import { mapaDoDia } from './programa.js?v=1.6';
+import { MANUAL } from './manual.js?v=1.6';
+import { abrirSalvar, blocosDe } from './salvar.js?v=1.6';
+import { agregar, enviosDoDia, MIN_TURMA } from './estatistica.js?v=1.6';
+import { conectar, gerarCodigo, limparCodigo, novoId } from './sala.js?v=1.6';
+import { novoEstado, sortearNiveis, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=1.6';
 
-import { PARES, EXIGENCIAS, prepararRodadas, cruzarRodadas } from './retomadas.js?v=1.5';
+import { PARES, EXIGENCIAS, prepararRodadas, cruzarRodadas } from './retomadas.js?v=1.6';
 
 const app = document.querySelector('#app');
 const topo = document.querySelector('#topo');
-const COR = { razao: '#1558b2', emocao: '#a8441b', impulso: '#126e5e' };
-const NOME = { razao: 'Razão', emocao: 'Emoção', impulso: 'Impulso' };
-const COR_CERTO = '#6250d6', COR_DESFECHO = '#a86d0a';
 
 let dia = 'empresa';       // dia escolhido na entrada
 const D = () => DIAS[dia];
@@ -66,8 +66,10 @@ function telaEscolhaDia() {
         <div class="opcoes">
           ${ORDEM_DIAS.map((k, n) => `<button class="btn entra" style="--n:${n + 1}" data-acao="dia" data-dia="${k}"><strong>${esc(DIAS[k].nome)}</strong><br><span class="suave pequeno">${esc(DIAS[k].resumo)}</span></button>`).join('')}
         </div>
+        ${sala ? `<p class="suave pequeno sala-aviso">Você está na sala <strong>${esc(sala.codigo)}</strong> como ${esc(sala.avatar)} ${esc(sala.nome)}. <button class="link" data-acao="sair-sala">Sair da sala</button></p>`
+               : `<div class="acoes"><button class="btn secundario" data-acao="tela-sala">Entrar numa sala</button></div>`}
       </section>
-      <p class="versao entra" style="--n:4">Versão ${esc(VERSAO)}</p>
+      <p class="versao entra" style="--n:4">Versão ${esc(VERSAO)} · <a href="?professor" class="link">Sou professor</a></p>
     </div>`;
   foco();
 }
@@ -129,6 +131,7 @@ function barraDoDia(cena) {
 }
 
 function telaCena() {
+  sincronizar();
   const cena = cenaAtual(est);
   const janela = janelaInfo(est, cena);
   visao = { cena, ordem: embaralhar(cena.opcoes.length), inicio: performance.now(), abriuInfo: false, infoDisponivel: janela > 0, relogio: null };
@@ -196,110 +199,7 @@ function escolher(i) {
   foco();
 }
 
-/* ---------- Gráficos ---------- */
-const L = { w: 340, esq: 30, dir: 16 };
-const xDe = (i, n, dirExtra = 0) => {
-  const largura = L.w - L.esq - L.dir - dirExtra;
-  return n === 1 ? L.esq + largura / 2 : L.esq + (largura * i) / (n - 1);
-};
-const numeros = (pontos, x, y, sel) => pontos.map((p, i) =>
-  `<text class="eixo" x="${x(i)}" y="${y}" text-anchor="middle" ${i === sel ? 'font-weight="700" fill="#1d1b16"' : ''}>${p.n}</text>`).join('');
-const alvosDe = (pontos, x, H, comFoco) => {
-  const passo = pontos.length > 1 ? x(1) - x(0) : 40;
-  return pontos.map((p, i) => `<rect class="ponto-alvo" data-acao="sel" data-i="${i}" ${comFoco ? `tabindex="0" role="button" aria-label="Decisão ${p.n}, ${esc(p.hora)}, ${esc(p.titulo)}"` : 'aria-hidden="true"'}
-      x="${x(i) - passo / 2}" y="0" width="${passo}" height="${H}" fill="transparent"/>`).join('');
-};
-
-
-/* ---------- Profundidade 3D dos gráficos ---------- */
-const escurece = (hex, f) => '#' + [1, 3, 5].map(i => Math.max(0, Math.min(255, Math.round(parseInt(hex.slice(i, i + 2), 16) * f))).toString(16).padStart(2, '0')).join('');
-const clareia = (hex, f) => '#' + [1, 3, 5].map(i => { const v = parseInt(hex.slice(i, i + 2), 16); return Math.round(v + (255 - v) * f).toString(16).padStart(2, '0'); }).join('');
-const DX = 4, DY = 3;
-/* Barra vertical em prisma: frente, lateral direita escura e topo claro; sombra no chão. */
-function barra3d(x, y, w, h, paraCima, cor) {
-  if (h <= 0.5) return '';
-  const ty = paraCima ? y : y + h; // aresta onde fica o topo visível
-  return `<g class="barra">
-    <ellipse cx="${x + w / 2 + DX / 2}" cy="${paraCima ? y + h + 1 : y - 1}" rx="${w / 2 + DX}" ry="2" fill="#2b21501f"/>
-    <path d="M${x + w},${y} L${x + w + DX},${y - DY} V${y + h - DY} L${x + w},${y + h} Z" fill="${escurece(cor, .66)}"/>
-    <path d="M${x},${ty} L${x + DX},${ty - DY} H${x + w + DX} L${x + w},${ty} Z" fill="${clareia(cor, .45)}"/>
-    <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${cor}"/>
-    <rect x="${x + 1.5}" y="${y}" width="2.5" height="${h}" fill="#fff" opacity=".28"/></g>`;
-}
-/* Barra horizontal em prisma. */
-function barraH3d(x, y, w, h, cor) {
-  return `<g class="barra">
-    <path d="M${x},${y + h} L${x + DX},${y + h + DY} H${x + w + DX} L${x + w},${y + h} Z" fill="${escurece(cor, .62)}"/>
-    <path d="M${x + w},${y} L${x + w + DX},${y + DY} V${y + h + DY} L${x + w},${y + h} Z" fill="${escurece(cor, .74)}"/>
-    <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${cor}"/>
-    <rect x="${x}" y="${y + 1.5}" width="${w}" height="3" fill="#fff" opacity=".28"/></g>`;
-}
-
-function graficoLinhas(pontos, sel) {
-  const n = pontos.length, H = 196, topoG = 12, base = 162, rotulos = 54;
-  const y = v => base - v * (base - topoG);
-  const x = i => xDe(i, n, rotulos);
-  const series = ['razao', 'emocao', 'impulso'];
-  const grade = [0, 0.5, 1].map(v => `<line x1="${L.esq}" x2="${x(n - 1)}" y1="${y(v)}" y2="${y(v)}" stroke="#e7e2d6" stroke-width="1"/>
-    <text class="eixo" x="${L.esq - 6}" y="${y(v) + 4}" text-anchor="end">${v === 0 ? '0' : v === 1 ? 'alto' : ''}</text>`).join('');
-  const guia = `<line x1="${x(sel)}" x2="${x(sel)}" y1="${topoG - 4}" y2="${base}" stroke="#b3a37f" stroke-width="1" stroke-dasharray="3 3"/>`;
-  const trilha = s => `M${pontos.map((p, i) => `${x(i)},${y(p[s])}`).join(' L')}`;
-  const linhas = series.map((s, k) => {
-    const d = trilha(s), fio = (extra, larg, cor, op) => `<path class="linha-serie" style="--s:${k}" pathLength="1" fill="none" stroke="${cor}" stroke-opacity="${op}" stroke-width="${larg}" stroke-linejoin="round" stroke-linecap="round" transform="translate(${extra})" d="${d}"/>`;
-    return `<g>${fio('1.5,4', 4, '#2b2150', .16)}${fio('0,1.2', 4.2, escurece(COR[s], .62), 1)}${fio('0,0', 3.4, COR[s], 1)}${fio('0,-.9', 1, '#ffffff', .5)}</g>`;
-  }).join('');
-  const marcas = series.map(s => pontos.map((p, i) => {
-    const r = i === sel ? 5.8 : 4.4, cx = x(i), cy = y(p[s]);
-    return `<g class="marca"><ellipse cx="${cx + 1.5}" cy="${cy + r + 1.5}" rx="${r}" ry="1.8" fill="#2b21502e"/>
-      <circle cx="${cx}" cy="${cy}" r="${r}" fill="${escurece(COR[s], .78)}" stroke="#fcfcfb" stroke-width="1.6"/>
-      <circle cx="${cx - r * .12}" cy="${cy - r * .14}" r="${r * .72}" fill="${COR[s]}"/>
-      <circle cx="${cx - r * .36}" cy="${cy - r * .4}" r="${r * .26}" fill="#fff" opacity=".7"/></g>`;
-  }).join('')).join('');
-  // rótulos diretos no fim das linhas, afastados para não colidir
-  const finais = series.map(s => ({ s, y: y(pontos[n - 1][s]) })).sort((a, b) => a.y - b.y);
-  for (let i = 1; i < finais.length; i++) if (finais[i].y - finais[i - 1].y < 13) finais[i].y = finais[i - 1].y + 13;
-  const nomes = finais.map(f => `<text class="rot-serie fim" x="${x(n - 1) + 9}" y="${f.y + 4}">${NOME[f.s]}</text>`).join('');
-  return `<svg class="grafico" viewBox="0 0 ${L.w} ${H}" role="group" aria-label="Razão, emoção e impulso em cada decisão do dia">
-    ${grade}${guia}${linhas}${marcas}${nomes}${numeros(pontos, x, base + 16, sel)}
-    <text class="eixo" x="${L.esq}" y="${H - 2}">decisões do dia, em ordem</text>${alvosDe(pontos, x, H, true)}</svg>`;
-}
-
-function graficoCertoDesfecho(pontos, sel) {
-  const n = pontos.length, H = 150, meio = 68, alt = 50, larg = 14;
-  const x = i => xDe(i, n);
-  const barras = pontos.map((p, i) => {
-    const h = Math.abs(p.certoDesfecho) * alt;
-    const cima = p.certoDesfecho >= 0;
-    return barra3d(x(i) - larg / 2, cima ? meio - h : meio, larg, h, cima, cima ? COR_CERTO : COR_DESFECHO);
-  }).join('');
-  return `<svg class="grafico" viewBox="0 0 ${L.w} ${H}" role="img" aria-label="Busca do certo e busca do desfecho em cada decisão">
-    <line x1="${L.esq - 12}" x2="${L.w - 4}" y1="${meio}" y2="${meio}" stroke="#b3a37f" stroke-width="1"/>
-    <text class="rot-serie" x="2" y="14">o certo</text>
-    <text class="rot-serie" x="2" y="${meio + alt + 6}">o desfecho</text>
-    ${barras}${numeros(pontos, x, H - 6, sel)}${alvosDe(pontos, x, H, false)}</svg>`;
-}
-
-function graficoMargem(pontos, sel) {
-  const n = pontos.length, H = 120, base = 92, alt = 76, larg = 14;
-  const x = i => xDe(i, n);
-  const barras = pontos.map((p, i) => barra3d(x(i) - larg / 2, base - p.margem * alt, larg, p.margem * alt, true, i === sel ? '#184f95' : '#2a78d6')).join('');
-  return `<svg class="grafico" viewBox="0 0 ${L.w} ${H}" role="img" aria-label="Margem de escolha em cada momento">
-    <line x1="${L.esq - 12}" x2="${L.w - 4}" y1="${base}" y2="${base}" stroke="#b3a37f" stroke-width="1"/>
-    ${barras}${numeros(pontos, x, H - 8, sel)}${alvosDe(pontos, x, H, false)}</svg>`;
-}
-
-function graficoEscala(escala) {
-  const linha = 30, esq = 112, max = Math.max(...escala.map(e => e.parte), 0.01), larguraMax = L.w - esq - 44;
-  const H = escala.length * linha + 6;
-  const itens = escala.map((e, i) => {
-    const w = (e.parte / max) * larguraMax, y = 6 + i * linha;
-    const barra = w > 4.5 ? barraH3d(esq, y, w, 18, '#2a78d6') : '';
-    return `<text class="rot-serie" x="${esq - 8}" y="${y + 13}" text-anchor="end">${esc(e.nome)}</text>${barra}
-      <text class="rot-valor" x="${esq + Math.max(w, 0) + 6}" y="${y + 13}">${Math.round(e.parte * 100)}%</text>`;
-  }).join('');
-  return `<svg class="grafico" viewBox="0 0 ${L.w} ${H}" role="img" aria-label="Peso de cada corrente ética no seu dia">
-    <line x1="${esq}" x2="${esq}" y1="2" y2="${H - 2}" stroke="#b3a37f" stroke-width="1"/>${itens}</svg>`;
-}
+import { graficoLinhas, graficoCertoDesfecho, graficoMargem, graficoEscala, COR, NOME, COR_CERTO, COR_DESFECHO } from './graficos.js?v=1.6';
 
 /* ---------- Revelação ---------- */
 function sinaisDe(p) {
@@ -548,7 +448,7 @@ function abaSintese(E) {
     </section>
     ${relatorioNiveis(E)}
     ${relatorioEixos(E)}
-    ${D().completo ? relatorioRepeticao(E) + relatorioTensao(E) : ''}
+    ${D().completo && retomadas?.registros?.[0] ? relatorioRepeticao(E) + relatorioTensao(E) : ''}
     <div class="par">
       <section class="cartao ${E}" style="--n:2">
         <h3>Sete perguntas para rever o dia</h3>
@@ -587,11 +487,11 @@ function abaAplicar(E) {
     <h2>${esc(D().APLICACAO.titulo)}</h2>
     <p>${esc(D().APLICACAO.situacao)}</p>
     <label for="resposta-aplicacao"><strong>${esc(D().APLICACAO.pergunta)}</strong></label>
-    <textarea id="resposta-aplicacao" rows="6" maxlength="2000" aria-describedby="aviso-aplicacao">${esc(rev.respostaAplicacao)}</textarea>
-    <p id="aviso-aplicacao" class="suave pequeno">Escreva a sua decisão e o porquê, com as suas palavras (pelo menos uma ou duas frases). Sem nota. O texto só existe nesta página: nada é enviado, então copie ou baixe para levar à discussão.</p>
-    <div class="acoes" id="acoes-aplicacao"><button class="btn principal" data-acao="copiar-texto" ${ok ? '' : 'disabled'}>Copiar meu texto</button><button class="btn secundario" data-acao="baixar-texto" ${ok ? '' : 'disabled'}>Baixar (.txt)</button></div>
-    <p id="retorno-texto" class="suave pequeno" role="status"></p>
-    <details class="conceito" id="conceito-aplicacao"${ok ? '' : ' hidden'}><summary>Explorar o conceito depois de refletir</summary><p>${esc(D().APLICACAO.leitura)}</p></details>
+    ${rev.professor ? `<p class="resposta-folha">${esc(rev.respostaAplicacao || 'Sem resposta escrita.')}</p>` : `<textarea id="resposta-aplicacao" rows="6" maxlength="2000" aria-describedby="aviso-aplicacao">${esc(rev.respostaAplicacao)}</textarea>
+    <p id="aviso-aplicacao" class="suave pequeno">Escreva a sua decisão e o porquê, com as suas palavras (pelo menos uma ou duas frases). Sem nota. O texto fica nesta página; copie ou baixe para levar à discussão. Só vai ao professor se você entrar numa sala e escolher enviar.</p>`}
+    <div class="acoes" id="acoes-aplicacao"${rev.professor ? ' hidden' : ''}><button class="btn principal" data-acao="copiar-texto" ${ok ? '' : 'disabled'}>Copiar meu texto</button><button class="btn secundario" data-acao="baixar-texto" ${ok ? '' : 'disabled'}>Baixar (.txt)</button></div>
+    ${rev.professor ? '' : '<p id="retorno-texto" class="suave pequeno" role="status"></p>'}
+    <details class="conceito" id="conceito-aplicacao"${ok || rev.professor ? '' : ' hidden'}><summary>Explorar o conceito depois de refletir</summary><p>${esc(D().APLICACAO.leitura)}</p></details>
   </section></div>`;
 }
 function textoDaAplicacao() {
@@ -609,7 +509,7 @@ function telaRevelacao() {
   const abas = [['curvas', 'Curvas'], ['decisoes', 'Decisões'], ['sintese', 'Síntese'], ['aplicar', 'Aplicar']];
   ceu('noite');
   topo.hidden = false;
-  topo.innerHTML = `<div class="abas" role="tablist" aria-label="Revelação do dia">
+  topo.innerHTML = barraProfessor() + `<div class="abas" role="tablist" aria-label="Revelação do dia">
     ${abas.map(([id, nome]) => `<button class="aba" role="tab" data-acao="aba" data-aba="${id}" aria-selected="${rev.aba === id}">${nome}</button>`).join('')}
   </div>`;
   const E = rev.anima ? 'entra' : '';
@@ -621,6 +521,7 @@ function telaRevelacao() {
         <p>${esc(INTRO[rev.aba])}</p>
       </section>
       ${corpo}
+      ${cartaoLevar(E)}
     </div>`;
   rev.anima = false;
   rev.estreia = false;
@@ -641,6 +542,288 @@ function mantendoRolagem(f) {
   window.scrollTo({ top: yRol });
 }
 
+
+/* ---------- Sala ao vivo (aluno) ---------- */
+const EMOJIS = ['😀', '🤓', '😎', '🧐', '😊', '🙂', '😇', '🤩', '🦊', '🐨', '🐸', '⚽', '📚', '🔬'];
+const lerJSON = k => { try { return JSON.parse(sessionStorage.getItem(k)); } catch (e) { return null; } };
+const gravarJSON = (k, v) => { try { if (v == null) sessionStorage.removeItem(k); else sessionStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* sem armazenamento */ } };
+let sala = lerJSON('le_sala');        // { codigo, alunoId, nome, avatar } quando o aluno entrou numa sala
+let emojiEscolhido = sala?.avatar || '';
+
+async function sincronizar(extra = {}) {
+  if (!sala) return;
+  try {
+    const api = await conectar();
+    const total = est ? totalCenas(est) : 0;
+    await api.gravarAluno(sala.codigo, sala.alunoId, { nome: sala.nome, avatar: sala.avatar, dia: est ? dia : '', status: 'Jogando', progresso: total ? Math.round(100 * est.pos / total) : 0, ...extra });
+  } catch (e) { console.warn('sala', e); }
+}
+
+function telaEntrarSala(codigo = '') {
+  ceu('alvorada'); topo.hidden = true; topo.innerHTML = '';
+  app.innerHTML = `<div class="estreita"><section class="cartao capa-dia entra">
+    <p class="rotulo">Sala</p><h1>Entrar na sala</h1>
+    <p>Quem conduz a atividade mostra um código. Entrar na sala só avisa que você está jogando. As suas respostas só vão para o professor se, no fim, você escolher enviar.</p>
+    <label for="sala-nome"><strong>Sua identificação</strong></label>
+    <input id="sala-nome" class="campo" maxlength="40" autocomplete="name" value="${esc(sala?.nome || '')}">
+    <label for="sala-codigo"><strong>Código da sala</strong></label>
+    <input id="sala-codigo" class="campo" maxlength="8" autocapitalize="characters" placeholder="Ex.: LE1234" value="${esc(codigo || sala?.codigo || '')}">
+    <p><strong>Escolha um emoji</strong></p>
+    <div class="emojis">${EMOJIS.map(e => `<button type="button" class="btn emoji" data-acao="emoji" data-e="${e}" aria-pressed="${emojiEscolhido === e}">${e}</button>`).join('')}</div>
+    <p id="erro-sala" class="erro" role="alert"></p>
+    <div class="acoes"><button class="btn principal" data-acao="entrar-sala">Entrar</button><button class="btn secundario" data-acao="escolher-dia">Voltar</button></div>
+  </section></div>`;
+  foco();
+}
+
+async function entrarSala() {
+  const erro = document.querySelector('#erro-sala');
+  const nome = document.querySelector('#sala-nome').value.trim(), codigo = limparCodigo(document.querySelector('#sala-codigo').value);
+  if (nome.length < 2 || codigo.length < 4) { erro.textContent = 'Informe a sua identificação e o código da sala.'; return; }
+  if (!emojiEscolhido) { erro.textContent = 'Escolha um emoji.'; return; }
+  erro.textContent = 'Verificando a sala…';
+  try {
+    const api = await conectar();
+    if (!(await api.sessaoAtiva(codigo))) { erro.textContent = 'Sala não encontrada ou já encerrada.'; return; }
+    const alunoId = sala && sala.codigo === codigo && sala.nome === nome ? sala.alunoId : novoId();
+    sala = { codigo, alunoId, nome, avatar: emojiEscolhido };
+    gravarJSON('le_sala', sala);
+    await api.gravarAluno(codigo, alunoId, { nome, avatar: emojiEscolhido, dia: '', status: 'Escolhendo o dia', progresso: 0, entrouEmMs: Date.now() });
+    telaEscolhaDia();
+  } catch (e) { console.error(e); erro.textContent = 'Não foi possível entrar. Verifique a internet e tente de novo.'; }
+}
+
+function sairDaSala() { sala = null; emojiEscolhido = ''; gravarJSON('le_sala', null); telaEscolhaDia(); }
+
+async function enviarAoProfessor() {
+  const api = await conectar();
+  const texto = (rev.respostaAplicacao || '').trim();
+  await api.gravarAluno(sala.codigo, sala.alunoId, {
+    nome: sala.nome, avatar: sala.avatar, dia, status: 'Enviou', progresso: 100, enviado: true, enviadoEmMs: Date.now(),
+    dadosJson: JSON.stringify(rev.dados),
+    extrasJson: JSON.stringify({ registros: retomadas?.registros || null, contestacoes }),
+    aplicacao: texto
+  });
+  return 'Enviado ao professor.';
+}
+
+function cartaoLevar(E) {
+  if (rev.professor) return '';
+  return `<div class="estreita"><section class="cartao ${E}">
+    <h3>Levar o seu dia</h3>
+    <p class="suave pequeno">Escolha os blocos que quer salvar, em PDF ou em imagem${sala ? ', ou envie tudo ao professor' : ''}.</p>
+    <div class="acoes"><button class="btn principal" data-acao="abrir-salvar">Salvar${sala ? ' ou enviar' : ''}…</button></div>
+  </section></div>`;
+}
+
+// Cada aba é renderizada sem animação e quebrada em blocos para a lista de caixas da janela Salvar.
+function gruposDaRevelacao() {
+  const abas = [['Curvas', abaCurvas], ['Decisões', abaDecisoes], ['Síntese', abaSintese], ['Aplicar', abaAplicar]];
+  return abas.map(([nome, f]) => ({ nome, blocos: blocosDe(f('')) }));
+}
+function abrirSalvarRevelacao() {
+  abrirSalvar({
+    titulo: rev.professor ? 'Salvar este dia' : 'Salvar o seu dia',
+    cabecalho: D().nome + (rev.professor && !document.body.classList.contains('telao') ? ' · ' + rev.professor.nome : ''),
+    arquivo: `limiar-etico-${dia}${rev.professor ? '-aluno' : ''}`,
+    grupos: gruposDaRevelacao(),
+    enviar: sala && !rev.professor ? { rotulo: 'Enviar tudo ao professor', aoClicar: enviarAoProfessor } : null
+  });
+}
+
+/* ---------- Módulo do professor ---------- */
+const P = { logado: false, codigo: lerJSON('le_prof') || '', alunos: [], unsub: null, vista: 'alunos', diaTurma: null, selId: null, erro: '' };
+const porNome = (a, b) => (a.nome || '').localeCompare(b.nome || '', 'pt-BR');
+const enviados = () => P.alunos.filter(a => a.enviado && a.dadosJson).sort(porNome);
+
+function barraProfessor() {
+  if (!rev?.professor) return '';
+  const lista = enviados(), i = lista.findIndex(a => a.id === rev.professor.id);
+  return `<div class="prof-barra">
+    <button class="btn pequeno-btn" data-acao="prof-voltar">← Turma</button>
+    <button class="btn pequeno-btn" data-acao="prof-ant" ${i <= 0 ? 'disabled' : ''} aria-label="Aluno anterior">‹</button>
+    <span class="prof-quem">${esc(rev.professor.avatar)} ${document.body.classList.contains('telao') ? 'Aluno' : esc(rev.professor.nome)} <small>${i + 1}/${lista.length}</small></span>
+    <button class="btn pequeno-btn" data-acao="prof-prox" ${i < 0 || i >= lista.length - 1 ? 'disabled' : ''} aria-label="Próximo aluno">›</button>
+    <button class="btn pequeno-btn" data-acao="abrir-salvar">Salvar…</button>
+    <button class="btn pequeno-btn" data-acao="telao">Telão</button>
+  </div>`;
+}
+
+function linkDaSala() { return location.origin + location.pathname + '?sala=' + encodeURIComponent(P.codigo); }
+
+function telaProfessor() {
+  ceu('noite'); topo.hidden = true; topo.innerHTML = '';
+  if (!P.logado) {
+    app.innerHTML = `<div class="estreita"><section class="cartao capa-dia entra">
+      <p class="rotulo">Limiar Ético</p><h1>Módulo do professor</h1>
+      <p>Crie uma sala para a turma, acompanhe em tempo real quem está jogando, veja a revelação de cada aluno que enviou e a estatística da turma.</p>
+      <p id="erro-prof" class="erro" role="alert">${esc(P.erro)}</p>
+      <div class="acoes"><button class="btn principal" data-acao="prof-entrar">Entrar com a conta Google</button><button class="btn secundario" data-acao="prof-sair">Voltar à atividade</button></div>
+    </section></div>`;
+    foco(); return;
+  }
+  if (!P.codigo) {
+    app.innerHTML = `<div class="estreita"><section class="cartao capa-dia entra">
+      <p class="rotulo">Limiar Ético</p><h1>Criar sala</h1>
+      <p>Os alunos entram pelo código ou pelo link, escolhem o dia e jogam no próprio celular. Cada um decide se envia o resultado.</p>
+      <p id="erro-prof" class="erro" role="alert">${esc(P.erro)}</p>
+      <div class="acoes"><button class="btn principal" data-acao="prof-criar">Criar sala</button><button class="btn secundario" data-acao="prof-sair">Voltar à atividade</button></div>
+    </section></div>`;
+    foco(); return;
+  }
+  const envs = enviados();
+  const cab = `<section class="cartao capa-dia">
+    <p class="rotulo">Sala ao vivo</p>
+    <div class="codigo-sala">${esc(P.codigo)}</div>
+    <p class="suave pequeno">${P.alunos.length} na sala · ${envs.length} enviaram. Link: <span class="quebra">${esc(linkDaSala())}</span></p>
+    <div class="acoes linha"><button class="btn secundario pequeno-btn" data-acao="prof-qr">QR</button><button class="btn secundario pequeno-btn" data-acao="prof-copiar">Copiar link</button><button class="btn secundario pequeno-btn" data-acao="telao">Telão</button><button class="btn secundario pequeno-btn" data-acao="prof-encerrar">Encerrar sala</button></div>
+    <div class="abas prof-abas" role="tablist"><button class="aba" role="tab" data-acao="prof-vista" data-v="alunos" aria-selected="${P.vista === 'alunos'}">Alunos</button><button class="aba" role="tab" data-acao="prof-vista" data-v="turma" aria-selected="${P.vista === 'turma'}">Turma</button></div>
+  </section>`;
+  const corpo = P.vista === 'turma' ? htmlTurma() : cardsAlunos();
+  app.innerHTML = `<div class="prof-tela">${cab}${corpo}</div>`;
+}
+
+function cardsAlunos() {
+  const tel = document.body.classList.contains('telao');
+  if (!P.alunos.length) return `<section class="cartao"><p>Ninguém entrou ainda. Mostre o código ou o QR.</p></section>`;
+  return `<div class="alunos-grade">${[...P.alunos].sort(porNome).map(a => `<button class="btn card-aluno ${a.enviado ? 'enviou' : ''}" data-acao="prof-ver" data-id="${esc(a.id)}" ${a.enviado ? '' : 'disabled'}>
+    <span class="av">${esc(a.avatar || '👤')}</span><strong>${tel ? '' : esc(a.nome || 'Aluno')}</strong>
+    <span class="suave pequeno">${a.enviado ? 'Enviou · ' + esc(DIAS[a.dia]?.nome || '') : esc(a.status || 'Entrou') + (a.dia ? ` · ${esc(DIAS[a.dia]?.nome || '')} · ${Math.round(a.progresso || 0)}%` : '')}</span></button>`).join('')}</div>`;
+}
+
+function dadosDoDiaTurma() {
+  const contagem = Object.fromEntries(ORDEM_DIAS.map(k => [k, enviosDoDia(P.alunos, k).length]));
+  if (!P.diaTurma || !contagem[P.diaTurma]) P.diaTurma = ORDEM_DIAS.find(k => contagem[k] > 0) || ORDEM_DIAS[0];
+  return contagem;
+}
+
+function barraOpcao(texto, pct, n) {
+  const p = Math.round(pct * 100);
+  return `<div class="opt"><span class="opt-txt">${esc(texto)}</span><span class="opt-linha"><span class="opt-barra" aria-hidden="true"><i style="width:${Math.max(p, 1)}%"></i></span><b>${p}%</b><span class="suave pequeno">${n}</span></span></div>`;
+}
+const pc = v => Math.round(v * 100) + '%';
+
+function htmlTurma() {
+  const contagem = dadosDoDiaTurma(), DIA = DIAS[P.diaTurma];
+  const ag = agregar(P.alunos, DIA, P.diaTurma);
+  const abas = `<div class="abas prof-dias">${ORDEM_DIAS.map(k => `<button class="aba" data-acao="prof-dia" data-dia="${k}" aria-selected="${k === P.diaTurma}">${esc(DIAS[k].nome.replace('Um dia ', ''))} · ${contagem[k]}</button>`).join('')}</div>`;
+  if (!ag.liberado) return `${abas}<section class="cartao"><h2>A turma</h2><p>A visão da turma aparece com ${MIN_TURMA} ou mais envios do mesmo dia. Hoje há ${ag.n}. Isso protege quem respondeu: com poucos alunos, qualquer resposta se reconheceria.</p></section>`;
+  const visiveis = ag.cenas.filter(c => !c.oculta);
+  const pts = visiveis.map((c, i) => ({ n: i + 1, hora: c.hora, titulo: c.titulo, ...c.medias }));
+  const legenda = `<ol class="legenda-cenas pequeno suave">${visiveis.map(c => `<li>${esc(c.hora)} · ${esc(c.titulo)}</li>`).join('')}</ol>`;
+  const tot = ag.niveis.baixo + ag.niveis.medio + ag.niveis.alto || 1;
+  return `${abas}
+  <section class="cartao painel"><h2>A turma neste dia</h2>
+    <p><strong>${ag.n}</strong> alunos enviaram. Cada um viveu o dia com cenas sorteadas em níveis diferentes: ${pc(ag.niveis.baixo / tot)} baixo, ${pc(ag.niveis.medio / tot)} médio, ${pc(ag.niveis.alto / tot)} alto.</p>
+    ${ag.conferiu ? `<p>Quando havia informação para conferir, a turma abriu em <strong>${pc(ag.conferiu.abriram / ag.conferiu.podiam)}</strong> das vezes.</p>` : ''}
+    <ul class="limpa">${['razao', 'emocao', 'impulso'].map(s => `<li>${NOME[s]} · média ${pc(ag.medias[s])}</li>`).join('')}</ul>
+  </section>
+  <section class="cartao painel"><div class="bloco-grafico"><h3>Razão, emoção e impulso, em média</h3>
+    <p class="sub">Média da turma em cada cena (só cenas com ${MIN_TURMA} ou mais respostas).</p>
+    <div class="legenda">${['razao', 'emocao', 'impulso'].map(s => `<span><i style="background:${COR[s]}"></i>${NOME[s]}</span>`).join('')}</div>
+    ${graficoLinhas(pts, -1, false)}${legenda}</div></section>
+  <section class="cartao painel"><div class="bloco-grafico"><h3>O certo ou o desfecho, em média</h3>
+    <p class="sub">Acima, a turma se aproximou mais do dever ou do princípio. Abaixo, mais das consequências.</p>
+    ${graficoCertoDesfecho(pts, -1, false)}</div></section>
+  <section class="cartao painel"><div class="bloco-grafico"><h3>Margem de escolha, em média</h3>
+    <p class="sub">Barra baixa: pouca liberdade real naquele momento para a maioria.</p>
+    ${graficoMargem(pts, -1, false)}</div></section>
+  <section class="cartao painel"><div class="bloco-grafico"><h3>As lentes da turma</h3>
+    <p class="sub">Peso médio de cada corrente ética nas escolhas.</p>
+    ${graficoEscala(ag.escala)}</div></section>
+  <section class="cartao painel"><h3>Como a turma decidiu, cena a cena</h3>
+    <p class="suave pequeno">Percentual de alunos em cada alternativa; o número à direita é a quantidade.</p>
+    ${ag.cenas.map(c => c.oculta ? `<div class="cena-turma"><h4>${esc(c.hora)} · ${esc(c.titulo)}</h4><p class="suave pequeno">Menos de ${MIN_TURMA} respostas (${c.n}).</p></div>`
+      : `<div class="cena-turma"><h4>${esc(c.hora)} · ${esc(c.titulo)} <small class="suave">${c.n} respostas${c.tempoS != null ? ` · tempo mediano ${Math.round(c.tempoS)} s` : ''}</small></h4>${c.opcoes.map(o => barraOpcao(o.texto, o.pct, o.n)).join('')}</div>`).join('')}
+  </section>
+  ${ag.eixos.length ? `<section class="cartao painel"><h3>O que a turma pôs à prova, por competência</h3>
+    <p class="suave pequeno">Em cada competência ética, o quanto a turma pesou razão, emoção e impulso nas cenas que a exercitam.</p>
+    <ul class="limpa">${ag.eixos.map(e => `<li><strong>${esc(e.titulo)}</strong> <span class="suave pequeno">${e.cenas} cena(s)</span>
+      ${['razao', 'emocao', 'impulso'].map(s => `<div class="mini-linha"><span>${NOME[s]}</span><span class="opt-barra"><i style="width:${Math.max(1, Math.round(e[s] * 100))}%;--c:${COR[s]}"></i></span><b>${pc(e[s])}</b></div>`).join('')}</li>`).join('')}</ul></section>` : ''}
+  <section class="cartao painel"><h3>O que a turma escreveu na aba Aplicar</h3>
+    <p class="suave pequeno">Sem nome, para discutir em grupo.</p>
+    ${ag.aplicacoes.length ? `<ul class="citacoes">${ag.aplicacoes.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : '<p>Ninguém escreveu ainda.</p>'}
+  </section>
+  <section class="cartao"><div class="acoes"><button class="btn principal" data-acao="prof-salvar-turma">Salvar a visão da turma…</button></div></section>`;
+}
+
+function salvarTurma() {
+  abrirSalvar({ titulo: 'Salvar a visão da turma', cabecalho: DIAS[P.diaTurma].nome + ' · turma', arquivo: `limiar-etico-${P.diaTurma}-turma`, grupos: [{ nome: 'A turma', blocos: blocosDe(htmlTurma()) }] });
+}
+
+function redesenharProf() {
+  if (P.vista === 'aluno') telaRevelacao(); else telaProfessor();
+}
+
+async function profEntrar() {
+  try {
+    const api = await conectar();
+    const ok = await api.entrarProfessor();
+    if (!ok) { P.erro = 'Esta conta não tem acesso ao módulo do professor.'; P.logado = false; } else { P.logado = true; P.erro = ''; if (P.codigo) await ouvirSala(); }
+  } catch (e) { console.error(e); P.erro = 'Não foi possível entrar. Verifique a internet e tente de novo.'; }
+  telaProfessor();
+}
+async function ouvirSala() {
+  const api = await conectar();
+  if (P.unsub) P.unsub();
+  P.unsub = api.ouvirAlunos(P.codigo, lista => { P.alunos = lista; if (P.vista !== 'aluno') telaProfessor(); }, () => { P.erro = 'A conexão da sala foi interrompida.'; });
+}
+async function profCriar() {
+  try {
+    const api = await conectar();
+    P.codigo = gerarCodigo(); await api.criarSessao(P.codigo); gravarJSON('le_prof', P.codigo); P.alunos = []; P.vista = 'alunos';
+    await ouvirSala();
+  } catch (e) { console.error(e); P.codigo = ''; P.erro = 'Não consegui criar a sala. Verifique a internet e o acesso da conta.'; }
+  telaProfessor();
+}
+async function profEncerrar() {
+  if (!confirm('Encerrar esta sala? Os alunos não poderão mais entrar. Os envios já feitos somem desta tela.')) return;
+  const api = await conectar();
+  await api.encerrarSessao(P.codigo);
+  if (P.unsub) P.unsub();
+  P.unsub = null; P.codigo = ''; P.alunos = []; gravarJSON('le_prof', null); telaProfessor();
+}
+
+function abrirAluno(id) {
+  const a = P.alunos.find(x => x.id === id);
+  if (!a || !a.enviado || !a.dadosJson) return;
+  let dados, extras = {};
+  try { dados = JSON.parse(a.dadosJson); extras = a.extrasJson ? JSON.parse(a.extrasJson) : {}; } catch (e) { return; }
+  dia = a.dia; est = null;
+  retomadas = extras.registros ? { registros: extras.registros } : null;
+  for (const k of Object.keys(contestacoes)) delete contestacoes[k];
+  Object.assign(contestacoes, extras.contestacoes || {});
+  rev = { dados, aba: 'curvas', sel: 0, abertas: {}, respostaAplicacao: a.aplicacao || '', anima: true, estreia: true, professor: { id: a.id, nome: a.nome || 'Aluno', avatar: a.avatar || '👤' } };
+  P.vista = 'aluno'; P.selId = id;
+  telaRevelacao(); window.scrollTo({ top: 0 });
+}
+function saltar(delta) {
+  const lista = enviados(), i = lista.findIndex(a => a.id === P.selId);
+  const alvo = lista[i + delta];
+  if (alvo) abrirAluno(alvo.id);
+}
+
+/* ---------- Telão ---------- */
+const botaoSairTelao = document.createElement('button');
+botaoSairTelao.className = 'btn botao-sair-telao';
+botaoSairTelao.dataset.acao = 'telao';
+botaoSairTelao.textContent = 'Sair do telão';
+botaoSairTelao.hidden = true;
+document.body.appendChild(botaoSairTelao);
+function alternarTelao(forca) {
+  const on = forca ?? !document.body.classList.contains('telao');
+  document.body.classList.toggle('telao', on);
+  botaoSairTelao.hidden = !on;
+  if (on) document.documentElement.requestFullscreen?.().catch(() => {});
+  else if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
+  if (rev?.professor || P.codigo) redesenharProf();
+}
+document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement && document.body.classList.contains('telao')) alternarTelao(false); });
+document.addEventListener('keydown', e => {
+  if (P.vista !== 'aluno' || !rev?.professor || e.target.matches?.('input, textarea')) return;
+  if (e.key === 'ArrowRight') saltar(1);
+  else if (e.key === 'ArrowLeft') saltar(-1);
+});
 
 /* ---------- Manual (abre na entrada; reabre no "i") ---------- */
 let manualAberto = false;
@@ -685,6 +868,25 @@ function acao(alvo) {
     }
     return;
   }
+  if (a === 'tela-sala') { telaEntrarSala(); return; }
+  if (a === 'emoji') { emojiEscolhido = alvo.dataset.e; document.querySelectorAll('.emojis .emoji').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.e === emojiEscolhido))); return; }
+  if (a === 'entrar-sala') { entrarSala(); return; }
+  if (a === 'sair-sala') { sairDaSala(); return; }
+  if (a === 'abrir-salvar') { abrirSalvarRevelacao(); return; }
+  if (a === 'prof-entrar') { profEntrar(); return; }
+  if (a === 'prof-sair') { location.href = location.pathname; return; }
+  if (a === 'prof-criar') { profCriar(); return; }
+  if (a === 'prof-encerrar') { profEncerrar(); return; }
+  if (a === 'prof-copiar') { navigator.clipboard?.writeText(linkDaSala()); return; }
+  if (a === 'prof-qr') { window.open('https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=10&data=' + encodeURIComponent(linkDaSala()), '_blank', 'noopener'); return; }
+  if (a === 'prof-vista') { P.vista = alvo.dataset.v; telaProfessor(); return; }
+  if (a === 'prof-dia') { P.diaTurma = alvo.dataset.dia; telaProfessor(); return; }
+  if (a === 'prof-ver') { abrirAluno(alvo.dataset.id); return; }
+  if (a === 'prof-voltar') { P.vista = 'alunos'; rev = null; telaProfessor(); return; }
+  if (a === 'prof-ant') { saltar(-1); return; }
+  if (a === 'prof-prox') { saltar(1); return; }
+  if (a === 'prof-salvar-turma') { salvarTurma(); return; }
+  if (a === 'telao') { alternarTelao(); return; }
   if (a === 'abrir-manual') { abrirManual(); return; }
   if (a === 'fechar-manual') { fecharManual(); return; }
   if (a === 'comecar' || a === 'recomecar') {
@@ -741,6 +943,9 @@ document.addEventListener('keydown', e => {
 });
 
 // Link direto para um dia: ?dia=escola ou ?dia=bairro (útil para QR code e palestras).
-const diaDoLink = new URLSearchParams(location.search).get('dia');
-if (diaDoLink && DIAS[diaDoLink]) { dia = diaDoLink; telaAbertura(); } else telaEscolhaDia();
-abrirManual();
+const params = new URLSearchParams(location.search);
+const diaDoLink = params.get('dia');
+if (params.has('professor')) telaProfessor();
+else if (params.get('sala')) { telaEntrarSala(limparCodigo(params.get('sala'))); abrirManual(); }
+else if (diaDoLink && DIAS[diaDoLink]) { dia = diaDoLink; telaAbertura(); abrirManual(); }
+else { telaEscolhaDia(); abrirManual(); }

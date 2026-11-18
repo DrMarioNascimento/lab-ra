@@ -577,3 +577,84 @@ details.conceito.mini { margin-top: 6px; }
 .topo-linha { padding-right: 40px; }
 .abas { grid-template-columns: repeat(4, minmax(0, 1fr)) 34px; }
 @media (min-width: 700px) { .abas { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+/* ---------- Sala, professor, salvar e telão (v1.6) ---------- */
+.campo { display: block; width: 100%; font: inherit; padding: 12px 14px; margin: 6px 0 14px; border-radius: 14px; border: 2px solid #cdbf9b; background: #fffdf6; box-shadow: inset 0 2px 4px #5a410b22; }
+.campo:focus-visible { outline: 3px solid #3a6fd8; outline-offset: 2px; }
+.erro { color: #a0281b; min-height: 1.4em; margin: 0 0 6px; }
+.link { background: none; border: 0; padding: 0; font: inherit; color: inherit; text-decoration: underline; cursor: pointer; }
+.sala-aviso { margin-top: 14px; }
+.emojis { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin: 6px 0 12px; }
+.emojis .btn.emoji { margin: 0; padding: 8px 0; font-size: 1.35rem; line-height: 1.2; min-height: 0; }
+.emojis .btn.emoji[aria-pressed="true"] { outline: 3px solid #3a6fd8; outline-offset: 1px; }
+.pequeno-btn { min-height: 0; padding: 8px 14px; font-size: .92rem; margin: 0 !important; }
+.prof-barra { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; max-width: 640px; margin: 0 auto 8px; padding-right: 40px; }
+.prof-quem { font-weight: 700; color: #fff; min-width: 120px; text-align: center; }
+.prof-quem small { font-weight: 500; opacity: .8; }
+.prof-tela { width: min(100%, 980px); margin: 0 auto; display: grid; gap: 18px; padding: 0 12px 24px; }
+.codigo-sala { text-align: center; font: 700 clamp(2.2rem, 9vw, 3.6rem) var(--texto); letter-spacing: .12em; color: #164643; background: #fffef9; border: 2px dashed #d3a14b; border-radius: 14px; padding: 10px; margin: 10px 0; }
+.quebra { overflow-wrap: anywhere; }
+.prof-abas, .prof-dias { margin-top: 14px; }
+.prof-dias { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); max-width: none; margin: 0 0 4px; }
+.alunos-grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+.card-aluno { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; padding: 14px 10px; margin: 0 !important; }
+.card-aluno .av { font-size: 2.1rem; line-height: 1; }
+.card-aluno.enviou { background: linear-gradient(#eaf7ee, #cfe9d7); }
+.card-aluno:disabled { opacity: .75; }
+.legenda-cenas { columns: 2; margin: 6px 0 0; padding-left: 22px; }
+.cena-turma { margin: 16px 0 6px; padding-top: 12px; border-top: 1px solid #e5dbc2; }
+.cena-turma h4 { margin: 0 0 8px; font-size: 1rem; }
+.opt { margin: 8px 0; }
+.opt-txt { display: block; font-size: .95rem; margin-bottom: 4px; }
+.opt-linha { display: flex; align-items: center; gap: 10px; }
+.opt-barra { flex: 1; display: block; height: 16px; border-radius: 8px; background: #e6dfcd; box-shadow: inset 0 2px 3px #3b2e0a33; }
+.opt-barra i { display: block; height: 100%; border-radius: 8px; background: linear-gradient(#5a9cf0 0%, #2a78d6 45%, #1a4f95 100%); box-shadow: 0 2px 0 #15407a, 0 4px 5px #15407a55, inset 0 1px 0 #ffffff88; }
+.mini-linha { display: flex; align-items: center; gap: 8px; font-size: .88rem; margin: 3px 0; }
+.mini-linha > span:first-child { width: 64px; }
+.mini-linha .opt-barra { height: 10px; }
+.mini-linha .opt-barra i { background: var(--c, #2a78d6); box-shadow: 0 2px 0 #0003, inset 0 1px 0 #fff7; }
+.citacoes { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 10px; }
+.citacoes li { background: #fff7de; border-left: 4px solid #d3a14b; border-radius: 10px; padding: 10px 14px; white-space: pre-wrap; }
+.resposta-folha { white-space: pre-wrap; background: #fff7de; border-left: 4px solid #d3a14b; border-radius: 10px; padding: 10px 14px; margin: 8px 0; }
+
+/* janela Salvar */
+.salvar { max-width: 560px; }
+.salvar-lista { max-height: 46vh; overflow-y: auto; display: grid; gap: 10px; margin: 8px 0 12px; padding-right: 4px; }
+.salvar-grupo { border: 1px solid #dccfae; border-radius: 12px; padding: 6px 12px 10px; margin: 0; }
+.salvar-grupo legend { padding: 0 6px; }
+.salvar-item { display: block; padding: 6px 0 6px 10px; font-size: .95rem; }
+.salvar input[type="checkbox"] { width: 20px; height: 20px; vertical-align: -4px; margin-right: 6px; accent-color: #205b58; }
+.salvar-formato { display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: center; margin-bottom: 6px; }
+
+/* folha de impressão e de imagem */
+.folha { position: fixed; left: -10000px; top: 0; width: 720px; padding: 24px; background: #fffaf0; color: var(--tinta); font-family: var(--texto); }
+.folha-topo { display: flex; justify-content: space-between; gap: 12px; border-bottom: 2px solid #d3a14b; padding-bottom: 8px; margin-bottom: 16px; font-size: .95rem; }
+.folha .cartao { box-shadow: none !important; border: 1px solid #e0d3b3; margin: 0 0 16px; animation: none !important; transform: none !important; break-inside: avoid; }
+.folha svg.grafico { max-width: 100%; }
+.folha * { animation: none !important; }
+@media print {
+  body.imprimindo > *:not(#folha) { display: none !important; }
+  body.imprimindo { background: #fff !important; display: block; min-height: 0; }
+  body.imprimindo #folha { position: static; width: auto; padding: 0; background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body.imprimindo .ceu { display: none !important; }
+}
+
+/* telão: letra maior, largura aberta, tela cheia */
+body.telao { font-size: 24px; }
+body.telao .estreita { max-width: 1100px; }
+body.telao svg.grafico { max-width: 1000px; }
+body.telao .prof-tela { width: min(100%, 1500px); }
+body.telao .botao-i, body.telao .rodape { display: none; }
+body.telao .alunos-grade { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+.botao-sair-telao { position: fixed; right: 14px; bottom: 14px; z-index: 30; min-height: 0; padding: 8px 14px; margin: 0 !important; font-size: .9rem; opacity: .75; }
+.botao-sair-telao:hover { opacity: 1; }
+.botao-sair-telao[hidden] { display: none; }
+.acoes.linha { display: flex; flex-wrap: wrap; gap: 10px; }
+.acoes.linha .btn { flex: 1 1 120px; }
+.prof-abas { grid-template-columns: 1fr 1fr; max-width: none; padding-right: 0; }
+.prof-dias { padding-right: 0; }
+.legenda-cenas { columns: 1; }
+.folha .cartao, .folha .bloco-grafico { display: block; break-inside: avoid; page-break-inside: avoid; }
+.folha .revela-topo, .folha .estreita { display: block; max-width: none; }
+.folha, .folha * { box-shadow: none !important; }
+.folha .bloco-grafico, .folha .painel { background: transparent !important; }

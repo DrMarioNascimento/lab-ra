@@ -7,7 +7,7 @@ export const MANUAL = {
     ['Nada de resposta pintada de verde.', 'Cada escolha protege alguma coisa e deixa outra de fora. O dia seguinte mostra o que ela causou.'],
     ['Conferir custa tempo.', 'Em alguns momentos há um botão para olhar mais um dado antes de decidir. Às vezes a janela para isso é curta.'],
     ['No fim, a revelação.', 'Você vê o seu dia em curvas e em conceitos de ética: o que protegeu, o que sacrificou e o que pesou em cada decisão.'],
-    ['Só entre você e a tela.', 'Nada do que você responde é enviado nem guardado. Pode ser sincero.']
+    ['A decisão é sua.', 'Nada é enviado nem guardado, a menos que você entre numa sala e escolha enviar no fim. Pode ser sincero.']
   ],
   botao: 'Entendi'
 };

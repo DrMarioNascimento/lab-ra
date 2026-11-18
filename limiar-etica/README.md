@@ -12,3 +12,5 @@
 ## Código e testes
 
 Vanilla HTML/JS/CSS, sem compilação. A partir de `limiar-etica/um-dia/`: `node testes/motor.test.mjs`, `balizamento.test.mjs`, `niveis.test.mjs` e `programa.test.mjs`. O protótipo original de cinco situações (15/11/2026) está arquivado em `alostase-arquivos/limiar-etica-fontes-atuais.zip`. Versões antigas de qualquer arquivo ficam no histórico do Git.
+
+- `docs/SALA-ao-vivo-v0.1.md`: sala ao vivo, envio opcional do aluno, módulo do professor, telão e estatística da turma (v1.6).
