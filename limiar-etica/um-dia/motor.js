@@ -1,9 +1,13 @@
 // Limiar Ético · Um dia — motor do dia (sem interface).
-import { CENAS, CENA_FINAL, CENA_NEGADA, ORDEM_PENDENCIAS, VOLTAS, CORRENTES, CONDICOES, COND_CENAS, NIVEIS, CONTEXTOS, VALORES } from './dados.js?v=1.0';
+import { CENA_FINAL, CENA_NEGADA, ORDEM_PENDENCIAS, VOLTAS, CORRENTES, CONDICOES, COND_CENAS, NIVEIS } from './dados.js?v=1.1';
+import { DIAS } from './dias.js?v=1.1';
+
+const diaDe = est => DIAS[est.dia];
 
 // Sorteio equilibrado dos níveis: em dez cenas, três de cada nível mais uma a mais num nível sorteado,
 // embaralhadas, com no máximo duas cenas de alto estresse seguidas.
-export function sortearNiveis(sortear = Math.random) {
+export function sortearNiveis(sortear = Math.random, dia = 'empresa') {
+  const { CENAS, CONTEXTOS } = DIAS[dia];
   const ids = CENAS.filter(c => CONTEXTOS[c.id]).map(c => c.id);
   const base = Math.floor(ids.length / NIVEIS.length);
   const lista = NIVEIS.flatMap(n => Array(base).fill(n));
@@ -16,10 +20,12 @@ export function sortearNiveis(sortear = Math.random) {
   return Object.fromEntries(ids.map((id, i) => [id, lista[i]]));
 }
 
-export function novoEstado(niveis) {
+export function novoEstado(niveis, dia = 'empresa') {
+  const D = DIAS[dia];
   return {
-    niveis: niveis || Object.fromEntries(CENAS.filter(c => CONTEXTOS[c.id]).map(c => [c.id, 'medio'])),
-    fila: CENAS.map(c => c.id).concat('volta'),
+    dia,
+    niveis: niveis || Object.fromEntries(D.CENAS.filter(c => D.CONTEXTOS[c.id]).map(c => [c.id, 'medio'])),
+    fila: D.CENAS.map(c => c.id).concat(D.completo ? ['volta'] : []),
     pos: 0,
     conf: { chefia: 0, equipe: 0, grupo: 0, cliente: 0 },
     familia: null,
@@ -39,6 +45,7 @@ export function pendenciaPrincipal(est) {
 export function cenaAtual(est) {
   const id = est.fila[est.pos];
   if (id === undefined) return null;
+  const { CENAS, CONTEXTOS } = diaDe(est);
   if (id === 'negada') return CENA_NEGADA;
   if (id === 'volta') return { ...CENA_FINAL, texto: VOLTAS[pendenciaPrincipal(est)] };
   const cena = CENAS.find(c => c.id === id);
@@ -53,7 +60,7 @@ export function totalCenas(est) { return est.fila.length; }
 // Devolve os segundos em que a informação fica disponível (Infinity = sempre).
 export function janelaInfo(est, cena) {
   if (!cena || !cena.info) return 0;
-  const noite = ['fotos', 'interprete'].includes(cena.id);
+  const noite = diaDe(est).completo && ['fotos', 'interprete'].includes(cena.id);
   if (!noite) return Infinity;
   if (est.cansaco >= 3) return 0;
   if (est.cansaco === 2) return 15;
@@ -79,7 +86,7 @@ export function decidir(est, indiceOpcao, sinais = {}) {
   let desfecho = op.d;
   aplicar(est, op.ef);
 
-  if (op.pedeChefia) {
+  if (diaDe(est).completo && op.pedeChefia) {
     if (est.conf.chefia >= 1) {
       aplicar(est, { familia: 'atendido', evento: -1 });
       desfecho = 'A chefia olha o relógio e libera: “Volta antes da abertura.” Você acompanha a consulta e chega de volta às 19h25, com o evento começando.';
@@ -89,7 +96,7 @@ export function decidir(est, indiceOpcao, sinais = {}) {
     }
   }
 
-  if (cena.id === 'interprete' && indiceOpcao === 1 && est.conf.equipe >= 2) {
+  if (diaDe(est).completo && cena.id === 'interprete' && indiceOpcao === 1 && est.conf.equipe >= 2) {
     est.evento += 1;
     desfecho = 'Uma colega da equipe ajuda a preparar as legendas e a distribuir os roteiros. O material fica disponível mais cedo. A medida ajuda parte da plateia, e a ausência de Libras continua sem reparo. No fim, a chefia diz que preferia ter sido avisada antes.';
   }
@@ -127,9 +134,10 @@ function textoFamilia(f) {
 
 // Tudo o que a revelação final precisa.
 export function resumo(est) {
+  const { VALORES } = diaDe(est);
   const pontos = est.log.map((l, n) => ({
     n: n + 1, hora: l.hora, titulo: l.titulo, cenaId: l.cenaId,
-    cond: COND_CENAS[l.cenaId] || [],
+    cond: diaDe(est).completo ? (COND_CENAS[l.cenaId] || []) : [],
     nivel: l.nivel,
     prot: (VALORES[l.cenaId]?.[l.indice]?.p) || [], sac: (VALORES[l.cenaId]?.[l.indice]?.s) || [],
     virtude: l.opcao.cor.V || 0,
@@ -160,11 +168,12 @@ export function resumo(est) {
     medias: { impulso: media('impulso'), emocao: media('emocao'), razao: media('razao') },
     conferiu: comInfo.filter(p => p.abriuInfo).length,
     podiaConferir: comInfo.length,
-    metas: {
+    metas: diaDe(est).completo ? {
       evento: textoEvento(est.evento),
       trabalho: textoTrabalho(est.trabalho),
       familia: textoFamilia(est.familia)
-    },
+    } : null,
+    dia: est.dia,
     pendencias: est.pend.slice(),
     adiou: est.adiou
   };

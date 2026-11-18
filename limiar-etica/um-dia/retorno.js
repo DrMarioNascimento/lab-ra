@@ -2,8 +2,8 @@
 // Funções puras: recebem os pontos do resumo e devolvem frases em conceitos éticos.
 // O nível é o da situação na história, e não o que a pessoa sentiu. As cenas mudam de um nível para outro,
 // então as frases descrevem o que aconteceu neste percurso e convidam à discussão; não são diagnóstico.
-import { NIVEIS, NOME_NIVEL } from './dados.js?v=1.0';
-import { CONCEITOS_DA_LEITURA } from './glossario.js?v=1.0';
+import { NIVEIS, NOME_NIVEL } from './dados.js?v=1.1';
+import { CONCEITOS_DA_LEITURA } from './glossario.js?v=1.1';
 
 const media = (lista, f) => lista.length ? lista.reduce((s, x) => s + f(x), 0) / lista.length : null;
 const plural = (n, um, varios) => `${n} ${n === 1 ? um : varios}`;
@@ -16,7 +16,8 @@ export function agruparPorNivel(pontos) {
 
 function contar(grupo, aplica) { return grupo.filter(aplica).length; }
 
-export function gerarRetorno(pontos) {
+export function gerarRetorno(pontos, opcoes = {}) {
+  const instituicao = opcoes.instituicao || 'a empresa';
   const g = agruparPorNivel(pontos);
   const alto = g.alto, baixo = g.baixo;
   const temComparacao = alto.length >= 2 && baixo.length >= 2;
@@ -54,11 +55,11 @@ export function gerarRetorno(pontos) {
     if (k) achados.push({ id: `meta-colegas-${n}`, titulo: 'Meta pessoal e coleguismo', texto: `Em ${plural(k, 'cena', 'cenas')} de ${NOME_NIVEL[n]}, você deixou o coleguismo em segundo plano para proteger uma meta pessoal.` });
   }
 
-  // 4. Justiça e equidade sem perder a empresa ou o curso
+  // 4. Justiça e equidade sem perder a empresa, o curso, a escola ou o projeto
   for (const n of ['alto', 'baixo', 'medio']) {
-    const k = g[n].filter(p => p.prot.includes('justica') && ((p.prot.includes('empresa') && !p.sac.includes('empresa')) || (p.prot.includes('curso') && !p.sac.includes('curso'))));
+    const k = g[n].filter(p => p.prot.includes('justica') && (['empresa', 'instituicao'].some(c => p.prot.includes(c) && !p.sac.includes(c)) || (p.prot.includes('curso') && !p.sac.includes('curso'))));
     if (k.length) {
-      const o = k.some(p => p.prot.includes('empresa')) ? 'a empresa' : 'o curso';
+      const o = k.some(p => p.prot.includes('instituicao')) ? instituicao : k.some(p => p.prot.includes('empresa')) ? 'a empresa' : 'o curso';
       achados.push({ id: `justica-${n}`, titulo: 'Justiça e equidade', texto: `Em ${plural(k.length, 'cena', 'cenas')} de ${NOME_NIVEL[n]}, você agiu com justiça e equidade e ainda preservou ${o}.` });
     }
   }

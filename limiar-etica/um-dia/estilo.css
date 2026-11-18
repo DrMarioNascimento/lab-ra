@@ -555,7 +555,8 @@ ul.limpa li::marker { color: var(--sol-base); }
 /* v1.0 · retorno por nível de estresse da situação */
 .niveis { display: grid; gap: 8px; margin: 12px 0; }
 .nivel { display: grid; gap: 2px; padding: 10px 12px; border-radius: 12px; background: #f1ecf9; box-shadow: inset 0 2px 3px #2b21502e; font-size: .95em; }
-.nivel strong { text-transform: capitalize; }
+.nivel strong { text-transform: none; }
+.nivel strong::first-letter { text-transform: uppercase; }
 .nivel-baixo { border-left: 6px solid #4f9d7a; }
 .nivel-medio { border-left: 6px solid #c9a227; }
 .nivel-alto { border-left: 6px solid #b5483c; }

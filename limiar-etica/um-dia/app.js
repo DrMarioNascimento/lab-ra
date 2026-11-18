@@ -1,10 +1,11 @@
 // Limiar Ético · Um dia — interface.
-import { ABERTURA, SINTESE, MOTIVOS, APLICACAO, VERSAO, CENAS, CONDICOES, BASE_ESTRESSE, NOME_NIVEL } from './dados.js?v=1.0';
-import { GLOSSARIO } from './glossario.js?v=1.0';
-import { gerarRetorno } from './retorno.js?v=1.0';
-import { novoEstado, sortearNiveis, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=1.0';
+import { SINTESE, MOTIVOS, VERSAO, CONDICOES, BASE_ESTRESSE, NOME_NIVEL } from './dados.js?v=1.1';
+import { DIAS, ORDEM_DIAS } from './dias.js?v=1.1';
+import { GLOSSARIO } from './glossario.js?v=1.1';
+import { gerarRetorno } from './retorno.js?v=1.1';
+import { novoEstado, sortearNiveis, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=1.1';
 
-import { PARES, EXIGENCIAS, prepararRodadas, cruzarRodadas } from './retomadas.js?v=1.0';
+import { PARES, EXIGENCIAS, prepararRodadas, cruzarRodadas } from './retomadas.js?v=1.1';
 
 const app = document.querySelector('#app');
 const topo = document.querySelector('#topo');
@@ -12,6 +13,8 @@ const COR = { razao: '#1558b2', emocao: '#a8441b', impulso: '#126e5e' };
 const NOME = { razao: 'Razão', emocao: 'Emoção', impulso: 'Impulso' };
 const COR_CERTO = '#6250d6', COR_DESFECHO = '#a86d0a';
 
+let dia = 'empresa';       // dia escolhido na entrada
+const D = () => DIAS[dia];
 let est = null;
 let retomadas = null;
 let visao = null;          // dados da cena em exibição
@@ -35,7 +38,7 @@ const PERIODO = { alvorada: 'Manhã cedo', manha: 'Manhã', tarde: 'Tarde', poen
 function arcoCapa() {
   const P0 = [16, 70], P1 = [160, -34], P2 = [304, 70];
   const em = t => [0, 1].map(k => (1 - t) ** 2 * P0[k] + 2 * (1 - t) * t * P1[k] + t ** 2 * P2[k]);
-  const horas = CENAS.map(c => c.hora).concat('23h00');
+  const horas = D().CENAS.map(c => c.hora).concat(D().completo ? ['23h00'] : []);
   const pontos = horas.map(h => em(Math.min(1, Math.max(0, (horaDecimal(h) - 6) / 18))));
   const [sx, sy] = pontos[0];
   return `<svg class="arco-capa" viewBox="0 0 320 96" aria-hidden="true">
@@ -45,6 +48,26 @@ function arcoCapa() {
     <circle class="halo" cx="${sx.toFixed(1)}" cy="${sy.toFixed(1)}" r="13"/><circle class="sol" cx="${sx.toFixed(1)}" cy="${sy.toFixed(1)}" r="7.5"/>
     <text x="16" y="90">manhã</text><text x="160" y="90" text-anchor="middle">tarde</text><text x="304" y="90" text-anchor="end">noite</text>
   </svg>`;
+}
+
+/* ---------- Escolha do dia ---------- */
+function telaEscolhaDia() {
+  ceu('alvorada');
+  topo.hidden = true;
+  topo.innerHTML = '';
+  app.innerHTML = `
+    <div class="estreita">
+      <section class="cartao capa-dia entra">
+        <p class="rotulo">Limiar Ético</p>
+        <h1>Qual dia você quer viver?</h1>
+        <p>Cada dia tem dez situações. Escolha com sinceridade o que você faria em cada uma. Ao final, você recebe um retorno em conceitos de ética.</p>
+        <div class="opcoes">
+          ${ORDEM_DIAS.map((k, n) => `<button class="btn entra" style="--n:${n + 1}" data-acao="dia" data-dia="${k}"><strong>${esc(DIAS[k].nome)}</strong><br><span class="suave pequeno">${esc(DIAS[k].resumo)}</span></button>`).join('')}
+        </div>
+      </section>
+      <p class="versao entra" style="--n:4">Versão ${esc(VERSAO)}</p>
+    </div>`;
+  foco();
 }
 
 /* ---------- Abertura ---------- */
@@ -57,10 +80,10 @@ function telaAbertura() {
       <section class="cartao capa-dia entra">
         <p class="rotulo">Limiar Ético</p>
         ${arcoCapa()}
-        <h1>${esc(ABERTURA.titulo)}</h1>
-        ${ABERTURA.texto.map(p => `<p>${esc(p)}</p>`).join('')}
+        <h1>${esc(D().ABERTURA.titulo)}</h1>
+        ${D().ABERTURA.texto.map(p => `<p>${esc(p)}</p>`).join('')}
         <p>Ao final, você poderá reconhecer padrões nas suas escolhas, comparar sua justificativa com as leituras do percurso e aplicar um conceito em outra situação. Se alguma situação pesar para você, pode só observar ou conversar com quem conduz a atividade. Reserve cerca de 30 minutos para a atividade. As respostas ficam nesta página e desaparecem ao fechá-la.</p>
-        <div class="acoes"><button class="btn principal" data-acao="comecar">Começar o dia</button></div>
+        <div class="acoes"><button class="btn principal" data-acao="comecar">Começar o dia</button><button class="btn secundario" data-acao="escolher-dia">Escolher outro dia</button></div>
       </section>
       <p class="versao entra" style="--n:2">Versão ${esc(VERSAO)}</p>
     </div>`;
@@ -321,11 +344,13 @@ function abaCurvas(E) {
     </section>
     <section class="cartao liso ${E}" style="--n:4">
       <h3>Como o dia terminou</h3>
-      <ul class="limpa">
+      ${r.metas
+        ? `<ul class="limpa">
         <li>${esc(r.metas.evento)}</li>
         <li>${esc(r.metas.trabalho)}</li>
         ${r.metas.familia ? `<li>${esc(r.metas.familia)}</li>` : ''}
-      </ul>
+      </ul>`
+        : `<p>${esc(D().FECHAMENTO)}</p>`}
     </section>`;
 }
 
@@ -451,7 +476,7 @@ function conceitosDe(a) {
 }
 
 function relatorioNiveis(E) {
-  const r = gerarRetorno(rev.dados.pontos);
+  const r = gerarRetorno(rev.dados.pontos, { instituicao: D().instituicao });
   return `<section class="cartao ${E}" style="--n:1">
     <h3>Nas situações de mais e de menos estresse</h3>
     <p class="suave pequeno">Cada cena do seu dia foi sorteada com um nível de estresse na história (baixo, médio ou alto). É o nível da situação, não o que você sentiu. As cenas mudam de um nível para outro, então use o que segue para conversar e discordar, não como veredito.</p>
@@ -484,8 +509,7 @@ function abaSintese(E) {
       <p class="suave pequeno" style="margin-top:12px">Compare os pesos das alternativas com os motivos que você relatou. Pense onde convergem e onde a mesma ação pode ter justificativas diferentes.</p>
     </section>
     ${relatorioNiveis(E)}
-    ${relatorioRepeticao(E)}
-    ${relatorioTensao(E)}
+    ${D().completo ? relatorioRepeticao(E) + relatorioTensao(E) : ''}
     <div class="par">
       <section class="cartao ${E}" style="--n:2">
         <h3>Sete perguntas para rever o dia</h3>
@@ -504,9 +528,9 @@ function abaSintese(E) {
       </section>
     </div>
     <div class="estreita">
-      <details class="conceito"><summary>${esc(BASE_ESTRESSE.titulo)}</summary><p>${esc(BASE_ESTRESSE.texto)}</p><ul class="limpa pequeno">${BASE_ESTRESSE.referencias.map(x => `<li>${esc(x)}</li>`).join('')}</ul></details>
+      ${D().completo ? `<details class="conceito"><summary>${esc(BASE_ESTRESSE.titulo)}</summary><p>${esc(BASE_ESTRESSE.texto)}</p><ul class="limpa pequeno">${BASE_ESTRESSE.referencias.map(x => `<li>${esc(x)}</li>`).join('')}</ul></details>` : ''}
       <p class="aviso">Simulação de aprendizagem. As leituras são interpretações para discutir em aula. Nada foi salvo.</p>
-      <div class="acoes"><button class="btn principal" data-acao="recomecar">Viver o dia de novo</button></div>
+      <div class="acoes"><button class="btn principal" data-acao="recomecar">Viver o dia de novo</button><button class="btn secundario" data-acao="escolher-dia">Escolher outro dia</button></div>
     </div>`;
 }
 
@@ -519,12 +543,12 @@ const INTRO = {
 
 function abaAplicar(E) {
   return `<div class="estreita"><section class="cartao ${E}" style="--n:1">
-    <h2>${esc(APLICACAO.titulo)}</h2>
-    <p>${esc(APLICACAO.situacao)}</p>
-    <label for="resposta-aplicacao"><strong>${esc(APLICACAO.pergunta)}</strong></label>
+    <h2>${esc(D().APLICACAO.titulo)}</h2>
+    <p>${esc(D().APLICACAO.situacao)}</p>
+    <label for="resposta-aplicacao"><strong>${esc(D().APLICACAO.pergunta)}</strong></label>
     <textarea id="resposta-aplicacao" rows="5" maxlength="2000" aria-describedby="aviso-aplicacao">${esc(rev.respostaAplicacao)}</textarea>
     <p id="aviso-aplicacao" class="suave pequeno">Reflexão opcional. O texto fica nesta página durante a atividade.</p>
-    <details class="conceito"><summary>Explorar o conceito depois de refletir</summary><p>${esc(APLICACAO.leitura)}</p></details>
+    <details class="conceito"><summary>Explorar o conceito depois de refletir</summary><p>${esc(D().APLICACAO.leitura)}</p></details>
   </section></div>`;
 }
 
@@ -567,10 +591,16 @@ function mantendoRolagem(f) {
 function acao(alvo) {
   const a = alvo.dataset.acao, i = Number(alvo.dataset.i);
   if (a === 'comecar' || a === 'recomecar') {
-    est = novoEstado(sortearNiveis()); rev = null; topo.innerHTML = '';
+    est = novoEstado(sortearNiveis(Math.random, dia), dia); rev = null; topo.innerHTML = '';
     for (const k of Object.keys(contestacoes)) delete contestacoes[k];
-    retomadas = { rodadas: prepararRodadas(), registros: [[], [], []], rodada: 0, pos: 0, consultou: false };
-    apresentarRetomada();
+    if (D().completo) {
+      retomadas = { rodadas: prepararRodadas(), registros: [[], [], []], rodada: 0, pos: 0, consultou: false };
+      apresentarRetomada();
+    } else telaCena();
+  } else if (a === 'dia') {
+    dia = alvo.dataset.dia; telaAbertura();
+  } else if (a === 'escolher-dia') {
+    telaEscolhaDia();
   } else if (a === 'consultar-retomada') {
     retomadas.consultou = true;
     telaRetomadas();
@@ -579,16 +609,22 @@ function acao(alvo) {
   else if (a === 'info') abrirInfo();
   else if (a === 'escolher') escolher(i);
   else if (a === 'seguir') {
-    if (est.log.length === 5 && retomadas.rodada === 0) {
+    if (D().completo && est.log.length === 5 && retomadas.rodada === 0) {
       retomadas.rodada = 1;
       retomadas.pos = 0;
       apresentarRetomada();
     } else telaCena();
   }
   else if (a === 'revelar') {
-    retomadas.rodada = 2;
-    retomadas.pos = 0;
-    apresentarRetomada();
+    if (D().completo) {
+      retomadas.rodada = 2;
+      retomadas.pos = 0;
+      apresentarRetomada();
+    } else {
+      rev = { dados: resumo(est), aba: 'curvas', sel: 0, abertas: {}, respostaAplicacao: '', anima: true, estreia: true };
+      telaRevelacao();
+      foco();
+    }
   }
   else if (a === 'aba') { rev.aba = alvo.dataset.aba; rev.anima = true; telaRevelacao(); foco(); }
   else if (a === 'sel') mantendoRolagem(() => { rev.sel = i; });
@@ -607,4 +643,6 @@ document.addEventListener('keydown', e => {
   if ((e.key === 'Enter' || e.key === ' ') && e.target.matches?.('.ponto-alvo')) { e.preventDefault(); acao(e.target); }
 });
 
-telaAbertura();
+// Link direto para um dia: ?dia=escola ou ?dia=bairro (útil para QR code e palestras).
+const diaDoLink = new URLSearchParams(location.search).get('dia');
+if (diaDoLink && DIAS[diaDoLink]) { dia = diaDoLink; telaAbertura(); } else telaEscolhaDia();

@@ -248,3 +248,18 @@ A PSS-10 também serve de régua interna do autor para estimar a carga de estres
 - **Etiquetas éticas.** Cada alternativa registra o que protege e o que sacrifica (profissional, colegas, meta, empresa, curso, família, vulneráveis, justiça, verdade).
 - **Retorno.** `retorno.js` compara as escolhas nas situações de mais e de menos estresse: mais emocional ou mais racional, coleguismo preservado ou sacrificado, meta pessoal sobre colegas, justiça com a empresa/curso preservados, ética profissional, virtudes, certo × desfecho. Cada leitura traz os verbetes do glossário (`um-dia/glossario.js`, copiado do glossário do Mosaico Vila Ética, baseado nos slides e no texto de apoio do professor), sem frases de rótulo sobre a pessoa.
 - **Testes.** `testes/niveis.test.mjs` (11 verificações), além de `motor` e `balizamento`.
+
+## 23. Versão 1.1: três dias jogáveis
+
+A tela inicial pergunta qual dia viver. Link direto: `um-dia/?dia=escola` ou `?dia=bairro` (útil para QR code e palestras). Nenhum texto do jogo usa os nomes dos cursos; os temas das histórias já indicam o público.
+
+| Dia | Situação | Fontes |
+|---|---|---|
+| Trabalho e faculdade | Evento à noite, trabalho em grupo, consulta da mãe. Dia completo, com retomadas e cenas condicionais. | PSS-10 (só como inspiração de temas) |
+| Um dia na escola | Estágio numa escola pública: turma sem professor, briga no futsal, ameaça com halter, gravação de relato, quadra com buraco, verba, convocação, lesão escondida, coleguismo, fotos. | Livro de estágio "Eu não estudei para isso!" (violência, infraestrutura e materiais, jogos escolares), com nomes trocados; textos de apoio |
+| Um dia no projeto do bairro | Iniciação esportiva em comunidade, com a violência do entorno como fio condutor: estouros na rua, quem busca a criança, criança com dor, torneio, briga e ameaça, favor de morador influente, convite de um grupo, imagens, plano de treino, relato de violência em casa. | Textos de apoio; livro de ética e bioética do CONFEF (2006); Código de Ética do CONFEF |
+
+- Os dois dias novos são simples (10 cenas, sem retomadas, "volta" nem "negada"), com o mesmo sorteio por nível e o mesmo retorno. A pessoa jogadora é estagiária ou estagiário (suposição; confirmar).
+- Novas etiquetas: `instituicao` (a escola ou o projeto) e `confianca` (a de quem se abriu com a pessoa). O retorno de justiça diz "preservou a escola" ou "preservou o projeto".
+- Arquivos: `dias.js` (registro), `dia-escola.js`, `dia-bairro.js`. Testes: `testes/niveis.test.mjs` percorre os três dias (25 verificações).
+- Pendente: notas de balizamento por nível para os dois dias novos; revisão do professor das etiquetas e dos desfechos; leitura dos capítulos do livro de ética profissional para novos verbetes.
