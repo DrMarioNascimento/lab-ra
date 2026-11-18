@@ -1,11 +1,12 @@
 // Limiar Ético · Um dia — interface.
-import { SINTESE, MOTIVOS, VERSAO, CONDICOES, BASE_ESTRESSE, NOME_NIVEL } from './dados.js?v=1.1';
-import { DIAS, ORDEM_DIAS } from './dias.js?v=1.1';
-import { GLOSSARIO } from './glossario.js?v=1.1';
-import { gerarRetorno } from './retorno.js?v=1.1';
-import { novoEstado, sortearNiveis, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=1.1';
+import { SINTESE, MOTIVOS, VERSAO, CONDICOES, BASE_ESTRESSE, NOME_NIVEL } from './dados.js?v=1.2';
+import { DIAS, ORDEM_DIAS } from './dias.js?v=1.2';
+import { GLOSSARIO } from './glossario.js?v=1.2';
+import { gerarRetorno } from './retorno.js?v=1.2';
+import { mapaDoDia } from './programa.js?v=1.2';
+import { novoEstado, sortearNiveis, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=1.2';
 
-import { PARES, EXIGENCIAS, prepararRodadas, cruzarRodadas } from './retomadas.js?v=1.1';
+import { PARES, EXIGENCIAS, prepararRodadas, cruzarRodadas } from './retomadas.js?v=1.2';
 
 const app = document.querySelector('#app');
 const topo = document.querySelector('#topo');
@@ -486,6 +487,18 @@ function relatorioNiveis(E) {
   </section>`;
 }
 
+function relatorioEixos(E) {
+  const mapa = mapaDoDia(dia, rev.dados.pontos);
+  if (!mapa.length) return '';
+  const verb = ids => ids.map(id => GLOSSARIO[id]).filter(Boolean);
+  return `<section class="cartao ${E}" style="--n:1">
+    <h3>O que o seu dia pôs à prova</h3>
+    <p class="suave pequeno">Cada cena exercita uma competência ética. Aqui estão as que apareceram no seu dia, com a pergunta para levar à discussão.</p>
+    <ul class="achados">${mapa.map(e => `<li><strong>${esc(e.titulo)}.</strong> ${esc(e.competencia)} <span class="suave">Cenas: ${e.cenas.map(esc).join(' · ')}.</span><br><em>${esc(e.pergunta)}</em>
+      <details class="conceito mini"><summary>Conceitos deste eixo</summary><ul class="limpa pequeno">${verb(e.verbetes).map(c => `<li><strong>${esc(c.termo)}${c.autor ? ` (${esc(c.autor)})` : ''}.</strong> ${esc(c.def)}</li>`).join('')}</ul></details></li>`).join('')}</ul>
+  </section>`;
+}
+
 function abaSintese(E) {
   const r = rev.dados;
   const motivos = MOTIVOS.map((texto, i) => ({
@@ -509,6 +522,7 @@ function abaSintese(E) {
       <p class="suave pequeno" style="margin-top:12px">Compare os pesos das alternativas com os motivos que você relatou. Pense onde convergem e onde a mesma ação pode ter justificativas diferentes.</p>
     </section>
     ${relatorioNiveis(E)}
+    ${relatorioEixos(E)}
     ${D().completo ? relatorioRepeticao(E) + relatorioTensao(E) : ''}
     <div class="par">
       <section class="cartao ${E}" style="--n:2">

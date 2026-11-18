@@ -1,0 +1,111 @@
+# Limiar Ético · Conteúdo programático v0.1 (2026-11-18)
+
+Documento de projeto. Não aparece para o aluno. O que o aluno vê é o card "O que o seu dia pôs à prova", no retorno, gerado a partir de `um-dia/programa.js`.
+
+## 1. Fontes e o que foi de fato lido
+
+| Fonte | Como entrou | Cobertura |
+|---|---|---|
+| Slides e textos do professor (UDESC/CEFID 2026/2; "Entre o impulso e a escolha"; "Ética do Profissional de Saúde"). | Base dos verbetes de conceito (principialismo, justiça e equidade, omissão, transferência, duplo efeito, imperícia/imprudência/negligência, limites de competência, salvaguardas, roteiro de deliberação). | Lidos nas sessões anteriores. |
+| *Ética Profissional em Educação Física* (CONFEF, 2004). | Ética profissional, honestidade, competência, zelo, sigilo, legal × ético, Kohlberg, códigos. | Lidos por trechos: abertura de 19 capítulos (Santin, Beresford, Drumond, Santos, Da Costa, Tojal, Reppold, Caminha, Vargas, Puga, Martins, Lima e Silva, Habermas/Kohlberg, Almeida, Costa, Gomes, Borges, Montenegro), o capítulo de Kohlberg e a parte de virtudes básicas. **Não foi lido palavra por palavra.** |
+| *A Ética e a Bioética na Preparação e na Intervenção do Profissional de EF* (CONFEF, 2006). | Coleguismo e complacência com o mal. | Lido por capítulos selecionados (ver sessões anteriores). Os demais capítulos ficam para uma segunda leitura. |
+| *Violência na Escola* (CREF4/SP, 2019, livro de estágio). | Temas das cenas da escola e do bairro (violência, infraestrutura, jogos escolares); verbetes violência na escola, bullying, rede de proteção. | Lido por trechos. |
+| ASBH, História (asbh.org/about/history). | Contexto: a ASBH nasceu em janeiro de 1998 da fusão de três associações (SHHV, SBC e AAB). | A página traz só a história. **A lista de competências essenciais (HEC-C) não estava nela e não foi lida.** Nenhuma competência do programa foi atribuída à ASBH. |
+| Ethicsglobal, riscos psicossociais no trabalho. | Régua interna: três fatores citados (ambiente rígido com pouco espaço de recuperação; exigências impossíveis; assédio/mobbing). | Lido integralmente (texto curto). |
+| NOM-035-STPS-2018 (gob.mx). | Régua interna: categorias de fatores de risco psicossocial. | **A página oficial não abriu.** As categorias abaixo vêm do que conheço da norma e de fontes secundárias, e devem ser conferidas no texto oficial antes de qualquer citação. |
+| AAPOR, definições padrão. | Não usada. Só serviria se a atividade for avaliada por questionário (taxas de resposta, elegibilidade). | **Não lida.** Os PDFs e a planilha na pasta ficaram intocados. |
+
+## 2. Objetivo geral
+
+Levar o aluno a perceber que uma decisão profissional é, ao mesmo tempo, uma escolha entre valores (colegas, instituição, quem é vulnerável, a própria meta), e que a situação em que ela é tomada (frequência, urgência, acúmulo) muda o que parece possível. O retorno nomeia o que a escolha protegeu e o que sacrificou, em conceitos do glossário.
+
+## 3. Oito eixos de competência
+
+Cada eixo tem uma competência (o que o aluno deve conseguir fazer), uma pergunta para a discussão e verbetes do glossário.
+
+| Eixo | Competência | Base teórica principal |
+|---|---|---|
+| 1. Veracidade e integridade profissional | Dizer o que é, assumir o erro, não maquiar dados. | Honestidade, competência e zelo como virtudes básicas (Sá; Motta; Lima e Silva, in CONFEF 2004); veracidade e justo meio (virtudes, Aristóteles). |
+| 2. Coleguismo e complacência | Apoiar sem acobertar; não desmerecer o ausente. | "Ética do coleguismo" e complacência com o mal (CONFEF 2006). |
+| 3. Justiça e equidade | Critério explicável a todos na distribuição de recursos e vagas. | Rawls (véu da ignorância), justiça distributiva, equidade (materiais do professor); utilitarismo como contraponto. |
+| 4. Cuidado e proteção de quem é vulnerável | Perceber o risco, não causar dano, acionar salvaguardas e rede. | Beneficência e não maleficência (principialismo), ética do cuidado, dever de vigilância, rede de proteção (livro de estágio). |
+| 5. Responsabilidade: agir, omitir, transferir | Saber que omitir também é decidir; encaminhar sem abandonar. | Ação, omissão, transferência, imprudência/negligência/imperícia (materiais do professor); responsabilizar-se por faltas (Código CONFEF). |
+| 6. Privacidade, consentimento e sigilo | Autorização para imagem e informação; sigilo e seu limite. | Sigilo profissional (Código CONFEF; Sá; Motta), autonomia da pessoa. *O limite do sigilo diante de risco é enquadramento nosso, não está nos livros.* |
+| 7. Papel, competência e norma | Limites da formação e do cargo; legal × ético × costume. | Limites de competência, ética profissional (Tojal, Da Costa, Beresford), legal e ético (Beresford), código (Reppold). |
+| 8. Razão, emoção e liberdade situada | Decidir sob pressão e entre lealdades. | Razão e afetos (Platão, Hume), intenção e motivo, liberdade situada, dever × consequências (Kant, utilitarismo); níveis de julgamento moral de Kohlberg. |
+
+## 4. Mapa dia × cena × eixo
+
+O eixo principal vem primeiro. A coluna "Fator" é da régua interna de estresse (ver seção 5) e nunca aparece ao aluno.
+
+### Dia da empresa (cotidiano de trabalho e faculdade)
+| Cena | Eixos | Fator da régua |
+|---|---|---|
+| A mensagem | veracidade, decisão | prazo e liderança |
+| O nome no trabalho | coleguismo, veracidade | relações |
+| O número redondo | veracidade, coleguismo | cultura e liderança |
+| Até que horas | decisão | carga, jornada |
+| A troca | cuidado, decisão | relações, atendimento ao público |
+| A verba | justiça, cuidado | falta de controle |
+| A figurinha | responsabilidade, coleguismo | relações (assédio) |
+| A ligação | decisão | trabalho × família |
+| As fotos | privacidade, cuidado | liderança, carga |
+| O que deu errado | veracidade, cuidado | carga, falta de controle |
+
+### Dia da escola
+| Cena | Eixos | Fator da régua |
+|---|---|---|
+| A turma sem professor | papel, cuidado | carga, falta de controle |
+| O gol e a linha | responsabilidade, cuidado | violência |
+| O halter | cuidado, privacidade | violência |
+| A gravação | privacidade, cuidado | violência |
+| A quadra | cuidado, responsabilidade | condições do ambiente |
+| A verba | justiça | falta de controle |
+| A convocação | justiça | carga, relações |
+| O joelho | responsabilidade, coleguismo | liderança (pressão por resultado) |
+| O antecessor | coleguismo, veracidade | relações |
+| As fotos | privacidade | liderança |
+
+### Dia do projeto do bairro (violência como fio)
+| Cena | Eixos | Fator da régua |
+|---|---|---|
+| O barulho | cuidado, responsabilidade | violência |
+| Quem busca | cuidado, papel | violência |
+| O cansaço | papel, cuidado | carga, liderança |
+| O torneio | justiça | relações |
+| A briga | responsabilidade, papel | violência |
+| O favor | justiça, veracidade | liderança, relações |
+| O convite | cuidado, papel | violência |
+| As imagens | privacidade, cuidado | violência |
+| O plano de treino | coleguismo, veracidade | relações |
+| O relato | privacidade, cuidado, papel | violência |
+
+Cobertura (verificada por teste): todos os eixos têm pelo menos duas cenas principais; cada dia cobre pelo menos cinco eixos; o bairro tem eixo de cuidado, responsabilidade ou papel em pelo menos sete das dez cenas.
+
+## 5. Régua interna de estresse e fatores de risco psicossocial
+
+A régua (PSS-10 como inspiração, só do autor, não calculada nem mostrada ao aluno) é lida junto com as categorias de fatores de risco psicossocial da NOM-035, para que os três níveis de cada cena variem em dimensões reconhecidas: condições do ambiente; carga de trabalho; falta de controle sobre o trabalho; jornada e turnos; interferência trabalho-família; liderança e relações; violência. O Ethicsglobal cita três deles (ambiente rígido, exigências impossíveis, assédio). Esses fatores aparecem só nas frases de contexto (frequência, urgência, acúmulo), nunca como palavras de estresse.
+
+## 6. Progressão sugerida
+
+1. **Dia da empresa**: situações cotidianas e conhecidas; apresenta o modelo (escolha, o que protege, o que sacrifica).
+2. **Dia da escola**: o papel do professor em formação; institui limites de competência, sigilo e responsabilidade.
+3. **Dia do projeto do bairro**: violência presente; cuidado, salvaguardas e rede de proteção.
+
+Cada dia pode ser jogado sozinho (palestras, outras turmas) pelo link `?dia=empresa|escola|bairro`. Os nomes dos dias não usam bacharelado nem licenciatura.
+
+Passos de aprendizagem em cada sessão: reconhecer o dilema (jogar) → nomear o que cada escolha protege e sacrifica (retorno) → comparar entre níveis de situação (retorno) → justificar em voz alta (perguntas para argumentar) → relacionar com o código e com os autores (verbetes).
+
+## 7. O que muda no jogo com este programa (v1.2)
+
+- Novo módulo `um-dia/programa.js` (eixos, mapa cena → eixos, `mapaDoDia`).
+- Card "O que o seu dia pôs à prova" na aba de síntese, com competência, cenas, pergunta e conceitos de cada eixo.
+- Cinco verbetes novos (zelo, níveis de julgamento moral de Kohlberg, violência na escola, bullying, fair play); total 62.
+- Teste `testes/programa.test.mjs` (6 verificações).
+
+## 8. Pendências para o professor
+
+1. Conferir o mapa cena → eixo (seção 4) e a redação das competências.
+2. Autorizar a segunda leitura dos capítulos restantes do livro de 2006 e a leitura dos arquivos da AAPOR, se a atividade for avaliada por questionário.
+3. Buscar a lista de competências essenciais da ASBH (HEC-C) e o texto oficial da NOM-035 para fechar as lacunas da seção 1.
+4. Confirmar persona (estagiário(a) com supervisor) e o enquadramento do limite do sigilo.

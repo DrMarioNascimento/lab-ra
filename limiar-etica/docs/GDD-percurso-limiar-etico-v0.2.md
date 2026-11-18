@@ -265,3 +265,10 @@ A tela inicial pergunta qual dia viver. Link direto: `um-dia/?dia=escola` ou `?d
 - Balizamento interno dos dois dias novos feito (`um-dia/balizamento/cargas.mjs`, só de projeto). Achado: no dia do bairro, as cenas de violência (briga, relato, barulho) ficam em faixa alta ou limite mesmo no nível baixo, porque o conteúdo já é pesado. No retorno, o nível sorteado mistura a gravidade da cena com o contexto; por isso o texto do retorno fala em "neste percurso" e convida à discussão, sem veredito.
 - Glossário: 57 verbetes, incluindo sigilo profissional, honestidade, competência, responsabilizar-se por faltas, legal e ético e encaminhamento e rede de proteção (livro de ética profissional do CONFEF e livro de estágio do CREF4/SP).
 - Pendente: revisão do professor das etiquetas, dos desfechos e dos verbetes novos; ler os demais capítulos do livro de ética profissional e do livro de ética e bioética.
+
+## 24. v1.2 · Conteúdo programático (2026-11-18)
+
+- Novo documento `PROGRAMA-limiar-etico-v0.1.md`: oito eixos de competência, mapa teoria → competência → cena para os 30 cenários dos três dias, régua interna ligada aos fatores de risco psicossocial e honestidade sobre o que foi lido.
+- Código: `um-dia/programa.js` (EIXOS, CENA_EIXOS, `mapaDoDia`), card "O que o seu dia pôs à prova" na síntese, cinco verbetes novos (62 no total), versão 1.2.
+- Testes: `node testes/*.test.mjs` (motor 6, balizamento 6, níveis 25, programa 6) e smoke Playwright nos três dias.
+- Lacunas declaradas: NOM-035 oficial e competências HEC-C da ASBH não foram lidas; AAPOR não usada; livros lidos por trechos.
