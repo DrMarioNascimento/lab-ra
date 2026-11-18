@@ -59,3 +59,13 @@ ok('páginas do aluno não citam documentos de projeto', () => {
 });
 
 console.log(`\n${n} verificações passaram.`);
+
+// --- Manual do jogador ---
+{
+  const { MANUAL } = await import('../manual.js');
+  const texto = [MANUAL.titulo, MANUAL.gancho, MANUAL.botao, ...MANUAL.itens.flat()].join(' ');
+  assert.ok(MANUAL.itens.length <= 6, 'manual curto');
+  assert.ok(texto.split(/\s+/).length <= 200, 'manual com até 200 palavras');
+  assert.ok(!/estress|press[ãa]o|tens[ãa]o|ansied|PSS|balizamento|NOM-035/i.test(texto), 'manual sem palavras de estresse nem de projeto');
+  console.log('ok  manual curto e sem palavras de estresse');
+}

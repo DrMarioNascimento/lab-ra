@@ -20,9 +20,10 @@ for (const k of ORDEM_DIAS) {
   const D = DIAS[k];
   const todas = [...D.CENAS, ...(D.completo ? [CENA_FINAL, CENA_NEGADA] : [])];
 
-  ok(`[${k}] dez cenas, com contexto nos três níveis e sem palavras de estresse`, () => {
+  const N = { empresa: 10, escola: 10, bairro: 11 }[k];
+  ok(`[${k}] ${N} cenas, com contexto nos três níveis e sem palavras de estresse`, () => {
     const ids = D.CENAS.map(c => c.id);
-    assert.equal(ids.length, 10);
+    assert.equal(ids.length, N);
     assert.deepEqual(Object.keys(D.CONTEXTOS).sort(), [...ids].sort());
     for (const id of ids) for (const nv of NIVEIS) {
       const t = D.CONTEXTOS[id][nv];
@@ -63,13 +64,14 @@ for (const k of ORDEM_DIAS) {
     }
   });
 
-  ok(`[${k}] o sorteio é equilibrado: 3/3/3 mais uma, e nunca três altas seguidas`, () => {
+  ok(`[${k}] o sorteio é equilibrado: níveis equilibrados (diferença máxima de uma cena), e nunca três altas seguidas`, () => {
     const ids = D.CENAS.map(c => c.id);
     for (let s = 1; s <= 1000; s++) {
       const sorteio = sortearNiveis(semente(s), k);
       const lista = ids.map(id => sorteio[id]);
       const cont = Object.fromEntries(NIVEIS.map(nv => [nv, lista.filter(x => x === nv).length]));
-      assert.deepEqual(Object.values(cont).sort(), [3, 3, 4]);
+      const q = Object.values(cont);
+      assert.ok(Math.max(...q) - Math.min(...q) <= 1 && q.reduce((a, b) => a + b) === ids.length, JSON.stringify(cont));
       for (let i = 2; i < lista.length; i++) assert.ok(!(lista[i] === 'alto' && lista[i - 1] === 'alto' && lista[i - 2] === 'alto'), 'três altas seguidas');
     }
   });
@@ -79,7 +81,7 @@ for (const k of ORDEM_DIAS) {
     let i = 0;
     while (!terminou(e)) { const c = cenaAtual(e); assert.ok(c.texto.includes(D.CONTEXTOS[c.id]?.[c.nivel] ?? '')); decidir(e, (i++) % c.opcoes.length); }
     const r = resumo(e);
-    assert.equal(r.pontos.filter(p => p.nivel).length, 10);
+    assert.equal(r.pontos.filter(p => p.nivel).length, N);
     const g = gerarRetorno(r.pontos, { instituicao: D.instituicao });
     assert.ok(g.achados.length >= 3);
     for (const a of g.achados) {
@@ -104,10 +106,10 @@ for (const k of ORDEM_DIAS) {
   });
 }
 
-ok('o dia da empresa continua com retomada e volta (11 decisões) e os outros têm 10', () => {
+ok('o dia da empresa continua com retomada e volta (11 decisões) e a escola tem 10 e o bairro 11', () => {
   assert.equal(novoEstado(null, 'empresa').fila.length, 11);
   assert.equal(novoEstado(null, 'escola').fila.length, 10);
-  assert.equal(novoEstado(null, 'bairro').fila.length, 10);
+  assert.equal(novoEstado(null, 'bairro').fila.length, 11);
 });
 
 ok('todo conceito do retorno existe no glossário, com definição', () => {

@@ -8,7 +8,7 @@ export const EIXOS = {
     titulo: 'Veracidade e integridade profissional',
     competencia: 'Dizer o que é, assumir o erro e não maquiar dados, mesmo quando o hábito do grupo manda o contrário.',
     pergunta: 'Eu diria isto do mesmo jeito se quem confia em mim estivesse vendo?',
-    verbetes: ['honestidade', 'veracidade', 'zelo', 'competencia', 'justo-meio']
+    verbetes: ['honestidade', 'veracidade', 'zelo', 'competencia', 'justo-meio', 'contrato-competicao']
   },
   coleguismo: {
     titulo: 'Coleguismo e complacência',
@@ -26,7 +26,7 @@ export const EIXOS = {
     titulo: 'Cuidado e proteção de quem é vulnerável',
     competencia: 'Perceber quem está em risco, não causar dano e acionar as salvaguardas e a rede de proteção.',
     pergunta: 'Quem aqui é mais vulnerável, e o que o meu papel me obriga a fazer por essa pessoa?',
-    verbetes: ['cuidado', 'beneficencia', 'nao-maleficencia', 'salvaguardas', 'dever-vigilancia', 'rede-protecao', 'violencia-escola', 'bullying']
+    verbetes: ['cuidado', 'beneficencia', 'nao-maleficencia', 'salvaguardas', 'dever-vigilancia', 'rede-protecao', 'primazia-bem-estar', 'pessoa-integral', 'violencia-escola', 'bullying']
   },
   responsabilidade: {
     titulo: 'Responsabilidade: agir, omitir, transferir',
@@ -44,7 +44,7 @@ export const EIXOS = {
     titulo: 'Papel, competência e norma',
     competencia: 'Reconhecer os limites da própria formação e do cargo, e distinguir o que é legal, o que é ético e o que é costume.',
     pergunta: 'Isto cabe a mim? Se não, a quem encaminho, e como?',
-    verbetes: ['limites-competencia', 'impericia', 'etica-profissional', 'codigo-confef', 'legal-etico', 'deontologia']
+    verbetes: ['limites-competencia', 'impericia', 'etica-profissional', 'codigo-confef', 'legal-etico', 'deontologia', 'minimos-maximos', 'tres-pilares']
   },
   decisao: {
     titulo: 'Razão, emoção e liberdade situada',
@@ -82,6 +82,7 @@ export const CENA_EIXOS = {
   },
   bairro: {
     barulho: ['cuidado', 'responsabilidade'],
+    piso: ['cuidado', 'responsabilidade'],
     busca: ['cuidado', 'papel'],
     cansaco: ['papel', 'cuidado'],
     torneio: ['justica'],

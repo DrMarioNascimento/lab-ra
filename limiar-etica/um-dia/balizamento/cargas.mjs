@@ -62,6 +62,7 @@ export const CARGAS_DIAS = {
   },
   bairro: {
     barulho:  [4, 3, 4, 3, 3, 3, 2, 3, 2, 3],
+    piso:     [2, 3, 2, 2, 2, 3, 2, 2, 2, 3],
     busca:    [3, 3, 4, 3, 3, 2, 2, 3, 2, 2],
     cansaco:  [3, 3, 3, 3, 3, 2, 2, 3, 2, 2],
     torneio:  [1, 2, 2, 2, 2, 3, 2, 2, 2, 2],
@@ -79,7 +80,7 @@ export const ALAVANCAS_DIAS = {
     verba: [1, 7, 9], convocacao: [1, 5, 9], joelho: [1, 2, 9], antecessor: [0, 6, 9], fotos: [0, 5, 9]
   },
   bairro: {
-    barulho: [1, 5, 9], busca: [0, 3, 9], cansaco: [0, 3, 9], torneio: [1, 5, 9], briga: [0, 6, 9],
+    barulho: [1, 5, 9], piso: [1, 5, 9], busca: [0, 3, 9], cansaco: [0, 3, 9], torneio: [1, 5, 9], briga: [0, 6, 9],
     favor: [1, 6, 9], convite: [1, 3, 9], imagens: [1, 5, 9], plano: [0, 6, 9], relato: [0, 5, 9]
   }
 };

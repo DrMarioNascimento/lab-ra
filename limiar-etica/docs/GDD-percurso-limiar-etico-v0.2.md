@@ -266,10 +266,11 @@ A tela inicial pergunta qual dia viver. Link direto: `um-dia/?dia=escola` ou `?d
 - Glossário: 57 verbetes, incluindo sigilo profissional, honestidade, competência, responsabilizar-se por faltas, legal e ético e encaminhamento e rede de proteção (livro de ética profissional do CONFEF e livro de estágio do CREF4/SP).
 - Pendente: revisão do professor das etiquetas, dos desfechos e dos verbetes novos; ler os demais capítulos do livro de ética profissional e do livro de ética e bioética.
 
-## 24. v1.2 · Conteúdo programático (2026-11-18)
+## 24. v1.2 → v1.3 · Conteúdo programático (2026-11-18)
 
 - Novo documento `PROGRAMA-limiar-etico-v0.1.md`: oito eixos de competência, mapa teoria → competência → cena para os 30 cenários dos três dias, régua interna ligada aos fatores de risco psicossocial e honestidade sobre o que foi lido.
 - Código: `um-dia/programa.js` (EIXOS, CENA_EIXOS, `mapaDoDia`), card "O que o seu dia pôs à prova" na síntese, seis verbetes novos (63 no total), versão 1.2.
 - Testes: `node testes/*.test.mjs` (motor 6, balizamento 6, níveis 25, programa 6) e smoke Playwright nos três dias.
 - Lacunas declaradas: NOM-035: item 7.2 lido no DOF (via SIDOF), guias de referência não lidas e livro de competências da ASBH não lido; AAPOR não usada; livros lidos por trechos.
 - Camada NOM-035 (`balizamento/fatores.mjs`, só projeto) com cobertura por fator; três contextos de nível alto ajustados (jornada, família). Ambiente físico ainda fraco: candidato a cena nova.
+- (18/11, tarde) Cena nova "O piso" (bairro, 14h45; 11 cenas), sorteio com sobras distintas; 6 verbetes da segunda leitura do livro de 2006 (68 no total); manual do jogador (entrada + botão "i"); roteiro de uso em aula e palestra (`docs/ROTEIRO-de-uso-limiar-etico-v0.1.md`).

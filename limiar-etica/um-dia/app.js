@@ -1,12 +1,13 @@
 // Limiar Ético · Um dia — interface.
-import { SINTESE, MOTIVOS, VERSAO, CONDICOES, BASE_ESTRESSE, NOME_NIVEL } from './dados.js?v=1.2';
-import { DIAS, ORDEM_DIAS } from './dias.js?v=1.2';
-import { GLOSSARIO } from './glossario.js?v=1.2';
-import { gerarRetorno } from './retorno.js?v=1.2';
-import { mapaDoDia } from './programa.js?v=1.2';
-import { novoEstado, sortearNiveis, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=1.2';
+import { SINTESE, MOTIVOS, VERSAO, CONDICOES, BASE_ESTRESSE, NOME_NIVEL } from './dados.js?v=1.3';
+import { DIAS, ORDEM_DIAS } from './dias.js?v=1.3';
+import { GLOSSARIO } from './glossario.js?v=1.3';
+import { gerarRetorno } from './retorno.js?v=1.3';
+import { mapaDoDia } from './programa.js?v=1.3';
+import { MANUAL } from './manual.js?v=1.3';
+import { novoEstado, sortearNiveis, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=1.3';
 
-import { PARES, EXIGENCIAS, prepararRodadas, cruzarRodadas } from './retomadas.js?v=1.2';
+import { PARES, EXIGENCIAS, prepararRodadas, cruzarRodadas } from './retomadas.js?v=1.3';
 
 const app = document.querySelector('#app');
 const topo = document.querySelector('#topo');
@@ -61,7 +62,7 @@ function telaEscolhaDia() {
       <section class="cartao capa-dia entra">
         <p class="rotulo">Limiar Ético</p>
         <h1>Qual dia você quer viver?</h1>
-        <p>Cada dia tem dez situações. Escolha com sinceridade o que você faria em cada uma. Ao final, você recebe um retorno em conceitos de ética.</p>
+        <p>Cada dia tem várias situações, hora a hora. Escolha com sinceridade o que você faria em cada uma. Ao final, você recebe um retorno em conceitos de ética.</p>
         <div class="opcoes">
           ${ORDEM_DIAS.map((k, n) => `<button class="btn entra" style="--n:${n + 1}" data-acao="dia" data-dia="${k}"><strong>${esc(DIAS[k].nome)}</strong><br><span class="suave pequeno">${esc(DIAS[k].resumo)}</span></button>`).join('')}
         </div>
@@ -602,8 +603,41 @@ function mantendoRolagem(f) {
   window.scrollTo({ top: yRol });
 }
 
+
+/* ---------- Manual (abre na entrada; reabre no "i") ---------- */
+let manualAberto = false;
+function abrirManual() {
+  if (manualAberto) return;
+  manualAberto = true;
+  const caixa = document.createElement('div');
+  caixa.className = 'manual-fundo';
+  caixa.id = 'manual';
+  caixa.innerHTML = `<section class="cartao manual" role="dialog" aria-modal="true" aria-labelledby="manual-titulo">
+      <h2 id="manual-titulo">${esc(MANUAL.titulo)}</h2>
+      <ul class="manual-lista">${MANUAL.itens.map(([t, d]) => `<li><strong>${esc(t)}</strong> ${esc(d)}</li>`).join('')}</ul>
+      <p class="manual-gancho">${esc(MANUAL.gancho)}</p>
+      <div class="acoes"><button class="btn principal" data-acao="fechar-manual">${esc(MANUAL.botao)}</button></div>
+    </section>`;
+  document.body.appendChild(caixa);
+  caixa.querySelector('[data-acao="fechar-manual"]').focus();
+}
+function fecharManual() {
+  document.querySelector('#manual')?.remove();
+  manualAberto = false;
+  app.focus({ preventScroll: true });
+}
+const botaoI = document.createElement('button');
+botaoI.className = 'btn botao-i';
+botaoI.dataset.acao = 'abrir-manual';
+botaoI.setAttribute('aria-label', 'Como funciona');
+botaoI.textContent = 'i';
+document.body.appendChild(botaoI);
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && manualAberto) fecharManual(); });
+
 function acao(alvo) {
   const a = alvo.dataset.acao, i = Number(alvo.dataset.i);
+  if (a === 'abrir-manual') { abrirManual(); return; }
+  if (a === 'fechar-manual') { fecharManual(); return; }
   if (a === 'comecar' || a === 'recomecar') {
     est = novoEstado(sortearNiveis(Math.random, dia), dia); rev = null; topo.innerHTML = '';
     for (const k of Object.keys(contestacoes)) delete contestacoes[k];
@@ -660,3 +694,4 @@ document.addEventListener('keydown', e => {
 // Link direto para um dia: ?dia=escola ou ?dia=bairro (útil para QR code e palestras).
 const diaDoLink = new URLSearchParams(location.search).get('dia');
 if (diaDoLink && DIAS[diaDoLink]) { dia = diaDoLink; telaAbertura(); } else telaEscolhaDia();
+abrirManual();

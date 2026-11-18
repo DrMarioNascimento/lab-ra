@@ -544,3 +544,22 @@ ul.limpa li::marker { color: var(--sol-base); }
   font: inherit;
   resize: vertical;
 }
+
+/* v0.9 · condições de pressão (inspiradas na PSS-10) */
+.sinal.cond { background: #ece6f7; color: #2b2150; box-shadow: inset 0 1px 0 #fff8, 0 2px 0 #b7a9d8; }
+.pressao ul { display: grid; gap: 14px; }
+.barra-pressao { display: block; height: 10px; margin-top: 6px; border-radius: 6px; background: #d9d2e6; box-shadow: inset 0 2px 3px #2b21503a; overflow: hidden; }
+.barra-pressao i { display: block; height: 100%; background: #6b4fb3; border-radius: 6px; }
+.pressao li { list-style: none; }
+
+/* v1.0 · retorno por nível de estresse da situação */
+.niveis { display: grid; gap: 8px; margin: 12px 0; }
+.nivel { display: grid; gap: 2px; padding: 10px 12px; border-radius: 12px; background: #f1ecf9; box-shadow: inset 0 2px 3px #2b21502e; font-size: .95em; }
+.nivel strong { text-transform: none; }
+.nivel strong::first-letter { text-transform: uppercase; }
+.nivel-baixo { border-left: 6px solid #4f9d7a; }
+.nivel-medio { border-left: 6px solid #c9a227; }
+.nivel-alto { border-left: 6px solid #b5483c; }
+.sinal.nivel-baixo, .sinal.nivel-medio, .sinal.nivel-alto { border-left-width: 0; }
+.achados { padding-left: 1.1em; display: grid; gap: 12px; }
+details.conceito.mini { margin-top: 6px; }

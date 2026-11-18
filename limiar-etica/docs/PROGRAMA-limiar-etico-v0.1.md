@@ -8,7 +8,7 @@ Documento de projeto. Não aparece para o aluno. O que o aluno vê é o card "O 
 |---|---|---|
 | Slides e textos do professor (UDESC/CEFID 2026/2; "Entre o impulso e a escolha"; "Ética do Profissional de Saúde"). | Base dos verbetes de conceito (principialismo, justiça e equidade, omissão, transferência, duplo efeito, imperícia/imprudência/negligência, limites de competência, salvaguardas, roteiro de deliberação). | Lidos nas sessões anteriores. |
 | *Ética Profissional em Educação Física* (CONFEF, 2004). | Ética profissional, honestidade, competência, zelo, sigilo, legal × ético, Kohlberg, códigos. | Lidos por trechos: abertura de 19 capítulos (Santin, Beresford, Drumond, Santos, Da Costa, Tojal, Reppold, Caminha, Vargas, Puga, Martins, Lima e Silva, Habermas/Kohlberg, Almeida, Costa, Gomes, Borges, Montenegro), o capítulo de Kohlberg e a parte de virtudes básicas. **Não foi lido palavra por palavra.** |
-| *A Ética e a Bioética na Preparação e na Intervenção do Profissional de EF* (CONFEF, 2006). | Coleguismo e complacência com o mal. | Lido por capítulos selecionados; nesta etapa, também Jung Mo Sung, Cazelato e Boschi (aberturas). Os demais capítulos (Reppold, Parry, Dias, Romano etc.) seguem por ler. |
+| *A Ética e a Bioética na Preparação e na Intervenção do Profissional de EF* (CONFEF, 2006). | Coleguismo e complacência com o mal. | Lido por capítulos selecionados; nesta etapa, também Jung Mo Sung, Cazelato e Boschi (aberturas). Também Siqueira, Romano, Parry, Drumond e Dias (aberturas e trechos centrais). Seguem por ler os trabalhos científicos da Parte II (TC.I a VIII) e as contribuições de Tojal e Puga. |
 | *Violência na Escola* (CREF4/SP, 2019, livro de estágio). | Temas das cenas da escola e do bairro (violência, infraestrutura, jogos escolares); verbetes violência na escola, bullying, rede de proteção. | Lido por trechos. |
 | ASBH (asbh.org: História; Core Competencies for Healthcare Ethics Consultants, 3ª ed.). | Contexto e modelo de organização: a ASBH nasceu em janeiro de 1998 da fusão de três associações (SHHV, SBC e AAB); sua publicação trata ética como conjunto de conhecimentos, habilidades e atributos profissionais que se aprendem e se treinam, e divide as habilidades em três domínios (avaliação e análise, processo, interpessoais), segundo um artigo que a cita. | Só o que está nas páginas públicas e no resumo de terceiros. **O livro não foi lido**, então o detalhamento dos domínios não foi usado. A ligação com os passos de aprendizagem da seção 6 é uma analogia nossa. |
 | Ethicsglobal, riscos psicossociais no trabalho. | Régua interna: três fatores citados (ambiente rígido com pouco espaço de recuperação; exigências impossíveis; assédio/mobbing). | Lido integralmente (texto curto). |
@@ -66,10 +66,11 @@ O eixo principal vem primeiro. A coluna "Fator" é da régua interna de estresse
 | O antecessor | coleguismo, veracidade | relações |
 | As fotos | privacidade | liderança |
 
-### Dia do projeto do bairro (violência como fio)
+### Dia do projeto do bairro (violência como fio; 11 momentos)
 | Cena | Eixos | Fator da régua |
 |---|---|---|
 | O barulho | cuidado, responsabilidade | violência |
+| O piso (14h45) | cuidado, responsabilidade | condições do ambiente, falta de controle |
 | Quem busca | cuidado, papel | violência |
 | O cansaço | papel, cuidado | carga, liderança |
 | O torneio | justiça | relações |
@@ -80,7 +81,7 @@ O eixo principal vem primeiro. A coluna "Fator" é da régua interna de estresse
 | O plano de treino | coleguismo, veracidade | relações |
 | O relato | privacidade, cuidado, papel | violência |
 
-Cobertura (verificada por teste): todos os eixos têm pelo menos duas cenas principais; cada dia cobre pelo menos cinco eixos; o bairro tem eixo de cuidado, responsabilidade ou papel em pelo menos sete das dez cenas.
+Cobertura (verificada por teste): todos os eixos têm pelo menos duas cenas principais; cada dia cobre pelo menos cinco eixos; o bairro tem eixo de cuidado, responsabilidade ou papel em pelo menos sete das onze cenas. Com 11 cenas, o sorteio dá 3/4/4 por nível (diferença máxima de uma cena).
 
 ## 5. Régua interna de estresse e fatores de risco psicossocial
 
@@ -96,9 +97,9 @@ Cobertura atual (número de cenas por fator):
 |---|---|---|---|---|---|---|---|
 | Empresa | 0 | 5 | 2 | 2 | 1 | 6 | 1 |
 | Escola | 1 | 2 | 2 | 1 | 1 | 4 | 3 |
-| Bairro | 0 | 1 | 0 | 1 | 1 | 4 | 6 |
+| Bairro | 1 | 1 | 1 | 1 | 1 | 4 | 6 |
 
-Achado: jornada, interferência trabalho-família e condições do ambiente estavam quase ausentes. Nesta versão, o nível alto de três cenas passou a trazer essas condições (bairro "O cansaço": três fins de semana seguidos; escola "A turma sem professor": ficar além do horário; escola "A convocação": lista na hora combinada para estar em casa). O ambiente físico segue pouco coberto fora da cena da quadra; fica como candidato a cena nova.
+Achado: jornada, interferência trabalho-família e condições do ambiente estavam quase ausentes. Nesta versão, o nível alto de três cenas passou a trazer essas condições (bairro "O cansaço": três fins de semana seguidos; escola "A turma sem professor": ficar além do horário; escola "A convocação": lista na hora combinada para estar em casa). Foi criada a cena nova "O piso" (bairro) para o fator ambiente: piso molhado e trincado, caixa de luz com fio à mostra, pedido de conserto sem resposta. O ambiente físico segue com uma cena por dia (escola e bairro) e nenhuma na empresa.
 
 ## 6. Progressão sugerida
 
@@ -114,8 +115,12 @@ Passos de aprendizagem em cada sessão: reconhecer o dilema (jogar) → nomear o
 
 - Novo módulo `um-dia/programa.js` (eixos, mapa cena → eixos, `mapaDoDia`).
 - Card "O que o seu dia pôs à prova" na aba de síntese, com competência, cenas, pergunta e conceitos de cada eixo.
-- Seis verbetes novos (zelo, níveis de julgamento moral de Kohlberg, violência na escola, bullying, fair play) e mais um da segunda leitura (moral de grupo e duplo padrão, Jung Mo Sung); total 63.
-- Teste `testes/programa.test.mjs` (6 verificações).
+- Seis verbetes novos (zelo, níveis de julgamento moral de Kohlberg, violência na escola, bullying, fair play) e mais um da segunda leitura (moral de grupo e duplo padrão, Jung Mo Sung); total 68.
+- Teste `testes/programa.test.mjs` (6 verificações mais o do manual).
+- Segunda leitura do livro de 2006 (Siqueira, Romano, Parry, Drumond, Dias, Jung Mo Sung, Cazelato, Boschi): 6 verbetes novos (duplo padrão; ética dos mínimos e dos máximos; três pilares da profissão; primazia do bem-estar; contrato de competição; pessoa integral); glossário com 68 verbetes.
+- Cena nova "O piso" no dia do bairro (11 cenas); sorteio de níveis com sobras distintas.
+- Manual do jogador (`um-dia/manual.js`): abre na entrada com "Entendi" e reabre no botão "i".
+- Roteiro de uso em aula e palestra: `docs/ROTEIRO-de-uso-limiar-etico-v0.1.md`.
 
 ## 8. Pendências para o professor
 

@@ -1,17 +1,19 @@
 // Limiar Ético · Um dia — motor do dia (sem interface).
-import { CENA_FINAL, CENA_NEGADA, ORDEM_PENDENCIAS, VOLTAS, CORRENTES, CONDICOES, COND_CENAS, NIVEIS } from './dados.js?v=1.2';
-import { DIAS } from './dias.js?v=1.2';
+import { CENA_FINAL, CENA_NEGADA, ORDEM_PENDENCIAS, VOLTAS, CORRENTES, CONDICOES, COND_CENAS, NIVEIS } from './dados.js?v=1.3';
+import { DIAS } from './dias.js?v=1.3';
 
 const diaDe = est => DIAS[est.dia];
 
-// Sorteio equilibrado dos níveis: em dez cenas, três de cada nível mais uma a mais num nível sorteado,
+// Sorteio equilibrado dos níveis: em dez cenas, três de cada nível mais uma a mais num nível sorteado (em onze, duas a mais, em níveis distintos),
 // embaralhadas, com no máximo duas cenas de alto estresse seguidas.
 export function sortearNiveis(sortear = Math.random, dia = 'empresa') {
   const { CENAS, CONTEXTOS } = DIAS[dia];
   const ids = CENAS.filter(c => CONTEXTOS[c.id]).map(c => c.id);
   const base = Math.floor(ids.length / NIVEIS.length);
   const lista = NIVEIS.flatMap(n => Array(base).fill(n));
-  while (lista.length < ids.length) lista.push(NIVEIS[Math.floor(sortear() * NIVEIS.length)]);
+  // Sobras: níveis diferentes entre si, para o sorteio continuar equilibrado (ex.: 11 cenas = 3/4/4 ou 4/4/3).
+  const sobras = [...NIVEIS];
+  while (lista.length < ids.length) lista.push(sobras.splice(Math.floor(sortear() * sobras.length), 1)[0]);
   for (let tent = 0; tent < 500; tent++) {
     for (let i = lista.length - 1; i > 0; i--) { const j = Math.floor(sortear() * (i + 1)); [lista[i], lista[j]] = [lista[j], lista[i]]; }
     const ok = lista.every((n, i) => !(n === 'alto' && lista[i - 1] === 'alto' && lista[i - 2] === 'alto'));

@@ -37,6 +37,26 @@ export const CENAS = [
     conceito: { titulo: 'Dever de vigilância', texto: 'Dever de vigilância é a atenção e o acompanhamento contínuos de quem está sob a sua responsabilidade. A omissão gera responsabilidade quando existe dever de cuidado, conhecimento e possibilidade razoável de agir.' }
   },
   {
+    id: 'piso', hora: '14h45', titulo: 'O piso', margem: 0.6,
+    texto: 'Choveu de manhã e a quadra do projeto ainda está molhada. Há uma trinca perto da trave e a caixa de luz ao lado da linha de fundo está com a tampa solta. Trinta crianças estão chegando para o treino, e o coordenador ainda não veio.',
+    info: { rotulo: 'Examinar o piso e a caixa de luz', texto: 'A água empoçou justo no trecho da trinca, e há um fio à mostra na caixa de luz. O pedido de conserto está registrado na associação, sem resposta.' },
+    opcoes: [
+      op('Fazer o treino como planejado: a quadra é o único espaço, e o pedido de conserto já foi feito.',
+        'Na primeira corrida, um menino escorrega na trinca e machuca o joelho. Outro encosta na caixa de luz antes de você ver.',
+        [0.3, 0.3, 0.4], -0.8, { U: 1 },
+        'manter a rotina sobre um risco conhecido, deixando a segurança das crianças em segundo plano.'),
+      op('Isolar o trecho da trinca e a caixa de luz, adaptar o treino para a parte seca e registrar o problema por escrito para a associação e para as famílias.',
+        'O treino fica menor e algumas crianças reclamam. O registro por escrito deixa claro o que foi pedido e quando, e a associação responde em dois dias.',
+        [0.1, 0.3, 0.6], 0.7, { V: 2, C: 1 },
+        'proteger quem estava sob sua responsabilidade e levar o problema por escrito a quem pode resolver.'),
+      op('Mandar as crianças para casa, sem avisar as famílias.',
+        'Parte das crianças fica pela rua do bairro, onde há estouros desde a semana passada. As famílias só descobrem à noite.',
+        [0.5, 0.4, 0.1], -0.5, {},
+        'afastar as crianças do piso, mas sem avisar e sem pensar no caminho de volta.')
+    ],
+    conceito: { titulo: 'Negligência e imprudência', texto: 'Negligência é deixar de fazer o que era devido, como corrigir ou comunicar um risco conhecido. Imprudência é agir sem o cuidado esperado, como manter a atividade num piso perigoso. Nos dois casos, quem tinha o dever de cuidado responde.' }
+  },
+  {
     id: 'busca', hora: '15h20', titulo: 'Quem busca', margem: 0.7,
     texto: 'Um homem que você nunca viu chega ao portão para buscar uma menina de nove anos. Ele diz que a mãe pediu, e a menina fica em silêncio atrás do seu braço.',
     info: { rotulo: 'Olhar a ficha da menina', texto: 'Na ficha, só a mãe e a avó constam como autorizadas a buscar. A menina não reconhece o homem.' },
@@ -224,6 +244,11 @@ export const CONTEXTOS = {
     medio: 'Já é a segunda vez neste mês que se ouvem estouros perto da quadra.',
     alto: 'É a terceira vez neste mês que se ouvem estouros perto da quadra, e na última o treino ficou suspenso.'
   },
+  piso: {
+    baixo: 'É a primeira vez que a quadra fica assim neste ano, e o responsável pelo espaço costuma atender rápido.',
+    medio: 'Já é a segunda vez neste mês que a quadra fica assim depois da chuva.',
+    alto: 'É a terceira vez neste mês que a quadra fica assim, o pedido de conserto está sem resposta há semanas e o coordenador disse que não há outro espaço.'
+  },
   busca: {
     baixo: 'É a primeira vez que alguém desconhecido pede uma criança, e o portão está cheio de gente.',
     medio: 'Já é a segunda vez neste mês que alguém desconhecido pede uma criança.',
@@ -273,6 +298,7 @@ export const CONTEXTOS = {
 
 export const VALORES = {
   barulho: [{ p: ['instituicao'], s: ['vulneraveis', 'profissional'] }, { p: ['vulneraveis', 'profissional', 'verdade'], s: [] }, { p: [], s: ['vulneraveis', 'profissional'] }],
+  piso: [{ p: ['instituicao', 'meta'], s: ['vulneraveis', 'profissional'] }, { p: ['vulneraveis', 'profissional', 'verdade'], s: [] }, { p: ['vulneraveis'], s: ['familia'] }],
   busca: [{ p: ['instituicao'], s: ['vulneraveis', 'profissional'] }, { p: ['vulneraveis', 'profissional', 'verdade'], s: [] }, { p: ['colegas'], s: ['vulneraveis', 'profissional'] }],
   cansaco: [{ p: ['meta', 'instituicao'], s: ['vulneraveis', 'profissional'] }, { p: ['vulneraveis', 'profissional', 'verdade'], s: ['meta'] }, { p: ['confianca'], s: ['profissional'] }],
   torneio: [{ p: ['meta', 'instituicao'], s: ['justica', 'vulneraveis'] }, { p: ['justica'], s: ['meta'] }, { p: ['justica', 'vulneraveis', 'verdade', 'instituicao'], s: [] }],

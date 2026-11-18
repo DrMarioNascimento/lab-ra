@@ -27,7 +27,7 @@ export const FATORES_CENA = {
     joelho: ['lideranca'], antecessor: ['lideranca'], fotos: ['lideranca']
   },
   bairro: {
-    barulho: ['violencia'], busca: ['violencia'], cansaco: ['carga', 'lideranca', 'jornada', 'familia'], torneio: ['lideranca'],
+    barulho: ['violencia'], piso: ['ambiente', 'controle'], busca: ['violencia'], cansaco: ['carga', 'lideranca', 'jornada', 'familia'], torneio: ['lideranca'],
     briga: ['violencia'], favor: ['lideranca'], convite: ['violencia'], imagens: ['violencia'],
     plano: ['lideranca'], relato: ['violencia']
   }
