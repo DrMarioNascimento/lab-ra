@@ -1,16 +1,16 @@
 // Limiar Ético · Um dia — interface.
-import { SINTESE, MOTIVOS, VERSAO, CONDICOES, BASE_ESTRESSE, NOME_NIVEL } from './dados.js?v=1.7';
-import { DIAS, ORDEM_DIAS } from './dias.js?v=1.7';
-import { GLOSSARIO } from './glossario.js?v=1.7';
-import { gerarRetorno } from './retorno.js?v=1.7';
-import { mapaDoDia } from './programa.js?v=1.7';
-import { MANUAL } from './manual.js?v=1.7';
-import { abrirSalvar, blocosDe } from './salvar.js?v=1.7';
-import { agregar, enviosDoDia, MIN_TURMA } from './estatistica.js?v=1.7';
-import { conectar, gerarCodigo, limparCodigo, novoId } from './sala.js?v=1.7';
-import { novoEstado, sortearNiveis, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=1.7';
+import { SINTESE, MOTIVOS, VERSAO, CONDICOES, BASE_ESTRESSE, NOME_NIVEL } from './dados.js?v=1.8';
+import { DIAS, ORDEM_DIAS } from './dias.js?v=1.8';
+import { GLOSSARIO } from './glossario.js?v=1.8';
+import { gerarRetorno } from './retorno.js?v=1.8';
+import { mapaDoDia } from './programa.js?v=1.8';
+import { MANUAL } from './manual.js?v=1.8';
+import { abrirSalvar, blocosDe } from './salvar.js?v=1.8';
+import { agregar, enviosDoDia, MIN_TURMA } from './estatistica.js?v=1.8';
+import { conectar, gerarCodigo, limparCodigo, novoId } from './sala.js?v=1.8';
+import { novoEstado, sortearNiveis, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=1.8';
 
-import { PARES, EXIGENCIAS, prepararRodadas, cruzarRodadas } from './retomadas.js?v=1.7';
+import { PARES, EXIGENCIAS, prepararRodadas, cruzarRodadas } from './retomadas.js?v=1.8';
 
 const app = document.querySelector('#app');
 const topo = document.querySelector('#topo');
@@ -67,7 +67,7 @@ function telaEscolhaDia() {
           ${ORDEM_DIAS.map((k, n) => `<button class="btn entra" style="--n:${n + 1}" data-acao="dia" data-dia="${k}"><strong>${esc(DIAS[k].nome)}</strong><br><span class="suave pequeno">${esc(DIAS[k].resumo)}</span></button>`).join('')}
         </div>
         ${sala ? `<p class="suave pequeno sala-aviso">Você está na sala <strong>${esc(sala.codigo)}</strong> como ${esc(sala.avatar)} ${esc(sala.nome)}. <button class="link" data-acao="sair-sala">Sair da sala</button></p>`
-               : `<div class="acoes"><button class="btn secundario" data-acao="tela-sala">Entrar numa sala</button></div>`}
+               : `<div class="acoes linha"><button class="btn secundario" data-acao="tela-sala">Entrar numa sala</button><button class="btn secundario" data-acao="tela-prof">Sou professor</button></div>`}
       </section>
       <p class="versao entra" style="--n:4">Versão ${esc(VERSAO)} · <a href="?professor" class="link">Sou professor</a></p>
     </div>`;
@@ -199,7 +199,7 @@ function escolher(i) {
   foco();
 }
 
-import { graficoLinhas, graficoCertoDesfecho, graficoMargem, graficoEscala, COR, NOME, COR_CERTO, COR_DESFECHO } from './graficos.js?v=1.7';
+import { graficoLinhas, graficoCertoDesfecho, graficoMargem, graficoEscala, COR, NOME, COR_CERTO, COR_DESFECHO } from './graficos.js?v=1.8';
 
 /* ---------- Revelação ---------- */
 function sinaisDe(p) {
@@ -544,7 +544,7 @@ function mantendoRolagem(f) {
 
 
 /* ---------- Sala ao vivo (aluno) ---------- */
-const EMOJIS = ['😀', '🤓', '😎', '🧐', '😊', '🙂', '😇', '🤩', '🦊', '🐨', '🐸', '⚽', '📚', '🔬'];
+const EMOJIS = ['⚖️', '🤝', '🧭', '🕊️', '🛡️', '🌱', '🔎', '📖', '🪞', '💡', '🫶', '🏛️', '🔔', '🧩'];
 const lerJSON = k => { try { return JSON.parse(sessionStorage.getItem(k)); } catch (e) { return null; } };
 const gravarJSON = (k, v) => { try { if (v == null) sessionStorage.removeItem(k); else sessionStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* sem armazenamento */ } };
 let sala = lerJSON('le_sala');        // { codigo, alunoId, nome, avatar } quando o aluno entrou numa sala
@@ -676,7 +676,7 @@ function telaProfessor() {
     <p class="rotulo">Sala ao vivo</p>
     <div class="codigo-sala">${esc(P.codigo)}</div>
     <p class="suave pequeno">${P.alunos.length} na sala · ${envs.length} enviaram. Link: <span class="quebra">${esc(linkDaSala())}</span></p>
-    <div class="acoes linha"><button class="btn secundario pequeno-btn" data-acao="prof-qr">QR</button><button class="btn secundario pequeno-btn" data-acao="prof-copiar">Copiar link</button><button class="btn secundario pequeno-btn" data-acao="telao">Telão</button><button class="btn secundario pequeno-btn" data-acao="prof-encerrar">Encerrar sala</button></div>
+    <div class="acoes linha"><button class="btn secundario pequeno-btn" data-acao="prof-qr">QR</button><button class="btn secundario pequeno-btn" data-acao="prof-copiar">Copiar link</button><button class="btn secundario pequeno-btn" data-acao="telao">Telão (tela cheia)</button><button class="btn secundario pequeno-btn" data-acao="prof-encerrar">Encerrar sala</button></div>
     <div class="abas prof-abas" role="tablist"><button class="aba" role="tab" data-acao="prof-vista" data-v="alunos" aria-selected="${P.vista === 'alunos'}">Alunos</button><button class="aba" role="tab" data-acao="prof-vista" data-v="turma" aria-selected="${P.vista === 'turma'}">Turma</button></div>
   </section>`;
   const corpo = P.vista === 'turma' ? htmlTurma() : cardsAlunos();
@@ -869,6 +869,7 @@ function acao(alvo) {
     return;
   }
   if (a === 'tela-sala') { telaEntrarSala(); return; }
+  if (a === 'tela-prof') { telaProfessor(); return; }
   if (a === 'emoji') { emojiEscolhido = alvo.dataset.e; document.querySelectorAll('.emojis .emoji').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.e === emojiEscolhido))); return; }
   if (a === 'entrar-sala') { entrarSala(); return; }
   if (a === 'sair-sala') { sairDaSala(); return; }
