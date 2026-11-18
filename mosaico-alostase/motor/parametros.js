@@ -84,7 +84,7 @@ export const PENDENCIAS = [
   'Refeição sobre o cortisol: aumento observado depois do almoço, não quantificado.',
   'Exercício sobre a glicemia.',
   'Exercício com mais de 30 min ou acima de 80% do VO2máx sobre o cortisol.',
-  'Jornada noturna sobre a glicemia (+6% no laboratório, lido só no resumo).',
+  'Jornada noturna sobre a glicemia: Scheer 2009 lido (ficha 09: +6% na média, café 99,9 → 132 mg/dL em 2 h, n = 8, dias de 28 h); falta decidir a forma de entrar no motor.',
   'Sono curto sobre a sensibilidade à insulina no dia seguinte.',
   'Deslocamento do relógio depois de várias noites seguidas.',
   'Dívida de sono sobre o cortisol e a glicemia do dia seguinte: direção lida (Spiegel 1999, só resumo), sem número para o motor.',

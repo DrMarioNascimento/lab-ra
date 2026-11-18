@@ -2,6 +2,8 @@
 
 18/11/2026 · versão de projeto, não aparece para o aluno.
 
+**Atualização de 18/11 (noite):** o artigo de Speed e colegas foi lido nos resultados e na discussão pelo texto aberto da PLOS. Acrescentam-se: diferença dia-noite de 3,9 bpm (DP 3,8); frequência de repouso de 55,2 bpm no quartil menos ativo e 48,5 no mais ativo; 53% tiveram o menor valor entre 3 h e 7 h; a frequência estabiliza depois de cerca de 4 min parado; amostra de idade média 35,4 anos, 66,1% mulheres, ativos, sem trabalhadores noturnos nem cardiopatas. Referência de frequência cardíaca média ambulatorial (SCAPIS, Suécia, 3.942 saudáveis de 50 a 65 anos, eletrocardiograma de 24 h): 73 ± 9 bpm em homens e 76 ± 8 em mulheres; menor valor de 1 min, 48 ± 7 e 51 ± 7. **Não serve para jovens**; entra só como contexto. Desalinhamento circadiano: ver ficha 09.
+
 **Estado da ficha: a forma da curva de 24 h está sustentada; os valores absolutos de pressão e o efeito do exercício sobre a frequência cardíaca, não.** **[completo]** = artigo inteiro lido; **[resumo]** = só resumo, trecho ou fonte secundária. Nesta ficha, tudo é [resumo]: nenhum artigo foi lido inteiro.
 
 ## 1. Curva de 24 h

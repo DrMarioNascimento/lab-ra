@@ -13,7 +13,7 @@ Dia de trabalho de 17/11/2026: o projeto saiu do GDD e virou protótipo jogável
 | Parte | Estado |
 |---|---|
 | GDD | v0.4 (`docs/GDD-mosaico-alostase-v0.4.md`) |
-| Fichas de literatura | 00 a 08 em `docs/fichas/`, todas com partes ainda por ler (a 08, de frequência cardíaca e pressão, só com resumos) |
+| Fichas de literatura | 00 a 09 em `docs/fichas/`, todas com partes ainda por ler (a 08, de frequência cardíaca e pressão, quase só resumos; a 09, de Scheer 2009, lida nos resultados) |
 | Motor de um dia | Cortisol (soro), glicemia e necessidade de sono; exercício, jornada noturna, noite ativa com álcool |
 | Motor da semana 1 | Sete dias contínuos; dívida de sono em horas de vigília em excesso; REM perdido somado |
 | Modo Prognóstico | Um dia (6 rotinas) e semana 1 (4 semanas prontas) |
@@ -50,7 +50,7 @@ Dia de trabalho de 17/11/2026: o projeto saiu do GDD e virou protótipo jogável
 
 ## Perguntas em aberto para o professor
 
-- PDF de Scheer e colegas (2009) no Drive, para a glicemia na jornada noturna.
+- Glicemia na jornada noturna: Scheer 2009 foi lido (ficha 09). Decidir como entra no motor: multiplicador da subida pós-refeição com relógio mais de 6 h fora de fase?
 - Ícones 3D: o jogo não tem nenhum; falta a lista de prompts.
 - Incluir o Mosaico Alostase no Acervo (depende do gerador no PC).
 
