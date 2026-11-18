@@ -125,7 +125,7 @@ export function renderTelao(st) {
   let body = "";
   switch (st.fase) {
     case "entrada":
-      body = topo(st, "Mosaico Vila") + `<div class="grid" style="grid-template-columns:1.1fr 1fr;flex:1;min-height:0"><div class="card col" style="justify-content:center"><div class="row" style="gap:1.6cqw">${ico("app-mosaico-vila", "xl")}<div><div class="fase">Código da sala</div><div class="mono" style="font-size:7cqw;font-weight:800;letter-spacing:.1em">SIM-01</div></div></div><p class="big">Entre pelo celular. A turma vira uma vila; os grupos, famílias.</p><p class="rodape">O jogo fala de dinheiro, aluguel, herança e propostas de corrupção, sempre de famílias e personagens inventados. Se algum tema pesar, dá para só observar ou falar com quem conduz.</p></div>
+      body = topo(st, "Mosaico Vila") + `<div class="grid" style="grid-template-columns:1.1fr 1fr;flex:1;min-height:0"><div class="card col" style="justify-content:center"><div class="row" style="gap:1.6cqw">${ico("app-mosaico-vila", "xl")}<div><div class="fase">Código da sala</div><div class="mono" style="font-size:7cqw;font-weight:800;letter-spacing:.1em">${esc(st.codigo || "SIM-01")}</div></div></div><p class="big">Entre pelo celular. A turma vira uma vila; os grupos, famílias.</p><p class="rodape">O jogo fala de dinheiro, aluguel, herança e propostas de corrupção, sempre de famílias e personagens inventados. Se algum tema pesar, dá para só observar ou falar com quem conduz.</p></div>
         <div class="card" style="overflow:hidden"><h2>${st.ordem.length} na sala</h2><div class="row" style="margin-top:1cqw;gap:.5cqw">${st.ordem.map((id) => `<span class="chip nome">${esc(st.alunos[id].nome)}</span>`).join("")}</div></div></div>`;
       break;
     case "familias": {
