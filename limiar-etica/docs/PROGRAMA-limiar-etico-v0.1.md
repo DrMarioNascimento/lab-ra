@@ -86,6 +86,20 @@ Cobertura (verificada por teste): todos os eixos têm pelo menos duas cenas prin
 
 A régua (PSS-10 como inspiração, só do autor, não calculada nem mostrada ao aluno) é lida junto com os fatores do item 7.2 da NOM-035: (a) condições no ambiente de trabalho; (b) cargas de trabalho (quantitativa, cognitiva, emocional, de responsabilidade, contraditória); (c) falta de controle sobre o trabalho; (d) jornadas e rotação de turnos além da lei; (e) interferência trabalho-família; (f) liderança negativa e relações negativas; (g) violência laboral (assédio psicológico, hostilização, maus-tratos). A norma define fatores de risco psicossocial como os que podem provocar ansiedade, alteração do sono e estresse grave, ligados à natureza das funções, ao tipo de jornada e à exposição a eventos traumáticos ou violência laboral. O Ethicsglobal cita três deles em outras palavras (ambiente rígido, exigências impossíveis, assédio). Assim os três níveis de cada cena variam em dimensões reconhecidas. As guias da norma pontuam cada item de 0 a 4 por frequência, com alguns itens invertidos, e classificam o risco em nulo, baixo, médio, alto e muito alto; a nossa régua segue lógica parecida (0 a 4, temas positivos invertidos), mas é do autor e não tem pontos de corte clínicos. Esses fatores aparecem só nas frases de contexto (frequência, urgência, acúmulo), nunca como palavras de estresse. Na tabela da seção 4, "falta de controle" corresponde à categoria 2.
 
+### 5.1 Como a NOM-035 ajuda o jogo (v1.2)
+
+Os temas da régua (PSS-10) descrevem a vivência da pessoa. Os fatores da NOM-035 descrevem a condição da situação, que é justamente o que as frases de contexto mudam. Por isso foi criada a camada `balizamento/fatores.mjs` (só do projeto), que marca quais fatores cada cena aciona em nível alto e permite conferir cobertura por teste.
+
+Cobertura atual (número de cenas por fator):
+
+| Dia | ambiente | carga | controle | jornada | família | liderança/relações | violência |
+|---|---|---|---|---|---|---|---|
+| Empresa | 0 | 5 | 2 | 2 | 1 | 6 | 1 |
+| Escola | 1 | 2 | 2 | 1 | 1 | 4 | 3 |
+| Bairro | 0 | 1 | 0 | 1 | 1 | 4 | 6 |
+
+Achado: jornada, interferência trabalho-família e condições do ambiente estavam quase ausentes. Nesta versão, o nível alto de três cenas passou a trazer essas condições (bairro "O cansaço": três fins de semana seguidos; escola "A turma sem professor": ficar além do horário; escola "A convocação": lista na hora combinada para estar em casa). O ambiente físico segue pouco coberto fora da cena da quadra; fica como candidato a cena nova.
+
 ## 6. Progressão sugerida
 
 1. **Dia da empresa**: situações cotidianas e conhecidas; apresenta o modelo (escolha, o que protege, o que sacrifica).

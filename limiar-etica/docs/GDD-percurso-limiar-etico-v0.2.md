@@ -272,3 +272,4 @@ A tela inicial pergunta qual dia viver. Link direto: `um-dia/?dia=escola` ou `?d
 - Código: `um-dia/programa.js` (EIXOS, CENA_EIXOS, `mapaDoDia`), card "O que o seu dia pôs à prova" na síntese, seis verbetes novos (63 no total), versão 1.2.
 - Testes: `node testes/*.test.mjs` (motor 6, balizamento 6, níveis 25, programa 6) e smoke Playwright nos três dias.
 - Lacunas declaradas: NOM-035: item 7.2 lido no DOF (via SIDOF), guias de referência não lidas e livro de competências da ASBH não lido; AAPOR não usada; livros lidos por trechos.
+- Camada NOM-035 (`balizamento/fatores.mjs`, só projeto) com cobertura por fator; três contextos de nível alto ajustados (jornada, família). Ambiente físico ainda fraco: candidato a cena nova.

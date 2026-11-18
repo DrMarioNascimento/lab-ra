@@ -52,3 +52,18 @@ ok('o balizamento não é carregado pela página do aluno', () => {
 });
 
 console.log(`\n${n} verificações passaram.`);
+
+// --- NOM-035: camada situacional (projeto apenas) ---
+{
+  const { FATORES, FATORES_CENA, cobertura } = await import('../balizamento/fatores.mjs');
+  const { DIAS, ORDEM_DIAS } = await import('../dias.js');
+  for (const k of ORDEM_DIAS) {
+    assert.deepEqual(Object.keys(FATORES_CENA[k]).sort(), DIAS[k].CENAS.map(c => c.id).sort(), `fatores: cenas de ${k}`);
+    for (const fs of Object.values(FATORES_CENA[k])) for (const f of fs) assert.ok(FATORES[f], f);
+  }
+  for (const f of Object.keys(FATORES)) {
+    const total = ORDEM_DIAS.reduce((a, k) => a + cobertura(k)[f].length, 0);
+    assert.ok(total >= 1, `fator ${f} sem nenhuma cena`);
+  }
+  console.log('ok  fatores NOM-035 cobrem as 30 cenas e os 7 fatores');
+}

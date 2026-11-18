@@ -222,7 +222,7 @@ export const CONTEXTOS = {
   vaga: {
     baixo: 'É a primeira vez que isso acontece neste ano, e a coordenação costuma ajudar rápido.',
     medio: 'Já é a segunda vez neste mês que uma turma sem professor é mandada para a quadra.',
-    alto: 'É a terceira vez neste mês que uma turma sem professor vem para a quadra, e ninguém da coordenação atendeu da última vez.'
+    alto: 'É a terceira vez neste mês que uma turma sem professor vem para a quadra, ninguém da coordenação atendeu da última vez e você já ficou além do horário nas duas anteriores.'
   },
   gol: {
     baixo: 'A turma estava animada e é a primeira discussão do dia.',
@@ -252,7 +252,7 @@ export const CONTEXTOS = {
   convocacao: {
     baixo: 'A lista só precisa ser entregue no fim do mês.',
     medio: 'A lista precisa ser entregue até amanhã.',
-    alto: 'É a terceira vez em três anos que a convocação gera discussão entre as famílias, e agora a lista precisa ser entregue hoje.'
+    alto: 'É a terceira vez em três anos que a convocação gera discussão entre as famílias, e agora a lista precisa ser entregue hoje, justo no horário em que você tinha combinado estar em casa.'
   },
   joelho: {
     baixo: 'O jogo de amanhã é amistoso, e o colega só sugeriu discretamente que não se falasse.',

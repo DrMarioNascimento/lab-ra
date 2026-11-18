@@ -232,7 +232,7 @@ export const CONTEXTOS = {
   cansaco: {
     baixo: 'O festival é só daqui a um mês.',
     medio: 'O festival é no sábado.',
-    alto: 'É o segundo menino que passa mal neste mês, o festival é amanhã e o coordenador já disse que não há reservas.'
+    alto: 'É o segundo menino que passa mal neste mês, o festival é amanhã, você já cobriu três fins de semana seguidos e o coordenador disse que não há reservas.'
   },
   torneio: {
     baixo: 'A inscrição fecha no fim do mês.',
