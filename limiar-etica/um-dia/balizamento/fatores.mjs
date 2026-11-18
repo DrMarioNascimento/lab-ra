@@ -30,6 +30,54 @@ export const FATORES_CENA = {
     barulho: ['violencia'], piso: ['ambiente', 'controle'], busca: ['violencia'], cansaco: ['carga', 'lideranca', 'jornada', 'familia'], torneio: ['lideranca'],
     briga: ['violencia'], favor: ['lideranca'], convite: ['violencia'], imagens: ['violencia'],
     plano: ['lideranca'], relato: ['violencia']
+  },
+  academia: {
+    triagem: ['carga', 'lideranca'],
+    suplemento: ['lideranca'],
+    ciclo: ['controle'],
+    espelho: ['carga'],
+    meta: ['lideranca', 'controle'],
+    treino: ['lideranca'],
+    bolsa: ['controle'],
+    ficha: ['lideranca'],
+    antesdepois: ['lideranca'],
+    registro: ['lideranca', 'controle']
+  },
+  pesquisa: {
+    termo: ['carga', 'controle'],
+    valor: ['carga', 'lideranca'],
+    autoria: ['lideranca'],
+    hipotese: ['carga', 'controle'],
+    planilha: ['carga'],
+    saida: ['lideranca', 'carga'],
+    equipamento: ['controle', 'carga'],
+    texto: ['carga'],
+    assentimento: ['controle'],
+    malestar: ['lideranca', 'carga']
+  },
+  clube: {
+    tornozelo: ['lideranca', 'violencia'],
+    comprimido: ['lideranca', 'violencia'],
+    peneira: ['lideranca'],
+    extra: ['carga', 'lideranca'],
+    vestiario: ['violencia', 'lideranca'],
+    agrado: ['lideranca'],
+    reporter: ['lideranca'],
+    cera: ['lideranca'],
+    reserva: ['lideranca'],
+    promessa: ['lideranca', 'carga']
+  },
+  reabilitacao: {
+    afericao: ['carga'],
+    desconforto: ['carga', 'controle'],
+    remedio: ['carga'],
+    filho: ['carga'],
+    prontuario: ['carga', 'lideranca'],
+    alta: ['controle', 'carga'],
+    vaga: ['lideranca', 'controle'],
+    ritmo: ['violencia', 'lideranca'],
+    medico: ['carga', 'controle', 'jornada'],
+    emergencia: ['ambiente', 'controle']
   }
 };
 

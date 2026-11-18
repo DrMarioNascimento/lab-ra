@@ -1,16 +1,16 @@
 // Limiar Ético · Um dia — interface.
-import { SINTESE, MOTIVOS, VERSAO, CONDICOES, BASE_ESTRESSE, NOME_NIVEL } from './dados.js?v=2.1';
-import { DIAS, ORDEM_DIAS } from './dias.js?v=2.1';
-import { GLOSSARIO } from './glossario.js?v=2.1';
-import { gerarRetorno } from './retorno.js?v=2.1';
-import { mapaDoDia } from './programa.js?v=2.1';
-import { MANUAL } from './manual.js?v=2.1';
-import { abrirSalvar, blocosDe } from './salvar.js?v=2.1';
-import { agregar, enviosDoDia, MIN_TURMA } from './estatistica.js?v=2.1';
-import { conectar, gerarCodigo, limparCodigo, novoId } from './sala.js?v=2.1';
-import { novoEstado, sortearNiveis, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=2.1';
+import { SINTESE, MOTIVOS, VERSAO, CONDICOES, BASE_ESTRESSE, NOME_NIVEL } from './dados.js?v=2.2';
+import { DIAS, ORDEM_DIAS } from './dias.js?v=2.2';
+import { GLOSSARIO } from './glossario.js?v=2.2';
+import { gerarRetorno } from './retorno.js?v=2.2';
+import { mapaDoDia } from './programa.js?v=2.2';
+import { MANUAL } from './manual.js?v=2.2';
+import { abrirSalvar, blocosDe } from './salvar.js?v=2.2';
+import { agregar, enviosDoDia, MIN_TURMA } from './estatistica.js?v=2.2';
+import { conectar, gerarCodigo, limparCodigo, novoId } from './sala.js?v=2.2';
+import { novoEstado, sortearNiveis, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=2.2';
 
-import { PARES, EXIGENCIAS, prepararRodadas, cruzarRodadas } from './retomadas.js?v=2.1';
+import { PARES, EXIGENCIAS, prepararRodadas, cruzarRodadas } from './retomadas.js?v=2.2';
 
 const app = document.querySelector('#app');
 const topo = document.querySelector('#topo');
@@ -199,7 +199,7 @@ function escolher(i) {
   foco();
 }
 
-import { graficoLinhas, graficoCertoDesfecho, graficoMargem, graficoEscala, COR, NOME, COR_CERTO, COR_DESFECHO } from './graficos.js?v=2.1';
+import { graficoLinhas, graficoCertoDesfecho, graficoMargem, graficoEscala, COR, NOME, COR_CERTO, COR_DESFECHO } from './graficos.js?v=2.2';
 
 /* ---------- Revelação ---------- */
 function sinaisDe(p) {
@@ -721,7 +721,7 @@ function cardsAlunos() {
 function dadosDoDiaTurma() {
   const contagem = Object.fromEntries(ORDEM_DIAS.map(k => [k, enviosDoDia(P.alunos, k).length]));
   if (P.config.modo === 'fixo' && DIAS[P.config.dia]) P.diaTurma = P.config.dia;
-  else if (!P.diaTurma || !contagem[P.diaTurma]) P.diaTurma = ORDEM_DIAS.find(k => contagem[k] > 0) || ORDEM_DIAS[0];
+  else if (!P.diaTurma || !contagem[P.diaTurma]) P.diaTurma = ORDEM_DIAS.reduce((m, k) => contagem[k] > (contagem[m] || 0) ? k : m, ORDEM_DIAS.find(k => contagem[k] > 0) || ORDEM_DIAS[0]);
   return contagem;
 }
 

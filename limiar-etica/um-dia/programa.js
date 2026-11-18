@@ -1,5 +1,5 @@
 // Limiar Ético · conteúdo programático.
-// Oito eixos de competência ética. Cada cena dos três dias exercita um eixo principal e, às vezes, um secundário.
+// Oito eixos de competência ética. Cada cena de cada dia exercita um eixo principal e, às vezes, um secundário.
 // O que o aluno vê no retorno é só o "mapa do dia": que eixos foram postos à prova e em quais cenas.
 // A base teórica de cada eixo está em docs/PROGRAMA-limiar-etico-v0.1.md. Nada aqui calcula nota ou nível de estresse.
 
@@ -92,6 +92,54 @@ export const CENA_EIXOS = {
     imagens: ['privacidade', 'cuidado'],
     plano: ['coleguismo', 'veracidade'],
     relato: ['privacidade', 'cuidado', 'papel']
+  },
+  academia: {
+    triagem: ['cuidado', 'papel'],
+    suplemento: ['papel', 'cuidado'],
+    ciclo: ['cuidado', 'papel'],
+    espelho: ['cuidado', 'papel'],
+    meta: ['veracidade', 'justica'],
+    treino: ['coleguismo', 'cuidado'],
+    bolsa: ['justica'],
+    ficha: ['privacidade', 'coleguismo'],
+    antesdepois: ['privacidade', 'veracidade'],
+    registro: ['papel', 'veracidade']
+  },
+  pesquisa: {
+    termo: ['privacidade', 'papel'],
+    valor: ['veracidade', 'responsabilidade'],
+    autoria: ['justica', 'coleguismo'],
+    hipotese: ['veracidade', 'decisao'],
+    planilha: ['privacidade', 'papel'],
+    saida: ['privacidade', 'decisao'],
+    equipamento: ['justica'],
+    texto: ['veracidade', 'coleguismo'],
+    assentimento: ['cuidado', 'privacidade'],
+    malestar: ['responsabilidade', 'cuidado']
+  },
+  clube: {
+    tornozelo: ['cuidado', 'responsabilidade'],
+    comprimido: ['cuidado', 'coleguismo'],
+    peneira: ['justica', 'veracidade'],
+    extra: ['cuidado', 'responsabilidade'],
+    vestiario: ['responsabilidade', 'cuidado'],
+    agrado: ['veracidade', 'justica'],
+    reporter: ['privacidade', 'veracidade'],
+    cera: ['veracidade', 'decisao'],
+    reserva: ['cuidado', 'privacidade'],
+    promessa: ['veracidade', 'cuidado', 'papel']
+  },
+  reabilitacao: {
+    afericao: ['cuidado', 'papel'],
+    desconforto: ['responsabilidade', 'cuidado'],
+    remedio: ['papel', 'cuidado'],
+    filho: ['veracidade', 'privacidade'],
+    prontuario: ['veracidade', 'coleguismo'],
+    alta: ['justica', 'cuidado'],
+    vaga: ['justica', 'cuidado'],
+    ritmo: ['cuidado', 'coleguismo'],
+    medico: ['papel', 'cuidado'],
+    emergencia: ['responsabilidade', 'cuidado']
   }
 };
 

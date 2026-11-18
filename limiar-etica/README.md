@@ -1,6 +1,6 @@
 # Limiar Ético
 
-**Entrada única:** [`um-dia/`](um-dia/) (lab-ra.dragongames.dev.br/limiar-etica/um-dia/). Três dias: empresa e faculdade, escola e projeto do bairro. Links diretos: `?dia=empresa`, `?dia=escola`, `?dia=bairro`. O endereço antigo `limiar-etica/` redireciona para o jogo.
+**Entrada única:** [`um-dia/`](um-dia/) (lab-ra.dragongames.dev.br/limiar-etica/um-dia/). Sete histórias: empresa e faculdade, escola, projeto do bairro, academia, laboratório (iniciação científica), clube (categorias de base) e reabilitação cardiovascular. Links diretos: `?dia=empresa`, `?dia=escola`, `?dia=bairro`, `?dia=academia`, `?dia=pesquisa`, `?dia=clube`, `?dia=reabilitacao`. O endereço antigo `limiar-etica/` redireciona para o jogo.
 
 ## Documentos (só do projeto)
 

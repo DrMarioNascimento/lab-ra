@@ -72,6 +72,54 @@ export const CARGAS_DIAS = {
     imagens:  [1, 2, 2, 2, 2, 2, 2, 2, 2, 2],
     plano:    [1, 2, 2, 2, 2, 2, 2, 2, 2, 2],
     relato:   [3, 4, 4, 4, 4, 3, 2, 4, 3, 3]
+  },
+  academia: {
+    triagem: [2, 2, 2, 2, 2, 3, 1, 2, 1, 2],
+    suplemento: [2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+    ciclo: [3, 3, 2, 2, 3, 2, 2, 3, 2, 2],
+    espelho: [2, 3, 3, 2, 2, 3, 2, 3, 2, 3],
+    meta: [2, 3, 2, 2, 2, 3, 3, 2, 2, 3],
+    treino: [2, 2, 3, 2, 2, 2, 3, 2, 2, 3],
+    bolsa: [1, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+    ficha: [1, 2, 2, 2, 2, 2, 3, 2, 3, 3],
+    antesdepois: [1, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+    registro: [2, 3, 3, 2, 2, 3, 2, 3, 3, 3]
+  },
+  pesquisa: {
+    termo: [2, 2, 2, 2, 2, 3, 2, 2, 2, 3],
+    valor: [2, 3, 3, 2, 2, 3, 2, 3, 2, 3],
+    autoria: [1, 2, 2, 2, 2, 2, 3, 2, 3, 3],
+    hipotese: [2, 3, 2, 2, 3, 3, 2, 3, 3, 3],
+    planilha: [1, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+    saida: [2, 3, 3, 2, 2, 2, 3, 2, 2, 3],
+    equipamento: [1, 3, 2, 2, 2, 3, 2, 3, 3, 3],
+    texto: [1, 2, 2, 2, 2, 2, 3, 2, 3, 2],
+    assentimento: [2, 3, 3, 2, 2, 2, 2, 2, 2, 2],
+    malestar: [3, 3, 3, 3, 3, 3, 2, 3, 3, 3]
+  },
+  clube: {
+    tornozelo: [3, 3, 3, 3, 3, 3, 2, 3, 3, 3],
+    comprimido: [3, 3, 3, 3, 3, 3, 3, 3, 2, 3],
+    peneira: [1, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+    extra: [2, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+    vestiario: [3, 2, 3, 3, 3, 2, 3, 3, 3, 3],
+    agrado: [2, 2, 3, 2, 2, 2, 2, 2, 2, 3],
+    reporter: [2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+    cera: [2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+    reserva: [2, 3, 3, 3, 3, 2, 2, 3, 2, 3],
+    promessa: [2, 3, 3, 3, 3, 3, 3, 3, 3, 3]
+  },
+  reabilitacao: {
+    afericao: [2, 3, 3, 2, 2, 3, 2, 3, 2, 3],
+    desconforto: [4, 3, 4, 3, 3, 3, 2, 3, 2, 3],
+    remedio: [2, 3, 3, 2, 2, 3, 2, 3, 2, 3],
+    filho: [2, 2, 3, 2, 2, 2, 2, 2, 2, 2],
+    prontuario: [2, 2, 2, 2, 2, 2, 3, 2, 2, 3],
+    alta: [2, 3, 2, 2, 3, 3, 2, 3, 2, 3],
+    vaga: [1, 3, 2, 2, 2, 2, 2, 2, 2, 3],
+    ritmo: [2, 2, 3, 2, 3, 2, 3, 3, 3, 3],
+    medico: [3, 3, 3, 3, 3, 3, 2, 3, 3, 3],
+    emergencia: [2, 3, 2, 2, 3, 3, 2, 3, 2, 3]
   }
 };
 export const ALAVANCAS_DIAS = {
@@ -82,6 +130,54 @@ export const ALAVANCAS_DIAS = {
   bairro: {
     barulho: [1, 5, 9], piso: [1, 5, 9], busca: [0, 3, 9], cansaco: [0, 3, 9], torneio: [1, 5, 9], briga: [0, 6, 9],
     favor: [1, 6, 9], convite: [1, 3, 9], imagens: [1, 5, 9], plano: [0, 6, 9], relato: [0, 5, 9]
+  },
+  academia: {
+    triagem: [0, 5, 9],
+    suplemento: [0, 5, 9],
+    ciclo: [0, 5, 9],
+    espelho: [0, 5, 9],
+    meta: [0, 5, 9],
+    treino: [0, 5, 9],
+    bolsa: [0, 5, 9],
+    ficha: [0, 5, 9],
+    antesdepois: [0, 5, 9],
+    registro: [0, 5, 9]
+  },
+  pesquisa: {
+    termo: [0, 5, 9],
+    valor: [0, 5, 9],
+    autoria: [0, 5, 9],
+    hipotese: [0, 5, 9],
+    planilha: [0, 5, 9],
+    saida: [0, 5, 9],
+    equipamento: [0, 5, 9],
+    texto: [0, 5, 9],
+    assentimento: [0, 5, 9],
+    malestar: [0, 5, 9]
+  },
+  clube: {
+    tornozelo: [0, 5, 9],
+    comprimido: [0, 5, 9],
+    peneira: [0, 5, 9],
+    extra: [0, 5, 9],
+    vestiario: [0, 5, 9],
+    agrado: [0, 5, 9],
+    reporter: [0, 5, 9],
+    cera: [0, 5, 9],
+    reserva: [0, 5, 9],
+    promessa: [0, 5, 9]
+  },
+  reabilitacao: {
+    afericao: [0, 5, 9],
+    desconforto: [1, 5, 9],
+    remedio: [0, 5, 9],
+    filho: [0, 5, 9],
+    prontuario: [0, 5, 9],
+    alta: [0, 5, 9],
+    vaga: [0, 5, 9],
+    ritmo: [0, 5, 9],
+    medico: [0, 5, 9],
+    emergencia: [1, 5, 9]
   }
 };
 
