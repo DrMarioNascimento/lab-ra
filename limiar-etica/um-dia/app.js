@@ -1,16 +1,16 @@
 // Limiar Ético · Um dia — interface.
-import { SINTESE, MOTIVOS, VERSAO, CONDICOES, BASE_ESTRESSE, NOME_NIVEL } from './dados.js?v=1.6';
-import { DIAS, ORDEM_DIAS } from './dias.js?v=1.6';
-import { GLOSSARIO } from './glossario.js?v=1.6';
-import { gerarRetorno } from './retorno.js?v=1.6';
-import { mapaDoDia } from './programa.js?v=1.6';
-import { MANUAL } from './manual.js?v=1.6';
-import { abrirSalvar, blocosDe } from './salvar.js?v=1.6';
-import { agregar, enviosDoDia, MIN_TURMA } from './estatistica.js?v=1.6';
-import { conectar, gerarCodigo, limparCodigo, novoId } from './sala.js?v=1.6';
-import { novoEstado, sortearNiveis, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=1.6';
+import { SINTESE, MOTIVOS, VERSAO, CONDICOES, BASE_ESTRESSE, NOME_NIVEL } from './dados.js?v=1.7';
+import { DIAS, ORDEM_DIAS } from './dias.js?v=1.7';
+import { GLOSSARIO } from './glossario.js?v=1.7';
+import { gerarRetorno } from './retorno.js?v=1.7';
+import { mapaDoDia } from './programa.js?v=1.7';
+import { MANUAL } from './manual.js?v=1.7';
+import { abrirSalvar, blocosDe } from './salvar.js?v=1.7';
+import { agregar, enviosDoDia, MIN_TURMA } from './estatistica.js?v=1.7';
+import { conectar, gerarCodigo, limparCodigo, novoId } from './sala.js?v=1.7';
+import { novoEstado, sortearNiveis, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=1.7';
 
-import { PARES, EXIGENCIAS, prepararRodadas, cruzarRodadas } from './retomadas.js?v=1.6';
+import { PARES, EXIGENCIAS, prepararRodadas, cruzarRodadas } from './retomadas.js?v=1.7';
 
 const app = document.querySelector('#app');
 const topo = document.querySelector('#topo');
@@ -199,7 +199,7 @@ function escolher(i) {
   foco();
 }
 
-import { graficoLinhas, graficoCertoDesfecho, graficoMargem, graficoEscala, COR, NOME, COR_CERTO, COR_DESFECHO } from './graficos.js?v=1.6';
+import { graficoLinhas, graficoCertoDesfecho, graficoMargem, graficoEscala, COR, NOME, COR_CERTO, COR_DESFECHO } from './graficos.js?v=1.7';
 
 /* ---------- Revelação ---------- */
 function sinaisDe(p) {

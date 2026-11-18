@@ -11,13 +11,13 @@ Esta nota descreve o que a sala guarda, quem vê o quê e o que o professor prec
 - **Professor, turma:** estatística do dia escolhido, **só com 5 ou mais envios** do mesmo dia (e cada cena só com 5 ou mais respostas): médias de razão, emoção e impulso por cena, certo × desfecho, margem de escolha, lentes éticas, percentual por alternativa em cada cena, tempo mediano, competências (eixos) e as respostas da aba Aplicar sem nome.
 
 ## Onde ficam os dados
-Mesmo projeto Firebase do Laboratório do Pesquisador (`laboratoriodopesquisador`), na estrutura `sessoes/{codigo}` e `sessoes/{codigo}/alunos/{id}`, separados pelo campo `projeto = "limiar-etico"`. Documento do aluno: `nome`, `avatar`, `dia`, `status`, `progresso`, e, se enviou, `enviado`, `dadosJson`, `extrasJson`, `aplicacao`.
+Projeto Firebase próprio (`limiar-etico`), na estrutura `sessoes/{codigo}` e `sessoes/{codigo}/alunos/{id}`, separados pelo campo `projeto = "limiar-etico"`. Documento do aluno: `nome`, `avatar`, `dia`, `status`, `progresso`, e, se enviou, `enviado`, `dadosJson`, `extrasJson`, `aplicacao`.
 
-## O que precisa estar nas regras do Firestore (conferir no console)
-- Qualquer pessoa pode **ler** o documento da sessão (para validar o código) e **escrever** em `sessoes/{codigo}/alunos/{id}`.
-- Só quem tem o documento `acesso/orientador` pode **criar** e **encerrar** sessões e **ler** a lista de alunos.
-- Se as regras atuais do Laboratório do Pesquisador validam o campo `projeto`, incluir `limiar-etico`.
-O código não foi testado contra o Firebase real (a rede do ambiente de desenvolvimento não alcança o serviço); o teste `um-dia/testes/sala_fumaca.py` usa uma sala simulada.
+## Configuração do Firebase (projeto `limiar-etico`)
+- Authentication: provedor Google ativo e `lab-ra.dragongames.dev.br` nos domínios autorizados.
+- Firestore em `southamerica-east1`, com as regras de `limiar-etica/firebase/firestore.rules` (trocar `SEU_EMAIL@gmail.com` pelo e-mail do professor).
+- Regras: qualquer pessoa lê só a sessão pelo código; o aluno grava só na própria ficha, com a sala ativa; o professor cria e encerra salas e lê os envios.
+- O código foi testado só com sala simulada (a rede do ambiente de desenvolvimento não alcança o Firebase); o teste real é abrir `?professor`, criar a sala e entrar com 2 celulares.
 
 ## Privacidade
 O manual diz que nada é enviado a menos que o aluno entre numa sala e escolha enviar. A estatística da turma e o telão não mostram nomes. O balizamento interno (PSS-10 e NOM-035) continua fora das telas do aluno e do professor.

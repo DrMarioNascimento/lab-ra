@@ -1,16 +1,15 @@
 // Limiar Ético · sala ao vivo. Só é carregado quando alguém entra numa sala ou abre o módulo do professor.
-// Usa o mesmo projeto Firebase do Laboratório do Pesquisador (estrutura sessoes/{codigo}/alunos/{id}),
-// separando os dados pelo campo projeto = 'limiar-etico'. O aluno não faz login; o professor entra com a conta Google
-// e quem decide se a conta tem acesso são as regras do Firestore (documento acesso/orientador).
+// Projeto Firebase próprio (limiar-etico), estrutura sessoes/{codigo}/alunos/{id}. O aluno não faz login; o professor entra
+// com a conta Google e as regras do Firestore (firestore.rules) decidem quem é professor. A chave abaixo é pública por desenho.
 export const PROJETO = 'limiar-etico';
 const VERSAO_FIREBASE = '12.17.1';
 const CONFIG = {
-  apiKey: 'AIzaSyAXjrSQUbsK9EMp5gxMyFHzQjIVDIzOuRw',
-  authDomain: 'laboratoriodopesquisador.firebaseapp.com',
-  projectId: 'laboratoriodopesquisador',
-  storageBucket: 'laboratoriodopesquisador.firebasestorage.app',
-  messagingSenderId: '779464235643',
-  appId: '1:779464235643:web:7a9c220660f07531f720de'
+  apiKey: 'AIzaSyAibhInsG1nZ9aSKzMIl8VVXQDQgd93f4I',
+  authDomain: 'limiar-etico.firebaseapp.com',
+  projectId: 'limiar-etico',
+  storageBucket: 'limiar-etico.firebasestorage.app',
+  messagingSenderId: '1025197130703',
+  appId: '1:1025197130703:web:4c14850f5c9e6d5e0e08ba'
 };
 
 let api = null;

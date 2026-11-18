@@ -1,0 +1,23 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Troque pelo e-mail da conta Google do professor (pode haver mais de um, separados por vírgula).
+    function professor() {
+      return request.auth != null && request.auth.token.email in ['SEU_EMAIL@gmail.com'];
+    }
+    match /acesso/orientador {
+      allow read: if professor();
+    }
+    match /sessoes/{codigo} {
+      allow get: if true;
+      allow create, update: if professor();
+      match /alunos/{id} {
+        allow create, update: if get(/databases/$(database)/documents/sessoes/$(codigo)).data.ativa == true
+          && request.resource.data.projeto == 'limiar-etico'
+          && request.resource.data.get('dadosJson', '').size() < 300000
+          && request.resource.data.get('aplicacao', '').size() < 4000;
+        allow read, delete: if professor();
+      }
+    }
+  }
+}
