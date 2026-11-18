@@ -205,3 +205,8 @@ O Lab-RA abre **Um dia** pelo card do Limiar Ético e oferece o protótipo de ci
 Em cada sessão, um elemento de urgência narrativa é sorteado para uma cena de cada par. Os pares abrangem decisões de trabalho e decisões que envolvem conciliar necessidades de outras pessoas. O elemento aparece como uma informação da história, com as mesmas alternativas e a mesma possibilidade de consultar os fatos nas duas versões de cada cena. Nas cenas selecionadas, nenhuma janela de informação é reduzida pela condição sorteada.
 
 A relação com a tensão aparece apenas na síntese após a última decisão. O relatório apresenta as quatro cenas, as escolhas e as consultas de informação. Os relatos dizem respeito a condutas no percurso. Para investigar o efeito da urgência, comparar a mesma cena entre participantes alocados às duas versões, em um piloto com protocolo definido. A comparação individual reúne dilemas diferentes e serve para reflexão.
+
+
+## 17. Conflito entre trabalho e faculdade · versão 0.5
+
+A cena “Até que horas” reúne uma escala de trabalho que se estende até a madrugada, risco de nova advertência, entrega em grupo e prova decisiva na manhã seguinte. Esses fatos aparecem no momento da decisão. A síntese final recupera o conflito, a escolha, a consulta opcional e a consequência narrativa. A leitura se limita ao comportamento que a atividade registra.

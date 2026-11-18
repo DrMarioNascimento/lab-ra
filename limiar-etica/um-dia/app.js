@@ -1,6 +1,6 @@
 // Limiar Ético · Um dia — interface.
-import { ABERTURA, SINTESE, MOTIVOS, APLICACAO, VERSAO, CENAS, CENAS_COM_URGENCIA } from './dados.js?v=0.4';
-import { novoEstado, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=0.4';
+import { ABERTURA, SINTESE, MOTIVOS, APLICACAO, VERSAO, CENAS, CENAS_COM_URGENCIA } from './dados.js?v=0.5';
+import { novoEstado, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=0.5';
 
 const app = document.querySelector('#app');
 const topo = document.querySelector('#topo');
@@ -333,6 +333,7 @@ function abaDecisoes(E) {
 
 function relatorioTensao(E) {
   const pontos = rev.dados.pontos;
+  const conflito = pontos.find(p => p.cenaId === 'horario');
   const marcadas = new Set(CENAS_COM_URGENCIA.flat().map(cena => cena.id));
   const grupos = [
     ['Com urgência na história', pontos.filter(p => urgencias.has(p.cenaId))],
@@ -340,6 +341,12 @@ function relatorioTensao(E) {
   ];
   return `<section class="cartao ${E}" style="--n:2">
     <h3>Como você decidiu em situações de tensão</h3>
+    <h4>Quando trabalho e faculdade disputaram o mesmo tempo</h4>
+    <p>A escala do trabalho, a possibilidade de outra advertência, a entrega e a prova colocaram compromissos importantes em conflito.</p>
+    <p><strong>Sua escolha:</strong> ${esc(conflito.escolha)}</p>
+    <p><strong>O que aconteceu:</strong> ${esc(conflito.desfecho)}</p>
+    <p class="suave pequeno">${conflito.abriuInfo ? 'Você perguntou sobre a possibilidade de trocar a escala.' : 'Você decidiu sem perguntar sobre a possibilidade de trocar a escala.'}</p>
+    <h4>Quando a urgência mudou a história</h4>
     <p>Em duas cenas, a história acrescentou um sinal de urgência. Veja o que você fez nessas cenas e nas outras duas em que esse elemento variava.</p>
     <div class="par">
       ${grupos.map(([titulo, cenas]) => `<div>

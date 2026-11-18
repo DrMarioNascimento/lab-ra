@@ -4,7 +4,7 @@
 // cor = pesos nas cinco correntes: U utilitarismo, V virtudes, I intenção, X existencialismo, C complexidade.
 // ef = efeitos nas variáveis do dia. margem = quanta escolha real a cena dava (0 a 1).
 
-export const VERSAO = '0.4';
+export const VERSAO = '0.5';
 
 export const CORRENTES = {
   U: 'Utilitarismo',
@@ -89,19 +89,19 @@ export const CENAS = [
   },
   {
     id: 'horario', hora: '11h00', titulo: 'Até que horas', margem: 0.3,
-    texto: 'A chefia pede que você fique até o fim da desmontagem, por volta de 1h. A entrega do trabalho é às 23h59 e a sua parte não está pronta.',
-    info: { rotulo: 'Perguntar ao colega veterano', texto: '“Quem recusa não costuma ser chamado para os próximos eventos.”' },
+    texto: 'A prova de amanhã às 7h pode definir se você passa no semestre. Você reservou esta noite para estudar e ainda precisa entregar sua parte do trabalho em grupo até 23h59. Uma pessoa avisa que não vem para o turno. A chefia inclui você na escala da desmontagem, que termina por volta de 1h. Você já recebeu um aviso por faltas e, se simplesmente deixar o turno, pode receber outra advertência.',
+    info: { rotulo: 'Perguntar ao colega veterano', texto: 'O colega diz que consegue cobrir a última parte da desmontagem se a chefia aprovar a troca até o fim da tarde.' },
     opcoes: [
-      { t: 'Aceitar e avisar o grupo da faculdade que alguém precisa fechar a sua parte.',
-        d: 'A chefia agradece. O grupo assume a sua parte, contrariado.',
+      { t: 'Ficar até o fim e avisar o grupo da faculdade que alguém precisa fechar a sua parte.',
+        d: 'A chefia agradece. O grupo assume a sua parte, contrariado. Você chega em casa depois da 1h e precisa escolher entre revisar para a prova e dormir um pouco mais.',
         w: { i: 0.2, e: 0.2, r: 0.6 }, cd: -0.5, cor: { X: 2, U: 1 }, ef: { evento: 1, grupo: -1, trabalho: -1 },
         car: 'escolha dentro do limite: você aceitou a condição do emprego e assumiu o custo às claras.' },
-      { t: 'Dizer que fica até as 22h por causa da entrega.',
-        d: 'A chefia aceita, sem sorrir.',
+      { t: 'Propor à chefia ficar até as 22h e combinar quem assume o restante do turno.',
+        d: 'A chefia aceita a troca de escala. Você ganha algum tempo para fechar o trabalho e revisar para a prova.',
         w: { i: 0.1, e: 0.2, r: 0.7 }, cd: 0.4, cor: { X: 2, V: 1 }, ef: { chefia: -1, trabalho: 1 },
         car: 'testar a margem real: você verificou se havia mais liberdade do que parecia.' },
-      { t: 'Aceitar e fazer a sua parte do trabalho nos intervalos, sem avisar ninguém.',
-        d: 'Ninguém fica contrariado agora. O dia fica bem mais pesado.',
+      { t: 'Ficar até o fim e usar os intervalos para dividir o tempo entre a entrega e a revisão para a prova.',
+        d: 'Você avança na entrega entre uma tarefa e outra. A desmontagem ocupa os últimos intervalos e sobra pouco tempo para revisar.',
         w: { i: 0.6, e: 0.2, r: 0.2 }, cd: -0.6, cor: { I: 1, X: 1 }, ef: { evento: 1, cansaco: 2 },
         car: 'evitar o conflito: a vontade de não desagradar ninguém falou mais alto.' }
     ],
