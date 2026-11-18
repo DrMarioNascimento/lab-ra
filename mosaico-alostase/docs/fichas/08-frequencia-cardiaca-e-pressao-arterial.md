@@ -22,7 +22,7 @@ Limites: Degaute só traz homens jovens em laboratório e o resumo não dá valo
 Os limites de monitorização ambulatorial (24 h ≥130/80; vigília ≥135/85; sono ≥120/70 mmHg) são **limites de diagnóstico de hipertensão** (ESC/ESH 2018, reproduzidos em várias fontes), não valores típicos. Servem para marcar a zona de alerta, não para desenhar a curva. Um estudo de 1.313 hipertensos relata médias correspondentes a 130/80 de consultório (sono 113,7/67,0; vigília 135,0/81,8), mas é de hipertensos tratados. **Médias em normotensos (adicionado em 18/11, só resumos):**
 
 - Meta-análise de 22 estudos, 2.638 pessoas: média de 24 h de 115/70 a 120/75 mmHg, vigília de 120/75 a 125/80, sono de 105/60 a 110/65 (Staessen e colegas, resumo no repositório da KU Leuven).
-- Outra amostra de 1.057 pessoas: 119/71 (24 h), 125/77 (vigília), 108/62 (sono) (revisão "What is a normal blood pressure", texto parcial).
+- **Correção de 18/11:** a amostra belga de 1.057 pessoas (119/71 em 24 h, 125/77 na vigília, 108/62 no sono) tem 328 hipertensos, idade média de cerca de 50 anos, e não separa os normotensos; **não serve** como valor de normotenso e saiu do motor.
 - Banco internacional: percentil 95 em normotensos de consultório de 133/82 (24 h), 140/88 (vigília) e 125/76 (sono).
 - Consórcio I24ABC: queda noturna da sistólica periférica de −11% no grupo mais jovem (18 a 29 anos), diminuindo com a idade.
 
@@ -47,7 +47,7 @@ Swain e Leutholtz, 1997: 63 adultos em bicicleta, teste máximo. %FC de reserva 
 
 ## 5. Decisões de modelagem
 
-**Implementado em 18/11/2026 (só motor, sem tela):** a pressão arterial de um normotenso, em `motor/hemodinamica.js`, com 5 testes. Média de vigília 125/77 e de sono 108/62; 70% da queda noturna segue o sono e 30% o relógio (forma de Degaute); quem dorme de dia perde a parte do sono, mas o relógio fica fora de fase; efeito crônico do trabalho noturno de +2,52/+1,76 mmHg como opção. Os valores continuam [resumo]. Frequência cardíaca, pós-exercício e a tela seguem como abaixo.
+**Implementado em 18/11/2026 (só motor, sem tela):** a pressão arterial de um normotenso, em `motor/hemodinamica.js`, com 5 testes. Média de vigília 122,5/77,5 e de sono 107,5/62,5 (pontos médios das faixas da meta-análise de normotensos); 70% da queda noturna segue o sono e 30% o relógio (forma de Degaute); quem dorme de dia perde a parte do sono, mas o relógio fica fora de fase; efeito crônico do trabalho noturno de +2,52/+1,76 mmHg como opção. Os valores continuam [resumo]. Frequência cardíaca, pós-exercício e a tela seguem como abaixo.
 
 - **Forma de 24 h** da frequência e da pressão: curva bimodal de Degaute como forma; amplitude relativa à média (19,9% / 14,1% / 10,9%). Só a forma e as amplitudes têm origem; a média absoluta não.
 - **Sono versus relógio:** separar o que é postura/sono do que é ritmo endógeno (65–75% para pressão, ~50% para frequência). Para quem dorme de dia, a consequência esperada é queda de pressão menor que a noturna normal e frequência que mantém parte do ritmo noturno. **Isso é extrapolação**: Degaute não estudou sono diurno.

@@ -59,9 +59,9 @@ export const P = {
   },
 
   pressaoArterial: {
-    unidade: 'mmHg (monitorização ambulatorial, adultos normotensos)',
-    sistolica:  { vigilia: 125, sono: 108, leitura: 'resumo', fonte: 'amostra de 1.057 pessoas (revisão What is a normal blood pressure); meta-análise de 22 estudos dá 120-125 e 105-110', nota: 'não é de adultos de 18 a 30 anos em particular' },
-    diastolica: { vigilia: 77,  sono: 62,  leitura: 'resumo', fonte: 'mesma amostra; meta-análise dá 75-80 e 60-65' },
+    unidade: 'mmHg (monitorização ambulatorial, normotensos)',
+    sistolica:  { vigilia: 122.5, sono: 107.5, leitura: 'resumo', fonte: 'meta-análise de 22 estudos, 2.638 normotensos (Staessen e colegas, resumo)', nota: 'ponto médio das faixas relatadas: vigília 120-125, sono 105-110. Idade média dos estudos não lida; não é de jovens em particular' },
+    diastolica: { vigilia: 77.5, sono: 62.5, leitura: 'resumo', fonte: 'mesma meta-análise', nota: 'ponto médio das faixas relatadas: vigília 75-80, sono 60-65' },
     partePostura: { valor: 0.70, leitura: 'resumo', fonte: 'Degaute 1991', nota: 'deitar e dormir explicam 65 a 75% da queda noturna da pressão; o restante é ritmo do relógio' },
     formaRelogio: { leitura: 'resumo', fonte: 'Degaute 1991', nota: 'picos perto das 10 h e das 20 h, queda pequena perto das 15 h, vale perto das 3 h; só o horário vem da fonte, a forma entre os pontos é modelagem' },
     pontosRelogio: [ { hora: 3, v: 1, leitura: 'resumo', fonte: 'Degaute 1991', nota: 'vale' }, { hora: 10, v: 0, leitura: 'resumo', fonte: 'Degaute 1991', nota: 'pico da manhã' }, { hora: 15, v: 0.2, leitura: 'modelagem', fonte: 'Degaute 1991', nota: 'o horário (queda pequena) vem da fonte; o 0,2 é escolha deste projeto' }, { hora: 20, v: 0, leitura: 'resumo', fonte: 'Degaute 1991', nota: 'pico da noite' } ],
