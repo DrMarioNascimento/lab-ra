@@ -45,7 +45,9 @@ Swain e Leutholtz, 1997: 63 adultos em bicicleta, teste máximo. %FC de reserva 
 
 **Contraponto:** um artigo cujo título diz que as frações de FC de reserva e de VO2 de reserva "não são equivalentes" reporta erro quadrático médio menor para %FCR contra %VO2máx (7,78%) do que contra %VO2R (9,25%), com alta variação entre pessoas. Autoria, ano e periódico não conferidos. **A equivalência é sustentada, mas disputada.**
 
-## 5. Decisões de modelagem (propostas, nada implementado)
+## 5. Decisões de modelagem
+
+**Implementado em 18/11/2026 (só motor, sem tela):** a pressão arterial de um normotenso, em `motor/hemodinamica.js`, com 5 testes. Média de vigília 125/77 e de sono 108/62; 70% da queda noturna segue o sono e 30% o relógio (forma de Degaute); quem dorme de dia perde a parte do sono, mas o relógio fica fora de fase; efeito crônico do trabalho noturno de +2,52/+1,76 mmHg como opção. Os valores continuam [resumo]. Frequência cardíaca, pós-exercício e a tela seguem como abaixo.
 
 - **Forma de 24 h** da frequência e da pressão: curva bimodal de Degaute como forma; amplitude relativa à média (19,9% / 14,1% / 10,9%). Só a forma e as amplitudes têm origem; a média absoluta não.
 - **Sono versus relógio:** separar o que é postura/sono do que é ritmo endógeno (65–75% para pressão, ~50% para frequência). Para quem dorme de dia, a consequência esperada é queda de pressão menor que a noturna normal e frequência que mantém parte do ritmo noturno. **Isso é extrapolação**: Degaute não estudou sono diurno.

@@ -18,7 +18,8 @@ Dia de trabalho de 17/11/2026: o projeto saiu do GDD e virou protótipo jogável
 | Motor da semana 1 | Sete dias contínuos; dívida de sono em horas de vigília em excesso; REM perdido somado |
 | Modo Prognóstico | Um dia (6 rotinas) e semana 1 (4 semanas prontas) |
 | Modo Diagnóstico | Rotina livre (dia e semana) e Desafio da semana (3 perfis) |
-| Testes | 43, todos passando (`npm test` nesta pasta) |
+| Pressão arterial | Só no motor (`motor/hemodinamica.js`), de um normotenso; ainda sem tela e fora das rotinas do jogo |
+| Testes | 48, todos passando (`npm test` nesta pasta) |
 
 ## Decisões do professor em 17/11/2026
 
@@ -55,7 +56,7 @@ Dia de trabalho de 17/11/2026: o projeto saiu do GDD e virou protótipo jogável
 
 ## Próximo passo
 
-**Frequência cardíaca e pressão arterial:** a ficha 08 (18/11/2026) está escrita só com resumos. Sustentado: forma bimodal de 24 h, amplitudes relativas e a divisão sono/postura versus ritmo endógeno. Médias de pressão em normotensos e efeito crônico do trabalho noturno (+2 a +3 mmHg) já têm resumo. Falta: Degaute inteiro, média por faixa de 18 a 30 anos, frequência pós-exercício e frequência/pressão no sono diurno. **Nada entrou no motor.** Decisão pendente do professor: só perfil saudável ou também hipertenso?
+**Frequência cardíaca e pressão arterial:** a ficha 08 (18/11/2026) está escrita só com resumos. Sustentado: forma bimodal de 24 h, amplitudes relativas e a divisão sono/postura versus ritmo endógeno. Médias de pressão em normotensos e efeito crônico do trabalho noturno (+2 a +3 mmHg) já têm resumo. Falta: Degaute inteiro, média por faixa de 18 a 30 anos, frequência pós-exercício e frequência/pressão no sono diurno. Entrou no motor só a pressão arterial de normotenso (18/11, sem tela); frequência cardíaca, pós-exercício e a interface ficam esperando. Decisão pendente do professor: só perfil saudável ou também hipertenso?
 
 Depois, pela ordem sugerida: conta de Treino; sala de aula com telão e `/simulador`; semanas 2 a 8 e meses por último.
 
