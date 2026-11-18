@@ -1,16 +1,16 @@
 // Limiar Ético · Um dia — interface.
-import { SINTESE, MOTIVOS, VERSAO, CONDICOES, BASE_ESTRESSE, NOME_NIVEL } from './dados.js?v=1.9';
-import { DIAS, ORDEM_DIAS } from './dias.js?v=1.9';
-import { GLOSSARIO } from './glossario.js?v=1.9';
-import { gerarRetorno } from './retorno.js?v=1.9';
-import { mapaDoDia } from './programa.js?v=1.9';
-import { MANUAL } from './manual.js?v=1.9';
-import { abrirSalvar, blocosDe } from './salvar.js?v=1.9';
-import { agregar, enviosDoDia, MIN_TURMA } from './estatistica.js?v=1.9';
-import { conectar, gerarCodigo, limparCodigo, novoId } from './sala.js?v=1.9';
-import { novoEstado, sortearNiveis, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=1.9';
+import { SINTESE, MOTIVOS, VERSAO, CONDICOES, BASE_ESTRESSE, NOME_NIVEL } from './dados.js?v=2.0';
+import { DIAS, ORDEM_DIAS } from './dias.js?v=2.0';
+import { GLOSSARIO } from './glossario.js?v=2.0';
+import { gerarRetorno } from './retorno.js?v=2.0';
+import { mapaDoDia } from './programa.js?v=2.0';
+import { MANUAL } from './manual.js?v=2.0';
+import { abrirSalvar, blocosDe } from './salvar.js?v=2.0';
+import { agregar, enviosDoDia, MIN_TURMA } from './estatistica.js?v=2.0';
+import { conectar, gerarCodigo, limparCodigo, novoId } from './sala.js?v=2.0';
+import { novoEstado, sortearNiveis, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=2.0';
 
-import { PARES, EXIGENCIAS, prepararRodadas, cruzarRodadas } from './retomadas.js?v=1.9';
+import { PARES, EXIGENCIAS, prepararRodadas, cruzarRodadas } from './retomadas.js?v=2.0';
 
 const app = document.querySelector('#app');
 const topo = document.querySelector('#topo');
@@ -67,9 +67,9 @@ function telaEscolhaDia() {
           ${ORDEM_DIAS.map((k, n) => `<button class="btn entra" style="--n:${n + 1}" data-acao="dia" data-dia="${k}"><strong>${esc(DIAS[k].nome)}</strong><br><span class="suave pequeno">${esc(DIAS[k].resumo)}</span></button>`).join('')}
         </div>
         ${sala ? `<p class="suave pequeno sala-aviso">Você está na sala <strong>${esc(sala.codigo)}</strong> como ${esc(sala.avatar)} ${esc(sala.nome)}. <button class="link" data-acao="sair-sala">Sair da sala</button></p>`
-               : `<div class="acoes linha"><button class="btn secundario" data-acao="tela-sala">Entrar numa sala</button><button class="btn secundario" data-acao="tela-prof">Sou professor</button></div>`}
+               : `<div class="acoes"><button class="btn secundario" data-acao="tela-sala">Entrar numa sala</button><button class="btn professor" data-acao="tela-prof" title="Abre ou retoma uma sala para a turma"><span class="entrada-prof"><img class="cadeado" src="icones/cadeado-fechado.png" width="40" height="40" alt="" aria-hidden="true">Abrir sala</span><small>Só o Professor tem a chave</small></button></div>`}
       </section>
-      <p class="versao entra" style="--n:4">Versão ${esc(VERSAO)} · <a href="?professor" class="link">Sou professor</a></p>
+      <p class="versao entra" style="--n:4">Versão ${esc(VERSAO)}</p>
     </div>`;
   foco();
 }
@@ -199,7 +199,7 @@ function escolher(i) {
   foco();
 }
 
-import { graficoLinhas, graficoCertoDesfecho, graficoMargem, graficoEscala, COR, NOME, COR_CERTO, COR_DESFECHO } from './graficos.js?v=1.9';
+import { graficoLinhas, graficoCertoDesfecho, graficoMargem, graficoEscala, COR, NOME, COR_CERTO, COR_DESFECHO } from './graficos.js?v=2.0';
 
 /* ---------- Revelação ---------- */
 function sinaisDe(p) {
@@ -664,7 +664,7 @@ function telaProfessor() {
   }
   if (!P.codigo) {
     app.innerHTML = `<div class="estreita"><section class="cartao capa-dia entra">
-      <p class="rotulo">Limiar Ético</p><h1>Criar sala</h1>
+      <p class="rotulo">Limiar Ético</p><h1><img class="cadeado" src="icones/cadeado-aberto.png" width="44" height="44" alt="" aria-hidden="true"> Criar sala</h1>
       <p>Os alunos entram pelo código ou pelo link, escolhem o dia e jogam no próprio celular. Cada um decide se envia o resultado.</p>
       <p id="erro-prof" class="erro" role="alert">${esc(P.erro)}</p>
       <div class="acoes"><button class="btn principal" data-acao="prof-criar">Criar sala</button><button class="btn secundario" data-acao="prof-sair">Voltar à atividade</button></div>

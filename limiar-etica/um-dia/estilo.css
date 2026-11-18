@@ -658,3 +658,20 @@ body.telao .alunos-grade { grid-template-columns: repeat(auto-fill, minmax(200px
 .folha .revela-topo, .folha .estreita { display: block; max-width: none; }
 .folha, .folha * { box-shadow: none !important; }
 .folha .bloco-grafico, .folha .painel { background: transparent !important; }
+
+/* botão do professor: roxo com cadeado, como o "Abrir Comitê" dos outros jogos de Ética */
+.btn.professor {
+  margin-top: 18px; text-align: center; color: #fff; font-weight: 800; font-size: 1.1rem;
+  background: linear-gradient(#8a4dc4 0%, #64289a 48%, #3f176f 100%);
+  border-color: #2e1052;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4), inset 0 -2px 0 rgba(30, 8, 60, .4), 0 7px 0 #2a0f4d, 0 8px 0 #1c0838, 0 18px 24px -8px rgba(63, 23, 111, .65);
+}
+@media (hover: hover) {
+  .btn.professor:hover { background: linear-gradient(#9a5fd2 0%, #7236ab 48%, #4a1f80 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4), 0 9px 0 #2a0f4d, 0 10px 0 #1c0838, 0 24px 28px -8px rgba(63, 23, 111, .7); }
+}
+.btn.professor:active { box-shadow: inset 0 2px 5px rgba(20, 5, 45, .5), 0 1px 0 #2a0f4d, 0 2px 0 #1c0838; }
+.btn.professor small { display: block; margin-top: 2px; font-size: .78rem; font-weight: 600; opacity: .92; }
+.entrada-prof { display: inline-flex; align-items: center; justify-content: center; gap: 10px; }
+.cadeado { width: 40px; height: 40px; vertical-align: middle; filter: drop-shadow(0 2px 2px rgba(20, 5, 45, .45)); }
+h1 .cadeado { width: 44px; height: 44px; }
