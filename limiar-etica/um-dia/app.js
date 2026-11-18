@@ -6,7 +6,7 @@ import { PARES, EXIGENCIAS, prepararRodadas, cruzarRodadas } from './retomadas.j
 
 const app = document.querySelector('#app');
 const topo = document.querySelector('#topo');
-const COR = { razao: '#2a78d6', emocao: '#eb6834', impulso: '#1baf7a' };
+const COR = { razao: '#1558b2', emocao: '#a8441b', impulso: '#126e5e' };
 const NOME = { razao: 'Razão', emocao: 'Emoção', impulso: 'Impulso' };
 const COR_CERTO = '#6250d6', COR_DESFECHO = '#a86d0a';
 
