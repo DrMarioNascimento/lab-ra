@@ -4,7 +4,7 @@
 // cor = pesos nas cinco correntes: U utilitarismo, V virtudes, I intenção, X existencialismo, C complexidade.
 // ef = efeitos nas variáveis do dia. margem = quanta escolha real a cena dava (0 a 1).
 
-export const VERSAO = '0.8';
+export const VERSAO = '0.9';
 
 export const CORRENTES = {
   U: 'Utilitarismo',
@@ -326,3 +326,36 @@ export const CENAS_COM_URGENCIA = [
     { id: 'ligacao', trecho: 'A sua irmã avisa que o carro que leva sua mãe já está a caminho.' }
   ]
 ];
+
+// Condições narrativas de cada cena, inspiradas nos temas que a literatura sobre estresse percebido (PSS-10)
+// reúne: o inesperado, a pouca margem de controle e o acúmulo de demandas. Descrevem a ficção, não a pessoa.
+export const CONDICOES = {
+  imprevisto: { nome: 'Imprevisto', texto: 'algo que você não esperava chegou e mudou o plano' },
+  controle: { nome: 'Pouco controle', texto: 'prazos ou decisões de outras pessoas limitavam o que você podia mudar' },
+  acumulo: { nome: 'Acúmulo de demandas', texto: 'várias obrigações pediam você ao mesmo tempo' }
+};
+
+export const COND_CENAS = {
+  mensagem: ['imprevisto', 'controle'],
+  nome: ['imprevisto', 'acumulo'],
+  numero: ['controle'],
+  horario: ['controle', 'acumulo'],
+  troca: ['imprevisto', 'acumulo'],
+  verba: ['imprevisto', 'controle'],
+  figurinha: ['acumulo'],
+  ligacao: ['imprevisto', 'acumulo'],
+  fotos: ['controle', 'acumulo'],
+  interprete: ['imprevisto', 'controle'],
+  volta: ['acumulo'],
+  negada: ['controle']
+};
+
+export const BASE_ESTRESSE = {
+  titulo: 'Base das condições de pressão',
+  texto: 'As condições “imprevisto”, “pouco controle” e “acúmulo de demandas” foram escolhidas a partir dos temas da Escala de Estresse Percebido (PSS-10). A atividade não aplica a escala, não calcula escore e não mede o seu estresse: descreve o que a história colocou no seu caminho.',
+  referencias: [
+    'Cohen, S., Kamarck, T., & Mermelstein, R. (1983). A global measure of perceived stress. Journal of Health and Social Behavior, 24(4), 385-396.',
+    'Cohen, S., & Williamson, G. (1988). Perceived stress in a probability sample of the United States. In S. Spacapan & S. Oskamp (Eds.), The social psychology of health. Sage.',
+    'Reis, R. S., Hino, A. A. F., & Añez, C. R. R. (2010). Perceived Stress Scale: reliability and validity study in Brazil. Journal of Health Psychology, 15(1), 107-114.'
+  ]
+};

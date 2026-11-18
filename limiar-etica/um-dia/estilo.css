@@ -1,4 +1,4 @@
-/* Percurso / Limiar Ético · Um dia
+/* Limiar Ético · Um dia
    Direção visual: "a agenda sob o céu do dia".
    O céu muda com a hora (alvorada, manhã, tarde, poente, noite); o conteúdo vive em papel,
    sempre claro, para o contraste do texto não depender do céu.
@@ -544,3 +544,10 @@ ul.limpa li::marker { color: var(--sol-base); }
   font: inherit;
   resize: vertical;
 }
+
+/* v0.9 · condições de pressão (inspiradas na PSS-10) */
+.sinal.cond { background: #ece6f7; color: #2b2150; box-shadow: inset 0 1px 0 #fff8, 0 2px 0 #b7a9d8; }
+.pressao ul { display: grid; gap: 14px; }
+.barra-pressao { display: block; height: 10px; margin-top: 6px; border-radius: 6px; background: #d9d2e6; box-shadow: inset 0 2px 3px #2b21503a; overflow: hidden; }
+.barra-pressao i { display: block; height: 100%; background: #6b4fb3; border-radius: 6px; }
+.pressao li { list-style: none; }

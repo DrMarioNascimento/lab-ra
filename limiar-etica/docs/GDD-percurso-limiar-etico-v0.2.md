@@ -231,3 +231,8 @@ A [PSS-10](https://www.cmu.edu/dietrich/psychology/stress-immunity-disease-lab/s
 Cada sessão inclui quatro cenas antes do dia, cinco perspectivas alternadas no meio e quatro cenas equivalentes depois. Os três níveis estão presentes em cada sessão e são distribuídos por sorteio entre temas. Cada tema preserva o próprio nível nas três passagens. A abertura e as cenas não revelam as comparações. As escolhas de quem pede a troca, de quem pode cobrir e de quem decide a escala aparecem distantes no percurso. Informação, ajuda e consentimento também são revistos pelo lado da pessoa afetada.
 
 Na síntese, a repetição de estratégia e de consulta é apresentada por nível. Um segundo cruzamento reúne os papéis de cada tema, suas escolhas e as leituras éticas de cada ação. As comparações entre níveis reúnem temas diferentes e servem à reflexão pedagógica. Comparações investigativas precisam de alocação documentada, mais casos por condição e piloto das histórias.
+
+
+## 21. Condições de pressão na revelação · versão 0.9
+
+Cada cena do dia recebe de uma a três condições narrativas (imprevisto, pouco controle, acúmulo de demandas), escolhidas a partir dos temas da PSS-10 sem aplicar a escala. A revelação mostra as condições de cada decisão e um bloco "O que pressionava o seu dia", e a síntese traz a base e as referências. O mapa, as lacunas (dinheiro, saúde, moradia, estágio, integridade acadêmica) e as ressalvas estão em `PSS10-situacoes-e-contextos-v0.1.md`. A atribuição das condições é proposta de autoria e depende de revisão do professor.

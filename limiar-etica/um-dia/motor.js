@@ -1,5 +1,5 @@
 // Limiar Ético · Um dia — motor do dia (sem interface).
-import { CENAS, CENA_FINAL, CENA_NEGADA, ORDEM_PENDENCIAS, VOLTAS, CORRENTES } from './dados.js?v=0.8';
+import { CENAS, CENA_FINAL, CENA_NEGADA, ORDEM_PENDENCIAS, VOLTAS, CORRENTES, CONDICOES, COND_CENAS } from './dados.js?v=0.9';
 
 export function novoEstado() {
   return {
@@ -110,6 +110,7 @@ function textoFamilia(f) {
 export function resumo(est) {
   const pontos = est.log.map((l, n) => ({
     n: n + 1, hora: l.hora, titulo: l.titulo, cenaId: l.cenaId,
+    cond: COND_CENAS[l.cenaId] || [],
     escolha: l.opcao.t, desfecho: l.desfecho, caracteristica: l.opcao.car, conceito: l.conceito,
     impulso: l.opcao.w.i, emocao: l.opcao.w.e, razao: l.opcao.w.r,
     certoDesfecho: l.opcao.cd, margem: l.margem,
@@ -127,8 +128,13 @@ export function resumo(est) {
   const media = campo => pontos.reduce((a, p) => a + p[campo], 0) / (pontos.length || 1);
   const comInfo = pontos.filter(p => p.tinhaInfo);
 
+  const contextos = Object.keys(CONDICOES).map(k => ({
+    chave: k, nome: CONDICOES[k].nome, texto: CONDICOES[k].texto,
+    cenas: pontos.filter(p => p.cond.includes(k)).map(p => p.n)
+  }));
+
   return {
-    pontos, escala,
+    pontos, escala, contextos,
     medias: { impulso: media('impulso'), emocao: media('emocao'), razao: media('razao') },
     conferiu: comInfo.filter(p => p.abriuInfo).length,
     podiaConferir: comInfo.length,

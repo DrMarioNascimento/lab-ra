@@ -1,8 +1,8 @@
 // Limiar Ético · Um dia — interface.
-import { ABERTURA, SINTESE, MOTIVOS, APLICACAO, VERSAO, CENAS, CENAS_COM_URGENCIA } from './dados.js?v=0.8';
-import { novoEstado, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=0.8';
+import { ABERTURA, SINTESE, MOTIVOS, APLICACAO, VERSAO, CENAS, CENAS_COM_URGENCIA, CONDICOES, BASE_ESTRESSE } from './dados.js?v=0.9';
+import { novoEstado, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=0.9';
 
-import { PARES, EXIGENCIAS, prepararRodadas, cruzarRodadas } from './retomadas.js?v=0.8';
+import { PARES, EXIGENCIAS, prepararRodadas, cruzarRodadas } from './retomadas.js?v=0.9';
 
 const app = document.querySelector('#app');
 const topo = document.querySelector('#topo');
@@ -259,13 +259,27 @@ function sinaisDe(p) {
   return s.map(t => `<span class="sinal">${esc(t)}</span>`).join('');
 }
 
+function condicoesDe(p) {
+  return (p.cond || []).map(k => `<span class="sinal cond">${esc(CONDICOES[k].nome)}</span>`).join('');
+}
+
+function blocoPressao(r) {
+  const total = r.pontos.length;
+  return `<div class="bloco-grafico pressao">
+        <h3>O que pressionava o seu dia</h3>
+        <p class="sub">Condições que a história colocou em cada momento. Descrevem a situação, não você.</p>
+        <ul class="limpa">${r.contextos.map(c => `<li><strong>${esc(c.nome)}</strong> · ${c.cenas.length} de ${total} momentos<br><span class="suave pequeno">${esc(c.texto)}</span>
+          <span class="barra-pressao" aria-hidden="true"><i style="width:${Math.round(100 * c.cenas.length / total)}%"></i></span></li>`).join('')}</ul>
+      </div>`;
+}
+
 function cartaoDetalhe(p, E) {
   return `<section class="cartao detalhe ${E}" style="--n:2" aria-live="polite">
       <p class="rotulo">Decisão ${p.n} · ${esc(p.hora)}</p>
       <h3>${esc(p.titulo)}</h3>
       <p class="escolhido">${esc(p.escolha)}</p>
       <p class="car">Uma leitura possível: ${esc(p.caracteristica)}</p>
-      <div class="sinais">${sinaisDe(p)}</div>
+      <div class="sinais">${sinaisDe(p)}${condicoesDe(p)}</div>
     </section>`;
 }
 
@@ -301,6 +315,7 @@ function abaCurvas(E) {
         <p class="sub">Como as ações escolhidas se aproximam das cinco lentes éticas, segundo os critérios de autoria.</p>
         ${graficoEscala(r.escala)}
       </div>
+      ${blocoPressao(r)}
     </section>
     <section class="cartao liso ${E}" style="--n:4">
       <h3>Como o dia terminou</h3>
@@ -322,7 +337,7 @@ function abaDecisoes(E) {
           <h3>${esc(p.titulo)}</h3>
           <p class="escolhido">${esc(p.escolha)}</p>
           <p>Uma leitura possível: ${esc(p.caracteristica)}</p>
-          <div class="sinais">${sinaisDe(p)}</div>
+          <div class="sinais">${sinaisDe(p)}${condicoesDe(p)}</div>
           <p class="desfecho">${esc(p.desfecho)}</p>
           <div class="conceito"><strong>${esc(p.conceito.titulo)}</strong><p>${esc(p.conceito.texto)}</p></div>
           ${rev.abertas[i]
@@ -490,6 +505,7 @@ function abaSintese(E) {
       </section>
     </div>
     <div class="estreita">
+      <details class="conceito"><summary>${esc(BASE_ESTRESSE.titulo)}</summary><p>${esc(BASE_ESTRESSE.texto)}</p><ul class="limpa pequeno">${BASE_ESTRESSE.referencias.map(x => `<li>${esc(x)}</li>`).join('')}</ul></details>
       <p class="aviso">Simulação de aprendizagem. As leituras são interpretações para discutir em aula. Nada foi salvo.</p>
       <div class="acoes"><button class="btn principal" data-acao="recomecar">Viver o dia de novo</button></div>
     </div>`;

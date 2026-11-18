@@ -245,7 +245,7 @@ Um personagem em Three.js cujo corpo mostra o estado do momento: postura caída 
 
 - **Alostase:** rede por hora com meias-vidas e cerca de 50 ligações, previsões por hora, perfis de corpo de partida, curvas e mapa de influências.
 - **Mosaico Lastro:** agenda de 24 horas, painéis por setor, acontecimentos, tela de créditos e débitos, comparação de trajetórias, cenário de turnos.
-- **Limiar Ética:** fica fora deste projeto. É outra linha (decisões guiadas com base filosófica e psicológica), a tratar em documento próprio.
+- **Limiar Ético:** fica fora deste projeto. É outra linha (decisões guiadas com base filosófica e psicológica), a tratar em documento próprio.
 
 ## 15. Etapas de construção
 

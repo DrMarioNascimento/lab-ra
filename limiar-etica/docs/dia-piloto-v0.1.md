@@ -1,4 +1,4 @@
-# Percurso / Limiar Ético · Dia-piloto
+# Limiar Ético · Dia-piloto
 
 Versão 0.1 · 16/11/2026 · documento de projeto (não é conteúdo para o aluno)
 Acompanha o `GDD-percurso-limiar-etico-v0.2.md`.

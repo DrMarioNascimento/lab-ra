@@ -1,4 +1,4 @@
-# Percurso / Limiar Ético · Um dia — avaliação visual e direção artística
+# Limiar Ético · Um dia — avaliação visual e direção artística
 
 16/11/2026 · documento de projeto (não é conteúdo para o aluno)
 Interface avaliada: `limiar-etica/um-dia/` · versão visual 0.1 (antes) e 0.2 (depois)

@@ -1,6 +1,6 @@
 // Verificações do motor do dia. Rodar: node testes/motor.test.mjs
 import assert from 'node:assert/strict';
-import { CENAS, CENA_FINAL, CENA_NEGADA, CORRENTES, VOLTAS, ORDEM_PENDENCIAS } from '../dados.js';
+import { CENAS, CENA_FINAL, CENA_NEGADA, CORRENTES, VOLTAS, ORDEM_PENDENCIAS, CONDICOES, COND_CENAS } from '../dados.js';
 import { novoEstado, cenaAtual, decidir, terminou, resumo, janelaInfo, pendenciaPrincipal } from '../motor.js';
 
 let n = 0;
@@ -85,6 +85,21 @@ ok('a confiança da equipe muda o desfecho da mesma escolha de reparo', () => {
   };
   assert.match(desfechoCom(1), /colega da equipe ajuda.*ausência de Libras/);
   assert.match(desfechoCom(2), /Funciona pela metade/);
+});
+
+ok('toda cena tem de uma a três condições de pressão válidas, e o resumo as reúne', () => {
+  for (const c of [...CENAS, CENA_FINAL, CENA_NEGADA]) {
+    const cond = COND_CENAS[c.id];
+    assert.ok(cond && cond.length >= 1 && cond.length <= 3, 'sem condições: ' + c.id);
+    for (const k of cond) assert.ok(CONDICOES[k], 'condição inexistente: ' + k);
+    assert.equal(new Set(cond).size, cond.length, 'condição repetida: ' + c.id);
+  }
+  const e = novoEstado();
+  while (!terminou(e)) decidir(e, 0);
+  const r = resumo(e);
+  assert.equal(r.contextos.length, Object.keys(CONDICOES).length);
+  for (const p of r.pontos) assert.ok(Array.isArray(p.cond) && p.cond.length >= 1);
+  for (const c of r.contextos) assert.ok(c.cenas.every(n => n >= 1 && n <= r.pontos.length));
 });
 
 console.log(`\n${n} verificações passaram.`);
