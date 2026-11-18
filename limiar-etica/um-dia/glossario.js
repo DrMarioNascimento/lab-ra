@@ -2,6 +2,7 @@
 // Cópia própria, a partir do glossário do Mosaico Vila Ética (lab-ra/mosaico-vila-etica/js/content/glossario.js), que se baseia
 // nos slides de Ética e Deontologia da Educação Física (UDESC/CEFID, 2026/2: Aranha e Martins, Chaui) e no texto de apoio da disciplina,
 // com complementos de Rawls, utilitarismo, ética do cuidado e do Código de Ética do CONFEF.
+// Os verbetes de "Material de apoio" vêm dos textos "Entre o impulso e a escolha" e "Ética do Profissional de Saúde — Educação Física" (Prof. Mário César Nascimento, 2026).
 // As frases que falam só do jogo da vila foram retiradas. As definições são as do professor; não editar aqui sem a autorização dele.
 
 export const GLOSSARIO = {
@@ -184,16 +185,35 @@ export const GLOSSARIO = {
     "autor": "",
     "def": "A deontologia da Educação Física: os deveres do profissional com quem atende, com os colegas e com a sociedade.",
     "cat": "Kant e o dever"
-  }
+  },
+  "subjetividade": {"termo": "Subjetividade", "autor": "", "def": "Maneira singular pela qual cada pessoa percebe, interpreta e atribui sentido ao mundo. Explica o ponto de partida do julgamento; a reflexão ética examina se ele pode ser defendido diante de outras pessoas, de direitos, de deveres e das consequências previsíveis.", "cat": "Material de apoio"},
+  "intencao-motivo": {"termo": "Intenção, motivo e consequência", "autor": "", "def": "Intenção é o que a pessoa pretende realizar; motivo é a razão pela qual deseja realizá-lo; consequência é o que efetivamente ocorre. Uma boa intenção não torna correta qualquer conduta: contam também os meios, a competência e os danos previsíveis.", "cat": "Material de apoio"},
+  "liberdade-situada": {"termo": "Liberdade situada", "autor": "Sartre, Merleau-Ponty", "def": "Liberdade não é escolher sem condicionamentos: decide-se dentro de situações concretas (regras institucionais, relações de poder, tempo, recursos, medo, dependência). Reconhecer condicionamentos não retira a responsabilidade; muda as alternativas realmente disponíveis.", "cat": "Material de apoio"},
+  "principialismo": {"termo": "Princípios éticos dos profissionais de saúde", "autor": "", "def": "Respeito pela pessoa (autonomia e proteção dos vulneráveis), beneficência, não maleficência e justiça e equidade.", "cat": "Material de apoio"},
+  "beneficencia": {"termo": "Beneficência", "autor": "", "def": "Promover benefícios e bem-estar, maximizando ganhos e minimizando danos. Não é o mesmo que utilitarismo: o benefício da maioria pode violar direitos individuais.", "cat": "Material de apoio"},
+  "nao-maleficencia": {"termo": "Não maleficência", "autor": "", "def": "Evitar ou reduzir danos previsíveis.", "cat": "Material de apoio"},
+  "autonomia-pessoa": {"termo": "Respeito pela pessoa (autonomia)", "autor": "", "def": "Participar das decisões que a envolvem (consentimento livre e esclarecido) e proteger quem é vulnerável.", "cat": "Material de apoio"},
+  "equidade": {"termo": "Equidade", "autor": "Rawls", "def": "Considerar necessidades e barreiras diferentes para garantir participação justa. Igualdade oferece a mesma regra a todos; tratar todos igual nem sempre produz justiça.", "cat": "Material de apoio"},
+  "etica-complexidade": {"termo": "Ética da complexidade", "autor": "Morin", "def": "As decisões acontecem em contextos de pessoas, instituições, regras, desigualdades e incertezas. Boa intenção não garante bom resultado: monitorar, corrigir e reparar também é responsabilidade.", "cat": "Material de apoio"},
+  "omissao": {"termo": "Omissão", "autor": "", "def": "Deixar de agir tendo dever, conhecimento e possibilidade razoável de intervir. A omissão gera responsabilidade quando existe dever de cuidado.", "cat": "Material de apoio"},
+  "transferencia": {"termo": "Transferência de responsabilidade", "autor": "", "def": "Encaminhar ou delegar a decisão a outro. Encaminhar pode ser decisão responsável; transferir sem acompanhamento pode ser fuga da própria responsabilidade.", "cat": "Material de apoio"},
+  "duplo-efeito": {"termo": "Duplo efeito", "autor": "Tomás de Aquino, Philippa Foot", "def": "Uma mesma ação pode produzir um efeito desejável e outro prejudicial. Prever um dano não é o mesmo que desejá-lo: contam a finalidade legítima, os meios e a proporcionalidade.", "cat": "Material de apoio"},
+  "imprudencia": {"termo": "Imprudência", "autor": "", "def": "Agir precipitadamente, sem a cautela exigida ou sem considerar as possíveis consequências.", "cat": "Material de apoio"},
+  "negligencia": {"termo": "Negligência", "autor": "", "def": "Deixar de cumprir um dever de cuidado por descuido ou omissão.", "cat": "Material de apoio"},
+  "impericia": {"termo": "Imperícia", "autor": "", "def": "Falta de conhecimento, habilidade ou preparo técnico necessário.", "cat": "Material de apoio"},
+  "limites-competencia": {"termo": "Limites de competência", "autor": "", "def": "Reconhecer o que a formação permite fazer e encaminhar quando necessário. Atuar fora dos limites da formação é infração ética e legal.", "cat": "Material de apoio"},
+  "salvaguardas": {"termo": "Salvaguardas", "autor": "", "def": "Condições mínimas de dignidade, segurança e direitos. Não são preferências pessoais: são limites éticos e profissionais da decisão.", "cat": "Material de apoio"},
+  "dever-vigilancia": {"termo": "Dever de vigilância", "autor": "", "def": "Atenção e acompanhamento contínuos de quem é atendido.", "cat": "Material de apoio"},
+  "etica-profissional": {"termo": "Ética profissional", "autor": "Tojal, Da Costa e Beresford", "def": "Exercer uma profissão exige conhecimento especializado, competência técnica e compromisso ético. Atitudes, valores e responsabilidade se formam na graduação e se aperfeiçoam na prática.", "cat": "Material de apoio"}
 };
 
 // Quais verbetes acompanham cada tipo de leitura do retorno (prefixo do id da leitura).
 export const CONCEITOS_DA_LEITURA = {
-  'razao-emocao': ['alma', 'platao', 'hume', 'afetos', 'desejo', 'vontade', 'racionalismo'],
-  'colegas': ['codigo-confef', 'confianca', 'cuidado', 'bem-comum'],
+  'razao-emocao': ['alma', 'platao', 'hume', 'afetos', 'desejo', 'vontade', 'racionalismo', 'subjetividade', 'intencao-motivo'],
+  'colegas': ['codigo-confef', 'confianca', 'cuidado', 'bem-comum', 'etica-complexidade'],
   'meta-colegas': ['individualismo', 'bem-comum', 'carona', 'codigo-confef'],
-  'justica': ['justica-distributiva', 'diferenca', 'veu', 'justica-virtude'],
-  'profissional': ['deontologia', 'codigo-confef', 'responsabilidade', 'dever'],
+  'justica': ['justica-distributiva', 'equidade', 'diferenca', 'veu', 'justica-virtude', 'autonomia-pessoa'],
+  'profissional': ['etica-profissional', 'deontologia', 'codigo-confef', 'responsabilidade', 'dever', 'limites-competencia', 'salvaguardas', 'omissao', 'transferencia', 'negligencia', 'imprudencia', 'impericia', 'dever-vigilancia'],
   'virtudes': ['virtude', 'justo-meio', 'coragem', 'veracidade', 'prudencia', 'covardia', 'temeridade'],
-  'certo-desfecho': ['dever', 'imperativo', 'deontologia', 'consequencialismo', 'utilitarismo']
+  'certo-desfecho': ['dever', 'imperativo', 'deontologia', 'consequencialismo', 'utilitarismo', 'beneficencia', 'nao-maleficencia', 'duplo-efeito', 'intencao-motivo', 'liberdade-situada']
 };
