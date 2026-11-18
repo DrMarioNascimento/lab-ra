@@ -3,6 +3,7 @@
 // nos slides de Ética e Deontologia da Educação Física (UDESC/CEFID, 2026/2: Aranha e Martins, Chaui) e no texto de apoio da disciplina,
 // com complementos de Rawls, utilitarismo, ética do cuidado e do Código de Ética do CONFEF.
 // Os verbetes de "Material de apoio" vêm dos textos "Entre o impulso e a escolha" e "Ética do Profissional de Saúde — Educação Física" (Prof. Mário César Nascimento, 2026).
+// "Coleguismo" e "Complacência com o mal" vêm do capítulo "Ética do coleguismo" de A Ética e a Bioética na Preparação e na Intervenção do Profissional de Educação Física (CONFEF, 2006).
 // As frases que falam só do jogo da vila foram retiradas. As definições são as do professor; não editar aqui sem a autorização dele.
 
 export const GLOSSARIO = {
@@ -204,14 +205,16 @@ export const GLOSSARIO = {
   "limites-competencia": {"termo": "Limites de competência", "autor": "", "def": "Reconhecer o que a formação permite fazer e encaminhar quando necessário. Atuar fora dos limites da formação é infração ética e legal.", "cat": "Material de apoio"},
   "salvaguardas": {"termo": "Salvaguardas", "autor": "", "def": "Condições mínimas de dignidade, segurança e direitos. Não são preferências pessoais: são limites éticos e profissionais da decisão.", "cat": "Material de apoio"},
   "dever-vigilancia": {"termo": "Dever de vigilância", "autor": "", "def": "Atenção e acompanhamento contínuos de quem é atendido.", "cat": "Material de apoio"},
-  "etica-profissional": {"termo": "Ética profissional", "autor": "Tojal, Da Costa e Beresford", "def": "Exercer uma profissão exige conhecimento especializado, competência técnica e compromisso ético. Atitudes, valores e responsabilidade se formam na graduação e se aperfeiçoam na prática.", "cat": "Material de apoio"}
+  "etica-profissional": {"termo": "Ética profissional", "autor": "Tojal, Da Costa e Beresford", "def": "Exercer uma profissão exige conhecimento especializado, competência técnica e compromisso ético. Atitudes, valores e responsabilidade se formam na graduação e se aperfeiçoam na prática.", "cat": "Material de apoio"},
+  "coleguismo": {"termo": "Coleguismo", "autor": "Cunha, Martins e Beresford; Sá", "def": "Sentimento de solidariedade que une os colegas, tratado como virtude essencial nas relações entre profissionais de Educação Física. Pede orientar e ajudar quem tem menos experiência, não se apropriar de ideias ou trabalhos alheios, não se omitir diante de atitudes imorais e evitar comentários depreciativos sobre o trabalho de quem veio antes. Prejudicar um colega para se projetar é vício; é tão importante não agir contra colegas quanto se defender de quem age contra nós.", "cat": "Material de apoio"},
+  "complacencia": {"termo": "Complacência com o mal", "autor": "Sá", "def": "Tolerar a atitude imoral de um colega estimula a ação viciosa. Por isso o coleguismo inclui não se omitir diante do que é errado, o que não é o mesmo que denunciar por rivalidade.", "cat": "Material de apoio"}
 };
 
 // Quais verbetes acompanham cada tipo de leitura do retorno (prefixo do id da leitura).
 export const CONCEITOS_DA_LEITURA = {
   'razao-emocao': ['alma', 'platao', 'hume', 'afetos', 'desejo', 'vontade', 'racionalismo', 'subjetividade', 'intencao-motivo'],
-  'colegas': ['codigo-confef', 'confianca', 'cuidado', 'bem-comum', 'etica-complexidade'],
-  'meta-colegas': ['individualismo', 'bem-comum', 'carona', 'codigo-confef'],
+  'colegas': ['coleguismo', 'complacencia', 'codigo-confef', 'confianca', 'cuidado', 'bem-comum', 'etica-complexidade'],
+  'meta-colegas': ['coleguismo', 'individualismo', 'bem-comum', 'carona', 'codigo-confef'],
   'justica': ['justica-distributiva', 'equidade', 'diferenca', 'veu', 'justica-virtude', 'autonomia-pessoa'],
   'profissional': ['etica-profissional', 'deontologia', 'codigo-confef', 'responsabilidade', 'dever', 'limites-competencia', 'salvaguardas', 'omissao', 'transferencia', 'negligencia', 'imprudencia', 'impericia', 'dever-vigilancia'],
   'virtudes': ['virtude', 'justo-meio', 'coragem', 'veracidade', 'prudencia', 'covardia', 'temeridade'],
