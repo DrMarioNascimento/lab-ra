@@ -13,7 +13,7 @@ Documento de projeto. Não aparece para o aluno. O que o aluno vê é o card "O 
 | ASBH (asbh.org: História; Core Competencies for Healthcare Ethics Consultants, 3ª ed.). | Contexto e modelo de organização: a ASBH nasceu em janeiro de 1998 da fusão de três associações (SHHV, SBC e AAB); sua publicação trata ética como conjunto de conhecimentos, habilidades e atributos profissionais que se aprendem e se treinam, e divide as habilidades em três domínios (avaliação e análise, processo, interpessoais), segundo um artigo que a cita. | Só o que está nas páginas públicas e no resumo de terceiros. **O livro não foi lido**, então o detalhamento dos domínios não foi usado. A ligação com os passos de aprendizagem da seção 6 é uma analogia nossa. |
 | Ethicsglobal, riscos psicossociais no trabalho. | Régua interna: três fatores citados (ambiente rígido com pouco espaço de recuperação; exigências impossíveis; assédio/mobbing). | Lido integralmente (texto curto). |
 | NOM-035-STPS-2018. | Régua interna: sete categorias de fator de risco psicossocial (seção 5). | A página oficial do gob.mx não abriu. As categorias vêm de um e-book de uma consultoria (Global Standards), fonte secundária. **Conferir no texto do DOF (23/10/2018) antes de citar.** |
-| AAPOR, definições padrão. | Não usada. Só serviria se a atividade for avaliada por questionário (taxas de resposta, elegibilidade). | **Não lida.** Os PDFs e a planilha na pasta ficaram intocados. |
+| AAPOR (Standard Definitions 10ª ed.; Establishment Surveys 2025; estimativa de elegibilidade; Response Rate Calculator 5.1, xlsx). | Não alimenta o conteúdo ético. Tratam de códigos finais de disposição de casos e taxas de resposta, cooperação, recusa e contato em pesquisas por questionário. Só serviriam se a atividade virar estudo com convite e questionário de avaliação. | Abertos em 18/11: aba "Read Me" e estrutura da calculadora, sumário das duas guias de definições. **Não li o texto completo nem o artigo de elegibilidade.** |
 
 ## 2. Objetivo geral
 
@@ -106,6 +106,6 @@ Passos de aprendizagem em cada sessão: reconhecer o dilema (jogar) → nomear o
 ## 8. Pendências para o professor
 
 1. Conferir o mapa cena → eixo (seção 4) e a redação das competências.
-2. Decidir se quer a leitura dos arquivos da AAPOR (só úteis se a atividade for avaliada por questionário).
+2. Decidir se a atividade será avaliada por questionário; só então as definições da AAPOR entram (protocolo de avaliação).
 3. Conferir a NOM-035 no texto oficial e, se quiser citar competências da ASBH, adquirir o livro (3ª ed.).
 4. Confirmar persona (estagiário(a) com supervisor) e o enquadramento do limite do sigilo.
