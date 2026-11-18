@@ -31,7 +31,7 @@ O projeto não nasce do zero. Ele reúne peças que já existem:
 | Escala do Dilema do Bonde | repositório Etica, `dilema-bonde/` | Cinco correntes: Utilitarismo, Virtudes, Intenção, Existencialismo e Ética da Complexidade |
 | Glossário do Mosaico Vila Ética | `mosaico-vila-etica/js/content/glossario.js` | Dezenas de verbetes de ética e deontologia |
 | "Passagem 2 · Ética" | `limiar-source/docs/GDD-Alostase-v0.5.md` | A ideia de reviver o mesmo dia pelo lado das pessoas e comparar o gesto com o estado do corpo |
-| Limiar Ético (protótipo) | `limiar-etica/` | Cinco cenas do cotidiano, sem acúmulo; serve como banco inicial de situações |
+| Limiar Ético (protótipo de 15/11) | pacote `alostase-arquivos/limiar-etica-fontes-atuais.zip` | Cinco cenas do cotidiano, sem acúmulo; arquivado, serviu como banco inicial de situações |
 | Percursos de Fisiologia | repositório fisiologia-em-fuga, `percursos/` | A estrutura de percurso: tema, contexto, questões ligadas à situação, síntese |
 
 ## 3. Base teórica
@@ -186,7 +186,7 @@ Os dois podem conviver no mesmo lugar.
 
 ## 15. Atualização da implementação · versão 0.3
 
-O Lab-RA abre **Um dia** pelo card do Limiar Ético e oferece o protótipo de cinco situações independentes como modalidade curta. O dia-piloto tem onze ou doze decisões, conforme o percurso. A abertura pede escolhas sinceras e informa que não há gabarito nem nota. Durante o percurso aparecem as consequências narrativas. Conceitos, curvas e motivos relatados entram no fechamento.
+O Lab-RA abre o Limiar Ético por um único link, `limiar-etica/um-dia/`, que oferece os três dias. O protótipo de cinco situações independentes foi arquivado (v1.3) e o endereço antigo `limiar-etica/` redireciona para o jogo. O dia-piloto tem onze ou doze decisões, conforme o percurso. A abertura pede escolhas sinceras e informa que não há gabarito nem nota. Durante o percurso aparecem as consequências narrativas. Conceitos, curvas e motivos relatados entram no fechamento.
 
 - **Consequência acumulada.** Na cena do intérprete de Libras, o relacionamento com a equipe construído durante o dia pode mudar a ajuda recebida e o desfecho quando a personagem decide improvisar legendas e distribuir roteiros. Esse apoio reduz a demora e a lacuna de acessibilidade persiste.
 - **Leitura das respostas.** A síntese mostra os pesos definidos na autoria e a frequência dos motivos que o participante relatou opcionalmente. Tempo de resposta e consulta a informações descrevem o contexto. Leitura, distrações e condições de acesso podem afetar esses sinais.

@@ -1,11 +1,14 @@
 # Limiar Ético
 
-[Abrir cinco situações independentes](https://lab-ra.dragongames.dev.br/limiar-etica/) · [Arquivos](https://lab-ra.dragongames.dev.br/alostase-arquivos/#limiar-etica)
+**Entrada única:** [`um-dia/`](um-dia/) (lab-ra.dragongames.dev.br/limiar-etica/um-dia/). Três dias: empresa e faculdade, escola e projeto do bairro. Links diretos: `?dia=empresa`, `?dia=escola`, `?dia=bairro`. O endereço antigo `limiar-etica/` redireciona para o jogo.
 
-[Abrir Um dia](https://lab-ra.dragongames.dev.br/limiar-etica/um-dia/) · [GDD](docs/GDD-percurso-limiar-etico-v0.2.md) · [PSS-10: situações e contextos](docs/PSS10-situacoes-e-contextos-v0.1.md) · [balizamento interno](docs/PSS10-balizamento-interno-v0.1.md)
+## Documentos (só do projeto)
 
-**Um dia** é o percurso encadeado em `um-dia/`, com desfechos que dependem das decisões anteriores e uma devolutiva conceitual no fim. Verifique o motor com `node limiar-etica/um-dia/testes/motor.test.mjs`, a partir da raiz do repositório.
+- [`docs/GDD-percurso-limiar-etico-v0.2.md`](docs/GDD-percurso-limiar-etico-v0.2.md): visão geral, decisões e histórico por versão.
+- [`docs/PROGRAMA-limiar-etico-v0.1.md`](docs/PROGRAMA-limiar-etico-v0.1.md): conteúdo programático (teoria → competências → cenas) e fontes.
+- [`docs/ROTEIRO-de-uso-limiar-etico-v0.1.md`](docs/ROTEIRO-de-uso-limiar-etico-v0.1.md): uso em aula e palestra.
+- [`docs/PSS10-situacoes-e-contextos-v0.1.md`](docs/PSS10-situacoes-e-contextos-v0.1.md) e [`docs/PSS10-balizamento-interno-v0.1.md`](docs/PSS10-balizamento-interno-v0.1.md): régua interna de estresse (nunca mostrada ao aluno).
 
-A modalidade curta reúne cinco decisões independentes em situações cotidianas. Os arquivos de execução são `index.html`, `app.js` e `style.css`. Não exige compilação. Publique os três juntos, preservando o caminho de retorno ao Lab-RA.
+## Código e testes
 
-A verificação automatizada existente está em `../limiar-source/check-etica.mjs`. O conjunto atual foi conferido contra as branches de desenvolvimento de ética; todas já estavam incorporadas à `main` em 15/11/2026.
+Vanilla HTML/JS/CSS, sem compilação. A partir de `limiar-etica/um-dia/`: `node testes/motor.test.mjs`, `balizamento.test.mjs`, `niveis.test.mjs` e `programa.test.mjs`. O protótipo original de cinco situações (15/11/2026) está arquivado em `alostase-arquivos/limiar-etica-fontes-atuais.zip`. Versões antigas de qualquer arquivo ficam no histórico do Git.
