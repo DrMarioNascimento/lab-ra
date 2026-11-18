@@ -1,16 +1,16 @@
 // Limiar Ético · Um dia — interface.
-import { SINTESE, MOTIVOS, VERSAO, CONDICOES, BASE_ESTRESSE, NOME_NIVEL } from './dados.js?v=1.8';
-import { DIAS, ORDEM_DIAS } from './dias.js?v=1.8';
-import { GLOSSARIO } from './glossario.js?v=1.8';
-import { gerarRetorno } from './retorno.js?v=1.8';
-import { mapaDoDia } from './programa.js?v=1.8';
-import { MANUAL } from './manual.js?v=1.8';
-import { abrirSalvar, blocosDe } from './salvar.js?v=1.8';
-import { agregar, enviosDoDia, MIN_TURMA } from './estatistica.js?v=1.8';
-import { conectar, gerarCodigo, limparCodigo, novoId } from './sala.js?v=1.8';
-import { novoEstado, sortearNiveis, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=1.8';
+import { SINTESE, MOTIVOS, VERSAO, CONDICOES, BASE_ESTRESSE, NOME_NIVEL } from './dados.js?v=1.9';
+import { DIAS, ORDEM_DIAS } from './dias.js?v=1.9';
+import { GLOSSARIO } from './glossario.js?v=1.9';
+import { gerarRetorno } from './retorno.js?v=1.9';
+import { mapaDoDia } from './programa.js?v=1.9';
+import { MANUAL } from './manual.js?v=1.9';
+import { abrirSalvar, blocosDe } from './salvar.js?v=1.9';
+import { agregar, enviosDoDia, MIN_TURMA } from './estatistica.js?v=1.9';
+import { conectar, gerarCodigo, limparCodigo, novoId } from './sala.js?v=1.9';
+import { novoEstado, sortearNiveis, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=1.9';
 
-import { PARES, EXIGENCIAS, prepararRodadas, cruzarRodadas } from './retomadas.js?v=1.8';
+import { PARES, EXIGENCIAS, prepararRodadas, cruzarRodadas } from './retomadas.js?v=1.9';
 
 const app = document.querySelector('#app');
 const topo = document.querySelector('#topo');
@@ -199,7 +199,7 @@ function escolher(i) {
   foco();
 }
 
-import { graficoLinhas, graficoCertoDesfecho, graficoMargem, graficoEscala, COR, NOME, COR_CERTO, COR_DESFECHO } from './graficos.js?v=1.8';
+import { graficoLinhas, graficoCertoDesfecho, graficoMargem, graficoEscala, COR, NOME, COR_CERTO, COR_DESFECHO } from './graficos.js?v=1.9';
 
 /* ---------- Revelação ---------- */
 function sinaisDe(p) {
@@ -544,7 +544,7 @@ function mantendoRolagem(f) {
 
 
 /* ---------- Sala ao vivo (aluno) ---------- */
-const EMOJIS = ['⚖️', '🤝', '🧭', '🕊️', '🛡️', '🌱', '🔎', '📖', '🪞', '💡', '🫶', '🏛️', '🔔', '🧩'];
+const EMOJIS = ['⚖️', '🤝', '🧭', '🕊️', '🛡️', '🌱', '🔎', '⚽', '🏐', '🏃', '🥇', '🤸', '🏫', '🎽'];
 const lerJSON = k => { try { return JSON.parse(sessionStorage.getItem(k)); } catch (e) { return null; } };
 const gravarJSON = (k, v) => { try { if (v == null) sessionStorage.removeItem(k); else sessionStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* sem armazenamento */ } };
 let sala = lerJSON('le_sala');        // { codigo, alunoId, nome, avatar } quando o aluno entrou numa sala
