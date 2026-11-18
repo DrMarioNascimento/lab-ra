@@ -1,6 +1,6 @@
 // Limiar Ético · Um dia — motor do dia (sem interface).
-import { CENA_FINAL, CENA_NEGADA, ORDEM_PENDENCIAS, VOLTAS, CORRENTES, CONDICOES, COND_CENAS, NIVEIS } from './dados.js?v=2.0';
-import { DIAS } from './dias.js?v=2.0';
+import { CENA_FINAL, CENA_NEGADA, ORDEM_PENDENCIAS, VOLTAS, CORRENTES, CONDICOES, COND_CENAS, NIVEIS } from './dados.js?v=2.1';
+import { DIAS } from './dias.js?v=2.1';
 
 const diaDe = est => DIAS[est.dia];
 

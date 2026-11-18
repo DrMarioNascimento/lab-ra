@@ -675,3 +675,21 @@ body.telao .alunos-grade { grid-template-columns: repeat(auto-fill, minmax(200px
 .entrada-prof { display: inline-flex; align-items: center; justify-content: center; gap: 10px; }
 .cadeado { width: 40px; height: 40px; vertical-align: middle; filter: drop-shadow(0 2px 2px rgba(20, 5, 45, .45)); }
 h1 .cadeado { width: 44px; height: 44px; }
+
+/* escolha do modo da sala e QR embutido */
+.modos { display: grid; gap: 12px; margin: 12px 0 8px; }
+.btn.modo { text-align: left; padding: 12px 16px; margin: 0 !important; }
+.btn.modo small { display: block; font-weight: 500; font-size: .86rem; color: var(--tinta-2); }
+.btn.modo[aria-pressed="true"] { background: linear-gradient(#e6f6ee, #bfe3cf); border-color: var(--petroleo); outline: 3px solid var(--petroleo); outline-offset: 1px; }
+.btn.modo[aria-pressed="true"] strong::before { content: "✓ "; }
+.sala-topo { display: flex; gap: 14px; align-items: center; justify-content: space-between; }
+.sala-topo > div:first-child { flex: 1; min-width: 0; }
+.qr-inline { flex: 0 0 auto; width: 128px; padding: 6px; background: #fff; border: 1px solid #d3c7a6; border-radius: 12px; box-shadow: 0 5px 0 #cdbf9b, 0 12px 16px -8px rgba(20, 24, 60, .4); cursor: pointer; }
+.qr-inline svg { display: block; width: 100%; height: auto; }
+.qr-inline:active { transform: translateY(3px); box-shadow: 0 2px 0 #cdbf9b; }
+.qr-painel { text-align: center; max-width: 520px; }
+.qr-grande-img { background: #fff; border-radius: 14px; padding: 10px; margin: 8px auto 12px; width: min(100%, 420px); }
+.qr-grande-img svg { display: block; width: 100%; height: auto; }
+body.telao .qr-inline { width: 240px; }
+.prof-tela { grid-template-columns: minmax(0, 1fr); }
+.prof-tela > * { min-width: 0; }

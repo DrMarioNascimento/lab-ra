@@ -4,6 +4,8 @@ Esta nota descreve o que a sala guarda, quem vê o quê e o que o professor prec
 
 ## Como funciona
 - **Professor:** abre `um-dia/?professor`, entra com a conta Google e cria uma sala (código `LE` + 4 dígitos). Mostra o código, o link ou o QR.
+- **Modo da sala (v2.1):** ao criar, o professor escolhe **modo livre** (cada aluno escolhe a história) ou **uma das três histórias** (todos entram direto nela, sem a tela de escolha do dia). O modo fica no documento da sessão (`modo`, `dia`).
+- **QR:** gerado na própria página (`vendor/qr.js`, o mesmo codificador do MOSAICO, sem serviço de terceiros). Aparece ao lado do código e abre em tamanho grande, na mesma tela, com "QR grande".
 - **Aluno:** abre o link (`?sala=LE1234`) ou toca em "Entrar numa sala", informa identificação, código e um emoji. Escolhe o dia e joga no próprio celular. Entrar na sala só avisa o professor do andamento (dia e progresso).
 - **Envio:** no fim, em "Salvar ou enviar…", o aluno escolhe **"Enviar tudo ao professor"**. Só então vão o resumo das decisões, a revelação e o texto da aba Aplicar. Sem esse clique, nada do conteúdo sai do celular.
 - **Salvar:** janela com caixas de seleção por bloco de cada aba (Curvas, Decisões, Síntese, Aplicar), em PDF (impressão do navegador, "Salvar como PDF"), em imagem PNG (dividida em partes quando muito alta) ou nos dois. O professor usa a mesma janela na revelação de um aluno e na visão da turma.

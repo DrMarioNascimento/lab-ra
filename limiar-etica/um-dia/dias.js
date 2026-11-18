@@ -1,8 +1,8 @@
 // Limiar Ético · registro dos dias jogáveis. O dia da empresa é o completo (com retomadas e cenas condicionais);
 // os outros dois são dias simples (escola com dez cenas, bairro com onze), com o mesmo sorteio por nível e o mesmo retorno.
-import * as E from './dados.js?v=2.0';
-import * as ESCOLA from './dia-escola.js?v=2.0';
-import * as BAIRRO from './dia-bairro.js?v=2.0';
+import * as E from './dados.js?v=2.1';
+import * as ESCOLA from './dia-escola.js?v=2.1';
+import * as BAIRRO from './dia-bairro.js?v=2.1';
 
 export const DIAS = {
   empresa: {

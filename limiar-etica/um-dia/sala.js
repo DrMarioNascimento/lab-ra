@@ -32,8 +32,9 @@ export async function conectar() {
       catch (e) { if (e && e.code === 'permission-denied') { await signOut(auth).catch(() => {}); return false; } throw e; }
     },
     async sairProfessor() { await signOut(auth).catch(() => {}); },
-    async criarSessao(codigo) { await setDoc(doc(db, 'sessoes', codigo), { ativa: true, projeto: PROJETO, criadaEm: serverTimestamp(), criadaEmMs: Date.now() }); return codigo; },
+    async criarSessao(codigo, config = {}) { await setDoc(doc(db, 'sessoes', codigo), { ativa: true, projeto: PROJETO, modo: config.modo === 'fixo' ? 'fixo' : 'livre', dia: config.modo === 'fixo' ? String(config.dia || '') : '', criadaEm: serverTimestamp(), criadaEmMs: Date.now() }); return codigo; },
     async encerrarSessao(codigo) { try { await updateDoc(doc(db, 'sessoes', codigo), { ativa: false, encerradaEmMs: Date.now() }); } catch (e) { /* já encerrada */ } },
+    async lerSessao(codigo) { const s = await getDoc(doc(db, 'sessoes', codigo)); if (!s.exists()) return null; const d = s.data(); return d.ativa === true && d.projeto === PROJETO ? { modo: d.modo === 'fixo' ? 'fixo' : 'livre', dia: d.dia || '' } : null; },
     async sessaoAtiva(codigo) { const s = await getDoc(doc(db, 'sessoes', codigo)); if (!s.exists()) return false; const d = s.data(); return d.ativa === true && d.projeto === PROJETO; },
     async gravarAluno(codigo, id, dados) { await setDoc(doc(db, 'sessoes', codigo, 'alunos', id), { ...dados, projeto: PROJETO, atualizadoEmMs: Date.now() }, { merge: true }); },
     async apagarAluno(codigo, id) { await deleteDoc(doc(db, 'sessoes', codigo, 'alunos', id)); },

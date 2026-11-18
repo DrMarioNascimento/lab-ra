@@ -1,16 +1,16 @@
 // Limiar Ético · Um dia — interface.
-import { SINTESE, MOTIVOS, VERSAO, CONDICOES, BASE_ESTRESSE, NOME_NIVEL } from './dados.js?v=2.0';
-import { DIAS, ORDEM_DIAS } from './dias.js?v=2.0';
-import { GLOSSARIO } from './glossario.js?v=2.0';
-import { gerarRetorno } from './retorno.js?v=2.0';
-import { mapaDoDia } from './programa.js?v=2.0';
-import { MANUAL } from './manual.js?v=2.0';
-import { abrirSalvar, blocosDe } from './salvar.js?v=2.0';
-import { agregar, enviosDoDia, MIN_TURMA } from './estatistica.js?v=2.0';
-import { conectar, gerarCodigo, limparCodigo, novoId } from './sala.js?v=2.0';
-import { novoEstado, sortearNiveis, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=2.0';
+import { SINTESE, MOTIVOS, VERSAO, CONDICOES, BASE_ESTRESSE, NOME_NIVEL } from './dados.js?v=2.1';
+import { DIAS, ORDEM_DIAS } from './dias.js?v=2.1';
+import { GLOSSARIO } from './glossario.js?v=2.1';
+import { gerarRetorno } from './retorno.js?v=2.1';
+import { mapaDoDia } from './programa.js?v=2.1';
+import { MANUAL } from './manual.js?v=2.1';
+import { abrirSalvar, blocosDe } from './salvar.js?v=2.1';
+import { agregar, enviosDoDia, MIN_TURMA } from './estatistica.js?v=2.1';
+import { conectar, gerarCodigo, limparCodigo, novoId } from './sala.js?v=2.1';
+import { novoEstado, sortearNiveis, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=2.1';
 
-import { PARES, EXIGENCIAS, prepararRodadas, cruzarRodadas } from './retomadas.js?v=2.0';
+import { PARES, EXIGENCIAS, prepararRodadas, cruzarRodadas } from './retomadas.js?v=2.1';
 
 const app = document.querySelector('#app');
 const topo = document.querySelector('#topo');
@@ -87,7 +87,7 @@ function telaAbertura() {
         <h1>${esc(D().ABERTURA.titulo)}</h1>
         ${D().ABERTURA.texto.map(p => `<p>${esc(p)}</p>`).join('')}
         <p>Ao final, você poderá reconhecer padrões nas suas escolhas, comparar sua justificativa com as leituras do percurso e aplicar um conceito em outra situação. Se alguma situação pesar para você, pode só observar ou conversar com quem conduz a atividade. Reserve cerca de 30 minutos para a atividade. As respostas ficam nesta página e desaparecem ao fechá-la.</p>
-        <div class="acoes"><button class="btn principal" data-acao="comecar">Começar o dia</button><button class="btn secundario" data-acao="escolher-dia">Escolher outro dia</button></div>
+        <div class="acoes"><button class="btn principal" data-acao="comecar">Começar o dia</button>${sala?.diaFixo ? '' : '<button class="btn secundario" data-acao="escolher-dia">Escolher outro dia</button>'}</div>
       </section>
       <p class="versao entra" style="--n:2">Versão ${esc(VERSAO)}</p>
     </div>`;
@@ -199,7 +199,7 @@ function escolher(i) {
   foco();
 }
 
-import { graficoLinhas, graficoCertoDesfecho, graficoMargem, graficoEscala, COR, NOME, COR_CERTO, COR_DESFECHO } from './graficos.js?v=2.0';
+import { graficoLinhas, graficoCertoDesfecho, graficoMargem, graficoEscala, COR, NOME, COR_CERTO, COR_DESFECHO } from './graficos.js?v=2.1';
 
 /* ---------- Revelação ---------- */
 function sinaisDe(p) {
@@ -584,16 +584,21 @@ async function entrarSala() {
   erro.textContent = 'Verificando a sala…';
   try {
     const api = await conectar();
-    if (!(await api.sessaoAtiva(codigo))) { erro.textContent = 'Sala não encontrada ou já encerrada.'; return; }
+    const info = await api.lerSessao(codigo);
+    if (!info) { erro.textContent = 'Sala não encontrada ou já encerrada.'; return; }
     const alunoId = sala && sala.codigo === codigo && sala.nome === nome ? sala.alunoId : novoId();
-    sala = { codigo, alunoId, nome, avatar: emojiEscolhido };
+    sala = { codigo, alunoId, nome, avatar: emojiEscolhido, modo: info.modo, diaFixo: info.modo === 'fixo' && DIAS[info.dia] ? info.dia : '' };
     gravarJSON('le_sala', sala);
-    await api.gravarAluno(codigo, alunoId, { nome, avatar: emojiEscolhido, dia: '', status: 'Escolhendo o dia', progresso: 0, entrouEmMs: Date.now() });
-    telaEscolhaDia();
+    await api.gravarAluno(codigo, alunoId, { nome, avatar: emojiEscolhido, dia: sala.diaFixo, status: sala.diaFixo ? 'Na abertura' : 'Escolhendo o dia', progresso: 0, entrouEmMs: Date.now() });
+    irParaInicio();
   } catch (e) { console.error(e); erro.textContent = 'Não foi possível entrar. Verifique a internet e tente de novo.'; }
 }
 
 function sairDaSala() { sala = null; emojiEscolhido = ''; gravarJSON('le_sala', null); telaEscolhaDia(); }
+// Sala com história escolhida pelo professor: todos entram direto nela; no modo livre, cada aluno escolhe o dia.
+function irParaInicio() {
+  if (sala?.diaFixo && DIAS[sala.diaFixo]) { dia = sala.diaFixo; telaAbertura(); } else telaEscolhaDia();
+}
 
 async function enviarAoProfessor() {
   const api = await conectar();
@@ -632,7 +637,7 @@ function abrirSalvarRevelacao() {
 }
 
 /* ---------- Módulo do professor ---------- */
-const P = { logado: false, codigo: lerJSON('le_prof') || '', alunos: [], unsub: null, vista: 'alunos', diaTurma: null, selId: null, erro: '' };
+const P = { modoNovo: 'livre', config: lerJSON('le_prof_cfg') || { modo: 'livre' }, logado: false, codigo: lerJSON('le_prof') || '', alunos: [], unsub: null, vista: 'alunos', diaTurma: null, selId: null, erro: '' };
 const porNome = (a, b) => (a.nome || '').localeCompare(b.nome || '', 'pt-BR');
 const enviados = () => P.alunos.filter(a => a.enviado && a.dadosJson).sort(porNome);
 
@@ -649,6 +654,22 @@ function barraProfessor() {
   </div>`;
 }
 
+// QR gerado aqui mesmo (sem serviço de terceiros), o mesmo codificador do MOSAICO.
+function qrSvg() {
+  try { return window.MosaicoQR ? window.MosaicoQR.svg(linkDaSala(), { rotulo: 'Código QR para entrar na sala ' + P.codigo }) : ''; } catch (e) { return ''; }
+}
+function abrirQR() {
+  if (document.querySelector('#qr-grande')) return;
+  const caixa = document.createElement('div');
+  caixa.className = 'manual-fundo'; caixa.id = 'qr-grande';
+  caixa.innerHTML = `<section class="cartao manual qr-painel" role="dialog" aria-modal="true" aria-label="QR da sala">
+    <p class="rotulo">Entre na sala</p><div class="codigo-sala">${esc(P.codigo)}</div>
+    <div class="qr-grande-img">${qrSvg()}</div>
+    <p class="suave pequeno quebra">${esc(linkDaSala())}</p>
+    <div class="acoes"><button class="btn principal" data-acao="fechar-qr">Fechar</button></div></section>`;
+  caixa.addEventListener('click', e => { if (e.target === caixa) caixa.remove(); });
+  document.body.appendChild(caixa);
+}
 function linkDaSala() { return location.origin + location.pathname + '?sala=' + encodeURIComponent(P.codigo); }
 
 function telaProfessor() {
@@ -665,7 +686,11 @@ function telaProfessor() {
   if (!P.codigo) {
     app.innerHTML = `<div class="estreita"><section class="cartao capa-dia entra">
       <p class="rotulo">Limiar Ético</p><h1><img class="cadeado" src="icones/cadeado-aberto.png" width="44" height="44" alt="" aria-hidden="true"> Criar sala</h1>
-      <p>Os alunos entram pelo código ou pelo link, escolhem o dia e jogam no próprio celular. Cada um decide se envia o resultado.</p>
+      <p>Os alunos entram pelo QR ou pelo código e jogam no próprio celular. Cada um decide se envia o resultado. Escolha como a sala começa:</p>
+      <div class="modos" role="group" aria-label="Como a sala começa">
+        <button class="btn modo" data-acao="prof-modo" data-modo="livre" aria-pressed="${P.modoNovo === 'livre'}"><strong>Modo livre</strong><small>Cada aluno escolhe a história.</small></button>
+        ${ORDEM_DIAS.map(k => `<button class="btn modo" data-acao="prof-modo" data-modo="${k}" aria-pressed="${P.modoNovo === k}"><strong>${esc(DIAS[k].nome)}</strong><small>Todos entram direto nesta história.</small></button>`).join('')}
+      </div>
       <p id="erro-prof" class="erro" role="alert">${esc(P.erro)}</p>
       <div class="acoes"><button class="btn principal" data-acao="prof-criar">Criar sala</button><button class="btn secundario" data-acao="prof-sair">Voltar à atividade</button></div>
     </section></div>`;
@@ -674,9 +699,11 @@ function telaProfessor() {
   const envs = enviados();
   const cab = `<section class="cartao capa-dia">
     <p class="rotulo">Sala ao vivo</p>
-    <div class="codigo-sala">${esc(P.codigo)}</div>
-    <p class="suave pequeno">${P.alunos.length} na sala · ${envs.length} enviaram. Link: <span class="quebra">${esc(linkDaSala())}</span></p>
-    <div class="acoes linha"><button class="btn secundario pequeno-btn" data-acao="prof-qr">QR</button><button class="btn secundario pequeno-btn" data-acao="prof-copiar">Copiar link</button><button class="btn secundario pequeno-btn" data-acao="telao">Telão (tela cheia)</button><button class="btn secundario pequeno-btn" data-acao="prof-encerrar">Encerrar sala</button></div>
+    <div class="sala-topo"><div><div class="codigo-sala">${esc(P.codigo)}</div>
+      <p class="suave pequeno"><strong>${P.config.modo === 'fixo' && DIAS[P.config.dia] ? 'História: ' + esc(DIAS[P.config.dia].nome) : 'Modo livre: cada aluno escolhe a história'}</strong></p>
+      <p class="suave pequeno">${P.alunos.length} na sala · ${envs.length} enviaram.</p></div>
+      <button class="qr-inline" data-acao="prof-qr" aria-label="Ampliar o QR da sala">${qrSvg()}</button></div>
+    <div class="acoes linha"><button class="btn secundario pequeno-btn" data-acao="prof-qr">QR grande</button><button class="btn secundario pequeno-btn" data-acao="prof-copiar">Copiar link</button><button class="btn secundario pequeno-btn" data-acao="telao">Telão (tela cheia)</button><button class="btn secundario pequeno-btn" data-acao="prof-encerrar">Encerrar sala</button></div>
     <div class="abas prof-abas" role="tablist"><button class="aba" role="tab" data-acao="prof-vista" data-v="alunos" aria-selected="${P.vista === 'alunos'}">Alunos</button><button class="aba" role="tab" data-acao="prof-vista" data-v="turma" aria-selected="${P.vista === 'turma'}">Turma</button></div>
   </section>`;
   const corpo = P.vista === 'turma' ? htmlTurma() : cardsAlunos();
@@ -693,7 +720,8 @@ function cardsAlunos() {
 
 function dadosDoDiaTurma() {
   const contagem = Object.fromEntries(ORDEM_DIAS.map(k => [k, enviosDoDia(P.alunos, k).length]));
-  if (!P.diaTurma || !contagem[P.diaTurma]) P.diaTurma = ORDEM_DIAS.find(k => contagem[k] > 0) || ORDEM_DIAS[0];
+  if (P.config.modo === 'fixo' && DIAS[P.config.dia]) P.diaTurma = P.config.dia;
+  else if (!P.diaTurma || !contagem[P.diaTurma]) P.diaTurma = ORDEM_DIAS.find(k => contagem[k] > 0) || ORDEM_DIAS[0];
   return contagem;
 }
 
@@ -706,7 +734,7 @@ const pc = v => Math.round(v * 100) + '%';
 function htmlTurma() {
   const contagem = dadosDoDiaTurma(), DIA = DIAS[P.diaTurma];
   const ag = agregar(P.alunos, DIA, P.diaTurma);
-  const abas = `<div class="abas prof-dias">${ORDEM_DIAS.map(k => `<button class="aba" data-acao="prof-dia" data-dia="${k}" aria-selected="${k === P.diaTurma}">${esc(DIAS[k].nome.replace('Um dia ', ''))} · ${contagem[k]}</button>`).join('')}</div>`;
+  const abas = P.config.modo === 'fixo' ? '' : `<div class="abas prof-dias">${ORDEM_DIAS.map(k => `<button class="aba" data-acao="prof-dia" data-dia="${k}" aria-selected="${k === P.diaTurma}">${esc(DIAS[k].nome.replace('Um dia ', ''))} · ${contagem[k]}</button>`).join('')}</div>`;
   if (!ag.liberado) return `${abas}<section class="cartao"><h2>A turma</h2><p>A visão da turma aparece com ${MIN_TURMA} ou mais envios do mesmo dia. Hoje há ${ag.n}. Isso protege quem respondeu: com poucos alunos, qualquer resposta se reconheceria.</p></section>`;
   const visiveis = ag.cenas.filter(c => !c.oculta);
   const pts = visiveis.map((c, i) => ({ n: i + 1, hora: c.hora, titulo: c.titulo, ...c.medias }));
@@ -771,7 +799,8 @@ async function ouvirSala() {
 async function profCriar() {
   try {
     const api = await conectar();
-    P.codigo = gerarCodigo(); await api.criarSessao(P.codigo); gravarJSON('le_prof', P.codigo); P.alunos = []; P.vista = 'alunos';
+    P.codigo = gerarCodigo(); P.config = P.modoNovo === 'livre' ? { modo: 'livre' } : { modo: 'fixo', dia: P.modoNovo };
+    await api.criarSessao(P.codigo, P.config); gravarJSON('le_prof', P.codigo); gravarJSON('le_prof_cfg', P.config); P.alunos = []; P.vista = 'alunos'; P.diaTurma = P.config.dia || null;
     await ouvirSala();
   } catch (e) { console.error(e); P.codigo = ''; P.erro = 'Não consegui criar a sala. Verifique a internet e o acesso da conta.'; }
   telaProfessor();
@@ -781,7 +810,7 @@ async function profEncerrar() {
   const api = await conectar();
   await api.encerrarSessao(P.codigo);
   if (P.unsub) P.unsub();
-  P.unsub = null; P.codigo = ''; P.alunos = []; gravarJSON('le_prof', null); telaProfessor();
+  P.unsub = null; P.codigo = ''; P.alunos = []; P.config = { modo: 'livre' }; gravarJSON('le_prof', null); gravarJSON('le_prof_cfg', null); telaProfessor();
 }
 
 function abrirAluno(id) {
@@ -853,7 +882,7 @@ botaoI.dataset.acao = 'abrir-manual';
 botaoI.setAttribute('aria-label', 'Como funciona');
 botaoI.textContent = 'i';
 document.body.appendChild(botaoI);
-document.addEventListener('keydown', e => { if (e.key === 'Escape' && manualAberto) fecharManual(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (manualAberto) fecharManual(); document.querySelector('#qr-grande')?.remove(); } });
 
 function acao(alvo) {
   const a = alvo.dataset.acao, i = Number(alvo.dataset.i);
@@ -879,7 +908,9 @@ function acao(alvo) {
   if (a === 'prof-criar') { profCriar(); return; }
   if (a === 'prof-encerrar') { profEncerrar(); return; }
   if (a === 'prof-copiar') { navigator.clipboard?.writeText(linkDaSala()); return; }
-  if (a === 'prof-qr') { window.open('https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=10&data=' + encodeURIComponent(linkDaSala()), '_blank', 'noopener'); return; }
+  if (a === 'prof-qr') { abrirQR(); return; }
+  if (a === 'fechar-qr') { document.querySelector('#qr-grande')?.remove(); return; }
+  if (a === 'prof-modo') { P.modoNovo = alvo.dataset.modo; document.querySelectorAll('.modos .modo').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.modo === P.modoNovo))); return; }
   if (a === 'prof-vista') { P.vista = alvo.dataset.v; telaProfessor(); return; }
   if (a === 'prof-dia') { P.diaTurma = alvo.dataset.dia; telaProfessor(); return; }
   if (a === 'prof-ver') { abrirAluno(alvo.dataset.id); return; }
@@ -948,5 +979,5 @@ const params = new URLSearchParams(location.search);
 const diaDoLink = params.get('dia');
 if (params.has('professor')) telaProfessor();
 else if (params.get('sala')) { telaEntrarSala(limparCodigo(params.get('sala'))); abrirManual(); }
-else if (diaDoLink && DIAS[diaDoLink]) { dia = diaDoLink; telaAbertura(); abrirManual(); }
-else { telaEscolhaDia(); abrirManual(); }
+else if (diaDoLink && DIAS[diaDoLink] && !sala?.diaFixo) { dia = diaDoLink; telaAbertura(); abrirManual(); }
+else { irParaInicio(); abrirManual(); }
