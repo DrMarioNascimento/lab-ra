@@ -10,7 +10,9 @@ test('biblioteca apresenta nove cards e duas ilustrações sem links',()=>{
  assert.equal((page.match(/class="emblema"/g)||[]).length,2);
  const emblemas=page.slice(page.indexOf('<div class="emblemas"'),page.indexOf('<div class="cards"'));
  assert.doesNotMatch(emblemas,/<a\b/);
- assert.match(page,/id="cinco-minutos"/);\n assert.match(page,/href="cinco-minutos\\/"/);\n assert.match(page,/Capítulo 1: O malote murcho/);
+ assert.ok(page.includes('id="cinco-minutos"'));
+ assert.ok(page.includes('href="cinco-minutos/"'));
+ assert.match(page,/Capítulo 1: O malote murcho/);
  assert.match(page,/Prólogo: Agência 0688/);
  assert.match(page,/Aprender pesquisa fazendo pesquisa/);
  assert.match(page,/Fazendo, errando e criando/);
