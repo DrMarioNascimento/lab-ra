@@ -74,4 +74,17 @@ ok('com cansaço alto, a informação da noite some', () => {
   assert.equal(janelaInfo(e, manha), Infinity);
 });
 
+ok('a confiança da equipe muda o desfecho da mesma escolha de reparo', () => {
+  const desfechoCom = (escolhaNaEquipe) => {
+    const e = novoEstado();
+    for (const i of [2, 1, escolhaNaEquipe, 0, 1, 1, 1, 0, 0]) decidir(e, i);
+    assert.equal(cenaAtual(e).id, 'interprete');
+    const desfecho = decidir(e, 1);
+    assert.equal(resumo(e).pontos.at(-1).desfecho, desfecho);
+    return desfecho;
+  };
+  assert.match(desfechoCom(1), /colega da equipe ajuda.*ausência de Libras/);
+  assert.match(desfechoCom(2), /Funciona pela metade/);
+});
+
 console.log(`\n${n} verificações passaram.`);

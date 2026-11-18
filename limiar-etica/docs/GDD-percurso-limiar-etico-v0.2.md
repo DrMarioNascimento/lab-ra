@@ -1,10 +1,10 @@
-# GDD · Percurso / Limiar Ético — "Um dia"
+# GDD · Limiar Ético — "Um dia"
 
 Versão 0.2 · 15/11/2026 · documento de projeto (não é conteúdo para o aluno)
 Autoria da concepção: Prof. Dr. Mário César Nascimento
-Nome do jogo, por enquanto: **Percurso / Limiar Ético** (decisão do professor em 15/11/2026).
+Nome da atividade: **Limiar Ético**.
 
-Este documento registra o desenho combinado em conversa de 15/11/2026. Nada foi programado a partir dele ainda.
+Este documento registra o desenho de 15/11/2026. Consulte a atualização abaixo para o estado da implementação.
 
 ---
 
@@ -31,7 +31,7 @@ O projeto não nasce do zero. Ele reúne peças que já existem:
 | Escala do Dilema do Bonde | repositório Etica, `dilema-bonde/` | Cinco correntes: Utilitarismo, Virtudes, Intenção, Existencialismo e Ética da Complexidade |
 | Glossário do Mosaico Vila Ética | `mosaico-vila-etica/js/content/glossario.js` | Dezenas de verbetes de ética e deontologia |
 | "Passagem 2 · Ética" | `limiar-source/docs/GDD-Alostase-v0.5.md` | A ideia de reviver o mesmo dia pelo lado das pessoas e comparar o gesto com o estado do corpo |
-| Limiar Ética (protótipo) | `limiar-etica/` | Cinco cenas do cotidiano, sem acúmulo; serve como banco inicial de situações |
+| Limiar Ético (protótipo) | `limiar-etica/` | Cinco cenas do cotidiano, sem acúmulo; serve como banco inicial de situações |
 | Percursos de Fisiologia | repositório fisiologia-em-fuga, `percursos/` | A estrutura de percurso: tema, contexto, questões ligadas à situação, síntese |
 
 ## 3. Base teórica
@@ -182,3 +182,19 @@ Os dois podem conviver no mesmo lugar.
 - **Teoria decorativa.** Na revelação, o conceito precisa explicar a decisão que foi tomada, e não aparecer como verbete solto.
 - **Alternativa que se denuncia.** Se o jogador percebe qual é a opção "racional", a sutileza acaba.
 - **Rejogo.** Depois da primeira revelação o jogador conhece o mecanismo; a variedade de dias e cenas precisa sustentar as partidas seguintes.
+
+
+## 15. Atualização da implementação · versão 0.3
+
+O Lab-RA abre **Um dia** pelo card do Limiar Ético e oferece o protótipo de cinco situações independentes como modalidade curta. O dia-piloto tem onze ou doze decisões, conforme o percurso. A abertura pede escolhas sinceras e informa que não há gabarito nem nota. Durante o percurso aparecem as consequências narrativas. Conceitos, curvas e motivos relatados entram no fechamento.
+
+- **Consequência acumulada.** Na cena do intérprete de Libras, o relacionamento com a equipe construído durante o dia pode mudar a ajuda recebida e o desfecho quando a personagem decide improvisar legendas e distribuir roteiros. Esse apoio reduz a demora e a lacuna de acessibilidade persiste.
+- **Leitura das respostas.** A síntese mostra os pesos definidos na autoria e a frequência dos motivos que o participante relatou opcionalmente. Tempo de resposta e consulta a informações descrevem o contexto. Leitura, distrações e condições de acesso podem afetar esses sinais.
+- **Aplicação conceitual.** Ao final, um novo caso pede que o participante aplique intenção, meio e consequência à circulação de um vídeo. A reflexão escrita é opcional, com uma leitura conceitual disponível depois. As respostas ficam em memória durante a sessão.
+
+### Próximos passos para um instrumento de pesquisa
+
+1. Definir quais aspectos serão observados: escolha no cenário, motivo declarado e capacidade de aplicar o conceito a um caso novo. Para estudar aprendizagem, preparar casos equivalentes antes e depois da experiência e definir critérios de análise das justificativas.
+2. Criar versões pareadas de dilemas, mudando uma condição por vez, como pressão de tempo, relação de poder ou presença de uma pessoa afetada. Fixar o núcleo do percurso quando a comparação entre participantes exigir exposição equivalente e registrar quais cenas e informações estiveram disponíveis.
+3. Fazer entrevistas cognitivas e um piloto para verificar a compreensão das instruções e se alguma alternativa soa claramente mais desejável. Revisar as atribuições dos pesos com avaliadores independentes e documentar as discordâncias.
+4. Para uma coleta futura, definir o protocolo de participação e o plano de gestão dos dados antes de habilitar armazenamento ou exportação. A versão atual funciona como atividade pedagógica exploratória, com leitura individual do percurso.

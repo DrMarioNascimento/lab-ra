@@ -1,4 +1,4 @@
-# Acervo Alostase e Limiar Ética — 15/11/2026
+# Acervo Alostase e Limiar Ético — 15/11/2026
 
 Conferência feita contra a `main` no commit `2175225fb54181c583891890e06afb1f00e733a6`.
 
@@ -14,7 +14,7 @@ Conferência feita contra a `main` no commit `2175225fb54181c583891890e06afb1f00
 
 - `limiar-v0.5-original.zip`: original integral, 231 arquivos, sem mudanças; preserva os nomes históricos e o ambiente de origem.
 - `alostase-fontes-atuais.zip`: código atual, documentação recuperada e arquivos da experiência publicada.
-- `limiar-etica-fontes-atuais.zip`: código e orientação de publicação do Limiar Ética.
+- `limiar-etica-fontes-atuais.zip`: pacote histórico de 15/11 com o protótipo de cinco situações.
 - `inventario.json`: hashes SHA-256, tamanhos e correspondências por arquivo.
 
 O inventário cobre os arquivos de projeto localizados no pacote disponível, nas cópias locais acessíveis e nas branches identificadas do GitHub. Capturas de tela da conversa com abas, favoritos e contexto pessoal de navegação não integram o código do projeto e não foram republicadas. Não se afirma acesso a arquivos apagados ou ambientes externos indisponíveis.

@@ -1,6 +1,6 @@
-// Percurso / Limiar Ético · Um dia — interface.
-import { ABERTURA, SINTESE, MOTIVOS, VERSAO, CENAS } from './dados.js';
-import { novoEstado, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js';
+// Limiar Ético · Um dia — interface.
+import { ABERTURA, SINTESE, MOTIVOS, APLICACAO, VERSAO, CENAS } from './dados.js?v=0.3';
+import { novoEstado, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=0.3';
 
 const app = document.querySelector('#app');
 const topo = document.querySelector('#topo');
@@ -50,13 +50,13 @@ function telaAbertura() {
   app.innerHTML = `
     <div class="estreita">
       <section class="cartao capa-dia entra">
-        <p class="rotulo">Percurso / Limiar Ético</p>
+        <p class="rotulo">Limiar Ético</p>
         ${arcoCapa()}
         <h1>${esc(ABERTURA.titulo)}</h1>
         ${ABERTURA.texto.map(p => `<p>${esc(p)}</p>`).join('')}
+        <p>Ao final, você poderá reconhecer padrões nas suas escolhas, comparar sua justificativa com as leituras do percurso e aplicar um conceito em outra situação. A atividade leva de 15 a 20 minutos. As respostas ficam nesta página e desaparecem ao fechá-la.</p>
         <div class="acoes"><button class="btn principal" data-acao="comecar">Começar o dia</button></div>
       </section>
-      <p class="aviso entra" style="--n:1">Esta é uma simulação para aprender e discutir. Leva de 15 a 20 minutos. Nada do que você escolher é salvo: ao fechar a página, o percurso some.</p>
       <p class="versao entra" style="--n:2">Versão ${esc(VERSAO)}</p>
     </div>`;
   foco();
@@ -260,7 +260,7 @@ function cartaoDetalhe(p, E) {
       <p class="rotulo">Decisão ${p.n} · ${esc(p.hora)}</p>
       <h3>${esc(p.titulo)}</h3>
       <p class="escolhido">${esc(p.escolha)}</p>
-      <p class="car">Esta escolha tem característica de ${esc(p.caracteristica)}</p>
+      <p class="car">Uma leitura possível: ${esc(p.caracteristica)}</p>
       <div class="sinais">${sinaisDe(p)}</div>
     </section>`;
 }
@@ -272,7 +272,7 @@ function abaCurvas(E) {
       <section class="cartao painel ${E}" style="--n:1">
         <div class="bloco-grafico">
           <h3>Razão, emoção e impulso</h3>
-          <p class="sub">O que pesou mais em cada decisão. Toque num ponto para abrir a decisão.</p>
+          <p class="sub">Pesos atribuídos às alternativas na autoria do percurso. Selecione um ponto para rever a decisão.</p>
           <div class="legenda">${['razao', 'emocao', 'impulso'].map(s => `<span><i style="background:${COR[s]}"></i>${NOME[s]}</span>`).join('')}</div>
           ${graficoLinhas(r.pontos, sel)}
         </div>
@@ -283,7 +283,7 @@ function abaCurvas(E) {
       <div class="duas">
         <div class="bloco-grafico">
           <h3>O certo ou o desfecho</h3>
-          <p class="sub">Para cima, a decisão se apoiou em dever ou princípio. Para baixo, na consequência.</p>
+          <p class="sub">Acima, aproximação com dever ou princípio. Abaixo, com a consideração das consequências.</p>
           ${graficoCertoDesfecho(r.pontos, sel)}
         </div>
         <div class="bloco-grafico">
@@ -294,7 +294,7 @@ function abaCurvas(E) {
       </div>
       <div class="bloco-grafico">
         <h3>As lentes do seu dia</h3>
-        <p class="sub">Quanto cada corrente ética apareceu nas suas escolhas.</p>
+        <p class="sub">Como as ações escolhidas se aproximam das cinco lentes éticas, segundo os critérios de autoria.</p>
         ${graficoEscala(r.escala)}
       </div>
     </section>
@@ -317,12 +317,13 @@ function abaDecisoes(E) {
           <p class="rotulo">Decisão ${p.n} · ${esc(p.hora)}</p>
           <h3>${esc(p.titulo)}</h3>
           <p class="escolhido">${esc(p.escolha)}</p>
-          <p>Esta escolha tem característica de ${esc(p.caracteristica)}</p>
+          <p>Uma leitura possível: ${esc(p.caracteristica)}</p>
           <div class="sinais">${sinaisDe(p)}</div>
+          <p class="desfecho">${esc(p.desfecho)}</p>
           <div class="conceito"><strong>${esc(p.conceito.titulo)}</strong><p>${esc(p.conceito.texto)}</p></div>
           ${rev.abertas[i]
             ? `<div class="chips" role="group" aria-label="Qual foi o seu motivo?">${MOTIVOS.map((m, k) => `<button class="chip" data-acao="motivo" data-i="${i}" data-k="${k}" aria-pressed="${minha === k}">${esc(m)}</button>`).join('')}</div>`
-            : `<div class="acoes"><button class="btn secundario" data-acao="contestar" data-i="${i}">Não foi por isso</button></div>`}
+            : `<div class="acoes"><button class="btn secundario" data-acao="contestar" data-i="${i}">Registrar o que pesou</button></div>`}
           ${minha != null ? `<p class="sua-leitura">Sua leitura: ${esc(MOTIVOS[minha])}.</p>` : ''}
         </article>`;
       }).join('')}
@@ -331,17 +332,25 @@ function abaDecisoes(E) {
 
 function abaSintese(E) {
   const r = rev.dados;
-  const discordou = Object.keys(contestacoes).length;
-  const maior = Object.entries(r.medias).sort((a, b) => b[1] - a[1])[0][0];
+  const motivos = MOTIVOS.map((texto, i) => ({
+    texto, total: Object.values(contestacoes).filter(motivo => motivo === i).length
+  })).filter(motivo => motivo.total > 0).sort((a, b) => b.total - a.total);
+  const leituras = Object.entries(r.medias).sort((a, b) => b[1] - a[1]);
   return `
     <section class="cartao ${E}" style="--n:1">
       <h2>O seu dia, em resumo</h2>
       <ul class="limpa">
-        <li>No conjunto, o que mais pesou nas suas decisões foi <strong>${NOME[maior].toLowerCase()}</strong>.</li>
+        <li><strong>Leitura das alternativas do percurso</strong>
+          <ul>${leituras.map(([chave, valor]) => `<li>${NOME[chave]} · ${Math.round(valor * 100)}%</li>`).join('')}</ul>
+        </li>
         <li>Você conferiu a informação disponível em ${r.conferiu} de ${r.podiaConferir} momentos.</li>
-        ${discordou ? `<li>Você discordou da leitura em ${discordou} ${discordou === 1 ? 'decisão' : 'decisões'}.</li>` : ''}
+        <li><strong>O que você disse que pesou</strong>
+          ${motivos.length
+            ? `<ul>${motivos.map(m => `<li>${esc(m.texto)} · ${m.total} ${m.total === 1 ? 'decisão' : 'decisões'}</li>`).join('')}</ul>`
+            : 'Você pode registrar seus motivos na aba Decisões.'}
+        </li>
       </ul>
-      <p class="suave pequeno" style="margin-top:12px">A mesma ação pode nascer da razão ou da emoção. Esta é uma leitura do percurso, não uma medida de quem você é.</p>
+      <p class="suave pequeno" style="margin-top:12px">Compare os pesos das alternativas com os motivos que você relatou. Pense onde convergem e onde a mesma ação pode ter justificativas diferentes.</p>
     </section>
     <div class="par">
       <section class="cartao ${E}" style="--n:2">
@@ -367,20 +376,32 @@ function abaSintese(E) {
 }
 
 const INTRO = {
-  curvas: 'Durante o dia você só decidiu. Agora dá para ver como.',
-  decisoes: 'Cada decisão, a leitura dela e o conceito por trás. Se a leitura não corresponde ao seu motivo, diga qual foi.',
-  sintese: 'O percurso inteiro, para rever e argumentar.'
+  curvas: 'Reveja as suas escolhas pelas lentes propostas no percurso. Tempo de resposta e consulta de informações ajudam a descrever o contexto da decisão.',
+  decisoes: 'Reveja a ação, o desfecho e o conceito. Se quiser, registre o que pesou para você em cada decisão.',
+  sintese: 'O percurso inteiro, para rever e argumentar.',
+  aplicar: 'Exercite um conceito do dia em uma nova situação do cotidiano.'
 };
 
+function abaAplicar(E) {
+  return `<div class="estreita"><section class="cartao ${E}" style="--n:1">
+    <h2>${esc(APLICACAO.titulo)}</h2>
+    <p>${esc(APLICACAO.situacao)}</p>
+    <label for="resposta-aplicacao"><strong>${esc(APLICACAO.pergunta)}</strong></label>
+    <textarea id="resposta-aplicacao" rows="5" maxlength="2000" aria-describedby="aviso-aplicacao">${esc(rev.respostaAplicacao)}</textarea>
+    <p id="aviso-aplicacao" class="suave pequeno">Reflexão opcional. O texto fica nesta página durante a atividade.</p>
+    <details class="conceito"><summary>Explorar o conceito depois de refletir</summary><p>${esc(APLICACAO.leitura)}</p></details>
+  </section></div>`;
+}
+
 function telaRevelacao() {
-  const abas = [['curvas', 'Curvas'], ['decisoes', 'Decisões'], ['sintese', 'Síntese']];
+  const abas = [['curvas', 'Curvas'], ['decisoes', 'Decisões'], ['sintese', 'Síntese'], ['aplicar', 'Aplicar']];
   ceu('noite');
   topo.hidden = false;
   topo.innerHTML = `<div class="abas" role="tablist" aria-label="Revelação do dia">
     ${abas.map(([id, nome]) => `<button class="aba" role="tab" data-acao="aba" data-aba="${id}" aria-selected="${rev.aba === id}">${nome}</button>`).join('')}
   </div>`;
   const E = rev.anima ? 'entra' : '';
-  const corpo = rev.aba === 'curvas' ? abaCurvas(E) : rev.aba === 'decisoes' ? abaDecisoes(E) : abaSintese(E);
+  const corpo = { curvas: abaCurvas, decisoes: abaDecisoes, sintese: abaSintese, aplicar: abaAplicar }[rev.aba](E);
   app.innerHTML = `<div class="${rev.estreia ? 'estreia' : ''}">
       <section class="cartao capa ${E}${rev.aba === 'curvas' ? '' : ' estreita'}">
         <p class="rotulo">Fim do dia</p>
@@ -417,7 +438,7 @@ function acao(alvo) {
   } else if (a === 'info') abrirInfo();
   else if (a === 'escolher') escolher(i);
   else if (a === 'seguir') telaCena();
-  else if (a === 'revelar') { rev = { dados: resumo(est), aba: 'curvas', sel: 0, abertas: {}, anima: true, estreia: true }; telaRevelacao(); foco(); }
+  else if (a === 'revelar') { rev = { dados: resumo(est), aba: 'curvas', sel: 0, abertas: {}, respostaAplicacao: '', anima: true, estreia: true }; telaRevelacao(); foco(); }
   else if (a === 'aba') { rev.aba = alvo.dataset.aba; rev.anima = true; telaRevelacao(); foco(); }
   else if (a === 'sel') mantendoRolagem(() => { rev.sel = i; });
   else if (a === 'contestar') mantendoRolagem(() => { rev.abertas[i] = true; });
@@ -427,6 +448,9 @@ function acao(alvo) {
 document.addEventListener('click', e => {
   const alvo = e.target.closest('[data-acao]');
   if (alvo) acao(alvo);
+});
+app.addEventListener('input', e => {
+  if (e.target.id === 'resposta-aplicacao') rev.respostaAplicacao = e.target.value;
 });
 document.addEventListener('keydown', e => {
   if ((e.key === 'Enter' || e.key === ' ') && e.target.matches?.('.ponto-alvo')) { e.preventDefault(); acao(e.target); }

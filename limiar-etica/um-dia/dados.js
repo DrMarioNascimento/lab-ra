@@ -1,10 +1,10 @@
-// Percurso / Limiar Ético · Um dia — cenas, alternativas, desfechos e leituras.
+// Limiar Ético · Um dia — cenas, alternativas, desfechos e leituras.
 // Pesos de cada alternativa: w = { i: impulso, e: emoção, r: razão } (somam 1);
 // cd = de -1 (busca do desfecho) a +1 (busca do certo);
 // cor = pesos nas cinco correntes: U utilitarismo, V virtudes, I intenção, X existencialismo, C complexidade.
 // ef = efeitos nas variáveis do dia. margem = quanta escolha real a cena dava (0 a 1).
 
-export const VERSAO = '0.2';
+export const VERSAO = '0.3';
 
 export const CORRENTES = {
   U: 'Utilitarismo',
@@ -19,7 +19,7 @@ export const ABERTURA = {
   texto: [
     'Você estuda à noite e trabalha numa empresa de eventos. Entrou há três meses e precisa do emprego para pagar a faculdade.',
     'Hoje a empresa realiza um evento para um cliente, com abertura às 19h. Também hoje, até 23h59, o seu grupo da faculdade entrega um trabalho. A sua parte ainda não está pronta.',
-    'Ao longo do dia você vai decidir o que fazer em onze momentos. Não existe resposta certa. Decida como você decidiria.'
+    'Ao longo do dia, escolha com sinceridade o que você realmente faria em cada situação. Não há resposta certa, gabarito ou nota.'
   ]
 };
 
@@ -306,3 +306,10 @@ export const MOTIVOS = [
   'Pensei no que era certo',
   'Pensei no resultado'
 ];
+
+export const APLICACAO = {
+  titulo: 'Um vídeo no grupo da turma',
+  situacao: 'Em uma aula, alguém grava uma colega fazendo uma pergunta. Ela autoriza o envio ao grupo da turma para retomar a discussão. Depois, uma pessoa sugere postar o vídeo no perfil público do curso para alcançar quem ficou de fora.',
+  pergunta: 'O que você faria? Explique o que muda entre os dois usos e aplique à sua decisão a distinção entre intenção, meio e consequência.',
+  leitura: 'A intenção de ampliar o acesso pode ser legítima. A postagem pública é outro meio: muda o público, o alcance e a exposição da colega. A autorização para um uso específico não se estende automaticamente ao outro. Que efeito cada alternativa teria para a colega e para quem quer acompanhar a discussão?'
+};

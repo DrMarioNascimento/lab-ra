@@ -1,5 +1,5 @@
-// Percurso / Limiar Ético · Um dia — motor do dia (sem interface).
-import { CENAS, CENA_FINAL, CENA_NEGADA, ORDEM_PENDENCIAS, VOLTAS, CORRENTES } from './dados.js';
+// Limiar Ético · Um dia — motor do dia (sem interface).
+import { CENAS, CENA_FINAL, CENA_NEGADA, ORDEM_PENDENCIAS, VOLTAS, CORRENTES } from './dados.js?v=0.3';
 
 export function novoEstado() {
   return {
@@ -70,9 +70,15 @@ export function decidir(est, indiceOpcao, sinais = {}) {
     }
   }
 
+  if (cena.id === 'interprete' && indiceOpcao === 1 && est.conf.equipe >= 2) {
+    est.evento += 1;
+    desfecho = 'Uma colega da equipe ajuda a preparar as legendas e a distribuir os roteiros. O material fica disponível mais cedo. A medida ajuda parte da plateia, e a ausência de Libras continua sem reparo. No fim, a chefia diz que preferia ter sido avisada antes.';
+  }
+
   est.log.push({
     cenaId: cena.id, hora: cena.hora, titulo: cena.titulo, margem: cena.margem,
     indice: indiceOpcao, opcao: op, conceito: cena.conceito,
+    desfecho,
     tempoMs: sinais.tempoMs ?? null,
     abriuInfo: !!sinais.abriuInfo,
     tinhaInfo: !!cena.info && sinais.infoDisponivel !== false
@@ -104,7 +110,7 @@ function textoFamilia(f) {
 export function resumo(est) {
   const pontos = est.log.map((l, n) => ({
     n: n + 1, hora: l.hora, titulo: l.titulo, cenaId: l.cenaId,
-    escolha: l.opcao.t, caracteristica: l.opcao.car, conceito: l.conceito,
+    escolha: l.opcao.t, desfecho: l.desfecho, caracteristica: l.opcao.car, conceito: l.conceito,
     impulso: l.opcao.w.i, emocao: l.opcao.w.e, razao: l.opcao.w.r,
     certoDesfecho: l.opcao.cd, margem: l.margem,
     tempoS: l.tempoMs == null ? null : Math.round(l.tempoMs / 1000),

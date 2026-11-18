@@ -61,6 +61,6 @@ A auditoria de 25/10/2026 corrigiu relevo em objetos com vários materiais e car
 
 A versão mais recente do Mosaico Lastro foi incorporada ao repositório em [mosaico-lastro/](mosaico-lastro/), com motor, interface, proposta e testes. [Abrir a experiência](https://lab-ra.dragongames.dev.br/mosaico-lastro/) · [Proposta completa](https://lab-ra.dragongames.dev.br/mosaico-lastro/proposta.html). O card da biblioteca passa a abrir esta cópia local. Origem e orientações em [mosaico-lastro/README.md](mosaico-lastro/README.md).
 
-## Alostase e Limiar Ética — acervo consolidado em 15/11/2026
+## Alostase e Limiar Ético — acervo consolidado em 15/11/2026
 
-[Experiências, códigos e documentação](https://lab-ra.dragongames.dev.br/alostase-arquivos/). O pacote original completo da versão 0.5, com 231 arquivos, foi preservado; o GDD recuperado inclui as seções 0.4 e 0.5 ausentes no histórico anterior. As versões atuais de [Alostase](limiar-source/) e [Limiar Ética](limiar-etica/) seguem publicadas nos mesmos endereços. Detalhes e limites da conferência em [alostase-arquivos/README.md](alostase-arquivos/README.md).
+[Experiências, códigos e documentação](https://lab-ra.dragongames.dev.br/alostase-arquivos/). O pacote original completo da versão 0.5, com 231 arquivos, foi preservado; o GDD recuperado inclui as seções 0.4 e 0.5 ausentes no histórico anterior. As versões atuais de [Alostase](limiar-source/) e [Limiar Ético](limiar-etica/) seguem publicadas nos mesmos endereços. Detalhes e limites da conferência em [alostase-arquivos/README.md](alostase-arquivos/README.md).

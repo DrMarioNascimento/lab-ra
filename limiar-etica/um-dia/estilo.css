@@ -453,3 +453,17 @@ ul.limpa li::marker { color: var(--sol-base); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+#resposta-aplicacao {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 8px 0;
+  padding: 12px;
+  border: 1px solid #77684c;
+  border-radius: 8px;
+  background: #fffdf7;
+  color: #252035;
+  font: inherit;
+  resize: vertical;
+}
