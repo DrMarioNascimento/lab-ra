@@ -2,7 +2,8 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { CENAS, CENA_FINAL } from '../dados.js';
-import { TEMAS, CARGAS, soma, faixa, relatorio } from '../balizamento/cargas.mjs';
+import { TEMAS, CARGAS, CARGAS_DIAS, soma, faixa, relatorio, cargaDoNivel } from '../balizamento/cargas.mjs';
+import { DIAS } from '../dias.js';
 
 let n = 0;
 const ok = (nome, f) => { f(); n++; console.log('ok  ' + nome); };
@@ -30,6 +31,19 @@ ok('o dia tem ao menos uma cena em faixa limite e uma leve', () => {
   const f = relatorio().linhas.map(l => l.faixa);
   assert.ok(f.includes('limite') && f.includes('leve'));
 });
+
+for (const d of ['escola', 'bairro']) {
+  ok(`[${d}] toda cena tem dez notas inteiras de 0 a 4 e o nível sobe de baixo a alto (diferença de ao menos 4)`, () => {
+    for (const c of DIAS[d].CENAS) {
+      const notas = CARGAS_DIAS[d][c.id];
+      assert.ok(notas && notas.length === 10, 'sem carga: ' + c.id);
+      for (const v of notas) assert.ok(Number.isInteger(v) && v >= 0 && v <= 4, c.id);
+      const b = soma(cargaDoNivel(c.id, 'baixo', d)), m = soma(cargaDoNivel(c.id, 'medio', d)), a = soma(cargaDoNivel(c.id, 'alto', d));
+      assert.ok(b < m && m < a && a - b >= 4, c.id);
+    }
+    assert.deepEqual(Object.keys(CARGAS_DIAS[d]).sort(), DIAS[d].CENAS.map(c => c.id).sort());
+  });
+}
 
 ok('o balizamento não é carregado pela página do aluno', () => {
   for (const arq of ['../app.js', '../dados.js', '../motor.js', '../retomadas.js', '../index.html']) {

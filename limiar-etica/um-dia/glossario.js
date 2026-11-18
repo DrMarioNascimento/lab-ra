@@ -4,6 +4,7 @@
 // com complementos de Rawls, utilitarismo, ética do cuidado e do Código de Ética do CONFEF.
 // Os verbetes de "Material de apoio" vêm dos textos "Entre o impulso e a escolha" e "Ética do Profissional de Saúde — Educação Física" (Prof. Mário César Nascimento, 2026).
 // "Coleguismo" e "Complacência com o mal" vêm do capítulo "Ética do coleguismo" de A Ética e a Bioética na Preparação e na Intervenção do Profissional de Educação Física (CONFEF, 2006).
+// "Sigilo profissional", "Honestidade", "Competência", "Responsabilizar-se por faltas" e "Legal e ético" vêm do livro Ética Profissional em Educação Física (CONFEF, 2004); "Encaminhamento e rede de proteção" vem do livro de estágio "Eu não estudei para isso!" (CREF4/SP, 2019). Redigidos em paráfrase.
 // As frases que falam só do jogo da vila foram retiradas. As definições são as do professor; não editar aqui sem a autorização dele.
 
 export const GLOSSARIO = {
@@ -207,7 +208,13 @@ export const GLOSSARIO = {
   "dever-vigilancia": {"termo": "Dever de vigilância", "autor": "", "def": "Atenção e acompanhamento contínuos de quem é atendido.", "cat": "Material de apoio"},
   "etica-profissional": {"termo": "Ética profissional", "autor": "Tojal, Da Costa e Beresford", "def": "Exercer uma profissão exige conhecimento especializado, competência técnica e compromisso ético. Atitudes, valores e responsabilidade se formam na graduação e se aperfeiçoam na prática.", "cat": "Material de apoio"},
   "coleguismo": {"termo": "Coleguismo", "autor": "Cunha, Martins e Beresford; Sá", "def": "Sentimento de solidariedade que une os colegas, tratado como virtude essencial nas relações entre profissionais de Educação Física. Pede orientar e ajudar quem tem menos experiência, não se apropriar de ideias ou trabalhos alheios, não se omitir diante de atitudes imorais e evitar comentários depreciativos sobre o trabalho de quem veio antes. Prejudicar um colega para se projetar é vício; é tão importante não agir contra colegas quanto se defender de quem age contra nós.", "cat": "Material de apoio"},
-  "complacencia": {"termo": "Complacência com o mal", "autor": "Sá", "def": "Tolerar a atitude imoral de um colega estimula a ação viciosa. Por isso o coleguismo inclui não se omitir diante do que é errado, o que não é o mesmo que denunciar por rivalidade.", "cat": "Material de apoio"}
+  "complacencia": {"termo": "Complacência com o mal", "autor": "Sá", "def": "Tolerar a atitude imoral de um colega estimula a ação viciosa. Por isso o coleguismo inclui não se omitir diante do que é errado, o que não é o mesmo que denunciar por rivalidade.", "cat": "Material de apoio"},
+  "sigilo": {"termo": "Sigilo profissional", "autor": "Código de Ética do CONFEF; Sá; Motta", "def": "Guardar sigilo sobre fato ou informação conhecida no exercício da profissão é dever previsto no Código de Ética, e violar o sigilo é infração disciplinar. Para alguns autores é virtude básica de todas as profissões. As informações registradas sobre quem é atendido ficam sob essa guarda.", "cat": "Material de apoio"},
+  "honestidade": {"termo": "Honestidade", "autor": "Sá", "def": "Virtude considerada magna na profissão: respeitar terceiros como retribuição à confiança depositada. Não admite meio-termo: ser desleal ou tirar o direito de outra pessoa é vício. O profissional comprometido com a ética não se deixa corromper, mesmo em ambiente que corrompe.", "cat": "Material de apoio"},
+  "competencia": {"termo": "Competência", "autor": "Sá", "def": "O conhecimento acumulado, suficiente para desempenhar bem uma tarefa. O erro de conduta não está em não ter conhecimento, mas em ter consciência de que não o tem e mesmo assim aceitar a tarefa.", "cat": "Material de apoio"},
+  "responsabilidade-equipe": {"termo": "Responsabilizar-se por faltas", "autor": "Código de Ética do CONFEF", "def": "O profissional responde por falta cometida no exercício das atividades, tenha ela sido praticada individualmente ou em equipe.", "cat": "Material de apoio"},
+  "legal-etico": {"termo": "Legal e ético", "autor": "Beresford", "def": "A legitimação social de um ato depende de dois aspectos: o jurídico, com o princípio legal, e o moral, com o princípio ético. A lei e o conselho definem o que pode ser exercido; a ética avalia se a conduta é justa. Cumprir a lei não esgota a pergunta ética.", "cat": "Material de apoio"},
+  "rede-protecao": {"termo": "Encaminhamento e rede de proteção", "autor": "Livro de estágio (CREF4/SP, 2019), a partir de orientações da Secretaria de Educação de SP", "def": "Diante de violência, a escola envolve os pais, faz orientações individuais ou em grupo e encaminha o aluno a serviços de orientação, de saúde, de assistência social e ao Conselho Tutelar. Crimes são comunicados às autoridades competentes (segurança pública, Judiciário, Ministério Público).", "cat": "Material de apoio"}
 };
 
 // Quais verbetes acompanham cada tipo de leitura do retorno (prefixo do id da leitura).
@@ -216,7 +223,7 @@ export const CONCEITOS_DA_LEITURA = {
   'colegas': ['coleguismo', 'complacencia', 'codigo-confef', 'confianca', 'cuidado', 'bem-comum', 'etica-complexidade'],
   'meta-colegas': ['coleguismo', 'individualismo', 'bem-comum', 'carona', 'codigo-confef'],
   'justica': ['justica-distributiva', 'equidade', 'diferenca', 'veu', 'justica-virtude', 'autonomia-pessoa'],
-  'profissional': ['etica-profissional', 'deontologia', 'codigo-confef', 'responsabilidade', 'dever', 'limites-competencia', 'salvaguardas', 'omissao', 'transferencia', 'negligencia', 'imprudencia', 'impericia', 'dever-vigilancia'],
-  'virtudes': ['virtude', 'justo-meio', 'coragem', 'veracidade', 'prudencia', 'covardia', 'temeridade'],
+  'profissional': ['etica-profissional', 'deontologia', 'codigo-confef', 'responsabilidade', 'responsabilidade-equipe', 'limites-competencia', 'competencia', 'sigilo', 'omissao', 'transferencia', 'rede-protecao', 'negligencia', 'imprudencia', 'impericia', 'legal-etico'],
+  'virtudes': ['virtude', 'honestidade', 'justo-meio', 'coragem', 'veracidade', 'prudencia', 'covardia', 'temeridade'],
   'certo-desfecho': ['dever', 'imperativo', 'deontologia', 'consequencialismo', 'utilitarismo', 'beneficencia', 'nao-maleficencia', 'duplo-efeito', 'intencao-motivo', 'liberdade-situada']
 };

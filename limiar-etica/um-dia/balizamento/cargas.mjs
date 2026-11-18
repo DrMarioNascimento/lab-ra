@@ -46,10 +46,50 @@ export const ALAVANCAS = {
   verba: [1, 5, 9], figurinha: [6, 8, 9], ligacao: [0, 5, 9], fotos: [0, 5, 9], interprete: [1, 3, 9]
 };
 
-export function cargaDoNivel(id, nivel) {
-  const base = [...CARGAS[id]];
+// Dias novos (notas de autoria, mesma régua; ids repetidos entre dias, como 'fotos', ficam separados por dia).
+export const CARGAS_DIAS = {
+  escola: {
+    vaga:       [3, 3, 3, 2, 2, 3, 1, 3, 1, 2],
+    gol:        [3, 2, 3, 2, 2, 1, 3, 2, 2, 1],
+    halter:     [3, 3, 3, 3, 3, 2, 2, 3, 2, 3],
+    gravacao:   [2, 2, 2, 2, 2, 2, 1, 2, 1, 2],
+    quadra:     [2, 3, 2, 2, 3, 2, 2, 3, 2, 3],
+    verba:      [2, 3, 2, 2, 3, 2, 2, 3, 3, 3],
+    convocacao: [1, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+    joelho:     [2, 3, 3, 3, 3, 2, 2, 3, 2, 2],
+    antecessor: [1, 1, 1, 1, 1, 1, 2, 1, 1, 1],
+    fotos:      [1, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+  },
+  bairro: {
+    barulho:  [4, 3, 4, 3, 3, 3, 2, 3, 2, 3],
+    busca:    [3, 3, 4, 3, 3, 2, 2, 3, 2, 2],
+    cansaco:  [3, 3, 3, 3, 3, 2, 2, 3, 2, 2],
+    torneio:  [1, 2, 2, 2, 2, 3, 2, 2, 2, 2],
+    briga:    [3, 3, 4, 3, 3, 3, 3, 3, 3, 3],
+    favor:    [2, 3, 3, 3, 3, 2, 3, 3, 3, 3],
+    convite:  [2, 3, 3, 3, 3, 3, 2, 3, 2, 3],
+    imagens:  [1, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+    plano:    [1, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+    relato:   [3, 4, 4, 4, 4, 3, 2, 4, 3, 3]
+  }
+};
+export const ALAVANCAS_DIAS = {
+  escola: {
+    vaga: [0, 5, 9], gol: [0, 6, 9], halter: [0, 3, 9], gravacao: [1, 3, 9], quadra: [0, 5, 9],
+    verba: [1, 7, 9], convocacao: [1, 5, 9], joelho: [1, 2, 9], antecessor: [0, 6, 9], fotos: [0, 5, 9]
+  },
+  bairro: {
+    barulho: [1, 5, 9], busca: [0, 3, 9], cansaco: [0, 3, 9], torneio: [1, 5, 9], briga: [0, 6, 9],
+    favor: [1, 6, 9], convite: [1, 3, 9], imagens: [1, 5, 9], plano: [0, 6, 9], relato: [0, 5, 9]
+  }
+};
+
+export function cargaDoNivel(id, nivel, dia = 'empresa') {
+  const cargas = dia === 'empresa' ? CARGAS : CARGAS_DIAS[dia];
+  const alavancas = dia === 'empresa' ? ALAVANCAS : ALAVANCAS_DIAS[dia];
+  const base = [...cargas[id]];
   const d = nivel === 'alto' ? 1 : nivel === 'baixo' ? -1 : 0;
-  for (const i of (ALAVANCAS[id] || [])) base[i] = Math.min(4, Math.max(0, base[i] + d));
+  for (const i of (alavancas[id] || [])) base[i] = Math.min(4, Math.max(0, base[i] + d));
   return base;
 }
 
@@ -70,7 +110,19 @@ export function relatorio() {
   return { linhas, media, pico: Math.max(...linhas.map(l => l.total)), altas: linhas.filter(l => l.total >= 22).length };
 }
 
+export function relatorioDia(dia) {
+  const linhas = Object.entries(CARGAS_DIAS[dia]).map(([id]) => ({
+    id, baixo: soma(cargaDoNivel(id, 'baixo', dia)), medio: soma(cargaDoNivel(id, 'medio', dia)), alto: soma(cargaDoNivel(id, 'alto', dia))
+  }));
+  return { linhas, media: linhas.reduce((a, l) => a + l.medio, 0) / linhas.length };
+}
+
 if (import.meta.url === `file://${process.argv[1]}`) {
+  for (const d of Object.keys(CARGAS_DIAS)) {
+    console.log(`\n${d}`);
+    for (const l of relatorioDia(d).linhas) console.log(l.id.padEnd(11), `baixo ${l.baixo} (${faixa(l.baixo)}) · médio ${l.medio} (${faixa(l.medio)}) · alto ${l.alto} (${faixa(l.alto)})`);
+  }
+  console.log('\nempresa');
   const r = relatorio();
   for (const l of r.linhas) console.log(l.id.padEnd(11), String(l.total).padStart(3), l.faixa);
   console.log(`média ${r.media.toFixed(1)} · pico ${r.pico} · cenas em faixa alta ou limite: ${r.altas} de ${r.linhas.length}`);
