@@ -32,6 +32,7 @@ Dia de trabalho de 17/11/2026: o projeto saiu do GDD e virou protótipo jogável
 - Perfil 3 do desafio: aula na semana e trabalho em eventos esportivos no fim de semana.
 - O custo precisa estar à vista ("é esse tipo de coisa que precisa se ver"): cartão "O que este dia/esta semana custa" abre as telas.
 - Glicemia identificada como de jejum ou pós-prandial; o pico de 143 mg/dL é explicado.
+- Pressão arterial: só perfil saudável (decisão de 18/11/2026, porque o jogo é de fisiologia geral). Hipertensão fica fora do escopo.
 - "Pressão de sono" passa a se chamar "necessidade de sono" na tela, com a nota "não é pressão arterial".
 
 ## Suposições de Claude que aguardam conferência do professor
@@ -49,14 +50,13 @@ Dia de trabalho de 17/11/2026: o projeto saiu do GDD e virou protótipo jogável
 
 ## Perguntas em aberto para o professor
 
-- Pressão arterial: só o perfil saudável ou também um perfil hipertenso?
 - PDF de Scheer e colegas (2009) no Drive, para a glicemia na jornada noturna.
 - Ícones 3D: o jogo não tem nenhum; falta a lista de prompts.
 - Incluir o Mosaico Alostase no Acervo (depende do gerador no PC).
 
 ## Próximo passo
 
-**Frequência cardíaca e pressão arterial:** a ficha 08 (18/11/2026) está escrita só com resumos. Sustentado: forma bimodal de 24 h, amplitudes relativas e a divisão sono/postura versus ritmo endógeno. Médias de pressão em normotensos e efeito crônico do trabalho noturno (+2 a +3 mmHg) já têm resumo. Falta: Degaute inteiro, média por faixa de 18 a 30 anos, frequência pós-exercício e frequência/pressão no sono diurno. Entrou no motor só a pressão arterial de normotenso (18/11, sem tela); frequência cardíaca, pós-exercício e a interface ficam esperando. Decisão pendente do professor: só perfil saudável ou também hipertenso?
+**Frequência cardíaca e pressão arterial:** a ficha 08 (18/11/2026) está escrita só com resumos. Sustentado: forma bimodal de 24 h, amplitudes relativas e a divisão sono/postura versus ritmo endógeno. Médias de pressão em normotensos e efeito crônico do trabalho noturno (+2 a +3 mmHg) já têm resumo. Falta: Degaute inteiro, média por faixa de 18 a 30 anos, frequência pós-exercício e frequência/pressão no sono diurno. Entrou no motor só a pressão arterial de normotenso (18/11, sem tela); frequência cardíaca, pós-exercício e a interface ficam esperando. Perfil: só saudável (decidido em 18/11).
 
 Depois, pela ordem sugerida: conta de Treino; sala de aula com telão e `/simulador`; semanas 2 a 8 e meses por último.
 
