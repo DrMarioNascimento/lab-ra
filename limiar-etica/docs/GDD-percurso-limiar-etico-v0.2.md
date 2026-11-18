@@ -236,3 +236,7 @@ Na síntese, a repetição de estratégia e de consulta é apresentada por níve
 ## 21. Condições de pressão na revelação · versão 0.9
 
 Cada cena do dia recebe de uma a três condições narrativas (imprevisto, pouco controle, acúmulo de demandas), escolhidas a partir dos temas da PSS-10 sem aplicar a escala. A revelação mostra as condições de cada decisão e um bloco "O que pressionava o seu dia", e a síntese traz a base e as referências. O mapa, as lacunas (dinheiro, saúde, moradia, estágio, integridade acadêmica) e as ressalvas estão em `PSS10-situacoes-e-contextos-v0.1.md`. A atribuição das condições é proposta de autoria e depende de revisão do professor.
+
+### 21.1 Balizamento interno e situações-limite
+
+A PSS-10 também serve de régua interna do autor para estimar a carga de estresse de cada cena (de 0 a 40, notas de autoria, sem validade psicométrica e sem pontos de corte clínicos). Isso fica em `um-dia/balizamento/`, não é carregado pela página e não é calculado sobre o aluno. As situações-limite nascem da frequência da pressão (a terceira advertência, a quarta consulta no mês). Detalhes em `PSS10-balizamento-interno-v0.1.md`.

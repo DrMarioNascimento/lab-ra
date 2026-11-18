@@ -2,7 +2,7 @@
 
 [Abrir cinco situações independentes](https://lab-ra.dragongames.dev.br/limiar-etica/) · [Arquivos](https://lab-ra.dragongames.dev.br/alostase-arquivos/#limiar-etica)
 
-[Abrir Um dia](https://lab-ra.dragongames.dev.br/limiar-etica/um-dia/) · [GDD](docs/GDD-percurso-limiar-etico-v0.2.md) · [PSS-10: situações e contextos](docs/PSS10-situacoes-e-contextos-v0.1.md)
+[Abrir Um dia](https://lab-ra.dragongames.dev.br/limiar-etica/um-dia/) · [GDD](docs/GDD-percurso-limiar-etico-v0.2.md) · [PSS-10: situações e contextos](docs/PSS10-situacoes-e-contextos-v0.1.md) · [balizamento interno](docs/PSS10-balizamento-interno-v0.1.md)
 
 **Um dia** é o percurso encadeado em `um-dia/`, com desfechos que dependem das decisões anteriores e uma devolutiva conceitual no fim. Verifique o motor com `node limiar-etica/um-dia/testes/motor.test.mjs`, a partir da raiz do repositório.
 
