@@ -14,7 +14,7 @@ export const EIXOS = {
     titulo: 'Coleguismo e complacência',
     competencia: 'Apoiar colegas sem acobertar o que está errado, e sem desmerecer quem não está presente.',
     pergunta: 'Proteger meu colega, aqui, é solidariedade ou é complacência com o mal?',
-    verbetes: ['coleguismo', 'complacencia', 'carona', 'bem-comum', 'fair-play']
+    verbetes: ['coleguismo', 'complacencia', 'carona', 'bem-comum', 'duplo-padrao', 'fair-play']
   },
   justica: {
     titulo: 'Justiça e equidade',

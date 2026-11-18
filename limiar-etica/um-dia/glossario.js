@@ -219,13 +219,14 @@ export const GLOSSARIO = {
   "kohlberg": {"termo": "Níveis de julgamento moral", "autor": "Kohlberg", "def": "Seis estágios em três níveis: pré-convencional (evitar punição, ganhar recompensa), convencional (corresponder ao grupo e à lei) e pós-convencional (princípios que a pessoa examina por conta própria). O que se avalia são as razões dadas para agir, não só a ação.", "cat": "Material de apoio"},
   "violencia-escola": {"termo": "Violência na escola", "autor": "Debarbieux; Ruotti, Alves e Cubas", "def": "Não há definição única nem tipologia que dê conta de tudo: vai de agressões graves a pequenas incivilidades. Uma visão estreita deixa de ver o que também fere.", "cat": "Material de apoio"},
   "bullying": {"termo": "Bullying", "autor": "Fante", "def": "Desejo deliberado de maltratar outra pessoa e colocá-la sob tensão. É uma violência muitas vezes oculta, repetitiva e com desequilíbrio de poder, o que dificulta a reação e a denúncia da vítima.", "cat": "Material de apoio"},
+  "duplo-padrao": {"termo": "Moral de grupo e duplo padrão", "autor": "Jung Mo Sung (CONFEF, 2006)", "def": "Todo grupo precisa de normas e de solidariedade entre os seus membros. O risco é valerem só para quem é do grupo: honestidade e respeito para os de dentro, trapaça para os de fora. A ética, como reflexão crítica sobre as normas vigentes, existe para superar esse duplo padrão.", "cat": "Material de apoio"},
   "fair-play": {"termo": "Fair play", "autor": "Gebauer", "def": "Regra não verbal das relações entre as pessoas no esporte: respeito ao outro e à regra que ninguém precisa vigiar para valer.", "cat": "Material de apoio"}
 };
 
 // Quais verbetes acompanham cada tipo de leitura do retorno (prefixo do id da leitura).
 export const CONCEITOS_DA_LEITURA = {
   'razao-emocao': ['alma', 'platao', 'hume', 'afetos', 'desejo', 'vontade', 'racionalismo', 'subjetividade', 'intencao-motivo'],
-  'colegas': ['coleguismo', 'complacencia', 'codigo-confef', 'confianca', 'cuidado', 'bem-comum', 'etica-complexidade'],
+  'colegas': ['coleguismo', 'complacencia', 'duplo-padrao', 'codigo-confef', 'confianca', 'cuidado', 'bem-comum', 'etica-complexidade'],
   'meta-colegas': ['coleguismo', 'individualismo', 'bem-comum', 'carona', 'codigo-confef'],
   'justica': ['justica-distributiva', 'equidade', 'diferenca', 'veu', 'justica-virtude', 'autonomia-pessoa'],
   'profissional': ['etica-profissional', 'deontologia', 'codigo-confef', 'responsabilidade', 'responsabilidade-equipe', 'limites-competencia', 'competencia', 'sigilo', 'omissao', 'transferencia', 'rede-protecao', 'negligencia', 'imprudencia', 'impericia', 'legal-etico'],

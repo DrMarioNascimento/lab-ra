@@ -269,6 +269,6 @@ A tela inicial pergunta qual dia viver. Link direto: `um-dia/?dia=escola` ou `?d
 ## 24. v1.2 · Conteúdo programático (2026-11-18)
 
 - Novo documento `PROGRAMA-limiar-etico-v0.1.md`: oito eixos de competência, mapa teoria → competência → cena para os 30 cenários dos três dias, régua interna ligada aos fatores de risco psicossocial e honestidade sobre o que foi lido.
-- Código: `um-dia/programa.js` (EIXOS, CENA_EIXOS, `mapaDoDia`), card "O que o seu dia pôs à prova" na síntese, cinco verbetes novos (62 no total), versão 1.2.
+- Código: `um-dia/programa.js` (EIXOS, CENA_EIXOS, `mapaDoDia`), card "O que o seu dia pôs à prova" na síntese, seis verbetes novos (63 no total), versão 1.2.
 - Testes: `node testes/*.test.mjs` (motor 6, balizamento 6, níveis 25, programa 6) e smoke Playwright nos três dias.
-- Lacunas declaradas: NOM-035 oficial e competências HEC-C da ASBH não foram lidas; AAPOR não usada; livros lidos por trechos.
+- Lacunas declaradas: NOM-035 só por fonte secundária (7 categorias) e livro de competências da ASBH não lido; AAPOR não usada; livros lidos por trechos.
