@@ -1,8 +1,8 @@
 // Limiar Ético · Um dia — interface.
-import { ABERTURA, SINTESE, MOTIVOS, APLICACAO, VERSAO, CENAS, CENAS_COM_URGENCIA } from './dados.js?v=0.6';
-import { novoEstado, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=0.6';
+import { ABERTURA, SINTESE, MOTIVOS, APLICACAO, VERSAO, CENAS, CENAS_COM_URGENCIA } from './dados.js?v=0.8';
+import { novoEstado, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=0.8';
 
-import { PARES, prepararRodadas, cruzarRodadas } from './retomadas.js?v=0.6';
+import { PARES, EXIGENCIAS, prepararRodadas, cruzarRodadas } from './retomadas.js?v=0.8';
 
 const app = document.querySelector('#app');
 const topo = document.querySelector('#topo');
@@ -58,7 +58,7 @@ function telaAbertura() {
         ${arcoCapa()}
         <h1>${esc(ABERTURA.titulo)}</h1>
         ${ABERTURA.texto.map(p => `<p>${esc(p)}</p>`).join('')}
-        <p>Ao final, você poderá reconhecer padrões nas suas escolhas, comparar sua justificativa com as leituras do percurso e aplicar um conceito em outra situação. Reserve cerca de 25 minutos para a atividade. As respostas ficam nesta página e desaparecem ao fechá-la.</p>
+        <p>Ao final, você poderá reconhecer padrões nas suas escolhas, comparar sua justificativa com as leituras do percurso e aplicar um conceito em outra situação. Reserve cerca de 30 minutos para a atividade. As respostas ficam nesta página e desaparecem ao fechá-la.</p>
         <div class="acoes"><button class="btn principal" data-acao="comecar">Começar o dia</button></div>
       </section>
       <p class="versao entra" style="--n:2">Versão ${esc(VERSAO)}</p>
@@ -164,7 +164,7 @@ function escolher(i) {
         <p class="rotulo">${esc(cena.titulo)}</p>
         <p class="escolhido">${esc(texto)}</p>
         <p class="desfecho">${esc(desfecho)}</p>
-        <div class="acoes"><button class="btn principal" data-acao="${fim ? 'revelar' : 'seguir'}">${fim ? 'Encerrar o dia' : 'Continuar'}</button></div>
+        <div class="acoes"><button class="btn principal" data-acao="${fim ? 'revelar' : 'seguir'}">Continuar</button></div>
       </section>
     </div>`;
   foco();
@@ -338,13 +338,13 @@ function telaRetomadas() {
   const { rodada, pos, rodadas, consultou } = retomadas;
   const caso = rodadas[rodada][pos];
   const { forma } = caso;
-  const opcoes = PARES[caso.par].opcoes;
+  const opcoes = caso.opcoes;
   topo.hidden = true;
   app.innerHTML = `
     <div class="cena-grade">
       <section class="cartao pagina entra">
         <h2>${esc(forma.titulo)}</h2>
-        <p class="cena-texto">${esc(forma.texto)}${caso.urgente ? ' ' + esc(forma.urgencia) : ''}</p>
+        <p class="cena-texto">${esc(forma.texto)}${caso.nivel >= 1 ? ' ' + esc(forma.urgencia) : ''}${caso.nivel === 2 ? ' ' + esc(caso.acrescimo) : ''}</p>
         ${consultou
           ? `<div class="info nova" tabindex="-1" id="fato-retomada"><p>${esc(forma.fato)}</p></div>`
           : `<button class="btn secundario" data-acao="consultar-retomada">${esc(forma.rotulo)}</button>`}
@@ -368,7 +368,7 @@ function responderRetomada(escolha) {
   retomadas.pos++;
   if (retomadas.pos < rodadas[rodada].length) {
     apresentarRetomada();
-  } else if (rodada === 0) {
+  } else if (rodada < 2) {
     telaCena();
   } else {
     rev = { dados: resumo(est), aba: 'curvas', sel: 0, abertas: {}, respostaAplicacao: '', anima: true, estreia: true };
@@ -378,28 +378,40 @@ function responderRetomada(escolha) {
 }
 
 function relatorioRepeticao(E) {
-  const pares = cruzarRodadas(...retomadas.registros);
-  const grupos = [
-    ['Com urgência na história', pares.filter(p => p.urgente)],
-    ['Sem o acréscimo de urgência', pares.filter(p => !p.urgente)]
-  ];
+  const pares = cruzarRodadas(retomadas.registros[0], retomadas.registros[2]);
+  const grupos = EXIGENCIAS.map((titulo, nivel) => [titulo, pares.filter(p => p.nivel === nivel)]);
   return `<section class="cartao ${E}" style="--n:2">
     <h3>O que se repetiu nas suas decisões</h3>
-    <p>Antes e depois do dia, você respondeu a situações diferentes com conflitos semelhantes. Em cada par, a condição foi a mesma nas duas situações. Agora você pode ver onde seu modo de agir ou de buscar informação se repetiu.</p>
+    <p>Antes e depois do dia, você respondeu a situações diferentes com conflitos semelhantes. Em cada par, o nível de exigência foi o mesmo nas duas situações. Agora você pode ver onde seu modo de agir ou de buscar informação se repetiu e interpretar suas escolhas pelos conceitos de ética.</p>
     <div class="par">${grupos.map(([titulo, itens]) => `<div>
       <h4>${titulo}</h4>
+      <p>Consulta em ${itens.flatMap(p => [p.antes, p.depois]).filter(r => r.consultou).length} de ${itens.length * 2} decisões.</p>
       <p>Mesma estratégia em ${itens.filter(p => p.repetiuEscolha).length} de ${itens.length} pares.
         Mesmo comportamento de consulta em ${itens.filter(p => p.repetiuConsulta).length} de ${itens.length}.</p>
       ${itens.map(p => `<details class="conceito">
         <summary>${esc(p.tema)} · ${p.repetiuEscolha ? 'estratégia repetida' : 'estratégia diferente'}</summary>
+        <p><strong>Conceito ético:</strong> ${esc(p.lente.titulo)}</p>
         <ol>${[p.antes, p.depois].map(registro => `<li>
           <strong>${esc(registro.forma.titulo)}</strong>
           <p>${esc(PARES[registro.par].opcoes[registro.escolha])}</p>
+          <p>${esc(p.lente.leituras[registro.escolha])}</p>
           <p class="suave pequeno">${registro.consultou ? 'Consultou a informação adicional.' : 'Seguiu sem abrir a informação adicional.'}</p>
         </li>`).join('')}</ol>
       </details>`).join('')}
     </div>`).join('')}</div>
-    <p class="suave pequeno">As situações têm contextos diferentes e aconteceram na mesma sessão. O relatório descreve a repetição das escolhas e consultas nesses casos.</p>
+    <h4>O mesmo conflito, de outro lugar</h4>
+    <p>Compare o que você fez quando mudou a sua responsabilidade na situação.</p>
+    ${pares.map(p => `<details class="conceito">
+      <summary>${esc(p.tema)} · ${esc(EXIGENCIAS[p.nivel])}</summary>
+      <p><strong>Conceito ético:</strong> ${esc(p.lente.titulo)}</p>
+      <ol>${[p.antes, ...retomadas.registros[1].filter(r => r.par === p.antes.par), p.depois].map(r => `<li>
+        <strong>${esc(r.forma.papel ?? 'Papel inicial')} · ${esc(r.forma.titulo)}</strong>
+        <p>${esc(r.opcoes[r.escolha])}</p>
+        <p>${esc(r.leituras[r.escolha])}</p>
+        <p class="suave pequeno">${r.consultou ? 'Consultou a informação adicional.' : 'Seguiu sem abrir a informação adicional.'}</p>
+      </li>`).join('')}</ol>
+    </details>`).join('')}
+    <p class="suave pequeno">As situações têm contextos diferentes e aconteceram na mesma sessão. A urgência faz parte do contexto. As leituras éticas são interpretações das ações, e uma mesma ação pode ter motivos diferentes.</p>
   </section>`;
 }
 
@@ -546,7 +558,7 @@ function acao(alvo) {
       return [cena.id, cena.trecho];
     }));
     for (const k of Object.keys(contestacoes)) delete contestacoes[k];
-    retomadas = { rodadas: prepararRodadas(), registros: [[], []], rodada: 0, pos: 0, consultou: false };
+    retomadas = { rodadas: prepararRodadas(), registros: [[], [], []], rodada: 0, pos: 0, consultou: false };
     apresentarRetomada();
   } else if (a === 'consultar-retomada') {
     retomadas.consultou = true;
@@ -555,9 +567,15 @@ function acao(alvo) {
   } else if (a === 'responder-retomada') responderRetomada(i);
   else if (a === 'info') abrirInfo();
   else if (a === 'escolher') escolher(i);
-  else if (a === 'seguir') telaCena();
+  else if (a === 'seguir') {
+    if (est.log.length === 5 && retomadas.rodada === 0) {
+      retomadas.rodada = 1;
+      retomadas.pos = 0;
+      apresentarRetomada();
+    } else telaCena();
+  }
   else if (a === 'revelar') {
-    retomadas.rodada = 1;
+    retomadas.rodada = 2;
     retomadas.pos = 0;
     apresentarRetomada();
   }

@@ -1,5 +1,5 @@
 // Limiar Ético · Um dia — motor do dia (sem interface).
-import { CENAS, CENA_FINAL, CENA_NEGADA, ORDEM_PENDENCIAS, VOLTAS, CORRENTES } from './dados.js?v=0.6';
+import { CENAS, CENA_FINAL, CENA_NEGADA, ORDEM_PENDENCIAS, VOLTAS, CORRENTES } from './dados.js?v=0.8';
 
 export function novoEstado() {
   return {

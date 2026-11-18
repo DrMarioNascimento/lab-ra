@@ -217,3 +217,17 @@ A cena “Até que horas” reúne uma escala de trabalho que se estende até a 
 O dia-piloto é precedido e seguido por quatro casos breves. Cada rodada inclui um caso de cada par: trabalho e estudo, informação e exposição, limites e ajuda, consentimento e finalidade. Em cada sessão, dois temas são sorteados para conter urgência nas duas rodadas, e dois usam as versões sem esse acréscimo. A forma inicial, a ordem dos casos e a ordem das ações são sorteadas. As ações correspondem a estratégias equivalentes dentro de cada par. A consulta opcional permanece disponível em ambas as formas. Os casos emparelhados avançam sem consequência ou interpretação entre as respostas.
 
 A síntese compara a repetição da estratégia escolhida e do comportamento de consulta em cada par e por condição. É uma checagem exploratória de repetição na mesma sessão. Para um teste–reteste formal, é preciso pilotar a equivalência das formas, definir um intervalo entre aplicações, documentar os efeitos de ordem e prever um protocolo de análise e coleta.
+
+
+## 19. Fundamento ético da devolutiva · versão 0.7
+
+Urgência, imprevistos e demandas simultâneas são condições narrativas. A síntese descreve as escolhas e consultas observadas e interpreta cada ação pela lente ética do dilema: liberdade situada e responsabilidade; juízo de fato, intenção e consequências; ética do cuidado e limites; ou intenção, meio e consequência no consentimento. A leitura explicita a tensão entre compromissos e efeitos da ação. O relato é situado nos dilemas da sessão e deixa espaço para o participante reconhecer outras razões para sua escolha.
+
+
+## 20. Exigência narrativa e mudança de perspectiva · versão 0.8
+
+A [PSS-10](https://www.cmu.edu/dietrich/psychology/stress-immunity-disease-lab/scales/html/pss.html) inspira a seleção de condições para a ficção: imprevistos, acúmulo de obrigações e pouca margem de controle. Os trechos narrativos acrescentam urgência ou urgência com demandas acumuladas. O percurso usa três níveis narrativos, sem aplicar os itens ou calcular o escore da PSS-10. A consulta continua disponível durante os casos comparáveis.
+
+Cada sessão inclui quatro cenas antes do dia, cinco perspectivas alternadas no meio e quatro cenas equivalentes depois. Os três níveis estão presentes em cada sessão e são distribuídos por sorteio entre temas. Cada tema preserva o próprio nível nas três passagens. A abertura e as cenas não revelam as comparações. As escolhas de quem pede a troca, de quem pode cobrir e de quem decide a escala aparecem distantes no percurso. Informação, ajuda e consentimento também são revistos pelo lado da pessoa afetada.
+
+Na síntese, a repetição de estratégia e de consulta é apresentada por nível. Um segundo cruzamento reúne os papéis de cada tema, suas escolhas e as leituras éticas de cada ação. As comparações entre níveis reúnem temas diferentes e servem à reflexão pedagógica. Comparações investigativas precisam de alocação documentada, mais casos por condição e piloto das histórias.

@@ -2,6 +2,14 @@
 export const PARES = [
   {
     tema: 'Trabalho e estudo',
+    lente: {
+      titulo: 'Liberdade situada e responsabilidade',
+      leituras: [
+        "Cumprir o turno protege a continuidade do trabalho e concentra em você o custo de estudar com menos tempo.",
+        "Negociar a troca usa a margem que as regras e as relações de trabalho oferecem. A solução depende do acordo de quem cobre o turno.",
+        "Priorizar a prova protege a continuidade dos estudos. Avisar abre espaço para reorganizar a escala, com consequências para você e para a equipe."
+      ]
+    },
     opcoes: ['Cumprir o turno e usar o tempo que sobrar para estudar.', 'Propor uma troca de horário à chefia.', 'Priorizar a prova e avisar que não pode cumprir o turno inteiro.'],
     formas: [
       {
@@ -22,6 +30,14 @@ export const PARES = [
   },
   {
     tema: 'Informação e exposição',
+    lente: {
+      titulo: 'Juízo de fato, intenção e consequências',
+      leituras: [
+        "Repassar o relato atende à intenção de alertar, mas o alcance da mensagem pode ampliar a exposição de alguém antes que a informação seja confirmada.",
+        "Encaminhar a quem pode verificar preserva a possibilidade de agir e delimita quem recebe uma acusação ainda incerta.",
+        "Aguardar confirmação protege a pessoa contra exposição indevida. Se a alteração era real e ainda podia ser corrigida, a espera também pode ter consequências."
+      ]
+    },
     opcoes: ['Repassar o relato a todo o grupo.', 'Levar o relato à pessoa responsável e dizer o que falta confirmar.', 'Esperar confirmação antes de encaminhar o relato.'],
     formas: [
       {
@@ -42,6 +58,14 @@ export const PARES = [
   },
   {
     tema: 'Limites e ajuda',
+    lente: {
+      titulo: 'Ética do cuidado e responsabilidade com os próprios limites',
+      leituras: [
+        "Assumir o compromisso inteiro acolhe a necessidade da outra pessoa. O custo do descanso recai sobre você.",
+        "Oferecer ajuda por um período combina cuidado com a necessidade da outra pessoa e atenção ao seu limite. O acordo depende de a ajuda parcial atender à tarefa.",
+        "Manter o período de descanso preserva um compromisso consigo. Avisar com clareza permite que a outra pessoa procure apoio em tempo."
+      ]
+    },
     opcoes: ['Assumir todo o compromisso.', 'Oferecer ajuda por um período combinado.', 'Manter seu plano e avisar que não pode assumir o compromisso.'],
     formas: [
       {
@@ -62,6 +86,14 @@ export const PARES = [
   },
   {
     tema: 'Consentimento e finalidade',
+    lente: {
+      titulo: 'Intenção, meio e consequência',
+      leituras: [
+        "Publicar amplia o alcance da divulgação e também muda o público que verá a pessoa. A finalidade de divulgar precisa ser examinada junto com o meio escolhido.",
+        "Pedir nova autorização reconhece que a pessoa pode decidir sobre o uso em um público diferente. A divulgação passa a depender desse acordo.",
+        "Usar outro material preserva a finalidade de divulgar e reduz a exposição da pessoa. O conteúdo alternativo pode comunicar a atividade com outro efeito."
+      ]
+    },
     opcoes: ['Publicar o material identificável no canal aberto.', 'Pedir autorização específica antes de publicar.', 'Divulgar a atividade usando outro material.'],
     formas: [
       {
@@ -82,6 +114,59 @@ export const PARES = [
   }
 ];
 
+export const EXIGENCIAS = ['Cenário de base', 'Urgência', 'Exigências acumuladas'];
+
+const CONTEXTOS = [
+  {
+    acrescimo: 'A pessoa que poderia avaliar uma troca está saindo e outra tarefa do turno também ficou sem cobertura.',
+    papeis: [
+      { papel: 'Colega que pode cobrir', titulo: 'A chave do salão',
+        texto: 'Uma colega pede que você cubra parte do fechamento para ela estudar para uma prova decisiva. Você tem um compromisso no mesmo horário.',
+        urgencia: 'A escala é fechada nesta reunião.', rotulo: 'Conferir a escala',
+        fato: 'O fechamento pode ser dividido em duas partes, se a encarregada aprovar.' },
+      { papel: 'Responsável pela escala', titulo: 'A escala do balcão',
+        texto: 'Uma pessoa da equipe pede para sair antes do fechamento. Ela tem uma prova decisiva na manhã seguinte. Você precisa garantir a cobertura do balcão.',
+        urgencia: 'A equipe está esperando a escala para organizar a volta para casa.', rotulo: 'Conferir as possibilidades de cobertura',
+        fato: 'Há duas pessoas disponíveis para dividir o final do turno.' }
+    ],
+    opcoes: [
+      ['Cobrir todo o horário e reorganizar meu compromisso.', 'Oferecer uma parte do horário e negociar a cobertura restante.', 'Manter meu compromisso e avisar que não consigo cobrir.'],
+      ['Liberar a pessoa e assumir pessoalmente a cobertura.', 'Autorizar a saída se a equipe combinar a cobertura restante.', 'Manter a escala e explicar a exigência de cobertura.']
+    ],
+    leituras: [
+      ['O apoio à colega tem um custo concreto para você.', 'O cuidado com a colega é negociado junto com o seu próprio compromisso.', 'Você preserva seu compromisso e deixa explícito o limite da ajuda disponível.'],
+      ['A chefia assume o custo da exceção para preservar o estudo da pessoa.', 'A chefia usa a margem de negociação e mantém a responsabilidade pela cobertura.', 'A chefia mantém uma regra de cobertura. Vale perguntar que margem a regra deixava para conciliar os compromissos.']
+    ]
+  },
+  {
+    acrescimo: 'A pessoa que poderia conferir o histórico está fora, e outra equipe já começou a distribuir a lista.',
+    papeis: [{ papel: 'Pessoa nomeada no relato', titulo: 'Seu nome no aviso',
+      texto: 'Uma mensagem com seu nome diz que você alterou a ordem de uma lista sem autorização. O grupo pede explicações e você ainda não viu o histórico.',
+      urgencia: 'A lista sai ao público em seguida.', rotulo: 'Consultar o canal de revisão',
+      fato: 'A organização pode conferir o histórico sem publicar os nomes envolvidos.' }],
+    opcoes: [['Responder no grupo com a sua versão.', 'Pedir revisão à organização antes de responder publicamente.', 'Aguardar acesso ao histórico antes de se manifestar.']],
+    leituras: [['A resposta permite contestar a acusação em público e pode ampliar a circulação do conflito.', 'A revisão busca estabelecer os fatos e delimita a exposição.', 'A espera preserva o cuidado com os fatos e pode deixar a acusação circulando por mais tempo.']]
+  },
+  {
+    acrescimo: 'Outra pessoa que poderia ajudar desmarcou e parte do material ainda precisa ser retirada.',
+    papeis: [{ papel: 'Pessoa que pede ajuda', titulo: 'O fim da montagem',
+      texto: 'Você precisa desmontar o espaço de uma atividade. A pessoa a quem você pede ajuda reservou esse período para descansar.',
+      urgencia: 'O espaço fecha logo e pediram que você confirme agora quem vai ficar.', rotulo: 'Conferir o que pode esperar',
+      fato: 'A organização aceita que parte do material seja guardada no dia seguinte.' }],
+    opcoes: [['Pedir ajuda até terminar tudo.', 'Pedir ajuda apenas com as peças que exigem duas pessoas.', 'Reorganizar a tarefa com a equipe e preservar o descanso da pessoa.']],
+    leituras: [['O pedido explicita a sua necessidade e transfere parte do custo para a outra pessoa.', 'O pedido delimita a ajuda e considera a necessidade de descanso.', 'A reorganização protege o descanso da outra pessoa e redistribui o trabalho.']]
+  },
+  {
+    acrescimo: 'O material alternativo ainda está com outra equipe e há dois canais aguardando a publicação.',
+    papeis: [{ papel: 'Pessoa que aparece na imagem', titulo: 'A imagem do encontro',
+      texto: 'Você autorizou uma foto no grupo de uma atividade. Agora pedem que ela seja publicada no canal aberto do projeto.',
+      urgencia: 'A equipe de divulgação pede uma resposta antes de fechar a publicação.', rotulo: 'Conferir onde a imagem vai aparecer',
+      fato: 'A página é pública e a foto mostra seu rosto com clareza.' }],
+    opcoes: [['Autorizar a publicação aberta da foto.', 'Propor uma autorização limitada a outra imagem ou outro público.', 'Manter a autorização restrita ao grupo.']],
+    leituras: [['A autorização expressa uma decisão sobre o novo uso; a exposição continua sendo um efeito a considerar.', 'A condição negociada delimita o meio para compatibilizar a divulgação com a sua preferência.', 'Manter o acordo anterior preserva o limite do consentimento que você deu.']]
+  }
+];
+
 function misturar(itens, sortear) {
   const copia = itens.slice();
   for (let i = copia.length - 1; i > 0; i--) {
@@ -92,14 +177,28 @@ function misturar(itens, sortear) {
 }
 
 export function prepararRodadas(sortear = Math.random) {
-  const urgentes = new Set(misturar(PARES.map((_, i) => i), sortear).slice(0, 2));
+  const niveis = misturar([0, 1, 2, Math.floor(sortear() * 3)], sortear);
   const primeiraForma = PARES.map(() => Math.floor(sortear() * 2));
-  return [0, 1].map(rodada => misturar(PARES.map((par, i) => ({
-    par: i,
-    urgente: urgentes.has(i),
-    forma: par.formas[rodada === 0 ? primeiraForma[i] : 1 - primeiraForma[i]],
-    ordem: misturar(par.opcoes.map((_, j) => j), sortear)
-  })), sortear));
+  const montar = (par, forma, opcoes, leituras) => ({
+    par, forma, opcoes, leituras, nivel: niveis[par],
+    acrescimo: CONTEXTOS[par].acrescimo,
+    ordem: misturar(opcoes.map((_, i) => i), sortear)
+  });
+  const [inicio, fim] = [0, 1].map(rodada => misturar(PARES.map((par, i) => {
+    const forma = par.formas[rodada === 0 ? primeiraForma[i] : 1 - primeiraForma[i]];
+    return montar(i, forma, par.opcoes, par.lente.leituras);
+  }), sortear));
+  const perspectivas = misturar(CONTEXTOS.flatMap((contexto, i) =>
+    contexto.papeis.map((forma, j) => montar(i, forma, contexto.opcoes[j], contexto.leituras[j]))
+  ), sortear);
+  const colega = perspectivas.findIndex(p => p.forma.papel === 'Colega que pode cobrir');
+  const chefia = perspectivas.findIndex(p => p.forma.papel === 'Responsável pela escala');
+  if (Math.abs(colega - chefia) === 1) {
+    const [cena] = perspectivas.splice(chefia, 1);
+    const colegaDepoisDaRemocao = colega - Number(chefia < colega);
+    perspectivas.splice(colegaDepoisDaRemocao < 2 ? perspectivas.length : 0, 0, cena);
+  }
+  return [inicio, perspectivas, fim];
 }
 
 export function cruzarRodadas(primeira, segunda) {
@@ -108,7 +207,8 @@ export function cruzarRodadas(primeira, segunda) {
     const depois = segunda.find(registro => registro.par === i);
     return {
       tema: par.tema,
-      urgente: antes.urgente,
+      lente: par.lente,
+      nivel: antes.nivel,
       antes,
       depois,
       repetiuEscolha: antes.escolha === depois.escolha,
