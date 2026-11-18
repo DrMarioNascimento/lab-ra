@@ -1,8 +1,10 @@
 // Limiar Ético · Um dia — interface.
-import { ABERTURA, SINTESE, MOTIVOS, APLICACAO, VERSAO, CENAS, CENAS_COM_URGENCIA, CONDICOES, BASE_ESTRESSE } from './dados.js?v=0.9';
-import { novoEstado, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=0.9';
+import { ABERTURA, SINTESE, MOTIVOS, APLICACAO, VERSAO, CENAS, CONDICOES, BASE_ESTRESSE, NOME_NIVEL } from './dados.js?v=1.0';
+import { GLOSSARIO } from './glossario.js?v=1.0';
+import { gerarRetorno } from './retorno.js?v=1.0';
+import { novoEstado, sortearNiveis, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=1.0';
 
-import { PARES, EXIGENCIAS, prepararRodadas, cruzarRodadas } from './retomadas.js?v=0.9';
+import { PARES, EXIGENCIAS, prepararRodadas, cruzarRodadas } from './retomadas.js?v=1.0';
 
 const app = document.querySelector('#app');
 const topo = document.querySelector('#topo');
@@ -11,7 +13,6 @@ const NOME = { razao: 'Razão', emocao: 'Emoção', impulso: 'Impulso' };
 const COR_CERTO = '#6250d6', COR_DESFECHO = '#a86d0a';
 
 let est = null;
-let urgencias = new Map();
 let retomadas = null;
 let visao = null;          // dados da cena em exibição
 let rev = null;            // dados da revelação
@@ -58,7 +59,7 @@ function telaAbertura() {
         ${arcoCapa()}
         <h1>${esc(ABERTURA.titulo)}</h1>
         ${ABERTURA.texto.map(p => `<p>${esc(p)}</p>`).join('')}
-        <p>Ao final, você poderá reconhecer padrões nas suas escolhas, comparar sua justificativa com as leituras do percurso e aplicar um conceito em outra situação. Reserve cerca de 30 minutos para a atividade. As respostas ficam nesta página e desaparecem ao fechá-la.</p>
+        <p>Ao final, você poderá reconhecer padrões nas suas escolhas, comparar sua justificativa com as leituras do percurso e aplicar um conceito em outra situação. Se alguma situação pesar para você, pode só observar ou conversar com quem conduz a atividade. Reserve cerca de 30 minutos para a atividade. As respostas ficam nesta página e desaparecem ao fechá-la.</p>
         <div class="acoes"><button class="btn principal" data-acao="comecar">Começar o dia</button></div>
       </section>
       <p class="versao entra" style="--n:2">Versão ${esc(VERSAO)}</p>
@@ -119,7 +120,7 @@ function telaCena() {
       <section class="cartao pagina entra">
         <span class="aba-hora">${PERIODO[faseDe(cena.hora)]}</span>
         <h2>${esc(cena.titulo)}</h2>
-        <p class="cena-texto">${esc([cena.texto, urgencias.get(cena.id)].filter(Boolean).join(' '))}</p>
+        <p class="cena-texto">${esc(cena.texto)}</p>
         ${botaoInfo}
       </section>
       <section class="lado" aria-label="O que você faz?">
@@ -260,7 +261,8 @@ function sinaisDe(p) {
 }
 
 function condicoesDe(p) {
-  return (p.cond || []).map(k => `<span class="sinal cond">${esc(CONDICOES[k].nome)}</span>`).join('');
+  const nivel = p.nivel ? `<span class="sinal nivel-${p.nivel}">Situação de ${esc(NOME_NIVEL[p.nivel])}</span>` : '';
+  return nivel + (p.cond || []).map(k => `<span class="sinal cond">${esc(CONDICOES[k].nome)}</span>`).join('');
 }
 
 function blocoPressao(r) {
@@ -433,33 +435,29 @@ function relatorioRepeticao(E) {
 function relatorioTensao(E) {
   const pontos = rev.dados.pontos;
   const conflito = pontos.find(p => p.cenaId === 'horario');
-  const marcadas = new Set(CENAS_COM_URGENCIA.flat().map(cena => cena.id));
-  const grupos = [
-    ['Com urgência na história', pontos.filter(p => urgencias.has(p.cenaId))],
-    ['Sem o acréscimo de urgência', pontos.filter(p => marcadas.has(p.cenaId) && !urgencias.has(p.cenaId))]
-  ];
   return `<section class="cartao ${E}" style="--n:2">
-    <h3>Como você decidiu em situações de tensão</h3>
-    <h4>Quando trabalho e faculdade disputaram o mesmo tempo</h4>
+    <h3>Quando trabalho e faculdade disputaram o mesmo tempo</h3>
     <p>A escala do trabalho, a possibilidade de outra advertência, a entrega e a prova colocaram compromissos importantes em conflito.</p>
     <p><strong>Sua escolha:</strong> ${esc(conflito.escolha)}</p>
     <p><strong>O que aconteceu:</strong> ${esc(conflito.desfecho)}</p>
     <p class="suave pequeno">${conflito.abriuInfo ? 'Você perguntou sobre a possibilidade de trocar a escala.' : 'Você decidiu sem perguntar sobre a possibilidade de trocar a escala.'}</p>
-    <h4>Quando a urgência mudou a história</h4>
-    <p>Em duas cenas, a história acrescentou um sinal de urgência. Veja o que você fez nessas cenas e nas outras duas em que esse elemento variava.</p>
-    <div class="par">
-      ${grupos.map(([titulo, cenas]) => `<div>
-        <h4>${titulo}</h4>
-        <p>Informação consultada em ${cenas.filter(p => p.abriuInfo).length} de ${cenas.length} cenas.</p>
-        <ul class="limpa">${cenas.map(p => `<li>
-          <strong>${esc(p.titulo)}</strong>
-          ${urgencias.has(p.cenaId) ? `<p>${esc(urgencias.get(p.cenaId))}</p>` : ''}
-          <p>${esc(p.escolha)}</p>
-          <p class="suave pequeno">${p.abriuInfo ? 'Consultou a informação disponível' : 'Seguiu sem abrir a informação adicional'}</p>
-        </li>`).join('')}</ul>
-      </div>`).join('')}
-    </div>
-    <p class="suave pequeno">As cenas envolvem decisões diferentes. Use a comparação para refletir sobre suas escolhas e sobre o que chamou sua atenção.</p>
+  </section>`;
+}
+
+function conceitosDe(a) {
+  const lista = (a.conceitos || []).map(id => GLOSSARIO[id]).filter(Boolean);
+  if (!lista.length) return '';
+  return `<details class="conceito mini"><summary>Conceitos desta leitura</summary><ul class="limpa pequeno">${lista.map(c => `<li><strong>${esc(c.termo)}${c.autor ? ` (${esc(c.autor)})` : ''}.</strong> ${esc(c.def)}</li>`).join('')}</ul></details>`;
+}
+
+function relatorioNiveis(E) {
+  const r = gerarRetorno(rev.dados.pontos);
+  return `<section class="cartao ${E}" style="--n:1">
+    <h3>Nas situações de mais e de menos estresse</h3>
+    <p class="suave pequeno">Cada cena do seu dia foi sorteada com um nível de estresse na história (baixo, médio ou alto). É o nível da situação, não o que você sentiu. As cenas mudam de um nível para outro, então use o que segue para conversar e discordar, não como veredito.</p>
+    <div class="niveis">${r.porNivel.map(n => `<div class="nivel nivel-${n.nivel}"><strong>${esc(n.nome)}</strong><span>${n.cenas.length ? n.cenas.map(esc).join(' · ') : 'nenhuma cena'}</span></div>`).join('')}</div>
+    ${r.achados.length ? `<ul class="achados">${r.achados.map(a => `<li><strong>${esc(a.titulo)}.</strong> ${esc(a.texto)}${conceitosDe(a)}</li>`).join('')}</ul>` : '<p>Poucas cenas em cada nível para uma comparação.</p>'}
+    ${r.temComparacao ? '' : '<p class="suave pequeno">Neste sorteio houve poucas cenas de um dos níveis, então a comparação entre alto e baixo estresse não foi feita.</p>'}
   </section>`;
 }
 
@@ -485,6 +483,7 @@ function abaSintese(E) {
       </ul>
       <p class="suave pequeno" style="margin-top:12px">Compare os pesos das alternativas com os motivos que você relatou. Pense onde convergem e onde a mesma ação pode ter justificativas diferentes.</p>
     </section>
+    ${relatorioNiveis(E)}
     ${relatorioRepeticao(E)}
     ${relatorioTensao(E)}
     <div class="par">
@@ -568,11 +567,7 @@ function mantendoRolagem(f) {
 function acao(alvo) {
   const a = alvo.dataset.acao, i = Number(alvo.dataset.i);
   if (a === 'comecar' || a === 'recomecar') {
-    est = novoEstado(); rev = null; topo.innerHTML = '';
-    urgencias = new Map(CENAS_COM_URGENCIA.map(par => {
-      const cena = par[Math.floor(Math.random() * par.length)];
-      return [cena.id, cena.trecho];
-    }));
+    est = novoEstado(sortearNiveis()); rev = null; topo.innerHTML = '';
     for (const k of Object.keys(contestacoes)) delete contestacoes[k];
     retomadas = { rodadas: prepararRodadas(), registros: [[], [], []], rodada: 0, pos: 0, consultou: false };
     apresentarRetomada();

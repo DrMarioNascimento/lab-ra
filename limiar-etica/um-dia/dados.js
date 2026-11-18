@@ -4,7 +4,7 @@
 // cor = pesos nas cinco correntes: U utilitarismo, V virtudes, I intenção, X existencialismo, C complexidade.
 // ef = efeitos nas variáveis do dia. margem = quanta escolha real a cena dava (0 a 1).
 
-export const VERSAO = '0.9';
+export const VERSAO = '1.0';
 
 export const CORRENTES = {
   U: 'Utilitarismo',
@@ -358,4 +358,93 @@ export const BASE_ESTRESSE = {
     'Cohen, S., & Williamson, G. (1988). Perceived stress in a probability sample of the United States. In S. Spacapan & S. Oskamp (Eds.), The social psychology of health. Sage.',
     'Reis, R. S., Hino, A. A. F., & Añez, C. R. R. (2010). Perceived Stress Scale: reliability and validity study in Brazil. Journal of Health Psychology, 15(1), 107-114.'
   ]
+};
+
+// ---------------------------------------------------------------------------------------------
+// v1.0 · Níveis de estresse por cena.
+// Cada cena do dia é sorteada em um nível (baixo, médio, alto). Só o contexto muda; as alternativas são as mesmas.
+// O contexto nunca usa palavras de estresse: a diferença está nos fatos e na frequência com que a pressão volta.
+// ---------------------------------------------------------------------------------------------
+export const NIVEIS = ['baixo', 'medio', 'alto'];
+export const NOME_NIVEL = { baixo: 'baixo estresse', medio: 'médio estresse', alto: 'alto estresse' };
+
+export const CONTEXTOS = {
+  mensagem: {
+    baixo: 'É a primeira vez que a chefia escreve nesse tom, e o dia ainda está calmo.',
+    medio: 'Duas vezes neste mês a chefia já cobrou uma entrega logo cedo.',
+    alto: 'É a quarta cobrança logo cedo só nesta semana, e o grupo já comenta.'
+  },
+  nome: {
+    baixo: 'É a primeira vez neste semestre que ele deixa de entregar uma parte.',
+    medio: 'Já é a segunda entrega em que ele atrasa a parte dele.',
+    alto: 'Já é a terceira entrega seguida em que ele some, e o grupo já cobrou duas vezes.'
+  },
+  numero: {
+    baixo: 'O relatório só vai ao cliente amanhã.',
+    medio: 'A pessoa da recepção avisa que o cliente já está esperando pelo relatório na sala ao lado.',
+    alto: 'O cliente já esperou duas vezes por este relatório, e a chefia está de olho na tela.'
+  },
+  horario: {
+    baixo: 'É a primeira vez que a chefia pede isso, e ela deixou claro que ouve sugestões.',
+    medio: 'Na semana passada a chefia já pediu algo parecido.',
+    alto: 'É a terceira vez neste mês que a chefia pede para ficar até o fim, e a advertência anterior continua valendo.'
+  },
+  troca: {
+    baixo: 'A entrada só abre em uma hora.',
+    medio: 'A colega mostra a escala. O atendimento dela é o próximo a começar.',
+    alto: 'É a terceira vez nesta semana que ela precisa sair do atendimento, e a fila já começou a se formar.'
+  },
+  verba: {
+    baixo: 'A chefia deu até amanhã para a proposta.',
+    medio: 'A equipe de compras avisa que precisa da proposta agora para fechar os pedidos.',
+    alto: 'É o terceiro corte de verba neste mês, e a equipe de compras espera a sua resposta agora.'
+  },
+  figurinha: {
+    baixo: 'A figurinha apareceu hoje pela primeira vez.',
+    medio: 'Já é a segunda figurinha do mesmo colega nesta semana.',
+    alto: 'Já é a quinta figurinha do mesmo colega nesta semana, e o grupo estranha quem não participa.'
+  },
+  ligacao: {
+    baixo: 'Faltam três horas para a consulta.',
+    medio: 'A sua irmã avisa que o carro que leva sua mãe já está a caminho.',
+    alto: 'É a quarta consulta da sua mãe neste mês que cai num dia de evento, e o carro já está a caminho.'
+  },
+  fotos: {
+    baixo: 'O cliente disse que a postagem pode esperar até amanhã.',
+    medio: 'O cliente pede a postagem agora, e a transmissão já começou.',
+    alto: 'É a terceira vez neste evento que o cliente reclama da demora nas postagens.'
+  },
+  interprete: {
+    baixo: 'É a primeira vez que você esquece algo na confirmação dos serviços.',
+    medio: 'Já é o segundo esquecimento seu nesta semana.',
+    alto: 'Já é o terceiro esquecimento seu neste mês, e a chefia avisou que a próxima falha vai para o seu registro.'
+  }
+};
+
+// O que cada alternativa protege (p) e o que sacrifica (s), em conceitos éticos. Ordem = ordem das alternativas.
+export const ETIQUETAS = {
+  profissional: 'a ética profissional (os deveres do ofício)',
+  colegas: 'o coleguismo',
+  meta: 'a meta pessoal',
+  empresa: 'a empresa',
+  curso: 'o curso',
+  familia: 'a família',
+  vulneraveis: 'quem estava mais vulnerável',
+  justica: 'a justiça e a equidade',
+  verdade: 'a veracidade'
+};
+
+export const VALORES = {
+  mensagem: [{ p: ['verdade'], s: [] }, { p: ['profissional', 'empresa'], s: ['meta'] }, { p: ['profissional', 'verdade'], s: [] }],
+  nome: [{ p: ['colegas'], s: ['verdade', 'meta'] }, { p: ['colegas', 'justica'], s: [] }, { p: ['verdade', 'justica', 'curso'], s: ['colegas'] }],
+  numero: [{ p: ['verdade', 'profissional'], s: ['colegas'] }, { p: ['colegas', 'empresa'], s: ['verdade', 'profissional'] }, { p: ['verdade', 'profissional', 'empresa'], s: [] }],
+  horario: [{ p: ['empresa'], s: ['curso', 'colegas'] }, { p: ['curso', 'justica'], s: ['empresa'] }, { p: ['empresa', 'curso'], s: ['meta'] }],
+  troca: [{ p: ['colegas', 'vulneraveis'], s: ['meta', 'curso'] }, { p: ['colegas', 'vulneraveis', 'curso'], s: ['meta'] }, { p: ['profissional', 'meta'], s: ['colegas'] }],
+  verba: [{ p: ['empresa'], s: ['vulneraveis', 'justica'] }, { p: ['justica', 'vulneraveis'], s: ['empresa'] }, { p: ['justica', 'vulneraveis', 'empresa'], s: ['colegas'] }],
+  figurinha: [{ p: ['meta'], s: ['colegas', 'vulneraveis'] }, { p: ['colegas', 'vulneraveis', 'justica'], s: [] }, { p: ['colegas', 'vulneraveis'], s: [] }],
+  ligacao: [{ p: ['empresa', 'meta'], s: ['familia'] }, { p: ['familia'], s: ['empresa'] }, { p: ['familia', 'empresa'], s: ['meta'] }],
+  fotos: [{ p: ['empresa'], s: ['vulneraveis', 'profissional'] }, { p: ['vulneraveis', 'profissional'], s: ['empresa'] }, { p: ['vulneraveis', 'profissional', 'justica'], s: ['empresa'] }],
+  interprete: [{ p: ['verdade', 'profissional', 'vulneraveis'], s: [] }, { p: ['vulneraveis', 'empresa'], s: ['verdade'] }, { p: ['meta'], s: ['vulneraveis', 'verdade', 'profissional'] }],
+  volta: [{ p: ['verdade', 'profissional'], s: [] }, { p: ['profissional'], s: ['verdade'] }, { p: ['meta'], s: ['profissional'] }],
+  negada: [{ p: ['empresa'], s: ['familia'] }, { p: ['familia'], s: ['empresa'] }]
 };

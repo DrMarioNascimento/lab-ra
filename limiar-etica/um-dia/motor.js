@@ -1,8 +1,24 @@
 // Limiar Ético · Um dia — motor do dia (sem interface).
-import { CENAS, CENA_FINAL, CENA_NEGADA, ORDEM_PENDENCIAS, VOLTAS, CORRENTES, CONDICOES, COND_CENAS } from './dados.js?v=0.9';
+import { CENAS, CENA_FINAL, CENA_NEGADA, ORDEM_PENDENCIAS, VOLTAS, CORRENTES, CONDICOES, COND_CENAS, NIVEIS, CONTEXTOS, VALORES } from './dados.js?v=1.0';
 
-export function novoEstado() {
+// Sorteio equilibrado dos níveis: em dez cenas, três de cada nível mais uma a mais num nível sorteado,
+// embaralhadas, com no máximo duas cenas de alto estresse seguidas.
+export function sortearNiveis(sortear = Math.random) {
+  const ids = CENAS.filter(c => CONTEXTOS[c.id]).map(c => c.id);
+  const base = Math.floor(ids.length / NIVEIS.length);
+  const lista = NIVEIS.flatMap(n => Array(base).fill(n));
+  while (lista.length < ids.length) lista.push(NIVEIS[Math.floor(sortear() * NIVEIS.length)]);
+  for (let tent = 0; tent < 500; tent++) {
+    for (let i = lista.length - 1; i > 0; i--) { const j = Math.floor(sortear() * (i + 1)); [lista[i], lista[j]] = [lista[j], lista[i]]; }
+    const ok = lista.every((n, i) => !(n === 'alto' && lista[i - 1] === 'alto' && lista[i - 2] === 'alto'));
+    if (ok) break;
+  }
+  return Object.fromEntries(ids.map((id, i) => [id, lista[i]]));
+}
+
+export function novoEstado(niveis) {
   return {
+    niveis: niveis || Object.fromEntries(CENAS.filter(c => CONTEXTOS[c.id]).map(c => [c.id, 'medio'])),
     fila: CENAS.map(c => c.id).concat('volta'),
     pos: 0,
     conf: { chefia: 0, equipe: 0, grupo: 0, cliente: 0 },
@@ -25,7 +41,10 @@ export function cenaAtual(est) {
   if (id === undefined) return null;
   if (id === 'negada') return CENA_NEGADA;
   if (id === 'volta') return { ...CENA_FINAL, texto: VOLTAS[pendenciaPrincipal(est)] };
-  return CENAS.find(c => c.id === id);
+  const cena = CENAS.find(c => c.id === id);
+  const nivel = est.niveis[id];
+  if (!nivel || !CONTEXTOS[id]) return cena;
+  return { ...cena, nivel, texto: [cena.texto, CONTEXTOS[id][nivel]].filter(Boolean).join(' ') };
 }
 
 export function totalCenas(est) { return est.fila.length; }
@@ -76,7 +95,7 @@ export function decidir(est, indiceOpcao, sinais = {}) {
   }
 
   est.log.push({
-    cenaId: cena.id, hora: cena.hora, titulo: cena.titulo, margem: cena.margem,
+    cenaId: cena.id, hora: cena.hora, titulo: cena.titulo, margem: cena.margem, nivel: cena.nivel || null,
     indice: indiceOpcao, opcao: op, conceito: cena.conceito,
     desfecho,
     tempoMs: sinais.tempoMs ?? null,
@@ -111,6 +130,9 @@ export function resumo(est) {
   const pontos = est.log.map((l, n) => ({
     n: n + 1, hora: l.hora, titulo: l.titulo, cenaId: l.cenaId,
     cond: COND_CENAS[l.cenaId] || [],
+    nivel: l.nivel,
+    prot: (VALORES[l.cenaId]?.[l.indice]?.p) || [], sac: (VALORES[l.cenaId]?.[l.indice]?.s) || [],
+    virtude: l.opcao.cor.V || 0,
     escolha: l.opcao.t, desfecho: l.desfecho, caracteristica: l.opcao.car, conceito: l.conceito,
     impulso: l.opcao.w.i, emocao: l.opcao.w.e, razao: l.opcao.w.r,
     certoDesfecho: l.opcao.cd, margem: l.margem,

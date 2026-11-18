@@ -240,3 +240,11 @@ Cada cena do dia recebe de uma a três condições narrativas (imprevisto, pouco
 ### 21.1 Balizamento interno e situações-limite
 
 A PSS-10 também serve de régua interna do autor para estimar a carga de estresse de cada cena (de 0 a 40, notas de autoria, sem validade psicométrica e sem pontos de corte clínicos). Isso fica em `um-dia/balizamento/`, não é carregado pela página e não é calculado sobre o aluno. As situações-limite nascem da frequência da pressão (a terceira advertência, a quarta consulta no mês). Detalhes em `PSS10-balizamento-interno-v0.1.md`.
+
+## 22. Versão 1.0 do "Um dia": níveis por cena e retorno ético
+
+- **Sorteio por nível.** Cada uma das 10 cenas sai em nível baixo, médio ou alto (3 de cada, mais 1 extra em nível aleatório, embaralhados, sem três altas seguidas). Só muda a frase de contexto (frequência, urgência, acúmulo); as alternativas são as mesmas. Nenhuma palavra de estresse aparece na cena nem nas alternativas.
+- **Balizamento interno.** O nível de cada cena é calibrado pelos temas do PSS-10 (`um-dia/balizamento/cargas.mjs`, alavancas por cena, baixo < médio < alto). Não é aplicado nem calculado no aluno, e não aparece para ele.
+- **Etiquetas éticas.** Cada alternativa registra o que protege e o que sacrifica (profissional, colegas, meta, empresa, curso, família, vulneráveis, justiça, verdade).
+- **Retorno.** `retorno.js` compara as escolhas nas situações de mais e de menos estresse: mais emocional ou mais racional, coleguismo preservado ou sacrificado, meta pessoal sobre colegas, justiça com a empresa/curso preservados, ética profissional, virtudes, certo × desfecho. Cada leitura traz os verbetes do glossário (`um-dia/glossario.js`, copiado do glossário do Mosaico Vila Ética, baseado nos slides e no texto de apoio do professor), sem frases de rótulo sobre a pessoa.
+- **Testes.** `testes/niveis.test.mjs` (11 verificações), além de `motor` e `balizamento`.

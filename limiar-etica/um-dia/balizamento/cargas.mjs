@@ -39,6 +39,20 @@ export const CARGAS = {
   volta:      [2, 2, 3, 3, 3, 3, 2, 3, 2, 4]
 };
 
+// Alavancas: os três temas em que o contexto do nível mexe em cada cena (o frequente, o urgente, o acumulado).
+// medio = nota-base acima; alto = +1 em cada alavanca; baixo = −1 em cada alavanca (sempre entre 0 e 4).
+export const ALAVANCAS = {
+  mensagem: [0, 2, 9], nome: [0, 8, 9], numero: [0, 5, 9], horario: [0, 3, 9], troca: [0, 5, 9],
+  verba: [1, 5, 9], figurinha: [6, 8, 9], ligacao: [0, 5, 9], fotos: [0, 5, 9], interprete: [1, 3, 9]
+};
+
+export function cargaDoNivel(id, nivel) {
+  const base = [...CARGAS[id]];
+  const d = nivel === 'alto' ? 1 : nivel === 'baixo' ? -1 : 0;
+  for (const i of (ALAVANCAS[id] || [])) base[i] = Math.min(4, Math.max(0, base[i] + d));
+  return base;
+}
+
 // Faixas internas (só comparativas, não clínicas), por soma de 0 a 40.
 export const FAIXAS = [
   { ate: 13, nome: 'leve' },
