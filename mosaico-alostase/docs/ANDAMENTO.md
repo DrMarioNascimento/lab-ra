@@ -13,7 +13,7 @@ Dia de trabalho de 17/11/2026: o projeto saiu do GDD e virou protótipo jogável
 | Parte | Estado |
 |---|---|
 | GDD | v0.4 (`docs/GDD-mosaico-alostase-v0.4.md`) |
-| Fichas de literatura | 00 a 09 em `docs/fichas/`, todas com partes ainda por ler (a 08, de frequência cardíaca e pressão, quase só resumos; a 09, de Scheer 2009, lida nos resultados) |
+| Fichas de literatura | 00 a 10 em `docs/fichas/`, todas com partes ainda por ler (a 08, de frequência cardíaca e pressão, quase só resumos; a 09, de Scheer 2009, lida nos resultados; a 10, de Treino, só resumos) |
 | Motor de um dia | Cortisol (soro), glicemia e necessidade de sono; exercício, jornada noturna, noite ativa com álcool |
 | Motor da semana 1 | Sete dias contínuos; dívida de sono em horas de vigília em excesso; REM perdido somado |
 | Modo Prognóstico | Um dia (6 rotinas) e semana 1 (4 semanas prontas) |
@@ -58,7 +58,7 @@ Dia de trabalho de 17/11/2026: o projeto saiu do GDD e virou protótipo jogável
 
 **Frequência cardíaca e pressão arterial:** a ficha 08 (18/11/2026) está escrita só com resumos. Sustentado: forma bimodal de 24 h, amplitudes relativas e a divisão sono/postura versus ritmo endógeno. Médias de pressão em normotensos e efeito crônico do trabalho noturno (+2 a +3 mmHg) já têm resumo. Falta: Degaute inteiro, média por faixa de 18 a 30 anos, frequência pós-exercício e frequência/pressão no sono diurno. Entrou no motor só a pressão arterial de normotenso (18/11, sem tela); frequência cardíaca, pós-exercício e a interface ficam esperando. Perfil: só saudável (decidido em 18/11).
 
-Depois, pela ordem sugerida: conta de Treino; sala de aula com telão e `/simulador`; semanas 2 a 8 e meses por último.
+Depois, pela ordem sugerida: conta de Treino (ficha 10 já escrita, só resumos); sala de aula com telão e `/simulador`; semanas 2 a 8 e meses por último.
 
 ## O que falta do GDD
 
