@@ -575,3 +575,5 @@ details.conceito.mini { margin-top: 6px; }
 .botao-i { top: 6px; right: 8px; width: 36px; height: 36px; min-height: 36px; font-size: 1.05rem; }
 #app { padding-top: 44px; }
 .topo-linha { padding-right: 40px; }
+.abas { grid-template-columns: repeat(4, minmax(0, 1fr)) 34px; }
+@media (min-width: 700px) { .abas { grid-template-columns: repeat(4, minmax(0, 1fr)); } }

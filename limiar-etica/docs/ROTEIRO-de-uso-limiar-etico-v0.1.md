@@ -57,5 +57,5 @@ Estas são as perguntas que o próprio jogo mostra no retorno; a coluna "Puxar" 
 | Aluno sem o manual | Botão "i" no canto superior direito. |
 | Quer trocar de dia | "Escolher outro dia" na abertura ou na síntese. |
 | Quer rejogar | "Viver o dia de novo": sorteia novos contextos. |
-| Página antiga em cache | Recarregar; a versão aparece no rodapé da entrada (1.3). |
+| Página antiga em cache | Recarregar; a versão aparece no rodapé da entrada (1.4). |
 | TV em sala | Abrir o mesmo link; votar por mão levantada e clicar a opção mais votada. |

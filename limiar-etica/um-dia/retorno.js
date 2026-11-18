@@ -2,8 +2,8 @@
 // Funções puras: recebem os pontos do resumo e devolvem frases em conceitos éticos.
 // O nível é o da situação na história, e não o que a pessoa sentiu. As cenas mudam de um nível para outro,
 // então as frases descrevem o que aconteceu neste percurso e convidam à discussão; não são diagnóstico.
-import { NIVEIS, NOME_NIVEL } from './dados.js?v=1.3';
-import { CONCEITOS_DA_LEITURA } from './glossario.js?v=1.3';
+import { NIVEIS, NOME_NIVEL } from './dados.js?v=1.4';
+import { CONCEITOS_DA_LEITURA } from './glossario.js?v=1.4';
 
 const media = (lista, f) => lista.length ? lista.reduce((s, x) => s + f(x), 0) / lista.length : null;
 const plural = (n, um, varios) => `${n} ${n === 1 ? um : varios}`;

@@ -1,13 +1,13 @@
 // Limiar Ético · Um dia — interface.
-import { SINTESE, MOTIVOS, VERSAO, CONDICOES, BASE_ESTRESSE, NOME_NIVEL } from './dados.js?v=1.3';
-import { DIAS, ORDEM_DIAS } from './dias.js?v=1.3';
-import { GLOSSARIO } from './glossario.js?v=1.3';
-import { gerarRetorno } from './retorno.js?v=1.3';
-import { mapaDoDia } from './programa.js?v=1.3';
-import { MANUAL } from './manual.js?v=1.3';
-import { novoEstado, sortearNiveis, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=1.3';
+import { SINTESE, MOTIVOS, VERSAO, CONDICOES, BASE_ESTRESSE, NOME_NIVEL } from './dados.js?v=1.4';
+import { DIAS, ORDEM_DIAS } from './dias.js?v=1.4';
+import { GLOSSARIO } from './glossario.js?v=1.4';
+import { gerarRetorno } from './retorno.js?v=1.4';
+import { mapaDoDia } from './programa.js?v=1.4';
+import { MANUAL } from './manual.js?v=1.4';
+import { novoEstado, sortearNiveis, cenaAtual, totalCenas, janelaInfo, decidir, terminou, resumo } from './motor.js?v=1.4';
 
-import { PARES, EXIGENCIAS, prepararRodadas, cruzarRodadas } from './retomadas.js?v=1.3';
+import { PARES, EXIGENCIAS, prepararRodadas, cruzarRodadas } from './retomadas.js?v=1.4';
 
 const app = document.querySelector('#app');
 const topo = document.querySelector('#topo');
@@ -556,15 +556,29 @@ const INTRO = {
   aplicar: 'Exercite um conceito do dia em uma nova situação do cotidiano.'
 };
 
+const MIN_APLICACAO = 40; // caracteres para liberar o conceito e a cópia do texto
 function abaAplicar(E) {
+  const ok = rev.respostaAplicacao.trim().length >= MIN_APLICACAO;
   return `<div class="estreita"><section class="cartao ${E}" style="--n:1">
     <h2>${esc(D().APLICACAO.titulo)}</h2>
     <p>${esc(D().APLICACAO.situacao)}</p>
     <label for="resposta-aplicacao"><strong>${esc(D().APLICACAO.pergunta)}</strong></label>
-    <textarea id="resposta-aplicacao" rows="5" maxlength="2000" aria-describedby="aviso-aplicacao">${esc(rev.respostaAplicacao)}</textarea>
-    <p id="aviso-aplicacao" class="suave pequeno">Reflexão opcional. O texto fica nesta página durante a atividade.</p>
-    <details class="conceito"><summary>Explorar o conceito depois de refletir</summary><p>${esc(D().APLICACAO.leitura)}</p></details>
+    <textarea id="resposta-aplicacao" rows="6" maxlength="2000" aria-describedby="aviso-aplicacao">${esc(rev.respostaAplicacao)}</textarea>
+    <p id="aviso-aplicacao" class="suave pequeno">Escreva a sua decisão e o porquê, com as suas palavras (pelo menos uma ou duas frases). Sem nota. O texto só existe nesta página: nada é enviado, então copie ou baixe para levar à discussão.</p>
+    <div class="acoes" id="acoes-aplicacao"><button class="btn principal" data-acao="copiar-texto" ${ok ? '' : 'disabled'}>Copiar meu texto</button><button class="btn secundario" data-acao="baixar-texto" ${ok ? '' : 'disabled'}>Baixar (.txt)</button></div>
+    <p id="retorno-texto" class="suave pequeno" role="status"></p>
+    <details class="conceito" id="conceito-aplicacao"${ok ? '' : ' hidden'}><summary>Explorar o conceito depois de refletir</summary><p>${esc(D().APLICACAO.leitura)}</p></details>
   </section></div>`;
+}
+function textoDaAplicacao() {
+  const A = D().APLICACAO;
+  return `Limiar Ético · ${D().nome}\n${A.titulo}\n\n${A.situacao}\n\n${A.pergunta}\n\nMinha resposta:\n${rev.respostaAplicacao.trim()}\n`;
+}
+function atualizarAplicacao() {
+  const ok = rev.respostaAplicacao.trim().length >= MIN_APLICACAO;
+  document.querySelectorAll('#acoes-aplicacao button').forEach(b => { b.disabled = !ok; });
+  const c = document.querySelector('#conceito-aplicacao');
+  if (c) c.hidden = !ok;
 }
 
 function telaRevelacao() {
@@ -636,6 +650,17 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape' && manualAber
 
 function acao(alvo) {
   const a = alvo.dataset.acao, i = Number(alvo.dataset.i);
+  if (a === 'copiar-texto' || a === 'baixar-texto') {
+    const msg = document.querySelector('#retorno-texto');
+    if (a === 'copiar-texto') {
+      (navigator.clipboard?.writeText(textoDaAplicacao()) ?? Promise.reject()).then(() => { msg.textContent = 'Texto copiado.'; }, () => { msg.textContent = 'Não consegui copiar. Use "Baixar (.txt)" ou selecione o texto na caixa.'; });
+    } else {
+      const url = URL.createObjectURL(new Blob([textoDaAplicacao()], { type: 'text/plain;charset=utf-8' }));
+      const l = document.createElement('a'); l.href = url; l.download = `limiar-etico-${dia}-aplicar.txt`; document.body.appendChild(l); l.click(); l.remove(); URL.revokeObjectURL(url);
+      msg.textContent = 'Arquivo baixado.';
+    }
+    return;
+  }
   if (a === 'abrir-manual') { abrirManual(); return; }
   if (a === 'fechar-manual') { fecharManual(); return; }
   if (a === 'comecar' || a === 'recomecar') {
@@ -685,7 +710,7 @@ document.addEventListener('click', e => {
   if (alvo) acao(alvo);
 });
 app.addEventListener('input', e => {
-  if (e.target.id === 'resposta-aplicacao') rev.respostaAplicacao = e.target.value;
+  if (e.target.id === 'resposta-aplicacao') { rev.respostaAplicacao = e.target.value; atualizarAplicacao(); }
 });
 document.addEventListener('keydown', e => {
   if ((e.key === 'Enter' || e.key === ' ') && e.target.matches?.('.ponto-alvo')) { e.preventDefault(); acao(e.target); }
