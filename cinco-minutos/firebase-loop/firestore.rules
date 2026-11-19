@@ -1,0 +1,59 @@
+rules_version = '2';
+
+// Loop (MOSAICO) · projeto mosaico-loop. Sala conduzida por um Mestre (login Google, e-mail em config/mestres).
+// Raiz única: mosaico/{código}. Subcoleções: jogadores, telao, relogios. Todo o resto é negado.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function salaPath(id) { return /databases/$(database)/documents/mosaico/$(id); }
+    function salaExiste(id) { return exists(salaPath(id)); }
+    function sala(id) { return get(salaPath(id)).data; }
+    function ativa(id) { return salaExiste(id) && sala(id).ativa == true; }
+    function mestre(id) { return signedIn() && salaExiste(id) && sala(id).mestreUid == request.auth.uid; }
+    function participante(id) { return signedIn() && exists(/databases/$(database)/documents/mosaico/$(id)/jogadores/$(request.auth.uid)); }
+    function dentro(id) { return mestre(id) || participante(id); }
+    function emailMestre() {
+      return signedIn() && request.auth.token.email is string && request.auth.token.email_verified == true
+        && exists(/databases/$(database)/documents/config/mestres)
+        && request.auth.token.email in get(/databases/$(database)/documents/config/mestres).data.emails;
+    }
+
+    match /config/mestres { allow read: if signedIn(); allow write: if false; }
+
+    match /mosaico/{salaId} {
+      allow create: if emailMestre() && request.resource.data.mestreUid == request.auth.uid
+        && request.resource.data.ativa == true && request.resource.data.fase == 'sala';
+      allow get: if signedIn() && (!salaExiste(salaId) || resource.data.ativa == true || dentro(salaId));
+      allow list: if false;
+      allow update: if mestre(salaId) && request.resource.data.mestreUid == resource.data.mestreUid;
+      allow delete: if false;
+
+      match /jogadores/{jogadorId} {
+        allow read: if signedIn() && ativa(salaId);
+        allow create: if signedIn() && ativa(salaId) && jogadorId == request.auth.uid
+          && request.resource.data.nome is string && request.resource.data.nome.size() >= 1 && request.resource.data.nome.size() <= 60;
+        // o participante só mexe no que é dele: ambiente da volta e conclusão (uma vez)
+        allow update: if ativa(salaId) && (mestre(salaId)
+          || (jogadorId == request.auth.uid
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['pronto','atualizadoEmMs','amb','ambVolta','resp','respEm','forma','papelCognitivo','camadaAcessibilidade'])
+              && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['resp']) || !('resp' in resource.data))));
+        allow delete: if false;
+      }
+
+      // o telão entra anônimo e só se anuncia
+      match /telao/{id} {
+        allow read: if signedIn() && ativa(salaId);
+        allow create, update: if signedIn() && ativa(salaId) && id == request.auth.uid && request.resource.data.vistoEmMs is int;
+        allow delete: if false;
+      }
+
+      // cada aparelho mede a diferença entre o relógio dele e o do servidor
+      match /relogios/{id} {
+        allow read, create, update: if signedIn() && ativa(salaId) && id == request.auth.uid;
+        allow delete: if false;
+      }
+
+      match /{outra}/{documento=**} { allow read, write: if false; }
+    }
+  }
+}
