@@ -72,7 +72,7 @@ const $=id=>document.getElementById(id);
 const storageKey='cinco-minutos-ensaio-v1', historyKey='cinco-minutos-ciclo-v1';
 let state=null,timerHandle=null,toastHandle=null,started=false;
 function load(key,fallback){try{return JSON.parse(localStorage.getItem(key))??fallback}catch{return fallback}}
-function save(){try{localStorage.setItem(storageKey,JSON.stringify(state))}catch{}}
+function save(){try{localStorage.setItem(window.coop?.storageKey ?? storageKey,JSON.stringify(state))}catch{}}
 function chooseCase(){let hist=load(historyKey,[]);if(!Array.isArray(hist))hist=[];let options=CASES.map((_,i)=>i).filter(i=>!hist.includes(i));if(!options.length){hist=[];options=CASES.map((_,i)=>i)}const i=options[Math.floor(Math.random()*options.length)];hist.push(i);try{localStorage.setItem(historyKey,JSON.stringify(hist))}catch{}return i}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function makeClues(c){
@@ -104,32 +104,33 @@ function makeClues(c){
    {id:'cor3',name:'Verificar a figura imóvel',time:180,text:c.room==='corredor'?fig:'Um recado indica que alguém viu uma figura imóvel em '+room+'.'}]
  }
 }
-function show(id){['start','game','between','final','result'].forEach(x=>$(x).classList.toggle('hidden',x!==id));window.scrollTo({top:0,behavior:'instant'})}
+function show(id){$('coopShortcut').classList.toggle('hidden',id==='start'||!!window.coop);['start','game','between','final','result'].forEach(x=>$(x).classList.toggle('hidden',x!==id));window.scrollTo({top:0,behavior:'instant'})}
 function toast(text){$('toast').textContent=text;$('toast').classList.add('show');clearTimeout(toastHandle);toastHandle=setTimeout(()=>$('toast').classList.remove('show'),2200)}
 function popup(id){if(!$(id).open)$(id).showModal()}
 function fmt(s){s=Math.max(0,Math.ceil(s));return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
 function current(){return CASES[state.caseIndex]}
 function reset(){clearInterval(timerHandle);state={caseIndex:chooseCase(),loop:1,phase:'choose',room:null,duration:Number($('speed').value),remaining:Number($('speed').value),endAt:null,clues:[],hints:0,notes:'',answers:null};started=true;save();renderGame();show('game')}
-function enterRoom(id){if(state.phase!=='choose')return;state.room=id;state.phase='playing';state.remaining=state.duration;state.endAt=Date.now()+state.remaining*1000;save();renderGame();tick();timerHandle=setInterval(tick,250)}
+function enterRoom(id){if(window.coop){window.coop.choose(id);return}if(state.phase!=='choose')return;state.room=id;state.phase='playing';state.remaining=state.duration;state.endAt=Date.now()+state.remaining*1000;save();renderGame();tick();timerHandle=setInterval(tick,250)}
 function renderGame(){
  $('loopLabel').textContent='LOOP '+state.loop+' DE 5';$('timer').textContent=fmt(state.remaining);
  $('clockStatus').textContent=state.phase==='playing'?'tempo em andamento':'aguardando escolha';
- $('phaseTitle').textContent=state.phase==='playing'?ROOMS.find(r=>r.id===state.room).name:'Escolha onde investigar';
+ $('phaseTitle').textContent=state.room?ROOMS.find(r=>r.id===state.room).name:'Escolha onde investigar';
  $('phaseDescription').textContent=state.phase==='playing'?'Observe o ambiente enquanto o tempo passa.':'Cada escolha revela uma perspectiva diferente da mesma noite.';
  $('boardTitle').textContent=state.phase==='playing'?'Ambiente escolhido':'Escolha um ambiente';
- $('roomGrid').innerHTML=ROOMS.map(r=>'<button class="room '+(state.room===r.id?'selected':'')+'" '+(state.phase==='playing'?'disabled':'')+' data-room="'+r.id+'"><span class="room-icon" aria-hidden="true">'+r.icon+'</span><strong>'+r.name+'</strong><small>'+r.sub+'</small></button>').join('');
+ $('roomGrid').innerHTML=ROOMS.map(r=>'<button class="room '+(state.room===r.id?'selected':'')+'" '+(state.phase==='playing'&&state.room?'disabled':'')+' data-room="'+r.id+'"><span class="room-icon" aria-hidden="true">'+r.icon+'</span><strong>'+r.name+'</strong><small>'+r.sub+'</small></button>').join('');
  document.querySelectorAll('[data-room]').forEach(b=>b.addEventListener('click',()=>enterRoom(b.dataset.room)));
  $('endLoop').classList.toggle('hidden',state.phase!=='playing');
  $('statusText').textContent=state.phase==='playing'?'Você permanece neste ambiente até o retorno.':'Você poderá visitar um ambiente em cada loop.';
  $('roomPanel').classList.toggle('hidden',state.phase!=='playing');
- if(state.phase==='playing')renderClues();
+ if(state.phase==='playing'&&state.room)renderClues();
+ if(window.coop)window.coop.decorate();
  $('notes').value=state.notes||'';renderJournal();
 }
 function renderClues(){let r=ROOMS.find(x=>x.id===state.room),clues=makeClues(current())[r.id],elapsed=state.duration-state.remaining;
  $('roomPanel').innerHTML='<h3>'+r.name+'</h3><p>'+roomDescriptions[r.id]+'</p><div class="clue-list">'+clues.map(q=>{let got=state.clues.some(x=>x.id===q.id),needed=q.time/300*state.duration,available=elapsed>=needed;return '<button class="clue" data-clue="'+q.id+'" '+(got||!available?'disabled':'')+'><span>'+esc(q.name)+'</span><small>'+(got?'Registrada':available?'Examinar':'Disponível em '+fmt(needed-elapsed))+'</small></button>'}).join('')+'</div>';
  document.querySelectorAll('[data-clue]').forEach(b=>b.addEventListener('click',()=>collect(b.dataset.clue)));
 }
-function collect(id){if(state.phase!=='playing'||Date.now()>=state.endAt){tick();return}const q=makeClues(current())[state.room].find(x=>x.id===id);if(!q||state.clues.some(x=>x.id===id))return;const room=ROOMS.find(x=>x.id===state.room);state.clues.push({id:q.id,room:room.name,name:q.name,text:q.text,loop:state.loop});save();renderClues();renderJournal();toast('Pista guardada no caderno')}
+function collect(id){if(state.phase!=='playing'||(window.coop?.now() ?? Date.now())>=state.endAt){tick();return}const q=makeClues(current())[state.room].find(x=>x.id===id);if(!q||state.clues.some(x=>x.id===id)||state.duration-(state.endAt-(window.coop?.now() ?? Date.now()))/1000<q.time/300*state.duration)return;const room=ROOMS.find(x=>x.id===state.room);state.clues.push({id:q.id,room:room.name,name:q.name,text:q.text,loop:state.loop});save();renderClues();renderJournal();toast('Pista guardada no caderno')}
 function renderJournal(){
  const clues=state.clues||[];$('countBadge').textContent=clues.length;
  $('journalPreview').innerHTML=clues.length?clues.slice(-3).reverse().map(c=>'<div class="preview-item">'+esc(c.name)+' <br><small>'+esc(c.room)+'</small></div>').join(''):'<p class="muted">Suas descobertas aparecerão aqui.</p>';
@@ -137,12 +138,12 @@ function renderJournal(){
  const hs=['Compare o que aconteceu com a peça com os registros da galeria e de conservação.','O alarme tem registros próprios. Compare segurança e sala técnica antes de ligá-lo a outros fatos.','Procure uma recomendação de prevenção no corredor de serviço ou na conservação.'];
  $('hints').innerHTML=hs.slice(0,state.hints).map((x,i)=>'<p><strong>Orientação '+(i+1)+':</strong> '+esc(x)+'</p>').join('');$('getHint').disabled=state.hints>=3;
 }
-function tick(){if(!state||state.phase!=='playing')return;const old=state.remaining;state.remaining=Math.max(0,(state.endAt-Date.now())/1000);$('timer').textContent=fmt(state.remaining);if(Math.ceil(old)!==Math.ceil(state.remaining))renderClues();if(state.remaining<=0)finishLoop()}
-function finishLoop(){if(!state||state.phase!=='playing')return;clearInterval(timerHandle);state.phase='between';state.remaining=0;state.endAt=null;save();$('betweenCount').textContent=state.clues.length;$('betweenLoop').textContent=state.loop+' / 5';$('betweenTitle').textContent=state.loop===5?'Os ciclos terminaram.':'Você se lembra.';$('betweenHint').textContent=state.loop===5?'É hora de reunir suas descobertas e apresentar sua conclusão.':'O próximo ambiente pode confirmar ou mudar sua hipótese.';$('nextLoop').textContent=state.loop===5?'Apresentar hipótese':'Escolher próximo ambiente';show('between')}
-function next(){if(state.loop>=5){state.phase='final';save();renderForm();show('final');return}state.loop++;state.phase='choose';state.room=null;state.remaining=state.duration;save();renderGame();show('game')}
+function tick(){if(window.coop){window.coop.tick();return}if(!state||state.phase!=='playing')return;const old=state.remaining;state.remaining=Math.max(0,(state.endAt-Date.now())/1000);$('timer').textContent=fmt(state.remaining);if(Math.ceil(old)!==Math.ceil(state.remaining))renderClues();if(state.remaining<=0)finishLoop()}
+function finishLoop(){if(window.coop){window.coop.move('between');return}if(!state||state.phase!=='playing')return;clearInterval(timerHandle);state.phase='between';state.remaining=0;state.endAt=null;save();$('betweenCount').textContent=state.clues.length;$('betweenLoop').textContent=state.loop+' / 5';$('betweenTitle').textContent=state.loop===5?'Os ciclos terminaram.':'Você se lembra.';$('betweenHint').textContent=state.loop===5?'É hora de reunir suas descobertas e apresentar sua conclusão.':'O próximo ambiente pode confirmar ou mudar sua hipótese.';$('nextLoop').textContent=state.loop===5?'Apresentar hipótese':'Escolher próximo ambiente';show('between')}
+function next(){if(window.coop){window.coop.move(state.loop>=5?'final':'choose');return}if(state.loop>=5){state.phase='final';save();renderForm();show('final');return}state.loop++;state.phase='choose';state.room=null;state.remaining=state.duration;save();renderGame();show('game')}
 function options(obj){return '<option value="">Ainda não sei</option>'+Object.entries(obj).map(([k,v])=>'<option value="'+k+'">'+esc(v)+'</option>').join('')}
 function renderForm(){$('answerFields').innerHTML='<div><label for="event">O que aconteceu com o acervo ou a exposição?</label><select id="event">'+options(EVENTS)+'</select></div><div><label for="alarm">O que disparou o alarme?</label><select id="alarm">'+options(ALARMS)+'</select></div><div><label for="figure">Quem era a figura imóvel observada?</label><select id="figure">'+options(FIGURES)+'</select></div><div><label for="action">Qual ação poderia melhorar o desfecho?</label><select id="action">'+options(ACTIONS)+'</select></div>'}
-function submit(e){e.preventDefault();const c=current(),answers={event:$('event').value,alarm:$('alarm').value,figure:$('figure').value,action:$('action').value};state.answers=answers;state.phase='result';save();renderResult();show('result')}
+function submit(e){e.preventDefault();const c=current(),answers={event:$('event').value,alarm:$('alarm').value,figure:$('figure').value,action:$('action').value};if(window.coop){window.coop.move('result',answers);return}state.answers=answers;state.phase='result';save();renderResult();show('result')}
 function renderResult(){const c=current(),a=state.answers||{},keys=['event','alarm','figure','action'],maps={event:EVENTS,alarm:ALARMS,figure:FIGURES,action:ACTIONS},titles={event:'Acontecimento',alarm:'Alarme',figure:'Figura imóvel',action:'Intervenção'},score=keys.reduce((n,k)=>n+(a[k]===c[k]?25:0),0);
  $('resultBody').innerHTML='<p class="large">Você reconheceu <strong>'+score+' de 100 pontos possíveis</strong>. Cada eixo vale 25 pontos nesta bancada experimental.</p>'+keys.map(k=>'<div class="result-card"><strong>'+titles[k]+'</strong><p>Sua resposta: '+esc(maps[k][a[k]]||'Ainda não sei')+'<br>Resultado desta partida: '+esc(maps[k][c[k]])+'</p></div>').join('')+'<div class="result-card"><strong>O que aconteceu</strong><p>'+esc(c.detail.charAt(0).toUpperCase()+c.detail.slice(1))+'. '+esc(labels[c.alarm][1])+'</p><p>'+esc(figures[c.figure])+'</p></div><div class="result-card"><strong>Sua decisão</strong><p>'+(a.action===c.action?'A ação escolhida está alinhada ao registro de prevenção desta variação.':'A ação recomendada nesta variação era: '+esc(ACTIONS[c.action]))+'</p><p>O efeito sobre o loop temporal ainda será desenvolvido. Nesta bancada, a intervenção é avaliada como hipótese; ela não altera a simulação.</p></div>';
 }
@@ -152,6 +153,15 @@ $('startButton').onclick=reset;$('nextLoop').onclick=next;$('endLoop').onclick=f
 ['openJournal','openJournalSide','betweenJournal','finalJournal'].forEach(x=>$(x).onclick=()=>{renderJournal();popup('journalDialog')});
 $('getHint').onclick=()=>{if(state&&state.hints<3){state.hints++;save();renderJournal()}};
 $('notes').addEventListener('input',e=>{if(state){state.notes=e.target.value;save()}});
-$('answerForm').addEventListener('submit',submit);$('replay').onclick=reset;
+$('answerForm').addEventListener('submit',submit);$('replay').onclick=()=>window.coop?window.coop.open():reset();
 // Recupera a partida local sem confundir o prazo real do loop com o relógio do aparelho.
+function restoreSolo(){
+ $('nextLoop').classList.remove('hidden');
+ $('coopBegin').classList.add('hidden');
+ $('answerFields').classList.remove('hidden');
+ $('answerForm').querySelector('button[type=submit]').classList.remove('hidden');
+ $('final').querySelector('.large').textContent='O que aconteceu? Use as pistas do caderno e escolha o que você faria. Se não souber, pode deixar uma resposta em aberto.';
+ $('replay').textContent='Jogar outra vez';
 const prev=load(storageKey,null);if(prev&&Number.isInteger(prev.caseIndex)&&CASES[prev.caseIndex]&&prev.loop>=1&&prev.loop<=5){state=prev;started=true;if(state.phase==='playing'&&Number.isFinite(state.endAt)){state.remaining=Math.max(0,(state.endAt-Date.now())/1000);renderGame();show('game');if(state.remaining<=0)finishLoop();else timerHandle=setInterval(tick,250)}else if(state.phase==='choose'){renderGame();show('game')}else if(state.phase==='between'){$('betweenCount').textContent=state.clues.length;$('betweenLoop').textContent=state.loop+' / 5';$('betweenTitle').textContent=state.loop===5?'Os ciclos terminaram.':'Você se lembra.';$('nextLoop').textContent=state.loop===5?'Apresentar hipótese':'Escolher próximo ambiente';show('between')}else if(state.phase==='final'){renderForm();show('final')}else if(state.phase==='result'&&state.answers){renderResult();show('result')}else{state=null;show('start')}}else show('start');
+}
+restoreSolo();
