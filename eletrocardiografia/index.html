@@ -31,16 +31,18 @@ button:hover{filter:brightness(1.06)}button:active{box-shadow:0 1px 0 #263e53}
 .paper-speed{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:15px}.speed-buttons{display:flex;gap:8px;flex-wrap:wrap}.speed-buttons button{min-height:42px;padding:8px 12px;font-size:.84rem}.speed-buttons small{font-weight:600;opacity:.9;margin-left:3px}
 .focus-mode .paper-speed{margin-top:9px;gap:8px}.focus-mode .speed-buttons button{min-height:38px;padding:7px 10px}
 .steps p,.explain p{color:#526d83}.steps b{color:#17324d}.steps span{color:#2f80ed}.references{color:#526d83;border-color:#cad9e7;background:#ffffffaa}.references summary{color:#17324d}.references a{color:#1768b6}footer{color:#627b90}footer span{color:#2f80ed}
+.quick-states{margin-top:18px;border:1px solid #cbddec;border-radius:15px;background:linear-gradient(160deg,#f8fbff,#edf5fd);box-shadow:inset 0 1px #fff,0 4px 12px #244c7010}.quick-states summary{padding:13px 15px;cursor:pointer;color:#17324d;display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:800;list-style:none}.quick-states summary::after{content:'▾';color:#2f80ed;font-size:1.1rem}.quick-states[open] summary::after{content:'▴'}.quick-states summary strong{margin-left:auto;color:#2868a8;font-size:.8rem;text-align:right}.quick-states>p{margin:0 15px 12px;color:#5c7086;font-size:.85rem}.scenario-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:0 12px 14px}.scenario-buttons button{text-align:left;font-size:.81rem;line-height:1.25;min-height:46px;padding:9px 11px}.scenario-buttons button.selected{color:#fff;background:linear-gradient(145deg,#57a7ff,#2f80ed);border-color:#90c5ff;box-shadow:0 4px 0 #1c5fb1,inset 0 1px 0 #ffffff65}.scenario-info{margin-top:10px;padding:10px 13px;border-left:4px solid #2f80ed;border-radius:0 10px 10px 0;background:#eaf3fc;color:#36536d;line-height:1.45;font-size:.83rem}.scenario-info strong{color:#17324d}.focus-mode .quick-states{margin-top:8px}.focus-mode .quick-states summary{padding:9px 11px}.focus-mode .scenario-info{font-size:.78rem;padding:7px 10px}.focus-mode .quick-states>p{display:none}@media(max-width:420px){.scenario-buttons{grid-template-columns:1fr}.quick-states summary strong{font-size:.72rem}}
+.scenario-info span{display:block;margin-top:5px;color:#637b90;font-size:.78rem}
 </style></head>
 <body><header><div class="brand"><span class="brand-icon">♥</span><div><small>FISIOLOGIA INTERATIVA</small><strong>ECG em movimento</strong></div></div><div class="head-note">UM LABORATÓRIO PARA APRENDER</div></header>
 <main><section class="intro"><div><span class="eyebrow">CORAÇÃO · ELETRICIDADE · MOVIMENTO</span><h1>Um coração.<br><em>Doze perspectivas.</em></h1><p>Explore como a atividade elétrica cardíaca é observada pelas derivações e descubra o que muda quando a frequência aumenta.</p></div><div class="intro-side"><span>EXPERIMENTE</span><p>Gire o eixo elétrico, escolha uma derivação e acompanhe o traçado.</p><a href="#laboratorio">Começar a explorar</a></div></section>
 <div class="notice"><b>Modelo didático</b> · Traçados sintéticos e simplificados, sem finalidade diagnóstica ou prescrição de exercício.</div><noscript><div class="error-notice" role="alert">O JavaScript está desativado neste navegador. Ative-o para usar os botões e a animação.</div></noscript><div id="ecgError" class="error-notice" role="alert" hidden></div>
 <section id="laboratorio" class="workspace"><div class="panel axis-panel"><div class="panel-head"><div><span class="kicker">PLANO FRONTAL</span><h2>O coração visto de frente</h2></div><span class="badge">6 derivações</span></div><p class="muted">O vetor médio do QRS é projetado sobre cada eixo. A derivação selecionada está em destaque.</p><svg id="axis" viewBox="0 0 400 360" role="img" aria-label="Sistema hexaxial com vetor elétrico cardíaco"></svg><div class="range-label"><label for="angle">Eixo médio do QRS</label><output id="angleValue">+60°</output></div><input id="angle" type="range" min="-180" max="180" value="60" step="5"><div class="range-ends"><span>−180°</span><span>0°</span><span>+180°</span></div><p id="axisExplanation" class="insight"></p></div>
-<div class="panel trace-panel"><div class="panel-head"><div><span class="kicker">MONITOR DE ECG</span><h2>Observe o traçado</h2></div><div class="monitor-actions"><div class="live"><i></i><span id="status">EM MOVIMENTO</span></div><button id="focus" class="focus-button" type="button" aria-pressed="false">⛶ Tela cheia</button></div></div><div class="lead-picker"><span class="small-label">ESCOLHA A DERIVAÇÃO</span><p>Toque em uma das opções para trocar o traçado do monitor.</p><div id="leadPicker" class="lead-buttons" role="group" aria-label="Selecionar derivação"></div></div><div class="monitor-top"><div><span class="small-label">DERIVAÇÃO SELECIONADA</span><div id="selectedTitle" class="lead-title" aria-live="polite">II <small>· plano frontal</small></div></div><div class="heart-rate"><span id="hrReadout">70</span><small>bpm</small></div></div><div class="canvas-wrap large"><canvas id="mainTrace" aria-label="Traçado sintético da derivação selecionada"></canvas></div><div class="calibration" id="calibration">25 mm/s · 10 mm/mV · 1 quadradinho = 0,04 s · escala ilustrativa</div><div class="paper-speed"><span class="small-label">VELOCIDADE DO PAPEL</span><div class="speed-buttons" role="group" aria-label="Velocidade de registro do ECG"><button type="button" data-speed="25" class="speed-active" aria-pressed="true">25 mm/s <small>habitual</small></button><button type="button" data-speed="50" aria-pressed="false">50 mm/s</button></div></div><div id="leadDescription" class="description"></div><div class="transport"><button id="play" class="primary" aria-pressed="true">Iniciar</button><button id="pause" aria-pressed="false">Pausar</button><button id="reset">Reiniciar</button><button id="loop" class="loop-on" aria-pressed="true">Loop contínuo: ligado</button><label class="check"><input type="checkbox" id="artifact"> Artefato de movimento</label></div><p id="loopHelp" class="loop-help">O traçado se repete continuamente. Desligue o loop para acompanhar um ciclo por vez.</p></div></section>
+<div class="panel trace-panel"><div class="panel-head"><div><span class="kicker">MONITOR DE ECG</span><h2>Observe o traçado</h2></div><div class="monitor-actions"><div class="live"><i></i><span id="status">EM MOVIMENTO</span></div><button id="focus" class="focus-button" type="button" aria-pressed="false">⛶ Tela cheia</button></div></div><details id="scenarioGroup" class="quick-states"><summary><span>Estados rápidos</span><strong id="scenarioSummary">Ritmo de referência</strong></summary><p>Escolha um exemplo para comparar com o ritmo de referência.</p><div id="scenarioButtons" class="scenario-buttons" role="group" aria-label="Estados rápidos de eletrocardiografia"></div></details><div id="scenarioInfo" class="scenario-info" aria-live="polite"></div><div class="lead-picker"><span class="small-label">ESCOLHA A DERIVAÇÃO</span><p>Toque em uma das opções para trocar o traçado do monitor.</p><div id="leadPicker" class="lead-buttons" role="group" aria-label="Selecionar derivação"></div></div><div class="monitor-top"><div><span class="small-label">DERIVAÇÃO SELECIONADA</span><div id="selectedTitle" class="lead-title" aria-live="polite">II <small>· plano frontal</small></div></div><div class="heart-rate"><span id="hrReadout">70</span><small>bpm</small></div></div><div class="canvas-wrap large"><canvas id="mainTrace" aria-label="Traçado sintético da derivação selecionada"></canvas></div><div class="calibration" id="calibration">25 mm/s · 10 mm/mV · 1 quadradinho = 0,04 s · escala ilustrativa</div><div class="paper-speed"><span class="small-label">VELOCIDADE DO PAPEL</span><div class="speed-buttons" role="group" aria-label="Velocidade de registro do ECG"><button type="button" data-speed="25" class="speed-active" aria-pressed="true">25 mm/s <small>habitual</small></button><button type="button" data-speed="50" aria-pressed="false">50 mm/s</button></div></div><div id="leadDescription" class="description"></div><div class="transport"><button id="play" class="primary" aria-pressed="true">Iniciar</button><button id="pause" aria-pressed="false">Pausar</button><button id="reset">Reiniciar</button><button id="loop" class="loop-on" aria-pressed="true">Loop contínuo: ligado</button><label class="check"><input type="checkbox" id="artifact"> Artefato de movimento</label></div><p id="loopHelp" class="loop-help">O traçado se repete continuamente. Desligue o loop para acompanhar um ciclo por vez.</p></div></section>
 <section class="panel controls"><div class="panel-head"><div><span class="kicker">CONTROLES DO EXPERIMENTO</span><h2>Altere as condições</h2></div></div><div class="controls-grid"><div><div class="range-label"><label for="hr">Frequência cardíaca</label><output id="hrValue">70 bpm</output></div><input id="hr" type="range" min="40" max="180" value="70" step="1"><div class="range-ends"><span>40 bpm</span><span>180 bpm</span></div></div><div><span class="small-label">CENÁRIOS ILUSTRATIVOS</span><div class="presets"><button data-hr="70" class="active">Repouso</button><button data-hr="110">Exercício leve</button><button data-hr="150">Exercício intenso</button></div></div></div><p class="fine">Os cenários alteram a frequência cardíaca; não representam um protocolo ergométrico nem predizem a resposta individual ao exercício.</p></section>
 <section class="section-title"><div><span class="kicker">AS 12 JANELAS DO CORAÇÃO</span><h2>Escolha uma derivação</h2><p>As prévias são estáticas. Toque em uma delas para ver o traçado em movimento no monitor.</p></div><span class="badge dark">6 frontais + 6 precordiais</span></section><div id="leads" class="lead-grid"></div>
 <section class="learn"><div class="panel"><span class="kicker">COMO INTERPRETAR</span><h2>Da eletricidade ao traçado</h2><div class="steps"><div><span>01</span><p><b>Onda P</b><br>Despolarização dos átrios.</p></div><div><span>02</span><p><b>Complexo QRS</b><br>Despolarização dos ventrículos.</p></div><div><span>03</span><p><b>Onda T</b><br>Repolarização dos ventrículos.</p></div></div></div><div class="panel explain"><span class="kicker">IDEIA CENTRAL</span><h2>Mesma atividade, olhares diferentes.</h2><p>Quando o vetor se dirige ao polo positivo de uma derivação, sua projeção tende a ser positiva; no sentido oposto, tende a ser negativa. Se for aproximadamente perpendicular, a projeção média tende a ser pequena.</p><p>As derivações precordiais observam o plano horizontal e, aqui, têm morfologias ilustrativas independentes do eixo frontal.</p></div></section>
-<details class="references"><summary>Saiba mais sobre o modelo e as referências</summary><p>O eixo exibido representa apenas uma aproximação do vetor médio do QRS. As ondas são geradas matematicamente, sem modelo anatômico individualizado, condução realista ou reprodução de doenças. A duração e a morfologia não substituem um ECG real. O exercício é representado apenas pela frequência; artefatos são ilustrativos.</p><p>As seis derivações frontais são calculadas a partir de potenciais comuns, preservando relações algébricas entre derivações. As seis precordiais utilizam formas sintéticas fixas. O diagrama é inspirado no sistema hexaxial e na imagem apresentada pelo professor.</p><p>Referências: <a href="https://www.ahajournals.org/doi/epdf/10.1161/CIRCULATIONAHA.108.191095" target="_blank" rel="noopener">AHA/ACCF/HRS — padronização do ECG</a> · <a href="https://ilearn.courses.med.fiu.edu/published/Essential_ECG/ECG_intro/std.html" target="_blank" rel="noopener">FIU — velocidade e calibração</a> · <a href="https://www.ahajournals.org/doi/pdf/10.1161/CIR.0b013e31829b5b44" target="_blank" rel="noopener">AHA — padrões para testes de exercício</a>.</p></details></main><footer>Fisiologia interativa <span>·</span> Um convite para compreender o que nos mantém em movimento.</footer><script>window.addEventListener('error',function(e){var box=document.getElementById('ecgError');if(box){box.hidden=false;box.textContent='O simulador encontrou um erro e pode parar de responder: '+(e.message||'erro desconhecido')+'. Informe esta mensagem para que possamos corrigir.';}});</script><script>(() => {
+<details class="references"><summary>Saiba mais sobre o modelo e as referências</summary><p>O eixo exibido representa apenas uma aproximação do vetor médio do QRS. Os estados são exemplos matemáticos esquemáticos: não reproduzem toda a variabilidade dos ritmos, nem todos os critérios necessários para identificar uma alteração. Não use o simulador para diagnóstico. As sequências irregulares e os batimentos prematuros seguem um padrão ilustrativo que se repete.</p><p>As seis derivações frontais são calculadas a partir de potenciais comuns, preservando relações algébricas entre derivações. As precordiais utilizam formas sintéticas ilustrativas. O diagrama é inspirado no sistema hexaxial e na imagem apresentada pelo professor. A condição de exercício altera apenas a frequência; não representa um protocolo ergométrico.</p><p>Referências: <a href="https://www.ahajournals.org/doi/epdf/10.1161/CIRCULATIONAHA.108.191095" target="_blank" rel="noopener">AHA/ACCF/HRS — condução intraventricular</a> · <a href="https://www.ahajournals.org/doi/10.1161/CIR.0000000000000628" target="_blank" rel="noopener">ACC/AHA/HRS — bradicardia e alterações de condução</a> · <a href="https://www.merckmanuals.com/professional/cardiovascular-disorders/specific-cardiac-arrhythmias/atrial-flutter" target="_blank" rel="noopener">Manual Merck — flutter atrial</a> · <a href="https://www.merckmanuals.com/professional/cardiovascular-disorders/specific-cardiac-arrhythmias/atrial-fibrillation" target="_blank" rel="noopener">Manual Merck — fibrilação atrial</a> · <a href="https://www.merckmanuals.com/professional/cardiovascular-disorders/specific-cardiac-arrhythmias/ectopic-supraventricular-arrhythmias" target="_blank" rel="noopener">Manual Merck — extrassístoles atriais</a> · <a href="https://www.merckmanuals.com/professional/cardiovascular-disorders/specific-cardiac-arrhythmias/ventricular-premature-beats-vpb" target="_blank" rel="noopener">Manual Merck — extrassístoles ventriculares</a> · <a href="https://ilearn.courses.med.fiu.edu/published/Essential_ECG/ECG_intro/std.html" target="_blank" rel="noopener">FIU — velocidade e calibração</a> · <a href="https://www.ahajournals.org/doi/pdf/10.1161/CIR.0b013e31829b5b44" target="_blank" rel="noopener">AHA — padrões para testes de exercício</a>.</p></details></main><footer>Fisiologia interativa <span>·</span> Um convite para compreender o que nos mantém em movimento.</footer><script>window.addEventListener('error',function(e){var box=document.getElementById('ecgError');if(box){box.hidden=false;box.textContent='O simulador encontrou um erro e pode parar de responder: '+(e.message||'erro desconhecido')+'. Informe esta mensagem para que possamos corrigir.';}});</script><script>(() => {
   'use strict';
   const leads = [
     {id:'I',angle:0,desc:'Compara o potencial do braço esquerdo com o do braço direito; observa o coração no plano frontal.'},
@@ -57,7 +59,25 @@ button:hover{filter:brightness(1.06)}button:active{box-shadow:0 1px 0 #263e53}
     {id:'V6',r:.9,s:.08,desc:'Na linha axilar média esquerda, no mesmo nível horizontal de V4 e V5.'}
   ];
   const $ = id => document.getElementById(id);
-  const state={lead:'II',angle:60,hr:70,speed:25,running:true,time:0,artifact:false,loop:true,cycleProgress:0,cycleDone:false};
+  const scenarios=[
+    {id:'normal',title:'Ritmo de referência',hr:70,axis:60,lead:'II',info:'Ritmo regular com ondas P e complexos QRS em sequência. Use-o como referência para as comparações.'},
+    {id:'tachy',title:'Taquicardia sinusal',hr:120,axis:60,lead:'II',info:'Ritmo sinusal regular com frequência aumentada; observe a onda P antes de cada QRS e os intervalos RR mais curtos.'},
+    {id:'brady',title:'Bradicardia sinusal',hr:45,axis:60,lead:'II',info:'Ritmo sinusal regular com frequência reduzida; observe o intervalo RR mais longo e a relação entre P e QRS.'},
+    {id:'pac',title:'Extrassístoles supraventriculares (atriais)',hr:70,axis:60,lead:'II',info:'Exemplo de extrassístole atrial conduzida: um batimento precoce com P de aspecto diferente e QRS estreito, seguido de pausa não totalmente compensatória.'},
+    {id:'pvc',title:'Extrassístoles ventriculares',hr:70,axis:60,lead:'V1',info:'Um batimento ventricular precoce tem QRS alargado, não é precedido por P relacionada e é seguido de pausa compensatória neste exemplo.'},
+    {id:'af',title:'Fibrilação atrial',hr:100,axis:60,lead:'II',info:'Intervalos RR irregularmente irregulares e ausência de ondas P organizadas; a frequência indicada é uma média aproximada. A sequência ilustrativa se repete.'},
+    {id:'nonspecific',title:'Alterações inespecíficas de ST e T',hr:70,axis:60,lead:'V5',info:'Exemplo de pequena alteração do segmento ST e da onda T em derivações laterais. O achado isolado não identifica uma causa.'},
+    {id:'lvh',title:'Sobrecarga ventricular esquerda (SVE)',hr:70,axis:30,lead:'V5',info:'Exemplo com voltagem aumentada em V5/V6 e S mais profunda em V1. Critérios de SVE dependem de medidas e contexto.'},
+    {id:'rbbb',title:'Bloqueio de ramo direito (BRD)',hr:70,axis:60,lead:'V1',info:'Exemplo de QRS alargado com duas deflexões positivas em V1; compare com a onda S alargada em V6.'},
+    {id:'lafb',title:'Bloqueio divisional anterossuperior esquerdo (BDAS)',hr:70,axis:-60,lead:'aVL',info:'Neste exemplo, o eixo frontal está desviado para a esquerda; compare aVL com as derivações inferiores II, III e aVF.'},
+    {id:'lbbb',title:'Bloqueio de ramo esquerdo (BRE)',hr:70,axis:-20,lead:'V6',info:'Exemplo de QRS alargado e positivo em V6, com entalhe, e predominantemente negativo em V1. Compare as derivações.'},
+    {id:'av1',title:'Bloqueio atrioventricular de 1º grau',hr:65,axis:60,lead:'II',info:'Exemplo de intervalo PR prolongado, com uma onda P conduzida a cada QRS; não há batimentos bloqueados neste estado.'},
+    {id:'qwave',title:'Zona eletricamente inativa (onda Q patológica)',hr:70,axis:60,lead:'III',info:'Exemplo didático de ondas Q profundas e alargadas em derivações inferiores. Ondas Q isoladas não determinam a causa ou o diagnóstico.'},
+    {id:'stdown',title:'Infradesnivelamento do segmento ST',hr:70,axis:60,lead:'V5',info:'Exemplo de ST abaixo da linha de base em derivações laterais. A interpretação depende das derivações, do contexto e de outros achados.'},
+    {id:'stup',title:'Supradesnivelamento do segmento ST',hr:70,axis:60,lead:'V3',info:'Exemplo de elevação anterior do ST em V2–V4, com alterações opostas em parte do plano frontal. Há múltiplas causas possíveis.'},
+    {id:'flutter',title:'Flutter atrial',hr:75,axis:60,lead:'II',info:'Exemplo regular com ondas atriais em “serrote” e condução 4:1: cerca de quatro ondas atriais por QRS. Outros padrões também ocorrem.'}
+  ];
+  const state={lead:'II',angle:60,hr:70,speed:25,scenario:'normal',running:true,time:0,artifact:false,loop:true,cycleProgress:0,cycleDone:false};
   const rad = n => n*Math.PI/180;
   const formatAngle = n => `${n>0?'+':''}${n}°`;
   const cards=$('leads');
@@ -65,6 +85,7 @@ button:hover{filter:brightness(1.06)}button:active{box-shadow:0 1px 0 #263e53}
   leads.forEach(l=>{const b=document.createElement('button');b.type='button';b.className='lead-card';b.dataset.lead=l.id;b.setAttribute('aria-label',`Selecionar derivação ${l.id}`);b.innerHTML=`<div class="lead-card-head"><strong>${l.id}</strong><small>${l.angle===undefined?'PRECORDIAL':'FRONTAL'}</small></div><div class="mini"><svg viewBox="0 0 200 75" preserveAspectRatio="none" aria-hidden="true"><path fill="none" stroke="#194f55" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"></path></svg></div>`;b.addEventListener('click',()=>selectLead(l.id));cards.appendChild(b);
     const pick=document.createElement('button');pick.type='button';pick.className='lead-choice';pick.dataset.lead=l.id;pick.textContent=l.id;pick.setAttribute('aria-label',`Selecionar derivação ${l.id}`);pick.addEventListener('click',()=>selectLead(l.id));$('leadPicker').appendChild(pick);
   });
+  scenarios.forEach(item=>{const b=document.createElement('button');b.type='button';b.className='scenario-choice';b.dataset.scenario=item.id;b.textContent=item.title;b.addEventListener('click',()=>{state.scenario=item.id;state.hr=item.hr;state.angle=item.axis;state.lead=item.lead;state.time=0;state.cycleProgress=0;state.cycleDone=false;$('hr').value=state.hr;$('angle').value=state.angle;$('scenarioGroup').open=false;updateUI()});$('scenarioButtons').appendChild(b)});
   function axisSvg(){
     const selected=leads.find(l=>l.id===state.lead),front=selected.angle!==undefined;
     const cx=200,cy=178,outer=140;
@@ -82,38 +103,107 @@ button:hover{filter:brightness(1.06)}button:active{box-shadow:0 1px 0 #263e53}
     $('axisExplanation').textContent=front?`Em ${l.id}, a projeção média do QRS é ${Math.abs(projection)<.15?'próxima de zero':projection>0?'positiva':'negativa'} neste modelo. Mova o controle para observar a mudança.`:'As derivações V1–V6 observam o plano horizontal; o vetor frontal acima não determina seus traçados neste modelo.';
     document.querySelectorAll('.lead-card').forEach(c=>{let on=c.dataset.lead===state.lead;c.classList.toggle('selected',on);c.setAttribute('aria-pressed',String(on));});
     document.querySelectorAll('.lead-choice').forEach(c=>{let on=c.dataset.lead===state.lead;c.classList.toggle('selected',on);c.setAttribute('aria-pressed',String(on));});
+    const scenario=scenarios.find(s=>s.id===state.scenario);$('scenarioSummary').textContent=scenario.title;let caveat='';
+    if((state.scenario==='tachy'&&state.hr<=100)||(state.scenario==='brady'&&state.hr>=60))caveat=' A frequência foi alterada e já não corresponde à faixa indicada no nome do exemplo.';
+    if(state.scenario==='lafb'&&(state.angle>-45||state.angle<-90))caveat=' O eixo foi alterado e está fora da faixa apresentada para este exemplo.';
+    if(state.scenario==='flutter'&&(state.hr*4<250||state.hr*4>350))caveat=' A frequência foi alterada e a atividade atrial neste modelo de condução 4:1 está fora da faixa típica.';
+    $('scenarioInfo').innerHTML=`<strong>${scenario.title}.</strong> ${scenario.info}${caveat} <span>Traçado esquemático para ensino; não estabelece diagnóstico.</span>`;
+    document.querySelectorAll('.scenario-choice').forEach(c=>{const on=c.dataset.scenario===state.scenario;c.classList.toggle('selected',on);c.setAttribute('aria-pressed',String(on))});
     document.querySelectorAll('[data-hr]').forEach(b=>b.classList.toggle('active',Number(b.dataset.hr)===state.hr));
     document.querySelectorAll('[data-speed]').forEach(b=>{const on=Number(b.dataset.speed)===state.speed;b.classList.toggle('speed-active',on);b.setAttribute('aria-pressed',String(on));});
     $('calibration').textContent=`${state.speed} mm/s · 10 mm/mV · 1 quadradinho = ${state.speed===25?'0,04':'0,02'} s · escala ilustrativa`;
     $('loop').textContent=`Loop contínuo: ${state.loop?'ligado':'desligado'}`;$('loop').setAttribute('aria-pressed',String(state.loop));$('loop').classList.toggle('loop-on',state.loop);
-    $('loopHelp').textContent=state.loop?'O traçado se repete continuamente. Desligue o loop para acompanhar um ciclo por vez.':'O traçado pausa após um ciclo. Use Iniciar para observar outro ciclo.';
+    $('loopHelp').textContent=state.loop?'O traçado se repete continuamente. Desligue o loop para acompanhar um intervalo médio por vez.':'O traçado pausa após um intervalo médio. Use Iniciar para avançar novamente.';
     $('play').textContent=state.cycleDone?'Iniciar ciclo':'Iniciar';$('play').setAttribute('aria-pressed',String(state.running));$('pause').setAttribute('aria-pressed',String(!state.running));$('status').textContent=state.running?'EM MOVIMENTO':state.cycleDone?'CICLO CONCLUÍDO':'PAUSADO';axisSvg();drawAll();
   }
   const gauss=(x,mean,width)=>Math.exp(-.5*((x-mean)/width)**2);
+  let rhythm={period:8*60/70,events:[]};
+  function buildRhythm(){
+    const rr=60/state.hr;let intervals=[1];
+    if(state.scenario==='pac')intervals=[1,1,1,1,.65,1.25,1,1];
+    if(state.scenario==='pvc')intervals=[1,1,1,1,.65,1.35,1,1];
+    if(state.scenario==='af')intervals=[.68,1.17,.77,1.28,.81,1.05,1.13,1.11];
+    let time=0;const events=intervals.map((interval,i)=>{const event={time,type:i===5&&state.scenario==='pac'?'pac':i===5&&state.scenario==='pvc'?'pvc':'sinus'};time+=interval*rr;return event});
+    return {period:time,events};
+  }
+  function rawVoltage(lead,t){
+    const rr=60/state.hr,kind=state.scenario,frontal=lead.angle!==undefined,b=frontal?rad(lead.angle):0,gain=frontal&&lead.id.startsWith('aV')?Math.sqrt(3)/2:1;
+    const proj=frontal?gain*Math.cos(rad(state.angle)-b):0;
+    const atrial=frontal?gain*Math.cos(rad(45)-b):1;
+    const inferior=frontal?gain*Math.cos(rad(90)-b):0;
+    const lateral=frontal?gain*Math.cos(b):0;
+    let value=0;
+    for(const event of rhythm.events){
+      const d=((t-event.time+rhythm.period/2)%rhythm.period+rhythm.period)%rhythm.period-rhythm.period/2;
+      if(d<-.55||d>.60)continue;
+      const pcenter=kind==='av1'?-.29:-Math.min(.18,rr*.30);
+      const p=gauss(d,pcenter,.025),q=gauss(d,-.027,.009),r=gauss(d,0,.011),s=gauss(d,.026,.012),tw=gauss(d,Math.min(.28,rr*.40),Math.min(.065,rr*.105));
+      let qrs=frontal?proj*(1.05*r-.12*q-.18*s):-.08*q+lead.r*r-lead.s*s;
+      let pWave=(frontal?.12*atrial:.09)*p;
+      let tWave=(frontal?.28*atrial:.22)*tw;
+      if(event.type==='pac')pWave=(frontal?.11*gain*Math.cos(rad(5)-b):.07)*gauss(d,pcenter+.025,.022);
+      if(kind==='af'||kind==='flutter'||event.type==='pvc')pWave=0;
+      if(event.type==='pvc'){
+        const wide=gauss(d,-.012,.036),late=gauss(d,.035,.032);
+        const direction=frontal?gain*Math.cos(rad(120)-b):(lead.id==='V1'||lead.id==='V2'?-1:1);
+        qrs=direction*(.85*wide+.42*late);tWave=-direction*.22*gauss(d,.26,.06);
+      }
+      if(kind==='rbbb'&&event.type==='sinus'){
+        if(lead.id==='V1'||lead.id==='V2')qrs=.35*gauss(d,-.036,.014)-.23*gauss(d,-.004,.012)+.95*gauss(d,.044,.023);
+        if(lead.id==='V5'||lead.id==='V6'||lead.id==='I')qrs=(frontal?gain:1)*(.90*gauss(d,-.012,.018)-.50*gauss(d,.047,.026));
+      }
+      if(kind==='lbbb'&&event.type==='sinus'){
+        if(lead.id==='V1'||lead.id==='V2')qrs=-.82*gauss(d,-.005,.035)-.35*gauss(d,.044,.028);
+        if(lead.id==='V5'||lead.id==='V6'||lead.id==='I'||lead.id==='aVL')qrs=(frontal?gain:1)*(.70*gauss(d,-.024,.024)+.86*gauss(d,.038,.030));
+        if(lead.id==='V5'||lead.id==='V6'||lead.id==='I'||lead.id==='aVL')tWave=-.24*tw;
+        if(lead.id==='V1'||lead.id==='V2')tWave=.20*tw;
+      }
+      if(kind==='lvh'){
+        if(lead.id==='V1')qrs=.15*r-1.85*s-.08*q;
+        if(lead.id==='V5'||lead.id==='V6')qrs=1.85*r-.14*s-.08*q;
+      }
+      if(kind==='qwave')qrs-=(frontal?.48*inferior:0)*gauss(d,-.043,.020);
+      if(kind==='nonspecific'&&(lead.id==='V4'||lead.id==='V5'||lead.id==='V6'||lead.id==='I'||lead.id==='aVL'))tWave=-.12*tw;
+      if(kind==='stup'||kind==='stdown'||kind==='nonspecific'){
+        const plateau=.5*(Math.tanh((d-.055)/.012)-Math.tanh((d-.19)/.012));
+        if(kind==='stup')value+=(frontal?.10*gain*Math.cos(rad(-60)-b):({V1:.10,V2:.20,V3:.20,V4:.18,V5:.05,V6:0}[lead.id]||0))*plateau;
+        if(kind==='stdown')value+=(frontal?-.14*lateral:({V1:0,V2:0,V3:-.05,V4:-.14,V5:-.16,V6:-.14}[lead.id]||0))*plateau;
+        if(kind==='nonspecific'&&(lead.id==='V4'||lead.id==='V5'||lead.id==='V6'))value-=.05*plateau;
+      }
+      value+=pWave+qrs+tWave;
+    }
+    if(kind==='af'){
+      const cycles=Math.max(1,Math.round(rhythm.period*5));value+=(frontal?atrial:.8)*(.018*Math.sin(2*Math.PI*cycles*t/rhythm.period)+.011*Math.sin(2*Math.PI*(cycles+3)*t/rhythm.period));
+    }
+    if(kind==='flutter'){
+      const phase=((t/(rr/4))%1+1)%1,saw=2*phase-1;
+      value+=(frontal?-.12*gain*Math.cos(rad(90)-b):(lead.id==='V1'?.12:-.04))*saw;
+    }
+    return value;
+  }
   function voltage(lead,t){
-    const rr=60/state.hr;let d=((t+rr/2)%rr+rr)%rr-rr/2;
-    const p=gauss(d,-Math.min(.18,rr*.30),.027),q=gauss(d,-.027,.009),r=gauss(d,0,.011),s=gauss(d,.026,.012),tw=gauss(d,Math.min(.28,rr*.40),Math.min(.065,rr*.105));
-    let v;
-    if(lead.angle!==undefined){
-      const a=rad(state.angle),b=rad(lead.angle),proj=Math.cos(a-b);
-      // Components are shared by all frontal leads; augmented lead gain is sqrt(3)/2.
-      const gain=lead.id.startsWith('aV')?Math.sqrt(3)/2:1;
-      v=gain*(proj*(1.05*r-.12*q-.18*s)+Math.cos(rad(45)-b)*(.12*p+.28*tw));
-    } else {v=.09*p-.08*q+lead.r*r-lead.s*s+.22*tw;}
-    return v;
+    if(!['III','aVR','aVL','aVF'].includes(lead.id))return rawVoltage(lead,t);
+    const one=rawVoltage(leads[0],t),two=rawVoltage(leads[1],t);
+    return lead.id==='III'?two-one:lead.id==='aVR'?-(one+two)/2:lead.id==='aVL'?one-two/2:two-one/2;
   }
   // Compute one cycle per lead only when its physiological controls change.
   // During animation we interpolate these values instead of recomputing
   // thousands of exponential functions on every frame.
-  const lookupSize=1024, lookup=new Map();let lookupKey='';
+  let lookupSize=1024;const lookup=new Map();let lookupKey='';
   function updateLookup(){
-    const key=`${state.hr}:${state.angle}`;if(key===lookupKey)return;
-    const rr=60/state.hr;
-    leads.forEach(lead=>{const values=new Float32Array(lookupSize+1);for(let i=0;i<=lookupSize;i++)values[i]=voltage(lead,i*rr/lookupSize);lookup.set(lead.id,values)});
+    const key=`${state.hr}:${state.angle}:${state.scenario}`;if(key===lookupKey)return;
+    rhythm=buildRhythm();lookupSize=rhythm.events.length>1?3072:1024;
+    leads.forEach(lead=>lookup.set(lead.id,new Float32Array(lookupSize+1)));
+    for(let i=0;i<=lookupSize;i++){
+      const t=i*rhythm.period/lookupSize,one=rawVoltage(leads[0],t),two=rawVoltage(leads[1],t);
+      const front=[one,two,two-one,-(one+two)/2,one-two/2,two-one/2];
+      for(let j=0;j<6;j++)lookup.get(leads[j].id)[i]=front[j];
+      for(let j=6;j<leads.length;j++)lookup.get(leads[j].id)[i]=rawVoltage(leads[j],t);
+    }
     lookupKey=key;
   }
   function sample(lead,t){
-    const rr=60/state.hr,phase=((t%rr)+rr)%rr/rr*lookupSize,index=Math.floor(phase),fraction=phase-index,values=lookup.get(lead.id);
+    const period=rhythm.period,phase=((t%period)+period)%period/period*lookupSize,index=Math.floor(phase),fraction=phase-index,values=lookup.get(lead.id);
     let result=values[index]+fraction*(values[index+1]-values[index]);
     if(state.artifact)result+=.045*Math.sin(2*Math.PI*1.3*t)+.025*Math.sin(2*Math.PI*17*t);
     return result;
@@ -130,15 +220,16 @@ button:hover{filter:brightness(1.06)}button:active{box-shadow:0 1px 0 #263e53}
   const miniPaths=miniCards.map(card=>card.querySelector('path'));
   let miniKey='';
   function drawMain(){draw($('mainTrace'),leads.find(l=>l.id===state.lead));}
-  function drawMinis(){const key=`${state.hr}:${state.angle}:${state.speed}:${state.artifact}`;if(key===miniKey)return;miniPaths.forEach((path,i)=>{let commands=[];for(let x=0;x<=200;x+=1){const t=(x-200)/(2*state.speed),y=42-sample(leads[i],t)*20;commands.push(`${x===0?'M':'L'}${x} ${y.toFixed(2)}`)}path.setAttribute('d',commands.join(' '))});miniKey=key;}
+  function drawMinis(){const key=`${state.hr}:${state.angle}:${state.speed}:${state.artifact}:${state.scenario}`;if(key===miniKey)return;miniPaths.forEach((path,i)=>{let commands=[];for(let x=0;x<=200;x+=1){const t=(x-200)/(2*state.speed),y=42-sample(leads[i],t)*20;commands.push(`${x===0?'M':'L'}${x} ${y.toFixed(2)}`)}path.setAttribute('d',commands.join(' '))});miniKey=key;}
   function drawAll(){updateLookup();drawMain();drawMinis();}
-  $('angle').addEventListener('input',e=>{state.angle=Number(e.target.value);updateUI()});$('hr').addEventListener('input',e=>{state.hr=Number(e.target.value);updateUI()});
+  let controlUpdatePending=false;function scheduleControlUpdate(){if(controlUpdatePending)return;controlUpdatePending=true;requestAnimationFrame(()=>{controlUpdatePending=false;updateUI()})}
+  $('angle').addEventListener('input',e=>{state.angle=Number(e.target.value);scheduleControlUpdate()});$('hr').addEventListener('input',e=>{state.hr=Number(e.target.value);scheduleControlUpdate()});
   document.querySelectorAll('[data-hr]').forEach(b=>b.addEventListener('click',()=>{state.hr=Number(b.dataset.hr);$('hr').value=state.hr;updateUI()}));
   document.querySelectorAll('[data-speed]').forEach(b=>b.addEventListener('click',()=>{state.speed=Number(b.dataset.speed);updateUI()}));
   $('play').addEventListener('click',()=>{if(state.cycleDone){state.cycleDone=false;state.cycleProgress=0;}state.running=true;updateUI()});
   $('pause').addEventListener('click',()=>{state.running=false;updateUI()});
   $('loop').addEventListener('click',()=>{state.loop=!state.loop;state.cycleProgress=0;state.cycleDone=false;updateUI()});
-  $('reset').addEventListener('click',()=>{Object.assign(state,{lead:'II',angle:60,hr:70,speed:25,running:true,time:0,artifact:false,loop:true,cycleProgress:0,cycleDone:false});$('angle').value=60;$('hr').value=70;$('artifact').checked=false;updateUI()});$('artifact').addEventListener('change',e=>{state.artifact=e.target.checked;drawAll()});window.addEventListener('resize',drawAll);
+  $('reset').addEventListener('click',()=>{Object.assign(state,{lead:'II',angle:60,hr:70,speed:25,scenario:'normal',running:true,time:0,artifact:false,loop:true,cycleProgress:0,cycleDone:false});$('angle').value=60;$('hr').value=70;$('artifact').checked=false;updateUI()});$('artifact').addEventListener('change',e=>{state.artifact=e.target.checked;drawAll()});window.addEventListener('resize',drawAll);
   let hadNativeFullscreen=false;
   function setFocusMode(on){document.body.classList.toggle('focus-mode',on);$('focus').textContent=on?'Sair da tela cheia':'⛶ Tela cheia';$('focus').setAttribute('aria-pressed',String(on));requestAnimationFrame(drawAll);}
   $('focus').addEventListener('click',()=>{const on=!document.body.classList.contains('focus-mode');setFocusMode(on);if(on&&typeof document.documentElement.requestFullscreen==='function'){try{const p=document.documentElement.requestFullscreen();if(p&&typeof p.then==='function')p.then(()=>{if(!document.body.classList.contains('focus-mode')&&document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen().catch(()=>{});}).catch(()=>{});}catch(_){/* A visualização ampliada permanece disponível. */}}else if(!on&&document.fullscreenElement&&document.exitFullscreen){const p=document.exitFullscreen();if(p&&typeof p.catch==='function')p.catch(()=>{});}});
