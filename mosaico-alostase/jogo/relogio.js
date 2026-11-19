@@ -32,3 +32,10 @@ export function relogio(h, legenda = '') {
       <span class="astro" style="left:${(a.x / 200) * 100}%;top:${(a.y / 40) * 100}%"></span>
     </div>${legenda ? `<span class="rel-leg">${legenda}</span>` : ''}</div>`;
 }
+
+/** O céu da página segue o relógio mostrado na tela; sem relógio, volta ao fundo escuro neutro. */
+export function ligarCeu(tela) {
+  const atualiza = () => { const el = tela.querySelector('.relogio'); if (el) document.body.dataset.fase = el.dataset.fase; else delete document.body.dataset.fase; };
+  new MutationObserver(atualiza).observe(tela, { childList: true, subtree: true });
+  atualiza();
+}

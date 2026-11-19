@@ -78,3 +78,10 @@ Variáveis (3 de cerca de 20); contas de Estresse, Energia e Treino, juros, cobr
 - Glicemia com relógio fora de fase: +6% (Scheer 2009), linear de 3 a 6 h de deslocamento; só no motor (as rotinas do jogo ainda não passam deslocamento). 54 testes.
 - Seguem abertos: sala ao vivo (Firebase próprio), personagem 3D, ícones 3D, semanas 2 a 8, leitura integral de Degaute, Panissa, van Loon, Gollnick, Iwayama e Salgin.
 - Ficha 12 (Treino: aptidão-fadiga, só resumos): forma fechada, números não (τ2 de 1,9 a 16,8 dias entre dois ajustes). Conta de Treino fica sem número no motor.
+
+## 19/11/2026: sala de aula (primeira versão)
+
+- Pasta `sala/`: entrada no padrão do Comitê (Participar com código | Conduzir como professor com cadeado roxo, abrir telão, simulador), `/sala/simulador/` (telão em cima, turma embaixo, tela cheia), professor, telão e aluno; manual de entrada com "Entendi" e "i".
+- Rodada: o professor escolhe a rotina e 3, 5 ou 8 perguntas; a turma estima cortisol ou glicemia; o telão revela distribuição (só com 5 ou mais respostas), faixa e raciocínio; fim mostra acertos por pergunta. Mesmas perguntas e pontuação do Prognóstico.
+- Transporte: cópia própria do usado no Vila Ética, sobre o Firebase do Comitê (decisão minha, igual à da Vila). Testado só com o banco de teste entre abas (`SALA_FALSA`); **falta testar com o Firebase real, o login Google e o telão na TV**.
+- Cadeado provisório em SVG (prompt em ICONES-prompts-3D.md). Sem pontos por nome no telão.

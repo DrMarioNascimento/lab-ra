@@ -5,7 +5,8 @@
   --cort: #f59e0b; --glic: #38bdf8; --font: "Sora", system-ui, sans-serif; --mono: "JetBrains Mono", ui-monospace, monospace;
 }
 * { box-sizing: border-box; }
-html, body { margin: 0; background: var(--bg); color: var(--tx); font-family: var(--font); -webkit-font-smoothing: antialiased; }
+html { background: var(--bg); }
+html, body { margin: 0; color: var(--tx); font-family: var(--font); -webkit-font-smoothing: antialiased; }
 body { min-height: 100dvh; display: flex; flex-direction: column; }
 h1, h2, h3 { margin: 0; letter-spacing: -0.01em; }
 h2 { font-size: 19px; } h3 { font-size: 15px; }
@@ -193,3 +194,18 @@ dialog ol { padding-left: 20px; line-height: 1.5; font-size: 15px; } dialog li {
 .relogio[data-fase="noite"] .astro { background: radial-gradient(circle at 35% 30%, #fff 0%, #e8ecff 50%, #b9c2f0 100%); border-color: #26355f;
   box-shadow: 0 0 0 5px rgba(140,150,230,.3), 0 0 16px 4px rgba(170,180,255,.7); }
 .rel-leg { flex-basis: 100%; font-size: 12px; opacity: .85; }
+
+/* Céu da página: acompanha a hora mostrada no relógio (tons escuros, para o texto continuar legível) */
+.ceu { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+.ceu span { position: absolute; inset: 0; opacity: 0; transition: opacity 1.4s ease; }
+body[data-fase="alvorada"] .ceu .f-alvorada, body[data-fase="manha"] .ceu .f-manha, body[data-fase="tarde"] .ceu .f-tarde,
+body[data-fase="poente"] .ceu .f-poente, body[data-fase="noite"] .ceu .f-noite { opacity: 1; }
+.ceu .f-alvorada { background: radial-gradient(120% 50% at 50% 104%, rgba(247,185,130,.55) 0%, rgba(247,185,130,0) 62%), linear-gradient(#24385f 0%, #3b4f78 45%, #6a5a73 100%); }
+.ceu .f-manha { background: radial-gradient(90% 45% at 80% -6%, rgba(255,240,190,.38) 0%, rgba(255,240,190,0) 62%), linear-gradient(#1d4a78 0%, #2a6598 55%, #3a7ba8 100%); }
+.ceu .f-tarde { background: radial-gradient(80% 45% at 50% -8%, rgba(255,245,210,.3) 0%, rgba(255,245,210,0) 60%), linear-gradient(#1b4f86 0%, #2b6ca3 60%, #4684ae 100%); }
+.ceu .f-poente { background: radial-gradient(120% 50% at 50% 106%, rgba(240,140,90,.6) 0%, rgba(240,140,90,0) 62%), linear-gradient(#2c3a6b 0%, #5a4a77 55%, #8a5a6a 100%); }
+.ceu .f-noite { background: linear-gradient(#070f24 0%, #0d1a3a 60%, #14264d 100%); }
+.ceu .f-noite::before { content: ""; position: absolute; inset: 0; opacity: .8;
+  background-image: radial-gradient(1.5px 1.5px at 12% 18%, #fff, transparent), radial-gradient(1px 1px at 31% 42%, #dfe6ff, transparent), radial-gradient(1.5px 1.5px at 58% 12%, #fff, transparent),
+    radial-gradient(1px 1px at 76% 33%, #dfe6ff, transparent), radial-gradient(1.5px 1.5px at 90% 14%, #fff, transparent), radial-gradient(1px 1px at 44% 68%, #dfe6ff, transparent), radial-gradient(1px 1px at 8% 76%, #fff, transparent), radial-gradient(1px 1px at 84% 80%, #dfe6ff, transparent); }
+@media (prefers-reduced-motion: reduce) { .ceu span { transition: none; } }

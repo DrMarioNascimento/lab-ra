@@ -1,0 +1,86 @@
+/* Mosaico Alostase · sala de aula: entrada, professor, telão e celular do aluno (mesmo fluxo do Comitê, paleta do Alostase) */
+body { background: transparent; }
+.ent-topo { display: flex; align-items: center; gap: 12px; padding: calc(10px + env(safe-area-inset-top)) 16px 10px; background: #0a182b; box-shadow: 0 4px 0 #050d18, 0 8px 18px rgba(0,0,0,.4); }
+.ent-kicker, .ent-rot { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--tx2); margin: 0; }
+.ent-titulo { font-size: 18px; font-weight: 800; margin: 0; }
+.ent-wrap { width: 100%; max-width: 980px; margin: 0 auto; padding: 18px 14px 28px; display: flex; flex-direction: column; gap: 16px; }
+.ent-frase { color: var(--tx2); max-width: 62ch; margin: 0; }
+.ent-grade { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.ent-card { display: flex; flex-direction: column; gap: 12px; padding: 18px; border-radius: 18px; background: linear-gradient(180deg, #1b3a63, #10223b); border: 1px solid rgba(160,200,255,.18); box-shadow: 0 5px 0 #040b17, inset 0 1px 0 rgba(255,255,255,.1); }
+.ent-card.escuro { background: linear-gradient(180deg, #14243d, #0b1627); }
+.ent-card h2 { font-size: 22px; }
+.ent-cod, .ent-nome { width: 100%; font: inherit; color: var(--tx); background: #07111f; border: 2px solid var(--line); border-radius: 12px; padding: 12px 14px; box-shadow: inset 0 2px 4px rgba(0,0,0,.5); }
+.ent-cod { font-family: var(--mono); font-weight: 700; font-size: 28px; letter-spacing: .3em; text-align: center; text-transform: uppercase; }
+.ent-erro { color: var(--bad); min-height: 1.2em; margin: 0; font-size: 14px; }
+.ent-aviso, .ent-link { color: var(--tx2); font-size: 13px; margin: 0; }
+.ent-link { text-decoration: underline; text-align: center; padding: 8px; }
+.btn.professor { --c: #7c3aed; --c2: #4c1d95; padding: 10px 16px; }
+.btn.contorno { --c: #1e3a5f; --c2: #0c1a2c; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
+.btn.warn { --c: #d97706; --c2: #92400e; }
+a.btn { display: block; text-align: center; text-decoration: none; }
+.entrada-prof { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 17px; }
+.btn.professor small { display: block; font-weight: 500; font-size: 12px; opacity: .92; margin-top: 2px; }
+.cadeado { filter: drop-shadow(0 2px 0 rgba(0,0,0,.35)); }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.faint { color: #7d93ab; font-size: 13px; }
+.pro-faixa { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.pro-qr { width: 150px; height: 150px; background: #fff; border-radius: 14px; padding: 8px; box-shadow: 0 4px 0 #040b17; }
+.pro-qr svg { width: 100%; height: 100%; display: block; }
+.pro-cod { font-size: 44px; font-weight: 700; letter-spacing: .22em; line-height: 1; }
+.campo { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color: var(--tx2); margin: 8px 0; }
+.campo select { font: inherit; color: var(--tx); background: #07111f; border: 2px solid var(--line); border-radius: 12px; padding: 12px; min-height: 48px; }
+
+/* celular do aluno */
+.so-aluno main, .al, .al-entrada { max-width: 560px; margin: 0 auto; width: 100%; }
+.al-entrada { padding: 0 12px 24px; display: flex; flex-direction: column; gap: 14px; }
+.al { padding: 10px 12px 24px; display: flex; flex-direction: column; gap: 12px; }
+.al-topo { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.al .valor { font-size: 34px; text-align: center; margin: 10px 0 2px; }
+.al input[type=range] { width: 100%; height: 44px; margin: 6px 0 12px; accent-color: #38bdf8; }
+.al .grande { font-size: 42px; margin: 6px 0; } .al .grande small { font-size: 15px; color: var(--tx2); }
+.al .prog { margin: 0; text-align: center; font-size: 13px; }
+.racio { padding-left: 18px; margin: 8px 0 0; color: var(--tx2); font-size: 14px; line-height: 1.45; }
+.manual p { color: var(--tx2); }
+
+/* telão: ocupa a tela toda; os tamanhos acompanham a largura do próprio telão */
+.telao { position: relative; container-type: size; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 14px; color: var(--tx); background: linear-gradient(180deg, #0a1730, #112746); }
+.so-telao .telao { width: 100vw; height: 100dvh; aspect-ratio: auto; border-radius: 0; }
+.telao.cheio { position: fixed; inset: 0; width: 100vw; height: 100dvh; aspect-ratio: auto; z-index: 99; border-radius: 0; }
+.telao:fullscreen { width: 100vw; height: 100vh; aspect-ratio: auto; border-radius: 0; }
+.fsbtn { position: absolute; top: 1.2cqw; right: 1.2cqw; z-index: 5; opacity: 0; transition: opacity .25s; }
+.telao.mostra-fs .fsbtn, .fsbtn:focus-visible { opacity: 1; }
+.tl { height: 100%; display: flex; flex-direction: column; padding: 2cqw 3cqw; gap: 1.6cqw; font-size: 1.7cqw; }
+.tl-topo { display: flex; gap: 2cqw; align-items: baseline; font-size: 1.5cqw; color: var(--tx2); } .tl-topo b { color: var(--tx); font-size: 1.9cqw; margin-right: auto; }
+.tl h1 { font-size: 3.6cqw; line-height: 1.1; margin: 0; }
+.tl-centro { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 1.2cqw; }
+.tl-cod { font-size: 10cqw; font-weight: 700; letter-spacing: .2em; margin: 0; padding-left: .2em; }
+.tl-sub { font-size: 2cqw; color: var(--tx2); margin: 0; }
+.tl-grade { flex: 1; min-height: 0; display: grid; grid-template-columns: 38% 1fr; gap: 3cqw; }
+.tl-esq { display: flex; flex-direction: column; gap: 1.2cqw; min-height: 0; overflow: hidden; }
+.tl-esq .relogio { font-size: 1.7cqw; } .tl-esq .rel-hora { font-size: 4cqw; }
+.tl-esq .itens { font-size: 1.35cqw; margin: 0; padding: 0; } .tl-esq .linha { margin-top: .4cqw; }
+.tl-dir { display: flex; flex-direction: column; gap: 1.3cqw; min-width: 0; min-height: 0; overflow: hidden; }
+.tl-prog { color: var(--tx2); font-size: 1.6cqw; margin: 0; }
+.tl-cont { font-size: 3cqw; margin: 2cqw 0 0; } .tl-cont b { font-size: 6cqw; color: var(--ok); }
+.tl-dist { width: 100%; max-height: 24cqw; }
+.tl-barra { fill: #38bdf8; } .tl-faixa { fill: rgba(52,211,153,.2); } .tl-esperado { stroke: #34d399; stroke-width: 5; } .tl-base { stroke: #4b647e; stroke-width: 2; }
+.tl-n { fill: var(--tx); font: 700 26px var(--mono); } .tl-eixo { fill: var(--tx2); font: 500 24px var(--mono); }
+.tl-leg { font-size: 1.4cqw; color: var(--tx2); margin: 0; } .chip { display: inline-block; width: 1.4cqw; height: 1.4cqw; border-radius: 3px; vertical-align: -.2cqw; } .chip.faixa { background: rgba(52,211,153,.5); } .chip.esp { background: #34d399; }
+.tl-aviso { font-size: 1.8cqw; color: var(--warn); }
+.tl-racio { margin: 0; padding-left: 2cqw; color: var(--tx2); font-size: 1.5cqw; line-height: 1.4; }
+.tl-lista { width: min(60cqw, 100%); text-align: left; } .tl-lista h3 { font-size: 1.9cqw; margin-bottom: .8cqw; } .tl-lista ul { list-style: none; margin: 0; padding: 0; }
+.tl-lista li { display: flex; justify-content: space-between; gap: 2cqw; font-size: 1.7cqw; padding: .6cqw 0; border-bottom: 1px solid var(--line); }
+.tl-qr { position: absolute; left: 3cqw; bottom: 3cqw; width: 14cqw; height: 14cqw; z-index: 4; }
+.tl-entrada { min-height: 100dvh; display: grid; place-items: center; padding: 16px; }
+
+/* simulador de aula: telão em cima, turma embaixo */
+.sim-topo { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding: 12px 16px; max-width: 1800px; margin: 0 auto; width: 100%; }
+.sim { width: 100%; max-width: 1800px; margin: 0 auto; padding: 0 16px 24px; display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr) 320px; align-items: start; }
+.sim .turma { grid-column: 1 / -1; }
+.turma .phones { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; margin-top: 10px; }
+.ph-wrap { display: flex; flex-direction: column; gap: 6px; }
+.ph-cap { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+.ph-cap b { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ph-frame { border: 3px solid #2a4a6e; border-radius: 22px; background: #07111f; overflow: auto; height: 520px; box-shadow: 0 5px 0 #040b17; }
+.fundo-nota { font-size: 12px; color: #7d93ab; margin: 6px 2px 0; }
+@media (max-width: 980px) { .sim { grid-template-columns: 1fr; } }

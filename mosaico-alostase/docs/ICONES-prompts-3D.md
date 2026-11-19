@@ -56,3 +56,8 @@
 - Se o gerador errar mãos, rosto ou texto, peça de novo: o ícone não leva texto nem pessoas detalhadas.
 - Manter o mesmo estilo entre todos: se um sair muito diferente, gerar de novo com o mesmo prompt de estilo.
 - Todos os botões e cards seguem o padrão de profundidade 3D (volume e reação ao clique); os ícones entram dentro deles.
+
+
+## Sala de aula (18/11/2026)
+
+- **Cadeado do professor** (entrada roxa, "Só o Professor tem a chave"): hoje é um desenho provisório em SVG (`sala/index.html` e `sala/modo-professor.js`). Prompt: cadeado fechado em 3D, corpo roxo violeta com brilho suave, argola prateada clara, buraco da fechadura escuro, fundo transparente, mesmo estilo comum dos demais ícones.

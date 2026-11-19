@@ -89,3 +89,8 @@ Swain e Leutholtz, 1997: 63 adultos em bicicleta, teste máximo. %FC de reserva 
 - Swain e colegas, 1998. Relationship between % heart rate reserve and % VO2 reserve in treadmill exercise. Med Sci Sports Exerc 30:318-321.
 - Brawner, Keteyian, Ehrman, 2002. The relationship of heart rate reserve to VO2 reserve in patients with heart disease. Med Sci Sports Exerc.
 - ESC/ESH 2018, limites de monitorização ambulatorial (via https://link.springer.com/article/10.1007/s40292-022-00552-3).
+
+
+## Conferência de 18/11/2026 (Degaute 1991)
+
+Só o resumo está aberto (texto completo não achado): 31 homens jovens saudáveis, 4 noites de sono polissonográfico, pressão e frequência medidas a cada 10 minutos por 24 h; o aumento já existe antes de acordar; deitar e dormir explicam 65 a 75% da queda noturna da pressão e só 50% da queda da frequência. Continua [resumo]: as amplitudes (19,9% / 14,1% / 10,9%) vêm de leitura anterior e não foram reconferidas aqui. Só homens: mulheres jovens sem dado lido.

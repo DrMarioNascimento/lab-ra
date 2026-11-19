@@ -5,11 +5,13 @@ import {createHash} from 'node:crypto';
 import {fileURLToPath} from 'node:url';
 const root=new URL('../',import.meta.url);
 const page=readFileSync(new URL('bancadas.html',root),'utf8');
-test('biblioteca apresenta oito cards e duas ilustrações sem links',()=>{
- assert.equal((page.match(/class="card"/g)||[]).length,8);
+test('biblioteca apresenta nove cards e duas ilustrações sem links',()=>{
+ assert.equal((page.match(/class="card"/g)||[]).length,9);
  assert.equal((page.match(/class="emblema"/g)||[]).length,2);
  const emblemas=page.slice(page.indexOf('<div class="emblemas"'),page.indexOf('<div class="cards"'));
  assert.doesNotMatch(emblemas,/<a\b/);
+ assert.ok(page.includes('id="cinco-minutos"'));
+ assert.ok(page.includes('href="cinco-minutos/"'));
  assert.match(page,/Capítulo 1: O malote murcho/);
  assert.match(page,/Prólogo: Agência 0688/);
  assert.match(page,/Aprender pesquisa fazendo pesquisa/);
