@@ -84,6 +84,7 @@ export const P = {
     repousoDiurno: { valor: 54.5, dp: 8.0, leitura: 'completo', fonte: 'Speed e colegas 2023', nota: 'frequência de repouso de dia, pulseira, 433 pessoas ativas de 18 a 65 anos (média 35,4), sem trabalhadores noturnos' },
     repousoNoturno: { valor: 50.5, dp: 7.6, leitura: 'completo', fonte: 'Speed e colegas 2023' },
     reservaVO2: { leitura: 'resumo', fonte: 'Swain e Leutholtz 1997 (e 1998)', nota: '%FC de reserva ≈ %VO2 de reserva (inclinação 1,00, intercepto −0,1 em 63 adultos), com contraponto na ficha 08' },
+    perfilPadrao: { idade: 21, grupo: 'ativo', vo2max: 45, leitura: 'modelagem', nota: 'escolha deste projeto para o jovem do jogo; a fração da reserva muda pouco com o VO2máx (a 80% do VO2máx: 0,78 com 35 e 0,79 com 55 ml/kg/min)' },
     vo2Repouso: { valor: 3.5, leitura: 'modelagem', nota: 'convenção de 1 MET (ml/kg/min); não vem de artigo lido aqui' },
   },
 
