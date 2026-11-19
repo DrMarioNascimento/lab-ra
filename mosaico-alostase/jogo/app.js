@@ -1,6 +1,6 @@
 // Mosaico Alostase · tela do modo Prognóstico.
 import { ROTINAS } from './rotinas.js';
-import { relogio } from './relogio.js';
+import { relogio, ligarCeu } from './relogio.js';
 import { novaPartida, pontuar, VARIAVEIS, TEMPOS, hhmm, momentoGlicemia, rotuloGlicemia } from './prognostico.js';
 import { leitura, custoDoDia } from './rotina-montada.js';
 import { $, fmt, esc, linhaDoTempo, listaDaRotina, grafico, cartaoCusto, CORV } from './ui.js';
@@ -9,6 +9,7 @@ import { SEMANAS } from './semanas.js';
 import { jogarSemana } from './prog-semana.js';
 
 const tela = $('#tela'), placar = $('#placar'), sub = $('#sub');
+ligarCeu(tela);
 const E = { tempo: 1, rotina: 'sorteio', escala: 'dia', semana: 'sorteio', partida: null, i: 0, respostas: [] };
 
 // manual: abre na entrada, fica no "i"
