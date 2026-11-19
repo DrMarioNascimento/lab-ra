@@ -1,1 +1,1 @@
-{ "name": "mosaico-alostase", "private": true, "type": "module", "scripts": { "test": "node --test motor/*.test.js jogo/*.test.js" } }
+{ "name": "mosaico-alostase", "private": true, "type": "module", "scripts": { "test": "node --test motor/*.test.js jogo/*.test.js sala/*.test.js" } }

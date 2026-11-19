@@ -30,6 +30,9 @@ function telaModos() {
     <section class="card modo"><div class="rotulo">Modo Diagnóstico</div><h2>Você monta a rotina, o jogo mostra</h2>
       <p class="muted">Escolha sono, refeições, trabalho, treino e noite. Veja o esperado, hora a hora.</p>
       <button class="btn block" id="m-diag">Abrir o Diagnóstico</button></section>
+    <section class="card modo"><div class="rotulo">Sala de aula</div><h2>Com telão e a turma nos celulares</h2>
+      <p class="muted">O professor abre a sala; a turma estima no celular e o telão revela onde a turma acertou.</p>
+      <a class="btn sec block" href="sala/index.html" style="text-align:center;text-decoration:none;display:block;padding-top:14px">Entrar na sala de aula</a></section>
     <p class="aviso">O organismo do jogo é um modelo médio de adulto saudável. Não é o seu corpo e não serve de diagnóstico clínico.</p>`;
   $('#m-prog').onclick = telaInicio;
   $('#m-diag').onclick = () => { sub.textContent = 'Modo Diagnóstico'; telaEntradaDiag(tela, telaModos); };

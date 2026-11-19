@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Sala de aula · Mosaico Alostase</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../jogo/estilo.css?v=9">
+<link rel="stylesheet" href="sala.css?v=1">
+</head>
+<body>
+<div class="ceu" aria-hidden="true"><span class="f-alvorada"></span><span class="f-manha"></span><span class="f-tarde"></span><span class="f-poente"></span><span class="f-noite"></span></div>
+<header class="ent-topo"><span class="selo">MA</span><div><div class="ent-kicker">Sala de jogo</div><div class="ent-titulo">Mosaico Alostase</div></div></header>
+<main class="ent-wrap">
+  <p class="ent-frase">O mesmo dia, em horas diferentes, encontra um corpo diferente. A turma estima o cortisol e a glicemia de uma rotina, hora a hora, e o telão revela onde a turma acertou.</p>
+  <div class="ent-grade">
+    <div class="ent-card"><p class="ent-rot">Participar</p><h2>Entrar com o código</h2>
+      <p class="muted" style="margin:0">Digite o código que aparece no telão. Não precisa de cadastro.</p>
+      <input class="ent-cod" id="cod" maxlength="5" placeholder="CÓDIGO" autocomplete="off" autocapitalize="characters" aria-label="Código da sala">
+      <button class="btn block" id="entrar" disabled>Entrar</button></div>
+    <div class="ent-card escuro"><p class="ent-rot">Conduzir</p><h2>Professor</h2>
+      <p class="muted" style="margin:0">Crie a sala e conduza pelo celular. No PC ou na TV da sala, abra o telão com o código.</p>
+      <a class="btn professor block" href="professor/index.html"><span class="entrada-prof"><svg class="cadeado" viewBox="0 0 36 36" width="34" height="34" aria-hidden="true"><path d="M10 16v-4a8 8 0 0 1 16 0v4" fill="none" stroke="#ddd6fe" stroke-width="3.5" stroke-linecap="round"/><rect x="6" y="15" width="24" height="17" rx="4" fill="#a78bfa"/><rect x="6" y="15" width="24" height="17" rx="4" fill="none" stroke="#4c1d95" stroke-width="1.5"/><circle cx="18" cy="23" r="2.6" fill="#4c1d95"/></svg>Entrar como Professor</span><small>Só o Professor tem a chave</small></a>
+      <a class="btn contorno block" href="telao/index.html">Abrir telão</a>
+      <a class="ent-link" href="simulador/index.html">Simulador de aula (testar no PC sem a turma)</a></div>
+  </div>
+  <a class="ent-link" href="../index.html">Jogar sozinho (Prognóstico e Diagnóstico)</a>
+  <p class="faint">Prof. Mário César Nascimento, PhD</p>
+</main>
+<script>
+(function () {
+  var c = document.getElementById("cod"), b = document.getElementById("entrar");
+  function limpa() { c.value = c.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 5); b.disabled = c.value.length < 5; }
+  function ir() { if (c.value.length >= 5) location.href = "aluno/index.html?sala=" + c.value; }
+  c.addEventListener("input", limpa); c.addEventListener("keydown", function (e) { if (e.key === "Enter") ir(); }); b.addEventListener("click", ir);
+  var q = new URLSearchParams(location.search).get("sala"); if (q) location.replace("aluno/index.html?sala=" + encodeURIComponent(q));
+})();
+</script>
+</body>
+</html>
