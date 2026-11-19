@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1721">
+<title>Museu em 3D · Loop</title>
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.1.0/model-viewer.min.js"></script>
+<style>
+:root{color-scheme:dark;--gold:#e7c18b;--paper:#eaf0eb}*{box-sizing:border-box}body{margin:0;background:#071019;color:var(--paper);font:16px/1.5 system-ui,sans-serif}header{display:flex;align-items:center;gap:16px;padding:14px clamp(15px,4vw,50px);background:#101c27;border-bottom:1px solid #d8b67b44}header a{color:#e7c18b;text-decoration:none;font-weight:700}header span{font-size:.8rem;color:#aab8b9}main{max-width:1500px;margin:auto;padding:20px clamp(15px,4vw,50px) 45px}h1{font:400 clamp(2rem,4vw,3.5rem)/1.05 Georgia,serif;margin:.2em 0}.eyebrow{color:#e7c18b;font-size:.72rem;letter-spacing:.16em;font-weight:700;text-transform:uppercase;margin:0}.lead{max-width:820px;color:#b7c6c4;margin:10px 0 20px}.layout{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:18px}.stage{position:relative;border:1px solid #d5b78155;border-radius:16px;background:radial-gradient(ellipse at 50% 35%,#3a5255,#172633 55%,#101c27);box-shadow:inset 0 1px #ffffff1f,0 15px 35px #0007;overflow:hidden;min-width:0}model-viewer{display:block;width:100%;height:min(70vh,720px);min-height:440px;--poster-color:transparent;touch-action:pan-y}.status{position:absolute;top:15px;left:16px;margin:0;padding:7px 10px;border-radius:8px;background:#08121dde;color:#e7eee8;font-size:.82rem;pointer-events:none}.controls{position:absolute;left:15px;right:15px;bottom:15px;display:flex;flex-wrap:wrap;gap:9px;pointer-events:none}.btn{border:1px solid #e4c18a88;border-radius:10px;color:#f8eddb;background:linear-gradient(#354954,#192b37);box-shadow:inset 0 1px #fff3,0 4px #071018,0 10px 20px #0007;padding:11px 15px;font:700 .9rem system-ui;text-decoration:none;cursor:pointer;pointer-events:auto}.btn:hover{filter:brightness(1.14)}.btn:active{transform:translateY(2px)}.btn.gold{background:linear-gradient(#f2d5a3,#bf8f4d);color:#191b1b}.side{border:1px solid #ad9e7666;border-radius:16px;background:#12212b;padding:20px;box-shadow:inset 0 1px #fff2,0 12px 30px #0005}.side h2{font:400 1.7rem Georgia;margin:.15em 0}.side p,.note{font-size:.87rem;color:#b3c2c0}.room-list{display:grid;gap:8px;margin-top:15px}.room{border:1px solid #d4b77d44;border-radius:9px;padding:10px;text-align:left;background:linear-gradient(#273b47,#1a2a35);color:#edf1ea;font:600 .86rem system-ui;cursor:pointer}.room:hover,.room[aria-pressed=true]{border-color:#ebc888;color:#ffe3b1}.room:focus-visible,.btn:focus-visible,a:focus-visible{outline:3px solid #f4d59b;outline-offset:3px}.credits{font-size:.82rem;color:#aabbb8;border-top:1px solid #c4af8255;margin-top:22px;padding-top:15px}.credits a{color:#e2c48e}@media(max-width:800px){.layout{grid-template-columns:1fr}.side{order:2}.room-list{grid-template-columns:1fr 1fr}.stage model-viewer{height:58vh;min-height:350px}.stage .controls{position:static;padding:0 15px 16px}.status{top:10px}.btn{font-size:.85rem}header span{display:none}}@media(max-width:360px){.room-list{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><a href="../">← Voltar ao jogo</a><span>LAB-RA · LOOP</span></header>
+<main><p class="eyebrow">Um museu para investigar</p><h1>Explore a maquete</h1><p class="lead">Conheça os ambientes de um museu em miniatura. Arraste para girar, aproxime com dois dedos ou pela roda do mouse e selecione uma sala para focar. A maquete é uma bancada visual e ainda não controla as pistas do jogo.</p>
+<div class="layout"><section class="stage" aria-label="Visualização tridimensional do museu">
+<model-viewer id="museum" src="museu.glb" alt="Maquete de museu com onze ambientes, paredes abertas, vitrines e peças de exposição" ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" camera-controls touch-action="pan-y" camera-orbit="-38deg 58deg 1.9m" min-camera-orbit="auto 15deg 0.18m" max-camera-orbit="auto 88deg 5m" field-of-view="30deg" shadow-intensity="1" exposure="0.75">
+<button class="btn gold" slot="ar-button" id="enterAR">Ver na sua mesa em RA</button>
+</model-viewer><p class="status" id="status" role="status">Carregando a maquete…</p>
+<div class="controls"><button class="btn" type="button" id="reset">Vista geral</button><a class="btn" href="museu.glb" download>Baixar GLB</a></div>
+</section><aside class="side"><p class="eyebrow">11 espaços</p><h2>Ambientes</h2><p>Toque em um nome para aproximar a câmera. Gire e amplie para explorar.</p><div class="room-list" id="rooms"></div><p class="note">A RA depende do aparelho, do navegador e da permissão de câmera. Quando disponível, use o botão dourado na maquete.</p></aside></div>
+<div class="credits"><strong>Origem e licença.</strong> Maquete adaptada da arquitetura de <a href="https://github.com/SamG-Coder/ThreeMuseum" target="_blank" rel="noopener">ThreeMuseum</a>, de ThreeMuseum contributors, licença MIT. Inclui sete peças originais do mesmo projeto. A adaptação remove o teto, agrupa a arquitetura por materiais e ajusta a escala para maquete. <a href="CREDITOS.txt">Créditos e licença completos</a>. Não é um modelo de um museu real.</div>
+</main>
+<script>
+'use strict';
+const viewer=document.getElementById('museum'),status=document.getElementById('status'),list=document.getElementById('rooms');
+const rooms=[
+ ['Recepção',0,19],['Galeria do tempo',-21,-17],['Pátio de luz',0,-17],
+ ['Sala da diversidade',12.5,1],['Sala dos habitats',29.5,1],['Laboratório de formas',12.5,-15],
+ ['Sala das coleções',29.5,-15],['Galeria especial',12.5,-33],['Auditório',29.5,-33],
+ ['Ateliê de descobertas',29,21],['Área de descanso',-29,21]
+];
+rooms.forEach(([name,x,z])=>{const b=document.createElement('button');b.type='button';b.className='room';b.textContent=name;b.setAttribute('aria-pressed','false');b.addEventListener('click',()=>{document.querySelectorAll('.room').forEach(n=>n.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');viewer.setAttribute('camera-target',(x/96).toFixed(4)+'m 0.02m '+(z/96).toFixed(4)+'m');viewer.setAttribute('camera-orbit','-38deg 48deg 0.55m');});list.appendChild(b)});
+document.getElementById('reset').addEventListener('click',()=>{document.querySelectorAll('.room').forEach(n=>n.setAttribute('aria-pressed','false'));viewer.setAttribute('camera-target','auto auto auto');viewer.setAttribute('camera-orbit','-38deg 58deg 1.9m')});
+viewer.addEventListener('load',()=>status.textContent='Maquete carregada · arraste para girar');
+viewer.addEventListener('error',()=>status.textContent='Não foi possível carregar a maquete. Verifique a conexão e tente novamente.');
+setTimeout(()=>{if(!customElements.get('model-viewer'))status.textContent='O visualizador 3D não carregou. Verifique a conexão e recarregue a página.'},12000);
+</script>
+</body>
+</html>
