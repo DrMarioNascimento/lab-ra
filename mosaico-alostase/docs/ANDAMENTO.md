@@ -70,3 +70,10 @@ Variáveis (3 de cerca de 20); contas de Estresse, Energia e Treino, juros, cobr
 - Rodar `_Acervo\atualizar-catalogo.cmd` (Mosaico Card Viagens no Acervo).
 - Playtest de 28/11, principalmente do Mosaico Card; decisões do Mosaico Card aguardam o resultado.
 - LAB-RA: 7 testes do Dilema do Bonde em RA e de texturas já falhavam antes e não foram tocados.
+
+
+## 18/11/2026, 22h30: decisões tomadas com autorização total
+
+- Frequência cardíaca no esforço aparece na leitura do Diagnóstico (perfil: 21 anos, ativo, VO2máx 45; modelagem).
+- Glicemia com relógio fora de fase: +6% (Scheer 2009), linear de 3 a 6 h de deslocamento; só no motor (as rotinas do jogo ainda não passam deslocamento). 54 testes.
+- Seguem abertos: sala ao vivo (Firebase próprio), personagem 3D, ícones 3D, semanas 2 a 8, leitura integral de Degaute, Panissa, van Loon, Gollnick, Iwayama e Salgin.

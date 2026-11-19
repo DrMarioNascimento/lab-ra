@@ -42,6 +42,7 @@ export const P = {
     escalaCarbo: { leitura: 'modelagem', nota: 'subida proporcional aos gramas de carboidrato; só 50 g tem dado lido' },
     formaVolta:  { leitura: 'modelagem', nota: 'curva (t/tp)·exp(1 − t/tp); a volta em cerca de 3 h confere com tabela vista só em trecho' },
     madrugada:   { leitura: 'completo', fonte: 'Freckmann 2022', nota: 'sem fenômeno do alvorecer entre 1h e 5h: a base fica plana' },
+    desalinhamento: { aumento: 0.06, deslocMinH: 3, deslocPlenoH: 6, leitura: 'modelagem', fonte: 'Scheer 2009 (ficha 09)', nota: 'a glicemia média sobe 6% com o relógio fora de fase (n = 8, dias de 28 h); aplicado ao valor total, de forma linear entre 3 e 6 h de deslocamento. O tamanho da subida pós-prandial (café 99,9 → 132 mg/dL em 2 h) não entra: só a média tem número lido' },
     jejum:       { leitura: 'modelagem', nota: 'sem queda por horas sem comer: a glicemia do saudável é defendida (ponto de rigor do GDD)' },
   },
 
@@ -101,7 +102,7 @@ export const PENDENCIAS = [
   'Refeição sobre o cortisol: aumento observado depois do almoço, não quantificado.',
   'Exercício sobre a glicemia.',
   'Exercício com mais de 30 min ou acima de 80% do VO2máx sobre o cortisol.',
-  'Jornada noturna sobre a glicemia: Scheer 2009 lido (ficha 09: +6% na média, café 99,9 → 132 mg/dL em 2 h, n = 8, dias de 28 h); falta decidir a forma de entrar no motor.',
+  'Jornada noturna sobre a glicemia: entra só a média (+6% com o relógio 6 h fora de fase, Scheer 2009, n = 8, dias de 28 h); a subida pós-prandial maior (café 99,9 → 132 mg/dL em 2 h) ainda não entra.',
   'Sono curto sobre a sensibilidade à insulina no dia seguinte.',
   'Deslocamento do relógio depois de várias noites seguidas.',
   'Dívida de sono sobre o cortisol e a glicemia do dia seguinte: direção lida (Spiegel 1999, só resumo), sem número para o motor.',

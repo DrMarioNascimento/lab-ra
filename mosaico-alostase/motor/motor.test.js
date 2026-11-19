@@ -113,3 +113,13 @@ test('todo parâmetro numérico declara a leitura', () => {
   };
   anda(P, 'P');
 });
+
+test('glicemia: relógio 6 h fora de fase sobe 6%, 3 h ou menos não muda (Scheer 2009)', () => {
+  const base = { sono: [{ inicio: 23, fim: 7 }], refeicoes: [{ hora: 7.5, carboG: 50 }] };
+  const pico = (d) => Math.max(...simularDia({ ...base, deslocamentoRelogioH: d }).pontos.map((p) => p.glicemia));
+  const p0 = pico(0);
+  assert.equal(pico(3), p0);
+  assert.ok(Math.abs(pico(6) / p0 - 1.06) < 0.002);
+  assert.ok(Math.abs(pico(-12) / p0 - 1.06) < 0.002, 'simétrico e satura');
+  assert.ok(pico(4.5) > p0 && pico(4.5) < pico(6));
+});
