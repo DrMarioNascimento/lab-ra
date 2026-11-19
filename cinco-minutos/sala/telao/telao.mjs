@@ -64,10 +64,10 @@ function desenhar() {
       <div class="tl-card">${mapa()}</div>`;
     rod = `<span class="tl-aviso">${g.filter((p) => p.amb && p.ambVolta === v).length} de ${g.length} em um ambiente</span>`;
   } else if (e === 'between') {
-    meio = `<div class="tl-card tl-relogio"><div class="tl-volta">VOLTA ${v} DE 5</div><h1 class="tl-titulo">O tempo retornou.</h1><p class="tl-texto">Conversem sobre o que cada um descobriu.</p></div><div class="tl-card">${mapa()}</div>`;
+    meio = `<div class="tl-card tl-relogio"><div class="tl-volta">VOLTA ${v} DE 5</div><h1 class="tl-titulo">O tempo retornou.</h1><p class="tl-texto">Cada um relê o seu caderno. O Mestre abre a próxima etapa.</p></div><div class="tl-card">${mapa()}</div>`;
   } else if (e === 'final') {
     const n = g.filter((p) => p.resp).length;
-    meio = `<div class="tl-card tl-relogio"><h1 class="tl-titulo">Conclusão</h1><p class="tl-texto">Cada um envia a sua conclusão no celular.</p></div>
+    meio = `<div class="tl-card tl-relogio"><h1 class="tl-titulo">Conclusão</h1><p class="tl-texto">Cada um envia a sua própria conclusão no celular.</p></div>
       <div class="tl-card tl-relogio"><div class="tl-tempo">${n}/${g.length}</div><p class="tl-texto">enviaram</p></div>`;
   } else {
     const c = CASES[room.caso], com = g.filter((p) => p.resp);

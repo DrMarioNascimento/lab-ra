@@ -80,7 +80,7 @@ function desenhar(leve) {
     $('betweenEyebrow').innerHTML = '<span></span> O TEMPO RETORNOU';
     $('betweenTitle').textContent = room.volta === 5 ? 'Os ciclos terminaram.' : 'Você se lembra.';
     $('betweenStory').textContent = 'As portas voltaram a fechar. Os objetos estão onde estavam. Você conserva o que descobriu.';
-    $('betweenHint').textContent = 'Conversem sobre as pistas. O Mestre abre a próxima etapa quando a turma estiver pronta.';
+    $('betweenHint').textContent = 'Releia o seu caderno. O Mestre abre a próxima volta quando a turma estiver pronta.';
     show('between');
   } else if (e === 'final') {
     renderForm();
@@ -128,7 +128,7 @@ function choose(id) {
 function decorate() {
   const escolhendo = room.etapa === 'choose', jogando = room.etapa === 'playing';
   $('boardTitle').textContent = state.room ? 'Ambiente escolhido' : 'Escolha um ambiente';
-  $('phaseDescription').textContent = escolhendo ? 'Escolha onde investigar. O Mestre inicia o relógio.' : 'Todos investigam no mesmo intervalo.';
+  $('phaseDescription').textContent = escolhendo ? 'Escolha onde investigar. O Mestre inicia o relógio.' : 'Todos investigam no mesmo intervalo, cada um por conta própria.';
   $('statusText').textContent = state.room ? 'Você permanece neste ambiente até o retorno.' : 'Escolha um ambiente para investigar nesta volta.';
   $('roomPanel').classList.toggle('hidden', !jogando || !state.room);
   for (const b of $('roomGrid').querySelectorAll('button')) b.disabled = !!state.room;
