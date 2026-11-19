@@ -37,7 +37,7 @@ const FIGURES = {
 };
 const ACTIONS = {
   avisar:'Avisar a equipe de conservação antes da movimentação.',
-  confirmar:'Conferir a identificação antes de transportar a caixa.',
+  confirmar:'Conferir a identificação do item na entrega ou no transporte.',
   combinar:'Combinar a apresentação com a equipe de segurança.',
   revisar:'Revisar os registros antes de anunciar o desaparecimento.',
   isolar:'Isolar o equipamento que apresenta falha.'
@@ -402,7 +402,7 @@ const ANSWER_AXES = [
  {key:'figure', title:'Figura imóvel', question:'Quem era a figura imóvel observada?', options:FIGURES,
   sources:['gal3','con4','seg3','rec3','cor3'],
   guide:'Procure uma credencial ou outro sinal de identidade. Estar no local não prova responsabilidade.'},
- {key:'action', title:'Prevenção no museu', question:'Qual medida reduziria o problema com o acervo ou a exposição?', options:ACTIONS,
+ {key:'action', title:'Prevenção no museu', question:'Qual procedimento ajudaria a equipe a lidar com o acontecimento?', options:ACTIONS,
   sources:['con3','cor2'],
   guide:'Pense em uma ação anterior ao problema. Qual registro ou acordo estava faltando?'}
 ];
