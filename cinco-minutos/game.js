@@ -42,7 +42,7 @@ const ACTIONS = {
   revisar:'Revisar os registros antes de anunciar o desaparecimento.',
   isolar:'Isolar o equipamento que apresenta falha.'
 };
-// Cada registro é uma variação de roteiro para ensaio, não uma história independente completa.
+// O índice identifica o cenário nas partidas salvas e nas salas cooperativas.
 const CASES = [
  {event:'proteger',alarm:'sensor',figure:'guarda',room:'galeria',action:'avisar',subject:'uma pequena escultura de vidro',detail:'a equipe percebeu um risco na base da vitrine e deslocou a peça para evitar danos',clue:'uma base apresentava uma fissura'},
  {event:'troca',alarm:'manual',figure:'artista',room:'recepcao',action:'avisar',subject:'um retrato do acervo',detail:'uma cópia temporária substituiu o retrato durante uma verificação da moldura',clue:'uma ordem de serviço menciona a moldura'},
@@ -135,6 +135,86 @@ function makeClues(c){
    {id:'ate2',name:'Ler a instrução de encerramento',time:180,text:'Em caso de repetição, use Suspender demonstração na Galeria do tempo antes do pulso final, às 22h.'}]
  }
 }
+const TIME_PATHS = {
+ suspension: {
+  room:'prototipo', source:'atelie', opens:120, closes:300,
+  control:'Painel da demonstração', action:'Suspender demonstração',
+  alternative:'Silenciar o aviso da demonstração',
+  observation:'O relógio da demonstração perde um segundo no primeiro pulso. O visor ainda indica uma segunda emissão programada.',
+  instruction:'A emissão final depende do modo Demonstração. Após o primeiro pulso, use Suspender demonstração na Galeria do tempo antes das 22h.',
+  distractor:'O aviso foi silenciado. O visor ainda mostra a emissão final programada.',
+  reconstruction:'Na Galeria do tempo, a demonstração guardou uma referência às 21h55. O pulso das 21h57 derrubou a iluminação. A emissão programada para as 22h reconectava o museu à referência.',
+  success:'Você suspendeu a demonstração na Galeria do tempo. Sem a emissão final, o relógio avançou depois das 22h.'
+ },
+ reserve: {
+  room:'eletrica', source:'seguranca', opens:120, closes:240,
+  control:'Painel da alimentação de ensaio', action:'Desacoplar a reserva do protótipo',
+  alternative:'Rearmar a iluminação principal',
+  observation:'Depois do apagão, o protótipo transfere a alimentação para a reserva. Às 21h59, o painel trava essa alimentação até o fechamento.',
+  instruction:'Depois da transferência às 21h57, a Sala técnica permite desacoplar a reserva do protótipo antes do travamento das 21h59.',
+  distractor:'O painel tentou rearmar as luzes. A reserva do protótipo continuou acoplada.',
+  reconstruction:'Às 21h57, o pulso derrubou as luzes e transferiu o protótipo para a reserva. Às 21h59, o painel travava a reserva. Essa alimentação sustentava o retorno das 22h.',
+  success:'Você desacoplou a reserva antes do travamento. O protótipo ficou sem alimentação no fechamento e o tempo seguiu.'
+ },
+ rehearsal: {
+  room:'auditorio', source:'recepcao', opens:90, closes:210,
+  control:'Mesa de produção', action:'Cancelar o sinal de encerramento',
+  alternative:'Silenciar os alto-falantes',
+  observation:'A produção agendou um sinal silencioso, independente do áudio. Às 21h58min30s, o comando sai da mesa e fica na fila do protótipo.',
+  instruction:'Entre a abertura da mesa às 21h56min30s e o envio automático às 21h58min30s, cancele o sinal de encerramento no Auditório.',
+  distractor:'Os alto-falantes ficaram mudos. O sinal silencioso continuou agendado.',
+  reconstruction:'O pulso inicial causou o apagão, mas dependia de um disparo externo para repetir a noite. O sinal da produção entrou na fila às 21h58min30s e ordenou o retorno às 22h.',
+  success:'Você cancelou o sinal na mesa de produção. Nenhuma ordem de retorno chegou ao protótipo.'
+ },
+ reference: {
+  room:'atelie', source:'deposito', opens:60, closes:180,
+  control:'Leitor da referência de ensaio', action:'Retirar o cartão do leitor',
+  alternative:'Fechar o caderno de ensaio',
+  observation:'O leitor abriu às 21h56. Às 21h58, ele envia ao protótipo a referência gravada no cartão que estiver encaixado.',
+  instruction:'Retire o cartão do leitor no Ateliê entre 21h56 e 21h58. Depois do envio, retirar o cartão não apaga a referência recebida.',
+  distractor:'O caderno foi fechado. O leitor ainda pôde enviar a referência.',
+  reconstruction:'O cartão do Ateliê guardava o instante das 21h55. O pulso inicial causava o apagão, mas só após receber o cartão às 21h58 o protótipo conseguia reconstruir a cena às 22h.',
+  success:'Você retirou o cartão antes do envio. Sem a referência temporal, o pulso das 22h não refez a noite.'
+ }
+};
+const CASE_PATHS = [
+ 'reserve','suspension','reference','rehearsal','reference',
+ 'reserve','reference','suspension','reserve','rehearsal',
+ 'reference','rehearsal','suspension','rehearsal','reserve'
+];
+const LEGACY_PATH = {...TIME_PATHS.suspension, opens:0};
+const timePath = () => state.caseRules === 2
+ ? TIME_PATHS[CASE_PATHS[state.caseIndex]]
+ : LEGACY_PATH;
+
+function scenarioClues(){
+ const clues = makeClues(current());
+ if (state.caseRules !== 2 || window.coop) return clues;
+
+ const path = timePath();
+ // A primeira emissão é comum. As fontes da segunda dependem da partida.
+ clues.eletrica.pop();
+ clues.prototipo.pop();
+ clues.atelie = [];
+ clues.prototipo[0].text = 'O protótipo produz uma imagem temporal a partir de uma referência. O fechamento da demonstração depende de um comando que pode vir de outro setor.';
+ clues.prototipo[1].text = 'Às 21h57, um pulso faz o relógio recuar um segundo. O estrondo vem da galeria e a luz cai. O alarme soa mais tarde.';
+ clues.atelie.push({id:'atebase',name:'Ler a anotação de ensaio',time:0,text:'As duas emissões têm funções diferentes. O pulso inicial pode ocorrer mesmo quando a ordem de fechamento ainda não está pronta.'});
+ clues[path.room].push({id:'time-control',name:'Observar o mecanismo',time:path.opens,text:path.observation});
+ clues[path.source].push({id:'time-source',name:'Consultar o procedimento de encerramento',time:60,text:path.instruction});
+ return clues;
+}
+
+function elapsedStoryTime(now){
+ const duration = state.duration;
+ return (duration - (state.endAt-now)/1000)*300/duration;
+}
+
+function clockAt(seconds){
+ const minute = 55+Math.floor(seconds/60);
+ return (minute<60?'21h':'22h')+String(minute%60).padStart(2,'0')+
+  (seconds%60 ? 'min'+String(seconds%60).padStart(2,'0')+'s' : '');
+}
+
 function show(id){$('coopShortcut').classList.toggle('hidden',id==='start'||!!window.coop);['start','game','between','final','result'].forEach(x=>$(x).classList.toggle('hidden',x!==id));window.scrollTo({top:0,behavior:'instant'})}
 function toast(text){$('toast').textContent=text;$('toast').classList.add('show');clearTimeout(toastHandle);toastHandle=setTimeout(()=>$('toast').classList.remove('show'),2200)}
 function popup(id){if(!$(id).open)$(id).showModal()}
@@ -145,7 +225,7 @@ function museumTime(){
  return (minutes<60?'21:':'22:')+String(minutes%60).padStart(2,'0')+':'+String(elapsed%60).padStart(2,'0');
 }
 function current(){return CASES[state.caseIndex]}
-function reset(){clearInterval(timerHandle);state={caseIndex:chooseCase(),loop:1,phase:'choose',room:null,duration:Number($('speed').value),remaining:Number($('speed').value),endAt:null,clues:[],hints:0,notes:'',answers:null,liveFinal:true};save();renderGame();show('game')}
+function reset(){clearInterval(timerHandle);state={caseIndex:chooseCase(),loop:1,phase:'choose',room:null,duration:Number($('speed').value),remaining:Number($('speed').value),endAt:null,clues:[],hints:0,notes:'',answers:null,liveFinal:true,caseRules:2,archive:[]};save();renderGame();show('game')}
 function enterRoom(id){if(window.coop){window.coop.choose(id);return}if(state.phase!=='choose')return;state.room=id;state.phase='playing';state.remaining=state.duration;state.endAt=Date.now()+state.remaining*1000;save();renderGame();tick();timerHandle=setInterval(tick,250)}
 function renderGame(){
  const finalLoop = hasLiveFinal() && state.loop === 5;
@@ -159,7 +239,7 @@ function renderGame(){
  $('boardTitle').textContent=state.phase==='playing'?'Ambiente escolhido':'Escolha um ambiente';
  $('roomGrid').innerHTML=ROOMS.map(r=>'<button class="room '+(state.room===r.id?'selected':'')+'" '+(state.phase==='playing'&&state.room?'disabled':'')+' data-room="'+r.id+'"><span class="room-icon" aria-hidden="true">'+r.icon+'</span><strong>'+r.name+'</strong><small>'+r.sub+'</small></button>').join('');
  document.querySelectorAll('[data-room]').forEach(b=>b.addEventListener('click',()=>enterRoom(b.dataset.room)));
- $('endLoop').classList.toggle('hidden', state.phase!=='playing' || (finalLoop && state.duration===300));
+ $('endLoop').classList.toggle('hidden', state.phase!=='playing' || ((finalLoop || state.caseRules === 2) && state.duration===300));
  $('statusText').textContent=state.phase==='playing'?'Você permanece neste ambiente até o retorno.':'Você poderá visitar um ambiente em cada loop.';
  $('roomPanel').classList.toggle('hidden',state.phase!=='playing');
  if(state.phase==='playing'&&state.room)renderClues();
@@ -169,8 +249,8 @@ function renderGame(){
 function renderClues(){
  const room = ROOMS.find(item => item.id === state.room);
  const panel = $('roomPanel');
- const clues = makeClues(current())[room.id];
- const scene = state.caseIndex + ':' + room.id;
+ const clues = scenarioClues()[room.id];
+ const scene = [state.caseIndex, state.caseRules, !!window.coop, room.id].join(':');
  if (panel.dataset.scene !== scene) {
   panel.dataset.scene = scene;
   panel.innerHTML = '<h3>'+room.name+'</h3><p>'+roomDescriptions[room.id]+'</p><div class="clue-list">'+
@@ -195,56 +275,96 @@ function renderClues(){
   button.disabled = registered || wait > 0;
   if (button.lastElementChild.textContent !== label) button.lastElementChild.textContent = label;
  });
- const intervention = $('intervention');
- const canIntervene = hasLiveFinal() && state.loop === 5 && room.id === 'prototipo';
- intervention.hidden = !canIntervene;
- if (canIntervene && !intervention.hasChildNodes()) {
-  intervention.innerHTML = '<h4>Controle da demonstração</h4><p>Suspenda o protótipo antes do próximo retorno.</p><button class="btn primary" type="button">Suspender demonstração</button><p role="status"></p>';
- }
- if (canIntervene) {
-  const button = intervention.querySelector('button');
-  button.disabled = !!state.intervention;
-  button.onclick = suspendDemonstration;
-  intervention.lastElementChild.textContent = state.intervention ? 'Comando registrado. O próximo retorno foi bloqueado.' : '';
- }
+ renderIntervention(room.id, storySeconds);
 }
 function hasLiveFinal(){
  return !window.coop && state.liveFinal === true;
 }
-function suspendDemonstration(){
- if (!hasLiveFinal() || state.loop !== 5 || state.phase !== 'playing' ||
-     state.room !== 'prototipo' || state.intervention || Date.now() >= state.endAt) return;
- state.intervention = 'suspender';
- save();
- renderClues();
+function renderIntervention(roomId, elapsed){
+ const panel = $('intervention');
+ const path = timePath();
+ panel.hidden = !hasLiveFinal() || state.loop !== 5 || roomId !== path.room;
+ if (panel.hidden) return;
+ if (!panel.hasChildNodes()) {
+  const commands = state.caseRules === 2
+   ? '<label for="command">Comando</label><select id="command"><option value="">Escolha um comando</option>'+
+     (path.room === 'prototipo' || path.room === 'atelie'
+      ? '<option value="other">'+esc(path.alternative)+'</option><option value="break">'+esc(path.action)+'</option>'
+      : '<option value="break">'+esc(path.action)+'</option><option value="other">'+esc(path.alternative)+'</option>')+
+     '</select><button class="btn primary" type="button">Executar comando</button>'
+   : '<button class="btn primary" type="button">'+esc(path.action)+'</button>';
+  panel.innerHTML = '<h4>'+esc(path.control)+'</h4>'+commands+'<p role="status"></p>';
+  const button = panel.querySelector('button');
+  button.onclick = () => applyIntervention(panel.querySelector('select')?.value ?? 'break');
+  panel.querySelector('select')?.addEventListener('change', () => renderIntervention(state.room, elapsedStoryTime(Date.now())));
+ }
+ const button = panel.querySelector('button');
+ const select = panel.querySelector('select');
+ const recorded = !!state.intervention;
+ const eligible = elapsed >= path.opens && elapsed < path.closes;
+ button.disabled = recorded || !eligible || (select ? !select.value : false);
+ if (select) select.disabled = recorded || !eligible;
+ const status = panel.lastElementChild;
+ const message = state.intervention === 'other' ? path.distractor
+  : recorded ? 'Comando registrado. O relógio seguirá adiante às 22h.'
+  : elapsed < path.opens ? 'O comando estará disponível às '+clockAt(path.opens)+'.'
+  : elapsed >= path.closes ? 'A janela de intervenção terminou às '+clockAt(path.closes)+'.'
+  : 'Você pode executar um comando até '+clockAt(path.closes)+'.';
+ if (status.textContent !== message) status.textContent = message;
 }
-function collect(id){if(state.phase!=='playing'||(window.coop?.now() ?? Date.now())>=state.endAt){tick();return}const q=makeClues(current())[state.room].find(x=>x.id===id);if(!q||state.clues.some(x=>x.id===id)||state.duration-(state.endAt-(window.coop?.now() ?? Date.now()))/1000<q.time/300*state.duration)return;const room=ROOMS.find(x=>x.id===state.room);state.clues.push({id:q.id,room:room.name,name:q.name,text:q.text,loop:state.loop});save();renderClues();renderJournal();toast('Pista guardada no caderno')}
+function applyIntervention(command){
+ const path = timePath();
+ const elapsed = elapsedStoryTime(Date.now());
+ if (!hasLiveFinal() || state.loop !== 5 || state.phase !== 'playing' ||
+     state.room !== path.room || state.intervention || !['break','other'].includes(command) ||
+     elapsed < path.opens || elapsed >= path.closes) return;
+ state.intervention = command;
+ save();
+ renderIntervention(state.room, elapsed);
+}
+function brokeLoop(){
+ return state.intervention === 'break' || state.intervention === 'suspender';
+}
+function collect(id){if(state.phase!=='playing'||(window.coop?.now() ?? Date.now())>=state.endAt){tick();return}const q=scenarioClues()[state.room].find(x=>x.id===id);if(!q||state.clues.some(x=>x.id===id)||state.duration-(state.endAt-(window.coop?.now() ?? Date.now()))/1000<q.time/300*state.duration)return;const room=ROOMS.find(x=>x.id===state.room);state.clues.push({id:q.id,room:room.name,name:q.name,text:q.text,loop:state.loop});save();renderClues();renderJournal();toast('Pista guardada no caderno')}
 function renderJournal(){
  const clues=state.clues||[];$('countBadge').textContent=clues.length;
  $('journalPreview').innerHTML=clues.length?clues.slice(-3).reverse().map(c=>'<div class="preview-item">'+esc(c.name)+' <br><small>'+esc(c.room)+'</small></div>').join(''):'<p class="muted">Suas descobertas aparecerão aqui.</p>';
  $('journalList').innerHTML=clues.length?clues.map(c=>'<article class="journal-item"><b>'+esc(c.room)+' · Loop '+c.loop+'</b><p><strong>'+esc(c.name)+':</strong> '+esc(c.text)+'</p></article>').join(''):'<p class="muted">Você ainda não registrou pistas.</p>';
+ if (!window.coop && state.archive?.length) {
+  $('journalList').insertAdjacentHTML('beforeend', state.archive.map(key => {
+   const axis = ANSWER_AXES.find(item=>item.key===key);
+   return '<article class="journal-item"><b>Arquivo de fechamento · '+esc(axis.title)+
+    '</b><p>'+esc(partialRecord(key))+'</p></article>';
+  }).join(''));
+ }
+ const path = timePath();
  const figureRoom = ROOMS.find(room => room.id === current().room).name;
+ const roomName = id => ROOMS.find(room => room.id === id).name;
+ const nearingIntervention = hasLiveFinal() && (state.loop === 5 || (state.loop === 4 && state.phase === 'between'));
+ const timeLead = nearingIntervention
+  ? 'Compare os comandos disponíveis em '+roomName(path.room)+'. Um atua sobre o retorno e o outro altera apenas um efeito secundário.'
+  : 'Há um procedimento de encerramento em '+roomName(path.source)+'.';
  const hs = [
   'Separe o que aconteceu com o acervo, o disparo do alarme e o retorno do tempo. Procure uma fonte para cada fato.',
   'A Sala das coleções ou a Conservação ajuda a explicar o acervo. A Segurança e a Sala técnica ajudam a explicar o alarme.',
-  'A figura imóvel pode ser identificada em '+figureRoom+'. A Galeria do tempo mostra como suspender o próximo retorno.'
+  'Procure a figura imóvel em '+figureRoom+'. '+timeLead
  ];
  $('hints').innerHTML=hs.slice(0,state.hints).map((x,i)=>'<p><strong>Orientação '+(i+1)+':</strong> '+esc(x)+'</p>').join('');$('getHint').disabled=state.hints>=3;
 }
-function tick(){if(window.coop){window.coop.tick();return}if(!state||state.phase!=='playing')return;const old=state.remaining;state.remaining=Math.max(0,(state.endAt-Date.now())/1000);$('timer').textContent=fmt(state.remaining);$('fictionTime').textContent=museumTime();if(Math.ceil(old)!==Math.ceil(state.remaining))renderClues();if(state.remaining<=0)finishLoop()}
+function tick(){if(window.coop){window.coop.tick();return}if(!state||state.phase!=='playing')return;const old=state.remaining;state.remaining=Math.max(0,(state.endAt-Date.now())/1000);$('timer').textContent=fmt(state.remaining);$('fictionTime').textContent=museumTime();if(Math.ceil(old)!==Math.ceil(state.remaining))renderClues();else if(state.loop===5 && state.room)renderIntervention(state.room,elapsedStoryTime(Date.now()));if(state.remaining<=0)finishLoop()}
 function renderBetween(){
  const finished = state.loop === 5;
  const interventionNext = hasLiveFinal() && state.loop === 4;
  $('betweenCount').textContent = state.clues.length;
  $('betweenLoop').textContent = state.loop+' / 5';
  $('betweenTitle').textContent = finished
-  ? (state.intervention ? 'O relógio passou das 22h.' : 'Os ciclos de investigação terminaram.')
+  ? (brokeLoop() ? 'O relógio passou das 22h.' : 'O museu retornou às 21h55.')
   : 'Você se lembra.';
  $('betweenStory').textContent = finished
-  ? (state.intervention ? 'O pulso de retorno foi suspenso. O museu permanece no presente.' : 'O museu voltou às 21h55. Use o que você descobriu para reconstruir a noite.')
+  ? (brokeLoop() ? 'A cadeia do retorno foi interrompida. O museu permanece no presente.' : 'O museu voltou às 21h55. Use o que você descobriu para reconstruir a noite.')
   : 'As portas voltaram a fechar. Os objetos estão onde estavam. Você conserva o que descobriu.';
- $('betweenHint').textContent = finished ? 'Seu caderno está disponível para a conclusão.'
-  : interventionNext ? 'A próxima volta é sua oportunidade de intervir. Consulte o caderno antes de escolher o ambiente.'
+ $('betweenHint').textContent = finished ? (state.caseRules === 2 && state.clues.length < 3 ? 'Com poucas pistas? Ao apresentar a hipótese, você pode consultar trechos do arquivo de fechamento.' : 'Seu caderno está disponível para a conclusão.')
+  : interventionNext ? 'A próxima volta é sua oportunidade de intervir. Se faltou uma pista sobre o retorno, peça uma orientação no caderno antes de escolher o ambiente.'
   : 'O próximo ambiente pode confirmar ou mudar sua hipótese.';
  $('nextLoop').textContent = finished ? 'Apresentar hipótese' : 'Escolher próximo ambiente';
  show('between');
@@ -252,6 +372,7 @@ function renderBetween(){
 function finishLoop(){
  if(window.coop){window.coop.move('between');return}
  if(!state||state.phase!=='playing')return;
+ if (state.caseRules === 2 && state.duration === 300 && Date.now() < state.endAt) return;
  clearInterval(timerHandle);
  state.phase='between';
  state.remaining=0;
@@ -271,30 +392,108 @@ function next(){
  show('game');
 }
 function options(obj){return '<option value="">Ainda não sei</option>'+Object.entries(obj).map(([k,v])=>'<option value="'+k+'">'+esc(v)+'</option>').join('')}
-function renderForm(){$('answerFields').innerHTML='<div><label for="event">O que aconteceu com o acervo ou a exposição?</label><select id="event">'+options(EVENTS)+'</select></div><div><label for="alarm">O que disparou o alarme?</label><select id="alarm">'+options(ALARMS)+'</select></div><div><label for="figure">Quem era a figura imóvel observada?</label><select id="figure">'+options(FIGURES)+'</select></div><div><label for="action">Qual medida ajudaria a prevenir o incidente com o acervo ou a exposição?</label><select id="action">'+options(ACTIONS)+'</select></div>'}
-function submit(e){e.preventDefault();const answers={event:$('event').value,alarm:$('alarm').value,figure:$('figure').value,action:$('action').value};if(window.coop){window.coop.move('result',answers);return}state.answers=answers;state.phase='result';save();renderResult();show('result')}
+const ANSWER_AXES = [
+ {key:'event', title:'Acontecimento', question:'O que aconteceu com o acervo ou a exposição?', options:EVENTS,
+  sources:['gal2','con1','rec2','cor1','dep2'],
+  guide:'Compare o que a equipe esperava encontrar com os registros de movimentação.'},
+ {key:'alarm', title:'Alarme', question:'O que disparou o alarme?', options:ALARMS,
+  sources:['seg1','seg2','ele1'],
+  guide:'Separe o estrondo do disparo do alarme. Compare os horários e o tipo de registro.'},
+ {key:'figure', title:'Figura imóvel', question:'Quem era a figura imóvel observada?', options:FIGURES,
+  sources:['gal3','con4','seg3','rec3','cor3'],
+  guide:'Procure uma credencial ou outro sinal de identidade. Estar no local não prova responsabilidade.'},
+ {key:'action', title:'Prevenção no museu', question:'Qual medida reduziria o problema com o acervo ou a exposição?', options:ACTIONS,
+  sources:['con3','cor2'],
+  guide:'Pense em uma ação anterior ao problema. Qual registro ou acordo estava faltando?'}
+];
+const ARCHIVE_LIMIT = 2;
+function partialRecord(key){
+ const c = current();
+ switch (key) {
+  case 'event': return 'O índice do acervo menciona '+c.subject+'. No verso, lê-se que '+c.clue+'. A ficha de desfecho está incompleta.';
+  case 'alarm': return 'O aviso sonoro começou às 21h57min45s, depois do apagão. ' + ({
+   sensor:'O fragmento recuperado veio do histórico de equipamentos.',
+   manual:'O fragmento recuperado veio do registro de operações da equipe.',
+   teste:'O fragmento recuperado veio da agenda de manutenção.'
+  }[c.alarm]) + ' O campo de causa está ilegível.';
+  case 'figure': return 'A ronda localiza a figura imóvel em '+ROOMS.find(room=>room.id===c.room).name+'. O campo de identificação está em branco.';
+  case 'action': return 'A ficha de prevenção faz referência a '+c.subject+'. Há uma anotação de que '+c.clue+'. A folha de recomendações não foi localizada.';
+ }
+}
+function renderArchive(){
+ const panel = $('archivePanel');
+ panel.classList.toggle('hidden', state.caseRules !== 2 || !!window.coop);
+ if (state.caseRules !== 2 || window.coop) return;
+
+ const recovered = state.archive ?? [];
+ const hasSource = axis => state.clues.some(clue => axis.sources.includes(clue.id) &&
+  (axis.key !== 'figure' || clue.text === figures[current().figure]));
+ const remaining = ARCHIVE_LIMIT-recovered.length;
+ const status = $('archiveStatus');
+ const message = remaining === 0 ? 'Dois trechos consultados.' :
+  remaining === 1 ? 'Você ainda pode consultar um trecho.' : 'Você pode consultar até dois trechos.';
+ if (status.textContent !== message) status.textContent = message;
+ $('archiveSections').innerHTML = ANSWER_AXES.map(axis => {
+  const ready = recovered.includes(axis.key);
+  const covered = hasSource(axis);
+  const body = ready ? '<p>'+esc(partialRecord(axis.key))+'</p>' :
+   covered ? '<p>Você já tem um registro sobre este ponto no caderno.</p>' :
+   '<button class="text-button" type="button" data-archive="'+axis.key+'" '+(remaining ? '' : 'disabled')+
+   ' aria-label="Consultar trecho sobre '+esc(axis.title.toLowerCase())+'">Consultar trecho</button>';
+  return '<section class="archive-item"><h4>'+esc(axis.title)+'</h4><p>'+esc(axis.guide)+'</p>'+body+'</section>';
+ }).join('');
+}
+function readArchive(event){
+ const key = event.target.dataset.archive;
+ const recovered = state.archive ?? [];
+ if (window.coop || state.caseRules !== 2 || state.phase !== 'final' ||
+  !ANSWER_AXES.some(axis=>axis.key===key) || recovered.length >= ARCHIVE_LIMIT || recovered.includes(key)) return;
+ state.archive = [...recovered, key];
+ save();
+ renderArchive();
+ const section = $('archiveSections').children[ANSWER_AXES.findIndex(axis=>axis.key===key)];
+ section.tabIndex = -1;
+ section.focus();
+}
+function selectedAnswers(){
+ return Object.fromEntries(ANSWER_AXES.map(axis=>[axis.key, $(axis.key).value]));
+}
+function renderForm(){
+ $('answerFields').innerHTML = ANSWER_AXES.map(axis => '<div><label for="'+axis.key+'">'+esc(axis.question)+
+  '</label><select id="'+axis.key+'">'+options(axis.options)+'</select></div>').join('');
+ for (const axis of ANSWER_AXES) $(axis.key).value = state.draft?.[axis.key] ?? '';
+ renderArchive();
+}
+function submit(event){
+ event.preventDefault();
+ const answers = selectedAnswers();
+ if(window.coop){window.coop.move('result',answers);return}
+ state.answers = answers;
+ state.phase = 'result';
+ save();
+ renderResult();
+ show('result');
+}
 function renderResult(){
  const c = current();
  const answers = state.answers || {};
- const axes = [
-  ['event','Acontecimento',EVENTS], ['alarm','Alarme',ALARMS],
-  ['figure','Figura imóvel',FIGURES], ['action','Prevenção no museu',ACTIONS]
- ];
- const score = axes.reduce((total, [key]) => total+(answers[key]===c[key]?25:0), 0);
+ const score = ANSWER_AXES.reduce((total, {key}) => total+(answers[key]===c[key]?25:0), 0);
+ const path = timePath();
  const reconstruction = hasLiveFinal()
-  ? '<div class="result-card"><strong>Como o tempo voltou</strong><ol><li>21h55 · O protótipo fixou a referência temporal.</li><li>21h57 · O primeiro pulso provocou o estrondo e o apagão. O alarme tocou depois.</li><li>22h00 · Nos ciclos anteriores, o pulso final fez o museu retornar às 21h55.</li></ol></div>'
+  ? '<div class="result-card"><strong>Como o tempo voltou</strong><p>'+esc(path.reconstruction)+'</p></div>'
   : '';
  const ending = hasLiveFinal()
-  ? (state.intervention
-   ? 'Você suspendeu a demonstração na Galeria do tempo. O relógio seguiu depois das 22h. O que já ocorreu com o acervo faz parte da história.'
-   : 'O pulso de retorno aconteceu às 22h. O museu voltou às 21h55. Na quinta volta, era possível suspender a demonstração na Galeria do tempo.')
+  ? (brokeLoop()
+   ? path.success+' O que já ocorreu com o acervo faz parte da história.'
+   : (state.intervention === 'other' ? path.distractor+' ' : '')+
+     'O museu voltou às 21h55. '+path.instruction)
   : 'Nesta partida, a ação foi avaliada como hipótese.';
  $('resultBody').innerHTML = '<p class="large">Investigação: <strong>'+score+' de 100 pontos</strong>. Cada resposta vale 25 pontos.</p>'+
-  axes.map(([key,title,labels]) => '<div class="result-card"><strong>'+title+'</strong><p>Sua resposta: '+
+  ANSWER_AXES.map(({key,title,options:labels}) => '<div class="result-card"><strong>'+title+'</strong><p>Sua resposta: '+
    esc(labels[answers[key]] || 'Ainda não sei')+'<br>Resultado desta partida: '+esc(labels[c[key]])+'</p></div>').join('')+
   '<div class="result-card"><strong>O que aconteceu</strong><p>'+esc(c.detail.charAt(0).toUpperCase()+c.detail.slice(1))+
   '. '+esc(labels[c.alarm][1])+'</p><p>'+esc(figures[c.figure])+'</p></div>'+reconstruction+
-  '<div class="result-card"><strong>Desfecho</strong><p>'+ending+'</p></div>';
+  '<div class="result-card"><strong>Desfecho</strong><p>'+esc(ending)+'</p></div>';
 }
 document.addEventListener('click',e=>{let id=e.target.dataset.close;if(id)$(id).close()});
 $('helpOpen').onclick=$('howButton').onclick=()=>popup('helpDialog');
@@ -302,6 +501,13 @@ $('startButton').onclick=reset;$('nextLoop').onclick=next;$('endLoop').onclick=f
 ['openJournal','openJournalSide','betweenJournal','finalJournal'].forEach(x=>$(x).onclick=()=>{renderJournal();popup('journalDialog')});
 $('getHint').onclick=()=>{if(state&&state.hints<3){state.hints++;save();renderJournal()}};
 $('notes').addEventListener('input',e=>{if(state){state.notes=e.target.value;save()}});
+$('archiveSections').addEventListener('click', readArchive);
+$('answerFields').addEventListener('change', () => {
+ if (!window.coop && state?.phase === 'final') {
+  state.draft = selectedAnswers();
+  save();
+ }
+});
 $('answerForm').addEventListener('submit',submit);$('replay').onclick=()=>window.coop?window.coop.open():reset();
 // Recupera a partida local sem confundir o prazo real do loop com o relógio do aparelho.
 function restoreSolo(){
@@ -312,6 +518,6 @@ function restoreSolo(){
  $('answerForm').querySelector('button[type=submit]').classList.remove('hidden');
  $('final').querySelector('.large').textContent='O que aconteceu? Use as pistas do caderno e indique como prevenir o acontecimento. Se não souber, pode deixar uma resposta em aberto.';
  $('replay').textContent='Jogar outra vez';
-const prev=load(storageKey,null);if(prev&&Number.isInteger(prev.caseIndex)&&CASES[prev.caseIndex]&&prev.loop>=1&&prev.loop<=5){state=prev;if(state.phase==='playing'&&Number.isFinite(state.endAt)){state.remaining=Math.max(0,(state.endAt-Date.now())/1000);renderGame();show('game');if(state.remaining<=0)finishLoop();else timerHandle=setInterval(tick,250)}else if(state.phase==='choose'){renderGame();show('game')}else if(state.phase==='between'){renderBetween()}else if(state.phase==='final'){renderForm();show('final')}else if(state.phase==='result'&&state.answers){renderResult();show('result')}else{state=null;show('start')}}else show('start');
+const prev=load(storageKey,null);if(prev&&Number.isInteger(prev.caseIndex)&&CASES[prev.caseIndex]&&prev.loop>=1&&prev.loop<=5){state=prev;$('speed').value=String(state.duration);if(state.phase==='playing'&&Number.isFinite(state.endAt)){state.remaining=Math.max(0,(state.endAt-Date.now())/1000);renderGame();show('game');if(state.remaining<=0)finishLoop();else timerHandle=setInterval(tick,250)}else if(state.phase==='choose'){renderGame();show('game')}else if(state.phase==='between'){renderBetween()}else if(state.phase==='final'){renderForm();show('final')}else if(state.phase==='result'&&state.answers){renderResult();show('result')}else{state=null;show('start')}}else show('start');
 }
 restoreSolo();

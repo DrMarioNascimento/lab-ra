@@ -18,3 +18,13 @@
 #intervention h4{margin:0;color:var(--gold)}
 #intervention p{margin:.55rem 0;font:.9rem/1.5 system-ui}
 #intervention p:empty{margin:0}
+
+#intervention label{display:block;margin-top:.6rem}
+#command{display:block;width:min(100%,28rem);margin:.4rem 0 .8rem;padding:.55rem;background:#0a1721;color:var(--paper);border:1px solid var(--line);border-radius:.4rem}
+.archive-panel{padding:.85rem 1rem;margin:1rem 0;background:#10212d;border:1px solid var(--line);border-radius:.65rem}
+.archive-panel summary{color:var(--gold);cursor:pointer;font-weight:bold}
+.archive-panel p{font:.9rem/1.5 system-ui;margin:.5rem 0}
+#archiveStatus{color:var(--gold)}
+.archive-item{border-top:1px solid var(--line);padding:.7rem 0}
+.archive-item h4{margin:0}
+.archive-item button{margin-top:.25rem}

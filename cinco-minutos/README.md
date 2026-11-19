@@ -1,6 +1,8 @@
 # Cinco Minutos para o Fim
 
-Bancada do LAB-RA com cinco voltas, 15 variações de um mistério, pistas temporizadas, caderno, orientações e tela de revelação. A sessão individual e o histórico de variações ficam no navegador. No modo individual, quatro voltas são de investigação e a quinta permite suspender a demonstração na Galeria do tempo. Se o comando for acionado antes das 22h, o relógio avança e o resultado registra a quebra do loop. A pontuação da hipótese é independente do desfecho. Partidas individuais iniciadas na versão anterior preservam o fluxo em que a ação é avaliada como hipótese.
+Bancada do LAB-RA com cinco voltas, 15 variações de um mistério, pistas temporizadas, caderno, orientações e tela de revelação. A sessão individual e o histórico de variações ficam no navegador. No modo individual, cada uma das 15 variações usa uma de quatro cadeias de retorno: emissão programada, alimentação de reserva, comando da produção ou cartão de referência. A quinta volta permite intervir no ambiente e no intervalo que as pistas indicam. O desfecho depende do comando executado a tempo. A pontuação é independente da intervenção. Partidas salvas preservam as regras com que foram iniciadas.
+
+O ritmo completo percorre cinco voltas de cinco minutos (25 minutos de relógio), além das escolhas, pausas e conclusão. O ensaio reduz cada volta a 30 segundos e aceita encerramento antecipado. Na conclusão individual, o arquivo permite consultar até dois trechos incompletos. Cada resposta correta vale 25 pontos, e o rascunho e os trechos consultados persistem após recarregar.
 
 A [maquete](museu/) apresenta 11 ambientes e sete peças do ThreeMuseum adaptadas sob licença MIT. A visualização em 3D e RA abre separadamente do jogo. O mapa jogável tem 11 ambientes. A Galeria do tempo, a Sala das coleções, o Auditório, o Pátio de luz e o Ateliê de descobertas correspondem a espaços nomeados na maquete.
 
