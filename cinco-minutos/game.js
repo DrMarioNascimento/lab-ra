@@ -342,7 +342,7 @@ function renderJournal(){
  const roomName = id => ROOMS.find(room => room.id === id).name;
  const nearingIntervention = hasLiveFinal() && (state.loop === 5 || (state.loop === 4 && state.phase === 'between'));
  const timeLead = nearingIntervention
-  ? 'Compare os comandos disponíveis em '+roomName(path.room)+'. Um atua sobre o retorno e o outro altera apenas um efeito secundário.'
+  ? 'Compare os comandos no ambiente '+roomName(path.room)+'. Um atua sobre o retorno e o outro altera apenas um efeito secundário.'
   : 'Há um procedimento de encerramento em '+roomName(path.source)+'.';
  const hs = [
   'Separe o que aconteceu com o acervo, o disparo do alarme e o retorno do tempo. Procure uma fonte para cada fato.',
@@ -355,6 +355,7 @@ function tick(){if(window.coop){window.coop.tick();return}if(!state||state.phase
 function renderBetween(){
  const finished = state.loop === 5;
  const interventionNext = hasLiveFinal() && state.loop === 4;
+ $('betweenEyebrow').innerHTML = '<span></span> '+(finished && brokeLoop() ? 'O TEMPO SEGUIU' : 'O TEMPO RETORNOU');
  $('betweenCount').textContent = state.clues.length;
  $('betweenLoop').textContent = state.loop+' / 5';
  $('betweenTitle').textContent = finished
@@ -511,6 +512,7 @@ $('answerFields').addEventListener('change', () => {
 $('answerForm').addEventListener('submit',submit);$('replay').onclick=()=>window.coop?window.coop.open():reset();
 // Recupera a partida local sem confundir o prazo real do loop com o relógio do aparelho.
 function restoreSolo(){
+ $('betweenEyebrow').innerHTML='<span></span> O TEMPO RETORNOU';
  $('betweenStory').textContent='As portas voltaram a fechar. Os objetos estão onde estavam. Você conserva o que descobriu.';
  $('nextLoop').classList.remove('hidden');
  $('coopBegin').classList.add('hidden');
