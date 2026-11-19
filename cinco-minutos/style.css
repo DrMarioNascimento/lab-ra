@@ -10,3 +10,11 @@
 .coop-content .btn{justify-self:start}
 .coop-code{display:block;color:var(--gold);font-size:clamp(1.25rem,6vw,2rem);letter-spacing:.05em;overflow-wrap:anywhere}
 #coopStatus{color:var(--gold);margin:.35rem 0}
+
+#fictionTime{font-variant-numeric:tabular-nums;color:var(--gold)}
+.museum-signal:not(:empty){background:#101e2b;border-inline-start:3px solid var(--gold);padding:.7rem 1rem;border-radius:.35rem}
+.museum-signal:empty{margin:0}
+#intervention{margin-top:1rem;padding:1rem;border:1px solid var(--line);border-radius:.65rem;background:#172733}
+#intervention h4{margin:0;color:var(--gold)}
+#intervention p{margin:.55rem 0;font:.9rem/1.5 system-ui}
+#intervention p:empty{margin:0}

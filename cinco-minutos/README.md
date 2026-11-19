@@ -1,10 +1,12 @@
 # Cinco Minutos para o Fim
 
-Bancada do LAB-RA com cinco voltas, 15 variações de um mistério, pistas temporizadas, caderno, orientações e tela de revelação. A sessão individual e o histórico de variações ficam no navegador. A intervenção final é avaliada como hipótese.
+Bancada do LAB-RA com cinco voltas, 15 variações de um mistério, pistas temporizadas, caderno, orientações e tela de revelação. A sessão individual e o histórico de variações ficam no navegador. No modo individual, quatro voltas são de investigação e a quinta permite suspender a demonstração na Galeria do tempo. Se o comando for acionado antes das 22h, o relógio avança e o resultado registra a quebra do loop. A pontuação da hipótese é independente do desfecho. Partidas individuais iniciadas na versão anterior preservam o fluxo em que a ação é avaliada como hipótese.
 
-A [maquete](museu/) apresenta 11 ambientes e sete peças do ThreeMuseum adaptadas sob licença MIT. A visualização em 3D e RA abre separadamente do jogo. O mapa de investigação tem seis ambientes próprios e controla as pistas.
+A [maquete](museu/) apresenta 11 ambientes e sete peças do ThreeMuseum adaptadas sob licença MIT. A visualização em 3D e RA abre separadamente do jogo. O mapa jogável tem 11 ambientes. A Galeria do tempo, a Sala das coleções, o Auditório, o Pátio de luz e o Ateliê de descobertas correspondem a espaços nomeados na maquete.
 
 ## Modo cooperativo
+
+O modo cooperativo mantém a intervenção como hipótese.
 
 Uma sala comporta de dois a seis participantes. O anfitrião convida por código ou link, abre as cinco voltas e envia a conclusão discutida pela equipe. Cada pessoa escolhe um ambiente e mantém seu próprio caderno neste navegador, inclusive após recarregar. O relógio usa o instante de início registrado no Firestore. No ensaio, o anfitrião pode encerrar uma volta antecipadamente. As salas deixam de aceitar acessos após quatro horas. O conteúdo das 15 variações está no cliente, adequado para a bancada cooperativa experimental.
 
