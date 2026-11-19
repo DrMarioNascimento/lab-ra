@@ -1,4 +1,4 @@
-# GDD Cinco Minutos para o Fim
+# GDD Loop
 
 **Documento de concepção e design de jogo**  
 **Versão:** 1.0 para discussão · 18 de novembro de 2026  
@@ -9,7 +9,7 @@
 
 ## 1. Visão geral
 
-Cinco Minutos para o Fim é um jogo de investigação para navegador em que um museu e as pessoas dentro dele retornam repetidamente ao mesmo intervalo de cinco minutos. Vários jogadores investigam em tempo real, cada um escolhendo um ambiente por ciclo. Eles acumulam conhecimento, relacionam indícios, registram hipóteses e tentam antecipar ou modificar o acontecimento da partida.
+Loop é um jogo de investigação para navegador em que um museu e as pessoas dentro dele retornam repetidamente ao mesmo intervalo de cinco minutos. Vários jogadores investigam em tempo real, cada um escolhendo um ambiente por ciclo. Eles acumulam conhecimento, relacionam indícios, registram hipóteses e tentam antecipar ou modificar o acontecimento da partida.
 
 O fato principal não é informado na abertura. Um estrondo, um apagão e um alarme são percebidos, mas suas causas, relações e consequências precisam ser descobertas. O que o jogador testemunha depende de onde está e do que pode ver ou ouvir.
 
@@ -322,7 +322,7 @@ Metas numéricas de carregamento, fluidez e limites de tamanho serão definidas 
 
 ## 23. Referências de concepção
 
-- Roteiro-base Cinco Minutos para o Fim fornecido por Mário para discussão; os elementos de revelação são tratados como proposta narrativa.
+- Roteiro-base Loop fornecido por Mário para discussão; os elementos de revelação são tratados como proposta narrativa.
 - Padrão de Personagens, Jogadores e Motor — Modo Impostor: https://chatgpt.com/library?file_id=libfile_1ea3784ba5a481919955b9f78bb90a14&account_id=personal. O ciclo de 15 mencionado ali se refere à cobertura e validação daquele modo.
 - Guia da História MOSAICO: https://chatgpt.com/library?file_id=libfile_c63bd6e777d88191be2bc9e48525eb65&account_id=personal. O novo projeto pode variar acontecimentos entre partidas conforme a proposta atual, mesmo quando um guia de outro modo trabalha com um cânone comum.
 - Dragon Games, documentação do repositório: https://github.com/DrMarioNascimento/Dragon
