@@ -2,14 +2,14 @@
 
 18/11/2026 · versão de projeto, não aparece para o aluno.
 
-**Estado da ficha: tudo [resumo]** (resumos e trechos; nenhum artigo lido inteiro). É a base para a futura conta de Treino. **Nada daqui entrou no motor.**
+**Estado da ficha:** o artigo de Tanaka (2001) foi lido **inteiro** (texto do PDF), o resto é [resumo]. É a base da conta de Treino. **Entrou no motor só a frequência cardíaca no esforço** (`motor/treino.js`, 4 testes); recuperação, EPOC e glicemia depois do exercício continuam fora.
 
 ## 1. Frequência cardíaca máxima e intensidade
 
 | Ponto | O que a fonte diz | Leitura |
 |---|---|---|
-| Equação | FCmáx = 208 − 0,7 × idade em adultos saudáveis; meta-análise de 351 estudos (18.712 pessoas) e validação em laboratório (209 − 0,7 × idade). Sem diferença entre homens e mulheres, nem por nível habitual de atividade. | [resumo] Tanaka e colegas, 2001 |
-| Erro | Erro-padrão de estimativa de cerca de 10 bpm; em amostra de adultos sedentários negros e brancos, 11,4 bpm (Tanaka) e 12,4 (220 − idade). | [resumo] Tanaka, 2001; HERITAGE |
+| Equação | FCmáx = 208 − 0,7 × idade (r = −0,90; 351 estudos, 492 grupos, 18.712 pessoas). Por hábito: sedentário 211 − 0,8 × idade; ativo 207 − 0,7 × idade; treinado em resistência 206 − 0,7 × idade. Validação em laboratório com 514 pessoas de 18 a 81 anos: 209 − 0,7 × idade; sem diferença entre homens e mulheres. A idade sozinha explica cerca de 80% da variação individual. | [completo] Tanaka e colegas, 2001 |
+| Erro | Desvio-padrão da FCmáx individual de 7 a 11 bpm segundo a idade (cerca de 10 na discussão); o artigo não traz erro-padrão de estimativa. Em sedentários negros e brancos do HERITAGE, 11,4 bpm (Tanaka) e 12,4 (220 − idade). A equação de 220 − idade superestima em jovens e subestima com a idade. Limite: sem fumantes nem doença cardiovascular. | [completo] Tanaka, 2001; [resumo] HERITAGE |
 | Intensidade | %FC de reserva ≈ %VO2 de reserva (Swain, 1997; 1998), com contraponto (ficha 08). | [resumo] |
 
 Consequência: a frequência no esforço é **uma faixa**, não um valor; o jogo deve mostrar incerteza de cerca de 10 bpm na FCmáx.
@@ -36,13 +36,13 @@ Revisão sistemática de 22 estudos: o consumo extra depois do exercício (EPOC)
 
 ## 5. Efeito no motor (propostas)
 
-1. Frequência no esforço: FCmáx de Tanaka e %FC de reserva ≈ %VO2 de reserva, com faixa. Precisa de idade e frequência de repouso do perfil. A frequência de repouso do perfil jovem tem fonte (Speed, 2023); a de esforço depende da idade escolhida.
+1. **Feito (18/11):** frequência no esforço = repouso + fração × (FCmáx − repouso), com FCmáx de Tanaka e faixa de 10 bpm; fração da reserva de VO2 calculada com VO2 de repouso de 3,5 ml/kg/min (modelagem, 1 MET). Repouso diurno de 54,5 bpm (Speed, 2023). Fora: perfis fumantes ou com doença cardiovascular.
 2. Recuperação da frequência: esperar o protocolo e a fonte lida antes de desenhar curva.
 3. Glicemia no dia seguinte: direção sustentada (sensibilidade maior), tamanho não; **fora do motor**.
 
 ## 6. O que falta
 
-Artigos inteiros de Tanaka (a página da revista abre só o resumo), de Panissa e do estudo de glicose de 24 h; curva de FC no esforço em jovens com VO2 medido; recuperação da pressão e da frequência depois de exercício em intensidades diferentes; fonte primária para o efeito de 24 a 48 h.
+Artigos inteiros de Panissa e do estudo de glicose de 24 h; curva de FC no esforço em jovens com VO2 medido; recuperação da pressão e da frequência depois de exercício em intensidades diferentes; fonte primária para o efeito de 24 a 48 h.
 
 ## Fontes
 

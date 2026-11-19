@@ -71,6 +71,22 @@ export const P = {
     efeitoCronicoNoturnoDiastolica: { valor: 1.76, ic95: [0.41, 3.12], leitura: 'resumo', fonte: 'meta-análise de 45 estudos, 2021' },
   },
 
+  treino: {
+    unidade: 'bpm',
+    fcMax: {
+      geral:      { a: 208, b: 0.7, leitura: 'completo', fonte: 'Tanaka 2001 (meta-análise de 351 estudos, 18.712 pessoas)', nota: 'HRmax = 208 − 0,7 × idade; sem diferença entre sexos nem por atividade habitual' },
+      sedentario: { a: 211, b: 0.8, leitura: 'completo', fonte: 'Tanaka 2001' },
+      ativo:      { a: 207, b: 0.7, leitura: 'completo', fonte: 'Tanaka 2001' },
+      treinado:   { a: 206, b: 0.7, leitura: 'completo', fonte: 'Tanaka 2001', nota: 'endurance' },
+      dpIndividual: { valor: 10, leitura: 'completo', fonte: 'Tanaka 2001', nota: 'desvio-padrão da FCmáx individual em torno da equação: 7 a 11 bpm segundo a idade, cerca de 10 na discussão' },
+      limite: { leitura: 'completo', fonte: 'Tanaka 2001', nota: 'sem fumantes nem doença cardiovascular; a equação pode não valer para eles' },
+    },
+    repousoDiurno: { valor: 54.5, dp: 8.0, leitura: 'completo', fonte: 'Speed e colegas 2023', nota: 'frequência de repouso de dia, pulseira, 433 pessoas ativas de 18 a 65 anos (média 35,4), sem trabalhadores noturnos' },
+    repousoNoturno: { valor: 50.5, dp: 7.6, leitura: 'completo', fonte: 'Speed e colegas 2023' },
+    reservaVO2: { leitura: 'resumo', fonte: 'Swain e Leutholtz 1997 (e 1998)', nota: '%FC de reserva ≈ %VO2 de reserva (inclinação 1,00, intercepto −0,1 em 63 adultos), com contraponto na ficha 08' },
+    vo2Repouso: { valor: 3.5, leitura: 'modelagem', nota: 'convenção de 1 MET (ml/kg/min); não vem de artigo lido aqui' },
+  },
+
   alcool: {
     remPerdidoMinPorGkg: { valor: 40.4, leitura: 'completo', fonte: 'Gardiner 2025' },
     atrasoRemMinPorGkg:  { valor: 30.1, leitura: 'completo', fonte: 'Gardiner 2025' },

@@ -19,7 +19,8 @@ Dia de trabalho de 17/11/2026: o projeto saiu do GDD e virou protótipo jogável
 | Modo Prognóstico | Um dia (6 rotinas) e semana 1 (4 semanas prontas) |
 | Modo Diagnóstico | Rotina livre (dia e semana) e Desafio da semana (3 perfis) |
 | Pressão arterial | Só no motor (`motor/hemodinamica.js`), de um normotenso; ainda sem tela e fora das rotinas do jogo |
-| Testes | 48, todos passando (`npm test` nesta pasta) |
+| Frequência no esforço | Só no motor (`motor/treino.js`, FCmáx de Tanaka lido inteiro); sem tela |
+| Testes | 52, todos passando (`npm test` nesta pasta) |
 
 ## Decisões do professor em 17/11/2026
 
