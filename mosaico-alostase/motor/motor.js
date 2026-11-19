@@ -90,6 +90,8 @@ export function simularDia(rotina) {
   const efeitoEx = (j, min) => efeitoExercicioCortisol(j, min, r.deslocamentoRelogioH);
   const efeitoRefeicao = efeitoRefeicaoGlicemia;
 
+  const dd = Math.abs(((r.deslocamentoRelogioH + 12) % 24 + 24) % 24 - 12), da = g.desalinhamento;
+  const fatorDesalinhamento = 1 + da.aumento * Math.max(0, Math.min(1, (dd - da.deslocMinH) / (da.deslocPlenoH - da.deslocMinH)));
   let S = 0.5;
   const pontos = [];
   for (let k = 0; k < 2 * N; k++) {                    // dia de aquecimento + dia de leitura
@@ -109,7 +111,7 @@ export function simularDia(rotina) {
       dormindo: dormindo(hDia),
       cortisol: +cort.toFixed(2),
       cortisolBase: +base.toFixed(2),
-      glicemia: +(g.base.valor + Math.min(subida, g.subidaMax.valor)).toFixed(1),
+      glicemia: +((g.base.valor + Math.min(subida, g.subidaMax.valor)) * fatorDesalinhamento).toFixed(1),
       pressaoSono: +S.toFixed(3),
     });
   }

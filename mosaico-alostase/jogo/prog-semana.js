@@ -1,4 +1,5 @@
 // Mosaico Alostase · modo Prognóstico, semana 1: estimativas de hora em dias diferentes e a dívida de sono ao fim do dia.
+import { relogio } from './relogio.js';
 import { novaPartidaSemana, pontuar, VARIAVEIS, DIVIDA, NOMES_DIAS, hhmm, momentoGlicemia, rotuloGlicemia } from './prognostico.js';
 import { $, fmt, esc, linhaDoTempo, listaDaRotina, cartaoCusto, NOTA_SONO } from './ui.js';
 import { graficoSemana } from './diagnostico.js';
@@ -37,6 +38,7 @@ export function jogarSemana(ctx, semana, nPerguntas, semente) {
     const r = p.sem.resumo[q.dia];
     mostraPlacar();
     tela.innerHTML = `
+      ${q.tipo === 'hora' ? relogio(q.hora) : ''}
       <section class="card">${faixaDias(q.dia)}<div style="margin-top:10px">${linhaDoTempo(rot, q.tipo === 'hora' ? q.hora : null)}</div>
         ${q.tipo === 'divida' ? `<p class="nota">${Dia(q.dia)}: <b class="mono">${fmt(r.horasAcordado, 1)} h</b> acordado.</p>` : ''}</section>
       <section class="card pergunta"><div class="rotulo">Estimativa ${i + 1} de ${p.perguntas.length}</div><h2>${titulo}</h2>

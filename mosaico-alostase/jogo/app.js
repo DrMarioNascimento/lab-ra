@@ -1,5 +1,6 @@
 // Mosaico Alostase · tela do modo Prognóstico.
 import { ROTINAS } from './rotinas.js';
+import { relogio } from './relogio.js';
 import { novaPartida, pontuar, VARIAVEIS, TEMPOS, hhmm, momentoGlicemia, rotuloGlicemia } from './prognostico.js';
 import { leitura, custoDoDia } from './rotina-montada.js';
 import { $, fmt, esc, linhaDoTempo, listaDaRotina, grafico, cartaoCusto, CORV } from './ui.js';
@@ -98,6 +99,7 @@ function telaPergunta() {
   const ref = ant ? { hora: ant.hora, valor: ant.valor } : { hora: p.ancora.hora, valor: p.ancora[q.variavel] };
   atualizaPlacar();
   tela.innerHTML = `
+    ${relogio(q.hora)}
     <section class="card">${linhaDoTempo(p.rotina, q.hora)}</section>
     <section class="card pergunta">
       <div class="rotulo">Estimativa ${E.i + 1} de ${p.perguntas.length}</div>

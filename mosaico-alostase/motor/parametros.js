@@ -42,6 +42,7 @@ export const P = {
     escalaCarbo: { leitura: 'modelagem', nota: 'subida proporcional aos gramas de carboidrato; só 50 g tem dado lido' },
     formaVolta:  { leitura: 'modelagem', nota: 'curva (t/tp)·exp(1 − t/tp); a volta em cerca de 3 h confere com tabela vista só em trecho' },
     madrugada:   { leitura: 'completo', fonte: 'Freckmann 2022', nota: 'sem fenômeno do alvorecer entre 1h e 5h: a base fica plana' },
+    desalinhamento: { aumento: 0.06, deslocMinH: 3, deslocPlenoH: 6, leitura: 'modelagem', fonte: 'Scheer 2009 (ficha 09)', nota: 'a glicemia média sobe 6% com o relógio fora de fase (n = 8, dias de 28 h); aplicado ao valor total, de forma linear entre 3 e 6 h de deslocamento. O tamanho da subida pós-prandial (café 99,9 → 132 mg/dL em 2 h) não entra: só a média tem número lido' },
     jejum:       { leitura: 'modelagem', nota: 'sem queda por horas sem comer: a glicemia do saudável é defendida (ponto de rigor do GDD)' },
   },
 
@@ -58,6 +59,36 @@ export const P = {
     pagamento: { leitura: 'modelagem', nota: 'dia com menos de 15,84 h acordado abate a dívida hora por hora. O artigo não mede a recuperação; Belenky 2003 sugere que ela é mais lenta do que isso' },
   },
 
+  pressaoArterial: {
+    unidade: 'mmHg (monitorização ambulatorial, normotensos)',
+    sistolica:  { vigilia: 122.5, sono: 107.5, leitura: 'resumo', fonte: 'meta-análise de 22 estudos, 2.638 normotensos (Staessen e colegas, resumo)', nota: 'ponto médio das faixas relatadas: vigília 120-125, sono 105-110. Idade média dos estudos não lida; não é de jovens em particular' },
+    diastolica: { vigilia: 77.5, sono: 62.5, leitura: 'resumo', fonte: 'mesma meta-análise', nota: 'ponto médio das faixas relatadas: vigília 75-80, sono 60-65' },
+    partePostura: { valor: 0.70, leitura: 'resumo', fonte: 'Degaute 1991', nota: 'deitar e dormir explicam 65 a 75% da queda noturna da pressão; o restante é ritmo do relógio' },
+    formaRelogio: { leitura: 'resumo', fonte: 'Degaute 1991', nota: 'picos perto das 10 h e das 20 h, queda pequena perto das 15 h, vale perto das 3 h; só o horário vem da fonte, a forma entre os pontos é modelagem' },
+    pontosRelogio: [ { hora: 3, v: 1, leitura: 'resumo', fonte: 'Degaute 1991', nota: 'vale' }, { hora: 10, v: 0, leitura: 'resumo', fonte: 'Degaute 1991', nota: 'pico da manhã' }, { hora: 15, v: 0.2, leitura: 'modelagem', fonte: 'Degaute 1991', nota: 'o horário (queda pequena) vem da fonte; o 0,2 é escolha deste projeto' }, { hora: 20, v: 0, leitura: 'resumo', fonte: 'Degaute 1991', nota: 'pico da noite' } ],
+    rampaSonoH: { valor: 1, leitura: 'modelagem', nota: 'tempo para a pressão descer ao dormir e subir ao acordar; Degaute mostra subida já antes de acordar' },
+    sonoDiurno: { leitura: 'modelagem', nota: 'o componente de sono vale em qualquer hora; o do relógio fica no horário biológico. Extrapolação: Degaute não estudou sono diurno, e Patterson 2020 acha a evidência de baixa qualidade' },
+    efeitoCronicoNoturnoSistolica: { valor: 2.52, ic95: [0.75, 4.29], leitura: 'resumo', fonte: 'meta-análise de 45 estudos, 2021', nota: 'trabalhadores noturnos permanentes; observacional' },
+    efeitoCronicoNoturnoDiastolica: { valor: 1.76, ic95: [0.41, 3.12], leitura: 'resumo', fonte: 'meta-análise de 45 estudos, 2021' },
+  },
+
+  treino: {
+    unidade: 'bpm',
+    fcMax: {
+      geral:      { a: 208, b: 0.7, leitura: 'completo', fonte: 'Tanaka 2001 (meta-análise de 351 estudos, 18.712 pessoas)', nota: 'HRmax = 208 − 0,7 × idade; sem diferença entre sexos nem por atividade habitual' },
+      sedentario: { a: 211, b: 0.8, leitura: 'completo', fonte: 'Tanaka 2001' },
+      ativo:      { a: 207, b: 0.7, leitura: 'completo', fonte: 'Tanaka 2001' },
+      treinado:   { a: 206, b: 0.7, leitura: 'completo', fonte: 'Tanaka 2001', nota: 'endurance' },
+      dpIndividual: { valor: 10, leitura: 'completo', fonte: 'Tanaka 2001', nota: 'desvio-padrão da FCmáx individual em torno da equação: 7 a 11 bpm segundo a idade, cerca de 10 na discussão' },
+      limite: { leitura: 'completo', fonte: 'Tanaka 2001', nota: 'sem fumantes nem doença cardiovascular; a equação pode não valer para eles' },
+    },
+    repousoDiurno: { valor: 54.5, dp: 8.0, leitura: 'completo', fonte: 'Speed e colegas 2023', nota: 'frequência de repouso de dia, pulseira, 433 pessoas ativas de 18 a 65 anos (média 35,4), sem trabalhadores noturnos' },
+    repousoNoturno: { valor: 50.5, dp: 7.6, leitura: 'completo', fonte: 'Speed e colegas 2023' },
+    reservaVO2: { leitura: 'resumo', fonte: 'Swain e Leutholtz 1997 (e 1998)', nota: '%FC de reserva ≈ %VO2 de reserva (inclinação 1,00, intercepto −0,1 em 63 adultos), com contraponto na ficha 08' },
+    perfilPadrao: { idade: 21, grupo: 'ativo', vo2max: 45, leitura: 'modelagem', nota: 'escolha deste projeto para o jovem do jogo; a fração da reserva muda pouco com o VO2máx (a 80% do VO2máx: 0,78 com 35 e 0,79 com 55 ml/kg/min)' },
+    vo2Repouso: { valor: 3.5, leitura: 'modelagem', nota: 'convenção de 1 MET (ml/kg/min); não vem de artigo lido aqui' },
+  },
+
   alcool: {
     remPerdidoMinPorGkg: { valor: 40.4, leitura: 'completo', fonte: 'Gardiner 2025' },
     atrasoRemMinPorGkg:  { valor: 30.1, leitura: 'completo', fonte: 'Gardiner 2025' },
@@ -71,10 +102,12 @@ export const PENDENCIAS = [
   'Refeição sobre o cortisol: aumento observado depois do almoço, não quantificado.',
   'Exercício sobre a glicemia.',
   'Exercício com mais de 30 min ou acima de 80% do VO2máx sobre o cortisol.',
-  'Jornada noturna sobre a glicemia (+6% no laboratório, lido só no resumo).',
+  'Jornada noturna sobre a glicemia: entra só a média (+6% com o relógio 6 h fora de fase, Scheer 2009, n = 8, dias de 28 h); a subida pós-prandial maior (café 99,9 → 132 mg/dL em 2 h) ainda não entra.',
   'Sono curto sobre a sensibilidade à insulina no dia seguinte.',
   'Deslocamento do relógio depois de várias noites seguidas.',
   'Dívida de sono sobre o cortisol e a glicemia do dia seguinte: direção lida (Spiegel 1999, só resumo), sem número para o motor.',
   'Lapsos de atenção por hora de dívida: o artigo dá a forma da curva (expoente 0,67), não o coeficiente.',
   'Virada de turno (do dia para a noite) dentro da mesma semana.',
+  'Frequência cardíaca: só há forma e amplitude de 24 h (Degaute) e a frequência de repouso (54,5 dia / 50,5 noite, pulseira); falta a média absoluta de 24 h em adultos jovens.',
+  'Pressão depois do exercício (queda de cerca de 5 a 10 mmHg na sistólica) e efeito agudo do trabalho noturno sobre a pressão: ficha 08, fora do motor.',
 ];

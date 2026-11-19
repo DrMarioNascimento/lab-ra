@@ -45,3 +45,15 @@ test('sem refeições a glicemia fica na base', () => {
   const d = simularDia(r); assert.ok(d.pontos.every((p) => Math.abs(p.glicemia - 92.8) < 0.01));
   assert.ok(leitura(r, d).some((t) => t.includes('base o dia todo')));
 });
+
+import { leitura as leituraFC } from './rotina-montada.js';
+import { ROTINAS as ROTINAS_FC } from './rotinas.js';
+test('leitura: o exercício mostra a frequência cardíaca esperada e a faixa', () => {
+  const treino = ROTINAS_FC.find((r) => r.id === 'diurna-treino-tarde'), leve = ROTINAS_FC.find((r) => r.id === 'treino-leve');
+  const nota = (r) => leituraFC(r).find((n) => n.includes('frequência cardíaca de um adulto'));
+  const bpm = (n) => Number(/por volta de (\d+) bpm/.exec(n)[1]);
+  assert.ok(nota(treino) && nota(leve));
+  assert.ok(bpm(nota(treino)) > bpm(nota(leve)), 'mais intenso, mais frequência');
+  assert.ok(bpm(nota(treino)) <= 195, 'não passa da FCmáx');
+  assert.ok(bpm(nota(leve)) > 54);
+});

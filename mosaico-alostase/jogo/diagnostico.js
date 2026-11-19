@@ -1,5 +1,6 @@
 // Mosaico Alostase · tela do modo Diagnóstico: o aluno monta a rotina, o jogo mostra o esperado.
 import { simularDia } from '../motor/motor.js';
+import { relogio } from './relogio.js';
 import { explicar, hhmm, rotuloGlicemia } from './prognostico.js';
 import { escolhasPadrao, conferir, montarRotina, leitura, custoDoDia, passo, NIVEIS, DURACOES, ALCOOL } from './rotina-montada.js';
 import { simularSemana, conferirSemana, diaDaSemana } from '../motor/semana.js';
@@ -75,7 +76,7 @@ function telaDia(tela, voltar, opc = null) {
     ${opc ? `<h2>${esc(opc.titulo)}</h2>` : (() => { const c = custoDoDia(rotina, dia); return cartaoCusto('O que este dia custa', c.numeros, c.frase); })()}
     <section class="card fixo"><div id="lt"></div>
       <input type="range" id="hr" min="0" max="23.5" step="0.5" value="${h}" aria-label="Hora do dia">
-      <div class="leitura" id="vals"></div></section>
+      <div id="rel"></div><div class="leitura" id="vals"></div></section>
     <section class="card"><div class="rotulo">Por quê, nesta hora</div><ul class="porque" id="pq"></ul></section>
     ${['cortisol', 'glicemia', 'pressaoSono'].map((k) => `<section class="card"><h3 style="color:${CORV[k]}">${k === 'glicemia' ? 'Glicemia de jejum e pós-prandial' : VARS[k].nome} (${VARS[k].unidade})</h3><div id="g-${k}"></div>${k === 'pressaoSono' ? NOTA_SONO : ''}</section>`).join('')}
     <section class="card"><div class="rotulo">O que esta rotina mostra</div><ul class="porque">${notas.map((n) => `<li>${esc(n)}</li>`).join('')}</ul></section>
@@ -84,8 +85,8 @@ function telaDia(tela, voltar, opc = null) {
   const pinta = () => {
     const p = dia.pontos.find((x) => Math.abs(x.hora - h) < 1e-6);
     $('#lt').innerHTML = linhaDoTempo(rotina, h);
-    $('#vals').innerHTML = `<div class="hora-atual"><b class="mono">${hhmm(h)}</b><span>${p.dormindo ? 'dormindo' : 'acordado'}</span></div>
-      <div class="valor cort"><b>${fmt(p.cortisol, 1)}</b><span>Cortisol, µg/dL</span></div>
+    $('#rel').innerHTML = relogio(h, p.dormindo ? 'dormindo' : 'acordado');
+    $('#vals').innerHTML = `      <div class="valor cort"><b>${fmt(p.cortisol, 1)}</b><span>Cortisol, µg/dL</span></div>
       <div class="valor glic"><b>${fmt(p.glicemia, 0)}</b><span>${rotuloGlicemia(rotina, h)}, mg/dL</span></div>
       <div class="valor sono"><b>${fmt(p.pressaoSono, 2)}</b><span>Necessidade de sono</span></div>`;
     $('#pq').innerHTML = [...explicar(rotina, h, 'cortisol'), ...explicar(rotina, h, 'glicemia')].map((f) => `<li>${esc(f)}</li>`).join('');
