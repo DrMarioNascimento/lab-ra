@@ -1,331 +1,330 @@
 # GDD Cinco Minutos para o Fim
 
-**Documento de concep��o e design de jogo**  
-**Vers�o:** 1.0 para discuss�o � 18 de novembro de 2026  
-**Projeto:** Dragon Games � t�tulo provis�rio  
-**Status:** proposta de design; narrativa, balanceamento, arquitetura e recursos 3D ainda dependem de defini��o e testes.
+**Documento de concepção e design de jogo**  
+**Versão:** 1.0 para discussão · 18 de novembro de 2026  
+**Projeto:** Dragon Games · título provisório  
+**Status:** proposta de design; narrativa, balanceamento, arquitetura e recursos 3D ainda dependem de definição e testes.
 
 ---
 
-## 1. Vis�o geral
+## 1. Visão geral
 
-Cinco Minutos para o Fim � um jogo de investiga��o para navegador em que um museu e as pessoas dentro dele retornam repetidamente ao mesmo intervalo de cinco minutos. V�rios jogadores investigam em tempo real, cada um escolhendo um ambiente por ciclo. Eles acumulam conhecimento, relacionam ind�cios, registram hip�teses e tentam antecipar ou modificar o acontecimento da partida.
+Cinco Minutos para o Fim é um jogo de investigação para navegador em que um museu e as pessoas dentro dele retornam repetidamente ao mesmo intervalo de cinco minutos. Vários jogadores investigam em tempo real, cada um escolhendo um ambiente por ciclo. Eles acumulam conhecimento, relacionam indícios, registram hipóteses e tentam antecipar ou modificar o acontecimento da partida.
 
-O fato principal n�o � informado na abertura. Um estrondo, um apag�o e um alarme s�o percebidos, mas suas causas, rela��es e consequ�ncias precisam ser descobertas. O que o jogador testemunha depende de onde est� e do que pode ver ou ouvir.
+O fato principal não é informado na abertura. Um estrondo, um apagão e um alarme são percebidos, mas suas causas, relações e consequências precisam ser descobertas. O que o jogador testemunha depende de onde está e do que pode ver ou ouvir.
 
-A experi�ncia combina suspense, descoberta, escolhas e colabora��o ou competi��o amig�vel, sem depender de assassinato. A hist�ria pode ter humor, emo��o, equ�vocos, segredos e a��es intencionais. O universo permite diferentes partidas e acontecimentos, mantendo a coer�ncia interna de cada uma.
+A experiência combina suspense, descoberta, escolhas e colaboração ou competição amigável, sem depender de assassinato. A história pode ter humor, emoção, equívocos, segredos e ações intencionais. O universo permite diferentes partidas e acontecimentos, mantendo a coerência interna de cada uma.
 
 ### Identidade do projeto
 
-| Aspecto | Dire��o inicial |
+| Aspecto | Direção inicial |
 |---|---|
-| G�nero | Investiga��o narrativa, dedu��o distribu�da e loop temporal |
-| Plataforma | Navegador em celulares e computadores; tel�o e RA s�o recursos opcionais a validar |
-| Participantes | Multijogador simult�neo; modo solo desejado e ainda a projetar |
-| Experi�ncia central | Escolher um ambiente, observar, reunir informa��es, formular hip�teses e intervir |
-| Sess�o de refer�ncia | Cinco loops de cinco minutos reais, mais prepara��o, pausas e desfecho |
-| Rejogabilidade | Meta m�nima de 15 partidas com diferen�as significativas; ainda n�o produzidas |
-| Modelo de acesso | A definir em fun��o do projeto e das autoriza��es existentes |
-| P�blico | Pessoas interessadas em mist�rio, jogos sociais e investiga��o; classifica��o et�ria a definir |
+| Gênero | Investigação narrativa, dedução distribuída e loop temporal |
+| Plataforma | Navegador em celulares e computadores; telão e RA são recursos opcionais a validar |
+| Participantes | Multijogador simultâneo; modo solo desejado e ainda a projetar |
+| Experiência central | Escolher um ambiente, observar, reunir informações, formular hipóteses e intervir |
+| Sessão de referência | Cinco loops de cinco minutos reais, mais preparação, pausas e desfecho |
+| Rejogabilidade | Meta mínima de 15 partidas com diferenças significativas; ainda não produzidas |
+| Modelo de acesso | A definir em função do projeto e das autorizações existentes |
+| Público | Pessoas interessadas em mistério, jogos sociais e investigação; classificação etária a definir |
 
-## 2. Inten��o e pilares
+## 2. Intenção e pilares
 
 1. **Curiosidade antes da certeza.** O jogador conhece sinais de um acontecimento, mas precisa descobrir o que eles significam.
 2. **O tempo passa para todos.** O mesmo intervalo acontece simultaneamente em diferentes ambientes.
-3. **A informa��o permanece.** Os objetos e personagens retornam ao estado anterior; o conhecimento adquirido pelo jogador permanece no caderno.
-4. **Nenhuma pessoa v� tudo.** As escolhas distribuem perspectivas e tornam a conversa valiosa, sem impedir a investiga��o individual.
-5. **O engano precisa ser justo.** Uma interpreta��o equivocada deve decorrer de evid�ncias incompletas e receber explica��o coerente.
-6. **O jogo pode ser revisitado.** Mist�rios, rela��es, personagens e acontecimentos podem variar entre partidas de maneira planejada.
-7. **Agir precisa ter consequ�ncia.** Quando uma interven��o � permitida, o resultado deve corresponder ao que foi alterado.
+3. **A informação permanece.** Os objetos e personagens retornam ao estado anterior; o conhecimento adquirido pelo jogador permanece no caderno.
+4. **Nenhuma pessoa vê tudo.** As escolhas distribuem perspectivas e tornam a conversa valiosa, sem impedir a investigação individual.
+5. **O engano precisa ser justo.** Uma interpretação equivocada deve decorrer de evidências incompletas e receber explicação coerente.
+6. **O jogo pode ser revisitado.** Mistérios, relações, personagens e acontecimentos podem variar entre partidas de maneira planejada.
+7. **Agir precisa ter consequência.** Quando uma intervenção é permitida, o resultado deve corresponder ao que foi alterado.
 
 ## 3. Terminologia
 
-**Partida:** experi�ncia completa, da abertura � revela��o e ao placar.  
-**Loop ou ciclo temporal:** uma repeti��o dos mesmos cinco minutos da hist�ria dentro da partida.  
-**Ciclo de 15 partidas:** meta de variedade e cobertura entre partidas completas; n�o significa 15 loops em uma mesma sess�o.  
-**Realidade da partida:** conjunto dos fatos, acontecimentos, participantes e rela��es selecionados no come�o da sess�o.  
-**Evid�ncia:** registro, observa��o ou relato que pode apoiar ou contestar uma hip�tese.  
-**Hip�tese:** interpreta��o formulada pelo jogador, ainda sujeita a revis�o.  
-**Interven��o:** a��o prevista que altera alguma condi��o da sequ�ncia original.
+**Partida:** experiência completa, da abertura à revelação e ao placar.  
+**Loop ou ciclo temporal:** uma repetição dos mesmos cinco minutos da história dentro da partida.  
+**Ciclo de 15 partidas:** meta de variedade e cobertura entre partidas completas; não significa 15 loops em uma mesma sessão.  
+**Realidade da partida:** conjunto dos fatos, acontecimentos, participantes e relações selecionados no começo da sessão.  
+**Evidência:** registro, observação ou relato que pode apoiar ou contestar uma hipótese.  
+**Hipótese:** interpretação formulada pelo jogador, ainda sujeita a revisão.  
+**Intervenção:** ação prevista que altera alguma condição da sequência original.
 
 ## 4. Premissa e abertura
 
-O museu est� pr�ximo do fechamento. Uma exposi��o tempor�ria apresenta inven��es experimentais, entre elas um prot�tipo doado por um inventor. O objeto est� exposto sem uma explica��o completa de seu funcionamento.
+O museu está próximo do fechamento. Uma exposição temporária apresenta invenções experimentais, entre elas um protótipo doado por um inventor. O objeto está exposto sem uma explicação completa de seu funcionamento.
 
-Na introdu��o proposta, o visitante observa o prot�tipo. Um estrondo ecoa, as luzes se apagam, a ilumina��o de emerg�ncia entra em opera��o e uma mensagem de seguran�a � reproduzida. Em seguida, o alarme de inc�ndio � acionado e as sa�das de emerg�ncia s�o liberadas conforme a l�gica ficcional. O jogador tenta compreender a situa��o e sair.
+Na introdução proposta, o visitante observa o protótipo. Um estrondo ecoa, as luzes se apagam, a iluminação de emergência entra em operação e uma mensagem de segurança é reproduzida. Em seguida, o alarme de incêndio é acionado e as saídas de emergência são liberadas conforme a lógica ficcional. O jogador tenta compreender a situação e sair.
 
-O tempo retorna. A partir da�, o jogador percebe a repeti��o e passa a investigar os minutos anteriores. O estrondo e o alarme s�o sinais conhecidos; n�o identificam por si s� o fato central de todas as partidas. N�o se revela antecipadamente se houve roubo, troca, acidente, a��o deliberada ou outro acontecimento.
+O tempo retorna. A partir daí, o jogador percebe a repetição e passa a investigar os minutos anteriores. O estrondo e o alarme são sinais conhecidos; não identificam por si só o fato central de todas as partidas. Não se revela antecipadamente se houve roubo, troca, acidente, ação deliberada ou outro acontecimento.
 
-**Abertura a validar:** para possibilitar a observa��o de eventos anteriores ao estrondo, o primeiro retorno deve levar a um ponto antes dele. Uma introdu��o encenada pode mostrar apenas parte de um ciclo inicial; os cinco minutos completos passam a ser jog�veis depois do retorno. O roteiro apresentado originalmente colocava o retorno diante da m�quina no instante do estrondo: essa adapta��o temporal ainda precisa de valida��o narrativa.
+**Abertura a validar:** para possibilitar a observação de eventos anteriores ao estrondo, o primeiro retorno deve levar a um ponto antes dele. Uma introdução encenada pode mostrar apenas parte de um ciclo inicial; os cinco minutos completos passam a ser jogáveis depois do retorno. O roteiro apresentado originalmente colocava o retorno diante da máquina no instante do estrondo: essa adaptação temporal ainda precisa de validação narrativa.
 
 ## 5. O intervalo de cinco minutos
 
 ### Cronologia ilustrativa
 
-Esta cronologia � uma estrutura de teste, n�o uma solu��o definitiva. Cada cen�rio ter� sua pr�pria cadeia de causas e hor�rios compat�veis.
+Esta cronologia é uma estrutura de teste, não uma solução definitiva. Cada cenário terá sua própria cadeia de causas e horários compatíveis.
 
-| Rel�gio da hist�ria | Tempo restante | Marco vis�vel ou poss�vel |
+| Relógio da história | Tempo restante | Marco visível ou possível |
 |---|---:|---|
-| 21h55 | 05:00 | �ncora do loop; o museu e seus personagens retornam �s posi��es definidas. |
-| 21h56 | 04:00 | Movimenta��es e decis�es preparat�rias em ambientes diferentes. |
-| 21h57 | 03:00 | Estrondo e interrup��o da ilumina��o principal na proposta-base. |
-| 21h57min45s | 02:15 | Alarme e libera��o das sa�das de emerg�ncia na proposta-base. |
-| 21h59 | 01:00 | Sinais crescentes associados ao fen�meno temporal, se fizerem parte do cen�rio. |
-| 22h00 | 00:00 | Retorno � �ncora, salvo se uma interven��o v�lida alterar esse resultado. |
+| 21h55 | 05:00 | Âncora do loop; o museu e seus personagens retornam às posições definidas. |
+| 21h56 | 04:00 | Movimentações e decisões preparatórias em ambientes diferentes. |
+| 21h57 | 03:00 | Estrondo e interrupção da iluminação principal na proposta-base. |
+| 21h57min45s | 02:15 | Alarme e liberação das saídas de emergência na proposta-base. |
+| 21h59 | 01:00 | Sinais crescentes associados ao fenômeno temporal, se fizerem parte do cenário. |
+| 22h00 | 00:00 | Retorno à âncora, salvo se uma intervenção válida alterar esse resultado. |
 
-Os rel�gios de fic��o s�o exemplos. Falhas el�tricas, disparo do alarme, manipula��o do prot�tipo e demais fatos devem ser ordenados e justificados em cada realidade de partida, sem presumir que sempre tenham a mesma causa.
+Os relógios de ficção são exemplos. Falhas elétricas, disparo do alarme, manipulação do protótipo e demais fatos devem ser ordenados e justificados em cada realidade de partida, sem presumir que sempre tenham a mesma causa.
 
-### Estado e mem�ria
+### Estado e memória
 
-No retorno, a posi��o f�sica dos objetos, as portas, os personagens e as condi��es do museu voltam ao estado inicial da variante. Jogadores mant�m caderno, anota��es e hip�teses. Um c�digo aprendido s� pode ser reutilizado se, naquela variante, seu valor for realmente v�lido no instante em que for inserido. Informa��es privadas n�o se tornam p�blicas automaticamente.
+No retorno, a posição física dos objetos, as portas, os personagens e as condições do museu voltam ao estado inicial da variante. Jogadores mantêm caderno, anotações e hipóteses. Um código aprendido só pode ser reutilizado se, naquela variante, seu valor for realmente válido no instante em que for inserido. Informações privadas não se tornam públicas automaticamente.
 
-Os personagens que n�o s�o jogadores n�o conservam mem�ria entre loops no modelo inicial. Qualquer exce��o precisa ser estabelecida pela narrativa e produzir pistas verific�veis.
+Os personagens que não são jogadores não conservam memória entre loops no modelo inicial. Qualquer exceção precisa ser estabelecida pela narrativa e produzir pistas verificáveis.
 
-## 6. La�o principal e estados da partida
+## 6. Laço principal e estados da partida
 
-**Abertura  escolha simult�nea de ambiente  observa��o durante o loop  retorno  consulta ao caderno e troca de informa��es  nova escolha  hip�tese e interven��o  revela��o e pontua��o.**
+**Abertura → escolha simultânea de ambiente → observação durante o loop → retorno → consulta ao caderno e troca de informações → nova escolha → hipótese e intervenção → revelação e pontuação.**
 
-1. O anfitri�o cria a sala; participantes entram e se preparam.
-2. A abertura apresenta o espa�o e sinais do acontecimento, sem revelar sua explica��o.
-3. Cada participante escolhe um ambiente. A escolha � independente; mais de um pode escolher o mesmo local.
-4. Os cinco minutos ocorrem com rel�gio compartilhado. Cada pessoa investiga sua perspectiva.
-5. O retorno encerra o loop. H� uma pausa de dura��o configur�vel para leitura, troca e pr�xima escolha.
-6. O processo se repete. O n�mero de loops e as regras de interven��o s�o par�metros da sess�o.
-7. Cada jogador registra uma hip�tese final estruturada, com possibilidade de responder parcialmente ou n�o saber.
-8. O grupo ou jogador executa uma interven��o quando dispon�vel.
-9. A revela��o recomp�e os acontecimentos, esclarece pistas enganosas e apresenta os resultados.
+1. O anfitrião cria a sala; participantes entram e se preparam.
+2. A abertura apresenta o espaço e sinais do acontecimento, sem revelar sua explicação.
+3. Cada participante escolhe um ambiente. A escolha é independente; mais de um pode escolher o mesmo local.
+4. Os cinco minutos ocorrem com relógio compartilhado. Cada pessoa investiga sua perspectiva.
+5. O retorno encerra o loop. Há uma pausa de duração configurável para leitura, troca e próxima escolha.
+6. O processo se repete. O número de loops e as regras de intervenção são parâmetros da sessão.
+7. Cada jogador registra uma hipótese final estruturada, com possibilidade de responder parcialmente ou não saber.
+8. O grupo ou jogador executa uma intervenção quando disponível.
+9. A revelação recompõe os acontecimentos, esclarece pistas enganosas e apresenta os resultados.
 
-**Modelo para o primeiro teste:** quatro loops de investiga��o e um quinto com possibilidade de interven��o, totalizando 25 minutos de tempo de loop. Comparar com cinco de investiga��o mais um sexto de interven��o, que soma 30 minutos de loop. Em ambos, introdu��o, pausas, hip�teses e revela��o acrescentam tempo; cerca de 37 a 51 minutos para a primeira op��o � uma estimativa, n�o um resultado medido.
+**Modelo para o primeiro teste:** quatro loops de investigação e um quinto com possibilidade de intervenção, totalizando 25 minutos de tempo de loop. Comparar com cinco de investigação mais um sexto de intervenção, que soma 30 minutos de loop. Em ambos, introdução, pausas, hipóteses e revelação acrescentam tempo; cerca de 37 a 51 minutos para a primeira opção é uma estimativa, não um resultado medido.
 
 ## 7. Escolha dos ambientes
 
-### Regra de refer�ncia
+### Regra de referência
 
-Cada participante escolhe um ambiente por loop. N�o h� reserva exclusiva: pessoas podem se encontrar no mesmo ambiente. A observa��o ocorre em tempo real; ningu�m deve receber conhecimento de outro local sem uma fonte narrativa ou compartilhamento autorizado.
+Cada participante escolhe um ambiente por loop. Não há reserva exclusiva: pessoas podem se encontrar no mesmo ambiente. A observação ocorre em tempo real; ninguém deve receber conhecimento de outro local sem uma fonte narrativa ou compartilhamento autorizado.
 
-No primeiro teste, o deslocamento at� o ambiente escolhido pode ser representado por uma transi��o no in�cio do loop. A dura��o dessa transi��o e sua coer�ncia com o mapa devem ser definidas antes do roteiro final. A regra de um ambiente por ciclo preserva a escolha com custo e evita exigir que o jogador percorra todo o museu em cinco minutos.
+No primeiro teste, o deslocamento até o ambiente escolhido pode ser representado por uma transição no início do loop. A duração dessa transição e sua coerência com o mapa devem ser definidas antes do roteiro final. A regra de um ambiente por ciclo preserva a escolha com custo e evita exigir que o jogador percorra todo o museu em cinco minutos.
 
-| Ambiente sugerido | Possibilidades de investiga��o |
+| Ambiente sugerido | Possibilidades de investigação |
 |---|---|
-| Galeria principal | Vitrines, quadros, montagem, visitantes e poss�veis est�tuas vivas. |
-| Sala do prot�tipo | Placa da exposi��o, sinais da m�quina, posi��o de visitantes e registros acess�veis. |
-| Recep��o | Entrada, registros de presen�a, entregas e comunica��es. |
-| Corredor de servi�o | Tr�nsito entre �reas, sons, caixas e rotas de funcion�rios. |
-| Conserva��o | Inspe��es, tratamento, movimenta��o autorizada e arquivos de pe�as. |
-| Seguran�a ou sala t�cnica | Registros de sistema, ilumina��o, comunica��es e controles apropriados. |
-| Dep�sito | Embalagens, invent�rio e movimenta��o de obras. |
-| Jardim de esculturas | Exposi��es externas, acessos vis�veis e oportunidades para uma figura disfar�ada. |
+| Galeria principal | Vitrines, quadros, montagem, visitantes e possíveis estátuas vivas. |
+| Sala do protótipo | Placa da exposição, sinais da máquina, posição de visitantes e registros acessíveis. |
+| Recepção | Entrada, registros de presença, entregas e comunicações. |
+| Corredor de serviço | Trânsito entre áreas, sons, caixas e rotas de funcionários. |
+| Conservação | Inspeções, tratamento, movimentação autorizada e arquivos de peças. |
+| Segurança ou sala técnica | Registros de sistema, iluminação, comunicações e controles apropriados. |
+| Depósito | Embalagens, inventário e movimentação de obras. |
+| Jardim de esculturas | Exposições externas, acessos visíveis e oportunidades para uma figura disfarçada. |
 
-Esses espa�os s�o candidatos, n�o uma lista fechada. O mapa definitivo precisar� especificar conex�es, rotas, dist�ncias, hor�rios, o que � visto e ouvido, acessibilidade e disponibilidade de pistas.
+Esses espaços são candidatos, não uma lista fechada. O mapa definitivo precisará especificar conexões, rotas, distâncias, horários, o que é visto e ouvido, acessibilidade e disponibilidade de pistas.
 
 ### Acesso ao local do acontecimento
 
-Pode haver um espa�o inacess�vel durante a investiga��o, mas isso deve decorrer das regras do cen�rio e n�o revelar automaticamente onde ocorreu o fato. Se o jogador estiver em posi��o de ver ou ouvir um acontecimento, a interface deve mostr�-lo ou represent�-lo de modo coerente. A revela��o final pode mostrar perspectivas n�o acessadas, sem introduzir uma prova essencial que n�o pudesse ser inferida antes.
+Pode haver um espaço inacessível durante a investigação, mas isso deve decorrer das regras do cenário e não revelar automaticamente onde ocorreu o fato. Se o jogador estiver em posição de ver ou ouvir um acontecimento, a interface deve mostrá-lo ou representá-lo de modo coerente. A revelação final pode mostrar perspectivas não acessadas, sem introduzir uma prova essencial que não pudesse ser inferida antes.
 
-## 8. A��es durante o loop
+## 8. Ações durante o loop
 
-As a��es candidatas s�o observar uma �rea, selecionar um objeto, ler ou ouvir um registro, acompanhar um personagem vis�vel, fazer perguntas previstas, marcar um hor�rio e guardar uma pista. A quantidade de a��es realiz�veis em cinco minutos deve ser testada e acess�vel por toque, sem exigir destreza excessiva.
+As ações candidatas são observar uma área, selecionar um objeto, ler ou ouvir um registro, acompanhar um personagem visível, fazer perguntas previstas, marcar um horário e guardar uma pista. A quantidade de ações realizáveis em cinco minutos deve ser testada e acessível por toque, sem exigir destreza excessiva.
 
-Uma a��o de observa��o n�o altera a sequ�ncia central. Uma a��o de interven��o � identificada claramente e tem consequ�ncia definida. No modelo inicial, a��es que mudam a realidade ficam dispon�veis na fase de interven��o. Interven��es em loops anteriores s�o expans�o poss�vel, mas exigem ramifica��es e efeitos consistentes; ainda n�o est�o aprovadas.
+Uma ação de observação não altera a sequência central. Uma ação de intervenção é identificada claramente e tem consequência definida. No modelo inicial, ações que mudam a realidade ficam disponíveis na fase de intervenção. Intervenções em loops anteriores são expansão possível, mas exigem ramificações e efeitos consistentes; ainda não estão aprovadas.
 
-N�o se devem esconder automaticamente acontecimentos vis�veis s� para preservar o mist�rio. Objetos e falas podem ser percebidos parcialmente quando isso decorre de dist�ncia, obst�culos, hor�rio ou aten��o do personagem, sem contradizer a apresenta��o ao jogador.
+Não se devem esconder automaticamente acontecimentos visíveis só para preservar o mistério. Objetos e falas podem ser percebidos parcialmente quando isso decorre de distância, obstáculos, horário ou atenção do personagem, sem contradizer a apresentação ao jogador.
 
-## 9. Caderno, hip�teses e apoio
+## 9. Caderno, hipóteses e apoio
 
-O caderno fica pr�ximo das jogadas e cont�m registros com origem, local e momento. Os estados sugeridos s�o: **observado**, **relatado por algu�m**, **registro consultado** e **hip�tese pessoal**. Um relato n�o equivale automaticamente a um fato confirmado. O sistema n�o atribui certeza a uma informa��o apenas por ela ter sido compartilhada.
+O caderno fica próximo das jogadas e contém registros com origem, local e momento. Os estados sugeridos são: **observado**, **relatado por alguém**, **registro consultado** e **hipótese pessoal**. Um relato não equivale automaticamente a um fato confirmado. O sistema não atribui certeza a uma informação apenas por ela ter sido compartilhada.
 
-O jogador pode arriscar partes da resposta ao longo da partida e revis�-las. Campos candidatos: o que ocorreu; onde; quando; mecanismo; pessoas ou objetos envolvidos; causa; rela��o com o loop; a��o para alterar o resultado. As perguntas finais devem depender da variante, para n�o pressupor roubo, culpado ou outra resposta que possa ser falsa. Op��es incluem hip�tese incompleta e n�o sei.
+O jogador pode arriscar partes da resposta ao longo da partida e revisá-las. Campos candidatos: o que ocorreu; onde; quando; mecanismo; pessoas ou objetos envolvidos; causa; relação com o loop; ação para alterar o resultado. As perguntas finais devem depender da variante, para não pressupor roubo, culpado ou outra resposta que possa ser falsa. Opções incluem hipótese incompleta e não sei.
 
 ### Ajuda gradual inspirada no Mosaico Card
 
-O jogador decide se pede ajuda durante a pausa. A ajuda tem graus progressivos: orienta��o ampla de racioc�nio, indica��o de tipo de fonte ou ambiente e, por fim, informa��o mais espec�fica. Cada pista de apoio � escrita para uma variante v�lida e n�o entrega automaticamente uma resposta falsa ou incompat�vel.
+O jogador decide se pede ajuda durante a pausa. A ajuda tem graus progressivos: orientação ampla de raciocínio, indicação de tipo de fonte ou ambiente e, por fim, informação mais específica. Cada pista de apoio é escrita para uma variante válida e não entrega automaticamente uma resposta falsa ou incompatível.
 
-S�o candidatos um apoio pessoal e um apoio compartilhado pelo grupo. Suas regras de custo, visibilidade e eventual efeito na pontua��o precisam ser anunciadas antes da escolha e testadas. Pedir ajuda n�o impede continuar nem deve eliminar a possibilidade de pontuar. O jogo n�o deve depender de ajuda externa para que as pistas essenciais sejam acess�veis.
+São candidatos um apoio pessoal e um apoio compartilhado pelo grupo. Suas regras de custo, visibilidade e eventual efeito na pontuação precisam ser anunciadas antes da escolha e testadas. Pedir ajuda não impede continuar nem deve eliminar a possibilidade de pontuar. O jogo não deve depender de ajuda externa para que as pistas essenciais sejam acessíveis.
 
-## 10. Pontua��o e resolu��o
+## 10. Pontuação e resolução
 
-Cada participante apresenta suas respostas. A mesma realidade de partida fornece o gabarito; respostas parciais recebem cr�dito proporcional quando houver crit�rios definidos antecipadamente. Justificativas livres podem enriquecer a conversa, mas n�o devem ser pontuadas automaticamente sem um sistema de avalia��o explicitamente projetado e testado.
+Cada participante apresenta suas respostas. A mesma realidade de partida fornece o gabarito; respostas parciais recebem crédito proporcional quando houver critérios definidos antecipadamente. Justificativas livres podem enriquecer a conversa, mas não devem ser pontuadas automaticamente sem um sistema de avaliação explicitamente projetado e testado.
 
-### Distribui��o inicial para teste
+### Distribuição inicial para teste
 
-| Eixo | Pontos m�ximos | Exemplo de avalia��o |
+| Eixo | Pontos máximos | Exemplo de avaliação |
 |---|---:|---|
-| Natureza do acontecimento | 20 | Reconhecer o que ocorreu, inclusive quando n�o houve roubo ou crime. |
-| Causa ou mecanismo | 20 | Identificar o mecanismo relevante para o mist�rio da variante. |
-| Tempo e sequ�ncia | 15 | Ordenar marcos e reconhecer rela��es temporais. |
-| Pessoas e objetos | 15 | Identificar participa��o comprovada sem confundir presen�a com responsabilidade. |
-| Rela��es entre evid�ncias | 15 | Escolher rela��es de apoio e contraprova previstas no gabarito. |
-| Interven��o | 15 | Escolher uma a��o coerente e o ponto adequado para alterar o resultado. |
-| **Total** | **100** | Distribui��o provis�ria, a calibrar por testes. |
+| Natureza do acontecimento | 20 | Reconhecer o que ocorreu, inclusive quando não houve roubo ou crime. |
+| Causa ou mecanismo | 20 | Identificar o mecanismo relevante para o mistério da variante. |
+| Tempo e sequência | 15 | Ordenar marcos e reconhecer relações temporais. |
+| Pessoas e objetos | 15 | Identificar participação comprovada sem confundir presença com responsabilidade. |
+| Relações entre evidências | 15 | Escolher relações de apoio e contraprova previstas no gabarito. |
+| Intervenção | 15 | Escolher uma ação coerente e o ponto adequado para alterar o resultado. |
+| **Total** | **100** | Distribuição provisória, a calibrar por testes. |
 
-Para cada variante, os campos e o cr�dito parcial precisam ser documentados; se um eixo n�o se aplicar, seus pontos ser�o redistribu�dos previamente e comunicados. Pontua��o por antecipa��o e custo de ajudas s�o propostas em aberto; n�o se somam a esta tabela at� existir regra definida. O resultado destaca acertos, hip�teses plaus�veis e limita��es do que foi observado. A revela��o mostra a sequ�ncia original, as fontes e as consequ�ncias da interven��o.
+Para cada variante, os campos e o crédito parcial precisam ser documentados; se um eixo não se aplicar, seus pontos serão redistribuídos previamente e comunicados. Pontuação por antecipação e custo de ajudas são propostas em aberto; não se somam a esta tabela até existir regra definida. O resultado destaca acertos, hipóteses plausíveis e limitações do que foi observado. A revelação mostra a sequência original, as fontes e as consequências da intervenção.
 
-## 11. Interven��o e finais
+## 11. Intervenção e finais
 
-O grupo ou jogador escolhe entre a��es vi�veis constru�das a partir das evid�ncias dispon�veis. O sistema deve explicitar qual a��o foi escolhida, em que ambiente e quando ser� executada. Em sess�es com pessoas suficientes, uma a��o composta pode ser distribu�da entre ambientes; para poucos participantes, a variante precisa oferecer um plano vi�vel com a quantidade presente. O m�todo de decis�o coletiva, vota��o e resolu��o de a��es incompat�veis ainda deve ser definido.
+O grupo ou jogador escolhe entre ações viáveis construídas a partir das evidências disponíveis. O sistema deve explicitar qual ação foi escolhida, em que ambiente e quando será executada. Em sessões com pessoas suficientes, uma ação composta pode ser distribuída entre ambientes; para poucos participantes, a variante precisa oferecer um plano viável com a quantidade presente. O método de decisão coletiva, votação e resolução de ações incompatíveis ainda deve ser definido.
 
-Cada cen�rio precisa registrar pelo menos: estado original; condi��es da a��o; consequ�ncia direta; efeito sobre o acontecimento; efeito sobre o loop; e explica��o mostrada depois. Acertar a hip�tese e interromper o loop s�o resultados diferentes. � poss�vel compreender o fato sem escolher a interven��o adequada, ou alterar uma consequ�ncia sem eliminar a causa.
+Cada cenário precisa registrar pelo menos: estado original; condições da ação; consequência direta; efeito sobre o acontecimento; efeito sobre o loop; e explicação mostrada depois. Acertar a hipótese e interromper o loop são resultados diferentes. É possível compreender o fato sem escolher a intervenção adequada, ou alterar uma consequência sem eliminar a causa.
 
-Finais candidatos: tempo continua e acontecimento � evitado; tempo continua mas uma consequ�ncia permanece; acontecimento muda e loop persiste; nenhum dos objetivos � alcan�ado; conclus�o parcial por falta de evid�ncia. N�o se deve prometer que todas as variantes ter�o todos os finais antes de serem escritos e testados.
+Finais candidatos: tempo continua e acontecimento é evitado; tempo continua mas uma consequência permanece; acontecimento muda e loop persiste; nenhum dos objetivos é alcançado; conclusão parcial por falta de evidência. Não se deve prometer que todas as variantes terão todos os finais antes de serem escritos e testados.
 
-## 12. Personagem disfar�ado de obra
+## 12. Personagem disfarçado de obra
 
-Uma pessoa pode se passar por escultura, manequim ou instala��o. Sua exist�ncia, papel, local, apar�ncia, motivo, relato e rela��o com a hist�ria mudam conforme a variante; tamb�m podem existir partidas sem essa pessoa. N�o deve haver um �nico lugar que sempre revele a resposta.
+Uma pessoa pode se passar por escultura, manequim ou instalação. Sua existência, papel, local, aparência, motivo, relato e relação com a história mudam conforme a variante; também podem existir partidas sem essa pessoa. Não deve haver um único lugar que sempre revele a resposta.
 
-| Vers�o candidata | Motivo | Contribui��o e limite |
+| Versão candidata | Motivo | Contribuição e limite |
 |---|---|---|
-| Guarda | Escondeu-se por medo depois de perceber algo. | Testemunhou uma parte da movimenta��o; sua interpreta��o pode ser incompleta. |
-| Artista | Prepara uma apresenta��o como est�tua viva. | Ouviu uma conversa, mas pode n�o saber seu contexto. |
-| Restaurador ou restauradora | Protege uma pe�a ou participa de uma montagem. | Conhece um procedimento, sem necessariamente conhecer o acontecimento inteiro. |
-| Visitante | Escondeu-se ap�s entrar em uma �rea restrita. | Viu parte de uma a��o e tem motivo para omitir sua presen�a. |
-| Funcion�rio ou funcion�ria | Prepara uma surpresa. | Explica uma movimenta��o suspeita que pode ser independente do evento central. |
-| Figura com plano pr�prio | Tenta observar ou agir sem ser identificada. | Sua responsabilidade precisa ser estabelecida por evid�ncias, n�o pelo disfarce. |
+| Guarda | Escondeu-se por medo depois de perceber algo. | Testemunhou uma parte da movimentação; sua interpretação pode ser incompleta. |
+| Artista | Prepara uma apresentação como estátua viva. | Ouviu uma conversa, mas pode não saber seu contexto. |
+| Restaurador ou restauradora | Protege uma peça ou participa de uma montagem. | Conhece um procedimento, sem necessariamente conhecer o acontecimento inteiro. |
+| Visitante | Escondeu-se após entrar em uma área restrita. | Viu parte de uma ação e tem motivo para omitir sua presença. |
+| Funcionário ou funcionária | Prepara uma surpresa. | Explica uma movimentação suspeita que pode ser independente do evento central. |
+| Figura com plano próprio | Tenta observar ou agir sem ser identificada. | Sua responsabilidade precisa ser estabelecida por evidências, não pelo disfarce. |
 
-Todas as vers�es precisam de trajet�ria, tempo, visibilidade, evid�ncias, rela��o causal ou independ�ncia expl�cita e explica��o final. A mesma solu��o n�o deve ser indicada apenas por uma anima��o min�scula, um objeto sempre igual ou uma pergunta que entregue o segredo.
+Todas as versões precisam de trajetória, tempo, visibilidade, evidências, relação causal ou independência explícita e explicação final. A mesma solução não deve ser indicada apenas por uma animação minúscula, um objeto sempre igual ou uma pergunta que entregue o segredo.
 
 ## 13. Rejogabilidade e matriz de 15 partidas
 
-**Meta de design:** ao menos 15 configura��es de partida com diferen�as narrativas significativas, verific�veis e jog�veis. N�o h� 15 cen�rios prontos neste documento; a lista a seguir � uma matriz inicial de cria��o, sujeita a escrita, combina��o compat�vel e testes.
+**Meta de design:** ao menos 15 configurações de partida com diferenças narrativas significativas, verificáveis e jogáveis. Não há 15 cenários prontos neste documento; a lista a seguir é uma matriz inicial de criação, sujeita a escrita, combinação compatível e testes.
 
-| N� | Foco provis�rio | Pergunta de cria��o para a equipe |
+| Nº | Foco provisório | Pergunta de criação para a equipe |
 |---:|---|---|
-| 01 | Ativa��o do prot�tipo | Quem ou o que completou as condi��es de ativa��o? |
-| 02 | Falha el�trica | O que a originou e qual foi seu efeito sobre a m�quina? |
-| 03 | Alarme autom�tico | Qual evento acionou o sistema e com que evid�ncia? |
+| 01 | Ativação do protótipo | Quem ou o que completou as condições de ativação? |
+| 02 | Falha elétrica | O que a originou e qual foi seu efeito sobre a máquina? |
+| 03 | Alarme automático | Qual evento acionou o sistema e com que evidência? |
 | 04 | Acionamento humano do alarme | Quem acionou o alarme e por qual motivo? |
-| 05 | Pe�a retirada para prote��o | O que motivou a retirada e onde ficou a pe�a? |
-| 06 | Troca autorizada | Por que houve a substitui��o e quem sabia dela? |
-| 07 | Troca indevida | Como distinguir a inten��o, o m�todo e o destino das pe�as? |
-| 08 | Caixa identificada incorretamente | Como a diverg�ncia de registros gerou uma falsa conclus�o? |
-| 09 | Visita inesperada | Quem entrou e qual rela��o tem com os fatos da noite? |
+| 05 | Peça retirada para proteção | O que motivou a retirada e onde ficou a peça? |
+| 06 | Troca autorizada | Por que houve a substituição e quem sabia dela? |
+| 07 | Troca indevida | Como distinguir a intenção, o método e o destino das peças? |
+| 08 | Caixa identificada incorretamente | Como a divergência de registros gerou uma falsa conclusão? |
+| 09 | Visita inesperada | Quem entrou e qual relação tem com os fatos da noite? |
 | 10 | Homenagem interrompida | O que era preparado e qual acontecimento interrompeu o plano? |
-| 11 | Instala��o art�stica interrompida | Qual era a a��o prevista e o que a alterou? |
-| 12 | Informa��o do inventor | Que registro foi mal interpretado e por quem? |
+| 11 | Instalação artística interrompida | Qual era a ação prevista e o que a alterou? |
+| 12 | Informação do inventor | Que registro foi mal interpretado e por quem? |
 | 13 | Guarda escondido | O que o guarda observou e o que interpretou equivocadamente? |
 | 14 | Obra deslocada | Quem a movimentou e se isso se relaciona ao evento central? |
-| 15 | Dois fatos independentes | Quais acontecimentos coincidiram sem rela��o causal? |
+| 15 | Dois fatos independentes | Quais acontecimentos coincidiram sem relação causal? |
 
-Esses focos precisam ser transformados em realidades completas e diferenciadas; simplesmente mudar nome, cor ou posi��o n�o conta como uma nova partida significativa. Uma variante pode combinar temas apenas quando causa, cronologia e evid�ncias forem consistentes. Evitar sinaliza��es que entreguem a solu��o por reconhecimento de padr�o.
+Esses focos precisam ser transformados em realidades completas e diferenciadas; simplesmente mudar nome, cor ou posição não conta como uma nova partida significativa. Uma variante pode combinar temas apenas quando causa, cronologia e evidências forem consistentes. Evitar sinalizações que entreguem a solução por reconhecimento de padrão.
 
-### Sele��o e hist�rico
+### Seleção e histórico
 
-O sistema seleciona apenas combina��es previamente validadas e registra a variante usada no hist�rico definido para a mesa. Proposta: n�o repetir uma configura��o completa no mesmo ciclo de 15 at� esgotar as dispon�veis, respeitando os cen�rios eleg�veis para o n�mero de participantes. O escopo desse hist�rico - anfitri�o, grupo ou outro identificador - precisa ser decidido; mudan�as de anfitri�o, grupos mistos e perda de hist�rico impedem prometer aus�ncia universal de repeti��o.
+O sistema seleciona apenas combinações previamente validadas e registra a variante usada no histórico definido para a mesa. Proposta: não repetir uma configuração completa no mesmo ciclo de 15 até esgotar as disponíveis, respeitando os cenários elegíveis para o número de participantes. O escopo desse histórico — anfitrião, grupo ou outro identificador — precisa ser decidido; mudanças de anfitrião, grupos mistos e perda de histórico impedem prometer ausência universal de repetição.
 
-Em cada partida, registra-se em sigilo a realidade selecionada, sua vers�o e o estado inicial. Durante os loops, a sequ�ncia-base permanece consistente; a interven��o autorizada cria uma ramifica��o rastre�vel. O ciclo de valida��o de 15 partidas documentado para outro modo MOSAICO � refer�ncia de cobertura, n�o prova de que este jogo j� possui 15 hist�rias nem regra autom�tica de autoria para todos os cen�rios.
+Em cada partida, registra-se em sigilo a realidade selecionada, sua versão e o estado inicial. Durante os loops, a sequência-base permanece consistente; a intervenção autorizada cria uma ramificação rastreável. O ciclo de validação de 15 partidas documentado para outro modo MOSAICO é referência de cobertura, não prova de que este jogo já possui 15 histórias nem regra automática de autoria para todos os cenários.
 
-## 14. Distribui��o de pistas e justi�a
+## 14. Distribuição de pistas e justiça
 
-Para cada fato essencial, planejar pelo menos duas fontes independentes, incluindo uma fonte que n�o dependa exclusivamente do relato de um personagem. Uma observa��o direta, um registro e uma consequ�ncia podem sustentar a mesma conclus�o por caminhos diferentes; n�o � necess�rio que todas as fontes estejam no mesmo ambiente.
+Para cada fato essencial, planejar pelo menos duas fontes independentes, incluindo uma fonte que não dependa exclusivamente do relato de um personagem. Uma observação direta, um registro e uma consequência podem sustentar a mesma conclusão por caminhos diferentes; não é necessário que todas as fontes estejam no mesmo ambiente.
 
-O crit�rio de duas fontes � necess�rio, mas n�o suficiente: com uma pessoa, cinco loops e um ambiente por loop, as fontes precisam ser alcan��veis nas rotas dispon�veis. Cada variante deve apresentar uma matriz de cobertura por n�mero de jogadores e por escolhas poss�veis. Quando uma combina��o de ambientes deixar o jogador sem fatos necess�rios, adicionar uma alternativa, uma recupera��o planejada, mais oportunidade de acesso ou recalibrar a variante.
+O critério de duas fontes é necessário, mas não suficiente: com uma pessoa, cinco loops e um ambiente por loop, as fontes precisam ser alcançáveis nas rotas disponíveis. Cada variante deve apresentar uma matriz de cobertura por número de jogadores e por escolhas possíveis. Quando uma combinação de ambientes deixar o jogador sem fatos necessários, adicionar uma alternativa, uma recuperação planejada, mais oportunidade de acesso ou recalibrar a variante.
 
-Pistas falsas devem ter uma explica��o verdadeira no final. Registros contradit�rios s� podem existir quando a contradi��o tiver explica��o estabelecida, como hor�rio incorreto, relato parcial ou altera��o comprovada. N�o introduzir solu��o baseada em um fato sem evid�ncia acess�vel. Assist�ncias s�o complementares e opcionais.
+Pistas falsas devem ter uma explicação verdadeira no final. Registros contraditórios só podem existir quando a contradição tiver explicação estabelecida, como horário incorreto, relato parcial ou alteração comprovada. Não introduzir solução baseada em um fato sem evidência acessível. Assistências são complementares e opcionais.
 
 ## 15. Multijogador e solo
 
-### Sala e sincroniza��o
+### Sala e sincronização
 
-O anfitri�o cria uma sala; participantes entram por c�digo e/ou QR, conforme a implementa��o aprovada. O estado compartilhado precisa incluir fase, variante, n�mero do loop, in�cio, prazo, pausas, participantes e interven��o autorizada. Cada dispositivo recebe apenas a informa��o permitida � sua perspectiva.
+O anfitrião cria uma sala; participantes entram por código e/ou QR, conforme a implementação aprovada. O estado compartilhado precisa incluir fase, variante, número do loop, início, prazo, pausas, participantes e intervenção autorizada. Cada dispositivo recebe apenas a informação permitida à sua perspectiva.
 
-O rel�gio de refer�ncia deve ser sincronizado por tempo confi�vel de servidor; uma mudan�a no rel�gio local n�o pode acelerar ou atrasar a sess�o. Ao voltar de uma desconex�o, a pessoa retoma o estado p�blico corrente e seu pr�prio caderno, sem reiniciar o tempo para os demais. A pol�tica de pausa do anfitri�o, aus�ncia prolongada e entrada tardia precisa ser definida e testada.
+O relógio de referência deve ser sincronizado por tempo confiável de servidor; uma mudança no relógio local não pode acelerar ou atrasar a sessão. Ao voltar de uma desconexão, a pessoa retoma o estado público corrente e seu próprio caderno, sem reiniciar o tempo para os demais. A política de pausa do anfitrião, ausência prolongada e entrada tardia precisa ser definida e testada.
 
-O grupo pode discutir e compartilhar informa��es; detalhes de chat, comunica��o presencial e ajuda comum est�o em aberto. A pontua��o pode ser individual, com avalia��o coletiva da interven��o, desde que o modo e as regras estejam claros antes da partida.
+O grupo pode discutir e compartilhar informações; detalhes de chat, comunicação presencial e ajuda comum estão em aberto. A pontuação pode ser individual, com avaliação coletiva da intervenção, desde que o modo e as regras estejam claros antes da partida.
 
 ### Modo solo
 
-Modo desejado, ainda n�o especificado por completo. Exige cobertura verific�vel dos fatos, op��es suficientes de observa��o e um plano final poss�vel para uma s� pessoa. Pode usar adapta��es de fontes, oportunidades adicionais ou a��es execut�veis individualmente, sem pressupor que basta manter as regras do grupo. N�mero de loops e dura��o do modo solo dependem de testes.
+Modo desejado, ainda não especificado por completo. Exige cobertura verificável dos fatos, opções suficientes de observação e um plano final possível para uma só pessoa. Pode usar adaptações de fontes, oportunidades adicionais ou ações executáveis individualmente, sem pressupor que basta manter as regras do grupo. Número de loops e duração do modo solo dependem de testes.
 
-## 16. Narrativa e estrutura de conte�do
+## 16. Narrativa e estrutura de conteúdo
 
-Cada cen�rio deve ser escrito antes de sua implementa��o com: premissa; atmosfera; situa��o inicial; fatos de fundo; hist�ria can�nica da variante; personagens e objetivos; linha do tempo; mapa de deslocamentos; invent�rio de pistas; hip�teses alternativas; momentos de descoberta; interven��o; consequ�ncias; revela��o; e textos p�blicos separados dos segredos de dire��o.
+Cada cenário deve ser escrito antes de sua implementação com: premissa; atmosfera; situação inicial; fatos de fundo; história canônica da variante; personagens e objetivos; linha do tempo; mapa de deslocamentos; inventário de pistas; hipóteses alternativas; momentos de descoberta; intervenção; consequências; revelação; e textos públicos separados dos segredos de direção.
 
-O roteiro do inventor prop�e uma �ncora temporal, um dispositivo aparentemente incompleto e experi�ncias anteriores. Ele � material de desenvolvimento, n�o uma resposta fixa para todas as partidas. Sua cronologia exige resolver a aparente diverg�ncia entre estrondo, falha el�trica, descarga e ativa��o, bem como esclarecer como o inventor poderia conhecer o funcionamento de um prot�tipo depois entregue incompleto.
+O roteiro do inventor propõe uma âncora temporal, um dispositivo aparentemente incompleto e experiências anteriores. Ele é material de desenvolvimento, não uma resposta fixa para todas as partidas. Sua cronologia exige resolver a aparente divergência entre estrondo, falha elétrica, descarga e ativação, bem como esclarecer como o inventor poderia conhecer o funcionamento de um protótipo depois entregue incompleto.
 
-Manter a promessa de suspense sem assassinato obrigat�rio. As pessoas possuem raz�es e segredos pr�prios. Um acontecimento pode ser acidental, intencional ou resultar de decis�es independentes. O final deve esclarecer pistas enganosas e deixar expl�cito o que foi observado e o que � interpreta��o.
+Manter a promessa de suspense sem assassinato obrigatório. As pessoas possuem razões e segredos próprios. Um acontecimento pode ser acidental, intencional ou resultar de decisões independentes. O final deve esclarecer pistas enganosas e deixar explícito o que foi observado e o que é interpretação.
 
-## 17. Interface, acessibilidade e dire��o audiovisual
+## 17. Interface, acessibilidade e direção audiovisual
 
-Priorizar celular: cron�metro leg�vel, ambiente selecionado, a��o atual e acesso ao caderno. Pistas pessoais e jogadas devem permanecer pr�ximas. Evitar excesso de pain�is sobre a maquete. Pausas mostram hip�tese, pistas opcionais, compartilhamento e escolha do pr�ximo ambiente sem expor respostas.
+Priorizar celular: cronômetro legível, ambiente selecionado, ação atual e acesso ao caderno. Pistas pessoais e jogadas devem permanecer próximas. Evitar excesso de painéis sobre a maquete. Pausas mostram hipótese, pistas opcionais, compartilhamento e escolha do próximo ambiente sem expor respostas.
 
-A dire��o visual desejada acompanha a identidade Dragon: atmosfera envolvente, profundidade, bot�es com volume, tipografia leg�vel e cores que diferenciem estados. Os sinais essenciais n�o dependem apenas de cor, �udio ou gestos finos. Fornecer legendas, controles de som, alvos de toque adequados, op��es de movimento reduzido e equivalentes para intera��es 3D. Compatibilidade real deve ser testada em dispositivos.
+A direção visual desejada acompanha a identidade Dragon: atmosfera envolvente, profundidade, botões com volume, tipografia legível e cores que diferenciem estados. Os sinais essenciais não dependem apenas de cor, áudio ou gestos finos. Fornecer legendas, controles de som, alvos de toque adequados, opções de movimento reduzido e equivalentes para interações 3D. Compatibilidade real deve ser testada em dispositivos.
 
-O som, a luz de emerg�ncia e o retorno do tempo podem produzir tens�o. A intensidade e frequ�ncia de flashes exigem alternativa reduzida ou desativ�vel. A arte final, personagens, efeitos e imagens n�o foram encomendados ou produzidos neste documento.
+O som, a luz de emergência e o retorno do tempo podem produzir tensão. A intensidade e frequência de flashes exigem alternativa reduzida ou desativável. A arte final, personagens, efeitos e imagens não foram encomendados ou produzidos neste documento.
 
 ## 18. Museu e ativos tridimensionais
 
-A maquete pode ser dividida por c�modos ou carregada progressivamente, com vers�es adequadas ao celular. A visualiza��o pode ser em 3D convencional e, se validada para os dispositivos, em RA; as pistas essenciais devem ter acesso equivalente sem RA.
+A maquete pode ser dividida por cômodos ou carregada progressivamente, com versões adequadas ao celular. A visualização pode ser em 3D convencional e, se validada para os dispositivos, em RA; as pistas essenciais devem ter acesso equivalente sem RA.
 
-Candidatos encontrados em pesquisa anterior, ainda sem download, inspe��o t�cnica ou valida��o visual nesta entrega:
+Candidatos encontrados em pesquisa anterior, ainda sem download, inspeção técnica ou validação visual nesta entrega:
 
-- Art Gallery and Exhibition Rooms: https://3dassets.dev/packs/art-gallery-and-exhibition-rooms - conjunto anunciado como CC0 com cena inicial e pe�as separadas; verificar origem, vers�o, qualidade e licen�a no momento de uso.
-- Galleries, 1DesignTool: https://1designtool.com/3d/models/museum-galleries - galeria leve sob licen�a pr�pria; a p�gina informa restri��es de redistribui��o do arquivo isolado ou em pacote.
-- Museum, Grab3D: https://grab3d.com/models/buildings/museum/ - fachada anunciada como CC0; n�o se pressup�e interior utiliz�vel.
-- Smithsonian Open Access: https://www.si.edu/spotlight/openaccesshighlights - pe�as individuais quando marcadas como CC0, observando a identifica��o de cada item.
+- Art Gallery and Exhibition Rooms: https://3dassets.dev/packs/art-gallery-and-exhibition-rooms — conjunto anunciado como CC0 com cena inicial e peças separadas; verificar origem, versão, qualidade e licença no momento de uso.
+- Galleries, 1DesignTool: https://1designtool.com/3d/models/museum-galleries — galeria leve sob licença própria; a página informa restrições de redistribuição do arquivo isolado ou em pacote.
+- Museum, Grab3D: https://grab3d.com/models/buildings/museum/ — fachada anunciada como CC0; não se pressupõe interior utilizável.
+- Smithsonian Open Access: https://www.si.edu/spotlight/openaccesshighlights — peças individuais quando marcadas como CC0, observando a identificação de cada item.
 
-Licen�as de modelos, texturas, obras, marcas e arquivos derivados devem ser registradas separadamente. A sele��o de um modelo anunciado como gratuito n�o comprova, por si s�, compatibilidade est�tica, desempenho ou direitos de todos os elementos incorporados.
+Licenças de modelos, texturas, obras, marcas e arquivos derivados devem ser registradas separadamente. A seleção de um modelo anunciado como gratuito não comprova, por si só, compatibilidade estética, desempenho ou direitos de todos os elementos incorporados.
 
-## 19. Dire��o t�cnica inicial
+## 19. Direção técnica inicial
 
-O projeto existente da Dragon emprega HTML, CSS, JavaScript, Firebase e Three.js em diferentes experi�ncias. Esta � uma refer�ncia para an�lise de compatibilidade, n�o uma decis�o de copiar a arquitetura ou a configura��o de outro jogo. A escolha final deve considerar o reposit�rio pr�prio, custo, autentica��o, privacidade, manuten��o e testes.
+O projeto existente da Dragon emprega HTML, CSS, JavaScript, Firebase e Three.js em diferentes experiências. Esta é uma referência para análise de compatibilidade, não uma decisão de copiar a arquitetura ou a configuração de outro jogo. A escolha final deve considerar o repositório próprio, custo, autenticação, privacidade, manutenção e testes.
 
-Separar estado da partida e regras; rel�gio e sincroniza��o; conte�do narrativo; interface; renderiza��o 3D; e persist�ncia. O servidor ou servi�o autorizado deve controlar a realidade selecionada e os dados secretos; esconder uma resposta na interface n�o protege um conte�do enviado integralmente ao navegador. Avaliar regras de acesso, integridade de a��es, reconex�o e tratamento de dados antes de publicar.
+Separar estado da partida e regras; relógio e sincronização; conteúdo narrativo; interface; renderização 3D; e persistência. O servidor ou serviço autorizado deve controlar a realidade selecionada e os dados secretos; esconder uma resposta na interface não protege um conteúdo enviado integralmente ao navegador. Avaliar regras de acesso, integridade de ações, reconexão e tratamento de dados antes de publicar.
 
-Metas num�ricas de carregamento, fluidez e limites de tamanho ser�o definidas ap�s medir dispositivos de refer�ncia. Planejar compress�o, carregamento por ambiente, descarte de recursos e qualidade adaptativa, preservando legibilidade e movimentos importantes.
+Metas numéricas de carregamento, fluidez e limites de tamanho serão definidas após medir dispositivos de referência. Planejar compressão, carregamento por ambiente, descarte de recursos e qualidade adaptativa, preservando legibilidade e movimentos importantes.
 
-## 20. Testes e crit�rios de aceite
+## 20. Testes e critérios de aceite
 
-### Coer�ncia da hist�ria
+### Coerência da história
 
-- Cada cen�rio tem uma realidade documentada, uma cronologia �nica e uma rela��o de causa e efeito verific�vel.
-- Os deslocamentos cabem nos hor�rios; personagens n�o est�o em dois lugares simultaneamente.
-- Testemunhos, registros e observa��es correspondem ao que cada perspectiva pode perceber.
-- Toda pista enganosa tem explica��o e toda conclus�o cobrada tem evid�ncia acess�vel.
-- C�digos, portas e objetos retornam corretamente no in�cio do loop.
-- Uma a��o que altera eventos produz a ramifica��o prevista; a solu��o final esclarece o que mudou.
+- Cada cenário tem uma realidade documentada, uma cronologia única e uma relação de causa e efeito verificável.
+- Os deslocamentos cabem nos horários; personagens não estão em dois lugares simultaneamente.
+- Testemunhos, registros e observações correspondem ao que cada perspectiva pode perceber.
+- Toda pista enganosa tem explicação e toda conclusão cobrada tem evidência acessível.
+- Códigos, portas e objetos retornam corretamente no início do loop.
+- Uma ação que altera eventos produz a ramificação prevista; a solução final esclarece o que mudou.
 
-### Experi�ncia e cobertura
+### Experiência e cobertura
 
-- Executar pelo menos 15 partidas de cobertura com as configura��es efetivamente implementadas; registrar cen�rio, variante, quantidade de pessoas, caminhos, resultado e falhas.
-- Conferir variedade significativa entre as 15, n�o apenas altera��es cosm�ticas, e n�o prometer 15 possibilidades antes de elas existirem.
-- Testar grupos de tamanhos variados e solo, incluindo jogadores que escolhem o mesmo ambiente, caminhos pouco informativos e pessoas que n�o compartilham pistas.
-- Verificar as duas fontes por fato e a possibilidade efetiva de alcan��-las no limite de escolhas.
-- Cronometrar abertura, cinco loops, pausas, hip�teses, interven��o e revela��o separadamente.
-- Testar ajudas, respostas parciais, op��es n�o sei, pontua��o e aus�ncia de pressupostos falsos.
-- Testar desconex�o, retorno, pausa, expira��o de tempo, duplicidade de a��o, dispositivos e navegadores priorit�rios.
-- Realizar partidas observadas com pessoas; testes automatizados e simula��es n�o substituem playtests humanos.
+- Executar pelo menos 15 partidas de cobertura com as configurações efetivamente implementadas; registrar cenário, variante, quantidade de pessoas, caminhos, resultado e falhas.
+- Conferir variedade significativa entre as 15, não apenas alterações cosméticas, e não prometer 15 possibilidades antes de elas existirem.
+- Testar grupos de tamanhos variados e solo, incluindo jogadores que escolhem o mesmo ambiente, caminhos pouco informativos e pessoas que não compartilham pistas.
+- Verificar as duas fontes por fato e a possibilidade efetiva de alcançá-las no limite de escolhas.
+- Cronometrar abertura, cinco loops, pausas, hipóteses, intervenção e revelação separadamente.
+- Testar ajudas, respostas parciais, opções não sei, pontuação e ausência de pressupostos falsos.
+- Testar desconexão, retorno, pausa, expiração de tempo, duplicidade de ação, dispositivos e navegadores prioritários.
+- Realizar partidas observadas com pessoas; testes automatizados e simulações não substituem playtests humanos.
 
-## 21. Etapas de produ��o
+## 21. Etapas de produção
 
-1. **Defini��o narrativa:** decidir o primeiro acontecimento, o papel do inventor, a ordem causal e a regra dieg�tica do retorno.
+1. **Definição narrativa:** decidir o primeiro acontecimento, o papel do inventor, a ordem causal e a regra diegética do retorno.
 2. **Mapa e cronologia:** fechar salas, visibilidade, rotas, cinco minutos e premissas para todos os participantes.
-3. **Primeira hist�ria completa:** escrever uma variante com pistas, hip�teses, resultado e interven��es.
-4. **Prot�tipo de fluxo:** testar sele��o de ambientes, rel�gio, mem�ria e resolu��o sem depender de maquete final.
-5. **Multijogador e reconex�o:** implementar sincroniza��o e prote��o de dados compat�veis com a infraestrutura escolhida.
-6. **Museu e intera��o:** avaliar modelos candidatos, licen�as, apar�ncia e desempenho antes de incorpor�-los.
-7. **Expans�o de conte�do:** produzir e validar as variantes at� alcan�ar a meta de 15 partidas significativas.
-8. **Playtests e revis�o:** testar dura��o, acessibilidade, compreens�o, rejogabilidade e justi�a; corrigir antes de disponibilizar.
+3. **Primeira história completa:** escrever uma variante com pistas, hipóteses, resultado e intervenções.
+4. **Protótipo de fluxo:** testar seleção de ambientes, relógio, memória e resolução sem depender de maquete final.
+5. **Multijogador e reconexão:** implementar sincronização e proteção de dados compatíveis com a infraestrutura escolhida.
+6. **Museu e interação:** avaliar modelos candidatos, licenças, aparência e desempenho antes de incorporá-los.
+7. **Expansão de conteúdo:** produzir e validar as variantes até alcançar a meta de 15 partidas significativas.
+8. **Playtests e revisão:** testar duração, acessibilidade, compreensão, rejogabilidade e justiça; corrigir antes de disponibilizar.
 
-## 22. Decis�es pendentes
+## 22. Decisões pendentes
 
-| Decis�o | Estado atual |
+| Decisão | Estado atual |
 |---|---|
-| Fato principal da primeira hist�ria | Em aberto; deve ser descoberto durante o jogo. |
-| Explica��o definitiva do loop | Prot�tipo e inventor s�o proposta de roteiro; causalidade precisa ser consolidada. |
-| Limite de jogadores e regras do anfitri�o | Em aberto; definir com base em testes e infraestrutura. |
-| Cinco loops de investiga��o ou quatro mais interven��o | Duas propostas; comparar ritmo, dura��o e cobertura. |
-| Interven��es antes do loop final | Em aberto; exigem ramifica��es consistentes. |
-| Hist�rico e preven��o de repeti��o | Proposta de ciclo de 15; identificar onde e para quem persistir�. |
-| Cooperativo, competitivo e compartilhamento de pistas | Modos candidatos; formalizar antes da implementa��o. |
-| Pesos finais, uso de ajudas e previs�o antecipada | Valores de refer�ncia neste documento; calibrar com testes. |
-| Maquete, 3D e RA | Modelos candidatos identificados; falta inspe��o, direitos e desempenho. |
-| Modo solo e adapta��es | Desejado; requer regras e teste pr�prios. |
+| Fato principal da primeira história | Em aberto; deve ser descoberto durante o jogo. |
+| Explicação definitiva do loop | Protótipo e inventor são proposta de roteiro; causalidade precisa ser consolidada. |
+| Limite de jogadores e regras do anfitrião | Em aberto; definir com base em testes e infraestrutura. |
+| Cinco loops de investigação ou quatro mais intervenção | Duas propostas; comparar ritmo, duração e cobertura. |
+| Intervenções antes do loop final | Em aberto; exigem ramificações consistentes. |
+| Histórico e prevenção de repetição | Proposta de ciclo de 15; identificar onde e para quem persistirá. |
+| Cooperativo, competitivo e compartilhamento de pistas | Modos candidatos; formalizar antes da implementação. |
+| Pesos finais, uso de ajudas e previsão antecipada | Valores de referência neste documento; calibrar com testes. |
+| Maquete, 3D e RA | Modelos candidatos identificados; falta inspeção, direitos e desempenho. |
+| Modo solo e adaptações | Desejado; requer regras e teste próprios. |
 
-## 23. Refer�ncias de concep��o
+## 23. Referências de concepção
 
-- Roteiro-base Cinco Minutos para o Fim fornecido por M�rio para discuss�o; os elementos de revela��o s�o tratados como proposta narrativa.
-- Padr�o de Personagens, Jogadores e Motor - Modo Impostor: https://chatgpt.com/library?file_id=libfile_1ea3784ba5a481919955b9f78bb90a14&account_id=personal. O ciclo de 15 mencionado ali se refere � cobertura e valida��o daquele modo.
-- Guia da Hist�ria MOSAICO: https://chatgpt.com/library?file_id=libfile_c63bd6e777d88191be2bc9e48525eb65&account_id=personal. O novo projeto pode variar acontecimentos entre partidas conforme a proposta atual, mesmo quando um guia de outro modo trabalha com um c�none comum.
-- Dragon Games, documenta��o do reposit�rio: https://github.com/DrMarioNascimento/Dragon
+- Roteiro-base Cinco Minutos para o Fim fornecido por Mário para discussão; os elementos de revelação são tratados como proposta narrativa.
+- Padrão de Personagens, Jogadores e Motor — Modo Impostor: https://chatgpt.com/library?file_id=libfile_1ea3784ba5a481919955b9f78bb90a14&account_id=personal. O ciclo de 15 mencionado ali se refere à cobertura e validação daquele modo.
+- Guia da História MOSAICO: https://chatgpt.com/library?file_id=libfile_c63bd6e777d88191be2bc9e48525eb65&account_id=personal. O novo projeto pode variar acontecimentos entre partidas conforme a proposta atual, mesmo quando um guia de outro modo trabalha com um cânone comum.
+- Dragon Games, documentação do repositório: https://github.com/DrMarioNascimento/Dragon
 
-**Documento de trabalho.** As propostas e metas ainda n�o s�o funcionalidades implementadas, testes realizados ou decis�es finais de publica��o.
-
+**Documento de trabalho.** As propostas e metas ainda não são funcionalidades implementadas, testes realizados ou decisões finais de publicação.

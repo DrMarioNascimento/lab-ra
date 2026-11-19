@@ -1,10 +1,11 @@
 # Cinco Minutos para o Fim
 
-Bancada experimental individual para o LAB-RA. O jogo � executado no navegador e salva a partida e o hist�rico das 15 configura��es experimentais neste aparelho. H� cinco loops, escolha de ambiente, pistas temporizadas, caderno, orienta��es, hip�teses e uma tela de revela��o.
+Bancada experimental individual para o LAB-RA. O jogo é executado no navegador e salva a partida e o histórico das 15 configurações experimentais neste aparelho. Há cinco loops, escolha de ambiente, pistas temporizadas, caderno, orientações, hipóteses e uma tela de revelação.
 
-As 15 configura��es s�o varia��es iniciais de conte�do, n�o 15 hist�rias completas validadas. A a��o final � avaliada como hip�tese e ainda n�o altera o loop. O prot�tipo n�o possui salas em dispositivos diferentes, autentica��o, sincroniza��o, Firebase, maquete 3D ou realidade aumentada.
+As 15 configurações são variações iniciais de conteúdo, não 15 histórias completas validadas. A ação final é avaliada como hipótese e ainda não altera o loop. O protótipo não possui salas em dispositivos diferentes, autenticação, sincronização ou Firebase.
 
-Arquivos: index.html, style.css e game.js. Para experimentar o modo acelerado, abra Como jogar e escolha Ensaio. O conte�do do caso fica no navegador e pode ser inspecionado; n�o usar esta vers�o para uma disputa que dependa de manter a solu��o secreta.
+A maquete em museu/ apresenta 11 ambientes e sete peças com navegação em 3D e uma entrada para realidade aumentada em aparelhos compatíveis. É uma visualização independente; ainda não controla os ambientes ou as pistas do jogo. A integração de RA em dispositivos físicos ainda não foi verificada.
 
-O GDD de refer�ncia est� em GDD.md. Nenhuma arte externa foi adicionada.
+Arquivos: index.html, style.css e game.js. Para experimentar o modo acelerado, abra Como jogar e escolha Ensaio. O conteúdo do caso fica no navegador e pode ser inspecionado; não usar esta versão para uma disputa que dependa de manter a solução secreta.
 
+O GDD de referência está em GDD.md. Nenhuma arte externa foi adicionada.

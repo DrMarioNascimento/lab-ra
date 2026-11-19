@@ -1,0 +1,34 @@
+MUSEU EM 3D - CRÉDITOS E LICENÇAS
+
+Maquete derivada dos dados de arquitetura do projeto ThreeMuseum.
+Origem: https://github.com/SamG-Coder/ThreeMuseum
+Revisão: f247052675d80ff0188709cab5facb4035bfaa49
+Copyright (c) 2026 ThreeMuseum contributors.
+Inclui elementos de exposição originais identificados como D05, D06, B10, B11,
+B12, B13 e B16 do mesmo projeto; todos tratados no projeto de origem como MIT.
+Modificações: conversão dos registros arquitetônicos em GLB, remoção dos tetos,
+agrupamento das peças arquitetônicas por material, escala de maquete e inclusão
+de sete objetos em suas posições. Texturas procedurais, textos, iluminação e
+outros objetos do acervo original não foram reproduzidos integralmente.
+
+MIT License
+
+Copyright (c) 2026 ThreeMuseum contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
