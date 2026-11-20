@@ -14,11 +14,11 @@
 <header><a href="../">← Voltar ao jogo</a><span>LAB-RA · LOOP</span></header>
 <main><p class="eyebrow">Um museu para investigar</p><h1>Explore a maquete</h1><p class="lead">Conheça os três andares de um museu em miniatura. Arraste para girar, aproxime com dois dedos ou pela roda do mouse e escolha um andar e toque em uma sala para focar. A maquete é uma bancada visual e ainda não controla as pistas do jogo.</p>
 <div class="layout"><section class="stage" aria-label="Visualização tridimensional do museu">
-<model-viewer id="museum" src="museu-andares.glb" alt="Maquete de museu com três andares, onze ambientes, paredes abertas, vitrines e peças de exposição" ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" camera-controls touch-action="pan-y" camera-orbit="-38deg 58deg 1.9m" min-camera-orbit="auto 15deg 0.18m" max-camera-orbit="auto 88deg 5m" field-of-view="30deg" shadow-intensity="1" exposure="0.75">
+<model-viewer id="museum" src="museu-andares.glb" alt="Maquete de museu com três andares, 31 ambientes, paredes abertas, vitrines e peças de exposição" ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" camera-controls touch-action="pan-y" camera-orbit="-38deg 58deg 1.9m" min-camera-orbit="auto 15deg 0.18m" max-camera-orbit="auto 88deg 5m" field-of-view="30deg" shadow-intensity="1" exposure="0.75">
 <button class="btn gold" slot="ar-button" id="enterAR">Ver na sua mesa em RA</button>
 </model-viewer><p class="status" id="status" role="status">Carregando a maquete…</p>
 <div class="controls"><button class="btn" type="button" id="reset">Vista geral</button><span id="floors" class="floors" role="group" aria-label="Andar"></span><a class="btn" href="museu-andares.glb" download>Baixar GLB</a></div>
-</section><aside class="side"><p class="eyebrow">3 andares · 11 espaços</p><h2>Ambientes</h2><p>Toque em um nome para aproximar a câmera. Os andares de cima repetem a planta do térreo, com piso próprio e o Pátio de luz vazado.</p><div class="room-list" id="rooms"></div><p class="note">A RA depende do aparelho, do navegador e da permissão de câmera. Quando disponível, use o botão dourado na maquete.</p></aside></div>
+</section><aside class="side"><p class="eyebrow">3 andares · 31 espaços</p><h2>Ambientes</h2><p>Toque em um nome para aproximar a câmera. Cada andar repete a planta do térreo, com piso próprio, e o Pátio de luz fica vazado, do térreo ao último andar. São 31 espaços para investigar.</p><div class="room-list" id="rooms"></div><p class="note">A RA depende do aparelho, do navegador e da permissão de câmera. Quando disponível, use o botão dourado na maquete.</p></aside></div>
 <div class="credits"><strong>Origem e licença.</strong> Maquete adaptada da arquitetura de <a href="https://github.com/SamG-Coder/ThreeMuseum" target="_blank" rel="noopener">ThreeMuseum</a>, de ThreeMuseum contributors, licença MIT. Inclui sete peças originais do mesmo projeto. A adaptação remove o teto, agrupa a arquitetura por materiais, ajusta a escala para maquete e empilha a planta em três andares (script <code>gerar-andares.py</code>). <a href="CREDITOS.txt">Créditos e licença completos</a>. Não é um modelo de um museu real.</div>
 </main>
 <script>
@@ -26,9 +26,37 @@
 const viewer=document.getElementById('museum'),status=document.getElementById('status'),list=document.getElementById('rooms');
 const P=0.132;
 const rooms=[
- ['Recepção',0,19,0],['Sala dos espécimes',12.5,1,0],['Sala dos habitats',29.5,1,0],['Ateliê de descobertas',29,21,0],['Área de descanso',-29,21,0],
- ['Galeria do tempo',-21,-17,1],['Laboratório de formas',12.5,-15,1],['Sala das coleções',29.5,-15,1],['Pátio de luz',0,-17,1],
- ['Galeria especial',12.5,-33,2],['Auditório',29.5,-33,2]
+ ["Terraço",0,19,2],
+ ["Sala dos instrumentos",12.5,1,2],
+ ["Sala das máscaras",29.5,1,2],
+ ["Ateliê de som",29,21,2],
+ ["Sala do educativo",-29,21,2],
+ ["Galeria das luzes",-21,-17,2],
+ ["Sala de controle",12.5,-15,2],
+ ["Cofre do acervo",29.5,-15,2],
+ ["Galeria especial",12.5,-33,2],
+ ["Auditório",29.5,-33,2],
+ ["Mezanino",0,19,1],
+ ["Sala dos fósseis",12.5,1,1],
+ ["Sala dos minerais",29.5,1,1],
+ ["Oficina de restauro",29,21,1],
+ ["Sala de leitura",-29,21,1],
+ ["Galeria do tempo",-21,-17,1],
+ ["Laboratório de formas",12.5,-15,1],
+ ["Sala das coleções",29.5,-15,1],
+ ["Galeria de arte",12.5,-33,1],
+ ["Sala de reuniões",29.5,-33,1],
+ ["Recepção",0,19,0],
+ ["Sala dos espécimes",12.5,1,0],
+ ["Sala dos habitats",29.5,1,0],
+ ["Ateliê de descobertas",29,21,0],
+ ["Área de descanso",-29,21,0],
+ ["Loja do museu",-21,-17,0],
+ ["Café",12.5,-15,0],
+ ["Sala de atendimento",29.5,-15,0],
+ ["Pátio de luz",0,-17,0],
+ ["Sala dos insetos",12.5,-33,0],
+ ["Sala de vídeo",29.5,-33,0]
 ];
 const andarNome=['Térreo','1º andar','2º andar'];
 let andar=-1;

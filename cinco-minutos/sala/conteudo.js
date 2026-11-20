@@ -2,17 +2,37 @@
 // Usado pelo telão e pelo simulador. Se o conteúdo mudar em game.js, gere este arquivo de novo (sala/gerar-conteudo.sh).
 const ANDARES = ['2º andar', '1º andar', 'Térreo'];
 const ROOMS = [
+  {id:'terraco', name:'Terraço', andar:'2º andar', icon:'✦', sub:'Vista para a cidade'},
+  {id:'instrumentos', name:'Sala dos instrumentos', andar:'2º andar', icon:'♪', sub:'Instrumentos antigos'},
+  {id:'mascaras', name:'Sala das máscaras', andar:'2º andar', icon:'◍', sub:'Máscaras e fantasias'},
+  {id:'som', name:'Ateliê de som', andar:'2º andar', icon:'◎', sub:'Gravações e áudio'},
+  {id:'educativo', name:'Sala do educativo', andar:'2º andar', icon:'❖', sub:'Oficinas e visitas escolares'},
+  {id:'luzes', name:'Galeria das luzes', andar:'2º andar', icon:'◐', sub:'Lâmpadas e vidros'},
+  {id:'controle', name:'Sala de controle', andar:'2º andar', icon:'⌘', sub:'Câmeras e iluminação'},
+  {id:'cofre', name:'Cofre do acervo', andar:'2º andar', icon:'▣', sub:'Peças guardadas'},
   {id:'galeria', name:'Galeria especial', andar:'2º andar', icon:'▧', sub:'Obras e vitrines'},
   {id:'auditorio', name:'Auditório', andar:'2º andar', icon:'▱', sub:'Programa e bastidores'},
+  {id:'mezanino', name:'Mezanino', andar:'1º andar', icon:'◫', sub:'Vista para o térreo'},
+  {id:'fosseis', name:'Sala dos fósseis', andar:'1º andar', icon:'◈', sub:'Fósseis e moldes'},
+  {id:'minerais', name:'Sala dos minerais', andar:'1º andar', icon:'⬡', sub:'Pedras e cristais'},
+  {id:'restauro', name:'Oficina de restauro', andar:'1º andar', icon:'✚', sub:'Ferramentas e tintas'},
+  {id:'leitura', name:'Sala de leitura', andar:'1º andar', icon:'☗', sub:'Livros e catálogos'},
   {id:'prototipo', name:'Galeria do tempo', andar:'1º andar', icon:'◷', sub:'Protótipo e retorno'},
   {id:'eletrica', name:'Laboratório de formas', andar:'1º andar', icon:'⌁', sub:'Energia e equipamentos'},
   {id:'deposito', name:'Sala das coleções', andar:'1º andar', icon:'▤', sub:'Inventário e movimentações'},
-  {id:'patio', name:'Pátio de luz', andar:'1º andar', icon:'☼', sub:'Vista para a circulação'},
+  {id:'arte', name:'Galeria de arte', andar:'1º andar', icon:'▨', sub:'Quadros e esculturas'},
+  {id:'reunioes', name:'Sala de reuniões', andar:'1º andar', icon:'▦', sub:'Mesa e quadro de avisos'},
   {id:'recepcao', name:'Recepção', andar:'Térreo', icon:'♧', sub:'Chegadas e convidados'},
   {id:'conservacao', name:'Sala dos espécimes', andar:'Térreo', icon:'◇', sub:'Acervo e registros'},
   {id:'seguranca', name:'Sala dos habitats', andar:'Térreo', icon:'◉', sub:'Alarmes e ocorrências'},
+  {id:'atelie', name:'Ateliê de descobertas', andar:'Térreo', icon:'✧', sub:'Ensaio e registros técnicos'},
   {id:'corredor', name:'Área de descanso', andar:'Térreo', icon:'▥', sub:'Recados e caixas da equipe'},
-  {id:'atelie', name:'Ateliê de descobertas', andar:'Térreo', icon:'✧', sub:'Ensaio e registros técnicos'}
+  {id:'loja', name:'Loja do museu', andar:'Térreo', icon:'♢', sub:'Catálogos e lembranças'},
+  {id:'cafe', name:'Café', andar:'Térreo', icon:'◌', sub:'Mesas e balcão'},
+  {id:'atend', name:'Sala de atendimento', andar:'Térreo', icon:'◑', sub:'Informações ao público'},
+  {id:'patio', name:'Pátio de luz', andar:'Térreo', icon:'☼', sub:'Vista para a circulação'},
+  {id:'insetos', name:'Sala dos insetos', andar:'Térreo', icon:'✿', sub:'Coleção de insetos'},
+  {id:'video', name:'Sala de vídeo', andar:'Térreo', icon:'◰', sub:'Filmes sobre o museu'}
 ];
 const EVENTS = {
   proteger:'Uma peça foi retirada para proteção.',
@@ -84,9 +104,34 @@ const extraDescriptions = {
 };
 Object.assign(roomDescriptions, extraDescriptions);
 
+const EXTRAS = {
+  terraco:"O terraço está vazio e as portas para o salão estão trancadas por dentro. O vento mexe numa faixa da exposição.",
+  instrumentos:"Instrumentos antigos repousam nas vitrines. Nenhum parece ter sido movido desde a última limpeza.",
+  mascaras:"As máscaras estão alinhadas na parede, cada uma com a sua etiqueta. Uma etiqueta está um pouco torta.",
+  som:"Fones e gravadores esperam sobre a bancada. A mesa de som está desligada.",
+  educativo:"Cadeiras pequenas e cartazes de oficina enchem a sala. Uma lousa guarda a lista da última visita escolar.",
+  luzes:"A galeria mostra lâmpadas antigas. Quando o apagão vem, todas apagam juntas.",
+  controle:"Os monitores da sala de controle mostram corredores vazios. Um deles está sem sinal desde a tarde.",
+  cofre:"O cofre está fechado com dois lacres, e os lacres estão inteiros.",
+  mezanino:"Do mezanino se vê a recepção lá embaixo. As luzes de emergência ainda não acenderam.",
+  fosseis:"Os fósseis estão nas bases de sempre. Uma criança deixou um desenho esquecido no chão.",
+  minerais:"Cristais brilham sob a luz fraca da vitrine. A trava da vitrine está no lugar.",
+  restauro:"Pincéis e potes de tinta estão lavados e secando. A oficina fechou no horário.",
+  leitura:"Livros e catálogos estão empilhados na mesa. Um deles está aberto numa página qualquer.",
+  arte:"Quadros e esculturas aguardam o fechamento. Um quadro foi trocado de lugar na semana passada.",
+  reunioes:"A mesa de reuniões tem copos usados. O quadro de avisos lembra o horário de fechamento.",
+  loja:"As lembranças estão arrumadas nas prateleiras. O caixa já foi fechado.",
+  cafe:"As cadeiras do café estão sobre as mesas. O balcão cheira a café recém-lavado.",
+  atend:"O balcão de informações tem um mapa do museu e uma pilha de folhetos.",
+  insetos:"Caixas com insetos estão ordenadas por tamanho. Uma caixa está sem tampa.",
+  video:"A tela da sala de vídeo está apagada. O projetor ainda está quente."
+};
+const EXTRA_ORDEM = Object.keys(EXTRAS);
+Object.keys(EXTRAS).forEach(k => { roomDescriptions[k] = EXTRAS[k]; });
+
 function makeClues(c){
  const evidence=labels[c.alarm][1],fig=figures[c.figure],room=ROOMS.find(r=>r.id===c.room).name;
- return {
+ const base={
   galeria:[
    {id:'gal1',name:'Observar a montagem',time:0,text:'A ficha da exposição menciona '+c.subject+'. '+c.clue.charAt(0).toUpperCase()+c.clue.slice(1)+'.'},
    {id:'gal2',name:'Examinar o registro de acervo',time:90,text:'Um registro da galeria informa: '+c.detail+'.'},
@@ -128,6 +173,20 @@ function makeClues(c){
   atelie:[
    {id:'ate1',name:'Ler o caderno de ensaio',time:0,text:'O ensaio diferencia o pulso que fixa a referência do pulso que fecha a demonstração. O retorno acontece no segundo pulso.'},
    {id:'ate2',name:'Ler a instrução de encerramento',time:180,text:'Em caso de repetição, use Suspender demonstração na Galeria do tempo antes do pulso final, às 22h.'}]
- }
+ };
+ // Salas sem peça-chave: um aviso de rotina e um eco, sempre verdadeiro, de um dos quatro eixos (acontecimento, alarme, figura, prevenção).
+ const ecos=[
+  ['Ler o bilhete de rotina','Um bilhete de rotina cita '+c.subject+'.'],
+  ['Conferir o registro do alarme',evidence],
+  ['Ouvir o relato da ronda','Um relato da ronda indica uma figura imóvel em '+room+'.'],
+  ['Ler o recado da equipe','Um recado da equipe sugere: '+ACTIONS[c.action]]
+ ];
+ EXTRA_ORDEM.forEach((id,k)=>{
+  const [nome,texto]=ecos[k%4];
+  base[id]=[
+   {id:id+'-0',name:'Observar o ambiente',time:0,text:EXTRAS[id]},
+   {id:id+'-1',name:nome,time:60+(k%3)*45,text:texto}];
+ });
+ return base;
 }
 export { ANDARES, ROOMS, EVENTS, ALARMS, FIGURES, ACTIONS, CASES, labels, figures, makeClues, esc };
