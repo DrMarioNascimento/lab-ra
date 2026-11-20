@@ -26,7 +26,7 @@ export const NOVIDADE_DO_ANO = {
 // Exemplo resolvido de cada regra nova (telão) e pergunta de controle (celular, com explicação para quem errar).
 export const EXEMPLO_DO_ANO = {
   1: { linhas: ["Família de 4, bem público no nível 0: 4 × 8 = 32, mais 4 × 2 = 8 (mata acima de 50%). Renda: 40.", "Pondo 25% no bem público: 10 vão para ele e 30 ficam no caixa.", "Cada nível novo do bem público dá +2 por pessoa, por ano, a todas as famílias.", "Meta (Monopólio): patrimônio médio de 54 por pessoa no fim, com a mata em 30% ou mais."],
-       pergunta: "O bem público subiu de nível. Quem ganha mais renda?", opcoes: ["Só a família que mais pôs", "Todas as famílias", "Ninguém, só o professor"], certa: 1,
+       pergunta: "O bem público subiu de nível. Quem ganha mais renda?", opcoes: ["Só a família que mais pôs", "Todas as famílias", "Ninguém, só o Mestre"], certa: 1,
        explica: "Todas: o nível novo dá +2 por pessoa, por ano, a todas as famílias, inclusive às que não puseram nada." },
   // R13: a mata em % da vila (a conta depende do número de famílias, por isso as linhas saem do próprio jogo)
   2: { linhas: (st) => { const pc = (x) => (Math.round((1000 * x) / (st.teto || 1)) / 10).toLocaleString("pt-BR"); return [

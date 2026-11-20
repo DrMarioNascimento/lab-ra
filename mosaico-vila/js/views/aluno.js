@@ -174,7 +174,7 @@ function telaManual() {
 
 export function renderAluno(st, id, loc) {
   idAtual = id;
-  if (st.encerrada) return `<div class="hd painel"><div class="p-topo">${ico("app-mosaico-vila", "m")}<div class="p-quem"><b>Mosaico Vila</b></div></div></div><div class="bd fim-tela" style="display:flex;flex-direction:column;justify-content:center;min-height:60vh"><div class="fim-ico" aria-hidden="true">✓</div><h2>Aula encerrada</h2><p class="muted">O professor encerrou a sessão. Obrigado pela participação, ${esc((st.alunos[id]?.nome || "").split(" ")[0])}!</p></div>`;
+  if (st.encerrada) return `<div class="hd painel"><div class="p-topo">${ico("app-mosaico-vila", "m")}<div class="p-quem"><b>Mosaico Vila</b></div></div></div><div class="bd fim-tela" style="display:flex;flex-direction:column;justify-content:center;min-height:60vh"><div class="fim-ico" aria-hidden="true">✓</div><h2>Aula encerrada</h2><p class="muted">O Mestre encerrou a sessão. Obrigado pela participação, ${esc((st.alunos[id]?.nome || "").split(" ")[0])}!</p></div>`;
   // R43: a cada mudança de etapa, um aviso de 3,5 s no cabeçalho (a primeira tela não avisa)
   const chaveFase = `${st.fase}:${st.ano}`;
   if (loc.faseVista == null) loc.faseVista = chaveFase;
@@ -184,7 +184,7 @@ export function renderAluno(st, id, loc) {
   const f = me?.fam ? st.fams[me.fam] : null;
   let bd = "";
   switch (st.fase) {
-    case "entrada": bd = `<h2>Você vai representar uma família</h2><p class="muted">Você entrou como <b>${esc(me?.nome)}</b>. Nesta atividade você vive um papel: o de uma família da vila. Aguarde o professor formar as famílias.</p><div class="card"><p class="muted" style="margin:0">O jogo fala de dinheiro, aluguel, herança e propostas de corrupção, sempre de famílias e personagens inventados. Os pontos são de mentira. Se algum tema pesar, você pode só observar ou falar com quem conduz.</p></div>`; break;
+    case "entrada": bd = `<h2>${me?.forma === "f" ? "Bem-vinda" : me?.forma === "m" ? "Bem-vindo" : "Boas-vindas"}, ${esc(me?.nome)}!</h2><p class="muted"><b>Você vai representar uma família.</b> Nesta atividade você vive um papel: o de uma família da vila. Aguarde o Mestre formar as famílias.</p><div class="card"><p class="muted" style="margin:0">O jogo fala de dinheiro, aluguel, herança e propostas de corrupção, sempre de famílias e personagens inventados. Os pontos são de mentira. Se algum tema pesar, você pode só observar ou falar com quem conduz.</p></div>`; break;
     case "familias":
       bd = `<div class="card col" style="align-items:center;text-align:center">${iconeFamilia(f, 72)}<h2>${esc(f.nome)}</h2><p class="muted">${sozinho(st, f) ? "Você chefia esta família. Os 2 parentes automáticos seguem as suas decisões: a proposta do ano, o lance e o voto." : "Procure as pessoas com este símbolo e sentem juntas."}</p></div>
         ${me.achou ? enviado("Família encontrada.") : `<button class="btn ok block" data-a="achei">Achei minha família</button>`}`;

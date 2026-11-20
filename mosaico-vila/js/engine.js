@@ -109,7 +109,7 @@ export function reduzir(st, a) {
   switch (a.t) {
     case "entrar":
       if (s.fase !== "entrada" || s.alunos[a.id]) break;
-      s.alunos[a.id] = { id: a.id, nome: String(a.nome).trim().slice(0, 24), fam: null, achou: false };
+      s.alunos[a.id] = { id: a.id, nome: String(a.nome).trim().slice(0, 24), fam: null, achou: false, forma: ["m", "f"].includes(a.forma) ? a.forma : "n" };
       s.ordem.push(a.id); s.pessoal[a.id] = 0;
       break;
     case "sortear": {
@@ -341,7 +341,7 @@ function avancar(s, r) {
   }
   s.k += 1;
   s.painel = null;
-  if (FASES[s.k]?.id === "mente" && s.semTroco) s.k += 1;   // carta do ano 4 desligada pelo professor (se a aula atrasar)
+  if (FASES[s.k]?.id === "mente" && s.semTroco) s.k += 1;   // carta do ano 4 desligada pelo Mestre (se a aula atrasar)
   const prox = FASES[s.k];
   s.fase = prox.id;
   if (prox.ano) s.ano = prox.ano;

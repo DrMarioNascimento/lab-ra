@@ -17,7 +17,7 @@ function dispatch(a) {
 }
 
 let nAlunos = 20, auto = true, autoProf = false;
-// R43: o professor pode ter um papel na simulação. "auto" = tudo automático (como antes); "familia" = o professor é uma pessoa em cada família
+// R43: o Mestre pode ter um papel na simulação. "auto" = tudo automático (como antes); "familia" = o Mestre é uma pessoa em cada família
 // (vê e joga o celular dela, vota e decide) e todos os outros continuam no automático.
 let modoProf = "auto";
 const representantes = () => { const r = new Set(); for (const f of Object.values(st.fams)) { const m = f.membros.find((id) => !st.alunos[id]?.auto); if (m) r.add(m); } return r; };
@@ -26,11 +26,11 @@ const app = document.getElementById("app");
 app.innerHTML = `
   <header class="row" style="padding:14px 16px 0;max-width:1800px;margin:0 auto">
     ${ico("app-mosaico-vila", "g")}
-    <div class="grow"><b style="font-size:18px">Mosaico Vila · Simulador de aula</b><div class="faint" style="font-size:12px">Telão em cima, turma embaixo. O professor comanda pelo painel ao lado (na sala real, pelo celular).</div></div>
+    <div class="grow"><b style="font-size:18px">Mosaico Vila · Simulador de aula</b><div class="faint" style="font-size:12px">Telão em cima, turma embaixo. O Mestre comanda pelo painel ao lado (na sala real, pelo celular).</div></div>
     <label class="row muted" style="gap:6px">Participantes <input id="nAl" type="range" min="2" max="40" value="20" style="width:140px"><b id="nAlV" class="mono">20</b></label>
     <label class="row muted" style="gap:6px">Meu papel <select id="modoProf" style="min-height:36px;border-radius:10px;padding:0 8px"><option value="auto">Tudo automático</option><option value="familia">Uma pessoa em cada família</option></select></label>
     <button class="btn sm ok on" id="auto">Piloto automático: ligado</button>
-    <button class="btn sm sec" id="autoProf">Professor automático: desligado</button>
+    <button class="btn sm sec" id="autoProf">Mestre automático: desligado</button>
     <button class="btn sm sec" id="fundo">Ver do fundo da sala</button>
     <button class="btn sm sec" id="reset">Recomeçar</button>
   </header>
@@ -112,7 +112,7 @@ document.getElementById("nAl").oninput = (e) => { nAlunos = +e.target.value; doc
 document.getElementById("reset").onclick = () => { faseAnt = "entrada"; novaSala(); };
 document.getElementById("fundo").onclick = (e) => { const on = document.querySelector(".sim").classList.toggle("fundo"); e.target.className = `btn sm ${on ? "ok on" : "sec"}`; };
 document.getElementById("auto").onclick = (e) => { auto = !auto; e.target.className = `btn sm ${auto ? "ok on" : "sec"}`; e.target.textContent = `Piloto automático: ${auto ? "ligado" : "desligado"}`; };
-document.getElementById("autoProf").onclick = (e) => { autoProf = !autoProf; e.target.className = `btn sm ${autoProf ? "ok on" : "sec"}`; e.target.textContent = `Professor automático: ${autoProf ? "ligado" : "desligado"}`; };
+document.getElementById("autoProf").onclick = (e) => { autoProf = !autoProf; e.target.className = `btn sm ${autoProf ? "ok on" : "sec"}`; e.target.textContent = `Mestre automático: ${autoProf ? "ligado" : "desligado"}`; };
 
 setInterval(() => { if (!auto) return; for (const id of st.ordem) if (pilotos[id] && !st.alunos[id]?.auto) passoBot(st, id, locs[id], dispatch); }, 600);
 // R38: os vizinhos automáticos jogam sempre, mesmo com o piloto desligado (na sala real, quem roda isto é o aparelho de quem conduz)
@@ -124,7 +124,7 @@ setInterval(() => {
     passoAuto(st, id, locs[id], dispatch);
   }
 }, 600);
-// Professor automático: avança quando todos enviaram (ou a cada 6 s nas telas só de leitura)
+// Mestre automático: avança quando todos enviaram (ou a cada 6 s nas telas só de leitura)
 let espera = 0;
 setInterval(() => {
   if (!autoProf) return;

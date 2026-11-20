@@ -1,4 +1,4 @@
-// Sala ao vivo, no mesmo desenho do Comitê de Ética: o "cérebro" do jogo roda no aparelho do professor;
+// Sala ao vivo, no mesmo desenho do Comitê de Ética: o "cérebro" do jogo roda no aparelho do Mestre;
 // alunos e telão só leem o que ele publica e mandam pedidos. Todos os Mosaicos Vila (Vila e Vila Ética, no LAB-RA e
 // no site de Ética) usam o MESMO projeto Firebase: mosaico-vila. Regras em lab-ra/mosaico-vila/firebase/firestore.rules;
 // a lista de mestres fica em config/mestres do Firestore desse projeto.
@@ -82,8 +82,8 @@ function bancoFalso() {
   return {
     real: false,
     async identificar() { return quem; },
-    async entrarGoogleNoToque() { sessionStorage.setItem('SF_PROF', '1'); return { uid: quem, email: 'prof@teste', nome: 'Professor de teste' }; },
-    async usuario() { return sessionStorage.getItem('SF_PROF') ? { uid: quem, email: 'prof@teste', nome: 'Professor de teste' } : null; },
+    async entrarGoogleNoToque() { sessionStorage.setItem('SF_PROF', '1'); return { uid: quem, email: 'prof@teste', nome: 'Mestre de teste' }; },
+    async usuario() { return sessionStorage.getItem('SF_PROF') ? { uid: quem, email: 'prof@teste', nome: 'Mestre de teste' } : null; },
     async sair() { sessionStorage.removeItem('SF_PROF'); },
     async ehMestre() { return true; },
     async ler(c) { return ler(c); },
@@ -107,7 +107,7 @@ export async function conectar() {
   return banco;
 }
 
-// ---------------------------------------------------------------- professor (anfitrião)
+// ---------------------------------------------------------------- Mestre (anfitrião)
 const PUB_MIN_MS = 250;
 const ACOES_DO_ALUNO = new Set(['achei', 'alvara', 'controle', 'lance', 'mente', 'palpite', 'palpitePct', 'pequena', 'prever', 'propor', 'quem', 'voto', 'final']);
 
@@ -131,7 +131,7 @@ export async function retomarSala(codigo, aoEntrar, aoAcao) {
 
 function ligarAnfitriao(b, codigo, uid, aoEntrar, aoAcao) {
   let guardado = []; try { guardado = JSON.parse(localStorage.getItem('SALA-MAPA-' + codigo) || '[]'); } catch {}
-  const mapa = new Map(guardado);   // uid do aluno → id no jogo (guardado no aparelho, para o professor poder recarregar a página)
+  const mapa = new Map(guardado);   // uid do aluno → id no jogo (guardado no aparelho, para o Mestre poder recarregar a página)
   const processados = new Set();
   let ultimo = '', ultimoEm = 0, timer = 0, pendente = null;
   const desligar = [];
@@ -139,7 +139,7 @@ function ligarAnfitriao(b, codigo, uid, aoEntrar, aoAcao) {
   const sinais = new Map(), observados = new Set();   // id do jogo → instante do último sinal
   const observar = (uid, idJogo) => {
     if (observados.has(uid)) return; observados.add(uid);
-    sinais.set(idJogo, Date.now());   // ao entrar (ou ao recarregar a página do professor), conta como sinal de agora
+    sinais.set(idJogo, Date.now());   // ao entrar (ou ao recarregar a página do Mestre), conta como sinal de agora
     desligar.push(b.ouvir(`salas/${codigo}/presenca/${uid}`, (d) => {
       const em = d && d.em, ms = typeof em === 'number' ? em : em && em.toMillis ? em.toMillis() : 0;
       const id = mapa.get(uid) ?? idJogo;
@@ -153,7 +153,7 @@ function ligarAnfitriao(b, codigo, uid, aoEntrar, aoAcao) {
     try {
       const j = JSON.parse(p.j || '{}');
       if (p.tipo === 'entrar') {
-        const r = aoEntrar(String(j.nome || '').trim().slice(0, 24), p.uid, !!j.reassumir, mapa.get(p.uid));
+        const r = aoEntrar(String(j.nome || '').trim().slice(0, 24), p.uid, !!j.reassumir, mapa.get(p.uid), j.forma);
         if (!r || !r.ok) { await responder(id, { ok: false, erro: (r && r.erro) || 'A entrada não está liberada.', dados: { cod: r && r.cod } }, p.uid); return; }
         const idJogo = r.id;
         if (mapa.get(p.uid) !== idJogo) {
@@ -208,12 +208,12 @@ export async function marcarPresencaTelao(codigo) {
   f(); return setInterval(f, 10000);
 }
 
-export async function entrarNaSala(codigo, nome, reassumir) {
+export async function entrarNaSala(codigo, nome, reassumir, forma) {
   const b = await conectar(); const uid = await b.identificar();
   const info = await lerSala(codigo);
   if (!info) throw new Error('Sala não encontrada. Confira o código.');
-  if (!info.liberada) throw new Error('A entrada ainda não foi liberada pelo professor. Aguarde.');
-  const id = await b.adicionar(`salas/${codigo}/pedidos`, { uid, tipo: 'entrar', j: JSON.stringify({ nome, reassumir: !!reassumir }), em: b.agora() });
+  if (!info.liberada) throw new Error('A entrada ainda não foi liberada pelo Mestre. Aguarde.');
+  const id = await b.adicionar(`salas/${codigo}/pedidos`, { uid, tipo: 'entrar', j: JSON.stringify({ nome, reassumir: !!reassumir, forma: ['m', 'f', 'n'].includes(forma) ? forma : 'n' }), em: b.agora() });
   return new Promise((resolve, reject) => {
     const fim = Date.now() + 25000;
     const off = b.ouvir(`salas/${codigo}/respostas/${id}`, (r) => {
@@ -221,11 +221,11 @@ export async function entrarNaSala(codigo, nome, reassumir) {
       if (off) off();
       if (!r.ok) { const e = new Error(r.erro || 'Não foi possível entrar.'); try { e.cod = JSON.parse(r.j).cod; } catch {} reject(e); } else resolve(JSON.parse(r.j).id);
     }, () => reject(new Error('Sem conexão. Tente de novo.')));
-    const t = setInterval(() => { if (Date.now() > fim) { clearInterval(t); if (off) off(); reject(new Error('O professor não respondeu ainda (a tela dele pode estar fechada). Tente de novo.')); } }, 1000);
+    const t = setInterval(() => { if (Date.now() > fim) { clearInterval(t); if (off) off(); reject(new Error('O Mestre não respondeu ainda (a tela dele pode estar fechada). Tente de novo.')); } }, 1000);
   });
 }
 
-// R43: o celular de cada pessoa avisa que a tela está aberta (o professor vê "sem sinal" depois de 60 s)
+// R43: o celular de cada pessoa avisa que a tela está aberta (o Mestre vê "sem sinal" depois de 60 s)
 export async function marcarPresencaAluno(codigo) {
   const b = await conectar(); const uid = await b.identificar();
   const f = () => { if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return; b.gravar(`salas/${codigo}/presenca/${uid}`, { em: b.agora() }).catch(() => {}); };

@@ -1,4 +1,4 @@
-// Telão: só lê o que o professor publica. Abre pelo link ?sala=CÓDIGO (ou digitando o código) e ocupa a tela toda.
+// Telão: só lê o que o Mestre publica. Abre pelo link ?sala=CÓDIGO (ou digitando o código) e ocupa a tela toda.
 import { renderTelao } from "../views/telao.js";
 import { ico } from "../views/desenho.js";
 import { ouvirEstado, marcarPresencaTelao, lerSala, normalizar } from "./transporte.js";

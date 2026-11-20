@@ -1,4 +1,4 @@
-// Professor: o "cérebro" do jogo roda neste aparelho. Entra com Google (lista de mestres), abre a sala, publica o estado
+// Mestre: o "cérebro" do jogo roda neste aparelho. Entra com Google (lista de mestres), abre a sala, publica o estado
 // para o telão e para os celulares e processa os pedidos da turma. O desenho é o mesmo do Comitê de Ética.
 import { estadoInicial, reduzir, progresso } from "../engine.js";
 import { renderProfessor, acaoProfessor, ligarSinal, SEM_SINAL_S } from "../views/professor.js";
@@ -19,19 +19,19 @@ function dispatch(a) {
   st = reduzir(st, a);
   if (!agendado) { agendado = true; requestAnimationFrame(() => { agendado = false; subs.forEach((f) => f()); }); }
 }
-const topo = (sub) => `<div class="ent-topo">${ico("app-mosaico-vila")}<div><div class="ent-kicker">Sala de jogo · professor</div><div class="ent-titulo">Mosaico Vila</div></div></div>${sub || ""}`;
+const topo = (sub) => `<div class="ent-topo">${ico("app-mosaico-vila")}<div><div class="ent-kicker">Sala de jogo · Mestre</div><div class="ent-titulo">Mosaico Vila</div></div></div>${sub || ""}`;
 const lacre = `<img class="cadeado" src="../assets/icones/cadeado-fechado.png" width="36" height="36" alt="" aria-hidden="true">`;
 
 async function telaLogin(msg) {
-  app.innerHTML = topo() + `<div class="ent-wrap"><div class="ent-card escuro" style="max-width:460px;margin:0 auto;width:100%"><p class="ent-rot">Conduzir</p><h2>Entrar como professor</h2>
-    <p class="ent-aviso">Entre com a conta Google que está na lista de professores autorizados. A turma entra pelo código ou pelo QR, sem cadastro.</p>
-    <button class="btn professor block" id="google"><span class="entrada-prof">${lacre}Entrar com Google</span><small>Só o Professor tem a chave</small></button>
+  app.innerHTML = topo() + `<div class="ent-wrap"><div class="ent-card escuro" style="max-width:460px;margin:0 auto;width:100%"><p class="ent-rot">Conduzir</p><h2>Entrar como Mestre</h2>
+    <p class="ent-aviso">Entre com a conta Google que está na lista de Mestres autorizados. A turma entra pelo código ou pelo QR, sem cadastro.</p>
+    <button class="btn professor block" id="google"><span class="entrada-prof">${lacre}Entrar com Google</span><small>Só o Mestre tem a chave</small></button>
     <p class="ent-erro" id="erro" role="alert">${esc(msg || "")}</p><a class="ent-link" href="../index.html">Voltar</a></div></div>`;
   const b = await conectar();
   document.getElementById("google").onclick = () => {
     // sem await antes do signInWithPopup: o Safari do iPhone bloqueia a janela do Google se houver
     b.entrarGoogleNoToque().then(async (u) => {
-      if (!(await b.ehMestre(u.email))) { await b.sair(); telaLogin("Esta conta não está na lista de professores autorizados."); return; }
+      if (!(await b.ehMestre(u.email))) { await b.sair(); telaLogin("Esta conta não está na lista de Mestres autorizados."); return; }
       abrir(u);
     }).catch((e) => { document.getElementById("erro").textContent = e && e.code === "auth/popup-closed-by-user" ? "A janela do Google foi fechada." : "Não consegui entrar. Tente de novo."; });
   };
@@ -52,9 +52,9 @@ async function abrir(u) {
 }
 
 let seq = 0;
-function aoEntrar(nome, uid, reassumir, atual) {
+function aoEntrar(nome, uid, reassumir, atual, forma) {
   if (atual && st.alunos[atual]) return { ok: true, id: atual };   // o mesmo celular de volta
-  if (st.encerrada) return { ok: false, erro: "Esta aula foi encerrada pelo professor." };
+  if (st.encerrada) return { ok: false, erro: "Esta aula foi encerrada pelo Mestre." };
   if (!nome) return { ok: false, erro: "Digite seu nome." };
   const chave = (x) => String(x || "").trim().toLowerCase();
   const ex = st.ordem.find((i) => !st.alunos[i]?.auto && chave(st.alunos[i]?.nome) === chave(nome));
@@ -64,11 +64,11 @@ function aoEntrar(nome, uid, reassumir, atual) {
     if (!reassumir) return { ok: false, cod: 412, erro: "Esse nome já está na sala, mas ninguém está usando agora. Se for você, toque em “Sou eu, voltar”." };
     return { ok: true, id: ex };
   }
-  if (st.fase !== "entrada") return { ok: false, erro: "O jogo já começou. Fale com o professor." };
-  if (!liberada) return { ok: false, erro: "A entrada ainda não foi liberada pelo professor." };
+  if (st.fase !== "entrada") return { ok: false, erro: "O jogo já começou. Fale com o Mestre." };
+  if (!liberada) return { ok: false, erro: "A entrada ainda não foi liberada pelo Mestre." };
   seq = Math.max(seq, ...st.ordem.map((i) => (/^a\d+$/.test(i) ? +i.slice(1) : 0))) + 1;   // ids nunca se repetem, mesmo depois de expulsões
   const id = `a${seq}`;
-  dispatch({ t: "entrar", id, nome });
+  dispatch({ t: "entrar", id, nome, forma });
   return { ok: true, id };
 }
 function aoAcao(a) { dispatch(a); }
@@ -92,7 +92,7 @@ function painel(u) {
   lib.onclick = () => { liberada = !liberada; lib.textContent = liberada ? "Entrada liberada" : "Entrada fechada"; lib.className = "btn sm " + (liberada ? "sec" : "warn"); sala.entradaLiberada(liberada); };
   document.getElementById("nova").onclick = () => { if (confirm("Abrir uma sala nova? A atual será deixada de lado.")) { localStorage.removeItem(CHAVE); sessionStorage.removeItem(CHAVE); location.reload(); } };
   const sairDoPainel = async () => {
-    if (!st.encerrada && !confirm("Sair sem encerrar a aula? Os celulares e o telão ficam sem o professor até você voltar a este painel.")) return;
+    if (!st.encerrada && !confirm("Sair sem encerrar a aula? Os celulares e o telão ficam sem o Mestre até você voltar a este painel.")) return;
     sala.encerrar(); const b = await conectar(); await b.sair(); location.href = "../index.html";
   };
   document.getElementById("sair").onclick = sairDoPainel; document.getElementById("sair2").onclick = sairDoPainel;
