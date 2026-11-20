@@ -2,7 +2,7 @@ import { nomeFase, progresso, agregadoOk, contagem, vista } from "../engine.js";
 import { NOVIDADE_DO_ANO, EXEMPLO_DO_ANO, EXEMPLO_VOTO, REGRAS_TXT, MOTIVOS, GUIAS, NIVEIS_PUBLICO } from "../content/vila.js";
 import { carta, cartaAno4, CONFIANCA, textoCarta, QUEM_GOLPE, FAIXAS_PCT, faixaDe, CHANCE_GOLPE, falaDe } from "../content/cartas.js";
 import { gini, lanceMinimo, VITORIA, VALOR_LOTE, patrimonio, COLAPSO, progressoMeta, MATA_INICIO, PONTOS_NIVEL } from "../content/regras.js";
-import { iconeFamilia, mapaVila, linhaDoTempo, ico, fileira, unidade, pctL, pctNum, nL } from "./desenho.js";
+import { iconeFamilia, mapaVila, linhaDoTempo, ico, fileira, unidade, pctL, pctNum, nL, ICO } from "./desenho.js";
 
 // Telão para TV (R11): letra grande, uma ideia por tela, barra de ícones com o estado da vila sempre no mesmo lugar.
 // Detalhes e contas ficam no celular de cada um.
@@ -233,9 +233,12 @@ export function painelAtual(st) {
 // Patrimônio das famílias (caixa + lotes × valor do lote), do maior para o menor, sem nome nem cor (regra dos 5).
 const porPatrimonio = (st) => fams(st).map((f) => ({ pat: patrimonio(f, st.publico), pp: patrimonio(f, st.publico) / f.membros.length })).sort((a, b) => b.pp - a.pp);
 
-// R13: unidade fixa no jogo inteiro: cada moeda vale 10 pontos (casas só querem dizer lotes).
+// R13 (substituído em 20/11 por barras com número em pontos; a moeda de 10 pontos não aparece mais no telão).
 const MOEDA = 10;
 const moedas = (valor, cls = "") => fileira("moeda.webp", Math.max(0, valor), MOEDA, cls);
+// Barra com volume e moeda na ponta; escala fixa para as barras de um ano valerem para o seguinte. Número e % sempre ao lado.
+const barraMoeda = (valor, escala, { marca = "", pct = null, mostrar = true, m = 4.4, grande = false } = {}) =>
+  `<div class="bm-linha${grande ? " g" : ""}"><span class="bm-trilho" style="--m:${m}cqw">${marca}<i class="bm-enche" style="--p:${Math.max(0, Math.min(100, (100 * valor) / escala)).toFixed(1)}"><img class="bm-moeda" src="${ICO}moeda.webp" alt="" draggable="false"></i></span>${mostrar ? `<span class="bm-txt"><b>${pct}%</b><span>${n0(valor)} pontos</span></span>` : ""}</div>`;
 
 // O dinheiro: patrimônio por pessoa de cada família, em moedas, com a marca da meta.
 function dinheiroPorPessoa(st, ranking) {
@@ -243,14 +246,15 @@ function dinheiroPorPessoa(st, ranking) {
   const mediaPP = ranking.reduce((a, f) => a + f.pp, 0) / ranking.length;
   const alvoPP = m.regra === "prosperidade" ? m.alvo * mediaPP : m.alvo;
   const maxPP = Math.max(alvoPP, ...ranking.map((f) => f.pp));
-  const cab = Math.max(1, Math.ceil(maxPP / MOEDA));   // largura da fileira, em moedas
-  const marca = `<i class="marca-meta" style="left:calc(var(--iso) * ${(alvoPP / MOEDA).toFixed(2)} + ${(0.12 * (alvoPP / MOEDA)).toFixed(2)}cqw)"><b>${m.regra === "prosperidade" ? `${Math.round(100 * m.alvo)}% da média` : `meta ${m.alvo}`}</b></i>`;
+  const escala = Math.max(120, maxPP * 1.05);   // 20/11: escala fixa de 0 a 120 pontos (o máximo visto nas simulações foi ~105)
+  const marca = `<i class="marca-meta" style="left:${(100 * alvoPP / escala).toFixed(1)}%"><b>${m.regra === "prosperidade" ? `${Math.round(100 * m.alvo)}% da média` : `meta ${m.alvo}`}</b></i>`;
   const iso = ranking.length <= 5 ? 3.6 : ranking.length <= 6 ? 3.1 : 2.6;   // até 8 famílias cabem na tela
   const antesDoVoto = st.ano === 3;   // R21: logo antes do voto, nenhuma das duas metas em número (o número de hoje inclinava o voto); R23: nem o patrimônio de cada família (dava para fazer a conta)
-  const linhas = ranking.map((f) => `<div class="iso-linha"><span class="fila-moedas" style="--n:${cab};--iso:${iso}cqw">${moedas(f.pp)}${antesDoVoto ? "" : marca}</span>${antesDoVoto ? "" : `<b class="mono">${n0(f.pp)}</b>`}</div>`).join("");
+  const mm = ranking.length <= 5 ? 3.6 : ranking.length <= 6 ? 3.2 : 2.7;   // moeda menor quando há mais famílias (até 8 cabem)
+  const linhas = ranking.map((f) => barraMoeda(f.pp, escala, { marca: antesDoVoto ? "" : marca, pct: Math.round((100 * f.pp) / (alvoPP || 1)), mostrar: !antesDoVoto, m: mm })).join("");
   const metaTxt = antesDoVoto ? "Logo depois, a turma conversa e vota a regra dos anos 4 e 5. As duas metas aparecem lado a lado no voto." : m.regra === "prosperidade" ? `A família mais pobre tem <b>${pctL(m.valor)}</b> da média por pessoa (meta: ${Math.round(100 * m.alvo)}%).` : `Patrimônio médio: <b>${nL(m.valor, m.alvo)}</b> por pessoa (meta: ${m.alvo}).`;
   return `<div class="grid" style="grid-template-columns:1.55fr 1fr;flex:1;min-height:0">
-    <div class="card${antesDoVoto ? " sem-marca" : ""}" style="min-height:0;overflow:hidden"><h2>Patrimônio por pessoa, por família</h2><p class="rodape" style="margin-bottom:.6cqw">${moedas(MOEDA, "p")} Cada moeda = ${MOEDA} pontos. ${antesDoVoto ? "Sem nomes; números só depois do voto." : "Sem nome de família."}</p>${linhas}</div>
+    <div class="card${antesDoVoto ? " sem-marca" : ""}" style="min-height:0;overflow:hidden"><h2>Patrimônio por pessoa, por família</h2><p class="rodape" style="margin-bottom:.6cqw">Barra de 0 a 120 pontos; a % é a parte da meta. ${antesDoVoto ? "Sem nomes; números só depois do voto." : "Sem nome de família."}</p>${linhas}</div>
     <div class="card col" style="justify-content:center;gap:1.2cqw">${ico("meta", "xl")}<p class="big" style="margin:0">${metaTxt}</p><p class="rodape">${m.mata >= VITORIA.mataMinima ? `E a mata precisa ficar em pelo menos ${Math.round(100 * VITORIA.mataMinima)}%: está em ${pctL(m.mata)}.` : `Mata em ${pctL(m.mata)}: precisa chegar a ${Math.round(100 * VITORIA.mataMinima)}%. Assim, meta não batida.`}</p></div></div>`;
 }
 
@@ -331,12 +335,13 @@ export function paineisResultado(st) {
   if (st.ano === 3 && st.renda) {
     const fs = fams(st), rs = fs.map((f) => st.renda[f.id]);
     const pg = rs.reduce((a, r) => a + r.aluguel, 0);
+    const totalRenda = rs.reduce((a, r) => a + r.total, 0) || 1, pctRenda = Math.min(100, Math.round((100 * pg) / totalRenda));
     const g0 = gini(fs.map((f, k) => (rs[k].base + rs[k].bonusMata - rs[k].perdaMata) / f.membros.length)), g1 = gini(fs.map((f, k) => rs[k].total / f.membros.length));
     paineis.push({ nome: "O aluguel", dur: 25, html: `<div class="card col" style="flex:1;justify-content:center;gap:1.6cqw">
       <h2 class="row">${ico("sobrado", "g")}${n0(pg)} pontos de aluguel mudaram de mãos</h2>
       <p class="big" style="margin:0">Saíram de quem não tem lote suficiente e foram para quem tem lote sobrando.</p>
-      <div class="iso-linha">${moedas(pg, "g")}</div>
-      <p class="rodape">Cada moeda = ${MOEDA} pontos.</p>
+      ${barraMoeda(pg, totalRenda, { pct: pctRenda, m: 7, grande: true })}
+      <p class="rodape">${pctRenda}% de toda a renda do ano mudou de mãos (a barra inteira é a renda do ano).</p>
       <p class="enorme">Desigualdade da renda do ano, por pessoa: ${v2(g0)} sem aluguel → <span style="color:#fca5a5">${v2(g1)}</span> com aluguel</p></div>` });
   }
 
