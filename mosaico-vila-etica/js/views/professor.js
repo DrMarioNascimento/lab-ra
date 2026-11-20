@@ -80,7 +80,7 @@ function linhaPessoa(st, id, chefe) {
   return `<div class="pp-lin"><i class="pp-bol ${sem ? "off" : "on"}" title="${sem ? "Sem sinal" : "Com sinal"}"></i>
     <div class="pp-txt"><b>${esc(p.nome)}${chefe ? ` <span class="pp-tag">chefia</span>` : ""}${sorteada ? ` <span class="pp-tag">sorteada</span>` : ""}</b>
       <span class="pp-st ${tom}">${sem ? `<b class="pp-off">Sem sinal há ${tempoSem(sem)} · </b>` : ""}${esc(t)}</span></div>
-    <button class="btn sm sec pp-menu" data-a="menu" data-id="${id}" aria-label="Ações para ${esc(p.nome)}" title="Ações">⋯</button></div>`;
+    <button class="btn sm sec pp-menu" data-a="menu" data-id="${id}" aria-label="Ações para ${esc(p.nome)}" title="Ações">⋮</button></div>`;
 }
 
 function avisos(st) {
@@ -89,19 +89,19 @@ function avisos(st) {
   const falta = st.fase === "entrada" ? [] : humanos.filter((id) => statusDe(st, id)[1] === "falta");
   let h = "";
   if (st.fase === "alvara" && st.alvara?.pessoa && semSinal(st.alvara.pessoa) && st.alunos[st.alvara.pessoa])
-    h += `<div class="pp-aviso red"><b>A pessoa sorteada (${esc(st.alunos[st.alvara.pessoa].nome)}) está sem sinal.</b> A resposta dela é a que vale. Toque em “⋯” ao lado de outra pessoa e escolha “Ser a pessoa sorteada”.</div>`;
-  if (sem.length) h += `<div class="pp-aviso red"><b>${sem.length} sem sinal:</b> ${esc(sem.slice(0, 8).map((id) => st.alunos[id].nome).join(", "))}${sem.length > 8 ? ` e mais ${sem.length - 8}` : ""}. Se foi a internet, a pessoa volta com “Sou eu, voltar”. Se não vai voltar, use “⋯ → Expulsar”.</div>`;
+    h += `<div class="pp-aviso red"><b>A pessoa sorteada (${esc(st.alunos[st.alvara.pessoa].nome)}) está sem sinal.</b> A resposta dela é a que vale. Toque em “⋮” ao lado de outra pessoa e escolha “Ser a pessoa sorteada”.</div>`;
+  if (sem.length) h += `<div class="pp-aviso red"><b>${sem.length} sem sinal:</b> ${esc(sem.slice(0, 8).map((id) => st.alunos[id].nome).join(", "))}${sem.length > 8 ? ` e mais ${sem.length - 8}` : ""}. Se foi a internet, a pessoa volta com “Sou eu, voltar”. Se não vai voltar, use “⋮ → Expulsar”.</div>`;
   if (falta.length) h += `<div class="pp-aviso"><b>Faltam ${falta.length}:</b> ${esc(falta.slice(0, 8).map((id) => st.alunos[id].nome).join(", "))}${falta.length > 8 ? ` e mais ${falta.length - 8}` : ""}.</div>`;
   return h;
 }
 
 function listaEntrada(st) {
   if (!st.ordem.length) return "";
-  return avisos(st) + `<div class="pp-tit">Na sala · “⋯” abre as ações de cada pessoa</div><section class="pp-fam" style="--fam:#60a5fa;--fam2:#1d4ed8"><div class="pp-lista">${st.ordem.map((id) => linhaPessoa(st, id, false)).join("")}</div></section>`;
+  return avisos(st) + `<div class="pp-tit">Na sala · “⋮” abre as ações de cada pessoa</div><section class="pp-fam" style="--fam:#60a5fa;--fam2:#1d4ed8"><div class="pp-lista">${st.ordem.map((id) => linhaPessoa(st, id, false)).join("")}</div></section>`;
 }
 
 function painelFamilias(st) {
-  return avisos(st) + `<div class="pp-tit">Famílias · “⋯” abre as ações de cada pessoa</div>` + Object.values(st.fams).map((f) => {
+  return avisos(st) + `<div class="pp-tit">Famílias · “⋮” abre as ações de cada pessoa</div>` + Object.values(st.fams).map((f) => {
     const hum = f.membros.filter((m) => !st.alunos[m]?.auto);
     const faltam = hum.filter((m) => statusDe(st, m)[1] === "falta").length, sem = hum.filter((m) => semSinal(m)).length;
     const autos = f.membros.length - hum.length;

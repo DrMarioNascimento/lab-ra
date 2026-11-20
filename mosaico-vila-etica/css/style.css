@@ -731,7 +731,7 @@ body { background: radial-gradient(1100px 560px at 50% -140px, #123057 0%, rgba(
 .pp-st.ok { color: #86efac; } .pp-st.falta { color: #fbbf24; font-weight: 700; } .pp-st.info { color: var(--tx3, #9bb1ca); }
 .pp-off { color: #fca5a5; }
 .pp-tag { font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; background: #7c3aed; color: #fff; border-radius: 999px; padding: 2px 7px; vertical-align: middle; }
-.pp-menu { min-width: 44px; min-height: 44px; font-size: 20px; line-height: 1; flex: none; }
+.pp-menu { min-width: 36px; padding: 0 6px; min-height: 44px; font-size: 22px; font-weight: 900; line-height: 1; flex: none; }
 .pp-aviso { border: 2px solid #f59e0b; background: rgba(245, 158, 11, .12); border-radius: 14px; padding: 10px 12px; font-size: 13px; margin: 0 0 10px; }
 .pp-aviso.red { border-color: #ef4444; background: rgba(239, 68, 68, .14); }
 .pp-fundo { position: fixed; inset: 0; z-index: 80; background: rgba(0, 0, 0, .62); display: flex; align-items: flex-end; justify-content: center; padding: 12px; }
