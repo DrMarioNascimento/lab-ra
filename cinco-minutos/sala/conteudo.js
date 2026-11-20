@@ -1,17 +1,18 @@
 // Conteúdo do Loop (cópia própria de ../game.js, só os dados e a montagem das pistas).
 // Usado pelo telão e pelo simulador. Se o conteúdo mudar em game.js, gere este arquivo de novo (sala/gerar-conteudo.sh).
+const ANDARES = ['2º andar', '1º andar', 'Térreo'];
 const ROOMS = [
-  {id:'galeria', name:'Galeria principal', icon:'▧', sub:'Obras e vitrines'},
-  {id:'conservacao', name:'Conservação', icon:'◇', sub:'Acervo e registros'},
-  {id:'seguranca', name:'Segurança', icon:'◉', sub:'Alarmes e ocorrências'},
-  {id:'eletrica', name:'Sala técnica', icon:'⌁', sub:'Energia e equipamentos'},
-  {id:'recepcao', name:'Recepção', icon:'♧', sub:'Chegadas e convidados'},
-  {id:'corredor', name:'Corredor de serviço', icon:'▥', sub:'Passagens e caixas'},
-  {id:'prototipo', name:'Galeria do tempo', icon:'◷', sub:'Protótipo e retorno'},
-  {id:'deposito', name:'Sala das coleções', icon:'▤', sub:'Inventário e movimentações'},
-  {id:'auditorio', name:'Auditório', icon:'▱', sub:'Programa e bastidores'},
-  {id:'patio', name:'Pátio de luz', icon:'☼', sub:'Vista para a circulação'},
-  {id:'atelie', name:'Ateliê de descobertas', icon:'✧', sub:'Ensaio e registros técnicos'}
+  {id:'galeria', name:'Galeria especial', andar:'2º andar', icon:'▧', sub:'Obras e vitrines'},
+  {id:'auditorio', name:'Auditório', andar:'2º andar', icon:'▱', sub:'Programa e bastidores'},
+  {id:'prototipo', name:'Galeria do tempo', andar:'1º andar', icon:'◷', sub:'Protótipo e retorno'},
+  {id:'eletrica', name:'Laboratório de formas', andar:'1º andar', icon:'⌁', sub:'Energia e equipamentos'},
+  {id:'deposito', name:'Sala das coleções', andar:'1º andar', icon:'▤', sub:'Inventário e movimentações'},
+  {id:'patio', name:'Pátio de luz', andar:'1º andar', icon:'☼', sub:'Vista para a circulação'},
+  {id:'recepcao', name:'Recepção', andar:'Térreo', icon:'♧', sub:'Chegadas e convidados'},
+  {id:'conservacao', name:'Sala dos espécimes', andar:'Térreo', icon:'◇', sub:'Acervo e registros'},
+  {id:'seguranca', name:'Sala dos habitats', andar:'Térreo', icon:'◉', sub:'Alarmes e ocorrências'},
+  {id:'corredor', name:'Área de descanso', andar:'Térreo', icon:'▥', sub:'Recados e caixas da equipe'},
+  {id:'atelie', name:'Ateliê de descobertas', andar:'Térreo', icon:'✧', sub:'Ensaio e registros técnicos'}
 ];
 const EVENTS = {
   proteger:'Uma peça foi retirada para proteção.',
@@ -102,7 +103,7 @@ function makeClues(c){
   eletrica:[
    {id:'ele1',name:'Examinar o painel',time:165,text:evidence},
    {id:'ele2',name:'Ler a anotação técnica',time:90,text:'Há uma anotação: '+c.clue+'. Ela deve ser relacionada a outros registros.'},
-   {id:'ele3',name:'Analisar o protótipo',time:180,text:'O registrador da sala técnica aponta um pulso do protótipo às 21h57, antes do alarme. O manual prevê outro pulso às 22h. O comando de suspensão fica na Galeria do tempo.'}],
+   {id:'ele3',name:'Analisar o protótipo',time:180,text:'O registrador do Laboratório de formas aponta um pulso do protótipo às 21h57, antes do alarme. O manual prevê outro pulso às 22h. O comando de suspensão fica na Galeria do tempo.'}],
   recepcao:[
    {id:'rec1',name:'Consultar a movimentação',time:0,text:'A recepção recebeu uma anotação sobre '+c.subject+'. '+c.clue.charAt(0).toUpperCase()+c.clue.slice(1)+'.'},
    {id:'rec2',name:'Examinar o livro de ocorrências',time:90,text:'Na ocorrência consta: '+c.detail+'.'},
@@ -113,7 +114,7 @@ function makeClues(c){
    {id:'cor3',name:'Verificar a figura imóvel',time:180,text:c.room==='corredor'?fig:'Um recado indica que alguém viu uma figura imóvel em '+room+'.'}],
   prototipo:[
    {id:'pro1',name:'Ler a placa da demonstração',time:0,text:'A demonstração guarda o instante de referência, às 21h55. Ao terminar, o protótipo deveria apenas projetar uma imagem desse instante.'},
-   {id:'pro2',name:'Observar o primeiro pulso',time:120,text:'Às 21h57, o relógio do protótipo recua por um segundo. O estrondo vem da galeria e a luz cai. O alarme soa mais tarde.'},
+   {id:'pro2',name:'Observar o primeiro pulso',time:120,text:'Às 21h57, o relógio do protótipo recua por um segundo. O estrondo vem da Galeria especial e a luz cai. O alarme soa mais tarde.'},
    {id:'pro3',name:'Conferir o comando de suspensão',time:180,text:'O manual indica que suspender a demonstração antes das 22h interrompe o pulso de retorno. O comando não altera o que já aconteceu nas outras salas.'}],
   deposito:[
    {id:'dep1',name:'Consultar o inventário',time:0,text:'A ficha de movimentação menciona '+c.subject+'.'},
@@ -129,4 +130,4 @@ function makeClues(c){
    {id:'ate2',name:'Ler a instrução de encerramento',time:180,text:'Em caso de repetição, use Suspender demonstração na Galeria do tempo antes do pulso final, às 22h.'}]
  }
 }
-export { ROOMS, EVENTS, ALARMS, FIGURES, ACTIONS, CASES, labels, figures, makeClues, esc };
+export { ANDARES, ROOMS, EVENTS, ALARMS, FIGURES, ACTIONS, CASES, labels, figures, makeClues, esc };

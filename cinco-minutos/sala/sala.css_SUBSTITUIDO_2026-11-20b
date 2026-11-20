@@ -1,0 +1,80 @@
+/* Loop (MOSAICO) · sala: barra do Mestre, botão "i", espera, telão e simulador. Usa as cores de ../style.css. */
+
+/* Quem abre as etapas é o Mestre, pela barra: os botões do jogo individual ficam fora da sala. */
+#coopBegin, #endLoop, #nextLoop, #replay, #coopShortcut, #coopBar { display: none !important; }
+
+.text-button.info { width: 44px; height: 44px; padding: 0; border-radius: 50%; border: 1px solid var(--line); background: linear-gradient(180deg, #294051, #172633);
+  color: #f3ead9; font: 700 1.1rem Georgia, serif; box-shadow: inset 0 1px 0 #ffffff2b, 0 3px 0 #05090d; }
+.text-button.info:active { transform: translateY(2px); box-shadow: inset 0 1px 0 #ffffff15, 0 1px 0 #05090d; }
+
+.mestre-bar { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; margin: 0 0 1rem; padding: .6rem .9rem;
+  background: #0e1a25f2; border: 1px solid #7c3aed99; border-radius: .7rem; box-shadow: 0 6px 18px #0007; }
+.mestre-bar .mb-rot { font: 700 .68rem system-ui, sans-serif; letter-spacing: .19em; color: #ddd6fe; }
+.mestre-bar .mb-info { flex: 1 1 14rem; font: .9rem/1.4 system-ui, sans-serif; color: var(--paper); }
+.mestre-bar .btn { min-height: 46px; padding: 10px 18px; }
+
+.sala-espera { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; background: #080e19ee; }
+.sala-espera .card { max-width: 26rem; padding: 1.6rem; text-align: center; border: 1px solid var(--line); border-radius: 14px; background: linear-gradient(145deg, #152735, #0e1925); box-shadow: 0 15px 35px #0007; }
+.sala-espera h2 { font-weight: 400; margin: .4rem 0 1rem; }
+
+#ritmoDialog .actions { flex-direction: column; }
+
+/* ---------------------------------------------------------------- telão (16:9, lido de longe) */
+body.telao { margin: 0; padding: 0; max-width: none; width: 100vw; min-height: 100vh; overflow: hidden; }
+body.telao > #app { width: 100vw; max-width: none; margin: 0; padding: 0; }
+.tl-raiz { position: relative; width: 100vw; height: 100vh; display: grid; grid-template-rows: auto 1fr auto; gap: 1.6vh; padding: 3vh 3vw 2.4vh; box-sizing: border-box; }
+.tl-topo { display: flex; align-items: center; justify-content: space-between; gap: 2vw; }
+.tl-marca { display: flex; flex-direction: column; }
+.tl-marca small { font: 700 clamp(.7rem, 1.2vw, 1.1rem) system-ui, sans-serif; letter-spacing: .3em; color: var(--gold); }
+.tl-marca b { font: 400 clamp(2rem, 5vw, 4.6rem) Georgia, serif; letter-spacing: -.02em; color: #fff; line-height: 1; }
+.tl-codigo { text-align: right; font: 700 clamp(.8rem, 1.4vw, 1.3rem) system-ui, sans-serif; letter-spacing: .18em; color: var(--muted); }
+.tl-codigo strong { display: block; font: 400 clamp(1.8rem, 4vw, 3.8rem) Georgia, serif; letter-spacing: .12em; color: var(--gold); }
+.tl-meio { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 3vw; min-height: 0; align-items: stretch; }
+.tl-card { background: linear-gradient(145deg, #152735ee, #0e1925f5); border: 1px solid #b49f7355; border-radius: 1.4vw; box-shadow: inset 0 1px #ffffff18, 0 .9vw 2.2vw #0006; padding: 2.4vh 2vw; min-height: 0; }
+.tl-relogio { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 1.2vh; }
+.tl-volta { font: 700 clamp(.9rem, 1.7vw, 1.6rem) system-ui, sans-serif; letter-spacing: .22em; color: var(--gold); }
+.tl-tempo { font: 400 clamp(4rem, 14vw, 13rem) Georgia, serif; line-height: 1; color: #f6d6a0; font-variant-numeric: tabular-nums; }
+.tl-museu { font: 600 clamp(1rem, 2.2vw, 2rem) system-ui, sans-serif; color: var(--muted); }
+.tl-museu time { color: var(--gold); font-variant-numeric: tabular-nums; }
+.tl-sinal { min-height: 2.6em; font: 400 clamp(1.1rem, 2.4vw, 2.2rem)/1.35 Georgia, serif; color: #ecd9b4; }
+.tl-sinal:not(:empty) { border-inline-start: .4vw solid var(--gold); padding-inline-start: 1.2vw; text-align: left; }
+.tl-titulo { font: 400 clamp(2rem, 5vw, 4.4rem)/1.05 Georgia, serif; color: #fff; margin: 0 0 1.2vh; }
+.tl-texto { font: clamp(1.1rem, 2.1vw, 2rem)/1.45 system-ui, sans-serif; color: #c8d6d5; margin: 0; }
+.tl-mapa { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1vw; align-content: center; }
+.tl-sala { position: relative; padding: 1.6vh 1vw; border: 1px solid #b89f724a; border-radius: .9vw; background: linear-gradient(145deg, #2a4051, #162735); box-shadow: inset 0 1px #ffffff1a, 0 .4vw 0 #09121a; min-height: 11vh; }
+.tl-sala b { display: block; font: 400 clamp(.85rem, 1.5vw, 1.35rem) Georgia, serif; color: #f0ece3; line-height: 1.2; }
+.tl-sala i { font-style: normal; color: #e5bc7b; font-size: clamp(1rem, 2vw, 1.8rem); }
+.tl-sala em { position: absolute; top: .8vh; right: .8vw; min-width: 2.2em; padding: .1em .5em; text-align: center; font: 700 clamp(.9rem, 1.8vw, 1.6rem) system-ui, sans-serif; font-style: normal; color: #1f1b17; background: linear-gradient(180deg, #f2d3a0, #be8e4b); border-radius: 999px; }
+.tl-sala.vazia { opacity: .5; }
+.tl-gente { display: flex; flex-wrap: wrap; gap: .6vw 1vw; font: 600 clamp(.9rem, 1.6vw, 1.5rem) system-ui, sans-serif; color: #d9c6a8; }
+.tl-gente span { padding: .3em .8em; border: 1px solid #b89f7255; border-radius: 999px; background: #0e1a25; }
+.tl-rodape { display: flex; justify-content: space-between; align-items: end; gap: 2vw; }
+.tl-qr { width: clamp(110px, 16vh, 220px); height: clamp(110px, 16vh, 220px); padding: .6vh; background: #fff; border-radius: .6vw; }
+.tl-qr svg { width: 100%; height: 100%; display: block; }
+.tl-barras { display: grid; gap: 1.4vh; margin-top: 1vh; }
+.tl-barra { display: grid; grid-template-columns: 17vw 1fr 6vw; gap: 1vw; align-items: center; font: 600 clamp(.9rem, 1.7vw, 1.6rem) system-ui, sans-serif; color: #d9e1df; }
+.tl-barra div { height: 2.4vh; background: #0a1721; border: 1px solid #b89f7255; border-radius: 999px; overflow: hidden; }
+.tl-barra div i { display: block; height: 100%; background: linear-gradient(180deg, #f2d3a0, #be8e4b); }
+.tl-aviso { font: 600 clamp(.8rem, 1.3vw, 1.2rem) system-ui, sans-serif; color: var(--muted); }
+.tl-fs { position: fixed; right: 1.2vw; bottom: 1.2vh; z-index: 5; opacity: 0; transition: opacity .2s; min-height: 44px; padding: 8px 16px; }
+body.telao:hover .tl-fs, .mostra-fs .tl-fs, .tl-fs:focus-visible { opacity: 1; }
+.tl-entrada { min-height: 100vh; display: grid; place-items: center; padding: 20px; }
+.tl-entrada .card { width: min(26rem, 100%); padding: 1.6rem; border: 1px solid var(--line); border-radius: 14px; background: linear-gradient(145deg, #152735, #0e1925); }
+.tl-entrada input { width: 100%; margin: .7rem 0; padding: .8rem; font: 700 1.5rem Georgia, serif; letter-spacing: .2em; text-align: center; text-transform: uppercase; background: #0a1721; color: var(--paper); border: 1px solid var(--line); border-radius: .5rem; }
+.tl-erro { color: #fca5a5; font: .9rem system-ui, sans-serif; min-height: 1.2em; }
+
+/* ---------------------------------------------------------------- simulador: telão em cima, turma embaixo */
+body.sim { margin: 0; }
+.sim-topo { display: flex; align-items: center; gap: .8rem 1.2rem; flex-wrap: wrap; padding: .7rem 1rem; border-bottom: 1px solid var(--line); background: #0c1722; font: .9rem system-ui, sans-serif; }
+.sim-topo b { font: 400 1.2rem Georgia, serif; color: var(--gold); }
+.sim-topo label { display: flex; align-items: center; gap: .5rem; color: var(--muted); }
+.sim-topo .btn { min-height: 40px; padding: 6px 14px; font-size: .8rem; }
+.sim-telao { position: relative; width: min(100%, calc((100vh - 6rem) * 1.7778 * .55)); aspect-ratio: 16 / 9; margin: .8rem auto; border: 1px solid var(--line); border-radius: .6rem; overflow: hidden; background: #000; }
+.sim-telao iframe { width: 100%; height: 100%; border: 0; display: block; }
+.sim-turma { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: .9rem; padding: 0 1rem 2rem; }
+.sim-fone { border: 1px solid var(--line); border-radius: 1rem; background: #0a131c; padding: .4rem; }
+.sim-fone figcaption { font: 600 .75rem system-ui, sans-serif; color: var(--muted); padding: .2rem .4rem; display: flex; justify-content: space-between; }
+.sim-fone iframe { width: 100%; height: 480px; border: 0; border-radius: .7rem; background: var(--bg); }
+.sim-fone.mestre { grid-column: span 2; border-color: #7c3aed99; }
+.sim-fone.mestre iframe { height: 480px; }
+.sim-nota { padding: 0 1rem; color: var(--muted); font: .8rem system-ui, sans-serif; }

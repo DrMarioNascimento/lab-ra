@@ -1,17 +1,18 @@
 'use strict';
 // Bancada independente: o conteúdo fica no aparelho e não oferece sigilo contra inspeção do código.
+const ANDARES = ['2º andar', '1º andar', 'Térreo'];
 const ROOMS = [
-  {id:'galeria', name:'Galeria principal', icon:'▧', sub:'Obras e vitrines'},
-  {id:'conservacao', name:'Conservação', icon:'◇', sub:'Acervo e registros'},
-  {id:'seguranca', name:'Segurança', icon:'◉', sub:'Alarmes e ocorrências'},
-  {id:'eletrica', name:'Sala técnica', icon:'⌁', sub:'Energia e equipamentos'},
-  {id:'recepcao', name:'Recepção', icon:'♧', sub:'Chegadas e convidados'},
-  {id:'corredor', name:'Corredor de serviço', icon:'▥', sub:'Passagens e caixas'},
-  {id:'prototipo', name:'Galeria do tempo', icon:'◷', sub:'Protótipo e retorno'},
-  {id:'deposito', name:'Sala das coleções', icon:'▤', sub:'Inventário e movimentações'},
-  {id:'auditorio', name:'Auditório', icon:'▱', sub:'Programa e bastidores'},
-  {id:'patio', name:'Pátio de luz', icon:'☼', sub:'Vista para a circulação'},
-  {id:'atelie', name:'Ateliê de descobertas', icon:'✧', sub:'Ensaio e registros técnicos'}
+  {id:'galeria', name:'Galeria especial', andar:'2º andar', icon:'▧', sub:'Obras e vitrines'},
+  {id:'auditorio', name:'Auditório', andar:'2º andar', icon:'▱', sub:'Programa e bastidores'},
+  {id:'prototipo', name:'Galeria do tempo', andar:'1º andar', icon:'◷', sub:'Protótipo e retorno'},
+  {id:'eletrica', name:'Laboratório de formas', andar:'1º andar', icon:'⌁', sub:'Energia e equipamentos'},
+  {id:'deposito', name:'Sala das coleções', andar:'1º andar', icon:'▤', sub:'Inventário e movimentações'},
+  {id:'patio', name:'Pátio de luz', andar:'1º andar', icon:'☼', sub:'Vista para a circulação'},
+  {id:'recepcao', name:'Recepção', andar:'Térreo', icon:'♧', sub:'Chegadas e convidados'},
+  {id:'conservacao', name:'Sala dos espécimes', andar:'Térreo', icon:'◇', sub:'Acervo e registros'},
+  {id:'seguranca', name:'Sala dos habitats', andar:'Térreo', icon:'◉', sub:'Alarmes e ocorrências'},
+  {id:'corredor', name:'Área de descanso', andar:'Térreo', icon:'▥', sub:'Recados e caixas da equipe'},
+  {id:'atelie', name:'Ateliê de descobertas', andar:'Térreo', icon:'✧', sub:'Ensaio e registros técnicos'}
 ];
 const EVENTS = {
   proteger:'Uma peça foi retirada para proteção.',
@@ -108,7 +109,7 @@ function makeClues(c){
   eletrica:[
    {id:'ele1',name:'Examinar o painel',time:165,text:evidence},
    {id:'ele2',name:'Ler a anotação técnica',time:90,text:'Há uma anotação: '+c.clue+'. Ela deve ser relacionada a outros registros.'},
-   {id:'ele3',name:'Analisar o protótipo',time:180,text:'O registrador da sala técnica aponta um pulso do protótipo às 21h57, antes do alarme. O manual prevê outro pulso às 22h. O comando de suspensão fica na Galeria do tempo.'}],
+   {id:'ele3',name:'Analisar o protótipo',time:180,text:'O registrador do Laboratório de formas aponta um pulso do protótipo às 21h57, antes do alarme. O manual prevê outro pulso às 22h. O comando de suspensão fica na Galeria do tempo.'}],
   recepcao:[
    {id:'rec1',name:'Consultar a movimentação',time:0,text:'A recepção recebeu uma anotação sobre '+c.subject+'. '+c.clue.charAt(0).toUpperCase()+c.clue.slice(1)+'.'},
    {id:'rec2',name:'Examinar o livro de ocorrências',time:90,text:'Na ocorrência consta: '+c.detail+'.'},
@@ -119,7 +120,7 @@ function makeClues(c){
    {id:'cor3',name:'Verificar a figura imóvel',time:180,text:c.room==='corredor'?fig:'Um recado indica que alguém viu uma figura imóvel em '+room+'.'}],
   prototipo:[
    {id:'pro1',name:'Ler a placa da demonstração',time:0,text:'A demonstração guarda o instante de referência, às 21h55. Ao terminar, o protótipo deveria apenas projetar uma imagem desse instante.'},
-   {id:'pro2',name:'Observar o primeiro pulso',time:120,text:'Às 21h57, o relógio do protótipo recua por um segundo. O estrondo vem da galeria e a luz cai. O alarme soa mais tarde.'},
+   {id:'pro2',name:'Observar o primeiro pulso',time:120,text:'Às 21h57, o relógio do protótipo recua por um segundo. O estrondo vem da Galeria especial e a luz cai. O alarme soa mais tarde.'},
    {id:'pro3',name:'Conferir o comando de suspensão',time:180,text:'O manual indica que suspender a demonstração antes das 22h interrompe o pulso de retorno. O comando não altera o que já aconteceu nas outras salas.'}],
   deposito:[
    {id:'dep1',name:'Consultar o inventário',time:0,text:'A ficha de movimentação menciona '+c.subject+'.'},
@@ -151,7 +152,7 @@ const TIME_PATHS = {
   control:'Painel da alimentação de ensaio', action:'Desacoplar a reserva do protótipo',
   alternative:'Rearmar a iluminação principal',
   observation:'Depois do apagão, o protótipo transfere a alimentação para a reserva. Às 21h59, o painel trava essa alimentação até o fechamento.',
-  instruction:'Depois da transferência às 21h57, a Sala técnica permite desacoplar a reserva do protótipo antes do travamento das 21h59.',
+  instruction:'Depois da transferência às 21h57, o Laboratório de formas permite desacoplar a reserva do protótipo antes do travamento das 21h59.',
   distractor:'O painel tentou rearmar as luzes. A reserva do protótipo continuou acoplada.',
   reconstruction:'Às 21h57, o pulso derrubou as luzes e transferiu o protótipo para a reserva. Às 21h59, o painel travava a reserva. Essa alimentação sustentava o retorno das 22h.',
   success:'Você desacoplou a reserva antes do travamento. O protótipo ficou sem alimentação no fechamento e o tempo seguiu.'
@@ -197,7 +198,7 @@ function scenarioClues(){
  clues.prototipo.pop();
  clues.atelie = [];
  clues.prototipo[0].text = 'O protótipo produz uma imagem temporal a partir de uma referência. O fechamento da demonstração depende de um comando que pode vir de outro setor.';
- clues.prototipo[1].text = 'Às 21h57, um pulso faz o relógio recuar um segundo. O estrondo vem da galeria e a luz cai. O alarme soa mais tarde.';
+ clues.prototipo[1].text = 'Às 21h57, um pulso faz o relógio recuar um segundo. O estrondo vem da Galeria especial e a luz cai. O alarme soa mais tarde.';
  clues.atelie.push({id:'atebase',name:'Ler a anotação de ensaio',time:0,text:'As duas emissões têm funções diferentes. O pulso inicial pode ocorrer mesmo quando a ordem de fechamento ainda não está pronta.'});
  clues[path.room].push({id:'time-control',name:'Observar o mecanismo',time:path.opens,text:path.observation});
  clues[path.source].push({id:'time-source',name:'Consultar o procedimento de encerramento',time:60,text:path.instruction});
@@ -237,7 +238,7 @@ function renderGame(){
  $('phaseTitle').textContent=state.room?ROOMS.find(r=>r.id===state.room).name:'Escolha onde investigar';
  $('phaseDescription').textContent=state.phase==='playing'?'Observe o ambiente enquanto o tempo passa.':'Cada escolha revela uma perspectiva diferente da mesma noite.';
  $('boardTitle').textContent=state.phase==='playing'?'Ambiente escolhido':'Escolha um ambiente';
- $('roomGrid').innerHTML=ROOMS.map(r=>'<button class="room '+(state.room===r.id?'selected':'')+'" '+(state.phase==='playing'&&state.room?'disabled':'')+' data-room="'+r.id+'"><span class="room-icon" aria-hidden="true">'+r.icon+'</span><strong>'+r.name+'</strong><small>'+r.sub+'</small></button>').join('');
+ $('roomGrid').innerHTML=ANDARES.map(a=>'<h4 class="andar">'+a+'</h4>'+ROOMS.filter(r=>r.andar===a).map(r=>'<button class="room '+(state.room===r.id?'selected':'')+'" '+(state.phase==='playing'&&state.room?'disabled':'')+' data-room="'+r.id+'"><span class="room-icon" aria-hidden="true">'+r.icon+'</span><strong>'+r.name+'</strong><small>'+r.sub+'</small></button>').join('')).join('');
  document.querySelectorAll('[data-room]').forEach(b=>b.addEventListener('click',()=>enterRoom(b.dataset.room)));
  $('endLoop').classList.toggle('hidden', state.phase!=='playing' || ((finalLoop || state.caseRules === 2) && state.duration===300));
  $('statusText').textContent=state.phase==='playing'?'Você permanece neste ambiente até o retorno.':'Você poderá visitar um ambiente em cada loop.';
