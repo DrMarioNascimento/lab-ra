@@ -51,6 +51,7 @@ function mapa() {
 }
 function desenhar() {
   if (!room) { app.innerHTML = `<div class="tl-raiz">${cabeca()}<div class="tl-card"><h1 class="tl-titulo">Sala não encontrada</h1><p class="tl-texto">Confira o código e abra de novo.</p></div></div>`; return; }
+  if (room.aulaEncerrada) { app.innerHTML = `<div class="tl-raiz">${cabeca()}<div class="tl-meio"><div class="tl-card"><p class="tl-volta">AULA ENCERRADA</p><h1 class="tl-titulo">Obrigado por participar!</h1><p class="tl-texto">O Mestre encerrou a aula.</p></div></div></div>`; return; }
   const e = room.etapa, g = gente(), v = room.volta;
   let meio = '', rod = '';
   if (room.fase === 'sala' || !e) {
@@ -64,7 +65,7 @@ function desenhar() {
       <div class="tl-card">${mapa()}</div>`;
     rod = `<span class="tl-aviso">${g.filter((p) => p.amb && p.ambVolta === v).length} de ${g.length} em um ambiente</span>`;
   } else if (e === 'between') {
-    meio = `<div class="tl-card tl-relogio"><div class="tl-volta">VOLTA ${v} DE 5</div><h1 class="tl-titulo">O tempo retornou.</h1><p class="tl-texto">Cada um relê o seu caderno. O Mestre abre a próxima etapa.</p></div><div class="tl-card">${mapa()}</div>`;
+    meio = `<div class="tl-card tl-relogio"><div class="tl-volta">VOLTA ${v} DE 5</div><h1 class="tl-titulo">O tempo retornou.</h1><p class="tl-texto">Cada um relê o seu dossiê. O Mestre abre a próxima etapa.</p></div><div class="tl-card">${mapa()}</div>`;
   } else if (e === 'final') {
     const n = g.filter((p) => p.resp).length;
     meio = `<div class="tl-card tl-relogio"><h1 class="tl-titulo">Conclusão</h1><p class="tl-texto">Cada um envia a sua própria conclusão no celular.</p></div>

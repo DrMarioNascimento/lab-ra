@@ -341,6 +341,11 @@ async function entrar(asMaster=false){
     }
     /* SUBSTITUIDO 14/10: gravava sempre o jogador inteiro, mesmo quando ele já existia. */
     const jaTem=asMaster?null:await getDoc(playerRef(code,u.uid)).catch(()=>null);
+    if(jaTem&&jaTem.exists()&&jaTem.data().expulso===true)return formEntrar('Você foi retirado desta sala pelo Mestre.',false);
+    if(!asMaster&&!(jaTem&&jaTem.exists())){
+      if(snap.data().aulaEncerrada===true)return formEntrar('Esta aula foi encerrada pelo Mestre.',false);
+      if(snap.data().entradaLiberada===false)return formEntrar('A entrada ainda não foi liberada pelo Mestre.',false);
+    }
     if(jaTem&&jaTem.exists()){
       await updateDoc(playerRef(code,u.uid),{forma,pronto:true,papelCognitivo:escolha.papel,camadaAcessibilidade:escolha.camada,atualizadoEmMs:Date.now()});
       role=(snap.data().mestreUid===u.uid)?'master':'guest';ouvir();return;
@@ -439,6 +444,7 @@ window.DragonSala={
   get sala(){return room},
   get jogadores(){return players},
   atualizarEu(campos){const u=auth.currentUser;if(!code||!u)return Promise.resolve(false);return updateDoc(playerRef(code,u.uid),{...campos,atualizadoEmMs:Date.now()}).then(()=>true,e=>{console.warn('MOSAICO: atualizarEu',e);return false})},
+  atualizarJogador(id,campos){if(!code||role!=='master'||!id)return Promise.resolve(false);return updateDoc(playerRef(code,id),{...campos,atualizadoEmMs:Date.now()}).then(()=>true,e=>{console.warn('MOSAICO: atualizarJogador',e);return false})},
   atualizarSala(campos){if(!code||role!=='master')return Promise.resolve(false);return updateDoc(roomRef(code),campos).then(()=>true,e=>{console.warn('MOSAICO: atualizarSala',e);return false})},
   adicionar(colecao,dados){const u=auth.currentUser;if(!code||!u)return Promise.resolve(null);return addDoc(collection(db,ROOT,code,colecao),{...dados,de:u.uid,ms:Date.now()}).catch(e=>{console.warn('MOSAICO: adicionar',e);return null})},
   ouvirColecao(colecao,cb){if(!code)return()=>{};return onSnapshot(collection(db,ROOT,code,colecao),s=>cb(s.docChanges().filter(c=>c.type==='added').map(c=>({id:c.doc.id,...c.doc.data()}))),e=>console.warn('MOSAICO: ouvirColecao',e))},

@@ -1,6 +1,6 @@
 // Loop (MOSAICO) · sala do Mestre.
 // Liga o jogo de ../game.js a uma sala do firebase-room.js (projeto mosaico-loop): o Mestre abre a sala e conduz as voltas;
-// cada participante escolhe o próprio ambiente, guarda o próprio caderno e envia a própria conclusão.
+// cada participante escolhe o próprio ambiente, guarda o próprio dossiê e envia a própria conclusão.
 // game.js continua intacto: aqui só se monta o `window.coop` que ele já espera (storageKey, choose, decorate, move, now, tick, open).
 // Estado da sala (documento mosaico/{código}): etapa, volta, caso, seg, iniEm, rodada. Do jogador: amb, ambVolta, resp, respEm.
 import { transporteReal, transporteFalso, ms } from './transporte.mjs';
@@ -52,6 +52,7 @@ function restante() { const f = fimDaVolta(); return f == null ? room.seg : Math
 function aceitar(r, ps) {
   room = r; players = ps || [];
   if (!room) return;
+  avisoDeSaida(); desenharTurma();
   esperaDoMestre();
   if (!ETAPAS.includes(room.etapa)) { barra(); return; }
   if (room.etapa === 'playing' && ms(room.iniEm) == null) return;   // o horário do servidor ainda não voltou
@@ -80,7 +81,7 @@ function desenhar(leve) {
     $('betweenEyebrow').innerHTML = '<span></span> O TEMPO RETORNOU';
     $('betweenTitle').textContent = room.volta === 5 ? 'Os ciclos terminaram.' : 'Você se lembra.';
     $('betweenStory').textContent = 'As portas voltaram a fechar. Os objetos estão onde estavam. Você conserva o que descobriu.';
-    $('betweenHint').textContent = 'Releia o seu caderno. O Mestre abre a próxima volta quando a turma estiver pronta.';
+    $('betweenHint').textContent = 'Releia o seu dossiê. O Mestre abre a próxima volta quando a turma estiver pronta.';
     show('between');
   } else if (e === 'final') {
     renderForm();
@@ -103,7 +104,7 @@ function marcarEnvio() {
   for (const k of EIXOS) $(k).disabled = mandou;
   $('final').querySelector('.large').textContent = mandou
     ? 'Conclusão enviada. Aguarde: o Mestre revela o resultado para toda a turma.'
-    : 'O que aconteceu? Use as pistas do caderno e indique como prevenir o acontecimento. Se não souber, deixe em aberto.';
+    : 'O que aconteceu? Use as pistas do dossiê e indique como prevenir o acontecimento. Se não souber, deixe em aberto.';
 }
 
 function blocoTurma() {
@@ -170,9 +171,17 @@ async function avancar(para) {
 }
 
 // ---------------------------------------------------------------- barra do Mestre
+const hh = (t) => String(t ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const entradaLiberada = () => room?.entradaLiberada !== false;
+/** Botões de poder do Mestre, os mesmos do Vila e do Comitê: turma (expulsar), entrada, encerrar a aula e sair. */
+function poderes(cls = '') {
+  const b = (mb, rot, c = 'secondary') => `<button class="btn ${c} ${cls}" data-mb="${mb}" type="button">${rot}</button>`;
+  return b('turma', 'Turma') + b('lib', entradaLiberada() ? 'Entrada liberada' : 'Entrada fechada', entradaLiberada() ? 'secondary' : 'warn')
+    + (room?.aulaEncerrada ? b('fim', 'Reabrir a aula') : b('fim', 'Encerrar a aula', 'danger')) + b('sair', 'Sair');
+}
 function barra() {
   const el = document.getElementById('mestreBar');
-  if (!el || !eMestre() || !room || !ETAPAS.includes(room.etapa)) { if (el) el.classList.add('hidden'); return; }
+  if (!el || !eMestre() || !room) { if (el) el.classList.add('hidden'); return; }
   const total = Math.max(players.filter((p) => !p.mestre).length, 1);
   const noAmb = players.filter((p) => p.amb && p.ambVolta === room.volta).length;
   const mandaram = players.filter((p) => p.resp).length;
@@ -180,18 +189,69 @@ function barra() {
   const e = room.etapa, v = room.volta;
   const btn = (id, rot, cls = 'primary') => `<button class="btn ${cls}" id="${id}" type="button" ${movendo ? 'disabled' : ''}>${rot}</button>`;
   let info = '', acao = '';
-  if (e === 'choose') { info = `Volta ${v} de 5 · ${noAmb} de ${total} escolheram ambiente`; acao = btn('mbIniciar', 'Iniciar relógio da volta'); }
+  if (room.aulaEncerrada) info = 'Aula encerrada para todos. Os dados ficam guardados.';
+  else if (!ETAPAS.includes(e)) info = `Sala aberta · ${players.filter((p) => !p.mestre).length} na sala`;
+  else if (e === 'choose') { info = `Volta ${v} de 5 · ${noAmb} de ${total} escolheram ambiente`; acao = btn('mbIniciar', 'Iniciar relógio da volta'); }
   else if (e === 'playing') { info = `Volta ${v} de 5 em andamento · ${mm(restante())}`; acao = room.seg === 30 ? btn('mbEncerrar', 'Encerrar volta', 'secondary') : ''; }
   else if (e === 'between') { info = `Volta ${v} de 5 concluída`; acao = v < 5 ? btn('mbProxima', 'Abrir próxima volta') : btn('mbFinal', 'Abrir conclusão'); }
   else if (e === 'final') { info = `${mandaram} de ${total} enviaram a conclusão`; acao = btn('mbRevelar', 'Revelar resultados'); }
   else { info = `Resultado revelado · ${mandaram} de ${total} participaram`; acao = btn('mbNova', 'Nova partida'); }
+  if (room.aulaEncerrada) acao = '';
   el.classList.remove('hidden');
-  const sinal = `${e}|${v}|${noAmb}|${mandaram}|${total}|${movendo}|${e === 'playing' ? Math.ceil(restante()) : ''}`;
+  const sinal = `${e}|${v}|${noAmb}|${mandaram}|${total}|${movendo}|${e === 'playing' ? Math.ceil(restante()) : ''}|${entradaLiberada()}|${!!room.aulaEncerrada}`;
   if (el.dataset.sinal === sinal) return;
   el.dataset.sinal = sinal;
-  el.innerHTML = `<span class="mb-rot">MESTRE</span><span class="mb-info" role="status">${info}</span>${acao}`;
+  el.innerHTML = `<span class="mb-rot">MESTRE</span><span class="mb-info" role="status">${info}</span>${acao}<span class="mb-poderes">${poderes()}</span>`;
   const liga = (id, para) => { const b = document.getElementById(id); if (b) b.onclick = () => avancar(para); };
   liga('mbIniciar', 'playing'); liga('mbEncerrar', 'between'); liga('mbProxima', 'choose'); liga('mbFinal', 'final'); liga('mbRevelar', 'result'); liga('mbNova', 'nova');
+}
+
+// ---------------------------------------------------------------- poderes do Mestre (turma, entrada, encerrar a aula, sair)
+function desenharTurma() {
+  const d = document.getElementById('turmaDialog');
+  if (!d || !d.open) return;
+  const gente = players.filter((p) => !p.mestre);
+  d.innerHTML = `<p class="kicker">TURMA</p><h2>${gente.length} na sala</h2>
+    <ul class="turma-lista">${gente.map((p) => `<li class="${p.expulso ? 'fora' : ''}"><span>${hh(p.nome || 'Participante')}${p.expulso ? ' · fora da sala' : ''}</span>
+      <button class="btn ${p.expulso ? 'secondary' : 'danger'} sm" data-exp="${hh(p.id)}" data-val="${p.expulso ? 0 : 1}" type="button">${p.expulso ? 'Readmitir' : 'Expulsar'}</button></li>`).join('') || '<li><span>Ninguém entrou ainda.</span></li>'}</ul>
+    <button class="btn primary" data-fechar type="button">Fechar</button>`;
+}
+function abrirTurma() {
+  let d = document.getElementById('turmaDialog');
+  if (!d) { d = document.createElement('dialog'); d.id = 'turmaDialog'; document.body.appendChild(d); }
+  if (!d.open) d.showModal();
+  desenharTurma();
+}
+document.addEventListener('click', async (ev) => {
+  const x = ev.target.closest('[data-exp],[data-fechar],[data-mb]');
+  if (!x || !T || !eMestre()) return;
+  if (x.dataset.fechar !== undefined) { document.getElementById('turmaDialog')?.close(); return; }
+  if (x.dataset.exp) {
+    const sair = x.dataset.val === '1';
+    if (sair && !confirm('Retirar esta pessoa da sala? Ela não consegue voltar até você readmitir.')) return;
+    if (!(await T.atualizarJogador(x.dataset.exp, { expulso: sair }))) toast('Não consegui. Confira a conexão e tente de novo.');
+    return;
+  }
+  const mb = x.dataset.mb;
+  if (mb === 'turma') abrirTurma();
+  else if (mb === 'lib') { if (!(await T.atualizarSala({ entradaLiberada: !entradaLiberada() }))) toast('Não consegui mudar a entrada. Tente de novo.'); }
+  else if (mb === 'fim') {
+    if (room.aulaEncerrada) { await T.atualizarSala({ aulaEncerrada: false }); return; }
+    if (!confirm('Encerrar a aula para todos? O telão e os celulares mostram “Aula encerrada”. Os dados ficam guardados e você pode reabrir depois.')) return;
+    if (!(await T.atualizarSala({ aulaEncerrada: true, entradaLiberada: false }))) toast('Não consegui encerrar. Tente de novo.');
+  } else if (mb === 'sair') {
+    if (!room?.aulaEncerrada && !confirm('Sair sem encerrar a aula? Os celulares e o telão ficam sem o Mestre até você voltar a esta sala.')) return;
+    location.href = '../../bancadas.html';
+  }
+});
+
+/** Para quem não é Mestre: tela cheia quando a aula foi encerrada ou quando foi retirado da sala. */
+function avisoDeSaida() {
+  let el = document.getElementById('salaFim');
+  const msg = eMestre() ? null : (euJogador().expulso ? ['VOCÊ SAIU DA SALA', 'O Mestre retirou você desta sala.'] : room?.aulaEncerrada ? ['AULA ENCERRADA', 'O Mestre encerrou a aula. Obrigado por participar!'] : null);
+  if (!msg) { if (el) el.remove(); return; }
+  if (!el) { el = document.createElement('div'); el.id = 'salaFim'; el.className = 'sala-espera sala-fim'; document.body.appendChild(el); }
+  el.innerHTML = `<div class="card"><p class="kicker">${msg[0]}</p><h2>${msg[1]}</h2></div>`;
 }
 
 // ---------------------------------------------------------------- simulador: a sala de mentira tem uma espera com botão
@@ -200,7 +260,7 @@ function esperaDoMestre() {
   if (!room || room.fase !== 'sala') { if (el) el.remove(); return; }
   if (!el) { el = document.createElement('div'); el.id = 'salaEspera'; el.className = 'sala-espera'; document.body.appendChild(el); }
   el.innerHTML = eMestre()
-    ? `<div class="card"><p class="kicker">SALA ABERTA</p><h2>${players.length} na sala</h2><button class="btn primary" id="mbComecar" type="button">Iniciar partida</button></div>`
+    ? `<div class="card"><p class="kicker">SALA ABERTA</p><h2>${players.length} na sala</h2><button class="btn primary" id="mbComecar" type="button">Iniciar partida</button><div class="espera-poderes">${poderes('sm')}</div></div>`
     : '<div class="card"><p class="kicker">SALA</p><h2>Aguardando o Mestre iniciar a partida…</h2></div>';
   const b = document.getElementById('mbComecar');
   if (b) b.onclick = async () => { const seg = Number(P.get('seg')) || (FALSA ? 30 : await perguntarRitmo()); await T.atualizarSala({ fase: 'jogo', iniciadaEmMs: Date.now(), ...partidaNova(seg, 1) }); };
@@ -210,6 +270,8 @@ function esperaDoMestre() {
 function manualDeEntrada() {
   const chave = 'cinco-loop-manual-' + T.codigo + '-' + T.uid;
   try { if (sessionStorage.getItem(chave)) return; sessionStorage.setItem(chave, '1'); } catch { /* sem sessionStorage: abre sempre */ }
+  const eu = euJogador(), nome = hh(eu.nome || '').trim(), sd = document.getElementById('saudacao');
+  if (sd && nome) { sd.textContent = ({ m: 'Bem-vindo', f: 'Bem-vinda' }[eu.forma] || 'Olá') + ', ' + (eu.nome || '').trim() + '.'; sd.classList.remove('hidden'); }
   popup('helpDialog');
 }
 

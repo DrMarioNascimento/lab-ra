@@ -45,6 +45,7 @@ export async function transporteReal(DS) {
     carimbo: () => fs.serverTimestamp(),
     atualizarSala: (c) => DS.atualizarSala(c),
     atualizarEu: (c) => DS.atualizarEu(c),
+    atualizarJogador: (id, c) => DS.atualizarJogador(id, c),
     aoMudar: (cb) => DS.aoMudar(cb),
     async sincronizar() { base = await relogioDoServidor(fs, DS.db, DS.codigo, DS.uid); }
   };
@@ -113,6 +114,7 @@ export function transporteFalso({ codigo = 'SIMUL', papel = 'guest', uid, nome =
     carimbo: () => Date.now(),
     atualizarSala: async (c) => { gravar('sala', { ...(sala() || {}), ...c }); olhar(); return true; },
     atualizarEu: async (c) => { eu(c); return true; },
+    atualizarJogador: async (id, c) => { const todos = ler('jogadores') || {}; if (!todos[id]) return false; todos[id] = { ...todos[id], ...c, atualizadoEmMs: Date.now() }; gravar('jogadores', todos); olhar(); return true; },
     aoMudar: (cb) => ouvintes.push(cb),
     async sincronizar() {}
   };
