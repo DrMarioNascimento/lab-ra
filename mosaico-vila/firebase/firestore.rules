@@ -1,0 +1,81 @@
+rules_version = '2';
+// Mosaicos Vila (projeto Firebase mosaico-vila) — regras do Firestore, no mesmo desenho das salas do Comitê.
+// O "cérebro" da sala roda no aparelho da Autoridade Ética (dono da sala). Os alunos nunca leem o estado
+// completo: cada um lê só a própria visão; o telão lê só a visão pública.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signed() { return request.auth != null; }
+    // Mestre = conta Google verificada cujo e-mail está em config/mestres { emails: [...] }
+    function mestre() {
+      return signed()
+        && request.auth.token.firebase.sign_in_provider == 'google.com'
+        && request.auth.token.email_verified == true
+        && request.auth.token.email in get(/databases/$(database)/documents/config/mestres).data.emails;
+    }
+    function sala(c) { return get(/databases/$(database)/documents/salas/$(c)).data; }
+    function dono(c) { return signed() && sala(c).dono == request.auth.uid; }
+    function minha(d) { return d == null || d.data.uid == request.auth.uid; }
+
+    // lista de mestres: editada só pelo console; cada mestre consegue conferir que está nela
+    match /config/mestres {
+      allow get: if signed() && request.auth.token.email in resource.data.emails;
+      allow list, write: if false;
+    }
+
+    // casos importados por planilha
+    match /casos/{id} {
+      allow read: if mestre();
+      allow create, update: if mestre() && request.resource.data.j is string && request.resource.data.j.size() < 900000;
+      allow delete: if mestre();
+    }
+
+    match /salas/{c} {
+      allow get: if signed();
+      allow list: if false;
+      allow create: if mestre() && c.matches('[A-Z0-9]{5}') && request.resource.data.dono == request.auth.uid;
+      allow update: if dono(c) && request.resource.data.dono == resource.data.dono;
+      allow delete: if dono(c);
+
+      // memória da sala (estado completo, fichas, votos…): só o dono
+      match /kv/{k} { allow read, write: if dono(c); }
+
+      // visão pública do telão
+      match /pub/{x} {
+        allow get: if signed();
+        allow write: if dono(c);
+      }
+
+      // visão de cada aluno: só o aparelho dele lê
+      match /visoes/{aluno} {
+        allow get: if signed() && minha(resource);
+        allow write: if dono(c);
+      }
+
+      // pedidos dos alunos (entrar, ações): cada um cria os seus; o dono processa e apaga
+      match /pedidos/{p} {
+        allow create: if signed()
+          && exists(/databases/$(database)/documents/salas/$(c))
+          && request.resource.data.keys().hasOnly(['uid', 'tipo', 'j', 'em'])
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.tipo in ['entrar', 'aluno']
+          && request.resource.data.j is string && request.resource.data.j.size() < 20000
+          && request.resource.data.em == request.time;
+        allow read, delete: if dono(c);
+      }
+
+      // resposta à entrada na sala: só quem pediu lê
+      match /respostas/{p} {
+        allow get: if signed() && minha(resource);
+        allow write: if dono(c);
+      }
+
+      // o telão avisa que está ligado
+      match /presenca/{x} {
+        allow get: if dono(c);
+        allow create, update: if signed() && exists(/databases/$(database)/documents/salas/$(c))
+          && request.resource.data.keys().hasOnly(['em']) && request.resource.data.em == request.time;
+        allow delete: if dono(c);
+      }
+    }
+  }
+}

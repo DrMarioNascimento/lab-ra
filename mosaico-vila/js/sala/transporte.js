@@ -1,17 +1,18 @@
 // Sala ao vivo, no mesmo desenho do Comitê de Ética: o "cérebro" do jogo roda no aparelho do professor;
-// alunos e telão só leem o que ele publica e mandam pedidos. Usa o projeto Firebase do Comitê (as regras
-// de salas/pub/pedidos/respostas/presenca já servem a qualquer jogo) e a lista de mestres dele.
+// alunos e telão só leem o que ele publica e mandam pedidos. Todos os Mosaicos Vila (Vila e Vila Ética, no LAB-RA e
+// no site de Ética) usam o MESMO projeto Firebase: mosaico-vila. Regras em lab-ra/mosaico-vila/firebase/firestore.rules;
+// a lista de mestres fica em config/mestres do Firestore desse projeto.
 // A chave abaixo é pública por desenho: a proteção vem do login e das regras do Firestore.
 // Para testar sem rede: localStorage.setItem('SALA_FALSA', '1') troca o Firestore por um banco local entre abas.
 
 const VERSAO_FIREBASE = '12.17.1';
 const CONFIG = {
-  apiKey: 'AIzaSyBRgILqLlVwm613G9F_3FhkvGN5QhhEvAw',
-  authDomain: 'comite-etica-3cfdd.firebaseapp.com',
-  projectId: 'comite-etica-3cfdd',
-  storageBucket: 'comite-etica-3cfdd.firebasestorage.app',
-  messagingSenderId: '648675086125',
-  appId: '1:648675086125:web:406f431e2ee8d622c20da4'
+  apiKey: 'AIzaSyBodXWvN30rNuMj0FzcFNRpxHfpRms_QEI',
+  authDomain: 'mosaico-vila.firebaseapp.com',
+  projectId: 'mosaico-vila',
+  storageBucket: 'mosaico-vila.firebasestorage.app',
+  messagingSenderId: '120103825998',
+  appId: '1:120103825998:web:76b776ae57c507ca5fc91f'
 };
 
 export const normalizar = (c) => String(c || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 5);
