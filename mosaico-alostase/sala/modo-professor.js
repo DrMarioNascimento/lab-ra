@@ -20,7 +20,7 @@ async function telaLogin(msg) {
   app.innerHTML = topo() + `<div class="ent-wrap"><div class="ent-card escuro" style="max-width:460px;margin:0 auto;width:100%"><p class="ent-rot">Conduzir</p><h2>Entrar como professor</h2>
     <p class="ent-aviso">Entre com a conta Google que está na lista de professores autorizados. A turma entra pelo código ou pelo QR, sem cadastro.</p>
     <button class="btn professor block" id="google"><span class="entrada-prof">${cadeado}Entrar com Google</span><small>Só o Professor tem a chave</small></button>
-    <p class="ent-erro" id="erro" role="alert">${esc(msg || '')}</p><a class="ent-link" href="../index.html">Voltar</a></div></div>`;
+    <p class="ent-erro" id="erro" role="alert">${esc(msg || '')}</p><a class="ent-link" href="../sala/index.html">Voltar</a></div></div>`;
   const b = await conectar();
   document.getElementById('google').onclick = () => {
     // sem await antes do signInWithPopup: o Safari do iPhone bloqueia a janela do Google se houver
@@ -69,7 +69,7 @@ function painel() {
   const lib = document.getElementById('lib');
   lib.onclick = () => { liberada = !liberada; lib.textContent = liberada ? 'Entrada liberada' : 'Entrada fechada'; lib.className = 'btn sm ' + (liberada ? 'sec' : 'warn'); sala.entradaLiberada(liberada); };
   document.getElementById('nova').onclick = () => { if (confirm('Abrir uma sala nova? A atual será deixada de lado.')) { localStorage.removeItem(CHAVE); sessionStorage.removeItem(CHAVE); location.reload(); } };
-  document.getElementById('sair').onclick = async () => { sala.encerrar(); const b = await conectar(); await b.sair(); location.href = '../index.html'; };
+  document.getElementById('sair').onclick = async () => { sala.encerrar(); const b = await conectar(); await b.sair(); location.href = '../sala/index.html'; };
   window.__sala = { get st() { return st; }, dispatch, codigo: sala.codigo };
 }
 

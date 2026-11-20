@@ -85,3 +85,4 @@ Variáveis (3 de cerca de 20); contas de Estresse, Energia e Treino, juros, cobr
 - Rodada: o professor escolhe a rotina e 3, 5 ou 8 perguntas; a turma estima cortisol ou glicemia; o telão revela distribuição (só com 5 ou mais respostas), faixa e raciocínio; fim mostra acertos por pergunta. Mesmas perguntas e pontuação do Prognóstico.
 - Transporte: cópia própria do usado no Vila Ética, sobre o Firebase do Comitê (decisão minha, igual à da Vila). Testado só com o banco de teste entre abas (`SALA_FALSA`); **falta testar com o Firebase real, o login Google e o telão na TV**.
 - Cadeado provisório em SVG (prompt em ICONES-prompts-3D.md). Sem pontos por nome no telão.
+- Endereços no padrão (raiz do projeto): `/simulador/`, `/professor/`, `/telao/`, `/aluno/`; a entrada fica em `/sala/`. (Primeira versão pôs as páginas dentro de `sala/`, o que fazia `/simulador` dar 404; corrigido em 19/11/2026.)

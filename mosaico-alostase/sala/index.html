@@ -23,9 +23,9 @@
       <button class="btn block" id="entrar" disabled>Entrar</button></div>
     <div class="ent-card escuro"><p class="ent-rot">Conduzir</p><h2>Professor</h2>
       <p class="muted" style="margin:0">Crie a sala e conduza pelo celular. No PC ou na TV da sala, abra o telão com o código.</p>
-      <a class="btn professor block" href="professor/index.html"><span class="entrada-prof"><svg class="cadeado" viewBox="0 0 36 36" width="34" height="34" aria-hidden="true"><path d="M10 16v-4a8 8 0 0 1 16 0v4" fill="none" stroke="#ddd6fe" stroke-width="3.5" stroke-linecap="round"/><rect x="6" y="15" width="24" height="17" rx="4" fill="#a78bfa"/><rect x="6" y="15" width="24" height="17" rx="4" fill="none" stroke="#4c1d95" stroke-width="1.5"/><circle cx="18" cy="23" r="2.6" fill="#4c1d95"/></svg>Entrar como Professor</span><small>Só o Professor tem a chave</small></a>
-      <a class="btn contorno block" href="telao/index.html">Abrir telão</a>
-      <a class="ent-link" href="simulador/index.html">Simulador de aula (testar no PC sem a turma)</a></div>
+      <a class="btn professor block" href="../professor/index.html"><span class="entrada-prof"><svg class="cadeado" viewBox="0 0 36 36" width="34" height="34" aria-hidden="true"><path d="M10 16v-4a8 8 0 0 1 16 0v4" fill="none" stroke="#ddd6fe" stroke-width="3.5" stroke-linecap="round"/><rect x="6" y="15" width="24" height="17" rx="4" fill="#a78bfa"/><rect x="6" y="15" width="24" height="17" rx="4" fill="none" stroke="#4c1d95" stroke-width="1.5"/><circle cx="18" cy="23" r="2.6" fill="#4c1d95"/></svg>Entrar como Professor</span><small>Só o Professor tem a chave</small></a>
+      <a class="btn contorno block" href="../telao/index.html">Abrir telão</a>
+      <a class="ent-link" href="../simulador/index.html">Simulador de aula (testar no PC sem a turma)</a></div>
   </div>
   <a class="ent-link" href="../index.html">Jogar sozinho (Prognóstico e Diagnóstico)</a>
   <p class="faint">Prof. Mário César Nascimento, PhD</p>
@@ -34,9 +34,9 @@
 (function () {
   var c = document.getElementById("cod"), b = document.getElementById("entrar");
   function limpa() { c.value = c.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 5); b.disabled = c.value.length < 5; }
-  function ir() { if (c.value.length >= 5) location.href = "aluno/index.html?sala=" + c.value; }
+  function ir() { if (c.value.length >= 5) location.href = "../aluno/index.html?sala=" + c.value; }
   c.addEventListener("input", limpa); c.addEventListener("keydown", function (e) { if (e.key === "Enter") ir(); }); b.addEventListener("click", ir);
-  var q = new URLSearchParams(location.search).get("sala"); if (q) location.replace("aluno/index.html?sala=" + encodeURIComponent(q));
+  var q = new URLSearchParams(location.search).get("sala"); if (q) location.replace("../aluno/index.html?sala=" + encodeURIComponent(q));
 })();
 </script>
 </body>
