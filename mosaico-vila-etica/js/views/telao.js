@@ -137,6 +137,7 @@ function duasMetas() {
 }
 
 export function renderTelao(st) {
+  if (st.encerrada) return `<div class="tin"><div class="col fim-tela" style="flex:1;justify-content:center;align-items:center"><div class="fim-ico" aria-hidden="true">✓</div><h1>Aula encerrada</h1><p class="muted" style="font-size:2.2cqw">Obrigado pela participação de todas e de todos.</p></div></div>`;
   let body = "";
   switch (st.fase) {
     case "entrada":

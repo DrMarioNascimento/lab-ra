@@ -54,6 +54,7 @@ async function abrir(u) {
 let seq = 0;
 function aoEntrar(nome, uid, reassumir, atual) {
   if (atual && st.alunos[atual]) return { ok: true, id: atual };   // o mesmo celular de volta
+  if (st.encerrada) return { ok: false, erro: "Esta aula foi encerrada pelo professor." };
   if (!nome) return { ok: false, erro: "Digite seu nome." };
   const chave = (x) => String(x || "").trim().toLowerCase();
   const ex = st.ordem.find((i) => !st.alunos[i]?.auto && chave(st.alunos[i]?.nome) === chave(nome));
@@ -80,7 +81,8 @@ function painel(u) {
       <div><p class="ent-rot">Código da sala</p><div class="pro-cod">${sala.codigo}</div><p class="ent-aviso">A turma entra por este código ou pelo QR, sem cadastro.</p></div></div>
       <div class="row"><a class="btn contorno" href="${telaoLink}" target="_blank" rel="noopener">Abrir telão</a>
       <button class="btn sm sec" id="lib">Entrada liberada</button><button class="btn sm sec" id="nova">Nova sala</button><button class="btn sm sec" id="sair">Sair</button></div></div>
-    <div id="prof" class="card"></div></div>`;
+    <div id="prof" class="card"></div></div>
+    <div class="pro-barra"><button class="btn sm red" id="encerrar">Encerrar a aula</button><button class="btn sm sec" id="sair2">Sair</button></div>`;
   const prof = montar(document.getElementById("prof"), () => renderProfessor(st), (a, el) => acaoProfessor(a, el, dispatch), () => {});
   subs.add(() => prof.draw()); prof.draw(true);
   setInterval(() => prof.draw(), 5000);   // o sinal dos celulares muda sem o estado mudar
@@ -89,7 +91,21 @@ function painel(u) {
   const lib = document.getElementById("lib");
   lib.onclick = () => { liberada = !liberada; lib.textContent = liberada ? "Entrada liberada" : "Entrada fechada"; lib.className = "btn sm " + (liberada ? "sec" : "warn"); sala.entradaLiberada(liberada); };
   document.getElementById("nova").onclick = () => { if (confirm("Abrir uma sala nova? A atual será deixada de lado.")) { localStorage.removeItem(CHAVE); sessionStorage.removeItem(CHAVE); location.reload(); } };
-  document.getElementById("sair").onclick = async () => { sala.encerrar(); const b = await conectar(); await b.sair(); location.href = "../index.html"; };
+  const sairDoPainel = async () => {
+    if (!st.encerrada && !confirm("Sair sem encerrar a aula? Os celulares e o telão ficam sem o professor até você voltar a este painel.")) return;
+    sala.encerrar(); const b = await conectar(); await b.sair(); location.href = "../index.html";
+  };
+  document.getElementById("sair").onclick = sairDoPainel; document.getElementById("sair2").onclick = sairDoPainel;
+  // R44: encerrar a aula para todos (reabrir desfaz); a barra fica sempre visível, mesmo rolando a tela
+  const enc = document.getElementById("encerrar");
+  enc.onclick = () => {
+    if (st.encerrada) { dispatch({ t: "reabrir" }); return; }
+    if (!confirm("Encerrar a aula para todos? O telão e os celulares mostram “Aula encerrada”. Os dados ficam guardados e você pode reabrir depois.")) return;
+    liberada = false; sala.entradaLiberada(false); lib.textContent = "Entrada fechada"; lib.className = "btn sm warn";
+    dispatch({ t: "encerrar" });
+  };
+  const barra = () => { enc.textContent = st.encerrada ? "Reabrir a aula" : "Encerrar a aula"; enc.className = "btn sm " + (st.encerrada ? "ok" : "red"); };
+  subs.add(barra); barra();
   // os vizinhos automáticos jogam sempre; na sala real, quem roda isto é o aparelho de quem conduz
   const locs = {};
   setInterval(() => {

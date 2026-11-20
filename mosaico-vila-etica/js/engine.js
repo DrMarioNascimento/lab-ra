@@ -163,6 +163,9 @@ export function reduzir(st, a) {
       break;
     }
     case "achei": if (s.fase === "familias" && s.alunos[a.id]) s.alunos[a.id].achou = true; break;
+    // R44: encerrar a aula para todos (telão e celulares mostram o encerramento); os dados ficam guardados e dá para reabrir
+    case "encerrar": s.encerrada = true; break;
+    case "reabrir": delete s.encerrada; break;
     // R43: quem conduz tira alguém da sala (o nome fica livre), muda alguém de família, escolhe a chefia ou a pessoa sorteada
     case "remover": if (s.alunos[a.id] && !s.alunos[a.id].auto) removerPessoa(s, a.id, r); break;
     case "mover": {

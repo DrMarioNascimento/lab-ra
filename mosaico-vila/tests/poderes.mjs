@@ -146,5 +146,16 @@ console.log("# painel do professor, celular e telão");
   ok(renderProfessor(e.st).includes("Na sala"), "entrada: lista de quem está na sala");
   ok(renderTelao(j.st).length > 100, "telão renderiza");
 }
+console.log("# encerrar a aula");
+{
+  const j = nova(14); j.dispatch({ t: "sortear", seed: 4 });
+  j.dispatch({ t: "encerrar" });
+  ok(j.st.encerrada === true, "estado encerrada");
+  ok(renderAluno(j.st, "a1", novoLocal()).includes("Aula encerrada"), "celular mostra aula encerrada");
+  ok(renderTelao(j.st).includes("Aula encerrada"), "telão mostra aula encerrada");
+  ok(renderProfessor(j.st).includes("Aula encerrada"), "painel avisa que encerrou");
+  j.dispatch({ t: "reabrir" });
+  ok(!j.st.encerrada && !renderAluno(j.st, "a1", novoLocal()).includes("Aula encerrada"), "reabrir volta ao jogo");
+}
 console.log(falhas ? `${falhas} FALHA(S)` : "todas as verificações passaram");
 process.exit(falhas ? 1 : 0);

@@ -174,6 +174,7 @@ function telaManual() {
 
 export function renderAluno(st, id, loc) {
   idAtual = id;
+  if (st.encerrada) return `<div class="hd painel"><div class="p-topo">${ico("app-mosaico-vila", "m")}<div class="p-quem"><b>Mosaico Vila</b></div></div></div><div class="bd fim-tela" style="display:flex;flex-direction:column;justify-content:center;min-height:60vh"><div class="fim-ico" aria-hidden="true">✓</div><h2>Aula encerrada</h2><p class="muted">O professor encerrou a sessão. Obrigado pela participação, ${esc((st.alunos[id]?.nome || "").split(" ")[0])}!</p></div>`;
   // R43: a cada mudança de etapa, um aviso de 3,5 s no cabeçalho (a primeira tela não avisa)
   const chaveFase = `${st.fase}:${st.ano}`;
   if (loc.faseVista == null) loc.faseVista = chaveFase;
