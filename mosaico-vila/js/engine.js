@@ -72,6 +72,35 @@ export function estadoInicial() {
 
 const famDe = (s, id) => s.fams[s.alunos[id]?.fam];
 
+// R43: poderes de quem conduz. Tirar alguém da sala, trocar de família, escolher a chefia da família e a pessoa sorteada.
+const humanos = (s, f) => f.membros.filter((m) => !s.alunos[m]?.auto).length;
+function ajustarFamilia(s, f) {
+  if (!f) return;
+  if (!f.membros.length) {   // família que ficou vazia ganha um vizinho automático (as contas dividem por pessoa)
+    let n = 1; while (s.alunos[`v${n}`]) n++;
+    const vid = `v${n}`;
+    s.alunos[vid] = { id: vid, nome: `Vizinho ${n}`, fam: f.id, achou: true, auto: true, parente: false };
+    s.ordem.push(vid); s.pessoal[vid] = 0; f.membros.push(vid);
+  }
+  const h = humanos(s, f);
+  f.automatica = h === 0;
+  if (f.chefe && !s.alunos[f.chefe]) delete f.chefe;
+  for (const m of f.membros) { const p = s.alunos[m]; if (p?.auto) { p.parente = h > 0; p.nome = p.nome.replace(/^(Parente|Vizinho)/, h > 0 ? "Parente" : "Vizinho"); } }
+}
+function removerPessoa(s, id, r) {
+  const al = s.alunos[id], f = s.fams[al.fam];
+  delete s.alunos[id];
+  s.ordem = s.ordem.filter((x) => x !== id);
+  for (const k of ["props", "lances", "previsao", "controle", "palpite", "palpitePct"]) for (const sub of Object.values(s[k] || {})) if (sub && typeof sub === "object") delete sub[id];
+  for (const k of ["pessoal", "mente", "dado", "quem", "golpe", "prev5", "voto", "final", "pulados", "situacao", "fala"]) if (s[k]) delete s[k][id];
+  if (s.pequena?.votos) delete s.pequena.votos[id];
+  if (s.alvara?.votos) delete s.alvara.votos[id];
+  if (s.lazer?.res) delete s.lazer.res[id];
+  if (s.alvara?.pessoa === id) s.alvara.pessoa = s.ordem.length ? s.ordem[Math.floor(r() * s.ordem.length)] : null;   // quem foi sorteado e saiu: sorteia de novo
+  if (f) { f.membros = f.membros.filter((x) => x !== id); ajustarFamilia(s, f); }
+  s.pilha = [];   // o "Voltar" não pode ressuscitar quem saiu
+}
+
 export function reduzir(st, a) {
   const s = structuredClone(st);
   s.v += 1;
@@ -129,6 +158,29 @@ export function reduzir(st, a) {
       break;
     }
     case "achei": if (s.fase === "familias" && s.alunos[a.id]) s.alunos[a.id].achou = true; break;
+    // R43: quem conduz tira alguém da sala (o nome fica livre), muda alguém de família, escolhe a chefia ou a pessoa sorteada
+    case "remover": if (s.alunos[a.id] && !s.alunos[a.id].auto) removerPessoa(s, a.id, r); break;
+    case "mover": {
+      const al = s.alunos[a.id], origem = al && s.fams[al.fam];
+      if (!al || al.auto || !origem || s.fase === "entrada") break;
+      let alvo = s.fams[a.fam];
+      if (a.fam === "sorteio") {   // a família com menos gente (de verdade), sorteada entre as empatadas
+        const pool = Object.values(s.fams).filter((f) => f.id !== origem.id);
+        const menor = Math.min(...pool.map((f) => humanos(s, f)));
+        const cand = pool.filter((f) => humanos(s, f) === menor);
+        alvo = cand[Math.floor(r() * cand.length)];
+      }
+      if (!alvo || alvo.id === origem.id) break;
+      origem.membros = origem.membros.filter((m) => m !== a.id);
+      if (origem.chefe === a.id) delete origem.chefe;
+      alvo.membros.push(a.id); al.fam = alvo.id;
+      if (s.fase === "familias") al.achou = false;   // precisa achar a família nova
+      ajustarFamilia(s, origem); ajustarFamilia(s, alvo);
+      s.pilha = [];
+      break;
+    }
+    case "chefe": { const al = s.alunos[a.id], f = al && s.fams[al.fam]; if (f && !al.auto) f.chefe = a.id; break; }   // no modo vizinhos, os parentes seguem esta pessoa
+    case "sorteado": if (s.fase === "alvara" && s.alunos[a.id]) s.alvara.pessoa = a.id; break;   // troca a pessoa sorteada da proposta grande
     case "propor": {
       if (s.fase !== "decidir") break;
       const p = a.p || {};
@@ -189,7 +241,7 @@ export function reduzir(st, a) {
     default: break;
   }
   // R38: no modo vizinhos, os parentes automáticos fazem o mesmo que quem chefia a família (proposta, lance e voto)
-  if (s.vizinhos && ACOES_DA_FAMILIA.has(a.t) && a.id && !ehAuto(s, a.id)) {
+  if (s.vizinhos && ACOES_DA_FAMILIA.has(a.t) && a.id && !ehAuto(s, a.id) && (!famDe(s, a.id)?.chefe || famDe(s, a.id).chefe === a.id)) {
     let out = s;
     for (const pid of famDe(s, a.id)?.membros || []) if (s.alunos[pid]?.parente) out = reduzir(out, { ...a, id: pid });
     return out;

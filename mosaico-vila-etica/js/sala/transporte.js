@@ -134,14 +134,33 @@ function ligarAnfitriao(b, codigo, uid, aoEntrar, aoAcao) {
   const processados = new Set();
   let ultimo = '', ultimoEm = 0, timer = 0, pendente = null;
   const desligar = [];
+  // R43: sinal de presença de cada celular (o aluno grava presenca/<uid> a cada ~20 s; aqui só se lê o documento de cada um)
+  const sinais = new Map(), observados = new Set();   // id do jogo → instante do último sinal
+  const observar = (uid, idJogo) => {
+    if (observados.has(uid)) return; observados.add(uid);
+    sinais.set(idJogo, Date.now());   // ao entrar (ou ao recarregar a página do professor), conta como sinal de agora
+    desligar.push(b.ouvir(`salas/${codigo}/presenca/${uid}`, (d) => {
+      const em = d && d.em, ms = typeof em === 'number' ? em : em && em.toMillis ? em.toMillis() : 0;
+      const id = mapa.get(uid) ?? idJogo;
+      if (ms > (sinais.get(id) || 0)) sinais.set(id, ms);
+    }, () => {}));
+  };
+  for (const [u, i] of mapa) observar(u, i);
   const responder = (pedido, resp, uidAluno) => b.gravar(`salas/${codigo}/respostas/${pedido}`, { uid: uidAluno, ok: !!resp.ok, erro: resp.erro || '', j: JSON.stringify(resp.dados || {}) }).catch(() => {});
   desligar.push(b.ouvirNovos(`salas/${codigo}/pedidos`, async (id, p) => {
     if (processados.has(id)) return; processados.add(id);
     try {
       const j = JSON.parse(p.j || '{}');
       if (p.tipo === 'entrar') {
-        let idJogo = mapa.get(p.uid);
-        if (!idJogo) { const r = aoEntrar(String(j.nome || '').trim().slice(0, 24), p.uid); if (!r || !r.ok) { await responder(id, { ok: false, erro: (r && r.erro) || 'A entrada não está liberada.' }, p.uid); return; } idJogo = r.id; mapa.set(p.uid, idJogo); try { localStorage.setItem('SALA-MAPA-' + codigo, JSON.stringify([...mapa])); } catch {} }
+        const r = aoEntrar(String(j.nome || '').trim().slice(0, 24), p.uid, !!j.reassumir, mapa.get(p.uid));
+        if (!r || !r.ok) { await responder(id, { ok: false, erro: (r && r.erro) || 'A entrada não está liberada.', dados: { cod: r && r.cod } }, p.uid); return; }
+        const idJogo = r.id;
+        if (mapa.get(p.uid) !== idJogo) {
+          for (const [u, i] of [...mapa]) if (i === idJogo && u !== p.uid) mapa.delete(u);   // quem volta de outro aparelho assume o lugar
+          mapa.set(p.uid, idJogo);
+          try { localStorage.setItem('SALA-MAPA-' + codigo, JSON.stringify([...mapa])); } catch {}
+        }
+        observar(p.uid, idJogo);
         await responder(id, { ok: true, dados: { id: idJogo } }, p.uid);
       } else if (p.tipo === 'aluno') {
         const idJogo = mapa.get(p.uid);
@@ -161,6 +180,7 @@ function ligarAnfitriao(b, codigo, uid, aoEntrar, aoAcao) {
       const espera = Math.max(0, PUB_MIN_MS - (Date.now() - ultimoEm));
       if (!timer) timer = setTimeout(gravar, espera);
     },
+    sinalDe: (id) => (sinais.has(id) ? (Date.now() - sinais.get(id)) / 1000 : Infinity),   // segundos sem sinal
     entradaLiberada(sim) { return b.atualizar('salas/' + codigo, { info: JSON.stringify({ liberada: !!sim }) }).catch(() => {}); },
     ouvirTelao(cb) { return b.ouvir(`salas/${codigo}/presenca/telao`, cb); },
     encerrar() { desligar.forEach((f) => f && f()); clearTimeout(timer); }
@@ -187,21 +207,29 @@ export async function marcarPresencaTelao(codigo) {
   f(); return setInterval(f, 10000);
 }
 
-export async function entrarNaSala(codigo, nome) {
+export async function entrarNaSala(codigo, nome, reassumir) {
   const b = await conectar(); const uid = await b.identificar();
   const info = await lerSala(codigo);
   if (!info) throw new Error('Sala não encontrada. Confira o código.');
   if (!info.liberada) throw new Error('A entrada ainda não foi liberada pelo professor. Aguarde.');
-  const id = await b.adicionar(`salas/${codigo}/pedidos`, { uid, tipo: 'entrar', j: JSON.stringify({ nome }), em: b.agora() });
+  const id = await b.adicionar(`salas/${codigo}/pedidos`, { uid, tipo: 'entrar', j: JSON.stringify({ nome, reassumir: !!reassumir }), em: b.agora() });
   return new Promise((resolve, reject) => {
     const fim = Date.now() + 25000;
     const off = b.ouvir(`salas/${codigo}/respostas/${id}`, (r) => {
       if (!r) { return; }
       if (off) off();
-      if (!r.ok) reject(new Error(r.erro || 'Não foi possível entrar.')); else resolve(JSON.parse(r.j).id);
+      if (!r.ok) { const e = new Error(r.erro || 'Não foi possível entrar.'); try { e.cod = JSON.parse(r.j).cod; } catch {} reject(e); } else resolve(JSON.parse(r.j).id);
     }, () => reject(new Error('Sem conexão. Tente de novo.')));
     const t = setInterval(() => { if (Date.now() > fim) { clearInterval(t); if (off) off(); reject(new Error('O professor não respondeu ainda (a tela dele pode estar fechada). Tente de novo.')); } }, 1000);
   });
+}
+
+// R43: o celular de cada pessoa avisa que a tela está aberta (o professor vê "sem sinal" depois de 60 s)
+export async function marcarPresencaAluno(codigo) {
+  const b = await conectar(); const uid = await b.identificar();
+  const f = () => { if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return; b.gravar(`salas/${codigo}/presenca/${uid}`, { em: b.agora() }).catch(() => {}); };
+  f(); document.addEventListener('visibilitychange', f);
+  return setInterval(f, 20000);
 }
 
 export async function enviarAcao(codigo, a) {

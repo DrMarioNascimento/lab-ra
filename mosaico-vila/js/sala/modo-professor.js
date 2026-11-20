@@ -1,7 +1,7 @@
 // Professor: o "cérebro" do jogo roda neste aparelho. Entra com Google (lista de mestres), abre a sala, publica o estado
 // para o telão e para os celulares e processa os pedidos da turma. O desenho é o mesmo do Comitê de Ética.
 import { estadoInicial, reduzir, progresso } from "../engine.js";
-import { renderProfessor, acaoProfessor } from "../views/professor.js";
+import { renderProfessor, acaoProfessor, ligarSinal, SEM_SINAL_S } from "../views/professor.js";
 import { renderTelao } from "../views/telao.js";
 import { novoLocal } from "../views/aluno.js";
 import { passoAuto, perfilBot, papelBully } from "../bots.js";
@@ -45,17 +45,27 @@ async function abrir(u) {
     if (guardado) { try { s = await retomarSala(guardado, aoEntrar, aoAcao); const sv = localStorage.getItem(CHAVE + ":" + guardado); if (sv) st = JSON.parse(sv); } catch { s = null; } }
     if (!s) { s = await abrirSala(JOGO, aoEntrar, aoAcao); st = estadoInicial(); }
     sala = s; localStorage.setItem(CHAVE, s.codigo);
+    ligarSinal((id) => (st.alunos[id]?.auto ? null : sala.sinalDe(id)));
     st.codigo = s.codigo;
     painel(u);
   } catch (e) { app.innerHTML = topo() + `<div class="ent-wrap"><p class="ent-erro">${esc(e.message || "Não consegui abrir a sala.")}</p><button class="btn" onclick="location.reload()">Tentar de novo</button></div>`; }
 }
 
 let seq = 0;
-function aoEntrar(nome, uid) {
+function aoEntrar(nome, uid, reassumir, atual) {
+  if (atual && st.alunos[atual]) return { ok: true, id: atual };   // o mesmo celular de volta
+  if (!nome) return { ok: false, erro: "Digite seu nome." };
+  const chave = (x) => String(x || "").trim().toLowerCase();
+  const ex = st.ordem.find((i) => !st.alunos[i]?.auto && chave(st.alunos[i]?.nome) === chave(nome));
+  if (ex) {   // R43: o mesmo nome. Com sinal: ocupado. Sem sinal: pode ser a mesma pessoa voltando de outro aparelho
+    const sem = sala ? sala.sinalDe(ex) : Infinity;
+    if (sem <= SEM_SINAL_S) return { ok: false, erro: "Esse nome já está na sala. Use outro nome (por exemplo, com o sobrenome)." };
+    if (!reassumir) return { ok: false, cod: 412, erro: "Esse nome já está na sala, mas ninguém está usando agora. Se for você, toque em “Sou eu, voltar”." };
+    return { ok: true, id: ex };
+  }
   if (st.fase !== "entrada") return { ok: false, erro: "O jogo já começou. Fale com o professor." };
   if (!liberada) return { ok: false, erro: "A entrada ainda não foi liberada pelo professor." };
-  if (!nome) return { ok: false, erro: "Digite seu nome." };
-  seq = Math.max(seq, st.ordem.length) + 1;
+  seq = Math.max(seq, ...st.ordem.map((i) => (/^a\d+$/.test(i) ? +i.slice(1) : 0))) + 1;   // ids nunca se repetem, mesmo depois de expulsões
   const id = `a${seq}`;
   dispatch({ t: "entrar", id, nome });
   return { ok: true, id };
@@ -73,6 +83,7 @@ function painel(u) {
     <div id="prof" class="card"></div></div>`;
   const prof = montar(document.getElementById("prof"), () => renderProfessor(st), (a, el) => acaoProfessor(a, el, dispatch), () => {});
   subs.add(() => prof.draw()); prof.draw(true);
+  setInterval(() => prof.draw(), 5000);   // o sinal dos celulares muda sem o estado mudar
   subs.add(() => { sala.publicar(st); localStorage.setItem(CHAVE + ":" + sala.codigo, JSON.stringify(st)); });
   sala.publicar(st);
   const lib = document.getElementById("lib");

@@ -1,0 +1,352 @@
+import { NOME_FASE, vista } from "../engine.js";
+import { NOVIDADE_DO_ANO, EXEMPLO_DO_ANO, EXEMPLO_VOTO, REGRAS_TXT, MOTIVOS, GUIAS, NIVEIS_PUBLICO } from "../content/vila.js";
+import { LIMITES, lanceMinimo, CARGA_RENDE, CARGA_TIRA, REPLANTA_POR, REPLANTA_DEVOLVE, patrimonio, VALOR_LOTE, progressoMeta, VITORIA, precisaLotes, tetoLotes, PONTOS_NIVEL, NIVEL_MAX } from "../content/regras.js";
+import { carta, cartaAno4, cartaPequena, cartaComFala, textoCarta, QUEM_GOLPE, FAIXAS_PCT, GANHO_PEQUENA, GANHO_GRANDE } from "../content/cartas.js";
+import { iconeFamilia, ico, pctL, nL } from "./desenho.js";
+import { decorrido, tempoResultado } from "./telao.js";
+
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const n0 = (x) => Math.round(x).toLocaleString("pt-BR");
+
+export function novoLocal() { return { pub: 20, rep: 0, car: 0, lance: 0, face: null, guia: null, motivo: null }; }
+
+// R34: no voto e na proposta grande, cada um responde longe da família: o cabeçalho não mostra o caixa a quem senta ao lado
+function hd(st, me) {
+  const f = me?.fam ? vista(st).fams[me.fam] : null;   // R19: nas cartas dos anos 2 e 4, o caixa de antes das decisões (como a barra)
+  return `<div class="hd painel"><div class="p-topo">${f ? iconeFamilia(f, 36) : ico("app-mosaico-vila", "m")}
+    <div class="p-quem"><b>${esc(me?.nome || "Mosaico Vila")}</b><span class="p-fam">${f ? esc(f.nome) : "Mosaico Vila"}${st.ano ? ` · ano ${st.ano}` : ""}</span></div>
+    <button class="btn sm sec info-btn" data-a="manual" aria-label="Como jogar">i</button></div>${st.ano ? faixaPainel(st, f) : ""}</div>`;
+}
+
+// R42: painel superior do celular. Linha 1: quem sou (casa da família, nome, família e ano) e as ferramentas (glossário, "i").
+// Linha 2: uma faixa de mostradores, sempre na mesma ordem: saldo da família em pontos, mata, bem público e meta (com o nome da regra).
+// R34: no voto e na proposta grande, cada um responde longe da família: o painel não mostra o saldo a quem senta ao lado.
+function faixaPainel(st0, f) {
+  const st = vista(st0);   // R17: entre as decisões e o resultado, a vila de antes das decisões
+  const m = progressoMeta(st.fams, st.publico, st.mata, st.teto, st.regra);
+  const meta = st.ano === 3 ? "duas metas" : m.regra === "prosperidade" ? `${pctL(m.valor)}<small>/${Math.round(100 * m.alvo)}%</small>` : `${nL(m.valor, m.alvo)}<small>/${m.alvo}</small>`;   // R20
+  const anos = `<div class="p-anos" aria-hidden="true">${Array.from({ length: 5 }, (_, k) => `<i class="${k + 1 < st.ano ? "feito" : k + 1 === st.ano ? "agora" : ""}"></i>`).join("")}</div>`;
+  const fm = st.teto ? st.mata / st.teto : 0;
+  const saldo = f && !["voto", "alvara"].includes(st.fase) ? `<div class="p-cel saldo" aria-label="Saldo da família: ${n0(f.caixa)} pontos"><b>${ico("moeda")}<span class="p-val">${n0(f.caixa)}</span></b><span>pontos</span></div>` : "";
+  const mata = st.ano >= 2 ? `<div class="p-cel ${fm < 0.3 ? "mal" : fm < 0.5 ? "atencao" : ""}"><b>${pctL(fm)}</b><span>mata</span></div>` : "";
+  const niv = Array.from({ length: 5 }, (_, k) => `<i class="${k < st.publico ? "on" : ""}"></i>`).join("");
+  return `${anos}<div class="p-faixa">${saldo}${mata}<div class="p-cel" aria-label="Bem público: nível ${st.publico} de 5"><b class="p-niv">${niv}</b><span>bem público</span></div><div class="p-cel"><b>${ico("meta")}<span class="p-val">${meta}</span></b><span>${REGRAS_TXT[st.regra].nome}</span></div></div>`;
+}
+
+// R19 e R20: as duas metas no celular, na conversa e no voto: o número de hoje e para onde ele costuma ir
+function duasMetasCel() {
+  return `<div class="card"><b>As duas metas</b><p class="faint" style="margin:4px 0 0">Monopólio: patrimônio médio de ${VITORIA.patrimonioPorPessoa} por pessoa. Prosperidade: a mais pobre com ${Math.round(100 * VITORIA.pobreSobreMedia)}% da média. Nas duas, mata em 30% ou mais. As duas mudam muito nos anos 4 e 5, com aluguel, mercado, mata e propostas: o que decide é como a vila joga.</p></div>`;   // R20: sem o número de hoje
+}
+
+// R10: a mesma barra da meta do telão, no celular (meta da regra vigente, desde o ano 1)
+function metaCelular(st) {
+  if (st.ano === 3) return `<div class="card"><b class="row">${ico("meta")}Metas</b><p class="faint" style="margin:4px 0 0">Logo depois, a turma conversa e vota a regra dos anos 4 e 5; as duas metas aparecem lado a lado no voto.</p></div>`;   // R21
+  const m = progressoMeta(st.fams, st.publico, st.mata, st.teto, st.regra);
+  const frac = Math.max(0, Math.min(1, m.valor / m.alvo));
+  const val = m.regra === "prosperidade" ? `${pctL(m.valor)} de ${Math.round(100 * m.alvo)}%` : `${nL(m.valor, m.alvo)} de ${m.alvo}`;
+  return `<div class="card"><b class="row">${ico("meta")}Meta da vila (${REGRAS_TXT[m.regra].nome})</b><div class="row" style="margin-top:6px;gap:8px"><span class="faint" style="min-width:42%">${m.regra === "prosperidade" ? "Família mais pobre / média da vila" : "Média da vila por pessoa"}</span><div class="barra"><i style="width:${100 * frac}%"></i></div><b class="mono">${val}</b></div><p class="faint" style="margin:4px 0 0">Mata: ${pctL(m.mata)} (mínimo ${Math.round(100 * VITORIA.mataMinima)}%).</p></div>`;
+}
+
+// R14: posição pelo patrimônio por pessoa (as famílias têm de 3 a 5 pessoas em turmas de 12 a 40)
+const porPessoa = (st, f) => patrimonio(f, st.publico) / f.membros.length;
+const posicao = (st, f) => 1 + Object.values(st.fams).filter((g) => porPessoa(st, g) > porPessoa(st, f)).length;
+const enviado = (txt = "Enviado. Aguarde a turma.") => `<div class="card" style="text-align:center"><b class="pill-ok">✓ ${txt}</b></div>`;
+// R13: mata em % da vila (a mesma unidade do telão)
+const pcMata = (st, x) => { const v = (100 * x) / (st.teto || 1), r = Math.round(v * 10) / 10; return `${([30, 50, 70].includes(r) && v < r - 1e-9 ? Math.floor(v * 10 + 1e-9) / 10 : r).toLocaleString("pt-BR")}%`; };   // R26: 29,96% não vira "30%"
+
+// Microtarefa enquanto a turma responde: em que faixa vai ficar a porcentagem (o telão mostra o acerto depois)
+function palpiteFaixa(st, id, onde, pergunta) {
+  const v = st.palpitePct?.[onde]?.[id];
+  return `<div class="card"><b>Enquanto a turma responde: ${esc(pergunta)}</b><div class="col" style="margin-top:8px;gap:6px">${FAIXAS_PCT.map((t, k) => `<button class="btn sm ${v === k ? "on" : "sec"}" data-a="palpitePct" data-onde="${onde}" data-val="${k}" ${v != null ? "disabled" : ""}>${t}</button>`).join("")}</div>${v != null ? `<p class="faint" style="margin:6px 0 0">Palpite enviado. O telão mostra quantos acertaram.</p>` : ""}</div>`;
+}
+
+// Carta sorteada (pequena, ano 4 ou grande): texto, aviso de sigilo e dois botões iguais (mesmo tamanho e mesma cor)
+// R34: a ordem dos dois botões de cada carta é sorteada por pessoa (fixa para ela), para a posição do dedo, vista de lado, não entregar a resposta
+let idAtual = "";
+const trocaOrdem = (chave) => { let h = 2166136261; for (const ch of `${idAtual}|${chave}`) h = Math.imul(h ^ ch.charCodeAt(0), 16777619); return (h >>> 0) % 2 === 1; };
+const doisBotoes = (chave, a, sim, nao) => { const bs = [sim, nao].map(([v, t]) => `<button class="btn sec" data-a="${a}" data-val="${v}">${esc(t)}</button>`); return `<div class="escolha">${(trocaOrdem(chave) ? bs.reverse() : bs).join("")}</div>`; };
+function cartaCelular(c, aviso, a, st, valSim = "1", valNao = "0") {
+  return `<h2 class="row">${ico(c.icone, "g")}${esc(c.titulo)}</h2><p class="muted">${esc(textoCarta(c, "texto", st.fase === "pequena" ? { rel: true } : { mata: st.mata, teto: st.teto, publico: st.publico, juntado: st.acumulado }))}</p><p class="faint">${aviso}</p>
+    ${doisBotoes(c.id, a, [valSim, c.sim], [valNao, c.nao])}`;
+}
+
+// R27: as linhas do extrato fecham com o caixa mostrado; o caixa de antes e a renda saem como já apareceram (cabeçalho e abertura),
+// e o arredondamento vai para as outras linhas (cada uma a menos de 1 ponto do valor exato)
+// R37: sinal sem "−0" e sem "+-"
+const sinal = (v) => (!v ? "0" : `${v > 0 ? "+" : "−"}${Math.abs(v).toLocaleString("pt-BR")}`);
+// R37: as linhas da abertura, inteiras, somando exatamente a renda do ano arredondada (o resto vai para a linha que tem fração)
+// R38: no modo vizinhos, quem está sozinho com parentes automáticos decide pela família
+const sozinho = (st, f) => !!(st.vizinhos && f && f.membros.some((m) => st.alunos[m]?.parente));
+export function linhasAbertura(r) {
+  const brutaV = r.base + r.bonusMata - r.perdaMata, total = Math.round(r.total);
+  const L = { bruta: Math.round(brutaV), aluguel: Math.round(r.aluguel || 0), recebido: Math.round(r.recebido || 0), imposto: Math.round(r.imposto || 0), piso: Math.round(r.piso || 0), total };
+  let resto = total - (L.bruta - L.aluguel + L.recebido - L.imposto + L.piso);
+  if (resto) {
+    const fr = (x) => Math.abs(x - Math.round(x));
+    const cand = [["imposto", -1, fr(r.imposto || 0)], ["recebido", 1, fr(r.recebido || 0)], ["piso", 1, fr(r.piso || 0)]].filter(([k, , f]) => f > 1e-9 && r[k]).sort((a, b) => b[2] - a[2]);
+    const [k, sg] = cand[0] || ["bruta", 1];
+    L[k] += sg * resto;
+  }
+  return L;
+}
+export function linhasExtrato(f, fx, ano) {
+  const gc = ano >= 2 ? fx.ganhoCarga : 0, rep = ano >= 2 ? fx.aRep : 0;
+  const A = Math.round(f.caixa - (fx.renda - fx.aPub - rep + gc)), R = Math.round(fx.renda), alvo = Math.round(f.caixa) - A - R;
+  const vals = ano >= 2 ? [-fx.aPub, -rep, gc] : [-fx.aPub], base = vals.map((v) => Math.floor(v + 1e-9));
+  let falta = alvo - base.reduce((a, b) => a + b, 0);
+  // R37: o arredondamento só vai para as linhas que têm fração (bem público e replantio são porcentagens); as cargas inteiras
+  // ficam inteiras (antes, "Cargas (2) +11" quando cada carga rende 6)
+  const comFracao = vals.map((v, k) => [v - Math.floor(v + 1e-9), k]).filter(([fr]) => fr > 1e-9);
+  const ordem = (comFracao.length ? comFracao : [[0, 0]]).sort((a, b) => b[0] - a[0]);
+  for (const [, k] of ordem) { if (falta <= 0) break; base[k] += 1; falta -= 1; }
+  for (const [, k] of ordem.slice().reverse()) { if (falta >= 0) break; base[k] -= 1; falta += 1; }
+  if (falta) base[ordem[0][1]] += falta;
+  return { A: A || 0, R: R || 0, pub: -base[0] || 0, rep: ano >= 2 ? -base[1] || 0 : 0, gc: ano >= 2 ? base[2] || 0 : 0 };   // || 0: nada de "−-0"
+}
+
+// Efeito da proposta, na hora, se a família inteira propusesse o mesmo.
+function projecao(st, f, loc) {
+  const r = st.renda?.[f.id]?.total ?? 0;
+  const base = Math.max(0, r);
+  const pub = (base * loc.pub) / 100, rep = st.ano >= 2 ? (base * loc.rep) / 100 : 0, car = st.ano >= 2 ? loc.car : 0;
+  // R27: ninguém tira madeira que não existe (R19): sozinha, a família não tira mais do que a mata tem; com a mata quase no fim, o celular avisa
+  const tem = st.mata || 0, carEf = Math.min(car, tem / CARGA_TIRA), poucaMata = st.ano >= 2 && car > 0 && tem < 0.15 * (st.teto || 1);
+  const fica = r - pub - rep + CARGA_RENDE * carEf;
+  const mata = st.ano >= 2 ? (rep / REPLANTA_POR) * REPLANTA_DEVOLVE - CARGA_TIRA * carEf : 0;
+  return `<div class="card proj"><b>Se a família seguir a sua proposta</b><table class="vals">
+    <tr><td>Renda do ano</td><td class="n">${n0(r)}</td></tr><tr><td>Vai para o bem público</td><td class="n">${n0(pub)}</td></tr>
+    ${st.ano >= 2 ? `<tr><td>Replantio</td><td class="n">${n0(rep)}</td></tr><tr><td>Madeira vendida${carEf < car - 1e-9 ? " (a mata não tem madeira para todas as cargas)" : poucaMata ? " (se a vila tirar mais do que a mata tem, cada carga rende menos)" : ""}</td><td class="n">+${n0(CARGA_RENDE * carEf)}</td></tr><tr><td>Efeito na mata (só da sua família)${mata > 0 && st.mata >= 0.98 * st.teto ? "; a mata está cheia e não passa de 100%" : ""}</td><td class="n">${mata >= 0 ? "+" : "−"}${pcMata(st, Math.abs(mata))}</td></tr>` : ""}
+    <tr><td><b>Fica no caixa</b></td><td class="n"><b>${fica >= 0 ? "+" : ""}${n0(fica)}</b></td></tr></table></div>`;
+}
+
+// R14: o lance mostra o efeito na hora: quantos pontos, quanto vale o lote e quanto o patrimônio da família muda se levar.
+// R16: até 3 lotes (quem leva um oferece metade no próximo), dentro do teto da família (moradia + 1 lote).
+function efeitoLance(st, f, loc) {
+  const min = lanceMinimo(st.ano), vale = VALOR_LOTE(st.publico), cabem = Math.min(3, st.lotes.filter((x) => !x).length, tetoLotes(f) - f.lotes);
+  if (f.caixa < min) return `<p class="faint" style="margin:6px 0 0">O caixa da família (${n0(f.caixa)}) não chega ao mínimo de ${min}: vocês ficam de fora este ano.</p>`;
+  let caixa = f.caixa, parte = (loc.lance / 100) * (st.regra === "prosperidade" ? 0.5 : 1), soma = 0;
+  const linhas = [];
+  for (let k = 0; k < cabem && caixa >= min; k++) {
+    const lance = Math.min(caixa, min + caixa * parte);
+    soma += vale - lance; caixa -= lance; parte *= 0.5;
+    linhas.push(`<tr><td>${k + 1}º lote: lance ${n0(lance)}, vale ${vale}</td><td class="n">${soma >= 0 ? "+" : "−"}${n0(Math.abs(soma))}</td></tr>`);
+  }
+  if (!linhas.length) return `<p class="faint" style="margin:6px 0 0">Não há lote que a família possa levar este ano.</p>`;
+  return `<table class="vals" style="margin-top:6px"><tr><td><b>Se a família levar…</b> (se todos propuserem isto)</td><td class="n"><b>patrimônio (soma)</b></td></tr>${linhas.join("")}</table><p class="faint" style="margin:4px 0 0">O lance vai para o banco; o lote entra no patrimônio pelo valor dele e ainda pode render aluguel e dar moradia.</p>`;
+}
+
+// Pergunta de controle da regra nova (anos 1 a 3): quem erra vê a explicação; não vale ponto.
+function controle(st, id) {
+  const noVoto = ["conversa", "voto"].includes(st.fase);
+  const chave = noVoto ? "voto" : st.ano;
+  const ex0 = noVoto ? EXEMPLO_VOTO : EXEMPLO_DO_ANO[st.ano];
+  const ex = ex0?.prosperidade && st.regra === "prosperidade" ? { ...ex0, ...ex0.prosperidade } : ex0;   // R36: no ano 4, a pergunta do mercado na regra que vale
+  if (!ex) return "";
+  const resp = st.controle?.[chave]?.[id];
+  if (resp == null) return `<div class="card"><b class="row" style="flex-wrap:nowrap;align-items:flex-start">${ico("ideia")}<span>Confira: ${esc(ex.pergunta)}</span></b>${ex.opcoes.map((o, k) => `<button class="opt" data-a="controle" data-val="${k}">${esc(o)}</button>`).join("")}<p class="faint" style="margin:4px 0 0">Não vale ponto.</p></div>`;
+  return `<div class="card"><b class="${resp === ex.certa ? "pill-ok" : ""}">${resp === ex.certa ? "✓ Isso mesmo." : "Quase."}</b><p class="muted" style="margin:6px 0 0">${esc(ex.explica)}</p></div>`;
+}
+
+// Microtarefa do ano 5: a desigualdade do patrimônio vai subir ou descer neste último ano?
+function prev5(st, id) {
+  const v = st.prev5?.[id];
+  return `<div class="card"><b class="row" style="flex-wrap:nowrap;align-items:flex-start">${ico("ideia")}<span>Palpite: neste último ano, a desigualdade do patrimônio vai…</span></b><div class="row" style="margin-top:8px">${["sobe", "desce"].map((x) => `<button class="btn sm ${v === x ? "on" : "sec"} grow" data-a="prev5" data-val="${x}" ${v ? "disabled" : ""}>${x === "sobe" ? "Subir" : "Descer"}</button>`).join("")}</div>${v ? `<p class="faint" style="margin:6px 0 0">O telão mostra no fim do ano quantos acertaram.</p>` : ""}</div>`;
+}
+
+// R41: manual do jogador. Abre sozinho na entrada (enquanto a pessoa espera) e fica no "i" do cabeçalho; "Entendi" fecha.
+const manualAberto = (st, loc) => loc.manual === true || (loc.manual === undefined && st.fase === "entrada");
+function telaManual() {
+  return `<h2 class="row">${ico("ideia", "g")}Mosaico Vila: como jogar</h2>
+    <div class="card man-gancho"><b>E se a sua família pudesse ganhar mais, mas a vila perdesse com isso? O que você faria, sabendo que ninguém vai ver a sua resposta?</b><p>Em cinco anos você vai descobrir. E vai descobrir também o que a turma fez.</p></div>
+    <div class="card man-bloco"><h3>A proposta</h3><p>Todos os participantes formam uma vila e cada grupo é uma família (sorteada). A vila inteira ganha ou perde junta. Não existe família vencedora.</p></div>
+    <div class="card man-bloco"><h3>Para ganhar, no fim do ano 5</h3><ul><li>bater a <b>meta</b> da regra em vigor (o telão mostra qual é e quanto falta);</li><li>manter a <b>mata</b> em 30% ou mais.</li></ul></div>
+    <div class="card man-bloco"><h3>O que você faz a cada ano</h3><ol><li>Olha o telão: ele explica a novidade do ano com um exemplo.</li><li>Responde a pergunta rápida no celular (não vale ponto).</li><li>Conversa com a família e envia a <b>sua</b> proposta. Vale a mediana da família.</li><li>Vê no telão como a vila ficou.</li></ol></div>
+    <div class="card man-bloco"><h3>O que você decide</h3><ul><li><b>Bem público:</b> quanto da renda vai para ele. Cada nível novo aumenta a renda de todas as famílias.</li><li><b>Mata (a partir do ano 2):</b> tirar madeira rende para a sua família e gasta a mata de todos; replantar devolve um pouco.</li><li><b>Moradia (ano 3):</b> cada família precisa de 1 lote a cada 3 pessoas; quem não tem paga aluguel. No fim do ano, a turma vota a regra dos anos 4 e 5.</li><li><b>Lotes (ano 4 em diante):</b> lotes livres vão a lance fechado; o maior lance leva.</li></ul></div>
+    <div class="card man-bloco"><h3>Vale saber</h3><ul><li>As famílias não começam iguais; foi sorteio.</li><li>Suas respostas são secretas: o telão só mostra totais.</li><li>Nem tudo está neste manual. Em alguns anos, algo chega só no seu celular. Leia em silêncio e responda sem mostrar a tela.</li><li>Se algum tema pesar, você pode só observar ou falar com quem conduz.</li></ul></div>
+    <button class="btn ok block" data-a="manual">Entendi</button><p class="faint" style="text-align:center;margin:0">Para reler, toque no <b>i</b> no alto da tela.</p>`;
+}
+
+export function renderAluno(st, id, loc) {
+  idAtual = id;
+  const me = st.alunos[id];
+  const f = me?.fam ? st.fams[me.fam] : null;
+  let bd = "";
+  switch (st.fase) {
+    case "entrada": bd = `<h2>Bem-vindo ao Mosaico Vila</h2><p class="muted">Você entrou como <b>${esc(me?.nome)}</b>. Aguarde o professor formar as famílias.</p><div class="card"><p class="muted" style="margin:0">O jogo fala de dinheiro, aluguel, herança e propostas de corrupção, sempre de famílias e personagens inventados. Os pontos são de mentira. Se algum tema pesar, você pode só observar ou falar com quem conduz.</p></div>`; break;
+    case "familias":
+      bd = `<div class="card col" style="align-items:center;text-align:center">${iconeFamilia(f, 72)}<h2>${esc(f.nome)}</h2><p class="muted">${sozinho(st, f) ? "Você chefia esta família. Os 2 parentes automáticos seguem as suas decisões: a proposta do ano, o lance e o voto." : "Procure as pessoas com este símbolo e sentem juntas."}</p></div>
+        ${me.achou ? enviado("Família encontrada.") : `<button class="btn ok block" data-a="achei">Achei minha família</button>`}`;
+      break;
+    case "abertura": {
+      const r = st.renda[f.id], nov = NOVIDADE_DO_ANO[st.ano];
+      const L = linhasAbertura(r);   // R37: as linhas da abertura somam a renda do ano que o extrato do fim mostra
+      bd = `<h2>${esc(nov.titulo)}</h2><p class="muted">${esc(nov.texto)}</p><div class="card"><b>Extrato da família</b><table class="vals">
+        <tr><td>Renda (${f.membros.length} pessoas)</td><td class="n">${sinal(L.bruta)}</td></tr>
+        ${r.aluguel ? `<tr><td>Aluguel pago (falta${r.falta === 1 ? " 1 lote" : `m ${r.falta} lotes`})</td><td class="n">${sinal(-L.aluguel)}</td></tr>` : ""}
+        ${r.recebido ? `<tr><td>Aluguel recebido</td><td class="n">${sinal(L.recebido)}</td></tr>` : ""}
+        ${r.imposto ? `<tr><td>Imposto ao bem público (lotes e pessoas)</td><td class="n">${sinal(-L.imposto)}</td></tr>` : ""}
+        ${r.piso ? `<tr><td>Piso de renda</td><td class="n">${sinal(L.piso)}</td></tr>` : ""}
+        ${r.aluguel || r.recebido || r.imposto || r.piso ? `<tr><td><b>Renda do ano</b></td><td class="n"><b>${sinal(L.total)}</b></td></tr>` : ""}
+        <tr><td>Lotes</td><td class="n">${f.lotes}</td></tr></table></div>${st.ano >= 3 ? `<p class="faint">Regra: ${REGRAS_TXT[st.regra].nome}. ${esc(REGRAS_TXT[st.regra].curto)}</p>` : ""}${st.ano === 5 ? prev5(st, id) : controle(st, id)}`;
+      break;
+    }
+    case "decidir": {
+      const p = st.props[st.ano]?.[id];
+      if (p && !p.auto) {
+        const prev = st.previsao[st.ano]?.[id];
+        bd = enviado("Proposta enviada.") + (st.ano >= 2 ? `<div class="card"><b>Enquanto a turma decide: a mata vai…</b><div class="row" style="margin-top:8px">${["sobe", "fica", "desce"].map((v) => `<button class="btn sm ${prev === v ? "on" : "sec"} grow" data-a="prever" data-val="${v}">${v === "sobe" ? "Subir" : v === "fica" ? "Ficar igual" : "Descer"}</button>`).join("")}</div></div>` : "");
+        break;
+      }
+      // R19: a família sabe o que levou no mercado antes de decidir (o mercado agora vem antes das decisões)
+      const levou = st.leilao?.ano === st.ano ? st.leilao.vendidos.filter((v) => v.fam === f.id) : [];
+      const merc = st.ano >= 4 && st.leilao?.ano === st.ano ? `<div class="card"><p class="muted" style="margin:0">${levou.length ? `No mercado, a família levou ${levou.length === 1 ? "1 lote" : `${levou.length} lotes`} (pagou ${n0(levou.reduce((a, v) => a + v.preco, 0))}). O caixa abaixo já desconta.` : st.leilao.noTeto?.includes(f.id) ? "A família já tinha a moradia + 1 lote: ficou fora do mercado, sem pagar nada." : st.leilao.semLote?.includes(f.id) ? "A família escolheu ficar fora do mercado este ano: não pagou nada." : "No mercado, a família não levou lote e não pagou nada."}</p></div>` : "";
+      // R18: primeiro a conversa da família (o relógio do telão), depois os controles; quem já conversou abre antes
+      const segC = st.curto && st.ano >= 4 ? 30 : 45, falta = loc.abriu === st.ano ? -1 : segC - decorrido(st);
+      const conversa = falta > 0 ? `<div class="card espera" style="text-align:center;--a:${falta.toFixed(2)}s">${ico("grupos", "g")}<p class="muted" style="margin:6px 0 8px">${sozinho(st, f) ? "<b>Pense na proposta da sua família</b> (os parentes automáticos seguem você)" : "<b>Conversem na família</b>, olhando uns para os outros"}: ${segC} s para combinar ${st.ano >= 2 ? "bem público, replantio e cargas" : "quanto vai para o bem público"}. A proposta abre aqui quando o relógio do telão acabar.</p><button class="btn sec block" data-a="abrir" data-val="${st.ano}">${sozinho(st, f) ? "Já pensei: abrir minha proposta" : "Já conversamos: abrir minha proposta"}</button></div>` : "";
+      // R28: no ano 5, a proposta grande aceita pode mudar a renda do ano depois da abertura; o celular diz de quanto para quanto
+      const rA = st.ano === 5 ? st.rendaAbertura?.[f.id]?.total : null, rN = st.renda?.[f.id]?.total;
+      const rendaMudou = rA != null && rN != null && Math.round(rA) !== Math.round(rN) ? `<div class="card"><p class="muted" style="margin:0">A proposta grande mudou a renda da família neste ano: de ${n0(rA)} para ${n0(rN)} (${st.alvara?.alvo === "mata" ? "a mata caiu, e a renda da mata mudou" : "o bem público caiu um nível"}).</p></div>` : "";
+      bd = merc + rendaMudou + conversa + `<div class="${falta > 0 ? "surge trava" : ""}" style="--a:${Math.max(0, falta).toFixed(2)}s"><h2>Sua proposta para a família</h2><p class="faint">Vale a mediana das propostas da família.</p>
+        <div class="card"><div class="row" style="justify-content:space-between"><b class="row">${ico("economia")}Bem público</b><b class="mono" data-eco="pub" data-eco-fmt="{v}% da renda">${loc.pub}% da renda</b></div><input type="range" min="0" max="${LIMITES.pub}" step="5" value="${loc.pub}" data-in="pub" data-key="pub"><p class="faint" style="margin:0">Nível ${st.publico}: ${esc(NIVEIS_PUBLICO[st.publico])}. ${st.publico >= NIVEL_MAX ? "É o nível máximo: o que entrar agora não sobe mais o bem público nem fica guardado." : `Faltam ${n0(Math.max(0, PONTOS_NIVEL * Object.keys(st.fams).length - (st.acumulado || 0)))} pontos da vila para o nível ${st.publico + 1}.`}</p></div>
+        ${st.ano >= 2 ? `<div class="card"><div class="row" style="justify-content:space-between"><b class="row">${ico("arvore-cubos")}Replantar a mata</b><b class="mono" data-eco="rep" data-eco-fmt="{v}% da renda">${loc.rep}% da renda</b></div><input type="range" min="0" max="${LIMITES.rep}" step="5" value="${loc.rep}" data-in="rep" data-key="rep"><p class="faint" style="margin:0">Cada 5 pontos devolvem ${pcMata(st, REPLANTA_DEVOLVE)} à mata.${st.mata >= 0.9 * st.teto ? " A mata está quase cheia: o que passar de 100% não conta." : ""}</p></div>
+        <div class="card"><b class="row">${ico("arvore-redonda")}Cargas de madeira</b><p class="faint" style="margin:2px 0 8px">Cada carga rende ${CARGA_RENDE} à família e tira ${pcMata(st, CARGA_TIRA)} da mata. Mata hoje: ${pctL(st.mata / st.teto)} (50% ou mais: +2 de renda por pessoa; abaixo de 30%: −4).</p><div class="dirs">${[0, 1, 2, 3].map((k) => `<button class="btn ${loc.car === k ? "warn on" : "sec"}" data-a="car" data-val="${k}">${k}</button>`).join("")}</div></div>` : ""}
+        ${projecao(st, f, loc)}
+        <button class="btn ok block" data-a="propor">Enviar proposta</button></div>`;
+      break;
+    }
+    case "mente": {
+      const c = cartaAno4(st, id);   // R16: na confiança, a situação sorteada para esta pessoa
+      if (st.mente[id] != null) {
+        bd = enviado("Resposta secreta enviada.");
+        if (c.tipo === "confia") {
+          const q = st.quem[id];
+          bd += `<div class="card"><b>Enquanto a turma responde: em qual situação você acha que mais vai haver golpe?</b><div class="col" style="margin-top:8px;gap:6px">${QUEM_GOLPE.map((t, k) => `<button class="btn sm ${q === k ? "on" : "sec"}" data-a="quem" data-val="${k}" ${q != null ? "disabled" : ""}>${esc(t)}</button>`).join("")}<button class="btn sm ${q === -1 ? "on" : "sec"}" data-a="quem" data-val="-1" ${q != null ? "disabled" : ""}>Prefiro não responder</button></div>${q != null ? `<p class="faint" style="margin:6px 0 0">Enviado. O telão mostra o total da turma e quanto era a chance de verdade.</p>` : ""}</div>`;
+        }
+        break;
+      }
+      if (c.tipo === "dado") {
+        bd = `<h2 class="row">${ico(c.icone, "g")}${esc(c.titulo)}</h2><p class="muted">${esc(c.texto)}</p><p class="faint">O telão mostra só o total da ${st.vizinhos ? "vila, que soma pessoas e vizinhos automáticos" : "turma"} (se todos fizerem o mesmo, o total diz isso).</p>` + (loc.face == null
+          ? `<button class="btn block" data-a="rolar">Pensei. Rolar o dado</button>`
+          : `<div class="card" style="text-align:center"><div class="dado">${loc.face}</div><p class="muted">Você acertou o número que pensou?</p>${doisBotoes("dado", "mente", ["1", "Acertei"], ["0", "Não acertei"])}</div>`);
+      } else if (c.tipo === "honesto") {
+        bd = cartaCelular(c, `<b>Só você vê esta tela.</b> O banco e a praça são do jogo; os 3 pontos são só seus. O telão mostra só o total da ${st.vizinhos ? "vila, que soma pessoas e vizinhos automáticos" : "turma"} (se todos fizerem o mesmo, o total diz isso).`, "mente", st);
+      } else {
+        bd = `<p class="faint" style="margin:0 0 6px">Cada pessoa recebeu uma das 4 situações do telão, sorteada. <b>Não arriscar não custa nada.</b></p>` + cartaCelular(c, "<b>Só você vê esta tela.</b> A outra pessoa é do jogo. Se arriscar, você põe 2; se ela for honesta, ganha 2; se não, perde os 2. Você só descobre no fim do ano, aqui no celular.", "mente", st);
+      }
+      break;
+    }
+    case "pequena": {
+      const c = cartaPequena(st, id);   // R28: a fala sorteada para esta pessoa ("presente em troca de" ou às claras)
+      bd = st.pequena.votos[id] != null ? enviado("Resposta secreta enviada.") + palpiteFaixa(st, id, "pequena", "quantos % de quem responder vão aceitar?")
+        : cartaCelular(c, `<b>Responda sem mostrar a tela.</b> O telão mostra só totais${st.vizinhos ? ", que somam pessoas e vizinhos automáticos" : ""}, nunca a resposta de alguém (se todos fizerem o mesmo, o total diz isso); com menos de 5 respostas, a proposta não vale. ${esc(c.segmento[0].toUpperCase() + c.segmento.slice(1))} é do jogo; os ${GANHO_PEQUENA} pontos são só seus.`, "pequena", st);
+      break;
+    }
+    case "lances": {
+      const p = st.lances?.[st.ano]?.[id];
+      const palp = st.palpite?.[st.ano]?.[id];
+      if (!p?.lanceEnviado && f.lotes >= tetoLotes(f)) {   // R16: a família já tem a moradia + 1 lote
+        bd = `<h2 class="row">${ico("mercado-lotes", "g")}Mercado de lotes</h2><div class="card row" style="flex-wrap:nowrap;align-items:flex-start;gap:12px">${iconeFamilia(f, 48, { moradia: true })}<p class="muted" style="margin:0">A família tem ${f.lotes === 1 ? "1 lote" : `${f.lotes} lotes`} e precisa de ${precisaLotes(f)} para morar. Cada família compra até ter a moradia + 1 lote: <b>vocês ficam de fora deste mercado</b>. O lote de vocês ainda pode render aluguel.</p></div>
+          <div class="card"><b>Enquanto a turma decide: qual vai ser o lance vencedor?</b><div class="row" style="margin-top:8px">${["até 20", "21 a 40", "mais de 40"].map((v) => `<button class="btn sm ${palp === v ? "on" : "sec"} grow" data-a="palpite" data-val="${v}">${v}</button>`).join("")}</div></div>`;
+        break;
+      }
+      bd = p?.lanceEnviado ? enviado(p.semLote ? "Enviado: não queremos lote este ano." : "Lance enviado.") + `<div class="card"><b>Enquanto a turma decide: qual vai ser o lance vencedor?</b><div class="row" style="margin-top:8px">${["até 20", "21 a 40", "mais de 40"].map((v) => `<button class="btn sm ${palp === v ? "on" : "sec"} grow" data-a="palpite" data-val="${v}">${v}</button>`).join("")}</div></div>` : `<h2 class="row">${ico("mercado-lotes", "g")}Mercado de lotes</h2><p class="muted">Lance fechado. Quanto do caixa da família (${n0(f.caixa)}) oferecer além do mínimo de ${lanceMinimo(st.ano)}?</p>
+        <div class="card"><div class="row" style="justify-content:space-between"><b>Parte do caixa</b><b class="mono" data-eco="lance" data-eco-fmt="{v}%">${loc.lance}%</b></div><input type="range" min="0" max="60" step="5" value="${loc.lance}" data-in="lance" data-key="lance">${efeitoLance(st, f, loc)}</div>
+        <div class="row" style="flex-wrap:nowrap;align-items:center;gap:12px">${iconeFamilia(f, 40, { moradia: true })}<p class="faint" style="margin:0">Precisam de ${precisaLotes(f) === 1 ? "1 lote" : `${precisaLotes(f)} lotes`} para morar; têm ${f.lotes}; podem ter até ${tetoLotes(f)}.</p></div><button class="btn ok block" data-a="lance">Enviar lance</button>
+        <button class="btn sec block" data-a="semLote" style="margin-top:8px">Não queremos lote este ano</button>
+        <button class="btn sec sm block" data-a="regrasMerc" style="margin-top:8px">${loc.regrasMerc ? "Esconder as regras do mercado ▴" : "Ver as regras do mercado ▾"}</button>${loc.regrasMerc ? `<div class="card regras-cel"><ul class="faint">
+          <li>Vale a mediana da família; quem não envia conta como 0%.</li>
+          <li>O maior lance leva e paga ao banco${st.regra === "prosperidade" ? "; na Prosperidade, conta metade do que vocês oferecem além do mínimo" : ""}. O lance mínimo é 6 + 2 × o ano.</li>
+          <li>Quem já levou um lote oferece, no próximo, metade da porcentagem, sobre o caixa que sobrou.</li>
+          <li>"Não queremos lote" vale se a maioria da família inteira marcar; ficar de fora não custa nada.</li>
+          <li>${st.ano >= 5 ? "No último ano, o lote novo conta só no patrimônio." : "O lote novo conta para moradia e aluguel a partir do próximo ano."}</li></ul></div>` : ""}`;   // R36: na tela, só o controle, o efeito e uma linha; as regras atrás de "ver as regras"
+      break;
+    }
+    case "alvara": {
+      const c = cartaComFala(st, id, st.cartas.grande);   // R34: a grande na fala sorteada para esta pessoa
+      bd = st.alvara.votos[id] != null ? enviado("Resposta secreta enviada.") + palpiteFaixa(st, id, "alvara", "quantos % de quem responder aceitariam?")
+        : cartaCelular(c, `<b>Responda no seu lugar, longe da família.</b> Vale a resposta de uma pessoa sorteada, que ninguém vai saber quem é (sem resposta, vale não). O telão mostra só o total${st.vizinhos ? ", que soma pessoas e vizinhos automáticos" : ""} (se todos fizerem o mesmo, o total diz isso). ${esc(c.segmento[0].toUpperCase() + c.segmento.slice(1))} é do jogo; os ${GANHO_GRANDE} pontos são só seus.`, "alvara", st);
+      break;
+    }
+    case "resultado": {
+      // R13: dois tempos. Primeiro a vila inteira no telão; o extrato da família aparece aqui quando começa o último painel.
+      const fx = st.fechamento?.extrato?.[f.id];
+      const tr = tempoResultado(st), falta = st.painel != null ? (st.painel >= tr.n - 1 ? -10 : 999) : tr.ultimo - decorrido(st);   // atraso negativo: a animação já andou
+      const pessoal = [];
+      if (st.ano === 2 && st.pequena.votos[id] != null) pessoal.push(st.pequena.valeu === false ? "Com menos de 5 respostas, a proposta não valeu: ninguém ganhou os pontos e nada se perdeu." : st.pequena.votos[id] ? `Você aceitou a proposta: +${GANHO_PEQUENA} no seu placar pessoal.` : "Você recusou a proposta.");   // R36: o +2 só quando a proposta valeu
+      if (st.ano === 4 && st.cartas && st.mente[id] != null) {
+        const c = cartaAno4(st, id);
+        if (c.tipo === "confia") pessoal.push(st.mente[id] ? (st.golpe[id] ? c.ruim : c.bom) : "Você não arriscou: nada mudou no seu placar.");
+      }
+      const pal = st.palpite?.[st.ano]?.[id];
+      if (pal && st.leilao?.vendidos?.length) { const maior = Math.round(Math.max(...st.leilao.vendidos.map((v) => v.preco))), certo = maior <= 20 ? "até 20" : maior <= 40 ? "21 a 40" : "mais de 40"; pessoal.push(`Lance vencedor: ${n0(maior)}. Seu palpite (${pal}) ${pal === certo ? "acertou" : "não acertou"}.`); }
+      // R17: o que é só seu fica numa tela à parte, aberta com um toque (o extrato é olhado junto com a família)
+      if (loc.verPessoal === st.ano && pessoal.length) { bd = `<h2>Só para você</h2><div class="card">${pessoal.map((t) => `<p class="muted" style="margin:6px 0 0">${esc(t)}</p>`).join("")}</div><p class="faint">Ninguém mais vê esta tela.</p><button class="btn sec block" data-a="verPessoal" data-val="0">Voltar ao extrato da família</button>`; break; }
+      const espera = `<div class="card espera" style="text-align:center;--a:${falta.toFixed(2)}s">${ico("telao", "g")}<p class="muted" style="margin:6px 0 0"><b>Olhe o telão:</b> primeiro a vila inteira. O extrato da sua família aparece aqui em seguida.</p></div>`;
+      const extrato = `<div class="surge" style="--a:${falta.toFixed(2)}s"><h2>Como ficou a sua família</h2><div class="card"><table class="vals">
+        ${fx ? (() => { const L = linhasExtrato(f, fx, st.ano); return `<tr><td>Caixa antes das decisões</td><td class="n">${L.A.toLocaleString("pt-BR")}</td></tr><tr><td>Renda do ano ${st.ano === 5 && st.alvara?.aceito && st.rendaAbertura ? "(refeita pela proposta grande)" : "(como na abertura)"}</td><td class="n">${sinal(L.R)}</td></tr><tr><td>Para o bem público</td><td class="n">${sinal(-L.pub)}</td></tr>${st.ano >= 2 ? `<tr><td>Replantio</td><td class="n">${sinal(-L.rep)}</td></tr><tr><td>Cargas (${fx.cargas})</td><td class="n">${sinal(L.gc)}</td></tr>` : ""}`; })() : ""}
+        <tr><td>Caixa</td><td class="n">${n0(f.caixa)}</td></tr><tr><td>Lotes (${VALOR_LOTE(st.publico)} cada)</td><td class="n">${f.lotes}</td></tr>
+        <tr><td><b>Patrimônio</b></td><td class="n"><b>${n0(patrimonio(f, st.publico))}</b></td></tr>
+        <tr><td>Patrimônio por pessoa</td><td class="n">${n0(porPessoa(st, f))}</td></tr>
+        <tr><td>Posição por pessoa (só vocês veem)</td><td class="n">${posicao(st, f)}º de ${Object.keys(st.fams).length}</td></tr></table></div>
+        ${pessoal.length ? `<button class="btn sec block" data-a="verPessoal" data-val="${st.ano}">Ver o que é só seu (incline a tela)</button>` : ""}${metaCelular(st)}</div>`;
+      bd = espera + extrato;
+      break;
+    }
+    case "conversa":
+      // R16: conversa de 90 s antes do voto; o celular confere a regra e espera o voto abrir
+      bd = `<h2 class="row">${ico("balanca", "g")}Antes do voto: conversem</h2><p class="muted">Com a família, ${st.curto ? 60 : 90} segundos: qual meta vocês querem, patrimônio médio alto ou ninguém muito atrás? Qual regra ajuda mais nisso, e quem ganha e quem paga em cada uma? <b>Quando o relógio do telão acabar, quem conduz abre o voto.</b></p>${controle(st, id)}
+        <div class="card"><b>${esc(REGRAS_TXT.monopolio.nome)}</b><p class="faint" style="margin:2px 0 6px">${esc(REGRAS_TXT.monopolio.curto)}</p><b>${esc(REGRAS_TXT.prosperidade.nome)}</b><p class="faint" style="margin:2px 0 0">${esc(REGRAS_TXT.prosperidade.curto)}</p></div>
+        ${duasMetasCel()}`;   // R19 e R20
+      break;
+    case "voto":
+      bd = st.voto[id] != null ? enviado("Voto secreto enviado.") + palpiteFaixa(st, id, "voto", "quantos % vão votar para trocar?") : `<h2 class="row">${ico("balanca", "g")}Que regra queremos?</h2><p class="muted"><b>Volte ao seu lugar e vote sem mostrar a tela.</b>${sozinho(st, f) ? " Os 2 parentes automáticos votam como você; os vizinhos automáticos votam por conta própria." : ""} Vale para os anos 4 e 5. Voto secreto (o telão mostra só o total; se todos votarem igual, o total diz isso); vence a maioria, e empate mantém o Monopólio.</p>
+        <div class="opcoes-iguais">${(() => { const os = [`<button class="opt" data-a="voto" data-val="0"><b>Manter o Monopólio</b><span class="faint">${esc(REGRAS_TXT.monopolio.curto)}</span></button>`, `<button class="opt" data-a="voto" data-val="1"><b>Trocar para a Prosperidade</b><span class="faint">${esc(REGRAS_TXT.prosperidade.curto)}</span></button>`]; return (trocaOrdem("voto") ? os.reverse() : os).join(""); })()}</div>${controle(st, id)}${duasMetasCel()}`;   // R33: as duas opções lado a lado, logo depois da regra; a conferência vem embaixo
+      break;
+    case "fechamento": {
+      const ja = st.final[id];
+      // R10: placar da pessoa = a parte dela no patrimônio da família + os pontos pessoais; só ela vê
+      const parte = patrimonio(f, st.publico) / f.membros.length, pes = st.pessoal[id] || 0;
+      // R21: os pontos pessoais (que podem entregar quem aceitou a proposta grande) ficam atrás de um toque
+      bd = `<h2>Fechamento</h2><div class="card"><b>A família</b><table class="vals" style="margin-top:6px"><tr><td>Sua parte no patrimônio da família (${n0(patrimonio(f, st.publico))} ÷ ${f.membros.length})</td><td class="n">${n0(parte)}</td></tr></table>` +
+        (loc.verPessoal === "fim" ? `<table class="vals" style="margin-top:6px"><tr><td>Seus pontos pessoais</td><td class="n">${n0(pes)}</td></tr><tr><td><b>Seu placar</b></td><td class="n"><b>${n0(parte + pes)}</b></td></tr></table><p class="faint" style="margin:6px 0 0">Os pontos pessoais não entram no caixa da família, nas metas nem no telão.</p><button class="btn sec block" data-a="verPessoal" data-val="0" style="margin-top:8px">Esconder</button>`
+          : `<button class="btn sec block" data-a="verPessoal" data-val="fim" style="margin-top:8px">Ver seu placar pessoal (incline a tela)</button>`) + `</div>` +
+        (ja ? enviado("Obrigado!") : `<div class="card"><b>O que mais te guiou hoje?</b><div class="row" style="margin-top:6px">${GUIAS.map((g) => `<button class="btn sm ${loc.guia === g ? "on" : "sec"} grow" data-a="guia" data-val="${g}">${g}</button>`).join("")}</div>
+          <b style="display:block;margin-top:10px">E o que mais pesou?</b><div class="row" style="margin-top:6px">${MOTIVOS.map((m) => `<button class="btn sm ${loc.motivo === m ? "on" : "sec"}" data-a="motivo" data-val="${m}">${m}</button>`).join("")}</div>
+          <button class="btn ok block" style="margin-top:10px" data-a="final" ${loc.guia && loc.motivo ? "" : "disabled"}>Enviar</button></div>`);
+      break;
+    }
+    default: bd = `<p class="muted">${esc(NOME_FASE[st.fase] || "")}</p>`;
+  }
+  if (manualAberto(st, loc)) bd = telaManual();   // R41: o manual por cima da etapa (o jogo continua ao fechar)
+  return hd(st, me) + `<div class="bd">${bd}</div>`;
+}
+
+export function acaoAluno(a, el, { st, id, loc, dispatch }) {
+  const val = el.dataset.val;
+  switch (a) {
+    case "manual": loc.manual = !manualAberto(st, loc); if (!loc.manual) loc.glos = false; return true;   // R41: abre e fecha o manual
+    case "achei": dispatch({ t: "achei", id }); return true;
+    case "car": loc.car = +val; return true;
+    case "propor": dispatch({ t: "propor", id, p: { pub: loc.pub, rep: loc.rep, car: loc.car } }); return true;
+    case "prever": dispatch({ t: "prever", id, v: val }); return true;
+    case "rolar": loc.face = 1 + Math.floor(Math.random() * 6); return true;
+    case "mente": dispatch({ t: "mente", id, face: loc.face, acertei: val === "1" }); return true;   // dado: "acertei"; carta: ficar/confiar
+    case "controle": dispatch({ t: "controle", id, op: +val }); return true;
+    case "palpite": dispatch({ t: "palpite", id, v: val }); return true;
+    case "lance": dispatch({ t: "lance", id, v: loc.lance / 100 }); return true;
+    case "semLote": dispatch({ t: "lance", id, v: -1 }); return true;
+    case "abrir": loc.abriu = +val; return true;
+    case "regrasMerc": loc.regrasMerc = !loc.regrasMerc; return true;   // R36: as regras do mercado atrás de um botão
+    case "verPessoal": loc.verPessoal = val === "fim" ? "fim" : +val || null; return true;   // o ano em que a pessoa abriu (no ano seguinte, volta ao extrato)
+    case "alvara": dispatch({ t: "alvara", id, aceita: val === "1" }); return true;
+    case "pequena": dispatch({ t: "pequena", id, aceita: val === "1" }); return true;
+    case "quem": dispatch({ t: "quem", id, v: +val }); return true;
+    case "palpitePct": dispatch({ t: "palpitePct", id, v: +val }); return true;
+    case "prev5": dispatch({ t: "prev5", id, v: val }); return true;
+    case "voto": dispatch({ t: "voto", id, trocar: val === "1" }); return true;
+    case "guia": loc.guia = val; return true;
+    case "motivo": loc.motivo = val; return true;
+    case "final": dispatch({ t: "final", id, guia: loc.guia, motivo: loc.motivo }); return true;
+    default: return false;
+  }
+}

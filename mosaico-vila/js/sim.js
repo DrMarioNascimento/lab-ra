@@ -1,7 +1,7 @@
 // /simulador: telão em cima, turma embaixo. O "cérebro" da sala roda nesta página (na sala real, no celular de quem conduz).
 import { estadoInicial, reduzir, progresso } from "./engine.js";
 import { renderTelao, duracaoTelao } from "./views/telao.js";
-import { renderAluno, acaoAluno, novoLocal } from "./views/aluno.js";
+import { renderAluno, acaoAluno, novoLocal, temaFamilia } from "./views/aluno.js";
 import { renderProfessor, acaoProfessor } from "./views/professor.js";
 import { iconeFamilia, ico } from "./views/desenho.js";
 import { montar, setPath } from "./ui.js";
@@ -17,6 +17,10 @@ function dispatch(a) {
 }
 
 let nAlunos = 20, auto = true, autoProf = false;
+// R43: o professor pode ter um papel na simulação. "auto" = tudo automático (como antes); "familia" = o professor é uma pessoa em cada família
+// (vê e joga o celular dela, vota e decide) e todos os outros continuam no automático.
+let modoProf = "auto";
+const representantes = () => { const r = new Set(); for (const f of Object.values(st.fams)) { const m = f.membros.find((id) => !st.alunos[id]?.auto); if (m) r.add(m); } return r; };
 const locs = {}, pilotos = {};
 const app = document.getElementById("app");
 app.innerHTML = `
@@ -24,6 +28,7 @@ app.innerHTML = `
     ${ico("app-mosaico-vila", "g")}
     <div class="grow"><b style="font-size:18px">Mosaico Vila · Simulador de aula</b><div class="faint" style="font-size:12px">Telão em cima, turma embaixo. O professor comanda pelo painel ao lado (na sala real, pelo celular).</div></div>
     <label class="row muted" style="gap:6px">Participantes <input id="nAl" type="range" min="2" max="40" value="20" style="width:140px"><b id="nAlV" class="mono">20</b></label>
+    <label class="row muted" style="gap:6px">Meu papel <select id="modoProf" style="min-height:36px;border-radius:10px;padding:0 8px"><option value="auto">Tudo automático</option><option value="familia">Uma pessoa em cada família</option></select></label>
     <button class="btn sm ok on" id="auto">Piloto automático: ligado</button>
     <button class="btn sm sec" id="autoProf">Professor automático: desligado</button>
     <button class="btn sm sec" id="fundo">Ver do fundo da sala</button>
@@ -55,12 +60,20 @@ const mostraFs = () => { telao.classList.add("mostra-fs"); clearTimeout(fsTimer)
 function atualizarFs() { fs.textContent = document.fullscreenElement || telao.classList.contains("cheio") ? "✕ Sair da tela cheia" : "⛶ Tela cheia"; }
 document.addEventListener("fullscreenchange", atualizarFs);
 
-let phoneSubs = [];
+let phoneSubs = [], mostrados = "";
 function montarTurma() {
   phoneSubs.forEach((f) => subs.delete(f)); phoneSubs = [];
   const box = document.getElementById("phones"); box.innerHTML = "";
   // R38: os vizinhos automáticos não têm celular na tela; jogam sozinhos (ver o laço abaixo)
-  const ordem = (Object.keys(st.fams).length ? Object.values(st.fams).flatMap((f) => f.membros) : st.ordem).filter((id) => !st.alunos[id]?.auto);
+  const todos = (Object.keys(st.fams).length ? Object.values(st.fams).flatMap((f) => f.membros) : st.ordem).filter((id) => !st.alunos[id]?.auto);
+  const meus = modoProf === "familia" && Object.keys(st.fams).length ? representantes() : null;
+  for (const id of todos) {   // quem não é "meu" joga sozinho, mesmo escondido
+    const i = +id.slice(1);
+    locs[id] ??= Object.assign(novoLocal(), { perfil: perfilBot(i), papelBully: papelBully(i) });
+    pilotos[id] = meus ? !meus.has(id) : (pilotos[id] ?? true);
+  }
+  const ordem = meus ? todos.filter((id) => meus.has(id)) : todos;
+  mostrados = ordem.join(",");
   const nAuto = st.ordem.filter((id) => st.alunos[id]?.auto).length;
   document.getElementById("vizNota").textContent = nAuto ? `Vila completada com ${nAuto} vizinhos automáticos (sem celular na tela).` : "";
   for (const id of ordem) {
@@ -72,7 +85,7 @@ function montarTurma() {
     wrap.innerHTML = `<div class="ph-cap">${f ? iconeFamilia(f, 22) : ""}<b class="grow">${esc(st.alunos[id]?.nome || id)}</b>
       <button class="btn sm ${pilotos[id] ? "ok on" : "sec"}" data-pilot="${id}">${pilotos[id] ? "piloto" : "manual"}</button></div><div class="ph-frame"><div class="ph-screen"></div></div>`;
     box.appendChild(wrap);
-    const m = montar(wrap.querySelector(".ph-screen"), () => `<div class="phone">${renderAluno(st, id, locs[id])}</div>`, (a, el) => acaoAluno(a, el, { st, id, loc: locs[id], dispatch }), (path, v) => setPath(locs[id], path, v));
+    const m = montar(wrap.querySelector(".ph-screen"), () => `<div class="phone"${temaFamilia(st, id)}>${renderAluno(st, id, locs[id])}</div>`, (a, el) => acaoAluno(a, el, { st, id, loc: locs[id], dispatch }), (path, v) => setPath(locs[id], path, v));
     const fn = () => m.draw(); subs.add(fn); phoneSubs.push(fn); m.draw(true);
     wrap.querySelector("[data-pilot]").onclick = (e) => { pilotos[id] = !pilotos[id]; e.target.className = `btn sm ${pilotos[id] ? "ok on" : "sec"}`; e.target.textContent = pilotos[id] ? "piloto" : "manual"; };
   }
@@ -86,6 +99,14 @@ function novaSala() {
 }
 let faseAnt = st.fase;
 subs.add(() => { if (st.fase !== faseAnt) { if (faseAnt === "entrada") montarTurma(); faseAnt = st.fase; } });
+// quem sai, muda de família ou deixa de ser "meu" some da tela (ou aparece), sem recomeçar nada
+subs.add(() => {
+  if (st.fase === "entrada" || !Object.keys(st.fams).length) return;
+  const todos = Object.values(st.fams).flatMap((f) => f.membros).filter((id) => !st.alunos[id]?.auto);
+  const novo = (modoProf === "familia" ? todos.filter((id) => representantes().has(id)) : todos).join(",");
+  if (novo !== mostrados) montarTurma();
+});
+document.getElementById("modoProf").onchange = (e) => { modoProf = e.target.value; if (st.fase !== "entrada") montarTurma(); };
 
 document.getElementById("nAl").oninput = (e) => { nAlunos = +e.target.value; document.getElementById("nAlV").textContent = nAlunos; if (st.fase === "entrada") novaSala(); };
 document.getElementById("reset").onclick = () => { faseAnt = "entrada"; novaSala(); };

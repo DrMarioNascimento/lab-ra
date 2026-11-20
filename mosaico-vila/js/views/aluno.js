@@ -8,14 +8,20 @@ import { decorrido, tempoResultado } from "./telao.js";
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const n0 = (x) => Math.round(x).toLocaleString("pt-BR");
 
+// R43: a paleta da família vale para a tela inteira (fundo, cabeçalho, botões e barras seguem a cor dela)
+export function temaFamilia(st, id) {
+  const f = st.alunos[id]?.fam ? st.fams[st.alunos[id].fam] : null;
+  return f ? ` data-fam="${esc(f.casa || f.id)}" style="--fam:${f.cor};--fam2:${f.cor2}"` : "";
+}
+
 export function novoLocal() { return { pub: 20, rep: 0, car: 0, lance: 0, face: null, guia: null, motivo: null }; }
 
 // R34: no voto e na proposta grande, cada um responde longe da família: o cabeçalho não mostra o caixa a quem senta ao lado
-function hd(st, me) {
+function hd(st, me, aviso = "") {
   const f = me?.fam ? vista(st).fams[me.fam] : null;   // R19: nas cartas dos anos 2 e 4, o caixa de antes das decisões (como a barra)
-  return `<div class="hd painel"><div class="p-topo">${f ? iconeFamilia(f, 36) : ico("app-mosaico-vila", "m")}
-    <div class="p-quem"><b>${esc(me?.nome || "Mosaico Vila")}</b><span class="p-fam">${f ? esc(f.nome) : "Mosaico Vila"}${st.ano ? ` · ano ${st.ano}` : ""}</span></div>
-    <button class="btn sm sec info-btn" data-a="manual" aria-label="Como jogar">i</button></div>${st.ano ? faixaPainel(st, f) : ""}</div>`;
+  return `<div class="hd painel"><div class="p-topo">${f ? iconeFamilia(f, 58) : ico("app-mosaico-vila", "g")}
+    <div class="p-quem"><span class="p-rot">${f ? "Sua família" : "Seu papel"}</span><b class="p-fam-nome">${f ? esc(f.nome) : "Uma família da vila"}</b><span class="p-fam">${esc(me?.nome || "")}${st.ano ? ` · ano ${st.ano}` : ""} · ${esc(NOME_FASE[st.fase] || "")}</span></div>
+    <button class="btn sm sec info-btn" data-a="manual" aria-label="Como jogar">i</button></div>${st.ano ? faixaPainel(st, f) : ""}${aviso}</div>`;
 }
 
 // R42: painel superior do celular. Linha 1: quem sou (casa da família, nome, família e ano) e as ferramentas (glossário, "i").
@@ -168,11 +174,16 @@ function telaManual() {
 
 export function renderAluno(st, id, loc) {
   idAtual = id;
+  // R43: a cada mudança de etapa, um aviso de 3,5 s no cabeçalho (a primeira tela não avisa)
+  const chaveFase = `${st.fase}:${st.ano}`;
+  if (loc.faseVista == null) loc.faseVista = chaveFase;
+  else if (loc.faseVista !== chaveFase) { loc.faseVista = chaveFase; loc.avisoAte = Date.now() + 3500; }
+  const aviso = loc.avisoAte > Date.now() ? `<div class="fase-aviso" role="status">Mudou: <b>${esc(NOME_FASE[st.fase] || "")}</b>${st.ano ? ` · ano ${st.ano}` : ""}</div>` : "";
   const me = st.alunos[id];
   const f = me?.fam ? st.fams[me.fam] : null;
   let bd = "";
   switch (st.fase) {
-    case "entrada": bd = `<h2>Bem-vindo ao Mosaico Vila</h2><p class="muted">Você entrou como <b>${esc(me?.nome)}</b>. Aguarde o professor formar as famílias.</p><div class="card"><p class="muted" style="margin:0">O jogo fala de dinheiro, aluguel, herança e propostas de corrupção, sempre de famílias e personagens inventados. Os pontos são de mentira. Se algum tema pesar, você pode só observar ou falar com quem conduz.</p></div>`; break;
+    case "entrada": bd = `<h2>Você vai representar uma família</h2><p class="muted">Você entrou como <b>${esc(me?.nome)}</b>. Nesta atividade você vive um papel: o de uma família da vila. Aguarde o professor formar as famílias.</p><div class="card"><p class="muted" style="margin:0">O jogo fala de dinheiro, aluguel, herança e propostas de corrupção, sempre de famílias e personagens inventados. Os pontos são de mentira. Se algum tema pesar, você pode só observar ou falar com quem conduz.</p></div>`; break;
     case "familias":
       bd = `<div class="card col" style="align-items:center;text-align:center">${iconeFamilia(f, 72)}<h2>${esc(f.nome)}</h2><p class="muted">${sozinho(st, f) ? "Você chefia esta família. Os 2 parentes automáticos seguem as suas decisões: a proposta do ano, o lance e o voto." : "Procure as pessoas com este símbolo e sentem juntas."}</p></div>
         ${me.achou ? enviado("Família encontrada.") : `<button class="btn ok block" data-a="achei">Achei minha família</button>`}`;
@@ -318,7 +329,7 @@ export function renderAluno(st, id, loc) {
     default: bd = `<p class="muted">${esc(NOME_FASE[st.fase] || "")}</p>`;
   }
   if (manualAberto(st, loc)) bd = telaManual();   // R41: o manual por cima da etapa (o jogo continua ao fechar)
-  return hd(st, me) + `<div class="bd">${bd}</div>`;
+  return hd(st, me, aviso) + `<div class="bd">${bd}</div>`;
 }
 
 export function acaoAluno(a, el, { st, id, loc, dispatch }) {
