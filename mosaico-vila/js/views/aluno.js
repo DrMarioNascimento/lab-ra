@@ -20,7 +20,7 @@ export function novoLocal() { return { pub: 20, rep: 0, car: 0, lance: 0, face: 
 function hd(st, me, aviso = "") {
   const f = me?.fam ? vista(st).fams[me.fam] : null;   // R19: nas cartas dos anos 2 e 4, o caixa de antes das decisões (como a barra)
   return `<div class="hd painel"><div class="p-topo">${f ? iconeFamilia(f, 58) : ico("app-mosaico-vila", "g")}
-    <div class="p-quem"><span class="p-rot">${f ? "Sua família" : "Seu papel"}</span><b class="p-fam-nome">${f ? esc(f.nome) : "Uma família da vila"}</b><span class="p-fam">${esc(me?.nome || "")}${st.ano ? ` · ano ${st.ano}` : ""} · ${esc(NOME_FASE[st.fase] || "")}</span></div>
+    <div class="p-quem"><span class="p-rot">${f ? "Sua família" : "Seu papel"}</span><b class="p-fam-nome">${f ? esc(f.nome) : "Uma família do Mosaico Vila"}</b><span class="p-fam">${esc(me?.nome || "")}${st.ano ? ` · ano ${st.ano}` : ""} · ${esc(NOME_FASE[st.fase] || "")}</span></div>
     <button class="btn sm sec info-btn" data-a="manual" aria-label="Como jogar">i</button></div>${st.ano ? faixaPainel(st, f) : ""}${aviso}</div>`;
 }
 
@@ -184,7 +184,7 @@ export function renderAluno(st, id, loc) {
   const f = me?.fam ? st.fams[me.fam] : null;
   let bd = "";
   switch (st.fase) {
-    case "entrada": bd = `<h2>${me?.forma === "f" ? "Bem-vinda" : me?.forma === "m" ? "Bem-vindo" : "Boas-vindas"}, ${esc(me?.nome)}!</h2><p class="muted"><b>Você vai representar uma família.</b> Nesta atividade você vive um papel: o de uma família da vila. Aguarde o Mestre formar as famílias.</p><div class="card"><p class="muted" style="margin:0">O jogo fala de dinheiro, aluguel, herança e propostas de corrupção, sempre de famílias e personagens inventados. Os pontos são de mentira. Se algum tema pesar, você pode só observar ou falar com quem conduz.</p></div>`; break;
+    case "entrada": bd = `<h2>${me?.forma === "f" ? "Bem-vinda" : me?.forma === "m" ? "Bem-vindo" : "Boas-vindas"}, ${esc(me?.nome)}!</h2><p class="muted"><b>Você vai representar uma família.</b> Nesta atividade você vive o papel de uma família do Mosaico Vila. Aguarde o Mestre formar as famílias.</p><div class="card"><p class="muted" style="margin:0">O jogo fala de dinheiro, aluguel, herança e propostas de corrupção, sempre de famílias e personagens inventados. Os pontos são de mentira. Se algum tema pesar, você pode só observar ou falar com quem conduz.</p></div>`; break;
     case "familias":
       bd = `<div class="card col" style="align-items:center;text-align:center">${iconeFamilia(f, 72)}<h2>${esc(f.nome)}</h2><p class="muted">${sozinho(st, f) ? "Você chefia esta família. Os 2 parentes automáticos seguem as suas decisões: a proposta do ano, o lance e o voto." : "Procure as pessoas com este símbolo e sentem juntas."}</p></div>
         ${me.achou ? enviado("Família encontrada.") : `<button class="btn ok block" data-a="achei">Achei minha família</button>`}`;

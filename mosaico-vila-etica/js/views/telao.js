@@ -657,7 +657,7 @@ function telaoFechamento(st) {
   const guias = contagem(fin.map((x) => x.guia)), motivos = contagem(fin.map((x) => x.motivo));
   const tam = qs[k].length + apoio.length, longa = tam > 170;
   return topo(st, "Fechamento", CONCEITOS_FECHAMENTO[k] || []) + `<div class="grid" style="grid-template-columns:1fr 1.25fr;flex:1;min-height:0">
-    <div class="card col" style="min-height:0;gap:.7cqw;overflow:hidden"><h2 class="row" style="color:var(${st.vitoria ? "--ok" : "--warn"})">${ico(st.vitoria ? "trofeu" : "meta", "g")}${st.vitoria ? "A vila bateu a meta!" : "A vila não bateu a meta"}</h2>
+    <div class="card col" style="min-height:0;gap:.7cqw;overflow:hidden"><h2 class="row" style="color:var(${st.vitoria ? "--ok" : "--warn"})">${ico(st.vitoria ? "trofeu" : "meta", "g")}${st.vitoria ? "O Mosaico Vila Ética bateu a meta!" : "O Mosaico Vila Ética não bateu a meta"}</h2>
       ${k === 3 ? `<div class="col" style="gap:.6cqw;align-items:flex-start">${st.cartas && carta(st.cartas.pequena).carimbo ? carimbo(`${carta(st.cartas.pequena).carimbo} e corrupção`, "pq longo", `q4-${st.seed}`) : `${carimbo("Corrupção", "pq", `q4-${st.seed}`)}<span class="big" style="margin:0">as duas propostas</span>`}</div>` : `<p class="big" style="margin:0;font-size:2.1cqw">${vz.txt}</p>`}
       <div class="linha-media">${k === 3 ? barrasPropostas(st) : k === 4 ? guiouTurma(st) : linhaDoTempo(st.historico, { F: 30, alto: 240, so: k === 2 ? "mata" : "desig" })}</div><p class="rodape teoria">De onde vem: ${esc(teoria(st, k))}</p></div>
     <div class="col" style="min-height:0"><div class="card pergunta" style="flex:1;min-height:0;overflow:hidden"><div class="temas">${TEMAS.map((t, i) => `<span class="${i === k ? "agora" : i < k ? "feito" : ""}">${t}</span>`).join("")}</div>
