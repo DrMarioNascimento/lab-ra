@@ -1,4 +1,4 @@
-// Cinco Minutos para o Fim · sala do Mestre: três transportes com a mesma forma.
+// Loop · sala do Mestre: três transportes com a mesma forma.
 //   transporteReal(DragonSala)  → jogador e Mestre, pela sala aberta pelo firebase-room.js (projeto mosaico-loop)
 //   transporteTelao(codigo)     → telão: só lê a mesma sala e marca presença
 //   transporteFalso(...)        → simulador: sala de mentira no localStorage, sem rede

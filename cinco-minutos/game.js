@@ -518,7 +518,7 @@ function restoreSolo(){
  $('coopBegin').classList.add('hidden');
  $('answerFields').classList.remove('hidden');
  $('answerForm').querySelector('button[type=submit]').classList.remove('hidden');
- $('final').querySelector('.large').textContent='O que aconteceu? Use as pistas do caderno e indique como prevenir o acontecimento. Se não souber, pode deixar uma resposta em aberto.';
+ $('final').querySelector('.large').textContent='O que aconteceu? Use as pistas do dossiê e indique como prevenir o acontecimento. Se não souber, pode deixar uma resposta em aberto.';
  $('replay').textContent='Jogar outra vez';
 const prev=load(storageKey,null);if(prev&&Number.isInteger(prev.caseIndex)&&CASES[prev.caseIndex]&&prev.loop>=1&&prev.loop<=5){state=prev;$('speed').value=String(state.duration);if(state.phase==='playing'&&Number.isFinite(state.endAt)){state.remaining=Math.max(0,(state.endAt-Date.now())/1000);renderGame();show('game');if(state.remaining<=0)finishLoop();else timerHandle=setInterval(tick,250)}else if(state.phase==='choose'){renderGame();show('game')}else if(state.phase==='between'){renderBetween()}else if(state.phase==='final'){renderForm();show('final')}else if(state.phase==='result'&&state.answers){renderResult();show('result')}else{state=null;show('start')}}else show('start');
 }

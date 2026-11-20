@@ -1,4 +1,4 @@
-// Conteúdo do Cinco Minutos para o Fim (cópia própria de ../game.js, só os dados e a montagem das pistas).
+// Conteúdo do Loop (cópia própria de ../game.js, só os dados e a montagem das pistas).
 // Usado pelo telão e pelo simulador. Se o conteúdo mudar em game.js, gere este arquivo de novo (sala/gerar-conteudo.sh).
 const ROOMS = [
   {id:'galeria', name:'Galeria principal', icon:'▧', sub:'Obras e vitrines'},
