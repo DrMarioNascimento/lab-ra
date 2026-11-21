@@ -164,6 +164,7 @@ function renderPhase() {
     caseIndex: room.caseIndex,
     loop: room.loop,
     phase: room.phase,
+    caseRules: 2,
     duration: room.seconds,
     endAt: room.startedAt ? room.startedAt.toMillis() + room.seconds * 1000 : null,
     remaining: room.phase === 'playing' ? remainingSeconds(room.startedAt.toMillis() + room.seconds * 1000) : room.seconds,

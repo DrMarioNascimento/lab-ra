@@ -209,4 +209,11 @@ function makeClues(c){
  Object.values(base).forEach(list=>list.forEach(cl=>{cl.tipo=/^(Ouvir|Conversar|Perguntar)/.test(cl.name)?'Relato':/^(Ler|Consultar|Examinar o registro|Examinar a ficha|Conferir a ficha|Conferir o registro|Comparar)/.test(cl.name)?'Registro':'Observação';}));
  return base;
 }
-export { ANDARES, INICIO, ROOMS, EVENTS, ALARMS, FIGURES, ACTIONS, CASES, labels, figures, makeClues, esc };
+const CASE_PATHS = [
+ 'reserve','suspension','reference','rehearsal','reference',
+ 'reserve','reference','suspension','reserve','rehearsal',
+ 'reference','rehearsal','suspension','rehearsal','reserve'
+];
+const EIXOS8 = [['event','O quê'],['where','Onde'],['when','Quando'],['how','Como'],['alarm','Por quê'],['figure','Quem'],['predict','Previsão'],['action','Intervenção']];
+const verdade = (caso, k) => { const c = CASES[caso]; return k === 'where' ? c.room : k === 'when' || k === 'how' ? CASE_PATHS[caso] : k === 'predict' ? 'retorno' : c[k]; };
+export { ANDARES, INICIO, ROOMS, EVENTS, ALARMS, FIGURES, ACTIONS, CASES, labels, figures, makeClues, esc, CASE_PATHS, EIXOS8, verdade };

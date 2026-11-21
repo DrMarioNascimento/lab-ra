@@ -217,41 +217,41 @@ function makeClues(c){
 }
 const TIME_PATHS = {
  suspension: {
-  room:'prototipo', source:'atelie', opens:120, closes:300,
+  room:'prototipo', source:'atelie', opens:120, closes:300, code:'P-7',
   control:'Painel da demonstração', action:'Suspender demonstração',
   alternative:'Silenciar o aviso da demonstração',
-  observation:'O relógio da demonstração perde um segundo no primeiro pulso. O visor ainda indica uma segunda emissão programada.',
-  instruction:'A emissão final depende do modo Demonstração. Após o primeiro pulso, use Suspender demonstração na Galeria do tempo antes das 22h.',
+  observation:'No painel P-7, o relógio da demonstração perde um segundo no primeiro pulso. O visor ainda indica uma segunda emissão programada.',
+  instruction:'A emissão final depende do modo Demonstração. Entre 21h57 e 22h, use Suspender demonstração no painel P-7.',
   distractor:'O aviso foi silenciado. O visor ainda mostra a emissão final programada.',
   reconstruction:'Na Galeria do tempo, a demonstração guardou uma referência às 21h55. O pulso das 21h57 derrubou a iluminação. A emissão programada para as 22h reconectava o museu à referência.',
   success:'Você suspendeu a demonstração na Galeria do tempo. Sem a emissão final, o relógio avançou depois das 22h.'
  },
  reserve: {
-  room:'eletrica', source:'seguranca', opens:120, closes:240,
+  room:'eletrica', source:'seguranca', opens:120, closes:240, code:'A-3',
   control:'Painel da alimentação de ensaio', action:'Desacoplar a reserva do protótipo',
   alternative:'Rearmar a iluminação principal',
-  observation:'Depois do apagão, o protótipo transfere a alimentação para a reserva. Às 21h59, o painel trava essa alimentação até o fechamento.',
-  instruction:'Depois da transferência às 21h57, o Laboratório de formas permite desacoplar a reserva do protótipo antes do travamento das 21h59.',
+  observation:'No painel A-3, depois do apagão, o protótipo transfere a alimentação para a reserva. Às 21h59, o painel trava essa alimentação até o fechamento.',
+  instruction:'Depois da transferência às 21h57 e antes do travamento das 21h59, desacople a reserva do protótipo pelo painel A-3.',
   distractor:'O painel tentou rearmar as luzes. A reserva do protótipo continuou acoplada.',
   reconstruction:'Às 21h57, o pulso derrubou as luzes e transferiu o protótipo para a reserva. Às 21h59, o painel travava a reserva. Essa alimentação sustentava o retorno das 22h.',
   success:'Você desacoplou a reserva antes do travamento. O protótipo ficou sem alimentação no fechamento e o tempo seguiu.'
  },
  rehearsal: {
-  room:'auditorio', source:'recepcao', opens:90, closes:210,
+  room:'auditorio', source:'recepcao', opens:90, closes:210, code:'M-2',
   control:'Mesa de produção', action:'Cancelar o sinal de encerramento',
   alternative:'Silenciar os alto-falantes',
-  observation:'A produção agendou um sinal silencioso, independente do áudio. Às 21h58min30s, o comando sai da mesa e fica na fila do protótipo.',
-  instruction:'Entre a abertura da mesa às 21h56min30s e o envio automático às 21h58min30s, cancele o sinal de encerramento no Auditório.',
+  observation:'Na mesa M-2, a produção agendou um sinal silencioso, independente do áudio. Às 21h58min30s, o comando sai da mesa e fica na fila do protótipo.',
+  instruction:'Entre a abertura da mesa às 21h56min30s e o envio automático às 21h58min30s, cancele o sinal de encerramento na mesa M-2.',
   distractor:'Os alto-falantes ficaram mudos. O sinal silencioso continuou agendado.',
   reconstruction:'O pulso inicial causou o apagão, mas dependia de um disparo externo para repetir a noite. O sinal da produção entrou na fila às 21h58min30s e ordenou o retorno às 22h.',
   success:'Você cancelou o sinal na mesa de produção. Nenhuma ordem de retorno chegou ao protótipo.'
  },
  reference: {
-  room:'atelie', source:'deposito', opens:60, closes:180,
+  room:'atelie', source:'deposito', opens:60, closes:180, code:'R-5',
   control:'Leitor da referência de ensaio', action:'Retirar o cartão do leitor',
   alternative:'Fechar o caderno de ensaio',
-  observation:'O leitor abriu às 21h56. Às 21h58, ele envia ao protótipo a referência gravada no cartão que estiver encaixado.',
-  instruction:'Retire o cartão do leitor no Ateliê entre 21h56 e 21h58. Depois do envio, retirar o cartão não apaga a referência recebida.',
+  observation:'O leitor R-5 abriu às 21h56. Às 21h58, ele envia ao protótipo a referência gravada no cartão que estiver encaixado.',
+  instruction:'Retire o cartão do leitor R-5 entre 21h56 e 21h58. Depois do envio, retirar o cartão não apaga a referência recebida.',
   distractor:'O caderno foi fechado. O leitor ainda pôde enviar a referência.',
   reconstruction:'O cartão do Ateliê guardava o instante das 21h55. O pulso inicial causava o apagão, mas só após receber o cartão às 21h58 o protótipo conseguia reconstruir a cena às 22h.',
   success:'Você retirou o cartão antes do envio. Sem a referência temporal, o pulso das 22h não refez a noite.'
@@ -269,7 +269,7 @@ const timePath = () => state.caseRules === 2
 
 function scenarioClues(){
  const clues = makeClues(current());
- if (state.caseRules !== 2 || window.coop) return clues;
+ if (state.caseRules !== 2) return clues;
 
  const path = timePath();
  // A primeira emissão é comum. As fontes da segunda dependem da partida.
@@ -278,9 +278,13 @@ function scenarioClues(){
  clues.atelie = [];
  clues.prototipo[0].text = 'O protótipo produz uma imagem temporal a partir de uma referência. O fechamento da demonstração depende de um comando que pode vir de outro setor.';
  clues.prototipo[1].text = 'Às 21h57, um pulso faz o relógio recuar um segundo. O estrondo vem da Galeria especial e a luz cai. O alarme soa mais tarde.';
- clues.atelie.push({id:'atebase',name:'Ler a anotação de ensaio',time:0,text:'As duas emissões têm funções diferentes. O pulso inicial pode ocorrer mesmo quando a ordem de fechamento ainda não está pronta.'});
- clues[path.room].push({id:'time-control',name:'Observar o mecanismo',time:path.opens,text:path.observation});
- clues[path.source].push({id:'time-source',name:'Consultar o procedimento de encerramento',time:60,text:path.instruction});
+ clues.atelie.push({id:'atebase',name:'Ler a anotação de ensaio',time:0,tipo:'Registro',text:'As duas emissões têm funções diferentes. O pulso inicial pode ocorrer mesmo quando a ordem de fechamento ainda não está pronta.'});
+ clues[path.room].push({id:'time-control',name:'Observar o mecanismo',time:path.opens,tipo:'Observação',text:path.observation});
+ clues[path.source].push({id:'time-source',name:'Consultar o procedimento de encerramento',time:60,tipo:'Registro',text:path.instruction});
+ // O procedimento cita só o código do equipamento. Dois diretórios, em ambientes diferentes, dizem onde cada código fica.
+ const diretorio = 'Diretório de equipamentos: ' + Object.values(TIME_PATHS).map(p => p.code+' fica em '+ROOMS.find(r=>r.id===p.room).name).join('; ') + '.';
+ clues.seguranca.push({id:'time-dir1',name:'Consultar o diretório de equipamentos',time:30,tipo:'Registro',text:diretorio});
+ clues.patio.push({id:'time-dir2',name:'Ler o mapa de equipamentos',time:60,tipo:'Registro',text:diretorio});
  return clues;
 }
 
@@ -383,47 +387,65 @@ function renderClues(){
  renderIntervention(room.id, storySeconds);
 }
 function hasLiveFinal(){
- return !window.coop && state.liveFinal === true;
+ return state.liveFinal === true;
+}
+const CONTROL_KEY = Object.fromEntries(Object.entries(TIME_PATHS).map(([k,p]) => [p.room,k]));
+const GENERIC_COMMAND = 'Reiniciar o equipamento';
+function activeKey(){ return state.caseRules === 2 ? CASE_PATHS[state.caseIndex] : 'suspension'; }
+function controlAt(roomId){
+ const key = CONTROL_KEY[roomId];
+ return key ? {key, ...TIME_PATHS[key]} : null;
+}
+// Cada equipamento oferece o comando dele, um comando-isca e o reinício genérico; a ordem muda com a partida.
+function commandsOf(ctl){
+ const list = [['break', ctl.action], ['other', ctl.alternative], ['reset', GENERIC_COMMAND]];
+ const k = (state.caseIndex + ctl.code.charCodeAt(0)) % 3;
+ return list.map((_, i) => list[(i+k)%3]);
+}
+function interventionNote(why, path){
+ return why === 'sala' ? 'O equipamento respondeu, mas não está ligado ao retorno desta noite. O relógio ainda voltará às 22h.'
+  : why === 'janela' ? 'O comando chegou fora da janela e o equipamento ignorou a ordem.'
+  : why === 'isca' ? path.distractor
+  : 'O equipamento reiniciou e voltou ao mesmo estado. O retorno das 22h continua programado.';
 }
 function renderIntervention(roomId, elapsed){
  const panel = $('intervention');
- const path = timePath();
- panel.hidden = !hasLiveFinal() || state.loop !== 5 || roomId !== path.room;
+ const ctl = controlAt(roomId);
+ panel.hidden = !hasLiveFinal() || state.loop !== 5 || !ctl;
  if (panel.hidden) return;
- if (!panel.hasChildNodes()) {
-  const commands = state.caseRules === 2
-   ? '<label for="command">Comando</label><select id="command"><option value="">Escolha um comando</option>'+
-     (path.room === 'prototipo' || path.room === 'atelie'
-      ? '<option value="other">'+esc(path.alternative)+'</option><option value="break">'+esc(path.action)+'</option>'
-      : '<option value="break">'+esc(path.action)+'</option><option value="other">'+esc(path.alternative)+'</option>')+
-     '</select><button class="btn primary" type="button">Executar comando</button>'
-   : '<button class="btn primary" type="button">'+esc(path.action)+'</button>';
-  panel.innerHTML = '<h4>'+esc(path.control)+'</h4>'+commands+'<p role="status"></p>';
-  const button = panel.querySelector('button');
-  button.onclick = () => applyIntervention(panel.querySelector('select')?.value ?? 'break');
-  panel.querySelector('select')?.addEventListener('change', () => renderIntervention(state.room, elapsedStoryTime(Date.now())));
+ const path = timePath();
+ if (panel.dataset.ctl !== roomId) {
+  panel.dataset.ctl = roomId;
+  panel.innerHTML = '<h4>'+esc(ctl.control)+' · '+esc(ctl.code)+'</h4><label for="command">Comando</label><select id="command"><option value="">Escolha um comando</option>'+
+   commandsOf(ctl).map(([v,t]) => '<option value="'+v+'">'+esc(t)+'</option>').join('')+
+   '</select><button class="btn primary" type="button">Executar comando</button><p role="status"></p>';
+  panel.querySelector('button').onclick = () => applyIntervention(panel.querySelector('select').value);
+  panel.querySelector('select').addEventListener('change', () => renderIntervention(state.room, elapsedStoryTime(window.coop?.now() ?? Date.now())));
  }
  const button = panel.querySelector('button');
  const select = panel.querySelector('select');
  const recorded = !!state.intervention;
- const eligible = elapsed >= path.opens && elapsed < path.closes;
- button.disabled = recorded || !eligible || (select ? !select.value : false);
- if (select) select.disabled = recorded || !eligible;
+ button.disabled = recorded || !select.value;
+ select.disabled = recorded;
  const status = panel.lastElementChild;
- const message = state.intervention === 'other' ? path.distractor
-  : recorded ? 'Comando registrado. O relógio seguirá adiante às 22h.'
-  : elapsed < path.opens ? 'O comando estará disponível às '+clockAt(path.opens)+'.'
-  : elapsed >= path.closes ? 'A janela de intervenção terminou às '+clockAt(path.closes)+'.'
-  : 'Você pode executar um comando até '+clockAt(path.closes)+'.';
+ const message = recorded
+  ? (state.intervention === 'break' ? 'Comando registrado. O relógio seguirá adiante às 22h.' : interventionNote(state.interventionWhy, path))
+  : 'Você só tem uma tentativa nesta volta. Hora no museu: '+clockAt(Math.floor(elapsed))+'.';
  if (status.textContent !== message) status.textContent = message;
 }
 function applyIntervention(command){
+ const ctl = controlAt(state.room);
+ const elapsed = elapsedStoryTime(window.coop?.now() ?? Date.now());
+ if (!ctl || !hasLiveFinal() || state.loop !== 5 || state.phase !== 'playing' || state.intervention ||
+     !commandsOf(ctl).some(([v]) => v === command)) return;
  const path = timePath();
- const elapsed = elapsedStoryTime(Date.now());
- if (!hasLiveFinal() || state.loop !== 5 || state.phase !== 'playing' ||
-     state.room !== path.room || state.intervention || !['break','other'].includes(command) ||
-     elapsed < path.opens || elapsed >= path.closes) return;
- state.intervention = command;
+ const rightEquipment = ctl.key === activeKey();
+ const inWindow = elapsed >= path.opens && elapsed < path.closes;
+ state.intervention = rightEquipment && command === 'break' && inWindow ? 'break' : 'other';
+ state.interventionWhy = state.intervention === 'break' ? 'ok'
+  : !rightEquipment ? 'sala'
+  : command === 'break' && !inWindow ? 'janela'
+  : command === 'other' ? 'isca' : 'reinicio';
  save();
  renderIntervention(state.room, elapsed);
 }
@@ -456,7 +478,7 @@ function renderJournal(){
  ];
  $('hints').innerHTML=hs.slice(0,state.hints).map((x,i)=>'<p><strong>Orientação '+(i+1)+':</strong> '+esc(x)+'</p>').join('');$('getHint').disabled=state.hints>=3;
 }
-function tick(){if(window.coop){window.coop.tick();return}if(!state||state.phase!=='playing')return;const old=state.remaining;state.remaining=Math.max(0,(state.endAt-Date.now())/1000);$('timer').textContent=fmt(state.remaining);$('fictionTime').textContent=museumTime();if(Math.ceil(old)!==Math.ceil(state.remaining))renderClues();else if(state.loop===5 && state.room)renderIntervention(state.room,elapsedStoryTime(Date.now()));if(state.remaining<=0)finishLoop()}
+function tick(){if(window.coop){window.coop.tick();return}if(!state||state.phase!=='playing')return;const old=state.remaining;state.remaining=Math.max(0,(state.endAt-Date.now())/1000);$('timer').textContent=fmt(state.remaining);$('fictionTime').textContent=museumTime();if(Math.ceil(old)!==Math.ceil(state.remaining))renderClues();else if(state.loop===5 && state.room)renderIntervention(state.room,elapsedStoryTime(window.coop?.now() ?? Date.now()));if(state.remaining<=0)finishLoop()}
 function renderBetween(){
  const finished = state.loop === 5;
  const interventionNext = hasLiveFinal() && state.loop === 4;
@@ -498,31 +520,82 @@ function next(){
  show('game');
 }
 function options(obj){return '<option value="">Ainda não sei</option>'+Object.entries(obj).map(([k,v])=>'<option value="'+k+'">'+esc(v)+'</option>').join('')}
+const WHERES = Object.fromEntries(['galeria','recepcao','corredor','seguranca','conservacao'].map(id => [id, ROOMS.find(r=>r.id===id).name]));
+const WHENS = {
+ suspension:'Entre 21h57 e 22h',
+ reserve:'Entre 21h57 e 21h59',
+ rehearsal:'Entre 21h56min30s e 21h58min30s',
+ reference:'Entre 21h56 e 21h58'
+};
+const HOWS = {
+ suspension:'Uma emissão final, programada na demonstração, reconecta o museu à referência',
+ reserve:'A alimentação de reserva do protótipo sustenta o retorno',
+ rehearsal:'Um sinal agendado pela produção ordena o retorno',
+ reference:'Um cartão de referência é lido e enviado ao protótipo'
+};
+const PREDICTIONS = {
+ retorno:'O museu volta às 21h55 e tudo recomeça',
+ seguir:'O tempo segue normalmente depois das 22h',
+ alarme:'O alarme para sozinho antes das 22h',
+ estrondo:'O estrondo deixa de acontecer'
+};
+const roomNameOf = id => ROOMS.find(r => r.id === id).name;
+// As 8 perguntas da investigação. Soma: 100 pontos. Cada pergunta indica de onde podem vir as respostas.
 const ANSWER_AXES = [
- {key:'event', title:'Acontecimento', question:'O que aconteceu com o acervo ou a exposição?', options:EVENTS,
+ {key:'event', pts:15, title:'O quê', question:'O quê: o que aconteceu com o acervo ou a exposição?', options:EVENTS,
   sources:['gal2','con1','rec2','cor1','dep2'],
   guide:'Compare o que a equipe esperava encontrar com os registros de movimentação.'},
- {key:'alarm', title:'Alarme', question:'O que disparou o alarme?', options:ALARMS,
+ {key:'where', pts:10, title:'Onde', question:'Onde: em que ambiente o acontecimento se concentrou?', options:WHERES,
+  test:clue => clue.text.includes(roomNameOf(current().room)),
+  guide:'Rondas e recados citam o ambiente da figura imóvel. Procure o nome do ambiente, não só o objeto.'},
+ {key:'when', pts:10, title:'Quando', question:'Quando era possível agir sobre o retorno?', options:WHENS,
+  sources:['time-source','time-control'],
+  guide:'Procure o horário em que o equipamento abre e o horário em que ele deixa de aceitar ordens.'},
+ {key:'how', pts:15, title:'Como', question:'Como o tempo voltava às 22h?', options:HOWS,
+  sources:['time-source','time-control','atebase'],
+  guide:'O primeiro pulso causa o apagão. Descubra o que precisava acontecer depois, e em qual equipamento.'},
+ {key:'alarm', pts:10, title:'Por quê', question:'Por quê: o que disparou o alarme?', options:ALARMS,
   sources:['seg1','seg2','ele1'],
   guide:'Separe o estrondo do disparo do alarme. Compare os horários e o tipo de registro.'},
- {key:'figure', title:'Figura imóvel', question:'Quem era a figura imóvel observada?', options:FIGURES,
+ {key:'figure', pts:15, title:'Quem', question:'Quem: quem era a figura imóvel observada?', options:FIGURES,
   sources:['gal3','con4','seg3','rec3','cor3'],
   guide:'Procure uma credencial ou outro sinal de identidade. Estar no local não prova responsabilidade.'},
- {key:'action', title:'Prevenção no museu', question:'Qual procedimento ajudaria a equipe a lidar com o acontecimento?', options:ACTIONS,
+ {key:'predict', pts:10, title:'Previsão', question:'Previsão: se ninguém agir, o que acontece às 22h?', options:PREDICTIONS,
+  sources:['atebase','time-source'],
+  guide:'Pense no que o protótipo foi feito para fazer ao fim da demonstração.'},
+ {key:'action', pts:15, title:'Intervenção', question:'Intervenção: qual procedimento ajudaria a equipe a lidar com o acontecimento?', options:ACTIONS,
   sources:['con3','cor2'],
   guide:'Pense em uma ação anterior ao problema. Qual registro ou acordo estava faltando?'}
 ];
+// Resposta certa de cada pergunta nesta partida.
+function truth(key){
+ const c = current();
+ return key === 'where' ? c.room : key === 'when' || key === 'how' ? activeKey() : key === 'predict' ? 'retorno' : c[key];
+}
+// Pontuação por proximidade: metade dos pontos para o mesmo andar (Onde) ou a mesma abertura de janela (Quando).
+function pointsFor(axis, answer){
+ if (!answer) return 0;
+ const right = truth(axis.key);
+ if (answer === right) return axis.pts;
+ if (axis.key === 'where' && ROOMS.find(r=>r.id===answer).andar === ROOMS.find(r=>r.id===right).andar) return Math.floor(axis.pts/2);
+ if (axis.key === 'when' && TIME_PATHS[answer].opens === TIME_PATHS[right].opens) return Math.floor(axis.pts/2);
+ return 0;
+}
 const ARCHIVE_LIMIT = 2;
 function partialRecord(key){
- const c = current();
+ const c = current(), path = timePath();
  switch (key) {
   case 'event': return 'O índice do acervo menciona '+c.subject+'. No verso, lê-se que '+c.clue+'. A ficha de desfecho está incompleta.';
+  case 'where': return 'O mapa de rondas marca um ponto de atenção no '+ROOMS.find(r=>r.id===c.room).andar+'. O nome do ambiente está borrado.';
+  case 'when': return 'A agenda do protótipo marca um comando que fecha às '+clockAt(path.closes)+'. O horário de abertura foi rasurado.';
+  case 'how': return 'O manual do protótipo cita o equipamento '+path.code+'. A página sobre a função dele foi arrancada.';
   case 'alarm': return 'O aviso sonoro começou às 21h57min45s, depois do apagão. ' + ({
    sensor:'O fragmento recuperado veio do histórico de equipamentos.',
    manual:'O fragmento recuperado veio do registro de operações da equipe.',
    teste:'O fragmento recuperado veio da agenda de manutenção.'
   }[c.alarm]) + ' O campo de causa está ilegível.';
   case 'figure': return 'A ronda localiza a figura imóvel em '+ROOMS.find(room=>room.id===c.room).name+'. O campo de identificação está em branco.';
+  case 'predict': return 'Um bilhete do inventor fala em marcar o fim da demonstração para as 22h. O resto do bilhete está rasgado.';
   case 'action': return 'A ficha de prevenção faz referência a '+c.subject+'. Há uma anotação de que '+c.clue+'. A folha de recomendações não foi localizada.';
  }
 }
@@ -532,7 +605,7 @@ function renderArchive(){
  if (state.caseRules !== 2 || window.coop) return;
 
  const recovered = state.archive ?? [];
- const hasSource = axis => state.clues.some(clue => axis.sources.includes(clue.id) &&
+ const hasSource = axis => state.clues.some(clue => axis.test ? axis.test(clue) : axis.sources.includes(clue.id) &&
   (axis.key !== 'figure' || clue.text === figures[current().figure]));
  const remaining = ARCHIVE_LIMIT-recovered.length;
  const status = $('archiveStatus');
@@ -583,7 +656,7 @@ function submit(event){
 function renderResult(){
  const c = current();
  const answers = state.answers || {};
- const score = ANSWER_AXES.reduce((total, {key}) => total+(answers[key]===c[key]?25:0), 0);
+ const score = ANSWER_AXES.reduce((total, axis) => total+pointsFor(axis, answers[axis.key]), 0);
  const path = timePath();
  const reconstruction = hasLiveFinal()
   ? '<div class="result-card"><strong>Como o tempo voltou</strong><p>'+esc(path.reconstruction)+'</p></div>'
@@ -591,12 +664,12 @@ function renderResult(){
  const ending = hasLiveFinal()
   ? (brokeLoop()
    ? path.success+' O que já ocorreu com o acervo faz parte da história.'
-   : (state.intervention === 'other' ? path.distractor+' ' : '')+
-     'O museu voltou às 21h55. '+path.instruction)
+   : (state.intervention === 'other' ? interventionNote(state.interventionWhy, path)+' ' : '')+
+     'O museu voltou às 21h55. '+path.instruction+' O equipamento '+path.code+' fica em '+roomNameOf(path.room)+'.')
   : 'Nesta partida, a ação foi avaliada como hipótese.';
- $('resultBody').innerHTML = '<p class="large">Investigação: <strong>'+score+' de 100 pontos</strong>. Cada resposta vale 25 pontos.</p>'+
-  ANSWER_AXES.map(({key,title,options:labels}) => '<div class="result-card"><strong>'+title+'</strong><p>Sua resposta: '+
-   esc(labels[answers[key]] || 'Ainda não sei')+'<br>Resultado desta partida: '+esc(labels[c[key]])+'</p></div>').join('')+
+ $('resultBody').innerHTML = '<p class="large">Investigação: <strong>'+score+' de 100 pontos</strong>. Cada pergunta vale 10 ou 15 pontos; resposta próxima vale metade.</p>'+
+  ANSWER_AXES.map(axis => { const got = pointsFor(axis, answers[axis.key]); return '<div class="result-card"><strong>'+axis.title+' · '+got+' de '+axis.pts+'</strong><p>Sua resposta: '+
+   esc(axis.options[answers[axis.key]] || 'Ainda não sei')+'<br>Resultado desta partida: '+esc(axis.options[truth(axis.key)])+'</p></div>'; }).join('')+
   '<div class="result-card"><strong>O que aconteceu</strong><p>'+esc(c.detail.charAt(0).toUpperCase()+c.detail.slice(1))+
   '. '+esc(labels[c.alarm][1])+'</p><p>'+esc(figures[c.figure])+'</p></div>'+reconstruction+
   '<div class="result-card"><strong>Desfecho</strong><p>'+esc(ending)+'</p></div>';
@@ -623,7 +696,7 @@ function restoreSolo(){
  $('coopBegin').classList.add('hidden');
  $('answerFields').classList.remove('hidden');
  $('answerForm').querySelector('button[type=submit]').classList.remove('hidden');
- $('final').querySelector('.large').textContent='O que aconteceu? Use as pistas do dossiê e indique como prevenir o acontecimento. Se não souber, pode deixar uma resposta em aberto.';
+ $('final').querySelector('.large').textContent='O que aconteceu? Use as pistas do dossiê e responda às 8 perguntas. Se não souber, pode deixar uma resposta em aberto.';
  $('replay').textContent='Jogar outra vez';
 const prev=load(storageKey,null);if(prev&&Number.isInteger(prev.caseIndex)&&CASES[prev.caseIndex]&&prev.loop>=1&&prev.loop<=5){state=prev;$('speed').value=String(state.duration);if(state.phase==='playing'&&Number.isFinite(state.endAt)){state.remaining=Math.max(0,(state.endAt-Date.now())/1000);renderGame();show('game');if(state.remaining<=0)finishLoop();else timerHandle=setInterval(tick,250)}else if(state.phase==='choose'){renderGame();show('game')}else if(state.phase==='between'){renderBetween()}else if(state.phase==='final'){renderForm();show('final')}else if(state.phase==='result'&&state.answers){renderResult();show('result')}else{state=null;show('start')}}else show('start');
 }

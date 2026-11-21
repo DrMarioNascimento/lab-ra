@@ -9,8 +9,9 @@ import { CASES, ROOMS } from './conteudo.js';
 const P = new URLSearchParams(location.search);
 const FALSA = P.get('falsa') === '1';
 const ETAPAS = ['choose', 'playing', 'between', 'final', 'result'];
-const EIXOS = ['event', 'alarm', 'figure', 'action'];
-const ROTULO_EIXO = { event: 'Acontecimento', alarm: 'Alarme', figure: 'Figura imóvel', action: 'Prevenção no museu' };
+// As 8 perguntas vêm do game.js (ANSWER_AXES): O quê, Onde, Quando, Como, Por quê, Quem, Previsão e Intervenção.
+const EIXOS = ANSWER_AXES.map((a) => a.key);
+const ROTULO_EIXO = Object.fromEntries(ANSWER_AXES.map((a) => [a.key, a.title]));
 
 let T = null, room = null, players = [], tela = '', movendo = false, relogio = 0, enviou = false;
 const eMestre = () => T?.papel === 'master';
@@ -69,7 +70,7 @@ function desenhar(leve) {
   const e = room.etapa;
   if (!leve && state.loop !== room.volta) state.room = null;
   const fim = fimDaVolta();
-  Object.assign(state, { caseIndex: room.caso, loop: room.volta, phase: e, duration: room.seg, endAt: fim, remaining: e === 'playing' ? restante() : room.seg, answers: euJogador().resp || null });
+  Object.assign(state, { caseRules: 2, liveFinal: true, caseIndex: room.caso, loop: room.volta, phase: e, duration: room.seg, endAt: fim, remaining: e === 'playing' ? restante() : room.seg, answers: euJogador().resp || null });
   save();
   if (!leve) clearInterval(timerHandle);
   if (e === 'choose' || e === 'playing') {
@@ -104,17 +105,18 @@ function marcarEnvio() {
   for (const k of EIXOS) $(k).disabled = mandou;
   $('final').querySelector('.large').textContent = mandou
     ? 'Conclusão enviada. Aguarde: o Mestre revela o resultado para toda a turma.'
-    : 'O que aconteceu? Use as pistas do dossiê e indique como prevenir o acontecimento. Se não souber, deixe em aberto.';
+    : 'O que aconteceu? Use as pistas do dossiê e responda às 8 perguntas. Se não souber, deixe em aberto.';
 }
 
 function blocoTurma() {
-  const c = CASES[room.caso], com = players.filter((p) => p.resp);
+  const com = players.filter((p) => p.resp);
   if (!com.length) return '';
   const linhas = EIXOS.map((k) => {
-    const certos = com.filter((p) => p.resp[k] === c[k]).length;
+    const certos = com.filter((p) => p.resp[k] === truth(k)).length;
     return `<p>${ROTULO_EIXO[k]}: <strong>${certos} de ${com.length}</strong> acertaram</p>`;
   }).join('');
-  return `<div class="result-card"><strong>A turma</strong>${linhas}</div>`;
+  const quebraram = com.filter((p) => p.resp.interv === 'break').length;
+  return `<div class="result-card"><strong>A turma</strong>${linhas}<p>Quebraram o loop: <strong>${quebraram} de ${com.length}</strong></p></div>`;
 }
 
 // ---------------------------------------------------------------- o que o jogo chama
@@ -149,7 +151,9 @@ function tick() {
 async function move(fase, respostas) {
   if (fase !== 'result' || !respostas) return;
   enviou = true; marcarEnvio();
-  const ok = await T.atualizarEu({ resp: respostas, respEm: Date.now() });
+  // Junto com as respostas segue o que a pessoa fez na última volta: quebrou o loop, tentou e errou, ou não agiu.
+  const interv = state.intervention === 'break' ? 'break' : state.intervention ? 'other' : 'none';
+  const ok = await T.atualizarEu({ resp: { ...respostas, interv }, respEm: Date.now() });
   if (!ok) { enviou = false; marcarEnvio(); toast('Não consegui enviar. Tente de novo.'); }
 }
 

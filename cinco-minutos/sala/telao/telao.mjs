@@ -1,12 +1,12 @@
 // Loop (MOSAICO) · telão: só lê a sala e mostra o que a turma inteira pode ver. Nunca mostra pistas.
 import { transporteTelao, transporteFalso, ms } from '../transporte.mjs';
-import { CASES, ROOMS, ANDARES, INICIO } from '../conteudo.js';
+import { CASES, ROOMS, ANDARES, INICIO, EIXOS8, verdade } from '../conteudo.js';
 
 const P = new URLSearchParams(location.search);
 const FALSA = P.get('falsa') === '1';
 const codigo = (P.get('sala') || '').toUpperCase();
 const app = document.getElementById('app');
-const EIXOS = [['event', 'Acontecimento'], ['alarm', 'Alarme'], ['figure', 'Figura imóvel'], ['action', 'Prevenção']];
+const EIXOS = EIXOS8;
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const mmss = (s) => String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(Math.ceil(s % 60) % 60).padStart(2, '0');
 
@@ -74,7 +74,7 @@ function desenhar() {
   } else {
     const c = CASES[room.caso], com = g.filter((p) => p.resp);
     meio = `<div class="tl-card"><p class="tl-volta">O QUE ACONTECEU</p><h1 class="tl-titulo">${esc(c.subject)}</h1><p class="tl-texto">${esc(c.detail)}</p></div>
-      <div class="tl-card"><p class="tl-volta">A TURMA ACERTOU</p><div class="tl-barras">${EIXOS.map(([k, r]) => { const ok = com.filter((p) => p.resp[k] === c[k]).length, pc = com.length ? Math.round(ok / com.length * 100) : 0; return `<div class="tl-barra"><span>${r}</span><div><i style="width:${pc}%"></i></div><span>${ok}/${com.length}</span></div>`; }).join('')}</div></div>`;
+      <div class="tl-card"><p class="tl-volta">A TURMA ACERTOU</p><div class="tl-barras">${EIXOS.map(([k, r]) => { const ok = com.filter((p) => p.resp[k] === verdade(room.caso, k)).length, pc = com.length ? Math.round(ok / com.length * 100) : 0; return `<div class="tl-barra"><span>${r}</span><div><i style="width:${pc}%"></i></div><span>${ok}/${com.length}</span></div>`; }).join('')}${(() => { const q = com.filter((p) => p.resp.interv === 'break').length, pc = com.length ? Math.round(q / com.length * 100) : 0; return `<div class="tl-barra"><span>Quebrou o loop</span><div><i style="width:${pc}%"></i></div><span>${q}/${com.length}</span></div>`; })()}</div></div>`;
   }
   app.innerHTML = `<div class="tl-raiz">${cabeca()}<div class="tl-meio">${meio}</div><div class="tl-rodape">${rod}</div></div>`;
 }

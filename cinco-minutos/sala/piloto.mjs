@@ -16,10 +16,10 @@ export function pilotar(win, { acerto = 0.6 } = {}) {
         if (bs.length && sorte(0.35)) bs[Math.floor(Math.random() * bs.length)].click();
       } else if (e === 'final' && !L.players.find((p) => p.id === L.T.uid)?.resp && sorte(0.3)) {
         const c = CASES[L.room.caso];
-        for (const k of ['event', 'alarm', 'figure', 'action']) {
-          const sel = d.getElementById(k); if (!sel) continue;
+        for (const sel of d.querySelectorAll('#answerFields select')) {
+          const k = sel.id;
           const ops = [...sel.options].filter((o) => o.value);
-          const certa = ops.find((o) => o.value === c?.[k]);
+          const certa = ops.find((o) => o.value === (win.truth ? win.truth(k) : c?.[k]));
           const o = certa && sorte(acerto) ? certa : ops[Math.floor(Math.random() * ops.length)];
           if (o) sel.value = o.value;
         }

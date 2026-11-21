@@ -120,7 +120,7 @@ Esses espaços são candidatos, não uma lista fechada. O mapa definitivo precis
 
 ### Sala de partida, objetivo de sair e peças (decisão de 20/11/2026)
 
-Todas as pessoas começam na mesma sala, o **Saguão superior**, no 2º andar, no começo da partida e a cada retorno do tempo. Dali, cada pessoa escolhe uma das 30 salas do museu (três andares, a mesma planta em cada um, com o Pátio de luz vazado). Quando o tempo acaba, todo mundo volta ao Saguão superior. Um dos objetivos é **sair do museu**: a pessoa descobre o que aconteceu e como sair antes das 22h.
+Todas as pessoas começam na mesma sala, o **Saguão superior**, no 2º andar, no começo da partida e a cada retorno do tempo. Dali, cada pessoa escolhe uma das 30 salas do museu (três andares, a mesma planta em cada um, com o Pátio de luz vazado). Quando o tempo acaba, todo mundo volta ao Saguão superior. O objetivo principal é **responder às 8 perguntas da investigação**. **Sair do museu** continua em aberto e é a última prioridade da lista: ainda não foi decidido se existe, como funciona e se os jogadores ficam sabendo (21/11/2026).
 
 **Porta principal (decisão de 20/11/2026):** a porta de entrada e saída do museu permanece fechada pela grade de segurança durante toda a partida, em todos os loops, para a saída não ser fácil. Isso passa a valer sobre a frase da abertura que fala em saídas de emergência liberadas pelo alarme: o alarme não abre a porta principal. A saída, se existir, será outra rota ou depende de descobrir como destravar a grade; a regra ainda precisa ser desenhada.
 
@@ -130,7 +130,7 @@ Cada sala exibe uma peça 3D (15 do ThreeMuseum, MIT, mais o Triceratops CC0 do 
 
 **Perguntas da investigação:** O quê? (qual acontecimento) · Onde? (em que local) · Quando? (em que momento) · Como? (mecanismo ou sequência) · Por quê? (causas e motivações) · Quem? (pessoas e participação de cada uma) · Previsão (é possível antecipar?) · Intervenção (é possível impedir ou modificar o resultado?). Elas são o núcleo da investigação e valem para qualquer cenário. Não é preciso responder todas para pontuar; a pontuação é por proximidade com o que aconteceu.
 
-**Objetivos do jogador:** investigar (explorar ambientes e recolher evidências), reconstruir (relacionar personagens, locais, horários e acontecimentos), formular hipóteses (mesmo incompletas) e prever e intervir. A eles soma-se **sair do museu**, e a porta principal fica fechada pela grade de segurança.
+**Objetivos do jogador:** investigar (explorar ambientes e recolher evidências), reconstruir (relacionar personagens, locais, horários e acontecimentos), formular hipóteses (mesmo incompletas) e prever e intervir. A porta principal fica fechada pela grade de segurança. Sair do museu não é prioridade: fica como a última opção da lista, a definir depois (21/11/2026). Uma ideia em aberto é tratá-la como consequência do que a pessoa descobre, sem anunciar como objetivo.
 
 **Tipos de informação:** Observação (o que a pessoa presenciou), Relato (o que um personagem informou), Registro (o que veio de documentos) e Hipótese (interpretação da própria pessoa). No jogo, cada pista do dossiê mostra se é Observação, Relato ou Registro.
 
@@ -179,6 +179,16 @@ Cada participante apresenta suas respostas. A mesma realidade de partida fornece
 | **Total** | **100** | Distribuição provisória, a calibrar por testes. |
 
 Para cada variante, os campos e o crédito parcial precisam ser documentados; se um eixo não se aplicar, seus pontos serão redistribuídos previamente e comunicados. Pontuação por antecipação e custo de ajudas são propostas em aberto; não se somam a esta tabela até existir regra definida. O resultado destaca acertos, hipóteses plausíveis e limitações do que foi observado. A revelação mostra a sequência original, as fontes e as consequências da intervenção.
+
+### Atualização de 21/11/2026: as 8 perguntas, pistas encadeadas e intervenção por dedução
+
+**Formulário final (jogo individual).** Passa a ter as 8 perguntas do projeto original, em vez de 4. Pontuação por proximidade, 100 pontos: O quê (15) · Onde (10) · Quando (10) · Como (15) · Por quê, o que disparou o alarme (10) · Quem (15) · Previsão (10) · Intervenção, o procedimento que ajudaria a equipe (15). "Onde" vale metade se a pessoa acertar o andar; "Quando" vale metade se a janela abrir no mesmo horário da certa. "Ainda não sei" vale 0. O arquivo de fechamento continua com até 2 trechos, agora um para cada pergunta.
+
+**Pistas encadeadas.** O procedimento de encerramento (na sala-fonte de cada caminho) cita só o **código do equipamento** (P-7 painel da demonstração, A-3 painel da alimentação, M-2 mesa de produção, R-5 leitor de referência) e a janela de horário. Onde cada código fica só aparece em dois diretórios de equipamentos, um na Sala dos habitats e outro no Pátio de luz. Para agir, a pessoa precisa cruzar: o código (procedimento) + o lugar (diretório) + o horário (janela). Cada fato essencial tem pelo menos duas fontes: o equipamento e a janela vêm do procedimento e da observação no próprio equipamento; o lugar vem de dois diretórios.
+
+**Intervenção por dedução.** Na 5ª volta, as quatro salas de equipamento (Galeria do tempo, Laboratório de formas, Auditório, Ateliê) mostram um painel com 3 comandos: o do equipamento, um comando-isca e o reinício genérico, em ordem que muda a cada partida. A pessoa tem **uma única tentativa**, sem aviso de janela: precisa saber o equipamento certo, o comando certo e o horário (o relógio do museu aparece no painel). O resultado explica o motivo da falha: equipamento sem ligação com o retorno, fora da janela, comando-isca ou reinício. Na sala do Mestre vale a mesma regra, **uma tentativa por pessoa**, cada uma no próprio celular (a investigação é individual). O resumo da turma mostra quantas pessoas quebraram o loop, e o telão mostra a barra "Quebrou o loop". O modo em grupo antigo (coop.mjs) ainda trata a ação como hipótese.
+
+**Saída do museu: a definir, última prioridade (21/11/2026).** O objetivo principal é responder às 8 perguntas. Ainda não foi decidido se há saída, como ela funciona nem se os jogadores precisam saber; uma ideia é que seja só consequência. Nada foi implementado e o texto do jogo não promete saída. Opções já levantadas: a grade abre quando o comando certo é executado a tempo; um código da grade espalhado nas pistas; ou uma saída de serviço.
 
 ## 11. Intervenção e finais
 
