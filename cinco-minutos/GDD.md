@@ -126,6 +126,16 @@ Todas as pessoas começam na mesma sala, o **Saguão superior**, no 2º andar, n
 
 Cada sala exibe uma peça 3D (30 modelos do ThreeMuseum, MIT, mais o Triceratops CC0 do Smithsonian, otimizados em `museu/pecas/`). As pistas ficam **escondidas na peça**, em pontos que a pessoa precisa achar girando e tocando; os pontos só aparecem no horário em que a pista fica disponível. Onze salas guardam peças-chave da história; as outras 19 trazem pistas de rotina e ecos verdadeiros do caso.
 
+### Perguntas centrais, objetivos e tipos de informação (recuperado em 20/11/2026)
+
+**Perguntas da investigação:** O quê? (qual acontecimento) · Onde? (em que local) · Quando? (em que momento) · Como? (mecanismo ou sequência) · Por quê? (causas e motivações) · Quem? (pessoas e participação de cada uma) · Previsão (é possível antecipar?) · Intervenção (é possível impedir ou modificar o resultado?). Elas são o núcleo da investigação e valem para qualquer cenário. Não é preciso responder todas para pontuar; a pontuação é por proximidade com o que aconteceu.
+
+**Objetivos do jogador:** investigar (explorar ambientes e recolher evidências), reconstruir (relacionar personagens, locais, horários e acontecimentos), formular hipóteses (mesmo incompletas) e prever e intervir. A eles soma-se **sair do museu**, e a porta principal fica fechada pela grade de segurança.
+
+**Tipos de informação:** Observação (o que a pessoa presenciou), Relato (o que um personagem informou), Registro (o que veio de documentos) e Hipótese (interpretação da própria pessoa). No jogo, cada pista do dossiê mostra se é Observação, Relato ou Registro.
+
+**Densidade de pistas (decisão de 20/11/2026):** cada peça de museu esconde vários detalhes, não só uma pista. As 19 salas de ambiente têm 6 pontos: 3 de rotina que não ajudam a resolver, e 3 verdadeiros (o ambiente e dois ecos de eixos diferentes do caso). As salas-chave têm de 2 a 4 pontos. A pessoa escolhe só uma sala por loop e não troca de sala dentro da volta, para não complicar.
+
 ### Acesso ao local do acontecimento
 
 Pode haver um espaço inacessível durante a investigação, mas isso deve decorrer das regras do cenário e não revelar automaticamente onde ocorreu o fato. Se o jogador estiver em posição de ver ou ouvir um acontecimento, a interface deve mostrá-lo ou representá-lo de modo coerente. A revelação final pode mostrar perspectivas não acessadas, sem introduzir uma prova essencial que não pudesse ser inferida antes.

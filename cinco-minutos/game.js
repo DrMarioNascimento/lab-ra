@@ -187,12 +187,32 @@ function makeClues(c){
   ['Ouvir o relato da ronda','Um relato da ronda indica uma figura imóvel em '+room+'.'],
   ['Ler o recado da equipe','Um recado da equipe sugere: '+ACTIONS[c.action]]
  ];
+ const ROTINA=[
+  ['Observar a etiqueta de horário','Uma etiqueta de acervo marca o horário de fechamento da ala: 22h.'],
+  ['Observar o carrinho de limpeza','Há um carrinho de limpeza encostado perto da porta.'],
+  ['Ler o livro de visitas','O livro de visitas da sala tem poucas assinaturas hoje.'],
+  ['Ouvir a equipe de limpeza','Uma pessoa da limpeza conta que passou aqui às 21h30 e tudo estava em ordem.'],
+  ['Observar a luz de emergência','Uma lâmpada de emergência fica de prontidão acima da porta.'],
+  ['Ler a planilha de umidade','A planilha de umidade da sala mostra números normais.'],
+  ['Observar o piso','O piso foi encerado hoje e ainda tem cheiro de cera.'],
+  ['Ouvir um guia','Um guia comenta que o grupo da tarde gostou muito desta sala.'],
+  ['Observar a faixa de segurança','Há uma faixa de segurança pintada no chão, junto ao corrimão.'],
+  ['Ler o aviso da parede','O aviso na parede lembra que a grade da porta principal desce depois do fechamento.'],
+  ['Conferir o extintor','O extintor foi conferido na semana passada; a etiqueta está em dia.'],
+  ['Ler a ordem de serviço','Uma ordem de serviço pede para trocar uma lâmpada da sala. Nada urgente.']
+ ];
  EXTRA_ORDEM.forEach((id,k)=>{
-  const [nome,texto]=ecos[k%4];
+  const [nome,texto]=ecos[k%4], [nome2,texto2]=ecos[(k+2)%4];
+  const r=j=>ROTINA[(k*5+j*4)%ROTINA.length];
   base[id]=[
    {id:id+'-0',name:'Observar o ambiente',time:0,text:EXTRAS[id]},
-   {id:id+'-1',name:nome,time:60+(k%3)*45,text:texto}];
+   {id:id+'-r0',name:r(0)[0],time:25,text:r(0)[1]},
+   {id:id+'-1',name:nome,time:60+(k%3)*45,text:texto},
+   {id:id+'-r1',name:r(1)[0],time:110,text:r(1)[1]},
+   {id:id+'-2',name:nome2,time:150+(k%3)*30,text:texto2},
+   {id:id+'-r2',name:r(2)[0],time:200,text:r(2)[1]}];
  });
+ Object.values(base).forEach(list=>list.forEach(cl=>{cl.tipo=/^(Ouvir|Conversar|Perguntar)/.test(cl.name)?'Relato':/^(Ler|Consultar|Examinar o registro|Examinar a ficha|Conferir a ficha|Conferir o registro|Comparar)/.test(cl.name)?'Registro':'Observação';}));
  return base;
 }
 const TIME_PATHS = {
@@ -410,11 +430,11 @@ function applyIntervention(command){
 function brokeLoop(){
  return state.intervention === 'break' || state.intervention === 'suspender';
 }
-function collect(id){if(state.phase!=='playing'||(window.coop?.now() ?? Date.now())>=state.endAt){tick();return}const q=scenarioClues()[state.room].find(x=>x.id===id);if(!q||state.clues.some(x=>x.id===id)||state.duration-(state.endAt-(window.coop?.now() ?? Date.now()))/1000<q.time/300*state.duration)return;const room=ROOMS.find(x=>x.id===state.room);state.clues.push({id:q.id,room:room.name,name:q.name,text:q.text,loop:state.loop});save();renderClues();renderJournal();toast('Pista guardada no caderno')}
+function collect(id){if(state.phase!=='playing'||(window.coop?.now() ?? Date.now())>=state.endAt){tick();return}const q=scenarioClues()[state.room].find(x=>x.id===id);if(!q||state.clues.some(x=>x.id===id)||state.duration-(state.endAt-(window.coop?.now() ?? Date.now()))/1000<q.time/300*state.duration)return;const room=ROOMS.find(x=>x.id===state.room);state.clues.push({id:q.id,room:room.name,name:q.name,text:q.text,tipo:q.tipo,loop:state.loop});save();renderClues();renderJournal();toast('Pista guardada no caderno')}
 function renderJournal(){
  const clues=state.clues||[];$('countBadge').textContent=clues.length;
  $('journalPreview').innerHTML=clues.length?clues.slice(-3).reverse().map(c=>'<div class="preview-item">'+esc(c.name)+' <br><small>'+esc(c.room)+'</small></div>').join(''):'<p class="muted">Suas descobertas aparecerão aqui.</p>';
- $('journalList').innerHTML=clues.length?clues.map(c=>'<article class="journal-item"><b>'+esc(c.room)+' · Loop '+c.loop+'</b><p><strong>'+esc(c.name)+':</strong> '+esc(c.text)+'</p></article>').join(''):'<p class="muted">Você ainda não registrou pistas.</p>';
+ $('journalList').innerHTML=clues.length?clues.map(c=>'<article class="journal-item"><b>'+esc(c.room)+' · Loop '+c.loop+(c.tipo?' · '+esc(c.tipo):'')+'</b><p><strong>'+esc(c.name)+':</strong> '+esc(c.text)+'</p></article>').join(''):'<p class="muted">Você ainda não registrou pistas.</p>';
  if (!window.coop && state.archive?.length) {
   $('journalList').insertAdjacentHTML('beforeend', state.archive.map(key => {
    const axis = ANSWER_AXES.find(item=>item.key===key);
