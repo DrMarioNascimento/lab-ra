@@ -1,38 +1,39 @@
 // Conteúdo do Loop (cópia própria de ../game.js, só os dados e a montagem das pistas).
 // Usado pelo telão e pelo simulador. Se o conteúdo mudar em game.js, gere este arquivo de novo (sala/gerar-conteudo.sh).
 const ANDARES = ['2º andar', '1º andar', 'Térreo'];
+// Todos começam (e recomeçam a cada volta) no Saguão superior, no 2º andar; dali escolhem para onde ir.
+const INICIO = {id:'saguao', name:'Saguão superior', andar:'2º andar', icon:'✦', sub:'Todo mundo começa aqui'};
 const ROOMS = [
-  {id:'terraco', name:'Terraço', andar:'2º andar', icon:'✦', sub:'Vista para a cidade'},
-  {id:'instrumentos', name:'Sala dos instrumentos', andar:'2º andar', icon:'♪', sub:'Instrumentos antigos'},
-  {id:'mascaras', name:'Sala das máscaras', andar:'2º andar', icon:'◍', sub:'Máscaras e fantasias'},
-  {id:'som', name:'Ateliê de som', andar:'2º andar', icon:'◎', sub:'Gravações e áudio'},
-  {id:'educativo', name:'Sala do educativo', andar:'2º andar', icon:'❖', sub:'Oficinas e visitas escolares'},
-  {id:'luzes', name:'Galeria das luzes', andar:'2º andar', icon:'◐', sub:'Lâmpadas e vidros'},
-  {id:'controle', name:'Sala de controle', andar:'2º andar', icon:'⌘', sub:'Câmeras e iluminação'},
-  {id:'cofre', name:'Cofre do acervo', andar:'2º andar', icon:'▣', sub:'Peças guardadas'},
-  {id:'galeria', name:'Galeria especial', andar:'2º andar', icon:'▧', sub:'Obras e vitrines'},
-  {id:'auditorio', name:'Auditório', andar:'2º andar', icon:'▱', sub:'Programa e bastidores'},
-  {id:'mezanino', name:'Mezanino', andar:'1º andar', icon:'◫', sub:'Vista para o térreo'},
-  {id:'fosseis', name:'Sala dos fósseis', andar:'1º andar', icon:'◈', sub:'Fósseis e moldes'},
-  {id:'minerais', name:'Sala dos minerais', andar:'1º andar', icon:'⬡', sub:'Pedras e cristais'},
-  {id:'restauro', name:'Oficina de restauro', andar:'1º andar', icon:'✚', sub:'Ferramentas e tintas'},
-  {id:'leitura', name:'Sala de leitura', andar:'1º andar', icon:'☗', sub:'Livros e catálogos'},
-  {id:'prototipo', name:'Galeria do tempo', andar:'1º andar', icon:'◷', sub:'Protótipo e retorno'},
-  {id:'eletrica', name:'Laboratório de formas', andar:'1º andar', icon:'⌁', sub:'Energia e equipamentos'},
-  {id:'deposito', name:'Sala das coleções', andar:'1º andar', icon:'▤', sub:'Inventário e movimentações'},
-  {id:'arte', name:'Galeria de arte', andar:'1º andar', icon:'▨', sub:'Quadros e esculturas'},
-  {id:'reunioes', name:'Sala de reuniões', andar:'1º andar', icon:'▦', sub:'Mesa e quadro de avisos'},
-  {id:'recepcao', name:'Recepção', andar:'Térreo', icon:'♧', sub:'Chegadas e convidados'},
-  {id:'conservacao', name:'Sala dos espécimes', andar:'Térreo', icon:'◇', sub:'Acervo e registros'},
-  {id:'seguranca', name:'Sala dos habitats', andar:'Térreo', icon:'◉', sub:'Alarmes e ocorrências'},
-  {id:'atelie', name:'Ateliê de descobertas', andar:'Térreo', icon:'✧', sub:'Ensaio e registros técnicos'},
-  {id:'corredor', name:'Área de descanso', andar:'Térreo', icon:'▥', sub:'Recados e caixas da equipe'},
-  {id:'loja', name:'Loja do museu', andar:'Térreo', icon:'♢', sub:'Catálogos e lembranças'},
-  {id:'cafe', name:'Café', andar:'Térreo', icon:'◌', sub:'Mesas e balcão'},
-  {id:'atend', name:'Sala de atendimento', andar:'Térreo', icon:'◑', sub:'Informações ao público'},
-  {id:'patio', name:'Pátio de luz', andar:'Térreo', icon:'☼', sub:'Vista para a circulação'},
-  {id:'insetos', name:'Sala dos insetos', andar:'Térreo', icon:'✿', sub:'Coleção de insetos'},
-  {id:'video', name:'Sala de vídeo', andar:'Térreo', icon:'◰', sub:'Filmes sobre o museu'}
+  {id:'gigantes', name:'Sala dos gigantes', andar:'2º andar', icon:'◈', sub:'Esqueleto de pescoço longo', peca:'D01'},
+  {id:'predadores', name:'Sala dos predadores', andar:'2º andar', icon:'◍', sub:'Dentes e garras', peca:'D02'},
+  {id:'defesas', name:'Sala das defesas', andar:'2º andar', icon:'▣', sub:'Couraças e chifres', peca:'D03'},
+  {id:'pequenos', name:'Sala dos pequenos', andar:'2º andar', icon:'❖', sub:'Pequeno, mas cheio de história', peca:'D04'},
+  {id:'pegadas', name:'Sala das pegadas', andar:'2º andar', icon:'◐', sub:'Pegadas como prova', peca:'D05'},
+  {id:'dentes', name:'Sala dos dentes', andar:'2º andar', icon:'⌘', sub:'Dentes que contam história', peca:'D06'},
+  {id:'mamiferos', name:'Sala dos mamíferos', andar:'2º andar', icon:'▤', sub:'Depois dos dinossauros', peca:'D07'},
+  {id:'galeria', name:'Galeria especial', andar:'2º andar', icon:'▧', sub:'Obras e vitrines', peca:'F01'},
+  {id:'auditorio', name:'Auditório', andar:'2º andar', icon:'▱', sub:'Programa e bastidores', peca:'C01'},
+  {id:'asas', name:'Mezanino das asas', andar:'1º andar', icon:'✦', sub:'Outro jeito de voar', peca:'D08'},
+  {id:'fosseis', name:'Sala dos fósseis', andar:'1º andar', icon:'◇', sub:'Provas na rocha', peca:'F02'},
+  {id:'recordistas', name:'Sala dos recordistas', andar:'1º andar', icon:'⬡', sub:'Os maiores e os mais rápidos', peca:'B03'},
+  {id:'mandibulas', name:'Sala das mandíbulas', andar:'1º andar', icon:'✚', sub:'Ferramentas para comer', peca:'B10'},
+  {id:'transformacoes', name:'Sala das transformações', andar:'1º andar', icon:'☗', sub:'De lagarta a borboleta', peca:'B11'},
+  {id:'prototipo', name:'Galeria do tempo', andar:'1º andar', icon:'◷', sub:'Protótipo e retorno', peca:'D09'},
+  {id:'eletrica', name:'Laboratório de formas', andar:'1º andar', icon:'⌁', sub:'Energia e equipamentos', peca:'B09'},
+  {id:'deposito', name:'Sala das coleções', andar:'1º andar', icon:'▤', sub:'Inventário e movimentações', peca:'B02'},
+  {id:'polinizadores', name:'Sala dos polinizadores', andar:'1º andar', icon:'▨', sub:'Pequenos e essenciais', peca:'B12'},
+  {id:'oitopernas', name:'Sala das oito pernas', andar:'1º andar', icon:'▦', sub:'Além das seis pernas', peca:'B13'},
+  {id:'recepcao', name:'Recepção', andar:'Térreo', icon:'♧', sub:'Chegadas e convidados', peca:'B01'},
+  {id:'conservacao', name:'Sala dos espécimes', andar:'Térreo', icon:'◇', sub:'Acervo e registros', peca:'B04'},
+  {id:'seguranca', name:'Sala dos habitats', andar:'Térreo', icon:'◉', sub:'Alarmes e ocorrências', peca:'B07'},
+  {id:'atelie', name:'Ateliê de descobertas', andar:'Térreo', icon:'✧', sub:'Ensaio e registros técnicos', peca:'L01'},
+  {id:'corredor', name:'Área de descanso', andar:'Térreo', icon:'▥', sub:'Recados e caixas da equipe', peca:'L02'},
+  {id:'cacador', name:'Sala do caçador paciente', andar:'Térreo', icon:'♢', sub:'Tocaia e paciência', peca:'B06'},
+  {id:'recicladores', name:'Sala dos recicladores', andar:'Térreo', icon:'◌', sub:'Quem recicla a natureza', peca:'B08'},
+  {id:'vitrines', name:'Sala das vitrines', andar:'Térreo', icon:'◑', sub:'Atrás do vidro', peca:'B14'},
+  {id:'patio', name:'Pátio de luz', andar:'Térreo', icon:'☼', sub:'Vista para a circulação', peca:'B05'},
+  {id:'vizinhos', name:'Sala dos vizinhos', andar:'Térreo', icon:'✿', sub:'Bichos do quintal', peca:'B15'},
+  {id:'seda', name:'Sala da seda', andar:'Térreo', icon:'◰', sub:'Arquitetura de seda', peca:'B16'}
 ];
 const EVENTS = {
   proteger:'Uma peça foi retirada para proteção.',
@@ -105,26 +106,25 @@ const extraDescriptions = {
 Object.assign(roomDescriptions, extraDescriptions);
 
 const EXTRAS = {
-  terraco:"O terraço está vazio e as portas para o salão estão trancadas por dentro. O vento mexe numa faixa da exposição.",
-  instrumentos:"Instrumentos antigos repousam nas vitrines. Nenhum parece ter sido movido desde a última limpeza.",
-  mascaras:"As máscaras estão alinhadas na parede, cada uma com a sua etiqueta. Uma etiqueta está um pouco torta.",
-  som:"Fones e gravadores esperam sobre a bancada. A mesa de som está desligada.",
-  educativo:"Cadeiras pequenas e cartazes de oficina enchem a sala. Uma lousa guarda a lista da última visita escolar.",
-  luzes:"A galeria mostra lâmpadas antigas. Quando o apagão vem, todas apagam juntas.",
-  controle:"Os monitores da sala de controle mostram corredores vazios. Um deles está sem sinal desde a tarde.",
-  cofre:"O cofre está fechado com dois lacres, e os lacres estão inteiros.",
-  mezanino:"Do mezanino se vê a recepção lá embaixo. As luzes de emergência ainda não acenderam.",
-  fosseis:"Os fósseis estão nas bases de sempre. Uma criança deixou um desenho esquecido no chão.",
-  minerais:"Cristais brilham sob a luz fraca da vitrine. A trava da vitrine está no lugar.",
-  restauro:"Pincéis e potes de tinta estão lavados e secando. A oficina fechou no horário.",
-  leitura:"Livros e catálogos estão empilhados na mesa. Um deles está aberto numa página qualquer.",
-  arte:"Quadros e esculturas aguardam o fechamento. Um quadro foi trocado de lugar na semana passada.",
-  reunioes:"A mesa de reuniões tem copos usados. O quadro de avisos lembra o horário de fechamento.",
-  loja:"As lembranças estão arrumadas nas prateleiras. O caixa já foi fechado.",
-  cafe:"As cadeiras do café estão sobre as mesas. O balcão cheira a café recém-lavado.",
-  atend:"O balcão de informações tem um mapa do museu e uma pilha de folhetos.",
-  insetos:"Caixas com insetos estão ordenadas por tamanho. Uma caixa está sem tampa.",
-  video:"A tela da sala de vídeo está apagada. O projetor ainda está quente."
+  gigantes:"Um esqueleto de pescoço comprido ocupa a sala inteira. As luzes do teto o deixam ainda maior.",
+  predadores:"Um predador montado em movimento domina a sala. A placa fala de dentes, garras e corrida.",
+  defesas:"Um dinossauro de couraça e espinhos guarda a sala. A placa explica como ele se defendia.",
+  pequenos:"Um dinossauro pequeno repousa numa base baixa. Crianças deixaram desenhos pregados na parede.",
+  pegadas:"Pegadas antigas estão marcadas no chão da sala. A placa diz que elas contam como o bicho andava.",
+  dentes:"Dentes de vários tamanhos estão alinhados numa vitrine. Cada um tem uma etiqueta pequena.",
+  mamiferos:"Esqueletos de mamíferos antigos ocupam a sala. A placa fala do que veio depois dos dinossauros.",
+  asas:"Do mezanino se vê uma criatura de asas presa ao teto. As luzes de emergência ainda não acenderam.",
+  fosseis:"Fósseis em placas de rocha estão nas bases de sempre. Uma criança deixou um desenho esquecido no chão.",
+  recordistas:"Os bichos recordistas aparecem em fileira, com a medida de cada um na placa.",
+  mandibulas:"Peças ampliadas mostram bocas de insetos. A sala fechou no horário.",
+  transformacoes:"Uma vitrine mostra cada fase da vida de um inseto. Uma etiqueta está um pouco torta.",
+  polinizadores:"Abelhas e outros polinizadores estão em vitrines baixas. Uma flor de pano enfeita a entrada.",
+  oitopernas:"Aranhas e parentes estão atrás do vidro. A placa lembra que elas não são insetos.",
+  cacador:"Um caçador de emboscada fica imóvel num galho. A placa fala de paciência.",
+  recicladores:"Besouros e vermes recicladores trabalham numa vitrine de terra. Cheira a terra úmida.",
+  vitrines:"Vitrines altas guardam pequenas coleções. Os vidros foram limpos hoje.",
+  vizinhos:"Os bichos do quintal aparecem em tamanho grande. Uma caixa está sem tampa.",
+  seda:"Teias gigantes de seda enfeitam o teto. A luz passa entre os fios."
 };
 const EXTRA_ORDEM = Object.keys(EXTRAS);
 Object.keys(EXTRAS).forEach(k => { roomDescriptions[k] = EXTRAS[k]; });
@@ -189,4 +189,4 @@ function makeClues(c){
  });
  return base;
 }
-export { ANDARES, ROOMS, EVENTS, ALARMS, FIGURES, ACTIONS, CASES, labels, figures, makeClues, esc };
+export { ANDARES, INICIO, ROOMS, EVENTS, ALARMS, FIGURES, ACTIONS, CASES, labels, figures, makeClues, esc };

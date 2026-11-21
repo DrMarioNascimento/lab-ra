@@ -118,6 +118,12 @@ No primeiro teste, o deslocamento até o ambiente escolhido pode ser representad
 
 Esses espaços são candidatos, não uma lista fechada. O mapa definitivo precisará especificar conexões, rotas, distâncias, horários, o que é visto e ouvido, acessibilidade e disponibilidade de pistas.
 
+### Sala de partida, objetivo de sair e peças (decisão de 20/11/2026)
+
+Todas as pessoas começam na mesma sala, o **Saguão superior**, no 2º andar, no começo da partida e a cada retorno do tempo. Dali, cada pessoa escolhe uma das 30 salas do museu (três andares, a mesma planta em cada um, com o Pátio de luz vazado). Quando o tempo acaba, todo mundo volta ao Saguão superior. Um dos objetivos é **sair do museu**: a pessoa descobre o que aconteceu e como sair antes das 22h.
+
+Cada sala exibe uma peça 3D (30 modelos do ThreeMuseum, MIT, mais o Triceratops CC0 do Smithsonian, otimizados em `museu/pecas/`). As pistas ficam **escondidas na peça**, em pontos que a pessoa precisa achar girando e tocando; os pontos só aparecem no horário em que a pista fica disponível. Onze salas guardam peças-chave da história; as outras 19 trazem pistas de rotina e ecos verdadeiros do caso.
+
 ### Acesso ao local do acontecimento
 
 Pode haver um espaço inacessível durante a investigação, mas isso deve decorrer das regras do cenário e não revelar automaticamente onde ocorreu o fato. Se o jogador estiver em posição de ver ou ouvir um acontecimento, a interface deve mostrá-lo ou representá-lo de modo coerente. A revelação final pode mostrar perspectivas não acessadas, sem introduzir uma prova essencial que não pudesse ser inferida antes.

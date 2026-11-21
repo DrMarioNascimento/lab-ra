@@ -30,3 +30,17 @@
 .archive-item button{margin-top:.25rem}
 
 .andar{grid-column:1/-1;margin:6px 0 0;font:700 .75rem system-ui,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#e7b975}
+
+.inicio{grid-column:1/-1;display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid #e7b97566;border-radius:12px;background:linear-gradient(145deg,#33432f,#1a2a1f);box-shadow:inset 0 1px #ffffff1a,0 4px 0 #09121a}
+.inicio .room-icon{font-size:1.5rem;color:#e7b975}.inicio strong{display:block;color:#f0ece3}.inicio small{color:#c8d3c2}
+.peca{position:relative;margin:12px 0;border:1px solid #b89f724a;border-radius:14px;background:radial-gradient(circle at 50% 35%,#24394a,#0c1621 70%);overflow:hidden}
+.peca model-viewer{display:block;width:100%;height:min(46vh,340px);--poster-color:transparent;background:transparent}
+.dica{margin:.2rem 0 .8rem;color:var(--muted);font-size:.92rem}
+.lista-pistas{margin:.4rem 0}.lista-pistas summary{cursor:pointer;color:var(--muted);padding:10px 0;min-height:44px}
+.hs{position:relative;width:26px;height:26px;padding:0;border-radius:50%;border:2px solid #fff9;background:radial-gradient(circle at 35% 30%,#fff3c9,#e7b975 45%,#b8761a);box-shadow:0 0 0 0 #f5d28aaa,0 3px 0 #5a3a0c;opacity:0;pointer-events:none;transition:opacity .3s,transform .15s;animation:hspulso 1.7s infinite;cursor:pointer}
+.hs::after{content:"";position:absolute;inset:-12px}
+.hs.on[data-visible]{opacity:1;pointer-events:auto}
+.hs.on[data-visible]:active{transform:translateY(2px)}
+.hs.ok{background:radial-gradient(circle at 35% 30%,#d1fae5,#34d399 50%,#0f7a55);animation:none;box-shadow:0 3px 0 #0a3d2b}
+@keyframes hspulso{0%{box-shadow:0 0 0 0 #f5d28acc,0 3px 0 #5a3a0c}70%{box-shadow:0 0 0 14px #f5d28a00,0 3px 0 #5a3a0c}100%{box-shadow:0 0 0 0 #f5d28a00,0 3px 0 #5a3a0c}}
+@media (prefers-reduced-motion:reduce){.hs{animation:none}}

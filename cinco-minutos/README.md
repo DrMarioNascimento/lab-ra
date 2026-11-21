@@ -4,7 +4,7 @@ Bancada do LAB-RA com cinco voltas, 15 variações de um mistério, pistas tempo
 
 O ritmo completo percorre cinco voltas de cinco minutos (25 minutos de relógio), além das escolhas, pausas e conclusão. O ensaio reduz cada volta a 30 segundos e aceita encerramento antecipado. Na conclusão individual, o arquivo permite consultar até dois trechos incompletos. Cada resposta correta vale 25 pontos, e o rascunho e os trechos consultados persistem após recarregar.
 
-A [maquete](museu/) apresenta 31 ambientes e sete peças do ThreeMuseum adaptadas sob licença MIT. A visualização em 3D e RA abre separadamente do jogo. O mapa jogável tem 31 ambientes em três andares (térreo, 1º e 2º), os mesmos espaços da maquete, onde cada andar repete a planta. Onze deles guardam as peças da história e os outros 20 trazem pistas de rotina e ecos verdadeiros do caso, para criar dúvida sobre onde investigar.
+A [maquete](museu/) apresenta 31 ambientes e sete peças do ThreeMuseum adaptadas sob licença MIT. A visualização em 3D e RA abre separadamente do jogo. Todo mundo começa no Saguão superior (2º andar) e escolhe uma das 30 salas, cada uma com uma peça 3D onde as pistas ficam escondidas. O mapa jogável tem 31 ambientes em três andares (térreo, 1º e 2º), os mesmos espaços da maquete, onde cada andar repete a planta. Onze deles guardam as peças da história e os outros 20 trazem pistas de rotina e ecos verdadeiros do caso, para criar dúvida sobre onde investigar.
 
 ## Modo cooperativo
 

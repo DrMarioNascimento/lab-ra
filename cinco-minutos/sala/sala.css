@@ -96,8 +96,9 @@ body.sim { margin: 0; }
 .turma-lista li.fora { opacity: .6; }
 
 .tl-mapa { grid-template-columns: repeat(6, 1fr); gap: .6vw; }
-.tl-mapa .tl-sala { min-height: 6.5vh; padding: .8vh .6vw; }
+.tl-mapa .tl-sala { min-height: 5.4vh; padding: .8vh .6vw; }
 .tl-mapa .tl-sala b { font-size: clamp(.6rem, 1vw, .95rem); }
 .tl-mapa .tl-sala i { font-size: clamp(.8rem, 1.3vw, 1.2rem); }
 .tl-mapa .tl-andar { margin: .3vh 0 0; }
 .tl-mapa .tl-sala em { top: .3vh; right: .3vw; min-width: 1.5em; padding: 0 .35em; font-size: clamp(.7rem, 1.1vw, 1rem); }
+.tl-sala.inicio { border-color: #e7b97566; background: linear-gradient(145deg, #33432f, #1a2a1f); }
