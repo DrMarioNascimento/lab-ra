@@ -122,6 +122,8 @@ Esses espaços são candidatos, não uma lista fechada. O mapa definitivo precis
 
 Todas as pessoas começam na mesma sala, o **Saguão superior**, no 2º andar, no começo da partida e a cada retorno do tempo. Dali, cada pessoa escolhe uma das 30 salas do museu (três andares, a mesma planta em cada um, com o Pátio de luz vazado). Quando o tempo acaba, todo mundo volta ao Saguão superior. Um dos objetivos é **sair do museu**: a pessoa descobre o que aconteceu e como sair antes das 22h.
 
+**Porta principal (decisão de 20/11/2026):** a porta de entrada e saída do museu permanece fechada pela grade de segurança durante toda a partida, em todos os loops, para a saída não ser fácil. Isso passa a valer sobre a frase da abertura que fala em saídas de emergência liberadas pelo alarme: o alarme não abre a porta principal. A saída, se existir, será outra rota ou depende de descobrir como destravar a grade; a regra ainda precisa ser desenhada.
+
 Cada sala exibe uma peça 3D (30 modelos do ThreeMuseum, MIT, mais o Triceratops CC0 do Smithsonian, otimizados em `museu/pecas/`). As pistas ficam **escondidas na peça**, em pontos que a pessoa precisa achar girando e tocando; os pontos só aparecem no horário em que a pista fica disponível. Onze salas guardam peças-chave da história; as outras 19 trazem pistas de rotina e ecos verdadeiros do caso.
 
 ### Acesso ao local do acontecimento
