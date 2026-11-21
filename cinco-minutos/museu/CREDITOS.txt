@@ -38,3 +38,10 @@ PEÇAS DAS SALAS (pasta pecas/)
 Os 30 modelos de exposição do ThreeMuseum (D01-D09, B01-B16, F02, L01, L02, C01) são MIT (Copyright (c) 2026 ThreeMuseum contributors).
 F01 (Triceratops): Smithsonian Institution, CC0 1.0 (https://3d.si.edu/object/3d/triceratops-horridus-marsh-1889:d8c623be-4ebc-11ea-b77f-2e728ce88125).
 Modificações: simplificação da malha e compressão (Draco e WebP) com glTF-Transform, para carregar no celular. Reconstruções interpretativas, sem valor de escala científica.
+
+
+PEÇAS VARIADAS (desde 20/11/2026) - Khronos glTF-Sample-Assets (https://github.com/KhronosGroup/glTF-Sample-Assets)
+N01 Xícara (DiffuseTransmissionTeacup), N05 Câmera antiga (AntiqueCamera, UX3D), N07 Rádio (BoomBox), N08 Garrafa (WaterBottle), N09 Carrinho (ToyCar), N10 Lanterna (Lantern, Microsoft), N12 Peixe (BarramundiFish), N13 Crânio (ScatteringSkull): CC0 1.0.
+N02 Cadeira (ChairDamaskPurplegold, Wayfair), N04 Capacete (DamagedHelmet, ctxwing), N06 Porta-velas de vidro (GlassHurricaneCandleHolder, Wayfair), N11 Mosquito no âmbar (MosquitoInAmber, Loïc Norgeot e Geoffrey Marchal), N14 Caminhão de leite (CesiumMilkTruck, Cesium), N15 Xadrez (ABeautifulGame, ASWF/MaterialX): CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/).
+N03 Relógio (ChronographWatch): baseado em "Chronograph Watch Mudmaster" de graphiccompressor (Sketchfab), CC BY 4.0.
+Modificações: simplificação da malha e compressão (Draco e WebP) com glTF-Transform. As peças D03, D04, D05, D06, D07, B03, B06, B08, B10, B11, B12, B13, B14, B15 e B16 do ThreeMuseum foram trocadas por estas e guardadas em pecas/_SUBSTITUIDO_2026-11-20/.

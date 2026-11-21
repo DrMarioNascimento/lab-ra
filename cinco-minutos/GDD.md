@@ -124,7 +124,7 @@ Todas as pessoas começam na mesma sala, o **Saguão superior**, no 2º andar, n
 
 **Porta principal (decisão de 20/11/2026):** a porta de entrada e saída do museu permanece fechada pela grade de segurança durante toda a partida, em todos os loops, para a saída não ser fácil. Isso passa a valer sobre a frase da abertura que fala em saídas de emergência liberadas pelo alarme: o alarme não abre a porta principal. A saída, se existir, será outra rota ou depende de descobrir como destravar a grade; a regra ainda precisa ser desenhada.
 
-Cada sala exibe uma peça 3D (30 modelos do ThreeMuseum, MIT, mais o Triceratops CC0 do Smithsonian, otimizados em `museu/pecas/`). As pistas ficam **escondidas na peça**, em pontos que a pessoa precisa achar girando e tocando; os pontos só aparecem no horário em que a pista fica disponível. Onze salas guardam peças-chave da história; as outras 19 trazem pistas de rotina e ecos verdadeiros do caso.
+Cada sala exibe uma peça 3D (15 do ThreeMuseum, MIT, mais o Triceratops CC0 do Smithsonian, e 15 de outros tipos do acervo da Khronos, CC0 e CC BY: relógio, capacete, câmera antiga, rádio, xadrez, carrinho, lanterna, cadeira, xícara, crânio, âmbar com mosquito, peixe, caminhão, garrafa e vidro; todos otimizados em `museu/pecas/`). As pistas ficam **escondidas na peça**, em pontos que a pessoa precisa achar girando e tocando; os pontos só aparecem no horário em que a pista fica disponível. Onze salas guardam peças-chave da história; as outras 19 trazem pistas de rotina e ecos verdadeiros do caso.
 
 ### Perguntas centrais, objetivos e tipos de informação (recuperado em 20/11/2026)
 
@@ -133,6 +133,8 @@ Cada sala exibe uma peça 3D (30 modelos do ThreeMuseum, MIT, mais o Triceratops
 **Objetivos do jogador:** investigar (explorar ambientes e recolher evidências), reconstruir (relacionar personagens, locais, horários e acontecimentos), formular hipóteses (mesmo incompletas) e prever e intervir. A eles soma-se **sair do museu**, e a porta principal fica fechada pela grade de segurança.
 
 **Tipos de informação:** Observação (o que a pessoa presenciou), Relato (o que um personagem informou), Registro (o que veio de documentos) e Hipótese (interpretação da própria pessoa). No jogo, cada pista do dossiê mostra se é Observação, Relato ou Registro.
+
+**Variedade de peças (decisão de 20/11/2026):** o museu não é só de história natural. Metade das salas tem outros tipos de peça (arte e objetos do dia a dia, fotografia, som, jogos, transporte, tempo), para a pessoa nunca saber que tipo de sala vem a seguir.
 
 **Densidade de pistas (decisão de 20/11/2026):** cada peça de museu esconde vários detalhes, não só uma pista. As 19 salas de ambiente têm 6 pontos: 3 de rotina que não ajudam a resolver, e 3 verdadeiros (o ambiente e dois ecos de eixos diferentes do caso). As salas-chave têm de 2 a 4 pontos. A pessoa escolhe só uma sala por loop e não troca de sala dentro da volta, para não complicar.
 
