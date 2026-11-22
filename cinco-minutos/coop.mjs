@@ -224,6 +224,8 @@ function tickRoom() {
   const old = state.remaining;
   state.remaining = remainingSeconds(state.endAt);
   $('timer').textContent = fmt(state.remaining);
+  $('fictionTime').textContent = museumTime();
+  if (state.remaining <= 0) window.loopSignalPanel?.render();
   if (state.room && Math.ceil(old) !== Math.ceil(state.remaining)) renderClues();
   if (online && isHost() && !moving && service.now() >= state.endAt + 1250) move('between');
 }

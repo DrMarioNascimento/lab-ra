@@ -59,3 +59,66 @@
 .certeza-provavel[aria-pressed="true"]{background:linear-gradient(180deg,#d9a85a,#a87a30);border-color:#f2d3a0;color:#1f1b17}
 .certeza-certeza[aria-pressed="true"]{background:linear-gradient(180deg,#d8685e,#9c3a33);border-color:#f0a59d}
 .support-label{margin:.2rem 0 0}
+
+.signal-console {
+  margin: 0 0 1.2rem;
+  padding: 1rem;
+  border: 1px solid #b496625e;
+  border-radius: 12px;
+  background: linear-gradient(140deg, #243b3d, #101e2b 64%);
+  box-shadow: inset 0 1px #ffffff19, 0 4px #09121a;
+}
+.signal-header { display: flex; align-items: center; justify-content: space-between; gap: .8rem; flex-wrap: wrap }
+.signal-header h4 { margin: 0; color: var(--gold); font-size: 1.15rem; font-weight: 400 }
+.signal-console p, .museum-plan p { margin: .45rem 0 0; color: #cbd9d8; font: .88rem/1.5 system-ui, sans-serif }
+.signal-console #signalMessage { min-height: 2.65em; margin-top: .9rem; color: #f4ddb1 }
+.signal-keys { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .6rem }
+.signal-key {
+  min-height: 56px;
+  border: 1px solid #71968c;
+  border-radius: 9px;
+  background: linear-gradient(#263e42, #102029);
+  color: #dbefe4;
+  font: 1.8rem system-ui, sans-serif;
+  box-shadow: inset 0 1px #ffffff20, 0 4px #080e19;
+}
+.signal-key:disabled { cursor: default }
+.signal-key:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 1px #080e19 }
+.signal-key.lit {
+  background: #f1d39a;
+  color: #20231c;
+  border-color: #fff1cb;
+  box-shadow: 0 0 15px #f3cf7a9c, 0 4px #674c31;
+}
+.signal-actions, .plan-floors { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: .8rem }
+.signal-actions .text-button { min-height: 44px; text-align: left }
+.museum-plan { margin: 0 0 .8rem; padding: .7rem; border: 1px solid #688a88; border-radius: 10px; background: #0b1822 }
+.museum-plan summary { padding: .35rem; color: var(--gold); cursor: pointer }
+.museum-plan summary:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px }
+.plan-floors .btn { min-height: 44px; padding: .5rem .75rem }
+.plan-floors [aria-pressed="true"] { border-color: var(--gold); color: var(--gold) }
+.plan-rooms {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: repeat(4, minmax(2.8rem, auto));
+  gap: 4px;
+  margin: .85rem 0 0;
+  padding: 4px;
+  border: 1px solid #688a88;
+  border-radius: 6px;
+  background: #263b3e;
+  list-style: none;
+}
+.plan-rooms li {
+  display: grid;
+  align-content: center;
+  padding: .36rem .25rem;
+  border: 1px solid #779492;
+  border-radius: 3px;
+  background: #101f2b;
+  color: #ecf3eb;
+  overflow-wrap: anywhere;
+  text-align: center;
+  font: .75rem/1.25 system-ui, sans-serif;
+}
+.plan-rooms .plan-origin { border-color: var(--gold); color: #f7deb1; background: #483c2b }
