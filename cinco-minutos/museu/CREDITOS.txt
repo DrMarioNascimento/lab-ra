@@ -53,3 +53,7 @@ Modificações: junção de vértices, simplificação da malha, textura reduzid
 
 PEÇAS EXTRAS DO MESHY AI (22/11/2026) - versões B e C de salas, geradas pelo autor do projeto; mesma observação de licença acima.
 L04 Ferramentas de limpeza, L05 Produtos de limpeza coloridos, M02 Baú de ferramentas de madeira, M03 Armário de ferramentas, N16 Rádio comunicador, L06 Bancada de projetos (Blueprint Workshop), L07 Conjunto de ferramentas de teste (Futuristic Toolset). Mesmas modificações das peças anteriores.
+
+PEÇAS DO ACERVO DO AUTOR (22/11/2026) - modelos já criados pelo autor para outros jogos do LAB-RA (O Eco do Amanhã e Casa da Costa), reaproveitados aqui como versões B e C de salas.
+R01 Relógio de custódia, R02 Relógio de caixa alta, E01 Quadro elétrico, I01 Fichário, P01 Mesa de recepção, P02 Mesa com notebook, M04 Gaveteiro, C02 Cortiça e alavancas, S02 Escrivaninha com monitor, F03 Farol. Também entram N10 (Lanterna) e B07 (inseto sob vidro), que já estavam na pasta.
+Modificações: junção de vértices, simplificação da malha, textura a 1024 px e compressão (Draco e WebP) com glTF-Transform.

@@ -55,6 +55,10 @@ Salas do Grupo A (entrada, trocam de lugar só entre si): recepção, central de
 ## Já entraram (7 modelos da Meshy, 22/11/2026)
 Limpeza B e C (L04, L05), Oficina técnica B e C (M02, M03), Ateliê B e C (L06, L07) e Sala dos sons B (N16, rádio comunicador). Nessas salas a peça já muda junto com o nome; nas outras, só o nome muda por enquanto.
 
+## Já entraram do acervo do LAB-RA (modelos próprios, 22/11/2026)
+Relógios B e C (relógio de custódia, relógio de pêndulo), Laboratório de formas B (quadro elétrico), Sala das coleções B (fichário), Recepção B e C (mesa de recepção, balcão com notebook), Sala da mobília C (gaveteiro), Área de descanso C (cortiça e alavancas), Central de monitoramento B (escrivaninha com monitor), Pátio de luz B e C (farol, lanterna) e Sala dos espécimes C (inseto sob vidro).
+**Antes de buscar fora, confira o acervo do LAB-RA (`biblioteca/`, `angulos/`, `dilema-bonde-3d/`).** A lista acima de "o que buscar" vale só para o que ainda não existe lá.
+
 ## Sobre os modelos antigos
 A Central de monitoramento (nomes B e C) ainda não tem peça extra; um rádio ou painel diferente serviria.
 
