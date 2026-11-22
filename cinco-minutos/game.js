@@ -572,14 +572,37 @@ function truth(key){
  const c = current();
  return key === 'where' ? c.room : key === 'when' || key === 'how' ? activeKey() : key === 'predict' ? 'retorno' : c[key];
 }
+// Grau de certeza (21/11/2026): quanto mais certeza, mais pontos se acertar; errar com certeza custa pontos. O máximo continua 100.
+const CERTEZAS = {
+ palpite:{label:'Palpite', hit:.6, miss:0},
+ provavel:{label:'Provável', hit:.8, miss:0},
+ certeza:{label:'Tenho certeza', hit:1, miss:-.3}
+};
+const CERTEZA_PADRAO = 'provavel';
+// Em Quem e Por quê, a resposta pede a pista do dossiê que a sustenta. Sem pista que valha, conta como palpite.
+const SUPPORT_KEYS = ['alarm','figure'];
+// Pistas que o jogador já guardou e que servem de fonte para a pergunta.
+function axisSources(axis){
+ return (state?.clues ?? []).filter(clue => axis.test ? axis.test(clue) : axis.sources.includes(clue.id) &&
+  (axis.key !== 'figure' || clue.text === figures[current().figure]));
+}
+function supportOk(axis, answers){
+ const id = answers?.[axis.key+'__p'];
+ return !!id && axisSources(axis).some(clue => clue.id === id);
+}
+function effectiveCerteza(axis, answers){
+ if (SUPPORT_KEYS.includes(axis.key) && !supportOk(axis, answers)) return CERTEZAS.palpite;
+ return CERTEZAS[answers?.[axis.key+'__c']] ?? CERTEZAS[CERTEZA_PADRAO];
+}
 // Pontuação por proximidade: metade dos pontos para o mesmo andar (Onde) ou a mesma abertura de janela (Quando).
-function pointsFor(axis, answer){
+// O grau de certeza multiplica o acerto; errar com "Tenho certeza" tira pontos.
+function pointsFor(axis, answer, answers = {}){
  if (!answer) return 0;
- const right = truth(axis.key);
- if (answer === right) return axis.pts;
- if (axis.key === 'where' && ROOMS.find(r=>r.id===answer).andar === ROOMS.find(r=>r.id===right).andar) return Math.floor(axis.pts/2);
- if (axis.key === 'when' && TIME_PATHS[answer].opens === TIME_PATHS[right].opens) return Math.floor(axis.pts/2);
- return 0;
+ const right = truth(axis.key), cz = effectiveCerteza(axis, answers);
+ if (answer === right) return Math.round(axis.pts*cz.hit);
+ if (axis.key === 'where' && ROOMS.find(r=>r.id===answer).andar === ROOMS.find(r=>r.id===right).andar) return Math.floor(axis.pts/2*cz.hit);
+ if (axis.key === 'when' && TIME_PATHS[answer].opens === TIME_PATHS[right].opens) return Math.floor(axis.pts/2*cz.hit);
+ return Math.round(axis.pts*cz.miss);
 }
 const ARCHIVE_LIMIT = 2;
 function partialRecord(key){
@@ -605,8 +628,7 @@ function renderArchive(){
  if (state.caseRules !== 2 || window.coop) return;
 
  const recovered = state.archive ?? [];
- const hasSource = axis => state.clues.some(clue => axis.test ? axis.test(clue) : axis.sources.includes(clue.id) &&
-  (axis.key !== 'figure' || clue.text === figures[current().figure]));
+ const hasSource = axis => axisSources(axis).length > 0;
  const remaining = ARCHIVE_LIMIT-recovered.length;
  const status = $('archiveStatus');
  const message = remaining === 0 ? 'Dois trechos consultados.' :
@@ -635,12 +657,51 @@ function readArchive(event){
  section.focus();
 }
 function selectedAnswers(){
- return Object.fromEntries(ANSWER_AXES.map(axis=>[axis.key, $(axis.key).value]));
+ const out = {};
+ for (const axis of ANSWER_AXES) {
+  out[axis.key] = $(axis.key).value;
+  out[axis.key+'__c'] = $(axis.key+'__c')?.value ?? '';
+  if (SUPPORT_KEYS.includes(axis.key)) out[axis.key+'__p'] = $(axis.key+'__p')?.value ?? '';
+ }
+ return out;
+}
+function setCerteza(key, value){
+ $(key+'__c').value = value;
+ for (const b of document.querySelectorAll('[data-axis="'+key+'"]')) b.setAttribute('aria-pressed', String(b.dataset.certeza === value));
+}
+// Preenche o formulário com respostas guardadas (rascunho ou envio da sala do Mestre).
+function fillAnswers(saved){
+ for (const axis of ANSWER_AXES) {
+  $(axis.key).value = saved?.[axis.key] ?? '';
+  setCerteza(axis.key, saved?.[axis.key+'__c'] ?? '');
+  if (SUPPORT_KEYS.includes(axis.key)) $(axis.key+'__p').value = saved?.[axis.key+'__p'] ?? '';
+ }
+}
+function lockAnswerExtras(locked){
+ for (const el of document.querySelectorAll('#answerFields .certeza-btn, #answerFields [id$="__p"]')) el.disabled = locked;
+}
+function saveDraft(){
+ if (!window.coop && state?.phase === 'final') {
+  state.draft = selectedAnswers();
+  save();
+ }
+}
+function certezaControl(axis){
+ return '<div class="certeza" role="group" aria-label="Quanto você confia em: '+esc(axis.title)+'"><span>Quanto você confia?</span>'+
+  Object.entries(CERTEZAS).map(([k,v]) => '<button type="button" class="certeza-btn certeza-'+k+'" data-axis="'+axis.key+'" data-certeza="'+k+'" aria-pressed="false">'+v.label+'</button>').join('')+
+  '<input type="hidden" id="'+axis.key+'__c" value=""></div>';
+}
+function supportControl(axis){
+ if (!SUPPORT_KEYS.includes(axis.key)) return '';
+ const clues = state?.clues ?? [];
+ return '<label for="'+axis.key+'__p" class="support-label">Qual pista do seu dossiê sustenta esta resposta?</label><select id="'+axis.key+'__p">'+
+  '<option value="">Nenhuma pista</option>'+clues.map(c => '<option value="'+esc(c.id)+'">'+esc(c.name+' · '+c.room)+'</option>').join('')+'</select>';
 }
 function renderForm(){
- $('answerFields').innerHTML = ANSWER_AXES.map(axis => '<div><label for="'+axis.key+'">'+esc(axis.question)+
-  '</label><select id="'+axis.key+'">'+options(axis.options)+'</select></div>').join('');
- for (const axis of ANSWER_AXES) $(axis.key).value = state.draft?.[axis.key] ?? '';
+ $('answerFields').innerHTML = '<p class="certeza-note">Escolha o quanto você confia em cada resposta. Com mais certeza você ganha mais pontos se acertar, mas perde pontos se errar. Em Quem e Por quê, aponte a pista que sustenta a resposta: sem ela, vale como palpite.</p>'+
+  ANSWER_AXES.map(axis => '<div class="answer-field"><label for="'+axis.key+'">'+esc(axis.question)+
+  '</label><select id="'+axis.key+'">'+options(axis.options)+'</select>'+certezaControl(axis)+supportControl(axis)+'</div>').join('');
+ fillAnswers(state.draft);
  renderArchive();
 }
 function submit(event){
@@ -656,7 +717,7 @@ function submit(event){
 function renderResult(){
  const c = current();
  const answers = state.answers || {};
- const score = ANSWER_AXES.reduce((total, axis) => total+pointsFor(axis, answers[axis.key]), 0);
+ const score = Math.max(0, ANSWER_AXES.reduce((total, axis) => total+pointsFor(axis, answers[axis.key], answers), 0));
  const path = timePath();
  const reconstruction = hasLiveFinal()
   ? '<div class="result-card"><strong>Como o tempo voltou</strong><p>'+esc(path.reconstruction)+'</p></div>'
@@ -667,9 +728,18 @@ function renderResult(){
    : (state.intervention === 'other' ? interventionNote(state.interventionWhy, path)+' ' : '')+
      'O museu voltou às 21h55. '+path.instruction+' O equipamento '+path.code+' fica em '+roomNameOf(path.room)+'.')
   : 'Nesta partida, a ação foi avaliada como hipótese.';
- $('resultBody').innerHTML = '<p class="large">Investigação: <strong>'+score+' de 100 pontos</strong>. Cada pergunta vale 10 ou 15 pontos; resposta próxima vale metade.</p>'+
-  ANSWER_AXES.map(axis => { const got = pointsFor(axis, answers[axis.key]); return '<div class="result-card"><strong>'+axis.title+' · '+got+' de '+axis.pts+'</strong><p>Sua resposta: '+
-   esc(axis.options[answers[axis.key]] || 'Ainda não sei')+'<br>Resultado desta partida: '+esc(axis.options[truth(axis.key)])+'</p></div>'; }).join('')+
+ $('resultBody').innerHTML = '<p class="large">Investigação: <strong>'+score+' de 100 pontos</strong>. Cada pergunta vale 10 ou 15 pontos; resposta próxima vale metade. Palpite acerta 60%, provável 80% e certeza 100%, mas errar com certeza tira 30%.</p>'+
+  ANSWER_AXES.map(axis => {
+   const got = pointsFor(axis, answers[axis.key], answers);
+   const cz = answers[axis.key] ? 'Seu grau de certeza: '+(CERTEZAS[answers[axis.key+'__c']]?.label ?? CERTEZAS[CERTEZA_PADRAO].label)+'.' : '';
+   const clue = (state.clues ?? []).find(c => c.id === answers[axis.key+'__p']);
+   const sup = !SUPPORT_KEYS.includes(axis.key) || !answers[axis.key] ? '' :
+    supportOk(axis, answers) ? ' Pista que sustenta: '+esc(clue.name)+'.' :
+    clue ? ' A pista que você apontou ('+esc(clue.name)+') não sustenta esta resposta, então valeu como palpite.' :
+    ' Sem pista apontada, valeu como palpite.';
+   return '<div class="result-card"><strong>'+axis.title+' · '+got+' de '+axis.pts+'</strong><p>Sua resposta: '+
+   esc(axis.options[answers[axis.key]] || 'Ainda não sei')+'<br>Resultado desta partida: '+esc(axis.options[truth(axis.key)])+
+   (cz || sup ? '<br>'+cz+sup : '')+'</p></div>'; }).join('')+
   '<div class="result-card"><strong>O que aconteceu</strong><p>'+esc(c.detail.charAt(0).toUpperCase()+c.detail.slice(1))+
   '. '+esc(labels[c.alarm][1])+'</p><p>'+esc(figures[c.figure])+'</p></div>'+reconstruction+
   '<div class="result-card"><strong>Desfecho</strong><p>'+esc(ending)+'</p></div>';
@@ -681,11 +751,12 @@ $('startButton').onclick=reset;$('nextLoop').onclick=next;$('endLoop').onclick=f
 $('getHint').onclick=()=>{if(state&&state.hints<3){state.hints++;save();renderJournal()}};
 $('notes').addEventListener('input',e=>{if(state){state.notes=e.target.value;save()}});
 $('archiveSections').addEventListener('click', readArchive);
-$('answerFields').addEventListener('change', () => {
- if (!window.coop && state?.phase === 'final') {
-  state.draft = selectedAnswers();
-  save();
- }
+$('answerFields').addEventListener('change', saveDraft);
+$('answerFields').addEventListener('click', e => {
+ const b = e.target.closest('[data-certeza]');
+ if (!b || b.disabled) return;
+ setCerteza(b.dataset.axis, $(b.dataset.axis+'__c').value === b.dataset.certeza ? '' : b.dataset.certeza);
+ saveDraft();
 });
 $('answerForm').addEventListener('submit',submit);$('replay').onclick=()=>window.coop?window.coop.open():reset();
 // Recupera a partida local sem confundir o prazo real do loop com o relógio do aparelho.

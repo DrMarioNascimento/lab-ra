@@ -86,7 +86,7 @@ function desenhar(leve) {
     show('between');
   } else if (e === 'final') {
     renderForm();
-    if (euJogador().resp) { for (const k of EIXOS) $(k).value = euJogador().resp[k] ?? ''; }
+    if (euJogador().resp) fillAnswers(euJogador().resp);
     marcarEnvio();
     show('final');
   } else {
@@ -103,6 +103,7 @@ function marcarEnvio() {
   b.textContent = mandou ? 'Conclusão enviada' : 'Enviar minha conclusão';
   b.disabled = mandou;
   for (const k of EIXOS) $(k).disabled = mandou;
+  lockAnswerExtras(mandou);
   $('final').querySelector('.large').textContent = mandou
     ? 'Conclusão enviada. Aguarde: o Mestre revela o resultado para toda a turma.'
     : 'O que aconteceu? Use as pistas do dossiê e responda às 8 perguntas. Se não souber, deixe em aberto.';
