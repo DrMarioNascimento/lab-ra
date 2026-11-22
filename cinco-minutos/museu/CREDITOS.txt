@@ -60,3 +60,4 @@ Modificações: junção de vértices, simplificação da malha, textura a 1024 
 S03 Sala de imprensa com telas e E02 Central de energia do subsolo (prédio VestChip, de O Eco do Amanhã), modelos do autor; mesmas modificações.
 
 LIVRO FOLHEÁVEL (museu/livro, 22/11/2026) - cópia do livro do farol de O Impostor (Casa da Costa), do autor do projeto, adaptada para o Loop (modo solo, capa e páginas vindas do jogo). Usa three.js (MIT) e, na RA do iPhone, o 8th Wall Engine (© 2026 Niantic Spatial, Inc.) sob a XR Engine License (https://github.com/8thwall/engine/blob/main/LICENSE), fornecido sem garantias.
+T01 Máquina do tempo (protótipo 3D do autor do projeto, comprimida de 19 MB para 0,9 MB; malha simplificada, textura a 1024 px, Draco e WebP).

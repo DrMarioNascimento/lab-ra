@@ -59,6 +59,8 @@ Limpeza B e C (L04, L05), Oficina técnica B e C (M02, M03), Ateliê B e C (L06,
 Relógios B e C (relógio de custódia, relógio de pêndulo), Laboratório de formas B (quadro elétrico), Sala das coleções B (fichário), Recepção B e C (mesa de recepção, balcão com notebook), Sala da mobília C (gaveteiro), Área de descanso C (cortiça e alavancas), Central de monitoramento B e C (escrivaninha com monitor, parede de telas da sala de imprensa), Laboratório de formas C (central de energia do subsolo), Pátio de luz B e C (farol, lanterna) e Sala dos espécimes C (inseto sob vidro).
 **Antes de buscar fora, confira o acervo do LAB-RA (`biblioteca/`, `angulos/`, `dilema-bonde-3d/`).** A lista acima de "o que buscar" vale só para o que ainda não existe lá.
 
+Máquina do tempo (protótipo do autor): Galeria do tempo B.
+
 ## Sobre os modelos antigos
 A Central de monitoramento (nomes B e C) ainda não tem peça extra; um rádio ou painel diferente serviria.
 

@@ -76,6 +76,7 @@ const PECAS_ALT = {
   limpeza:    [{peca:'L04', sub:'Ferramentas de limpeza'}, {peca:'L05', sub:'Produtos e panos coloridos'}],
   manutencao: [{peca:'M02', sub:'Baú de ferramentas'}, {peca:'M03', sub:'Armário de ferramentas'}],
   atelie:     [{peca:'L06', sub:'Projetos e bancada'}, {peca:'L07', sub:'Ferramentas de teste'}],
+  prototipo:  [{peca:'T01', sub:'Máquina do tempo (protótipo)'}, null],
   sons:       [{peca:'N16', sub:'Rádio comunicador'}, null],
   relogios:   [{peca:'R01', sub:'Relógio de custódia'}, {peca:'R02', sub:'Relógio de pêndulo'}],
   eletrica:   [{peca:'E01', sub:'Quadro elétrico'}, {peca:'E02', sub:'Central de energia'}],
@@ -614,14 +615,30 @@ function renderIntervention(roomId, elapsed){
  panel.hidden = !hasLiveFinal() || !ctl;
  if (panel.hidden) return;
  const path = timePath();
- if (panel.dataset.ctl !== roomId) {
-  panel.dataset.ctl = roomId;
+ const aberto = !!state.abertos?.[ctl.code];
+ if (panel.dataset.ctl !== roomId+':'+(aberto ? 1 : 0)) {
+  panel.dataset.ctl = roomId+':'+(aberto ? 1 : 0);
+  if (!aberto) {
+   panel.innerHTML = '<div class="cadeado"><svg viewBox="0 0 64 80" aria-hidden="true"><path d="M18 36V24a14 14 0 0 1 28 0v12" fill="none" stroke="#c9ccd2" stroke-width="7" stroke-linecap="round"/><rect x="8" y="34" width="48" height="40" rx="8" fill="#e0b13a" stroke="#7a5a12" stroke-width="3"/><circle cx="32" cy="50" r="5" fill="#3a2a08"/><rect x="30" y="52" width="4" height="12" rx="2" fill="#3a2a08"/></svg>'+
+    '<div><h4>Equipamento trancado</h4><label for="codigoCadeado">Cadeado de código. Digite o código do equipamento.</label>'+
+    '<div class="cadeado-linha"><input id="codigoCadeado" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" maxlength="6" placeholder="Código"><button class="btn primary" type="button">Abrir</button></div><p role="status"></p></div></div>';
+   const entrada = panel.querySelector('input'), aviso = panel.querySelector('p');
+   const abrir = () => {
+    const limpo = t => String(t).toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (limpo(entrada.value) === limpo(ctl.code)) { (state.abertos ??= {})[ctl.code] = true; save(); renderIntervention(roomId, elapsed); }
+    else { state.erroCadeado = (state.erroCadeado||0)+1; aviso.textContent = state.erroCadeado >= 2 ? 'Código errado. O diretório de equipamentos diz o código de cada um; procure essa pista.' : 'Código errado.'; }
+   };
+   panel.querySelector('button').onclick = abrir;
+   entrada.addEventListener('keydown', ev => { if (ev.key === 'Enter') abrir(); });
+   return;
+  }
   panel.innerHTML = '<h4>'+esc(ctl.control)+' · '+esc(ctl.code)+'</h4><label for="command">Comando</label><select id="command"><option value="">Escolha um comando</option>'+
    commandsOf(ctl).map(([v,t]) => '<option value="'+v+'">'+esc(t)+'</option>').join('')+
    '</select><button class="btn primary" type="button">Executar comando</button><p role="status"></p>';
   panel.querySelector('button').onclick = () => applyIntervention(panel.querySelector('select').value);
   panel.querySelector('select').addEventListener('change', () => renderIntervention(state.room, elapsedStoryTime(window.coop?.now() ?? Date.now())));
  }
+ if (!aberto) return;
  const button = panel.querySelector('button');
  const select = panel.querySelector('select');
  const recorded = state.tentouVolta === state.loop || brokeLoop();

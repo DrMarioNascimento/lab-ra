@@ -98,3 +98,13 @@
 .ar-btn{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);padding:8px 14px;font-size:.85rem;white-space:nowrap}
 .peca.livro iframe{width:100%;height:100%;border:0;display:block;border-radius:inherit;background:#070605}
 .peca.livro{height:min(56vh,430px)}
+.cadeado{display:flex;gap:14px;align-items:center;padding:12px;border:1px solid #b89f724a;border-radius:14px;background:linear-gradient(#1c2a38,#101a24);box-shadow:0 4px 0 #05090d}
+.cadeado svg{width:54px;height:68px;flex:none;filter:drop-shadow(0 3px 0 #0006)}
+.cadeado h4{margin:0 0 4px}
+.cadeado label{display:block;font-size:.85rem;opacity:.85;margin-bottom:6px}
+.cadeado-linha{display:flex;gap:8px}
+.cadeado input{flex:1;min-width:0;padding:10px;border-radius:10px;border:1px solid #b89f72;background:#0c1621;color:#f4ead0;font:700 1.1rem monospace;letter-spacing:.2em;text-transform:uppercase;text-align:center}
+.cadeado p{margin:6px 0 0;min-height:1.2em;font-size:.85rem}
+.cadeado>div{flex:1;min-width:0}
+.cadeado svg{width:40px;height:50px}
+@media(max-width:420px){.cadeado{flex-direction:column;align-items:flex-start}.cadeado>div{width:100%}}
