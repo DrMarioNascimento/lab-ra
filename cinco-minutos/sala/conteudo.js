@@ -25,15 +25,15 @@ const ROOMS = [
   {id:'mar', name:'Sala do mar', andar:'1º andar', icon:'▦', sub:'Peixes e águas', peca:'N12'},
   {id:'recepcao', name:'Recepção', andar:'Térreo', icon:'♧', sub:'Chegadas e convidados', peca:'B01'},
   {id:'conservacao', name:'Sala dos espécimes', andar:'Térreo', icon:'◇', sub:'Acervo e registros', peca:'B04'},
-  {id:'seguranca', name:'Sala dos habitats', andar:'Térreo', icon:'◉', sub:'Alarmes e ocorrências', peca:'B07'},
+  {id:'seguranca', name:'Central de monitoramento', andar:'Térreo', icon:'◉', sub:'Alarmes e ocorrências', peca:'S01'},
   {id:'atelie', name:'Ateliê de descobertas', andar:'Térreo', icon:'✧', sub:'Ensaio e registros técnicos', peca:'L01'},
   {id:'corredor', name:'Área de descanso', andar:'Térreo', icon:'▥', sub:'Recados e caixas da equipe', peca:'L02'},
   {id:'sons', name:'Sala dos sons', andar:'Térreo', icon:'♢', sub:'Rádio e música', peca:'N07'},
-  {id:'cotidiano', name:'Sala do cotidiano', andar:'Térreo', icon:'◌', sub:'Objetos de todo dia', peca:'N08'},
+  {id:'limpeza', name:'Base da limpeza', andar:'Térreo', icon:'◌', sub:'Rotina e fechamento', peca:'L03'},
   {id:'ambar', name:'Sala do âmbar', andar:'Térreo', icon:'◑', sub:'Preso no tempo', peca:'N11'},
   {id:'patio', name:'Pátio de luz', andar:'Térreo', icon:'☼', sub:'Vista para a circulação', peca:'B05'},
   {id:'brinquedos', name:'Sala dos brinquedos', andar:'Térreo', icon:'✿', sub:'Carrinho e memória', peca:'N09'},
-  {id:'lanternas', name:'Sala das lanternas', andar:'Térreo', icon:'◰', sub:'Luz de mão', peca:'N10'}
+  {id:'manutencao', name:'Oficina técnica', andar:'Térreo', icon:'◰', sub:'Fios, lâmpadas e reparos', peca:'M01'}
 ];
 const EVENTS = {
   proteger:'Uma peça foi retirada para proteção.',
@@ -94,7 +94,7 @@ const figures={
   restauradora:'Uma identificação e uma ficha de trabalho indicam que a figura é uma restauradora. Ela diz baixinho: "Não toque em nada. A umidade mudou e eu não largo esta peça até conferir o suporte."',
   funcionario:'Uma credencial de serviço identifica a figura como uma funcionária que preparava uma surpresa. Ela cochicha: "Shh! É surpresa para o pessoal. Ninguém pode saber ainda... você não vai contar, vai?"'
 };
-const roomDescriptions={galeria:'Vitrines, pedestais e obras aguardam o fechamento. Algo chama sua atenção entre os registros da exposição.',conservacao:'Fichas de acervo e materiais de trabalho contam uma parte da história dos objetos.',seguranca:'Um painel registra as ocorrências do edifício. O alarme é apenas um dos sinais daquela noite.',eletrica:'A luz de emergência revela equipamentos e anotações técnicas. Nem toda falha tem a mesma causa.',recepcao:'Convidados, entregas e registros de entrada se cruzam perto da porta principal, fechada pela grade de segurança.',corredor:'Pelo corredor passam pessoas e caixas. Olhar a passagem não revela, sozinho, toda a intenção.'};
+const roomDescriptions={galeria:'Vitrines, pedestais e obras aguardam o fechamento. Algo chama sua atenção entre os registros da exposição.',conservacao:'Fichas de acervo e materiais de trabalho contam uma parte da história dos objetos.',seguranca:'Telas e botões cercam uma mesa de comando. O alarme é apenas um dos sinais daquela noite.',eletrica:'A luz de emergência revela equipamentos e anotações técnicas. Nem toda falha tem a mesma causa.',recepcao:'Convidados, entregas e registros de entrada se cruzam perto da porta principal, fechada pela grade de segurança.',corredor:'Pelo corredor passam pessoas e caixas. Olhar a passagem não revela, sozinho, toda a intenção.'};
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 const extraDescriptions = {
   prototipo: 'O protótipo da exposição fica ligado ao relógio de demonstração.',
@@ -121,10 +121,10 @@ const EXTRAS = {
   vidros:"Um porta-velas de vidro guarda o reflexo da sala. Tudo que passa por trás aparece torto.",
   mar:"Um peixe grande de escamas prateadas nada no ar, preso por fios. A placa fala de rios e mares.",
   sons:"Um rádio de caixa grande fica sobre um pedestal. A placa pergunta se você ainda lembra de uma fita cassete.",
-  cotidiano:"Uma garrafa d’água comum virou peça de museu. A placa pergunta o que a gente guarda e o que joga fora.",
+  limpeza:"Um balde com esfregão espera encostado na parede. A placa fala do trabalho que ninguém vê, mas que mantém tudo de pé.",
   ambar:"Um mosquito aparece preso dentro de um bloco de âmbar. A placa diz que ele ficou parado por milhões de anos.",
   brinquedos:"Um carrinho de brinquedo está parado numa pista de madeira. Uma criança deixou a marca de um dedo no vidro.",
-  lanternas:"Uma lanterna de metal pende de um gancho. A placa fala de como se andava no escuro antes da luz elétrica."
+  manutencao:"Uma caixa de ferramentas antiga está aberta sobre a bancada. A placa fala de quem conserta o que quebra, de uma lâmpada a um fio."
 };
 const EXTRA_ORDEM = Object.keys(EXTRAS);
 Object.keys(EXTRAS).forEach(k => { roomDescriptions[k] = EXTRAS[k]; });

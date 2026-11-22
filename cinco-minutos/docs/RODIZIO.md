@@ -1,9 +1,9 @@
 # Museu vivo — tabela de rodízio (documento de projeto, não público)
 
 ## O que a planta permite
-A maquete 3D é só o prédio em 3 andares (sem coordenadas de sala). No jogo, a posição de uma sala hoje é **andar + ordem na lista**. Por isso nada na planta impede o rodízio. Falta criar o conceito de **lugar**: cada andar tem lugares numerados, e cada partida distribui as exposições entre eles.
+A maquete 3D (página `museu/`) mostra o prédio em 3 andares e já tem **posições marcadas** por andar (coordenadas x e z de cada sala, repetidas nos três andares). No jogo, a sala hoje só guarda o andar. Nada impede o rodízio, mas a página da maquete hoje usa nomes fixos: para acompanhar uma partida, ela precisa receber o sorteio (ou mostrar só números de lugar).
 
-- **Lugares por andar** (a capacidade atual): 2º andar = 9, 1º andar = 10, Térreo = 11. Saguão superior fica fixo (todos começam nele).
+- **Lugares por andar** (capacidade atual do jogo): 2º andar = 9, 1º andar = 10, Térreo = 11. Saguão superior fica fixo (todos começam nele).
 - **Exposição** = a unidade que viaja: nome, subtítulo, ícone e peça 3D. A peça combina com o nome, então **nome e peça andam juntos**.
 - **Lugar** = andar + número. É o que muda de uma partida para outra e é o que o jogador vê ("Térreo · lugar 4").
 - **Pontuação do "Onde":** metade dos pontos por estar no mesmo andar continua valendo, usando o andar da partida.
@@ -43,20 +43,20 @@ Tipo: **F** = função perto da entrada (Grupo A), **E** = livre (Grupo B). Anda
 | mar | N12 | E | 1º | Sala do mar | Aquário antigo | Sala das águas |
 | recepcao | B01 | F | Térreo | Recepção | Entrada de convidados | Balcão de chegada |
 | conservacao | B04 | F | Térreo | Sala dos espécimes | Gabinete dos espécimes | Sala do acervo |
-| seguranca | B07 | F | Térreo | Sala dos habitats | Gabinete dos habitats | Sala dos ambientes |
+| seguranca | S01 | F | Térreo | Central de monitoramento | Sala dos monitores | Posto de controle |
 | atelie | L01 | E | Térreo | Ateliê de descobertas | Oficina de ensaios | Sala dos testes |
 | corredor | L02 | E | Térreo | Área de descanso | Canto de descanso | Varanda da equipe |
 | sons | N07 | E | Térreo | Sala dos sons | Sala do rádio | Galeria da música |
-| limpeza | N08 | F | Térreo | Base da limpeza | Depósito de limpeza | Sala dos carrinhos |
+| limpeza | L03 | F | Térreo | Base da limpeza | Depósito de limpeza | Sala dos carrinhos |
 | ambar | N11 | E | Térreo | Sala do âmbar | Sala do tempo preso | Galeria da resina |
 | patio | B05 | E | Térreo | Pátio de luz | Pátio da claridade | Jardim de luz |
 | brinquedos | N09 | E | Térreo | Sala dos brinquedos | Sala das brincadeiras | Galeria dos carrinhos |
-| manutencao | N10 | F | Térreo | Oficina técnica | Bancada de reparos | Sala dos reparos |
+| manutencao | M01 | F | Térreo | Oficina técnica | Bancada de reparos | Sala dos reparos |
 
 ## Duas funções novas (decisão do autor, 22/11/2026)
 - **Limpeza:** limpeza geral (chão, pó, rotina de fechamento). Já existe como pessoa recorrente da história; ganha sala própria.
 - **Manutenção:** equipamentos e estrutura (troca de lâmpada, fio partido, ferramentas, sensor). Não é o mesmo que a **conservação**, que cuida das peças e do acervo (restauração, registros).
-- **Peças 3D:** não há modelo sobrando. Provisório: Limpeza usa a peça N08 (antes Sala do cotidiano) e Manutenção usa a N10 (antes Sala das lanternas), que saem do grupo das exposições. Falta conferir se as peças combinam com a função; se não, o autor gera ou escolhe modelos novos (lista de pedidos em seguida).
+- **Peças 3D (feito em 22/11/2026):** modelos do Meshy enviados pelo autor, comprimidos e ligados ao jogo: Limpeza = L03 (esfregão com balde), Manutenção = M01 (caixa de ferramentas antiga), Segurança = S01 (central de monitoramento). A Sala do cotidiano (N08) e a Sala das lanternas (N10) saíram do jogo; a peça B07 (habitats) também ficou sem uso.
 - **Enredo:** a Manutenção pode virar a **5ª perspectiva** (vê fios, lâmpadas, sensor, equipamento), que combina muito com as noites de falha de sensor e teste de alarme.
 
 ## Variedade

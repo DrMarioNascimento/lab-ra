@@ -45,3 +45,8 @@ N01 Xícara (DiffuseTransmissionTeacup), N05 Câmera antiga (AntiqueCamera, UX3D
 N02 Cadeira (ChairDamaskPurplegold, Wayfair), N04 Capacete (DamagedHelmet, ctxwing), N06 Porta-velas de vidro (GlassHurricaneCandleHolder, Wayfair), N11 Mosquito no âmbar (MosquitoInAmber, Loïc Norgeot e Geoffrey Marchal), N14 Caminhão de leite (CesiumMilkTruck, Cesium), N15 Xadrez (ABeautifulGame, ASWF/MaterialX): CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/).
 N03 Relógio (ChronographWatch): baseado em "Chronograph Watch Mudmaster" de graphiccompressor (Sketchfab), CC BY 4.0.
 Modificações: simplificação da malha e compressão (Draco e WebP) com glTF-Transform. As peças D03, D04, D05, D06, D07, B03, B06, B08, B10, B11, B12, B13, B14, B15 e B16 do ThreeMuseum foram trocadas por estas e guardadas em pecas/_SUBSTITUIDO_2026-11-20/.
+
+
+PEÇAS GERADAS NO MESHY AI (22/11/2026) - geradas pelo autor do projeto no Meshy AI (https://www.meshy.ai). A licença de uso depende do plano do autor no Meshy; conferir antes de redistribuir fora do Loop.
+L03 Esfregão com balde (a mop with bucket), M01 Caixa de ferramentas antiga (Vintage Toolbox), S01 Central de monitoramento (Command Control Center).
+Modificações: junção de vértices, simplificação da malha, textura reduzida a 1024 px e compressão (Draco e WebP) com glTF-Transform. As peças N08 (Garrafa), N10 (Lanterna) e B07 deixaram de ser usadas no Loop e continuam na pasta pecas.
