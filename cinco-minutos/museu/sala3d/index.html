@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#0b0f14">
+<title>Entrar na sala</title>
+<style>
+html,body{margin:0;height:100%;height:100dvh;background:#0b0f14;overflow:hidden;touch-action:none;overscroll-behavior:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#f4efe3}
+#c{position:fixed;inset:0;width:100%;height:100%;display:block}
+#hud{position:fixed;inset:0;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))}
+#topo{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+#nome{font:700 17px/1.2 system-ui;text-shadow:0 2px 10px #000}
+#nome small{display:block;font:600 11px/1.3 system-ui;letter-spacing:.14em;text-transform:uppercase;color:#efc878;margin-top:3px}
+button{pointer-events:auto;font:700 14px system-ui;color:#f4efe3;border:1px solid #5b6b78;background:#16212b;border-radius:10px;min-height:44px;padding:0 14px;box-shadow:0 3px 0 #0a1016;cursor:pointer}
+button:active{transform:translateY(2px);box-shadow:0 1px 0 #0a1016}
+#baixo{display:flex;justify-content:space-between;align-items:flex-end}
+#joy{pointer-events:auto;width:132px;height:132px;border-radius:50%;background:#ffffff14;border:2px solid #ffffff40;position:relative;touch-action:none}
+#joy i{position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;background:#efc878cc;box-shadow:0 3px 10px #0008}
+#dica{position:fixed;left:0;right:0;bottom:calc(max(16px,env(safe-area-inset-bottom)) + 150px);text-align:center;font:500 13px/1.4 system-ui;color:#d9d2c0;text-shadow:0 1px 6px #000;padding:0 20px;transition:opacity .6s}
+#intro{position:fixed;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:26px;background:linear-gradient(180deg,#0b0f14f2,#05080cf8)}
+#intro h1{font:700 30px/1.05 system-ui;margin:0}
+#intro .k{font:700 11px system-ui;letter-spacing:.22em;text-transform:uppercase;color:#efc878}
+#intro p{max-width:22em;margin:0;font:500 16px/1.45 system-ui;color:#e4ddcc}
+#intro .go{width:min(320px,88vw);min-height:52px;background:linear-gradient(180deg,#efc878,#c99a45);color:#201707;border:0;box-shadow:0 5px 0 #6f4d17;font-size:15px;letter-spacing:.08em}
+#intro .alt{width:min(320px,88vw)}
+#carr{position:fixed;inset:0;z-index:4;display:flex;align-items:center;justify-content:center;background:#0b0f14;font:600 14px system-ui;color:#efc878}
+</style></head>
+<body>
+<canvas id="c"></canvas>
+<div id="carr">Montando a sala…</div>
+<div id="hud">
+  <div id="topo"><div id="nome">—<small>Dentro da sala</small></div><button id="sair" type="button">Sair</button></div>
+  <div id="dica">Arraste para olhar · use o círculo para andar</div>
+  <div id="baixo"><div id="joy"><i></i></div><button id="giro" type="button">Giroscópio: desligado</button></div>
+</div>
+<div id="intro">
+  <div class="k">Dentro da sala</div>
+  <h1 id="t-sala">Sala</h1>
+  <p>Você está dentro da sala. <b>Gire o celular</b> para olhar em volta e use o círculo para andar até a peça.</p>
+  <button class="go" id="b-giro" type="button">Entrar com giroscópio</button>
+  <button class="alt" id="b-dedo" type="button">Entrar sem giroscópio</button>
+</div>
+<script type="importmap">{"imports":{"three":"./vendor/three.module.min.js","three/addons/":"./vendor/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+
+const Q = new URLSearchParams(location.search);
+const PECA = Q.get('peca') || 'D01';
+const NOME = Q.get('nome') || 'Sala dos gigantes';
+// tamanho real da peça (maior lado, em metros) e como ela fica na sala
+const ESCALAS = { D01: {m: 4.6, cabine: [5.6, 1.7, 2.9]} };
+const ESC = ESCALAS[PECA] || {m: 1.2, cabine: [2.2, 1.6, 2.2]};
+if (Q.get('esc')) ESC.m = parseFloat(Q.get('esc'));
+document.getElementById('nome').firstChild.textContent = NOME;
+document.getElementById('t-sala').textContent = NOME;
+
+const cv = document.getElementById('c');
+const R = new THREE.WebGLRenderer({canvas: cv, antialias: true});
+R.setPixelRatio(Math.min(devicePixelRatio, 2));
+R.outputColorSpace = THREE.SRGBColorSpace;
+R.toneMapping = THREE.ACESFilmicToneMapping; R.toneMappingExposure = 1.05;
+const S = new THREE.Scene(); S.background = new THREE.Color(0x10141a); S.fog = new THREE.Fog(0x10141a, 9, 22);
+const cam = new THREE.PerspectiveCamera(70, 1, 0.05, 40);
+const LARG = 9, PROF = 7, ALT = 3.6;           // sala: x de -4.5 a 4.5, z de -3.5 a 3.5
+const EYE = 1.6;
+cam.position.set(0, EYE, 2.6);
+
+// ---------- sala
+function tex(fn, w = 256, h = 256, rep) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h; fn(c.getContext('2d'), w, h);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  if (rep) t.repeat.set(rep[0], rep[1]); t.anisotropy = 4; return t;
+}
+const madeira = tex((g, w, h) => { g.fillStyle = '#6d4a2e'; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 8; i++) { g.fillStyle = i % 2 ? '#74502f' : '#643f26'; g.fillRect(0, i * h / 8, w, h / 8 - 2); g.fillStyle = '#00000040'; g.fillRect(0, i * h / 8, w, 2); }
+  for (let i = 0; i < 400; i++) { g.fillStyle = `rgba(0,0,0,${Math.random() * .08})`; g.fillRect(Math.random() * w, Math.random() * h, 30 + Math.random() * 60, 1); } }, 256, 256, [LARG / 2.2, PROF / 2.2]);
+const piso = new THREE.Mesh(new THREE.PlaneGeometry(LARG, PROF), new THREE.MeshStandardMaterial({map: madeira, roughness: .55}));
+piso.rotation.x = -Math.PI / 2; S.add(piso);
+const matP = new THREE.MeshStandardMaterial({color: 0xd9cfb8, roughness: .95});
+const teto = new THREE.Mesh(new THREE.PlaneGeometry(LARG, PROF), new THREE.MeshStandardMaterial({color: 0xc9c0ab, roughness: 1}));
+teto.rotation.x = Math.PI / 2; teto.position.y = ALT; S.add(teto);
+function parede(w, x, z, ry) { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, ALT), matP); m.position.set(x, ALT / 2, z); m.rotation.y = ry; S.add(m);
+  const r = new THREE.Mesh(new THREE.BoxGeometry(w, .14, .03), new THREE.MeshStandardMaterial({color: 0x4a3524, roughness: .6}));
+  r.position.set(x + Math.sin(ry) * .015, .07, z + Math.cos(ry) * .015); r.rotation.y = ry; S.add(r); }
+parede(LARG, 0, -PROF / 2, 0); parede(LARG, 0, PROF / 2, Math.PI); parede(PROF, -LARG / 2, 0, Math.PI / 2); parede(PROF, LARG / 2, 0, -Math.PI / 2);
+// janelas altas na parede do norte (fundo): luz fria
+const luzJ = [];
+for (const x of [-2.8, 0, 2.8]) {
+  const j = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 1.9), new THREE.MeshBasicMaterial({color: 0xa9c8e8}));
+  j.position.set(x, 2.0, -PROF / 2 + .04); S.add(j);
+  const mold = new THREE.Mesh(new THREE.BoxGeometry(1.6, 2.0, .05), new THREE.MeshStandardMaterial({color: 0x3a2b1e})); mold.position.set(x, 2.0, -PROF / 2 + .005); S.add(mold);
+  const sp = new THREE.SpotLight(0xbcd6f2, 14, 12, .8, .6); sp.position.set(x, 2.4, -PROF / 2 + .3); sp.target.position.set(x * .5, 0, -.5); S.add(sp, sp.target); luzJ.push(sp);
+}
+S.add(new THREE.HemisphereLight(0xdfe6f0, 0x4a3524, .75));
+const spotCentro = new THREE.SpotLight(0xfff0d0, 40, 12, .65, .5); spotCentro.position.set(0, ALT - .1, 1.0); spotCentro.target.position.set(0, 1, -1.2); S.add(spotCentro, spotCentro.target);
+
+// ---------- cabine de vidro com a peça dentro
+const [CW, CH, CD] = ESC.cabine, CZ = -1.2;
+const cab = new THREE.Group(); cab.position.set(0, 0, CZ); S.add(cab);
+const base = new THREE.Mesh(new THREE.BoxGeometry(CW, .3, CD), new THREE.MeshStandardMaterial({color: 0x2a2f36, roughness: .5, metalness: .2})); base.position.y = .15; cab.add(base);
+const topo = new THREE.Mesh(new THREE.BoxGeometry(CW, .06, CD), new THREE.MeshStandardMaterial({color: 0x2a2f36, roughness: .5})); topo.position.y = .3 + CH; cab.add(topo);
+const vid = new THREE.Mesh(new THREE.BoxGeometry(CW - .06, CH, CD - .06), new THREE.MeshStandardMaterial({color: 0xcfe6f2, transparent: true, opacity: .09, roughness: .05, metalness: 0, depthWrite: false, side: THREE.DoubleSide}));
+vid.position.y = .3 + CH / 2; cab.add(vid);
+const arestas = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(CW - .06, CH, CD - .06)), new THREE.LineBasicMaterial({color: 0xe8f4ff, transparent: true, opacity: .55}));
+arestas.position.y = .3 + CH / 2; cab.add(arestas);
+const luzCab = new THREE.PointLight(0xfff3dd, 6, 6, 1.6); luzCab.position.set(0, .3 + CH - .2, 0); cab.add(luzCab);
+// placa
+const placa = new THREE.Mesh(new THREE.PlaneGeometry(1.1, .22), new THREE.MeshBasicMaterial({map: tex((g, w, h) => { g.fillStyle = '#d6b36a'; g.fillRect(0, 0, w, h); g.fillStyle = '#2a1d08'; g.font = '700 30px system-ui'; g.textAlign = 'center'; g.fillText(NOME.toUpperCase(), w / 2, h / 2 + 10); }, 512, 100)}));
+placa.position.set(0, .16, CD / 2 + .002); cab.add(placa);
+
+// ---------- peça
+const dr = new DRACOLoader(); dr.setDecoderPath('./vendor/draco/');
+const gl = new GLTFLoader(); gl.setDRACOLoader(dr);
+gl.load('../pecas/' + PECA + '.glb', g => {
+  const o = g.scene; { const q = new THREE.Box3().setFromObject(o).getSize(new THREE.Vector3()); if (q.z > q.x) o.rotation.y = Math.PI / 2; o.updateMatrixWorld(true); }
+  const b = new THREE.Box3().setFromObject(o); const sz = b.getSize(new THREE.Vector3());
+  const maior = Math.max(sz.x, sz.y, sz.z); const e = ESC.m / maior;
+  // a peça tem de caber na cabine (altura e profundidade também)
+  const e2 = Math.min(e, (CH - .1) / sz.y, (CD - .3) / sz.z, (CW - .3) / sz.x);
+  o.scale.setScalar(e2); const b2 = new THREE.Box3().setFromObject(o); const c = b2.getCenter(new THREE.Vector3());
+  o.position.set(-c.x, .3 - b2.min.y + .02, -c.z); cab.add(o);
+  window.__peca = {escala: e2, tam: b2.getSize(new THREE.Vector3()).toArray()};
+  fim();
+}, undefined, err => { console.error(err); fim(); });
+let feito = false; function fim() { if (feito) return; feito = true; document.getElementById('carr').style.display = 'none'; }
+
+// ---------- controles: olhar (giroscópio ou arrasto) e andar (círculo / teclado)
+let yaw = 0, pitch = 0, usaGiro = false, ang0 = null;
+const dir = new THREE.Vector2(), keys = {};
+const cvp = cv; let drag = null;
+cvp.addEventListener('pointerdown', e => { drag = {x: e.clientX, y: e.clientY}; cvp.setPointerCapture(e.pointerId); });
+cvp.addEventListener('pointermove', e => { if (!drag) return; const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag = {x: e.clientX, y: e.clientY};
+  yaw -= dx * .005; if (!usaGiro) pitch = Math.max(-1.2, Math.min(1.2, pitch - dy * .005)); });
+cvp.addEventListener('pointerup', () => drag = null);
+addEventListener('keydown', e => keys[e.key.toLowerCase()] = 1); addEventListener('keyup', e => keys[e.key.toLowerCase()] = 0);
+const joy = document.getElementById('joy'), bola = joy.firstElementChild; let jid = null;
+function jmove(e) { const r = joy.getBoundingClientRect(); let x = (e.clientX - r.left - r.width / 2) / (r.width / 2), y = (e.clientY - r.top - r.height / 2) / (r.height / 2);
+  const l = Math.hypot(x, y); if (l > 1) { x /= l; y /= l; } dir.set(x, y); bola.style.transform = `translate(${x * 38}px,${y * 38}px)`; }
+joy.addEventListener('pointerdown', e => { jid = e.pointerId; joy.setPointerCapture(jid); jmove(e); e.stopPropagation(); });
+joy.addEventListener('pointermove', e => { if (e.pointerId === jid) jmove(e); });
+const jfim = e => { if (e.pointerId === jid) { jid = null; dir.set(0, 0); bola.style.transform = ''; } };
+joy.addEventListener('pointerup', jfim); joy.addEventListener('pointercancel', jfim);
+
+const eu = new THREE.Euler(0, 0, 0, 'YXZ'), qG = new THREE.Quaternion(), qTela = new THREE.Quaternion(), qMundo = new THREE.Quaternion(-Math.sqrt(.5), 0, 0, Math.sqrt(.5)), zee = new THREE.Vector3(0, 0, 1);
+let orient = null;
+function giroOn() {
+  addEventListener('deviceorientation', e => { if (e.alpha != null) orient = e; });
+  usaGiro = true; ang0 = null; document.getElementById('giro').textContent = 'Giroscópio: ligado';
+}
+async function pedirGiro() {
+  try {
+    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+      const r = await DeviceOrientationEvent.requestPermission(); if (r !== 'granted') return false;
+    }
+    giroOn(); return true;
+  } catch (e) { return false; }
+}
+document.getElementById('b-giro').onclick = async () => { await pedirGiro(); document.getElementById('intro').style.display = 'none'; };
+document.getElementById('b-dedo').onclick = () => { document.getElementById('intro').style.display = 'none'; };
+document.getElementById('giro').onclick = async () => { if (usaGiro) { usaGiro = false; pitch = 0; document.getElementById('giro').textContent = 'Giroscópio: desligado'; } else await pedirGiro(); };
+document.getElementById('sair').onclick = () => { if (parent !== window) parent.postMessage({sala3d: 'sair'}, '*'); else if (history.length > 1) history.back(); else location.href = '../index.html'; };
+setTimeout(() => { document.getElementById('dica').style.opacity = 0; }, 9000);
+
+// com giroscópio: o arrasto soma um giro extra no eixo vertical
+let ultimo = performance.now();
+function volta(t) {
+  const dt = Math.min(.05, (t - ultimo) / 1000); ultimo = t;
+  if (usaGiro && orient) {
+    const a = THREE.MathUtils.degToRad(orient.alpha || 0), b = THREE.MathUtils.degToRad(orient.beta || 0), g = THREE.MathUtils.degToRad(orient.gamma || 0);
+    const so = THREE.MathUtils.degToRad((screen.orientation && screen.orientation.angle) || window.orientation || 0);
+    eu.set(b, a, -g, 'YXZ'); qG.setFromEuler(eu); qG.multiply(qMundo); qG.multiply(qTela.setFromAxisAngle(zee, -so));
+    const e0 = new THREE.Euler().setFromQuaternion(qG, 'YXZ');
+    if (ang0 === null) ang0 = e0.y;
+    cam.quaternion.setFromEuler(new THREE.Euler(e0.x, e0.y - ang0 + yaw, e0.z, 'YXZ'));
+  } else { cam.quaternion.setFromEuler(new THREE.Euler(pitch, yaw, 0, 'YXZ')); }
+  // andar: direção segue para onde a câmera olha (só no plano)
+  let fx = -dir.y, sx = dir.x; if (keys.w || keys.arrowup) fx += 1; if (keys.s || keys.arrowdown) fx -= 1; if (keys.d || keys.arrowright) sx += 1; if (keys.a || keys.arrowleft) sx -= 1;
+  if (fx || sx) {
+    const f = new THREE.Vector3(0, 0, -1).applyQuaternion(cam.quaternion); f.y = 0; f.normalize(); const r = new THREE.Vector3(-f.z, 0, f.x).multiplyScalar(-1).negate();
+    const v = f.multiplyScalar(fx).add(new THREE.Vector3(-f.z, 0, f.x).multiplyScalar(-sx)).multiplyScalar(1.7 * dt);
+    const p = cam.position.clone().add(v);
+    p.x = Math.max(-LARG / 2 + .35, Math.min(LARG / 2 - .35, p.x)); p.z = Math.max(-PROF / 2 + .35, Math.min(PROF / 2 - .35, p.z));
+    // a cabine é sólida: empurra para fora do retângulo dela (com folga)
+    const mx = CW / 2 + .3, mz = CD / 2 + .3, dx = p.x, dz = p.z - CZ;
+    if (Math.abs(dx) < mx && Math.abs(dz) < mz) { const px = mx - Math.abs(dx), pz = mz - Math.abs(dz); if (pz < px) p.z = CZ + Math.sign(dz || 1) * mz; else p.x = Math.sign(dx || 1) * mx; }
+    cam.position.x = p.x; cam.position.z = p.z;
+  }
+  R.render(S, cam); requestAnimationFrame(volta);
+}
+function tam() { const w = innerWidth, h = innerHeight; R.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }
+addEventListener('resize', tam); tam(); requestAnimationFrame(volta);
+window.__sala = {cam, S, set(y, p) { yaw = y; pitch = p; }, ir(x, z) { cam.position.x = x; cam.position.z = z; }};
+</script></body></html>
