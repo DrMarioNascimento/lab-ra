@@ -63,3 +63,5 @@ LIVRO FOLHEÁVEL (museu/livro, 22/11/2026) - cópia do livro do farol de O Impos
 T01 Máquina do tempo (protótipo 3D do autor do projeto, comprimida de 19 MB para 0,9 MB; malha simplificada, textura a 1024 px, Draco e WebP).
 
 PEÇAS NOVAS (22/11/2026) - coleção do autor do projeto, geradas por ele e depois comprimidas (malha simplificada, textura a 1024 px, Draco e WebP, com glTF-Transform). V01 a V52: crânio de mamute, costelas gigantes, mandíbula de tubarão, bicicleta de roda alta, carroça, bule, jarro azul, xadrez, dados, crânio de primata, máscara de pedra, cômoda, vitrine, escultura, refletor, microfone, planador, esqueleto de pássaro, amonite, trilobita, capacete, escudo, câmera, projetor, motor a vapor, garrafa soprada, lustre, concha, esqueleto de baleia, sofá, gramofone, cavalinho, pião, âmbar e inseto em âmbar.
+
+MAQUETE (22/11/2026): museu-andares.glb agora leva a peça 3D (versão A) de cada sala, posta por pecas-na-maquete.mjs (gltf-transform; textura a 512 px e Draco). As peças são as de museu/pecas e seguem os créditos acima. O museu-andares.usdz (RA do iPhone) continua só com a arquitetura.
