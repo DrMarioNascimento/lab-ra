@@ -11,6 +11,13 @@
 4. **Decide-se a partir da perspectiva que você assumiu.** Outra perspectiva decidiria outra coisa, sem estar errada. A pontuação continua nos fatos do caso (as 8 perguntas); a perspectiva muda o caminho e a decisão, não o fato.
 5. **Sem conflito entre casos:** equipe, salas e rotina são fixas. O que muda é o objeto, o motivo e quem estava envolvido.
 
+## Loop vivo (decisão do autor, 22/11/2026)
+- Dentro de uma noite, **as pessoas do museu lembram e aprendem a cada volta**. Entre casos, continua valendo: um não desmente o outro.
+- **Núcleo fixo:** o apagão, o loop e a causa técnica do caso (equipamento, comando, horário). Igual em todas as voltas.
+- **Camada viva:** cada pessoa tem desejo e memória e muda o que faz a cada volta. Exemplo: só cabe uma pessoa no esconderijo; na volta 1 o vigilante chega antes e o visitante fica de fora; na volta 2 o visitante se adianta e ocupa o lugar.
+- **Mistério aberto:** o que causa o apagão e o loop não é explicado em nenhum caso. Cada noite deixa uma pista pequena que não contradiz as outras.
+- **Em aberto (pergunta ao autor):** mudanças roteirizadas por volta (recomendado) ou reagindo às ações dos jogadores.
+
 ## Os 15 casos
 Formato: **Título** — verdade da noite. *Perspectiva A:* o que vê → o que decide. *Perspectiva B:* idem. Ação = a intervenção certa do caso.
 
