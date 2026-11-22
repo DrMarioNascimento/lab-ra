@@ -1,0 +1,47 @@
+MUSEU EM 3D - CRÉDITOS E LICENÇAS
+
+Maquete derivada dos dados de arquitetura do projeto ThreeMuseum.
+Origem: https://github.com/SamG-Coder/ThreeMuseum
+Revisão: f247052675d80ff0188709cab5facb4035bfaa49
+Copyright (c) 2026 ThreeMuseum contributors.
+Inclui elementos de exposição originais identificados como D05, D06, B10, B11,
+B12, B13 e B16 do mesmo projeto; todos tratados no projeto de origem como MIT.
+Modificações: conversão dos registros arquitetônicos em GLB, remoção dos tetos,
+agrupamento das peças arquitetônicas por material, escala de maquete e inclusão
+de sete objetos em suas posições. Texturas procedurais, textos, iluminação e
+outros objetos do acervo original não foram reproduzidos integralmente.
+
+MIT License
+
+Copyright (c) 2026 ThreeMuseum contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+PEÇAS DAS SALAS (pasta pecas/)
+Os 30 modelos de exposição do ThreeMuseum (D01-D09, B01-B16, F02, L01, L02, C01) são MIT (Copyright (c) 2026 ThreeMuseum contributors).
+F01 (Triceratops): Smithsonian Institution, CC0 1.0 (https://3d.si.edu/object/3d/triceratops-horridus-marsh-1889:d8c623be-4ebc-11ea-b77f-2e728ce88125).
+Modificações: simplificação da malha e compressão (Draco e WebP) com glTF-Transform, para carregar no celular. Reconstruções interpretativas, sem valor de escala científica.
+
+
+PEÇAS VARIADAS (desde 20/11/2026) - Khronos glTF-Sample-Assets (https://github.com/KhronosGroup/glTF-Sample-Assets)
+N01 Xícara (DiffuseTransmissionTeacup), N05 Câmera antiga (AntiqueCamera, UX3D), N07 Rádio (BoomBox), N08 Garrafa (WaterBottle), N09 Carrinho (ToyCar), N10 Lanterna (Lantern, Microsoft), N12 Peixe (BarramundiFish), N13 Crânio (ScatteringSkull): CC0 1.0.
+N02 Cadeira (ChairDamaskPurplegold, Wayfair), N04 Capacete (DamagedHelmet, ctxwing), N06 Porta-velas de vidro (GlassHurricaneCandleHolder, Wayfair), N11 Mosquito no âmbar (MosquitoInAmber, Loïc Norgeot e Geoffrey Marchal), N14 Caminhão de leite (CesiumMilkTruck, Cesium), N15 Xadrez (ABeautifulGame, ASWF/MaterialX): CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/).
+N03 Relógio (ChronographWatch): baseado em "Chronograph Watch Mudmaster" de graphiccompressor (Sketchfab), CC BY 4.0.
+Modificações: simplificação da malha e compressão (Draco e WebP) com glTF-Transform. As peças D03, D04, D05, D06, D07, B03, B06, B08, B10, B11, B12, B13, B14, B15 e B16 do ThreeMuseum foram trocadas por estas e guardadas em pecas/_SUBSTITUIDO_2026-11-20/.
