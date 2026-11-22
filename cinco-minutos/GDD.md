@@ -360,3 +360,7 @@ Metas numéricas de carregamento, fluidez e limites de tamanho serão definidas 
 - Dragon Games, documentação do repositório: https://github.com/DrMarioNascimento/Dragon
 
 **Documento de trabalho.** As propostas e metas ainda não são funcionalidades implementadas, testes realizados ou decisões finais de publicação.
+
+
+### Atualização 22/11/2026
+Códigos sorteados a cada partida (sem repetir os dos modelos). Salas sem peça-chave guardam três ecos verdadeiros de fatos diferentes, cada pista marcada com os fatos que sustenta. Falas próprias nas cinco figuras, texto novo entre as voltas, pergunta de valor por caso e apresentação das telas em passos. Rodadas de avaliação e fichas em `docs/` (uso interno). Escalas ainda não passaram; ver `docs/AVALIACAO-ESCALAS.md`.
