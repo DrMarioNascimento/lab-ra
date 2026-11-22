@@ -71,6 +71,13 @@ const NOMES_ALT = {
   brinquedos:['Sala das brincadeiras','Galeria dos carrinhos'],
   manutencao:['Bancada de reparos','Sala dos reparos']
 };
+// Peças extras por sala: [versão B, versão C]. A variante do nome sorteada (A, B ou C) também escolhe a peça, quando ela existe.
+const PECAS_ALT = {
+  limpeza:    [{peca:'L04', sub:'Ferramentas de limpeza'}, {peca:'L05', sub:'Produtos e panos coloridos'}],
+  manutencao: [{peca:'M02', sub:'Baú de ferramentas'}, {peca:'M03', sub:'Armário de ferramentas'}],
+  atelie:     [{peca:'L06', sub:'Projetos e bancada'}, {peca:'L07', sub:'Ferramentas de teste'}],
+  sons:       [{peca:'N16', sub:'Rádio comunicador'}, null]
+};
 const FUNCOES_ENTRADA = ['recepcao','conservacao','seguranca','limpeza','manutencao'];
 const LUGARES = {'2º andar':9, '1º andar':10, 'Térreo':11};
 let MUSEU = null;
@@ -80,7 +87,7 @@ function montarMuseu(semente){
  const mapa = {};
  if (!semente) {
   const cont = {};
-  for (const r of ROOMS) { cont[r.andar] = (cont[r.andar]||0)+1; mapa[r.id] = {nome:r.name, andar:r.andar, lugar:cont[r.andar]}; }
+  for (const r of ROOMS) { cont[r.andar] = (cont[r.andar]||0)+1; mapa[r.id] = {nome:r.name, v:0, andar:r.andar, lugar:cont[r.andar]}; }
   return {semente:0, mapa};
  }
  const rnd = rngMuseu(semente);
@@ -91,7 +98,7 @@ function montarMuseu(semente){
  for (const a of ANDARES) for (let n=1; n<=LUGARES[a]; n++) if (!(a==='Térreo' && n<=FUNCOES_ENTRADA.length)) livres.push({andar:a, lugar:n});
  const grupoB = embaralhar(ROOMS.map(r => r.id).filter(id => !FUNCOES_ENTRADA.includes(id)), rnd);
  grupoB.forEach((id, i) => { mapa[id] = livres[i]; });
- for (const r of ROOMS) { const v = [r.name, ...NOMES_ALT[r.id]]; mapa[r.id].nome = v[Math.floor(rnd()*3)]; }
+ for (const r of ROOMS) { const v = [r.name, ...NOMES_ALT[r.id]]; const i = Math.floor(rnd()*3); mapa[r.id].nome = v[i]; mapa[r.id].v = i; }
  return {semente, mapa};
 }
 function definirMuseu(semente){ MUSEU = montarMuseu(Number(semente)||0); return MUSEU; }
@@ -99,7 +106,8 @@ function sala(id){
  const base = ROOMS.find(r => r.id === id); if (!base) return undefined;
  MUSEU ??= montarMuseu(0);
  const m = MUSEU.mapa[id];
- return {...base, name:m.nome, andar:m.andar, lugar:m.lugar, nomeBase:base.name};
+ const alt = m.v ? PECAS_ALT[id]?.[m.v-1] : null;
+ return {...base, name:m.nome, andar:m.andar, lugar:m.lugar, nomeBase:base.name, ...(alt ? {peca:alt.peca, sub:alt.sub} : {})};
 }
 // Troca, em qualquer texto de pista, o nome de origem das salas pelo nome da partida.
 function nomear(texto){

@@ -52,8 +52,11 @@ Salas do Grupo A (entrada, trocam de lugar só entre si): recepção, central de
 | Sala dos brinquedos | carrinho | Sala das brincadeiras · cavalinho de balanço · *rocking horse* | Galeria dos carrinhos · pião e bola de gude · *spinning top toy* |
 | Oficina técnica | ferramentas | Bancada de reparos · caixa de ferramentas aberta · *open toolbox* | Sala dos reparos · escada pequena e lâmpada · *stepladder lamp* |
 
-## Já tenho (modelos da Meshy que sobraram)
-Servem de B ou C onde combinarem. O rádio comunicador, por exemplo, combina com a Central de monitoramento ou com a Sala dos sons. Diga quais são e eu encaixo.
+## Já entraram (7 modelos da Meshy, 22/11/2026)
+Limpeza B e C (L04, L05), Oficina técnica B e C (M02, M03), Ateliê B e C (L06, L07) e Sala dos sons B (N16, rádio comunicador). Nessas salas a peça já muda junto com o nome; nas outras, só o nome muda por enquanto.
+
+## Sobre os modelos antigos
+A Central de monitoramento (nomes B e C) ainda não tem peça extra; um rádio ou painel diferente serviria.
 
 ## Como entregar
 Coloque os GLBs na mesma pasta de antes e me diga a sala e se é B ou C, por exemplo "porcelana B". Se o nome do arquivo já tiver isso, melhor ainda.

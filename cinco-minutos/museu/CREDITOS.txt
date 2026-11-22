@@ -50,3 +50,6 @@ Modificações: simplificação da malha e compressão (Draco e WebP) com glTF-T
 PEÇAS GERADAS NO MESHY AI (22/11/2026) - geradas pelo autor do projeto no Meshy AI (https://www.meshy.ai). A licença de uso depende do plano do autor no Meshy; conferir antes de redistribuir fora do Loop.
 L03 Esfregão com balde (a mop with bucket), M01 Caixa de ferramentas antiga (Vintage Toolbox), S01 Central de monitoramento (Command Control Center).
 Modificações: junção de vértices, simplificação da malha, textura reduzida a 1024 px e compressão (Draco e WebP) com glTF-Transform. As peças N08 (Garrafa), N10 (Lanterna) e B07 deixaram de ser usadas no Loop e continuam na pasta pecas.
+
+PEÇAS EXTRAS DO MESHY AI (22/11/2026) - versões B e C de salas, geradas pelo autor do projeto; mesma observação de licença acima.
+L04 Ferramentas de limpeza, L05 Produtos de limpeza coloridos, M02 Baú de ferramentas de madeira, M03 Armário de ferramentas, N16 Rádio comunicador, L06 Bancada de projetos (Blueprint Workshop), L07 Conjunto de ferramentas de teste (Futuristic Toolset). Mesmas modificações das peças anteriores.
