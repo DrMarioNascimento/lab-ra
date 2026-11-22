@@ -109,3 +109,15 @@ Um único recurso por volta, que combina com o apagão. Enche de novo a cada vol
 - **Um mesmo detalhe** (porta encostada) é chave numa noite e só cenário em outra.
 
 **Acessibilidade:** toda pista necessária tem ícone e nome, nunca só cor ou detalhe minúsculo.
+
+## Modelo de jogo consolidado (22/11/2026; inspirado no Oregon Trail)
+Estrutura: preparar → investigar → decidir → viver as consequências → voltar lembrando → tentar de novo.
+- **Recursos (só três):** **tempo** (5 min por volta); **energia da lanterna** (enche a cada volta; gasta ao se deslocar, ao andar rápido e ao tentar o caixote); **ferramentas** (a equipe escolhe 2 de 4 antes da noite: prancheta de registros, rádio, kit de inspeção, planta do museu; valem a noite toda e voltam a cada volta; nenhuma é indispensável).
+- **Sem barra de confiança:** só compromissos no quadro (ex.: "A Segurança vai acompanhar o carrinho").
+- **Observar, conversar, agir:** não é botão de modo; em grupo cada jogador escolhe uma, no solo uma por volta.
+- **Eventos:** conjunto fixo de variações verificadas por noite. Modelos: corredor temporariamente ocupado (esperar, desviar ou pedir ajuda), duas tarefas ao mesmo tempo (dividir a equipe) e informação incompleta (procurar o registro, perguntar a quem estava ou seguir com hipótese provisória).
+- **Travessias:** decisões de custo e tempo (separar a equipe, ir toda junta ou confirmar antes com um setor); nenhuma opção é universalmente melhor.
+- **Minigames como escolhas:** cadeado, painel de iluminação, grade de planta, balança; sempre com alternativa para resolver o caso sem eles.
+- **Reinicia a cada volta:** relógio, acontecimentos fixos, posição inicial de objetos, apagão e teste de alarme. **Permanece:** o que as pessoas e a equipe lembram, informações do caderno, combinações previstas, aprendizados.
+- **Cuidado:** "A peça que não chegou" é só modelo de fluxo, não uma 16ª noite; as 15 seguem a matriz.
+- **Fase 1:** preparação (2 ferramentas e energia), rotinas no tempo, combinações entre voltas e teoria final, testadas na noite 3. **Fase 2:** caixote, bilhetes e minigames.
