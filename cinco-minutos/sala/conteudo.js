@@ -78,12 +78,12 @@ const PECAS_ALT = {
   atelie:     [{peca:'L06', sub:'Projetos e bancada'}, {peca:'L07', sub:'Ferramentas de teste'}],
   sons:       [{peca:'N16', sub:'Rádio comunicador'}, null],
   relogios:   [{peca:'R01', sub:'Relógio de custódia'}, {peca:'R02', sub:'Relógio de pêndulo'}],
-  eletrica:   [{peca:'E01', sub:'Quadro elétrico'}, null],
+  eletrica:   [{peca:'E01', sub:'Quadro elétrico'}, {peca:'E02', sub:'Central de energia'}],
   deposito:   [{peca:'I01', sub:'Fichário de registros'}, null],
   recepcao:   [{peca:'P01', sub:'Mesa de recepção'}, {peca:'P02', sub:'Balcão com notebook'}],
   mobilia:    [null, {peca:'M04', sub:'Gaveteiro antigo'}],
   corredor:   [null, {peca:'C02', sub:'Quadro de recados e alavancas'}],
-  seguranca:  [{peca:'S02', sub:'Mesa com monitor'}, null],
+  seguranca:  [{peca:'S02', sub:'Mesa com monitor'}, {peca:'S03', sub:'Parede de telas'}],
   patio:      [{peca:'F03', sub:'Farol de luz'}, {peca:'N10', sub:'Lanterna de rua'}],
   conservacao:[null, {peca:'B07', sub:'Inseto sob vidro'}]
 };
