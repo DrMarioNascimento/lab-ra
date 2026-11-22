@@ -1,6 +1,6 @@
 // Loop (MOSAICO) · telão: só lê a sala e mostra o que a turma inteira pode ver. Nunca mostra pistas.
 import { transporteTelao, transporteFalso, ms } from '../transporte.mjs';
-import { CASES, ROOMS, ANDARES, INICIO, EIXOS8, verdade } from '../conteudo.js';
+import { CASES, ROOMS, ANDARES, INICIO, EIXOS8, verdade, sala as salaMuseu, definirMuseu } from '../conteudo.js';
 
 const P = new URLSearchParams(location.search);
 const FALSA = P.get('falsa') === '1';
@@ -46,9 +46,10 @@ function cabeca() {
   return `<div class="tl-topo"><div class="tl-marca"><small>MOSAICO</small><b>Loop</b></div><div class="tl-codigo">CÓDIGO<strong>${esc(codigo)}</strong></div></div>`;
 }
 function mapa() {
+  definirMuseu(room.museu || 0);
   const cont = {}; for (const p of gente()) if (p.amb && p.ambVolta === room.volta) cont[p.amb] = (cont[p.amb] || 0) + 1;
   const esperando = gente().filter((p) => !(p.amb && p.ambVolta === room.volta)).length;
-  return `<div class="tl-mapa">${ANDARES.map((a) => `<h4 class="tl-andar">${esc(a)}</h4>` + (a === INICIO.andar ? `<div class="tl-sala inicio ${esperando ? '' : 'vazia'}"><i>${esc(INICIO.icon)}</i>${esperando ? `<em>${esperando}</em>` : ''}<b>${esc(INICIO.name)} · início</b></div>` : '') + ROOMS.filter((r) => r.andar === a).map((r) => `<div class="tl-sala ${cont[r.id] ? '' : 'vazia'}"><i>${esc(r.icon)}</i>${cont[r.id] ? `<em>${cont[r.id]}</em>` : ''}<b>${esc(r.name)}</b></div>`).join('')).join('')}</div>`;
+  return `<div class="tl-mapa">${ANDARES.map((a) => `<h4 class="tl-andar">${esc(a)}</h4>` + (a === INICIO.andar ? `<div class="tl-sala inicio ${esperando ? '' : 'vazia'}"><i>${esc(INICIO.icon)}</i>${esperando ? `<em>${esperando}</em>` : ''}<b>${esc(INICIO.name)} · início</b></div>` : '') + ROOMS.map((r) => salaMuseu(r.id)).filter((r) => r.andar === a).sort((x, y) => x.lugar - y.lugar).map((r) => `<div class="tl-sala ${cont[r.id] ? '' : 'vazia'}"><i>${esc(r.icon)}</i>${cont[r.id] ? `<em>${cont[r.id]}</em>` : ''}<b>${esc(r.name)}</b></div>`).join('')).join('')}</div>`;
 }
 function desenhar() {
   if (!room) { app.innerHTML = `<div class="tl-raiz">${cabeca()}<div class="tl-card"><h1 class="tl-titulo">Sala não encontrada</h1><p class="tl-texto">Confira o código e abra de novo.</p></div></div>`; return; }

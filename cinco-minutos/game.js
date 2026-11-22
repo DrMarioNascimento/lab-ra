@@ -35,6 +35,89 @@ const ROOMS = [
   {id:'brinquedos', name:'Sala dos brinquedos', andar:'Térreo', icon:'✿', sub:'Carrinho e memória', peca:'N09'},
   {id:'manutencao', name:'Oficina técnica', andar:'Térreo', icon:'◰', sub:'Fios, lâmpadas e reparos', peca:'M01'}
 ];
+
+// ---------------------------------------------------------------- museu vivo (rodízio de lugares e nomes por partida)
+// Cada exposição tem 3 nomes (o de ROOMS é o A; aqui ficam B e C). A semente da partida decide o lugar (andar + número) e o nome de cada sala.
+// Semente 0 = museu de origem (nomes A, andares de ROOMS). O mapa não muda dentro da partida. Ver docs/RODIZIO.md.
+const NOMES_ALT = {
+  gigantes:['Salão dos colossos','Galeria do pescoço longo'],
+  predadores:['Salão das garras','Ala dos caçadores'],
+  veiculos:['Garagem do passado','Sala das rodas'],
+  porcelana:['Salão da louça fina','Sala das xícaras'],
+  jogos:['Salão dos tabuleiros','Sala do passatempo'],
+  cranios:['Galeria dos ancestrais','Sala dos rostos antigos'],
+  mobilia:['Salão das cadeiras','Sala da casa antiga'],
+  galeria:['Galeria das vitrines','Sala das obras'],
+  auditorio:['Sala dos bastidores','Palco pequeno'],
+  asas:['Mezanino do voo','Terraço das asas'],
+  fosseis:['Galeria da rocha','Sala das marcas'],
+  relogios:['Sala das horas','Galeria dos ponteiros'],
+  protecoes:['Sala dos capacetes','Galeria da armadura'],
+  fotografia:['Sala das câmeras','Galeria das imagens'],
+  prototipo:['Sala das invenções','Galeria das demonstrações'],
+  eletrica:['Laboratório de energia','Oficina das formas'],
+  deposito:['Sala do inventário','Galeria das caixas'],
+  vidros:['Sala da transparência','Galeria do brilho'],
+  mar:['Aquário antigo','Sala das águas'],
+  recepcao:['Entrada de convidados','Balcão de chegada'],
+  conservacao:['Gabinete dos espécimes','Sala do acervo'],
+  seguranca:['Sala dos monitores','Posto de controle'],
+  atelie:['Oficina de ensaios','Sala dos testes'],
+  corredor:['Canto de descanso','Varanda da equipe'],
+  sons:['Sala do rádio','Galeria da música'],
+  limpeza:['Depósito de limpeza','Sala dos carrinhos'],
+  ambar:['Sala do tempo preso','Galeria da resina'],
+  patio:['Pátio da claridade','Jardim de luz'],
+  brinquedos:['Sala das brincadeiras','Galeria dos carrinhos'],
+  manutencao:['Bancada de reparos','Sala dos reparos']
+};
+const FUNCOES_ENTRADA = ['recepcao','conservacao','seguranca','limpeza','manutencao'];
+const LUGARES = {'2º andar':9, '1º andar':10, 'Térreo':11};
+let MUSEU = null;
+function rngMuseu(semente){let a=(semente>>>0)||1;return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296}}
+function embaralhar(v,rnd){const o=v.slice();for(let i=o.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[o[i],o[j]]=[o[j],o[i]]}return o}
+function montarMuseu(semente){
+ const mapa = {};
+ if (!semente) {
+  const cont = {};
+  for (const r of ROOMS) { cont[r.andar] = (cont[r.andar]||0)+1; mapa[r.id] = {nome:r.name, andar:r.andar, lugar:cont[r.andar]}; }
+  return {semente:0, mapa};
+ }
+ const rnd = rngMuseu(semente);
+ const lugaresTerreo = Array.from({length:LUGARES['Térreo']}, (_, i) => i+1);
+ const entrada = lugaresTerreo.slice(0, FUNCOES_ENTRADA.length);
+ embaralhar(FUNCOES_ENTRADA, rnd).forEach((id, i) => { mapa[id] = {andar:'Térreo', lugar:entrada[i]}; });
+ const livres = [];
+ for (const a of ANDARES) for (let n=1; n<=LUGARES[a]; n++) if (!(a==='Térreo' && n<=FUNCOES_ENTRADA.length)) livres.push({andar:a, lugar:n});
+ const grupoB = embaralhar(ROOMS.map(r => r.id).filter(id => !FUNCOES_ENTRADA.includes(id)), rnd);
+ grupoB.forEach((id, i) => { mapa[id] = livres[i]; });
+ for (const r of ROOMS) { const v = [r.name, ...NOMES_ALT[r.id]]; mapa[r.id].nome = v[Math.floor(rnd()*3)]; }
+ return {semente, mapa};
+}
+function definirMuseu(semente){ MUSEU = montarMuseu(Number(semente)||0); return MUSEU; }
+function sala(id){
+ const base = ROOMS.find(r => r.id === id); if (!base) return undefined;
+ MUSEU ??= montarMuseu(0);
+ const m = MUSEU.mapa[id];
+ return {...base, name:m.nome, andar:m.andar, lugar:m.lugar, nomeBase:base.name};
+}
+// Troca, em qualquer texto de pista, o nome de origem das salas pelo nome da partida.
+function nomear(texto){
+ MUSEU ??= montarMuseu(0);
+ if (!MUSEU.semente) return texto;
+ const por = Object.fromEntries(ROOMS.map(r => [r.name, MUSEU.mapa[r.id].nome]));
+ const re = new RegExp(Object.keys(por).sort((x,y)=>y.length-x.length).map(n=>n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|'),'g');
+ return String(texto).replace(re, n => por[n]);
+}
+// Sorteia a semente da partida: as salas-chave do caso (onde, equipamento e fonte) não podem ficar todas no mesmo andar.
+function sortearMuseu(chaves){
+ for (let k=0; k<50; k++) {
+  const semente = 1 + Math.floor(Math.random()*2147483646), m = montarMuseu(semente);
+  if (!chaves || new Set(chaves.map(id => m.mapa[id].andar)).size > 1) return semente;
+ }
+ return 1;
+}
+
 const EVENTS = {
   proteger:'Uma peça foi retirada para proteção.',
   troca:'Uma obra foi substituída por outra.',
@@ -101,7 +184,7 @@ let state=null,timerHandle=null,toastHandle=null;
 function load(key,fallback){try{return JSON.parse(localStorage.getItem(key))??fallback}catch{return fallback}}
 function save(){try{localStorage.setItem(window.coop?.storageKey ?? storageKey,JSON.stringify(state))}catch{}}
 function chooseCase(){let hist=load(historyKey,[]);if(!Array.isArray(hist))hist=[];let options=CASES.map((_,i)=>i).filter(i=>!hist.includes(i));if(!options.length){hist=[];options=CASES.map((_,i)=>i)}const i=options[Math.floor(Math.random()*options.length)];hist.push(i);try{localStorage.setItem(historyKey,JSON.stringify(hist))}catch{}return i}
-function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function esc(s){return nomear(String(s)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 const extraDescriptions = {
   prototipo: 'O protótipo da exposição fica ligado ao relógio de demonstração.',
   deposito: 'Etiquetas e fichas de movimentação documentam o trajeto de cada peça.',
@@ -136,7 +219,7 @@ const EXTRA_ORDEM = Object.keys(EXTRAS);
 Object.keys(EXTRAS).forEach(k => { roomDescriptions[k] = EXTRAS[k]; });
 
 function makeClues(c){
- const evidence=labels[c.alarm][1],fig=figures[c.figure],room=ROOMS.find(r=>r.id===c.room).name;
+ const evidence=labels[c.alarm][1],fig=figures[c.figure],room=sala(c.room).name;
  const base={
   galeria:[
    {id:'gal1',name:'Observar a montagem',time:0,text:'Preso à vitrine, um cartão escrito à mão fala de '+c.subject+'. Embaixo, uma observação de alguém da montagem: '+c.clue+'.'},
@@ -312,6 +395,11 @@ const timePath = () => state.caseRules === 2
  : LEGACY_PATH;
 
 function scenarioClues(){
+ const todas = scenarioCluesBase(), out = {};
+ for (const k of Object.keys(todas)) out[k] = todas[k].map(q => ({...q, name:nomear(q.name), text:nomear(q.text)}));
+ return out;
+}
+function scenarioCluesBase(){
  const clues = makeClues(current());
  if (state.caseRules !== 2) return clues;
 
@@ -326,12 +414,12 @@ function scenarioClues(){
  clues[path.room].push({id:'time-control',name:'Observar o mecanismo',time:path.opens,tipo:'Observação',text:path.observation});
  clues[path.source].push({id:'time-source',name:'Consultar o procedimento de encerramento',time:60,tipo:'Registro',text:path.instruction});
  // O procedimento cita só o código do equipamento. Dois diretórios, em ambientes diferentes, dizem onde cada código fica.
- const diretorio = 'Diretório de equipamentos: ' + Object.keys(TIME_PATHS).map(resolvePath).map(p => p.code+' fica em '+ROOMS.find(r=>r.id===p.room).name).join('; ') + '.';
+ const diretorio = 'Diretório de equipamentos: ' + Object.keys(TIME_PATHS).map(resolvePath).map(p => p.code+' fica em '+sala(p.room).name).join('; ') + '.';
  clues.seguranca.push({id:'time-dir1',name:'Consultar o diretório de equipamentos',time:30,tipo:'Registro',text:diretorio,fatos:['dir']});
  clues.patio.push({id:'time-dir2',name:'Ler o mapa de equipamentos',time:60,tipo:'Registro',text:diretorio,fatos:['dir']});
  clues[path.source].find(q => q.id === 'time-source').fatos = ['when','how','predict','proc'];
  // Salas sem peça-chave: três ecos verdadeiros, de fatos diferentes (21/11/2026: mais caminhos até cada fato essencial).
- const c = current(), evidence = labels[c.alarm][1], room = ROOMS.find(r=>r.id===c.room).name;
+ const c = current(), evidence = labels[c.alarm][1], room = sala(c.room).name;
  const eco = [
   ['Ler o aviso interno', 'Um aviso interno conta que '+c.detail+'.', 'Registro', ['event']],
   ['Conferir o registro do alarme', evidence, 'Registro', ['alarm']],
@@ -372,19 +460,22 @@ function museumTime(){
  return (minutes<60?'21:':'22:')+String(minutes%60).padStart(2,'0')+':'+String(elapsed%60).padStart(2,'0');
 }
 function current(){return CASES[state.caseIndex]}
-function reset(){clearInterval(timerHandle);state={caseIndex:chooseCase(),loop:1,phase:'choose',room:null,duration:Number($('speed').value),remaining:Number($('speed').value),endAt:null,clues:[],hints:0,notes:'',answers:null,liveFinal:true,caseRules:2,archive:[],codes:sortearCodigos()};save();renderGame();show('game')}
+function reset(){clearInterval(timerHandle);state={caseIndex:chooseCase(),loop:1,phase:'choose',room:null,duration:Number($('speed').value),remaining:Number($('speed').value),endAt:null,clues:[],hints:0,notes:'',answers:null,liveFinal:true,caseRules:2,archive:[],codes:sortearCodigos()};state.museu=sortearMuseu(chavesDoCaso(state.caseIndex));definirMuseu(state.museu);save();renderGame();show('game')}
 function enterRoom(id){if(window.coop){window.coop.choose(id);return}if(state.phase!=='choose')return;state.room=id;state.phase='playing';state.remaining=state.duration;state.endAt=Date.now()+state.remaining*1000;save();renderGame();tick();timerHandle=setInterval(tick,250)}
+function chavesDoCaso(i){ const t = TIME_PATHS[CASE_PATHS[i]]; return [CASES[i].room, ...(t ? [t.room, t.source] : [])]; }
+function aplicarMuseu(){ if ((MUSEU?.semente ?? 0) !== (state.museu || 0)) definirMuseu(state.museu || 0); }
 function renderGame(){
+ aplicarMuseu();
  const finalLoop = hasLiveFinal() && state.loop === 5;
  $('loopBrief').classList.toggle('hidden', !finalLoop);
  $('fictionTime').textContent = museumTime();
  $('museumSignal').textContent = '';
  $('loopLabel').textContent='LOOP '+state.loop+' DE 5';$('timer').textContent=fmt(state.remaining);
  $('clockStatus').textContent=state.phase==='playing'?'tempo em andamento':'aguardando escolha';
- $('phaseTitle').textContent=state.room?ROOMS.find(r=>r.id===state.room).name:'Escolha onde investigar';
+ $('phaseTitle').textContent=state.room?sala(state.room).name:'Escolha onde investigar';
  $('phaseDescription').textContent=state.phase==='playing'?'Gire a peça e toque nos pontos que brilham para achar pistas.':'Todo mundo começa no '+INICIO.name+', no '+INICIO.andar+'. Escolha para onde ir.';
  $('boardTitle').textContent=state.phase==='playing'?'Ambiente escolhido':'Escolha um ambiente';
- $('roomGrid').innerHTML='<div class="inicio" role="status"><span class="room-icon" aria-hidden="true">'+INICIO.icon+'</span><div><strong>'+INICIO.name+' · '+INICIO.andar+'</strong><small>'+(state.phase==='playing'?'Quando o tempo acabar, você volta para cá. A porta principal está trancada pela grade de segurança.':'Você está aqui. Todo mundo começa aqui, a cada volta. A porta principal está trancada pela grade de segurança.')+'</small></div></div>'+ANDARES.map(a=>'<h4 class="andar">'+a+'</h4>'+ROOMS.filter(r=>r.andar===a).map(r=>'<button class="room '+(state.room===r.id?'selected':'')+'" '+(state.phase==='playing'&&state.room?'disabled':'')+' data-room="'+r.id+'"><span class="room-icon" aria-hidden="true">'+r.icon+'</span><strong>'+r.name+'</strong><small>'+r.sub+'</small></button>').join('')).join('');
+ $('roomGrid').innerHTML='<div class="inicio" role="status"><span class="room-icon" aria-hidden="true">'+INICIO.icon+'</span><div><strong>'+INICIO.name+' · '+INICIO.andar+'</strong><small>'+(state.phase==='playing'?'Quando o tempo acabar, você volta para cá. A porta principal está trancada pela grade de segurança.':'Você está aqui. Todo mundo começa aqui, a cada volta. A porta principal está trancada pela grade de segurança.')+'</small></div></div>'+ANDARES.map(a=>'<h4 class="andar">'+a+'</h4>'+ROOMS.map(r=>sala(r.id)).filter(r=>r.andar===a).sort((x,y)=>x.lugar-y.lugar).map(r=>'<button class="room '+(state.room===r.id?'selected':'')+'" '+(state.phase==='playing'&&state.room?'disabled':'')+' data-room="'+r.id+'"><span class="room-icon" aria-hidden="true">'+r.icon+'</span><strong>'+esc(r.name)+'</strong><small>Lugar '+r.lugar+' · '+esc(r.sub)+'</small></button>').join('')).join('');
  document.querySelectorAll('[data-room]').forEach(b=>b.addEventListener('click',()=>enterRoom(b.dataset.room)));
  $('endLoop').classList.toggle('hidden', state.phase!=='playing' || ((finalLoop || state.caseRules === 2) && state.duration===300));
  $('statusText').textContent=state.phase==='playing'?'Você fica nesta sala até o tempo voltar. Aí você acorda no '+INICIO.name+'.':'Você visita uma sala por volta.';
@@ -409,7 +500,7 @@ function pontosDaPeca(mv, clues){
  } catch (e) { console.warn('pontos da peça', e); }
 }
 function renderClues(){
- const room = ROOMS.find(item => item.id === state.room);
+ const room = sala(state.room);
  const panel = $('roomPanel');
  const clues = scenarioClues()[room.id];
  const scene = [state.caseIndex, state.caseRules, !!window.coop, room.id].join(':');
@@ -515,7 +606,7 @@ function applyIntervention(command){
 function brokeLoop(){
  return state.intervention === 'break' || state.intervention === 'suspender';
 }
-function collect(id){if(state.phase!=='playing'||(window.coop?.now() ?? Date.now())>=state.endAt){tick();return}const q=scenarioClues()[state.room].find(x=>x.id===id);if(!q||state.clues.some(x=>x.id===id)||state.duration-(state.endAt-(window.coop?.now() ?? Date.now()))/1000<q.time/300*state.duration)return;const room=ROOMS.find(x=>x.id===state.room);state.clues.push({id:q.id,room:room.name,name:q.name,text:q.text,tipo:q.tipo,fatos:q.fatos,loop:state.loop});save();renderClues();renderJournal();toast('Pista guardada no caderno')}
+function collect(id){if(state.phase!=='playing'||(window.coop?.now() ?? Date.now())>=state.endAt){tick();return}const q=scenarioClues()[state.room].find(x=>x.id===id);if(!q||state.clues.some(x=>x.id===id)||state.duration-(state.endAt-(window.coop?.now() ?? Date.now()))/1000<q.time/300*state.duration)return;const room=sala(state.room);state.clues.push({id:q.id,room:room.name,name:q.name,text:q.text,tipo:q.tipo,fatos:q.fatos,loop:state.loop});save();renderClues();renderJournal();toast('Pista guardada no caderno')}
 function renderJournal(){
  const clues=state.clues||[];$('countBadge').textContent=clues.length;
  $('journalPreview').innerHTML=clues.length?clues.slice(-3).reverse().map(c=>'<div class="preview-item">'+esc(c.name)+' <br><small>'+esc(c.room)+'</small></div>').join(''):'<p class="muted">Suas descobertas aparecerão aqui.</p>';
@@ -528,8 +619,8 @@ function renderJournal(){
   }).join(''));
  }
  const path = timePath();
- const figureRoom = ROOMS.find(room => room.id === current().room).name;
- const roomName = id => ROOMS.find(room => room.id === id).name;
+ const figureRoom = sala(current().room).name;
+ const roomName = id => sala(id).name;
  const nearingIntervention = hasLiveFinal() && (state.loop === 5 || (state.loop === 4 && state.phase === 'between'));
  const timeLead = nearingIntervention
   ? 'Compare os comandos no ambiente '+roomName(path.room)+'. Um atua sobre o retorno e o outro altera apenas um efeito secundário.'
@@ -583,7 +674,7 @@ function next(){
  show('game');
 }
 function options(obj){return '<option value="">Ainda não sei</option>'+Object.entries(obj).map(([k,v])=>'<option value="'+k+'">'+esc(v)+'</option>').join('')}
-const WHERES = Object.fromEntries(['galeria','recepcao','corredor','seguranca','conservacao'].map(id => [id, ROOMS.find(r=>r.id===id).name]));
+const wheres = () => Object.fromEntries(['galeria','recepcao','corredor','seguranca','conservacao'].map(id => [id, sala(id).name]));
 const WHENS = {
  suspension:'Entre 21h57 e 22h',
  reserve:'Entre 21h57 e 21h59',
@@ -602,13 +693,13 @@ const PREDICTIONS = {
  alarme:'O alarme para sozinho antes das 22h',
  estrondo:'O estrondo deixa de acontecer'
 };
-const roomNameOf = id => ROOMS.find(r => r.id === id).name;
+const roomNameOf = id => sala(id).name;
 // As 8 perguntas da investigação. Soma: 100 pontos. Cada pergunta indica de onde podem vir as respostas.
 const ANSWER_AXES = [
  {key:'event', pts:15, title:'O quê', question:'O quê: o que aconteceu com o acervo ou a exposição?', options:EVENTS,
   sources:['gal2','con1','rec2','cor1','dep2'],
   guide:'Compare o que a equipe esperava encontrar com os registros de movimentação.'},
- {key:'where', pts:10, title:'Onde', question:'Onde: em que ambiente o acontecimento se concentrou?', options:WHERES,
+ {key:'where', pts:10, title:'Onde', question:'Onde: em que ambiente o acontecimento se concentrou?', get options(){return wheres()},
   test:clue => clue.text.includes(roomNameOf(current().room)),
   guide:'Rondas e recados citam o ambiente da figura imóvel. Procure o nome do ambiente, não só o objeto.'},
  {key:'when', pts:10, title:'Quando', question:'Quando era possível agir sobre o retorno?', options:WHENS,
@@ -665,7 +756,7 @@ function pointsFor(axis, answer, answers = {}){
  if (!answer) return 0;
  const right = truth(axis.key), cz = effectiveCerteza(axis, answers);
  if (answer === right) return Math.round(axis.pts*cz.hit);
- if (axis.key === 'where' && ROOMS.find(r=>r.id===answer).andar === ROOMS.find(r=>r.id===right).andar) return Math.floor(axis.pts/2*cz.hit);
+ if (axis.key === 'where' && sala(answer).andar === sala(right).andar) return Math.floor(axis.pts/2*cz.hit);
  if (axis.key === 'when' && TIME_PATHS[answer].opens === TIME_PATHS[right].opens) return Math.floor(axis.pts/2*cz.hit);
  return Math.round(axis.pts*cz.miss);
 }
@@ -674,7 +765,7 @@ function partialRecord(key){
  const c = current(), path = timePath();
  switch (key) {
   case 'event': return 'O índice do acervo menciona '+c.subject+'. No verso, lê-se que '+c.clue+'. A ficha de desfecho está incompleta.';
-  case 'where': return 'O mapa de rondas marca um ponto de atenção no '+ROOMS.find(r=>r.id===c.room).andar+'. O nome do ambiente está borrado.';
+  case 'where': return 'O mapa de rondas marca um ponto de atenção no '+sala(c.room).andar+'. O nome do ambiente está borrado.';
   case 'when': return 'A agenda do protótipo marca um comando que fecha às '+clockAt(path.closes)+'. O horário de abertura foi rasurado.';
   case 'how': return 'O manual do protótipo cita o equipamento '+path.code+'. A página sobre a função dele foi arrancada.';
   case 'alarm': return 'O aviso sonoro começou às 21h57min45s, depois do apagão. ' + ({
@@ -682,7 +773,7 @@ function partialRecord(key){
    manual:'O fragmento recuperado veio do registro de operações da equipe.',
    teste:'O fragmento recuperado veio da agenda de manutenção.'
   }[c.alarm]) + ' O campo de causa está ilegível.';
-  case 'figure': return 'A ronda localiza a figura imóvel em '+ROOMS.find(room=>room.id===c.room).name+'. O campo de identificação está em branco.';
+  case 'figure': return 'A ronda localiza a figura imóvel em '+sala(c.room).name+'. O campo de identificação está em branco.';
   case 'predict': return 'Um bilhete do inventor fala em marcar o fim da demonstração para as 22h. O resto do bilhete está rasgado.';
   case 'action': return 'A ficha de prevenção faz referência a '+c.subject+'. Há uma anotação de que '+c.clue+'. A folha de recomendações não foi localizada.';
  }

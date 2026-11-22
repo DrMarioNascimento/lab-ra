@@ -68,3 +68,8 @@ Tipo: **F** = função perto da entrada (Grupo A), **E** = livre (Grupo B). Anda
 - Todas as telas e textos devem ler nome, andar e lugar por uma função (`sala(id)`), nunca de `ROOMS` direto. Isso inclui pistas, resposta do "Onde" e lista do telão.
 - A resposta de "Onde" compara ids; o rótulo mostrado usa o nome da partida.
 - `sala/conteudo.js` é gerado de `game.js`: regenerar depois da mudança.
+
+## Estado da implementação (22/11/2026)
+**Feito no motor:** `game.js` tem o rodízio (semente por partida, Grupo A só entre os 5 lugares da entrada, Grupo B nos outros 25, nome A/B/C por sala). `sala(id)` entrega nome, andar e lugar da partida; `nomear()` troca o nome de origem nos textos das pistas; `esc()` já aplica isso. A semente é sorteada em `reset()` (individual) e pelo Mestre em `partidaNova` (sala, campo `museu` do documento da sala). Jogadores, Mestre e telão desenham o mesmo museu a partir da semente. Salas-chave do caso nunca ficam todas no mesmo andar. A pontuação do "Onde" usa o andar da partida. O cartão de cada sala mostra "Lugar N".
+**Testado:** 40 partidas sorteadas sem nome de origem vazando nas pistas, 30 lugares sem repetição, simulação e testes iguais ao anterior, sala simulada com Mestre + participantes + telão na mesma semente.
+**Ainda não:** a página da maquete (`museu/`) continua com os nomes e posições de origem; precisa receber a semente ou mostrar só o número do lugar.

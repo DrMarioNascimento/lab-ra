@@ -10,5 +10,5 @@ sed -n "3,$((L-1))p" game.js | grep -v '^const \$=id\|^const storageKey\|^let st
 sed -n '/^const CASE_PATHS/,/^];/p' game.js
 echo "const EIXOS8 = [['event','O quê'],['where','Onde'],['when','Quando'],['how','Como'],['alarm','Por quê'],['figure','Quem'],['predict','Previsão'],['action','Intervenção']];"
 echo "const verdade = (caso, k) => { const c = CASES[caso]; return k === 'where' ? c.room : k === 'when' || k === 'how' ? CASE_PATHS[caso] : k === 'predict' ? 'retorno' : c[k]; };"
-echo "export { ANDARES, INICIO, ROOMS, EVENTS, ALARMS, FIGURES, ACTIONS, CASES, labels, figures, makeClues, esc, CASE_PATHS, EIXOS8, verdade };"
+echo "export { ANDARES, INICIO, ROOMS, sala, definirMuseu, sortearMuseu, montarMuseu, nomear, EVENTS, ALARMS, FIGURES, ACTIONS, CASES, labels, figures, makeClues, esc, CASE_PATHS, EIXOS8, verdade };"
 } > sala/conteudo.js

@@ -35,6 +35,89 @@ const ROOMS = [
   {id:'brinquedos', name:'Sala dos brinquedos', andar:'Térreo', icon:'✿', sub:'Carrinho e memória', peca:'N09'},
   {id:'manutencao', name:'Oficina técnica', andar:'Térreo', icon:'◰', sub:'Fios, lâmpadas e reparos', peca:'M01'}
 ];
+
+// ---------------------------------------------------------------- museu vivo (rodízio de lugares e nomes por partida)
+// Cada exposição tem 3 nomes (o de ROOMS é o A; aqui ficam B e C). A semente da partida decide o lugar (andar + número) e o nome de cada sala.
+// Semente 0 = museu de origem (nomes A, andares de ROOMS). O mapa não muda dentro da partida. Ver docs/RODIZIO.md.
+const NOMES_ALT = {
+  gigantes:['Salão dos colossos','Galeria do pescoço longo'],
+  predadores:['Salão das garras','Ala dos caçadores'],
+  veiculos:['Garagem do passado','Sala das rodas'],
+  porcelana:['Salão da louça fina','Sala das xícaras'],
+  jogos:['Salão dos tabuleiros','Sala do passatempo'],
+  cranios:['Galeria dos ancestrais','Sala dos rostos antigos'],
+  mobilia:['Salão das cadeiras','Sala da casa antiga'],
+  galeria:['Galeria das vitrines','Sala das obras'],
+  auditorio:['Sala dos bastidores','Palco pequeno'],
+  asas:['Mezanino do voo','Terraço das asas'],
+  fosseis:['Galeria da rocha','Sala das marcas'],
+  relogios:['Sala das horas','Galeria dos ponteiros'],
+  protecoes:['Sala dos capacetes','Galeria da armadura'],
+  fotografia:['Sala das câmeras','Galeria das imagens'],
+  prototipo:['Sala das invenções','Galeria das demonstrações'],
+  eletrica:['Laboratório de energia','Oficina das formas'],
+  deposito:['Sala do inventário','Galeria das caixas'],
+  vidros:['Sala da transparência','Galeria do brilho'],
+  mar:['Aquário antigo','Sala das águas'],
+  recepcao:['Entrada de convidados','Balcão de chegada'],
+  conservacao:['Gabinete dos espécimes','Sala do acervo'],
+  seguranca:['Sala dos monitores','Posto de controle'],
+  atelie:['Oficina de ensaios','Sala dos testes'],
+  corredor:['Canto de descanso','Varanda da equipe'],
+  sons:['Sala do rádio','Galeria da música'],
+  limpeza:['Depósito de limpeza','Sala dos carrinhos'],
+  ambar:['Sala do tempo preso','Galeria da resina'],
+  patio:['Pátio da claridade','Jardim de luz'],
+  brinquedos:['Sala das brincadeiras','Galeria dos carrinhos'],
+  manutencao:['Bancada de reparos','Sala dos reparos']
+};
+const FUNCOES_ENTRADA = ['recepcao','conservacao','seguranca','limpeza','manutencao'];
+const LUGARES = {'2º andar':9, '1º andar':10, 'Térreo':11};
+let MUSEU = null;
+function rngMuseu(semente){let a=(semente>>>0)||1;return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296}}
+function embaralhar(v,rnd){const o=v.slice();for(let i=o.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[o[i],o[j]]=[o[j],o[i]]}return o}
+function montarMuseu(semente){
+ const mapa = {};
+ if (!semente) {
+  const cont = {};
+  for (const r of ROOMS) { cont[r.andar] = (cont[r.andar]||0)+1; mapa[r.id] = {nome:r.name, andar:r.andar, lugar:cont[r.andar]}; }
+  return {semente:0, mapa};
+ }
+ const rnd = rngMuseu(semente);
+ const lugaresTerreo = Array.from({length:LUGARES['Térreo']}, (_, i) => i+1);
+ const entrada = lugaresTerreo.slice(0, FUNCOES_ENTRADA.length);
+ embaralhar(FUNCOES_ENTRADA, rnd).forEach((id, i) => { mapa[id] = {andar:'Térreo', lugar:entrada[i]}; });
+ const livres = [];
+ for (const a of ANDARES) for (let n=1; n<=LUGARES[a]; n++) if (!(a==='Térreo' && n<=FUNCOES_ENTRADA.length)) livres.push({andar:a, lugar:n});
+ const grupoB = embaralhar(ROOMS.map(r => r.id).filter(id => !FUNCOES_ENTRADA.includes(id)), rnd);
+ grupoB.forEach((id, i) => { mapa[id] = livres[i]; });
+ for (const r of ROOMS) { const v = [r.name, ...NOMES_ALT[r.id]]; mapa[r.id].nome = v[Math.floor(rnd()*3)]; }
+ return {semente, mapa};
+}
+function definirMuseu(semente){ MUSEU = montarMuseu(Number(semente)||0); return MUSEU; }
+function sala(id){
+ const base = ROOMS.find(r => r.id === id); if (!base) return undefined;
+ MUSEU ??= montarMuseu(0);
+ const m = MUSEU.mapa[id];
+ return {...base, name:m.nome, andar:m.andar, lugar:m.lugar, nomeBase:base.name};
+}
+// Troca, em qualquer texto de pista, o nome de origem das salas pelo nome da partida.
+function nomear(texto){
+ MUSEU ??= montarMuseu(0);
+ if (!MUSEU.semente) return texto;
+ const por = Object.fromEntries(ROOMS.map(r => [r.name, MUSEU.mapa[r.id].nome]));
+ const re = new RegExp(Object.keys(por).sort((x,y)=>y.length-x.length).map(n=>n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|'),'g');
+ return String(texto).replace(re, n => por[n]);
+}
+// Sorteia a semente da partida: as salas-chave do caso (onde, equipamento e fonte) não podem ficar todas no mesmo andar.
+function sortearMuseu(chaves){
+ for (let k=0; k<50; k++) {
+  const semente = 1 + Math.floor(Math.random()*2147483646), m = montarMuseu(semente);
+  if (!chaves || new Set(chaves.map(id => m.mapa[id].andar)).size > 1) return semente;
+ }
+ return 1;
+}
+
 const EVENTS = {
   proteger:'Uma peça foi retirada para proteção.',
   troca:'Uma obra foi substituída por outra.',
@@ -95,7 +178,7 @@ const figures={
   funcionario:'Uma credencial de serviço identifica a figura como uma funcionária que preparava uma surpresa. Ela cochicha: "Shh! É surpresa para o pessoal. Ninguém pode saber ainda... você não vai contar, vai?"'
 };
 const roomDescriptions={galeria:'Vitrines, pedestais e obras aguardam o fechamento. Algo chama sua atenção entre os registros da exposição.',conservacao:'Fichas de acervo e materiais de trabalho contam uma parte da história dos objetos.',seguranca:'Telas e botões cercam uma mesa de comando. O alarme é apenas um dos sinais daquela noite.',eletrica:'A luz de emergência revela equipamentos e anotações técnicas. Nem toda falha tem a mesma causa.',recepcao:'Convidados, entregas e registros de entrada se cruzam perto da porta principal, fechada pela grade de segurança.',corredor:'Pelo corredor passam pessoas e caixas. Olhar a passagem não revela, sozinho, toda a intenção.'};
-function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function esc(s){return nomear(String(s)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 const extraDescriptions = {
   prototipo: 'O protótipo da exposição fica ligado ao relógio de demonstração.',
   deposito: 'Etiquetas e fichas de movimentação documentam o trajeto de cada peça.',
@@ -130,7 +213,7 @@ const EXTRA_ORDEM = Object.keys(EXTRAS);
 Object.keys(EXTRAS).forEach(k => { roomDescriptions[k] = EXTRAS[k]; });
 
 function makeClues(c){
- const evidence=labels[c.alarm][1],fig=figures[c.figure],room=ROOMS.find(r=>r.id===c.room).name;
+ const evidence=labels[c.alarm][1],fig=figures[c.figure],room=sala(c.room).name;
  const base={
   galeria:[
    {id:'gal1',name:'Observar a montagem',time:0,text:'Preso à vitrine, um cartão escrito à mão fala de '+c.subject+'. Embaixo, uma observação de alguém da montagem: '+c.clue+'.'},
@@ -216,4 +299,4 @@ const CASE_PATHS = [
 ];
 const EIXOS8 = [['event','O quê'],['where','Onde'],['when','Quando'],['how','Como'],['alarm','Por quê'],['figure','Quem'],['predict','Previsão'],['action','Intervenção']];
 const verdade = (caso, k) => { const c = CASES[caso]; return k === 'where' ? c.room : k === 'when' || k === 'how' ? CASE_PATHS[caso] : k === 'predict' ? 'retorno' : c[k]; };
-export { ANDARES, INICIO, ROOMS, EVENTS, ALARMS, FIGURES, ACTIONS, CASES, labels, figures, makeClues, esc, CASE_PATHS, EIXOS8, verdade };
+export { ANDARES, INICIO, ROOMS, sala, definirMuseu, sortearMuseu, montarMuseu, nomear, EVENTS, ALARMS, FIGURES, ACTIONS, CASES, labels, figures, makeClues, esc, CASE_PATHS, EIXOS8, verdade };

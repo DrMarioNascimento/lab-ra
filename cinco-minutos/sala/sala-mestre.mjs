@@ -32,7 +32,12 @@ function perguntarRitmo() {
   });
 }
 const sorteio = () => (typeof chooseCase === 'function' ? chooseCase() : Math.floor(Math.random() * CASES.length));
-const partidaNova = (seg, rodada) => ({ etapa: 'choose', volta: 1, caso: sorteio(), seg, iniEm: null, rodada });
+const partidaNova = (seg, rodada) => {
+  const caso = sorteio();
+  // Museu vivo: o Mestre sorteia a semente (lugares e nomes) e todo mundo vê o mesmo museu.
+  const museu = typeof sortearMuseu === 'function' && typeof chavesDoCaso === 'function' ? sortearMuseu(chavesDoCaso(caso)) : 0;
+  return { etapa: 'choose', volta: 1, caso, seg, iniEm: null, rodada, museu };
+};
 
 // O firebase-room.js chama isto quando o Mestre toca em "Iniciar partida" e grava o que voltar junto com fase:'jogo'.
 window.DragonSalaAntesDeIniciar = async () => partidaNova(await perguntarRitmo(), 1);
@@ -70,7 +75,7 @@ function desenhar(leve) {
   const e = room.etapa;
   if (!leve && state.loop !== room.volta) state.room = null;
   const fim = fimDaVolta();
-  Object.assign(state, { caseRules: 2, liveFinal: true, caseIndex: room.caso, loop: room.volta, phase: e, duration: room.seg, endAt: fim, remaining: e === 'playing' ? restante() : room.seg, answers: euJogador().resp || null });
+  Object.assign(state, { caseRules: 2, liveFinal: true, caseIndex: room.caso, museu: room.museu || 0, loop: room.volta, phase: e, duration: room.seg, endAt: fim, remaining: e === 'playing' ? restante() : room.seg, answers: euJogador().resp || null });
   save();
   if (!leve) clearInterval(timerHandle);
   if (e === 'choose' || e === 'playing') {
