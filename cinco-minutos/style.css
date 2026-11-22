@@ -108,3 +108,15 @@
 .cadeado>div{flex:1;min-width:0}
 .cadeado svg{width:40px;height:50px}
 @media(max-width:420px){.cadeado{flex-direction:column;align-items:flex-start}.cadeado>div{width:100%}}
+/* noites: preparação, energia, caixote, combinações, teoria */
+.prep,.caixote,.combo-box,.teoria{border:1px solid #d8b67b55;border-radius:14px;padding:14px;margin:12px 0;background:linear-gradient(#162634,#101c27)}
+.ferramentas{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.ferramenta,.combo,.disco{border:1px solid #e4c18a88;border-radius:12px;color:#f8eddb;background:linear-gradient(#354954,#192b37);box-shadow:inset 0 1px #fff3,0 4px #071018,0 10px 20px #0007;padding:12px;text-align:left;font:600 .9rem system-ui;cursor:pointer}
+.ferramenta span{font-size:1.6rem;display:block}.ferramenta small{display:block;font-weight:400;color:#b7c6c4}
+.ferramenta[aria-pressed=true],.combo[aria-pressed=true]{background:linear-gradient(#f2d5a3,#bf8f4d);color:#191b1b}.ferramenta[aria-pressed=true] small{color:#3b2e17}
+.ferramenta:active,.combo:active,.disco:active{transform:translateY(2px)}
+.combo{display:block;width:100%;margin:8px 0}
+.energia{margin:6px 0;font-weight:700;letter-spacing:.08em;color:#f2d5a3}.energia small{letter-spacing:0;color:#b7c6c4}
+.discos{display:flex;gap:10px;margin:10px 0}.disco{flex:1;text-align:center;font-size:2rem}.disco small{display:block;font-size:.7rem;font-weight:600}
+.bilhete{font-style:italic;border-left:3px solid #f2d5a3;padding-left:10px}
+@media(max-width:420px){.ferramentas{grid-template-columns:1fr}}

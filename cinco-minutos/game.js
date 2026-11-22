@@ -429,7 +429,7 @@ const timePath = () => state.caseRules === 2
  : LEGACY_PATH;
 
 function scenarioClues(){
- const todas = scenarioCluesBase(), out = {};
+ const todas = mergeNoite(scenarioCluesBase()), out = {};
  for (const k of Object.keys(todas)) out[k] = todas[k].map(q => ({...q, name:nomear(q.name), text:nomear(q.text)}));
  return out;
 }
@@ -511,6 +511,7 @@ function renderGame(){
  $('boardTitle').textContent=state.phase==='playing'?'Ambiente escolhido':'Escolha um ambiente';
  $('roomGrid').innerHTML='<div class="inicio" role="status"><span class="room-icon" aria-hidden="true">'+INICIO.icon+'</span><div><strong>'+INICIO.name+' · '+INICIO.andar+'</strong><small>'+(state.phase==='playing'?'Quando o tempo acabar, você volta para cá. A porta principal está trancada pela grade de segurança.':'Você está aqui. Todo mundo começa aqui, a cada volta. A porta principal está trancada pela grade de segurança.')+'</small></div></div>'+ANDARES.map(a=>'<h4 class="andar">'+a+'</h4>'+ROOMS.map(r=>sala(r.id)).filter(r=>r.andar===a).sort((x,y)=>x.lugar-y.lugar).map(r=>'<button class="room '+(state.room===r.id?'selected':'')+'" '+(state.phase==='playing'&&state.room?'disabled':'')+' data-room="'+r.id+'"><span class="room-icon" aria-hidden="true">'+r.icon+'</span><strong>'+esc(r.name)+'</strong><small>Lugar '+r.lugar+' · '+esc(r.sub)+'</small></button>').join('')).join('');
  document.querySelectorAll('[data-room]').forEach(b=>b.addEventListener('click',()=>enterRoom(b.dataset.room)));
+ renderPrep();
  $('endLoop').classList.toggle('hidden', state.phase!=='playing' || ((finalLoop || state.caseRules === 2) && state.duration===300));
  $('statusText').textContent=state.phase==='playing'?'Você fica nesta sala até o tempo voltar. Aí você acorda no '+INICIO.name+'.':'Você visita uma sala por volta.';
  $('roomPanel').classList.toggle('hidden',state.phase!=='playing');
@@ -577,12 +578,13 @@ function renderClues(){
   const hs = panel.querySelector('[data-hs="'+clue.id+'"]');
   const registered = state.clues.some(item => item.id === clue.id);
   const wait = clue.time/300*state.duration-elapsed;
-  const label = registered?'Registrada':wait>0?'Disponível em '+fmt(wait):'Examinar';
+  const label = registered?'Registrada':wait>0?'Disponível em '+fmt(wait):'Examinar'+sufixoCusto(clue);
   button.disabled = registered || wait > 0;
   if (button.lastElementChild.textContent !== label) button.lastElementChild.textContent = label;
   if (hs) { hs.classList.toggle('on', wait <= 0); hs.classList.toggle('ok', registered); hs.disabled = registered; }
  });
  if (room.livro) atualizarLivro(clues, elapsed);
+ renderNoitePanel();
  renderIntervention(room.id, storySeconds);
 }
 // Livro folheável (museu/livro): cada pista vira uma página, escrita quando chega a hora dela; ao virar para a página, a pista é registrada.
@@ -687,7 +689,7 @@ function applyIntervention(command){
 function brokeLoop(){
  return state.intervention === 'break' || state.intervention === 'suspender';
 }
-function collect(id){if(state.phase!=='playing'||(window.coop?.now() ?? Date.now())>=state.endAt){tick();return}const q=scenarioClues()[state.room].find(x=>x.id===id);if(!q||state.clues.some(x=>x.id===id)||state.duration-(state.endAt-(window.coop?.now() ?? Date.now()))/1000<q.time/300*state.duration)return;const room=sala(state.room);state.clues.push({id:q.id,room:room.name,name:q.name,text:q.text,tipo:q.tipo,fatos:q.fatos,loop:state.loop});save();renderClues();renderJournal();toast('Pista guardada no caderno')}
+function collect(id){if(state.phase!=='playing'||(window.coop?.now() ?? Date.now())>=state.endAt){tick();return}const q=scenarioClues()[state.room].find(x=>x.id===id);if(!q||state.clues.some(x=>x.id===id)||state.duration-(state.endAt-(window.coop?.now() ?? Date.now()))/1000<q.time/300*state.duration)return;if(!cobrarPista(q))return;const room=sala(state.room);state.clues.push({id:q.id,room:room.name,name:q.name,text:q.text,tipo:q.tipo,fatos:q.fatos,loop:state.loop});save();renderClues();renderJournal();toast('Pista guardada no caderno')}
 function renderJournal(){
  const clues=state.clues||[];$('countBadge').textContent=clues.length;
  $('journalPreview').innerHTML=clues.length?clues.slice(-3).reverse().map(c=>'<div class="preview-item">'+esc(c.name)+' <br><small>'+esc(c.room)+'</small></div>').join(''):'<p class="muted">Suas descobertas aparecerão aqui.</p>';
@@ -731,6 +733,7 @@ function renderBetween(){
   : state.loop >= 2 ? 'Quando achar o equipamento do retorno, você pode tentar intervir. É uma tentativa por volta, e agir mais cedo vale bônus. Se faltou uma pista, peça orientação no caderno.'
   : 'O próximo ambiente pode confirmar ou mudar sua hipótese.';
  $('nextLoop').textContent = finished ? 'Apresentar hipótese' : 'Escolher próximo ambiente';
+ renderCombos();
  show('between');
 }
 function finishLoop(){
@@ -901,6 +904,7 @@ function selectedAnswers(){
   out[axis.key+'__c'] = $(axis.key+'__c')?.value ?? '';
   if (SUPPORT_KEYS.includes(axis.key)) out[axis.key+'__p'] = $(axis.key+'__p')?.value ?? '';
  }
+ Object.assign(out, lerTeoria());
  return out;
 }
 function setCerteza(key, value){
@@ -941,6 +945,7 @@ function renderForm(){
   '</label><select id="'+axis.key+'">'+options(axis.options)+'</select>'+certezaControl(axis)+supportControl(axis)+'</div>').join('');
  fillAnswers(state.draft);
  renderArchive();
+ $('answerFields').insertAdjacentHTML('beforeend', renderTeoria());
 }
 function submit(event){
  event.preventDefault();
@@ -995,6 +1000,7 @@ function renderResult(){
   '<div class="result-card"><strong>O que aconteceu</strong><p>'+esc(c.detail.charAt(0).toUpperCase()+c.detail.slice(1))+
   '. '+esc(labels[c.alarm][1])+'</p><p>'+esc(figures[c.figure])+'</p></div>'+reconstruction+
   '<div class="result-card"><strong>Desfecho</strong><p>'+esc(ending)+'</p></div>'+
+  teoriaResultado(answers)+blocoT()+
   (VALORES[state.caseIndex] ? '<div class="result-card"><strong>Para conversar</strong><p>'+esc(VALORES[state.caseIndex])+'</p></div>' : '');
 }
 document.addEventListener('click',e=>{let id=e.target.dataset.close;if(id)$(id).close()});
