@@ -9,16 +9,16 @@ A maquete 3D é só o prédio em 3 andares (sem coordenadas de sala). No jogo, a
 - **Pontuação do "Onde":** metade dos pontos por estar no mesmo andar continua valendo, usando o andar da partida.
 
 ## Regras do sorteio (uma semente por partida; em sala, o Mestre sorteia e todos veem o mesmo museu)
-1. **Grupo A, funções do Térreo** (recepção, sala dos espécimes = conservação, sala dos habitats = segurança): trocam de lugar **entre si**, dentro dos 3 lugares delas. São 6 arranjos. A função vai junto com o conteúdo: quem era a conservação continua sendo a conservação, só em outro lugar.
-2. **Grupo B, funções de apoio** (auditório, galeria especial, ateliê, área de descanso): trocam entre si nos 4 lugares delas, **podendo mudar de andar**. São 24 arranjos. *(Proposta; o autor decide se entra.)*
-3. **Grupo C, exposições** (as 23 restantes): ocupam os lugares restantes em qualquer andar.
+1. **Grupo A, funções perto da entrada** (5): recepção, segurança, conservação, **limpeza** e **manutenção**. Trocam de lugar **entre si**, nos 5 lugares da entrada (Térreo). São 120 arranjos. A função vai junto com o conteúdo: quem era a conservação continua sendo a conservação, só em outro lugar. Motivo: quem entra espera achar recepção e segurança perto da porta, e o apoio da equipe fica junto.
+2. **Grupo B, todo o resto** (25): exposições, auditório, galeria especial, ateliê e área de descanso. Ocupam os 25 lugares restantes (9 no 2º andar, 10 no 1º, 6 no Térreo), **em qualquer andar e em qualquer posição**. Um auditório de 40 m² pode estar no 2º andar numa partida, no Térreo na outra, à frente ou ao fundo.
+3. *(regra extra)* As funções do Grupo A **nunca** saem do Térreo.
 4. **Nome:** cada exposição tem 3 nomes (A, B, C) coerentes com a peça. Um é sorteado por partida. O nome nunca muda dentro da partida.
 5. **Sem pistas no nome:** nenhum nome usa palavras da solução (reserva, retorno, suspensão, referência, ensaio de repetição, cartão, pulso, loop, alarme).
 6. **Dentro da partida o mapa não muda** entre as voltas.
 7. **Equivalência:** as salas-chave do caso (onde o fato aconteceu, equipamento, fonte) nunca caem todas no mesmo andar.
 
 ## Tabela
-Tipo: **F** = função (Grupo A), **S** = apoio (Grupo B), **E** = exposição (Grupo C). Andar = onde está hoje.
+Tipo: **F** = função perto da entrada (Grupo A), **E** = livre (Grupo B). Andar = onde está hoje.
 
 | id | Peça | Tipo | Andar hoje | Nome A (atual) | Nome B | Nome C |
 |---|---|---|---|---|---|---|
@@ -29,8 +29,8 @@ Tipo: **F** = função (Grupo A), **S** = apoio (Grupo B), **E** = exposição (
 | jogos | N15 | E | 2º | Sala dos jogos | Salão dos tabuleiros | Sala do passatempo |
 | cranios | N13 | E | 2º | Sala dos crânios | Galeria dos ancestrais | Sala dos rostos antigos |
 | mobilia | N02 | E | 2º | Sala da mobília | Salão das cadeiras | Sala da casa antiga |
-| galeria | F01 | S | 2º | Galeria especial | Galeria das vitrines | Sala das obras |
-| auditorio | C01 | S | 2º | Auditório | Sala dos bastidores | Palco pequeno |
+| galeria | F01 | E | 2º | Galeria especial | Galeria das vitrines | Sala das obras |
+| auditorio | C01 | E | 2º | Auditório | Sala dos bastidores | Palco pequeno |
 | asas | D08 | E | 1º | Mezanino das asas | Mezanino do voo | Terraço das asas |
 | fosseis | F02 | E | 1º | Sala dos fósseis | Galeria da rocha | Sala das marcas |
 | relogios | N03 | E | 1º | Sala dos relógios | Sala das horas | Galeria dos ponteiros |
@@ -44,17 +44,23 @@ Tipo: **F** = função (Grupo A), **S** = apoio (Grupo B), **E** = exposição (
 | recepcao | B01 | F | Térreo | Recepção | Entrada de convidados | Balcão de chegada |
 | conservacao | B04 | F | Térreo | Sala dos espécimes | Gabinete dos espécimes | Sala do acervo |
 | seguranca | B07 | F | Térreo | Sala dos habitats | Gabinete dos habitats | Sala dos ambientes |
-| atelie | L01 | S | Térreo | Ateliê de descobertas | Oficina de ensaios | Sala dos testes |
-| corredor | L02 | S | Térreo | Área de descanso | Canto de descanso | Varanda da equipe |
+| atelie | L01 | E | Térreo | Ateliê de descobertas | Oficina de ensaios | Sala dos testes |
+| corredor | L02 | E | Térreo | Área de descanso | Canto de descanso | Varanda da equipe |
 | sons | N07 | E | Térreo | Sala dos sons | Sala do rádio | Galeria da música |
-| cotidiano | N08 | E | Térreo | Sala do cotidiano | Sala das coisas de casa | Galeria do dia a dia |
+| limpeza | N08 | F | Térreo | Base da limpeza | Depósito de limpeza | Sala dos carrinhos |
 | ambar | N11 | E | Térreo | Sala do âmbar | Sala do tempo preso | Galeria da resina |
 | patio | B05 | E | Térreo | Pátio de luz | Pátio da claridade | Jardim de luz |
 | brinquedos | N09 | E | Térreo | Sala dos brinquedos | Sala das brincadeiras | Galeria dos carrinhos |
-| lanternas | N10 | E | Térreo | Sala das lanternas | Sala das luzes de mão | Galeria das lanternas |
+| manutencao | N10 | F | Térreo | Oficina técnica | Bancada de reparos | Sala dos reparos |
+
+## Duas funções novas (decisão do autor, 22/11/2026)
+- **Limpeza:** limpeza geral (chão, pó, rotina de fechamento). Já existe como pessoa recorrente da história; ganha sala própria.
+- **Manutenção:** equipamentos e estrutura (troca de lâmpada, fio partido, ferramentas, sensor). Não é o mesmo que a **conservação**, que cuida das peças e do acervo (restauração, registros).
+- **Peças 3D:** não há modelo sobrando. Provisório: Limpeza usa a peça N08 (antes Sala do cotidiano) e Manutenção usa a N10 (antes Sala das lanternas), que saem do grupo das exposições. Falta conferir se as peças combinam com a função; se não, o autor gera ou escolhe modelos novos (lista de pedidos em seguida).
+- **Enredo:** a Manutenção pode virar a **5ª perspectiva** (vê fios, lâmpadas, sensor, equipamento), que combina muito com as noites de falha de sensor e teste de alarme.
 
 ## Variedade
-- Grupo A: 6 arranjos. Grupo B: 24 arranjos. Grupo C: mais de 10²⁰ arranjos. Nomes: 3³⁰ combinações. Na prática, nenhuma partida repete a outra.
+- Grupo A: 120 arranjos. Grupo B: mais de 10²⁵ arranjos. Nomes: 3³⁰ combinações. Na prática, nenhuma partida repete a outra.
 - O rodízio sozinho **não conta** como conteúdo novo para as escalas: ele protege contra decorar lugar. O que sustenta o longo prazo continua sendo versões de caso e caderno do museu.
 
 ## O que isto pede do motor
