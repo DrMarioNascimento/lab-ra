@@ -122,3 +122,101 @@
   font: .75rem/1.25 system-ui, sans-serif;
 }
 .plan-rooms .plan-origin { border-color: var(--gold); color: #f7deb1; background: #483c2b }
+
+.lighting-cabinet {
+  margin: .9rem 0 1rem;
+  padding: .85rem 1rem;
+  border: 1px solid #9a8964;
+  border-radius: 10px;
+  background: linear-gradient(155deg, #263438, #13202c 62%);
+  box-shadow: inset 0 1px #ffffff23, 0 4px #07111b;
+}
+.lighting-cabinet summary { padding: .35rem 0; color: var(--gold); cursor: pointer }
+.lighting-cabinet summary:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px }
+.lighting-cabinet h4 { margin: 1rem 0 .45rem; color: #f3d5a4; font-size: 1.18rem }
+.lighting-cabinet p, .lighting-cabinet li { color: #d8e4e5; font: .89rem/1.55 system-ui, sans-serif }
+.lighting-cabinet form > p { margin-top: 0 }
+.lighting-cabinet .lighting-status { color: #f0d19e; margin: .85rem 0 0 }
+.lighting-cabinet .lighting-status:empty { display: none }
+.lighting-cabinet .lighting-success { color: #b2efd4 }
+.lighting-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+  list-style: none;
+  padding: 0;
+  margin: .8rem 0;
+}
+.lighting-steps li {
+  border: 1px solid #687982;
+  border-radius: 5px;
+  padding: .25rem .5rem;
+  font-size: .76rem;
+}
+.lighting-steps [aria-current="step"] { border-color: var(--gold); color: #f9d8a6; background: #56422e }
+.lighting-steps .complete { border-color: #80a995; color: #c2eddb }
+.lock-log, .lighting-grade {
+  width: min(100%, 33rem);
+  border-collapse: collapse;
+  margin: .8rem 0 1rem;
+  color: #dde9e9;
+  font: .8rem/1.35 system-ui, sans-serif;
+  text-align: center;
+}
+.lock-log caption, .lighting-grade caption { text-align: left; color: #f1cf93; padding-bottom: .45rem }
+.lock-log th, .lock-log td, .lighting-grade th, .lighting-grade td {
+  border: 1px solid #617381;
+  padding: .4rem .25rem;
+  background: #101d28;
+}
+.lock-log th, .lighting-grade th { background: #253949 }
+.lighting-grade th[scope="row"] { text-align: left }
+.lighting-grade td { padding: 0 }
+.lighting-grade td label { display: grid; place-items: center; margin: 0; min-height: 44px; cursor: pointer }
+.lighting-grade td input { width: 1.16rem; height: 1.16rem; margin: 0; accent-color: var(--gold) }
+.lighting-grid { display: grid; width: min(100%, 19rem); gap: .5rem; grid-template-columns: repeat(3, minmax(0, 1fr)) }
+.lock-dials { display: grid; width: min(100%, 22rem); grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem; margin-bottom: .65rem }
+.lock-dials select { margin-top: .35rem; min-height: 44px }
+.lighting-tile {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  min-height: 44px;
+  padding: 0;
+  border: 1px solid #697e89;
+  border-radius: 8px;
+  background: linear-gradient(145deg, #263c49, #11232e);
+  box-shadow: inset 0 1px #ffffff25, 0 3px #080e19;
+  color: #a4b9bf;
+}
+.lighting-tile:active { transform: translateY(2px); box-shadow: 0 1px #080e19 }
+.lighting-tile.powered { color: #f4cc80 }
+.lighting-wire { position: absolute; background: currentColor; border-radius: 2px }
+.lighting-wire.north, .lighting-wire.south { width: 4px; height: 50%; left: calc(50% - 2px) }
+.lighting-wire.east, .lighting-wire.west { width: 50%; height: 4px; top: calc(50% - 2px) }
+.lighting-wire.north { top: 0 }
+.lighting-wire.south { bottom: 0 }
+.lighting-wire.east { right: 0 }
+.lighting-wire.west { left: 0 }
+.lighting-node {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: currentColor;
+  font: 1.25rem/1 system-ui, sans-serif;
+}
+.lighting-node:not(:empty) {
+  width: 1.6rem;
+  height: 1.6rem;
+  border: 1px solid currentColor;
+  background: #14232d;
+}
+.lighting-tile.powered .lighting-node:not(:empty) { box-shadow: 0 0 12px #f4cc8080 }
+.lighting-legend { display: flex; gap: .9rem; margin: .7rem 0; color: #d9dfd7; font: .8rem system-ui, sans-serif }
+.grade-hints { padding-left: 1.25rem }
+.auxiliary-lit .lighting-cabinet { border-color: #d3ac66; box-shadow: inset 0 1px #f5c87940, 0 0 18px #d4a95732 }
+.auxiliary-lit .peca { background: radial-gradient(circle at 50% 25%, #695637, #1b2b37 64%, #0c1621) }

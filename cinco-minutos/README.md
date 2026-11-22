@@ -8,6 +8,8 @@ A [maquete](museu/) apresenta 31 ambientes e sete peças do ThreeMuseum adaptada
 
 O painel de sinais do Saguão superior libera uma planta esquemática dos três andares. Na partida individual, acionar o painel inicia o relógio. Em sala, o painel fica disponível após o início da volta. Rever os sinais ou mudar de ideia consome o tempo já decorrido. A planta fica disponível no dossiê pelo restante da partida.
 
+No Laboratório de formas, o quadro opcional de iluminação auxiliar reúne três etapas: deduzir a combinação do cadeado, girar os módulos do circuito e conciliar os horários de três ocorrências. A mesma contagem da volta continua durante os desafios. Quando a volta termina antes da gravação, o quadro volta à condição inicial no próximo loop. O registro obtido depois do alarme permanece no dossiê e pode sustentar a resposta sobre sua causa.
+
 ## Modo cooperativo
 
 O modo cooperativo mantém a intervenção como hipótese.

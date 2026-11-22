@@ -367,8 +367,10 @@ function renderClues(){
  const scene = [state.caseIndex, state.caseRules, !!window.coop, room.id].join(':');
  if (panel.dataset.scene !== scene) {
   panel.dataset.scene = scene;
+  panel.classList.remove('auxiliary-lit');
   const hotspots = clues.map((clue, i) => '<button type="button" class="hs" slot="hotspot-'+i+'" data-hs="'+clue.id+'" data-visibility-attribute="visible" data-position="0m 0m 0m" data-normal="0m 1m 0m" aria-label="Ponto de interesse na peça"></button>').join('');
   panel.innerHTML = '<h3>'+room.name+'</h3><p>'+roomDescriptions[room.id]+'</p>'+
+   (room.id === 'eletrica' ? '<details class="lighting-cabinet"><summary>Quadro de iluminação auxiliar</summary><section id="lightingChallenge"></section></details>' : '')+
    '<div class="peca"><model-viewer loading="eager" reveal="auto" src="'+new URL(room.peca+'.glb', PECAS_URL).href+'" alt="Peça da sala '+esc(room.name)+'" camera-controls touch-action="pan-y" interaction-prompt="none" shadow-intensity="0.6" exposure="1.15" field-of-view="26deg" min-field-of-view="12deg" max-field-of-view="45deg">'+hotspots+'</model-viewer></div>'+
    '<p class="dica">Gire a peça e toque nos pontos que brilham. As pistas ficam escondidas nela.</p>'+
    '<details class="lista-pistas"><summary>Não consegue ver a peça? Use a lista</summary><div class="clue-list">'+
@@ -399,6 +401,7 @@ function renderClues(){
   if (button.lastElementChild.textContent !== label) button.lastElementChild.textContent = label;
   if (hs) { hs.classList.toggle('on', wait <= 0); hs.classList.toggle('ok', registered); hs.disabled = registered; }
  });
+ window.loopLighting?.render($('lightingChallenge'), storySeconds);
  renderIntervention(room.id, storySeconds);
 }
 function hasLiveFinal(){
@@ -467,7 +470,14 @@ function applyIntervention(command){
 function brokeLoop(){
  return state.intervention === 'break' || state.intervention === 'suspender';
 }
-function collect(id){if(state.phase!=='playing'||(window.coop?.now() ?? Date.now())>=state.endAt){tick();return}const q=scenarioClues()[state.room].find(x=>x.id===id);if(!q||state.clues.some(x=>x.id===id)||state.duration-(state.endAt-(window.coop?.now() ?? Date.now()))/1000<q.time/300*state.duration)return;const room=ROOMS.find(x=>x.id===state.room);state.clues.push({id:q.id,room:room.name,name:q.name,text:q.text,tipo:q.tipo,loop:state.loop});save();renderClues();renderJournal();toast('Pista guardada no caderno')}
+function collect(id){if(state.phase!=='playing'||(window.coop?.now() ?? Date.now())>=state.endAt){tick();return}const q=scenarioClues()[state.room].find(x=>x.id===id);if(!q||state.clues.some(x=>x.id===id)||state.duration-(state.endAt-(window.coop?.now() ?? Date.now()))/1000<q.time/300*state.duration)return;recordClue(state.room,q);renderClues();
+}
+function recordClue(roomId, clue){
+ const room = ROOMS.find(item => item.id === roomId);
+ state.clues.push({id:clue.id, room:room.name, name:clue.name, text:clue.text, tipo:clue.tipo, loop:state.loop});
+ save();
+ renderJournal();
+ toast('Pista guardada no caderno');}
 function renderJournal(){
  window.loopSignalPanel?.renderJournal();
  const clues=state.clues||[];$('countBadge').textContent=clues.length;
@@ -571,7 +581,7 @@ const ANSWER_AXES = [
   sources:['time-source','time-control','atebase'],
   guide:'O primeiro pulso causa o apagão. Descubra o que precisava acontecer depois, e em qual equipamento.'},
  {key:'alarm', pts:10, title:'Por quê', question:'Por quê: o que disparou o alarme?', options:ALARMS,
-  sources:['seg1','seg2','ele1'],
+  sources:['seg1','seg2','ele1','lighting-log'],
   guide:'Separe o estrondo do disparo do alarme. Compare os horários e o tipo de registro.'},
  {key:'figure', pts:15, title:'Quem', question:'Quem: quem era a figura imóvel observada?', options:FIGURES,
   sources:['gal3','con4','seg3','rec3','cor3'],
