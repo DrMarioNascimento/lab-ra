@@ -80,3 +80,12 @@ Cada bilhete funciona sozinho e conversa com a noite. Texto curto, sempre assina
 - **Versões 1 e 2** das noites 3 e 6 como teste; depois as outras 13.
 - **Caixote:** peça 3D (baú de madeira), três discos, 3 erros por volta, retorno fechado a cada volta, caderno de bilhetes com linhas por contagem.
 - **Roteiro por volta** das pessoas do museu, igual para todos.
+
+## Energia da lanterna (ideia do autor, 22/11/2026; inspirada no Oregon Trail)
+Um único recurso por volta, que combina com o apagão. Enche de novo a cada volta (o loop recomeça).
+- **Gasta:** mudar de sala; ritmo rápido; tentar o caixote ou o cadeado.
+- **Kit da volta:** antes da volta a equipe divide uma quantidade fixa entre as perspectivas.
+- **Sem energia:** a sala fica escura, o jogador vê o que está à vista mas perde pistas pequenas; recarregar um pouco em sala de função custa tempo.
+- **Rio = corredor parado pelo teste de alarme:** atravessar direto gasta energia; pedir liberação à Segurança gasta tempo.
+- **Sem sorte:** custos fixos e iguais para todos; o jogador aprende na volta 1 e planeja na 2.
+- **Fora:** morte, doença, dinheiro, eventos aleatórios.
