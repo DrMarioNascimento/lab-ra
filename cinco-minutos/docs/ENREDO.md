@@ -70,6 +70,14 @@ Para cada noite: **intenção** (não muda), **muda a cada volta** (varia o resu
 - Substituir Quando e Como por "o que fez o resultado mudar".
 - Bônus por acertar antes da volta 5.
 
+## Plano de variedade e vida longa (propostas, aguardando confirmação do autor — 22/11/2026)
+Meta: manter o interesse por pelo menos 15 partidas por jogador ou turma, e além.
+- **O que se aprende entre partidas é método, nunca resposta.** A estrutura é fixa; lugar, código, mecanismo e fragmentos são sorteados por partida.
+- **Sem repetir caso** por jogador ou turma até esgotar os 15; depois, cada caso tem **2 ou 3 versões** (muda a circunstância decisiva, a ordem dos resultados por volta e quem faz o quê).
+- **Segredo da noite** (cofre, peça, caixa): escondido, achado por dedução, aberto juntando fragmentos de pessoas diferentes. Vale como **bônus**, não trava o caso. Guarda uma **peça do mistério maior** (apagão e loop), que nunca explica e nunca contradiz as outras. Quem acha cedo ajuda quem acha depois. No jogo individual, o fragmento vem completo, sem bônus de cooperação.
+- **Caderno do museu:** guarda, no navegador, as peças do mistério maior que o jogador já juntou. É o que dá progresso entre as partidas.
+- **Museu vivo:** a cada partida, as salas de exposição mudam de tema, de nome e de lugar, e as peças trocam de nome e de posição. Justificativa no enredo: o Museu do Loop está sempre se reorganizando, e *quem reorganiza* é parte do mistério (sem resposta). Salas de função (recepção, conservação, segurança) mantêm o nome, porque os papéis da história dependem delas, mas podem mudar de lugar. Dentro de uma partida, o mapa não muda entre as voltas. Em sala, o sorteio é feito pelo Mestre e vale para todos.
+
 ## O que isto pede do motor (próximo passo técnico)
 - **Perspectiva escolhida no início** (individual) ou atribuída pelo Mestre (sala): cada perspectiva vê um subconjunto verdadeiro das pistas; juntas, cobrem os 8 fatos.
 - **Intervenção por perspectiva:** a ação certa do caso continua valendo na pontuação; as outras ações aparecem como "decisões legítimas de outra perspectiva", sem punição de enredo.
