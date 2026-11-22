@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#080e19">
 <title>Loop · Mosaico · Dragon Games</title>
 <meta name="robots" content="noindex">
-<link rel="stylesheet" href="../style.css?v=4">
+<link rel="stylesheet" href="../style.css?v=5">
 <link rel="stylesheet" href="sala.css?v=1">
 <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.1.0/model-viewer.min.js"></script>
 </head>
@@ -48,12 +48,7 @@
 <p id="papelFrase"><strong>Nesta atividade você vive o papel de uma pessoa que investiga o museu do Loop.</strong></p>
 <p><strong>Seu objetivo:</strong> descobrir o que aconteceu naquela noite. O que você anota fica com você quando o tempo volta. A porta principal está trancada pela grade de segurança.</p>
 <p>O museu vai fechar, o alarme toca e a mesma noite se repete. O que aconteceu de verdade ainda está escondido.</p>
-<ol>
-<li>A cada volta, todo mundo começa no <strong>Saguão superior</strong>. Escolha <strong>uma sala</strong>, gire a peça e toque nos pontos que brilham: as pistas estão escondidas nela.</li>
-<li>O dossiê guarda o que você descobriu quando o tempo retorna.</li>
-<li>Os procedimentos citam o código de um equipamento (como P-7); outros registros dizem onde cada código fica. Cruze as pistas.</li>
-<li>No fim, você responde a 8 perguntas, envia a sua conclusão e o Mestre revela a noite.</li>
-</ol>
+<div id="tour"></div>
 <select id="speed" class="hidden" aria-hidden="true" tabindex="-1"><option value="300">300</option><option value="30">30</option></select>
 </div>
 <button class="btn primary" data-close="helpDialog">Entendi</button>
@@ -75,7 +70,7 @@
   document.head.appendChild(s);
 })();
 </script>
-<script src="../game.js?v=8"></script>
+<script src="../game.js?v=10"></script>
 <script type="module" src="sala-mestre.mjs?v=2"></script>
 </body>
 </html>

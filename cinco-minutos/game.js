@@ -18,7 +18,7 @@ const ROOMS = [
   {id:'relogios', name:'Sala dos relógios', andar:'1º andar', icon:'⬡', sub:'Cada segundo conta', peca:'N03'},
   {id:'protecoes', name:'Sala das proteções', andar:'1º andar', icon:'✚', sub:'Capacete e história', peca:'N04'},
   {id:'fotografia', name:'Sala da fotografia', andar:'1º andar', icon:'☗', sub:'Câmera de outro tempo', peca:'N05'},
-  {id:'prototipo', name:'Galeria do tempo', andar:'1º andar', icon:'◷', sub:'Protótipo e retorno', peca:'D09'},
+  {id:'prototipo', name:'Galeria do tempo', andar:'1º andar', icon:'◷', sub:'Protótipo e demonstração', peca:'D09'},
   {id:'eletrica', name:'Laboratório de formas', andar:'1º andar', icon:'⌁', sub:'Energia e equipamentos', peca:'B09'},
   {id:'deposito', name:'Sala das coleções', andar:'1º andar', icon:'▤', sub:'Inventário e movimentações', peca:'B02'},
   {id:'vidros', name:'Sala dos vidros', andar:'1º andar', icon:'▨', sub:'Transparência e brilho', peca:'N06'},
@@ -262,9 +262,28 @@ const CASE_PATHS = [
  'reserve','reference','suspension','reserve','rehearsal',
  'reference','rehearsal','suspension','rehearsal','reserve'
 ];
+// Código dos equipamentos: sorteado a cada partida (escalas: nenhum código fixo visível, para não decorar entre partidas).
+// Os textos de TIME_PATHS guardam o código-modelo; ao usar, ele é trocado pelo código sorteado da partida.
+function sortearCodigos(){
+ const letras = 'ABCDEFGHJKLMNPRSTUVWXZ', usados = new Set(Object.values(TIME_PATHS).map(p => p.code)), out = {};
+ for (const k of Object.keys(TIME_PATHS)) {
+  let c;
+  do { c = letras[Math.floor(Math.random()*letras.length)]+'-'+(1+Math.floor(Math.random()*9)); } while (usados.has(c));
+  usados.add(c); out[k] = c;
+ }
+ return out;
+}
+function resolvePath(key){
+ const modelo = TIME_PATHS[key];
+ state.codes ??= sortearCodigos();
+ const code = state.codes[key] ?? modelo.code, out = {key, ...modelo};
+ for (const f of Object.keys(out)) if (typeof out[f] === 'string') out[f] = out[f].split(modelo.code).join(code);
+ out.code = code;
+ return out;
+}
 const LEGACY_PATH = {...TIME_PATHS.suspension, opens:0};
 const timePath = () => state.caseRules === 2
- ? TIME_PATHS[CASE_PATHS[state.caseIndex]]
+ ? resolvePath(CASE_PATHS[state.caseIndex])
  : LEGACY_PATH;
 
 function scenarioClues(){
@@ -282,7 +301,7 @@ function scenarioClues(){
  clues[path.room].push({id:'time-control',name:'Observar o mecanismo',time:path.opens,tipo:'Observação',text:path.observation});
  clues[path.source].push({id:'time-source',name:'Consultar o procedimento de encerramento',time:60,tipo:'Registro',text:path.instruction});
  // O procedimento cita só o código do equipamento. Dois diretórios, em ambientes diferentes, dizem onde cada código fica.
- const diretorio = 'Diretório de equipamentos: ' + Object.values(TIME_PATHS).map(p => p.code+' fica em '+ROOMS.find(r=>r.id===p.room).name).join('; ') + '.';
+ const diretorio = 'Diretório de equipamentos: ' + Object.keys(TIME_PATHS).map(resolvePath).map(p => p.code+' fica em '+ROOMS.find(r=>r.id===p.room).name).join('; ') + '.';
  clues.seguranca.push({id:'time-dir1',name:'Consultar o diretório de equipamentos',time:30,tipo:'Registro',text:diretorio});
  clues.patio.push({id:'time-dir2',name:'Ler o mapa de equipamentos',time:60,tipo:'Registro',text:diretorio});
  return clues;
@@ -309,7 +328,7 @@ function museumTime(){
  return (minutes<60?'21:':'22:')+String(minutes%60).padStart(2,'0')+':'+String(elapsed%60).padStart(2,'0');
 }
 function current(){return CASES[state.caseIndex]}
-function reset(){clearInterval(timerHandle);state={caseIndex:chooseCase(),loop:1,phase:'choose',room:null,duration:Number($('speed').value),remaining:Number($('speed').value),endAt:null,clues:[],hints:0,notes:'',answers:null,liveFinal:true,caseRules:2,archive:[]};save();renderGame();show('game')}
+function reset(){clearInterval(timerHandle);state={caseIndex:chooseCase(),loop:1,phase:'choose',room:null,duration:Number($('speed').value),remaining:Number($('speed').value),endAt:null,clues:[],hints:0,notes:'',answers:null,liveFinal:true,caseRules:2,archive:[],codes:sortearCodigos()};save();renderGame();show('game')}
 function enterRoom(id){if(window.coop){window.coop.choose(id);return}if(state.phase!=='choose')return;state.room=id;state.phase='playing';state.remaining=state.duration;state.endAt=Date.now()+state.remaining*1000;save();renderGame();tick();timerHandle=setInterval(tick,250)}
 function renderGame(){
  const finalLoop = hasLiveFinal() && state.loop === 5;
@@ -394,7 +413,7 @@ const GENERIC_COMMAND = 'Reiniciar o equipamento';
 function activeKey(){ return state.caseRules === 2 ? CASE_PATHS[state.caseIndex] : 'suspension'; }
 function controlAt(roomId){
  const key = CONTROL_KEY[roomId];
- return key ? {key, ...TIME_PATHS[key]} : null;
+ return key ? resolvePath(key) : null;
 }
 // Cada equipamento oferece o comando dele, um comando-isca e o reinício genérico; a ordem muda com a partida.
 function commandsOf(ctl){
@@ -583,7 +602,8 @@ const CERTEZA_PADRAO = 'provavel';
 const SUPPORT_KEYS = ['alarm','figure'];
 // Pistas que o jogador já guardou e que servem de fonte para a pergunta.
 function axisSources(axis){
- return (state?.clues ?? []).filter(clue => axis.test ? axis.test(clue) : axis.sources.includes(clue.id) &&
+ return (state?.clues ?? []).filter(clue => axis.test ? axis.test(clue) : (axis.sources.includes(clue.id) ||
+  (axis.key === 'alarm' && clue.text === labels[current().alarm][1])) &&
   (axis.key !== 'figure' || clue.text === figures[current().figure]));
 }
 function supportOk(axis, answers){
@@ -758,6 +778,49 @@ $('answerFields').addEventListener('click', e => {
  setCerteza(b.dataset.axis, $(b.dataset.axis+'__c').value === b.dataset.certeza ? '' : b.dataset.certeza);
  saveDraft();
 });
+// Apresentação das telas (21/11/2026): passo a passo visual dentro do manual. Sem códigos fixos nem nomes de escala.
+const TOUR = [
+ {t:'Escolha uma sala', d:'Toda volta começa no Saguão superior. Escolha só uma sala para investigar.',
+  v:'<div class="tv-rooms"><span class="tv-room on"><i>◈</i>Sala dos gigantes</span><span class="tv-room"><i>◍</i>Sala dos predadores</span><span class="tv-room"><i>▣</i>Sala dos veículos</span><span class="tv-room"><i>◐</i>Sala dos jogos</span></div><p class="tv-floor">✦ Saguão superior · você começa aqui</p>'},
+ {t:'Gire a peça', d:'Toque nos pontos que brilham: cada um esconde uma pista. Eles aparecem com o tempo.',
+  v:'<div class="tv-piece"><div class="tv-obj"></div><b class="tv-dot d1"></b><b class="tv-dot d2"></b><b class="tv-dot d3"></b></div><p class="tv-floor">Arraste para girar · toque no brilho</p>'},
+ {t:'O tempo corre', d:'Cada volta tem 5 minutos. Quando acaba, o tempo volta, mas você guarda o que descobriu.',
+  v:'<div class="tv-clock"><span>VOLTA 2 DE 5</span><strong>04:12</strong><small>21h56 no museu</small></div><div class="tv-bar"><i></i></div>'},
+ {t:'Seu dossiê', d:'Cada pista é uma Observação, um Relato ou um Registro. O que alguém diz nem sempre é fato.',
+  v:'<div class="tv-dossie"><p><span class="tv-chip obs">Observação</span> O que você viu</p><p><span class="tv-chip rel">Relato</span> O que alguém contou</p><p><span class="tv-chip reg">Registro</span> O que está escrito</p></div>'},
+ {t:'A hora de agir', d:'Na 5ª volta você tem uma única tentativa: o equipamento, o comando e o horário certos.',
+  v:'<div class="tv-panel"><b>Painel da demonstração</b><span class="tv-select">Escolha um comando ▾</span><span class="tv-btn">Executar comando</span></div><p class="tv-floor">1 tentativa · sem aviso de janela</p>'},
+ {t:'As 8 perguntas', d:'Diga o quanto você confia em cada resposta. Em Quem e Por quê, aponte a pista que sustenta.',
+  v:'<div class="tv-q"><b>Quem: quem era a figura imóvel?</b><span class="tv-select">Um guarda escondido ▾</span><span class="tv-cert"><i class="c1">Palpite</i><i class="c2">Provável</i><i class="c3 on">Tenho certeza</i></span><span class="tv-select tv-pista">Pista: Procurar sinais da figura ▾</span></div>'}
+];
+function montarTour(){
+ const host = $('tour');
+ if (!host) return;
+ let i = 0;
+ host.innerHTML = '<div class="tour-card"><p class="tour-step" aria-live="polite"></p><div class="tour-visual" aria-hidden="true"></div><h3 class="tour-title"></h3><p class="tour-text"></p></div>'+
+  '<div class="tour-nav"><button class="btn secondary tour-prev" type="button">Voltar</button><span class="tour-dots" aria-hidden="true"></span><button class="btn primary tour-next" type="button">Próximo</button></div>';
+ const q = sel => host.querySelector(sel);
+ function draw(){
+  const s = TOUR[i];
+  q('.tour-step').textContent = 'Tela '+(i+1)+' de '+TOUR.length;
+  q('.tour-visual').innerHTML = s.v;
+  q('.tour-title').textContent = s.t;
+  q('.tour-text').textContent = s.d;
+  q('.tour-dots').innerHTML = TOUR.map((_,k)=>'<b'+(k===i?' class="on"':'')+'></b>').join('');
+  q('.tour-prev').disabled = i === 0;
+  q('.tour-next').disabled = i === TOUR.length-1;
+ }
+ q('.tour-prev').onclick = () => { if (i > 0) { i--; draw(); } };
+ q('.tour-next').onclick = () => { if (i < TOUR.length-1) { i++; draw(); } };
+ host.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') { q('.tour-next').click(); e.preventDefault(); }
+  if (e.key === 'ArrowLeft') { q('.tour-prev').click(); e.preventDefault(); }
+ });
+ const dlg = host.closest('dialog');
+ if (dlg) dlg.addEventListener('close', () => { i = 0; draw(); });
+ draw();
+}
+montarTour();
 $('answerForm').addEventListener('submit',submit);$('replay').onclick=()=>window.coop?window.coop.open():reset();
 // Recupera a partida local sem confundir o prazo real do loop com o relógio do aparelho.
 function restoreSolo(){
