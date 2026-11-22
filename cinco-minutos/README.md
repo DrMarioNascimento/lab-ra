@@ -28,3 +28,9 @@ O GDD está em [GDD.md](GDD.md).
 - **Intervenção:** uma tentativa por volta, em qualquer volta; agir cedo dá bônus.
 - **Caderno do museu:** lembra, no aparelho, as noites já visitadas.
 - Documentos de projeto (não públicos): `docs/ENREDO.md`, `docs/RODIZIO.md`, `docs/AVALIACAO-ESCALAS.md`, `docs/FICHAS.md`.
+
+## Atualização de 22/11/2026 (noites, energia, caixote)
+- **Roteiro:** `docs/ROTEIRO.md`, `docs/ENREDO-MATRIZ.md`. As 15 noites estão em `noites.js`; o motor está em `noites-motor.js`.
+- **Jogo:** preparação com 2 ferramentas, energia da lanterna por volta, pistas por horário, combinações entre voltas, caixote com bilhete de T. e teoria final em 3 partes.
+- **Maquete:** `museu/` agora mostra a peça 3D de cada sala (`museu/pecas-na-maquete.mjs`).
+- **Peças:** 35 modelos novos como versões B e C das salas (`museu/pecas/V*.glb`).

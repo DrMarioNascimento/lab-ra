@@ -81,3 +81,13 @@ Seguem a matriz (pergunta, variação, caixote e bilhete). Cada uma é escrita n
 
 ## 13. Implementação em fases
 **Fase 1:** preparação (2 ferramentas e energia), rotinas no tempo, combinações, teoria final em 3 partes, noite 3. **Fase 2:** noite 6, caixote, bilhetes, caderno. **Fase 3:** quadro de investigação, objetivos extras, volta de observação, noites 1 a 15.
+
+## Estado da implementação (22/11/2026)
+**No jogo (testado):** `noites.js` (as 15 noites: pergunta principal, 2 a 3 pistas de rotina por horário, uma pista por versão, bilhete de T.), `noites-motor.js` (motor) e ganchos em `game.js`.
+- **Preparação** antes da volta 1 (pergunta da noite + 2 de 4 ferramentas). Energia: 5 cargas por volta (+2 com a planta); cada pista examinada gasta 1, exceto o tipo que a ferramenta escolhida facilita (prancheta: registros; rádio: relatos; kit: observações).
+- **Versões:** a semente da partida escolhe a versão 1 ou 2 da noite (muda só uma pista de rotina; a verdade e as 8 perguntas continuam).
+- **Combinações entre voltas:** 4 por noite (de um catálogo de 6), até 2 por volta; o resultado vira uma pista na sala certa, escrita a partir da verdade do caso.
+- **Caixote:** fica numa sala sorteada pela semente; 3 fechos com símbolos (ícone e nome), 3 erros por volta, 1 de energia por tentativa; 3 dicas e 1 regra espalhadas em Conservação, Segurança, Recepção e Auditório; bilhete de T. guardado no aparelho; mensagem final por contagem (a cada 3 bilhetes).
+- **Teoria final em 3 partes** (+10 pontos cada, separados das 8 perguntas), com devolutiva.
+- Funciona no solo e na sala (o piloto do simulador passa pela preparação). Partida simulada com Mestre automático e 6 participantes chega ao resultado.
+**Ainda não feito:** trocar Quando/Como por "o que fez o resultado mudar"; texto por volta das pessoas do museu (loop vivo) além das pistas de rotina; quadro de investigação; volta de observação; versões 3+ das noites; teste no iPhone.

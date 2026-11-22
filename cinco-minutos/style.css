@@ -120,3 +120,9 @@
 .discos{display:flex;gap:10px;margin:10px 0}.disco{flex:1;text-align:center;font-size:2rem}.disco small{display:block;font-size:.7rem;font-weight:600}
 .bilhete{font-style:italic;border-left:3px solid #f2d5a3;padding-left:10px}
 @media(max-width:420px){.ferramentas{grid-template-columns:1fr}}
+#roomGrid .prep{grid-column:1/-1}
+.prep,.caixote,.combo-box,.teoria{font-family:system-ui,sans-serif;color:#dfe8e5}
+.prep h3{font:400 1.5rem Georgia,serif;margin:.2em 0;color:#f4e6cb}
+.prep p,.caixote p,.combo-box p,.teoria p{font:.92rem/1.5 system-ui,sans-serif;color:#c9d6d3}
+.prep .btn{margin-top:6px}
+.prep .kicker,.caixote .kicker,.combo-box .kicker,.teoria .kicker{color:#e7c18b;font-weight:700;font-size:.72rem;letter-spacing:.16em}
