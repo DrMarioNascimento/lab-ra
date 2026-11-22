@@ -88,11 +88,11 @@ const labels={
   teste:['Calendário de manutenção','O painel registra que um teste programado foi iniciado. Um teste não prova, por si só, um incêndio.']
 };
 const figures={
-  guarda:'O uniforme e o rádio indicam que a figura escondida é um guarda; ele diz ter se escondido com medo.',
-  artista:'Uma credencial e o programa do evento indicam que a figura é uma artista preparada como estátua viva.',
-  visitante:'Um ingresso e um relato identificam a figura como um visitante que entrou onde não deveria.',
-  restauradora:'Uma identificação e uma ficha de trabalho indicam que a figura é uma restauradora.',
-  funcionario:'Uma credencial de serviço identifica a figura como uma funcionária que preparava uma surpresa.'
+  guarda:'O uniforme e o rádio indicam que a figura imóvel é um guarda. Ele sussurra: "Eu ia chamar a central, mas o estrondo me travou. Fiquei parado como manda o protocolo... só que de medo."',
+  artista:'Uma credencial e o programa do evento mostram que a figura é uma artista de estátua viva. Ela fala sem mexer os lábios: "Se eu piscar, perco o personagem. A plateia volta, e eu não saio daqui sem o bis."',
+  visitante:'Um ingresso e um relato identificam a figura como um visitante que entrou onde não deveria. Ele cochicha: "Eu só queria ver a sala por dentro, juro. A porta estava encostada. Agora não sei como sair sem ser visto."',
+  restauradora:'Uma identificação e uma ficha de trabalho indicam que a figura é uma restauradora. Ela diz baixinho: "Não toque em nada. A umidade mudou e eu não largo esta peça até conferir o suporte."',
+  funcionario:'Uma credencial de serviço identifica a figura como uma funcionária que preparava uma surpresa. Ela cochicha: "Shh! É surpresa para o pessoal. Ninguém pode saber ainda... você não vai contar, vai?"'
 };
 const roomDescriptions={galeria:'Vitrines, pedestais e obras aguardam o fechamento. Algo chama sua atenção entre os registros da exposição.',conservacao:'Fichas de acervo e materiais de trabalho contam uma parte da história dos objetos.',seguranca:'Um painel registra as ocorrências do edifício. O alarme é apenas um dos sinais daquela noite.',eletrica:'A luz de emergência revela equipamentos e anotações técnicas. Nem toda falha tem a mesma causa.',recepcao:'Convidados, entregas e registros de entrada se cruzam perto da porta principal, fechada pela grade de segurança.',corredor:'Pelo corredor passam pessoas e caixas. Olhar a passagem não revela, sozinho, toda a intenção.'};
 const $=id=>document.getElementById(id);
@@ -139,13 +139,13 @@ function makeClues(c){
  const evidence=labels[c.alarm][1],fig=figures[c.figure],room=ROOMS.find(r=>r.id===c.room).name;
  const base={
   galeria:[
-   {id:'gal1',name:'Observar a montagem',time:0,text:'A ficha da exposição menciona '+c.subject+'. '+c.clue.charAt(0).toUpperCase()+c.clue.slice(1)+'.'},
-   {id:'gal2',name:'Examinar o registro de acervo',time:90,text:'Um registro da galeria informa: '+c.detail+'.'},
+   {id:'gal1',name:'Observar a montagem',time:0,text:'Preso à vitrine, um cartão escrito à mão fala de '+c.subject+'. Embaixo, uma observação de alguém da montagem: '+c.clue+'.'},
+   {id:'gal2',name:'Examinar o registro de acervo',time:90,text:'No livro de turno da galeria, a última anotação diz: '+c.detail+'.'},
    {id:'gal3',name:'Procurar sinais da figura',time:180,text:c.room==='galeria'?fig:'Um registro de ronda indica uma figura imóvel em '+room+'.'}],
   conservacao:[
-   {id:'con1',name:'Ler a ficha de conservação',time:0,text:'A ficha referente a '+c.subject+' anota que '+c.detail+'.'},
-   {id:'con2',name:'Examinar a observação técnica',time:90,text:'Na pasta consta: '+c.clue+'.'},
-   {id:'con3',name:'Consultar o plano de prevenção',time:180,text:'Uma nota recomenda: '+ACTIONS[c.action]},
+   {id:'con1',name:'Ler a ficha de conservação',time:0,text:'Na bancada, a ficha de '+c.subject+' traz uma nota de próprio punho: '+c.detail+'.'},
+   {id:'con2',name:'Examinar a observação técnica',time:90,text:'Presa à pasta, outra nota técnica avisa: '+c.clue+'.'},
+   {id:'con3',name:'Consultar o plano de prevenção',time:180,text:'No quadro de avisos, uma nota recomenda: '+ACTIONS[c.action]},
    ...(c.room==='conservacao'?[{id:'con4',name:'Conversar com a figura imóvel',time:180,text:fig}]:[])],
   seguranca:[
    {id:'seg1',name:'Ler o registro do alarme',time:165,text:evidence},
@@ -156,20 +156,20 @@ function makeClues(c){
    {id:'ele2',name:'Ler a anotação técnica',time:90,text:'Há uma anotação: '+c.clue+'. Ela deve ser relacionada a outros registros.'},
    {id:'ele3',name:'Analisar o protótipo',time:180,text:'O registrador do Laboratório de formas aponta um pulso do protótipo às 21h57, antes do alarme. O manual prevê outro pulso às 22h. O comando de suspensão fica na Galeria do tempo.'}],
   recepcao:[
-   {id:'rec1',name:'Consultar a movimentação',time:0,text:'A recepção recebeu uma anotação sobre '+c.subject+'. '+c.clue.charAt(0).toUpperCase()+c.clue.slice(1)+'.'},
-   {id:'rec2',name:'Examinar o livro de ocorrências',time:90,text:'Na ocorrência consta: '+c.detail+'.'},
-   {id:'rec3',name:'Observar a figura',time:180,text:c.room==='recepcao'?fig:'Uma pessoa da recepção comenta que havia uma figura imóvel em '+room+'.'}],
+   {id:'rec1',name:'Consultar a movimentação',time:0,text:'Atrás do balcão, um bilhete sobre '+c.subject+' ficou esquecido. Nele se lê: '+c.clue+'.'},
+   {id:'rec2',name:'Examinar o livro de ocorrências',time:90,text:'No livro de ocorrências, a última linha diz: '+c.detail+'.'},
+   {id:'rec3',name:'Observar a figura',time:180,text:c.room==='recepcao'?fig:'Uma pessoa da recepção comenta, baixando a voz: "Tinha alguém parado feito estátua em '+room+'. Eu não quis chegar perto."'}],
   corredor:[
-   {id:'cor1',name:'Examinar o registro de passagem',time:0,text:'No registro de passagem: '+c.detail+'.'},
-   {id:'cor2',name:'Ler o recado da equipe',time:90,text:'O recado sugere uma ação: '+ACTIONS[c.action]},
+   {id:'cor1',name:'Examinar o registro de passagem',time:0,text:'No registro de passagem, a letra é apressada: '+c.detail+'.'},
+   {id:'cor2',name:'Ler o recado da equipe',time:90,text:'Colado na parede, o recado da equipe sugere: '+ACTIONS[c.action]},
    {id:'cor3',name:'Verificar a figura imóvel',time:180,text:c.room==='corredor'?fig:'Um recado indica que alguém viu uma figura imóvel em '+room+'.'}],
   prototipo:[
    {id:'pro1',name:'Ler a placa da demonstração',time:0,text:'A demonstração guarda o instante de referência, às 21h55. Ao terminar, o protótipo deveria apenas projetar uma imagem desse instante.'},
    {id:'pro2',name:'Observar o primeiro pulso',time:120,text:'Às 21h57, o relógio do protótipo recua por um segundo. O estrondo vem da Galeria especial e a luz cai. O alarme soa mais tarde.'},
    {id:'pro3',name:'Conferir o comando de suspensão',time:180,text:'O manual indica que suspender a demonstração antes das 22h interrompe o pulso de retorno. O comando não altera o que já aconteceu nas outras salas.'}],
   deposito:[
-   {id:'dep1',name:'Consultar o inventário',time:0,text:'A ficha de movimentação menciona '+c.subject+'.'},
-   {id:'dep2',name:'Conferir a ficha de transferência',time:90,text:'Uma anotação de transferência registra que '+c.detail+'.'}],
+   {id:'dep1',name:'Consultar o inventário',time:0,text:'Na prancheta do depósito, a ficha de movimentação menciona '+c.subject+'.'},
+   {id:'dep2',name:'Conferir a ficha de transferência',time:90,text:'Um papel dobrado dentro da prancheta registra a transferência: '+c.detail+'.'}],
   auditorio:[
    {id:'aud1',name:'Ler o aviso da produção',time:0,text:'A produção pede que as equipes de montagem e segurança confirmem separadamente suas tarefas de encerramento.'},
    {id:'aud2',name:'Consultar a mensagem da produção',time:90,text:'Uma mensagem sobre '+c.subject+' foi arquivada na pasta de encerramento: '+c.clue+'.'}],
@@ -191,11 +191,11 @@ function makeClues(c){
   ['Observar a etiqueta de horário','Uma etiqueta de acervo marca o horário de fechamento da ala: 22h.'],
   ['Observar o carrinho de limpeza','Há um carrinho de limpeza encostado perto da porta.'],
   ['Ler o livro de visitas','O livro de visitas da sala tem poucas assinaturas hoje.'],
-  ['Ouvir a equipe de limpeza','Uma pessoa da limpeza conta que passou aqui às 21h30 e tudo estava em ordem.'],
+  ['Ouvir a equipe de limpeza','Uma pessoa da limpeza conta: "Passei aqui às 21h30, tudo em ordem. Só o carrinho ficou torto, culpa minha."'],
   ['Observar a luz de emergência','Uma lâmpada de emergência fica de prontidão acima da porta.'],
   ['Ler a planilha de umidade','A planilha de umidade da sala mostra números normais.'],
   ['Observar o piso','O piso foi encerado hoje e ainda tem cheiro de cera.'],
-  ['Ouvir um guia','Um guia comenta que o grupo da tarde gostou muito desta sala.'],
+  ['Ouvir um guia','Um guia comenta, animado: "O grupo da tarde não queria sair desta sala! Eu quase perdi o horário."'],
   ['Observar a faixa de segurança','Há uma faixa de segurança pintada no chão, junto ao corrimão.'],
   ['Ler o aviso da parede','O aviso na parede lembra que a grade da porta principal desce depois do fechamento.'],
   ['Conferir o extintor','O extintor foi conferido na semana passada; a etiqueta está em dia.'],
@@ -282,6 +282,31 @@ function resolvePath(key){
  return out;
 }
 const LEGACY_PATH = {...TIME_PATHS.suspension, opens:0};
+// História entre as voltas: cada retorno mostra um pouco mais do clima da noite, sem entregar a resposta.
+const ENTRE_VOLTAS = [
+ 'As portas voltaram a fechar. Os objetos estão onde estavam. Você conserva o que descobriu.',
+ 'De novo. Você já sabe o que esperar às 21h57: o estrondo e a luz que cai. O que ainda não sabe é por que a noite recomeça.',
+ 'Terceira vez. Alguns registros não batem com o que as pessoas contam. Anote quem disse o quê, e a que horas.',
+ 'Quarta vez. O museu fecha em minutos e alguma coisa precisa ser feita antes das 22h. Você já sabe onde, quando e como?'
+];
+// Uma pergunta para a turma conversar depois da revelação (uma por caso).
+const VALORES = [
+ 'Vale mover uma obra sem avisar ninguém para evitar um dano?',
+ 'Uma cópia no lugar da obra é cuidado ou engano?',
+ 'Quem responde quando uma etiqueta antiga leva a caixa para o lugar errado?',
+ 'O que pesa mais: manter a surpresa ou seguir o protocolo de segurança?',
+ 'Conferir uma assinatura justifica retirar um documento sem avisar quem o expôs?',
+ 'Inspecionar uma peça justifica deixar a sala vazia na hora do fechamento?',
+ 'Quem confirma que uma peça emprestada voltou inteira?',
+ 'Anunciar um desaparecimento antes de revisar os registros é prudência ou pressa?',
+ 'Proteger uma obra pode ser mais importante do que mostrá-la?',
+ 'Quando existem duas versões de uma obra, qual delas o visitante deveria ver?',
+ 'Uma etiqueta solta é falha de quem entrega ou de quem recebe?',
+ 'Guardar segredo por carinho justifica atrapalhar o trabalho dos outros?',
+ 'Registrar o verso de uma obra muda o que ela significa?',
+ 'Mover uma réplica para uma apresentação é diferente de mover uma peça de verdade?',
+ 'Uma restauração apaga a história de uma peça ou ajuda a preservá-la?'
+];
 const timePath = () => state.caseRules === 2
  ? resolvePath(CASE_PATHS[state.caseIndex])
  : LEGACY_PATH;
@@ -302,8 +327,27 @@ function scenarioClues(){
  clues[path.source].push({id:'time-source',name:'Consultar o procedimento de encerramento',time:60,tipo:'Registro',text:path.instruction});
  // O procedimento cita só o código do equipamento. Dois diretórios, em ambientes diferentes, dizem onde cada código fica.
  const diretorio = 'Diretório de equipamentos: ' + Object.keys(TIME_PATHS).map(resolvePath).map(p => p.code+' fica em '+ROOMS.find(r=>r.id===p.room).name).join('; ') + '.';
- clues.seguranca.push({id:'time-dir1',name:'Consultar o diretório de equipamentos',time:30,tipo:'Registro',text:diretorio});
- clues.patio.push({id:'time-dir2',name:'Ler o mapa de equipamentos',time:60,tipo:'Registro',text:diretorio});
+ clues.seguranca.push({id:'time-dir1',name:'Consultar o diretório de equipamentos',time:30,tipo:'Registro',text:diretorio,fatos:['dir']});
+ clues.patio.push({id:'time-dir2',name:'Ler o mapa de equipamentos',time:60,tipo:'Registro',text:diretorio,fatos:['dir']});
+ clues[path.source].find(q => q.id === 'time-source').fatos = ['when','how','predict','proc'];
+ // Salas sem peça-chave: três ecos verdadeiros, de fatos diferentes (21/11/2026: mais caminhos até cada fato essencial).
+ const c = current(), evidence = labels[c.alarm][1], room = ROOMS.find(r=>r.id===c.room).name;
+ const eco = [
+  ['Ler o aviso interno', 'Um aviso interno conta que '+c.detail+'.', 'Registro', ['event']],
+  ['Conferir o registro do alarme', evidence, 'Registro', ['alarm']],
+  ['Ouvir o relato da ronda', 'Um relato da ronda indica uma figura imóvel em '+room+'.', 'Relato', ['where']],
+  ['Ler o recado da equipe', 'Um recado da equipe sugere: '+ACTIONS[c.action], 'Registro', ['action']],
+  ['Ouvir um colega da ronda', figures[c.figure], 'Relato', ['figure']],
+  ['Ler a cópia do procedimento', path.instruction, 'Registro', ['when','how','predict','proc']],
+  ['Consultar o diretório afixado', diretorio, 'Registro', ['dir']],
+  ['Ouvir uma técnica', 'Uma técnica conta: '+path.observation, 'Relato', ['when','how']]
+ ];
+ EXTRA_ORDEM.forEach((id, k) => {
+  const fixos = clues[id].filter(q => !/-(1|2|r1)$/.test(q.id));
+  const tempos = [60+(k%3)*45, 110, 150+(k%3)*30];
+  const novos = [0,1,2].map(j => { const [name,text,tipo,fatos] = eco[(k*3+j)%eco.length]; return {id:id+'-'+(j+1), name, time:tempos[j], text, tipo, fatos}; });
+  clues[id] = [...fixos, ...novos];
+ });
  return clues;
 }
 
@@ -471,7 +515,7 @@ function applyIntervention(command){
 function brokeLoop(){
  return state.intervention === 'break' || state.intervention === 'suspender';
 }
-function collect(id){if(state.phase!=='playing'||(window.coop?.now() ?? Date.now())>=state.endAt){tick();return}const q=scenarioClues()[state.room].find(x=>x.id===id);if(!q||state.clues.some(x=>x.id===id)||state.duration-(state.endAt-(window.coop?.now() ?? Date.now()))/1000<q.time/300*state.duration)return;const room=ROOMS.find(x=>x.id===state.room);state.clues.push({id:q.id,room:room.name,name:q.name,text:q.text,tipo:q.tipo,loop:state.loop});save();renderClues();renderJournal();toast('Pista guardada no caderno')}
+function collect(id){if(state.phase!=='playing'||(window.coop?.now() ?? Date.now())>=state.endAt){tick();return}const q=scenarioClues()[state.room].find(x=>x.id===id);if(!q||state.clues.some(x=>x.id===id)||state.duration-(state.endAt-(window.coop?.now() ?? Date.now()))/1000<q.time/300*state.duration)return;const room=ROOMS.find(x=>x.id===state.room);state.clues.push({id:q.id,room:room.name,name:q.name,text:q.text,tipo:q.tipo,fatos:q.fatos,loop:state.loop});save();renderClues();renderJournal();toast('Pista guardada no caderno')}
 function renderJournal(){
  const clues=state.clues||[];$('countBadge').textContent=clues.length;
  $('journalPreview').innerHTML=clues.length?clues.slice(-3).reverse().map(c=>'<div class="preview-item">'+esc(c.name)+' <br><small>'+esc(c.room)+'</small></div>').join(''):'<p class="muted">Suas descobertas aparecerão aqui.</p>';
@@ -509,7 +553,7 @@ function renderBetween(){
   : 'Você se lembra.';
  $('betweenStory').textContent = finished
   ? (brokeLoop() ? 'A cadeia do retorno foi interrompida. O museu permanece no presente.' : 'O museu voltou às 21h55. Use o que você descobriu para reconstruir a noite.')
-  : 'As portas voltaram a fechar. Os objetos estão onde estavam. Você conserva o que descobriu.';
+  : (state.caseRules === 2 ? ENTRE_VOLTAS[Math.min(state.loop,ENTRE_VOLTAS.length)-1] : ENTRE_VOLTAS[0]);
  $('betweenHint').textContent = finished ? (state.caseRules === 2 && state.clues.length < 3 ? 'Com poucas pistas? Ao apresentar a hipótese, você pode consultar trechos do arquivo de fechamento.' : 'Seu caderno está disponível para a conclusão.')
   : interventionNext ? 'A próxima volta é sua oportunidade de intervir. Se faltou uma pista sobre o retorno, peça uma orientação no caderno antes de escolher o ambiente.'
   : 'O próximo ambiente pode confirmar ou mudar sua hipótese.';
@@ -603,6 +647,7 @@ const SUPPORT_KEYS = ['alarm','figure'];
 // Pistas que o jogador já guardou e que servem de fonte para a pergunta.
 function axisSources(axis){
  return (state?.clues ?? []).filter(clue => axis.test ? axis.test(clue) : (axis.sources.includes(clue.id) ||
+  clue.fatos?.includes(axis.key) ||
   (axis.key === 'alarm' && clue.text === labels[current().alarm][1])) &&
   (axis.key !== 'figure' || clue.text === figures[current().figure]));
 }
@@ -762,7 +807,8 @@ function renderResult(){
    (cz || sup ? '<br>'+cz+sup : '')+'</p></div>'; }).join('')+
   '<div class="result-card"><strong>O que aconteceu</strong><p>'+esc(c.detail.charAt(0).toUpperCase()+c.detail.slice(1))+
   '. '+esc(labels[c.alarm][1])+'</p><p>'+esc(figures[c.figure])+'</p></div>'+reconstruction+
-  '<div class="result-card"><strong>Desfecho</strong><p>'+esc(ending)+'</p></div>';
+  '<div class="result-card"><strong>Desfecho</strong><p>'+esc(ending)+'</p></div>'+
+  (VALORES[state.caseIndex] ? '<div class="result-card"><strong>Para conversar</strong><p>'+esc(VALORES[state.caseIndex])+'</p></div>' : '');
 }
 document.addEventListener('click',e=>{let id=e.target.dataset.close;if(id)$(id).close()});
 $('helpOpen').onclick=$('howButton').onclick=()=>popup('helpDialog');
