@@ -66,3 +66,7 @@ A Central de monitoramento (nomes B e C) ainda não tem peça extra; um rádio o
 
 ## Como entregar
 Coloque os GLBs na mesma pasta de antes e me diga a sala e se é B ou C, por exemplo "porcelana B". Se o nome do arquivo já tiver isso, melhor ainda.
+
+
+## Já entraram (22/11/2026, pasta TEMP do autor)
+35 peças (V01 a V52) entraram como versões B e C de 18 salas: gigantes, predadores, veículos, porcelana, jogos, crânios, mobília, galeria, auditório, asas, fósseis, proteções, fotografia, vidros, mar, brinquedos, âmbar, protótipo, sons e corredor. Ficaram de fora (sem sala livre ou ainda REVISAR): planta alta (11 MB), máquina do tempo REVISAR, presa de marfim, pulseira de bolas, papai noel, e as peças que repetiam salas já preenchidas.
