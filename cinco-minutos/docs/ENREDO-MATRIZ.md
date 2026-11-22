@@ -89,3 +89,23 @@ Um único recurso por volta, que combina com o apagão. Enche de novo a cada vol
 - **Rio = corredor parado pelo teste de alarme:** atravessar direto gasta energia; pedir liberação à Segurança gasta tempo.
 - **Sem sorte:** custos fixos e iguais para todos; o jogador aprende na volta 1 e planeja na 2.
 - **Fora:** morte, doença, dinheiro, eventos aleatórios.
+
+## Decisões de jogabilidade (22/11/2026)
+**Primeira versão (4 itens):**
+1. **Rotinas no tempo:** cada pessoa tem horário fixo nos 5 minutos (ronda, transporte, conferência); chegar cedo ou tarde muda o que se encontra. A rotina é clara o bastante para aprender e planejar.
+2. **Divisão do grupo:** cada jogador investiga um lugar no mesmo intervalo; a energia da lanterna impede que alguém veja tudo.
+3. **Combinações entre voltas:** 1 ou 2 ações combinadas com os setores (acompanhar um transporte, registrar o destino, confirmar uma orientação, avisar antes de mudar a sala). **Regra:** poucas combinações por noite (4 ou 5), cada uma com resultado já escrito e igual para todos que a escolherem; a pessoa lembra do combinado na volta seguinte. Atualiza a regra anterior ("as pessoas não reagem ao jogador"): reagem só às combinações previstas. Tentativa que não resolve diz o que eliminou, sem punição.
+4. **Teoria final em 3 partes:** (a) o que aconteceu com a peça; (b) por que pareceu desaparecimento; (c) que combinação entre setores evitaria a confusão. As 8 perguntas e a pontuação continuam, distribuídas nas 3 partes; a devolutiva reconhece o que está sustentado e diz o que faltou confirmar.
+
+**Camada de mistério:** caixote e bilhetes de T.
+**Regra de bastidor (não revelada ao jogador):** o caixote é o único objeto que o loop não apaga. Por isso o bilhete de T. sobrevive, o papel deixado sobre a mesa some e o caixote volta fechado a cada volta. Nenhum caso explica o porquê.
+
+**Depois:**
+- **Quadro de investigação** ("o que sabemos / o que falta confirmar"), aceitando hipóteses sem dizer se estão certas.
+- **Objetivos extras** opcionais, poucos e ligados à história.
+- **Volta de observação:** acompanhar uma pessoa durante os 5 minutos. Liberada como recompensa do caderno, depois de algumas noites.
+- **Tipos de cooperação** distribuídos pelas 15 noites: reconstruir, cruzar relatos, dividir caminhos, acompanhar uma ação, combinar uma mudança, escolher prioridades, confirmar hipótese.
+- **Relatos que parecem conflitar:** todos verdadeiros, de momentos diferentes (exemplo: a peça saiu da sala azul, voltou e foi para a verde).
+- **Um mesmo detalhe** (porta encostada) é chave numa noite e só cenário em outra.
+
+**Acessibilidade:** toda pista necessária tem ícone e nome, nunca só cor ou detalhe minúsculo.
