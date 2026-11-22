@@ -79,13 +79,13 @@ const PECAS_ALT = {
   sons:       [{peca:'N16', sub:'Rádio comunicador'}, null],
   relogios:   [{peca:'R01', sub:'Relógio de custódia'}, {peca:'R02', sub:'Relógio de pêndulo'}],
   eletrica:   [{peca:'E01', sub:'Quadro elétrico'}, {peca:'E02', sub:'Central de energia'}],
-  deposito:   [{peca:'I01', sub:'Fichário de registros'}, null],
+  deposito:   [{peca:'I01', sub:'Fichário de registros'}, {livro:true, sub:'Livro de inventário', capa:'Livro de Inventário|MOVIMENTAÇÕES'}],
   recepcao:   [{peca:'P01', sub:'Mesa de recepção'}, {peca:'P02', sub:'Balcão com notebook'}],
   mobilia:    [null, {peca:'M04', sub:'Gaveteiro antigo'}],
   corredor:   [null, {peca:'C02', sub:'Quadro de recados e alavancas'}],
   seguranca:  [{peca:'S02', sub:'Mesa com monitor'}, {peca:'S03', sub:'Parede de telas'}],
   patio:      [{peca:'F03', sub:'Farol de luz'}, {peca:'N10', sub:'Lanterna de rua'}],
-  conservacao:[null, {peca:'B07', sub:'Inseto sob vidro'}]
+  conservacao:[{livro:true, sub:'Livro de registros do acervo', capa:'Livro do Acervo|REGISTRO DE ESPÉCIMES'}, {peca:'B07', sub:'Inseto sob vidro'}]
 };
 const FUNCOES_ENTRADA = ['recepcao','conservacao','seguranca','limpeza','manutencao'];
 const LUGARES = {'2º andar':9, '1º andar':10, 'Térreo':11};
@@ -116,7 +116,7 @@ function sala(id){
  MUSEU ??= montarMuseu(0);
  const m = MUSEU.mapa[id];
  const alt = m.v ? PECAS_ALT[id]?.[m.v-1] : null;
- return {...base, name:m.nome, andar:m.andar, lugar:m.lugar, nomeBase:base.name, ...(alt ? {peca:alt.peca, sub:alt.sub} : {})};
+ return {...base, name:m.nome, andar:m.andar, lugar:m.lugar, nomeBase:base.name, ...(alt ? alt : {})};
 }
 // Troca, em qualquer texto de pista, o nome de origem das salas pelo nome da partida.
 function nomear(texto){

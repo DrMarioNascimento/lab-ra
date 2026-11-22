@@ -79,13 +79,13 @@ const PECAS_ALT = {
   sons:       [{peca:'N16', sub:'Rádio comunicador'}, null],
   relogios:   [{peca:'R01', sub:'Relógio de custódia'}, {peca:'R02', sub:'Relógio de pêndulo'}],
   eletrica:   [{peca:'E01', sub:'Quadro elétrico'}, {peca:'E02', sub:'Central de energia'}],
-  deposito:   [{peca:'I01', sub:'Fichário de registros'}, null],
+  deposito:   [{peca:'I01', sub:'Fichário de registros'}, {livro:true, sub:'Livro de inventário', capa:'Livro de Inventário|MOVIMENTAÇÕES'}],
   recepcao:   [{peca:'P01', sub:'Mesa de recepção'}, {peca:'P02', sub:'Balcão com notebook'}],
   mobilia:    [null, {peca:'M04', sub:'Gaveteiro antigo'}],
   corredor:   [null, {peca:'C02', sub:'Quadro de recados e alavancas'}],
   seguranca:  [{peca:'S02', sub:'Mesa com monitor'}, {peca:'S03', sub:'Parede de telas'}],
   patio:      [{peca:'F03', sub:'Farol de luz'}, {peca:'N10', sub:'Lanterna de rua'}],
-  conservacao:[null, {peca:'B07', sub:'Inseto sob vidro'}]
+  conservacao:[{livro:true, sub:'Livro de registros do acervo', capa:'Livro do Acervo|REGISTRO DE ESPÉCIMES'}, {peca:'B07', sub:'Inseto sob vidro'}]
 };
 const FUNCOES_ENTRADA = ['recepcao','conservacao','seguranca','limpeza','manutencao'];
 const LUGARES = {'2º andar':9, '1º andar':10, 'Térreo':11};
@@ -116,7 +116,7 @@ function sala(id){
  MUSEU ??= montarMuseu(0);
  const m = MUSEU.mapa[id];
  const alt = m.v ? PECAS_ALT[id]?.[m.v-1] : null;
- return {...base, name:m.nome, andar:m.andar, lugar:m.lugar, nomeBase:base.name, ...(alt ? {peca:alt.peca, sub:alt.sub} : {})};
+ return {...base, name:m.nome, andar:m.andar, lugar:m.lugar, nomeBase:base.name, ...(alt ? alt : {})};
 }
 // Troca, em qualquer texto de pista, o nome de origem das salas pelo nome da partida.
 function nomear(texto){
@@ -520,10 +520,20 @@ function renderClues(){
  const room = sala(state.room);
  const panel = $('roomPanel');
  const clues = scenarioClues()[room.id];
- const scene = [state.caseIndex, state.caseRules, !!window.coop, room.id].join(':');
+ const scene = [state.caseIndex, state.caseRules, !!window.coop, room.id, state.museu||0].join(':');
  if (panel.dataset.scene !== scene) {
   panel.dataset.scene = scene;
   const hotspots = clues.map((clue, i) => '<button type="button" class="hs" slot="hotspot-'+i+'" data-hs="'+clue.id+'" data-visibility-attribute="visible" data-position="0m 0m 0m" data-normal="0m 1m 0m" aria-label="Ponto de interesse na peça"></button>').join('');
+  if (room.livro) {
+   panel.innerHTML = '<h3>'+room.name+'</h3><p>'+roomDescriptions[room.id]+'</p>'+
+    '<div class="peca livro"><iframe title="Livro da sala" src="'+new URL('livro/index.html?embed=1&solo=1&capa='+encodeURIComponent(room.capa||'Livro|REGISTRO'), PECAS_URL.href.replace('pecas/','')).href+'" allow="xr-spatial-tracking; camera; fullscreen" loading="eager"></iframe></div>'+
+    '<p class="dica">Arraste a página para virar a folha. O que a página mostra fica registrado no seu caderno. Se o livro não abrir, use a lista.</p>'+
+    '<details class="lista-pistas"><summary>Não consegue ver o livro? Use a lista</summary><div class="clue-list">'+
+    clues.map(clue => '<button type="button" class="clue" data-clue="'+clue.id+'"><span>'+esc(clue.name)+'</span><small></small></button>').join('')+
+    '</div></details><div id="intervention" hidden></div>';
+   panel.querySelectorAll('[data-clue]').forEach(button => { button.onclick = () => collect(button.dataset.clue); });
+   panel.dataset.livro = '';
+  } else
   panel.innerHTML = '<h3>'+room.name+'</h3><p>'+roomDescriptions[room.id]+'</p>'+
    '<div class="peca"><model-viewer loading="eager" reveal="auto" src="'+new URL(room.peca+'.glb', PECAS_URL).href+'" alt="Peça da sala '+esc(room.name)+'" ar ar-modes="webxr scene-viewer quick-look" ar-scale="auto" ar-placement="floor" camera-controls touch-action="pan-y" interaction-prompt="none" shadow-intensity="0.6" exposure="1.15" field-of-view="26deg" min-field-of-view="12deg" max-field-of-view="45deg">'+hotspots+'<button type="button" slot="ar-button" class="btn secondary ar-btn">Ver no ambiente</button></model-viewer></div>'+
    '<p class="dica">Gire a peça e toque nos pontos que brilham. As pistas ficam escondidas nela.</p>'+
@@ -555,8 +565,27 @@ function renderClues(){
   if (button.lastElementChild.textContent !== label) button.lastElementChild.textContent = label;
   if (hs) { hs.classList.toggle('on', wait <= 0); hs.classList.toggle('ok', registered); hs.disabled = registered; }
  });
+ if (room.livro) atualizarLivro(clues, elapsed);
  renderIntervention(room.id, storySeconds);
 }
+// Livro folheável (museu/livro): cada pista vira uma página, escrita quando chega a hora dela; ao virar para a página, a pista é registrada.
+function atualizarLivro(clues, elapsed){
+ const panel = $('roomPanel'), fr = panel.querySelector('iframe'); if (!fr) return;
+ const abertas = clues.map(c => c.time/300*state.duration-elapsed <= 0);
+ const chave = abertas.map(x => x ? 1 : 0).join('');
+ if (panel.dataset.livro === chave && fr.dataset.pronto === '1') return;
+ const folhas = clues.map((c, i) => abertas[i] ? {titulo:c.name, linhas:[c.text]} : {titulo:'', linhas:[]});
+ try { fr.contentWindow.postMessage({oi:'livro', evento:'paginas', folhas}, location.origin); panel.dataset.livro = chave; } catch (e) {}
+}
+addEventListener('message', e => {
+ if (e.origin !== location.origin || !e.data || e.data.oi !== 'livro') return;
+ const fr = document.querySelector('#roomPanel iframe'); if (!fr || e.source !== fr.contentWindow) return;
+ if (e.data.evento === 'pronto') { fr.dataset.pronto = '1'; $('roomPanel').dataset.livro = ''; try { renderClues(); } catch (err) {} return; }
+ if (e.data.evento !== 'folha' || !e.data.aberto || state.phase !== 'playing') return;
+ const room = sala(state.room); if (!room?.livro) return;
+ const clues = scenarioClues()[room.id], elapsed = state.duration-state.remaining;
+ [2*e.data.par, 2*e.data.par+1].forEach(i => { const c = clues[i]; if (c && c.time/300*state.duration-elapsed <= 0 && !state.clues.some(x => x.id === c.id)) collect(c.id); });
+});
 function hasLiveFinal(){
  return state.liveFinal === true;
 }

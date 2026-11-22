@@ -96,3 +96,5 @@
 
 .tour-cena{font-style:italic;margin:.2rem 0 .6rem;padding:.6rem .8rem;border-left:4px solid #a78bfa;border-radius:8px;background:rgba(167,139,250,.12);line-height:1.4}
 .ar-btn{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);padding:8px 14px;font-size:.85rem;white-space:nowrap}
+.peca.livro iframe{width:100%;height:100%;border:0;display:block;border-radius:inherit;background:#070605}
+.peca.livro{height:min(56vh,430px)}

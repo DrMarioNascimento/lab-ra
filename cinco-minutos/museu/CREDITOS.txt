@@ -58,3 +58,5 @@ PEÇAS DO ACERVO DO AUTOR (22/11/2026) - modelos já criados pelo autor para out
 R01 Relógio de custódia, R02 Relógio de caixa alta, E01 Quadro elétrico, I01 Fichário, P01 Mesa de recepção, P02 Mesa com notebook, M04 Gaveteiro, C02 Cortiça e alavancas, S02 Escrivaninha com monitor, F03 Farol. Também entram N10 (Lanterna) e B07 (inseto sob vidro), que já estavam na pasta.
 Modificações: junção de vértices, simplificação da malha, textura a 1024 px e compressão (Draco e WebP) com glTF-Transform.
 S03 Sala de imprensa com telas e E02 Central de energia do subsolo (prédio VestChip, de O Eco do Amanhã), modelos do autor; mesmas modificações.
+
+LIVRO FOLHEÁVEL (museu/livro, 22/11/2026) - cópia do livro do farol de O Impostor (Casa da Costa), do autor do projeto, adaptada para o Loop (modo solo, capa e páginas vindas do jogo). Usa three.js (MIT) e, na RA do iPhone, o 8th Wall Engine (© 2026 Niantic Spatial, Inc.) sob a XR Engine License (https://github.com/8thwall/engine/blob/main/LICENSE), fornecido sem garantias.
