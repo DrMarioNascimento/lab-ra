@@ -83,3 +83,16 @@ Meta: manter o interesse por pelo menos 15 partidas por jogador ou turma, e alé
 - **Intervenção por perspectiva:** a ação certa do caso continua valendo na pontuação; as outras ações aparecem como "decisões legítimas de outra perspectiva", sem punição de enredo.
 - **Textos a ajustar:** o tour diz "nem tudo que contam é fato"; passa a dizer "cada pessoa só vê uma parte".
 - **Pendente:** o enredo de cada caso precisa de uma cena com a voz de cada perspectiva (o que cada pista diz na primeira pessoa).
+
+## Estado da implementação (22/11/2026) — o que o motor já faz e o que espera o enredo
+**Já no motor (testado):**
+- **Museu vivo:** lugares e nomes sorteados por partida (ver `docs/RODIZIO.md`).
+- **Sem repetir caso:** o sorteio evita as noites já jogadas no aparelho até as 15 serem usadas (`chooseCase`; na sala vale o aparelho do Mestre).
+- **Intervenção no ritmo de cada jogador:** tentativa em **qualquer volta**, **uma por volta**, no equipamento certo, na janela certa e com o comando certo. A falha diz só o que faltou (lugar, hora ou circunstância) e a pessoa tenta de novo na volta seguinte. Quem acerta cedo ganha **bônus de 3 pontos por volta que sobrou** (volta 1 = 12, volta 4 = 3, volta 5 = 0), além dos 100. Depois de acertar, a pessoa continua investigando as outras voltas sem novas tentativas.
+- **Caderno do museu:** guarda no aparelho quantas das 15 noites já foram visitadas e a melhor pontuação de cada uma; aparece no resultado.
+**Esperam o enredo e a sua decisão:**
+- Perspectivas (Segurança, Conservação, Programação, Atendimento, talvez Manutenção) com subconjunto de pistas por perspectiva.
+- Textos do "loop vivo" (o que cada pessoa da noite faz de diferente a cada volta) e a tabela de desfechos por volta.
+- Troca de Quando/Como (opções fechadas e adivinháveis) por "o que fez o resultado mudar".
+- Segredo da noite cooperativo (fragmentos entre jogadores).
+- Versões 2–3 de cada caso (a variedade além do rodízio).

@@ -19,3 +19,12 @@ Use um projeto dedicado ao jogo. Registre um app Web, habilite o provedor de aut
 Para teste local, execute `npx -y firebase-tools@latest emulators:start --project demo-cinco-minutos` no diretório `firebase`. Sirva o repositório por HTTP e adicione uma configuração de teste em `web-config.json` com `projectId: "demo-cinco-minutos"`, valores de exemplo em `apiKey` e `appId`, e `emulator: true`. Os emuladores só são usados em `localhost` ou `127.0.0.1`.
 
 O GDD está em [GDD.md](GDD.md).
+
+## Atualização de 22/11/2026
+- **Rodadas e prólogo:** cada partida tem 5 voltas de 5 minutos; o manual abre com o Prólogo, uma visita normal que ensina as telas.
+- **Códigos sorteados:** os códigos dos equipamentos mudam a cada partida.
+- **Ecos:** salas sem peça-chave dão pistas verdadeiras sobre fatos diferentes, para todo fato ter mais de um caminho.
+- **Museu vivo:** lugares e nomes das salas mudam a cada partida (semente única; na sala, o Mestre sorteia e jogadores e telão veem o mesmo museu). Detalhes em `docs/RODIZIO.md`.
+- **Intervenção:** uma tentativa por volta, em qualquer volta; agir cedo dá bônus.
+- **Caderno do museu:** lembra, no aparelho, as noites já visitadas.
+- Documentos de projeto (não públicos): `docs/ENREDO.md`, `docs/RODIZIO.md`, `docs/AVALIACAO-ESCALAS.md`, `docs/FICHAS.md`.

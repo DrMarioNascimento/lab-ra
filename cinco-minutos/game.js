@@ -565,7 +565,7 @@ function interventionNote(why, path){
 function renderIntervention(roomId, elapsed){
  const panel = $('intervention');
  const ctl = controlAt(roomId);
- panel.hidden = !hasLiveFinal() || state.loop !== 5 || !ctl;
+ panel.hidden = !hasLiveFinal() || !ctl;
  if (panel.hidden) return;
  const path = timePath();
  if (panel.dataset.ctl !== roomId) {
@@ -578,24 +578,26 @@ function renderIntervention(roomId, elapsed){
  }
  const button = panel.querySelector('button');
  const select = panel.querySelector('select');
- const recorded = !!state.intervention;
+ const recorded = state.tentouVolta === state.loop || brokeLoop();
  button.disabled = recorded || !select.value;
  select.disabled = recorded;
  const status = panel.lastElementChild;
  const message = recorded
-  ? (state.intervention === 'break' ? 'Comando registrado. O relógio seguirá adiante às 22h.' : interventionNote(state.interventionWhy, path))
-  : 'Você só tem uma tentativa nesta volta. Hora no museu: '+clockAt(Math.floor(elapsed))+'.';
+  ? (brokeLoop() ? (state.intervencaoVolta === state.loop ? 'Comando registrado. O relógio seguirá adiante às 22h.' : 'Você já interrompeu o retorno na volta '+state.intervencaoVolta+'.') : interventionNote(state.interventionWhy, path)+' Você pode tentar de novo na próxima volta.')
+  : 'Você tem uma tentativa por volta, em qualquer volta. Hora no museu: '+clockAt(Math.floor(elapsed))+'.';
  if (status.textContent !== message) status.textContent = message;
 }
 function applyIntervention(command){
  const ctl = controlAt(state.room);
  const elapsed = elapsedStoryTime(window.coop?.now() ?? Date.now());
- if (!ctl || !hasLiveFinal() || state.loop !== 5 || state.phase !== 'playing' || state.intervention ||
+ if (!ctl || !hasLiveFinal() || state.phase !== 'playing' || brokeLoop() || state.tentouVolta === state.loop ||
      !commandsOf(ctl).some(([v]) => v === command)) return;
  const path = timePath();
  const rightEquipment = ctl.key === activeKey();
  const inWindow = elapsed >= path.opens && elapsed < path.closes;
+ state.tentouVolta = state.loop;
  state.intervention = rightEquipment && command === 'break' && inWindow ? 'break' : 'other';
+ if (state.intervention === 'break') state.intervencaoVolta = state.loop;
  state.interventionWhy = state.intervention === 'break' ? 'ok'
   : !rightEquipment ? 'sala'
   : command === 'break' && !inWindow ? 'janela'
@@ -646,7 +648,8 @@ function renderBetween(){
   ? (brokeLoop() ? 'A cadeia do retorno foi interrompida. O museu permanece no presente.' : 'O museu voltou às 21h55. Use o que você descobriu para reconstruir a noite.')
   : (state.caseRules === 2 ? ENTRE_VOLTAS[Math.min(state.loop,ENTRE_VOLTAS.length)-1] : ENTRE_VOLTAS[0]);
  $('betweenHint').textContent = finished ? (state.caseRules === 2 && state.clues.length < 3 ? 'Com poucas pistas? Ao apresentar a hipótese, você pode consultar trechos do arquivo de fechamento.' : 'Seu caderno está disponível para a conclusão.')
-  : interventionNext ? 'A próxima volta é sua oportunidade de intervir. Se faltou uma pista sobre o retorno, peça uma orientação no caderno antes de escolher o ambiente.'
+  : brokeLoop() ? 'Você já interrompeu o retorno. Continue investigando para entender o que aconteceu e ajudar a turma.'
+  : state.loop >= 2 ? 'Quando achar o equipamento do retorno, você pode tentar intervir. É uma tentativa por volta, e agir mais cedo vale bônus. Se faltou uma pista, peça orientação no caderno.'
   : 'O próximo ambiente pode confirmar ou mudar sua hipótese.';
  $('nextLoop').textContent = finished ? 'Apresentar hipótese' : 'Escolher próximo ambiente';
  show('between');
@@ -870,6 +873,18 @@ function submit(event){
  renderResult();
  show('result');
 }
+// Caderno do museu: lembra, neste aparelho, quais noites já foram visitadas e a melhor pontuação de cada uma.
+const CADERNO_KEY = 'cinco-caderno-v1';
+function registrarCaderno(score){
+ const cad = load(CADERNO_KEY, {casos:{}, partidas:0});
+ if (!cad.casos || typeof cad.casos !== 'object') { cad.casos = {}; cad.partidas = 0; }
+ if (!state.cadernoFeito) {
+  const k = String(state.caseIndex), c = cad.casos[k] || {vezes:0, melhor:0};
+  c.vezes += 1; c.melhor = Math.max(c.melhor, score); cad.casos[k] = c; cad.partidas = (cad.partidas||0)+1;
+  try { localStorage.setItem(CADERNO_KEY, JSON.stringify(cad)); state.cadernoFeito = true; save(); } catch {}
+ }
+ return {noites:Object.keys(cad.casos).length, partidas:cad.partidas, melhor:cad.casos[String(state.caseIndex)]?.melhor ?? score, vezes:cad.casos[String(state.caseIndex)]?.vezes ?? 1};
+}
 function renderResult(){
  const c = current();
  const answers = state.answers || {};
@@ -884,7 +899,9 @@ function renderResult(){
    : (state.intervention === 'other' ? interventionNote(state.interventionWhy, path)+' ' : '')+
      'O museu voltou às 21h55. '+path.instruction+' O equipamento '+path.code+' fica em '+roomNameOf(path.room)+'.')
   : 'Nesta partida, a ação foi avaliada como hipótese.';
- $('resultBody').innerHTML = '<p class="large">Investigação: <strong>'+score+' de 100 pontos</strong>. Cada pergunta vale 10 ou 15 pontos; resposta próxima vale metade. Palpite acerta 60%, provável 80% e certeza 100%, mas errar com certeza tira 30%.</p>'+
+ const caderno = registrarCaderno(score);
+ const bonusCedo = hasLiveFinal() && brokeLoop() && state.intervencaoVolta ? Math.max(0,(5-state.intervencaoVolta)*3) : 0;
+ $('resultBody').innerHTML = '<div class="result-card"><strong>Caderno do museu</strong><p>Você já visitou '+caderno.noites+' de '+CASES.length+' noites diferentes ('+caderno.partidas+(caderno.partidas===1?' partida':' partidas')+' neste aparelho). Melhor pontuação nesta noite: '+caderno.melhor+'.</p></div>'+(bonusCedo ? '<div class="result-card"><strong>Você agiu na volta '+state.intervencaoVolta+' · bônus de '+bonusCedo+' pontos</strong><p>Quanto mais cedo você interrompe o retorno, maior o bônus. Ele vem além dos 100 pontos.</p></div>' : '')+'<p class="large">Investigação: <strong>'+score+' de 100 pontos</strong>. Cada pergunta vale 10 ou 15 pontos; resposta próxima vale metade. Palpite acerta 60%, provável 80% e certeza 100%, mas errar com certeza tira 30%.</p>'+
   ANSWER_AXES.map(axis => {
    const got = pointsFor(axis, answers[axis.key], answers);
    const cz = answers[axis.key] ? 'Seu grau de certeza: '+(CERTEZAS[answers[axis.key+'__c']]?.label ?? CERTEZAS[CERTEZA_PADRAO].label)+'.' : '';
