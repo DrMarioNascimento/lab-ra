@@ -143,6 +143,8 @@ function tick() {
   const antes = state.remaining;
   state.remaining = restante();
   $('timer').textContent = fmt(state.remaining);
+  $('fictionTime').textContent = museumTime();
+  if (state.remaining <= 0) window.loopSignalPanel?.render();
   if (state.room && Math.ceil(antes) !== Math.ceil(state.remaining)) renderClues();
   const fim = fimDaVolta();
   if (eMestre() && !movendo && fim != null && T.agora() >= fim + 1250) avancar('between');

@@ -299,7 +299,7 @@ function clockAt(seconds){
   (seconds%60 ? 'min'+String(seconds%60).padStart(2,'0')+'s' : '');
 }
 
-function show(id){$('coopShortcut').classList.toggle('hidden',id==='start'||!!window.coop);['start','game','between','final','result'].forEach(x=>$(x).classList.toggle('hidden',x!==id));window.scrollTo({top:0,behavior:'instant'})}
+function show(id){if(id!=='game')window.loopSignalPanel?.close();$('coopShortcut').classList.toggle('hidden',id==='start'||!!window.coop);['start','game','between','final','result'].forEach(x=>$(x).classList.toggle('hidden',x!==id));window.scrollTo({top:0,behavior:'instant'})}
 function toast(text){$('toast').textContent=text;$('toast').classList.add('show');clearTimeout(toastHandle);toastHandle=setTimeout(()=>$('toast').classList.remove('show'),2200)}
 function popup(id){if(!$(id).open)$(id).showModal()}
 function fmt(s){s=Math.max(0,Math.ceil(s));return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
@@ -310,7 +310,21 @@ function museumTime(){
 }
 function current(){return CASES[state.caseIndex]}
 function reset(){clearInterval(timerHandle);state={caseIndex:chooseCase(),loop:1,phase:'choose',room:null,duration:Number($('speed').value),remaining:Number($('speed').value),endAt:null,clues:[],hints:0,notes:'',answers:null,liveFinal:true,caseRules:2,archive:[]};save();renderGame();show('game')}
-function enterRoom(id){if(window.coop){window.coop.choose(id);return}if(state.phase!=='choose')return;state.room=id;state.phase='playing';state.remaining=state.duration;state.endAt=Date.now()+state.remaining*1000;save();renderGame();tick();timerHandle=setInterval(tick,250)}
+function startSoloClock(){
+ state.phase='playing';
+ state.remaining=state.duration;
+ state.endAt=Date.now()+state.duration*1000;
+ timerHandle=setInterval(tick,250);
+}
+function enterRoom(id){
+ if(window.coop){window.coop.choose(id);return}
+ if(state.room || !['choose','playing'].includes(state.phase))return;
+ if(state.phase==='playing' && Date.now()>=state.endAt){tick();return}
+ if(state.phase==='choose')startSoloClock();
+ state.room=id;
+ save();
+ renderGame();
+}
 function renderGame(){
  const finalLoop = hasLiveFinal() && state.loop === 5;
  $('loopBrief').classList.toggle('hidden', !finalLoop);
@@ -319,16 +333,17 @@ function renderGame(){
  $('loopLabel').textContent='LOOP '+state.loop+' DE 5';$('timer').textContent=fmt(state.remaining);
  $('clockStatus').textContent=state.phase==='playing'?'tempo em andamento':'aguardando escolha';
  $('phaseTitle').textContent=state.room?ROOMS.find(r=>r.id===state.room).name:'Escolha onde investigar';
- $('phaseDescription').textContent=state.phase==='playing'?'Gire a peça e toque nos pontos que brilham para achar pistas.':'Todo mundo começa no '+INICIO.name+', no '+INICIO.andar+'. Escolha para onde ir.';
- $('boardTitle').textContent=state.phase==='playing'?'Ambiente escolhido':'Escolha um ambiente';
+ $('phaseDescription').textContent=state.room && state.phase==='playing'?'Gire a peça e toque nos pontos que brilham para achar pistas.':'Todo mundo começa no '+INICIO.name+', no '+INICIO.andar+'. Escolha para onde ir.';
+ $('boardTitle').textContent=state.room?'Ambiente escolhido':'Escolha um ambiente';
  $('roomGrid').innerHTML='<div class="inicio" role="status"><span class="room-icon" aria-hidden="true">'+INICIO.icon+'</span><div><strong>'+INICIO.name+' · '+INICIO.andar+'</strong><small>'+(state.phase==='playing'?'Quando o tempo acabar, você volta para cá. A porta principal está trancada pela grade de segurança.':'Você está aqui. Todo mundo começa aqui, a cada volta. A porta principal está trancada pela grade de segurança.')+'</small></div></div>'+ANDARES.map(a=>'<h4 class="andar">'+a+'</h4>'+ROOMS.filter(r=>r.andar===a).map(r=>'<button class="room '+(state.room===r.id?'selected':'')+'" '+(state.phase==='playing'&&state.room?'disabled':'')+' data-room="'+r.id+'"><span class="room-icon" aria-hidden="true">'+r.icon+'</span><strong>'+r.name+'</strong><small>'+r.sub+'</small></button>').join('')).join('');
  document.querySelectorAll('[data-room]').forEach(b=>b.addEventListener('click',()=>enterRoom(b.dataset.room)));
  $('endLoop').classList.toggle('hidden', state.phase!=='playing' || ((finalLoop || state.caseRules === 2) && state.duration===300));
- $('statusText').textContent=state.phase==='playing'?'Você fica nesta sala até o tempo voltar. Aí você acorda no '+INICIO.name+'.':'Você visita uma sala por volta.';
- $('roomPanel').classList.toggle('hidden',state.phase!=='playing');
+ $('statusText').textContent=state.room && state.phase==='playing'?'Você fica nesta sala até o tempo voltar. Aí você acorda no '+INICIO.name+'.':'Você visita uma sala por volta.';
+ $('roomPanel').classList.toggle('hidden',state.phase!=='playing'||!state.room);
  if(state.phase==='playing'&&state.room)renderClues();
  if(window.coop)window.coop.decorate();
  $('notes').value=state.notes||'';renderJournal();
+ window.loopSignalPanel?.render();
 }
 const PECAS_URL = new URL('museu/pecas/', document.currentScript ? document.currentScript.src : location.href);
 const hashTxt = t => { let h = 2166136261; for (const ch of String(t)) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return (h >>> 0) / 4294967295; };
@@ -352,8 +367,10 @@ function renderClues(){
  const scene = [state.caseIndex, state.caseRules, !!window.coop, room.id].join(':');
  if (panel.dataset.scene !== scene) {
   panel.dataset.scene = scene;
+  panel.classList.remove('auxiliary-lit');
   const hotspots = clues.map((clue, i) => '<button type="button" class="hs" slot="hotspot-'+i+'" data-hs="'+clue.id+'" data-visibility-attribute="visible" data-position="0m 0m 0m" data-normal="0m 1m 0m" aria-label="Ponto de interesse na peça"></button>').join('');
   panel.innerHTML = '<h3>'+room.name+'</h3><p>'+roomDescriptions[room.id]+'</p>'+
+   (room.id === 'eletrica' ? '<details class="lighting-cabinet"><summary>Quadro de iluminação auxiliar</summary><section id="lightingChallenge"></section></details>' : '')+
    '<div class="peca"><model-viewer loading="eager" reveal="auto" src="'+new URL(room.peca+'.glb', PECAS_URL).href+'" alt="Peça da sala '+esc(room.name)+'" camera-controls touch-action="pan-y" interaction-prompt="none" shadow-intensity="0.6" exposure="1.15" field-of-view="26deg" min-field-of-view="12deg" max-field-of-view="45deg">'+hotspots+'</model-viewer></div>'+
    '<p class="dica">Gire a peça e toque nos pontos que brilham. As pistas ficam escondidas nela.</p>'+
    '<details class="lista-pistas"><summary>Não consegue ver a peça? Use a lista</summary><div class="clue-list">'+
@@ -384,6 +401,7 @@ function renderClues(){
   if (button.lastElementChild.textContent !== label) button.lastElementChild.textContent = label;
   if (hs) { hs.classList.toggle('on', wait <= 0); hs.classList.toggle('ok', registered); hs.disabled = registered; }
  });
+ window.loopLighting?.render($('lightingChallenge'), storySeconds);
  renderIntervention(room.id, storySeconds);
 }
 function hasLiveFinal(){
@@ -452,8 +470,16 @@ function applyIntervention(command){
 function brokeLoop(){
  return state.intervention === 'break' || state.intervention === 'suspender';
 }
-function collect(id){if(state.phase!=='playing'||(window.coop?.now() ?? Date.now())>=state.endAt){tick();return}const q=scenarioClues()[state.room].find(x=>x.id===id);if(!q||state.clues.some(x=>x.id===id)||state.duration-(state.endAt-(window.coop?.now() ?? Date.now()))/1000<q.time/300*state.duration)return;const room=ROOMS.find(x=>x.id===state.room);state.clues.push({id:q.id,room:room.name,name:q.name,text:q.text,tipo:q.tipo,loop:state.loop});save();renderClues();renderJournal();toast('Pista guardada no caderno')}
+function collect(id){if(state.phase!=='playing'||(window.coop?.now() ?? Date.now())>=state.endAt){tick();return}const q=scenarioClues()[state.room].find(x=>x.id===id);if(!q||state.clues.some(x=>x.id===id)||state.duration-(state.endAt-(window.coop?.now() ?? Date.now()))/1000<q.time/300*state.duration)return;recordClue(state.room,q);renderClues();
+}
+function recordClue(roomId, clue){
+ const room = ROOMS.find(item => item.id === roomId);
+ state.clues.push({id:clue.id, room:room.name, name:clue.name, text:clue.text, tipo:clue.tipo, loop:state.loop});
+ save();
+ renderJournal();
+ toast('Pista guardada no caderno');}
 function renderJournal(){
+ window.loopSignalPanel?.renderJournal();
  const clues=state.clues||[];$('countBadge').textContent=clues.length;
  $('journalPreview').innerHTML=clues.length?clues.slice(-3).reverse().map(c=>'<div class="preview-item">'+esc(c.name)+' <br><small>'+esc(c.room)+'</small></div>').join(''):'<p class="muted">Suas descobertas aparecerão aqui.</p>';
  $('journalList').innerHTML=clues.length?clues.map(c=>'<article class="journal-item"><b>'+esc(c.room)+' · Loop '+c.loop+(c.tipo?' · '+esc(c.tipo):'')+'</b><p><strong>'+esc(c.name)+':</strong> '+esc(c.text)+'</p></article>').join(''):'<p class="muted">Você ainda não registrou pistas.</p>';
@@ -478,7 +504,7 @@ function renderJournal(){
  ];
  $('hints').innerHTML=hs.slice(0,state.hints).map((x,i)=>'<p><strong>Orientação '+(i+1)+':</strong> '+esc(x)+'</p>').join('');$('getHint').disabled=state.hints>=3;
 }
-function tick(){if(window.coop){window.coop.tick();return}if(!state||state.phase!=='playing')return;const old=state.remaining;state.remaining=Math.max(0,(state.endAt-Date.now())/1000);$('timer').textContent=fmt(state.remaining);$('fictionTime').textContent=museumTime();if(Math.ceil(old)!==Math.ceil(state.remaining))renderClues();else if(state.loop===5 && state.room)renderIntervention(state.room,elapsedStoryTime(window.coop?.now() ?? Date.now()));if(state.remaining<=0)finishLoop()}
+function tick(){if(window.coop){window.coop.tick();return}if(!state||state.phase!=='playing')return;const old=state.remaining;state.remaining=Math.max(0,(state.endAt-Date.now())/1000);$('timer').textContent=fmt(state.remaining);$('fictionTime').textContent=museumTime();if(state.remaining<=0){finishLoop();return}if(!state.room)return;if(Math.ceil(old)!==Math.ceil(state.remaining))renderClues();else if(state.loop===5)renderIntervention(state.room,elapsedStoryTime(Date.now()))}
 function renderBetween(){
  const finished = state.loop === 5;
  const interventionNext = hasLiveFinal() && state.loop === 4;
@@ -555,7 +581,7 @@ const ANSWER_AXES = [
   sources:['time-source','time-control','atebase'],
   guide:'O primeiro pulso causa o apagão. Descubra o que precisava acontecer depois, e em qual equipamento.'},
  {key:'alarm', pts:10, title:'Por quê', question:'Por quê: o que disparou o alarme?', options:ALARMS,
-  sources:['seg1','seg2','ele1'],
+  sources:['seg1','seg2','ele1','lighting-log'],
   guide:'Separe o estrondo do disparo do alarme. Compare os horários e o tipo de registro.'},
  {key:'figure', pts:15, title:'Quem', question:'Quem: quem era a figura imóvel observada?', options:FIGURES,
   sources:['gal3','con4','seg3','rec3','cor3'],
