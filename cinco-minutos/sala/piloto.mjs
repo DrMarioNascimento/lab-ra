@@ -8,7 +8,12 @@ export function pilotar(win, { acerto = 0.6 } = {}) {
     try {
       const L = win.LoopSala; if (!L?.room) return;
       const e = L.room.etapa, d = doc();
-      if (e === 'choose' && !win.state?.room) {
+      if (e === 'choose' && !win.state?.room && !win.state?.prep && d.querySelector('[data-nt="prep"]')) {
+        // preparação da noite: duas ferramentas e começar
+        const kits = [...d.querySelectorAll('[data-nt^="kit:"]')], marcados = kits.filter((k) => k.getAttribute('aria-pressed') === 'true');
+        if (marcados.length < 2) kits.find((k) => k.getAttribute('aria-pressed') !== 'true')?.click();
+        else d.querySelector('[data-nt="prep"]').click();
+      } else if (e === 'choose' && !win.state?.room) {
         const bs = [...d.querySelectorAll('#roomGrid button:not([disabled])')];
         if (bs.length && sorte(0.5)) bs[Math.floor(Math.random() * bs.length)].click();
       } else if (e === 'playing') {
