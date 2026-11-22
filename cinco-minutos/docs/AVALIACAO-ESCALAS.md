@@ -30,7 +30,7 @@ Todos os critérios da história, Big Five, GAMS e a cobertura técnica.
 ## Decisões que são suas (mudam enredo/regra)
 1. Trocar Quando/Como por resposta menos chutável (por exemplo, escolher entre mais opções ou montar a sequência).
 2. Dar a cada caso um enredo próprio, não só o mesmo mecanismo em 4 cadeias.
-3. Criar prólogo e viradas ao longo das 5 voltas.
+3. Prólogo feito (visita normal que ensina as telas); faltam as viradas ao longo das 5 voltas.
 4. Diálogo ramificado com as figuras.
 5. Testar com grupos reais e com celulares.
 

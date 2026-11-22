@@ -285,7 +285,7 @@ const LEGACY_PATH = {...TIME_PATHS.suspension, opens:0};
 // História entre as voltas: cada retorno mostra um pouco mais do clima da noite, sem entregar a resposta.
 const ENTRE_VOLTAS = [
  'As portas voltaram a fechar. Os objetos estão onde estavam. Você conserva o que descobriu.',
- 'De novo. Você já sabe o que esperar às 21h57: o estrondo e a luz que cai. O que ainda não sabe é por que a noite recomeça.',
+ 'De novo. Você já sabe o que esperar perto das 22h: o estrondo e a luz que cai. O que ainda não sabe é por que a noite recomeça.',
  'Terceira vez. Alguns registros não batem com o que as pessoas contam. Anote quem disse o quê, e a que horas.',
  'Quarta vez. O museu fecha em minutos e alguma coisa precisa ser feita antes das 22h. Você já sabe onde, quando e como?'
 ];
@@ -826,29 +826,30 @@ $('answerFields').addEventListener('click', e => {
 });
 // Apresentação das telas (21/11/2026): passo a passo visual dentro do manual. Sem códigos fixos nem nomes de escala.
 const TOUR = [
- {t:'Escolha uma sala', d:'Toda volta começa no Saguão superior. Escolha só uma sala para investigar.',
+ {c:'Você chega ao museu no fim da tarde. Tudo calmo: gente passeando, luz quente, cheiro de cera no piso. Uma funcionária cochicha: "Shh! É surpresa para o pessoal. Depois eu explico."',t:'Escolha uma sala', d:'Toda volta começa no Saguão superior. Escolha só uma sala para investigar.',
   v:'<div class="tv-rooms"><span class="tv-room on"><i>◈</i>Sala dos gigantes</span><span class="tv-room"><i>◍</i>Sala dos predadores</span><span class="tv-room"><i>▣</i>Sala dos veículos</span><span class="tv-room"><i>◐</i>Sala dos jogos</span></div><p class="tv-floor">✦ Saguão superior · você começa aqui</p>'},
- {t:'Gire a peça', d:'Toque nos pontos que brilham: cada um esconde uma pista. Eles aparecem com o tempo.',
+ {c:'Na vitrine, um objeto brilha de leve. A restauradora passa e avisa baixinho: "Pode olhar de perto, só não encoste. Eu confiro tudo antes de fechar."',t:'Gire a peça', d:'Toque nos pontos que brilham: cada um esconde uma pista. Eles aparecem com o tempo.',
   v:'<div class="tv-piece"><div class="tv-obj"></div><b class="tv-dot d1"></b><b class="tv-dot d2"></b><b class="tv-dot d3"></b></div><p class="tv-floor">Arraste para girar · toque no brilho</p>'},
- {t:'O tempo corre', d:'Cada volta tem 5 minutos. Quando acaba, o tempo volta, mas você guarda o que descobriu.',
+ {c:'O relógio da parede marca a hora de sempre. Um guarda confere o rádio e murmura: "Faltam poucos minutos para fechar... eu odeio essa hora, tudo fica tão quieto." Num canto, uma artista de estátua viva se prepara para o bis, e um visitante olha para a porta, sem jeito.',t:'O tempo corre', d:'Cada volta tem 5 minutos. Quando acaba, o tempo volta, mas você guarda o que descobriu.',
   v:'<div class="tv-clock"><span>VOLTA 2 DE 5</span><strong>04:12</strong><small>21h56 no museu</small></div><div class="tv-bar"><i></i></div>'},
- {t:'Seu dossiê', d:'Cada pista é uma Observação, um Relato ou um Registro. O que alguém diz nem sempre é fato.',
+ {c:'No balcão, a ronda anota tudo: hora, sala, quem passou. "Se algo der errado hoje", diz o guarda, "estes registros salvam a gente. Mas cuidado: nem tudo que contam é fato."',t:'Seu dossiê', d:'Cada pista é uma Observação, um Relato ou um Registro. O que alguém diz nem sempre é fato.',
   v:'<div class="tv-dossie"><p><span class="tv-chip obs">Observação</span> O que você viu</p><p><span class="tv-chip rel">Relato</span> O que alguém contou</p><p><span class="tv-chip reg">Registro</span> O que está escrito</p></div>'},
- {t:'A hora de agir', d:'Na 5ª volta você tem uma única tentativa: o equipamento, o comando e o horário certos.',
+ {c:'Falta pouco para fechar. De repente, um estrondo, o alarme toca e todo mundo fica imóvel. A grade desce. Agora é com você.',t:'A hora de agir', d:'Na 5ª volta você tem uma única tentativa: o equipamento, o comando e o horário certos.',
   v:'<div class="tv-panel"><b>Painel da demonstração</b><span class="tv-select">Escolha um comando ▾</span><span class="tv-btn">Executar comando</span></div><p class="tv-floor">1 tentativa · sem aviso de janela</p>'},
- {t:'As 8 perguntas', d:'Diga o quanto você confia em cada resposta. Em Quem e Por quê, aponte a pista que sustenta.',
+ {c:'Quando o tempo se fecha, a ronda reúne todos. Cada um tem uma versão. Para acertar, você precisa dizer o quanto confia e mostrar a pista que sustenta.',t:'As 8 perguntas', d:'Diga o quanto você confia em cada resposta. Em Quem e Por quê, aponte a pista que sustenta.',
   v:'<div class="tv-q"><b>Quem: quem era a figura imóvel?</b><span class="tv-select">Um guarda escondido ▾</span><span class="tv-cert"><i class="c1">Palpite</i><i class="c2">Provável</i><i class="c3 on">Tenho certeza</i></span><span class="tv-select tv-pista">Pista: Procurar sinais da figura ▾</span></div>'}
 ];
 function montarTour(){
  const host = $('tour');
  if (!host) return;
  let i = 0;
- host.innerHTML = '<div class="tour-card"><p class="tour-step" aria-live="polite"></p><div class="tour-visual" aria-hidden="true"></div><h3 class="tour-title"></h3><p class="tour-text"></p></div>'+
+ host.innerHTML = '<div class="tour-card"><p class="tour-step" aria-live="polite"></p><p class="tour-cena"></p><div class="tour-visual" aria-hidden="true"></div><h3 class="tour-title"></h3><p class="tour-text"></p></div>'+
   '<div class="tour-nav"><button class="btn secondary tour-prev" type="button">Voltar</button><span class="tour-dots" aria-hidden="true"></span><button class="btn primary tour-next" type="button">Próximo</button></div>';
  const q = sel => host.querySelector(sel);
  function draw(){
   const s = TOUR[i];
-  q('.tour-step').textContent = 'Tela '+(i+1)+' de '+TOUR.length;
+  q('.tour-step').textContent = 'Prólogo · uma visita normal · '+(i+1)+' de '+TOUR.length;
+  q('.tour-cena').textContent = s.c;
   q('.tour-visual').innerHTML = s.v;
   q('.tour-title').textContent = s.t;
   q('.tour-text').textContent = s.d;
