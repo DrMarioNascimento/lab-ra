@@ -96,3 +96,7 @@ Meta: manter o interesse por pelo menos 15 partidas por jogador ou turma, e alé
 - Troca de Quando/Como (opções fechadas e adivinháveis) por "o que fez o resultado mudar".
 - Segredo da noite cooperativo (fragmentos entre jogadores).
 - Versões 2–3 de cada caso (a variedade além do rodízio).
+
+
+## Matriz das 15 noites (22/11/2026)
+Ver `ENREDO-MATRIZ.md`: pergunta principal por noite, versões, caixote, bilhetes de T., duas noites completas (3 e 6).
