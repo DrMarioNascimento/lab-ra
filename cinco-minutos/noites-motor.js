@@ -89,6 +89,77 @@ function camadaMuitas(base){
  return pistasEspeciais(base, c, ci);
 }
 // Pistas especiais (ideias do professor, 23/11/2026). Ninguém mente: as duas são verdadeiras.
+
+// ---- enigmas (cifras, cadeados e adivinhas): o jogador digita a resposta; só depois a pista é registrada. Catálogo completo em docs/CATALOGO-ENIGMAS.md.
+const semAcento = t => String(t).normalize('NFD').replace(/[̀-ͯ]/g, '');
+const normResp = t => semAcento(t).toUpperCase().replace(/[^A-Z0-9]/g, '');
+const ABC = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const cifCesar = (t, k) => t.replace(/[A-Z]/g, ch => ABC[(ABC.indexOf(ch) + k) % 26]);
+const cifAtbash = t => t.replace(/[A-Z]/g, ch => ABC[25 - ABC.indexOf(ch)]);
+const cifA1Z26 = t => t.split('').map(ch => ABC.indexOf(ch) + 1).join('-');
+const MORSE = {A:'.-',B:'-...',C:'-.-.',D:'-..',E:'.',F:'..-.',G:'--.',H:'....',I:'..',J:'.---',K:'-.-',L:'.-..',M:'--',N:'-.',O:'---',P:'.--.',Q:'--.-',R:'.-.',S:'...',T:'-',U:'..-',V:'...-',W:'.--',X:'-..-',Y:'-.--',Z:'--..'};
+const cifMorse = t => t.split('').map(ch => MORSE[ch]).join(' ');
+const cifBin = t => t.split('').map(ch => ch.charCodeAt(0).toString(2).padStart(8, '0')).join(' ');
+function cifAnagrama(t, sem){ const a = t.split(''); let tent = 0, r; do { r = a.slice(); for (let i = r.length - 1; i > 0; i--) { const j = Math.floor(hashTxt(sem+':'+tent+':'+i) * (i + 1)); [r[i], r[j]] = [r[j], r[i]]; } tent++; } while (r.join('') === t && tent < 20); return r.join(''); }
+function fatoChave(tipo, c){
+ const sc = sala(c.room).name;
+ if (tipo === 0) return {palavra:c.room.toUpperCase(), fatos:['where'], texto:'A mensagem decifrada aponta para um lugar: a figura imóvel está em '+sc+'.'};
+ if (tipo === 1) return {palavra:c.figure.toUpperCase(), fatos:['figure'], texto:'A mensagem decifrada aponta para uma pessoa. '+figures[c.figure]};
+ if (tipo === 2) return {palavra:c.action.toUpperCase(), fatos:['action'], texto:'A mensagem decifrada manda fazer algo. '+ACTIONS[c.action]};
+ if (tipo === 3) return {palavra:c.alarm.toUpperCase(), fatos:['alarm'], texto:'A mensagem decifrada fala do alarme. '+labels[c.alarm][1]};
+ return {palavra:c.event.toUpperCase(), fatos:['event'], texto:'A mensagem decifrada conta o que houve: '+c.detail+'.'};
+}
+function pistasEnigmas(base, c, ci){
+ const add = (sala, q) => (base[sala] ||= []).push({tipo:'Registro', ...q});
+ const kw = i => fatoChave((i + ci) % 5, c);
+ const mk = (i, sala, id, nome, time, enun, cifrado, rotulo) => { const f = kw(i); add(sala, {id:'enig'+ci+'-'+id, name:nome, time, fatos:f.fatos, text:'Cifra: '+cifrado(f.palavra).cifrado+'. Palavra-chave: '+f.palavra+'. '+f.texto, enigma:{rotulo:rotulo||'DECIFRAR', enunciado:enun, cifrado:cifrado(f.palavra).cifrado, resposta:f.palavra}}); };
+ const k = 2 + (ci % 9);
+ // 1 César: o deslocamento está no relógio de parede da mesma sala
+ add('fotografia', {id:'enig'+ci+'-cesar-chave', name:'Olhar o relógio de parede', time:15, text:'O relógio de parede marca exatamente '+k+' horas. Um bilhete colado nele diz: "É o mesmo tanto que está no papel da mesa."'});
+ mk(0, 'fotografia', 'cesar', 'Ler o bilhete cifrado', 30, 'Cada letra deste bilhete foi empurrada para a frente no alfabeto tantas casas quanto o relógio de parede marca. Qual é a palavra-chave?', p => ({cifrado:cifCesar(p, k)}));
+ // 2 Morse: a tabela está afixada na parede
+ add('sons', {id:'enig'+ci+'-morse-tab', name:'Ler a tabela de Morse na parede', time:15, text:'Na parede da sala há uma tabela de pontos e traços: '+Object.entries(MORSE).map(([a,b]) => a+' '+b).join(' · ')+'.'});
+ mk(1, 'sons', 'morse', 'Ouvir as batidas no cano', 40, 'Alguém bate no cano: ponto é batida curta e traço é batida longa. A tabela está na parede. Qual é a palavra-chave?', p => ({cifrado:cifMorse(p)}));
+ // 3 Atbash: o espelho mostra o alfabeto invertido
+ add('vidros', {id:'enig'+ci+'-atbash-chave', name:'Olhar o alfabeto no espelho', time:15, text:'No espelho o alfabeto aparece de trás para a frente: o A vira Z, o B vira Y, o C vira X, e assim por diante.'});
+ mk(2, 'vidros', 'atbash', 'Ler a mensagem no vidro', 40, 'Esta mensagem foi escrita com o alfabeto invertido. Qual é a palavra-chave?', p => ({cifrado:cifAtbash(p)}));
+ // 4 A1Z26
+ add('jogos', {id:'enig'+ci+'-a1z26-chave', name:'Ler o cartão da partida', time:15, text:'O cartão da partida lembra que A vale 1, B vale 2, C vale 3, e assim por diante, até o Z, que vale 26.'});
+ mk(3, 'jogos', 'a1z26', 'Somar as casas do tabuleiro', 40, 'Cada número da fileira é a posição de uma letra no alfabeto. Qual é a palavra-chave?', p => ({cifrado:cifA1Z26(p)}));
+ // 5 ROT13
+ add('mobilia', {id:'enig'+ci+'-rot13-chave', name:'Ler a anotação no rodapé do livro', time:15, text:'No rodapé do livro alguém escreveu a lápis: "O alfabeto tem 26 letras. Gire exatamente metade."'});
+ mk(4, 'mobilia', 'rot13', 'Ler o livro esquecido na poltrona', 40, 'Uma linha do livro está escrita com as letras giradas. Qual é a palavra-chave?', p => ({cifrado:cifCesar(p, 13)}));
+ // 6 Binário
+ add('eletrica', {id:'enig'+ci+'-bin-chave', name:'Ler a tabela do painel', time:15, text:'A tabela do painel diz: A é 01000001, B é 01000010, C é 01000011. Cada letra seguinte soma 1.'});
+ mk(0, 'eletrica', 'bin', 'Ler a fileira de luzes do painel', 45, 'Luz acesa é 1 e luz apagada é 0. Cada grupo de oito vira uma letra. Qual é a palavra-chave?', p => ({cifrado:cifBin(p)}));
+ // 7 Anagrama
+ mk(1, 'asas', 'anagrama', 'Montar as letrinhas da placa', 45, 'As letras desta placa caíram embaralhadas. Reorganize para formar a palavra-chave.', p => ({cifrado:cifAnagrama(p, 'an'+ci).split('').join(' ')}), 'ANAGRAMA');
+ // 8 Frase de trás para a frente
+ { const f = kw(2); const frase = 'A PALAVRA SECRETA E '+f.palavra; add('auditorio', {id:'enig'+ci+'-inv', name:'Ler o bilhete de trás para a frente', time:50, fatos:f.fatos, text:'Bilhete lido ao contrário: "'+frase+'". '+f.texto, enigma:{rotulo:'DECIFRAR', enunciado:'Este bilhete está escrito de trás para a frente. Leia do fim para o começo. Qual é a palavra secreta?', cifrado:frase.split('').reverse().join(''), resposta:f.palavra}}); }
+ // 9 Adivinha
+ { const f = kw(3); add('mar', {id:'enig'+ci+'-adivinha', name:'Ler a adivinha da placa', time:55, fatos:f.fatos, text:'A resposta da adivinha é MAPA. No verso do mapa há um recado: '+f.texto, enigma:{rotulo:'ADIVINHA', enunciado:'A placa pergunta:', cifrado:'"Tenho cidades, mas não tenho casas. Tenho montanhas, mas não tenho árvores. Tenho água, mas não tenho peixes. O que eu sou?"', resposta:'MAPA', placeholder:'Uma palavra'}}); }
+ // 10 Cadeado de 4 dígitos: um dígito em cada ponto da sala
+ const dg = [0,1,2,3].map(j => 1 + Math.floor(hashTxt('cad'+ci+':'+j+':'+semente())*9));
+ const pontos = [['Contar as cadeiras', 'Você conta {n} cadeiras.'],['Olhar o quadro', 'O quadro tem {n} molduras douradas.'],['Ler a placa da porta', 'A placa da porta indica a sala número {n}.'],['Contar os capacetes', 'Há {n} capacetes na prateleira.']];
+ pontos.forEach((pt, j) => add('protecoes', {id:'enig'+ci+'-cad'+j, name:pt[0]+' (dígito '+(j+1)+')', time:10+j*20, text:pt[1].replace('{n}', dg[j])+' Esse é o dígito '+(j+1)+' do cadeado.'}));
+ { const f = kw(4); add('protecoes', {id:'enig'+ci+'-cadeado', name:'Abrir o cadeado da caixa', time:100, fatos:f.fatos, text:'O cadeado abriu com '+dg.join('')+'. Dentro da caixa há um papel. '+f.texto, enigma:{rotulo:'CADEADO', enunciado:'Um cadeado de 4 dígitos. Os dígitos estão em quatro pontos da sala (dígito 1 ao 4).', cifrado:'[ _ ] [ _ ] [ _ ] [ _ ]', resposta:dg.join(''), placeholder:'4 dígitos'}}); }
+ return base;
+}
+function abrirEnigma(q){
+ let d = document.getElementById('enigmaDlg');
+ if (!d) { d = document.createElement('dialog'); d.id = 'enigmaDlg'; d.style.cssText = 'width:min(92vw,520px);border:2px solid #9a7842;border-radius:16px;background:#12171d;color:#f3ead6;padding:16px;'; document.body.appendChild(d); }
+ d.innerHTML = '<p style="margin:0;color:#e6c36b;font-weight:800;letter-spacing:.08em">'+esc(q.enigma.rotulo)+'</p><h3 style="margin:.2em 0 .4em">'+esc(q.name)+'</h3><p style="margin:.2em 0 .6em">'+esc(q.enigma.enunciado)+'</p>'+
+  '<pre style="white-space:pre-wrap;word-break:break-word;margin:0 0 .8em;font:700 20px ui-monospace,Menlo,monospace;background:#0a0e12;padding:10px;border-radius:10px">'+esc(q.enigma.cifrado)+'</pre>'+
+  '<input id="enigmaIn" type="text" autocomplete="off" autocapitalize="characters" placeholder="'+esc(q.enigma.placeholder || 'Palavra-chave')+'" style="width:100%;box-sizing:border-box;font:700 18px system-ui;padding:12px;border-radius:10px;border:1px solid #5b6b78;background:#0a0e12;color:#fff">'+
+  '<p id="enigmaMsg" style="min-height:1.4em;margin:.5em 0;color:#e6c36b">Se faltar uma dica, feche e procure outras pistas desta sala.</p>'+
+  '<div style="display:flex;gap:8px"><button type="button" class="btn primary" id="enigmaOk">Decifrar</button><button type="button" class="btn secondary" id="enigmaNo">Fechar</button></div>';
+ const ok = () => { const v = normResp(d.querySelector('#enigmaIn').value);
+  if (v && v === normResp(q.enigma.resposta)) { (state.resolvidos ||= {})[q.id] = true; d.close(); collect(q.id); }
+  else d.querySelector('#enigmaMsg').textContent = v ? 'Ainda não. Confira a cifra e procure a dica nesta sala.' : 'Digite a sua resposta.'; };
+ d.querySelector('#enigmaOk').onclick = ok; d.querySelector('#enigmaNo').onclick = () => d.close();
+ d.querySelector('#enigmaIn').onkeydown = e => { if (e.key === 'Enter') ok(); };
+ if (!d.open) d.showModal(); setTimeout(() => d.querySelector('#enigmaIn')?.focus(), 50);
+}
 function pistasEspeciais(base, c, ci){
  const pend = (base.relogios ||= []), cons = (base.conservacao ||= []);
  pend.push({id:'esp'+ci+'-pend1', name:'Observar o relógio parado', time:20, tipo:'Observação', text:'Um relógio antigo de parede está parado em 21h47. A hora do museu agora é outra. Relógio parado não prova que horas eram.'});
@@ -129,7 +200,7 @@ function pistasEspeciais(base, c, ci){
   (base.seguranca ||= []).push({id:'esp'+ci+'-guarda'+v, name:'Ouvir o guarda noturno', time:20, volta:v, tipo:'Relato', text:GUARDA[v-1]});
   (base.conservacao ||= []).push({id:'esp'+ci+'-rest'+v, name:'Ouvir a restauradora', time:20, volta:v, tipo:'Relato', text:REST[v-1]});
  }
- return base;
+ return pistasEnigmas(base, c, ci);
 }
 function mergeNoite(base){
  const extra = pistasDaNoite();
