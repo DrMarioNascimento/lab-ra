@@ -24,6 +24,15 @@ const PECAS_ORDEM = [['D01','G'],['D02','G'],['N14','G'],['N01','P'],['N15','M']
  ['N04','M'],['N05','M'],['D09','M'],['B09','M'],['B02','M'],['N06','M'],
  ['N12','M'],['N07','P'],['N11','P'],['N09','P'],['L01','M'],['L02','M'],
  ['B01','M'],['S01','M'],['L03','M'],['B04','M'],['M01','M'],['B05','G']];   // térreo: as 5 funções de entrada (recepção, segurança, limpeza, conservação, manutenção) ocupam os 5 primeiros lugares, da porta para dentro
+// Rodízio da partida (como no jogo, docs/RODIZIO.md): as 5 funções de entrada (recepção, conservação, segurança, limpeza, manutenção) trocam entre si nos 5 primeiros lugares do térreo; as outras 25 trocam entre os demais lugares.
+if (VI) {
+ let sd = VI * 7919 + 12345; const rnd = () => { sd |= 0; sd = sd + 0x6D2B79F5 | 0; let t = Math.imul(sd ^ sd >>> 15, 1 | sd); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+ const emb = v => { const o = v.slice(); for (let i = o.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [o[i], o[j]] = [o[j], o[i]]; } return o; };
+ const ENTRADA = ['B01', 'B04', 'S01', 'L03', 'M01'], velho = PECAS_ORDEM.slice();
+ const ent = emb(velho.filter(x => ENTRADA.includes(x[0]))), resto = emb(velho.filter(x => !ENTRADA.includes(x[0])));
+ const novo = []; for (let i = 0; i < 30; i++) novo.push(i >= 24 && i <= 28 ? ent[i - 24] : (i === 29 ? resto[24] : resto[i]));
+ PECAS_ORDEM.splice(0, 30, ...novo); console.log('rodízio', VARIANTE, PECAS_ORDEM.map(x => x[0]).join(' '));
+}
 const ANDARES = [4,3,2,1,0].map(a => [a === 0 ? 'T' : String(a), PECAS_ORDEM.slice((4 - a) * 6, (4 - a) * 6 + 6)]);
 const TAM = { G, M, P };
 const AGENCIA = process.argv[4] || '../../../biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/modelos/agencia-0688-base.glb';
@@ -276,5 +285,13 @@ await doc.transform(prune());
 for (const a of doc.getRoot().listAnimations()) a.dispose();
 const bufs = doc.getRoot().listBuffers();
 for (const b of bufs.slice(1)) { for (const a of doc.getRoot().listAccessors()) if (a.getBuffer() === b) a.setBuffer(bufs[0]); b.dispose(); }
+if (VI) { // textos dos cartões da maquete para esta partida (nome e peça sorteados, como no jogo)
+ const gj2 = fs.readFileSync(process.env.GAME_JS || '/home/claude/lab-ra/cinco-minutos/game.js', 'utf8'), i2 = gj2.indexOf('const NOMES_ALT = {');
+ const NOMES = new Function('return ' + gj2.slice(i2 + 'const NOMES_ALT = '.length, gj2.indexOf('\n};', i2) + 3))();
+ const base = JSON.parse(fs.readFileSync('/home/claude/lab-ra/cinco-minutos/museu/torre/salas.json', 'utf8')), out = {};
+ for (const [id] of PECAS_ORDEM) { const sid = ID2SALA[id], a = base[id] || { nome: id, sub: '', texto: '' }, alt = ALT[sid]?.[VI - 1], nm = NOMES[sid]?.[VI - 1];
+  out[id] = { id: sid, nome: nm || a.nome, sub: (alt && alt.sub) || a.sub, texto: (alt && alt.peca) ? 'Nesta partida, esta sala mostra: ' + alt.sub.toLowerCase() + '.' : a.texto }; }
+ fs.writeFileSync(path.join(path.dirname(SAIDA), 'salas-' + VARIANTE + '.json'), JSON.stringify(out, null, 1));
+}
 fs.writeFileSync(path.join(path.dirname(SAIDA), VI ? 'auditoria-salas-' + VARIANTE + '.json' : 'auditoria-salas.json'), JSON.stringify(auditoria, null, 1));
 await io.write(SAIDA, doc); console.log('ok', n, 'salas ->', SAIDA);

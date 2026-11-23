@@ -52,7 +52,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 const $ = id => document.getElementById(id);
 const NOMES_ANDAR = ['Térreo', '1º andar', '2º andar', '3º andar', '4º andar'];
-const SALAS = await (await fetch('salas.json')).json();
+const SALAS = await (await fetch(((new URLSearchParams(location.search).get('versao') || 'A').toUpperCase().replace(/[^BC]/g, '') ? 'salas-' + (new URLSearchParams(location.search).get('versao')).toUpperCase().replace(/[^BC]/g, '') : 'salas') + '.json?v=20261123i')).json();
 
 const R = new THREE.WebGLRenderer({canvas: $('c'), antialias: true});
 R.setPixelRatio(Math.min(devicePixelRatio, 2)); R.outputColorSpace = THREE.SRGBColorSpace;
@@ -76,7 +76,7 @@ document.getElementById('bVers').onclick = e => { e.preventDefault(); const a = 
 const SLIDE = 11;                                     // metros do prédio (a torre tem escala 0,025)
 
 const VERS = (new URLSearchParams(location.search).get('versao') || 'A').toUpperCase().replace(/[^ABC]/g, 'A');
-gl.load((VERS === 'A' ? 'torre.glb' : 'torre-' + VERS + '.glb') + '?v=20261123h', g => {
+gl.load((VERS === 'A' ? 'torre.glb' : 'torre-' + VERS + '.glb') + '?v=20261123i', g => {
   torre = g.scene; S.add(torre);
   for (let k = 0; k < 5; k++) { andar[k] = torre.getObjectByName('andar_' + k); pos0[k] = andar[k].position.z; }
   montaAndares(); $('carr').style.display = 'none';

@@ -1,0 +1,182 @@
+{
+ "N06": {
+  "id": "vidros",
+  "nome": "Sala da transparência",
+  "sub": "Garrafa de vidro soprado",
+  "texto": "Nesta partida, esta sala mostra: garrafa de vidro soprado."
+ },
+ "B02": {
+  "id": "deposito",
+  "nome": "Sala do inventário",
+  "sub": "Fichário de registros",
+  "texto": "Nesta partida, esta sala mostra: fichário de registros."
+ },
+ "L02": {
+  "id": "corredor",
+  "nome": "Canto de descanso",
+  "sub": "Sofá do descanso",
+  "texto": "Nesta partida, esta sala mostra: sofá do descanso."
+ },
+ "N09": {
+  "id": "brinquedos",
+  "nome": "Sala das brincadeiras",
+  "sub": "Cavalinho de balanço",
+  "texto": "Nesta partida, esta sala mostra: cavalinho de balanço."
+ },
+ "L01": {
+  "id": "atelie",
+  "nome": "Oficina de ensaios",
+  "sub": "Projetos e bancada",
+  "texto": "Nesta partida, esta sala mostra: projetos e bancada."
+ },
+ "D02": {
+  "id": "predadores",
+  "nome": "Salão das garras",
+  "sub": "Mandíbula de tubarão",
+  "texto": "Nesta partida, esta sala mostra: mandíbula de tubarão."
+ },
+ "N04": {
+  "id": "protecoes",
+  "nome": "Sala dos capacetes",
+  "sub": "Capacete de bombeiro",
+  "texto": "Nesta partida, esta sala mostra: capacete de bombeiro."
+ },
+ "N03": {
+  "id": "relogios",
+  "nome": "Sala das horas",
+  "sub": "Relógio de custódia",
+  "texto": "Nesta partida, esta sala mostra: relógio de custódia."
+ },
+ "N07": {
+  "id": "sons",
+  "nome": "Sala do rádio",
+  "sub": "Rádio comunicador",
+  "texto": "Nesta partida, esta sala mostra: rádio comunicador."
+ },
+ "C01": {
+  "id": "auditorio",
+  "nome": "Sala dos bastidores",
+  "sub": "Refletor de palco",
+  "texto": "Nesta partida, esta sala mostra: refletor de palco."
+ },
+ "N01": {
+  "id": "porcelana",
+  "nome": "Salão da louça fina",
+  "sub": "Bule de porcelana",
+  "texto": "Nesta partida, esta sala mostra: bule de porcelana."
+ },
+ "CERA": {
+  "id": "cera",
+  "nome": "Galeria das figuras",
+  "sub": "Crânio de primata",
+  "texto": "Nesta partida, esta sala mostra: crânio de primata."
+ },
+ "F01": {
+  "id": "galeria",
+  "nome": "Galeria das vitrines",
+  "sub": "Vitrine de vidro",
+  "texto": "Nesta partida, esta sala mostra: vitrine de vidro."
+ },
+ "D01": {
+  "id": "gigantes",
+  "nome": "Salão dos colossos",
+  "sub": "Crânio de mamute",
+  "texto": "Nesta partida, esta sala mostra: crânio de mamute."
+ },
+ "N05": {
+  "id": "fotografia",
+  "nome": "Sala das câmeras",
+  "sub": "Câmera antiga",
+  "texto": "Nesta partida, esta sala mostra: câmera antiga."
+ },
+ "N02": {
+  "id": "mobilia",
+  "nome": "Salão das cadeiras",
+  "sub": "Cômoda de madeira",
+  "texto": "Nesta partida, esta sala mostra: cômoda de madeira."
+ },
+ "N12": {
+  "id": "mar",
+  "nome": "Aquário antigo",
+  "sub": "Concha grande",
+  "texto": "Nesta partida, esta sala mostra: concha grande."
+ },
+ "N11": {
+  "id": "ambar",
+  "nome": "Sala do tempo preso",
+  "sub": "Inseto em âmbar",
+  "texto": "Nesta partida, esta sala mostra: inseto em âmbar."
+ },
+ "D09": {
+  "id": "prototipo",
+  "nome": "Sala das invenções",
+  "sub": "Máquina do tempo (protótipo)",
+  "texto": "Nesta partida, esta sala mostra: máquina do tempo (protótipo)."
+ },
+ "N15": {
+  "id": "jogos",
+  "nome": "Salão dos tabuleiros",
+  "sub": "Jogo de xadrez",
+  "texto": "Nesta partida, esta sala mostra: jogo de xadrez."
+ },
+ "D08": {
+  "id": "asas",
+  "nome": "Mezanino do voo",
+  "sub": "Planador antigo",
+  "texto": "Nesta partida, esta sala mostra: planador antigo."
+ },
+ "F02": {
+  "id": "fosseis",
+  "nome": "Galeria da rocha",
+  "sub": "Amonite",
+  "texto": "Nesta partida, esta sala mostra: amonite."
+ },
+ "B05": {
+  "id": "patio",
+  "nome": "Pátio da claridade",
+  "sub": "Farol de luz",
+  "texto": "Nesta partida, esta sala mostra: farol de luz."
+ },
+ "B09": {
+  "id": "eletrica",
+  "nome": "Laboratório de energia",
+  "sub": "Quadro elétrico",
+  "texto": "Nesta partida, esta sala mostra: quadro elétrico."
+ },
+ "B04": {
+  "id": "conservacao",
+  "nome": "Gabinete dos espécimes",
+  "sub": "Livro de registros do acervo",
+  "texto": ""
+ },
+ "S01": {
+  "id": "seguranca",
+  "nome": "Sala dos monitores",
+  "sub": "Mesa com monitor",
+  "texto": "Nesta partida, esta sala mostra: mesa com monitor."
+ },
+ "M01": {
+  "id": "manutencao",
+  "nome": "Bancada de reparos",
+  "sub": "Baú de ferramentas",
+  "texto": "Nesta partida, esta sala mostra: baú de ferramentas."
+ },
+ "B01": {
+  "id": "recepcao",
+  "nome": "Entrada de convidados",
+  "sub": "Mesa de recepção",
+  "texto": "Nesta partida, esta sala mostra: mesa de recepção."
+ },
+ "L03": {
+  "id": "limpeza",
+  "nome": "Depósito de limpeza",
+  "sub": "Ferramentas de limpeza",
+  "texto": "Nesta partida, esta sala mostra: ferramentas de limpeza."
+ },
+ "N14": {
+  "id": "veiculos",
+  "nome": "Garagem do passado",
+  "sub": "Carroça de madeira e bicicleta",
+  "texto": "Nesta partida, esta sala mostra: carroça de madeira e bicicleta."
+ }
+}
