@@ -10,7 +10,7 @@ const [,, PECAS = '../pecas', SAIDA = 'museu-novo.glb'] = process.argv;
 // [peça, tamanho: G grande / M médio / P pequeno]  — por andar, na ordem das salas do jogo (2º, 1º, térreo)
 const G = 0.095, M = 0.06, P = 0.036;
 // 5 andares x 6 salas (2 colunas x 3 fileiras). De cima para baixo: 5º andar primeiro.
-const PECAS_ORDEM = [['D01','G'],['D02','G'],['N14','G'],['N01','P'],['N15','M'],['N13','M'],
+const PECAS_ORDEM = [['D01','G'],['D02','G'],['N14','G'],['N01','P'],['N15','M'],['CERA','G'],
  ['N02','M'],['F01','M'],['C01','M'],['D08','G'],['F02','M'],['N03','P'],
  ['N04','M'],['N05','M'],['D09','M'],['B09','M'],['B02','M'],['N06','M'],
  ['N12','M'],['B01','M'],['B04','M'],['S01','M'],['L01','M'],['L02','M'],
