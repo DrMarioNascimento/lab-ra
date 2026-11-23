@@ -39,10 +39,59 @@ function pistasDaNoite(){
  add('auditorio', 'x3', 60, 'Regra do caixote', 'Um bilhete lembra: '+tp.regra, 'Registro');
  return out;
 }
+
+// ---- muitas pistas (etapa 1, 23/11/2026): em TODAS as salas, uma camada a mais de pistas espalhadas até 4 min 30 s da volta.
+// Três de rotina (não decidem nada) e duas de eco (fatos verdadeiros do caso, vistos por outra pessoa; quando a mesma verdade aparece em mais de uma sala, é de propósito).
+const ROTINA_MAIS = [
+ ['Observar o quadro de avisos','No quadro de avisos, um papel lembra que o museu fecha às 22h e que a grade desce depois disso.'],
+ ['Ouvir uma visitante','Uma visitante pergunta, meio perdida, onde fica o café. Ninguém sabe responder.'],
+ ['Observar o rodapé','Há uma marca de sapato no rodapé, já meio apagada.'],
+ ['Ler a lista de tarefas','A lista de tarefas da noite está quase toda riscada. Falta só uma linha, ilegível.'],
+ ['Ouvir um guia cansado','Um guia comenta que o grupo da tarde falou muito e andou devagar.'],
+ ['Observar a lixeira','A lixeira está vazia e com saco novo, trocado há pouco.'],
+ ['Ler o cartaz da exposição','O cartaz da exposição foi trocado esta semana. A cola ainda cheira forte.'],
+ ['Observar a porta','A porta fecha sozinha, devagar, com um barulho de mola.'],
+ ['Ouvir o rádio da equipe','O rádio da equipe chia no canto. Dá para ouvir só pedaços de conversa sobre o fechamento.'],
+ ['Observar o relógio da parede','O relógio da parede está adiantado uns dois minutos, como sempre.'],
+ ['Ler o recibo preso na mesa','Um recibo de material de limpeza está preso na mesa, sem nada de importante.'],
+ ['Observar a cadeira','Uma cadeira está fora do lugar, virada para a janela.'],
+ ['Ouvir um funcionário','Um funcionário diz que a noite está calma e que quer ir embora cedo.'],
+ ['Observar o corrimão','O corrimão foi polido hoje. Dá para ver o reflexo da luz.'],
+ ['Ler a etiqueta da vitrine','A etiqueta da vitrine tem o número do lote e a data de entrada do acervo.'],
+ ['Observar o tapete','O tapete tem um canto levantado. Alguém já avisou a manutenção.'],
+ ['Ouvir passos no corredor','Passos de alguém andando devagar passam pelo corredor e somem.'],
+ ['Observar a luz de emergência','A luz de emergência fica acesa, fraquinha, sobre a porta.'],
+ ['Ler o aviso de silêncio','Um aviso pede silêncio nas galerias depois das 21h.'],
+ ['Observar a janela','Pela janela dá para ver a rua molhada e um carro parado do lado de fora.']
+];
+const ECOS_CASO = [
+ c => ['Ler o aviso interno', 'Um aviso interno conta que '+c.detail+'.', 'Registro', ['event']],
+ c => ['Conferir o registro do alarme', labels[c.alarm][1], 'Registro', ['alarm']],
+ c => ['Ouvir o relato da ronda', 'Um relato da ronda indica uma figura imóvel em '+sala(c.room).name+'.', 'Relato', ['where']],
+ c => ['Ler o recado da equipe', 'Um recado da equipe sugere: '+ACTIONS[c.action], 'Registro', ['action']],
+ c => ['Ouvir um colega da ronda', figures[c.figure], 'Relato', ['figure']]
+];
+function camadaMuitas(base){
+ const c = CASES[state.caseIndex], ci = state.caseIndex, T = [30, 80, 140, 200, 255];
+ ROOMS.forEach((r, k) => {
+  const lista = (base[r.id] ||= []), jit = (k % 3) * 7;
+  for (let j = 0; j < 5; j++) {
+   const id = 'mp'+ci+'-'+r.id+'-'+j, time = T[j] + jit, h = hashTxt('mp'+id+':'+semente());
+   if (j === 1 || j === 3) {
+    const e = ECOS_CASO[Math.floor(h*ECOS_CASO.length)](c);
+    lista.push({id, name:e[0], time, text:e[1], tipo:e[2], fatos:e[3]});
+   } else {
+    const x = ROTINA_MAIS[Math.floor(h*ROTINA_MAIS.length)];
+    lista.push({id, name:x[0], time, text:x[1], tipo:/^(Ouvir|Conversar)/.test(x[0]) ? 'Relato' : /^(Ler)/.test(x[0]) ? 'Registro' : 'Observação'});
+   }
+  }
+ });
+ return base;
+}
 function mergeNoite(base){
  const extra = pistasDaNoite();
  for (const sala of Object.keys(extra)) { base[sala] = (base[sala] || []).concat(extra[sala]); }
- return base;
+ return camadaMuitas(base);
 }
 // ---- preparação (antes da volta 1)
 function renderPrep(){

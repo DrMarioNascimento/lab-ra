@@ -91,3 +91,7 @@ Seguem a matriz (pergunta, variação, caixote e bilhete). Cada uma é escrita n
 - **Teoria final em 3 partes** (+10 pontos cada, separados das 8 perguntas), com devolutiva.
 - Funciona no solo e na sala (o piloto do simulador passa pela preparação). Partida simulada com Mestre automático e 6 participantes chega ao resultado.
 **Ainda não feito:** trocar Quando/Como por "o que fez o resultado mudar"; texto por volta das pessoas do museu (loop vivo) além das pistas de rotina; quadro de investigação; volta de observação; versões 3+ das noites; teste no iPhone.
+
+## 10. Muitas pistas (etapa 1, 23/11/2026)
+Em todas as salas entra uma camada a mais de 5 pistas, nos tempos 0:30, 1:20, 2:20, 3:20 e 4:15 da volta (com pequena variação por sala): 3 de rotina (20 textos, não decidem nada) e 2 de eco (fatos verdadeiros do caso, como evento, alarme, onde está a figura, ação e quem é a figura, vistos por outra pessoa; a mesma verdade pode aparecer em mais de uma sala de propósito). Resultado: 7 a 11 pistas por sala, nenhuma depois de 4:30. Código: `camadaMuitas` em `noites-motor.js`. Como cada pista examinada gasta 1 de energia, o jogador escolhe quais ler.
+**Próximas etapas combinadas:** (2) minigames nos cadeados (código, caixote, cofre, quadro de energia); (3) cofre e quadro de energia cooperativos, que só abrem quando o grupo já guardou pistas suficientes da noite.
