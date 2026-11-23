@@ -247,43 +247,43 @@
   "e": 1.866
  },
  {
-  "id": "P01",
-  "sala": "B01",
-  "uso": "serv",
-  "real": "balcão de recepção de ~1,9 m, tamanho real",
-  "alvo": 1.9,
-  "larg": 1.9,
-  "prof": 1.12,
-  "alt": 1.67,
-  "ped": 0,
-  "rot": 0,
-  "e": 1.301
- },
- {
-  "id": "B04",
-  "sala": "B04",
+  "id": "N07",
+  "sala": "N07",
   "uso": "pub",
-  "real": "mesa de espécimes de ~1,5 m",
-  "alvo": 1.8,
-  "larg": 1.8,
-  "prof": 0.71,
-  "alt": 0.24,
-  "ped": 0.9,
+  "real": "rádio de ~0,5 m, ampliado",
+  "alvo": 0.9,
+  "larg": 0.89,
+  "prof": 0.9,
+  "alt": 0.87,
+  "ped": 1,
   "rot": 0,
-  "e": 0.707
+  "e": 44.659
  },
  {
-  "id": "S01",
-  "sala": "S01",
-  "uso": "serv",
-  "real": "central de comando de ~2,0 m, tamanho de uso",
-  "alvo": 2,
-  "larg": 2,
-  "prof": 2,
-  "alt": 0.95,
-  "ped": 0.12,
+  "id": "N11",
+  "sala": "N11",
+  "uso": "pub",
+  "real": "âmbar de ~0,08 m, muito ampliado",
+  "alvo": 0.6,
+  "larg": 0.59,
+  "prof": 0.53,
+  "alt": 0.6,
+  "ped": 1,
   "rot": 0,
-  "e": 1.053
+  "e": 6.02
+ },
+ {
+  "id": "N09",
+  "sala": "N09",
+  "uso": "pub",
+  "real": "carrinho de ~0,15 m, muito ampliado",
+  "alvo": 0.9,
+  "larg": 0.89,
+  "prof": 0.9,
+  "alt": 0.35,
+  "ped": 1,
+  "rot": 0,
+  "e": 12.168
  },
  {
   "id": "L01",
@@ -312,17 +312,30 @@
   "e": 1.463
  },
  {
-  "id": "N07",
-  "sala": "N07",
-  "uso": "pub",
-  "real": "rádio de ~0,5 m, ampliado",
-  "alvo": 0.9,
-  "larg": 0.89,
-  "prof": 0.9,
-  "alt": 0.87,
-  "ped": 1,
+  "id": "P01",
+  "sala": "B01",
+  "uso": "serv",
+  "real": "balcão de recepção de ~1,9 m, tamanho real",
+  "alvo": 1.9,
+  "larg": 1.9,
+  "prof": 1.12,
+  "alt": 1.67,
+  "ped": 0,
   "rot": 0,
-  "e": 44.659
+  "e": 1.301
+ },
+ {
+  "id": "S01",
+  "sala": "S01",
+  "uso": "serv",
+  "real": "central de comando de ~2,0 m, tamanho de uso",
+  "alvo": 2,
+  "larg": 2,
+  "prof": 2,
+  "alt": 0.95,
+  "ped": 0.12,
+  "rot": 0,
+  "e": 1.053
  },
  {
   "id": "L03",
@@ -338,43 +351,17 @@
   "e": 0.753
  },
  {
-  "id": "N11",
-  "sala": "N11",
+  "id": "B04",
+  "sala": "B04",
   "uso": "pub",
-  "real": "âmbar de ~0,08 m, muito ampliado",
-  "alvo": 0.6,
-  "larg": 0.59,
-  "prof": 0.53,
-  "alt": 0.6,
-  "ped": 1,
+  "real": "mesa de espécimes de ~1,5 m",
+  "alvo": 1.8,
+  "larg": 1.8,
+  "prof": 0.71,
+  "alt": 0.24,
+  "ped": 0.9,
   "rot": 0,
-  "e": 6.02
- },
- {
-  "id": "B05",
-  "sala": "B05",
-  "uso": "pub",
-  "real": "canteiro do pátio de ~2,4 m, tamanho real",
-  "alvo": 2.13,
-  "larg": 2.13,
-  "prof": 1.8,
-  "alt": 1.39,
-  "ped": 0.15,
-  "rot": 0,
-  "e": 0.709
- },
- {
-  "id": "N09",
-  "sala": "N09",
-  "uso": "pub",
-  "real": "carrinho de ~0,15 m, muito ampliado",
-  "alvo": 0.9,
-  "larg": 0.89,
-  "prof": 0.9,
-  "alt": 0.35,
-  "ped": 1,
-  "rot": 0,
-  "e": 12.168
+  "e": 0.707
  },
  {
   "id": "M01",
@@ -388,5 +375,18 @@
   "ped": 0.9,
   "rot": 0,
   "e": 0.368
+ },
+ {
+  "id": "B05",
+  "sala": "B05",
+  "uso": "pub",
+  "real": "canteiro do pátio de ~2,4 m, tamanho real",
+  "alvo": 2.13,
+  "larg": 2.13,
+  "prof": 1.8,
+  "alt": 1.39,
+  "ped": 0.15,
+  "rot": 0,
+  "e": 0.709
  }
 ]

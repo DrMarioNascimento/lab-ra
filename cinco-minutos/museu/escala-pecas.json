@@ -196,35 +196,35 @@
    "altura_m": 0.54,
    "base_m": 1
   },
-  "B01": {
-   "peca": "P01",
-   "nome": "Recepção",
-   "uso": "serviço do museu",
-   "real": "balcão de recepção de ~1,9 m, tamanho real",
-   "largura_m": 1.9,
-   "profundidade_m": 1.12,
-   "altura_m": 1.67,
-   "base_m": 0
-  },
-  "B04": {
-   "peca": "B04",
-   "nome": "Sala dos espécimes",
+  "N07": {
+   "peca": "N07",
+   "nome": "Sala dos sons",
    "uso": "visitação pública",
-   "real": "mesa de espécimes de ~1,5 m",
-   "largura_m": 1.8,
-   "profundidade_m": 0.71,
-   "altura_m": 0.24,
-   "base_m": 0.9
+   "real": "rádio de ~0,5 m, ampliado",
+   "largura_m": 0.89,
+   "profundidade_m": 0.9,
+   "altura_m": 0.87,
+   "base_m": 1
   },
-  "S01": {
-   "peca": "S01",
-   "nome": "Central de monitoramento",
-   "uso": "serviço do museu",
-   "real": "central de comando de ~2,0 m, tamanho de uso",
-   "largura_m": 2,
-   "profundidade_m": 2,
-   "altura_m": 0.95,
-   "base_m": 0.12
+  "N11": {
+   "peca": "N11",
+   "nome": "Sala do âmbar",
+   "uso": "visitação pública",
+   "real": "âmbar de ~0,08 m, muito ampliado",
+   "largura_m": 0.59,
+   "profundidade_m": 0.53,
+   "altura_m": 0.6,
+   "base_m": 1
+  },
+  "N09": {
+   "peca": "N09",
+   "nome": "Sala dos brinquedos",
+   "uso": "visitação pública",
+   "real": "carrinho de ~0,15 m, muito ampliado",
+   "largura_m": 0.89,
+   "profundidade_m": 0.9,
+   "altura_m": 0.35,
+   "base_m": 1
   },
   "L01": {
    "peca": "L01",
@@ -246,15 +246,25 @@
    "altura_m": 1.16,
    "base_m": 0
   },
-  "N07": {
-   "peca": "N07",
-   "nome": "Sala dos sons",
-   "uso": "visitação pública",
-   "real": "rádio de ~0,5 m, ampliado",
-   "largura_m": 0.89,
-   "profundidade_m": 0.9,
-   "altura_m": 0.87,
-   "base_m": 1
+  "B01": {
+   "peca": "P01",
+   "nome": "Recepção",
+   "uso": "serviço do museu",
+   "real": "balcão de recepção de ~1,9 m, tamanho real",
+   "largura_m": 1.9,
+   "profundidade_m": 1.12,
+   "altura_m": 1.67,
+   "base_m": 0
+  },
+  "S01": {
+   "peca": "S01",
+   "nome": "Central de monitoramento",
+   "uso": "serviço do museu",
+   "real": "central de comando de ~2,0 m, tamanho de uso",
+   "largura_m": 2,
+   "profundidade_m": 2,
+   "altura_m": 0.95,
+   "base_m": 0.12
   },
   "L03": {
    "peca": "L03",
@@ -266,35 +276,15 @@
    "altura_m": 1.5,
    "base_m": 0
   },
-  "N11": {
-   "peca": "N11",
-   "nome": "Sala do âmbar",
+  "B04": {
+   "peca": "B04",
+   "nome": "Sala dos espécimes",
    "uso": "visitação pública",
-   "real": "âmbar de ~0,08 m, muito ampliado",
-   "largura_m": 0.59,
-   "profundidade_m": 0.53,
-   "altura_m": 0.6,
-   "base_m": 1
-  },
-  "B05": {
-   "peca": "B05",
-   "nome": "Pátio de luz",
-   "uso": "visitação pública",
-   "real": "canteiro do pátio de ~2,4 m, tamanho real",
-   "largura_m": 2.13,
-   "profundidade_m": 1.8,
-   "altura_m": 1.39,
-   "base_m": 0.15
-  },
-  "N09": {
-   "peca": "N09",
-   "nome": "Sala dos brinquedos",
-   "uso": "visitação pública",
-   "real": "carrinho de ~0,15 m, muito ampliado",
-   "largura_m": 0.89,
-   "profundidade_m": 0.9,
-   "altura_m": 0.35,
-   "base_m": 1
+   "real": "mesa de espécimes de ~1,5 m",
+   "largura_m": 1.8,
+   "profundidade_m": 0.71,
+   "altura_m": 0.24,
+   "base_m": 0.9
   },
   "M01": {
    "peca": "M01",
@@ -305,6 +295,16 @@
    "profundidade_m": 0.48,
    "altura_m": 0.64,
    "base_m": 0.9
+  },
+  "B05": {
+   "peca": "B05",
+   "nome": "Pátio de luz",
+   "uso": "visitação pública",
+   "real": "canteiro do pátio de ~2,4 m, tamanho real",
+   "largura_m": 2.13,
+   "profundidade_m": 1.8,
+   "altura_m": 1.39,
+   "base_m": 0.15
   }
  }
 }

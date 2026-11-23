@@ -13,8 +13,8 @@ const G = 0.095, M = 0.06, P = 0.036;
 const PECAS_ORDEM = [['D01','G'],['D02','G'],['N14','G'],['N01','P'],['N15','M'],['CERA','G'],
  ['N02','M'],['F01','M'],['C01','M'],['D08','G'],['F02','M'],['N03','P'],
  ['N04','M'],['N05','M'],['D09','M'],['B09','M'],['B02','M'],['N06','M'],
- ['N12','M'],['B01','M'],['B04','M'],['S01','M'],['L01','M'],['L02','M'],
- ['N07','P'],['L03','M'],['N11','P'],['B05','G'],['N09','P'],['M01','M']];
+ ['N12','M'],['N07','P'],['N11','P'],['N09','P'],['L01','M'],['L02','M'],
+ ['B01','M'],['S01','M'],['L03','M'],['B04','M'],['M01','M'],['B05','G']];   // térreo: as 5 funções de entrada (recepção, segurança, limpeza, conservação, manutenção) ocupam os 5 primeiros lugares, da porta para dentro
 const ANDARES = [4,3,2,1,0].map(a => [a === 0 ? 'T' : String(a), PECAS_ORDEM.slice((4 - a) * 6, (4 - a) * 6 + 6)]);
 const TAM = { G, M, P };
 const AGENCIA = process.argv[4] || '../../../biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/modelos/agencia-0688-base.glb';
@@ -116,9 +116,9 @@ async function extra(sala, pre, ex_) {   // peça extra pendurada/pousada numa s
 const auditoria = [], salasFeitas = [];
 let n = 0;
 for (let a = 0; a < ANDARES.length; a++) {
- const [rot, lista] = ANDARES[a]; const pre = rot === 'T' ? '' : 'A' + rot + '_'; const y0 = NIVEL[4 - a];
+ const [rot, lista] = ANDARES[a]; const ROTULO_ANDAR = rot; const pre = rot === 'T' ? '' : 'A' + rot + '_'; const y0 = NIVEL[4 - a];
  for (let i = 0; i < lista.length; i++) {
-  const [id, cl] = lista[i]; const c = i % COLS, l = Math.floor(i / COLS);
+  const [id, cl] = lista[i]; const c = i % COLS, l = ROTULO_ANDAR === 'T' ? (LINHAS - 1 - Math.floor(i / COLS)) : Math.floor(i / COLS);   // térreo: lugar 1 = junto à porta (frente)
   const cx = X0 + RW / 2 + c * (RW + 0.3), cz = Z0 + RD / 2 + l * (RD + 0.2);
   const sala = doc.createNode('sala_' + id).setTranslation([cx, y0, cz]); grupo[4 - a].addChild(sala);
   const k = 1 / ESC; // caixa() recebe medidas em m do prédio; pedestal/peça em unidades de maquete são convertidos por k
@@ -164,14 +164,7 @@ for (let a = 0; a < ANDARES.length; a++) {
  }
 }
 
-// ----- visitante de referência (1,75 m) em cada sala, clonado da sala de cera (mesma malha, sem peso extra)
-{ const fig = doc.getRoot().listNodes().find(nd => nd.getName() === 'figura_colega');
-  const copia = (nd, pai) => { const c = doc.createNode(nd.getName() + '_vis').setMesh(nd.getMesh()).setTranslation(nd.getTranslation()).setRotation(nd.getRotation()).setScale(nd.getScale()); pai.addChild(c); nd.listChildren().forEach(f => copia(f, c)); return c; };
-  if (fig) { for (const sf of salasFeitas) { if (sf.id === 'CERA') continue;
-    const v = doc.createNode('visitante'); copia(fig, v); sf.sala.addChild(v);
-    const b0 = getBounds(v), st = sf.sala.getTranslation(), k0 = 1 / ESC;
-    const cx = (b0.min[0] + b0.max[0]) / 2 * k0 - st[0], cz = (b0.min[2] + b0.max[2]) / 2 * k0 - st[2], mnY = b0.min[1] * k0 - st[1];
-    v.setTranslation([sf.HW - 0.6 - cx, .25 - mnY, sf.HD - 0.8 - cz]); } } }
+// (visitante de referência removido a pedido: as figuras da sala de cera já são a régua de 1,75 m)
 // ----- letreiro "Museu Mosaico" sobre o telhado (grupo do 4º andar, some junto com a fachada)
 { const tex = doc.createTexture('letreiro').setImage(fs.readFileSync(path.join(path.dirname(process.argv[1]), 'letreiro.png'))).setMimeType('image/png');
   const mL = doc.createMaterial('letreiro').setBaseColorTexture(tex).setEmissiveTexture(tex).setEmissiveFactor([1, 1, 1]).setRoughnessFactor(.6).setMetallicFactor(0);
