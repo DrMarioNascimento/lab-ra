@@ -6,7 +6,7 @@ const INICIO = {id:'saguao', name:'Saguão superior', andar:'2º andar', icon:'�
 const ROOMS = [
   {id:'gigantes', name:'Sala dos gigantes', andar:'2º andar', icon:'◈', sub:'Esqueleto de pescoço longo', peca:'D01'},
   {id:'predadores', name:'Sala dos predadores', andar:'2º andar', icon:'◍', sub:'Dentes e garras', peca:'D02'},
-  {id:'veiculos', name:'Sala dos veículos', andar:'2º andar', icon:'▣', sub:'Caminhão de leite', peca:'N14'},
+  {id:'veiculos', name:'Sala dos veículos', andar:'2º andar', icon:'▣', sub:'Caminhão de leite e bicicleta', peca:'VEI_A'},
   {id:'porcelana', name:'Sala da porcelana', andar:'2º andar', icon:'❖', sub:'Xícara e delicadeza', peca:'N01'},
   {id:'jogos', name:'Sala dos jogos', andar:'2º andar', icon:'◐', sub:'Tabuleiro e estratégia', peca:'N15'},
   {id:'cera', name:'Sala de cera', andar:'2º andar', icon:'⌘', sub:'Figuras que parecem vivas', peca:'CERA'},
@@ -76,7 +76,7 @@ const PECAS_ALT = {
   limpeza:    [{peca:'L04', sub:'Ferramentas de limpeza'}, {peca:'L05', sub:'Produtos e panos coloridos'}],
   manutencao: [{peca:'M02', sub:'Baú de ferramentas'}, {peca:'M03', sub:'Armário de ferramentas'}],
   atelie:     [{peca:'L06', sub:'Projetos e bancada'}, {peca:'L07', sub:'Ferramentas de teste'}],
-  prototipo:  [{peca:'T01', sub:'Máquina do tempo (protótipo)'}, null],   // C: falta a 3ª máquina do tempo (ver docs/PECAS-A-CONSEGUIR.md)
+  prototipo:  [{peca:'T01', sub:'Máquina do tempo (protótipo)'}, {peca:'T02', sub:'Cabine de viagem no tempo'}],
   sons:       [{peca:'N16', sub:'Rádio comunicador'}, {peca:'V44', sub:'Gramofone'}],
   relogios:   [{peca:'R01', sub:'Relógio de custódia'}, {peca:'R02', sub:'Relógio de pêndulo'}],
   eletrica:   [{peca:'E01', sub:'Quadro elétrico'}, {peca:'E02', sub:'Central de energia'}],
@@ -88,7 +88,7 @@ const PECAS_ALT = {
   patio:      [{peca:'F03', sub:'Farol de luz'}, {peca:'N10', sub:'Lanterna de rua'}],
   gigantes  : [{peca:'V01', sub:'Crânio de mamute'}, {peca:'V02', sub:'Costelas gigantes'}],
   predadores: [{peca:'V03', sub:'Mandíbula de tubarão'}, null],
-  veiculos  : [{peca:'V04', sub:'Bicicleta de roda alta'}, {peca:'V27', sub:'Motor a vapor'}],
+  veiculos  : [{peca:'VEI_B', sub:'Carroça de madeira e bicicleta'}, {peca:'VEI_C', sub:'Motor a vapor e bicicleta'}],   // a bicicleta de roda alta aparece em todas as versões
   porcelana : [{peca:'V06', sub:'Bule de porcelana'}, {peca:'V07', sub:'Jarro de pintura azul'}],
   jogos     : [{peca:'V08', sub:'Jogo de xadrez'}, {peca:'V09', sub:'Dados antigos'}],
   cera      : [{peca:'V10', sub:'Crânio de primata'}, {peca:'V11', sub:'Máscara de pedra'}],

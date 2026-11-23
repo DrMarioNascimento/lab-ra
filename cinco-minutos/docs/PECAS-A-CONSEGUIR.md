@@ -70,3 +70,6 @@ Coloque os GLBs na mesma pasta de antes e me diga a sala e se é B ou C, por exe
 
 ## Já entraram (22/11/2026, pasta TEMP do autor)
 35 peças (V01 a V52) entraram como versões B e C de 18 salas: gigantes, predadores, veículos, porcelana, jogos, crânios, mobília, galeria, auditório, asas, fósseis, proteções, fotografia, vidros, mar, brinquedos, âmbar, protótipo, sons e corredor. Ficaram de fora (sem sala livre ou ainda REVISAR): planta alta (11 MB), máquina do tempo REVISAR, presa de marfim, pulseira de bolas, papai noel, e as peças que repetiam salas já preenchidas.
+
+## T02 – Cabine de viagem no tempo (provisória, feita por código)
+Prompt para versão 3D de melhor qualidade: "Cabine de viagem no tempo steampunk, base quadrada 1,3 m, altura 2,7 m, estrutura de latão, parte de baixo em madeira vinho, vidros nos quatro lados, relógios redondos no topo, calota de latão com luz no alto, anel luminoso turquesa no chão, desenho original (não imitar cabine policial nem carro DeLorean), GLB com texturas PBR."

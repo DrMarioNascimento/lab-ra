@@ -26,17 +26,17 @@
   "e": 0.38
  },
  {
-  "id": "N14",
+  "id": "VEI_A",
   "sala": "N14",
   "uso": "pub",
-  "real": "caminhão de ~4,6 m, réplica reduzida",
-  "alvo": 3.14,
-  "larg": 3.14,
+  "real": "caminhão de ~4,6 m e bicicleta de roda alta, réplica reduzida",
+  "alvo": 1.81,
+  "larg": 1.81,
   "prof": 1.8,
-  "alt": 1.67,
+  "alt": 0.95,
   "ped": 0.12,
-  "rot": 90,
-  "e": 0.645
+  "rot": 0,
+  "e": 0.391
  },
  {
   "id": "N01",

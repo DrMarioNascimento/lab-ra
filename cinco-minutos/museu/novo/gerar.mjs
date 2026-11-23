@@ -51,7 +51,8 @@ const RW = (X1 - X0 - 0.3) / COLS, RD = (Z1 - Z0 - 0.4) / LINHAS;   // tamanho d
 const ESCALA = {
  D01: { alvo: 3.4, ped: .25, uso: 'pub', real: 'esqueleto de ~18 m, réplica reduzida' },
  D02: { alvo: 3.2, ped: .25, uso: 'pub', real: 'esqueleto de ~6 m, réplica reduzida' },
- N14: { alvo: 3.4, ped: .12, uso: 'pub', real: 'caminhão de ~4,6 m, réplica reduzida' },
+ VEI_A: { alvo: 3.4, ped: .12, uso: 'pub', real: 'caminhão de ~4,6 m e bicicleta de roda alta, réplica reduzida' },
+ T02: { alvo: 2.7, ped: .1, uso: 'pub', rot: 0, real: 'cabine de viagem no tempo de ~2,7 m, tamanho real' },
  N01: { alvo: .8, ped: 1.0, uso: 'pub', real: 'xícara de ~0,12 m, ampliada' },
  N15: { alvo: 1.3, ped: .8, uso: 'pub', real: 'tabuleiro de ~0,5 m, ampliado' },
  CERA: { nativo: true, ped: 0, semBase: true, uso: 'pub', rot: 0, real: 'figuras de 1,75 m, tamanho real' },
@@ -93,7 +94,7 @@ const ESCALA = {
  P01: { alvo: 1.9, ped: 0, semBase: true, uso: 'serv', rot: 0, real: 'balcão de recepção de ~1,9 m, tamanho real' },
 };
 // salas onde a peça principal do jogo (B01) não é a recepção em si: a recepção usa o balcão P01 e o quadro B01 na parede
-const TROCA = { B01: { peca: 'P01', extras: [{ id: 'B01', alvo: 1.4, pos: [0, 1.2, -1.7], rot: 0 }, { id: 'COFRE', arq: '/home/claude/lab-ra/biblioteca/dragon/jogos/o-eco-do-amanha/o-impostor/modelos/pecas/rec-cofre-balanca.glb', alvo: 1.0, pos: [-2.3, .25, -1.45], rot: 0 }] } };
+const TROCA = { N14: { peca: 'VEI_A' }, B01: { peca: 'P01', extras: [{ id: 'B01', alvo: 1.4, pos: [0, 1.2, -1.7], rot: 0 }, { id: 'COFRE', arq: '/home/claude/lab-ra/biblioteca/dragon/jogos/o-eco-do-amanha/o-impostor/modelos/pecas/rec-cofre-balanca.glb', alvo: 1.0, pos: [-2.3, .25, -1.45], rot: 0 }] } };
 async function carrega(pd) {
  for (const nd of pd.getRoot().listNodes()) { const inst = nd.getExtension('EXT_mesh_gpu_instancing'); if (!inst) continue;
   const T_ = inst.getAttribute('TRANSLATION'), R_ = inst.getAttribute('ROTATION'), S_ = inst.getAttribute('SCALE'), ct = (T_ || R_ || S_).getCount(), mesh = nd.getMesh();
