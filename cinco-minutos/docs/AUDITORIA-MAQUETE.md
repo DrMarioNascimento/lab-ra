@@ -43,3 +43,6 @@ Peças alternativas (versões B e C) usam o padrão de visitação (maior lado 1
 Verificação automática: nenhuma sala passa do teto (3,55 m livres) nem do contorno do prédio.
 ## Versões B e C da maquete (2026-11-23)
 `museu/torre/torre-B.glb` e `torre-C.glb` usam as peças alternativas sorteadas do jogo (PECAS_ALT em game.js), com tamanho/base de cada uma na tabela ESCALA de `museu/novo/gerar.mjs` (rodar com `VARIANTE=B` ou `C`). Conferido por código: 30 salas sem peça saindo do prédio nas duas. Abrir: `museu/torre/?versao=B` (botão "Peças" alterna A/B/C) e `museu/ra.html?versao=B`.
+
+## Cores da maquete (2026-11-23)
+Parede cinza-azulada escura, piso em tom de madeira clara e pedestal cinza médio, para as peças claras e coloridas se destacarem. O branco estourado das versões B e C vinha de luzes embutidas em algumas peças (ex.: farol de luz F03); o gerador agora remove todas as luzes (KHR_lights_punctual) ao montar a torre.

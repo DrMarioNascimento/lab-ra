@@ -56,7 +56,7 @@ function caixa(nome, m, [w, h, d], [x, y, z]) { // caixa com base em y (y = part
  const pr = doc.createPrimitive().setAttribute('POSITION', pos).setAttribute('NORMAL', nor).setIndices(ind).setMaterial(m);
  return doc.createNode(nome).setMesh(doc.createMesh(nome).addPrimitive(pr)).setTranslation([x, y, z]);
 }
-const PALETA = [[.93,.88,.78],[.85,.9,.82],[.82,.87,.94],[.94,.84,.82],[.9,.86,.93],[.95,.92,.78]];
+const PALETA = [[.26,.16,.085],[.24,.15,.08],[.28,.175,.095],[.25,.155,.085],[.27,.17,.09],[.235,.145,.08]];   // piso em madeira/pedra quente, para destacar as peças
 
 // ----- sala: caixa própria (laje + paredes baixas com vão de porta + pedestal + peça). Medidas em metros do prédio; tudo no nó 'mundo' (escala ESC)
 const torre = doc.createNode('torre').setScale([ESC, ESC, ESC]); cena.addChild(torre);
@@ -203,7 +203,7 @@ for (let a = 0; a < ANDARES.length; a++) {
   const sala = doc.createNode('sala_' + id).setTranslation([cx, y0, cz]); grupo[4 - a].addChild(sala);
   const k = 1 / ESC; // caixa() recebe medidas em m do prédio; pedestal/peça em unidades de maquete são convertidos por k
   sala.addChild(caixa('laje', mat(pre + 'laje' + (n % PALETA.length), PALETA[n % PALETA.length], .9), [RW, .25, RD], [0, 0, 0]));
-  const mp = mat(pre + 'parede', [.97,.96,.93], .95), HW = RW / 2, HD = RD / 2, VG = 1.3, PA = 1.5, T = .15;
+  const mp = mat(pre + 'parede', [.055,.085,.12], .95), HW = RW / 2, HD = RD / 2, VG = 1.3, PA = 1.5, T = .15;
   for (const s of [-1, 1]) {
    const Lx = HW - VG / 2, Lz = HD - VG / 2;
    sala.addChild(caixa('p', mp, [Lx, PA, T], [s * (VG / 2 + Lx / 2), .25, HD - T / 2])); sala.addChild(caixa('p', mp, [Lx, PA, T], [s * (VG / 2 + Lx / 2), .25, -HD + T / 2]));
@@ -225,7 +225,7 @@ for (let a = 0; a < ANDARES.length; a++) {
   let e = cfg.nativo ? 1 : cfg.alvo / Math.max(dx, dy, dz);
   if (!cfg.nativo) e = Math.min(e, LMAXp / ex, PMAXp / ez, HMAXp / dy);
   const px = ex * e, pz = ez * e;
-  const mt_ped = mat(pre + 'pedestal', [.18,.2,.24], .5, .2);
+  const mt_ped = mat(pre + 'pedestal', [.42,.43,.46], .5, .2);
   if (ped > 0 && !cfg.semBase) {
    if (cfg.base === 'red') sala.addChild(cilindro('pedestal', mt_ped, Math.max(px, pz) / 2 + .25, ped, [0, .25, 0]));
    else sala.addChild(caixa('pedestal', mt_ped, [Math.max(px + .3, 1.0), ped, Math.max(pz + .3, 1.0)], [0, .25, 0]));
@@ -281,6 +281,9 @@ clona(porNome['telhado'], 3 * ALT_P, 4);
 cenaA.removeChild(raizA);   // o resto do quarteirão fica sem cena e é limpo pelo prune
 doc.createExtension(KHRDracoMeshCompression).setRequired(true).setEncoderOptions({ method: KHRDracoMeshCompression.EncoderMethod.EDGEBREAKER });
 for (const sc of doc.getRoot().listScenes()) if (sc !== cena) sc.dispose();
+// Algumas peças trazem luzes embutidas (KHR_lights_punctual) que estouravam o branco da maquete: tira todas.
+for (const nd of doc.getRoot().listNodes()) if (nd.getExtension('KHR_lights_punctual')) nd.setExtension('KHR_lights_punctual', null);
+for (const ex of doc.getRoot().listExtensionsUsed()) if (ex.extensionName === 'KHR_lights_punctual') ex.dispose();
 await doc.transform(prune());
 for (const a of doc.getRoot().listAnimations()) a.dispose();
 const bufs = doc.getRoot().listBuffers();
