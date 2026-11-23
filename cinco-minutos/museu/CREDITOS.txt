@@ -65,3 +65,8 @@ T01 Máquina do tempo (protótipo 3D do autor do projeto, comprimida de 19 MB pa
 PEÇAS NOVAS (22/11/2026) - coleção do autor do projeto, geradas por ele e depois comprimidas (malha simplificada, textura a 1024 px, Draco e WebP, com glTF-Transform). V01 a V52: crânio de mamute, costelas gigantes, mandíbula de tubarão, bicicleta de roda alta, carroça, bule, jarro azul, xadrez, dados, crânio de primata, máscara de pedra, cômoda, vitrine, escultura, refletor, microfone, planador, esqueleto de pássaro, amonite, trilobita, capacete, escudo, câmera, projetor, motor a vapor, garrafa soprada, lustre, concha, esqueleto de baleia, sofá, gramofone, cavalinho, pião, âmbar e inseto em âmbar.
 
 MAQUETE (22/11/2026): museu-andares.glb agora leva a peça 3D (versão A) de cada sala, posta por pecas-na-maquete.mjs (gltf-transform; textura a 512 px e Draco). As peças são as de museu/pecas e seguem os créditos acima. O museu-andares.usdz (RA do iPhone) continua só com a arquitetura.
+
+MAQUETE-TORRE (22/11/2026) - cópias próprias, sem compartilhar arquivo com outros jogos:
+ - Fachada: agência 0688 (prédio preto de A Manhã do Carro-Forte), empilhada em 5 andares.
+ - Segredos da noite no térreo: cofre (rec-cofre-balanca) e caixa de luz (rec-quadro-eletrico), de O Eco do Amanhã.
+ - Sala de cera: bonecos do Dilema do Bonde (cópias independentes).

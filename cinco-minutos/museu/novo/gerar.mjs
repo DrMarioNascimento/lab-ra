@@ -39,9 +39,10 @@ function caixa(nome, m, [w, h, d], [x, y, z]) { // caixa com base em y (y = part
  return doc.createNode(nome).setMesh(doc.createMesh(nome).addPrimitive(pr)).setTranslation([x, y, z]);
 }
 const PALETA = [[.93,.88,.78],[.85,.9,.82],[.82,.87,.94],[.94,.84,.82],[.9,.86,.93],[.95,.92,.78]];
-const salasNo = doc.createNode('salas'); cena.addChild(salasNo);
+
 // ----- sala: caixa própria (laje + paredes baixas com vão de porta + pedestal + peça). Medidas em metros do prédio; tudo no nó 'mundo' (escala ESC)
-const mundo = doc.createNode('mundo').setScale([ESC, ESC, ESC]); salasNo.addChild(mundo);
+const torre = doc.createNode('torre').setScale([ESC, ESC, ESC]); cena.addChild(torre);
+const grupo = []; for (let k = 0; k < 5; k++) { grupo[k] = doc.createNode('andar_' + k); torre.addChild(grupo[k]); }
 const RW = (X1 - X0 - 0.3) / COLS, RD = (Z1 - Z0 - 0.4) / LINHAS;   // tamanho de cada sala (m)
 let n = 0;
 for (let a = 0; a < ANDARES.length; a++) {
@@ -49,7 +50,7 @@ for (let a = 0; a < ANDARES.length; a++) {
  for (let i = 0; i < lista.length; i++) {
   const [id, cl] = lista[i]; const c = i % COLS, l = Math.floor(i / COLS);
   const cx = X0 + RW / 2 + c * (RW + 0.3), cz = Z0 + RD / 2 + l * (RD + 0.2);
-  const sala = doc.createNode('sala_' + id).setTranslation([cx, y0, cz]); mundo.addChild(sala);
+  const sala = doc.createNode('sala_' + id).setTranslation([cx, y0, cz]); grupo[4 - a].addChild(sala);
   const k = 1 / ESC; // caixa() recebe medidas em m do prédio; pedestal/peça em unidades de maquete são convertidos por k
   sala.addChild(caixa('laje', mat(pre + 'laje' + (n % PALETA.length), PALETA[n % PALETA.length], .9), [RW, .25, RD], [0, 0, 0]));
   const mp = mat(pre + 'parede', [.97,.96,.93], .95), HW = RW / 2, HD = RD / 2, VG = 1.3, PA = 1.5, T = .15;
@@ -77,16 +78,32 @@ for (let a = 0; a < ANDARES.length; a++) {
   n++;
  }
 }
+// ----- segredos da noite (cópias próprias): cofre e caixa de luz (quadro elétrico), no térreo
+const EXTRAS = [['COFRE', '/home/claude/lab-ra/biblioteca/dragon/jogos/o-eco-do-amanha/o-impostor/modelos/pecas/rec-cofre-balanca.glb', 2.0, [-3.4, 0.4, 11.2], Math.PI],
+ ['CAIXA_LUZ', '/home/claude/lab-ra/biblioteca/dragon/jogos/o-eco-do-amanha/o-impostor/modelos/pecas/rec-quadro-eletrico.glb', 2.2, [X0 - 1.6, 0.4, 1.5], Math.PI / 2]];
+for (const [eid, earq, alt, pos, ry] of EXTRAS) {
+ const pd = await io.read(earq);
+ for (const nd of pd.getRoot().listNodes()) { const inst = nd.getExtension('EXT_mesh_gpu_instancing'); if (!inst) continue;
+  const T_ = inst.getAttribute('TRANSLATION'), R_ = inst.getAttribute('ROTATION'), S_ = inst.getAttribute('SCALE'), ct = (T_ || R_ || S_).getCount(), mesh = nd.getMesh();
+  for (let q = 0; q < ct; q++) { const f = pd.createNode(nd.getName() + '_i' + q).setMesh(mesh); if (T_) f.setTranslation(T_.getElement(q,[0,0,0])); if (R_) f.setRotation(R_.getElement(q,[0,0,0,1])); if (S_) f.setScale(S_.getElement(q,[0,0,0])); nd.addChild(f); }
+  nd.setMesh(null); nd.setExtension('EXT_mesh_gpu_instancing', null); }
+ const b = getBounds(pd.getRoot().listScenes()[0]); const e = alt / (b.max[1] - b.min[1]);
+ const mx = (b.min[0]+b.max[0])/2, mz = (b.min[2]+b.max[2])/2;
+ const mapa = mergeDocuments(doc, pd); const nova = mapa.get(pd.getRoot().listScenes()[0]);
+ const c = Math.cos(ry/2), s_ = Math.sin(ry/2);
+ const raiz = doc.createNode('segredo_' + eid).setScale([e,e,e]).setRotation([0, s_, 0, c]).setTranslation([pos[0], pos[1] - b.min[1]*e, pos[2]]);
+ for (const f of nova.listChildren()) { nova.removeChild(f); raiz.addChild(f); } nova.dispose(); grupo[0].addChild(raiz);
+ raiz.traverse(nd => { const m = nd.getMesh(); if (m) for (const p of m.listPrimitives()) { const mt = p.getMaterial(); if (mt) mt.setName('segredo_' + eid + '_' + mt.getName()); } });
+ console.log('segredo', eid, 'esc', e.toFixed(3));
+}
 // ----- fachada: a agência 0688 (prédio preto do carro-forte), empilhada em 5 andares. Caixa à parte, nó 'fachada'.
-const fachada = doc.createNode('fachada').setScale([ESC, ESC, ESC]); cena.addChild(fachada);
 const ag = await io.read(AGENCIA);
 const mapaA = mergeDocuments(doc, ag); const cenaA = mapaA.get(ag.getRoot().listScenes()[0]);
 const raizA = cenaA.listChildren()[0]; const porNome = {}; raizA.listChildren().forEach(c => porNome[c.getName()] = c);
-const clona = (no, dy) => { const f = doc.createNode(no.getName() + '_c').setMesh(no.getMesh()); { const t = no.getTranslation(); f.setTranslation([t[0], t[1] + dy, t[2]]); f.setRotation(no.getRotation()); f.setScale(no.getScale()); } fachada.addChild(f); return f; };
-for (const nm of ['agencia', 'porta-giratoria']) if (porNome[nm]) clona(porNome[nm], 0);
-const ALT_P = 3.7; for (let i = 0; i < 4; i++) clona(porNome['piso-2'], i * ALT_P);
-clona(porNome['telhado'], 3 * ALT_P);
-// descarta o resto do quarteirão (ruas, vizinhos); o prédio fica sozinho
+const clona = (no, dy, k) => { const f = doc.createNode('fachada_' + k + '_' + no.getName()).setMesh(no.getMesh()); const t = no.getTranslation(); f.setTranslation([t[0], t[1] + dy, t[2]]); f.setRotation(no.getRotation()); f.setScale(no.getScale()); grupo[k].addChild(f); };
+for (const nm of ['agencia', 'porta-giratoria']) if (porNome[nm]) clona(porNome[nm], 0, 0);
+const ALT_P = 3.7; for (let i = 0; i < 4; i++) clona(porNome['piso-2'], i * ALT_P, i + 1);
+clona(porNome['telhado'], 3 * ALT_P, 4);
 cenaA.removeChild(raizA);   // o resto do quarteirão fica sem cena e é limpo pelo prune
 doc.createExtension(KHRDracoMeshCompression).setRequired(true).setEncoderOptions({ method: KHRDracoMeshCompression.EncoderMethod.EDGEBREAKER });
 for (const sc of doc.getRoot().listScenes()) if (sc !== cena) sc.dispose();

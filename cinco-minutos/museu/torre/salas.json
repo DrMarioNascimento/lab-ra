@@ -1,0 +1,182 @@
+{
+"D01": {
+"id": "gigantes",
+"nome": "Sala dos gigantes",
+"sub": "Esqueleto de pescoço longo",
+"texto": "Um esqueleto de pescoço comprido ocupa a sala inteira. As luzes do teto o deixam ainda maior."
+},
+"D02": {
+"id": "predadores",
+"nome": "Sala dos predadores",
+"sub": "Dentes e garras",
+"texto": "Um predador montado em movimento domina a sala. A placa fala de dentes, garras e corrida."
+},
+"N14": {
+"id": "veiculos",
+"nome": "Sala dos veículos",
+"sub": "Caminhão de leite",
+"texto": "Um caminhão de leite antigo está estacionado no meio da sala. A placa fala de entregas de madrugada."
+},
+"N01": {
+"id": "porcelana",
+"nome": "Sala da porcelana",
+"sub": "Xícara e delicadeza",
+"texto": "Uma xícara de porcelana fina repousa numa base de vidro. A luz atravessa a borda como se fosse papel."
+},
+"N15": {
+"id": "jogos",
+"nome": "Sala dos jogos",
+"sub": "Tabuleiro e estratégia",
+"texto": "Um tabuleiro de xadrez está com a partida no meio. As peças parecem aguardar o próximo lance."
+},
+"CERA": {
+"id": "cera",
+"nome": "Sala de cera",
+"sub": "Figuras que parecem vivas",
+"texto": "Seis figuras de cera estão paradas em seus pedestais, tão imóveis que parecem prender o fôlego. Uma delas pode não ser de cera."
+},
+"N02": {
+"id": "mobilia",
+"nome": "Sala da mobília",
+"sub": "Cadeira de outra época",
+"texto": "Uma cadeira antiga de tecido bordado está cercada por uma cordinha. Uma plaquinha pede para não sentar."
+},
+"F01": {
+"id": "galeria",
+"nome": "Galeria especial",
+"sub": "Obras e vitrines",
+"texto": ""
+},
+"C01": {
+"id": "auditorio",
+"nome": "Auditório",
+"sub": "Programa e bastidores",
+"texto": ""
+},
+"D08": {
+"id": "asas",
+"nome": "Mezanino das asas",
+"sub": "Outro jeito de voar",
+"texto": "Do mezanino se vê uma criatura de asas presa ao teto. As luzes de emergência ainda não acenderam."
+},
+"F02": {
+"id": "fosseis",
+"nome": "Sala dos fósseis",
+"sub": "Provas na rocha",
+"texto": ""
+},
+"N03": {
+"id": "relogios",
+"nome": "Sala dos relógios",
+"sub": "Cada segundo conta",
+"texto": ""
+},
+"N04": {
+"id": "protecoes",
+"nome": "Sala das proteções",
+"sub": "Capacete e história",
+"texto": ""
+},
+"N05": {
+"id": "fotografia",
+"nome": "Sala da fotografia",
+"sub": "Câmera de outro tempo",
+"texto": ""
+},
+"D09": {
+"id": "prototipo",
+"nome": "Galeria do tempo",
+"sub": "Protótipo e demonstração",
+"texto": ""
+},
+"B09": {
+"id": "eletrica",
+"nome": "Laboratório de formas",
+"sub": "Energia e equipamentos",
+"texto": ""
+},
+"B02": {
+"id": "deposito",
+"nome": "Sala das coleções",
+"sub": "Inventário e movimentações",
+"texto": ""
+},
+"N06": {
+"id": "vidros",
+"nome": "Sala dos vidros",
+"sub": "Transparência e brilho",
+"texto": ""
+},
+"N12": {
+"id": "mar",
+"nome": "Sala do mar",
+"sub": "Peixes e águas",
+"texto": ""
+},
+"B01": {
+"id": "recepcao",
+"nome": "Recepção",
+"sub": "Chegadas e convidados",
+"texto": ""
+},
+"B04": {
+"id": "conservacao",
+"nome": "Sala dos espécimes",
+"sub": "Acervo e registros",
+"texto": ""
+},
+"S01": {
+"id": "seguranca",
+"nome": "Central de monitoramento",
+"sub": "Alarmes e ocorrências",
+"texto": ""
+},
+"L01": {
+"id": "atelie",
+"nome": "Ateliê de descobertas",
+"sub": "Ensaio e registros técnicos",
+"texto": ""
+},
+"L02": {
+"id": "corredor",
+"nome": "Área de descanso",
+"sub": "Recados e caixas da equipe",
+"texto": ""
+},
+"N07": {
+"id": "sons",
+"nome": "Sala dos sons",
+"sub": "Rádio e música",
+"texto": ""
+},
+"L03": {
+"id": "limpeza",
+"nome": "Base da limpeza",
+"sub": "Rotina e fechamento",
+"texto": ""
+},
+"N11": {
+"id": "ambar",
+"nome": "Sala do âmbar",
+"sub": "Preso no tempo",
+"texto": ""
+},
+"B05": {
+"id": "patio",
+"nome": "Pátio de luz",
+"sub": "Vista para a circulação",
+"texto": ""
+},
+"N09": {
+"id": "brinquedos",
+"nome": "Sala dos brinquedos",
+"sub": "Carrinho e memória",
+"texto": ""
+},
+"M01": {
+"id": "manutencao",
+"nome": "Oficina técnica",
+"sub": "Fios, lâmpadas e reparos",
+"texto": ""
+}
+}
