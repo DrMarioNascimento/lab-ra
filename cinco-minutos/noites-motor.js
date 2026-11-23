@@ -122,6 +122,13 @@ function pistasEspeciais(base, c, ci){
  const dep = (base.deposito ||= []);
  dep.push({id:'esp'+ci+'-temp1', name:'Ler o gráfico de temperatura', time:45, tipo:'Registro', text:'O ar-condicionado dos arquivos é controlado e deixa a sala sempre fria. No gráfico do computador há um pico de calor das 21h10 às 21h30: duas pessoas ficaram ali dentro, com a porta fechada, por cerca de 20 minutos.'});
  dep.push({id:'esp'+ci+'-temp2', name:'Conferir a ficha de acesso dos arquivos', time:150, requer:'esp'+ci+'-temp1', tipo:'Registro', text:'A ficha de acesso mostra duas entradas às 21h10 e duas saídas às 21h30. Os nomes estão borrados. Ninguém comentou essa visita com a equipe.'});
+ // O outro preso: um NPC diferente em cada volta (campo volta), com uma fala nova e um "de novo não...".
+ const GUARDA = ['O guarda boceja e diz: \"Plantão da noite é isso: a noite nunca acaba.\" Ele ri sozinho.','O guarda olha o relógio e resmunga: \"Esse café já esfriou duas vezes hoje.\" Ele parece estranhar a própria frase.','O guarda murmura \"de novo não...\" e esfrega o rosto. Quando vê você, disfarça e pergunta se vai demorar.','O guarda conta uma piada: \"Sabe por que o museu nunca fecha? Porque eu nunca consigo ir embora.\" Ninguém ri, nem ele.','O guarda fala baixinho: \"Você também sente que já passou por aqui? Acho que não sou o único.\" Depois muda de assunto.'];
+ const REST = ['A restauradora diz, sem tirar os olhos da peça: \"Eu juro que acabei de limpar isso.\"','A restauradora ri: \"Tenho um déjà vu tão forte que já sei o que você vai perguntar.\" Ela não sabe.','A restauradora murmura \"de novo não...\" e põe os pincéis de volta no mesmo lugar de sempre.','A restauradora faz uma piada: \"Se eu trabalhasse todo dia assim, já tinha terminado esta obra umas dez vezes.\"','A restauradora cochicha: \"Eu anotei o que acontece aqui. Quem mais sabe disso? Vi nos seus olhos.\" Ela fecha o caderno.'];
+ for (let v = 1; v <= 5; v++) {
+  (base.seguranca ||= []).push({id:'esp'+ci+'-guarda'+v, name:'Ouvir o guarda noturno', time:20, volta:v, tipo:'Relato', text:GUARDA[v-1]});
+  (base.conservacao ||= []).push({id:'esp'+ci+'-rest'+v, name:'Ouvir a restauradora', time:20, volta:v, tipo:'Relato', text:REST[v-1]});
+ }
  return base;
 }
 function mergeNoite(base){
