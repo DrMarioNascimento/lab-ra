@@ -693,6 +693,7 @@ function brokeLoop(){
 // Pistas com condição: requer (outra pista antes), ate (limite em segundos da história) e trava (depois dela, a sala fica vigiada até o fim da volta).
 function bloqueioPista(q, storySec){
  if (q.requer && !state.clues.some(x => x.id === q.requer)) return 'Falta fazer algo antes. Veja as outras pistas desta sala.';
+ if (q.minPistas && (state.clues || []).length < q.minPistas) return 'Faltam pistas no seu caderno. Precisa de pelo menos '+q.minPistas+'.';
  if (q.ate != null && storySec > q.ate) return 'Tarde demais nesta volta. Tente de novo na próxima.';
  const tr = state.trava && state.trava[state.loop+':'+state.room]; if (tr && tr !== q.id) return 'Os seguranças chegaram. Esta sala fica vigiada até o fim da volta.';
  return '';

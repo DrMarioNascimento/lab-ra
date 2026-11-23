@@ -221,6 +221,76 @@ function pistasCofre(base, c, ci){
   enigma:{rotulo:'COFRE', enunciado:'O cofre da Recepção tem seis números e um leitor de digital.', cifrado:'', resposta:dg.join(''), placeholder:'6 números', cofre:true, digital:'esp'+ci+'-taca3'}});
  return base;
 }
+
+// ---- segundo lote de pistas do loop (lista do professor, 23/11/2026). Ajustes: "morte" vira "apagão", "sangue" vira "mancha vermelha de tinta". Cada pista vale na volta indicada (volta) ou da volta em diante (desde).
+function pistasLoop2(base, c, ci){
+ const L = state.loop || 1, tem = id => (state.clues || []).some(x => x.id === id), dg = cofreDig(ci), restante = Math.max(0, Math.round(300 - (state.duration ? (state.duration - state.remaining) * 300 / state.duration : 0)));
+ const salasVistas = [...new Set((state.clues || []).filter(x => x.loop < L).map(x => x.room))], naoVistas = ROOMS.filter(r => !salasVistas.includes(sala(r.id).name)).map(r => sala(r.id).name);
+ const eco = ECOS_CASO[Math.floor(hashTxt('l2e'+ci+':'+semente())*ECOS_CASO.length)](c), eco2 = ECOS_CASO[(Math.floor(hashTxt('l2e'+ci+':'+semente())*ECOS_CASO.length)+1) % ECOS_CASO.length](c);
+ const U = (sl, id, nome, time, texto, ex) => (base[sl] ||= []).push({id:'l2'+ci+'-'+id, name:nome, time, tipo:'Registro', text:texto, ...ex});
+ const V = (sl, id, vs, nome, time, textos, ex) => vs.forEach(v => (base[sl] ||= []).push({id:'l2'+ci+'-'+id+v, name:nome, time, tipo:'Registro', volta:v, text:Array.isArray(textos) ? textos[v-1] : typeof textos === 'string' ? textos : textos(v), ...(typeof ex === 'function' ? ex(v) : ex)}));
+ // Placas e etiquetas
+ V('auditorio', 'amanha', [1,2,3,4,5], 'Ler a placa com a data de amanhã', 25, v => 'A placa do evento diz "amanhã, dia '+(23+v)+'". Ontem ela dizia dia '+(22+v)+'. Ninguém troca essa placa.');
+ U('mar', 'preco', 'Ler a etiqueta de preço do presente', 55, 'A etiqueta do presente de aniversário do diretor tem um valor escrito à mão: "5 minutos".');
+ V('galeria', 'naotoque', [1,4], 'Ler a placa de aviso', 30, v => v === 4 ? 'A placa "Não toque" foi trocada. Agora diz: "Toque agora." Embaixo, uma seta aponta para a base da vitrine. '+eco[1] : 'A placa diz: "Não toque."', v => v === 4 ? {fatos:eco[3]} : {});
+ V('mobilia', 'saida', [5], 'Ler a placa de saída', 35, 'A placa de saída diz: "Saída bloqueada. Intervenha." Dá para ver a seta apagada embaixo.');
+ // Crachás, fichas, registros, cartas
+ U('corredor', 'cracha', 'Pegar o crachá no chão', 45, 'No chão há um crachá de funcionário com a sua foto e horário de saída às 22h30. Esse horário ainda não chegou.');
+ U('recepcao', 'carta', 'Abrir a carta do correio interno', 80, 'A carta traz o seu nome e a data de ontem. Dentro, uma linha: "Você vai precisar de mais de uma volta." ');
+ U('deposito', 'emprest', 'Ler a ficha de empréstimo', 85, 'A ficha de empréstimo tem o seu nome e uma data que ainda não aconteceu.');
+ V('recepcao', 'visitante', [1,2,3,4,5], 'Ler o crachá de visitante', 100, v => v < 3 ? 'O crachá de visitante com o seu nome já está carimbado como "saiu". Você ainda está dentro.' : 'O carimbo "saiu" ficou borrado. Agora o crachá mostra a hora de saída em branco.');
+ // Câmeras e sensores
+ U('seguranca', 'cftv30', 'Ver a câmera 30 segundos antes', 55, 'Na câmera da sala ao lado você aparece parado na porta. O horário do vídeo está 30 segundos adiantado.');
+ U('seguranca', 'sensor', 'Ler o sensor de movimento', 65, 'O sensor de movimento marcou alguém na porta da sala antes de você entrar. Foi você, só que mais cedo.');
+ U('seguranca', 'cftvsub', 'Ver a câmera do subsolo', 175, 'A câmera do subsolo mostra as luzes caindo e todo o museu se apagando de uma vez. Depois, tudo recomeça como se nada tivesse acontecido.', {desde:3});
+ U('seguranca', 'termica', 'Olhar a câmera térmica', 130, 'A câmera térmica mostra um ponto frio e parado. Alguém ficou imóvel por muito tempo em '+sala(c.room).name+'. Ainda está lá.', {fatos:['where']});
+ U('seguranca', 'cftvfut', 'Ver a câmera do futuro', 210, 'A câmera mostra você parado perto da saída, com a luz do apagão sobre você. A hora do vídeo é a do próximo apagão.');
+ U('seguranca', 'videoloop', 'Ver o vídeo em repetição', 190, 'Um vídeo passa sem parar. Ele mostra o que houve: '+c.detail+'.', {fatos:['event']});
+ // Livros, diários e dossiês
+ V('atelie', 'diretor', [1,2,3,4,5], 'Ler o diário do diretor', 60, v => v < 3 ? 'Três páginas do diário do diretor foram arrancadas. Sobraram só os cantinhos rasgados.' : 'As páginas arrancadas voltaram ao diário, preenchidas. Uma delas diz: '+eco[1], v => v >= 3 ? {fatos:eco[3]} : {});
+ U('conservacao', 'restauro', 'Ler o livro de restauração', 105, 'O livro de restauração tem anotações com a sua letra sobre peças que você ainda não examinou.', {desde:2});
+ U('atelie', 'notebook', 'Olhar o notebook da curadoria', 95, 'O notebook da curadoria está com uma aba aberta chamada "Dossiê do visitante". A primeira linha traz o seu nome.');
+ U('recepcao', 'nota', 'Ler a nota que apareceu no dossiê', 5, 'Uma nota nova apareceu no seu dossiê depois do primeiro apagão: "Quem anota, lembra."', {desde:2});
+ for (let v = 1; v <= 5; v++) U('conservacao', 'dossie'+v, 'Contar as páginas do dossiê físico', 110, 'O dossiê físico tem '+(v + 2)+' páginas. A cada volta completada surge uma nova.', {volta:v});
+ U('atelie', 'ssel', 'Ler a nota adesiva do monitor', 120, 'Uma nota adesiva no monitor diz: "Intervir só no último momento."');
+ // Objetos, esculturas, retratos, espelho
+ U('vidros', 'digital', 'Ver a digital no vidro da vitrine', 70, 'No vidro da vitrine há uma impressão digital nítida. É igual à do seu dedo.');
+ V('cera', 'pose', [1,2,3,4,5], 'Observar a escultura', 75, v => 'A escultura de bronze está '+['de braços junto do corpo','com a mão direita levemente levantada','com a mão levantada e a cabeça virada','com a cabeça virada para a porta','apontando para a porta, de braço esticado'][v-1]+'.');
+ U('fotografia', 'olhar', 'Olhar o quadro que acompanha', 85, 'Os olhos do quadro seguem você pela sala, devagar, mesmo quando você muda de lado.', {desde:2});
+ U('vidros', 'espelho', 'Olhar no espelho', 115, 'No espelho aparece você de ontem, olhando de volta e fazendo um sinal de que ouviu.', {desde:2});
+ U('protecoes', 'estatua', 'Ler o bilhete da estátua', 100, 'A estátua segura um bilhete. Só você consegue ler: "Procure o que não combina."');
+ V('jogos', 'foto', [1,2,3,4], 'Olhar a foto na parede', 65, v => 'Na foto da parede, ao fundo, há alguém parecido com você. A data da foto é de '+v+' volta'+(v > 1 ? 's' : '')+' no futuro.');
+ V('porcelana', 'xicara', [2], 'Olhar a xícara de porcelana', 55, 'A xícara que quebrou na volta anterior está inteira de novo, sem uma única rachadura.');
+ V('deposito', 'mancha', [1,2,3,4,5], 'Olhar a mancha vermelha de tinta', 140, v => 'A mancha vermelha de tinta no chão tem do tamanho de '+['uma moeda','uma mão','um prato','uma bacia','um tapete'][v-1]+'.');
+ // Relógios e tempo
+ U('relogios', 'manequim', 'Olhar o relógio de pulso do manequim', 85, 'O relógio de pulso do manequim marca o tempo que falta: '+Math.floor(restante/60)+' minutos e '+String(restante % 60).padStart(2, '0')+' segundos.');
+ U('prototipo', 'digital5', 'Olhar o relógio digital', 90, 'O relógio digital conta de 5:00 até 0:00 e depois volta para 5:00.');
+ U('sons', 'alarme', 'Ouvir o alarme antes do reset', 290, 'O alarme soa dez segundos antes do reset, e só dá para ouvir se você ficar quieto.');
+ V('relogios', 'sol', [1,2,3,4,5], 'Olhar o relógio de sol do pátio', 100, v => v <= 3 ? 'A sombra do relógio de sol aponta para a direção errada, para uma parede sem porta.' : 'Agora a sombra do relógio de sol aponta direto para '+sala(c.room).name+'.', v => v > 3 ? {fatos:['where']} : {});
+ U('relogios', 'chaveiro', 'Pegar o chaveiro', 95, 'O chaveiro tem 5 chaves, cada uma com uma etiqueta: "Volta 1", "Volta 2" e assim por diante. A da volta '+L+' brilha mais.');
+ // Pessoas, vozes, passos
+ V('limpeza', 'func', [1,2,3,4,5], 'Ouvir o funcionário repetir a frase', 30, v => v < 4 ? 'O funcionário diz a mesma frase de sempre: "Hoje a noite está tranquila."' : 'O funcionário para no meio da frase, olha para você e diz o seu nome, que você nunca disse a ele.');
+ V('mar', 'visita', [2], 'Conversar com a visitante', 50, 'Uma visitante só aparece nesta volta, perto do aquário. Ela diz: "Você me viu antes? Eu não existia na volta anterior."');
+ V('mobilia', 'passos', [1,2,3,4,5], 'Ouvir os passos atrás de você', 60, v => v < 5 ? 'Você ouve passos atrás de você. Quando se vira, eles param.' : 'Desta vez os passos não param quando você se vira: alguém caminha até você e passa direto.');
+ V('gigantes', 'entrega', [1,2,3,4,5], 'Receber o item do funcionário', 45, ['uma lanterna pequena','um pacote de papel pardo','uma chave de latão','um lenço com um nó','um envelope sem nome'].map(x => 'O funcionário entrega a você '+x+' e não explica por quê.'));
+ U('auditorio', 'radio', 'Ouvir o rádio de segurança', 115, 'O rádio de segurança transmite uma conversa que só vai acontecer na próxima volta: "'+eco2[1].replace(/^Um (aviso|recado|relato)[^:]*:?\s*/i, '')+'"');
+ U('auditorio', 'gravacao', 'Ouvir a gravação da sua voz', 135, 'Uma gravação toca a sua voz dizendo: "O número 1 do cofre é '+dg[0]+'." Você ainda não sabia esse número.', {desde:2});
+ // Mapas, portas, chaves, arquivos
+ U('corredor', 'mapacalor', 'Ver o mapa de calor do museu', 145, 'O mapa de calor mostra o caminho que você ainda vai fazer: '+(naoVistas.slice(0, 3).join(', ') || 'todas as salas já visitadas')+'.', {desde:2});
+ U('eletrica', 'disjuntor', 'Ler o quadro de disjuntores', 125, 'Num dos disjuntores do quadro está escrito "Reset do loop". Está desligado.');
+ U('eletrica', 'elevador', 'Ler a mensagem do elevador', 105, 'A tela do elevador mostra "Subsolo, volta 5". O botão do subsolo está apagado.');
+ U('eletrica', 'usb', 'Abrir a chave USB', 150, 'A chave USB agora tem arquivos. O primeiro é uma lista curta que termina com: '+eco2[1], {desde:4, fatos:eco2[3]});
+ U('eletrica', 'arquivo', 'Abrir o arquivo digital', 155, 'O arquivo digital só abriu depois de três apagões. Dentro, um texto curto: '+eco[1], {desde:4, fatos:eco[3]});
+ U('eletrica', 'morse', 'Ler a luz que pisca', 100, 'A luz do corredor pisca em Morse e soletra uma palavra. Quem vê o padrão percebe que é a figura fantasiada de estátua.', {fatos:['figure']});
+ U('limpeza', 'bilhete', 'Ler o bilhete do banheiro', 85, 'Um bilhete colado no espelho do banheiro diz: "Na volta 3, não confie no relógio do segurança. Ele atrasa dois minutos."');
+ U('asas', 'chave', 'Usar a chave na porta lateral', 120, 'A chave de latão do funcionário só gira se você já viu o apagão. Dentro da sala lateral há um papel: '+eco[1], {desde:2, fatos:eco[3]});
+ U('asas', 'portavista', 'Abrir a porta que só abre para quem viu', 130, 'A porta só abre porque você já encontrou as pegadas. Atrás dela há um papel: '+eco2[1], {requer:'esp'+ci+'-infra2', fatos:eco2[3]});
+ U('fosseis', 'quadro', 'Olhar o quadro do impostor', 135, 'O quadro de um "impostor" mostra um rosto parecido com o seu. É só um espelho pintado, mas a moldura diz: "Olhe de novo."', {volta:5});
+ U('fosseis', 'hipotese', 'Ler o documento borrado', 140, 'O documento tem a hipótese correta, mas as letras estão borradas. Na última volta ele fica legível: a figura imóvel está em '+sala(c.room).name+'. '+c.detail+'.', {volta:5, fatos:['where','event']});
+ // Botão vermelho: precisa de 11 pistas no caderno
+ U('atelie', 'botao', 'Apertar o botão vermelho do subsolo', 5, 'O botão vermelho do subsolo acendeu, porque o seu caderno já tem pistas suficientes. Uma tela mostra o essencial: '+c.detail+'. A figura imóvel está em '+sala(c.room).name+'.', {minPistas:11, fatos:['event','where']});
+ return base;
+}
 function pistasEspeciais(base, c, ci){
  const pend = (base.relogios ||= []), cons = (base.conservacao ||= []);
  pend.push({id:'esp'+ci+'-pend1', name:'Observar o relógio parado', time:20, tipo:'Observação', text:'Um relógio antigo de parede está parado em 21h47. A hora do museu agora é outra. Relógio parado não prova que horas eram.'});
@@ -261,7 +331,7 @@ function pistasEspeciais(base, c, ci){
   (base.seguranca ||= []).push({id:'esp'+ci+'-guarda'+v, name:'Ouvir o guarda noturno', time:20, volta:v, tipo:'Relato', text:GUARDA[v-1]});
   (base.conservacao ||= []).push({id:'esp'+ci+'-rest'+v, name:'Ouvir a restauradora', time:20, volta:v, tipo:'Relato', text:REST[v-1]});
  }
- return pistasCofre(pistasVoltas(pistasEnigmas(base, c, ci), c, ci), c, ci);
+ return pistasLoop2(pistasCofre(pistasVoltas(pistasEnigmas(base, c, ci), c, ci), c, ci), c, ci);
 }
 function mergeNoite(base){
  const extra = pistasDaNoite();
