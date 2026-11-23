@@ -8,6 +8,7 @@ import draco3d from 'draco3dgltf';
 import fs from 'fs'; import path from 'path';
 const [,, ENTRADA, SAIDA, PECAS='pecas', ESCALA='0.06'] = process.argv;
 const P = 0.132;
+const id_ = c => c.s.join('x');
 const SALAS = [ // [peça, x(cm), z(cm), andar]
  ['D01',12.5,1,2],['D02',29.5,1,2],['N14',29,21,2],['N01',-29,21,2],['N15',-21,-17,2],['N13',12.5,-15,2],['N02',29.5,-15,2],['F01',12.5,-33,2],['C01',29.5,-33,2],
  ['D08',0,19,1],['F02',12.5,1,1],['N03',29.5,1,1],['N04',29,21,1],['N05',-29,21,1],['D09',-21,-17,1],['B09',12.5,-15,1],['B02',29.5,-15,1],['N06',12.5,-33,1],['N12',29.5,-33,1],
@@ -18,6 +19,9 @@ const io = new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies(
 const doc = await io.read(ENTRADA);
 const cena = doc.getRoot().listScenes()[0];
 const alvo = Number(ESCALA);
+// cabines de vidro do térreo (cabines.json, em cm): a peça do térreo é ajustada ao interior da cabine mais próxima
+const CAB = JSON.parse(fs.readFileSync(new URL('./cabines.json', import.meta.url))).filter(c => c.s[0] > 1 && c.s[2] > 1 && c.s[1] > 1);
+const usadas = new Set();
 const SO = process.env.SO ? process.env.SO.split(',') : null;
 for (const [id, x, z, k] of SALAS) {
  if (SO && !SO.includes(id)) continue;
@@ -38,12 +42,22 @@ for (const [id, x, z, k] of SALAS) {
  }
  const b = getBounds(pd.getRoot().listScenes()[0]);
  const tam = Math.max(b.max[0]-b.min[0], b.max[1]-b.min[1], b.max[2]-b.min[2]) || 1;
- const e = alvo / tam;
+ let e = alvo / tam, rot = false, X = x/100, Z = z/100, Y0 = k*P + 0.006;
+ let sx = b.max[0]-b.min[0], sy = b.max[1]-b.min[1], sz = b.max[2]-b.min[2];
  const cx = (b.min[0]+b.max[0])/2, cz = (b.min[2]+b.max[2])/2;
+ { // cabine mais próxima do mesmo andar (até 14 cm)
+  let best = -1, bd = 14; CAB.forEach((c, i) => { if (usadas.has(i) || Math.round(c.mn[1] / (P*100)) !== k) return; const d = Math.hypot(c.c[0]-x, c.c[1]-z); if (d < bd) { bd = d; best = i; } });
+  if (best >= 0) { usadas.add(best); const c = CAB[best]; const iw = (c.s[0]-0.5)/100, id = (c.s[2]-0.5)/100, ih = (c.s[1]-0.3)/100;
+   rot = (sz > sx) !== (id > iw);                 // alinha o lado maior da peça ao lado maior da cabine
+   const [a, d2] = rot ? [sz, sx] : [sx, sz];
+   e = Math.min(iw / a, id / d2, ih / sy); X = c.c[0]/100; Z = c.c[1]/100; Y0 = c.mn[1]/100 + 0.002; console.log(id_(c), 'cabine', best, 'esc', e.toFixed(4)); }
+  else e = Math.min(e, 0.03 / tam);
+ }
  const mapa = mergeDocuments(doc, pd);
  const nova = mapa.get(pd.getRoot().listScenes()[0]);
  const raiz = doc.createNode('peca_' + id).setScale([e,e,e])
-  .setTranslation([x/100 - cx*e, k*P + 0.006 - b.min[1]*e, z/100 - cz*e]);
+  .setTranslation(rot ? [X - cz*e, Y0 - b.min[1]*e, Z + cx*e] : [X - cx*e, Y0 - b.min[1]*e, Z - cz*e]);
+ if (rot) raiz.setRotation([0, Math.SQRT1_2, 0, Math.SQRT1_2]);
  for (const f of nova.listChildren()) { nova.removeChild(f); raiz.addChild(f); }
  nova.dispose(); cena.addChild(raiz);
  const prefixo = k === 1 ? 'A1_' : k === 2 ? 'A2_' : '';
