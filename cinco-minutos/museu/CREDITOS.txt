@@ -71,5 +71,5 @@ MAQUETE-TORRE (22/11/2026) - cópias próprias, sem compartilhar arquivo com out
  - Segredos da noite no térreo: cofre (rec-cofre-balanca) e caixa de luz (rec-quadro-eletrico), de O Eco do Amanhã.
  - Sala de cera: bonecos do Dilema do Bonde (cópias independentes).
 
-T02 (Carro de viagem no tempo): modelo 3D enviado pelo professor (delorean_time_machine.glb, 182 MB), reduzido para 1,3 MB com museu/tempo/reduzir-glb.mjs. Autoria e licença do modelo original: CONFIRMAR com a fonte de onde foi baixado. A primeira cabine feita por código ficou guardada em museu/tempo/.
+T02 (Carro de viagem no tempo): modelo 3D criado pelo professor no MeshAI a partir de descrição em texto (delorean_time_machine.glb, 182 MB), reduzido para 1,3 MB com museu/tempo/reduzir-glb.mjs. A primeira cabine feita por código ficou guardada em museu/tempo/.
 VEI_A/VEI_B/VEI_C: composições próprias (veículo principal + bicicleta de roda alta V04), geradas por museu/pecas-compostas.mjs a partir das peças N14, V05, V27 e V04.
