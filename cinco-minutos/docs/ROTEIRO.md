@@ -102,3 +102,5 @@ O jogo agora aceita pistas com condição (`requer`, `ate`, `trava` em `game.js`
 - **Carta em branco (Sala dos espécimes, restauro):** só aos 3:35 o aquecedor liga e a tinta invisível mostra o aviso do caso daquela noite.
 - **Taça do segurança (Recepção):** derrubar água na taça até 1:50 manda o segurança ao banheiro; aos 2:05 dá para olhar o posto desprotegido e achar um leitor de digital com uma digital desconhecida (**reservada para o cofre**, etapa 3).
 - **Incêndio (Galeria especial):** disparar o alarme revela, sob a tinta falsa, um mapa com a sala circulada do caso; os seguranças chegam e a sala fica vigiada até o fim da volta, então a informação só vale na volta seguinte.
+- **Eco da estátua (Sala de cera):** bater na estátua de bronze até 1:40 dá som cheio; aos 2:20 o som é oco (alguém escondeu algo); aos 2:40 dá para olhar dentro e achar o papel com o aviso do caso.
+- **Peça que quebra (Sala da porcelana):** a alça da xícara solta, quebra e revela um papel com um fato verdadeiro do caso (muda por noite). A peça não volta.

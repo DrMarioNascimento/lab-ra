@@ -102,6 +102,14 @@ function pistasEspeciais(base, c, ci){
  rec.push({id:'esp'+ci+'-taca1', name:'Observar a taça do segurança', time:0, tipo:'Observação', text:'Durante o evento de hoje, o segurança do posto bebe sempre da mesma taça às 21h58. Se algo cair nela antes disso, ele vai ter que sair.'});
  rec.push({id:'esp'+ci+'-taca2', name:'Derrubar água na taça', time:25, ate:110, tipo:'Observação', text:'Você esbarra na taça e a água se espalha. O segurança resmunga, pega um pano e se prepara para ir ao banheiro.'});
  rec.push({id:'esp'+ci+'-taca3', name:'Olhar o posto desprotegido', time:125, requer:'esp'+ci+'-taca2', tipo:'Registro', text:'O segurança saiu e o posto ficou sozinho. Preso sob o balcão há um leitor de impressão digital que guarda uma digital que não é de ninguém da equipe. Ela pode servir para abrir algo trancado.'});
+ // Eco da estátua: o som muda se você bater antes ou depois de alguém esconder algo lá dentro.
+ const cera = (base.cera ||= []), porc = (base.porcelana ||= []);
+ cera.push({id:'esp'+ci+'-eco1', name:'Bater na estátua de bronze', time:10, ate:100, tipo:'Observação', text:'Ao lado das figuras de cera há uma estátua de bronze. Você bate nela com o nó do dedo: um som seco e cheio. Parece maciça.'});
+ cera.push({id:'esp'+ci+'-eco2', name:'Bater na estátua outra vez', time:140, requer:'esp'+ci+'-eco1', tipo:'Observação', text:'Agora o som é oco e mais grave. Entre uma batida e outra, alguém escondeu alguma coisa lá dentro.'});
+ cera.push({id:'esp'+ci+'-eco3', name:'Olhar dentro da estátua', time:160, requer:'esp'+ci+'-eco2', tipo:'Registro', fatos:['event'], text:'Por uma fresta na base você puxa um papel dobrado. Está escrito: \"'+maiuscula(c.detail)+'.\"'});
+ // Peça que quebra e revela uma pista: a alça da xícara solta e traz um papel do cabo oco.
+ const ec = ECOS_CASO[Math.floor(hashTxt('xic'+ci+':'+semente())*ECOS_CASO.length)](c);
+ porc.push({id:'esp'+ci+'-xicara', name:'Segurar a xícara rachada', time:50, tipo:ec[2], fatos:ec[3], text:'A alça da xícara se solta na sua mão e quebra. Dentro do cabo oco havia um papel enrolado. Está escrito: '+ec[1]+' A xícara não tem mais conserto.'});
  return base;
 }
 function mergeNoite(base){
