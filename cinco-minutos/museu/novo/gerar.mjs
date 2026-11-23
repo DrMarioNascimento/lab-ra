@@ -1,0 +1,97 @@
+// Museu novo, em caixas: cada sala é uma caixa (laje + paredes baixas + pedestal + peça) e a fachada é outra caixa separada.
+// Uso (na pasta do gltf-transform): node gerar.mjs ../pecas saida.glb
+import { Document, NodeIO } from '@gltf-transform/core';
+import { ALL_EXTENSIONS, KHRDracoMeshCompression } from '@gltf-transform/extensions';
+import { getBounds, mergeDocuments, prune } from '@gltf-transform/functions';
+import draco3d from 'draco3dgltf';
+import { MeshoptDecoder } from 'meshoptimizer';
+import fs from 'fs'; import path from 'path';
+const [,, PECAS = '../pecas', SAIDA = 'museu-novo.glb'] = process.argv;
+// [peça, tamanho: G grande / M médio / P pequeno]  — por andar, na ordem das salas do jogo (2º, 1º, térreo)
+const G = 0.095, M = 0.06, P = 0.036;
+// 5 andares x 6 salas (2 colunas x 3 fileiras). De cima para baixo: 5º andar primeiro.
+const PECAS_ORDEM = [['D01','G'],['D02','G'],['N14','G'],['N01','P'],['N15','M'],['N13','M'],
+ ['N02','M'],['F01','M'],['C01','M'],['D08','G'],['F02','M'],['N03','P'],
+ ['N04','M'],['N05','M'],['D09','M'],['B09','M'],['B02','M'],['N06','M'],
+ ['N12','M'],['B01','M'],['B04','M'],['S01','M'],['L01','M'],['L02','M'],
+ ['N07','P'],['L03','M'],['N11','P'],['B05','G'],['N09','P'],['M01','M']];
+const ANDARES = [4,3,2,1,0].map(a => [a === 0 ? 'T' : String(a), PECAS_ORDEM.slice((4 - a) * 6, (4 - a) * 6 + 6)]);
+const TAM = { G, M, P };
+const AGENCIA = process.argv[4] || '../../../biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/modelos/agencia-0688-base.glb';
+const ESC = 0.025;                         // 1 m do prédio = 2,5 cm de maquete
+const COLS = 2, LINHAS = 3, ESP = 0.004, PED = 0.022;
+const X0 = -10.6, X1 = 4.2, Z0 = -6.1, Z1 = 8.7;           // área interna do prédio (m)
+const NIVEL = [0.4, 4.0, 7.7, 11.4, 15.1];                   // altura de cada andar (m)
+const io = new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({
+ 'draco3d.decoder': await draco3d.createDecoderModule(), 'draco3d.encoder': await draco3d.createEncoderModule(), 'meshopt.decoder': MeshoptDecoder });
+await MeshoptDecoder.ready;
+const doc = new Document(); const buf = doc.createBuffer(); const cena = doc.createScene('museu');
+const mats = {};
+function mat(nome, cor, rug = .8, met = 0, alfa = 1) { if (!mats[nome]) { const m = doc.createMaterial(nome).setBaseColorFactor([...cor, alfa]).setRoughnessFactor(rug).setMetallicFactor(met); if (alfa < 1) m.setAlphaMode('BLEND'); mats[nome] = m; } return mats[nome]; }
+function caixa(nome, m, [w, h, d], [x, y, z]) { // caixa com base em y (y = parte de baixo)
+ const hw = w/2, hd = d/2; const P_ = [], N = [], I = [];
+ const faces = [[[0,0,1],[[-hw,0,hd],[hw,0,hd],[hw,h,hd],[-hw,h,hd]]],[[0,0,-1],[[hw,0,-hd],[-hw,0,-hd],[-hw,h,-hd],[hw,h,-hd]]],[[1,0,0],[[hw,0,hd],[hw,0,-hd],[hw,h,-hd],[hw,h,hd]]],[[-1,0,0],[[-hw,0,-hd],[-hw,0,hd],[-hw,h,hd],[-hw,h,-hd]]],[[0,1,0],[[-hw,h,hd],[hw,h,hd],[hw,h,-hd],[-hw,h,-hd]]],[[0,-1,0],[[-hw,0,-hd],[hw,0,-hd],[hw,0,hd],[-hw,0,hd]]]];
+ faces.forEach(([n, vs], i) => { vs.forEach(v => { P_.push(...v); N.push(...n); }); I.push(i*4, i*4+1, i*4+2, i*4, i*4+2, i*4+3); });
+ const pos = doc.createAccessor().setType('VEC3').setArray(new Float32Array(P_)).setBuffer(buf);
+ const nor = doc.createAccessor().setType('VEC3').setArray(new Float32Array(N)).setBuffer(buf);
+ const ind = doc.createAccessor().setType('SCALAR').setArray(new Uint16Array(I)).setBuffer(buf);
+ const pr = doc.createPrimitive().setAttribute('POSITION', pos).setAttribute('NORMAL', nor).setIndices(ind).setMaterial(m);
+ return doc.createNode(nome).setMesh(doc.createMesh(nome).addPrimitive(pr)).setTranslation([x, y, z]);
+}
+const PALETA = [[.93,.88,.78],[.85,.9,.82],[.82,.87,.94],[.94,.84,.82],[.9,.86,.93],[.95,.92,.78]];
+const salasNo = doc.createNode('salas'); cena.addChild(salasNo);
+// ----- sala: caixa própria (laje + paredes baixas com vão de porta + pedestal + peça). Medidas em metros do prédio; tudo no nó 'mundo' (escala ESC)
+const mundo = doc.createNode('mundo').setScale([ESC, ESC, ESC]); salasNo.addChild(mundo);
+const RW = (X1 - X0 - 0.3) / COLS, RD = (Z1 - Z0 - 0.4) / LINHAS;   // tamanho de cada sala (m)
+let n = 0;
+for (let a = 0; a < ANDARES.length; a++) {
+ const [rot, lista] = ANDARES[a]; const pre = rot === 'T' ? '' : 'A' + rot + '_'; const y0 = NIVEL[4 - a];
+ for (let i = 0; i < lista.length; i++) {
+  const [id, cl] = lista[i]; const c = i % COLS, l = Math.floor(i / COLS);
+  const cx = X0 + RW / 2 + c * (RW + 0.3), cz = Z0 + RD / 2 + l * (RD + 0.2);
+  const sala = doc.createNode('sala_' + id).setTranslation([cx, y0, cz]); mundo.addChild(sala);
+  const k = 1 / ESC; // caixa() recebe medidas em m do prédio; pedestal/peça em unidades de maquete são convertidos por k
+  sala.addChild(caixa('laje', mat(pre + 'laje' + (n % PALETA.length), PALETA[n % PALETA.length], .9), [RW, .25, RD], [0, 0, 0]));
+  const mp = mat(pre + 'parede', [.97,.96,.93], .95), HW = RW / 2, HD = RD / 2, VG = 1.3, PA = 1.5, T = .15;
+  for (const s of [-1, 1]) {
+   const Lx = HW - VG / 2, Lz = HD - VG / 2;
+   sala.addChild(caixa('p', mp, [Lx, PA, T], [s * (VG / 2 + Lx / 2), .25, HD - T / 2])); sala.addChild(caixa('p', mp, [Lx, PA, T], [s * (VG / 2 + Lx / 2), .25, -HD + T / 2]));
+   sala.addChild(caixa('p', mp, [T, PA, Lz], [HW - T / 2, .25, s * (VG / 2 + Lz / 2)])); sala.addChild(caixa('p', mp, [T, PA, Lz], [-HW + T / 2, .25, s * (VG / 2 + Lz / 2)]));
+  }
+  const ped = 1.0; // pedestal de 1 m de altura no prédio
+  sala.addChild(caixa('pedestal', mat(pre + 'pedestal', [.18,.2,.24], .5, .2), [2.2, ped, 2.2], [0, .25, 0]));
+  const arq = path.join(PECAS, id + '.glb'); if (!fs.existsSync(arq)) { console.log('falta', id); n++; continue; }
+  const pd = await io.read(arq);
+  for (const nd of pd.getRoot().listNodes()) { const inst = nd.getExtension('EXT_mesh_gpu_instancing'); if (!inst) continue;
+   const T_ = inst.getAttribute('TRANSLATION'), R_ = inst.getAttribute('ROTATION'), S_ = inst.getAttribute('SCALE'), ct = (T_ || R_ || S_).getCount(), mesh = nd.getMesh();
+   for (let q = 0; q < ct; q++) { const f = pd.createNode(nd.getName() + '_i' + q).setMesh(mesh); if (T_) f.setTranslation(T_.getElement(q,[0,0,0])); if (R_) f.setRotation(R_.getElement(q,[0,0,0,1])); if (S_) f.setScale(S_.getElement(q,[0,0,0])); nd.addChild(f); }
+   nd.setMesh(null); nd.setExtension('EXT_mesh_gpu_instancing', null); }
+  const b = getBounds(pd.getRoot().listScenes()[0]); const sx = b.max[0]-b.min[0], sy = b.max[1]-b.min[1], sz = b.max[2]-b.min[2];
+  const alvoM = TAM[cl] / ESC;                       // maior lado da peça, em metros do prédio
+  const e = alvoM / Math.max(sx, sz, sy * 1.2);
+  const mx = (b.min[0]+b.max[0])/2, mz = (b.min[2]+b.max[2])/2;
+  const mapa = mergeDocuments(doc, pd); const nova = mapa.get(pd.getRoot().listScenes()[0]);
+  const raiz = doc.createNode('peca_' + id).setScale([e,e,e]).setTranslation([-mx*e, .25 + ped - b.min[1]*e, -mz*e]);
+  for (const f of nova.listChildren()) { nova.removeChild(f); raiz.addChild(f); } nova.dispose(); sala.addChild(raiz);
+  raiz.traverse(nd => { const m = nd.getMesh(); if (m) for (const p of m.listPrimitives()) { const mt = p.getMaterial(); if (mt) mt.setName(pre + 'peca_' + id + '_' + mt.getName()); } });
+  n++;
+ }
+}
+// ----- fachada: a agência 0688 (prédio preto do carro-forte), empilhada em 5 andares. Caixa à parte, nó 'fachada'.
+const fachada = doc.createNode('fachada').setScale([ESC, ESC, ESC]); cena.addChild(fachada);
+const ag = await io.read(AGENCIA);
+const mapaA = mergeDocuments(doc, ag); const cenaA = mapaA.get(ag.getRoot().listScenes()[0]);
+const raizA = cenaA.listChildren()[0]; const porNome = {}; raizA.listChildren().forEach(c => porNome[c.getName()] = c);
+const clona = (no, dy) => { const f = doc.createNode(no.getName() + '_c').setMesh(no.getMesh()); { const t = no.getTranslation(); f.setTranslation([t[0], t[1] + dy, t[2]]); f.setRotation(no.getRotation()); f.setScale(no.getScale()); } fachada.addChild(f); return f; };
+for (const nm of ['agencia', 'porta-giratoria']) if (porNome[nm]) clona(porNome[nm], 0);
+const ALT_P = 3.7; for (let i = 0; i < 4; i++) clona(porNome['piso-2'], i * ALT_P);
+clona(porNome['telhado'], 3 * ALT_P);
+// descarta o resto do quarteirão (ruas, vizinhos); o prédio fica sozinho
+cenaA.removeChild(raizA);   // o resto do quarteirão fica sem cena e é limpo pelo prune
+doc.createExtension(KHRDracoMeshCompression).setRequired(true).setEncoderOptions({ method: KHRDracoMeshCompression.EncoderMethod.EDGEBREAKER });
+for (const sc of doc.getRoot().listScenes()) if (sc !== cena) sc.dispose();
+await doc.transform(prune());
+for (const a of doc.getRoot().listAnimations()) a.dispose();
+const bufs = doc.getRoot().listBuffers();
+for (const b of bufs.slice(1)) { for (const a of doc.getRoot().listAccessors()) if (a.getBuffer() === b) a.setBuffer(bufs[0]); b.dispose(); }
+await io.write(SAIDA, doc); console.log('ok', n, 'salas ->', SAIDA);
