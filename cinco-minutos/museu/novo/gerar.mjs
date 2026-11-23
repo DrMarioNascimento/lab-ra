@@ -105,6 +105,13 @@ for (const nm of ['agencia', 'porta-giratoria']) if (porNome[nm]) clona(porNome[
 for (let i = 1; i < 5; i++) if (porNome['porta-giratoria']) clona(porNome['porta-giratoria'], i * 3.7, i);   // vidro redondo repetido em todos os andares
 const ALT_P = 3.7; for (let i = 0; i < 4; i++) clona(porNome['piso-2'], i * ALT_P, i + 1);
 clona(porNome['telhado'], 3 * ALT_P, 4);
+// canto arredondado com vidro (vidro + esquadrias do térreo) repetido nos andares 1..4
+{ const ag0 = porNome['agencia'], mAg = ag0.getMesh(), mv = doc.createMesh('canto_vidro');
+  for (const p of mAg.listPrimitives()) { const mn = p.getMaterial() && p.getMaterial().getName(); if (mn !== 'vidro' && mn !== 'aco-escuro') continue;
+   const q = doc.createPrimitive().setMode(p.getMode()).setMaterial(p.getMaterial()); for (const sem of p.listSemantics()) q.setAttribute(sem, p.getAttribute(sem)); if (p.getIndices()) q.setIndices(p.getIndices()); mv.addPrimitive(q); }
+  const t = ag0.getTranslation(), sc = ag0.getScale(), FY = 0.85, yb = -7436 / 32767;   // altura menor: pé-direito dos andares é 3,7 m
+  for (let k = 1; k < 5; k++) { const base = 4.0 + (k - 1) * ALT_P + 0.1;
+   const f = doc.createNode('fachada_' + k + '_canto_vidro').setMesh(mv).setTranslation([t[0], base - yb * sc[1] * FY, t[2]]).setRotation(ag0.getRotation()).setScale([sc[0], sc[1] * FY, sc[2]]); grupo[k].addChild(f); } }
 cenaA.removeChild(raizA);   // o resto do quarteirão fica sem cena e é limpo pelo prune
 doc.createExtension(KHRDracoMeshCompression).setRequired(true).setEncoderOptions({ method: KHRDracoMeshCompression.EncoderMethod.EDGEBREAKER });
 for (const sc of doc.getRoot().listScenes()) if (sc !== cena) sc.dispose();
