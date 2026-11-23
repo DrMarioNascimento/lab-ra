@@ -20,7 +20,7 @@ const TAM = { G, M, P };
 const AGENCIA = process.argv[4] || '../../../biblioteca/dragon/jogos/a-manha-do-carro-forte/o-impostor/modelos/agencia-0688-base.glb';
 const ESC = 0.025;                         // 1 m do prédio = 2,5 cm de maquete
 const COLS = 2, LINHAS = 3, ESP = 0.004, PED = 0.022;
-const X0 = -10.6, X1 = 4.2, Z0 = -6.1, Z1 = 8.7;           // área interna do prédio (m)
+const X0 = -8.2, X1 = 4.2, Z0 = -6.0, Z1 = 6.2;           // área interna do prédio (m)
 const NIVEL = [0.4, 4.0, 7.7, 11.4, 15.1];                   // altura de cada andar (m)
 const io = new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({
  'draco3d.decoder': await draco3d.createDecoderModule(), 'draco3d.encoder': await draco3d.createEncoderModule(), 'meshopt.decoder': MeshoptDecoder });
@@ -80,7 +80,7 @@ for (let a = 0; a < ANDARES.length; a++) {
 }
 // ----- segredos da noite (cópias próprias): cofre e caixa de luz (quadro elétrico), no térreo
 const EXTRAS = [['COFRE', '/home/claude/lab-ra/biblioteca/dragon/jogos/o-eco-do-amanha/o-impostor/modelos/pecas/rec-cofre-balanca.glb', 2.0, [-3.4, 0.4, 11.2], Math.PI],
- ['CAIXA_LUZ', '/home/claude/lab-ra/biblioteca/dragon/jogos/o-eco-do-amanha/o-impostor/modelos/pecas/rec-quadro-eletrico.glb', 2.2, [X0 - 1.6, 0.4, 1.5], Math.PI / 2]];
+ ['CAIXA_LUZ', '/home/claude/lab-ra/biblioteca/dragon/jogos/o-eco-do-amanha/o-impostor/modelos/pecas/rec-quadro-eletrico.glb', 2.2, [-12.2, 0.4, 1.5], Math.PI / 2]];
 for (const [eid, earq, alt, pos, ry] of EXTRAS) {
  const pd = await io.read(earq);
  for (const nd of pd.getRoot().listNodes()) { const inst = nd.getExtension('EXT_mesh_gpu_instancing'); if (!inst) continue;
@@ -102,6 +102,7 @@ const mapaA = mergeDocuments(doc, ag); const cenaA = mapaA.get(ag.getRoot().list
 const raizA = cenaA.listChildren()[0]; const porNome = {}; raizA.listChildren().forEach(c => porNome[c.getName()] = c);
 const clona = (no, dy, k) => { const f = doc.createNode('fachada_' + k + '_' + no.getName()).setMesh(no.getMesh()); const t = no.getTranslation(); f.setTranslation([t[0], t[1] + dy, t[2]]); f.setRotation(no.getRotation()); f.setScale(no.getScale()); grupo[k].addChild(f); };
 for (const nm of ['agencia', 'porta-giratoria']) if (porNome[nm]) clona(porNome[nm], 0, 0);
+for (let i = 1; i < 5; i++) if (porNome['porta-giratoria']) clona(porNome['porta-giratoria'], i * 3.7, i);   // vidro redondo repetido em todos os andares
 const ALT_P = 3.7; for (let i = 0; i < 4; i++) clona(porNome['piso-2'], i * ALT_P, i + 1);
 clona(porNome['telhado'], 3 * ALT_P, 4);
 cenaA.removeChild(raizA);   // o resto do quarteirão fica sem cena e é limpo pelo prune
