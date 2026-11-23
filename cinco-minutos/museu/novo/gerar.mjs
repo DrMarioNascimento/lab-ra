@@ -60,7 +60,6 @@ for (let a = 0; a < ANDARES.length; a++) {
    sala.addChild(caixa('p', mp, [T, PA, Lz], [HW - T / 2, .25, s * (VG / 2 + Lz / 2)])); sala.addChild(caixa('p', mp, [T, PA, Lz], [-HW + T / 2, .25, s * (VG / 2 + Lz / 2)]));
   }
   const ped = 1.0; // pedestal de 1 m de altura no prédio
-  sala.addChild(caixa('pedestal', mat(pre + 'pedestal', [.18,.2,.24], .5, .2), [2.2, ped, 2.2], [0, .25, 0]));
   const arq = path.join(PECAS, id + '.glb'); if (!fs.existsSync(arq)) { console.log('falta', id); n++; continue; }
   const pd = await io.read(arq);
   for (const nd of pd.getRoot().listNodes()) { const inst = nd.getExtension('EXT_mesh_gpu_instancing'); if (!inst) continue;
@@ -69,7 +68,10 @@ for (let a = 0; a < ANDARES.length; a++) {
    nd.setMesh(null); nd.setExtension('EXT_mesh_gpu_instancing', null); }
   const b = getBounds(pd.getRoot().listScenes()[0]); const sx = b.max[0]-b.min[0], sy = b.max[1]-b.min[1], sz = b.max[2]-b.min[2];
   const alvoM = TAM[cl] / ESC;                       // maior lado da peça, em metros do prédio
-  const e = alvoM / Math.max(sx, sz, sy * 1.2);
+  // AUDITORIA 23/11: toda peça cabe na menor sala (qualquer peça pode cair em qualquer sala): largura <= LMAX, profundidade <= PMAX, altura <= HMAX
+  const LMAX = 5.0, PMAX = 3.3, HMAX = 2.3;
+  const e = Math.min(alvoM / Math.max(sx, sz, sy * 1.2), LMAX / sx, PMAX / sz, HMAX / sy);
+  sala.addChild(caixa('pedestal', mat(pre + 'pedestal', [.18,.2,.24], .5, .2), [Math.min(Math.max(sx * e + .5, 1.8), LMAX + .5), ped, Math.min(Math.max(sz * e + .5, 1.8), PMAX + .4)], [0, .25, 0]));
   const mx = (b.min[0]+b.max[0])/2, mz = (b.min[2]+b.max[2])/2;
   const mapa = mergeDocuments(doc, pd); const nova = mapa.get(pd.getRoot().listScenes()[0]);
   const raiz = doc.createNode('peca_' + id).setScale([e,e,e]).setTranslation([-mx*e, .25 + ped - b.min[1]*e, -mz*e]);
