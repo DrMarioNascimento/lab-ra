@@ -118,6 +118,10 @@ function pistasEspeciais(base, c, ci){
  const seg = (base.seguranca ||= []);
  seg.push({id:'esp'+ci+'-infra1', name:'Ligar a câmera infravermelha', time:100, tipo:'Registro', fatos:['where'], text:'No monitor em visão noturna, pegadas quentes brilham no chão encerado da galeria. Elas saem de lá e seguem até '+sala(c.room).name+'.'});
  seg.push({id:'esp'+ci+'-infra2', name:'Seguir as pegadas no monitor', time:190, requer:'esp'+ci+'-infra1', tipo:'Relato', fatos:['figure'], text:'As pegadas terminam e não voltam. Quem as fez ainda está dentro do prédio, parado no mesmo lugar. '+figures[c.figure]});
+ // Temperatura da sala de arquivos: o gráfico do ar-condicionado mostra calor de gente. Ninguém mente: ninguém falou disso.
+ const dep = (base.deposito ||= []);
+ dep.push({id:'esp'+ci+'-temp1', name:'Ler o gráfico de temperatura', time:45, tipo:'Registro', text:'O ar-condicionado dos arquivos é controlado e deixa a sala sempre fria. No gráfico do computador há um pico de calor das 21h10 às 21h30: duas pessoas ficaram ali dentro, com a porta fechada, por cerca de 20 minutos.'});
+ dep.push({id:'esp'+ci+'-temp2', name:'Conferir a ficha de acesso dos arquivos', time:150, requer:'esp'+ci+'-temp1', tipo:'Registro', text:'A ficha de acesso mostra duas entradas às 21h10 e duas saídas às 21h30. Os nomes estão borrados. Ninguém comentou essa visita com a equipe.'});
  return base;
 }
 function mergeNoite(base){

@@ -106,3 +106,4 @@ O jogo agora aceita pistas com condição (`requer`, `ate`, `trava` em `game.js`
 - **Peça que quebra (Sala da porcelana):** a alça da xícara solta, quebra e revela um papel com um fato verdadeiro do caso (muda por noite). A peça não volta.
 - **Fone da visita guiada (Sala dos sons):** a faixa normal deixa escapar um fato do caso ao fundo; aos 2:50, com a primeira ouvida, aparece uma faixa escondida com outro fato.
 - **Câmera infravermelha (Central de monitoramento):** aos 1:40 mostra pegadas quentes saindo da galeria até a sala da figura imóvel; aos 3:10, seguindo as pegadas, vê que a pessoa continua escondida no prédio.
+- **Temperatura dos arquivos (Sala das coleções):** o gráfico mostra calor de duas pessoas das 21h10 às 21h30; aos 2:30 a ficha de acesso confirma duas entradas e saídas. Ninguém mente: apenas ninguém falou disso.
