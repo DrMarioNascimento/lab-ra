@@ -95,3 +95,10 @@ Seguem a matriz (pergunta, variação, caixote e bilhete). Cada uma é escrita n
 ## 10. Muitas pistas (etapa 1, 23/11/2026)
 Em todas as salas entra uma camada a mais de 5 pistas, nos tempos 0:30, 1:20, 2:20, 3:20 e 4:15 da volta (com pequena variação por sala): 3 de rotina (20 textos, não decidem nada) e 2 de eco (fatos verdadeiros do caso, como evento, alarme, onde está a figura, ação e quem é a figura, vistos por outra pessoa; a mesma verdade pode aparecer em mais de uma sala de propósito). Resultado: 7 a 11 pistas por sala, nenhuma depois de 4:30. Código: `camadaMuitas` em `noites-motor.js`. Como cada pista examinada gasta 1 de energia, o jogador escolhe quais ler.
 **Próximas etapas combinadas:** (2) minigames nos cadeados (código, caixote, cofre, quadro de energia); (3) cofre e quadro de energia cooperativos, que só abrem quando o grupo já guardou pistas suficientes da noite.
+
+## 11. Pistas especiais com ação e consequência (ideias do professor, 23/11/2026)
+O jogo agora aceita pistas com condição (`requer`, `ate`, `trava` em `game.js`; criadas em `pistasEspeciais`, `noites-motor.js`). Todas verdadeiras (ninguém mente):
+- **Relógio parado (Sala dos relógios):** observar o relógio parado em 21h47; abrir a caixa do mecanismo mostra um clipe que travou os ponteiros de propósito.
+- **Carta em branco (Sala dos espécimes, restauro):** só aos 3:35 o aquecedor liga e a tinta invisível mostra o aviso do caso daquela noite.
+- **Taça do segurança (Recepção):** derrubar água na taça até 1:50 manda o segurança ao banheiro; aos 2:05 dá para olhar o posto desprotegido e achar um leitor de digital com uma digital desconhecida (**reservada para o cofre**, etapa 3).
+- **Incêndio (Galeria especial):** disparar o alarme revela, sob a tinta falsa, um mapa com a sala circulada do caso; os seguranças chegam e a sala fica vigiada até o fim da volta, então a informação só vale na volta seguinte.

@@ -578,10 +578,11 @@ function renderClues(){
   const hs = panel.querySelector('[data-hs="'+clue.id+'"]');
   const registered = state.clues.some(item => item.id === clue.id);
   const wait = clue.time/300*state.duration-elapsed;
-  const label = registered?'Registrada':wait>0?'Disponível em '+fmt(wait):'Examinar'+sufixoCusto(clue);
-  button.disabled = registered || wait > 0;
+  const bl = !registered && wait <= 0 ? bloqueioPista(clue, storySeconds) : '';
+  const label = registered?'Registrada':wait>0?'Disponível em '+fmt(wait):bl?'Bloqueada agora':'Examinar'+sufixoCusto(clue);
+  button.disabled = registered || wait > 0 || !!bl;
   if (button.lastElementChild.textContent !== label) button.lastElementChild.textContent = label;
-  if (hs) { hs.classList.toggle('on', wait <= 0); hs.classList.toggle('ok', registered); hs.disabled = registered; }
+  if (hs) { hs.classList.toggle('on', wait <= 0 && !bl); hs.classList.toggle('ok', registered); hs.disabled = registered; }
  });
  if (room.livro) atualizarLivro(clues, elapsed);
  renderNoitePanel();
@@ -689,7 +690,14 @@ function applyIntervention(command){
 function brokeLoop(){
  return state.intervention === 'break' || state.intervention === 'suspender';
 }
-function collect(id){if(state.phase!=='playing'||(window.coop?.now() ?? Date.now())>=state.endAt){tick();return}const q=scenarioClues()[state.room].find(x=>x.id===id);if(!q||state.clues.some(x=>x.id===id)||state.duration-(state.endAt-(window.coop?.now() ?? Date.now()))/1000<q.time/300*state.duration)return;if(!cobrarPista(q))return;const room=sala(state.room);state.clues.push({id:q.id,room:room.name,name:q.name,text:q.text,tipo:q.tipo,fatos:q.fatos,loop:state.loop});save();renderClues();renderJournal();toast('Pista guardada no caderno')}
+// Pistas com condição: requer (outra pista antes), ate (limite em segundos da história) e trava (depois dela, a sala fica vigiada até o fim da volta).
+function bloqueioPista(q, storySec){
+ if (q.requer && !state.clues.some(x => x.id === q.requer)) return 'Falta fazer algo antes. Veja as outras pistas desta sala.';
+ if (q.ate != null && storySec > q.ate) return 'Tarde demais nesta volta. Tente de novo na próxima.';
+ const tr = state.trava && state.trava[state.loop+':'+state.room]; if (tr && tr !== q.id) return 'Os seguranças chegaram. Esta sala fica vigiada até o fim da volta.';
+ return '';
+}
+function collect(id){if(state.phase!=='playing'||(window.coop?.now() ?? Date.now())>=state.endAt){tick();return}const q=scenarioClues()[state.room].find(x=>x.id===id);if(!q||state.clues.some(x=>x.id===id)||state.duration-(state.endAt-(window.coop?.now() ?? Date.now()))/1000<q.time/300*state.duration)return;{const bl=bloqueioPista(q,(state.duration-(state.endAt-(window.coop?.now() ?? Date.now()))/1000)*300/state.duration);if(bl){toast(bl);return}}if(!cobrarPista(q))return;const room=sala(state.room);state.clues.push({id:q.id,room:room.name,name:q.name,text:q.text,tipo:q.tipo,fatos:q.fatos,loop:state.loop});if(q.trava){(state.trava ||= {})[state.loop+':'+state.room]=q.id}save();renderClues();renderJournal();toast(q.trava?'Pista guardada. Os seguranças estão a caminho!':'Pista guardada no caderno')}
 function renderJournal(){
  const clues=state.clues||[];$('countBadge').textContent=clues.length;
  $('journalPreview').innerHTML=clues.length?clues.slice(-3).reverse().map(c=>'<div class="preview-item">'+esc(c.name)+' <br><small>'+esc(c.room)+'</small></div>').join(''):'<p class="muted">Suas descobertas aparecerão aqui.</p>';

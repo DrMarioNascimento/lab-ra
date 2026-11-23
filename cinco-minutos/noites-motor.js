@@ -86,6 +86,22 @@ function camadaMuitas(base){
    }
   }
  });
+ return pistasEspeciais(base, c, ci);
+}
+// Pistas especiais (ideias do professor, 23/11/2026). Ninguém mente: as duas são verdadeiras.
+function pistasEspeciais(base, c, ci){
+ const pend = (base.relogios ||= []), cons = (base.conservacao ||= []);
+ pend.push({id:'esp'+ci+'-pend1', name:'Observar o relógio parado', time:20, tipo:'Observação', text:'Um relógio antigo de parede está parado em 21h47. A hora do museu agora é outra. Relógio parado não prova que horas eram.'});
+ pend.push({id:'esp'+ci+'-pend2', name:'Abrir a caixa do mecanismo', time:95, tipo:'Observação', text:'Dentro da caixa, um clipe de papel prende os ponteiros às 21h47. Alguém fez isso de propósito, antes de o apagão começar. O relógio foi travado, não quebrou sozinho.'});
+ cons.push({id:'esp'+ci+'-tinta1', name:'Examinar a carta em branco', time:0, tipo:'Observação', text:'Na mesa de restauro há uma carta em branco, um pouco enrugada, com cheiro leve de limão. Ao lado, um aquecedor desligado.'});
+ cons.push({id:'esp'+ci+'-tinta2', name:'Reler a carta com o aquecedor ligado', time:215, tipo:'Registro', fatos:['event'], text:'O aquecedor da sala ligou sozinho e esquentou o papel. Letras marrons apareceram: "'+maiuscula(c.detail)+'."'});
+ const gal = (base.galeria ||= []), rec = (base.recepcao ||= []);
+ // Incêndio: dispara o alarme (com água), a tinta falsa escorre e mostra o mapa. A obra se estraga e os seguranças vêm: a sala fica vigiada e a informação só serve na volta seguinte.
+ gal.push({id:'esp'+ci+'-fogo', name:'Disparar o alarme de incêndio', time:40, tipo:'Observação', trava:true, fatos:['where'], text:'A água cai, a tinta falsa do quadro valioso escorre e, por baixo, aparece um mapa antigo do museu com uma sala circulada: '+sala(c.room).name+'. A obra está estragada e os seguranças vêm correndo. Você não pode examinar mais nada aqui nesta volta. Use o que viu na próxima.'});
+ // Taça: o segurança bebe da mesma taça às 21h58. Derrubar água nela antes disso o manda ao banheiro, e o posto fica sozinho.
+ rec.push({id:'esp'+ci+'-taca1', name:'Observar a taça do segurança', time:0, tipo:'Observação', text:'Durante o evento de hoje, o segurança do posto bebe sempre da mesma taça às 21h58. Se algo cair nela antes disso, ele vai ter que sair.'});
+ rec.push({id:'esp'+ci+'-taca2', name:'Derrubar água na taça', time:25, ate:110, tipo:'Observação', text:'Você esbarra na taça e a água se espalha. O segurança resmunga, pega um pano e se prepara para ir ao banheiro.'});
+ rec.push({id:'esp'+ci+'-taca3', name:'Olhar o posto desprotegido', time:125, requer:'esp'+ci+'-taca2', tipo:'Registro', text:'O segurança saiu e o posto ficou sozinho. Preso sob o balcão há um leitor de impressão digital que guarda uma digital que não é de ninguém da equipe. Ela pode servir para abrir algo trancado.'});
  return base;
 }
 function mergeNoite(base){
