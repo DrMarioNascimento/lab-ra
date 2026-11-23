@@ -114,7 +114,7 @@ const ESCALA = {
  V52: { alvo: .6, ped: 1.0, uso: 'pub', real: 'inseto em âmbar de ~0,05 m, muito ampliado' },
  V50: { alvo: .6, ped: 1.0, uso: 'pub', real: 'âmbar polido de ~0,08 m, muito ampliado' },
  B07: { alvo: 1.2, ped: 1.0, uso: 'pub', real: 'inseto sob vidro de ~0,1 m, ampliado' },
- T02: { alvo: 2.7, ped: .1, uso: 'pub', rot: 0, real: 'cabine de viagem no tempo de ~2,7 m, tamanho real' },
+ T02: { alvo: 4.2, ped: .1, uso: 'pub', rot: 0, real: 'carro de viagem no tempo de ~4,2 m, tamanho real' },
  N01: { alvo: .8, ped: 1.0, uso: 'pub', real: 'xícara de ~0,12 m, ampliada' },
  N15: { alvo: 1.3, ped: .8, uso: 'pub', real: 'tabuleiro de ~0,5 m, ampliado' },
  CERA: { nativo: true, ped: 0, semBase: true, uso: 'pub', rot: 0, real: 'figuras de 1,75 m, tamanho real' },

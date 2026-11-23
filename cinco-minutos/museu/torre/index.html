@@ -76,7 +76,7 @@ document.getElementById('bVers').onclick = e => { e.preventDefault(); const a = 
 const SLIDE = 11;                                     // metros do prédio (a torre tem escala 0,025)
 
 const VERS = (new URLSearchParams(location.search).get('versao') || 'A').toUpperCase().replace(/[^ABC]/g, 'A');
-gl.load((VERS === 'A' ? 'torre.glb' : 'torre-' + VERS + '.glb') + '?v=20261123g', g => {
+gl.load((VERS === 'A' ? 'torre.glb' : 'torre-' + VERS + '.glb') + '?v=20261123h', g => {
   torre = g.scene; S.add(torre);
   for (let k = 0; k < 5; k++) { andar[k] = torre.getObjectByName('andar_' + k); pos0[k] = andar[k].position.z; }
   montaAndares(); $('carr').style.display = 'none';

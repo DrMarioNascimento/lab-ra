@@ -185,14 +185,14 @@
   "id": "T02",
   "sala": "D09",
   "uso": "pub",
-  "real": "cabine de viagem no tempo de ~2,7 m, tamanho real",
-  "alvo": 2.7,
-  "larg": 1.64,
-  "prof": 1.64,
-  "alt": 2.7,
+  "real": "carro de viagem no tempo de ~4,2 m, tamanho real",
+  "alvo": 3.6,
+  "larg": 3.6,
+  "prof": 1.77,
+  "alt": 1.4,
   "ped": 0.1,
   "rot": 0,
-  "e": 0.844
+  "e": 1.898
  },
  {
   "id": "E02",

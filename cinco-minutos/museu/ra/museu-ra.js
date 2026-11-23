@@ -20,7 +20,7 @@
     });
   }
   var vs = (new URLSearchParams(location.search).get('versao') || 'A').toUpperCase().replace(/[^ABC]/g, 'A');
-  b.carregar(['torre/' + (vs === 'A' ? 'torre.glb' : 'torre-' + vs + '.glb') + '?v=20261123g']).then(function (r) {
+  b.carregar(['torre/' + (vs === 'A' ? 'torre.glb' : 'torre-' + vs + '.glb') + '?v=20261123h']).then(function (r) {
     modelo = r[0].scene; b.raiz.add(modelo); b.estado('Pronto.');
     document.getElementById('btRA').disabled = false; b.pronto && b.pronto();
   }).catch(function (e) { b.estado('Não consegui abrir o museu (' + (e && e.message || e) + ').'); });

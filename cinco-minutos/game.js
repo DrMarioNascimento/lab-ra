@@ -76,7 +76,7 @@ const PECAS_ALT = {
   limpeza:    [{peca:'L04', sub:'Ferramentas de limpeza'}, {peca:'L05', sub:'Produtos e panos coloridos'}],
   manutencao: [{peca:'M02', sub:'Baú de ferramentas'}, {peca:'M03', sub:'Armário de ferramentas'}],
   atelie:     [{peca:'L06', sub:'Projetos e bancada'}, {peca:'L07', sub:'Ferramentas de teste'}],
-  prototipo:  [{peca:'T01', sub:'Máquina do tempo (protótipo)'}, {peca:'T02', sub:'Cabine de viagem no tempo'}],
+  prototipo:  [{peca:'T01', sub:'Máquina do tempo (protótipo)'}, {peca:'T02', sub:'Carro de viagem no tempo'}],
   sons:       [{peca:'N16', sub:'Rádio comunicador'}, {peca:'V44', sub:'Gramofone'}],
   relogios:   [{peca:'R01', sub:'Relógio de custódia'}, {peca:'R02', sub:'Relógio de pêndulo'}],
   eletrica:   [{peca:'E01', sub:'Quadro elétrico'}, {peca:'E02', sub:'Central de energia'}],
