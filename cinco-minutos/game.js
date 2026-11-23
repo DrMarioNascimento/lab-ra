@@ -430,7 +430,7 @@ const timePath = () => state.caseRules === 2
 
 function scenarioClues(){
  const todas = mergeNoite(scenarioCluesBase()), out = {};
- for (const k of Object.keys(todas)) out[k] = todas[k].filter(q => !q.volta || q.volta === state.loop).map(q => ({...q, name:nomear(q.name), text:nomear(q.text)}));
+ for (const k of Object.keys(todas)) out[k] = todas[k].filter(q => (!q.volta || q.volta === state.loop) && (!q.desde || state.loop >= q.desde)).map(q => ({...q, name:nomear(q.name), text:nomear(q.text)}));
  return out;
 }
 function scenarioCluesBase(){

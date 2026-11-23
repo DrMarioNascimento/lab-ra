@@ -160,6 +160,45 @@ function abrirEnigma(q){
  d.querySelector('#enigmaIn').onkeydown = e => { if (e.key === 'Enter') ok(); };
  if (!d.open) d.showModal(); setTimeout(() => d.querySelector('#enigmaIn')?.focus(), 50);
 }
+
+// ---- pistas que mudam a cada volta (ideias do professor, 23/11/2026): usam `volta` (só naquela volta) e `desde` (da volta em diante) e o que o jogador já fez nas voltas anteriores.
+function pistasVoltas(base, c, ci){
+ const L = state.loop || 1, salasVistas = [...new Set((state.clues || []).filter(x => x.loop < L).map(x => x.room))], ultima = salasVistas.length ? salasVistas[salasVistas.length - 1] : 'a sala ao lado';
+ const naoVistas = ROOMS.filter(r => !salasVistas.includes(sala(r.id).name)), alvo = (naoVistas.length ? naoVistas : ROOMS)[Math.floor(hashTxt('alv'+ci+':'+L+':'+semente())*(naoVistas.length || ROOMS.length))];
+ const add = (sl, id, v, nome, time, texto, extra) => (base[sl] ||= []).push({id:'lp'+ci+'-'+id+v, name:nome, time, tipo:'Registro', volta:v, text:texto, ...extra});
+ const mais = (sl, id, desde, nome, time, texto, extra) => (base[sl] ||= []).push({id:'lp'+ci+'-'+id, name:nome, time, tipo:'Registro', desde, text:texto, ...extra});
+ const eco = ECOS_CASO[Math.floor(hashTxt('lpe'+ci+':'+semente())*ECOS_CASO.length)](c);
+ // 1 Etiqueta de exposição que muda (Galeria especial)
+ const ETQ = ['A etiqueta da exposição está normal: nome da obra, ano e uma frase sobre o artista.',
+  'A etiqueta mudou. Agora diz: "Um visitante curioso vai ler esta etiqueta às 21h56."',
+  'A etiqueta diz: "O visitante curioso ainda vai passar por '+ultima+' e voltar aqui com mais perguntas."',
+  'A etiqueta diz: "Neste momento, o visitante curioso sente que já leu esta frase antes."',
+  'A etiqueta quase não fala mais da obra. Só repete: "Ele já sabe o bastante. Falta usar."'];
+ for (let v = 1; v <= 5; v++) add('galeria', 'etq', v, 'Ler a etiqueta da exposição', 20, ETQ[v-1]);
+ // 2 Câmera com atraso (Central de monitoramento)
+ mais('seguranca', 'cam', 2, 'Olhar a tela da câmera com atraso', 70, 'Uma tela mostra você andando em '+sala(alvo.id).name+', uma sala aonde você ainda não foi. A hora do vídeo é daqui a pouco. Quando você aproxima o rosto, a imagem falha.');
+ mais('seguranca', 'cam2', 4, 'Rever a gravação do apagão', 150, 'A câmera mostra uma poltrona vazia onde você estava e, logo depois, a luz caindo. A hora do vídeo é a do próximo apagão.');
+ // 3 Diário do guarda e livro de visitantes (a letra é a sua)
+ const feitos = (state.clues || []).filter(x => x.loop < L).slice(-3).map(x => x.name+' ('+x.room+')');
+ mais('recepcao', 'diario', 2, 'Ler o diário do guarda', 40, feitos.length ? 'As páginas têm uma letra igualzinha à sua: "Volta anterior: '+feitos.join('; ')+'. Não esqueça de olhar o que ninguém olha."' : 'As páginas estão em branco, mas o papel parece ter sido apagado há pouco.');
+ mais('recepcao', 'diario2', 3, 'Ler a página que só apareceu agora', 120, 'Uma página nova, com a sua letra, diz: "Se o apagão voltar, não confie só no relógio. Anote o que você viu."');
+ for (let v = 1; v <= 5; v++) add('recepcao', 'reg', v, 'Ler o registro de entrada', 60, v < 3 ? 'No livro de visitantes aparece o seu nome com entrada às 22h01. A hora ainda não chegou.' : 'No livro de visitantes o seu nome aparece como "já saiu", mas você ainda está dentro do museu.');
+ // 4 Retrato que reage (Sala da fotografia)
+ const RET = ['No retrato do fundador, os olhos parecem olhar um pouco para a esquerda.','Os olhos do retrato olham mais para a esquerda. A mão apoiada na mesa mudou de posição.','A mão do retrato agora aponta para baixo, na direção do chão.','A mão do retrato aponta para a porta da sala.','A mão do retrato aponta para longe, para '+sala(c.room).name+'. Ele não olha mais para você.'];
+ for (let v = 1; v <= 5; v++) add('fotografia', 'ret', v, 'Observar o retrato', 90, RET[v-1], v === 5 ? {fatos:['where']} : {});
+ // 5 Relógio que marca as voltas (Sala dos relógios)
+ for (let v = 1; v <= 5; v++) add('relogios', 'volt', v, 'Olhar o relógio da parede', 70, 'O relógio da parede não marca a hora de verdade: ele marca '+v+' volta'+(v > 1 ? 's' : '')+'. Um funcionário passa e diz que o relógio está normal.');
+ // 6 Áudio-guia que fala com você (Sala dos sons)
+ const AUD = ['', 'A narração muda de repente: "Você já esteve em '+ultima+'. Aqui, olhe com mais calma."', 'A voz do áudio-guia fala só com você: "Você já tentou a porta dos fundos. Não funciona."', 'O áudio-guia sussurra: "Quem se lembra do apagão não está sozinho."', 'O áudio-guia diz baixinho: "Esta é a última. Faça valer."'];
+ for (let v = 2; v <= 5; v++) add('sons', 'aud', v, 'Ouvir o áudio-guia desta sala', 100, AUD[v-1]);
+ // 7 Objeto que some e reaparece (Sala das coleções)
+ const OBJ = ['O relógio de bolso está na vitrine, no lugar de sempre.','A vitrine está vazia. O relógio de bolso sumiu sem barulho.','O relógio de bolso voltou e tem um bilhete dobrado dentro da tampa: '+eco[1],'O relógio de bolso continua no lugar, agora com uma mancha de tinta vermelha na tampa.','O relógio de bolso está na vitrine. A mancha vermelha secou.'];
+ for (let v = 1; v <= 5; v++) add('deposito', 'obj', v, 'Olhar a vitrine do relógio de bolso', 130, OBJ[v-1], v === 3 ? {fatos:eco[3], tipo:eco[2]} : {});
+ // 8 Mapa antigo com sala que não existe mais (Área de descanso)
+ mais('corredor', 'mapa', 1, 'Ler o mapa antigo do museu', 50, 'O mapa antigo mostra uma sala atrás desta parede, a "Sala do Relógio Mestre". Hoje ela não existe.');
+ mais('corredor', 'mapa2', 3, 'Abrir o acesso secreto atrás do mapa', 140, 'Com tantas voltas, você nota uma fresta atrás do mapa e abre o acesso secreto. Dentro há um papel: '+eco[1], {fatos:eco[3], tipo:eco[2]});
+ return base;
+}
 function pistasEspeciais(base, c, ci){
  const pend = (base.relogios ||= []), cons = (base.conservacao ||= []);
  pend.push({id:'esp'+ci+'-pend1', name:'Observar o relógio parado', time:20, tipo:'Observação', text:'Um relógio antigo de parede está parado em 21h47. A hora do museu agora é outra. Relógio parado não prova que horas eram.'});
@@ -200,7 +239,7 @@ function pistasEspeciais(base, c, ci){
   (base.seguranca ||= []).push({id:'esp'+ci+'-guarda'+v, name:'Ouvir o guarda noturno', time:20, volta:v, tipo:'Relato', text:GUARDA[v-1]});
   (base.conservacao ||= []).push({id:'esp'+ci+'-rest'+v, name:'Ouvir a restauradora', time:20, volta:v, tipo:'Relato', text:REST[v-1]});
  }
- return pistasEnigmas(base, c, ci);
+ return pistasVoltas(pistasEnigmas(base, c, ci), c, ci);
 }
 function mergeNoite(base){
  const extra = pistasDaNoite();
