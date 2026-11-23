@@ -19,7 +19,7 @@
       if (f) o.visible = fachada;
     });
   }
-  b.carregar(['torre/torre.glb?v=20261123d']).then(function (r) {
+  b.carregar(['torre/torre.glb?v=20261123e']).then(function (r) {
     modelo = r[0].scene; b.raiz.add(modelo); b.estado('Pronto.');
     document.getElementById('btRA').disabled = false; b.pronto && b.pronto();
   }).catch(function (e) { b.estado('Não consegui abrir o museu (' + (e && e.message || e) + ').'); });
