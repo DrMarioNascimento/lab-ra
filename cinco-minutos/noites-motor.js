@@ -114,6 +114,10 @@ function pistasEspeciais(base, c, ci){
  const sons = (base.sons ||= []), h1 = Math.floor(hashTxt('fone'+ci+':'+semente())*ECOS_CASO.length), e1 = ECOS_CASO[h1](c), e2 = ECOS_CASO[(h1+2)%ECOS_CASO.length](c);
  sons.push({id:'esp'+ci+'-fone1', name:'Colocar o fone da visita guiada', time:35, tipo:'Relato', fatos:e1[3], text:'No fone, a voz da visita guiada fala da sala. De repente ela erra a faixa e, ao fundo, se ouve: '+e1[1]});
  sons.push({id:'esp'+ci+'-fone2', name:'Ouvir a faixa escondida do fone', time:170, requer:'esp'+ci+'-fone1', tipo:'Relato', fatos:e2[3], text:'Você aperta o botão de avançar duas vezes e aparece uma faixa sem nome: uma gravação da ronda. '+e2[1]});
+ // Câmera infravermelha: pegadas quentes no chão encerado mostram para onde alguém foi e ficou escondido.
+ const seg = (base.seguranca ||= []);
+ seg.push({id:'esp'+ci+'-infra1', name:'Ligar a câmera infravermelha', time:100, tipo:'Registro', fatos:['where'], text:'No monitor em visão noturna, pegadas quentes brilham no chão encerado da galeria. Elas saem de lá e seguem até '+sala(c.room).name+'.'});
+ seg.push({id:'esp'+ci+'-infra2', name:'Seguir as pegadas no monitor', time:190, requer:'esp'+ci+'-infra1', tipo:'Relato', fatos:['figure'], text:'As pegadas terminam e não voltam. Quem as fez ainda está dentro do prédio, parado no mesmo lugar. '+figures[c.figure]});
  return base;
 }
 function mergeNoite(base){
