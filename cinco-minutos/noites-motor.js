@@ -110,6 +110,10 @@ function pistasEspeciais(base, c, ci){
  // Peça que quebra e revela uma pista: a alça da xícara solta e traz um papel do cabo oco.
  const ec = ECOS_CASO[Math.floor(hashTxt('xic'+ci+':'+semente())*ECOS_CASO.length)](c);
  porc.push({id:'esp'+ci+'-xicara', name:'Segurar a xícara rachada', time:50, tipo:ec[2], fatos:ec[3], text:'A alça da xícara se solta na sua mão e quebra. Dentro do cabo oco havia um papel enrolado. Está escrito: '+ec[1]+' A xícara não tem mais conserto.'});
+ // Fone da visita guiada: a faixa normal traz um eco do caso; uma faixa escondida, ouvida depois, traz outro.
+ const sons = (base.sons ||= []), h1 = Math.floor(hashTxt('fone'+ci+':'+semente())*ECOS_CASO.length), e1 = ECOS_CASO[h1](c), e2 = ECOS_CASO[(h1+2)%ECOS_CASO.length](c);
+ sons.push({id:'esp'+ci+'-fone1', name:'Colocar o fone da visita guiada', time:35, tipo:'Relato', fatos:e1[3], text:'No fone, a voz da visita guiada fala da sala. De repente ela erra a faixa e, ao fundo, se ouve: '+e1[1]});
+ sons.push({id:'esp'+ci+'-fone2', name:'Ouvir a faixa escondida do fone', time:170, requer:'esp'+ci+'-fone1', tipo:'Relato', fatos:e2[3], text:'Você aperta o botão de avançar duas vezes e aparece uma faixa sem nome: uma gravação da ronda. '+e2[1]});
  return base;
 }
 function mergeNoite(base){
