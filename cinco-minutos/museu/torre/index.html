@@ -73,7 +73,7 @@ const andar = [], pos0 = [], alvoZ = [0, 0, 0, 0, 0], atualZ = [0, 0, 0, 0, 0];
 let torre = null, fachadaOn = true, aberto = -1, dentro = null;
 const SLIDE = 11;                                     // metros do prédio (a torre tem escala 0,025)
 
-gl.load('torre.glb?v=20261123e', g => {
+gl.load('torre.glb?v=20261123f', g => {
   torre = g.scene; S.add(torre);
   for (let k = 0; k < 5; k++) { andar[k] = torre.getObjectByName('andar_' + k); pos0[k] = andar[k].position.z; }
   montaAndares(); $('carr').style.display = 'none';
