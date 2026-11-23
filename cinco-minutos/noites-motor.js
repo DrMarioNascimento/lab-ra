@@ -149,11 +149,13 @@ function abrirEnigma(q){
  let d = document.getElementById('enigmaDlg');
  if (!d) { d = document.createElement('dialog'); d.id = 'enigmaDlg'; d.style.cssText = 'width:min(92vw,520px);border:2px solid #9a7842;border-radius:16px;background:#12171d;color:#f3ead6;padding:16px;'; document.body.appendChild(d); }
  d.innerHTML = '<p style="margin:0;color:#e6c36b;font-weight:800;letter-spacing:.08em">'+esc(q.enigma.rotulo)+'</p><h3 style="margin:.2em 0 .4em">'+esc(q.name)+'</h3><p style="margin:.2em 0 .6em">'+esc(q.enigma.enunciado)+'</p>'+
-  '<pre style="white-space:pre-wrap;word-break:break-word;margin:0 0 .8em;font:700 20px ui-monospace,Menlo,monospace;background:#0a0e12;padding:10px;border-radius:10px">'+esc(q.enigma.cifrado)+'</pre>'+
+  '<pre style="white-space:pre-wrap;word-break:break-word;margin:0 0 .8em;font:700 20px ui-monospace,Menlo,monospace;background:#0a0e12;padding:10px;border-radius:10px">'+esc(q.enigma.cofre ? '[ '+achadosCofre().map(n => n === null ? '_' : n).join(' ] [ ')+' ]   digital: '+(state.clues.some(x => x.id === q.enigma.digital) ? 'sim' : 'não') : q.enigma.cifrado)+'</pre>'+
   '<input id="enigmaIn" type="text" autocomplete="off" autocapitalize="characters" placeholder="'+esc(q.enigma.placeholder || 'Palavra-chave')+'" style="width:100%;box-sizing:border-box;font:700 18px system-ui;padding:12px;border-radius:10px;border:1px solid #5b6b78;background:#0a0e12;color:#fff">'+
   '<p id="enigmaMsg" style="min-height:1.4em;margin:.5em 0;color:#e6c36b">Se faltar uma dica, feche e procure outras pistas desta sala.</p>'+
   '<div style="display:flex;gap:8px"><button type="button" class="btn primary" id="enigmaOk">Decifrar</button><button type="button" class="btn secondary" id="enigmaNo">Fechar</button></div>';
  const ok = () => { const v = normResp(d.querySelector('#enigmaIn').value);
+  if (q.enigma.cofre) { const ach = achadosCofre().filter(n => n !== null).length, dig = state.clues.some(x => x.id === q.enigma.digital);
+   if (ach < 6 || !dig) { d.querySelector('#enigmaMsg').textContent = 'Não abre. O cofre pede seis números'+(dig ? '' : ' e a digital de alguém do posto')+'. Eles estão espalhados pelo museu. Você já achou '+ach+' de 6 números.'; return; } }
   if (v && v === normResp(q.enigma.resposta)) { (state.resolvidos ||= {})[q.id] = true; d.close(); collect(q.id); }
   else d.querySelector('#enigmaMsg').textContent = v ? 'Ainda não. Confira a cifra e procure a dica nesta sala.' : 'Digite a sua resposta.'; };
  d.querySelector('#enigmaOk').onclick = ok; d.querySelector('#enigmaNo').onclick = () => d.close();
@@ -199,6 +201,26 @@ function pistasVoltas(base, c, ci){
  mais('corredor', 'mapa2', 3, 'Abrir o acesso secreto atrás do mapa', 140, 'Com tantas voltas, você nota uma fresta atrás do mapa e abre o acesso secreto. Dentro há um papel: '+eco[1], {fatos:eco[3], tipo:eco[2]});
  return base;
 }
+
+// ---- cofre da Recepção (etapa 3, versão para um jogador): seis números espalhados pelo museu + a digital do posto. O progresso fica no caderno, então vale em qualquer volta.
+const cofreDig = ci => [0,1,2,3,4,5].map(j => Math.floor(hashTxt('cof'+ci+':'+j+':'+semente())*10));
+const COFRE_PONTOS = [
+ ['gigantes', 'Ler o número gravado no osso', 'Um número foi gravado a lápis num osso do esqueleto: {n}.', 30],
+ ['cera', 'Ler a etiqueta no pé da figura', 'A etiqueta presa ao pé de uma figura de cera tem só um número: {n}.', 60],
+ ['fosseis', 'Contar as marcas na rocha', 'Você conta as marcas na rocha, uma por uma: são {n}.', 120],
+ ['vidros', 'Ler o número riscado no vidro', 'Alguém riscou um número no canto do vidro com a unha: {n}.', 90],
+ ['conservacao', 'Ler o número no frasco', 'O frasco de verniz tem um número escrito na tampa: {n}.', 150],
+ ['limpeza', 'Ler o número no carrinho', 'Na barra do carrinho de limpeza há um número pintado de branco: {n}.', 45]
+];
+function achadosCofre(){ const ci = state.caseIndex, dg = cofreDig(ci); return dg.map((d, i) => (state.clues || []).some(x => x.id === 'cof'+ci+'-n'+i) ? d : null); }
+function pistasCofre(base, c, ci){
+ const dg = cofreDig(ci);
+ COFRE_PONTOS.forEach(([sl, nome, texto, t], i) => (base[sl] ||= []).push({id:'cof'+ci+'-n'+i, name:nome, time:t, tipo:'Registro', text:texto.replace('{n}', dg[i])+' Esse é o número '+(i+1)+' do cofre da Recepção.'}));
+ (base.recepcao ||= []).push({id:'cof'+ci+'-cofre', name:'Tentar abrir o cofre', time:0, tipo:'Registro', fatos:['event','where'],
+  text:'O cofre abriu. Dentro há um envelope com duas folhas. Primeira: '+c.detail+'. Segunda: a figura imóvel está em '+sala(c.room).name+'.',
+  enigma:{rotulo:'COFRE', enunciado:'O cofre da Recepção tem seis números e um leitor de digital.', cifrado:'', resposta:dg.join(''), placeholder:'6 números', cofre:true, digital:'esp'+ci+'-taca3'}});
+ return base;
+}
 function pistasEspeciais(base, c, ci){
  const pend = (base.relogios ||= []), cons = (base.conservacao ||= []);
  pend.push({id:'esp'+ci+'-pend1', name:'Observar o relógio parado', time:20, tipo:'Observação', text:'Um relógio antigo de parede está parado em 21h47. A hora do museu agora é outra. Relógio parado não prova que horas eram.'});
@@ -239,7 +261,7 @@ function pistasEspeciais(base, c, ci){
   (base.seguranca ||= []).push({id:'esp'+ci+'-guarda'+v, name:'Ouvir o guarda noturno', time:20, volta:v, tipo:'Relato', text:GUARDA[v-1]});
   (base.conservacao ||= []).push({id:'esp'+ci+'-rest'+v, name:'Ouvir a restauradora', time:20, volta:v, tipo:'Relato', text:REST[v-1]});
  }
- return pistasVoltas(pistasEnigmas(base, c, ci), c, ci);
+ return pistasCofre(pistasVoltas(pistasEnigmas(base, c, ci), c, ci), c, ci);
 }
 function mergeNoite(base){
  const extra = pistasDaNoite();
