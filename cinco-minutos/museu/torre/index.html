@@ -34,7 +34,7 @@ button.on{border-color:var(--ouro);color:var(--ouro)}
 <div id="carr">Montando o museu…</div>
 <div id="hud">
   <div id="topo"><div id="titulo">O museu<small>Toque num andar para abrir a gaveta</small></div>
-    <div style="display:flex;gap:6px"><button id="bFach" type="button" class="on">Fachada</button><a class="bt" id="bSair" href="../">Sair</a></div></div>
+    <div style="display:flex;gap:6px"><a class="bt" id="bVers" href="#">Peças: A</a><button id="bFach" type="button" class="on">Fachada</button><a class="bt" id="bSair" href="../">Sair</a></div></div>
   <div id="baixo">
     <div id="ajuda">Arraste para girar · pince para aproximar · toque num andar</div>
     <div id="cartao"><span id="cAndar"></span><b id="cNome"></b><p id="cTexto"></p><button id="bVoltar" type="button" class="ouro">Voltar ao museu</button></div>
@@ -71,9 +71,12 @@ const dr = new DRACOLoader(); dr.setDecoderPath('./vendor/draco/');
 const gl = new GLTFLoader(); gl.setDRACOLoader(dr);
 const andar = [], pos0 = [], alvoZ = [0, 0, 0, 0, 0], atualZ = [0, 0, 0, 0, 0];
 let torre = null, fachadaOn = true, aberto = -1, dentro = null;
+document.getElementById('bVers').textContent = 'Peças: ' + (new URLSearchParams(location.search).get('versao') || 'A').toUpperCase();
+document.getElementById('bVers').onclick = e => { e.preventDefault(); const a = (new URLSearchParams(location.search).get('versao') || 'A').toUpperCase(); location.search = '?versao=' + ({A:'B',B:'C',C:'A'}[a] || 'B'); };
 const SLIDE = 11;                                     // metros do prédio (a torre tem escala 0,025)
 
-gl.load('torre.glb?v=20261123f', g => {
+const VERS = (new URLSearchParams(location.search).get('versao') || 'A').toUpperCase().replace(/[^ABC]/g, 'A');
+gl.load((VERS === 'A' ? 'torre.glb' : 'torre-' + VERS + '.glb') + '?v=20261123g', g => {
   torre = g.scene; S.add(torre);
   for (let k = 0; k < 5; k++) { andar[k] = torre.getObjectByName('andar_' + k); pos0[k] = andar[k].position.z; }
   montaAndares(); $('carr').style.display = 'none';

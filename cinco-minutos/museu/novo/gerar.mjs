@@ -7,6 +7,15 @@ import draco3d from 'draco3dgltf';
 import { MeshoptDecoder } from 'meshoptimizer';
 import fs from 'fs'; import path from 'path';
 const [,, PECAS = '../pecas', SAIDA = 'museu-novo.glb'] = process.argv;
+// VARIANTE=B|C: monta a maquete com as peças alternativas sorteadas (as mesmas do jogo, game.js)
+const VARIANTE = (process.env.VARIANTE || 'A').toUpperCase(), VI = VARIANTE === 'B' ? 1 : VARIANTE === 'C' ? 2 : 0;
+let ALT = {}, ID2SALA = { N14: 'veiculos' };
+if (VI) {
+ const gj = fs.readFileSync(process.env.GAME_JS || '/home/claude/lab-ra/cinco-minutos/game.js', 'utf8');
+ for (const m of gj.matchAll(/\{id:'(\w+)',\s*name:'[^']*',\s*andar:'[^']*',\s*icon:'[^']*',\s*sub:'[^']*',\s*peca:'(\w+)'/g)) ID2SALA[m[2]] = ID2SALA[m[2]] || m[1];
+ const ini = gj.indexOf('const PECAS_ALT = {'), fim = gj.indexOf('\n};', ini);
+ ALT = new Function('return ' + gj.slice(ini + 'const PECAS_ALT = '.length, fim + 3))();
+}
 // [peça, tamanho: G grande / M médio / P pequeno]  — por andar, na ordem das salas do jogo (2º, 1º, térreo)
 const G = 0.095, M = 0.06, P = 0.036;
 // 5 andares x 6 salas (2 colunas x 3 fileiras). De cima para baixo: 5º andar primeiro.
@@ -52,6 +61,59 @@ const ESCALA = {
  D01: { alvo: 3.4, ped: .25, uso: 'pub', real: 'esqueleto de ~18 m, réplica reduzida' },
  D02: { alvo: 3.2, ped: .25, uso: 'pub', real: 'esqueleto de ~6 m, réplica reduzida' },
  VEI_A: { alvo: 3.4, ped: .12, uso: 'pub', real: 'caminhão de ~4,6 m e bicicleta de roda alta, réplica reduzida' },
+ T01: { alvo: 2.2, ped: .15, uso: 'pub', real: 'máquina do tempo protótipo de ~2,2 m' },
+ L04: { alvo: 1.2, ped: 0, semBase: true, uso: 'serv', rot: 0, real: 'carrinho de limpeza de ~1,2 m, tamanho real' },
+ L05: { alvo: 1.0, ped: 0, semBase: true, uso: 'serv', rot: 0, real: 'prateleira de produtos de ~1,0 m, tamanho real' },
+ M02: { alvo: .9, ped: 0, semBase: true, uso: 'serv', rot: 0, real: 'baú de ferramentas de ~0,9 m, tamanho real' },
+ M03: { alvo: 1.8, ped: 0, uso: 'serv', real: 'armário de ferramentas de ~1,8 m, tamanho real' },
+ L06: { alvo: 1.6, ped: 0, uso: 'serv', real: 'bancada de projetos de ~1,6 m, tamanho real' },
+ L07: { alvo: 1.2, ped: .85, uso: 'serv', real: 'ferramentas de teste sobre bancada, ~1,2 m' },
+ N16: { alvo: .9, ped: 1.0, uso: 'pub', real: 'rádio comunicador de ~0,25 m, ampliado' },
+ V44: { alvo: 1.0, ped: .9, uso: 'pub', real: 'gramofone de ~0,8 m, quase real' },
+ R01: { alvo: .7, ped: 1.0, uso: 'pub', real: 'relógio de custódia de ~0,2 m, ampliado' },
+ R02: { alvo: 2.0, ped: .15, uso: 'pub', real: 'relógio de pêndulo de ~2,0 m, tamanho real' },
+ E01: { alvo: 1.0, ped: 0, semBase: true, uso: 'serv', rot: 0, real: 'quadro elétrico de ~1,0 m, tamanho real' },
+ E02: { alvo: 1.8, ped: .1, uso: 'serv', real: 'central de energia de ~1,8 m, tamanho real' },
+ I01: { alvo: 1.4, ped: .1, uso: 'serv', real: 'fichário de registros de ~1,4 m, tamanho real' },
+ P02: { alvo: 1.6, ped: 0, semBase: true, uso: 'serv', rot: 0, real: 'balcão com notebook de ~1,6 m, tamanho real' },
+ V12: { alvo: 1.0, ped: .1, uso: 'pub', real: 'cômoda de ~1,0 m, tamanho real' },
+ M04: { alvo: 1.2, ped: .1, uso: 'pub', real: 'gaveteiro de ~1,2 m, tamanho real' },
+ V41: { alvo: 1.9, ped: .1, uso: 'pub', real: 'sofá de ~1,9 m, tamanho real' },
+ C02: { alvo: 1.6, ped: 0, uso: 'pub', real: 'quadro de recados de ~1,6 m' },
+ S02: { alvo: 1.5, ped: .1, base: 'red', uso: 'serv', rot: 0, real: 'mesa com monitor de ~1,5 m, tamanho de uso' },
+ S03: { alvo: 2.0, ped: .1, base: 'red', uso: 'serv', rot: 0, real: 'parede de telas de ~2,0 m, tamanho de uso' },
+ F03: { alvo: 2.2, ped: .15, base: 'red', uso: 'pub', real: 'farol de luz de ~2,2 m' },
+ N10: { alvo: 3.0, ped: .15, base: 'red', uso: 'pub', real: 'lanterna de rua de ~3,0 m, tamanho real' },
+ V01: { alvo: 1.4, ped: .3, uso: 'pub', real: 'crânio de mamute de ~1,2 m' },
+ V02: { alvo: 2.4, ped: .25, uso: 'pub', real: 'costelas gigantes de ~2,4 m' },
+ V03: { alvo: 1.6, ped: .3, uso: 'pub', real: 'mandíbula de tubarão de ~1,6 m, réplica' },
+ V06: { alvo: .7, ped: 1.0, uso: 'pub', real: 'bule de ~0,2 m, ampliado' },
+ V07: { alvo: .9, ped: 1.0, uso: 'pub', real: 'jarro de ~0,4 m, ampliado' },
+ V08: { alvo: 1.3, ped: .8, uso: 'pub', real: 'tabuleiro de xadrez de ~0,5 m, ampliado' },
+ V09: { alvo: .6, ped: 1.0, uso: 'pub', real: 'dados de ~0,02 m, muito ampliados' },
+ V10: { alvo: .7, ped: 1.0, uso: 'pub', real: 'crânio de primata de ~0,2 m, ampliado' },
+ V11: { alvo: .8, ped: 1.0, uso: 'pub', real: 'máscara de pedra de ~0,3 m, ampliada' },
+ V13: { alvo: 1.8, ped: .1, uso: 'pub', real: 'vitrine de ~1,8 m, tamanho real' },
+ V14: { alvo: 1.6, ped: .3, uso: 'pub', real: 'escultura de ~1,6 m' },
+ V15: { alvo: .9, ped: 1.0, uso: 'pub', real: 'refletor de ~0,5 m, ampliado' },
+ V16: { alvo: 1.5, ped: .1, uso: 'pub', real: 'microfone de pedestal de ~1,5 m, tamanho real' },
+ V17: { alvo: 3.4, ped: .25, uso: 'pub', real: 'planador de ~8 m, réplica reduzida' },
+ V18: { alvo: .9, ped: 1.0, uso: 'pub', real: 'esqueleto de pássaro de ~0,4 m, ampliado' },
+ V19: { alvo: .8, ped: 1.0, uso: 'pub', real: 'amonite de ~0,2 m, ampliada' },
+ V20: { alvo: .6, ped: 1.0, uso: 'pub', real: 'trilobita de ~0,08 m, muito ampliada' },
+ V23: { alvo: .8, ped: 1.0, uso: 'pub', real: 'capacete de ~0,3 m, ampliado' },
+ V24: { alvo: 1.0, ped: .8, uso: 'pub', real: 'escudo de ~0,8 m' },
+ V25: { alvo: .9, ped: 1.0, uso: 'pub', real: 'câmera antiga de ~0,3 m, ampliada' },
+ V26: { alvo: 1.0, ped: .9, uso: 'pub', real: 'projetor de ~0,5 m, ampliado' },
+ V30: { alvo: .9, ped: 1.0, uso: 'pub', real: 'garrafa de ~0,3 m, ampliada' },
+ V31: { alvo: 1.2, ped: .5, uso: 'pub', real: 'lustre de cristal de ~1,0 m' },
+ V32: { alvo: 1.0, ped: 1.0, uso: 'pub', real: 'concha de ~0,3 m, ampliada' },
+ V33: { alvo: 3.4, ped: .25, uso: 'pub', real: 'esqueleto de baleia de ~15 m, réplica reduzida' },
+ V48: { alvo: 1.1, ped: .1, uso: 'pub', real: 'cavalinho de balanço de ~1,0 m, tamanho real' },
+ V49: { alvo: .6, ped: 1.0, uso: 'pub', real: 'pião de ~0,08 m, muito ampliado' },
+ V52: { alvo: .6, ped: 1.0, uso: 'pub', real: 'inseto em âmbar de ~0,05 m, muito ampliado' },
+ V50: { alvo: .6, ped: 1.0, uso: 'pub', real: 'âmbar polido de ~0,08 m, muito ampliado' },
+ B07: { alvo: 1.2, ped: 1.0, uso: 'pub', real: 'inseto sob vidro de ~0,1 m, ampliado' },
  T02: { alvo: 2.7, ped: .1, uso: 'pub', rot: 0, real: 'cabine de viagem no tempo de ~2,7 m, tamanho real' },
  N01: { alvo: .8, ped: 1.0, uso: 'pub', real: 'xícara de ~0,12 m, ampliada' },
  N15: { alvo: 1.3, ped: .8, uso: 'pub', real: 'tabuleiro de ~0,5 m, ampliado' },
@@ -138,8 +200,9 @@ for (let a = 0; a < ANDARES.length; a++) {
    sala.addChild(caixa('p', mp, [Lx, PA, T], [s * (VG / 2 + Lx / 2), .25, HD - T / 2])); sala.addChild(caixa('p', mp, [Lx, PA, T], [s * (VG / 2 + Lx / 2), .25, -HD + T / 2]));
    sala.addChild(caixa('p', mp, [T, PA, Lz], [HW - T / 2, .25, s * (VG / 2 + Lz / 2)])); sala.addChild(caixa('p', mp, [T, PA, Lz], [-HW + T / 2, .25, s * (VG / 2 + Lz / 2)]));
   }
-  const pecaId = (TROCA[id] && TROCA[id].peca) || id;
-  const cfg = { ...(ESCALA[pecaId] || { alvo: 1.2, ped: 1.0, uso: 'pub' }) }; if (TROCA[id]) cfg.extras = TROCA[id].extras;
+  let pecaId = (TROCA[id] && TROCA[id].peca) || id;
+  let cfg = { ...(ESCALA[pecaId] || { alvo: 1.2, ped: 1.0, uso: 'pub' }) }; if (TROCA[id]) cfg.extras = TROCA[id].extras;
+  if (VI) { const alt = ALT[ID2SALA[id]]?.[VI - 1]; if (alt && alt.peca) { const base = cfg; pecaId = alt.peca; cfg = { ...(ESCALA[pecaId] || { alvo: 1.2, ped: 1.0, uso: 'pub' }), extras: base.extras, cenario: base.cenario }; console.log(VARIANTE, id, '->', pecaId); } else console.log(VARIANTE, id, 'sem alternativa, fica a principal'); }
   const arq = path.join(PECAS, pecaId + '.glb'); if (!fs.existsSync(arq)) { console.log('falta', id); n++; continue; }
   const pd = await io.read(arq); await carrega(pd);
   const bb = getBounds(pd.getRoot().listScenes()[0]); const dx = bb.max[0]-bb.min[0], dy = bb.max[1]-bb.min[1], dz = bb.max[2]-bb.min[2];
@@ -213,5 +276,5 @@ await doc.transform(prune());
 for (const a of doc.getRoot().listAnimations()) a.dispose();
 const bufs = doc.getRoot().listBuffers();
 for (const b of bufs.slice(1)) { for (const a of doc.getRoot().listAccessors()) if (a.getBuffer() === b) a.setBuffer(bufs[0]); b.dispose(); }
-fs.writeFileSync(path.join(path.dirname(SAIDA), 'auditoria-salas.json'), JSON.stringify(auditoria, null, 1));
+fs.writeFileSync(path.join(path.dirname(SAIDA), VI ? 'auditoria-salas-' + VARIANTE + '.json' : 'auditoria-salas.json'), JSON.stringify(auditoria, null, 1));
 await io.write(SAIDA, doc); console.log('ok', n, 'salas ->', SAIDA);

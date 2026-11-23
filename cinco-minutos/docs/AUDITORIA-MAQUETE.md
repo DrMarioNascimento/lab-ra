@@ -41,3 +41,5 @@ Dados para a sala de investigação do jogo: `museu/escala-pecas.json`. Gerador:
 
 Peças alternativas (versões B e C) usam o padrão de visitação (maior lado 1,2 m, base de 1,0 m); ajustar uma a uma quando forem para a maquete.
 Verificação automática: nenhuma sala passa do teto (3,55 m livres) nem do contorno do prédio.
+## Versões B e C da maquete (2026-11-23)
+`museu/torre/torre-B.glb` e `torre-C.glb` usam as peças alternativas sorteadas do jogo (PECAS_ALT em game.js), com tamanho/base de cada uma na tabela ESCALA de `museu/novo/gerar.mjs` (rodar com `VARIANTE=B` ou `C`). Conferido por código: 30 salas sem peça saindo do prédio nas duas. Abrir: `museu/torre/?versao=B` (botão "Peças" alterna A/B/C) e `museu/ra.html?versao=B`.
