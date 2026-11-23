@@ -78,6 +78,22 @@ for (let a = 0; a < ANDARES.length; a++) {
   n++;
  }
 }
+// ----- letreiro "Museu Mosaico" sobre o telhado (grupo do 4º andar, some junto com a fachada)
+{ const tex = doc.createTexture('letreiro').setImage(fs.readFileSync(path.join(path.dirname(process.argv[1]), 'letreiro.png'))).setMimeType('image/png');
+  const mL = doc.createMaterial('letreiro').setBaseColorTexture(tex).setEmissiveTexture(tex).setEmissiveFactor([1, 1, 1]).setRoughnessFactor(.6).setMetallicFactor(0);
+  const LW = 14, LH = LW * 320 / 2048, LY = 19.7, LZ = 4.6, LX = -2;
+  const quad = (z, n, flip) => { const xs = flip ? [LW/2, -LW/2] : [-LW/2, LW/2];
+   const P_ = [xs[0], LY, z, xs[1], LY, z, xs[1], LY + LH, z, xs[0], LY + LH, z], UV = [0, 1, 1, 1, 1, 0, 0, 0];
+   const pos = doc.createAccessor().setType('VEC3').setArray(new Float32Array(P_)).setBuffer(buf), nor = doc.createAccessor().setType('VEC3').setArray(new Float32Array([0,0,n, 0,0,n, 0,0,n, 0,0,n])).setBuffer(buf),
+    uv = doc.createAccessor().setType('VEC2').setArray(new Float32Array(UV)).setBuffer(buf), ind = doc.createAccessor().setType('SCALAR').setArray(new Uint16Array([0,1,2,0,2,3])).setBuffer(buf);
+   const pr = doc.createPrimitive().setAttribute('POSITION', pos).setAttribute('NORMAL', nor).setAttribute('TEXCOORD_0', uv).setIndices(ind).setMaterial(mL);
+   return doc.createNode('fachada_4_letreiro_' + (n > 0 ? 'frente' : 'costas')).setMesh(doc.createMesh('letreiro' + n).addPrimitive(pr)).setTranslation([LX, 0, 0]); };
+  const mB = mat('letreiro_base', [.07, .07, .09], .5, .3);
+  const corpo = caixa('fachada_4_letreiro_corpo', mB, [LW, LH, .3], [LX, LY, LZ]);
+  const q1 = quad(LZ + .16, 1, false), q2 = quad(LZ - .16, -1, true);
+  const base = caixa('fachada_4_letreiro_pe', mB, [LW * .8, LY - 18.8, .6], [LX, 18.8, LZ]);
+  for (const nd of [corpo, base]) grupo[4].addChild(nd);
+  for (const q of [q1, q2]) grupo[4].addChild(q); }
 // ----- segredos da noite (cópias próprias): cofre e caixa de luz (quadro elétrico), no térreo
 const EXTRAS = [['COFRE', '/home/claude/lab-ra/biblioteca/dragon/jogos/o-eco-do-amanha/o-impostor/modelos/pecas/rec-cofre-balanca.glb', 2.0, [-3.4, 0.4, 11.2], Math.PI],
  ['CAIXA_LUZ', '/home/claude/lab-ra/biblioteca/dragon/jogos/o-eco-do-amanha/o-impostor/modelos/pecas/rec-quadro-eletrico.glb', 2.2, [-12.2, 0.4, 1.5], Math.PI / 2]];
