@@ -126,3 +126,16 @@
 .prep p,.caixote p,.combo-box p,.teoria p{font:.92rem/1.5 system-ui,sans-serif;color:#c9d6d3}
 .prep .btn{margin-top:6px}
 .prep .kicker,.caixote .kicker,.combo-box .kicker,.teoria .kicker{color:#e7c18b;font-weight:700;font-size:.72rem;letter-spacing:.16em}
+
+.lc-fab{position:fixed;right:14px;bottom:14px;z-index:6;padding:12px 16px;border-radius:12px;border:1px solid #f2d3a0;background:linear-gradient(180deg,#f2d3a0,#be8e4b);color:#1f1b17;font:700 .95rem system-ui;box-shadow:0 4px 0 #05090d,0 10px 24px #0007}
+.lc-fab:active{transform:translateY(2px);box-shadow:0 1px 0 #05090d}
+.lc-dialog{width:min(720px,94vw)}.lc-x{position:absolute;right:12px;top:8px;background:transparent;color:#e9d0a7;border:0;font:1.6rem system-ui}
+.lc-dialog h3{margin:0 0 10px;font-weight:400;font-size:1.6rem}.lc-dialog h4{margin:14px 0 6px;font:700 1rem system-ui;color:#f2d3a0}
+.lc-abas{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}.lc-aba{flex:1;min-width:90px;padding:10px;border-radius:9px;border:1px solid #9eb2b241;background:linear-gradient(180deg,#203546,#172b3b);color:#e9eee9;font:600 .85rem system-ui;box-shadow:0 3px 0 #09121a}
+.lc-aba.on{background:linear-gradient(180deg,#f2d3a0,#be8e4b);color:#1f1b17}
+.lc-status,.lc-dica,.lc-papel,.lc-pal,.lc-solo,.lc-msg,.lc-ok{font:.88rem/1.5 system-ui;color:#c9d6d5}.lc-ok{color:#83c6ac}.lc-msg{min-height:1.5em;color:#f2d3a0;font-weight:700}
+.lc-causas,.lc-provas{display:grid;gap:6px;margin:8px 0}.lc-causas label,.lc-provas label{display:block;margin:0;padding:10px;border:1px solid #9eb2b241;border-radius:8px;background:#0b1824;font:.88rem system-ui}
+.lc-provas small{color:#d5b881;margin-left:6px}.lc-btn{display:block;width:100%;margin:10px 0;padding:13px;border-radius:10px;border:1px solid #f2d3a0;background:linear-gradient(180deg,#f2d3a0,#be8e4b);color:#1f1b17;font:700 .92rem system-ui;box-shadow:0 4px 0 #05090d}.lc-btn:active{transform:translateY(2px);box-shadow:0 1px 0 #05090d}
+.lc-ativ{margin:10px 0;padding:12px;border:1px solid #9eb2b233;border-radius:10px;background:#0b1824}.lc-ativ.on{border-color:#83c6ac}.lc-ativ small{color:#d5b881;font:.78rem system-ui}
+.lc-dialog input:not([type=radio]):not([type=checkbox]),.lc-dialog select{width:100%;margin:6px 0;padding:11px;border-radius:8px;border:1px solid #a5a48670;background:#142a37;color:#fff;font:.95rem system-ui}
+.lc-vals{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.lc-cod{font:700 1.6rem Georgia;color:#f6d6a0;text-align:center;min-height:2rem}.lc-lista{list-style:none;padding:0;font:.95rem system-ui}

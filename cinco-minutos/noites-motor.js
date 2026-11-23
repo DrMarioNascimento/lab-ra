@@ -16,10 +16,10 @@ const tipoCaixote = () => CAIXOTE_TIPOS[state.caseIndex % 4];
 function kitDaPartida(){ return Array.isArray(state.kit) ? state.kit : []; }
 function cargasMax(){ return CARGAS_BASE + kitDaPartida().reduce((n, f) => n + (FERRAMENTAS[f]?.extra || 0), 0); }
 function cargasRestantes(){
- if (state.cargasVolta !== state.loop) { state.cargasVolta = state.loop; state.cargas = cargasMax(); }
+ if (state.cargasVolta !== state.loop) { state.cargasVolta = state.loop; state.cargas = Math.max(0, cargasMax() - ((state.lc && state.lc.debitos && state.lc.debitos[state.loop]) || 0)); }
  return state.cargas;
 }
-function custoPista(q){ return kitDaPartida().some(f => FERRAMENTAS[f]?.livre && FERRAMENTAS[f].livre === q.tipo) ? 0 : 1; }
+function custoPista(q){ if (q.custo0) return 0; return kitDaPartida().some(f => FERRAMENTAS[f]?.livre && FERRAMENTAS[f].livre === q.tipo) ? 0 : 1; }
 function sufixoCusto(q){ return custoPista(q) ? ' · 1 de energia' : ' · sem custo'; }
 function cobrarPista(q){
  const custo = custoPista(q);
@@ -331,7 +331,7 @@ function pistasEspeciais(base, c, ci){
   (base.seguranca ||= []).push({id:'esp'+ci+'-guarda'+v, name:'Ouvir o guarda noturno', time:20, volta:v, tipo:'Relato', text:GUARDA[v-1]});
   (base.conservacao ||= []).push({id:'esp'+ci+'-rest'+v, name:'Ouvir a restauradora', time:20, volta:v, tipo:'Relato', text:REST[v-1]});
  }
- return pistasLoop2(pistasCofre(pistasVoltas(pistasEnigmas(base, c, ci), c, ci), c, ci), c, ci);
+ return pistasCentral(pistasLoop2(pistasCofre(pistasVoltas(pistasEnigmas(base, c, ci), c, ci), c, ci), c, ci));
 }
 function mergeNoite(base){
  const extra = pistasDaNoite();

@@ -1,6 +1,6 @@
 'use strict';
 // Bancada independente: o conteúdo fica no aparelho e não oferece sigilo contra inspeção do código.
-const ANDARES = ['2º andar', '1º andar', 'Térreo'];
+const ANDARES = ['2º andar', '1º andar', 'Térreo', 'Subsolo'];
 // Todos começam (e recomeçam a cada volta) no Saguão superior, no 2º andar; dali escolhem para onde ir.
 const INICIO = {id:'saguao', name:'Saguão superior', andar:'2º andar', icon:'✦', sub:'Todo mundo começa aqui'};
 const ROOMS = [
@@ -18,8 +18,8 @@ const ROOMS = [
   {id:'relogios', name:'Sala dos relógios', andar:'1º andar', icon:'⬡', sub:'Cada segundo conta', peca:'N03'},
   {id:'protecoes', name:'Sala das proteções', andar:'1º andar', icon:'✚', sub:'Capacete e história', peca:'N04'},
   {id:'fotografia', name:'Sala da fotografia', andar:'1º andar', icon:'☗', sub:'Câmera de outro tempo', peca:'N05'},
-  {id:'prototipo', name:'Galeria do tempo', andar:'1º andar', icon:'◷', sub:'Protótipo e demonstração', peca:'D09'},
-  {id:'eletrica', name:'Laboratório de formas', andar:'1º andar', icon:'⌁', sub:'Energia e equipamentos', peca:'B09'},
+  {id:'prototipo', name:'Subsolo · Câmara do tempo', andar:'Subsolo', icon:'◷', sub:'Protótipo e demonstração', peca:'D09'},
+  {id:'eletrica', name:'Oficina elétrica', andar:'1º andar', icon:'⌁', sub:'Energia e equipamentos', peca:'B09'},
   {id:'deposito', name:'Sala das coleções', andar:'1º andar', icon:'▤', sub:'Inventário e movimentações', peca:'B02'},
   {id:'vidros', name:'Sala dos vidros', andar:'1º andar', icon:'▨', sub:'Transparência e brilho', peca:'N06'},
   {id:'mar', name:'Sala do mar', andar:'1º andar', icon:'▦', sub:'Peixes e águas', peca:'N12'},
@@ -54,8 +54,8 @@ const NOMES_ALT = {
   relogios:['Sala das horas','Galeria dos ponteiros'],
   protecoes:['Sala dos capacetes','Galeria da armadura'],
   fotografia:['Sala das câmeras','Galeria das imagens'],
-  prototipo:['Sala das invenções','Galeria das demonstrações'],
-  eletrica:['Laboratório de energia','Oficina das formas'],
+  prototipo:['Subsolo · Câmara do tempo','Subsolo · Câmara do tempo'],
+  eletrica:['Oficina elétrica','Oficina elétrica'],
   deposito:['Sala do inventário','Galeria das caixas'],
   vidros:['Sala da transparência','Galeria do brilho'],
   mar:['Aquário antigo','Sala das águas'],
@@ -104,7 +104,7 @@ const PECAS_ALT = {
   ambar     : [{peca:'V52', sub:'Inseto em âmbar'}, {peca:'V50', sub:'Âmbar polido'}],
   conservacao:[{livro:true, sub:'Livro de registros do acervo', capa:'Livro do Acervo|REGISTRO DE ESPÉCIMES'}, {peca:'B07', sub:'Inseto sob vidro'}]
 };
-const FUNCOES_ENTRADA = ['recepcao','conservacao','seguranca','limpeza','manutencao'];
+const FUNCOES_ENTRADA = ['recepcao','conservacao','seguranca','limpeza','manutencao','patio'];
 const LUGARES = {'2º andar':9, '1º andar':10, 'Térreo':11};
 let MUSEU = null;
 function rngMuseu(semente){let a=(semente>>>0)||1;return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296}}
@@ -122,8 +122,9 @@ function montarMuseu(semente){
  embaralhar(FUNCOES_ENTRADA, rnd).forEach((id, i) => { mapa[id] = {andar:'Térreo', lugar:entrada[i]}; });
  const livres = [];
  for (const a of ANDARES) for (let n=1; n<=LUGARES[a]; n++) if (!(a==='Térreo' && n<=FUNCOES_ENTRADA.length)) livres.push({andar:a, lugar:n});
- const grupoB = embaralhar(ROOMS.map(r => r.id).filter(id => !FUNCOES_ENTRADA.includes(id)), rnd);
+ const grupoB = embaralhar(ROOMS.map(r => r.id).filter(id => !FUNCOES_ENTRADA.includes(id) && id !== 'prototipo'), rnd);
  grupoB.forEach((id, i) => { mapa[id] = livres[i]; });
+ mapa.prototipo = {andar:'Subsolo', lugar:1};
  for (const r of ROOMS) { const v = [r.name, ...NOMES_ALT[r.id]]; const i = Math.floor(rnd()*3); mapa[r.id].nome = v[i]; mapa[r.id].v = i; }
  return {semente, mapa};
 }
@@ -430,7 +431,7 @@ const timePath = () => state.caseRules === 2
 
 function scenarioClues(){
  const todas = mergeNoite(scenarioCluesBase()), out = {};
- for (const k of Object.keys(todas)) out[k] = todas[k].filter(q => (!q.volta || q.volta === state.loop) && (!q.desde || state.loop >= q.desde)).map(q => ({...q, name:nomear(q.name), text:nomear(q.text)}));
+ for (const k of Object.keys(todas)) out[k] = todas[k].filter(q => (!q.volta || q.volta === state.loop) && (!q.desde || state.loop >= q.desde) && (!q.vmax || state.loop <= q.vmax) && (!q.lcp || lcVisivel(q))).map(q => ({...q, name:nomear(q.name), text:nomear(q.lcp ? lcTextoClue(q) : q.text)}));
  return out;
 }
 function scenarioCluesBase(){
@@ -692,13 +693,14 @@ function brokeLoop(){
 }
 // Pistas com condição: requer (outra pista antes), ate (limite em segundos da história) e trava (depois dela, a sala fica vigiada até o fim da volta).
 function bloqueioPista(q, storySec){
+ if (q.lcp) { const m = lcBloqueio(q); if (m) return m; }
  if (q.requer && !state.clues.some(x => x.id === q.requer)) return 'Falta fazer algo antes. Veja as outras pistas desta sala.';
  if (q.minPistas && (state.clues || []).length < q.minPistas) return 'Faltam pistas no seu caderno. Precisa de pelo menos '+q.minPistas+'.';
  if (q.ate != null && storySec > q.ate) return 'Tarde demais nesta volta. Tente de novo na próxima.';
  const tr = state.trava && state.trava[state.loop+':'+state.room]; if (tr && tr !== q.id) return 'Os seguranças chegaram. Esta sala fica vigiada até o fim da volta.';
  return '';
 }
-function collect(id){if(state.phase!=='playing'||(window.coop?.now() ?? Date.now())>=state.endAt){tick();return}const q=scenarioClues()[state.room].find(x=>x.id===id);if(!q||state.clues.some(x=>x.id===id)||state.duration-(state.endAt-(window.coop?.now() ?? Date.now()))/1000<q.time/300*state.duration)return;{const bl=bloqueioPista(q,(state.duration-(state.endAt-(window.coop?.now() ?? Date.now()))/1000)*300/state.duration);if(bl){toast(bl);return}}if(q.enigma&&!(state.resolvidos&&state.resolvidos[q.id])){abrirEnigma(q);return}if(!cobrarPista(q))return;const room=sala(state.room);state.clues.push({id:q.id,room:room.name,name:q.name,text:q.text,tipo:q.tipo,fatos:q.fatos,loop:state.loop});if(q.trava){(state.trava ||= {})[state.loop+':'+state.room]=q.id}save();renderClues();renderJournal();toast(q.trava?'Pista guardada. Os seguranças estão a caminho!':'Pista guardada no caderno')}
+function collect(id){if(state.phase!=='playing'||(window.coop?.now() ?? Date.now())>=state.endAt){tick();return}const q=scenarioClues()[state.room].find(x=>x.id===id);if(!q||state.clues.some(x=>x.id===id)||state.duration-(state.endAt-(window.coop?.now() ?? Date.now()))/1000<q.time/300*state.duration)return;{const bl=bloqueioPista(q,(state.duration-(state.endAt-(window.coop?.now() ?? Date.now()))/1000)*300/state.duration);if(bl){toast(bl);return}}if(q.enigma&&!(state.resolvidos&&state.resolvidos[q.id])){abrirEnigma(q);return}if(!cobrarPista(q))return;const room=sala(state.room);state.clues.push({id:q.id,room:room.name,name:q.name,text:q.text,tipo:q.tipo,fatos:q.fatos,loop:state.loop});if(q.lcp)lcAposColetar(q);if(q.trava){(state.trava ||= {})[state.loop+':'+state.room]=q.id}save();renderClues();renderJournal();toast(q.trava?'Pista guardada. Os seguranças estão a caminho!':'Pista guardada no caderno')}
 function renderJournal(){
  const clues=state.clues||[];$('countBadge').textContent=clues.length;
  $('journalPreview').innerHTML=clues.length?clues.slice(-3).reverse().map(c=>'<div class="preview-item">'+esc(c.name)+' <br><small>'+esc(c.room)+'</small></div>').join(''):'<p class="muted">Suas descobertas aparecerão aqui.</p>';
