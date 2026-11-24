@@ -113,7 +113,7 @@ function lcAnexar(causa, ids){
  const v = lcValidaAnexo(causa, ids);
  s.anexos[state.loop] = causa;
  if (!v.ok) { save(); return 'O dossiê não aceita. ' + v.msg + ' ' + v.linhas.join(' ') + ' A tentativa desta volta foi gasta.'; }
- if (causa !== lcCausa()) { save(); return 'As provas parecem bater, mas A MÁQUINA NÃO REAGE a esse diagnóstico. A tentativa desta volta foi gasta.'; }
+ if (causa !== lcCausa()) { save(); return 'As provas até combinam, mas A MÁQUINA NÃO REAGE: o defeito é outro, ou são dois defeitos juntos. Releia os sinais do caderno antes da próxima tentativa. (A tentativa desta volta foi gasta.)'; }
  s.diag = {volta:state.loop}; save(); return 'DIAGNÓSTICO ANEXADO. ' + v.msg + ' O conserto da máquina pode acender.';
 }
 function lcFaltas(A){
