@@ -16,3 +16,8 @@ Simulação: rodada 1 (10 grupos, 0 conserto) → versão 2 → rodada 2 (12 gru
 - **Detalhes que distraem**: 10 pistas novas (café, quadro torto, gato no quadro de energia, balde com multímetro, lâmpadas queimadas, relógio de pulso parado, rádio chiando, bilhete do eletricista, cola fresca, foto da festa). As que parecem sinal são "falsa honesta": não contam no anexar.
 - **Quebra-cabeça**: o cofre do vigia (Segurança, a partir da volta 2) pede 3 números tirados da descrição da máquina do Subsolo (3 mostradores, 1 luz de âncora, 1 botão). Abre mais uma fonte da prova do trajeto.
 - **Armadilha do pêndulo** (sala dos Relógios, a partir da volta 2): puxar a corda adianta 40 s no relógio de TODO mundo. Há um bilhete de aviso na Manutenção. Cada aparelho aplica uma vez; o aviso viaja pelos campos `alarmeVolta/alarmeSeg/alarmeId` do próprio jogador na sala do Mestre (regra nova em `firebase-loop/firestore.rules`: precisa publicar as regras para valer em todos os aparelhos; sem isso vale só para quem puxou).
+
+## Ajuste 19:40 — mais pistas (Regra das Três Pistas)
+- 170 → 201 pistas. Cada sinal e cada descarte do diagnóstico ganhou uma segunda fonte em outra sala (sinais diegéticos: quadro de consumo, lâmpada, visor, metrônomo, medidor, armário de fusíveis).
+- Caso contra o suspeito com 3 pontas: motivo, meio e oportunidade do Lenz (2+2+2 pistas); álibis e pistas falsas com retorno para Ivone e Braga; diário do Téo em três dias (dias 10, 12 e 14); 6 detalhes de clima do museu.
+- Teto do validador subiu de 125 para 160 pistas ativas; validar.py APROVADO nas 5 causas.
