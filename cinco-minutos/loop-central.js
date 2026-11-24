@@ -126,7 +126,9 @@ function lcVisivel(q){ const p = LC_PID[q.lcp]; return !p || (lcPodeVer(p) && lc
 function lcBloqueio(q){
  const p = LC_PID[q.lcp]; if (!p) return '';
  const pd = p.precisaDe || {}, falta = (pd.todas || []).find(i => !lcTem(i));
+ if (falta && p.porque) return p.porque + ' (em ' + lcNomeSala(LC_PID[falta].sala) + ')';
  if (falta) return 'Falta achar algo antes, em ' + lcNomeSala(LC_PID[falta].sala) + '.';
+ if ((pd.umaDe || []).length && !pd.umaDe.some(lcTem) && p.porque) return p.porque + ' (em ' + lcNomeSala(LC_PID[pd.umaDe[0]].sala) + ')';
  if ((pd.umaDe || []).length && !pd.umaDe.some(lcTem)) return 'Falta achar algo antes, em ' + lcNomeSala(LC_PID[pd.umaDe[0]].sala) + '.';
  return '';
 }
