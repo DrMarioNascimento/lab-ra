@@ -154,7 +154,7 @@ function lcValidaAnexo(causa, ids){
   else if (ap && g) { sinais[g] = i; linhas.push(rot + ': CONTOU como sinal.'); }
   else if (de.length) { desc.push(i); linhas.push(rot + ': CONTOU como descarte (outro sistema está inteiro).'); }
   else if ((g || '').startsWith('sint_')) linhas.push(rot + ': é sinal da máquina, mas não combina com o defeito escolhido. NÃO CONTOU.');
-  else if ((g || '').startsWith('desc_')) linhas.push(rot + ': mostra um sistema inteiro, mas é justamente o do defeito escolhido. NÃO CONTOU.');
+  else if ((g || '').startsWith('desc_')) linhas.push(rot + ': mostra um sistema inteiro, mas não serve de descarte para esse defeito. NÃO CONTOU.');
   else linhas.push(rot + ': não é sinal da máquina nem descarte (história, manual ou ferramenta). NÃO CONTOU.');
  }
  if (completo) return {ok:true, msg:'', linhas};
@@ -174,6 +174,7 @@ function lcAnexar(causa, ids){
  const v = lcValidaAnexo(causa, ids);
  s.anexos[state.loop] = causa;
  if (!v.ok) { save(); return 'O dossiê não aceita. ' + v.msg + ' ' + v.linhas.join(' ') + ' A tentativa desta volta foi gasta.'; }
+ if (lcCausa() === 'E_dois' && (causa === 'A_calibrar' || causa === 'B_potencia')) { save(); return 'MEIO CERTO: as provas combinam, mas a máquina só dá um tranco e o aviso muda de lugar. Tem OUTRO defeito junto: é a opção "dois defeitos" (E). A tentativa desta volta foi gasta.'; }
  if (causa !== lcCausa()) { save(); return 'As provas até combinam, mas A MÁQUINA NÃO REAGE: o defeito escolhido não é esse. Releia os sinais do caderno antes da próxima tentativa. (A tentativa desta volta foi gasta.)'; }
  s.diag = {volta:state.loop}; save(); return 'DIAGNÓSTICO ANEXADO. ' + v.msg + ' O conserto da máquina pode acender.';
 }
