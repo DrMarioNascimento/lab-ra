@@ -55,6 +55,7 @@ const LC_GLOS = [
  ['etiquetas?', 'O tipo da pista. Duas pistas com a mesma etiqueta valem um sinal só.'],
  ['ensaio', 'Treino do conserto: na volta 4 você treina, na 5 vale.']
 ].map(([re, txt]) => ({re: new RegExp('(?<![\\p{L}])(' + re + ')(?![\\p{L}])', 'iu'), txt}));
+const LC_GLOS_LISTA = [['Tombo','Número de registro da peça, tipo o RG dela (ex.: 305).'],['Âncora','A peça que prende a máquina no tempo, como a âncora de um barco.'],['Borne','Ponto onde o fio se liga, tipo o encaixe de uma tomada.'],['Catraca','A roleta da entrada, a que gira quando você passa.'],['Calibrar','Acertar os números da máquina, como acertar um relógio.'],['Disjuntor','A chave do quadro de luz que desarma quando algo dá errado.'],['Fusível','Peça pequena que queima para proteger a energia.'],['Pedestal','O suporte onde a peça fica apoiada.'],['Patrocinador','Quem paga as despesas do museu e aparece com o nome numa exposição.'],['Restauro','Consertar uma obra antiga.'],['Dossiê','As pistas do grupo, juntas.'],['Eco','O som que volta. Aqui, a gravação que a máquina guarda.'],['Sinal','Pista que mostra o que está errado na máquina.'],['Descarte','Pista que mostra o que está funcionando, ou seja, o que NÃO é o defeito.'],['Etiqueta','O tipo da pista. Duas pistas com a mesma etiqueta valem um sinal só.'],['Ensaio','Treino do conserto: na volta 4 você treina, na 5 vale.']];
 function lcGlos(html){
  const usados = new Set();
  return String(html).replace(/(<[^>]*>)|([^<]+)/g, (m, tag, texto) => {
@@ -64,6 +65,18 @@ function lcGlos(html){
   return texto; });
 }
 window.lcGlos = lcGlos;
+// pré-conferência: olha só a etiqueta que está escrita em cada pista marcada (não diz qual é o defeito), para ninguém gastar a tentativa por erro de forma
+function lcPreConf(){
+ const el = document.getElementById('lcPre'); if (!el) return;
+ const marc = Array.from(document.querySelectorAll('input[name=lcprova]:checked')).map(i => (state.clues || []).find(c => c.id === 'lc-' + i.value)).filter(Boolean);
+ let sin = [], sis = 0, out = 0; for (const c of marc) { const e = (c.etq || '').toUpperCase(); if (e.startsWith('SINAL')) sin.push(e); else if (e.startsWith('SISTEMA')) sis++; else out++; }
+ const tipos = new Set(sin).size, ok = marc.length === 3 && sin.length === 2 && tipos === 2 && sis === 1;
+ let m = 'Marcadas: ' + marc.length + ' de 3 · 🚨 sinais: ' + sin.length + ' (' + tipos + ' tipo' + (tipos === 1 ? '' : 's') + ') · ✅ sistema inteiro: ' + sis + (out ? ' · outras: ' + out : '') + '.';
+ if (marc.length === 3 && !ok) { if (out) m += ' Pista sem etiqueta de sinal ou de sistema inteiro não conta.'; if (sin.length === 2 && tipos < 2) m += ' Os dois sinais têm a mesma etiqueta: valem um só.'; else if (sin.length !== 2) m += ' Precisa de 2 sinais.'; if (sis !== 1) m += ' Precisa de 1 de sistema inteiro.'; }
+ if (ok) m += ' Forma certa. (O jogo ainda confere se aponta o defeito.)';
+ el.textContent = m;
+}
+document.addEventListener('change', e => { if (e.target && e.target.name === 'lcprova') lcPreConf(); });
 document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('.lc-gi'); if (!b) return; e.preventDefault(); e.stopPropagation(); const x = b.nextElementSibling; if (!x) return; x.hidden = !x.hidden; b.setAttribute('aria-expanded', String(!x.hidden)); b.textContent = x.hidden ? '?' : '×'; });
 // ---- armadilha do pêndulo: adianta o relógio de TODO mundo (cada aparelho aplica uma vez; o aviso viaja pelo campo do próprio jogador na sala do Mestre)
 function lcAcelerar(id, seg){
@@ -211,12 +224,12 @@ function lcPainelHtml(aba){
  h += '<p class="lc-status">Volta ' + state.loop + ' de 5 · ' + (s.diag ? '✅ Diagnóstico anexado' : '🔍 Diagnóstico aberto') + ' · ' + (s.conserto === 5 ? '✅ Máquina consertada' : s.ensaio.length ? '🧪 Ensaio feito' : '⚙️ Máquina travada') + ' · ' + lcCargas() + ' de energia</p>';
  const meus = (state.clues || []).filter(c => c.id.startsWith('lc-'));
  if (aba === 'dossie') {
-  h += '<h4>Por que a máquina travou?</h4>' + lcGlos('<p class="lc-dica">Escolha o defeito e <b>3 pistas</b> do seu caderno: <b>2 sinais de tipos diferentes</b> que apontem esse defeito + <b>1 prova de que outro sistema está inteiro</b>. Cada pista mostra uma etiqueta: <b>duas pistas com a mesma etiqueta são do mesmo tipo e valem um sinal só</b>. Uma tentativa por volta, a partir da volta 2. Coisa estranha com explicação inocente não conta, e manual ou ferramenta também não: só sinais da máquina. Cada pessoa tem o próprio caderno: para outra pessoa usar uma pista, passe na pausa.</p><p class="lc-dica"><b>Palavras do museu:</b> tombo = número de registro da peça · âncora = a peça a que a máquina se prende · borne = ponto de ligação · catraca = roleta da entrada · dossiê = as pistas do grupo.</p>') + '';
+  h += '<h4>Por que a máquina travou?</h4>' + lcGlos('<p class="lc-dica">Escolha o defeito e <b>3 pistas</b> do seu caderno: <b>2 sinais de tipos diferentes</b> que apontem esse defeito + <b>1 prova de que outro sistema está inteiro</b>. Cada pista mostra uma etiqueta: <b>duas pistas com a mesma etiqueta são do mesmo tipo e valem um sinal só</b>. Uma tentativa por volta, a partir da volta 2. Coisa estranha com explicação inocente não conta, e manual ou ferramenta também não: só sinais da máquina. Cada pessoa tem o próprio caderno: para outra pessoa usar uma pista, passe na pausa.</p><div class="lc-leg"><span>🚨 <b>Sinal</b>: mostra o que está errado</span><span>✅ <b>Descarte</b>: mostra o que está funcionando</span><span>🏷️ <b>Etiqueta</b>: o tipo da pista</span></div><details class="lc-dic"><summary>Dicionário das palavras</summary>' + LC_GLOS_LISTA.map(([n, t]) => '<p><b>' + n + '</b>: ' + esc(t) + '</p>').join('') + '</details>') + '';
   if (s.diag) h += '<p class="lc-ok">O dossiê já aceitou o diagnóstico. Vá para Atividades.</p>';
   else {
    h += '<div class="lc-causas">' + LC_CAUSAS.map(c => '<label><input type="radio" name="lccausa" value="' + c + '"> ' + LC_NOME[c] + '</label>').join('') + '</div>';
    h += '<div class="lc-provas">' + (meus.length ? meus.map(c => '<label><input type="checkbox" name="lcprova" value="' + c.id.slice(3) + '"> <b>' + esc(c.name) + '</b> <small>' + esc(c.etq ? c.etq + ' · ' : '') + esc(c.room) + '</small></label>').join('') : '<p class="muted">Você ainda não tem pistas da máquina no caderno.</p>') + '</div>';
-   h += '<button type="button" class="lc-btn" id="lcAnexar">Anexar ao dossiê</button>';
+   h += '<p class="lc-pre" id="lcPre">Marque 3 pistas: 2 sinais de tipos diferentes e 1 descarte.</p><button type="button" class="lc-btn" id="lcAnexar">Anexar ao dossiê</button>';
   }
   h += '<p class="lc-msg" id="lcMsg" role="status"></p>';
  } else if (aba === 'atividades') {
@@ -364,7 +377,7 @@ function lcRevelar(){
  if (state.phase !== 'playing') return lcMsg('O telão da Recepção só aceita o Revelar durante uma volta.');
  if (state.room !== 'recepcao') return lcMsg('Para Revelar, vá à Recepção.');
  const falta = ['prova_falsa','trajeto','cracha'].filter(g => !lcTemGrupo(g));
- if (falta.length) return lcMsg('Faltam no SEU caderno: ' + falta.map(g => LC.grupos_fonte[g].rotulo).join(' · ') + '. Outra pessoa do grupo pode apresentar.');
+ if (falta.length) return lcMsg('Faltam no SEU caderno: ' + falta.map(g => LC.grupos_fonte[g].rotulo).join(' · ') + '. Peça a quem tem, na pausa (aba Passar pista), ou deixe essa pessoa apresentar. Quem apresenta também pode achar a prova nas salas.');
  if (!nome) return lcMsg('Diga o nome.');
  const ok = normResp(LC.culpado.split(' ')[0]) === normResp(nome.split(' ')[0]);
  s.revelado = {ok, nome}; save();
