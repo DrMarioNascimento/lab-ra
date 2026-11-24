@@ -2,7 +2,7 @@
 
 Arquivos: `loop-central-dados.js` (dados gerados de `docs/simulacao/versao2.md`), `loop-central.js` (regras e telas). Botão **🧭 Máquina** no canto da tela.
 
-- **Defeito por semente**: A (painel desregulado) ou B (falta de potência), sorteado por noite. As pistas de cada defeito só existem quando ele é o sorteado.
+- **Defeito por semente** (5 causas): A painel desregulado, B falta de potência, C âncora presa à peça falsa, D fusível tirado de propósito, E dois defeitos juntos (A + B, em voltas diferentes). Roteiro completo em `ROTEIRO-LOOP.md`. As pistas de cada defeito só existem quando ele é o sorteado.
 - **Lugares**: máquina e botão "Loop Reset" no **Subsolo · Câmara do tempo**; quadro de energia e para-raios **fora do prédio**, no Pátio; Oficina elétrica com luvas e chavinha.
 - **Dossiê**: a partir da volta 2, anexar o diagnóstico com 3 pistas (2 sinais de tipos diferentes + 1 que descarta outra causa), uma tentativa por volta. Também sai pela dupla "Painel e Manual".
 - **Atividades**: em dupla (cada pessoa numa sala; palavra da dupla que muda a cada 30 s; no Raio, código da chave + janela de 1:06 a 1:14) ou solo (mais caro: calibrar sozinho = 3 de energia com tudo no próprio caderno; Raio solo = eco gravado numa volta e alavanca em outra).

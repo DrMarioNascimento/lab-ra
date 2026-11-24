@@ -1,0 +1,55 @@
+VALIDADOR LOOP v3 | dados: /tmp/roda/v3_pistas.json | 155 pistas, 10 atividades, 15 salas abertas (+1 em reforma) | causas: A_calibrar, B_potencia, C_ancora, D_fusivel, E_dois
+(a) ids referenciados: OK, todos existem
+
+=== A_calibrar === (103 pistas ativas) conserto: coop_calibrar
+(a) entradas de atividade alcancaveis: OK | pistas ativas inalcancaveis: nenhuma
+(a) teste das atividades pelo motor (13 caminhos: dupla, solo, Central, anexar): OK
+(b) OTIMO SOLO  (1 pessoa, 6 cargas/volta): final = Ouro na volta 5 | diagnostico anexado V2 | conserto pronto V2 | ensaio V4 | conserto V5 | cargas por volta [6, 5, 0, 3, 3] de 6 (total 17 de 30)
+(b) OTIMO DUPLA (2 pessoas, 5 cargas/volta): final = Ouro na volta 5 | diagnostico anexado V2 | conserto pronto V2 | ensaio V4 | conserto V5 | cargas por volta [9, 1, 0, 2, 2] de 10 (total 14 de 50)
+(c) bot aleatorio, 2000 partidas: Ouro/Desligar = 0.00% (OK, abaixo de 2%) | finais: {'Minimo': 979, 'Parcial': 798, 'Revelar': 223} | diagnostico anexado no chute: 19.3%
+(d) essenciais sem 2 caminhos: nenhuma | diagnostico por: ['anexar (3 pistas)', 'coop_painel_manual'] | conserto por: ['coop_calibrar: dupla | solo:individual']
+    endurecimento: salas que fecham o diagnostico sozinhas: nenhuma
+(f) tamanho, formato dos valores e papeis da volta 5 (turma de 5 com Central): OK
+
+=== B_potencia === (103 pistas ativas) conserto: coop_raio
+(a) entradas de atividade alcancaveis: OK | pistas ativas inalcancaveis: nenhuma
+(a) teste das atividades pelo motor (12 caminhos: dupla, solo, Central, anexar): OK
+(b) OTIMO SOLO  (1 pessoa, 6 cargas/volta): final = Ouro na volta 5 | diagnostico anexado V2 | conserto pronto V2 | eco V3 | ensaio V4 | conserto V5 | cargas por volta [6, 4, 2, 2, 2] de 6 (total 16 de 30)
+(b) OTIMO DUPLA (2 pessoas, 5 cargas/volta): final = Ouro na volta 5 | diagnostico anexado V2 | conserto pronto V2 | ensaio V4 | conserto V5 | cargas por volta [10, 0, 0, 2, 2] de 10 (total 14 de 50)
+(c) bot aleatorio, 2000 partidas: Ouro/Desligar = 0.50% (OK, abaixo de 2%) | finais: {'Desligar': 10, 'Minimo': 987, 'Parcial': 780, 'Revelar': 223} | diagnostico anexado no chute: 18.7%
+(d) essenciais sem 2 caminhos: nenhuma | diagnostico por: ['anexar (3 pistas)', 'coop_painel_manual'] | conserto por: ['coop_raio: dupla | solo:eco']
+    endurecimento: salas que fecham o diagnostico sozinhas: nenhuma
+(f) tamanho, formato dos valores e papeis da volta 5 (turma de 5 com Central): OK
+
+=== C_ancora === (110 pistas ativas) conserto: coop_ancora
+(a) entradas de atividade alcancaveis: OK | pistas ativas inalcancaveis: nenhuma
+(a) teste das atividades pelo motor (13 caminhos: dupla, solo, Central, anexar): OK
+(b) OTIMO SOLO  (1 pessoa, 6 cargas/volta): final = Ouro na volta 5 | diagnostico anexado V2 | conserto pronto V2 | peca no chao V2 | ensaio V4 | conserto V5 | cargas por volta [6, 5, 0, 2, 2] de 6 (total 15 de 30)
+(b) OTIMO DUPLA (2 pessoas, 5 cargas/volta): final = Ouro na volta 5 | diagnostico anexado V2 | conserto pronto V2 | ensaio V4 | conserto V5 | cargas por volta [10, 1, 0, 2, 2] de 10 (total 15 de 50)
+(c) bot aleatorio, 2000 partidas: Ouro/Desligar = 0.00% (OK, abaixo de 2%) | finais: {'Minimo': 1055, 'Parcial': 762, 'Revelar': 183} | diagnostico anexado no chute: 16.6%
+(d) essenciais sem 2 caminhos: nenhuma | diagnostico por: ['anexar (3 pistas)', 'coop_painel_manual'] | conserto por: ['coop_ancora: dupla | solo:chao']
+    endurecimento: salas que fecham o diagnostico sozinhas: nenhuma
+(f) tamanho, formato dos valores e papeis da volta 5 (turma de 5 com Central): OK
+
+=== D_fusivel === (107 pistas ativas) conserto: coop_circuito
+(a) entradas de atividade alcancaveis: OK | pistas ativas inalcancaveis: nenhuma
+(a) teste das atividades pelo motor (13 caminhos: dupla, solo, Central, anexar): OK
+(b) OTIMO SOLO  (1 pessoa, 6 cargas/volta): final = Ouro na volta 5 | diagnostico anexado V2 | conserto pronto V2 | ensaio V4 | conserto V5 | cargas por volta [6, 5, 0, 3, 3] de 6 (total 17 de 30)
+(b) OTIMO DUPLA (2 pessoas, 5 cargas/volta): final = Ouro na volta 5 | diagnostico anexado V2 | conserto pronto V2 | ensaio V4 | conserto V5 | cargas por volta [10, 1, 0, 2, 2] de 10 (total 15 de 50)
+(c) bot aleatorio, 2000 partidas: Ouro/Desligar = 0.05% (OK, abaixo de 2%) | finais: {'Desligar': 1, 'Minimo': 960, 'Parcial': 812, 'Revelar': 227} | diagnostico anexado no chute: 17.8%
+(d) essenciais sem 2 caminhos: nenhuma | diagnostico por: ['anexar (3 pistas)', 'coop_painel_manual'] | conserto por: ['coop_circuito: dupla | solo:individual']
+    endurecimento: salas que fecham o diagnostico sozinhas: nenhuma
+(f) tamanho, formato dos valores e papeis da volta 5 (turma de 5 com Central): OK
+
+=== E_dois === (109 pistas ativas) conserto: coop_calibrar + coop_raio
+(a) entradas de atividade alcancaveis: OK | pistas ativas inalcancaveis: nenhuma
+(a) teste das atividades pelo motor (20 caminhos: dupla, solo, Central, anexar): OK
+(b) OTIMO SOLO  (1 pessoa, 6 cargas/volta): final = Ouro na volta 5 | diagnostico anexado V2 | conserto pronto V2 | eco V3 | meio conserto V3 | ensaio V4 | conserto V5 | cargas por volta [6, 6, 6, 3, 2] de 6 (total 23 de 30)
+(b) OTIMO DUPLA (2 pessoas, 5 cargas/volta): final = Ouro na volta 5 | diagnostico anexado V2 | conserto pronto V2 | meio conserto V3 | ensaio V4 | conserto V5 | cargas por volta [10, 3, 4, 4, 4] de 10 (total 25 de 50)
+(c) bot aleatorio, 2000 partidas: Ouro/Desligar = 0.00% (OK, abaixo de 2%) | finais: {'Minimo': 1018, 'Parcial': 791, 'Revelar': 191} | diagnostico anexado no chute: 18.4%
+(d) essenciais sem 2 caminhos: nenhuma | diagnostico por: ['anexar (3 pistas)', 'coop_painel_manual'] | conserto por: ['coop_calibrar: dupla | solo:individual', 'coop_raio: dupla | solo:eco']
+    endurecimento: salas que fecham o diagnostico sozinhas: nenhuma
+(f) tamanho, formato dos valores e papeis da volta 5 (turma de 5 com Central): OK
+
+RESUMO: A_calibrar: solo=Ouro, dupla=Ouro, bot=0.00% | B_potencia: solo=Ouro, dupla=Ouro, bot=0.50% | C_ancora: solo=Ouro, dupla=Ouro, bot=0.00% | D_fusivel: solo=Ouro, dupla=Ouro, bot=0.05% | E_dois: solo=Ouro, dupla=Ouro, bot=0.00%
+RESULTADO: APROVADO nas 5 causas: otimo solo e otimo dupla chegam ao Ouro; bot aleatorio abaixo de 2% em todas.
