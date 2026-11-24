@@ -113,7 +113,7 @@ function lcAnexar(causa, ids){
  const v = lcValidaAnexo(causa, ids);
  s.anexos[state.loop] = causa;
  if (!v.ok) { save(); return 'O dossiê não aceita. ' + v.msg + ' ' + v.linhas.join(' ') + ' A tentativa desta volta foi gasta.'; }
- if (causa !== lcCausa()) { save(); return 'As provas até combinam, mas A MÁQUINA NÃO REAGE: o defeito é outro, ou são dois defeitos juntos. Releia os sinais do caderno antes da próxima tentativa. (A tentativa desta volta foi gasta.)'; }
+ if (causa !== lcCausa()) { save(); return 'As provas até combinam, mas A MÁQUINA NÃO REAGE: o defeito escolhido não é esse. Releia os sinais do caderno antes da próxima tentativa. (A tentativa desta volta foi gasta.)'; }
  s.diag = {volta:state.loop}; save(); return 'DIAGNÓSTICO ANEXADO. ' + v.msg + ' O conserto da máquina pode acender.';
 }
 function lcFaltas(A){
@@ -163,7 +163,7 @@ function lcPainelHtml(aba){
  h += '<p class="lc-status">Volta ' + state.loop + ' de 5 · ' + (s.diag ? '✅ Diagnóstico anexado' : '🔍 Diagnóstico aberto') + ' · ' + (s.conserto === 5 ? '✅ Máquina consertada' : s.ensaio.length ? '🧪 Ensaio feito' : '⚙️ Máquina travada') + ' · ' + lcCargas() + ' de energia</p>';
  const meus = (state.clues || []).filter(c => c.id.startsWith('lc-'));
  if (aba === 'dossie') {
-  h += '<h4>Por que a máquina travou?</h4><p class="lc-dica">Escolha o defeito e <b>3 pistas</b> do seu caderno: <b>2 sinais de tipos diferentes</b> que apontem esse defeito + <b>1 prova de que outro sistema está inteiro</b>. Uma tentativa por volta, a partir da volta 2. Coisa estranha com explicação inocente não conta, e manual ou ferramenta também não: só sinais da máquina. Cada pessoa tem o próprio caderno: para outra pessoa usar uma pista, passe na pausa.</p><p class="lc-dica"><b>Palavras do museu:</b> tombo = número de registro da peça · âncora = a peça a que a máquina se prende · borne = ponto de ligação · catraca = roleta da entrada · dossiê = as pistas do grupo.</p>';
+  h += '<h4>Por que a máquina travou?</h4><p class="lc-dica">Escolha o defeito e <b>3 pistas</b> do seu caderno: <b>2 sinais de tipos diferentes</b> que apontem esse defeito + <b>1 prova de que outro sistema está inteiro</b>. Cada pista mostra uma etiqueta: <b>duas pistas com a mesma etiqueta são do mesmo tipo e valem um sinal só</b>. Uma tentativa por volta, a partir da volta 2. Coisa estranha com explicação inocente não conta, e manual ou ferramenta também não: só sinais da máquina. Cada pessoa tem o próprio caderno: para outra pessoa usar uma pista, passe na pausa.</p><p class="lc-dica"><b>Palavras do museu:</b> tombo = número de registro da peça · âncora = a peça a que a máquina se prende · borne = ponto de ligação · catraca = roleta da entrada · dossiê = as pistas do grupo.</p>';
   if (s.diag) h += '<p class="lc-ok">O dossiê já aceitou o diagnóstico. Vá para Atividades.</p>';
   else {
    h += '<div class="lc-causas">' + LC_CAUSAS.map(c => '<label><input type="radio" name="lccausa" value="' + c + '"> ' + LC_NOME[c] + '</label>').join('') + '</div>';
@@ -172,7 +172,7 @@ function lcPainelHtml(aba){
   }
   h += '<p class="lc-msg" id="lcMsg" role="status"></p>';
  } else if (aba === 'atividades') {
-  h += '<p class="lc-dica">Atividades em dupla: cada pessoa fica numa sala, <b>fala</b> o que vê e <b>escuta</b> o outro. Cada pessoa da dupla gasta 1 de energia. Sem dupla, vale o caminho solo (gasta 3). Sozinho, alguns consertos pedem duas voltas: deixe a peça ou grave o eco numa volta e use na seguinte.</p>';
+  h += '<p class="lc-dica">Atividades em dupla: cada pessoa fica numa sala, <b>fala</b> o que vê e <b>escuta</b> o outro. Cada pessoa da dupla gasta 1 de energia. Sem dupla, vale o caminho solo (gasta 3). Sozinho, alguns consertos pedem duas voltas: deixe a peça ou grave o eco numa volta e use na seguinte. <b>Cada volta aceita um conserto só</b>: dois consertos na mesma volta viram meio conserto cada um.</p>';
   for (const A of LC.atividades_coop) {
    if (!lcAtiva(A)) continue;
    const f = lcFaltas(A), cedo = state.loop < lcVmin(A), aberta = !f.length && !cedo;
@@ -183,7 +183,7 @@ function lcPainelHtml(aba){
   }
   h += '<p class="lc-msg" id="lcMsg" role="status"></p>';
  } else if (aba === 'revelar') {
-  h += '<h4>Revelar quem trocou a peça</h4><p class="lc-dica">Na <b>Recepção</b>, em qualquer volta, uma tentativa. Quem apresenta precisa ter no PRÓPRIO caderno as 3 provas: peça falsa, trajeto e crachá.</p>';
+  h += '<h4>Revelar quem trocou a peça</h4><p class="lc-dica">Na <b>Recepção</b>, em qualquer volta, uma tentativa. Quem apresenta precisa ter no PRÓPRIO caderno as 3 provas: peça falsa, trajeto e crachá. Falta uma? Ache nas salas ou peça a alguém do grupo na pausa (aba Passar pista), ou deixe essa pessoa apresentar.</p>';
   const pv = ['prova_falsa','trajeto','cracha'];
   h += '<ul class="lc-lista">' + pv.map(g => '<li>' + (lcTemGrupo(g) ? '✅' : '⬜') + ' ' + esc(LC.grupos_fonte[g].rotulo) + '</li>').join('') + '</ul>';
   h += s.revelado ? '<p class="lc-ok">Você já usou a tentativa: ' + (s.revelado.ok ? 'o nome fechou com as provas.' : 'o nome não fechou.') + '</p>' : '<input id="lcNome" placeholder="Nome de quem trocou a peça" autocomplete="off"><button type="button" class="lc-btn" id="lcRevelar">Revelar no telão</button>';
