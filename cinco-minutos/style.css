@@ -139,3 +139,7 @@
 .lc-ativ{margin:10px 0;padding:12px;border:1px solid #9eb2b233;border-radius:10px;background:#0b1824}.lc-ativ.on{border-color:#83c6ac}.lc-ativ small{color:#d5b881;font:.78rem system-ui}
 .lc-dialog input:not([type=radio]):not([type=checkbox]),.lc-dialog select{width:100%;margin:6px 0;padding:11px;border-radius:8px;border:1px solid #a5a48670;background:#142a37;color:#fff;font:.95rem system-ui}
 .lc-vals{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.lc-cod{font:700 1.6rem Georgia;color:#f6d6a0;text-align:center;min-height:2rem}.lc-lista{list-style:none;padding:0;font:.95rem system-ui}
+
+/* glossário na palavra (24/11/2026) */
+.lc-gi{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;margin:0 3px;border-radius:11px;border:1.5px solid #e6c36b;background:#1a2229;color:#e6c36b;font:800 .78rem/1 system-ui;cursor:pointer;vertical-align:baseline;box-shadow:0 2px 0 #7a6230}.lc-gi:active{transform:translateY(1px);box-shadow:0 1px 0 #7a6230}.lc-gi[aria-expanded=true]{background:#e6c36b;color:#12171d}
+.lc-gx{display:block;margin:.35em 0;padding:.45em .65em;border-left:3px solid #e6c36b;background:#0e1519;border-radius:6px;font:.86rem/1.4 system-ui;color:#f3ead6}.lc-gx[hidden]{display:none}

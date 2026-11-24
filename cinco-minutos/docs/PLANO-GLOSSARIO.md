@@ -63,3 +63,6 @@ Rodar a rodada 10 por faixa de idade (17–20, 25–30, 31–40) e pedir a cada 
 - Balão aberto demais vira ruído. Usar só nas palavras do dicionário, no máximo uma vez por pista.
 - Trocar palavras pode mexer em pista que o motor de teste usa para identificar. Os ids não mudam, só o texto.
 - O glossário não pode entregar resposta. Nada de "isto é o defeito"; só o significado da palavra.
+
+## 6. Feito em 24/11/2026 (primeira entrega)
+Uma letrinha "?" ao lado da palavra difícil abre e fecha a explicação ali mesmo (vira "×" quando aberta), no mesmo jeito do "i" das regras. Vale para as pistas no caderno e para a regra do Anexar. São 16 termos (tombo, âncora, borne, catraca, calibrar, disjuntor, fusível, pedestal, patrocínio, restauro, dossiê, eco, sinal, descarte, etiqueta, ensaio); cada termo aparece uma vez por texto. Falta: botão "?" geral com busca (etapa 4), trocar a palavra comum nas pistas (etapa 2) e o quadro de regras com ícones (etapa 3).

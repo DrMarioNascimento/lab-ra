@@ -35,6 +35,36 @@ const lcId = id => 'lc-' + id;
 const lcTem = id => (state.clues || []).some(c => c.id === lcId(id));
 const lcTemGrupo = g => (LC.grupos_fonte[g]?.fontes || []).some(lcTem);
 const lcSeg = () => state.phase === 'playing' ? (state.duration - (state.endAt - (window.coop?.now() ?? Date.now())) / 1000) * 300 / state.duration : 0;
+
+// ---- glossário na palavra: uma letrinha "?" ao lado do termo difícil abre e fecha a explicação ali mesmo (mesmo jeito do "i" das regras)
+const LC_GLOS = [
+ ['tombos?', 'Número de registro da peça, tipo o RG dela (ex.: 305).'],
+ ['âncoras?', 'A peça que prende a máquina no tempo, como a âncora de um barco.'],
+ ['bornes?', 'Ponto onde o fio se liga, tipo o encaixe de uma tomada.'],
+ ['catracas?', 'A roleta da entrada, a que gira quando você passa.'],
+ ['calibra(?:gem|r|da|do)', 'Acertar os números da máquina, como acertar um relógio.'],
+ ['disjuntor(?:es)?', 'A chave do quadro de luz que desarma quando algo dá errado.'],
+ ['fusíve(?:l|is)', 'Peça pequena que queima para proteger a energia.'],
+ ['pedestais?', 'O suporte onde a peça fica apoiada.'],
+ ['patrocin(?:ador(?:es)?|io)', 'Quem paga as despesas do museu e aparece com o nome numa exposição.'],
+ ['restauro', 'Consertar uma obra antiga.'],
+ ['dossiê', 'As pistas do grupo, juntas.'],
+ ['eco', 'O som que volta. Aqui, a gravação que a máquina guarda.'],
+ ['sinais?', 'Pista que mostra o que está errado na máquina.'],
+ ['descartes?', 'Pista que mostra o que está funcionando, ou seja, o que NÃO é o defeito.'],
+ ['etiquetas?', 'O tipo da pista. Duas pistas com a mesma etiqueta valem um sinal só.'],
+ ['ensaio', 'Treino do conserto: na volta 4 você treina, na 5 vale.']
+].map(([re, txt]) => ({re: new RegExp('(?<![\\p{L}])(' + re + ')(?![\\p{L}])', 'iu'), txt}));
+function lcGlos(html){
+ const usados = new Set();
+ return String(html).replace(/(<[^>]*>)|([^<]+)/g, (m, tag, texto) => {
+  if (tag || !texto) return m;
+  for (const g of LC_GLOS) { if (usados.has(g.txt)) continue; const r = texto.match(g.re); if (!r) continue;
+   usados.add(g.txt); texto = texto.replace(g.re, '$1<button type="button" class="lc-gi" aria-label="O que é ' + r[1].toLowerCase() + '?" aria-expanded="false">?</button><span class="lc-gx" hidden>' + g.txt + '</span>'); }
+  return texto; });
+}
+window.lcGlos = lcGlos;
+document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('.lc-gi'); if (!b) return; e.preventDefault(); e.stopPropagation(); const x = b.nextElementSibling; if (!x) return; x.hidden = !x.hidden; b.setAttribute('aria-expanded', String(!x.hidden)); b.textContent = x.hidden ? '?' : '×'; });
 // ---- armadilha do pêndulo: adianta o relógio de TODO mundo (cada aparelho aplica uma vez; o aviso viaja pelo campo do próprio jogador na sala do Mestre)
 function lcAcelerar(id, seg){
  const s = lcS(); s.alarmes ||= {}; if (s.alarmes[id]) return false; s.alarmes[id] = state.loop;
@@ -181,7 +211,7 @@ function lcPainelHtml(aba){
  h += '<p class="lc-status">Volta ' + state.loop + ' de 5 · ' + (s.diag ? '✅ Diagnóstico anexado' : '🔍 Diagnóstico aberto') + ' · ' + (s.conserto === 5 ? '✅ Máquina consertada' : s.ensaio.length ? '🧪 Ensaio feito' : '⚙️ Máquina travada') + ' · ' + lcCargas() + ' de energia</p>';
  const meus = (state.clues || []).filter(c => c.id.startsWith('lc-'));
  if (aba === 'dossie') {
-  h += '<h4>Por que a máquina travou?</h4><p class="lc-dica">Escolha o defeito e <b>3 pistas</b> do seu caderno: <b>2 sinais de tipos diferentes</b> que apontem esse defeito + <b>1 prova de que outro sistema está inteiro</b>. Cada pista mostra uma etiqueta: <b>duas pistas com a mesma etiqueta são do mesmo tipo e valem um sinal só</b>. Uma tentativa por volta, a partir da volta 2. Coisa estranha com explicação inocente não conta, e manual ou ferramenta também não: só sinais da máquina. Cada pessoa tem o próprio caderno: para outra pessoa usar uma pista, passe na pausa.</p><p class="lc-dica"><b>Palavras do museu:</b> tombo = número de registro da peça · âncora = a peça a que a máquina se prende · borne = ponto de ligação · catraca = roleta da entrada · dossiê = as pistas do grupo.</p>';
+  h += '<h4>Por que a máquina travou?</h4>' + lcGlos('<p class="lc-dica">Escolha o defeito e <b>3 pistas</b> do seu caderno: <b>2 sinais de tipos diferentes</b> que apontem esse defeito + <b>1 prova de que outro sistema está inteiro</b>. Cada pista mostra uma etiqueta: <b>duas pistas com a mesma etiqueta são do mesmo tipo e valem um sinal só</b>. Uma tentativa por volta, a partir da volta 2. Coisa estranha com explicação inocente não conta, e manual ou ferramenta também não: só sinais da máquina. Cada pessoa tem o próprio caderno: para outra pessoa usar uma pista, passe na pausa.</p><p class="lc-dica"><b>Palavras do museu:</b> tombo = número de registro da peça · âncora = a peça a que a máquina se prende · borne = ponto de ligação · catraca = roleta da entrada · dossiê = as pistas do grupo.</p>') + '';
   if (s.diag) h += '<p class="lc-ok">O dossiê já aceitou o diagnóstico. Vá para Atividades.</p>';
   else {
    h += '<div class="lc-causas">' + LC_CAUSAS.map(c => '<label><input type="radio" name="lccausa" value="' + c + '"> ' + LC_NOME[c] + '</label>').join('') + '</div>';

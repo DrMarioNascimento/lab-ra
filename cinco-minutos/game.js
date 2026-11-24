@@ -704,7 +704,7 @@ function collect(id){if(state.phase!=='playing'||(window.coop?.now() ?? Date.now
 function renderJournal(){
  const clues=state.clues||[];$('countBadge').textContent=clues.length;
  $('journalPreview').innerHTML=clues.length?clues.slice(-3).reverse().map(c=>'<div class="preview-item">'+esc(c.name)+' <br><small>'+esc(c.room)+'</small></div>').join(''):'<p class="muted">Suas descobertas aparecerão aqui.</p>';
- $('journalList').innerHTML=clues.length?clues.map(c=>'<article class="journal-item"><b>'+esc(c.room)+' · Loop '+c.loop+(c.tipo?' · '+esc(c.tipo):'')+'</b><p><strong>'+esc(c.name)+':</strong> '+esc(c.text)+'</p></article>').join(''):'<p class="muted">Você ainda não registrou pistas.</p>';
+ $('journalList').innerHTML=clues.length?clues.map(c=>'<article class="journal-item"><b>'+esc(c.room)+' · Loop '+c.loop+(c.tipo?' · '+esc(c.tipo):'')+'</b><p><strong>'+esc(c.name)+':</strong> '+(window.lcGlos?lcGlos(esc(c.text)):esc(c.text))+'</p></article>').join(''):'<p class="muted">Você ainda não registrou pistas.</p>';
  if (!window.coop && state.archive?.length) {
   $('journalList').insertAdjacentHTML('beforeend', state.archive.map(key => {
    const axis = ANSWER_AXES.find(item=>item.key===key);
