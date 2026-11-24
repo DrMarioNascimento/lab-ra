@@ -160,7 +160,7 @@ function lcPainelHtml(aba){
  const s = lcS(), causa = lcCausa();
  const abas = [['dossie','Dossiê'],['atividades','Atividades'],['revelar','Revelar'],['trocar','Passar pista']];
  let h = '<div class="lc-abas">' + abas.map(([k, n]) => '<button type="button" class="lc-aba' + (k === aba ? ' on' : '') + '" data-lcaba="' + k + '">' + n + '</button>').join('') + '</div>';
- h += '<p class="lc-status">Volta ' + state.loop + ' de 5 · ' + (s.diag ? '✅ Diagnóstico anexado' : '🔍 Diagnóstico aberto') + ' · ' + (s.conserto === 5 ? '✅ Máquina consertada' : s.ensaio.length ? '🧪 Ensaio feito' : '⚙️ Máquina travada') + ' · ' + lcCargas() + ' de energia</p>' + (state.loop >= 4 && !s.revelado ? '<p class="lc-dica">🎭 <b>Revelar pendente:</b> na volta 5, na <b>Recepção</b>, quem apresenta precisa ter no próprio caderno as 3 provas (peça falsa, trajeto, crachá). Passe pistas na pausa antes. Sem isso o final fica sem a revelação.</p>' : '');
+ h += '<p class="lc-status">Volta ' + state.loop + ' de 5 · ' + (s.diag ? '✅ Diagnóstico anexado' : '🔍 Diagnóstico aberto') + ' · ' + (s.conserto === 5 ? '✅ Máquina consertada' : s.ensaio.length ? '🧪 Ensaio feito' : '⚙️ Máquina travada') + ' · ' + lcCargas() + ' de energia</p>';
  const meus = (state.clues || []).filter(c => c.id.startsWith('lc-'));
  if (aba === 'dossie') {
   h += '<h4>Por que a máquina travou?</h4><p class="lc-dica">Escolha o defeito e <b>3 pistas</b> do seu caderno: <b>2 sinais de tipos diferentes</b> que apontem esse defeito + <b>1 prova de que outro sistema está inteiro</b>. Uma tentativa por volta, a partir da volta 2. Coisa estranha com explicação inocente não conta.</p>';
@@ -183,7 +183,7 @@ function lcPainelHtml(aba){
   }
   h += '<p class="lc-msg" id="lcMsg" role="status"></p>';
  } else if (aba === 'revelar') {
-  h += '<h4>Revelar quem trocou a peça</h4><p class="lc-dica">Só na volta 5, na <b>Recepção</b>, antes de 5:00, uma tentativa. Quem apresenta precisa ter no PRÓPRIO caderno as 3 provas: peça falsa, trajeto e crachá.</p>';
+  h += '<h4>Revelar quem trocou a peça</h4><p class="lc-dica">Na <b>Recepção</b>, em qualquer volta, uma tentativa. Quem apresenta precisa ter no PRÓPRIO caderno as 3 provas: peça falsa, trajeto e crachá.</p>';
   const pv = ['prova_falsa','trajeto','cracha'];
   h += '<ul class="lc-lista">' + pv.map(g => '<li>' + (lcTemGrupo(g) ? '✅' : '⬜') + ' ' + esc(LC.grupos_fonte[g].rotulo) + '</li>').join('') + '</ul>';
   h += s.revelado ? '<p class="lc-ok">Você já usou a tentativa: ' + (s.revelado.ok ? 'o nome fechou com as provas.' : 'o nome não fechou.') + '</p>' : '<input id="lcNome" placeholder="Nome de quem trocou a peça" autocomplete="off"><button type="button" class="lc-btn" id="lcRevelar">Revelar no telão</button>';
@@ -313,7 +313,7 @@ function lcAgir(cmd){
 function lcRevelar(){
  const s = lcS(), nome = (document.getElementById('lcNome')?.value || '').trim();
  if (s.revelado) return lcMsg('Você já usou a tentativa.');
- if (state.loop !== 5 || state.phase !== 'playing') return lcMsg('O telão da Recepção só aceita o Revelar durante a volta 5.');
+ if (state.phase !== 'playing') return lcMsg('O telão da Recepção só aceita o Revelar durante uma volta.');
  if (state.room !== 'recepcao') return lcMsg('Para Revelar, vá à Recepção.');
  const falta = ['prova_falsa','trajeto','cracha'].filter(g => !lcTemGrupo(g));
  if (falta.length) return lcMsg('Faltam no SEU caderno: ' + falta.map(g => LC.grupos_fonte[g].rotulo).join(' · ') + '. Outra pessoa do grupo pode apresentar.');
