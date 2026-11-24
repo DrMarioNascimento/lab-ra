@@ -11,3 +11,8 @@ Arquivos: `loop-central-dados.js` (dados gerados de `docs/simulacao/versao2.md`)
 - Sem Firebase novo: tudo roda em cada aparelho. Dossiê compartilhado em tempo real exigiria regra nova do Firestore.
 
 Simulação: rodada 1 (10 grupos, 0 conserto) → versão 2 → rodada 2 (12 grupos: 9 Desligar/Ouro, 3 Parcial). Ver `docs/simulacao/`.
+
+## Novidades de 24/11/2026
+- **Detalhes que distraem**: 10 pistas novas (café, quadro torto, gato no quadro de energia, balde com multímetro, lâmpadas queimadas, relógio de pulso parado, rádio chiando, bilhete do eletricista, cola fresca, foto da festa). As que parecem sinal são "falsa honesta": não contam no anexar.
+- **Quebra-cabeça**: o cofre do vigia (Segurança, a partir da volta 2) pede 3 números tirados da descrição da máquina do Subsolo (3 mostradores, 1 luz de âncora, 1 botão). Abre mais uma fonte da prova do trajeto.
+- **Armadilha do pêndulo** (sala dos Relógios, a partir da volta 2): puxar a corda adianta 40 s no relógio de TODO mundo. Há um bilhete de aviso na Manutenção. Cada aparelho aplica uma vez; o aviso viaja pelos campos `alarmeVolta/alarmeSeg/alarmeId` do próprio jogador na sala do Mestre (regra nova em `firebase-loop/firestore.rules`: precisa publicar as regras para valer em todos os aparelhos; sem isso vale só para quem puxou).

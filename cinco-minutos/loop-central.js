@@ -35,6 +35,23 @@ const lcId = id => 'lc-' + id;
 const lcTem = id => (state.clues || []).some(c => c.id === lcId(id));
 const lcTemGrupo = g => (LC.grupos_fonte[g]?.fontes || []).some(lcTem);
 const lcSeg = () => state.phase === 'playing' ? (state.duration - (state.endAt - (window.coop?.now() ?? Date.now())) / 1000) * 300 / state.duration : 0;
+// ---- armadilha do pêndulo: adianta o relógio de TODO mundo (cada aparelho aplica uma vez; o aviso viaja pelo campo do próprio jogador na sala do Mestre)
+function lcAcelerar(id, seg){
+ const s = lcS(); s.alarmes ||= {}; if (s.alarmes[id]) return false; s.alarmes[id] = state.loop;
+ if (state.phase === 'playing' && Number.isFinite(state.endAt)) { state.endAt -= seg * 1000 * (state.duration / 300); state.remaining = Math.max(0, (state.endAt - (window.coop?.now() ?? Date.now())) / 1000); }
+ save(); return true;
+}
+function lcOuvirAlarmes(){
+ const D = window.DragonSala; if (!D || D._lcOuve) return; D._lcOuve = true;
+ D.aoMudar((sala, jogs) => { for (const j of (jogs || [])) if (j && j.alarmeId && j.alarmeVolta === state.loop && lcAcelerar(j.alarmeId, j.alarmeSeg || 40)) { toast('ALARME! Alguém puxou o pêndulo: o relógio do museu deu um salto de ' + (j.alarmeSeg || 40) + ' s.'); if (typeof renderClues === 'function') renderClues(); } });
+}
+setTimeout(lcOuvirAlarmes, 1500); setInterval(lcOuvirAlarmes, 4000);
+function lcArmadilha(p){
+ const seg = (p.armadilha && p.armadilha.seg) || 40, id = 'arm' + state.loop + ':' + p.id;
+ lcAcelerar(id, seg); lcOuvirAlarmes();
+ try { window.DragonSala?.atualizarEu({alarmeVolta:state.loop, alarmeSeg:seg, alarmeId:id}); } catch (e) {}
+ toast('ALARME! Você puxou a corda: o relógio de TODO mundo deu um salto de ' + seg + ' s.');
+}
 const lcNomeSala = id => sala(id)?.name || id;
 const TIPO_LC = {comum:'Registro', clima:'Observação', coop:'Relato', falsa_honesta:'Observação', objeto:'Observação'};
 function lcPodeVer(p){
@@ -58,7 +75,7 @@ function pistasCentral(base){
  for (const p of LC.pistas) {
   if (!lcAtiva(p) || p.daAtividade) continue;
   (base[p.sala] ||= []).push({id:lcId(p.id), name:p.previa || 'Examinar', text:lcTexto(p), time:p.segundo_min || 0, desde:p.volta_min, vmax:p.volta_max,
-   tipo:TIPO_LC[p.tipo] || 'Registro', custo0:(p.custo === 0), lcp:p.id, etq:p.etiqueta || ''});
+   tipo:TIPO_LC[p.tipo] || 'Registro', custo0:(p.custo === 0), lcp:p.id, etq:p.etiqueta || '', enigma:p.enigma});
  }
  return base;
 }
@@ -74,6 +91,7 @@ function lcTextoClue(q){ const p = LC_PID[q.lcp]; return p ? lcTexto(p) : q.text
 function lcAposColetar(q){
  const p = LC_PID[q.lcp]; if (!p) return;
  if (p.tipo === 'objeto' && p.objeto) lcS().mao = {obj:p.objeto, volta:state.loop};
+ if (p.armadilha) lcArmadilha(p);
 }
 function lcDarPista(pid, tipo){
  const p = LC_PID[pid]; if (!p || lcTem(pid)) return false;

@@ -35,7 +35,7 @@ service cloud.firestore {
         // o participante só mexe no que é dele: ambiente da volta e conclusão (uma vez)
         allow update: if ativa(salaId) && (mestre(salaId)
           || (jogadorId == request.auth.uid
-              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['pronto','atualizadoEmMs','amb','ambVolta','resp','respEm','forma','papelCognitivo','camadaAcessibilidade'])
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['pronto','atualizadoEmMs','alarmeVolta','alarmeSeg','alarmeId','amb','ambVolta','resp','respEm','forma','papelCognitivo','camadaAcessibilidade'])
               && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['resp']) || !('resp' in resource.data))));
         allow delete: if false;
       }
