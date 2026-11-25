@@ -46,7 +46,7 @@ def checar_ids():
     for g, v in GF.items():
         for i in v['fontes']:
             ref(i, 'grupo ' + g)
-            if i in P and P[i].get('grupoFonte') != g: bad.append(f'grupo {g}: fonte {i} declara outro grupo')
+            if i in P and P[i].get('grupoFonte') != g and g not in P[i].get('gruposExtras', []): bad.append(f'grupo {g}: fonte {i} declara outro grupo')  # revisao 2: uma pista pode valer em um segundo grupo (gruposExtras)
     for A in D['atividades_coop']:
         e = A['entrada']
         if not isinstance(e, dict): bad.append(f'{A["id"]}: entrada nao calculada ("{e}")'); continue
@@ -444,11 +444,11 @@ def caminhos(c, R):
     As = [AT[a] for a in E.alvos_de(c)]; out = []
     apg = [g for g, v in GF.items() if any(i in R and c in P[i]['revela']['aponta'] and P[i]['tipo'] != 'falsa_honesta' and not P[i].get('daAtividade') for i in v['fontes'])]
     ess = [(g, 'diagnostico (aponta)') for g in apg] + [(g, 'entrada de ' + A['id']) for A in As for g in A['entrada'].get('grupos', [])] + [(g, 'Revelar') for g in E.PROVAS]
-    def livre(i): x = P[i]; return x.get('segundo_min', 0) <= 100 and not x.get('daAtividade') and x['volta_min'] <= 2 and len(x['precisaDe']['todas']) <= 2
+    def livre(i, vmax=2): x = P[i]; return x.get('segundo_min', 0) <= 100 and not x.get('daAtividade') and x['volta_min'] <= vmax and len(x['precisaDe']['todas']) <= 2
     for g, para in ess:
-        fs = [i for i in GF[g]['fontes'] if i in R]; salas = set(P[i]['sala'] for i in fs); lv = [i for i in fs if livre(i)]
+        fs = [i for i in GF[g]['fontes'] if i in R]; salas = set(P[i]['sala'] for i in fs); lv = [i for i in fs if livre(i, 3 if para == 'Revelar' else 2)]  # revisao 2: o nome do culpado so sai da volta 3
         if len(fs) < 2 or len(salas) < 2: out.append(f'{g} ({para}): so {len(fs)} fonte(s) em {len(salas)} sala(s)')
-        elif not lv: out.append(f'{g} ({para}): nenhuma fonte sem trava de tempo / ate a volta 2')
+        elif not lv: out.append(f'{g} ({para}): nenhuma fonte sem trava de tempo / ate a volta 2 (3 nas provas do Revelar)')
     lados = D.get('diagnostico_por_causa', {}).get(c, {}).get('lados')
     if lados:
         for k, lado in enumerate(lados):

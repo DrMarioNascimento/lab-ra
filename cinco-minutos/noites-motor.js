@@ -152,7 +152,7 @@ function abrirEnigma(q){
   '<pre style="white-space:pre-wrap;word-break:break-word;margin:0 0 .8em;font:700 20px ui-monospace,Menlo,monospace;background:#0a0e12;padding:10px;border-radius:10px">'+esc(q.enigma.cofre ? '[ '+achadosCofre().map(n => n === null ? '_' : n).join(' ] [ ')+' ]   digital: '+(state.clues.some(x => x.id === q.enigma.digital) ? 'sim' : 'não') : q.enigma.cifrado)+'</pre>'+
   '<input id="enigmaIn" type="text" autocomplete="off" autocapitalize="characters" placeholder="'+esc(q.enigma.placeholder || 'Palavra-chave')+'" style="width:100%;box-sizing:border-box;font:700 18px system-ui;padding:12px;border-radius:10px;border:1px solid #5b6b78;background:#0a0e12;color:#fff">'+
   '<p id="enigmaMsg" style="min-height:1.4em;margin:.5em 0;color:#e6c36b">Se faltar uma dica, feche e procure outras pistas desta sala.</p>'+
-  '<div style="display:flex;gap:8px"><button type="button" class="btn primary" id="enigmaOk">Decifrar</button><button type="button" class="btn secondary" id="enigmaNo">Fechar</button></div>';
+  '<div style="display:flex;gap:8px"><button type="button" class="btn primary" id="enigmaOk">Abrir</button><button type="button" class="btn secondary" id="enigmaNo">Fechar</button></div>';
  const ok = () => { const v = normResp(d.querySelector('#enigmaIn').value);
   if (q.enigma.cofre) { const ach = achadosCofre().filter(n => n !== null).length, dig = state.clues.some(x => x.id === q.enigma.digital);
    if (ach < 6 || !dig) { d.querySelector('#enigmaMsg').textContent = 'Não abre. O cofre pede seis números'+(dig ? '' : ' e a digital de alguém do posto')+'. Eles estão espalhados pelo museu. Você já achou '+ach+' de 6 números.'; return; } }

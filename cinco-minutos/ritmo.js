@@ -34,9 +34,11 @@ const LOOP_LINHA = [
   {id:'cracha', hora:'4:00', ic:'🪪', txt:'O crachá emprestado do Braga abre a porta'},
   {id:'botao', hora:'4:10', ic:'🔘', txt:'O botão da Câmara é apertado'}
 ];
-function loopFitaHtml(listas, total) {
+function loopFitaHtml(listas, total, nomes) {   // nomes (opcional): quem trouxe cada lista, na mesma ordem
   const cont = id => listas.filter(l => Array.isArray(l) && l.includes(id)).length;
+  const quem = id => { if (!Array.isArray(nomes)) return ''; const q = listas.map((l, i) => Array.isArray(l) && l.includes(id) ? nomes[i] : '').filter(Boolean); return q.length ? 'Quem trouxe: ' + q.slice(0, 3).join(', ') + (q.length > 3 ? ' e mais ' + (q.length - 3) : '') : ''; };
+  const h = t => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const achados = LOOP_LINHA.filter(f => cont(f.id) > 0).length;
   return '<div class="tl-fita"><p class="tl-volta">A NOITE RECONSTRUÍDA · ' + achados + ' DE ' + LOOP_LINHA.length + ' FATOS</p><ol>' +
-    LOOP_LINHA.map(f => { const n = cont(f.id); return '<li class="' + (n ? 'achou' : 'falta') + '"><span class="ic">' + (n ? f.ic : '❔') + '</span><b>' + f.hora + '</b><span class="tx">' + (n ? f.txt : 'Ninguém achou ainda') + '</span>' + (n ? '<i>' + n + (n === 1 ? ' pessoa' : ' pessoas') + '</i>' : '') + '</li>'; }).join('') + '</ol></div>';
+    LOOP_LINHA.map(f => { const n = cont(f.id), q = n ? quem(f.id) : ''; return '<li class="' + (n ? 'achou' : 'falta') + '"><span class="ic">' + (n ? f.ic : '❔') + '</span><b>' + f.hora + '</b><span class="tx">' + (n ? f.txt : 'Ninguém achou ainda') + (q ? '<small>' + h(q) + '</small>' : '') + '</span>' + (n ? '<i>' + n + (n === 1 ? ' pessoa' : ' pessoas') + '</i>' : '') + '</li>'; }).join('') + '</ol></div>';
 }

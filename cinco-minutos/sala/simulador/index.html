@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Loop · Simulador</title>
+<title>Mosaico Loop · Simulador</title>
 <meta name="robots" content="noindex">
-<link rel="stylesheet" href="../../style.css?v=16">
-<link rel="stylesheet" href="../sala.css?v=1">
+<link rel="stylesheet" href="../../style.css?v=20">
+<link rel="stylesheet" href="../sala.css?v=2">
 </head>
 <body class="sim">
 <div class="sim-topo">
@@ -14,11 +14,12 @@
   <label>Participantes <input id="n" type="range" min="1" max="12" value="6"> <span id="nv">6</span></label>
   <label>Ritmo <select id="seg"><option value="30">Ensaio (30 s)</option><option value="300">Completo (5 min)</option></select></label>
   <label><input id="auto" type="checkbox" checked> Participantes jogam sozinhos</label>
-  <label><input id="mauto" type="checkbox"> Mestre automático</label>
+  <label><input id="mauto" type="checkbox"> Professor automático</label>
   <button class="btn secondary" id="rec" type="button">Recomeçar</button>
+  <button class="btn primary" id="cheia" type="button">Telão em tela cheia</button>
 </div>
 <div class="sim-telao"><iframe id="tl" title="Telão" allow="fullscreen"></iframe></div>
-<p class="sim-nota">Telão em cima, turma embaixo. O quadro do Mestre conduz a partida; use o celular para comandar esta página.</p>
+<p class="sim-nota">Telão em cima, turma embaixo. O quadro do Professor conduz a partida.</p>
 <div class="sim-turma" id="turma"></div>
 <script type="module">
 import { limparSalaFalsa } from '../transporte.mjs';
@@ -34,8 +35,8 @@ function montar() {
   const q = (extra) => '../index.html?falsa=1&sala=' + SALA + '&seg=' + seg + extra;
   $('tl').src = '../telao/index.html?falsa=1&sala=' + SALA;
   const t = $('turma'); t.innerHTML = '';
-  const fig = (rot, url, cls) => { const f = document.createElement('figure'); f.className = 'sim-fone ' + cls; f.innerHTML = '<figcaption><span>' + rot + '</span></figcaption><iframe></iframe>'; t.appendChild(f); const i = f.querySelector('iframe'); i.src = url; return i; };
-  const m = fig('Mestre', q('&papel=master&uid=mestre&nome=Mestre'), 'mestre');
+  const fig = (rot, url, cls) => { const f = document.createElement('figure'); f.className = 'sim-fone ' + cls; f.innerHTML = '<figcaption><span>' + rot + '</span></figcaption><div class="sim-tela"><iframe title="' + rot + '"></iframe></div>'; t.appendChild(f); const i = f.querySelector('iframe'); i.src = url; return i; };
+  const m = fig('Professor', q('&papel=master&uid=mestre&nome=Professor'), 'mestre');
   const quadros = [m];
   for (let k = 1; k <= n; k++) quadros.push(fig('Participante ' + k, q('&papel=guest&uid=p' + k + '&nome=Participante%20' + k), ''));
   quadros.forEach((i, k) => i.addEventListener('load', () => {
@@ -62,6 +63,10 @@ function mestreAuto(w) {
   }, 3000);
   paradas.push(() => clearInterval(id));
 }
+$('cheia').onclick = () => { const el = $('tl'); (el.requestFullscreen || el.webkitRequestFullscreen)?.call(el); };
+// O telão do simulador é desenhado em 1280 × 720 e reduzido por inteiro: fica igual ao da TV, só menor.
+const ajustarTelao = () => { const el = $('tl'); el.style.transform = 'scale(' + (el.parentElement.clientWidth / 1280) + ')'; };
+addEventListener('resize', ajustarTelao); ajustarTelao();
 $('n').oninput = () => { $('nv').textContent = $('n').value; };
 $('n').onchange = $('seg').onchange = $('rec').onclick = montar;
 montar();

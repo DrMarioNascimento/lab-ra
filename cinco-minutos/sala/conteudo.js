@@ -1,6 +1,6 @@
 // Conteúdo do Loop (cópia própria de ../game.js, só os dados e a montagem das pistas).
 // Usado pelo telão e pelo simulador. Se o conteúdo mudar em game.js, gere este arquivo de novo (sala/gerar-conteudo.sh).
-const ANDARES = ['2º andar', '1º andar', 'Térreo'];
+const ANDARES = ['2º andar', '1º andar', 'Térreo', 'Subsolo'];
 // Todos começam (e recomeçam a cada volta) no Saguão superior, no 2º andar; dali escolhem para onde ir.
 const INICIO = {id:'saguao', name:'Saguão superior', andar:'2º andar', icon:'✦', sub:'Todo mundo começa aqui'};
 const ROOMS = [
@@ -18,8 +18,8 @@ const ROOMS = [
   {id:'relogios', name:'Sala dos relógios', andar:'1º andar', icon:'⬡', sub:'Cada segundo conta', peca:'N03'},
   {id:'protecoes', name:'Sala das proteções', andar:'1º andar', icon:'✚', sub:'Capacete e história', peca:'N04'},
   {id:'fotografia', name:'Sala da fotografia', andar:'1º andar', icon:'☗', sub:'Câmera de outro tempo', peca:'N05'},
-  {id:'prototipo', name:'Galeria do tempo', andar:'1º andar', icon:'◷', sub:'Protótipo e demonstração', peca:'D09'},
-  {id:'eletrica', name:'Laboratório de formas', andar:'1º andar', icon:'⌁', sub:'Energia e equipamentos', peca:'B09'},
+  {id:'prototipo', name:'Subsolo · Câmara do tempo', andar:'Subsolo', icon:'◷', sub:'A máquina do tempo', peca:'T01'},
+  {id:'eletrica', name:'Oficina elétrica', andar:'1º andar', icon:'⌁', sub:'Energia e equipamentos', peca:'B09'},
   {id:'deposito', name:'Sala das coleções', andar:'1º andar', icon:'▤', sub:'Inventário e movimentações', peca:'B02'},
   {id:'vidros', name:'Sala dos vidros', andar:'1º andar', icon:'▨', sub:'Transparência e brilho', peca:'N06'},
   {id:'mar', name:'Sala do mar', andar:'1º andar', icon:'▦', sub:'Peixes e águas', peca:'N12'},
@@ -54,8 +54,8 @@ const NOMES_ALT = {
   relogios:['Sala das horas','Galeria dos ponteiros'],
   protecoes:['Sala dos capacetes','Galeria da armadura'],
   fotografia:['Sala das câmeras','Galeria das imagens'],
-  prototipo:['Sala das invenções','Galeria das demonstrações'],
-  eletrica:['Laboratório de energia','Oficina das formas'],
+  prototipo:['Subsolo · Câmara do tempo','Subsolo · Câmara do tempo'],
+  eletrica:['Oficina elétrica','Oficina elétrica'],
   deposito:['Sala do inventário','Galeria das caixas'],
   vidros:['Sala da transparência','Galeria do brilho'],
   mar:['Aquário antigo','Sala das águas'],
@@ -76,7 +76,7 @@ const PECAS_ALT = {
   limpeza:    [{peca:'L04', sub:'Ferramentas de limpeza'}, {peca:'L05', sub:'Produtos e panos coloridos'}],
   manutencao: [{peca:'M02', sub:'Baú de ferramentas'}, {peca:'M03', sub:'Armário de ferramentas'}],
   atelie:     [{peca:'L06', sub:'Projetos e bancada'}, {peca:'L07', sub:'Ferramentas de teste'}],
-  prototipo:  [{peca:'T01', sub:'Máquina do tempo (protótipo)'}, {peca:'T02', sub:'Carro de viagem no tempo'}],
+  prototipo:  [{peca:'T01', sub:'A máquina do tempo'}, {peca:'T01', sub:'A máquina do tempo'}],
   sons:       [{peca:'N16', sub:'Rádio comunicador'}, {peca:'V44', sub:'Gramofone'}],
   relogios:   [{peca:'R01', sub:'Relógio de custódia'}, {peca:'R02', sub:'Relógio de pêndulo'}],
   eletrica:   [{peca:'E01', sub:'Quadro elétrico'}, {peca:'E02', sub:'Central de energia'}],
@@ -104,7 +104,7 @@ const PECAS_ALT = {
   ambar     : [{peca:'V52', sub:'Inseto em âmbar'}, {peca:'V50', sub:'Âmbar polido'}],
   conservacao:[{livro:true, sub:'Livro de registros do acervo', capa:'Livro do Acervo|REGISTRO DE ESPÉCIMES'}, {peca:'B07', sub:'Inseto sob vidro'}]
 };
-const FUNCOES_ENTRADA = ['recepcao','conservacao','seguranca','limpeza','manutencao'];
+const FUNCOES_ENTRADA = ['recepcao','conservacao','seguranca','limpeza','manutencao','patio'];
 const LUGARES = {'2º andar':9, '1º andar':10, 'Térreo':11};
 let MUSEU = null;
 function rngMuseu(semente){let a=(semente>>>0)||1;return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296}}
@@ -122,8 +122,9 @@ function montarMuseu(semente){
  embaralhar(FUNCOES_ENTRADA, rnd).forEach((id, i) => { mapa[id] = {andar:'Térreo', lugar:entrada[i]}; });
  const livres = [];
  for (const a of ANDARES) for (let n=1; n<=LUGARES[a]; n++) if (!(a==='Térreo' && n<=FUNCOES_ENTRADA.length)) livres.push({andar:a, lugar:n});
- const grupoB = embaralhar(ROOMS.map(r => r.id).filter(id => !FUNCOES_ENTRADA.includes(id)), rnd);
+ const grupoB = embaralhar(ROOMS.map(r => r.id).filter(id => !FUNCOES_ENTRADA.includes(id) && id !== 'prototipo'), rnd);
  grupoB.forEach((id, i) => { mapa[id] = livres[i]; });
+ mapa.prototipo = {andar:'Subsolo', lugar:1};
  for (const r of ROOMS) { const v = [r.name, ...NOMES_ALT[r.id]]; const i = Math.floor(rnd()*3); mapa[r.id].nome = v[i]; mapa[r.id].v = i; }
  return {semente, mapa};
 }
@@ -133,10 +134,24 @@ function sala(id){
  MUSEU ??= montarMuseu(0);
  const m = MUSEU.mapa[id];
  const alt = m.v ? PECAS_ALT[id]?.[m.v-1] : null;
- return {...base, name:m.nome, andar:m.andar, lugar:m.lugar, nomeBase:base.name, ...(alt ? alt : {})};
+ const r = {...base, name:m.nome, andar:m.andar, lugar:m.lugar, nomeBase:base.name, ...(alt ? alt : {})};
+ const L = (typeof state !== 'undefined' && state && state.caseRules === 2) ? LOOP_SALAS[id] : null;   // no Loop: nome, peça e legenda da história
+ if (L) { delete r.livro; delete r.capa; Object.assign(r, {name:L[0], sub:L[1], peca:L[2]}); }
+ return r;
 }
+// Salas da história do Loop: um nome só por sala (o mesmo das pistas e do roteiro) e a peça que pertence à cena.
+const LOOP_SALAS = {
+ prototipo:['Subsolo · Câmara do tempo','A máquina do tempo','T01'], patio:['Pátio · Quadro externo','Quadro de energia e para-raios','E01'],
+ eletrica:['Oficina elétrica','Gerador, fusíveis e luvas','E02'], relogios:['Sala dos relógios','Relógios que param na queda de luz','R02'],
+ seguranca:['Central de monitoramento','Câmeras e crachás','S01'], recepcao:['Recepção','Livro de visitas e roleta','P01'],
+ conservacao:['Sala de conservação','Registros e laudos do acervo','I01'], atelie:['Ateliê de descobertas','Bancada da Ivone e manual','L06'],
+ deposito:['Sala das coleções','Caixas e movimentações','V12'], galeria:['Galeria especial','A peça principal','V11'],
+ manutencao:['Oficina técnica','Ferramentas e fusíveis','M03'], corredor:['Corredor de serviço e descanso','Porta de serviço e recados','V41'],
+ limpeza:['Base da limpeza','Armário da equipe e carrinho','L05'], sons:['Sala dos sons','Rádio da equipe','N07'], fotografia:['Sala da fotografia','Câmera antiga e catálogo','N05']
+};
 // Troca, em qualquer texto de pista, o nome de origem das salas pelo nome da partida.
 function nomear(texto){
+ if (typeof state !== 'undefined' && state && state.caseRules === 2) return texto;   // no Loop os nomes das salas são fixos
  MUSEU ??= montarMuseu(0);
  if (!MUSEU.semente) return texto;
  const por = Object.fromEntries(ROOMS.map(r => [r.name, MUSEU.mapa[r.id].nome]));
@@ -333,4 +348,4 @@ const CASE_PATHS = [
 ];
 const EIXOS8 = [['event','O quê'],['where','Onde'],['when','Quando'],['how','Como'],['alarm','Por quê'],['figure','Quem'],['predict','Previsão'],['action','Intervenção']];
 const verdade = (caso, k) => { const c = CASES[caso]; return k === 'where' ? c.room : k === 'when' || k === 'how' ? CASE_PATHS[caso] : k === 'predict' ? 'retorno' : c[k]; };
-export { ANDARES, INICIO, ROOMS, sala, definirMuseu, sortearMuseu, montarMuseu, nomear, EVENTS, ALARMS, FIGURES, ACTIONS, CASES, labels, figures, makeClues, esc, CASE_PATHS, EIXOS8, verdade };
+export { ANDARES, INICIO, ROOMS, LOOP_SALAS, sala, definirMuseu, sortearMuseu, montarMuseu, nomear, EVENTS, ALARMS, FIGURES, ACTIONS, CASES, labels, figures, makeClues, esc, CASE_PATHS, EIXOS8, verdade };

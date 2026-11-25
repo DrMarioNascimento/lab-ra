@@ -1,0 +1,72 @@
+/* Bancada de investigação (minigames vindos da Reserva), isolada no diálogo do Loop. */
+.lc-banc{--gold:#f1c27d;--line:#3b4b4c;--ink:#f4ebd8;--muted:#b9b09b;--pane:#1b292d;color:var(--ink);width:min(94vw,650px);max-height:88dvh;overflow:auto;background:#162226;border:1px solid #927b59;border-radius:16px;padding:1rem}
+.lc-banc::backdrop{background:#070c0de8}
+.lc-banc h2{font-family:Georgia,serif;font-size:1.4rem;margin:.2em 0 .4em}.lc-banc .kicker{letter-spacing:.13em;text-transform:uppercase;font-size:.72rem;color:var(--gold);margin:0}
+.lc-banc p{line-height:1.5;margin:.35rem 0 .8rem}
+.lc-banc button{font:inherit;display:inline-flex;align-items:center;justify-content:center;padding:.6rem .9rem;border-radius:10px;border:1px solid #6b7a78;background:linear-gradient(#34474a,#25353a);color:var(--ink);cursor:pointer;min-height:44px;box-shadow:0 3px 0 #101a1c}
+.lc-banc button:active:not(:disabled){transform:translateY(2px);box-shadow:0 1px 0 #101a1c}
+.lc-banc button:disabled{opacity:.55}.lc-banc .primary{background:linear-gradient(#f3ce91,#ce9854);color:#1a1c18;border-color:#e7b77a}
+.lc-banc .row{display:flex;flex-wrap:wrap;gap:.6rem;margin:.7rem 0}
+.lc-banc select,.lc-banc input:not([type=checkbox]){font:inherit;border:1px solid var(--line);background:#132124;color:var(--ink);border-radius:8px;padding:.5rem}
+.lc-banc .puzzle button{margin:.15rem .35rem .3rem 0}
+.lc-banc .cena{height:clamp(130px,37vh,250px);padding:0;margin:0 0 .6rem;display:grid;place-items:center;overflow:hidden}
+.lc-banc .cena canvas{width:100%;height:100%;touch-action:none}
+.lc-banc .ajuda{color:var(--gold);min-height:1.45rem}
+.lc-banc .puzzle input[type=range]{width:100%;accent-color:var(--gold)}
+.lc-banc .foto-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;max-width:390px;margin:.4rem auto}
+.lc-banc .foto-grid .encaixe{aspect-ratio:1.1;margin:0;padding:.2rem;background:#34444a no-repeat;border:1px solid #687676;box-shadow:none}
+.lc-banc .foto-grid .fragmento{background-size:300% 200%;background-color:#5e5943}
+.lc-banc .foto-grid button[aria-pressed=true]{outline:2px solid var(--gold)}
+.lc-banc .bandeja{padding-top:.6rem;border-top:1px solid var(--line)}
+.lc-banc .sintomas{display:grid;gap:.45rem;margin-bottom:.55rem}
+.lc-banc .sintomas label{display:flex;align-items:center;gap:.55rem}
+.lc-banc .puzzle>label{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:.4rem;margin:.55rem 0}
+.lc-banc .fita{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.4rem}
+.lc-banc .fita button{display:grid;gap:.35rem;justify-content:stretch;text-align:left;margin:0;padding:.4rem}
+.lc-banc .clip{display:block;position:relative;height:62px;border:1px solid #54665d;overflow:hidden;background:linear-gradient(151deg,#24382e 38%,#56634a 39%,#253730 42%,#1a2924 58%,#495342 59%,#29362c 60%);}
+.lc-banc .clip::before,.lc-banc .clip::after{content:"";position:absolute;border:1px solid #a8ac85;background:#67745c;bottom:14%;right:31%;width:31%;height:35%}
+.lc-banc .clip-bancada::after{width:72%;height:8%;right:12%;bottom:11%}
+.lc-banc .clip-carrinho::after{width:43%;height:12%;right:27%;border-radius:0 0 12px 12px}
+.lc-banc .clip-porta::before{width:42%;height:81%;right:29%;bottom:0}
+.lc-banc .clip-porta::after{width:8%;height:13%;bottom:39%;right:32%;background:#dddd9a}
+.lc-banc .clip-colecoes::after{width:27%;height:38%;right:18%;bottom:39%}
+.lc-banc .porta-grafica{height:140px;margin:.6rem auto;max-width:290px;border:2px solid #af9465;border-radius:10px;background:repeating-linear-gradient(90deg,#714a30 0,#8a613d 9%,#775136 18%,#67442c 22%);display:grid;place-items:center;perspective:320px}
+.lc-banc .chave-grafica{width:65px;height:13px;background:#d6b568;box-shadow:0 2px 5px #050a0b;position:relative;border-radius:8px;transform-origin:90% 50%;transition:transform .22s ease}
+.lc-banc .chave-grafica::before{content:"";width:21px;height:21px;position:absolute;left:-9px;top:-4px;border:5px solid #d6b568;border-radius:50%;background:#67442c}
+.lc-banc .porta-grafica[data-giro="1"] .chave-grafica{transform:rotate(46deg)}
+.lc-banc .porta-grafica[data-giro="2"] .chave-grafica{transform:rotate(90deg)}
+@media(prefers-reduced-motion:reduce){.lc-banc .chave-grafica{transition:none}}
+.lc-banc .relevo{display:grid;place-items:center;width:100%;height:100%;overflow:hidden;background:radial-gradient(ellipse at center,#354745,#202d2e 60%,#172123)}
+.lc-banc .objeto{position:relative;width:min(64%,218px);height:82px;perspective:360px}
+.lc-banc .objeto span{position:absolute;display:block}
+.lc-banc .relevo-caixa .face{inset:0;background:repeating-linear-gradient(176deg,#93623f 0,#a57149 7px,#775033 10px,#945f38 17px);border:2px solid #d49d5f;box-shadow:0 13px 16px #0008;border-radius:3px;z-index:2}
+.lc-banc .relevo-caixa .lateral{left:100%;top:0;width:26%;height:100%;transform-origin:left;transform:skewY(-25deg);background:#694128;border:1px solid #bc8c56}
+.lc-banc .relevo-caixa .tampa{left:-2%;width:105%;height:46%;top:-41%;transform:skewX(-41deg);transform-origin:bottom right;background:repeating-linear-gradient(135deg,#714a2d 0,#714a2d 12px,#b5804d 13px,#b5804d 16px,#8f603a 17px,#a37353 25px);border:2px solid #e4ac66;border-radius:5px;transition:transform .25s,top .25s;z-index:3}
+.lc-banc .relevo-caixa .faixa,.lc-banc .relevo-caixa .fundo{width:42%;height:25%;left:9%;top:40%;border:1px solid #f1c58a;background:#b38651;z-index:4;transition:transform .28s,opacity .28s}
+.lc-banc .relevo-caixa .faixa::before{content:"△";color:#4e3523;padding-left:8%;font-size:.75rem}
+.lc-banc .relevo-caixa .fundo{left:54%;top:54%;background:#805636;opacity:0}
+.lc-banc .relevo-caixa .segredo{left:43%;top:-13%;width:35%;height:10%;background:#ecbe70;border:2px solid #f0d391;border-radius:7px;box-shadow:0 0 14px #eec38690;opacity:0;transition:opacity .25s;z-index:4}
+.lc-banc .relevo-caixa .segredo::before{content:"";position:absolute;width:18px;height:18px;border:5px solid #e7bc74;border-radius:50%;top:-9px;left:-13px}
+.lc-banc .relevo-caixa[data-passo="1"] .faixa,.lc-banc .relevo-caixa[data-passo="2"] .faixa,.lc-banc .relevo-caixa[data-passo="3"] .faixa{transform:translateX(55%)}
+.lc-banc .relevo-caixa:not([data-passo="0"]) .fundo{opacity:1}
+.lc-banc .relevo-caixa[data-passo="2"] .fundo,.lc-banc .relevo-caixa[data-passo="3"] .fundo{transform:translateX(30%)}
+.lc-banc .relevo-caixa[data-passo="3"] .tampa{top:-78%;transform:skewX(-16deg) rotateZ(-12deg)}
+.lc-banc .relevo-caixa[data-passo="3"] .segredo{opacity:1}
+.lc-banc .relevo-luz .objeto{height:112px}
+.lc-banc .relevo-luz .obra{inset:0;border:6px double #cca16e;border-radius:4px;background:linear-gradient(145deg,#b68a5f,#7f7c64 48%,#374b48 50%,#283a3a 65%,#567063);box-shadow:0 8px 15px #0006}
+.lc-banc .relevo-luz .facho{inset:0;opacity:.35;background:linear-gradient(97deg,transparent 20%,#fff2c8 45%,transparent 62%);transition:transform .16s;transform:translateX(-28%)}
+.lc-banc .relevo-luz[data-passo="2"] .facho{transform:translateX(-15%)}
+.lc-banc .relevo-luz[data-passo="3"] .facho{transform:translateX(0)}
+.lc-banc .relevo-luz[data-passo="4"] .facho{transform:translateX(18%)}
+.lc-banc .relevo-luz[data-passo="5"] .facho{transform:translateX(35%)}
+.lc-banc .relevo-luz .marca{bottom:16%;right:14%;width:24px;height:17px;border:2px solid #eebd6e;transform:rotate(-8deg);opacity:.22}
+.lc-banc .relevo-luz .marca::after{content:"";position:absolute;width:2px;height:120%;background:#120f0a;left:42%;transform:rotate(41deg)}
+.lc-banc .relevo-luz[data-passo="4"] .marca{opacity:1}
+.lc-banc .relevo-maquina .objeto{border:2px solid #968563;border-radius:8px;background:linear-gradient(140deg,#4e6061,#2e3d3f 46%,#192529);box-shadow:0 8px 18px #0008}
+.lc-banc .relevo-maquina [class^="mostrador-"]{width:18%;height:49%;top:17%;border-radius:50%;background:radial-gradient(circle,#ba9563,#63503b 38%,#121e20 47%,#9d8156 49%,#342a25 61%,#131f20);border:1px solid #ccaa73}
+.lc-banc .mostrador-a{left:13%}
+.lc-banc .mostrador-b{left:41%}
+.lc-banc .mostrador-c{right:13%}
+.lc-banc .relevo-maquina .base{height:10%;left:9%;right:9%;bottom:12%;border-radius:6px;background:#7c6747}
+@media(prefers-reduced-motion:reduce){.lc-banc .relevo span{transition:none!important}}
+.lc-banc .cena{background:#203034;border:1px solid var(--line);border-radius:12px}

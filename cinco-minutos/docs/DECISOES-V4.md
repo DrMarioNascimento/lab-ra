@@ -1,5 +1,5 @@
 # Loop v4 (25/11/2026) — decisões aplicadas nos dados e no código
-Fonte da verdade do enredo: docs/ROTEIRO-LOOP.md. Dados: cinco-minutos/dados/pistas-v4.json (224 pistas) → loop-central-dados.js.
+Fonte da verdade do enredo: docs/ROTEIRO-LOOP.md. Dados: cinco-minutos/dados/pistas-v4.json (229 pistas desde a revisão 2; ver a seção "Revisão 2" no fim, que vale sobre o que estiver acima) → loop-central-dados.js.
 
 ## Mundo
 - Uma versão só para o Téo: confrontou o Lenz na Sala das coleções minutos antes de 0:00, foi empurrado, caiu ao lado do pote de tinta. Enquanto a Câmara gira ele "não piora nem melhora, fica guardado igual a uma peça numa vitrine" (pista sato_teo). Saíram as frases "encostou na Câmara / ficou preso entre as voltas".
@@ -18,7 +18,7 @@ Fonte da verdade do enredo: docs/ROTEIRO-LOOP.md. Dados: cinco-minutos/dados/pis
 
 ## Escada de revelações
 - Volta 1: sinais da máquina, Téo caído, cheiro de verniz, recibo, registro, raio e hora, manual, bilhete do crachá SEM assinatura.
-- A partir da volta 2 (ou de quem já viu a pista anterior): laudo do Aurélio, molde, páginas anteriores do diário, carta da seguradora, gravação, mancha maior, escultura.
+- A partir da volta 2 (ou de quem já viu a pista anterior): laudo do Aurélio, molde, páginas anteriores do diário, carta da seguradora, gravação, mancha maior, escultura. (Mudou na revisão 2: ver o fim.)
 - Nome do culpado: só com prova da cópia + escala + bilhete (cracha_3), ou mostrando o bilhete ao homem de paletó perto das 4:00 (lenz_2), ou na atividade Acusação e Defesa. Não há mais como chegar ao nome na volta 1.
 - Pendrive do Nico: senha = número de registro da peça verdadeira (antes era a hora do apagão, que o Téo não podia saber). A gravação não diz mais "foi o Lenz" nem sabe do travamento.
 
@@ -32,3 +32,62 @@ Fonte da verdade do enredo: docs/ROTEIRO-LOOP.md. Dados: cinco-minutos/dados/pis
 - Atividades renomeadas: "Lado a Lado" (antes Original e Cópia), "As Duas Listas" (antes Entrou, mas não saiu).
 - Missões secretas (5): o que o Braga esconde; o que derrubou o Téo; quem ganha se a peça sumir; por que a Ivone não pode ter trocado; o que o Aurélio sabia.
 - Vocabulário: número de registro (não tombo), base (não pedestal), apoio (não berço), luva isolante (não manopla), ajustar/ajuste (não calibrar), luz da peça / modo livre / peça presa (não âncora), pontos (não bornes).
+
+## Revisão 2 (25/11/2026) — depois da rodada 2 das escalas
+
+Onde esta seção contradiz o que está acima, vale esta. Relatórios de origem: escala da história e escalas de personagem/Big Five/GAMS, rodada 2.
+
+### Regra de memória (sem exceção)
+- Ninguém do museu lembra; objetos voltam ao mesmo ponto; só o caderno de quem joga, o chão e a Câmara guardam.
+- Reescritas: cracha_1 (escala "de hoje", sem prever as 4:00), raio_3 (registro de meses, letras diferentes), hora_3 (carimbo do relógio da câmera), eco_chave e o caminho solo do Raio (quem grava é a Câmara), mancha_2 (mesmo tamanho; some a marca do sapato de quem joga), pose (a escultura não muda: quem joga é que não tinha reparado), c_anc_3 ("desde ontem"), final Revelar.
+- loop_reset ganhou o motivo, no mundo, de só responder na volta 5: "depois de quatro voltas completas: é a trava de segurança dela".
+
+### Escada de voltas (campo volta_min)
+- Volta 2: c_peca (pede também o cheiro de verniz), além de laudo, molde, páginas anteriores do diário e carta.
+- Volta 3: cracha_3, lenz_2, coop_veredito e a atividade Acusação e Defesa, v4_braga, aurelio_2, lenz_mot_3.
+- Volta 4: rev_3, v5_lenz, nico_1, teo_radio, lenz_1.
+- Toda pista com volta_min > 1 tem `porque`, e todo `porque` (61 mensagens) é frase do mundo: não conta a solução, não cita "volta".
+- Contagem: 188 / 25 / 6 / 6 / 4.
+
+### Regra das provas (Revelar)
+- prova_falsa: sai falsa_1 (cheiro de verniz vira suspeita que abre laudo, molde e caixa); entra c_peca, por `gruposExtras` (a pista continua no grupo peca_verdadeira, que é o do conserto da noite C).
+- trajeto: sai cofre_ronda (prova o crachá em uso, não a descida); saem assim_foto e assim_leg soltas; entra assim_par (as duas metades no caderno, 1 de energia); traj_4 passa a custar 1.
+- Nome do patrocinador fora do minuto 0: cracha_4, coop_catraca_ok e catraca_solo dizem "o do patrocínio". "Lenz" só aparece em lenz_mot_2 (volta 2, quem assinou o recebimento) e, como dono da mão, em cracha_3, coop_veredito e v4_braga (volta 3). Agora é verdade que não há como chegar ao nome na volta 1, nem na 2.
+- iso_1 (luva isolante do armário) passou a contar como luva.
+
+### Causas com o mesmo peso
+- C: c_modo_1 sem a frase que explicava; fh_pedestal/fh_pedestalx viraram "a base dá um apito curto" + "bateria do sensor fraca" (toda noite menos a C, onde a base apita e pisca amarelo); prévias iguais.
+- D: d_ord_1 pede um sinal da caixa de fusíveis; d_fus_3 sem "de macacão"; man_circ_3 existe em toda noite e não diz "CIRCUITO ABERTO".
+- A e B: segunda fonte para a cena (a_hist_2 no Subsolo, b_hist_2 na Recepção). E: cena própria (e_hist_1, verso da ordem de serviço).
+- man_cal_1 explica por que o ajuste existe ("se ela perder os números") e não fala mais em peça "verdadeira"; fichas e registros de ensaio são "de ontem"; na noite C a Dra. Sato "deixou armado ontem, não deu tempo de testar".
+
+### Finais
+- Revelar: "Às 5:00 o museu esquece de novo. O seu caderno, não."
+- Desligar: diz o que se perde (a caixa sai pela porta da frente) e tem um texto por causa (A, B, C, D, E). Na C a caixa não sai: a cópia fica na base.
+- Ouro: a sirene tem origem (sato_teo: socorro pedido pelo rádio da estrada).
+
+### Quem sabe o quê
+- Dra. Sato: as respostas do interfone devolvem pergunta; não fala mais em verniz.
+- Téo: abre_1 e v4_teo sem prever o reinício; no trecho da noite C da gravação ele desconfia ("ainda não achei"), não sabe.
+- Lenz: lenz_1 só acontece quando quem joga fala; v5_lenz saiu da gaveta do museu (paletó reserva na chapelaria); lenz_mot_3 tem origem (rádio esquecido ligado na escada); traj_3: vira a chave de ligar, que já está virada (a máquina tem 1 botão só; a senha do cofre continua 311).
+- Braga: uma versão só do crachá. O Lenz rondou o armário, pegou e deixou bilhete.
+- Ivone: ivone_red em cena e sem contradizer o bilhete da cafeteira; v5_ivone sem "hora anotada".
+- Diário: é um só, o diário do acervo (Sala de conservação). Duas folhas foram arrancadas: uma serve de marcador num álbum (Sala da fotografia), outra está no bolso do Téo (Sala das coleções). Assinatura sempre "— T.".
+
+### Vozes
+- Nico: nico_0 reescrita e nico_0b nova (repara nas pessoas). Braga: traj_aviso e c_esc_3 com o jeito dele. Seu Dirceu: ivone_ali_2 e c_anc_3.
+
+### Prosa e nomes
+- Sem narrador concluindo (falsa_1, c_esc_2, dis_guarda, traj_4, coop_veredito), sem ordem de jogo dentro de pista (man_legenda, iso_1, aviso_solo, catraca_solo).
+- A sala `corredor` é a Área de descanso em todo texto; "Pátio" no relatório da oficina.
+- Rótulo do grupo da página 4 do manual: "como soltar a máquina da peça errada".
+- O Raio: os papéis dizem quem lê e quem digita os 3 números da chave.
+
+### Validador
+- `gruposExtras` aceito na conferência de grupos; para as provas do Revelar, fonte "sem trava" pode ter volta_min até 3.
+
+### Ficou para decidir (regra que pede código)
+- Custo da escolha final (Revelar levando tempo de fala, "Loop Reset" pedindo alguém na tampa).
+- Energia de quem joga sem dupla: 5 ou 6 (hoje os dados dizem as duas coisas).
+- Noite E sem dupla: liberar o primeiro conserto na volta 2.
+- Ensaio respondendo "2 de 3" sem dizer qual valor está errado.

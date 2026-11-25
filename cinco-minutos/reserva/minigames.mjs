@@ -154,8 +154,9 @@ export function abrirMinigame(dialog, atividade, causa, aoResolver) {
     const status=no('p','Posição 1 de 5');
     const desenhar=cena('luz',()=>{range.value=String(angulo%5+1);range.oninput();},()=>angulo);
     const range=no('input');range.type='range';range.min=1;range.max=5;range.value=1;range.setAttribute('aria-label','Posição da luz');
-    const registrar=botao('Registrar a fissura',()=>conferir(angulo),'primary');registrar.disabled=true;
-    range.oninput=()=>{angulo=Number(range.value);const claro=angulo===4;status.textContent=claro?'A luz revelou a fissura que cruza o selo.':'Posição '+angulo+' de 5 · a marca ainda está encoberta.';registrar.disabled=!claro;desenhar();};
+    const L=atividade.luz||{};
+    const registrar=botao(L.botao||'Registrar a fissura',()=>conferir(angulo),'primary');registrar.disabled=true;
+    range.oninput=()=>{angulo=Number(range.value);const claro=angulo===4;status.textContent=claro?(L.achou||'A luz revelou a fissura que cruza o selo.'):'Posição '+angulo+' de 5 · '+(L.falta||'a marca ainda está encoberta')+'.';registrar.disabled=!claro;desenhar();};
     corpo.append(range,status,registrar);
   } else if (atividade.tipo==='maquina' && maquinaValores[causa]) {
     const seletores=[];

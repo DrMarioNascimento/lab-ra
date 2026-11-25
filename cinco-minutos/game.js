@@ -416,10 +416,10 @@ function resolvePath(key){
 const LEGACY_PATH = {...TIME_PATHS.suspension, opens:0};
 // História entre as voltas: cada retorno mostra um pouco mais do clima da noite, sem entregar a resposta.
 const ENTRE_VOLTAS = [
- 'As portas voltaram a fechar. Os objetos estão onde estavam. Você conserva o que descobriu.',
- 'De novo. Você já sabe o que esperar perto das 22h: o estrondo e a luz que cai. O que ainda não sabe é por que a noite recomeça.',
- 'Terceira vez. Alguns registros não batem com o que as pessoas contam. Anote quem disse o quê, e a que horas.',
- 'Quarta vez. O museu fecha em minutos e alguma coisa precisa ser feita antes das 22h. Você já sabe onde, quando e como?'
+ 'As portas fecharam de novo. Tudo voltou para o lugar. Mas você lembra do que achou.',
+ 'De novo. Você já sabe o que esperar: o raio, a luz que cai, o homem de paletó perto das 4:00. O que ainda não sabe é por que a máquina não deixa a noite andar.',
+ 'Terceira vez. Alguns registros não batem com o que as pessoas contam. Anote quem disse o quê, e em que minuto da volta.',
+ 'Quarta vez. Falta uma volta. Você já sabe o que consertar, em que sala e em que minuto?'
 ];
 // Uma pergunta para a turma conversar depois da revelação (uma por caso).
 const VALORES = [
@@ -525,7 +525,7 @@ function enterRoom(id){
   window.coop.choose(id);
  } else if (state.phase === 'playing' && state.room && id !== state.room) {
   if (andando()) { toast('Você ainda está andando.'); return; }
-  state.room = id; marcarCaminhada(); save(); renderGame(); toast('Você vai para ' + sala(id).name + '. A caminhada leva 10 segundos.');
+  state.room = id; marcarCaminhada(); save(); renderGame(); toast('Você vai para ' + sala(id).name + '. Andar até lá leva 10 segundos.');
  } else if (state.phase === 'choose') {
   state.room = id;
   state.phase = 'playing';
@@ -576,24 +576,36 @@ function renderGame(){
  $('loopBrief').classList.toggle('hidden', !finalLoop);
  $('fictionTime').textContent = museumTime();
  $('museumSignal').textContent = '';
- $('loopLabel').textContent='LOOP '+state.loop+' DE 5';$('timer').textContent=fmt(state.remaining);
- $('clockStatus').textContent=state.phase==='playing'?'tempo em andamento':'aguardando escolha';
- $('phaseTitle').textContent=state.room?sala(state.room).name:'Escolha onde investigar';
- $('phaseDescription').textContent=state.phase==='playing'?'Gire a peça e toque nos pontos que brilham para achar pistas.':'Todo mundo começa no '+INICIO.name+', no '+INICIO.andar+'. Escolha para onde ir.';
- $('boardTitle').textContent = state.room ? (state.phase === 'playing' ? 'Examine a sala' : 'Ambiente escolhido') : 'Escolha um ambiente';
+ $('loopLabel').textContent='VOLTA '+state.loop+' DE 5';$('timer').textContent=fmt(state.remaining);
+ $('clockStatus').textContent=state.phase==='playing'?'tempo correndo':'escolha a sala';
+ $('phaseTitle').textContent=state.room?sala(state.room).name:'Escolha uma sala';
+ $('phaseDescription').textContent=state.phase==='playing'?'Gire a peça e toque nos pontos que brilham.':'Toque numa sala para ir até lá.';
+ $('boardTitle').textContent = state.room ? (state.phase === 'playing' ? 'Examine a sala' : 'Sala escolhida') : 'Para onde você vai?';
  $('phaseTitle').tabIndex = -1;
- $('roomGrid').innerHTML='<div class="inicio" role="status"><span class="room-icon" aria-hidden="true">'+INICIO.icon+'</span><div><strong>'+INICIO.name+' · '+INICIO.andar+'</strong><small>'+(state.phase==='playing'?'Quando o tempo acabar, você volta para cá. A porta principal está trancada pela grade de segurança.':'Você está aqui. Todo mundo começa aqui, a cada volta. A porta principal está trancada pela grade de segurança.')+'</small></div></div>'+ANDARES.map(a=>'<h4 class="andar">'+a+'</h4>'+ROOMS.filter(r=>state.caseRules!==2||salasDoLoop().has(r.id)).map(r=>sala(r.id)).filter(r=>r.andar===a).sort((x,y)=>x.lugar-y.lugar).map(r=>'<button class="room an'+ANDARES.indexOf(a)+' '+(state.room===r.id?'selected':'')+'" '+(state.phase==='playing'&&state.room===r.id?'disabled':'')+' data-room="'+r.id+'">'+(r.peca?'<img class="room-3d" src="'+new URL('../icones/'+r.peca+'.webp',PECAS_URL).href+'" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'room-icon\',textContent:\''+r.icon+'\'}))">':'<span class="room-icon" aria-hidden="true">'+r.icon+'</span>')+'<strong>'+esc(r.name)+'</strong><small>'+esc(r.sub)+'</small></button>').join('')).join('');
+ $('roomGrid').innerHTML='<div class="inicio" role="status"><span class="ic3d" aria-hidden="true">🚪</span><div><strong>'+INICIO.name+' · '+INICIO.andar+'</strong><small>'+(state.phase==='playing'?'No fim da volta, você volta para cá.':'Você está aqui. Toda volta começa aqui.')+'</small></div></div>'+ANDARES.map(a=>'<h4 class="andar">'+a+'</h4>'+ROOMS.filter(r=>state.caseRules!==2||salasDoLoop().has(r.id)).map(r=>sala(r.id)).filter(r=>r.andar===a).sort((x,y)=>x.lugar-y.lugar).map(r=>'<button class="room an'+ANDARES.indexOf(a)+' '+(state.room===r.id?'selected':'')+'" '+(state.phase==='playing'&&state.room===r.id?'disabled':'')+' data-room="'+r.id+'">'+(r.peca?'<img class="room-3d" src="'+new URL('../icones/'+r.peca+'.webp',PECAS_URL).href+'" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'room-icon\',textContent:\''+r.icon+'\'}))">':'<span class="room-icon" aria-hidden="true">'+r.icon+'</span>')+'<strong>'+esc(r.name)+'</strong><small>'+esc(r.sub)+'</small></button>').join('')).join('');
  document.querySelectorAll('[data-room]').forEach(b=>b.addEventListener('click',()=>enterRoom(b.dataset.room)));
  const preparando = renderPrep();
  renderRouteChoices(preparando);
  $('endLoop').classList.toggle('hidden', state.phase!=='playing' || ((finalLoop || state.caseRules === 2) && state.duration===300));
- $('statusText').textContent=state.phase==='playing'?'Você pode ir a outra sala quando quiser: a caminhada leva 10 segundos. No fim da volta você acorda no '+INICIO.name+'.':'Escolha por onde começar.';
+ $('statusText').textContent=state.phase==='playing'?'Você pode ir a outra sala quando quiser. Andar até lá leva 10 segundos.':'Escolha por onde começar.';
  renderRoomFocus();
  if(state.phase==='playing'&&state.room)renderClues();
  if(window.coop)window.coop.decorate();
  $('notes').value=state.notes||'';renderJournal();
 }
 const PECAS_URL = new URL('museu/pecas/', document.currentScript ? document.currentScript.src : location.href);
+const ICONE_URL = n => new URL('../icones/'+n+'.webp', PECAS_URL).href;
+// Miniatura 3D da sala a partir do nome que ficou guardado na pista (caderno): a peça é a mesma do mapa.
+function pecaDaSalaNome(nome){
+ const L = Object.values(LOOP_SALAS).find(x => x[0] === nome); if (L) return L[2];
+ const r = ROOMS.find(x => x.name === nome || sala(x.id).name === nome); return r ? r.peca : '';
+}
+const fichaSala = (nome, cls) => { const p = pecaDaSalaNome(nome); return '<span class="ic3d '+(cls||'')+'" aria-hidden="true">'+(p ? '<img src="'+ICONE_URL(p)+'" alt="" loading="lazy">' : '<img src="'+ICONE_URL('ui/caderno')+'" alt="" loading="lazy">')+'</span>'; };
+// Tipo da pista na lista da sala: ícone e cor fixos por tipo (papel, olhar, conversa, objeto que se leva).
+const TIPO_PISTA = {Registro:['reg','📄'], 'Observação':['obs','🔍'], Relato:['rel','💬']};
+function tipoDaPista(q){ const p = q.lcp && typeof LC_PID !== 'undefined' ? LC_PID[q.lcp] : null; if (p && p.tipo === 'objeto') return ['obj','✋']; return TIPO_PISTA[q.tipo] || TIPO_PISTA.Registro; }
+const botaoPista = clue => { const t = tipoDaPista(clue); return '<button type="button" class="clue t-'+t[0]+'" data-clue="'+clue.id+'"><i class="ic3d sm" aria-hidden="true">'+t[1]+'</i><span>'+esc(clue.name)+'</span><small></small></button>'; };
+const etqClasse = e => /^SINAL/i.test(e || '') ? 'sinal' : /^LEITURA/i.test(e || '') ? 'normal' : /^MANUAL/i.test(e || '') ? 'manual' : 'outra';
 const hashTxt = t => { let h = 2166136261; for (const ch of String(t)) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return (h >>> 0) / 4294967295; };
 /** Põe cada pista num ponto escondido da peça (ao redor do centro dela, só visível de certos ângulos). */
 function pontosDaPeca(mv, clues){
@@ -622,9 +634,9 @@ function renderClues(){
   if (room.livro) {
    panel.innerHTML = '<h3>'+room.name+'</h3><p>'+roomDescriptions[room.id]+'</p>'+
     '<div class="peca livro"><iframe title="Livro da sala" src="'+new URL('livro/index.html?embed=1&solo=1&capa='+encodeURIComponent(room.capa||'Livro|REGISTRO'), PECAS_URL.href.replace('pecas/','')).href+'" allow="xr-spatial-tracking; camera; fullscreen" loading="eager"></iframe></div>'+
-    '<p class="dica">Arraste a página para virar a folha. O que a página mostra fica registrado no seu caderno. Se o livro não abrir, use a lista.</p>'+
+    '<p class="dica">Arraste a página para virar a folha. O que a página mostra vai para o seu caderno. Se o livro não abrir, use a lista.</p>'+
     '<details class="lista-pistas"><summary>Examinar pela lista</summary><div class="clue-list">'+
-    clues.map(clue => '<button type="button" class="clue" data-clue="'+clue.id+'"><span>'+esc(clue.name)+'</span><small></small></button>').join('')+
+    clues.map(botaoPista).join('')+
     '</div></details><div id="intervention" hidden></div>';
    panel.querySelectorAll('[data-clue]').forEach(button => { button.onclick = () => collect(button.dataset.clue); });
    panel.dataset.livro = '';
@@ -633,7 +645,7 @@ function renderClues(){
    '<div class="peca"><model-viewer loading="eager" reveal="auto" src="'+new URL(room.peca+'.glb', PECAS_URL).href+'" alt="Peça da sala '+esc(room.name)+'" ar ar-modes="webxr scene-viewer quick-look" ar-scale="auto" ar-placement="floor" camera-controls touch-action="pan-y" interaction-prompt="none" shadow-intensity="0.6" exposure="1.15" field-of-view="26deg" min-field-of-view="12deg" max-field-of-view="45deg">'+hotspots+'<button type="button" slot="ar-button" class="btn secondary ar-btn">Ver no ambiente</button></model-viewer></div>'+
    '<p class="dica">Gire a peça e toque nos pontos que brilham. As pistas ficam escondidas nela.</p>'+
    '<details class="lista-pistas"><summary>Examinar pela lista</summary><div class="clue-list">'+
-   clues.map(clue => '<button type="button" class="clue" data-clue="'+clue.id+'"><span>'+esc(clue.name)+'</span><small></small></button>').join('')+
+   clues.map(botaoPista).join('')+
    '</div></details><div id="intervention" hidden></div>';
   panel.querySelectorAll('[data-clue]').forEach(button => { button.onclick = () => collect(button.dataset.clue); });
   panel.querySelectorAll('[data-hs]').forEach(hs => { hs.onclick = () => collect(hs.dataset.hs); });
@@ -661,8 +673,13 @@ function renderClues(){
   const registered = state.clues.some(item => item.id === clue.id);
   const wait = clue.time/300*state.duration-elapsed;
   const bl = !registered && wait <= 0 ? bloqueioPista(clue, storySeconds) : '';
-  const label = registered?'Registrada':wait>0?'Disponível em '+fmt(wait):bl?'Bloqueada agora':(clue.enigma&&!(state.resolvidos&&state.resolvidos[clue.id])?'Decifrar':'Examinar')+sufixoCusto(clue);
+  const fechado = clue.enigma&&!(state.resolvidos&&state.resolvidos[clue.id]);
+  const label = registered?'✓ no caderno':wait>0?'em '+fmt(wait):bl?'travada':fechado?'🔒 abrir':(typeof custoPista==='function'&&custoPista(clue)?'1 ⚡':'grátis');
+  const estado = registered?'feita':wait>0?'espera':bl?'travada':'livre';
   button.disabled = registered || wait > 0 || !!bl;
+  if (button.dataset.estado !== estado) button.dataset.estado = estado;
+  const aria = clue.name+': '+(registered?'já está no caderno':wait>0?'aparece em '+fmt(wait):bl?'travada agora':fechado?'tem tranca':(typeof custoPista==='function'&&custoPista(clue)?'gasta 1 de energia':'não gasta energia'));
+  if (button.getAttribute('aria-label') !== aria) button.setAttribute('aria-label', aria);
   if (button.lastElementChild.textContent !== label) button.lastElementChild.textContent = label;
   if (hs) { hs.classList.toggle('on', wait <= 0 && !bl); hs.classList.toggle('ok', registered); hs.disabled = registered; }
  });
@@ -673,7 +690,7 @@ function renderClues(){
  if (reserva && !lembrete) {
   lembrete = document.createElement('p');
   lembrete.className = 'loop-reserva muted';
-  panel.querySelector('.lista-pistas').before(lembrete);
+  (panel.querySelector('.dica') || panel.querySelector('.lista-pistas')).after(lembrete);
  }
  if (lembrete?.textContent !== reserva && lembrete) lembrete.textContent = reserva;
  if (!reserva) lembrete?.remove();
@@ -791,16 +808,17 @@ function bloqueioPista(q, storySec){
  const tr = state.trava && state.trava[state.loop+':'+state.room]; if (tr && tr !== q.id) return 'Os seguranças chegaram. Esta sala fica vigiada até o fim da volta.';
  return '';
 }
-function collect(id){if(andando()){toast('Você ainda está chegando na sala.');return}if(state.phase!=='playing'||(window.coop?.now() ?? Date.now())>=state.endAt){tick();return}const q=scenarioClues()[state.room].find(x=>x.id===id);if(!q||state.clues.some(x=>x.id===id)||state.duration-(state.endAt-(window.coop?.now() ?? Date.now()))/1000<q.time/300*state.duration)return;{const bl=bloqueioPista(q,(state.duration-(state.endAt-(window.coop?.now() ?? Date.now()))/1000)*300/state.duration);if(bl){toast(bl);return}}if(q.enigma&&!(state.resolvidos&&state.resolvidos[q.id])){abrirEnigma(q);return}if(q.lcp&&window.lcBancada&&lcBancada(q))return;if(!cobrarPista(q))return;const room=sala(state.room);state.clues.push({id:q.id,room:room.name,name:q.name,text:q.text,tipo:q.tipo,fatos:q.fatos,loop:state.loop,etq:q.etq||''});if(q.lcp)lcAposColetar(q);if(q.trava){(state.trava ||= {})[state.loop+':'+state.room]=q.id}save();renderClues();renderJournal();toast(q.trava?'Pista guardada. Os seguranças estão a caminho!':'Pista guardada no caderno')}
+function collect(id){if(andando()){toast('Você ainda está chegando na sala.');return}if(state.phase!=='playing'||(window.coop?.now() ?? Date.now())>=state.endAt){tick();return}const q=scenarioClues()[state.room].find(x=>x.id===id);if(!q||state.clues.some(x=>x.id===id)||state.duration-(state.endAt-(window.coop?.now() ?? Date.now()))/1000<q.time/300*state.duration)return;{const bl=bloqueioPista(q,(state.duration-(state.endAt-(window.coop?.now() ?? Date.now()))/1000)*300/state.duration);if(bl){toast(bl);return}}if(q.enigma&&!(state.resolvidos&&state.resolvidos[q.id])){abrirEnigma(q);return}if(q.lcp&&window.lcBancada&&lcBancada(q))return;if(!cobrarPista(q))return;const room=sala(state.room);state.clues.push({id:q.id,room:room.name,name:q.name,text:q.text,tipo:q.tipo,fatos:q.fatos,loop:state.loop,etq:q.etq||''});if(q.lcp)lcAposColetar(q);if(q.trava){(state.trava ||= {})[state.loop+':'+state.room]=q.id}save();renderClues();renderJournal();toast(q.trava?'Pista no caderno. Os seguranças estão a caminho!':'Pista guardada no caderno')}
 function renderJournal(){
  const clues=state.clues||[];$('countBadge').textContent=clues.length;
- $('journalPreview').innerHTML=clues.length?clues.slice(-3).reverse().map(c=>'<div class="preview-item">'+esc(c.name)+' <br><small>'+esc(c.room)+'</small></div>').join(''):'<p class="muted">Suas descobertas aparecerão aqui.</p>';
- $('journalList').innerHTML=clues.length?clues.map(c=>'<article class="journal-item"><b>'+esc(c.room)+' · Loop '+c.loop+(c.tipo?' · '+esc(c.tipo):'')+'</b><p><strong>'+esc(c.name)+':</strong> '+(window.lcGlos?lcGlos(esc(c.text)):esc(c.text))+'</p></article>').join(''):'<p class="muted">Você ainda não registrou pistas.</p>';
+ $('journalPreview').innerHTML=clues.length?clues.slice(-3).reverse().map(c=>'<div class="preview-item">'+fichaSala(c.room,'sm')+'<div>'+esc(c.name)+'<small>'+esc(c.room)+'</small></div></div>').join(''):'<p class="muted">O que você achar aparece aqui.</p>';
+ const nb=document.getElementById('lcBarN'); if(nb) nb.textContent=clues.length;
+ $('journalList').innerHTML=clues.length?clues.map(c=>'<article class="journal-item '+etqClasse(c.etq)+'">'+fichaSala(c.room)+'<div><b>'+esc(c.room)+' · Volta '+c.loop+(c.tipo?' · '+esc(c.tipo):'')+'</b><p><strong>'+esc(c.name)+':</strong> '+(window.lcGlos?lcGlos(esc(c.text)):esc(c.text))+'</p></div></article>').join(''):'<p class="muted">Seu caderno ainda está vazio.</p>';
  if (!window.coop && state.archive?.length) {
   $('journalList').insertAdjacentHTML('beforeend', state.archive.map(key => {
    const axis = ANSWER_AXES.find(item=>item.key===key);
-   return '<article class="journal-item"><b>Arquivo de fechamento · '+esc(axis.title)+
-    '</b><p>'+esc(partialRecord(key))+'</p></article>';
+   return '<article class="journal-item">'+fichaSala('')+'<div><b>Arquivo de fechamento · '+esc(axis.title)+
+    '</b><p>'+esc(partialRecord(key))+'</p></div></article>';
   }).join(''));
  }
  const path = timePath();
@@ -810,33 +828,39 @@ function renderJournal(){
  const timeLead = nearingIntervention
   ? 'Compare os comandos no ambiente '+roomName(path.room)+'. Um atua sobre o retorno e o outro altera apenas um efeito secundário.'
   : 'Há um procedimento de encerramento em '+roomName(path.source)+'.';
- const hs = [
+ const hs = state.caseRules === 2 ? [
+  'São duas perguntas: por que a máquina travou e quem trocou a peça. Cada uma pede provas diferentes.',
+  'Para a máquina: junte 2 sinais de tipos diferentes e 1 leitura normal. Depois abra a Máquina e escolha o defeito.',
+  'Para a peça: compare a peça da Galeria com a foto do catálogo, veja a câmera e junte a escala com o bilhete do armário.'
+ ] : [
   'Separe o que aconteceu com o acervo, o disparo do alarme e o retorno do tempo. Procure uma fonte para cada fato.',
   'A Sala das coleções ou a Conservação ajuda a explicar o acervo. A Segurança e a Sala técnica ajudam a explicar o alarme.',
   'Procure a figura imóvel em '+figureRoom+'. '+timeLead
  ];
- $('hints').innerHTML=hs.slice(0,state.hints).map((x,i)=>'<p><strong>Orientação '+(i+1)+':</strong> '+esc(x)+'</p>').join('');$('getHint').disabled=state.hints>=3;
+ $('hints').innerHTML=hs.slice(0,state.hints).map((x,i)=>'<p><strong>Dica '+(i+1)+':</strong> '+esc(x)+'</p>').join('');$('getHint').disabled=state.hints>=3;
 }
 function tick(){if(window.coop){window.coop.tick();return}if(!state||state.phase!=='playing')return;const old=state.remaining;state.remaining=Math.max(0,(state.endAt-Date.now())/1000);$('timer').textContent=fmt(state.remaining);$('fictionTime').textContent=museumTime();if(Math.ceil(old)!==Math.ceil(state.remaining))renderClues();else if(state.loop===5 && state.room)renderIntervention(state.room,elapsedStoryTime(window.coop?.now() ?? Date.now()));if(state.remaining<=0)finishLoop()}
 function renderBetweenPlan(){
  const novas = state.clues.filter(pista => pista.loop === state.loop).length;
- $('betweenProgress').textContent = novas === 1 ? '1 pista registrada nesta volta.'
-  : novas ? novas + ' pistas registradas nesta volta.' : 'Nenhuma pista registrada nesta volta.';
+ $('betweenProgress').textContent = novas === 1 ? '1 pista nova nesta volta.'
+  : novas ? novas + ' pistas novas nesta volta.' : 'Nenhuma pista nova nesta volta.';
  $('betweenShare').classList.toggle('hidden', !window.coop || state.loop === 5);
+ document.querySelectorAll('#betweenDots b').forEach((b, i) => b.classList.toggle('on', i < state.loop));
  if (state.caseRules !== 2) return;
  const s = lcS();
- const assunto = s.diag ? 'Com o diagnóstico anexado, confira as exigências do conserto em Máquina → Atividades.'
-  : 'Compare os sinais. Procure dois tipos de sinal e uma pista que ajude a descartar outro defeito.';
+ const T = (ic, txt) => [ic, txt];
+ const assunto = s.diag ? T('M03', 'Você já tem o diagnóstico. Veja o que o conserto pede em Máquina, aba Atividades.')
+  : T('ui/alvo', 'Junte 2 sinais de tipos diferentes e 1 leitura normal.');
  const instrucoes = {
-  1: 'Volta 2 · Teste uma hipótese. ' + assunto,
-  2: 'Volta 3 · Prepare a intervenção. Confira o que precisa ser feito em outra sala ou numa volta anterior, como gravar o gesto no Pátio ou deixar a peça verdadeira no Subsolo.',
-  3: 'Volta 4 · Ensaie a ação final. Sem dupla, esta é a última volta para gravar o gesto no Pátio ou deixar a peça verdadeira no Subsolo, quando o conserto exigir.',
+  1: [T('T01', 'Volta 2: teste um palpite na Máquina.'), assunto],
+  2: [T('M03', 'Volta 3: hora de preparar o conserto.'), T('T01', 'Veja o que você precisa deixar pronto em outra sala.'), T('E01', 'Sem dupla? Grave o gesto no Pátio ou deixe a peça verdadeira no Subsolo.')],
+  3: [T('T01', 'Volta 4: ensaie o conserto. Ainda não vale.'), T('E01', 'Sem dupla, esta é a última volta para gravar o gesto no Pátio ou deixar a peça verdadeira no Subsolo.')],
   4: window.coop
-   ? 'Volta 5 · Combinem quem vai operar a Máquina e quem leva as três provas para a Recepção. Guardem a energia necessária antes de explorar.'
-   : 'Volta 5 · Escolha o objetivo que seu caderno permite concluir. Confira as provas, a sala e a energia antes de começar.',
-  5: 'Os ciclos terminaram. Confira o desfecho que a sua investigação alcançou.'
+   ? [T('T01', 'Volta 5: agora vale. Quem opera a Máquina?'), T('P01', 'Quem leva as 3 provas para a Recepção?'), T('E01', 'Guarde energia para a sua parte.')]
+   : [T('T01', 'Volta 5: agora vale.'), T('ui/caderno', 'Escolha o que o seu caderno deixa você terminar.'), T('P01', 'Confira as provas, a sala e a energia antes de começar.')],
+  5: [T('ui/caderno', 'As voltas terminaram. Veja o desfecho da sua investigação.')]
  };
- $('betweenHint').textContent = instrucoes[state.loop];
+ $('betweenHint').innerHTML = (instrucoes[state.loop] || []).map(([ic, txt]) => '<p class="bs-tarefa"><span class="ic3d sm" aria-hidden="true"><img src="'+ICONE_URL(ic)+'" alt=""></span><span>'+esc(txt)+'</span></p>').join('');
 }
 function renderBetween(){
  const finished = state.loop === 5;
@@ -845,16 +869,16 @@ function renderBetween(){
  $('betweenCount').textContent = state.clues.length;
  $('betweenLoop').textContent = state.loop+' / 5';
  $('betweenTitle').textContent = finished
-  ? (interrompeu ? 'O relógio passou das 22h.' : 'O museu retornou às 21h55.')
+  ? (interrompeu ? 'A noite andou.' : 'A noite voltou ao começo.')
   : 'Você se lembra.';
  $('betweenStory').textContent = finished
-  ? (interrompeu ? 'A cadeia do retorno foi interrompida. O museu permanece no presente.' : 'O museu voltou às 21h55. Use o que você descobriu para reconstruir a noite.')
+  ? (interrompeu ? 'A máquina parou de puxar o tempo de volta. O museu segue em frente.' : 'O tempo voltou mais uma vez. Use o que você achou para fechar a noite.')
   : (state.caseRules === 2 ? ENTRE_VOLTAS[Math.min(state.loop,ENTRE_VOLTAS.length)-1] : ENTRE_VOLTAS[0]);
- $('betweenHint').textContent = finished ? (state.caseRules === 2 && state.clues.length < 3 ? 'Com poucas pistas? Ao apresentar a hipótese, você pode consultar trechos do arquivo de fechamento.' : 'Seu caderno está disponível para a conclusão.')
-  : brokeLoop() ? 'Você já interrompeu o retorno. Continue investigando para entender o que aconteceu e ajudar a turma.'
-  : state.loop >= 2 ? 'Quando achar o equipamento do retorno, você pode tentar intervir. É uma tentativa por volta, e agir mais cedo vale bônus. Se faltou uma pista, peça orientação no caderno.'
-  : 'O próximo ambiente pode confirmar ou mudar sua hipótese.';
- $('nextLoop').textContent = finished ? 'Apresentar hipótese' : 'Escolher próximo ambiente';
+ $('betweenHint').textContent = finished ? (state.caseRules === 2 && state.clues.length < 3 ? 'Poucas pistas? No desfecho você pode ver trechos do arquivo.' : 'Seu caderno vai com você para o desfecho.')
+  : brokeLoop() ? 'Você já parou a máquina. Continue procurando para entender a noite e ajudar a turma.'
+  : state.loop >= 2 ? 'Faltou pista? Peça uma dica no caderno.'
+  : 'A próxima sala pode confirmar ou mudar o seu palpite.';
+ $('nextLoop').textContent = finished ? 'Ir para o desfecho' : 'Escolher a próxima sala';
  if (finished && state.caseRules === 2) $('nextLoop').textContent = 'Ir para o desfecho';
  renderCombos();
  renderBetweenPlan();
@@ -1162,19 +1186,20 @@ $('answerFields').addEventListener('click', e => {
  saveDraft();
 });
 // Apresentação das telas (21/11/2026): passo a passo visual dentro do manual. Sem códigos fixos nem nomes de escala.
+const TV_SALA = (id, on) => '<span class="tv-room'+(on?' on':'')+'"><img src="'+ICONE_URL(LOOP_SALAS[id][2])+'" alt="">'+LOOP_SALAS[id][0].split(' · ').pop()+'</span>';
 const TOUR = [
- {c:'Você chega ao museu no fim da tarde. Tudo calmo: gente passeando, luz quente, cheiro de cera no piso. Uma funcionária cochicha: "Shh! É surpresa para o pessoal. Depois eu explico."',t:'Escolha uma sala', d:'Toda volta começa no Saguão superior. Escolha só uma sala para investigar.',
-  v:'<div class="tv-rooms"><span class="tv-room on"><i>◈</i>Sala dos gigantes</span><span class="tv-room"><i>◍</i>Sala dos predadores</span><span class="tv-room"><i>▣</i>Sala dos veículos</span><span class="tv-room"><i>◐</i>Sala dos jogos</span></div><p class="tv-floor">✦ Saguão superior · você começa aqui</p>'},
- {c:'Na vitrine, um objeto brilha de leve. A restauradora passa e avisa baixinho: "Pode olhar de perto, só não encoste. Eu confiro tudo antes de fechar."',t:'Gire a peça', d:'Toque nos pontos que brilham: cada um esconde uma pista. Eles aparecem com o tempo.',
-  v:'<div class="tv-piece"><div class="tv-obj"></div><b class="tv-dot d1"></b><b class="tv-dot d2"></b><b class="tv-dot d3"></b></div><p class="tv-floor">Arraste para girar · toque no brilho</p>'},
- {c:'O relógio da parede marca a hora de sempre. Um guarda confere o rádio e murmura: "Faltam poucos minutos para fechar... eu odeio essa hora, tudo fica tão quieto." Num canto, uma artista de estátua viva se prepara para o bis, e um visitante olha para a porta, sem jeito.',t:'O tempo corre', d:'Cada volta tem 5 minutos. Quando acaba, o tempo volta, mas você guarda o que descobriu.',
-  v:'<div class="tv-clock"><span>VOLTA 2 DE 5</span><strong>04:12</strong><small>21h56 no museu</small></div><div class="tv-bar"><i></i></div>'},
- {c:'No balcão, a ronda anota tudo: hora, sala, quem passou. "Se algo der errado hoje", diz o guarda, "estes registros salvam a gente. Mas cuidado: nem tudo que contam é fato."',t:'Seu dossiê', d:'Cada pista é uma Observação, um Relato ou um Registro. O que alguém diz nem sempre é fato.',
-  v:'<div class="tv-dossie"><p><span class="tv-chip obs">Observação</span> O que você viu</p><p><span class="tv-chip rel">Relato</span> O que alguém contou</p><p><span class="tv-chip reg">Registro</span> O que está escrito</p></div>'},
- {c:'Falta pouco para fechar. De repente, um estrondo, o alarme toca e todo mundo fica imóvel. A grade desce. Agora é com você.',t:'A hora de agir', d:'Na 5ª volta você tem uma única tentativa: o equipamento, o comando e o horário certos.',
-  v:'<div class="tv-panel"><b>Painel da demonstração</b><span class="tv-select">Escolha um comando ▾</span><span class="tv-btn">Executar comando</span></div><p class="tv-floor">1 tentativa · sem aviso de janela</p>'},
- {c:'Quando o tempo se fecha, a ronda reúne todos. Cada um tem uma versão. Para acertar, você precisa dizer o quanto confia e mostrar a pista que sustenta.',t:'As 8 perguntas', d:'Diga o quanto você confia em cada resposta. Em Quem e Por quê, aponte a pista que sustenta.',
-  v:'<div class="tv-q"><b>Quem: quem era a figura imóvel?</b><span class="tv-select">Um guarda escondido ▾</span><span class="tv-cert"><i class="c1">Palpite</i><i class="c2">Provável</i><i class="c3 on">Tenho certeza</i></span><span class="tv-select tv-pista">Pista: Procurar sinais da figura ▾</span></div>'}
+ {c:'Você chega ao museu no fim da tarde. Tudo calmo: gente passeando, luz quente, cheiro de cera no piso. Uma funcionária cochicha: "Shh! É surpresa para o pessoal. Depois eu explico."',t:'Escolha uma sala', d:'Toda volta começa no Saguão superior. Toque numa sala para ir até lá.',
+  v:()=>'<div class="tv-rooms">'+TV_SALA('galeria',1)+TV_SALA('seguranca')+TV_SALA('prototipo')+TV_SALA('recepcao')+'</div><p class="tv-floor">Saguão superior · você começa aqui</p>'},
+ {c:'Na vitrine, um objeto brilha de leve. A restauradora passa e avisa baixinho: "Pode olhar de perto, só não encoste. Eu confiro tudo antes de fechar."',t:'Gire a peça', d:'Toque nos pontos que brilham. Cada um guarda uma pista. Eles aparecem com o tempo.',
+  v:()=>'<div class="tv-piece"><img class="tv-obj3d" src="'+ICONE_URL('V11')+'" alt=""><b class="tv-dot d1"></b><b class="tv-dot d2"></b><b class="tv-dot d3"></b></div><p class="tv-floor">Arraste para girar · toque no brilho</p>'},
+ {c:'O relógio da parede marca a hora de sempre. Um guarda confere o rádio e murmura: "Faltam poucos minutos para fechar... eu odeio essa hora, tudo fica tão quieto."',t:'O tempo corre', d:'Cada volta tem 5 minutos. Quando acaba, o tempo volta. Só você lembra.',
+  v:()=>'<div class="tv-clock"><span>VOLTA 2 DE 5</span><strong>04:12</strong><small>Minuto da volta · 0:48</small></div><div class="tv-bar"><i></i></div>'},
+ {c:'No balcão, a ronda anota tudo: sala, minuto, quem passou. "Se algo der errado hoje", diz o guarda, "estes registros salvam a gente. Mas cuidado: nem tudo que contam é fato."',t:'Seu caderno', d:'Tudo que você acha vai para o caderno. O que alguém conta nem sempre é fato.',
+  v:()=>'<div class="tv-dossie"><p><span class="tv-chip obs">Observação</span> O que você viu</p><p><span class="tv-chip rel">Relato</span> O que alguém contou</p><p><span class="tv-chip reg">Registro</span> O que está escrito</p></div>'},
+ {c:'Falta pouco para fechar. De repente, um estrondo, o alarme toca e todo mundo fica imóvel. A grade desce. Agora é com você.',t:'A Máquina', d:'Descubra por que a máquina travou. Na 5ª volta, o conserto vale.',
+  v:()=>'<div class="tv-panel"><b><img class="tv-mini" src="'+ICONE_URL('T01')+'" alt="">A Máquina</b><span class="tv-select">2 sinais + 1 leitura normal</span><span class="tv-btn">Escolher o defeito</span></div><p class="tv-floor">1 tentativa por volta</p>'},
+ {c:'Quando o tempo se fecha, a ronda reúne todos. Cada um tem uma versão. Para acertar, você precisa de provas.',t:'Revelar', d:'Com 3 provas no caderno, vá à Recepção e diga quem trocou a peça. É uma tentativa só.',
+  v:()=>'<div class="tv-rooms">'+TV_SALA('galeria')+TV_SALA('seguranca')+TV_SALA('limpeza')+TV_SALA('recepcao',1)+'</div><p class="tv-floor">3 provas · 1 nome · 1 tentativa</p>'}
 ];
 function montarTour(){
  const host = $('tour');
@@ -1185,9 +1210,9 @@ function montarTour(){
  const q = sel => host.querySelector(sel);
  function draw(){
   const s = TOUR[i];
-  q('.tour-step').textContent = 'Prólogo · uma visita normal · '+(i+1)+' de '+TOUR.length;
+  q('.tour-step').textContent = 'Como jogar · '+(i+1)+' de '+TOUR.length;
   q('.tour-cena').textContent = s.c;
-  q('.tour-visual').innerHTML = s.v;
+  q('.tour-visual').innerHTML = typeof s.v === 'function' ? s.v() : s.v;
   q('.tour-title').textContent = s.t;
   q('.tour-text').textContent = s.d;
   q('.tour-dots').innerHTML = TOUR.map((_,k)=>'<b'+(k===i?' class="on"':'')+'></b>').join('');
@@ -1209,12 +1234,12 @@ $('answerForm').addEventListener('submit',submit);$('replay').onclick=()=>window
 // Recupera a partida local sem confundir o prazo real do loop com o relógio do aparelho.
 function restoreSolo(){
  $('betweenEyebrow').innerHTML='<span></span> O TEMPO RETORNOU';
- $('betweenStory').textContent='As portas voltaram a fechar. Os objetos estão onde estavam. Você conserva o que descobriu.';
+ $('betweenStory').textContent=ENTRE_VOLTAS[0];
  $('nextLoop').classList.remove('hidden');
  $('coopBegin').classList.add('hidden');
  $('answerFields').classList.remove('hidden');
  $('answerForm').querySelector('button[type=submit]').classList.remove('hidden');
- $('final').querySelector('.large').textContent='O que aconteceu? Use as pistas do dossiê e responda às 8 perguntas. Se não souber, pode deixar uma resposta em aberto.';
+ $('final').querySelector('.large').textContent='O que aconteceu? Use as pistas do caderno e responda às 8 perguntas. Se não souber, pode deixar em aberto.';
  $('replay').textContent='Jogar outra vez';
 const prev=load(storageKey,null);if(prev&&Number.isInteger(prev.caseIndex)&&CASES[prev.caseIndex]&&prev.loop>=1&&prev.loop<=5){state=prev;$('speed').value=String(state.duration);if(state.phase==='playing'&&Number.isFinite(state.endAt)){state.remaining=Math.max(0,(state.endAt-Date.now())/1000);renderGame();show('game');if(state.remaining<=0)finishLoop();else timerHandle=setInterval(tick,250)}else if(state.phase==='choose'){renderGame();show('game')}else if(state.phase==='between'){renderBetween()}else if(state.phase==='final'){renderForm();show('final')}else if(state.phase==='result'&&state.answers){renderResult();show('result')}else{state=null;show('start')}}else show('start');
 }
