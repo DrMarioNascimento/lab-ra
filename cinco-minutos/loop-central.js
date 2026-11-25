@@ -199,12 +199,20 @@ function lcProduzir(A, tipo){
  for (const pid of A.produz || []) { const p = LC_PID[pid]; if (p && lcAtiva(p) && lcDarPista(pid, tipo || 'Relato')) novas.push(p); }
  return novas;
 }
+const LC_ENSAIO = {
+ A_calibrar:'O que ainda pode falhar: os 3 valores (dia, hora, registro) precisam estar certos no seu caderno na hora de valer.',
+ B_potencia:'O que ainda pode falhar: a força só entra na janela do raio (1:06 a 1:14 da volta). Chegue à alavanca antes e combine com a dupla.',
+ C_ancora:'O que ainda pode falhar: a peça verdadeira precisa estar no berço, e ela só chega se for encaminhada numa volta anterior.',
+ D_fusivel:'O que ainda pode falhar: a ordem dos conectores. Na volta 5 não dá para trocar a ordem depois de confirmar.',
+ E_dois:'O que ainda pode falhar: um dos defeitos reagiu e o outro não. Os dois consertos precisam acontecer, em voltas diferentes.'
+};
+const lcAvisoEnsaio = () => LC_ENSAIO[lcCausa()] || '';
 function lcFimAtividade(A, modo){
  const s = lcS(); s.feitas[A.id] = (s.feitas[A.id] || 0) + 1;
  if (A.anexa_diagnostico && !s.diag) { s.diag = {volta:state.loop, via:A.id}; toast('Leitura completa: DIAGNÓSTICO ANEXADO.'); }
  if (A.conserto) {
   if (lcMeioPendente(A, String(modo).startsWith('solo'))) { s.meio[A.id] = state.loop; if (A.produto_meio) lcDarPista(A.produto_meio); return 'MEIO CONSERTO (' + modo + ') gravado na Câmara. O aviso mudou de lugar, mas não sumiu: falta o OUTRO defeito, em OUTRA volta.'; }
-  if (state.loop <= 4) { s.ensaio.push(A.id); if (A.produto_ensaio) lcDarPista(A.produto_ensaio); return 'ENSAIO (' + modo + '): A MÁQUINA REAGE. Não valeu ainda: repita na volta 5.'; }
+  if (state.loop <= 4) { s.ensaio.push(A.id); if (A.produto_ensaio) lcDarPista(A.produto_ensaio); return 'ENSAIO (' + modo + '): A MÁQUINA REAGE. Não valeu ainda: repita na volta 5. ' + lcAvisoEnsaio() + ''; }
   s.conserto = 5; if (A.produto_final) lcDarPista(A.produto_final); return 'CONSERTO FEITO (' + modo + '). O retorno foi interrompido.';
  }
  const n = lcProduzir(A);

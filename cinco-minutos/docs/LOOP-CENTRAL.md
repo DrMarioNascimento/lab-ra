@@ -21,3 +21,9 @@ Simulação: rodada 1 (10 grupos, 0 conserto) → versão 2 → rodada 2 (12 gru
 - 170 → 201 pistas. Cada sinal e cada descarte do diagnóstico ganhou uma segunda fonte em outra sala (sinais diegéticos: quadro de consumo, lâmpada, visor, metrônomo, medidor, armário de fusíveis).
 - Caso contra o suspeito com 3 pontas: motivo, meio e oportunidade do Lenz (2+2+2 pistas); álibis e pistas falsas com retorno para Ivone e Braga; diário do Téo em três dias (dias 10, 12 e 14); 6 detalhes de clima do museu.
 - Teto do validador subiu de 125 para 160 pistas ativas; validar.py APROVADO nas 5 causas.
+
+## União Loop + Reserva (24/11, 23h)
+- Base: Loop (201+ pistas, 5 causas, Mestre). A Reserva ("A peça que o museu esqueceu") fica como episódio e seus minigames viram a BANCADA do Loop.
+- Bancada (`bancada.css`, `LC_MG` em loop-central.js): ao coletar tombo_2 (foto), falsa_1 (luz rasante), traj_1 (fita), c_esc_1 (caixa), cracha_1 (escala), abre o minigame; acertar entrega a pista. Errar não gasta carga; há "Pedir uma pista".
+- Ritmo: abre_1 (cartão do Téo na Recepção, objetivo claro na volta 1, custo 0); rev_3 (reviravolta da volta 3: o seguro foi pedido antes do dia 14, a troca foi planejada); ensaio da volta 4 agora diz o que ainda pode falhar na execução final (por causa).
+- Falta: cooperação Pátio/Corredor na bancada, final reconstruído no telão com as provas, mais minigames (cadeado, painel).
