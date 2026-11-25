@@ -355,7 +355,7 @@ function renderNoitePanel(){
  if (!box) { box = document.createElement('div'); box.id = 'noitePanel'; const h = panel.querySelector('h3'); h ? h.after(box) : panel.prepend(box); }
  const cs = cargasRestantes(), mx = cargasMax();
  let html = '<p class="energia" aria-label="Energia da lanterna: '+cs+' de '+mx+'"><span aria-hidden="true">🔦</span> Energia '+'●'.repeat(cs)+'○'.repeat(Math.max(0, mx - cs))+'<small> '+(kitDaPartida().map(f => FERRAMENTAS[f]?.icone).join(' '))+'</small></p>';
- if (state.room === caixoteSala()) {
+ if (state.room === caixoteSala() && state.caseRules !== 2) {
   const cx = state.cx || (state.cx = {sel:[0,0,0], erros:{}, aberto:false}), tp = tipoCaixote();
   html += '<div class="caixote"><strong>📦 Caixote trancado</strong><p>'+esc(tp.frase)+'</p>';
   if (cx.aberto && cx.abertoLoop !== state.loop) html += '<p>Você já abriu este caixote. O bilhete está no seu caderno. Ele voltou fechado, como sempre.</p>';

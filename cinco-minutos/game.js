@@ -429,9 +429,12 @@ const timePath = () => state.caseRules === 2
  ? resolvePath(CASE_PATHS[state.caseIndex])
  : LEGACY_PATH;
 
+// No Loop (camada central) o mapa mostra só as salas da história e as salas só trazem pistas dela.
+let SALAS_LOOP = null;
+function salasDoLoop(){ return SALAS_LOOP ||= new Set(LC.pistas.map(p => p.sala)); }
 function scenarioClues(){
  const todas = mergeNoite(scenarioCluesBase()), out = {};
- for (const k of Object.keys(todas)) out[k] = todas[k].filter(q => (!q.volta || q.volta === state.loop) && (!q.desde || state.loop >= q.desde) && (!q.vmax || state.loop <= q.vmax) && (!q.lcp || lcVisivel(q))).map(q => ({...q, name:nomear(q.name), text:nomear(q.lcp ? lcTextoClue(q) : q.text)}));
+ for (const k of Object.keys(todas)) out[k] = todas[k].filter(q => (!q.volta || q.volta === state.loop) && (!q.desde || state.loop >= q.desde) && (!q.vmax || state.loop <= q.vmax) && (!q.lcp || lcVisivel(q)) && (state.caseRules !== 2 || q.lcp)).map(q => ({...q, name:nomear(q.name), text:nomear(q.lcp ? lcTextoClue(q) : q.text)}));
  return out;
 }
 function scenarioCluesBase(){
@@ -565,7 +568,7 @@ function renderGame(){
  $('phaseDescription').textContent=state.phase==='playing'?'Gire a peça e toque nos pontos que brilham para achar pistas.':'Todo mundo começa no '+INICIO.name+', no '+INICIO.andar+'. Escolha para onde ir.';
  $('boardTitle').textContent = state.room ? (state.phase === 'playing' ? 'Examine a sala' : 'Ambiente escolhido') : 'Escolha um ambiente';
  $('phaseTitle').tabIndex = -1;
- $('roomGrid').innerHTML='<div class="inicio" role="status"><span class="room-icon" aria-hidden="true">'+INICIO.icon+'</span><div><strong>'+INICIO.name+' · '+INICIO.andar+'</strong><small>'+(state.phase==='playing'?'Quando o tempo acabar, você volta para cá. A porta principal está trancada pela grade de segurança.':'Você está aqui. Todo mundo começa aqui, a cada volta. A porta principal está trancada pela grade de segurança.')+'</small></div></div>'+ANDARES.map(a=>'<h4 class="andar">'+a+'</h4>'+ROOMS.map(r=>sala(r.id)).filter(r=>r.andar===a).sort((x,y)=>x.lugar-y.lugar).map(r=>'<button class="room an'+ANDARES.indexOf(a)+' '+(state.room===r.id?'selected':'')+'" '+(state.phase==='playing'&&state.room===r.id?'disabled':'')+' data-room="'+r.id+'">'+(r.peca?'<img class="room-3d" src="'+new URL('../icones/'+r.peca+'.webp',PECAS_URL).href+'" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'room-icon\',textContent:\''+r.icon+'\'}))">':'<span class="room-icon" aria-hidden="true">'+r.icon+'</span>')+'<strong>'+esc(r.name)+'</strong><small>'+esc(r.sub)+'</small></button>').join('')).join('');
+ $('roomGrid').innerHTML='<div class="inicio" role="status"><span class="room-icon" aria-hidden="true">'+INICIO.icon+'</span><div><strong>'+INICIO.name+' · '+INICIO.andar+'</strong><small>'+(state.phase==='playing'?'Quando o tempo acabar, você volta para cá. A porta principal está trancada pela grade de segurança.':'Você está aqui. Todo mundo começa aqui, a cada volta. A porta principal está trancada pela grade de segurança.')+'</small></div></div>'+ANDARES.map(a=>'<h4 class="andar">'+a+'</h4>'+ROOMS.filter(r=>state.caseRules!==2||salasDoLoop().has(r.id)).map(r=>sala(r.id)).filter(r=>r.andar===a).sort((x,y)=>x.lugar-y.lugar).map(r=>'<button class="room an'+ANDARES.indexOf(a)+' '+(state.room===r.id?'selected':'')+'" '+(state.phase==='playing'&&state.room===r.id?'disabled':'')+' data-room="'+r.id+'">'+(r.peca?'<img class="room-3d" src="'+new URL('../icones/'+r.peca+'.webp',PECAS_URL).href+'" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'room-icon\',textContent:\''+r.icon+'\'}))">':'<span class="room-icon" aria-hidden="true">'+r.icon+'</span>')+'<strong>'+esc(r.name)+'</strong><small>'+esc(r.sub)+'</small></button>').join('')).join('');
  document.querySelectorAll('[data-room]').forEach(b=>b.addEventListener('click',()=>enterRoom(b.dataset.room)));
  const preparando = renderPrep();
  renderRouteChoices(preparando);
@@ -1053,6 +1056,7 @@ function renderForm(){
  $('final').querySelector('.large').textContent = central
   ? 'Veja até onde sua investigação chegou. As perguntas de reflexão são opcionais.'
   : 'Use as pistas do dossiê para reconstruir a noite.';
+ $('reflectionForm').hidden = central;
  $('answerFields').innerHTML = '<p class="certeza-note">Escolha o quanto você confia em cada resposta. Com mais certeza você ganha mais pontos se acertar, mas perde pontos se errar. Em Quem e Por quê, aponte a pista que sustenta a resposta: sem ela, vale como palpite.</p>'+
   ANSWER_AXES.map(axis => '<div class="answer-field"><label for="'+axis.key+'">'+esc(axis.question)+
   '</label><select id="'+axis.key+'">'+options(axis.options)+'</select>'+certezaControl(axis)+supportControl(axis)+'</div>').join('');
@@ -1119,8 +1123,8 @@ function renderResult(){
  const historico = '<div class="result-card"><strong>Caderno do museu</strong><p>Você já visitou '+caderno.noites+' de '+CASES.length+' noites diferentes neste aparelho.</p></div>';
  const bonus = bonusCedo ? '<div class="result-card"><strong>Você agiu na volta '+state.intervencaoVolta+' · bônus de '+bonusCedo+' pontos</strong><p>Quanto mais cedo você interrompe o retorno, maior o bônus.</p></div>' : '';
  const respondeu = ANSWER_AXES.some(axis => answers[axis.key]);
- $('resultBody').innerHTML = central ? lcResumoFinal() + historico +
-  (respondeu ? '<details class="loop-reflection"><summary>Rever a reflexão</summary>'+reflexao+'</details>' : '')
+ $('resultBody').innerHTML = central ? lcResumoFinal() +
+  (false ? '<details class="loop-reflection"><summary>Rever a reflexão</summary>'+reflexao+'</details>' : '')
   : historico + bonus + reflexao;
 }
 document.addEventListener('click',e=>{let id=e.target.dataset.close;if(id)$(id).close()});

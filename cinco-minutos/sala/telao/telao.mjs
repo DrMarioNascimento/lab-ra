@@ -60,7 +60,7 @@ function desenhar() {
   } else if (e === 'choose' || e === 'playing') {
     const seg = restante(), jog = e === 'playing';
     meio = `<div class="tl-card tl-relogio"><div class="tl-volta">VOLTA ${v} DE 5</div><div class="tl-tempo">${mmss(jog ? seg : room.seg)}</div>
-      <div class="tl-museu">No museu: <time>${loopHora(room.seg, jog ? seg : room.seg)}</time></div><div class="tl-sinal">${jog ? esc(sinal(seg)) : 'Escolham um ambiente.'}</div></div>
+      <div class="tl-museu">Minuto da volta: <time>${loopHora(room.seg, jog ? seg : room.seg)}</time></div><div class="tl-sinal">${jog ? esc(sinal(seg)) : 'Escolham um ambiente.'}</div></div>
       <div class="tl-card">${mapa()}</div>`;
     rod = `<span class="tl-aviso">${g.filter((p) => p.amb && p.ambVolta === v).length} de ${g.length} em um ambiente</span>`;
   } else if (e === 'between') {

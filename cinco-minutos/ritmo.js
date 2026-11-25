@@ -7,11 +7,9 @@ const LOOP_FINAIS = {
   'Mínimo': 'O museu esqueceu aquela noite. O caderno conservou o que foi descoberto.'
 };
 
-function loopHora(duracao, restante) {
+function loopHora(duracao, restante) {   // o relógio do mundo é um só: o minuto da volta, de 0:00 a 5:00
   const decorrido = Math.max(0, Math.min(300, Math.floor((duracao - restante) * 300 / duracao)));
-  const minutos = 55 + Math.floor(decorrido / 60);
-  const dois = n => String(n).padStart(2, '0');
-  return (minutos < 60 ? '21:' : '22:') + dois(minutos % 60) + ':' + dois(decorrido % 60);
+  return Math.floor(decorrido / 60) + ':' + String(decorrido % 60).padStart(2, '0');
 }
 
 function loopFinalTurma(respostas) {
