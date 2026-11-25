@@ -358,12 +358,13 @@ function lcAtivHtml(A){
  }
  h += '<button type="button" class="lc-btn" data-lcagir="dupla:' + A.id + ':' + papel + '">Fazer em dupla (1 de energia)</button>';
  const S = A.solo;
- if (S && S.tipo === 'individual' && vals) h += '<div class="lc-solo"><b>Sem dupla</b> (' + S.custo + ' de energia): tudo precisa estar no seu caderno.<button type="button" class="lc-btn" data-lcagir="solo:' + A.id + ':A">Fazer sozinho</button></div>';
+ if (S && S.tipo === 'individual' && vals) h += '<div class="lc-solo"><b>Sem dupla</b> (' + S.custo + ' de energia): tudo precisa estar no seu caderno.<button type="button" class="lc-btn" data-lcagir="solo:' + A.id + ':A">Fazer sozinho</button><button type="button" class="lc-btn lc-sato" data-lcagir="solosato:' + A.id + '">📞 Com a Dra. Sato (' + (S.custo + 1) + ' de energia)</button><small>Ela confere pelo interfone uma fonte que faltar no seu caderno.</small></div>';
  else if (S && S.tipo === 'chao') {
   const mao = s.mao && s.mao.volta === state.loop ? s.mao.obj : null;
   h += '<div class="lc-solo"><b>Sem dupla</b> (duas voltas): encaminhe a peça pela tela da sala onde a encontrou. Na volta seguinte, use-a na Câmara.';
   if (mao === S.objeto && room === LC_PID.c_peca.sala && !s.chaoUsado && state.loop < 5) h += '<p>Você está com a peça. Volte à tela da sala e toque em “Encaminhar peça de referência”.</p>';
   if (vals) h += '<button type="button" class="lc-btn" data-lcagir="solochao:' + A.id + '">Agir usando a peça do chão (' + S.custo + ' de energia)</button>';
+  if (vals) h += '<button type="button" class="lc-btn lc-sato" data-lcagir="solosato:' + A.id + '">📞 Numa volta só, com a Dra. Sato (' + (S.custo + 1) + ' de energia)</button><small>Estando com a peça verdadeira na mão, ela segura a trava pelo interfone.</small>';
   h += '</div>';
  } else if (A.saida_solo) h += '<p class="lc-solo"><b>Sem dupla:</b> ' + esc(A.saida_solo) + '</p>';
  if (A.papelCentral) h += '<p class="lc-solo"><b>Central:</b> ' + esc(A.papelCentral) + '</p>';
@@ -379,7 +380,7 @@ function lcRaioHtml(A, papel){
   if (s.eco) h += '<p class="lc-ok">Eco gravado na volta ' + s.eco.volta + '.</p>';
  } else {
   h += '<p>Com o código que a outra pessoa disser, baixe a alavanca <b>dentro da janela do raio</b> (' + lcMM(LC_JANELA[0]) + ' a ' + lcMM(LC_JANELA[1]) + '). Cedo ou tarde demais, a máquina não reage.</p><input id="lcCodChaveIn" placeholder="Código de 3 números" inputmode="numeric" maxlength="3" autocomplete="off"><button type="button" class="lc-btn" data-lcagir="raio:' + A.id + '">Baixar a alavanca (1 de energia)</button>';
-  h += '<div class="lc-solo"><b>Sem dupla (eco):</b> numa volta anterior você gravou a chave no Pátio. Agora baixe a alavanca na janela (2 de energia).<button type="button" class="lc-btn" data-lcagir="ecoalavanca:' + A.id + '">Baixar usando o eco</button></div>';
+  h += '<div class="lc-solo"><b>Sem dupla (eco):</b> numa volta anterior você gravou a chave no Pátio. Agora baixe a alavanca na janela (2 de energia).<button type="button" class="lc-btn" data-lcagir="ecoalavanca:' + A.id + '">Baixar usando o eco</button><button type="button" class="lc-btn lc-sato" data-lcagir="raiosato:' + A.id + '">📞 Sem eco, com a Dra. Sato (' + (A.solo.custo_executar + 1) + ' de energia)</button><small>Ela fecha a chave do Pátio por você, na janela do raio.</small></div>';
  }
  return h;
 }
@@ -407,6 +408,17 @@ function lcAgir(cmd){
   if (ladoVals) { const r = lcConfere(A, lerVals()); if (r.certos !== r.tot) { save(); return lcMsg(lcMsgErro(A, r, A.custo_por_pessoa || 1)); } }
   const r = lcFimAtividade(A, 'dupla'); save(); renderClues?.(); renderJournal?.(); return lcMsg(r);
  }
+ if (tipo === 'solosato') {
+  const S = A.solo; if (!S) return;
+  if (S.tipo === 'individual') {
+   const falta = S.no_proprio_caderno.filter(g => !lcTemGrupo(g)).map(g => LC.grupos_fonte[g].rotulo);
+   if (falta.length > 1) return lcMsg('A Dra. Sato cobre UMA fonte que falte. Ainda faltam: ' + falta.join(' · ') + '.');
+  } else if (!(s.mao && s.mao.volta === state.loop && s.mao.obj === S.objeto)) return lcMsg('Você precisa estar com a peça verdadeira na mão, nesta volta.');
+  if (!lcGastar(S.custo + 1)) return;
+  const r = lcConfere(A, lerVals());
+  if (r.certos !== r.tot) { save(); return lcMsg(lcMsgErro(A, r, S.custo + 1)); }
+  const m = lcFimAtividade(A, 'solo (Sato)'); save(); return lcMsg('Pelo interfone, a Dra. Sato cobre o que faltava. ' + m);
+ }
  if (tipo === 'solo' || tipo === 'solochao') {
   const S = A.solo; if (!S) return;
   if (tipo === 'solochao') {
@@ -426,6 +438,11 @@ function lcAgir(cmd){
   if (!na) return lcMsg('Fora da janela do raio (' + lcMM(LC_JANELA[0]) + ' a ' + lcMM(LC_JANELA[1]) + '). Agora são ' + lcMM(Math.floor(seg)) + '.');
   if (!lcGastar(A.solo.custo_gravar)) return;
   s.eco = {volta:state.loop}; lcDarPista(A.solo.produto_eco); save(); return lcMsg('ECO GRAVADO. Em outra volta, baixe a alavanca no Subsolo.');
+ }
+ if (tipo === 'raiosato') {
+  if (!na) return lcMsg('Fora da janela do raio. Agora são ' + lcMM(Math.floor(seg)) + '.');
+  if (!lcGastar(A.solo.custo_executar + 1)) return;
+  const r = lcFimAtividade(A, 'solo (Sato)'); save(); return lcMsg('A Dra. Sato fecha a chave do Pátio pelo interfone. ' + r);
  }
  if (tipo === 'ecoalavanca') {
   if (!s.eco || s.eco.volta >= state.loop) return lcMsg('Falta o eco: numa volta anterior, grave a chave no Pátio.');
