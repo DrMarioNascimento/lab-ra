@@ -134,10 +134,24 @@ function sala(id){
  MUSEU ??= montarMuseu(0);
  const m = MUSEU.mapa[id];
  const alt = m.v ? PECAS_ALT[id]?.[m.v-1] : null;
- return {...base, name:m.nome, andar:m.andar, lugar:m.lugar, nomeBase:base.name, ...(alt ? alt : {})};
+ const r = {...base, name:m.nome, andar:m.andar, lugar:m.lugar, nomeBase:base.name, ...(alt ? alt : {})};
+ const L = (typeof state !== 'undefined' && state && state.caseRules === 2) ? LOOP_SALAS[id] : null;   // no Loop: nome, peça e legenda da história
+ if (L) { delete r.livro; delete r.capa; Object.assign(r, {name:L[0], sub:L[1], peca:L[2]}); }
+ return r;
 }
+// Salas da história do Loop: um nome só por sala (o mesmo das pistas e do roteiro) e a peça que pertence à cena.
+const LOOP_SALAS = {
+ prototipo:['Subsolo · Câmara do tempo','A máquina do tempo','T01'], patio:['Pátio · Quadro externo','Quadro de energia e para-raios','E01'],
+ eletrica:['Oficina elétrica','Gerador, fusíveis e luvas','E02'], relogios:['Sala dos relógios','Relógios que param na queda de luz','R02'],
+ seguranca:['Central de monitoramento','Câmeras e crachás','S01'], recepcao:['Recepção','Livro de visitas e roleta','P01'],
+ conservacao:['Sala de conservação','Registros e laudos do acervo','I01'], atelie:['Ateliê de descobertas','Bancada da Ivone e manual','L06'],
+ deposito:['Sala das coleções','Caixas e movimentações','V12'], galeria:['Galeria especial','A peça principal','V11'],
+ manutencao:['Oficina técnica','Ferramentas e fusíveis','M03'], corredor:['Corredor de serviço e descanso','Porta de serviço e recados','V41'],
+ limpeza:['Base da limpeza','Armário da equipe e carrinho','L05'], sons:['Sala dos sons','Rádio da equipe','N07'], fotografia:['Sala da fotografia','Câmera antiga e catálogo','N05']
+};
 // Troca, em qualquer texto de pista, o nome de origem das salas pelo nome da partida.
 function nomear(texto){
+ if (typeof state !== 'undefined' && state && state.caseRules === 2) return texto;   // no Loop os nomes das salas são fixos
  MUSEU ??= montarMuseu(0);
  if (!MUSEU.semente) return texto;
  const por = Object.fromEntries(ROOMS.map(r => [r.name, MUSEU.mapa[r.id].nome]));
