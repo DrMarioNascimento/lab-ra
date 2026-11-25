@@ -127,7 +127,7 @@ function renderMasterGate(error=''){
   modo='sem-telao';
   const corpo=ensaio
     ? `<div class="dr-master-info"><p>Nenhuma sala é aberta e ninguém entra por QR. Percorra a partida neste aparelho.</p></div>`
-    : `<div class="dr-ident">Como as rodadas devem avançar?</div><button class="dr-choice ${ritmo==='automatico'?'on':''}" data-rhythm="automatico"><b>AUTOMATICAMENTE · RECOMENDADO</b><span>O jogo avança quando todos terminam.</span></button><button class="dr-choice ${ritmo==='conduzido'?'on':''}" data-rhythm="conduzido"><b>COM MINHA LIBERAÇÃO</b><span>A Sala avisará quando for hora de avançar.</span></button>`;
+    : `<div class="dr-ident">Como as voltas avançam?</div><button class="dr-choice ${ritmo==='automatico'?'on':''}" data-rhythm="automatico"><img class="dr-ic" src="../museu/icones/R02.webp" alt=""><b>Sozinho (melhor)</b><span>O jogo anda quando a turma termina.</span></button><button class="dr-choice ${ritmo==='conduzido'?'on':''}" data-rhythm="conduzido"><img class="dr-ic" src="../museu/icones/ui/conduzir.webp" alt=""><b>Eu libero</b><span>Você toca para passar de volta.</span></button>`;
   gate().innerHTML=`<div class="dr-shell"><div class="dr-brand">${esc(TITLE)} · ÁREA DO PROFESSOR</div><div class="dr-card pf-card"><h2>${ensaio?'Ensaiar neste aparelho':'Conduzir como professor'}</h2>${corpo}${error?`<div class="dr-error">${esc(error)}</div>`:''}<button class="dr-btn" id="drGoogle">${ensaio?'Ensaiar com Google':'Abrir com Google'}</button><button class="dr-btn secondary" id="drBack">Cancelar</button></div></div>`;
   document.querySelectorAll('[data-rhythm]').forEach(b=>b.onclick=()=>{ritmo=b.dataset.rhythm;renderMasterGate()});
   /* A SENHA SAIU (03/09/2026), e com ela uma tela inteira do caminho do Professor.

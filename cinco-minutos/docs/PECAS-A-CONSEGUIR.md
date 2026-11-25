@@ -76,7 +76,23 @@ Prompt para versão 3D de melhor qualidade: "Cabine de viagem no tempo steampunk
 
 ## Loop — modelos 3D a obter (25/11/2026, da avaliação pelas escalas)
 
-Antes de pedir, o acervo do LAB-RA foi conferido (93 peças em museu/pecas). Dez salas já foram trocadas por peças que existem. Estas cinco não têm peça adequada (e uma é opcional):
+Antes de pedir, o acervo do LAB-RA foi conferido (93 peças em museu/pecas). Das 15 salas da história, a avaliação da rodada 3 aprovou 5 (Câmara do tempo, Central de monitoramento, Recepção, Oficina técnica, Oficina elétrica) e reprovou 10. Das 10 reprovadas, 5 foram tratadas na revisão 4 sem modelo novo (ver "Composições e livro", logo abaixo) e esperam nova avaliação; as outras 5 não têm peça adequada no acervo e são as desta lista (o item 6 é opcional).
+
+### Composições e livro (feitos na revisão 4, sem modelo novo)
+
+| Sala | O que foi feito | Arquivo | Falta |
+|---|---|---|---|
+| Ateliê de descobertas | Livro de folhear como segunda peça: botão "Abrir o manual", com as 6 páginas do Manual da Câmara e a legenda dos símbolos | `LOOP_SALAS.atelie` (campo `livro`) | Reavaliar. O texto da página fica pequeno no celular (o caderno guarda o texto inteiro) |
+| Sala de conservação | Livro de folhear como segunda peça: "Abrir o livro de registro", com o livro de registro, os registros técnicos e as páginas do diário. Página que gasta energia fica fechada até a pessoa tocar em "Ler" | `LOOP_SALAS.conservacao` | Reavaliar. O fichário continua como peça principal |
+| Galeria especial | Máscara de pedra (V11) em cima de uma base de madeira escura feita por código | `museu/pecas/GAL_A.glb` (493 KB) | Os pontos que falam da base ainda caem por sorteio (`pontosDaPeca()` não foi mexido). A base é uma caixa lisa: uma base modelada ficaria melhor |
+| Sala dos relógios | Relógio de caixa alta (R02) + relógio de parede (R01), lado a lado | `museu/pecas/REL_A.glb` (823 KB) | Acima da meta de 600 KB: recomprimir as texturas. O ponto do pêndulo ainda cai por sorteio |
+| Área de descanso | Sofá (V41) + quadro de recados com alavancas (C02), lado a lado | `museu/pecas/DESC_A.glb` (470 KB) | Não tem porta de serviço nem cafeteira: continuam só em texto |
+
+As três peças compostas saem de `museu/pecas-compostas.mjs` (precisa do gltf-transform: `npm install @gltf-transform/core @gltf-transform/extensions @gltf-transform/functions draco3dgltf meshoptimizer`; uso: `node pecas-compostas.mjs museu/pecas GAL_A,REL_A,DESC_A`).
+
+**Não foi feito nesta revisão (fica para a próxima):** pontos em lugar fixo por peça (tabela no lugar do sorteio de `pontosDaPeca()`), peça que reage ao apagão (luz que cai), recompressão das peças acima de 600 KB (L05 com 1.045 KB; T01, L06, S01, M03 e REL_A entre 820 e 890 KB) e cenas dos minijogos com render das peças reais.
+
+### Modelos a pedir
 
 
 Regras iguais às de `docs/PECAS-A-CONSEGUIR.md`: um conjunto só sobre base, sem pessoa, sem marca nem logotipo, GLB com textura PBR; a compressão (Draco + WebP, 1024 px, alvo ≤ 600 KB) é feita depois.

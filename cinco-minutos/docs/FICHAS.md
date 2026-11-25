@@ -33,13 +33,15 @@ Nada deste arquivo aparece para quem joga. Níveis: **A** alto, **M** médio, **
 ## Exceções (registradas de propósito)
 
 - **Téo** não fala ao vivo. Tudo dele é escrito ou gravado antes de 0:00 (diário, bilhetes, pendrive). Nada "novo" dele aparece depois da queda.
-- **Nico** repete a mesma frase porque é quem mais sente o reinício. Só sai da repetição quando ouve o número de registro da peça verdadeira (da volta 4 em diante).
-- **Dra. Sato** nunca vê: só comenta o que quem joga conta pelo interfone ou rádio. Não dá diagnóstico sem ouvir o sinal.
+- **Nico** repete a mesma frase por jeito dele: já fala assim na primeira volta. Não é memória. Só sai da repetição quando ouve o número de registro da peça verdadeira (da volta 4 em diante).
+- **Dra. Sato** nunca vê o que está dentro do prédio: só comenta o que quem joga conta pelo interfone ou rádio. Não dá diagnóstico sem ouvir o sinal.
+- **Dra. Sato na linha** (caminhos sem dupla, revisão 4): ela dita e confere pelo interfone, e nada mais. Quem joga faz tudo com as próprias mãos: prende a trava do apoio com o cinto, prende a chave do Pátio com a luva. De fora do prédio ela vê o céu, e por isso consegue contar o raio. Quando aceita uma coisa que quem joga viu e não anotou, é confiança dada uma vez ("Desta vez eu confio"), não palpite.
 - **Ninguém do museu lembra das voltas.** Quem lembra: o caderno de quem joga, o chão (objeto deixado) e a Câmara (meio conserto, eco). Uma pessoa só "muda de fala" quando quem joga mostra a ela algo do caderno.
 - **Seu Dirceu** é figurante: tem voz, não tem arco. Quando diz "desde ontem é isso", fala do dia de ontem, não das voltas.
 - **Aurélio**, no final Ouro, agradece "por não esquecer": ele não lembra das voltas; fala do que acabou de ver no telão.
 - **Téo** não prevê o reinício: o cartão da Recepção e o bilhete da oficina falam da montagem e da abertura da exposição. Só na noite do fusível ele sabe do risco da Câmara (página dobrada do diário).
-- **Lenz** só muda de fala na escada quando quem joga diz, alto, que a peça é cópia.
+- **Lenz** só muda de fala na escada quando quem joga diz, alto, que a peça é cópia. O nome dele só aparece da volta 3 em diante: ele mesmo diz, ao atender o telefone perto da porta de serviço.
+- **Seu Dirceu**, na noite do fusível, conta o que viu (o Téo subindo de mão fechada e voltando de mão vazia). O Téo não contou a ele o que levava.
 
 ## Onde cada traço extremo aparece em cena
 
@@ -57,5 +59,7 @@ Nada deste arquivo aparece para quem joga. Níveis: **A** alto, **M** médio, **
 Observação: os traços só orientam a voz de cada fala. O jogo mostra falas e cenas, nunca os traços.
 
 ## Revisão 2 (25/11/2026)
+
+Linhas acertadas a pedido da rodada 3 (revisão 4): as três páginas do diário do Téo ganharam a assinatura "— T."; o manual de entrada só usa falas que existem no jogo (Aurélio e Braga); a Dra. Sato deixou de agir dentro do prédio; duas respostas do interfone saíram do molde "pode ser duas coisas".
 
 Linhas acertadas a pedido da rodada 2 das escalas: assinatura do Téo (uma só, "— T."), voz da Ivone sem hora do dia, cenas da Dra. Sato e do Nico apontando para as pistas certas, exceções do Aurélio, do Téo, do Lenz e do Seu Dirceu, e uma versão só do crachá (o Lenz pegou no armário e deixou bilhete; não pediu).

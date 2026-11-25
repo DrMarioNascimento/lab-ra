@@ -11,9 +11,9 @@ const LC_BASE = new URL('.', (typeof document !== 'undefined' && document.curren
 const lcIc = n => new URL('museu/icones/' + n + '.webp', LC_BASE).href;
 const lcFicha = (x, cls) => '<span class="ic3d' + (cls ? ' ' + cls : '') + '" aria-hidden="true">' + (String(x).startsWith('img:') ? '<img src="' + lcIc(x.slice(4)) + '" alt="" loading="lazy">' : x) + '</span>';
 const lcFichaSala = (id, cls) => lcFicha('img:' + ((typeof sala === 'function' && sala(id) && sala(id).peca) || 'ui/caderno'), cls);
-const LC_ICONE = {A_calibrar:'🎛️', B_potencia:'img:E01', C_ancora:'img:V11', D_fusivel:'img:M03', E_dois:'⚙️'};
-const lcEtqClasse = e => /^SINAL/i.test(e || '') ? 'sinal' : /^LEITURA/i.test(e || '') ? 'normal' : /^MANUAL/i.test(e || '') ? 'manual' : 'outra';
-const lcEtqIcone = e => /^SINAL/i.test(e) ? '🚨' : /^LEITURA/i.test(e) ? '✅' : '📘';
+const LC_ICONE = {A_calibrar:'img:ui/falta-ajustar', B_potencia:'img:E01', C_ancora:'img:V11', D_fusivel:'img:M03', E_dois:'img:ui/dois-defeitos'};
+const lcEtqClasse = e => /^SINAL/i.test(e || '') ? 'sinal' : /^LEITURA COMPLETA/i.test(e || '') ? 'completa' : /^LEITURA/i.test(e || '') ? 'normal' : /^MANUAL/i.test(e || '') ? 'manual' : 'outra';
+const lcEtqIcone = e => /^MANUAL/i.test(e) ? '📘' : '<img class="lc-etq-ic" src="' + lcIc(/^SINAL/i.test(e) ? 'ui/sinal' : /^LEITURA COMPLETA/i.test(e) ? 'T01' : 'ui/leitura-normal') + '" alt="">';   // manual: provisório (docs/ICONES-A-GERAR.md)
 const LC_CAUSAS = ['A_calibrar','B_potencia','C_ancora','D_fusivel','E_dois'];
 // Valores do conserto sorteados pela semente (nada para decorar entre partidas). Os textos trazem marcadores {dia}, {hora}, {reg}...
 let LC_VC = null;
@@ -36,7 +36,7 @@ function lcS(){
  return state.lc;
 }
 const lcAlvos = () => { const a = LC.conserto_por_causa[lcCausa()] || []; return Array.isArray(a) ? a : [a]; };
-const lcMeioPendente = (A, solo) => { const al = lcAlvos(), s = lcS(); return al.length > 1 && al.includes(A.id) && !al.filter(o => o !== A.id).every(o => s.meio[o] && (solo ? s.meio[o] <= state.loop : s.meio[o] < state.loop)); };
+const lcMeioPendente = A => { const al = lcAlvos(), s = lcS(); return al.length > 1 && al.includes(A.id) && !al.filter(o => o !== A.id).every(o => s.meio[o] && s.meio[o] < state.loop); };   // um conserto por volta, com ou sem dupla
 const lcVmin = A => (lcAlvos().length > 1 && lcAlvos().includes(A.id)) ? LC.regras.E_volta_min_meio : A.volta_min;
 const lcFmt = k => LC.formato_valores[k] || {};
 function lcNorm(k, v){
@@ -51,7 +51,7 @@ function lcConfere(A, vals){
  return {certos:A.valores_pedidos.length - erradas.length, tot:A.valores_pedidos.length, erradas};
 }
 // Valores errados: a máquina só diz quantos estão certos, nunca qual está errado. O formato de cada valor aparece dentro do campo.
-const lcMsgErro = (A, r, custo) => 'A MÁQUINA NÃO REAGE: ' + r.certos + ' de ' + r.tot + ' certos. (-' + custo + ' de energia' + (state.loop === 4 ? '; ensaio sem punição' : '') + ')';
+const lcMsgErro = (A, r, custo) => 'A MÁQUINA NÃO REAGE: ' + r.certos + ' de ' + r.tot + ' certos. ' + (state.loop <= 4 ? 'Era ensaio: você só gastou a energia.' : 'Você gastou ' + custo + ' de energia.');
 const lcAtiva = x => !x.soNaCausa || x.soNaCausa.includes(lcCausa());
 const lcId = id => 'lc-' + id;
 const lcTem = id => (state.clues || []).some(c => c.id === lcId(id));
@@ -65,14 +65,14 @@ const LC_GLOS = [
  ['fusíve(?:l|is)', 'Peça pequena que queima para proteger a energia.'],
  ['patrocin(?:ador(?:es)?|io)', 'Quem paga as despesas do museu e aparece com o nome numa exposição.'],
  ['restauro', 'Consertar uma obra antiga.'],
- ['dossiê', 'As pistas do grupo, juntas.'],
+ ['dossiê', 'A página da Máquina onde você prova o defeito com 3 pistas do seu caderno.'],
  ['eco', 'O som que volta. Aqui, a gravação que a máquina guarda.'],
  ['sinais?', 'Pista que mostra o que está errado na máquina.'],
- ['descartes?', 'Pista que mostra o que está funcionando, ou seja, o que NÃO é o defeito.'],
+ ['leituras? norma(?:l|is)', 'Pista que mostra uma parte da máquina que está bem. Ela afasta outro defeito.'],
  ['etiquetas?', 'O tipo da pista. Duas pistas com a mesma etiqueta valem um sinal só.'],
- ['ensaio', 'Treino do conserto: na volta 4 você treina, na 5 vale.']
+ ['ensaio', 'Treino do conserto: das voltas 2 a 4 você treina, na 5 vale.']
 ].map(([re, txt]) => ({re: new RegExp('(?<![\\p{L}])(' + re + ')(?![\\p{L}])', 'iu'), txt}));
-const LC_GLOS_LISTA = [['Registro','Número que identifica a peça, tipo o RG dela (ex.: 050).'],['Luz da peça','A luz do painel que mostra se a peça da base é a registrada.'],['Ponto de ligação','Onde o fio se encaixa, tipo uma tomada.'],['Roleta de entrada','A roleta da entrada, a que gira quando você passa.'],['Ajustar','Acertar os números da máquina, como acertar um relógio.'],['Disjuntor','A chave do quadro de luz que desarma quando algo dá errado.'],['Fusível','Peça pequena que queima para proteger a energia.'],['Base da peça','O suporte onde a peça fica apoiada.'],['Patrocinador','Quem paga as despesas do museu e aparece com o nome numa exposição.'],['Restauro','Consertar uma obra antiga.'],['Dossiê','As pistas do grupo, juntas.'],['Eco','O som que volta. Aqui, a gravação que a máquina guarda.'],['Sinal','Pista que mostra o que está errado na máquina.'],['Descarte','Pista que mostra o que está funcionando, ou seja, o que NÃO é o defeito.'],['Etiqueta','O tipo da pista. Duas pistas com a mesma etiqueta valem um sinal só.'],['Ensaio','Treino do conserto: na volta 4 você treina, na 5 vale.']];
+const LC_GLOS_LISTA = [['Registro','Número que identifica a peça, tipo o RG dela (ex.: 050).'],['Luz da peça','A luz do painel que mostra se a peça da base é a registrada.'],['Ponto de ligação','Onde o fio se encaixa, tipo uma tomada.'],['Roleta de entrada','A roleta da entrada, a que gira quando você passa.'],['Ajustar','Acertar os números da máquina, como acertar um relógio.'],['Disjuntor','A chave do quadro de luz que desarma quando algo dá errado.'],['Fusível','Peça pequena que queima para proteger a energia.'],['Base da peça','O suporte onde a peça fica apoiada.'],['Patrocinador','Quem paga as despesas do museu e aparece com o nome numa exposição.'],['Restauro','Consertar uma obra antiga.'],['Dossiê','A página da Máquina onde você prova o defeito com 3 pistas do seu caderno.'],['Eco','O som que volta. Aqui, a gravação que a máquina guarda.'],['Sinal','Pista que mostra o que está errado na máquina.'],['Leitura normal','Pista que mostra uma parte da máquina que está bem. Ela afasta outro defeito.'],['Etiqueta','O tipo da pista. Duas pistas com a mesma etiqueta valem um sinal só.'],['Ensaio','Treino do conserto: das voltas 2 a 4 você treina, na 5 vale.']];
 function lcGlos(html){
  const usados = new Set();
  return String(html).replace(/(<[^>]*>)|([^<]+)/g, (m, tag, texto) => {
@@ -86,9 +86,10 @@ window.lcGlos = lcGlos;
 function lcPreConf(){
  const el = document.getElementById('lcPre'); if (!el) return;
  const marc = Array.from(document.querySelectorAll('input[name=lcprova]:checked')).map(i => (state.clues || []).find(c => c.id === 'lc-' + i.value)).filter(Boolean);
- let sin = [], sis = 0, out = 0; for (const c of marc) { const e = (c.etq || '').toUpperCase(); if (e.startsWith('SINAL')) sin.push(e); else if (e.startsWith('LEITURA')) sis++; else out++; }
+ let sin = [], sis = 0, out = 0, comp = 0; for (const c of marc) { const e = (c.etq || '').toUpperCase(); if (e.startsWith('SINAL')) sin.push(e); else if (e.startsWith('LEITURA COMPLETA')) comp++; else if (e.startsWith('LEITURA')) sis++; else out++; }
+ if (comp) { el.textContent = 'Você marcou a leitura completa do painel: ela vale sozinha. Falta escolher o defeito.'; return; }
  const tipos = new Set(sin).size, ok = marc.length === 3 && sin.length === 2 && tipos === 2 && sis === 1;
- let m = 'Marcadas: ' + marc.length + ' de 3 · 🚨 sinais: ' + sin.length + ' (' + tipos + ' tipo' + (tipos === 1 ? '' : 's') + ') · ✅ leitura normal: ' + sis + (out ? ' · outras: ' + out : '') + '.';
+ let m = 'Marcadas: ' + marc.length + ' de 3 · sinais: ' + sin.length + ' (' + tipos + ' tipo' + (tipos === 1 ? '' : 's') + ') · leitura normal: ' + sis + (out ? ' · outras: ' + out : '') + '.';
  if (marc.length === 3 && !ok) { if (out) m += ' Pista sem etiqueta de sinal ou de leitura normal não conta.'; if (sin.length === 2 && tipos < 2) m += ' Os dois sinais têm a mesma etiqueta: valem um só.'; else if (sin.length !== 2) m += ' Precisa de 2 sinais.'; if (sis !== 1) m += ' Precisa de 1 leitura normal.'; }
  if (ok) m += ' Forma certa. (O jogo ainda confere se aponta o defeito.)';
  el.textContent = m;
@@ -144,14 +145,16 @@ function pistasCentral(base){
  return base;
 }
 function lcVisivel(q){ const p = LC_PID[q.lcp]; return !p || (lcPodeVer(p) && lcChaoOk(p)); }
+// salas das pistas pedidas que existem na noite, sempre na mesma ordem (a frase da tranca é igual nas 5 causas)
+const lcSalasDe = ids => { const s = [...new Set(ids.filter(i => lcAtiva(LC_PID[i])).map(i => LC_PID[i].sala))].sort((a, b) => LC.salas.indexOf(a) - LC.salas.indexOf(b)).map(lcNomeSala); return s.length > 3 ? s.slice(0, 3).concat('outras salas') : s; };   // no máximo 3 nomes: a dica aponta, não lista o museu
 function lcBloqueio(q){
  const p = LC_PID[q.lcp]; if (!p) return '';
  if (p.excl && lcTem(p.excl) && !/individual/.test(location.pathname)) return 'Você já viu a outra metade desta pista. Peça à outra pessoa que veja esta e descreva em voz alta.';
  const pd = p.precisaDe || {}, falta = (pd.todas || []).find(i => !lcTem(i));
  if (falta && p.porque) return p.porque + ' (em ' + lcNomeSala(LC_PID[falta].sala) + ')';
  if (falta) return 'Falta achar algo antes, em ' + lcNomeSala(LC_PID[falta].sala) + '.';
- if ((pd.umaDe || []).length && !pd.umaDe.some(lcTem) && p.porque) return p.porque + ' (veja em ' + [...new Set(pd.umaDe.map(i => lcNomeSala(LC_PID[i].sala)))].join(' ou ') + ')';
- if ((pd.umaDe || []).length && !pd.umaDe.some(lcTem)) return 'Falta achar algo antes, em ' + [...new Set(pd.umaDe.map(i => lcNomeSala(LC_PID[i].sala)))].join(' ou ') + '.';
+ if ((pd.umaDe || []).length && !pd.umaDe.some(lcTem) && p.porque) return p.porque + ' (veja em ' + lcSalasDe(pd.umaDe).join(' ou ') + ')';
+ if ((pd.umaDe || []).length && !pd.umaDe.some(lcTem)) return 'Falta achar algo antes, em ' + lcSalasDe(pd.umaDe).join(' ou ') + '.';
  return '';
 }
 function lcTextoClue(q){ const p = LC_PID[q.lcp]; return p ? lcTexto(p) : q.text; }
@@ -174,21 +177,22 @@ function lcValidaAnexo(causa, ids){
  const lados = (LC.diagnostico_por_causa[causa] || {}).lados, sinais = {}, desc = [], linhas = []; let completo = false;
  for (const i of ids) {
   const x = LC_PID[i], g = x.grupoFonte, ap = x.revela.aponta.includes(causa), rot = '"' + (x.previa || i) + '"', de = x.revela.descarta.filter(c => LC_CAUSAS.includes(c) && c !== causa);
-  if (x.diagnosticoCompleto && ap) { completo = true; linhas.push(rot + ': leitura completa do painel. Vale sozinha.'); }
-  else if (x.tipo === 'falsa_honesta') linhas.push(rot + ': coisa estranha com explicação inocente. NÃO CONTA.');
-  else if (ap && g && sinais[g]) linhas.push(rot + ': sinal REPETIDO (mesmo tipo). Conta uma vez só.');
-  else if (ap && g) { sinais[g] = i; linhas.push(rot + ': CONTOU como sinal.'); }
-  else if (de.length) { desc.push(i); linhas.push(rot + ': CONTOU como leitura normal (essa parte não é o defeito).'); }
-  else if ((g || '').startsWith('sint_')) linhas.push(rot + ': é sinal da máquina, mas não combina com o defeito escolhido. NÃO CONTOU.');
-  else if ((g || '').startsWith('desc_')) linhas.push(rot + ': é leitura normal, mas não afasta nenhum outro defeito aqui. NÃO CONTOU.');
-  else linhas.push(rot + ': não é sinal da máquina nem leitura normal (história, manual ou ferramenta). NÃO CONTOU.');
+  if (x.diagnosticoCompleto && ap) { completo = true; linhas.push(rot + ': leitura completa. Vale sozinha.'); }
+  else if (x.diagnosticoCompleto) linhas.push(rot + ': leitura completa, mas de outro defeito.');
+  else if (x.tipo === 'falsa_honesta') linhas.push(rot + ': tem explicação inocente. Não conta.');
+  else if (ap && g && sinais[g]) linhas.push(rot + ': sinal repetido.');
+  else if (ap && g) { sinais[g] = i; linhas.push(rot + ': contou, sinal.'); }
+  else if (de.length) { desc.push(i); linhas.push(rot + ': contou, leitura normal.'); }
+  else if ((g || '').startsWith('sint_')) linhas.push(rot + ': sinal de outro defeito.');
+  else if ((g || '').startsWith('desc_')) linhas.push(rot + ': leitura que não ajuda aqui.');
+  else linhas.push(rot + ': não é sinal nem leitura.');
  }
  if (completo) return {ok:true, msg:'', linhas};
  let ns = Math.min(Object.keys(sinais).length, 2); const nd = Math.min(desc.length, 1);
  if (lados) ns = lados.filter(l => l.some(g => sinais[g])).length;
- const placar = 'Contaram ' + ns + ' de 2 sinais' + (lados ? ' (dois defeitos: 1 sinal de número + 1 de força)' : '') + ' e ' + nd + ' de 1 leitura normal.';
- if (ns < 2) return {ok:false, msg:placar + ' Faltam sinais de tipos diferentes que apontem esse defeito.', linhas};
- if (!nd) return {ok:false, msg:placar + ' Falta 1 leitura normal: uma pista que mostre uma parte que está bem (ex.: números parados, fusíveis no lugar, carga cheia, modo livre).', linhas};
+ const placar = ns + ' de 2 sinais e ' + nd + ' de 1 leitura normal.';
+ if (ns < 2) return {ok:false, msg:placar + ' Faltam sinais.', linhas};
+ if (!nd) return {ok:false, msg:placar + ' Falta 1 leitura normal.', linhas};
  return {ok:true, msg:placar, linhas};
 }
 function lcAnexar(causa, ids){
@@ -196,15 +200,16 @@ function lcAnexar(causa, ids){
  if (s.diag) return 'O dossiê já tem diagnóstico.';
  if (state.loop < 2) return 'A página de diagnóstico abre na volta 2. Por enquanto, olhe e anote.';
  if (s.anexos[state.loop]) return 'Uma tentativa por volta. Tente de novo na próxima.';
- if (ids.length !== 3) return 'Escolha exatamente 3 pistas do seu caderno. (Não gastou a tentativa.)';
+ const completa = ids.some(i => LC_PID[i] && LC_PID[i].diagnosticoCompleto);   // a leitura completa do painel vale sozinha (pode ir sem as outras duas)
+ if (ids.length !== 3 && !(completa && ids.length >= 1 && ids.length <= 3)) return 'Escolha exatamente 3 pistas do seu caderno. (Não gastou a tentativa.)';
  const v = lcValidaAnexo(causa, ids);
  s.anexos[state.loop] = causa;
- if (!v.ok) { save(); return 'O dossiê não aceita. ' + v.msg + ' ' + v.linhas.join(' ') + ' A tentativa desta volta foi gasta.'; }
+ if (!v.ok) { save(); return 'O dossiê não aceita: ' + (completa ? '' : v.msg + ' ') + v.linhas.join(' ') + ' Tentativa da volta gasta.'; }
  if (lcCausa() === 'E_dois' && (causa === 'A_calibrar' || causa === 'B_potencia')) { save(); return 'MEIO CERTO: as provas combinam, mas a máquina só dá um tranco e o aviso muda de lugar. Tem OUTRO defeito junto: é a opção "Dois defeitos juntos". A tentativa desta volta foi gasta.'; }
  if (causa !== lcCausa()) { save(); return 'As provas até combinam, mas A MÁQUINA NÃO REAGE: o defeito escolhido não é esse. Releia os sinais do caderno antes da próxima tentativa. (A tentativa desta volta foi gasta.)'; }
  s.diag = {volta:state.loop}; save();
- return 'DIAGNÓSTICO ANEXADO. ' + v.msg + ' No interfone, a Dra. Sato quase sussurra: "Quem fez isso? Ela... ela escutou você." ' +
-  (v.msg ? 'Você não chutou: dois sinais diferentes apontando para o mesmo lado e uma leitura dizendo "aqui não é".' : 'Você não chutou: a leitura completa do painel mostrou o defeito.') + ' O conserto da máquina pode acender.';
+ return 'DIAGNÓSTICO ANEXADO.' + (v.msg ? ' ' + v.msg : '') + (state.room === 'prototipo' ? ' No interfone, a Dra. Sato quase sussurra: "Quem fez isso? Ela... ela escutou você." ' : ' Lá embaixo, a Câmara dá um estalo, como quem escuta. ') +
+  (v.msg ? 'Você não chutou: dois sinais diferentes apontando para o mesmo lado e uma leitura dizendo "aqui não é".' : 'Você não chutou: a leitura completa do painel mostrou o defeito e você soube dar nome a ele.') + ' O conserto da máquina pode acender.';
 }
 function lcFaltas(A){
  const e = A.entrada, f = [];
@@ -232,19 +237,19 @@ const LC_ENSAIO = {
  B_potencia:'O que ainda pode falhar: a força só entra na hora do raio ({j0} a {j1} da volta). Chegue à alavanca antes e combine com a dupla.',
  C_ancora:'O que ainda pode falhar: a peça verdadeira precisa estar no apoio, e sem dupla, ela só chega se for deixada no chão numa volta anterior.',
  D_fusivel:'O que ainda pode falhar: a ordem dos 3 pontos. Na volta 5 não dá para trocar a ordem depois de confirmar.',
- E_dois:'O que ainda pode falhar: um dos defeitos reagiu e o outro não. Os dois consertos precisam acontecer, em voltas diferentes.'
+ E_dois:'O que ainda pode falhar: um dos defeitos reagiu e o outro não. São dois consertos, um por volta.'
 };
 const lcAvisoEnsaio = () => LC_ENSAIO[lcCausa()] || '';
 function lcFimAtividade(A, modo){
  const s = lcS(); s.feitas[A.id] = (s.feitas[A.id] || 0) + 1;
- if (A.anexa_diagnostico && !s.diag) { s.diag = {volta:state.loop, via:A.id}; toast('Leitura completa: DIAGNÓSTICO ANEXADO. A Dra. Sato sussurra: "Ela... ela escutou você."'); }
  if (A.conserto) {
-  if (lcMeioPendente(A, String(modo).startsWith('sem dupla'))) { s.meio[A.id] = state.loop; if (A.produto_meio) lcDarPista(A.produto_meio); return 'MEIO CONSERTO (' + modo + ') gravado na Câmara. O aviso mudou de lugar, mas não sumiu: falta o OUTRO defeito, em OUTRA volta.'; }
+  if (lcMeioPendente(A)) { const mesma = Object.entries(s.meio).some(([o, v]) => o !== A.id && v === state.loop); s.meio[A.id] = state.loop; if (A.produto_meio) lcDarPista(A.produto_meio);
+   return 'MEIO CONSERTO (' + modo + ') gravado na Câmara. ' + (mesma ? 'Você mexeu nos dois defeitos na mesma volta: a Câmara só fecha em outra. Repita um deles numa volta seguinte.' : 'O aviso mudou de lugar, mas não sumiu: falta o OUTRO defeito, em OUTRA volta.'); }
   if (state.loop <= 4) { s.ensaio.push(A.id); if (A.produto_ensaio) lcDarPista(A.produto_ensaio); return 'ENSAIO (' + modo + '): A MÁQUINA REAGE. Não valeu ainda: repita na volta 5. ' + lcAvisoEnsaio() + ''; }
-  s.conserto = 5; if (A.produto_final) lcDarPista(A.produto_final); return 'CONSERTO FEITO (' + modo + '). O retorno foi interrompido.';
+  s.conserto = 5; if (A.produto_final) lcDarPista(A.produto_final); return 'CONSERTO FEITO (' + modo + '). A máquina está inteira. Agora o botão "Loop Reset" responde.';
  }
  const n = lcProduzir(A);
- return 'ATIVIDADE FEITA: ' + A.nome + '.' + (n.length ? ' Novas pistas no caderno: ' + n.map(p => p.previa).join(', ') + '.' : '');
+ return 'ATIVIDADE FEITA: ' + A.nome + '.' + (n.length ? ' Novas pistas no caderno: ' + n.map(p => p.previa).join(', ') + '.' : '') + (A.entrega_diagnostico && !s.diag ? ' A leitura completa vale sozinha no Dossiê. Quem escolhe o defeito é você.' : '');
 }
 function lcFinal(){
  const s = lcS(), certa = !!s.diag, des = certa && s.conserto === 5, rev = !!(s.revelado && s.revelado.ok);
@@ -255,16 +260,16 @@ function lcFinal(){
 const lcFinalTxt = n => { const f = LC.finais.find(x => x.nome.toLowerCase() === n.toLowerCase() || x.nome === n.replace('í', 'i')) || {}; return (f.texto_por_causa && f.texto_por_causa[lcCausa()]) || f.texto || ''; };
 function lcResumoFinal() {
  const s = lcS(), final = lcFinal();
- const provasTxt = ['prova_falsa','trajeto','cracha'].map(g => (lcTemGrupo(g) ? '✅ ' : '⬜ ') + LC.grupos_fonte[g].rotulo).join(' · ');
+ const provasTxt = ['prova_falsa','trajeto','cracha'].map(g => (lcTemGrupo(g) ? '✓ ' : '○ ') + LC.grupos_fonte[g].rotulo).join(' · ');
  const passos = [
   s.diag ? 'Diagnóstico anexado ao dossiê.' : 'Diagnóstico ainda em aberto.',
   s.conserto === 5 ? 'Máquina consertada na última volta.'
    : Object.keys(s.meio).length ? 'Parte do conserto ficou registrada.' : 'A máquina continua ativa.',
   provasTxt,
   s.revelado?.ok ? 'A troca da peça foi revelada com as três provas.'
-   : s.revelado ? 'O nome apresentado não fechou com as provas.' : 'A troca da peça ainda precisa ser revelada.'
+   : s.revelado ? 'O nome apresentado não fechou com as provas.' : 'O que aconteceu nesta noite ainda precisa ser revelado.'
  ];
- return '<div class="result-card loop-ending"><p class="kicker">DESFECHO DA MÁQUINA</p><h3>' + esc(final) + '</h3><p>' +
+ return '<div class="result-card loop-ending"><p class="kicker">DESFECHO DA MÁQUINA</p><h3>' + esc(LOOP_FINAL_NOME[final] || final) + '</h3><p>' +
   esc(lcFinalTxt(final) || LOOP_FINAIS[final]) + '</p><ul>' + passos.map(p => '<li>' + esc(p) + '</li>').join('') + '</ul></div>';
 }
 
@@ -281,7 +286,7 @@ function lcEncaminharPeca() {
  s.mao = null;
  save();
  renderClues();
- toast('Peça encaminhada. Ela estará no ' + lcNomeSala(abrigo) + ' na próxima volta.');
+ toast('Você desceu com a peça e deixou ao lado do apoio. Na próxima volta ela está lá.');
 }
 function lcRenderEncaminhamento(panel) {
  const abrigo = LC_AT.coop_ancora.solo.sala, s = lcS();
@@ -292,10 +297,10 @@ function lcRenderEncaminhamento(panel) {
   box?.remove();
   return;
  }
- const texto = pode ? 'Encaminhe a peça ao ' + lcNomeSala(abrigo) + ' para poder usá-la em outra volta.'
-  : 'A peça verdadeira está guardada em: ' + lcNomeSala(abrigo) + ' desde a volta ' + s.chao[abrigo].volta + '.';
+ const texto = pode ? 'Desça com a peça verdadeira e deixe ao lado do apoio, no Subsolo. O chão guarda.'
+  : 'A peça verdadeira está no chão do Subsolo, ao lado do apoio, desde a volta ' + s.chao[abrigo].volta + '.';
  const conteudo = '<p>' + esc(texto) + '</p>' + (pode
-  ? '<button type="button" class="btn secondary" data-encaminhar-peca>Deixar a peça verdadeira · 1 de energia</button>' : '');
+  ? '<button type="button" class="btn secondary" data-encaminhar-peca>Descer com a peça e deixar no chão · 1 de energia</button>' : '');
  if (!box) {
   box = document.createElement('div');
   box.className = 'lc-encaminhamento note';
@@ -326,7 +331,7 @@ function lcPainelHtml(aba){
  const meus = (state.clues || []).filter(c => c.id.startsWith('lc-'));
  if (aba === 'dossie') {
   h += lcMissaoHtml();
-  h += '<h4>Por que a máquina travou?</h4><div class="lc-passos">' + passo('🚨', '2 sinais de tipos diferentes') + passo('✅', '1 leitura normal') + passo('img:ui/alvo', '1 defeito') + '</div>' + lcGlos('<p class="lc-dica">Marque 3 pistas do seu caderno e escolha o defeito. Uma tentativa por volta, da volta 2 em diante.</p><details class="lc-dic"><summary>Como funciona</summary><p>Um <b>sinal</b> mostra o que está errado na máquina. Dois sinais com a mesma etiqueta valem um só. Uma <b>leitura normal</b> mostra uma parte que está bem: ela afasta outro defeito. Manual, ferramenta e coisa estranha com explicação inocente não contam. Cada pessoa tem o seu caderno. Para outra pessoa usar uma pista sua, passe na pausa.</p></details><details class="lc-dic"><summary>Dicionário das palavras</summary>' + LC_GLOS_LISTA.map(([n, t]) => '<p><b>' + n + '</b>: ' + esc(t) + '</p>').join('') + '</details>') + '';
+  h += '<h4>Por que a máquina travou?</h4><div class="lc-passos">' + passo('img:ui/sinal', '2 sinais de tipos diferentes') + passo('img:ui/leitura-normal', '1 leitura normal') + passo('img:ui/alvo', '1 defeito') + '</div>' + lcGlos('<p class="lc-dica">Marque 3 pistas do seu caderno e escolha o defeito. Uma tentativa por volta, da volta 2 em diante.</p><details class="lc-dic"><summary>Como funciona</summary><p>Um <b>sinal</b> mostra o que está errado na máquina. Dois sinais com a mesma etiqueta valem um só. Uma <b>leitura normal</b> mostra uma parte que está bem: ela afasta outro defeito. Manual, ferramenta e coisa estranha com explicação inocente não contam. A leitura completa do painel vale sozinha. Cada pessoa tem o seu caderno. Para outra pessoa usar uma pista sua, passe na pausa.</p></details><details class="lc-dic"><summary>Dicionário das palavras</summary>' + LC_GLOS_LISTA.map(([n, t]) => '<p><b>' + n + '</b>: ' + esc(t) + '</p>').join('') + '</details>') + '';
   if (s.diag) h += '<p class="lc-ok">O dossiê já aceitou o diagnóstico. Vá para Atividades.</p>';
   else {
    h += '<div class="lc-causas">' + LC_CAUSAS.map(c => '<label class="lc-causa"><input type="radio" name="lccausa" value="' + c + '">' + lcFicha(LC_ICONE[c]) + '<span>' + LC_NOME[c] + '</span></label>').join('') + '</div>';
@@ -335,9 +340,11 @@ function lcPainelHtml(aba){
   }
   h += '<p class="lc-msg" id="lcMsg" role="status"></p>';
  } else if (aba === 'atividades') {
-  h += '<div class="lc-passos">' + passo('img:ui/dupla', 'Dupla: cada pessoa numa sala, falando') + passo('⚡', '1 de energia de cada pessoa') + passo('img:M03', 'Um conserto por volta') + '</div><details class="lc-dic"><summary>Sem dupla?</summary><p>Vale o caminho sem dupla, que gasta mais energia. Alguns consertos pedem duas voltas: numa você deixa a peça no chão ou grava o gesto, na seguinte você termina. Comece cedo. Dois consertos na mesma volta viram meio conserto cada um.</p></details>';
+  h += '<div class="lc-passos">' + passo('img:ui/dupla', 'Dupla: cada pessoa numa sala, falando') + passo('img:E01', '1 de energia de cada pessoa') + passo('img:M03', 'Um conserto por volta') + '</div><details class="lc-dic"><summary>Sem dupla?</summary><p>Vale o caminho sem dupla, que gasta mais energia. Alguns consertos pedem duas voltas: numa você deixa a peça no chão ou grava o gesto, na seguinte você termina. Comece cedo. Dois consertos na mesma volta viram meio conserto cada um.</p></details>';
+  if (!s.diag) h += '<section class="lc-ativ"><h4><i class="lc-luz" aria-hidden="true"></i>Conserto da máquina</h4><p class="lc-dica">A máquina ainda não sabe o que você quer dela.</p><p class="muted">Aparece quando o diagnóstico estiver anexado (aba Dossiê).</p></section>';
   for (const A of LC.atividades_coop) {
    if (!lcAtiva(A)) continue;
+   if (A.conserto && !s.diag) continue;   // o conserto da noite não aparece antes do diagnóstico (seria o defeito de graça)
    const f = lcFaltas(A), cedo = state.loop < lcVmin(A), aberta = !f.length && !cedo;
    h += '<section class="lc-ativ' + (aberta ? ' on' : '') + '"><h4><i class="lc-luz" aria-hidden="true"></i>' + esc(A.nome) + '</h4><div class="lc-salas">' + A.salas.map(id => '<span>' + lcFichaSala(id, 'sm') + esc(lcNomeSala(id)) + '</span>').join('') + '</div>';
    if (!aberta) { const pr = [LC_PID[state.loop >= 5 ? A.produto_final : A.produto_ensaio], ...(A.produz || []).map(i => LC_PID[i])].find(p => p && lcAtiva(p) && p.porque);   // a frase do mundo que explica por que ainda não dá
@@ -347,13 +354,13 @@ function lcPainelHtml(aba){
   }
   h += '<p class="lc-msg" id="lcMsg" role="status"></p>';
  } else if (aba === 'revelar') {
-  h += '<h4>Revelar quem trocou a peça</h4><div class="lc-passos">' + passo('img:P01', 'Na Recepção, na última volta') + passo('img:ui/caderno', '3 provas no seu caderno') + passo('☝️', 'Uma tentativa na noite inteira') + '</div><p class="lc-dica">Até a última volta, junte as 3 provas. Falta uma? Ache nas salas, peça a alguém na pausa ou deixe essa pessoa apresentar.</p>';
+  h += '<h4>Revelar o que aconteceu</h4><div class="lc-passos">' + passo('img:P01', 'Na Recepção, na última volta') + passo('img:ui/caderno', '3 provas no seu caderno') + passo('☝️', 'Uma tentativa na noite inteira') + '</div><p class="lc-dica">Até a última volta, junte as 3 provas. Falta uma? Ache nas salas, peça a alguém na pausa ou deixe essa pessoa apresentar.</p>';
   const PV_IC = {prova_falsa:'img:V11', trajeto:'img:S01', cracha:'img:L05'};
   const pv = ['prova_falsa','trajeto','cracha'];
   h += '<ul class="lc-lista lc-p3">' + pv.map(g => { const tem = lcTemGrupo(g); return '<li class="' + (tem ? 'ok' : 'falta') + '">' + lcFicha(PV_IC[g]) + '<div><b>' + esc(LC.grupos_fonte[g].rotulo) + '</b><small>' + (tem ? 'Está no seu caderno.' : LC_ONDE[g]) + '</small></div><i class="lc-selo">' + (tem ? '✓ tem' : 'falta') + '</i></li>'; }).join('') + '</ul>';
   h += s.revelado ? '<p class="lc-ok">' + (s.revelado.ok ? 'Três provas, três perguntas respondidas: o que foi feito, por onde passou, de quem era a mão. O nome fechou.' : 'Você já usou a tentativa: o nome não fechou.') + '</p>' : state.loop !== 5 ? '<p class="muted">O telão da Recepção só aceita o Revelar na última volta.</p>'
-   : '<input id="lcNome" placeholder="Nome de quem trocou a peça" autocomplete="off"><button type="button" class="lc-btn" id="lcRevelar">Registrar revelação</button>';
-  h += '<p class="lc-ok">Final se a noite acabasse agora: <b>' + lcFinal() + '</b>. ' + esc(lcFinalTxt(lcFinal())) + '</p><p class="lc-msg" id="lcMsg" role="status"></p>';
+   : '<input id="lcNome" placeholder="Diga o nome" autocomplete="off"><button type="button" class="lc-btn" id="lcRevelar">Registrar revelação</button>';
+  h += '<p class="lc-ok">Final se a noite acabasse agora: <b>' + (LOOP_FINAL_NOME[lcFinal()] || lcFinal()) + '</b>. ' + esc(lcFinalTxt(lcFinal())) + '</p><p class="lc-msg" id="lcMsg" role="status"></p>';
  } else {
   h += '<div class="lc-passos">' + passo('img:ui/caderno', 'Quem passa mostra o código') + passo('img:ui/participar', 'Quem recebe digita') + passo('img:ui/dupla', 'Conte com as suas palavras') + '</div><p class="lc-dica">Só na pausa entre as voltas. Não gasta energia. Até 3 pistas por pausa.</p>';
   if (state.phase === 'playing') h += '<p class="muted">Espere a pausa entre as voltas.</p>';
@@ -383,26 +390,30 @@ function lcAtivHtml(A){
   if (A.saida_solo) h += '<p class="lc-solo"><b>Sem dupla:</b> ' + esc(A.saida_solo) + '</p>';
   return h;
  }
- if (lcMeioPendente(A) && s.meio[A.id]) return h + '<p class="lc-ok">Esta metade já está gravada na Câmara. Falta o OUTRO defeito (em outra volta, ou na mesma se você joga sem dupla).</p>';
+ if (lcMeioPendente(A) && s.meio[A.id]) return h + '<p class="lc-ok">Esta metade já está gravada na Câmara. Falta o OUTRO defeito, em outra volta.</p>';
  h += '<p class="lc-papel"><b>Sua parte:</b> ' + esc(papel === 'A' ? A.papelA : A.papelB) + '</p>';
- if (A.dicaTela && A.dicaTela[papel]) h += '<p class="lc-dica">💡 ' + esc(A.dicaTela[papel]) + '</p>';
+ if (A.dicaTela && A.dicaTela[papel]) h += '<p class="lc-dica">' + esc(A.dicaTela[papel]) + '</p>';
  if (A.id === 'coop_raio') return h + lcRaioHtml(A, papel);
  const slot = lcSlot(), vals = A.valores_pedidos && room === 'prototipo';
- h += '<p class="lc-pal">Palavra para dizer em voz alta: <b>' + lcPal(A.id, papel, slot) + '</b> <small>(muda a cada 30 s)</small></p>';
+ const tp = A.telaPapel && A.telaPapel[papel];   // o que só esta pessoa vê: a outra precisa ouvir
+ if (tp) { const it = Array.isArray(tp.itens) ? tp.itens : (tp.itens[lcCausa()] || []); h += '<div class="lc-ve"><b>' + esc(tp.titulo) + '</b><ul>' + it.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul></div>'; }
+ if (A.perguntaB && papel === 'B') h += '<div class="lc-vals">' + A.perguntaB.rotulos.map((r, i) => '<label class="lc-val"><span>' + esc(r) + '</span><select data-lcleg="' + i + '" aria-label="' + esc(r) + '"><option value="">como está?</option>' + A.perguntaB.opcoes[i].map((o, k) => '<option value="' + k + '">' + esc(o) + '</option>').join('') + '</select></label>').join('') + '</div>';
+ if (A.segurar === papel) h += '<button type="button" class="lc-btn lc-segurar" id="lcSegurar" data-lcsegpal="' + A.id + ':' + papel + '">Segurar a chave geral</button><p class="lc-cod" id="lcChaveCod"></p>';
+ else h += '<p class="lc-pal">Palavra para dizer em voz alta: <b>' + lcPal(A.id, papel, slot) + '</b> <small>(muda a cada 30 s)</small></p>';
  h += '<input data-lcpal="' + A.id + '" placeholder="Palavra que a outra pessoa disse" autocomplete="off">';
  if (vals) {
   h += '<p class="lc-dica">' + esc(A.formato || '') + '</p><div class="lc-vals">' + A.valores_pedidos.map((k, i) => '<label class="lc-val"><span>' + esc(lcFmt(k).rotulo || k) + '</span><input data-lcval="' + i + '" placeholder="ex.: ' + esc(lcFmt(k).exemplo || '') + '" aria-label="' + esc(lcFmt(k).rotulo || k) + '"></label>').join('') + '</div>';
  }
  h += '<button type="button" class="lc-btn" data-lcagir="dupla:' + A.id + ':' + papel + '">Fazer em dupla (1 de energia)</button>';
  const S = A.solo;
- if (S && S.tipo === 'individual' && vals) h += '<div class="lc-solo"><b>Sem dupla</b> (' + S.custo + ' de energia): tudo precisa estar no seu caderno.<button type="button" class="lc-btn" data-lcagir="solo:' + A.id + ':A">Fazer sem dupla</button><button type="button" class="lc-btn lc-sato" data-lcagir="solosato:' + A.id + '">📞 Com a Dra. Sato (' + (S.custo + 1) + ' de energia)</button><small>Ela confere pelo interfone uma fonte que faltar no seu caderno.</small></div>';
+ if (S && S.tipo === 'individual' && vals) h += '<div class="lc-solo"><b>Sem dupla</b> (' + S.custo + ' de energia): tudo precisa estar no seu caderno.<button type="button" class="lc-btn" data-lcagir="solo:' + A.id + ':A">Fazer sem dupla</button><button type="button" class="lc-btn lc-sato" data-lcagir="solosato:' + A.id + '">Com a Dra. Sato na linha (' + (S.custo + 1) + ' de energia)</button><small>Você conta de cabeça uma coisa que viu e não anotou. Desta vez, ela confia.</small></div>';
  else if (S && S.tipo === 'chao') {
   const mao = s.mao && s.mao.volta === state.loop ? s.mao.obj : null;
   h += '<div class="lc-solo"><b>Sem dupla</b> (duas voltas): traga a peça e deixe no chão, ao lado do apoio. Na volta seguinte, use-a na Câmara.';
   if (mao === S.objeto && room === S.sala && !s.chaoUsado && state.loop < 5) h += '<button type="button" class="lc-btn" data-lcagir="deixarpeca:' + A.id + '">Deixar a peça no chão aqui</button>';
-  if (mao === S.objeto && room === LC_PID.c_peca.sala && !s.chaoUsado && state.loop < 5) h += '<p>Você está com a peça. Volte à tela da sala e toque em “Deixar a peça verdadeira”.</p>';
+  if (mao === S.objeto && room === LC_PID.c_peca.sala && !s.chaoUsado && state.loop < 5) h += '<p>Você está com a peça. Volte à tela da sala e toque em “Descer com a peça e deixar no chão”.</p>';
   if (vals) h += '<button type="button" class="lc-btn" data-lcagir="solochao:' + A.id + '">Agir usando a peça do chão (' + S.custo + ' de energia)</button>';
-  if (vals) h += '<button type="button" class="lc-btn lc-sato" data-lcagir="solosato:' + A.id + '">📞 Numa volta só, com a Dra. Sato (' + (S.custo + 1) + ' de energia)</button><small>Estando com a peça verdadeira na mão, ela segura a trava pelo interfone.</small>';
+  if (vals) h += '<button type="button" class="lc-btn lc-sato" data-lcagir="solosato:' + A.id + '">Numa volta só, com a Dra. Sato na linha (' + (S.custo + 1) + ' de energia)</button><small>Com a peça verdadeira na mão: ela dita pelo interfone e você prende a trava com o seu cinto.</small>';
   h += '</div>';
  } else if (A.saida_solo) h += '<p class="lc-solo"><b>Sem dupla:</b> ' + esc(A.saida_solo) + '</p>';
  if (A.papelCentral) h += '<p class="lc-solo"><b>Central:</b> ' + esc(A.papelCentral) + '</p>';
@@ -418,7 +429,7 @@ function lcRaioHtml(A, papel){
   if (s.eco) h += '<p class="lc-ok">Eco gravado na volta ' + s.eco.volta + '.</p>';
  } else {
   h += '<p>Com o código que a outra pessoa disser, baixe a alavanca <b>dentro da janela do raio</b> (' + lcMM(LC_JANELA[0]) + ' a ' + lcMM(LC_JANELA[1]) + '). Cedo ou tarde demais, a máquina não reage.</p><input id="lcCodChaveIn" placeholder="Código de 3 números" inputmode="numeric" maxlength="3" autocomplete="off"><button type="button" class="lc-btn" data-lcagir="raio:' + A.id + '">Baixar a alavanca (1 de energia)</button>';
-  h += '<div class="lc-solo"><b>Sem dupla (eco):</b> numa volta anterior você gravou a chave no Pátio. Agora baixe a alavanca na janela (2 de energia).<button type="button" class="lc-btn" data-lcagir="ecoalavanca:' + A.id + '">Baixar usando o eco</button><button type="button" class="lc-btn lc-sato" data-lcagir="raiosato:' + A.id + '">📞 Sem eco, com a Dra. Sato (' + (A.solo.custo_executar + 1) + ' de energia)</button><small>Ela fecha a chave do Pátio por você, na janela do raio.</small></div>';
+  h += '<div class="lc-solo"><b>Sem dupla (eco):</b> numa volta anterior você gravou a chave no Pátio. Agora baixe a alavanca na janela (2 de energia).<button type="button" class="lc-btn" data-lcagir="ecoalavanca:' + A.id + '">Baixar usando o eco</button><button type="button" class="lc-btn lc-sato" data-lcagir="raiosato:' + A.id + '">Sem eco, com a Dra. Sato na linha (' + (A.solo.custo_executar + 1) + ' de energia)</button><small>Antes de descer, você prende a chave {ch} com a luva, do jeito que ela ensina. De fora, ela vê o céu e conta o raio pelo interfone.</small></div>';
  }
  return h;
 }
@@ -450,6 +461,7 @@ function lcAgir(cmd){
  if (tipo === 'dupla') {
   const outro = papel0 === 'A' ? 'B' : 'A', inp = dlg.querySelector('[data-lcpal="' + aid + '"]');
   if (!lcPalOk(aid, outro, inp?.value)) return lcMsg('A palavra não confere. Escute a outra pessoa: ela precisa estar na outra sala agora.');
+  if (A.perguntaB && papel0 === 'B') { const m = [...dlg.querySelectorAll('[data-lcleg]')].map(x => x.value), c = A.perguntaB.certo[lcCausa()] || []; if (m.some(v => v === '')) return lcMsg('Marque como está cada parte, do jeito que a outra pessoa descreveu.'); if (m.some((v, i) => Number(v) !== c[i])) return lcMsg('Não bate com o painel. Peça para descrever de novo, uma parte por vez.'); }
   const ladoVals = A.valores_pedidos && state.room === 'prototipo';
   if (A.valores_pedidos && !ladoVals) { return lcMsg('Sua parte está feita. Quem está no Subsolo gira, liga ou digita, e confere os valores com você.'); }
   if (!lcGastar(A.custo_por_pessoa || 1)) return;
@@ -460,12 +472,12 @@ function lcAgir(cmd){
   const S = A.solo; if (!S) return;
   if (S.tipo === 'individual') {
    const falta = S.no_proprio_caderno.filter(g => !lcTemGrupo(g)).map(g => LC.grupos_fonte[g].rotulo);
-   if (falta.length > 1) return lcMsg('A Dra. Sato cobre UMA fonte que falte. Ainda faltam: ' + falta.join(' · ') + '.');
+   if (falta.length > 1) return lcMsg('A Dra. Sato confia em UMA coisa que você viu e não anotou. Ainda faltam: ' + falta.join(' · ') + '.');
   } else if (!(s.mao && s.mao.volta === state.loop && s.mao.obj === S.objeto)) return lcMsg('Você precisa estar com a peça verdadeira na mão, nesta volta.');
   if (!lcGastar(S.custo + 1)) return;
   const r = lcConfere(A, lerVals());
   if (r.certos !== r.tot) { save(); return lcMsg(lcMsgErro(A, r, S.custo + 1)); }
-  const m = lcFimAtividade(A, 'sem dupla, com a Dra. Sato'); save(); return lcMsg('Pelo interfone, a Dra. Sato cobre o que faltava. ' + m);
+  const m = lcFimAtividade(A, 'sem dupla, com a Dra. Sato na linha'); save(); return lcMsg((S.tipo === 'individual' ? 'Pelo interfone, a Dra. Sato escuta e demora: "Tá. Desta vez eu confio. Gira." ' : 'A Dra. Sato dita pelo interfone: "Cinto na trava. Puxa. Agora a peça." ') + m);
  }
  if (tipo === 'solo' || tipo === 'solochao') {
   const S = A.solo; if (!S) return;
@@ -490,7 +502,7 @@ function lcAgir(cmd){
  if (tipo === 'raiosato') {
   if (!na) return lcMsg('Fora da janela do raio. Agora são ' + lcMM(Math.floor(seg)) + '.');
   if (!lcGastar(A.solo.custo_executar + 1)) return;
-  const r = lcFimAtividade(A, 'sem dupla, com a Dra. Sato'); save(); return lcMsg('A Dra. Sato fecha a chave do Pátio pelo interfone. ' + r);
+  const r = lcFimAtividade(A, 'sem dupla, com a Dra. Sato na linha'); save(); return lcMsg('A Dra. Sato conta o raio pelo interfone: "Agora." Você baixa a alavanca. ' + r);
  }
  if (tipo === 'ecoalavanca') {
   if (!s.eco || s.eco.volta >= state.loop) return lcMsg('Falta o eco: numa volta anterior, grave a chave no Pátio.');
@@ -507,7 +519,7 @@ function lcAgir(cmd){
   const r = lcFimAtividade(A, 'em dupla'); save(); return lcMsg(r);
  }
 }
-const LC_ONDE = {prova_falsa:'compare a peça da Galeria com a foto do catálogo', trajeto:'veja a câmera da Central, a porta de serviço e o chão da Área de descanso', cracha:'junte a escala e o bilhete do armário e mostre ao Braga, ou a quem passa pela porta de serviço'};
+const LC_ONDE = {prova_falsa:'olhe a peça da Galeria de perto, com alguma coisa para comparar', trajeto:'veja a câmera da Central, a porta de serviço e o chão da Área de descanso', cracha:'junte a escala e o bilhete do armário e mostre a quem pode explicar'};
 function lcRevelar(){
  const s = lcS(), nome = (document.getElementById('lcNome')?.value || '').trim();
  if (s.revelado) return lcMsg('Você já usou a tentativa.');
@@ -529,7 +541,7 @@ function lcReceber(cod){
  if (!p) return lcMsg('Código inválido.');
  if (lcTem(p.id)) return lcMsg('Você já tem essa pista.');
  s.recebeu[state.loop] = (s.recebeu[state.loop] || 0) + 1;
- state.clues.push({id:lcId(p.id), room:lcNomeSala(p.sala), name:p.previa || p.id, text:lcTexto(p), tipo:'Relato', loop:state.loop, recebida:true}); save();
+ state.clues.push({id:lcId(p.id), room:lcNomeSala(p.sala), name:lcTok(p.previa || p.id), text:lcTexto(p), tipo:'Relato', loop:state.loop, recebida:true, etq:p.etiqueta || ''}); save();
  lcMsg('Recebida: ' + (p.previa || p.id) + '. (Troca de pista não gasta energia.)');
 }
 let lcAba = 'dossie', lcTimer = 0, lcSeguro = false;
@@ -552,7 +564,7 @@ function lcAbrir(aba){
    if (t.id === 'lcCod') { const id = d.querySelector('#lcPassar')?.value; if (id) d.querySelector('#lcCodTxt').textContent = 'Código: ' + lcCodPista(id); return; }
    if (t.id === 'lcReceber') { lcReceber(d.querySelector('#lcCodIn').value); lcDesenhar(true); return; }
   });
-  const hold = (on) => { lcSeguro = on; const c = document.getElementById('lcChaveCod'); if (c) c.textContent = on ? 'Código da chave: ' + lcCodChave() : ''; };
+  const hold = (on) => { lcSeguro = on; const c = document.getElementById('lcChaveCod'), b = document.getElementById('lcSegurar'), sp = b && b.dataset.lcsegpal; if (c) c.textContent = !on ? '' : sp ? 'Palavra para dizer em voz alta: ' + lcPal(sp.split(':')[0], sp.split(':')[1], lcSlot()) : 'Código da chave: ' + lcCodChave(); };
   for (const ev of ['pointerdown','pointerup','pointerleave','pointercancel']) d.addEventListener(ev, e => { if (e.target.id === 'lcSegurar') hold(ev === 'pointerdown'); });
   d.addEventListener('close', () => { lcSeguro = false; clearInterval(lcTimer); });
  }
@@ -566,15 +578,16 @@ function lcDesenhar(forcar){
  if (!forcar && d.contains(document.activeElement) && /INPUT|SELECT/.test(document.activeElement.tagName)) {
   const pal = d.querySelector('.lc-pal b'); if (pal) { const a = pal.closest('section'); } return;
  }
- const guardar = [...d.querySelectorAll('input')].map(i => [i.id || i.name + i.value || i.dataset.lcval, i.value]);
+ const guardar = [...d.querySelectorAll('input')].map(i => [i.id || i.name + i.value || i.dataset.lcval, i.value]), leg = Object.fromEntries([...d.querySelectorAll('select[data-lcleg]')].map(x => [x.dataset.lcleg, x.value]));
  if (!forcar && lcSeguro) return;
  d.innerHTML = '<button type="button" id="lcFechar" class="lc-x" aria-label="Fechar">✕</button><h3 class="lc-tit">' + lcFicha('img:T01') + 'A Máquina</h3>' + lcTok(lcPainelHtml(lcAba));
  d.querySelectorAll('input[type=text],input:not([type])').forEach((i, n) => { const g = guardar.find(x => x[0] === (i.id || i.dataset.lcval)); if (g && forcar !== true) i.value = g[1]; });
+ d.querySelectorAll('select[data-lcleg]').forEach(x => { if (leg[x.dataset.lcleg] != null && forcar !== true) x.value = leg[x.dataset.lcleg]; });
 }
 function lcBotao(){
  if (document.getElementById('lcBarra')) return;
  const n = document.createElement('nav'); n.id = 'lcBarra'; n.className = 'lc-barra'; n.setAttribute('aria-label', 'Atalhos da partida');
- n.innerHTML = '<button type="button" id="lcBtnMapa">' + lcFicha('🗺️', 'sm') + '<span>Mapa</span></button>' +
+ n.innerHTML = '<button type="button" id="lcBtnMapa">' + lcFicha('img:ui/mapa', 'sm') + '<span>Mapa</span></button>' +
   '<button type="button" id="lcBtnMaq" class="pri">' + lcFicha('img:T01', 'sm') + '<span>Máquina</span></button>' +
   '<button type="button" id="lcBtnCad">' + lcFicha('img:ui/caderno', 'sm') + '<span>Caderno <b id="lcBarN">' + ((typeof state !== 'undefined' && state && state.clues || []).length) + '</b></span></button>';
  document.body.appendChild(n);
@@ -598,14 +611,16 @@ if (typeof document !== 'undefined') { const i = setInterval(() => { if (documen
 
 // ---- Bancada de investigação: minigames (vindos da Reserva) que abrem ao coletar certas pistas
 const LC_MG = {
- tombo_2:{ativ:'fotoConsulta', resp:'012345', nome:'Remontar a foto antiga do catálogo', texto:'A foto está em seis pedaços. Junte as partes pela continuidade da imagem e leia o número na base da peça.'},
+ tombo_2:{ativ:'livro', resp:0, nome:'Ler a foto antiga do catálogo', texto:'A foto foi tirada de baixo. Em que parte da peça você procura o número dela?', opcoes:['Embaixo da base','No alto da peça','Na moldura da foto'],
+  dicas:['Quem registra uma peça grava o número onde ninguém vê de frente.','A foto foi tirada de baixo por um motivo.']},
  falsa_1:{ativ:'marca', resp:4, nome:'Olhar a peça com luz de lado', texto:'Mude o ângulo da luz até aparecer o que a luz de frente esconde.',
-  luz:{achou:'O verniz brilha por igual, sem um risco. Peça de 300 anos não brilha assim.', falta:'a luz ainda não mostra nada de novo', botao:'Anotar o que apareceu'},
+  luz:{achou:'O verniz brilha por igual, sem um risco.', falta:'ainda não apareceu nada', botao:'Anotar o que apareceu'},
   dicas:['Luz de frente esconde. Luz de lado mostra a superfície.','Quase no fim do curso da luz, a superfície aparece inteira.']},
- traj_1:{ativ:'fita', resp:'A porta de serviço, sem ninguém|Paletó entra no quadro|Paletó olha o relógio|Crachá encosta na porta de serviço', nome:'Pôr a fita da câmera em ordem', texto:'A fita está fora de ordem. Toque nas cenas na ordem em que a câmera gravou.',
+ traj_1:{ativ:'fita', resp:'A porta de serviço, sem ninguém|Paletó entra no quadro|Paletó olha o relógio|Crachá encosta na porta de serviço', nome:'Pôr a fita da câmera em ordem', texto:'A fita está fora de ordem. Toque nas cenas na ordem em que aconteceram.',
   itens:['A porta de serviço, sem ninguém','Paletó entra no quadro','Paletó olha o relógio','Crachá encosta na porta de serviço'], clipes:['bancada','carrinho','colecoes','porta'],
   dicas:['Antes de alguém aparecer, não tem ninguém na porta.','O crachá na porta é a última cena.']},
- c_esc_1:{ativ:'caixa', resp:'faixa/fundo/tampa', nome:'Abrir a caixa de banners', texto:'A caixa pesa demais para banner. Deslize a faixa, mexa no fundo e abra a tampa.'},
+ c_peca:{ativ:'livro', resp:0, nome:'Abrir a caixa de banners', texto:'Agora você tem motivo. Três caixas com adesivo do patrocínio. Qual você abre?', opcoes:['A que pesa demais para banner','A mais nova, ainda com fita','A que está em cima das outras'],
+  dicas:['Banner é pano e papel. Pesa pouco.','Você já empurrou uma dessas caixas, ou alguém falou dela.']},
  cracha_1:{ativ:'livro', resp:1, nome:'Ler a escala de crachás', texto:'A escala diz que o crachá do Braga abre a porta de serviço. Onde o Braga está agora?', opcoes:['Na porta de serviço','Aqui na Central, na sua frente','No Subsolo'],
   dicas:['Olhe em volta: quem está nesta sala com você?','O crachá abre a porta. A pessoa que usa o crachá pode ser outra.']}
 };
@@ -620,7 +635,7 @@ function lcMgSorteado(id, mg){
 function lcBancada(q){
  const mg0 = LC_MG[q.lcp], mg = mg0 && lcMgSorteado(q.lcp, mg0);
  if (!mg || (state.resolvidos && state.resolvidos[q.id])) return false;
- Promise.all([import('./reserva/banco.mjs'), import('./reserva/minigames.mjs?v=4')]).then(([B, M]) => {
+ Promise.all([import('./reserva/banco.mjs'), import('./reserva/minigames.mjs?v=5')]).then(([B, M]) => {
   if (!document.getElementById('bancadaCss')) { const l = document.createElement('link'); l.id = 'bancadaCss'; l.rel = 'stylesheet'; l.href = new URL('bancada.css?v=2', LC_BASE).href; document.head.appendChild(l); }
   let d = document.getElementById('lcBancada');
   if (!d) { d = document.createElement('dialog'); d.id = 'lcBancada'; d.className = 'lc-banc'; document.body.appendChild(d); }
@@ -645,7 +660,7 @@ const LC_MGA = {
 };
 function lcBancadaAtiv(aid, cmd){
  const mg = lcMgSorteado(aid, LC_MGA[aid]);
- Promise.all([import('./reserva/banco.mjs'), import('./reserva/minigames.mjs?v=4')]).then(([B, M]) => {
+ Promise.all([import('./reserva/banco.mjs'), import('./reserva/minigames.mjs?v=5')]).then(([B, M]) => {
   if (!document.getElementById('bancadaCss')) { const l = document.createElement('link'); l.id = 'bancadaCss'; l.rel = 'stylesheet'; l.href = new URL('bancada.css?v=2', LC_BASE).href; document.head.appendChild(l); }
   let d = document.getElementById('lcBancada');
   if (!d) { d = document.createElement('dialog'); d.id = 'lcBancada'; d.className = 'lc-banc'; document.body.appendChild(d); }
@@ -660,18 +675,19 @@ function lcBancadaAtiv(aid, cmd){
 }
 
 // fatos da noite que este caderno comprova (o telão monta a fita do tempo com o que a turma toda achou)
-const LC_FATO_PISTA = {copia:['falsa_1','falsa_2','falsa_3'], troca:['data_1','data_2','data_3'], entrada:['lenz_op_1','cracha_4'], raio:['raio_1','raio_2'], camera:['braga_1x'], teo:['empurra_1','empurra_2','lenz_3'], passagem:['traj_1','traj_2','traj_4'], cracha:['cracha_3','lenz_2','coop_veredito'], botao:['traj_3']};
+const LC_FATO_PISTA = {troca:['data_1','data_2','data_3'], motivo:['motivo_1','lenz_mot_2','lenz_mot_3','v5_lenz'], copia:['falsa_2','falsa_3','coop_copia_ok','foto_solo','c_peca'], entrada:['lenz_op_1','cracha_4','cofre_ronda','assim_par'], teo:['empurra_1','empurra_2','lenz_3'], raio:['raio_1','raio_2'], passagem:['traj_1','traj_2','traj_4'], cracha:['cracha_3','lenz_2','coop_veredito'], engano:['rev_3']};
 window.lcFatos = () => Object.keys(LC_FATO_PISTA).filter(k => LC_FATO_PISTA[k].some(p => LC_PID[p] && lcTem(p)));
+window.lcDefeito = () => lcS().diag ? LC_NOME[lcCausa()] : '';   // décima linha da fita: o defeito da noite, de quem anexou o diagnóstico
 
 // Missão secreta: cada pessoa recebe um objetivo particular. Cumprir rende +1 de energia na volta seguinte.
 const LC_MISSOES = [
  {t:'Descubra o que o Braga está escondendo.', ok:() => lcTem('cracha_3') || lcTem('v4_braga') || lcTemGrupo('alibi_braga')},
  {t:'Descubra o que derrubou o Téo.', ok:() => ['empurra_1','empurra_2','lenz_3'].some(lcTem)},
  {t:'Descubra quem ganha dinheiro se a peça sumir.', ok:() => lcTemGrupo('motivo_lenz')},
- {t:'Descubra por que a Ivone não pode ter trocado a peça.', ok:() => lcTemGrupo('alibi_ivone') || lcTem('ivone_2')},
+ {t:'Descubra por que a tinta da Ivone não faz dela culpada.', ok:() => lcTemGrupo('alibi_ivone') || lcTem('ivone_2')},
  {t:'Descubra o que o Aurélio sabia e não disse.', ok:() => lcTem('aurelio_1') || lcTem('aurelio_2')},
  {t:'Descubra para onde vão as pegadas.', ok:() => ['coop_pegadas','pegadas_solo','lenz_3'].some(lcTem)},
- {t:'Descubra onde a peça verdadeira está.', ok:() => lcTem('c_peca')},
+ {t:'Descubra o que tem na caixa que pesa demais.', ok:() => lcTem('c_peca')},
  {t:'Descubra o que o Nico está guardando.', ok:() => lcTem('nico_1')}
 ];
 function lcMissao(){ const s = lcS(); if (s.missao == null) s.missao = Math.floor(Math.random() * LC_MISSOES.length); return LC_MISSOES[s.missao % LC_MISSOES.length]; }
@@ -685,5 +701,15 @@ function lcMissaoChecar(){
 }
 function lcMissaoHtml(){
  const s = lcS(), m = lcMissao(); lcMissaoChecar();
- return '<section class="lc-missao' + (s.missaoOk ? ' ok' : '') + '"><h4>' + lcFicha('🕵️', 'sm') + 'Sua missão secreta</h4><p>' + esc(m.t) + '</p><small>Só você sabe. Na pausa, conte (ou blefe) para a turma. ' + (s.missaoOk ? '✅ Você cumpriu na volta ' + s.missaoOk + '. A turma vê o seu nome no telão, no fim.' : 'Se você cumprir, ganha +1 de energia na próxima volta.') + '</small></section>';
+ return '<section class="lc-missao' + (s.missaoOk ? ' ok' : '') + '"><h4>' + lcFicha('🕵️', 'sm') + 'Sua missão secreta</h4><p>' + esc(m.t) + '</p><small>Só você sabe. Na pausa, conte (ou blefe) para a turma. ' + (s.missaoOk ? 'Você cumpriu na volta ' + s.missaoOk + '. A turma vê o seu nome no telão, no fim.' : 'Se você cumprir, ganha +1 de energia na próxima volta.') + '</small></section>';
 }
+
+// Papéis da última volta: na pausa da volta 4, em sala, cada pessoa toca num papel. A tela da volta 5 mostra a dica do papel e o telão mostra nome e papel. Não muda regra.
+const LC_PAPEL_IC = {A:'T01', B:'M03', Central:'S01', PortaVoz:'P01', Guardiao:'ui/caderno'};
+function lcPapeisHtml(){
+ const s = lcS(), P5 = LC.papeis_volta5;
+ return '<div class="lc-papeis"><p class="lc-papeis-t">Qual é o seu papel na última volta?</p>' + P5.papeis.map(p => '<button type="button" class="lc-papel-b' + (s.papel5 === p.id ? ' on' : '') + '" data-lcpapel="' + p.id + '" aria-pressed="' + (s.papel5 === p.id) + '">' + lcFicha('img:' + LC_PAPEL_IC[p.id], 'sm') + '<span>' + esc(p.nome) + '</span></button>').join('') + (s.papel5 ? '<p class="lc-papeis-d">' + esc(lcTok(P5.dica_de_tela[s.papel5])) + '</p>' : '') + '</div>';
+}
+const lcPapelNome = id => (LC.papeis_volta5.papeis.find(p => p.id === id) || {}).nome || '';
+const lcPapelDica = () => { const s = lcS(); return s.papel5 ? lcTok(LC.papeis_volta5.dica_de_tela[s.papel5]) : ''; };
+document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-lcpapel]'); if (!b) return; const s = lcS(); s.papel5 = b.dataset.lcpapel; save(); try { window.coop && window.coop.papel && window.coop.papel(lcPapelNome(s.papel5)); } catch (err) {} const h = b.closest('.lc-papeis'); if (h) h.outerHTML = lcPapeisHtml(); });

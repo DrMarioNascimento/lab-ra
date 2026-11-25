@@ -151,16 +151,17 @@ function pistasEnigmas(base, c, ci){
 function abrirEnigma(q){
  let d = document.getElementById('enigmaDlg');
  if (!d) { d = document.createElement('dialog'); d.id = 'enigmaDlg'; d.style.cssText = 'width:min(92vw,520px);border:2px solid #9a7842;border-radius:16px;background:#12171d;color:#f3ead6;padding:16px;'; document.body.appendChild(d); }
- d.innerHTML = '<p style="margin:0;color:#e6c36b;font-weight:800;letter-spacing:.08em">'+esc(q.enigma.rotulo)+'</p><h3 style="margin:.2em 0 .4em">'+esc(q.name)+'</h3><p style="margin:.2em 0 .6em">'+esc(q.enigma.enunciado)+'</p>'+
-  '<pre style="white-space:pre-wrap;word-break:break-word;margin:0 0 .8em;font:700 20px ui-monospace,Menlo,monospace;background:#0a0e12;padding:10px;border-radius:10px">'+esc(q.enigma.cofre ? '[ '+achadosCofre().map(n => n === null ? '_' : n).join(' ] [ ')+' ]   digital: '+(state.clues.some(x => x.id === q.enigma.digital) ? 'sim' : 'não') : q.enigma.cifrado)+'</pre>'+
-  '<input id="enigmaIn" type="text" autocomplete="off" autocapitalize="characters" placeholder="'+esc(q.enigma.placeholder || 'Palavra-chave')+'" style="width:100%;box-sizing:border-box;font:700 18px system-ui;padding:12px;border-radius:10px;border:1px solid #5b6b78;background:#0a0e12;color:#fff">'+
+ const loopE = !!q.lcp, pecaE = loopE && sala(state.room) ? sala(state.room).peca : '';
+ d.innerHTML = (pecaE ? '<span class="ic3d enigma-arte" aria-hidden="true"><img src="'+ICONE_URL(pecaE)+'" alt=""></span>' : '')+'<p style="margin:0;color:#e6c36b;font-weight:800;letter-spacing:.08em">'+esc(q.enigma.rotulo)+'</p><h3 style="margin:.2em 0 .4em">'+esc(q.name)+'</h3><p style="margin:.2em 0 .6em">'+esc(q.enigma.enunciado)+'</p>'+
+  (loopE ? '<pre hidden>' : '<pre style="white-space:pre-wrap;word-break:break-word;margin:0 0 .8em;font:700 20px ui-monospace,Menlo,monospace;background:#0a0e12;padding:10px;border-radius:10px">')+esc(q.enigma.cofre ? '[ '+achadosCofre().map(n => n === null ? '_' : n).join(' ] [ ')+' ]   digital: '+(state.clues.some(x => x.id === q.enigma.digital) ? 'sim' : 'não') : q.enigma.cifrado)+'</pre>'+
+  '<input id="enigmaIn" type="text" autocomplete="off" autocapitalize="characters" '+(loopE ? 'inputmode="numeric" maxlength="3" class="enigma-casas" ' : '')+'placeholder="'+esc(loopE ? '000' : q.enigma.placeholder || 'Palavra-chave')+'" aria-label="'+esc(q.enigma.placeholder || 'Resposta')+'" style="width:100%;box-sizing:border-box;font:700 18px system-ui;padding:12px;border-radius:10px;border:1px solid #5b6b78;background:#0a0e12;color:#fff">'+
   '<p id="enigmaMsg" style="min-height:1.4em;margin:.5em 0;color:#e6c36b">Se faltar uma dica, feche e procure outras pistas desta sala.</p>'+
   '<div style="display:flex;gap:8px"><button type="button" class="btn primary" id="enigmaOk">Abrir</button><button type="button" class="btn secondary" id="enigmaNo">Fechar</button></div>';
  const ok = () => { const v = normResp(d.querySelector('#enigmaIn').value);
   if (q.enigma.cofre) { const ach = achadosCofre().filter(n => n !== null).length, dig = state.clues.some(x => x.id === q.enigma.digital);
    if (ach < 6 || !dig) { d.querySelector('#enigmaMsg').textContent = 'Não abre. O cofre pede seis números'+(dig ? '' : ' e a digital de alguém do posto')+'. Eles estão espalhados pelo museu. Você já achou '+ach+' de 6 números.'; return; } }
   if (v && v === normResp(q.enigma.resposta)) { (state.resolvidos ||= {})[q.id] = true; d.close(); collect(q.id); }
-  else d.querySelector('#enigmaMsg').textContent = v ? 'Ainda não. Confira a cifra e procure a dica nesta sala.' : 'Digite a sua resposta.'; };
+  else d.querySelector('#enigmaMsg').textContent = v ? (loopE ? 'Não abriu. A senha está escrita em algum lugar desta sala.' : 'Ainda não. Confira a cifra e procure a dica nesta sala.') : 'Digite a sua resposta.'; };
  d.querySelector('#enigmaOk').onclick = ok; d.querySelector('#enigmaNo').onclick = () => d.close();
  d.querySelector('#enigmaIn').onkeydown = e => { if (e.key === 'Enter') ok(); };
  if (!d.open) d.showModal(); setTimeout(() => d.querySelector('#enigmaIn')?.focus(), 50);
@@ -346,8 +347,8 @@ function renderPrep(){
  if (state.prep || state.loop !== 1 || state.phase !== 'choose' || window.coop?.skipPrep) return false;
  const sel = kitDaPartida(), n = nt();
  if (noLoop()) {   // no Loop: a premissa é a da história; não há ferramentas (energia igual para todo mundo)
-  $('roomGrid').innerHTML = '<div class="prep"><p class="kicker">PREPARAÇÃO</p><h3>Por que a máquina travou? Quem trocou a peça?</h3><p>O museu repete os mesmos 5 minutos. Descubra por que a máquina travou e quem trocou a peça principal.</p>'+
-   '<p>Você tem '+CARGAS_BASE+' de energia por volta. Cada pista examinada gasta 1.</p>'+
+  $('roomGrid').innerHTML = '<div class="prep"><p class="kicker">PREPARAÇÃO</p><h3>Por que a máquina travou? O que aconteceu nesta noite?</h3><p>O museu repete os mesmos 5 minutos. Descubra por que a máquina travou e o que aconteceu aqui.</p>'+
+   '<p class="prep-energia"><span class="ic3d sm" aria-hidden="true"><img src="'+ICONE_URL('E01')+'" alt=""></span>Você tem '+CARGAS_BASE+' de energia por volta. Quase toda pista gasta 1.</p>'+
    '<button type="button" class="btn primary" data-nt="prep">Começar a noite</button></div>';
   return true;
  }

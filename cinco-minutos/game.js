@@ -136,18 +136,18 @@ function sala(id){
  const alt = m.v ? PECAS_ALT[id]?.[m.v-1] : null;
  const r = {...base, name:m.nome, andar:m.andar, lugar:m.lugar, nomeBase:base.name, ...(alt ? alt : {})};
  const L = (typeof state !== 'undefined' && state && state.caseRules === 2) ? LOOP_SALAS[id] : null;   // no Loop: nome, peça e legenda da história
- if (L) { delete r.livro; delete r.capa; Object.assign(r, {name:L[0], sub:L[1], peca:L[2], andar:L[3], lugar:L[4]}); }
+ if (L) { delete r.livro; delete r.capa; Object.assign(r, {name:L[0], sub:L[1], peca:L[2], andar:L[3], lugar:L[4]}); if (L[5] && L[5].livro) r.livroLoop = L[5].livro; }   // no Loop o livro de folhear é por sala (segunda peça, com o conteúdo da história)
  return r;
 }
 // Salas da história do Loop: um nome só por sala (o mesmo das pistas e do roteiro), a peça que pertence à cena e o andar FIXO (as pistas falam de escada, porta de vidro e de quem sobe para a Galeria).
-// [nome, legenda, peça, andar, ordem no andar]
+// [nome, legenda, peça, andar, ordem no andar, extras]  extras.livro = {capa, abrir, ids}: livro de folhear como segunda peça da sala, com as pistas listadas (na ordem das páginas)
 const LOOP_SALAS = {
- galeria:['Galeria especial','A peça principal','V11','2º andar',1],
- conservacao:['Sala de conservação','Registros e laudos do acervo','I01','1º andar',1], sons:['Sala dos sons','Rádio da equipe','N07','1º andar',2],
- fotografia:['Sala da fotografia','Câmera antiga e catálogo','N05','1º andar',3], relogios:['Sala dos relógios','Relógios que param na queda de luz','R02','1º andar',4],
+ galeria:['Galeria especial','A peça principal na base','GAL_A','2º andar',1],
+ conservacao:['Sala de conservação','Registros e laudos do acervo','I01','1º andar',1,{livro:{capa:'Livro de registro|ACERVO DO MUSEU', abrir:'Abrir o livro de registro', ids:['tombo_1','livre_1','c_modo_1','b_verde_3','fh_carimbo','data_3','d_teo_1','fh_dobrada','teo_d1']}}], sons:['Sala dos sons','Rádio da equipe','N07','1º andar',2],
+ fotografia:['Sala da fotografia','Câmera antiga e catálogo','N05','1º andar',3], relogios:['Sala dos relógios','Relógios que param na queda de luz','REL_A','1º andar',4],
  recepcao:['Recepção','Livro de visitas e roleta','P01','Térreo',1], seguranca:['Central de monitoramento','Câmeras e crachás','S01','Térreo',2],
- corredor:['Área de descanso','Porta de serviço e recados','V41','Térreo',3], limpeza:['Base da limpeza','Armário da equipe e carrinho','L05','Térreo',4],
- atelie:['Ateliê de descobertas','Bancada da Ivone e manual','L06','Térreo',5], deposito:['Sala das coleções','Caixas e movimentações','V12','Térreo',6],
+ corredor:['Área de descanso','Porta de serviço e recados','DESC_A','Térreo',3], limpeza:['Base da limpeza','Armário da equipe e carrinho','L05','Térreo',4],
+ atelie:['Ateliê de descobertas','Bancada da Ivone e manual','L06','Térreo',5,{livro:{capa:'Manual da Câmara|DRA. SATO', abrir:'Abrir o manual', ids:['man_1','man_cal_1','man_pot_1','man_anc_1','man_circ_1','man_dois_1','man_legenda']}}], deposito:['Sala das coleções','Caixas e movimentações','V12','Térreo',6],
  manutencao:['Oficina técnica','Ferramentas e fusíveis','M03','Térreo',7], eletrica:['Oficina elétrica','Gerador, fusíveis e luvas','E02','Térreo',8],
  patio:['Pátio · Quadro externo','Quadro de energia e para-raios','E01','Térreo',9],
  prototipo:['Subsolo · Câmara do tempo','A máquina do tempo','T01','Subsolo',1]
@@ -432,7 +432,7 @@ const LEGACY_PATH = {...TIME_PATHS.suspension, opens:0};
 // História entre as voltas: cada retorno mostra um pouco mais do clima da noite, sem entregar a resposta.
 const ENTRE_VOLTAS = [
  'As portas fecharam de novo. Tudo voltou para o lugar. Mas você lembra do que achou.',
- 'De novo. Você já sabe o que esperar: o raio, a luz que cai, o homem de paletó perto das 4:00. O que ainda não sabe é por que a máquina não deixa a noite andar.',
+ 'De novo. As mesmas falas, a mesma chuva, a luz que cai no mesmo ponto. O que você ainda não sabe é por que a máquina não deixa a noite andar.',
  'Terceira vez. Alguns registros não batem com o que as pessoas contam. Anote quem disse o quê, e em que minuto da volta.',
  'Quarta vez. Falta uma volta. Você já sabe o que consertar, em que sala e em que minuto?'
 ];
@@ -524,7 +524,7 @@ function show(id){
  lcAtualizarBotao();
  window.scrollTo({top:0,behavior:'instant'});
 }
-function toast(text){$('toast').textContent=text;$('toast').classList.add('show');clearTimeout(toastHandle);toastHandle=setTimeout(()=>$('toast').classList.remove('show'),2200)}
+function toast(text){$('toast').textContent=text;$('toast').classList.add('show');clearTimeout(toastHandle);toastHandle=setTimeout(()=>$('toast').classList.remove('show'),Math.max(2200,String(text).length*60))}
 function popup(id){if(!$(id).open)$(id).showModal()}
 function fmt(s){s=Math.max(0,Math.ceil(s));return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
 function museumTime(){ return loopHora(state.duration, state.remaining); }
@@ -591,13 +591,14 @@ function renderGame(){
  $('loopBrief').classList.toggle('hidden', !finalLoop);
  $('fictionTime').textContent = museumTime();
  $('museumSignal').textContent = '';
- $('loopLabel').textContent='VOLTA '+state.loop+' DE 5';$('timer').textContent=fmt(state.remaining);
+ $('loopLabel').textContent='VOLTA '+state.loop+' DE 5'; { const pd = state.caseRules === 2 && state.loop === 5 && typeof lcPapelDica === 'function' ? lcPapelDica() : ''; $('loopBrief').textContent = pd || 'Última volta. Agora o conserto vale. Abra a Máquina e veja o que falta.'; }$('timer').textContent=fmt(state.remaining);
  $('clockStatus').textContent=state.phase==='playing'?'tempo correndo':'escolha a sala';
  $('phaseTitle').textContent=state.room?sala(state.room).name:'Escolha uma sala';
  $('phaseDescription').textContent=state.phase==='playing'?'Gire a peça e toque nos pontos que brilham.':'Toque numa sala para ir até lá.';
  $('boardTitle').textContent = state.room ? (state.phase === 'playing' ? 'Examine a sala' : 'Sala escolhida') : 'Para onde você vai?';
  $('phaseTitle').tabIndex = -1;
- $('roomGrid').innerHTML='<div class="inicio" role="status"><span class="ic3d" aria-hidden="true">🚪</span><div><strong>'+INICIO.name+' · '+INICIO.andar+'</strong><small>'+(state.phase==='playing'?'No fim da volta, você volta para cá.':'Você está aqui. Toda volta começa aqui.')+'</small></div></div>'+ANDARES.map(a=>'<h4 class="andar">'+a+'</h4>'+ROOMS.filter(r=>state.caseRules!==2||salasDoLoop().has(r.id)).map(r=>sala(r.id)).filter(r=>r.andar===a).sort((x,y)=>x.lugar-y.lugar).map(r=>'<button class="room an'+ANDARES.indexOf(a)+' '+(state.room===r.id?'selected':'')+'" '+(state.phase==='playing'&&state.room===r.id?'disabled':'')+' data-room="'+r.id+'">'+(r.peca?'<img class="room-3d" src="'+new URL('../icones/'+r.peca+'.webp',PECAS_URL).href+'" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'room-icon\',textContent:\''+r.icon+'\'}))">':'<span class="room-icon" aria-hidden="true">'+r.icon+'</span>')+'<strong>'+esc(r.name)+'</strong><small>'+esc(r.sub)+'</small></button>').join('')).join('');
+ $('roomGrid').innerHTML='<div class="inicio" role="status"><span class="ic3d" aria-hidden="true">🚪</span><div><strong>'+INICIO.name+' · '+INICIO.andar+'</strong><small>'+(state.phase==='playing'?'No fim da volta, você volta para cá.':'Você está aqui. Toda volta começa aqui.')+'</small></div></div>'+ANDARES.map(a=>(state.caseRules===2?'':'<h4 class="andar">'+a+'</h4>')+ROOMS.filter(r=>state.caseRules!==2||salasDoLoop().has(r.id)).map(r=>sala(r.id)).filter(r=>r.andar===a).sort((x,y)=>x.lugar-y.lugar).map(r=>'<button class="room an'+ANDARES.indexOf(a)+' '+(state.room===r.id?'selected':'')+'" '+(state.phase==='playing'&&state.room===r.id?'disabled':'')+' data-room="'+r.id+'">'+(r.peca?'<img class="room-3d" src="'+new URL('../icones/'+r.peca+'.webp',PECAS_URL).href+'" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'room-icon\',textContent:\''+r.icon+'\'}))">':'<span class="room-icon" aria-hidden="true">'+r.icon+'</span>')+'<strong>'+esc(state.caseRules===2?r.name.split(' · ')[0]:r.name)+'</strong>'+(state.caseRules===2?'<small class="room-andar">'+esc(r.andar)+'</small>':'<small>'+esc(r.sub)+'</small>')+'</button>').join('')).join('');
+ $('roomGrid').classList.toggle('loop-mapa', state.caseRules===2);
  document.querySelectorAll('[data-room]').forEach(b=>b.addEventListener('click',()=>enterRoom(b.dataset.room)));
  const preparando = renderPrep();
  renderRouteChoices(preparando);
@@ -617,10 +618,11 @@ function pecaDaSalaNome(nome){
 }
 const fichaSala = (nome, cls) => { const p = pecaDaSalaNome(nome); return '<span class="ic3d '+(cls||'')+'" aria-hidden="true">'+(p ? '<img src="'+ICONE_URL(p)+'" alt="" loading="lazy">' : '<img src="'+ICONE_URL('ui/caderno')+'" alt="" loading="lazy">')+'</span>'; };
 // Tipo da pista na lista da sala: ícone e cor fixos por tipo (papel, olhar, conversa, objeto que se leva).
-const TIPO_PISTA = {Registro:['reg','📄'], 'Observação':['obs','🔍'], Relato:['rel','💬']};
-function tipoDaPista(q){ const p = q.lcp && typeof LC_PID !== 'undefined' ? LC_PID[q.lcp] : null; if (p && p.tipo === 'objeto') return ['obj','✋']; return TIPO_PISTA[q.tipo] || TIPO_PISTA.Registro; }
-const botaoPista = clue => { const t = tipoDaPista(clue); return '<button type="button" class="clue t-'+t[0]+'" data-clue="'+clue.id+'"><i class="ic3d sm" aria-hidden="true">'+t[1]+'</i><span>'+esc(clue.name)+'</span><small></small></button>'; };
-const etqClasse = e => /^SINAL/i.test(e || '') ? 'sinal' : /^LEITURA/i.test(e || '') ? 'normal' : /^MANUAL/i.test(e || '') ? 'manual' : 'outra';
+const TIPO_PISTA = {Registro:['reg','pista-registro'], 'Observação':['obs','pista-observacao'], Relato:['rel','pista-relato']};
+function tipoDaPista(q){ const p = q.lcp && typeof LC_PID !== 'undefined' ? LC_PID[q.lcp] : null; if (p && p.tipo === 'objeto') return ['obj','pista-objeto']; return TIPO_PISTA[q.tipo] || TIPO_PISTA.Registro; }
+// Na sala a faixa do cartão é neutra (o tipo vem do ícone): a cor de etiqueta só existe no caderno e no dossiê, depois de a pista ser lida, para não dizer de graça o que é sinal.
+const botaoPista = clue => { const t = tipoDaPista(clue); return '<button type="button" class="clue t-'+t[0]+'" data-clue="'+clue.id+'"><i class="ic3d sm" aria-hidden="true"><img src="'+ICONE_URL('ui/'+t[1])+'" alt=""></i><span>'+esc(clue.name)+'</span><small></small></button>'; };
+const etqClasse = e => /^SINAL/i.test(e || '') ? 'sinal' : /^LEITURA COMPLETA/i.test(e || '') ? 'completa' : /^LEITURA/i.test(e || '') ? 'normal' : /^MANUAL/i.test(e || '') ? 'manual' : 'outra';
 const hashTxt = t => { let h = 2166136261; for (const ch of String(t)) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return (h >>> 0) / 4294967295; };
 /** Põe cada pista num ponto escondido da peça (ao redor do centro dela, só visível de certos ângulos). */
 function pontosDaPeca(mv, clues){
@@ -666,6 +668,14 @@ function renderClues(){
   panel.querySelectorAll('[data-hs]').forEach(hs => { hs.onclick = () => collect(hs.dataset.hs); });
   const lista = panel.querySelector('.lista-pistas');
   panel.insertBefore(lista, panel.querySelector('.peca'));
+  if (room.livroLoop) {
+   panel.querySelector('.dica').insertAdjacentHTML('afterend', '<div class="livro-loop"><button type="button" class="btn secondary wide" data-abrir-livro><span class="ic3d sm" aria-hidden="true"><img src="'+ICONE_URL('ui/caderno')+'" alt=""></span>'+esc(room.livroLoop.abrir)+'</button><div class="livro-acoes"></div></div>');
+   panel.querySelector('[data-abrir-livro]').onclick = e => {
+    const host = e.currentTarget.parentNode; if (host.querySelector('iframe')) return;
+    e.currentTarget.insertAdjacentHTML('afterend', '<div class="peca livro"><iframe title="'+esc(room.livroLoop.abrir)+'" src="'+new URL('livro/index.html?embed=1&solo=1&capa='+encodeURIComponent(room.livroLoop.capa), PECAS_URL.href.replace('pecas/','')).href+'" allow="fullscreen" loading="eager"></iframe></div>');
+    e.currentTarget.style.display = 'none'; panel.dataset.livro = ''; panel.dataset.par = '0';
+   };
+  }
   lista.open = !!manterLista;
   const mv = panel.querySelector('model-viewer');
   if (mv) {
@@ -694,14 +704,14 @@ function renderClues(){
   // no Loop a lista não conta quanto falta: a contagem entregaria a hora do raio
   const label = repega?'pegar de novo · grátis':registered?'✓ no caderno':wait>0?(clue.lcp?'ainda não':'em '+fmt(wait)):bl?'travada':fechado?'🔒 abrir':(custoN?custoN+' ⚡':'grátis');
   const estado = repega?'livre':registered?'feita':wait>0?'espera':bl?'travada':'livre';
-  button.disabled = (registered && !repega) || wait > 0 || !!bl;
+  button.disabled = (registered && !repega) || wait > 0; button.setAttribute('aria-disabled', String(!!bl));
   if (button.dataset.estado !== estado) button.dataset.estado = estado;
-  const aria = clue.name+': '+(repega?'já está no caderno; pegar de novo não gasta energia':registered?'já está no caderno':wait>0?(clue.lcp?'ainda não apareceu':'aparece em '+fmt(wait)):bl?'travada agora':fechado?'tem tranca':(custoN?'gasta '+custoN+' de energia':'não gasta energia'));
+  const aria = clue.name+': '+(repega?'já está no caderno; pegar de novo não gasta energia':registered?'já está no caderno':wait>0?(clue.lcp?'ainda não apareceu':'aparece em '+fmt(wait)):bl?'travada: toque para saber por quê':fechado?'tem tranca':(custoN?'gasta '+custoN+' de energia':'não gasta energia'));
   if (button.getAttribute('aria-label') !== aria) button.setAttribute('aria-label', aria);
   if (button.lastElementChild.textContent !== label) button.lastElementChild.textContent = label;
   if (hs) { hs.classList.toggle('on', wait <= 0 && !bl); hs.classList.toggle('ok', registered); hs.disabled = registered && !repega; }
  });
- if (room.livro) atualizarLivro(clues, elapsed);
+ if (room.livro || room.livroLoop) atualizarLivro(clues, elapsed);
  renderNoitePanel();
  const reserva = lcReservaDaSala();
  let lembrete = panel.querySelector('.loop-reserva');
@@ -716,8 +726,26 @@ function renderClues(){
  renderIntervention(room.id, storySeconds);
 }
 // Livro folheável (museu/livro): cada pista vira uma página, escrita quando chega a hora dela; ao virar para a página, a pista é registrada.
+// No Loop (sala com livroLoop): as páginas são só as pistas da lista do livro. Página sem custo entra no caderno ao ser virada; página que gasta energia fica fechada até a pessoa tocar em "Ler" embaixo do livro.
+const livroPistas = (room, clues) => room.livroLoop ? room.livroLoop.ids.map(id => clues.find(c => c.lcp === id)).filter(Boolean) : clues;
+function livroAcoes(room, clues){
+ const panel = $('roomPanel'), host = panel.querySelector('.livro-acoes'); if (!host || !panel.querySelector('iframe')) return;
+ const par = Number(panel.dataset.par || 0), cl = livroPistas(room, clues), tem = c => state.clues.some(x => x.id === c.id);
+ const html = [cl[2*par], cl[2*par+1]].filter(c => c && !tem(c) && custoPista(c) > 0).map(c => '<button type="button" class="btn secondary wide" data-ler="'+c.id+'">Ler “'+esc(c.name)+'” · '+custoPista(c)+' de energia</button>').join('');
+ if (host.dataset.k === html) return; host.dataset.k = html; host.innerHTML = html;
+ host.querySelectorAll('[data-ler]').forEach(b => { b.onclick = () => collect(b.dataset.ler); });
+}
 function atualizarLivro(clues, elapsed){
  const panel = $('roomPanel'), fr = panel.querySelector('iframe'); if (!fr) return;
+ const sl = sala(state.room);
+ if (sl && sl.livroLoop) {
+  const cl = livroPistas(sl, clues), tem = c => state.clues.some(x => x.id === c.id), chaveL = 'L' + cl.map(c => tem(c) ? 1 : 0).join('');
+  livroAcoes(sl, clues);
+  if (panel.dataset.livro === chaveL && fr.dataset.pronto === '1') return;
+  const folhasL = cl.map(c => tem(c) ? {titulo:c.name, linhas:[c.text]} : {titulo:c.name, linhas:[custoPista(c) > 0 ? 'Página fechada. Para ler, toque no botão embaixo do livro.' : 'Vire a folha até aqui para ler.']});
+  try { fr.contentWindow.postMessage({oi:'livro', evento:'paginas', folhas:folhasL}, location.origin); panel.dataset.livro = chaveL; } catch (e) {}
+  return;
+ }
  const abertas = clues.map(c => c.time/300*state.duration-elapsed <= 0);
  const chave = abertas.map(x => x ? 1 : 0).join('');
  if (panel.dataset.livro === chave && fr.dataset.pronto === '1') return;
@@ -729,7 +757,13 @@ addEventListener('message', e => {
  const fr = document.querySelector('#roomPanel iframe'); if (!fr || e.source !== fr.contentWindow) return;
  if (e.data.evento === 'pronto') { fr.dataset.pronto = '1'; $('roomPanel').dataset.livro = ''; try { renderClues(); } catch (err) {} return; }
  if (e.data.evento !== 'folha' || !e.data.aberto || state.phase !== 'playing') return;
- const room = sala(state.room); if (!room?.livro) return;
+ const room = sala(state.room);
+ if (room?.livroLoop) {
+  const todas = scenarioClues()[room.id], cl = livroPistas(room, todas); $('roomPanel').dataset.par = String(e.data.par);
+  [2*e.data.par, 2*e.data.par+1].forEach(i => { const c = cl[i]; if (c && custoPista(c) === 0 && !state.clues.some(x => x.id === c.id) && !bloqueioPista(c, 0)) collect(c.id); });
+  livroAcoes(room, todas); return;
+ }
+ if (!room?.livro) return;
  const clues = scenarioClues()[room.id], elapsed = state.duration-state.remaining;
  [2*e.data.par, 2*e.data.par+1].forEach(i => { const c = clues[i]; if (c && c.time/300*state.duration-elapsed <= 0 && !state.clues.some(x => x.id === c.id)) collect(c.id); });
 });
@@ -847,9 +881,9 @@ function renderJournal(){
   ? 'Compare os comandos no ambiente '+roomName(path.room)+'. Um atua sobre o retorno e o outro altera apenas um efeito secundário.'
   : 'Há um procedimento de encerramento em '+roomName(path.source)+'.';
  const hs = state.caseRules === 2 ? [
-  'São duas perguntas: por que a máquina travou e quem trocou a peça. Cada uma pede provas diferentes.',
+  'São duas perguntas: por que a máquina travou e o que aconteceu nesta noite. Cada uma pede provas diferentes.',
   'Para a máquina: junte 2 sinais de tipos diferentes e 1 leitura normal. Depois abra a Máquina e escolha o defeito.',
-  'Para a peça: compare a peça da Galeria com a foto do catálogo, veja a câmera e junte a escala com o bilhete do armário.'
+  'Para a noite: olhe a peça da Galeria de perto, veja a câmera da Central e junte a escala com o bilhete do armário.'
  ] : [
   'Separe o que aconteceu com o acervo, o disparo do alarme e o retorno do tempo. Procure uma fonte para cada fato.',
   'A Sala das coleções ou a Conservação ajuda a explicar o acervo. A Segurança e a Sala técnica ajudam a explicar o alarme.',
@@ -878,7 +912,7 @@ function renderBetweenPlan(){
    : [T('T01', 'Volta 5: agora vale.'), T('ui/caderno', 'Escolha o que o seu caderno deixa você terminar.'), T('P01', 'Confira as provas, a sala e a energia antes de começar.')],
   5: [T('ui/caderno', 'As voltas terminaram. Veja o desfecho da sua investigação.')]
  };
- $('betweenHint').innerHTML = (instrucoes[state.loop] || []).map(([ic, txt]) => '<p class="bs-tarefa"><span class="ic3d sm" aria-hidden="true"><img src="'+ICONE_URL(ic)+'" alt=""></span><span>'+esc(txt)+'</span></p>').join('');
+ $('betweenHint').innerHTML = (state.loop === 4 && window.coop && typeof lcPapeisHtml === 'function' ? lcPapeisHtml() : '') + (instrucoes[state.loop] || []).map(([ic, txt]) => '<p class="bs-tarefa"><span class="ic3d sm" aria-hidden="true"><img src="'+ICONE_URL(ic)+'" alt=""></span><span>'+esc(txt)+'</span></p>').join('');
 }
 function renderBetween(){
  const finished = state.loop === 5;
@@ -892,7 +926,7 @@ function renderBetween(){
  $('betweenStory').textContent = finished
   ? (interrompeu ? 'A máquina parou de puxar o tempo de volta. O museu segue em frente.' : 'O tempo voltou mais uma vez. Use o que você achou para fechar a noite.')
   : (state.caseRules === 2 ? ENTRE_VOLTAS[Math.min(state.loop,ENTRE_VOLTAS.length)-1] : ENTRE_VOLTAS[0]);
- $('betweenHint').textContent = finished ? (state.caseRules === 2 && state.clues.length < 3 ? 'Poucas pistas? No desfecho você pode ver trechos do arquivo.' : 'Seu caderno vai com você para o desfecho.')
+ $('betweenHint').textContent = finished ? (state.caseRules === 2 && state.clues.length < 3 ? 'Seu caderno vai com você para o desfecho.' : 'Seu caderno vai com você para o desfecho.')
   : brokeLoop() ? 'Você já parou a máquina. Continue procurando para entender a noite e ajudar a turma.'
   : state.loop >= 2 ? 'Faltou pista? Peça uma dica no caderno.'
   : 'A próxima sala pode confirmar ou mudar o seu palpite.';
@@ -1066,6 +1100,7 @@ function readArchive(event){
 }
 function selectedAnswers(){
  const out = {};
+ if (state && state.caseRules === 2) return out;   // no Loop não há formulário de perguntas: o desfecho vem da Máquina
  for (const axis of ANSWER_AXES) {
   out[axis.key] = $(axis.key).value;
   out[axis.key+'__c'] = $(axis.key+'__c')?.value ?? '';
@@ -1080,6 +1115,7 @@ function setCerteza(key, value){
 }
 // Preenche o formulário com respostas guardadas (rascunho ou envio da sala do Mestre).
 function fillAnswers(saved){
+ if (state && state.caseRules === 2) return;
  for (const axis of ANSWER_AXES) {
   $(axis.key).value = saved?.[axis.key] ?? '';
   setCerteza(axis.key, saved?.[axis.key+'__c'] ?? '');
@@ -1114,6 +1150,7 @@ function renderForm(){
   ? 'Veja até onde a sua investigação chegou.'
   : 'Use as pistas do dossiê para reconstruir a noite.';
  $('reflectionForm').hidden = central;
+ if (central) { $('answerFields').innerHTML = ''; renderArchive(); return; }   // o Loop não monta as 8 perguntas do caso antigo, nem escondidas
  $('answerFields').innerHTML = '<p class="certeza-note">Escolha o quanto você confia em cada resposta. Com mais certeza você ganha mais pontos se acertar, mas perde pontos se errar. Em Quem e Por quê, aponte a pista que sustenta a resposta: sem ela, vale como palpite.</p>'+
   ANSWER_AXES.map(axis => '<div class="answer-field"><label for="'+axis.key+'">'+esc(axis.question)+
   '</label><select id="'+axis.key+'">'+options(axis.options)+'</select>'+certezaControl(axis)+supportControl(axis)+'</div>').join('');
@@ -1207,24 +1244,24 @@ $('answerFields').addEventListener('click', e => {
 // Apresentação das telas (21/11/2026): passo a passo visual dentro do manual. Sem códigos fixos nem nomes de escala.
 const TV_SALA = (id, on) => '<span class="tv-room'+(on?' on':'')+'"><img src="'+ICONE_URL(LOOP_SALAS[id][2])+'" alt="">'+LOOP_SALAS[id][0].split(' · ').pop()+'</span>';
 const TOUR = [
- {c:'Você chega ao museu no fim da tarde. Tudo calmo: gente passeando, luz quente, cheiro de cera no piso. Uma funcionária cochicha: "Shh! É surpresa para o pessoal. Depois eu explico."',t:'Escolha uma sala', d:'Toda volta começa no Saguão superior. Toque numa sala para ir até lá.',
+ {c:'Fim de tarde no museu. Amanhã abre a maior exposição da casa. Na Galeria, o curador não tira o olho da peça principal: "Está linda, não está?" Ele não parece ter certeza.',t:'Escolha uma sala', d:'Toda volta começa no Saguão. Toque numa sala para ir até lá.',
   v:()=>'<div class="tv-rooms">'+TV_SALA('galeria',1)+TV_SALA('seguranca')+TV_SALA('prototipo')+TV_SALA('recepcao')+'</div><p class="tv-floor">Saguão superior · você começa aqui</p>'},
- {c:'Na vitrine, um objeto brilha de leve. A restauradora passa e avisa baixinho: "Pode olhar de perto, só não encoste. Eu confiro tudo antes de fechar."',t:'Gire a peça', d:'Toque nos pontos que brilham. Cada um guarda uma pista. Eles aparecem com o tempo.',
+ {c:'Cada sala guarda um objeto. Gire, chegue perto. O que importa quase nunca está de frente.',t:'Gire a peça', d:'Toque nos pontos que brilham. Cada um guarda uma pista. Eles aparecem com o tempo.',
   v:()=>'<div class="tv-piece"><img class="tv-obj3d" src="'+ICONE_URL('V11')+'" alt=""><b class="tv-dot d1"></b><b class="tv-dot d2"></b><b class="tv-dot d3"></b></div><p class="tv-floor">Arraste para girar · toque no brilho</p>'},
- {c:'O relógio da parede marca a hora de sempre. Um guarda confere o rádio e murmura: "Faltam poucos minutos para fechar... eu odeio essa hora, tudo fica tão quieto."',t:'O tempo corre', d:'Cada volta tem 5 minutos. Quando acaba, o tempo volta. Só você lembra.',
+ {c:'Na Central, o Braga empurra uma xícara: "Chuva feia, hein? Pega um café." Daqui a cinco minutos ele vai dizer isso de novo. Só você vai saber.',t:'O tempo corre', d:'Cada volta tem 5 minutos. Quando acaba, o tempo volta. Só você lembra.',
   v:()=>'<div class="tv-clock"><span>VOLTA 2 DE 5</span><strong>04:12</strong><small>Minuto da volta · 0:48</small></div><div class="tv-bar"><i></i></div>'},
- {c:'No balcão, a ronda anota tudo: sala, minuto, quem passou. "Se algo der errado hoje", diz o guarda, "estes registros salvam a gente. Mas cuidado: nem tudo que contam é fato."',t:'Seu caderno', d:'Tudo que você acha vai para o caderno. O que alguém conta nem sempre é fato.',
+ {c:'O museu esquece. O caderno lembra. O chão guarda. O que você anota volta com você. O que você deixa no chão fica lá.',t:'Seu caderno', d:'Tudo que você acha vai para o caderno. O que alguém conta nem sempre é fato.',
   v:()=>'<div class="tv-dossie"><p><span class="tv-chip obs">Observação</span> O que você viu</p><p><span class="tv-chip rel">Relato</span> O que alguém contou</p><p><span class="tv-chip reg">Registro</span> O que está escrito</p></div>'},
- {c:'De repente, um raio. A luz cai, volta mais fraca, e o museu inteiro recomeça. Agora é com você.',t:'A Máquina', d:'Descubra por que a máquina travou. Na 5ª volta, o conserto vale.',
+ {c:'Cinco minutos depois, o museu inteiro recomeça. No Subsolo, uma máquina ligada que ninguém consegue desligar.',t:'A Máquina', d:'Descubra por que a máquina travou. Na 5ª volta, o conserto vale.',
   v:()=>'<div class="tv-panel"><b><img class="tv-mini" src="'+ICONE_URL('T01')+'" alt="">A Máquina</b><span class="tv-select">2 sinais + 1 leitura normal</span><span class="tv-btn">Escolher o defeito</span></div><p class="tv-floor">1 tentativa por volta</p>'},
- {c:'Quando o tempo se fecha, a ronda reúne todos. Cada um tem uma versão. Para acertar, você precisa de provas.',t:'Revelar', d:'Na última volta, com 3 provas no caderno, vá à Recepção e diga quem trocou a peça. É uma tentativa só.',
+ {c:'Na última volta, o telão da Recepção espera. Para fechar a noite, você precisa de provas, não de palpite.',t:'Revelar', d:'Na última volta, com 3 provas no caderno, vá à Recepção e diga o nome. É uma tentativa só.',
   v:()=>'<div class="tv-rooms">'+TV_SALA('galeria')+TV_SALA('seguranca')+TV_SALA('limpeza')+TV_SALA('recepcao',1)+'</div><p class="tv-floor">3 provas · 1 nome · 1 tentativa</p>'}
 ];
 function montarTour(){
  const host = $('tour');
  if (!host) return;
  let i = 0;
- host.innerHTML = '<div class="tour-card"><p class="tour-step" aria-live="polite"></p><p class="tour-cena"></p><div class="tour-visual" aria-hidden="true"></div><h3 class="tour-title"></h3><p class="tour-text"></p></div>'+
+ host.innerHTML = '<div class="tour-card"><p class="tour-step" aria-live="polite"></p><div class="tour-visual" aria-hidden="true"></div><h3 class="tour-title"></h3><p class="tour-text"></p><p class="tour-cena"></p></div>'+
   '<div class="tour-nav"><button class="btn secondary tour-prev" type="button">Voltar</button><span class="tour-dots" aria-hidden="true"></span><button class="btn primary tour-next" type="button">Próximo</button></div>';
  const q = sel => host.querySelector(sel);
  function draw(){

@@ -136,18 +136,18 @@ function sala(id){
  const alt = m.v ? PECAS_ALT[id]?.[m.v-1] : null;
  const r = {...base, name:m.nome, andar:m.andar, lugar:m.lugar, nomeBase:base.name, ...(alt ? alt : {})};
  const L = (typeof state !== 'undefined' && state && state.caseRules === 2) ? LOOP_SALAS[id] : null;   // no Loop: nome, peça e legenda da história
- if (L) { delete r.livro; delete r.capa; Object.assign(r, {name:L[0], sub:L[1], peca:L[2], andar:L[3], lugar:L[4]}); }
+ if (L) { delete r.livro; delete r.capa; Object.assign(r, {name:L[0], sub:L[1], peca:L[2], andar:L[3], lugar:L[4]}); if (L[5] && L[5].livro) r.livroLoop = L[5].livro; }   // no Loop o livro de folhear é por sala (segunda peça, com o conteúdo da história)
  return r;
 }
 // Salas da história do Loop: um nome só por sala (o mesmo das pistas e do roteiro), a peça que pertence à cena e o andar FIXO (as pistas falam de escada, porta de vidro e de quem sobe para a Galeria).
-// [nome, legenda, peça, andar, ordem no andar]
+// [nome, legenda, peça, andar, ordem no andar, extras]  extras.livro = {capa, abrir, ids}: livro de folhear como segunda peça da sala, com as pistas listadas (na ordem das páginas)
 const LOOP_SALAS = {
- galeria:['Galeria especial','A peça principal','V11','2º andar',1],
- conservacao:['Sala de conservação','Registros e laudos do acervo','I01','1º andar',1], sons:['Sala dos sons','Rádio da equipe','N07','1º andar',2],
- fotografia:['Sala da fotografia','Câmera antiga e catálogo','N05','1º andar',3], relogios:['Sala dos relógios','Relógios que param na queda de luz','R02','1º andar',4],
+ galeria:['Galeria especial','A peça principal na base','GAL_A','2º andar',1],
+ conservacao:['Sala de conservação','Registros e laudos do acervo','I01','1º andar',1,{livro:{capa:'Livro de registro|ACERVO DO MUSEU', abrir:'Abrir o livro de registro', ids:['tombo_1','livre_1','c_modo_1','b_verde_3','fh_carimbo','data_3','d_teo_1','fh_dobrada','teo_d1']}}], sons:['Sala dos sons','Rádio da equipe','N07','1º andar',2],
+ fotografia:['Sala da fotografia','Câmera antiga e catálogo','N05','1º andar',3], relogios:['Sala dos relógios','Relógios que param na queda de luz','REL_A','1º andar',4],
  recepcao:['Recepção','Livro de visitas e roleta','P01','Térreo',1], seguranca:['Central de monitoramento','Câmeras e crachás','S01','Térreo',2],
- corredor:['Área de descanso','Porta de serviço e recados','V41','Térreo',3], limpeza:['Base da limpeza','Armário da equipe e carrinho','L05','Térreo',4],
- atelie:['Ateliê de descobertas','Bancada da Ivone e manual','L06','Térreo',5], deposito:['Sala das coleções','Caixas e movimentações','V12','Térreo',6],
+ corredor:['Área de descanso','Porta de serviço e recados','DESC_A','Térreo',3], limpeza:['Base da limpeza','Armário da equipe e carrinho','L05','Térreo',4],
+ atelie:['Ateliê de descobertas','Bancada da Ivone e manual','L06','Térreo',5,{livro:{capa:'Manual da Câmara|DRA. SATO', abrir:'Abrir o manual', ids:['man_1','man_cal_1','man_pot_1','man_anc_1','man_circ_1','man_dois_1','man_legenda']}}], deposito:['Sala das coleções','Caixas e movimentações','V12','Térreo',6],
  manutencao:['Oficina técnica','Ferramentas e fusíveis','M03','Térreo',7], eletrica:['Oficina elétrica','Gerador, fusíveis e luvas','E02','Térreo',8],
  patio:['Pátio · Quadro externo','Quadro de energia e para-raios','E01','Térreo',9],
  prototipo:['Subsolo · Câmara do tempo','A máquina do tempo','T01','Subsolo',1]
@@ -361,6 +361,4 @@ const CASE_PATHS = [
  'reserve','reference','suspension','reserve','rehearsal',
  'reference','rehearsal','suspension','rehearsal','reserve'
 ];
-const EIXOS8 = [['event','O quê'],['where','Onde'],['when','Quando'],['how','Como'],['alarm','Por quê'],['figure','Quem'],['predict','Previsão'],['action','Intervenção']];
-const verdade = (caso, k) => { const c = CASES[caso]; return k === 'where' ? c.room : k === 'when' || k === 'how' ? CASE_PATHS[caso] : k === 'predict' ? 'retorno' : c[k]; };
-export { ANDARES, INICIO, ROOMS, LOOP_SALAS, sala, definirMuseu, sortearMuseu, montarMuseu, nomear, EVENTS, ALARMS, FIGURES, ACTIONS, CASES, labels, figures, makeClues, esc, CASE_PATHS, EIXOS8, verdade };
+export { ANDARES, INICIO, ROOMS, LOOP_SALAS, sala, definirMuseu, sortearMuseu, montarMuseu, nomear, EVENTS, ALARMS, FIGURES, ACTIONS, CASES, labels, figures, makeClues, esc, CASE_PATHS };

@@ -1,5 +1,5 @@
 # Loop v4 (25/11/2026) — decisões aplicadas nos dados e no código
-Fonte da verdade do enredo: docs/ROTEIRO-LOOP.md. Dados: cinco-minutos/dados/pistas-v4.json (278 pistas desde a revisão 3; as seções "Revisão 2" e "Revisão 3", no fim, valem sobre o que estiver acima, e a 3 vale sobre a 2) → loop-central-dados.js.
+Fonte da verdade do enredo: docs/ROTEIRO-LOOP.md. Dados: cinco-minutos/dados/pistas-v4.json (278 pistas desde a revisão 3; as seções "Revisão 2", "Revisão 3" e "Revisão 4", no fim, valem sobre o que estiver acima, e a mais nova vale sobre as anteriores) → loop-central-dados.js.
 
 ## Mundo
 - Uma versão só para o Téo: confrontou o Lenz na Sala das coleções minutos antes de 0:00, foi empurrado, caiu ao lado do pote de tinta. Enquanto a Câmara gira ele "não piora nem melhora, fica guardado igual a uma peça numa vitrine" (pista sato_teo). Saíram as frases "encostou na Câmara / ficou preso entre as voltas".
@@ -30,7 +30,7 @@ Fonte da verdade do enredo: docs/ROTEIRO-LOOP.md. Dados: cinco-minutos/dados/pis
 - Recurso de quem joga: "energia" (carga é só o ponteiro da máquina).
 - Regras de jogo saíram das pistas (regras_quadro apagada; aviso_solo e v4_camara viraram objetos do mundo) e ficam na ajuda da Máquina.
 - Atividades renomeadas: "Lado a Lado" (antes Original e Cópia), "As Duas Listas" (antes Entrou, mas não saiu).
-- Missões secretas (5): o que o Braga esconde; o que derrubou o Téo; quem ganha se a peça sumir; por que a Ivone não pode ter trocado; o que o Aurélio sabia.
+- Missões secretas (5; hoje são 8): o que o Braga esconde; o que derrubou o Téo; quem ganha se a peça sumir; por que a Ivone não pode ter trocado; o que o Aurélio sabia.
 - Vocabulário: número de registro (não tombo), base (não pedestal), apoio (não berço), luva isolante (não manopla), ajustar/ajuste (não calibrar), luz da peça / modo livre / peça presa (não âncora), pontos (não bornes).
 
 ## Revisão 2 (25/11/2026) — depois da rodada 2 das escalas
@@ -52,7 +52,7 @@ Onde esta seção contradiz o que está acima, vale esta. Relatórios de origem:
 ### Regra das provas (Revelar)
 - prova_falsa: sai falsa_1 (cheiro de verniz vira suspeita que abre laudo, molde e caixa); entra c_peca, por `gruposExtras` (a pista continua no grupo peca_verdadeira, que é o do conserto da noite C).
 - trajeto: sai cofre_ronda (prova o crachá em uso, não a descida); saem assim_foto e assim_leg soltas; entra assim_par (as duas metades no caderno, 1 de energia); traj_4 passa a custar 1.
-- Nome do patrocinador fora do minuto 0: cracha_4, coop_catraca_ok e catraca_solo dizem "o do patrocínio". "Lenz" só aparece em lenz_mot_2 (volta 2, quem assinou o recebimento) e, como dono da mão, em cracha_3, coop_veredito e v4_braga (volta 3). Agora é verdade que não há como chegar ao nome na volta 1, nem na 2.
+- Nome do patrocinador fora do minuto 0: cracha_4, coop_catraca_ok e catraca_solo dizem "o do patrocínio". "Lenz" só aparece em lenz_mot_2 (volta 2, quem assinou o recebimento) e, como dono da mão, em cracha_3, coop_veredito e v4_braga (volta 3). Agora é verdade que não há como chegar ao nome na volta 1. (Na volta 2 o nome ainda estava na carta; saiu na revisão 4.)
 - iso_1 (luva isolante do armário) passou a contar como luva.
 
 ### Causas com o mesmo peso
@@ -147,6 +147,40 @@ Onde esta seção contradiz o que está acima, vale esta. Origem: relatório da 
 - Jogador ótimo com 1, 2 e 3 pessoas; valores sorteados como no jogo, com 5 sementes por rodada; aviso de prévia que muda com a causa (erro se existir numa causa só).
 - Teto de pistas ativas por noite: 230 (eram 190), por causa dos pares.
 - Simulador: energia 5, Revelar só na volta 5, tranca conferida no caderno de quem olha, valor errado sem dizer qual, Central sem devolução.
+
+### Ficou para decidir
+Nada.
+
+## Revisão 4 (25/11/2026) — depois da rodada 3 das escalas
+
+Onde esta seção contradiz o que está acima, vale esta. Origem: os quatro relatórios da rodada 3 (`docs/avaliacao/rodada3/`): conferência técnica (B1 a B15 e 16 menores), escala da história, fichas e motivação (16 de texto e dado, 6 de mecânica) e padrão visual com peças 3D.
+
+### Decisões do responsável
+- **"Lenz" só da volta 3 em diante.** A carta da seguradora diz "quem assinou pelo patrocínio". O nome aparece em cena: `lenz_2` (ele atende o telefone), `cracha_3`, `coop_veredito`, `v4_braga`.
+- **`foto_solo` na volta 2.** O minijogo da caixa de "banners" não manda abrir a caixa na volta 1: foi para `c_peca` (volta 2) e virou pergunta.
+- **Pares inocentes.** Nenhum par mostra o defeito da noite nem uma leitura normal de verdade: os 7 apontados e mais 23 iguais viraram objeto de ambiente. Par continua sem grupo e sem etiqueta. A tranca do par é a mesma nas 5 causas.
+- **Trajeto.** `cofre_ronda` e `assim_par` valem os dois.
+- **Noite E.** Um conserto por volta, com ou sem dupla. O validador aprovou a noite E sem dupla com o primeiro conserto na volta 3; não foi preciso liberar a volta 2.
+- **Pendrive.** Fato novo em `teo_radio`: o envelope que o Téo recusou.
+- **Dra. Sato sem dupla.** Fora do prédio, só fala: dita e confere. Nenhuma ação física dela. Registrado em FICHAS.md e em `regras.sato`.
+- **Painel e Manual.** Não anexa mais sozinha. Entrega a leitura completa (etiqueta "LEITURA COMPLETA · painel"), que no Anexar vale sozinha; quem joga escolhe o defeito. O texto da leitura não diz mais o nome do defeito.
+- **Aba Atividades.** Conserto só com o diagnóstico anexado.
+- **Papéis da última volta na tela**, sem regra nova: escolha na pausa da volta 4 (em sala), dica na volta 5, nome e papel no telão.
+- **Telão final.** Final da história, fita completa em ordem (motivo, engano e defeito da noite: 10 fatos) e a pergunta para conversar. Sem a página das 8 perguntas antigas.
+- **Entrada.** Sem o botão "Episódio visual" (a pasta `reserva/` continua). Manual de entrada e título da sala com o mundo do Loop.
+- **Etiqueta no caderno.** Fica (é a regra do Anexar). A pista recebida de outra pessoa conserva a etiqueta.
+- **Visual e peças.** Correções do padrão visual aplicadas; miniaturas 3D do próprio acervo; livro de folhear no Ateliê e na Sala de conservação; três peças compostas (Galeria, Sala dos relógios, Área de descanso).
+
+### Onde dois relatórios pediam coisas diferentes
+- **Título e passos do manual de entrada.** A conferência técnica propôs "Um raio. O tempo recomeça."; a escala da história pediu para não ligar o reinício ao raio nem entregar a troca no minuto 0. Ficou a da história: "Cinco minutos. Depois, tudo de novo.", e os passos 5 e 6 sem raio e sem "trocou a peça".
+- **Seu Dirceu na noite D.** A história pediu para não nomear o fusível; as fichas pediram a voz dele e que o Téo não contasse o esconderijo. O texto junta os dois: ele viu, não soube o que era.
+- **Tranca da página dobrada.** A história propôs três leituras dos fusíveis; ficou a mesma lista do papel na mão do Téo, para a tranca ser igual nas 5 causas.
+- **Cor da faixa da pista.** Na sala a faixa é neutra e o tipo vem do ícone; a cor de etiqueta fica no caderno e no dossiê. Assim há um código de cor só, e a sala não diz de graça o que é sinal.
+- **Minijogos de manuseio.** As fichas pediam a caixa na volta 2; o padrão das peças pedia pergunta no lugar de manuseio. A caixa e a foto viraram perguntas que pedem a história.
+
+### Simulador de texto e validador
+- Um conserto por volta com ou sem dupla; Painel e Manual entrega e não anexa; anexar aceita a leitura completa sozinha; valor errado no ensaio diz "só gastou a energia".
+- Continua diferente do jogo (registrado, não bloqueia): o simulador usa o dossiê do grupo, tem pré-conferência que não gasta a tentativa e limite de 2 atividades em dupla por volta.
 
 ### Ficou para decidir
 Nada.

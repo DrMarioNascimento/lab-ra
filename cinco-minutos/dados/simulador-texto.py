@@ -118,7 +118,8 @@ def vmin(A, s):
 def falta_outro(A, s, solo=False):
     """Dois defeitos: True se os outros consertos ainda nao estao gravados em volta anterior."""
     al = alvos(s)
-    return len(al) > 1 and A['id'] in al and not all((s['meio'].get(o, 99) <= s['volta']) if solo else (s['meio'].get(o, 99) < s['volta']) for o in al if o != A['id'])
+    # revisão 4: um conserto por volta, com ou sem dupla (o parâmetro solo ficou só por compatibilidade)
+    return len(al) > 1 and A['id'] in al and not all(s['meio'].get(o, 99) < s['volta'] for o in al if o != A['id'])
 def meio_repetido(A, s, solo=False): return falta_outro(A, s, solo) and A['id'] in s['meio']
 MSG_MEIO = 'Esta metade já está gravada na Câmara. Falta o OUTRO defeito, e ele só entra em volta diferente da primeira gravação.'
 def nao_desta_noite(s):
@@ -240,7 +241,7 @@ def _valores(A, vals):
 def _msg_erro(A, s, certos, tot, erradas, custo_txt, devolveu):
     o = f'A MÁQUINA NÃO REAGE: {certos} de {tot} valor(es) aceito(s). '
     o += 'Formato: ' + '; '.join(f'{FMT.get(k, {}).get("rotulo", k)} = {FMT.get(k, {}).get("como", "?")} (do jeito {FMT.get(k, {}).get("exemplo", "?")})' for k in A['valores_pedidos']) + '. '
-    o += f'({custo_txt}' + ('; ensaio sem punição)' if s['volta'] == 4 else ')')
+    o += f'({custo_txt})' + (' Era ensaio: só gastou a energia.' if s['volta'] <= 4 else '')
     return o
 def _devolve(s):
     return False   # revisão 3: como no jogo, nenhuma tentativa errada devolve energia
@@ -257,7 +258,7 @@ def _conserto(g, s, A, js, modo):
     """Volta 4 = ensaio (a maquina reage ou nao). Volta 5 = vale."""
     if falta_outro(A, s, str(modo).startswith('sem dupla')):
         s['meio'][A['id']] = s['volta']; s['coop_feitas'].append((s['volta'], A['id'], 'meio')); save(g, s)
-        print(f'MEIO CONSERTO ({modo}) gravado na Câmara na volta {s["volta"]}. O AVISO MUDOU DE LUGAR. Mudou, não sumiu: falta o outro defeito, em OUTRA volta.'); _entrega(A['produto_meio'], js); save(g, s); return
+        mesma = any(v == s['volta'] for o, v in s['meio'].items() if o != A['id']); print(f'MEIO CONSERTO ({modo}) gravado na Câmara na volta {s["volta"]}. ' + ('Os dois defeitos foram mexidos na mesma volta: a Câmara só fecha em outra. Repita um deles numa volta seguinte.' if mesma else 'O AVISO MUDOU DE LUGAR. Mudou, não sumiu: falta o outro defeito, em OUTRA volta.')); _entrega(A['produto_meio'], js); save(g, s); return
     if s['volta'] <= 4:
         s['ensaio'].append((A['id'], modo)); print(f'ENSAIO ({modo}): A MÁQUINA REAGE. Não valeu ainda: repita na volta 5.'); _entrega(A['produto_ensaio'], js)
     else:
@@ -300,8 +301,7 @@ def cmd_coop(g, aid, ja, jb, *vals):
     print(f'ATIVIDADE FEITA: {A["nome"]} (-{cp} de energia por pessoa, {A["duracao_s"]} s). Os dois recebem:')
     for pid in A['produz']:
         if pid in P and ativa(P[pid], s): _entrega(pid, (A_, B_))
-    if A.get('anexa_diagnostico') and not s['diag']:
-        s['diag'] = dict(volta=s['volta'], via=aid); s['apostas'].setdefault(str(s['volta']), s['causa']); print('  A leitura completa entra no dossiê: DIAGNÓSTICO ANEXADO.')
+    if A.get('entrega_diagnostico') and not s['diag']: print('  A leitura completa do painel está no caderno. Ela vale sozinha no anexar, mas quem escolhe o defeito é você: anexar <causa> <id da leitura>.')
     s['coop_feitas'].append((s['volta'], aid, 'em dupla')); save(g, s)
 def cmd_solo(g, j, aid, *vals):
     s = load(g); A = AT.get(aid)
@@ -364,6 +364,7 @@ def _valida_anexo(causa, ids):
         x = P[i]; g = x.get('grupoFonte'); ap = causa in x['revela']['aponta']; rot = f'"{x["previa"]}"'
         de = [c for c in x['revela']['descarta'] if c in CAUSAS and c != causa]
         if x.get('diagnosticoCompleto') and ap: completo = True; linhas.append(f'{rot}: leitura completa do painel. Vale sozinha.')
+        elif x.get('diagnosticoCompleto'): linhas.append(f'{rot}: leitura completa, mas ela não mostra esse defeito. NÃO CONTOU.')
         elif x['tipo'] == 'falsa_honesta': linhas.append(f'{rot}: coisa estranha com explicação inocente. NÃO CONTA.')
         elif ap and g and g in sinais: linhas.append(f'{rot}: sinal REPETIDO (mesmo tipo: {GF[g]["rotulo"]}). Conta uma vez só.')
         elif ap and g: sinais[g] = i; linhas.append(f'{rot}: CONTOU como sinal (tipo: {GF[g]["rotulo"]}).')
@@ -388,7 +389,8 @@ def cmd_anexar(g, causa, *ids):
     if str(s['volta']) in s['anexos']: print('Uma tentativa de anexar por volta: o grupo já tentou nesta volta. Tente de novo na próxima.'); return
     u = uniao(s); fora = [i for i in ids if i not in u]; ids = list(dict.fromkeys(i for i in ids if i in u))
     if fora: print('Estas pistas não estão no dossiê do grupo: ' + ', '.join(fora)); return
-    if len(ids) != 3: print('Para anexar, cite exatamente 3 pistas do dossiê do grupo: 2 que apontam a causa (de tipos diferentes) + 1 que descarta outra causa. (Não gastou a tentativa da volta.)'); return
+    completa = any(P[i].get('diagnosticoCompleto') for i in ids)
+    if len(ids) != 3 and not (completa and 1 <= len(ids) <= 3): print('Para anexar, cite exatamente 3 pistas do dossiê do grupo: 2 que apontam a causa (de tipos diferentes) + 1 que descarta outra causa. (Não gastou a tentativa da volta.)'); return
     # pré-conferência pela etiqueta escrita nas pistas (como a tela do jogo faz): forma errada nao gasta a tentativa
     et = [(P[i].get('etiqueta') or '').upper() for i in ids]; sin = [e for e in et if e.startswith('SINAL')]; sis = [e for e in et if e.startswith('LEITURA')]
     if not any(P[i].get('diagnosticoCompleto') for i in ids) and not (len(sin) == 2 and len(set(sin)) == 2 and len(sis) == 1):

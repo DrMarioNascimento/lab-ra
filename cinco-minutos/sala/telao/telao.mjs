@@ -1,14 +1,13 @@
 // Loop (MOSAICO) · telão: só lê a sala e mostra o que a turma inteira pode ver. Nunca mostra pistas.
-// O conteúdo fica em páginas por tema (Relógio, Mapa, Turma, Máquina; no fim: Desfecho, A noite, Turma, Perguntas),
+// O conteúdo fica em páginas por tema (Relógio, Mapa, Turma, Máquina; no fim: Desfecho, A noite, Para conversar, Turma),
 // com abas, setas do teclado e troca automática (que dá para parar). As salas são só as 15 da história (LOOP_SALAS).
 import { transporteTelao, transporteFalso, ms } from '../transporte.mjs';
-import { CASES, ANDARES, INICIO, LOOP_SALAS, EIXOS8, verdade, sala as salaMuseu, definirMuseu } from '../conteudo.js?v=3';
+import { ANDARES, INICIO, LOOP_SALAS, definirMuseu } from '../conteudo.js?v=4';
 
 const P = new URLSearchParams(location.search);
 const FALSA = P.get('falsa') === '1';
 const codigo = (P.get('sala') || '').toUpperCase();
 const app = document.getElementById('app');
-const EIXOS = EIXOS8;
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const mmss = (s) => {
   const total = Math.max(0, Math.ceil(s));
@@ -57,8 +56,7 @@ function paginasDaEtapa() {
   if (room.fase === 'sala' || !e) return [['entrada', 'Entrada']];
   if (e === 'choose' || e === 'playing' || e === 'between') return [['relogio', 'Relógio'], ['mapa', 'Mapa'], ['turma', 'Turma'], ['maquina', 'Máquina']];
   if (e === 'final') return [['desfecho', 'Desfecho'], ['turma', 'Turma']];
-  const temPerguntas = gente().some(p => p.resp && EIXOS.some(([k]) => p.resp[k]));
-  return [['desfecho', 'Desfecho'], ['noite', 'A noite'], ['turma', 'Turma']].concat(temPerguntas ? [['perguntas', 'Perguntas']] : []);
+  return [['desfecho', 'Desfecho'], ['noite', 'A noite'], ['conversa', 'Para conversar'], ['turma', 'Turma']];
 }
 function irPara(i, manual) {
   const n = paginasDaEtapa().length; pag = ((i % n) + n) % n; trocaEm = Date.now() + GIRO_MS;
@@ -80,8 +78,8 @@ app.addEventListener('click', (e) => {
 
 function cabeca(pags) {
   const jogo = ['choose', 'playing', 'between'].includes(room?.etapa) && room.fase !== 'sala';
-  const mini = jogo ? `<div class="tl-mini"><small>VOLTA ${room.volta} DE 5</small><b id="tlMini">${mmss(room.etapa === 'playing' ? restante() : room.seg)}</b></div>` : '';
-  const abas = pags && pags.length > 1 ? `<nav class="tl-abas" aria-label="Páginas do telão"><button class="tl-seta" data-pag="-" type="button" aria-label="Página anterior">‹</button>${pags.map(([, n], i) => `<button class="tl-aba${i === pag ? ' on' : ''}" data-pag="${i}" type="button">${n}</button>`).join('')}<button class="tl-seta" data-pag="+" type="button" aria-label="Próxima página">›</button><button class="tl-aba tl-auto${auto ? ' on' : ''}" data-auto type="button" title="Barra de espaço">${auto ? 'Girando' : 'Parado'}</button></nav>` : '';
+  const mini = jogo ? `<div class="tl-mini"><small>VOLTA ${room.volta} DE 5</small><b id="tlMini">${room.etapa === 'between' ? 'pausa' : mmss(room.etapa === 'playing' ? restante() : room.seg)}</b></div>` : '';
+  const abas = pags && pags.length > 1 ? `<nav class="tl-abas" aria-label="Páginas do telão"><button class="tl-seta" data-pag="-" type="button" aria-label="Página anterior">‹</button>${pags.map(([, n], i) => `<button class="tl-aba${i === pag ? ' on' : ''}" data-pag="${i}" type="button">${n}</button>`).join('')}<button class="tl-seta" data-pag="+" type="button" aria-label="Próxima página">›</button><button class="tl-aba tl-auto${auto ? ' on' : ''}" data-auto type="button" title="Barra de espaço">Troca sozinha: ${auto ? 'sim' : 'não'}</button></nav>` : '';
   return `<div class="tl-topo"><div class="tl-marca"><small>MOSAICO</small><b>Loop</b></div>${abas}${mini}<div class="tl-codigo">CÓDIGO<strong>${esc(codigo)}</strong></div></div>`;
 }
 
@@ -108,10 +106,10 @@ function pgRelogio() {
     2: 'Juntem as pistas. O que precisa ficar pronto em outra sala?',
     3: 'Combinem o ensaio. O que ainda falta para a última volta?',
     4: 'Dividam as tarefas. Quem opera a Máquina? Quem leva as 3 provas à Recepção?',
-    5: 'Conversem sobre o que conseguiram. Registrem o desfecho no celular.'
+    5: 'Conversem sobre o que conseguiram. Contem no celular como a noite acabou.'
   };
   const voltas = `<div class="tl-voltas" aria-hidden="true">${[1, 2, 3, 4, 5].map(i => `<b class="${i < v || (i === v && e === 'between') ? 'feita' : i === v ? 'agora' : ''}">${i}</b>`).join('')}</div>`;
-  if (e === 'between') return `<div class="tl-card tl-relogio tl-largo">${voltas}<div class="tl-volta">VOLTA ${v} DE 5</div><h1 class="tl-titulo">${v === 5 ? 'A última volta acabou.' : 'O tempo voltou.'}</h1><p class="tl-texto">${passos[v]}</p></div>`;
+  if (e === 'between') return `<div class="tl-card tl-relogio tl-largo tl-pausa"><img class="tl-arte" src="${ICONE('T01')}" alt=""><div>${voltas}<div class="tl-volta">VOLTA ${v} DE 5</div><h1 class="tl-titulo">${v === 5 ? 'A última volta acabou.' : 'O tempo voltou.'}</h1><p class="tl-texto">${passos[v]}</p></div></div>`;
   return `<div class="tl-card tl-relogio">${voltas}<div class="tl-volta">VOLTA ${v} DE 5</div><div class="tl-tempo" id="tlTempo">${mmss(jog ? seg : room.seg)}</div>
       <div class="tl-museu">Minuto da volta: <time id="tlMin">${loopHora(room.seg, jog ? seg : room.seg)}</time></div></div>
     <div class="tl-card tl-relogio tl-lado"><div class="tl-num"><b>${g.filter(naSala).length}</b><span>de ${g.length}</span></div><p class="tl-texto">já ${g.filter(naSala).length === 1 ? 'escolheu' : 'escolheram'} uma sala</p><div class="tl-sinal" id="tlSinal">${jog ? esc(sinal(seg)) : 'Escolham uma sala no celular.'}</div></div>`;
@@ -131,15 +129,17 @@ function pgTurma() {
       <div class="tl-card"><p class="tl-volta">${e === 'result' ? 'QUEM JOGOU' : 'FALTA REGISTRAR'}</p>${chips((e === 'result' ? g : falta).map(p => [p.nome || 'Participante', '', e === 'result' && p.resp ? 'ok' : '']), 'Todo mundo registrou.')}</div>`;
   }
   const dentro = g.filter(naSala), fora = g.filter(p => !naSala(p));
-  return `<div class="tl-card"><p class="tl-volta">NAS SALAS · ${dentro.length}</p>${chips(dentro.map(p => [p.nome || 'Participante', LOOP_SALAS[p.amb] ? `<img src="${ICONE(LOOP_SALAS[p.amb][2])}" alt="" title="${esc(nomeSala(p.amb))}">` : '', 'ok']), 'Ninguém escolheu sala ainda.')}</div>
-    <div class="tl-card"><p class="tl-volta">NO SAGUÃO · ${fora.length}</p>${chips(fora.map(p => [p.nome || 'Participante', '', '']), 'Todo mundo já está numa sala.')}</div>`;
+  const rot = (p) => (p.nome || 'Participante') + (room.volta >= 4 && p.papel5 ? ' · ' + p.papel5 : '');   // papel escolhido na pausa da volta 4
+  const salas = `<div class="tl-card${fora.length ? '' : ' tl-largo'}"><p class="tl-volta">NAS SALAS · ${dentro.length}</p>${chips(dentro.map(p => [rot(p), LOOP_SALAS[p.amb] ? `<img src="${ICONE(LOOP_SALAS[p.amb][2])}" alt="" title="${esc(nomeSala(p.amb))}">` : '', 'ok']), 'Ninguém escolheu sala ainda.')}</div>`;
+  if (!dentro.length) return `<div class="tl-card tl-largo"><p class="tl-volta">NO SAGUÃO · ${fora.length}</p>${chips(fora.map(p => [rot(p), '', '']), 'Ninguém entrou ainda.')}</div>`;
+  return salas + (fora.length ? `<div class="tl-card"><p class="tl-volta">NO SAGUÃO · ${fora.length}</p>${chips(fora.map(p => [rot(p), '', '']), '')}</div>` : '');
 }
 function pgMaquina() {
   const f = (img, t, d) => `<div class="tl-meta">${ficha(img, 'g')}<b>${t}</b><span>${d}</span></div>`;
   return `<div class="tl-card tl-largo"><p class="tl-volta">O QUE A TURMA PRECISA FAZER</p><div class="tl-metas">` +
     f('ui/alvo', 'Achar o defeito', '2 sinais de tipos diferentes e 1 leitura normal') +
-    f('T01', 'Consertar a Máquina', 'Nas voltas 3 e 4 é ensaio. Na volta 5 vale.') +
-    f('P01', 'Revelar a troca', '3 provas no caderno, um nome, na Recepção') + `</div></div>`;
+    f('T01', 'Consertar a Máquina', 'Das voltas 2 a 4 é ensaio. Na volta 5 vale.') +
+    f('P01', 'Revelar o que aconteceu', '3 provas no caderno, um nome, na Recepção') + `</div></div>`;
 }
 function pgEntrada() {
   const g = gente();
@@ -151,30 +151,26 @@ function pgDesfecho() {
   const g = gente();
   if (room.etapa === 'final') {
     const n = g.filter((p) => p.resp).length;
-    return `<div class="tl-card tl-relogio"><h1 class="tl-titulo">Desfecho</h1><p class="tl-texto">Registrem o desfecho no celular.</p></div>
-      <div class="tl-card tl-relogio"><div class="tl-num"><b>${n}</b><span>de ${g.length}</span></div><p class="tl-texto">já registraram</p></div>`;
+    return `<div class="tl-card tl-relogio tl-pausa"><img class="tl-arte" src="${ICONE('ui/caderno')}" alt=""><div><h1 class="tl-titulo">Desfecho</h1><p class="tl-texto">Contem no celular como a noite acabou.</p></div></div>
+      <div class="tl-card tl-relogio"><div class="tl-num"><b>${n}</b><span>de ${g.length}</span></div><p class="tl-texto">já contaram</p></div>`;
   }
-  const enviados = g.filter(p => p.resp), coletivo = loopFinalTurma(enviados.map(p => p.resp)), c = CASES[room.caso];
-  return coletivo ? `<div class="tl-card tl-relogio tl-largo"><p class="tl-volta">DESFECHO DA TURMA</p><h1 class="tl-titulo tl-enorme">${esc(coletivo.final)}</h1>
-      <p class="tl-texto">${esc(LOOP_FINAIS[coletivo.final])}</p><p class="tl-aviso">${coletivo.registrados} de ${g.length} registraram o desfecho.</p></div>`
-    : `<div class="tl-card tl-relogio tl-largo"><p class="tl-volta">CONCLUSÃO</p><h1 class="tl-titulo">${esc(enviados.length ? c?.subject : 'Investigação encerrada')}</h1>
-        <p class="tl-texto">${esc(enviados.length ? c?.detail : 'A turma encerrou a investigação.')}</p></div>`;
+  const enviados = g.filter(p => p.resp), coletivo = loopFinalTurma(enviados.map(p => p.resp));
+  if (!coletivo) return `<div class="tl-card tl-relogio tl-largo"><p class="tl-volta">DESFECHO</p><h1 class="tl-titulo">A noite acabou.</h1><p class="tl-texto">Ninguém contou o desfecho no celular.</p></div>`;
+  const fs = enviados.map(p => p.resp.loopFinal), tem = (...l) => fs.some(x => l.includes(x));
+  const ficha = (img, ok, t) => `<div class="tl-meta ${ok ? 'ok' : 'nao'}">${`<span class="ic3d g" aria-hidden="true"><img src="${ICONE(img)}" alt=""></span>`}<b>${t}</b><span>${ok ? '✓ feito' : 'ficou aberto'}</span></div>`;
+  return `<div class="tl-card tl-relogio tl-largo"><p class="tl-volta">DESFECHO DA TURMA</p><h1 class="tl-titulo tl-enorme">${esc(LOOP_FINAL_NOME[coletivo.final] || coletivo.final)}</h1>
+      <p class="tl-texto">${esc(LOOP_FINAIS[coletivo.final])}</p>
+      <div class="tl-metas tl-res">${ficha('ui/alvo', enviados.some(p => p.resp.loopDefeito) || tem('Ouro', 'Desligar'), 'Defeito achado')}${ficha('T01', tem('Ouro', 'Desligar'), 'Máquina consertada')}${ficha('P01', tem('Ouro', 'Revelar'), 'Noite revelada')}</div>
+      <p class="tl-aviso">${coletivo.registrados} de ${g.length} contaram o desfecho.</p></div>`;
 }
 function pgNoite() {
   const enviados = gente().filter(p => p.resp);
-  return `<div class="tl-card tl-largo">${loopFitaHtml(enviados.map(p => p.resp.loopFatos), gente().length, enviados.map(p => p.nome || 'Participante'))}</div>`;
+  return `<div class="tl-card tl-largo">${loopFitaHtml(enviados.map(p => p.resp.loopFatos), gente().length, enviados.map(p => p.nome || 'Participante'), enviados.map(p => p.resp.loopDefeito || ''), new URL('../../museu/icones/', import.meta.url).href)}</div>`;
 }
-function pgPerguntas() {
-  const reflexoes = gente().filter(p => p.resp && EIXOS.some(([k]) => p.resp[k]));
-  return `<div class="tl-card tl-largo"><p class="tl-volta">PERGUNTAS DA INVESTIGAÇÃO</p><div class="tl-barras">${EIXOS.map(([k, rotulo]) => {
-    const respostas = reflexoes.filter(p => p.resp[k]);
-    if (!respostas.length) return '';
-    const ok = respostas.filter(p => p.resp[k] === verdade(room.caso, k)).length;
-    const pc = Math.round(ok / respostas.length * 100);
-    return `<div class="tl-barra"><span>${esc(rotulo)}</span><div><i style="width:${pc}%"></i></div><span>${ok}/${respostas.length}</span></div>`;
-  }).join('')}</div></div>`;
+function pgConversa() {
+  return `<div class="tl-card tl-relogio tl-largo tl-pausa"><img class="tl-arte" src="${ICONE('ui/dupla')}" alt=""><div><p class="tl-volta">PARA CONVERSAR</p><h1 class="tl-titulo tl-pergunta">${esc(LOOP_CONVERSA)}</h1></div></div>`;
 }
-const PG = { entrada: pgEntrada, relogio: pgRelogio, mapa: pgMapa, turma: pgTurma, maquina: pgMaquina, desfecho: pgDesfecho, noite: pgNoite, perguntas: pgPerguntas };
+const PG = { entrada: pgEntrada, relogio: pgRelogio, mapa: pgMapa, turma: pgTurma, maquina: pgMaquina, desfecho: pgDesfecho, noite: pgNoite, conversa: pgConversa };
 
 function desenhar() {
   if (!room) { app.innerHTML = `<div class="tl-raiz">${cabeca()}<div class="tl-meio"><div class="tl-card tl-largo tl-relogio"><h1 class="tl-titulo">Sala não encontrada</h1><p class="tl-texto">Confira o código e abra de novo.</p></div></div></div>`; return; }
@@ -183,7 +179,7 @@ function desenhar() {
   if (pag >= pags.length) pag = 0;
   const g = gente();
   // Só refaz a tela quando algo de fato muda; o relógio atualiza no lugar (nada pisca).
-  const chave = [room.fase, room.etapa, room.volta, room.rodada, pag, auto, pags.length, g.map(p => [p.id, p.nome, p.amb, p.ambVolta, p.resp ? 1 : 0].join(':')).join('|')].join('~');
+  const chave = [room.fase, room.etapa, room.volta, room.rodada, pag, auto, pags.length, g.map(p => [p.id, p.nome, p.amb, p.ambVolta, p.papel5 || '', p.resp ? 1 : 0].join(':')).join('|')].join('~');
   if (chave !== chaveTela) {
     chaveTela = chave;
     const dots = pags.length > 1 ? `<div class="tl-dots" aria-hidden="true">${pags.map((_, i) => `<b class="${i === pag ? 'on' : ''}"></b>`).join('')}</div>` : '<span></span>';

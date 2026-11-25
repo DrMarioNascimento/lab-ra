@@ -38,7 +38,7 @@ function quadro() {
 }
 
 export function abrirMinigame(dialog, atividade, causa, aoResolver) {
-  dialog.replaceChildren(no('p','BANCADA DE INVESTIGAÇÃO','kicker'),no('h2',atividade.nome),no('p',atividade.texto));
+  dialog.replaceChildren(no('p','Olhe de perto','kicker'),no('h2',atividade.nome),no('p',atividade.texto));
   const corpo=no('div',null,'puzzle');
   const aviso=no('p',null,'ajuda');
   aviso.setAttribute('role','status');
@@ -148,16 +148,16 @@ export function abrirMinigame(dialog, atividade, causa, aoResolver) {
         return b;
       }));
     }
-    corpo.append(no('p','Escolha ou arraste um fragmento e encaixe pela continuidade da imagem. As posições são numeradas por linha, de cima para baixo.'),tabuleiro,bandeja);
+    corpo.append(no('p','Toque num pedaço e depois no lugar dele.'),tabuleiro,bandeja);
     renovar();
   } else if (atividade.tipo==='luz') {
     let angulo=1;
-    const status=no('p','Posição 1 de 5');
+    const status=no('p','Luz 1 de 5');
     const desenhar=cena('luz',()=>{range.value=String(angulo%5+1);range.oninput();},()=>angulo);
     const range=no('input');range.type='range';range.min=1;range.max=5;range.value=1;range.setAttribute('aria-label','Posição da luz');
     const L=atividade.luz||{};
     const registrar=botao(L.botao||'Registrar a fissura',()=>conferir(angulo),'primary');registrar.disabled=true;
-    range.oninput=()=>{angulo=Number(range.value);const claro=angulo===(L.certo||4);status.textContent=claro?(L.achou||'A luz revelou a fissura que cruza o selo.'):'Posição '+angulo+' de 5 · '+(L.falta||'a marca ainda está encoberta')+'.';registrar.disabled=!claro;desenhar();};
+    range.oninput=()=>{angulo=Number(range.value);const claro=angulo===(L.certo||4);status.textContent=claro?(L.achou||'A luz revelou a fissura que cruza o selo.'):'Luz '+angulo+' de 5 · '+(L.falta||'a marca ainda está encoberta')+'.';registrar.disabled=!claro;desenhar();};
     corpo.append(range,status,registrar);
   } else if (atividade.tipo==='maquina' && maquinaValores[causa]) {
     const seletores=[];
@@ -176,7 +176,7 @@ export function abrirMinigame(dialog, atividade, causa, aoResolver) {
     const m=atividade.tipo==='maquina', dados=causas[causa];
     const itens=m?dados.conjunto:atividade.itens;
     const sequencia=[];
-    const progresso=no('p','Toque nos elementos na ordem correta.');
+    const progresso=no('p','Toque nas cenas na ordem em que aconteceram.');
     const avancar=i=>{if(!sequencia.includes(i)){sequencia.push(i);progresso.textContent=sequencia.map(j=>itens[j]).join(' → ');}};
     if(m) {
       cena('maquina',i=>avancar(Number(i)),()=>sequencia.length);

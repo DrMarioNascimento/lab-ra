@@ -76,7 +76,7 @@ def checar_ids():
         for k in ('pista_objeto', 'aparece_como'):
             if S.get(k): ref(S[k], A['id'] + '.solo.' + k)
         if S.get('sala') and S['sala'] not in D['salas']: bad.append(f'{A["id"]}: sala solo "{S["sala"]}" inexistente')
-        if not (S or A.get('solo_pistas') or A.get('anexa_diagnostico')): bad.append(f'{A["id"]}: sem caminho solo declarado')
+        if not (S or A.get('solo_pistas') or A.get('entrega_diagnostico')): bad.append(f'{A["id"]}: sem caminho solo declarado')
         for k in A.get('valores_pedidos', []):
             if k not in D['valores']: bad.append(f'{A["id"]}: valor "{k}" inexistente')
             if k not in FMT: bad.append(f'{A["id"]}: valor "{k}" sem formato declarado')
@@ -205,6 +205,13 @@ def fumaca(c):
         out.append(('dois defeitos', f'{A1["id"]} gravado na V3, {A2["id"]} ensaio V4 e vale V5', ok1 and ok1b and ok2 and ok3))
         s = novo(2, 'coop,coop'); faz(s, 5, A2); faz(E.load(g), 5, A1); out.append(('dois defeitos', 'os dois na mesma volta 5 NAO consertam', E.load(g)['conserto'] is None and len(E.load(g)['meio']) == 2))
         s = novo(2, 'coop,coop'); faz(s, 4, A2); faz(E.load(g), 5, A1); out.append(('dois defeitos', f'{A2["id"]} gravado na V4, {A1["id"]} vale na V5', E.load(g)['conserto'] == 5))
+        # revisão 4: sem dupla a regra é a mesma (um conserto por volta)
+        Ai = next((AT[a] for a in al if AT[a].get('solo', {}).get('tipo') == 'individual'), None); Ao = next((AT[a] for a in al if Ai and a != Ai['id']), None)
+        if Ai:
+            s = novo(1, 'solo'); s['meio'] = {Ao['id']: 5}; E.save(g, s); pos(E.load(g), 5, [Ai['solo']['sala']], 0); run('solo', g, 1, Ai['id'], *vals_de(Ai))
+            out.append(('dois defeitos', 'sem dupla, os dois na mesma volta 5 NAO consertam', E.load(g)['conserto'] is None and len(E.load(g)['meio']) == 2))
+            s = novo(1, 'solo'); s['meio'] = {Ao['id']: 4}; E.save(g, s); pos(E.load(g), 5, [Ai['solo']['sala']], 0); run('solo', g, 1, Ai['id'], *vals_de(Ai))
+            out.append(('dois defeitos', 'sem dupla, um na V4 e o outro na V5 consertam', E.load(g)['conserto'] == 5))
     # anexar: feedback com placar; causa-metade na noite de dois defeitos
     s = novo(1, 'solo'); pos(s, 4, ['recepcao'], 0); o = run('revelar', g, 1, D['culpado'].split()[0]); s = E.load(g)
     out.append(('revelar', 'recusado antes da volta 5 (com as provas no caderno)', s['revelado'] is None and 'última volta' in o))
@@ -214,6 +221,16 @@ def fumaca(c):
     out.append(('anexar', 'sinal repetido e recusado com placar "1 de 2 sinais"', ('PRÉ-CONFERÊNCIA' in o or ('Contaram 1 de 2 sinais' in o and 'REPETIDO' in o)) and E.load(g)['diag'] is None))
     s = novo(1, 'solo'); s['diag'] = None; s['volta'] = 2; o = run('anexar', g, c, *ids)
     out.append(('anexar', '2 sinais + 1 descarte aceito com placar', 'Contaram 2 de 2 sinais' in o and bool(E.load(g)['diag'])))
+    # revisão 4: Painel e Manual entrega a leitura completa e NAO anexa; quem joga escolhe o defeito e anexa só com ela
+    Ap = next((a for a in D['atividades_coop'] if a.get('entrega_diagnostico')), None)
+    if Ap:
+        lc = next(i for i in Ap['produz'] if p_ativa(P[i], c))
+        s = novo(2, 'coop,coop'); s['diag'] = None; E.save(g, s); pos(E.load(g), 2, Ap['salas'], 0); run('coop', g, Ap['id'], 1, 2); s = E.load(g)
+        ok_a = s['diag'] is None and all(lc in j['caderno'] for j in s['jog'])
+        errada = next(k for k in D['causas_jogaveis'] if k != c and k not in D.get('composicao_E', {}).get('defeitos', []) + ['E_dois'] or (k != c and c != 'E_dois' and k != 'E_dois'))
+        o = run('anexar', g, errada, lc); ok_b = E.load(g)['diag'] is None
+        s = E.load(g); s['volta'] = 3; E.save(g, s); o = run('anexar', g, c, lc); ok_c = bool(E.load(g)['diag'])
+        out.append(('painel e manual', 'entrega a leitura completa, nao anexa sozinha; defeito errado recusado; defeito certo aceito so com ela', ok_a and ok_b and ok_c))
     return out
 
 def req_diag(c):
@@ -470,7 +487,7 @@ def caminhos(c, R):
     if len(apg) < 2: out.append(f'diagnostico: so {len(apg)} grupo(s) de sinal apontam {c}')
     desc = [x['id'] for x in D['pistas'] if x['id'] in R and not x.get('daAtividade') and any(k in D['causas_possiveis'] and k != c for k in x['revela']['descarta'])]
     if len(set(P[i]['sala'] for i in desc)) < 2: out.append('diagnostico: pista que descarta em menos de 2 salas')
-    vias_diag = ['anexar (3 pistas)'] + [a['id'] for a in D['atividades_coop'] if a.get('anexa_diagnostico') and at_ativa(a, c) and any(p_ativa(P[i], c) for i in a['produz'])]
+    vias_diag = ['anexar (3 pistas)'] + [a['id'] for a in D['atividades_coop'] if a.get('entrega_diagnostico') and at_ativa(a, c) and any(p_ativa(P[i], c) for i in a['produz'])]
     vias_cons = [f'{A["id"]}: dupla' + (' | solo:' + A['solo']['tipo'] if A.get('solo') else '') for A in As]
     if len(vias_diag) < 2: out.append('diagnostico_anexado: so 1 caminho')
     for A in As:

@@ -46,7 +46,7 @@ window.DragonSalaAntesDeIniciar = async () => partidaNova(await perguntarRitmo()
 function chaveLocal() { return `cinco-loop-${T.codigo}-${T.uid}-r${room.rodada || 1}`; }
 
 function montarCoop() {
-  window.coop = { storageKey: chaveLocal(), choose, decorate, move, now: () => T.agora(), tick, open: () => {} };
+  window.coop = { storageKey: chaveLocal(), choose, decorate, move, now: () => T.agora(), tick, open: () => {}, papel: (nome) => T.atualizarEu({ papel5: nome, papelVolta: room.volta }) };
   state = load(window.coop.storageKey, {}) ?? {};
   state.clues ??= []; state.hints ??= 0; state.notes ??= '';
   enviou = false;
@@ -102,7 +102,7 @@ function desenhar(leve) {
     renderResult();
     const coletivo = loopFinalTurma(players.filter(p => !p.mestre && !p.expulso).map(p => p.resp));
     if (coletivo) $('resultBody').insertAdjacentHTML('afterbegin', '<div class="result-card"><p class="kicker">DESFECHO DA TURMA</p><h3>' +
-      esc(coletivo.final) + '</h3><p>' + esc(LOOP_FINAIS[coletivo.final]) + '</p></div>');
+      esc(LOOP_FINAL_NOME[coletivo.final] || coletivo.final) + '</h3><p>' + esc(LOOP_FINAIS[coletivo.final]) + '</p></div><div class="result-card"><p class="kicker">PARA CONVERSAR</p><p>' + esc(LOOP_CONVERSA) + '</p></div>');
     $('resultBody').insertAdjacentHTML('beforeend', blocoTurma());
     show('result');
   }
@@ -113,14 +113,15 @@ function marcarEnvio() {
   const b = $('answerForm').querySelector('button[type=submit]');
   b.textContent = mandou ? 'Desfecho registrado' : 'Registrar meu desfecho';
   b.disabled = mandou;
-  for (const k of EIXOS) $(k).disabled = mandou;
+  for (const k of EIXOS) { const el = $(k); if (el) el.disabled = mandou; }
   lockAnswerExtras(mandou);
   $('final').querySelector('.large').textContent = mandou
     ? 'Seu desfecho foi registrado. O Professor abre o resultado da turma.'
-    : 'Registre seu desfecho para o telão.';
+    : 'Conte como a noite acabou para você: o telão junta o que a turma achou.';
 }
 
 function blocoTurma() {
+  return '';   // o Loop não tem as 8 perguntas do caso antigo: o fim é o desfecho, a fita da noite e a conversa
   const com = players.filter(p => !p.mestre && p.resp && EIXOS.some(k => p.resp[k]));
   if (!com.length) return '';
   const linhas = EIXOS.map((k) => {
@@ -167,7 +168,7 @@ async function move(fase, respostas) {
   enviou = true; marcarEnvio();
   const loopFinal = lcFinal();
   const interv = lcS().conserto === 5 ? 'break' : state.intervention ? 'other' : 'none';
-  const ok = await T.atualizarEu({ resp: { ...respostas, interv, loopFinal, loopFatos: window.lcFatos ? window.lcFatos() : [], loopMissao: lcS().missaoOk ? lcMissao().t : '' }, respEm: Date.now() });
+  const ok = await T.atualizarEu({ resp: { ...respostas, interv, loopFinal, loopFatos: window.lcFatos ? window.lcFatos() : [], loopDefeito: window.lcDefeito ? window.lcDefeito() : '', loopPapel: (typeof lcPapelNome === 'function' && lcPapelNome(lcS().papel5)) || '', loopMissao: lcS().missaoOk ? lcMissao().t : '' }, respEm: Date.now() });
   if (!ok) { enviou = false; marcarEnvio(); toast('Não consegui enviar. Tente de novo.'); }
 }
 
@@ -212,8 +213,8 @@ function barra() {
   else if (!ETAPAS.includes(e)) info = `Sala aberta · ${players.filter((p) => !p.mestre).length} na sala`;
   else if (e === 'choose') { info = `Volta ${v} de 5 · ${noAmb} de ${total} escolheram sala`; acao = btn('mbIniciar', 'Iniciar relógio da volta'); }
   else if (e === 'playing') { info = `Volta ${v} de 5 em andamento · ${fmt(restante())}`; acao = room.seg === 30 ? btn('mbEncerrar', 'Encerrar volta', 'secondary') : ''; }
-  else if (e === 'between') { info = `Volta ${v} de 5 concluída`; acao = v < 5 ? btn('mbProxima', 'Abrir próxima volta') : btn('mbFinal', 'Abrir conclusão'); }
-  else if (e === 'final') { info = `${mandaram} de ${total} enviaram a conclusão`; acao = btn('mbRevelar', 'Revelar resultados'); }
+  else if (e === 'between') { info = `Volta ${v} de 5 concluída`; acao = v < 5 ? btn('mbProxima', 'Abrir próxima volta') : btn('mbFinal', 'Abrir o desfecho'); }
+  else if (e === 'final') { info = `${mandaram} de ${total} registraram o desfecho`; acao = btn('mbRevelar', 'Mostrar o resultado da turma'); }
   else { info = `Resultado revelado · ${mandaram} de ${total} participaram`; acao = btn('mbNova', 'Nova partida'); }
   if (room.aulaEncerrada) acao = '';
   el.classList.remove('hidden');

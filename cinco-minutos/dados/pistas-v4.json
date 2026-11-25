@@ -1,5 +1,5 @@
 {
- "versao": "v4 revisão 3 (25/11/2026)",
+ "versao": "v4 revisão 4 (25/11/2026)",
  "noite": "v4",
  "causa_sorteada": "B_potencia",
  "causas_possiveis": [
@@ -79,8 +79,8 @@
   "custo_pista": 1,
   "custo_clima": 0,
   "objetos_no_chao_por_jogador": 1,
-  "diagnostico": "2 sinais da máquina que apontam a mesma causa, de tipos (grupoFonte) diferentes, + 1 pista que descarta outra causa. Falsa honesta e pista sem grupoFonte não contam como sinal. Na noite de dois defeitos: 1 sinal de número + 1 sinal de força + 1 descarte. Uma pista com diagnosticoCompleto (leitura do painel) vale sozinha.",
-  "precisaDe": "confere o caderno de cada aparelho: quem não tem no próprio caderno a pista pedida vê a pista travada, com a frase do campo porque. Passar pista na pausa resolve.",
+  "diagnostico": "2 sinais da máquina que apontam a mesma causa, de tipos (grupoFonte) diferentes, + 1 pista que descarta outra causa. Falsa honesta e pista sem grupoFonte não contam como sinal. Na noite de dois defeitos: 1 sinal de número + 1 sinal de força + 1 descarte. Uma pista com diagnosticoCompleto (leitura completa do painel, etiqueta LEITURA COMPLETA) vale sozinha no Anexar: pode ir sem as outras duas.",
+  "precisaDe": "confere o caderno de cada aparelho: quem não tem no próprio caderno a pista pedida vê a pista travada; ao tocar nela, aparece a frase do campo porque e a sala onde olhar (só salas de pistas que existem na noite). Passar pista na pausa resolve.",
   "quemPodeVer": "todos | portador_<id> (quem tem a pista no próprio caderno) | portador_grupo_<g1>|<g2> (quem tem no próprio caderno alguma fonte de um desses grupos)",
   "soNaCausa": "a pista só existe quando a causa sorteada está na lista; sem o campo, existe sempre",
   "essencialPara": "causas ou finais para os quais o grupoFonte é necessário",
@@ -93,28 +93,30 @@
   "previa": "rótulo curto e inteiro que aparece no olhar, sem entregar o conteúdo, sem hora e sem \"só quando\". Em cada sala, a lista tem os mesmos rótulos nas 5 causas: onde um sinal não existe, há um par de mesmo rótulo com texto inocente (campo parDe).",
   "textoPorSintoma": "só em man_3: a Dra. Sato responde só ao sinal mais recente do caderno; quando o caderno tem um sinal de número e um de força, ela responde só com o trecho do par (textoPorPar). O texto mostrado fica em até 60 palavras.",
   "condicao.chao": "a pista só aparece se o objeto foi deixado no chão daquela sala em volta anterior (1 objeto de chão por pessoa por partida).",
-  "diagnostico_anexado": "ESTADO DE CADA APARELHO, não é pista. Nasce quando a pessoa anexa a causa com exatamente 3 pistas do próprio caderno (da volta 2 em diante, uma tentativa por volta) ou ao concluir Painel e Manual (da volta 2 em diante). Vale até o fim da partida. É a primeira exigência de todo conserto.",
+  "diagnostico_anexado": "ESTADO DE CADA APARELHO, não é pista. Nasce quando a pessoa escolhe o defeito e anexa 3 pistas do próprio caderno (2 sinais de tipos diferentes + 1 leitura normal) ou a leitura completa do painel, que vale sozinha. Da volta 2 em diante, uma tentativa por volta. Painel e Manual entrega a leitura completa como pista; não anexa por ninguém. Vale até o fim da partida. É a primeira exigência de todo conserto.",
   "entrada": "entrada calculada de cada atividade: estado (diagnóstico anexado no aparelho), grupos (o caderno de quem vai agir precisa de 1 fonte de cada) e pistas (ids exatos). A recusa lista o que falta.",
-  "aposta": "anexar = uma tentativa por volta, com exatamente 3 pistas do próprio caderno; se as 3 não provam a causa, o dossiê diz o motivo e a tentativa da volta é gasta. Marcar número errado de pistas não gasta. (Só no simulador de texto existe também apostar: palpite do grupo para o telão.)",
+  "aposta": "anexar = uma tentativa por volta, com exatamente 3 pistas do próprio caderno (ou só a leitura completa do painel); se as 3 não provam a causa, o dossiê diz o motivo e a tentativa da volta é gasta. Marcar número errado de pistas não gasta. (Só no simulador de texto existe também apostar: palpite do grupo para o telão.)",
   "conserto": "atividades com conserto=true: das voltas 2 a 4 são ensaio (respondem \"a máquina reage\" ou \"não reage\", sem punição) e dão produto_ensaio; na volta 5 valem e dão produto_final.",
   "janela_segundos": "No Raio, quem participa precisa estar no lugar entre 6 s antes e 10 s depois do raio (com o padrão: 64 a 80 s).",
   "solo": "toda atividade tem caminho sem dupla: solo_pistas (pistas de fechamento, mais caras) ou o bloco solo (eco no Raio; \"individual\" no ajuste e no circuito; \"chao\" na peça verdadeira). Sem dupla a energia é a mesma: 5 por volta.",
   "trocar": "Na pausa entre voltas: grátis, até 3 pistas por pessoa.",
-  "revelar": "só na volta 5, na Recepção, antes de 5:00, com 1 fonte de prova_falsa, 1 de trajeto e 1 de cracha no caderno de quem apresenta. Uma tentativa por aparelho, na noite inteira. O cheiro de verniz (falsa_1) é suspeita, não prova; a peça verdadeira na mão (c_peca) é prova; foto e legenda (assim_foto, assim_leg) só valem juntas, pela pista assim_par.",
+  "revelar": "só na volta 5, na Recepção, antes de 5:00, com 1 fonte de prova_falsa, 1 de trajeto e 1 de cracha no caderno de quem apresenta. Uma tentativa por aparelho, na noite inteira. O cheiro de verniz (falsa_1) é suspeita, não prova; a peça verdadeira na mão (c_peca) é prova; foto e legenda (assim_foto, assim_leg) só valem juntas, pela pista assim_par; o caderno de rondas do Braga (cofre_ronda) também vale como prova do trajeto: os dois mostram a entrada pela porta de serviço.",
   "esperar": "só no simulador de texto: comando que adianta o relógio de quem joga até o segundo pedido, sem gastar energia. No jogo, o relógio anda sozinho.",
   "coop_por_volta": "só no simulador de texto: no máximo 2 atividades em dupla por pessoa por volta. No jogo não há esse limite: quem limita é a energia.",
-  "etiqueta": "toda pista de sinal ou de leitura normal mostra a etiqueta do tipo no caderno (ex.: \"SINAL DA MÁQUINA · carga baixa\"). Duas pistas com a mesma etiqueta contam como um sinal só.",
-  "anexar_feedback": "a resposta do anexar diz quantos sinais contaram (de 2) e quantos descartes (de 1), e mostra, pista por pista, como o dossiê leu cada uma.",
+  "etiqueta": "toda pista de sinal ou de leitura normal mostra a etiqueta do tipo no caderno (ex.: \"SINAL DA MÁQUINA · carga baixa\"). Duas pistas com a mesma etiqueta contam como um sinal só. A pista recebida de outra pessoa na pausa conserva a etiqueta.",
+  "anexar_feedback": "a resposta do anexar diz quantos sinais contaram (de 2) e quantas leituras normais (de 1), e mostra, pista por pista, como o dossiê leu cada uma, em até 60 palavras.",
   "formato_valores": "todo valor pedido tem o formato escrito na receita e na tela da atividade: dia = número; hora = minuto:segundos com dois-pontos (0:45); registro = 3 algarismos; ordem dos pontos de ligação = 0-0-0. Valor errado: a máquina só diz quantos estão certos, nunca qual está errado.",
-  "dois_defeitos": "na causa E_dois há dois consertos. O primeiro pode ser feito da volta 3 em diante (campo E_volta_min_meio, lido pelo jogo e pelo simulador) e fica gravado na Câmara (estado \"meio\"). O outro precisa ser em volta diferente: na volta 4 é ensaio, na volta 5 vale. Sem dupla, os dois podem ser gravados na mesma volta.",
+  "dois_defeitos": "na causa E_dois há dois consertos, um por volta, com ou sem dupla. O primeiro pode ser feito da volta 3 em diante (campo E_volta_min_meio, lido pelo jogo e pelo simulador) e fica gravado na Câmara (estado \"meio\"). O outro precisa ser em volta diferente: na volta 4 é ensaio, na volta 5 vale. Dois consertos na mesma volta ficam gravados como meio cada um, e um deles precisa ser repetido em volta seguinte.",
   "E_volta_min_meio": 3,
   "central": "A Central é um papel falado: quem fica na Central de monitoramento confirma em voz alta quem está onde e se os valores batem. O aparelho não tem comando próprio para isso e nenhuma tentativa errada devolve energia. (O simulador de texto tem o comando central só para ler em voz alta onde cada pessoa está.)",
   "objeto": "pista de objeto que já está no caderno pode ser pega de novo na sala dela, sem gastar energia: o objeto volta para a mão (botão \"pegar de novo · grátis\").",
-  "escada": "volta_min: 2 = laudo, molde, peça verdadeira, páginas anteriores do diário, carta da seguradora; 3 = nome (Braga admite, mostrar o bilhete, Acusação e Defesa), livro da Central, Aurélio e o diário, gravação do telefonema; 4 = ata, guardanapo, pendrive, voz do Téo, fala na escada. Toda pista com volta_min > 1 tem porque escrito como frase do mundo; a tela mostra a frase quando a pista está travada por precisaDe, e a aba Atividades mostra a do produto enquanto a atividade não abre.",
+  "escada": "volta_min: 2 = laudo, molde, peça verdadeira, comparação da foto sem ajuda, páginas anteriores do diário, carta da seguradora; 3 = nome (Braga admite, mostrar o bilhete, Acusação e Defesa), livro da Central, Aurélio e o diário, gravação do telefonema; 4 = ata, guardanapo, pendrive, voz do Téo, fala na escada. Toda pista com volta_min > 1 tem porque escrito como frase do mundo; a tela mostra a frase (no toque da pista travada) quando ela está travada por precisaDe, e a aba Atividades mostra a do produto enquanto a atividade não abre.",
   "energia_por_volta": 5,
   "aparelho": "O jogo roda em cada aparelho, sem dossiê compartilhado. Cada aparelho tem o próprio caderno, o próprio diagnóstico e a própria tentativa de Revelar. Para abrir uma atividade, o aparelho precisa do diagnóstico anexado e das fontes de entrada no próprio caderno. Nos consertos em dupla, só o aparelho de quem está no Subsolo registra ensaio, meio conserto e conserto; quem está na outra sala diz a palavra da dupla e não gasta energia.",
   "tipoTela": "ícone da pista na lista quando ele precisa ser igual ao do par de mesmo rótulo (hoje só em c_anc_1).",
-  "parDe": "id da pista de que esta é par: mesmo rótulo, mesma sala, mesmo custo e mesmo minuto, em outra causa, com texto inocente. Par não tem grupo nem etiqueta: não conta no diagnóstico."
+  "parDe": "id da pista de que esta é par: mesmo rótulo, mesma sala, mesmo custo e mesmo minuto, em outra causa, com texto inocente: um objeto de ambiente, que não mostra o defeito da noite nem uma leitura normal de verdade. A tranca do par é a mesma nas 5 causas. Par não tem grupo nem etiqueta: não conta no diagnóstico.",
+  "sato": "A Dra. Sato está fora do prédio e só fala. Nos caminhos sem dupla \"com a Dra. Sato na linha\" ela dita e confere pelo interfone; quem joga faz tudo com as próprias mãos (prende a trava com o cinto, prende a chave com a luva). No Raio, de fora, ela vê o céu e conta o clarão.",
+  "papeis_volta5": "Na pausa da volta 4, em sala, cada pessoa toca num papel; a tela da volta 5 mostra a dica do papel e o telão mostra nome e papel. Não muda regra nenhuma."
  },
  "estados_do_grupo": {
   "diagnostico_anexado": "o dossiê aceitou a causa (no jogo, um por aparelho; ver regras.diagnostico_anexado)",
@@ -127,8 +129,7 @@
  },
  "compensacao_solo": {
   "energia_por_volta": 5,
-  "dica_do_mestre": "1 dica dirigida por volta a partir da volta 3",
-  "eco": "liberado sem pedir ao Mestre"
+  "nota": "Sem dupla a energia é a mesma. O que compensa são os caminhos sem dupla de cada atividade (eco, chão, fechamentos de 2 de energia) e a Dra. Sato na linha."
  },
  "linha_do_tempo_s": {
   "-1": "antes de 0:00 (só reconstruído): a troca do dia {dia}, o aviso do Téo, o crachá levado do armário, a entrada pela porta de serviço no começo da noite, a discussão na Sala das coleções; Lenz sai pela porta de serviço e só volta às 4:00",
@@ -138,7 +139,7 @@
   "160": "alarme (2:40)",
   "240": "Lenz volta: o crachá do Braga abre a porta de serviço; a câmera da porta de serviço mostra o paletó chegando (4:00)",
   "242": "Lenz cruza a Área de descanso (4:02)",
-  "250": "Lenz desce ao Subsolo e liga a Câmara (4:10)",
+  "250": "Lenz desce ao Subsolo e vira a chave de ligar da Câmara, que já está virada (4:10)",
   "300": "reinício (5:00)"
  },
  "valores": {
@@ -188,7 +189,7 @@
      ]
     },
     "dupla": {
-     "como": "Painel e Manual: a leitura completa do painel já anexa o diagnóstico.",
+     "como": "Painel e Manual: a leitura completa do painel vira pista. No Anexar ela vale sozinha, mas é a pessoa que escolhe o defeito.",
      "custo_energia": "1 por pessoa + 1 de uma fonte do manual",
      "atividade": "coop_painel_manual"
     },
@@ -203,7 +204,7 @@
    "pergunta": "A peça é cópia?",
    "chaves": {
     "solo": {
-     "como": "Laudo ou molde (falsa_2, falsa_3, da volta 2, depois do cheiro de verniz), a peça verdadeira na mão (c_peca, da volta 2) ou foto_solo. O cheiro de verniz sozinho não é prova.",
+     "como": "Laudo ou molde (falsa_2, falsa_3, da volta 2, depois do cheiro de verniz), a peça verdadeira na mão (c_peca, da volta 2) ou foto_solo (da volta 2). O cheiro de verniz sozinho não é prova.",
      "custo_energia": "0 a 2",
      "grupos": [
       "prova_falsa"
@@ -225,7 +226,7 @@
    "pergunta": "Por onde passou quem trocou a peça?",
    "chaves": {
     "solo": {
-     "como": "traj_4 (marca de sola na porta de serviço, 1 de energia, sem trava de tempo), catraca_solo ou pegadas_solo (2 de energia cada), traj_1/2/3 depois que o paletó passa, ou as duas metades juntas (assim_par).",
+     "como": "traj_4 (marca de sola na porta de serviço, 1 de energia, sem trava de tempo), catraca_solo ou pegadas_solo (2 de energia cada), traj_1/2/3 depois que o paletó passa, as duas metades juntas (assim_par) ou o caderno de rondas no cofre do Braga (cofre_ronda).",
      "custo_energia": 1,
      "grupos": [
       "trajeto"
@@ -662,6 +663,8 @@
     ],
     "descarta": [],
     "destrava": [
+     "fh_dobrada",
+     "fh_papel_teo",
      "b_hist_1",
      "fh_os_cd",
      "b_hist_2",
@@ -689,7 +692,7 @@
   {
    "id": "fh_zumbido_a",
    "sala": "sons",
-   "texto": "O alto-falante de teste repete o som da Câmara lá embaixo: um zumbido cheio, firme, que não cai.",
+   "texto": "O alto-falante de teste está com um fio solto atrás. Dele só sai um chiado baixinho.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -701,7 +704,12 @@
    "revela": {
     "aponta": [],
     "descarta": [],
-    "destrava": []
+    "destrava": [
+     "fh_dobrada",
+     "fh_papel_teo",
+     "fh_os_a",
+     "fh_email_a"
+    ]
    },
    "essencial": false,
    "tipo": "comum",
@@ -760,7 +768,7 @@
   {
    "id": "fh_lamp_of",
    "sala": "eletrica",
-   "texto": "As lâmpadas da Oficina elétrica acendem firmes. Nem quando a máquina tenta ligar lá embaixo elas mudam.",
+   "texto": "As lâmpadas da Oficina elétrica são antigas, amareladas. Numa delas, uma aranha fez casa por dentro do vidro.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -772,7 +780,12 @@
    "revela": {
     "aponta": [],
     "descarta": [],
-    "destrava": []
+    "destrava": [
+     "fh_os_cd",
+     "fh_os_a",
+     "fh_email_cd",
+     "fh_email_a"
+    ]
    },
    "essencial": false,
    "tipo": "comum",
@@ -832,7 +845,7 @@
   {
    "id": "fh_luz_desc",
    "sala": "corredor",
-   "texto": "A luz da Área de descanso está firme. A geladeira zumbe sem parar.",
+   "texto": "A luz da Área de descanso é uma lâmpada só, em cima da cafeteira. Colaram nela um papel: \"apague ao sair\".",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -844,7 +857,12 @@
    "revela": {
     "aponta": [],
     "descarta": [],
-    "destrava": []
+    "destrava": [
+     "fh_os_cd",
+     "fh_os_a",
+     "fh_email_cd",
+     "fh_email_a"
+    ]
    },
    "essencial": false,
    "tipo": "comum",
@@ -904,7 +922,7 @@
   {
    "id": "fh_lamp_limp",
    "sala": "limpeza",
-   "texto": "A lâmpada da base da limpeza está acesa e firme. Nem um piscar.",
+   "texto": "A lâmpada da Base da limpeza tem uma cúpula de lata amassada. Em cima dela, um pano secando.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -916,7 +934,12 @@
    "revela": {
     "aponta": [],
     "descarta": [],
-    "destrava": []
+    "destrava": [
+     "fh_os_cd",
+     "fh_os_a",
+     "fh_email_cd",
+     "fh_email_a"
+    ]
    },
    "essencial": false,
    "tipo": "comum",
@@ -984,10 +1007,7 @@
     "descarta": [
      "A_calibrar"
     ],
-    "destrava": [
-     "fh_ficha_bc",
-     "fh_fita_bc"
-    ]
+    "destrava": []
    },
    "essencial": true,
    "tipo": "comum",
@@ -1008,7 +1028,7 @@
   {
    "id": "fh_ficha_ult",
    "sala": "atelie",
-   "texto": "A ficha do último ensaio está pela metade: a data, o nome da Dra. Sato e nenhum visto.",
+   "texto": "A ficha do último ensaio está embaixo de uma xícara. O café borrou tudo, menos a data e o nome da Dra. Sato.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -1051,10 +1071,7 @@
     "descarta": [
      "A_calibrar"
     ],
-    "destrava": [
-     "fh_ficha_bc",
-     "fh_fita_bc"
-    ]
+    "destrava": []
    },
    "essencial": true,
    "tipo": "comum",
@@ -1075,7 +1092,7 @@
   {
    "id": "fh_carimbo",
    "sala": "conservacao",
-   "texto": "A cópia do caderno de registro de ontem está sem carimbo. Só a data e um visto a lápis.",
+   "texto": "A cópia do caderno de registro de ontem tem carimbo, mas é o da biblioteca: \"Não retirar da sala\".",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -1196,7 +1213,7 @@
   {
    "id": "c_modo_2",
    "sala": "atelie",
-   "texto": "Uma anotação de ensaio da Dra. Sato: \"Para a abertura ela fica presa à peça principal. Deixei armado ontem, não deu tempo de testar. Se mexerem na peça da base, ela se perde.\"",
+   "texto": "Uma anotação de ensaio da Dra. Sato: \"Para a abertura ela fica presa à peça principal. Deixei armado ontem, não deu tempo de testar.\"",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -1237,6 +1254,7 @@
      "D_fusivel"
     ],
     "destrava": [
+     "fh_dobrada",
      "fh_papel_teo"
     ]
    },
@@ -1272,6 +1290,7 @@
     ],
     "descarta": [],
     "destrava": [
+     "d_teo_1",
      "d_ord_1"
     ]
    },
@@ -1306,9 +1325,7 @@
     "descarta": [
      "D_fusivel"
     ],
-    "destrava": [
-     "fh_papel_teo"
-    ]
+    "destrava": []
    },
    "essencial": false,
    "tipo": "comum",
@@ -1327,7 +1344,7 @@
   {
    "id": "fh_folha_d",
    "sala": "eletrica",
-   "texto": "Folha de conferência da Oficina elétrica, de hoje: a linha dos fusíveis da Câmara ficou sem visto. Ninguém assinou.",
+   "texto": "Folha de conferência da Oficina elétrica, de hoje: só a linha da iluminação da fachada está preenchida. O resto ficou para amanhã.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -1442,7 +1459,7 @@
   {
    "id": "fh_cam_most_bc",
    "sala": "seguranca",
-   "texto": "Na câmera do Subsolo, os mostradores estão parados, sem piscar.",
+   "texto": "Na câmera do Subsolo, a imagem dos mostradores está fora de foco. Dá para ver que estão lá, e só.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -1454,7 +1471,10 @@
    "revela": {
     "aponta": [],
     "descarta": [],
-    "destrava": []
+    "destrava": [
+     "fh_ficha_bc",
+     "fh_fita_bc"
+    ]
    },
    "essencial": false,
    "tipo": "comum",
@@ -1514,7 +1534,7 @@
   {
    "id": "fh_bipes_bc",
    "sala": "sons",
-   "texto": "O alto-falante de teste repete os bipes do painel da Câmara: três notas juntas, no mesmo tempo.",
+   "texto": "Os bipes no alto-falante de teste vêm do telefone da Recepção, que toca e ninguém atende.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -1526,7 +1546,10 @@
    "revela": {
     "aponta": [],
     "descarta": [],
-    "destrava": []
+    "destrava": [
+     "fh_ficha_bc",
+     "fh_fita_bc"
+    ]
    },
    "essencial": false,
    "tipo": "comum",
@@ -1581,7 +1604,7 @@
   {
    "id": "fh_rel_sala",
    "sala": "relogios",
-   "texto": "Os relógios da sala andam certinho, todos no mesmo segundo.",
+   "texto": "Os relógios da sala são de corda, de pilha, de pêndulo. Cada um tem a plaquinha de quem doou.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -1648,7 +1671,7 @@
   {
    "id": "fh_rel_recep",
    "sala": "recepcao",
-   "texto": "O relógio da Recepção anda sem tropeço, segundo por segundo.",
+   "texto": "O relógio da Recepção tem o vidro trincado e um adesivo do patrocínio colado no canto.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -1715,7 +1738,7 @@
   {
    "id": "fh_fotos_parede",
    "sala": "fotografia",
-   "texto": "As fotos da parede estão como sempre: cada uma com a sua data, e nenhuma muda.",
+   "texto": "As fotos da parede são de inaugurações antigas do museu. Em todas, alguém corta uma fita.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -1743,7 +1766,7 @@
   {
    "id": "a_cheia_1",
    "sala": "prototipo",
-   "texto": "O ponteiro de carga está no máximo. Força não falta.",
+   "texto": "O ponteiro de carga está no máximo.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -1779,7 +1802,7 @@
   {
    "id": "fh_pont_d",
    "sala": "prototipo",
-   "texto": "O ponteiro de carga balança no meio do mostrador e não para em lugar nenhum.",
+   "texto": "O ponteiro de carga está atrás de uma etiqueta de papel: \"aferir\". Não dá para ler.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -1791,7 +1814,10 @@
    "revela": {
     "aponta": [],
     "descarta": [],
-    "destrava": []
+    "destrava": [
+     "fh_os_cd",
+     "fh_email_cd"
+    ]
    },
    "essencial": false,
    "tipo": "comum",
@@ -1820,10 +1846,7 @@
     "descarta": [
      "B_potencia"
     ],
-    "destrava": [
-     "fh_os_a",
-     "fh_email_a"
-    ]
+    "destrava": []
    },
    "essencial": true,
    "tipo": "comum",
@@ -1844,7 +1867,7 @@
   {
    "id": "fh_med_quadro",
    "sala": "patio",
-   "texto": "O medidor do Quadro externo quase não se mexe na linha que desce para o Subsolo.",
+   "texto": "O medidor do Quadro externo está com o vidro embaçado por dentro. Não dá para ler a linha que desce para o Subsolo.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -1909,7 +1932,7 @@
   {
    "id": "fh_cam_agulha_d",
    "sala": "seguranca",
-   "texto": "Na câmera do Subsolo, a agulha de carga balança no meio, sem parar em lugar nenhum.",
+   "texto": "Na câmera do Subsolo, um reflexo de lâmpada cai bem em cima da agulha de carga. Não dá para ler.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -1921,7 +1944,10 @@
    "revela": {
     "aponta": [],
     "descarta": [],
-    "destrava": []
+    "destrava": [
+     "fh_os_cd",
+     "fh_email_cd"
+    ]
    },
    "essencial": false,
    "tipo": "comum",
@@ -2175,8 +2201,8 @@
    ],
    "textoPorSintoma": {
     "sint_carga": "Você conta da carga baixa. Ela responde: \"Carga baixa pode ser duas coisas. Não me pergunta qual: me diz como estão as luzes do museu e a luz da peça.\"",
-    "sint_luz": "Você conta da luz fraca. Ela responde: \"Luz que enfraquece pode ser duas coisas. Vai até a caixa de fusíveis e me conta o que tem lá.\"",
-    "sint_pisca": "Você conta dos mostradores piscando. Ela responde: \"Piscando assim pode ser duas coisas. Olha a caixa de fusíveis. Depois me liga.\"",
+    "sint_luz": "Você conta da luz fraca. Ela responde: \"Luz caindo a cada tentativa? Ou tem coisa puxando, ou tem coisa faltando. Vai até a caixa de fusíveis e me conta o que tem lá.\"",
+    "sint_pisca": "Você conta dos mostradores piscando. Ela responde: \"Sem ritmo? Ou ela perdeu os números, ou perdeu um pedaço. Olha a caixa de fusíveis. Depois me liga.\"",
     "sint_relogios": "Você conta dos relógios tremendo. Ela responde: \"Relógio tremendo é ela perdida no tempo. Por quê, eu não sei daqui. Como está a luz da peça?\"",
     "sint_ancora": "Você conta da base apitando e piscando amarelo. Ela responde: \"Então ela não reconhece a peça que está na base. Procura 300 anos e acha outra coisa. O quê, quem tem olho aí é você.\"",
     "sint_fusivel": "Você conta do lacre cortado. Ela responde: \"Lacre cortado e fusível fora não é defeito. É decisão de alguém. Descobre por que antes de religar.\""
@@ -2349,7 +2375,7 @@
   {
    "id": "fh_tampa",
    "sala": "prototipo",
-   "texto": "Riscado a lápis por dentro da tampa do painel, ao lado dos três pontos de ligação: \"conferido\". Os três estão presos no lugar.",
+   "texto": "Riscado a lápis por dentro da tampa do painel: um jogo da velha pela metade e um número de ramal.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -2443,7 +2469,7 @@
   {
    "id": "man_dois_1",
    "sala": "atelie",
-   "texto": "Manual, página 6: \"Dois defeitos na mesma noite: conserte um por volta. O primeiro fica gravado na Câmara (ela não volta com o museu) e o aviso muda de lugar. Mudou, não sumiu. O segundo, em outra volta, libera o botão.\"",
+   "texto": "Manual, página 6: \"Dois defeitos na mesma noite: conserte um por volta. O primeiro fica gravado na Câmara (o que ela já guardou, ela não desfaz) e o aviso muda de lugar. Mudou, não sumiu. O segundo, em outra volta, libera o botão.\"",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -2773,7 +2799,7 @@
   {
    "id": "hora_1",
    "sala": "relogios",
-   "texto": "Depois do apagão, todos os relógios da sala param no mesmo ponto: {hora}.",
+   "texto": "Depois do apagão, os relógios elétricos da sala param de vez. O maior deles ficou em {hora}.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 71,
@@ -2875,6 +2901,7 @@
     ],
     "descarta": [],
     "destrava": [
+     "d_teo_1",
      "d_ord_1"
     ]
    },
@@ -2895,7 +2922,7 @@
   {
    "id": "fh_varal",
    "sala": "fotografia",
-   "texto": "No varal da Sala da fotografia, duas fotos de conferência da caixa de fusíveis da Câmara. A de ontem e a de hoje, ainda úmida: lacre inteiro nas duas.",
+   "texto": "No varal da Sala da fotografia, duas fotos ainda úmidas: a fachada do museu com a faixa da festa, de dois ângulos.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -2907,7 +2934,10 @@
    "revela": {
     "aponta": [],
     "descarta": [],
-    "destrava": []
+    "destrava": [
+     "fh_dobrada",
+     "fh_papel_teo"
+    ]
    },
    "essencial": false,
    "tipo": "comum",
@@ -3226,7 +3256,7 @@
   {
    "id": "d_fus_2",
    "sala": "patio",
-   "texto": "Pelo vidro do Quadro externo: a chave \"Circuito da Câmara\" está presa em DESLIGADO por um cadeado vermelho. A etiqueta do cadeado está molhada e a tinta escorreu.",
+   "texto": "Pelo vidro do Quadro externo: na chave \"Circuito da Câmara\", um cadeado vermelho pendurado, aberto, só de aviso. A etiqueta do cadeado está molhada e a tinta escorreu.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -3241,6 +3271,7 @@
     ],
     "descarta": [],
     "destrava": [
+     "d_teo_1",
      "d_ord_1",
      "d_fus_2b"
     ]
@@ -3262,7 +3293,7 @@
   {
    "id": "fh_vidro",
    "sala": "patio",
-   "texto": "Pelo vidro do Quadro externo: a chave \"Circuito da Câmara\" está em LIGADO, com o lacre de papel inteiro.",
+   "texto": "Pelo vidro do Quadro externo, a chuva escorre e embaça tudo. Dá para ver que tem chaves lá dentro, não a posição delas.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -3275,6 +3306,8 @@
     "aponta": [],
     "descarta": [],
     "destrava": [
+     "fh_dobrada",
+     "fh_papel_teo",
      "fh_quadro2"
     ]
    },
@@ -3569,7 +3602,6 @@
     "aponta": [],
     "descarta": [],
     "destrava": [
-     "fh_base_perto",
      "falsa_2",
      "falsa_3",
      "c_peca",
@@ -3630,7 +3662,10 @@
     "todas": [],
     "umaDe": [
      "fh_dobrada",
-     "falsa_1"
+     "dirceu_0",
+     "c_anc_3",
+     "teo_radio_2x",
+     "teo_radio_2c"
     ]
    },
    "revela": {
@@ -3824,7 +3859,12 @@
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": []
+    "umaDe": [
+     "d_fus_1",
+     "d_fus_2",
+     "d_fus_3",
+     "d_fus_4"
+    ]
    },
    "revela": {
     "aponta": [],
@@ -3842,7 +3882,8 @@
    "soNaCausa": [
     "D_fusivel"
    ],
-   "grupoFonte": "bilhete_teo"
+   "grupoFonte": "bilhete_teo",
+   "porque": "O diário tem meia dúzia de páginas dobradas. Você não sabe qual abrir."
   },
   {
    "id": "fh_dobrada",
@@ -3854,7 +3895,13 @@
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": []
+    "umaDe": [
+     "fus_ok_1",
+     "fh_varal",
+     "fh_vidro",
+     "b_carga_3",
+     "fh_zumbido_a"
+    ]
    },
    "revela": {
     "aponta": [],
@@ -3875,12 +3922,13 @@
     "C_ancora",
     "E_dois"
    ],
-   "parDe": "d_teo_1"
+   "parDe": "d_teo_1",
+   "porque": "O diário tem meia dúzia de páginas dobradas. Você não sabe qual abrir."
   },
   {
    "id": "tombo_1",
    "sala": "conservacao",
-   "texto": "Livro de registro: a peça principal verdadeira tem o número {reg} gravado embaixo da base.",
+   "texto": "Livro de registro: \"Peça principal. Número {reg}, gravado embaixo da base.\"",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -4058,6 +4106,7 @@
     "aponta": [],
     "descarta": [],
     "destrava": [
+     "ivone_red",
      "teo_d3",
      "empurra_1",
      "empurra_2",
@@ -4119,8 +4168,10 @@
     "todas": [],
     "umaDe": [
      "fus_ok_1",
-     "fus_ok_2",
-     "fus_ok_4"
+     "fh_varal",
+     "fh_vidro",
+     "b_carga_3",
+     "fh_zumbido_a"
     ]
    },
    "revela": {
@@ -4203,7 +4254,7 @@
   {
    "id": "d_teo_2",
    "sala": "limpeza",
-   "texto": "Seu Dirceu conta: \"Antes de escurecer o Téo passou com uma pecinha de vidro na mão, indo para a Galeria. Disse que ia guardar onde ninguém olha: embaixo da estrela da festa.\"",
+   "texto": "Seu Dirceu conta, de pano na mão: \"Antes de escurecer o Téo passou de mão fechada, indo pra Galeria. Perguntei o que era. 'Coisa que não pode ficar no lugar.' Subiu. Voltou de mão aberta, vazia. Eu reparo.\"",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -4551,7 +4602,8 @@
     ],
     "descarta": [],
     "destrava": [
-     "ivone_1x"
+     "ivone_1x",
+     "ivone_red"
     ]
    },
    "essencial": false,
@@ -4896,7 +4948,7 @@
   {
    "id": "fh_cx_passagem",
    "sala": "corredor",
-   "texto": "Na parede da Área de descanso, ao lado da porta de serviço, a caixa de passagem do cabo que vem da base da Galeria tem um ponteiro pequeno. Ele fica parado no verde.",
+   "texto": "Na parede da Área de descanso, ao lado da porta de serviço, a caixa de passagem do cabo que vem da base da Galeria está fechada com quatro parafusos. Na tampa, a caneta: \"não abrir sem a Dra. Sato\".",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -4940,7 +4992,9 @@
      "C_ancora"
     ],
     "descarta": [],
-    "destrava": []
+    "destrava": [
+     "fh_base_perto"
+    ]
    },
    "essencial": true,
    "tipo": "comum",
@@ -4971,7 +5025,9 @@
    "revela": {
     "aponta": [],
     "descarta": [],
-    "destrava": []
+    "destrava": [
+     "fh_base_perto"
+    ]
    },
    "essencial": false,
    "tipo": "comum",
@@ -5197,7 +5253,7 @@
   {
    "id": "teo_radio",
    "sala": "sons",
-   "texto": "Com o pendrive no rádio, a voz do Téo: \"Se você achou o número, sabe que a da Galeria é cópia. Eu carrego essa peça há seis anos e conheço o peso dela. Quem pediu a 'limpeza' foi o patrocínio. Hoje eu falo com ele, cara a cara. Se eu não aparecer, não deixa a noite acabar sem prova.\"",
+   "texto": "Com o pendrive no rádio, a voz do Téo: \"Se você achou o número, sabe que a da Galeria é cópia. Ontem o do patrocínio me estendeu um envelope pra eu 'não ter carregado nada'. Eu não peguei. Hoje eu falo com ele, cara a cara. Se eu não aparecer, não deixa a noite acabar sem prova.\"",
    "volta_min": 4,
    "volta_max": 5,
    "segundo_min": 0,
@@ -5245,7 +5301,9 @@
    "revela": {
     "aponta": [],
     "descarta": [],
-    "destrava": []
+    "destrava": [
+     "fh_base_perto"
+    ]
    },
    "essencial": false,
    "tipo": "comum",
@@ -5306,7 +5364,9 @@
    "revela": {
     "aponta": [],
     "descarta": [],
-    "destrava": []
+    "destrava": [
+     "fh_base_perto"
+    ]
    },
    "essencial": false,
    "tipo": "comum",
@@ -5337,6 +5397,7 @@
     "aponta": [],
     "descarta": [],
     "destrava": [
+     "ivone_red",
      "mancha_2"
     ]
    },
@@ -5377,7 +5438,7 @@
   {
    "id": "ceu",
    "sala": "patio",
-   "texto": "O céu sobre o pátio está carregado. As nuvens giram sempre do mesmo jeito, volta após volta.",
+   "texto": "O céu sobre o pátio está carregado. As nuvens giram devagar em volta do para-raios.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -5461,7 +5522,7 @@
    "id": "foto_solo",
    "sala": "galeria",
    "texto": "Com a foto do catálogo anotada no caderno, você compara sem ajuda, indo e voltando com o olho: a rachadura está do outro lado e falta o número na base. A peça exposta é uma cópia.",
-   "volta_min": 1,
+   "volta_min": 2,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
@@ -5519,7 +5580,7 @@
   {
    "id": "coop_catraca_ok",
    "sala": "recepcao",
-   "texto": "Comparando as duas listas: o entregador e a fotógrafa passaram pela roleta da saída. O do patrocínio, não. Ele ainda está aqui dentro. E alguém abriu a porta de serviço com o crachá do Braga.",
+   "texto": "Comparando as duas listas: o entregador e a fotógrafa passaram pela roleta da saída. O do patrocínio, não. Se saiu, foi por outra porta. E alguém abriu a porta de serviço com o crachá do Braga.",
    "volta_min": 2,
    "volta_max": 5,
    "segundo_min": 0,
@@ -5552,7 +5613,7 @@
   {
    "id": "catraca_solo",
    "sala": "seguranca",
-   "texto": "Com o livro de visitas no caderno, você confere nome por nome: o entregador e a fotógrafa saíram pela roleta. O do patrocínio, não. Ele ainda está aqui dentro.",
+   "texto": "Com o livro de visitas no caderno, você confere nome por nome: o entregador e a fotógrafa saíram pela roleta. O do patrocínio, não. Se saiu, foi por outra porta.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -5580,7 +5641,7 @@
     "final_revelar"
    ],
    "previa": "Conferir as listas sem ajuda",
-   "porque": "Uma lista só não diz quem ficou. Faltam a roleta da saída e o livro de visitas."
+   "porque": "Uma lista só não diz quem passou por onde. Faltam a roleta da saída e o livro de visitas."
   },
   {
    "id": "par_tinta",
@@ -5676,7 +5737,7 @@
   {
    "id": "coop_painel_B",
    "sala": "prototipo",
-   "texto": "Leitura completa do painel: números parados, luz da peça verde, fusíveis no lugar. Só a carga está baixa. Falta força.",
+   "texto": "Leitura completa do painel: números parados, luz da peça verde, fusíveis no lugar. Só a carga está baixa.",
    "volta_min": 2,
    "volta_max": 5,
    "segundo_min": 0,
@@ -5711,12 +5772,13 @@
    "diagnosticoCompleto": true,
    "previa": "Leitura do painel",
    "custo": 1,
-   "porque": "Os símbolos do painel não dizem nada para quem não tem a legenda."
+   "porque": "Os símbolos do painel não dizem nada para quem não tem a legenda.",
+   "etiqueta": "LEITURA COMPLETA · painel"
   },
   {
    "id": "coop_painel_A",
    "sala": "prototipo",
-   "texto": "Leitura completa do painel: carga cheia, luz da peça verde, fusíveis no lugar. Os 3 mostradores estão fora do ponto. Falta ajustar.",
+   "texto": "Leitura completa do painel: carga cheia, luz da peça verde, fusíveis no lugar. Os 3 mostradores estão fora do ponto.",
    "volta_min": 2,
    "volta_max": 5,
    "segundo_min": 0,
@@ -5751,12 +5813,13 @@
    "diagnosticoCompleto": true,
    "previa": "Leitura do painel",
    "custo": 1,
-   "porque": "Os símbolos do painel não dizem nada para quem não tem a legenda."
+   "porque": "Os símbolos do painel não dizem nada para quem não tem a legenda.",
+   "etiqueta": "LEITURA COMPLETA · painel"
   },
   {
    "id": "coop_veredito",
    "sala": "seguranca",
-   "texto": "A escala diz de quem é o crachá. O bilhete diz \"peguei emprestado\" numa letra corrida, deitada para a direita. No livro de visitas, uma assinatura deita igual: a do patrocínio. O crachá era do Braga. A letra é do Lenz.",
+   "texto": "A escala diz de quem é o crachá. O bilhete diz \"peguei emprestado\" numa letra corrida, deitada para a direita. No livro de visitas, uma assinatura deita igual: a do patrocínio. Lado a lado com o bilhete, o risco vira letra: Lenz. O crachá era do Braga. A mão, não.",
    "volta_min": 3,
    "volta_max": 5,
    "segundo_min": 0,
@@ -5850,7 +5913,8 @@
     "E_dois"
    ],
    "previa": "Eco da chave {ch}",
-   "custo": 1
+   "custo": 1,
+   "porque": "A chave do para-raios está aberta. Ninguém fechou no clarão ainda."
   },
   {
    "id": "conserto_B",
@@ -5956,7 +6020,7 @@
   {
    "id": "coop_painel_C",
    "sala": "prototipo",
-   "texto": "Leitura completa do painel: números parados, fusíveis no lugar. A carga cai e a luz da peça está amarela: a máquina se segura numa peça que não é a dela.",
+   "texto": "Leitura completa do painel: números parados, fusíveis no lugar. A carga cai e a luz da peça está amarela.",
    "volta_min": 2,
    "volta_max": 5,
    "segundo_min": 0,
@@ -5991,7 +6055,8 @@
    ],
    "daAtividade": "coop_painel_manual",
    "diagnosticoCompleto": true,
-   "porque": "Os símbolos do painel não dizem nada para quem não tem a legenda."
+   "porque": "Os símbolos do painel não dizem nada para quem não tem a legenda.",
+   "etiqueta": "LEITURA COMPLETA · painel"
   },
   {
    "id": "coop_ancora_ensaio",
@@ -6062,7 +6127,7 @@
   {
    "id": "coop_painel_D",
    "sala": "prototipo",
-   "texto": "Leitura completa do painel: tem força chegando e a luz da peça está verde. Os mostradores piscam e a luz cai porque o circuito principal foi aberto na mão. Falta o fusível-mestre.",
+   "texto": "Leitura completa do painel: tem força chegando e a luz da peça está verde. Os mostradores piscam, a luz cai, e o encaixe do fusível-mestre está vazio.",
    "volta_min": 2,
    "volta_max": 5,
    "segundo_min": 0,
@@ -6097,7 +6162,8 @@
    ],
    "daAtividade": "coop_painel_manual",
    "diagnosticoCompleto": true,
-   "porque": "Os símbolos do painel não dizem nada para quem não tem a legenda."
+   "porque": "Os símbolos do painel não dizem nada para quem não tem a legenda.",
+   "etiqueta": "LEITURA COMPLETA · painel"
   },
   {
    "id": "coop_circuito_ensaio",
@@ -6236,7 +6302,7 @@
   {
    "id": "coop_painel_E",
    "sala": "prototipo",
-   "texto": "Leitura completa do painel: luz da peça verde, fusíveis no lugar. Mostradores fora do ponto E carga baixa. São dois defeitos ao mesmo tempo: falta ajustar e falta força.",
+   "texto": "Leitura completa do painel: luz da peça verde, fusíveis no lugar. Mostradores fora do ponto E carga baixa.",
    "volta_min": 2,
    "volta_max": 5,
    "segundo_min": 0,
@@ -6269,7 +6335,8 @@
    ],
    "daAtividade": "coop_painel_manual",
    "diagnosticoCompleto": true,
-   "porque": "Os símbolos do painel não dizem nada para quem não tem a legenda."
+   "porque": "Os símbolos do painel não dizem nada para quem não tem a legenda.",
+   "etiqueta": "LEITURA COMPLETA · painel"
   },
   {
    "volta_min": 1,
@@ -6340,7 +6407,8 @@
    "sala": "deposito",
    "tipo": "falsa_honesta",
    "previa": "Caixa de lâmpadas",
-   "texto": "Uma caixa cheia de lâmpadas queimadas. Na tampa, a caneta: \"troca geral de março\"."
+   "texto": "Uma caixa cheia de lâmpadas queimadas. Na tampa, a caneta: \"troca geral de março\".",
+   "explicaNoTexto": true
   },
   {
    "volta_min": 1,
@@ -6365,7 +6433,8 @@
    "sala": "limpeza",
    "tipo": "falsa_honesta",
    "previa": "Balde e multímetro molhado",
-   "texto": "Um balde de água turva com um multímetro dentro, ainda pingando. No cabo do rodo, um bilhete: \"Desculpa, doutora. Compro outro. — Dirceu\""
+   "texto": "Um balde de água turva com um multímetro dentro, ainda pingando. No cabo do rodo, um bilhete: \"Desculpa, doutora. Compro outro. — Dirceu\"",
+   "explicaNoTexto": true
   },
   {
    "volta_min": 1,
@@ -6390,7 +6459,8 @@
    "sala": "atelie",
    "tipo": "falsa_honesta",
    "previa": "Relógio de pulso na bancada",
-   "texto": "Um relógio de pulso parado em 3:14 em cima da bancada, com a tampa da pilha aberta e a pilha ao lado."
+   "texto": "Um relógio de pulso parado em 3:14 em cima da bancada, com a tampa da pilha aberta e a pilha ao lado.",
+   "explicaNoTexto": true
   },
   {
    "volta_min": 1,
@@ -6440,7 +6510,8 @@
    "sala": "sons",
    "tipo": "falsa_honesta",
    "previa": "Rádio chiando",
-   "texto": "O rádio da sala está numa estação fora do ar, só chiando. Alguém colou um esparadrapo no botão: \"não mexer, é assim mesmo\"."
+   "texto": "O rádio da sala está numa estação fora do ar, só chiando. Alguém colou um esparadrapo no botão: \"não mexer, é assim mesmo\".",
+   "explicaNoTexto": true
   },
   {
    "volta_min": 1,
@@ -6466,7 +6537,8 @@
    "sala": "recepcao",
    "tipo": "falsa_honesta",
    "previa": "Bilhete: ligar pro eletricista",
-   "texto": "Um bilhete colado na mesa: \"Ligar pro eletricista, URGENTE! A máquina de café morreu de novo.\""
+   "texto": "Um bilhete colado na mesa: \"Ligar pro eletricista, URGENTE! A máquina de café morreu de novo.\"",
+   "explicaNoTexto": true
   },
   {
    "volta_min": 1,
@@ -6489,7 +6561,8 @@
    "sala": "conservacao",
    "tipo": "falsa_honesta",
    "previa": "Cola ainda fresca",
-   "texto": "Um frasco de cola aberto ao lado de uma xícara de cerâmica sem asa. A etiqueta da xícara: \"loja do museu\"."
+   "texto": "Um frasco de cola aberto ao lado de uma xícara de cerâmica sem asa. A etiqueta da xícara: \"loja do museu\".",
+   "explicaNoTexto": true
   },
   {
    "volta_min": 1,
@@ -6577,13 +6650,13 @@
     "descarta": [],
     "destrava": []
    },
-   "essencial": false,
+   "essencial": true,
    "camada": "historia",
    "custo": 1,
    "id": "cofre_ronda",
    "sala": "seguranca",
    "tipo": "comum",
-   "grupoFonte": null,
+   "grupoFonte": "trajeto",
    "previa": "Cofre do Braga",
    "enigma": {
     "rotulo": "COFRE DO VIGIA",
@@ -6592,7 +6665,10 @@
     "resposta": "{reg_inv}",
     "placeholder": "3 números"
    },
-   "texto": "O cofre abriu. Dentro, o caderno de rondas do Braga. Na ronda de hoje, no começo da noite, uma linha riscada e, ao lado, a lápis: \"paletó entrou pela porta de serviço com crachá da casa. Não registrei.\""
+   "texto": "O cofre abriu. Dentro, o caderno de rondas do Braga. Na ronda de hoje, no começo da noite, uma linha riscada e, ao lado, a lápis: \"paletó entrou pela porta de serviço com crachá da casa. Não registrei.\"",
+   "essencialPara": [
+    "final_revelar"
+   ]
   },
   {
    "id": "cofre_dica",
@@ -6708,7 +6784,7 @@
   {
    "id": "fh_consumo",
    "sala": "recepcao",
-   "texto": "No quadro de consumo da Recepção, a barra de energia da Câmara está cheia e parada.",
+   "texto": "No quadro de consumo da Recepção, a linha da Câmara está tampada por um aviso da festa: \"Chapelaria à direita\".",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -6720,7 +6796,12 @@
    "revela": {
     "aponta": [],
     "descarta": [],
-    "destrava": []
+    "destrava": [
+     "fh_os_cd",
+     "fh_os_a",
+     "fh_email_cd",
+     "fh_email_a"
+    ]
    },
    "essencial": false,
    "tipo": "comum",
@@ -6775,7 +6856,7 @@
   {
    "id": "fh_lamp_lab",
    "sala": "fotografia",
-   "texto": "A lâmpada vermelha do laboratório de fotos fica igual, firme, mesmo quando a Câmara tenta ligar.",
+   "texto": "A lâmpada vermelha do laboratório de fotos está acesa. Na porta, a plaquinha: \"Revelando. Não abra.\"",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -6787,7 +6868,12 @@
    "revela": {
     "aponta": [],
     "descarta": [],
-    "destrava": []
+    "destrava": [
+     "fh_os_cd",
+     "fh_os_a",
+     "fh_email_cd",
+     "fh_email_a"
+    ]
    },
    "essencial": false,
    "tipo": "comum",
@@ -6876,7 +6962,7 @@
   {
    "id": "fh_metronomo",
    "sala": "sons",
-   "texto": "O metrônomo da Sala dos sons bate no compasso, sem falhar uma batida.",
+   "texto": "O metrônomo da Sala dos sons está parado, com a haste presa na trava. Tem pó em cima.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -6934,7 +7020,7 @@
   {
    "id": "fh_med_base",
    "sala": "eletrica",
-   "texto": "O medidor ligado à base da Galeria, na Oficina elétrica, fica parado no verde enquanto a máquina tenta ligar.",
+   "texto": "O medidor ligado à base da Galeria, na Oficina elétrica, está sem a agulha. No lugar, um papel: \"peça pedida\".",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -6964,7 +7050,7 @@
   {
    "id": "d_fus_4",
    "sala": "sons",
-   "texto": "O alto-falante de teste repete um estalo seco a cada tentativa da Câmara: som de circuito aberto, de fusível faltando.",
+   "texto": "O alto-falante de teste repete um estalo seco a cada tentativa da Câmara.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -6979,7 +7065,10 @@
     ],
     "descarta": [],
     "destrava": [
-     "d_ord_1"
+     "d_teo_1",
+     "d_ord_1",
+     "fh_os_cd",
+     "fh_email_cd"
     ]
    },
    "essencial": false,
@@ -7044,10 +7133,7 @@
     "descarta": [
      "B_potencia"
     ],
-    "destrava": [
-     "fh_os_a",
-     "fh_email_a"
-    ]
+    "destrava": []
    },
    "essencial": false,
    "tipo": "comum",
@@ -7063,7 +7149,7 @@
   {
    "id": "fh_med_pot_bce",
    "sala": "patio",
-   "texto": "O medidor de potência ao lado do quadro de energia mostra a barra lá embaixo, quase vazia.",
+   "texto": "O medidor de potência ao lado do quadro de energia está desligado. No vidro, um papel: \"aferir depois da festa\".",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -7092,7 +7178,7 @@
   {
    "id": "fh_med_pot_d",
    "sala": "patio",
-   "texto": "O medidor de potência ao lado do quadro de energia mostra a barra alta: força, tem.",
+   "texto": "O medidor de potência ao lado do quadro de energia está desligado. No vidro, um papel: \"aferir depois da festa\".",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -7152,7 +7238,7 @@
   {
    "id": "fh_status_c",
    "sala": "manutencao",
-   "texto": "O painel de status da Oficina técnica mostra a base da Galeria com luz amarela, piscando.",
+   "texto": "No painel de status da Oficina técnica, a linha da base da Galeria está coberta com fita crepe: \"sensor novo, ainda não ligado aqui\".",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -7193,9 +7279,7 @@
     "descarta": [
      "D_fusivel"
     ],
-    "destrava": [
-     "fh_papel_teo"
-    ]
+    "destrava": []
    },
    "essencial": false,
    "tipo": "comum",
@@ -7214,7 +7298,7 @@
   {
    "id": "fh_painel_fus_d",
    "sala": "eletrica",
-   "texto": "No painel de fusíveis da Oficina elétrica, a fileira da Câmara está apagada. Daqui não dá para ver por quê.",
+   "texto": "No painel de fusíveis da Oficina elétrica, a tampa da fileira da Câmara está parafusada. Daqui não dá para ver nada.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -7241,7 +7325,7 @@
   {
    "id": "lenz_mot_2",
    "sala": "conservacao",
-   "texto": "Carta da seguradora para o patrocinador: o seguro só paga se a peça principal for dada como perdida. Quem assinou o recebimento foi o Lenz.",
+   "texto": "Carta da seguradora para o patrocinador: o seguro só paga se a peça principal for dada como perdida. Quem assinou pelo patrocínio: uma rubrica apressada, quase um risco.",
    "volta_min": 2,
    "volta_max": 5,
    "segundo_min": 0,
@@ -7449,7 +7533,11 @@
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": []
+    "umaDe": [
+     "mancha",
+     "teo_1",
+     "ivone_1"
+    ]
    },
    "revela": {
     "aponta": [],
@@ -7461,7 +7549,8 @@
    "camada": "historia",
    "previa": "Mancha x tinta da Ivone",
    "custo": 1,
-   "grupoFonte": "contra_ivone"
+   "grupoFonte": "contra_ivone",
+   "porque": "Ivone trabalha de costas, debruçada na bancada. Você ainda não tem o que perguntar."
   },
   {
    "id": "braga_ali",
@@ -7490,7 +7579,7 @@
   {
    "id": "braga_red",
    "sala": "recepcao",
-   "texto": "O Braga sempre prende o crachá no cinto. Hoje o cinto está vazio, e na folha dele, a lápis: \"crachá: ver depois\".",
+   "texto": "Na folha do Braga, a lápis: \"crachá: ver depois\". Na foto 3x4 grampeada na folha, o crachá está preso no cinto.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -7514,7 +7603,7 @@
   {
    "id": "teo_d1",
    "sala": "conservacao",
-   "texto": "Diário do acervo, dia {dia_a}, com a letra do Téo: \"O do patrocínio pediu pra ficar sozinho com a peça. Sozinho pra quê? Ele nem olhou pra ela. Olhou pra base.\"",
+   "texto": "Diário do acervo, dia {dia_a}, com a letra do Téo: \"O do patrocínio pediu pra ficar sozinho com a peça. Sozinho pra quê? Ele nem olhou pra ela. Olhou pra base. — T.\"",
    "volta_min": 2,
    "volta_max": 5,
    "segundo_min": 0,
@@ -7541,7 +7630,7 @@
   {
    "id": "teo_d2",
    "sala": "fotografia",
-   "texto": "Página arrancada do diário do acervo, usada de marcador num álbum, com a letra do Téo: \"Dia {dia_b}. O do patrocínio no telefone, na escada: 'some e eles pagam'. Quando me viu, perguntou do tempo.\"",
+   "texto": "Página arrancada do diário do acervo, usada de marcador num álbum, com a letra do Téo: \"Dia {dia_b}. O do patrocínio no telefone, na escada: 'some e eles pagam'. Quando me viu, perguntou do tempo. — T.\"",
    "volta_min": 2,
    "volta_max": 5,
    "segundo_min": 0,
@@ -7568,7 +7657,7 @@
   {
    "id": "teo_d3",
    "sala": "deposito",
-   "texto": "No bolso do macacão do Téo, uma folha arrancada do diário, com a data de hoje: \"Hoje à noite eu falo com ele. Se ele negar, eu marco a base da cópia de vermelho. Tinta não mente.\"",
+   "texto": "No bolso do macacão do Téo, uma folha arrancada do diário, com a data de hoje: \"Hoje à noite eu falo com ele. Se ele negar, eu marco a base da cópia de vermelho. Tinta não mente. — T.\"",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -7821,7 +7910,7 @@
   {
    "id": "assim_leg",
    "sala": "corredor",
-   "texto": "No mural da Área de descanso, uma legenda sem foto: \"Sola lisa, de couro, número 42. Não é bota da casa.\" Atrás: \"foto no Quadro externo, no Pátio\".",
+   "texto": "No mural da Área de descanso, uma legenda sem foto, com a letra do Seu Dirceu: \"Quem sujou meu chão? Sola lisa, de couro, número 42. Não é bota da casa.\" Atrás: \"foto no Quadro externo, no Pátio\".",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -8157,7 +8246,7 @@
   {
    "id": "lenz_2",
    "sala": "corredor",
-   "texto": "Você estende o bilhete quando ele passa. Ele nem para, sorri sem os olhos: \"Emprestado. Tá escrito aí: emprestado. Eu devolvo tudo que eu pego.\" No crachá pendurado na cintura dele, a foto é do Braga.",
+   "texto": "Você estende o bilhete quando ele passa. Ele nem para, sorri sem os olhos: \"Emprestado. Tá escrito aí: emprestado. Eu devolvo tudo que eu pego.\" No crachá na cintura dele, a foto é do Braga. O telefone dele toca. \"Lenz. Agora não.\"",
    "volta_min": 3,
    "volta_max": 5,
    "segundo_min": 242,
@@ -8219,7 +8308,7 @@
   {
    "id": "empurra_1",
    "sala": "deposito",
-   "texto": "No chão, perto da mão do Téo, um botão de paletó com um fiapo de linha. Ninguém da montagem trabalha de paletó.",
+   "texto": "No chão, perto da mão do Téo, um botão de paletó com um fiapo de linha.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -8273,7 +8362,7 @@
   {
    "id": "lenz_3",
    "sala": "deposito",
-   "texto": "Ao lado do Téo, a pegada de sola lisa começa dentro da tinta. Quem pisou aqui estava de frente para ele, a um braço de distância. E foi embora andando, não correndo.",
+   "texto": "Ao lado do Téo, a pegada de sola lisa começa dentro da tinta. Quem pisou aqui estava de frente para ele, a um braço de distância.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -8348,7 +8437,8 @@
     "aponta": [],
     "descarta": [],
     "destrava": [
-     "e_hist_1"
+     "e_hist_1",
+     "fh_verso_a"
     ]
    },
    "essencial": false,
@@ -8366,7 +8456,7 @@
   {
    "id": "fh_ficha_bc",
    "sala": "atelie",
-   "texto": "Ficha de ensaio de ontem, com a letra da Dra. Sato: \"Tudo no lugar. Saio antes da chuva.\"",
+   "texto": "Ficha de ensaio de ontem, com a letra da Dra. Sato: \"Levar o guarda-chuva. Saio antes da chuva.\"",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -8375,15 +8465,18 @@
     "todas": [],
     "umaDe": [
      "b_verde_1",
-     "b_verde_2",
-     "b_verde_3",
-     "b_verde_4"
+     "b_verde_4",
+     "fh_cam_most_bc",
+     "fh_bipes_bc"
     ]
    },
    "revela": {
     "aponta": [],
     "descarta": [],
-    "destrava": []
+    "destrava": [
+     "fh_verso_b",
+     "fh_verso_cd"
+    ]
    },
    "essencial": false,
    "tipo": "comum",
@@ -8400,7 +8493,7 @@
   {
    "id": "fh_ficha_d",
    "sala": "atelie",
-   "texto": "Ficha de ensaio de ontem, com a letra da Dra. Sato: \"Tudo no lugar. Saio antes da chuva.\"",
+   "texto": "Ficha de ensaio de ontem, com a letra da Dra. Sato: \"Levar o guarda-chuva. Saio antes da chuva.\"",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -8417,7 +8510,9 @@
    "revela": {
     "aponta": [],
     "descarta": [],
-    "destrava": []
+    "destrava": [
+     "fh_verso_cd"
+    ]
    },
    "essencial": false,
    "tipo": "comum",
@@ -8452,7 +8547,8 @@
     "aponta": [],
     "descarta": [],
     "destrava": [
-     "e_hist_1"
+     "e_hist_1",
+     "fh_verso_a"
     ]
    },
    "essencial": false,
@@ -8478,15 +8574,18 @@
     "todas": [],
     "umaDe": [
      "b_verde_1",
-     "b_verde_2",
-     "b_verde_3",
-     "b_verde_4"
+     "b_verde_4",
+     "fh_cam_most_bc",
+     "fh_bipes_bc"
     ]
    },
    "revela": {
     "aponta": [],
     "descarta": [],
-    "destrava": []
+    "destrava": [
+     "fh_verso_b",
+     "fh_verso_cd"
+    ]
    },
    "essencial": false,
    "tipo": "comum",
@@ -8520,7 +8619,9 @@
    "revela": {
     "aponta": [],
     "descarta": [],
-    "destrava": []
+    "destrava": [
+     "fh_verso_cd"
+    ]
    },
    "essencial": false,
    "tipo": "comum",
@@ -8592,7 +8693,15 @@
      "b_luz_1",
      "b_luz_2",
      "b_luz_3",
-     "b_luz_4"
+     "b_luz_4",
+     "fh_pont_d",
+     "fh_cam_agulha_d",
+     "d_fus_4",
+     "fh_consumo",
+     "fh_lamp_of",
+     "fh_luz_desc",
+     "fh_lamp_limp",
+     "fh_lamp_lab"
     ]
    },
    "revela": {
@@ -8626,9 +8735,13 @@
     "todas": [],
     "umaDe": [
      "a_cheia_1",
-     "a_cheia_2",
      "a_cheia_3",
-     "a_cheia_4"
+     "fh_zumbido_a",
+     "fh_consumo",
+     "fh_lamp_of",
+     "fh_luz_desc",
+     "fh_lamp_limp",
+     "fh_lamp_lab"
     ]
    },
    "revela": {
@@ -8705,7 +8818,15 @@
      "b_luz_1",
      "b_luz_2",
      "b_luz_3",
-     "b_luz_4"
+     "b_luz_4",
+     "fh_pont_d",
+     "fh_cam_agulha_d",
+     "d_fus_4",
+     "fh_consumo",
+     "fh_lamp_of",
+     "fh_luz_desc",
+     "fh_lamp_limp",
+     "fh_lamp_lab"
     ]
    },
    "revela": {
@@ -8737,9 +8858,13 @@
     "todas": [],
     "umaDe": [
      "a_cheia_1",
-     "a_cheia_2",
      "a_cheia_3",
-     "a_cheia_4"
+     "fh_zumbido_a",
+     "fh_consumo",
+     "fh_lamp_of",
+     "fh_luz_desc",
+     "fh_lamp_limp",
+     "fh_lamp_lab"
     ]
    },
    "revela": {
@@ -8803,7 +8928,10 @@
     "todas": [
      "b_hist_1"
     ],
-    "umaDe": []
+    "umaDe": [
+     "fh_ficha_bc",
+     "fh_fita_bc"
+    ]
    },
    "revela": {
     "aponta": [],
@@ -8833,7 +8961,12 @@
     "todas": [
      "fh_os_cd"
     ],
-    "umaDe": []
+    "umaDe": [
+     "fh_ficha_bc",
+     "fh_fita_bc",
+     "fh_ficha_d",
+     "fh_fita_d"
+    ]
    },
    "revela": {
     "aponta": [],
@@ -8864,7 +8997,10 @@
     "todas": [
      "fh_os_a"
     ],
-    "umaDe": []
+    "umaDe": [
+     "a_hist_1",
+     "a_hist_2"
+    ]
    },
    "revela": {
     "aponta": [],
@@ -8904,7 +9040,8 @@
    "camada": "historia",
    "previa": "Um fusível na bancada",
    "custo": 1,
-   "grupoFonte": null
+   "grupoFonte": null,
+   "explicaNoTexto": true
   },
   {
    "id": "d_fus_2b",
@@ -8940,7 +9077,7 @@
   {
    "id": "fh_quadro2",
    "sala": "patio",
-   "texto": "Você volta ao vidro do Quadro externo. O lacre de papel da chave continua inteiro. Nada mudou.",
+   "texto": "Você volta ao vidro do Quadro externo. A chuva continua escorrendo. Nada de novo.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -9199,7 +9336,7 @@
    ]
   },
   "prova_falsa": {
-   "rotulo": "prova de que a peça é cópia",
+   "rotulo": "o que foi feito",
    "fontes": [
     "falsa_2",
     "falsa_3",
@@ -9240,7 +9377,7 @@
    ]
   },
   "trajeto": {
-   "rotulo": "trajeto do culpado",
+   "rotulo": "por onde passou",
    "fontes": [
     "traj_1",
     "traj_2",
@@ -9250,7 +9387,8 @@
     "catraca_solo",
     "coop_pegadas",
     "pegadas_solo",
-    "assim_par"
+    "assim_par",
+    "cofre_ronda"
    ],
    "salas": [
     "corredor",
@@ -9261,7 +9399,7 @@
    ]
   },
   "cracha": {
-   "rotulo": "de quem era a mão no crachá",
+   "rotulo": "de quem era a mão",
    "fontes": [
     "cracha_3",
     "coop_veredito",
@@ -9495,8 +9633,8 @@
    "simultaneo": true,
    "volta_min": 2,
    "duracao_s": 75,
-   "papelA": "Na Galeria especial, você olha a peça exposta e descreve em voz alta o que vê.",
-   "papelB": "Na Sala da fotografia, você olha a foto do catálogo e diz o que não bate.",
+   "papelA": "Na Galeria especial, a sua tela lista 3 coisas da peça exposta. Você lê em voz alta.",
+   "papelB": "Na Sala da fotografia, a sua tela lista 3 coisas da foto do catálogo. Você lê em voz alta e os dois dizem o que não bate.",
    "entrada": {
     "estado": [],
     "grupos": [],
@@ -9507,7 +9645,7 @@
    "produz": [
     "coop_copia_ok"
    ],
-   "saida_solo": "Sem dupla: na Galeria especial, compare a foto do catálogo sem ajuda (2 de energia), ou junte outra prova de que a peça é cópia.",
+   "saida_solo": "na Galeria especial, compare a foto do catálogo sem ajuda (2 de energia), ou junte outra prova de que a peça é cópia.",
    "formato_turma": {
     "3": "Dupla nas duas salas; Central escuta as duas pessoas e marca as diferenças já ditas.",
     "4": "Uma dupla faz esta; a outra faz 'As Duas Listas' na mesma volta.",
@@ -9526,6 +9664,24 @@
     "A": "Fale, não mostre a tela.",
     "B": "Fale, não mostre a tela.",
     "Central": "Anote o que cada pessoa disse e confirme em voz alta."
+   },
+   "telaPapel": {
+    "A": {
+     "titulo": "A peça exposta",
+     "itens": [
+      "rachadura do lado direito",
+      "pedra clara, brilhando",
+      "base lisa, sem número"
+     ]
+    },
+    "B": {
+     "titulo": "A foto do catálogo",
+     "itens": [
+      "rachadura do lado esquerdo",
+      "pedra escura, fosca",
+      "número gravado na base"
+     ]
+    }
    }
   },
   {
@@ -9538,8 +9694,8 @@
    "simultaneo": true,
    "volta_min": 2,
    "duracao_s": 60,
-   "papelA": "Na Recepção, você lê o livro de visitas em voz alta: quem entrou.",
-   "papelB": "Na Central de monitoramento, você lê o registro da roleta da saída: quem saiu.",
+   "papelA": "Na Recepção, você lê o livro de visitas em voz alta: quem entrou. Depois os dois respondem à mesma pergunta.",
+   "papelB": "Na Central de monitoramento, você lê o registro da roleta da saída: quem saiu. Depois os dois respondem à mesma pergunta.",
    "entrada": {
     "estado": [],
     "grupos": [],
@@ -9550,7 +9706,7 @@
    "produz": [
     "coop_catraca_ok"
    ],
-   "saida_solo": "Sem dupla: na Central, confira as listas sem ajuda, com o livro de visitas no caderno (2 de energia).",
+   "saida_solo": "na Central, confira as listas sem ajuda, com o livro de visitas no caderno (2 de energia).",
    "formato_turma": {
     "3": "Dupla nas duas salas; Central confere os nomes na linha do tempo.",
     "4": "Feita pela segunda dupla enquanto a primeira faz 'Lado a Lado'.",
@@ -9579,8 +9735,8 @@
    "simultaneo": true,
    "volta_min": 2,
    "duracao_s": 60,
-   "papelA": "No Pátio, você segura a chave geral do térreo no Quadro externo por 20 segundos. Soltou, a luz volta.",
-   "papelB": "Na Área de descanso, no escuro, você segue as pegadas que brilham e diz por onde elas saem.",
+   "papelA": "No Pátio, você segura a chave geral do térreo no Quadro externo. Enquanto você segura, a sua tela mostra a palavra: diga em voz alta. Soltou, a luz volta.",
+   "papelB": "Na Área de descanso, no escuro, você escuta a palavra de quem segura a chave e segue as pegadas que brilham.",
    "entrada": {
     "estado": [],
     "grupos": [],
@@ -9591,7 +9747,7 @@
    "produz": [
     "coop_pegadas"
    ],
-   "saida_solo": "Sem dupla: fique na Área de descanso e olhe o chão logo depois do apagão (2 de energia).",
+   "saida_solo": "fique na Área de descanso e olhe o chão logo depois do apagão (2 de energia).",
    "formato_turma": {
     "3": "Um segura a chave geral, outro segue as pegadas; Central conta os 20 segundos em voz alta.",
     "4": "A segunda dupla aproveita o escuro para ver a própria sala (pistas de clima).",
@@ -9608,7 +9764,8 @@
     "A": "Fale, não mostre a tela.",
     "B": "Fale, não mostre a tela.",
     "Central": "Anote o que cada pessoa disse e confirme em voz alta."
-   }
+   },
+   "segurar": "A"
   },
   {
    "id": "coop_painel_manual",
@@ -9620,8 +9777,8 @@
    "simultaneo": true,
    "volta_min": 2,
    "duracao_s": 90,
-   "papelA": "No Subsolo, você vê os símbolos do painel e descreve. Você não sabe o que eles querem dizer.",
-   "papelB": "No Ateliê de descobertas, só você tem a legenda dos símbolos, colada no manual. Você traduz e diz o que significa. Você não vê o painel.",
+   "papelA": "No Subsolo, a sua tela mostra os 3 símbolos do painel e como cada um está. Você descreve em voz alta. Você não sabe o que eles querem dizer.",
+   "papelB": "No Ateliê de descobertas, a sua tela mostra a legenda dos símbolos. Você escuta, traduz e marca como está cada parte. Você não vê o painel.",
    "entrada": {
     "estado": [],
     "grupos": [
@@ -9636,20 +9793,110 @@
     "coop_painel_D",
     "coop_painel_E"
    ],
-   "saida_solo": "Sem dupla: feche o diagnóstico no dossiê com 3 pistas (2 sinais de tipos diferentes + 1 leitura normal).",
+   "saida_solo": "no dossiê, feche o diagnóstico com 3 pistas (2 sinais de tipos diferentes + 1 leitura normal).",
    "formato_turma": {
     "3": "Dupla nas duas salas; Central anota os 3 passos na ordem.",
     "4": "A segunda dupla busca o que o conserto da noite pede (valores, alavanca, peça verdadeira ou fusível).",
     "15_grupos_de_3": "Símbolos e legenda embaralhados por grupo: copiar do vizinho não serve.",
     "15_grupo_unico": "Cópia por dupla, símbolos diferentes para cada dupla. Até 2 duplas ao mesmo tempo. Frente 'Máquina'."
    },
-   "anexa_diagnostico": true,
    "custo_por_pessoa": 1,
    "papelCentral": "Você fica na Central de monitoramento, não mexe no museu, escuta as duas pessoas, marca o que já foi dito e confirma em voz alta.",
    "dicaTela": {
     "A": "Fale, não mostre a tela.",
     "B": "Fale, não mostre a tela.",
     "Central": "Anote o que cada pessoa disse e confirme em voz alta."
+   },
+   "entrega_diagnostico": true,
+   "telaPapel": {
+    "A": {
+     "titulo": "O painel, na sua frente",
+     "itens": {
+      "A_calibrar": [
+       "ponteiro: lá em cima, parado",
+       "três janelas: piscando",
+       "luz redonda: verde"
+      ],
+      "B_potencia": [
+       "ponteiro: lá embaixo",
+       "três janelas: paradas",
+       "luz redonda: verde"
+      ],
+      "C_ancora": [
+       "ponteiro: descendo aos poucos",
+       "três janelas: paradas",
+       "luz redonda: amarela"
+      ],
+      "D_fusivel": [
+       "ponteiro: balançando no meio",
+       "três janelas: piscando",
+       "luz redonda: verde"
+      ],
+      "E_dois": [
+       "ponteiro: lá embaixo",
+       "três janelas: piscando",
+       "luz redonda: verde"
+      ]
+     }
+    },
+    "B": {
+     "titulo": "A legenda, colada no manual",
+     "itens": [
+      "ponteiro = força",
+      "três janelas = números",
+      "luz redonda = peça"
+     ]
+    }
+   },
+   "perguntaB": {
+    "rotulos": [
+     "Força (ponteiro)",
+     "Números (três janelas)",
+     "Peça (luz redonda)"
+    ],
+    "opcoes": [
+     [
+      "lá em cima, parado",
+      "lá embaixo",
+      "descendo aos poucos",
+      "balançando no meio"
+     ],
+     [
+      "paradas",
+      "piscando"
+     ],
+     [
+      "verde",
+      "amarela"
+     ]
+    ],
+    "certo": {
+     "A_calibrar": [
+      0,
+      1,
+      0
+     ],
+     "B_potencia": [
+      1,
+      0,
+      0
+     ],
+     "C_ancora": [
+      2,
+      0,
+      1
+     ],
+     "D_fusivel": [
+      3,
+      1,
+      0
+     ],
+     "E_dois": [
+      1,
+      1,
+      0
+     ]
+    }
    }
   },
   {
@@ -9674,7 +9921,7 @@
    "produz": [
     "chao_manopla"
    ],
-   "saida_solo": "Sem dupla: a mesma pessoa deixa a luva e pega na volta seguinte, ou usa as luvas de borracha da Oficina elétrica ou do carrinho de limpeza.",
+   "saida_solo": "a mesma pessoa deixa a luva e pega na volta seguinte, ou usa as luvas de borracha da Oficina elétrica ou do carrinho de limpeza.",
    "formato_turma": {
     "3": "Central é quem avisa na pausa onde o objeto ficou.",
     "4": "Uma dupla deixa, a outra pega: espalha a informação.",
@@ -9722,7 +9969,7 @@
    "produz": [
     "coop_veredito"
    ],
-   "saida_solo": "Sem dupla: mostre a escala e o bilhete ao Braga, ou mostre o bilhete a quem passa pela porta de serviço.",
+   "saida_solo": "mostre a escala e o bilhete ao Braga, ou mostre o bilhete a quem passa pela porta de serviço.",
    "formato_turma": {
     "3": "Central faz o papel de quem pergunta: 'isso prova ou só sugere?'",
     "4": "As duas duplas trocam de lado: quem acusou defende na tentativa seguinte.",
@@ -9778,7 +10025,7 @@
     "coop_raio_ensaio",
     "conserto_B"
    ],
-   "saida_solo": "Sem dupla: feche a chave {ch} no Pátio na hora do raio (volta 3 ou 4) e, numa volta seguinte, baixe a alavanca no Subsolo.",
+   "saida_solo": "feche a chave {ch} no Pátio na hora do raio (volta 3 ou 4) e, numa volta seguinte, baixe a alavanca no Subsolo.",
    "formato_turma": {
     "3": "Dupla na chave e na alavanca; Central na Central de monitoramento confirma pelas câmeras.",
     "4": "Dupla + Central + uma pessoa na Recepção pronta para o Revelar (final Ouro).",
@@ -9862,7 +10109,7 @@
     ],
     "como": "Sem dupla, é você quem traduz e gira: precisa ter no SEU caderno uma página do manual, a página do ajuste e os 3 valores. Custa 3 de energia e 2 minutos."
    },
-   "saida_solo": "Sem dupla: no Subsolo, com os 3 valores no seu caderno (3 de energia, 2 minutos). O que faltar pode vir de outra pessoa na pausa.",
+   "saida_solo": "no Subsolo, com os 3 valores no seu caderno (3 de energia, 2 minutos). O que faltar pode vir de outra pessoa na pausa.",
    "formato_turma": {
     "3": "Dupla nas duas salas; Central confere os 3 números em voz alta.",
     "4": "A segunda dupla fica na Recepção com as 3 provas para o Revelar (final Ouro).",
@@ -9935,7 +10182,7 @@
     "aparece_como": "chao_peca",
     "como": "Sem dupla, não dá para segurar a trava e a peça ao mesmo tempo. Numa volta, desça com a peça verdadeira e deixe no chão do Subsolo, ao lado do apoio. O chão guarda. Em qualquer volta seguinte, segure a trava, puxe a peça do chão e digite o registro e o dia. Custa 2 de energia e uma volta a mais."
    },
-   "saida_solo": "Sem dupla: numa volta, deixe a peça verdadeira no chão do Subsolo; na volta seguinte, digite o registro e o dia (2 de energia).",
+   "saida_solo": "numa volta, deixe a peça verdadeira no chão do Subsolo; na volta seguinte, digite o registro e o dia (2 de energia).",
    "formato_turma": {
     "3": "Uma pessoa carrega, outra segura a trava; Central confere o registro em voz alta.",
     "4": "A quarta pessoa fica na Recepção com as 3 provas para o Revelar (final Ouro).",
@@ -10002,7 +10249,7 @@
     ],
     "como": "Sem dupla, você religa os pontos e sobe para armar o disjuntor: precisa ter no SEU caderno o procedimento, o fusível, a ordem e a luva. Custa 3 de energia e 2 minutos."
    },
-   "saida_solo": "Sem dupla: no Subsolo, com a ordem dos pontos no seu caderno (3 de energia, 2 minutos). O que faltar pode vir de outra pessoa na pausa.",
+   "saida_solo": "no Subsolo, com a ordem dos pontos no seu caderno (3 de energia, 2 minutos). O que faltar pode vir de outra pessoa na pausa.",
    "formato_turma": {
     "3": "Dupla nas duas salas; Central conta os pontos de ligação pela câmera.",
     "4": "A quarta pessoa fica na Recepção com as 3 provas para o Revelar (final Ouro).",
@@ -10223,7 +10470,7 @@
    "A": "Você é a Mão A. Faça só a sua parte e fale o que vê.",
    "B": "Você é a Mão B. Faça só a sua parte e fale o que sabe.",
    "Central": "Você é a Central. Fique na Central de monitoramento e confirme em voz alta quem está onde e se os valores batem.",
-   "PortaVoz": "Você é Porta-voz. Na volta 5, vá para a Recepção com as 3 provas e toque em \"Revelar\" antes de 5:00.",
+   "PortaVoz": "Você é Porta-voz. Vá para a Recepção com as 3 provas no caderno e diga o nome antes de 5:00.",
    "Guardiao": "Você guarda o dossiê. Confira as 3 provas de quem vai falar e conte o tempo em voz alta."
   }
  },

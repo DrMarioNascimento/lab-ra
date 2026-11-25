@@ -5,25 +5,25 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Mosaico Loop · Simulador</title>
 <meta name="robots" content="noindex">
-<link rel="stylesheet" href="../../style.css?v=20">
-<link rel="stylesheet" href="../sala.css?v=2">
+<link rel="stylesheet" href="../../style.css?v=21">
+<link rel="stylesheet" href="../sala.css?v=3">
 </head>
 <body class="sim">
 <div class="sim-topo">
   <b>Loop · Simulador</b>
-  <label>Participantes <input id="n" type="range" min="1" max="12" value="6"> <span id="nv">6</span></label>
+  <label>Turma <input id="n" type="range" min="1" max="12" value="6" style="width:90px"> <span id="nv">6</span></label>
   <label>Ritmo <select id="seg"><option value="30">Ensaio (30 s)</option><option value="300">Completo (5 min)</option></select></label>
-  <label><input id="auto" type="checkbox" checked> Participantes jogam sozinhos</label>
+  <label><input id="auto" type="checkbox" checked> Turma joga sozinha</label>
   <label><input id="mauto" type="checkbox"> Professor automático</label>
   <button class="btn secondary" id="rec" type="button">Recomeçar</button>
-  <button class="btn primary" id="cheia" type="button">Telão em tela cheia</button>
+  <button class="btn primary" id="cheia" type="button">Tela cheia</button>
 </div>
 <div class="sim-telao"><iframe id="tl" title="Telão" allow="fullscreen"></iframe></div>
 <p class="sim-nota">Telão em cima, turma embaixo. O quadro do Professor conduz a partida.</p>
 <div class="sim-turma" id="turma"></div>
 <script type="module">
 import { limparSalaFalsa } from '../transporte.mjs';
-import { pilotar } from '../piloto.mjs?v=2';
+import { pilotar } from '../piloto.mjs?v=3';
 const SALA = 'SIMUL';
 const $ = (id) => document.getElementById(id);
 let paradas = [];
