@@ -178,17 +178,18 @@ function renderPhase() {
     $('betweenCount').textContent = state.clues.length;
     $('betweenLoop').textContent = room.loop + ' / 5';
     $('betweenTitle').textContent = room.loop === 5 ? 'Os ciclos terminaram.' : 'Vocês se lembram.';
-    $('betweenHint').textContent = isHost() ? 'Conversem sobre as pistas antes de avançar.' : 'Conversem sobre as pistas. O anfitrião avança quando o grupo estiver pronto.';
     $('nextLoop').textContent = room.loop === 5 ? 'Abrir conclusão' : 'Abrir próxima volta';
     $('nextLoop').classList.toggle('hidden', !isHost());
+    renderBetweenPlan();
     show('between');
   } else if (room.phase === 'final') {
     renderForm();
+    $('reflectionForm').classList.toggle('hidden', !isHost());
     $('answerFields').classList.toggle('hidden', !isHost());
     $('answerForm').querySelector('button[type=submit]').classList.toggle('hidden', !isHost());
     $('final').querySelector('.large').textContent = isHost()
-      ? 'Reúnam as pistas e discutam a intervenção. Envie a conclusão do grupo.'
-      : 'Discutam a conclusão em grupo. O anfitrião registra a decisão de todos.';
+      ? 'Registre o desfecho do grupo. As perguntas são opcionais.'
+      : 'O anfitrião registra o desfecho depois da discussão do grupo.';
     show('final');
   } else {
     renderResult();
@@ -212,8 +213,8 @@ function decorate() {
   $('coopBegin').disabled = moving || !online;
   $('endLoop').classList.toggle('hidden', !playing || !isHost() || room.seconds !== 30);
   $('endLoop').disabled = moving || !online;
-  $('boardTitle').textContent = state.room ? 'Ambiente escolhido' : 'Escolha um ambiente';
-  $('phaseDescription').textContent = choosing ? 'Escolha onde investigar. O anfitrião inicia o relógio.' : 'Todos investigam no mesmo intervalo.';
+  $('phaseDescription').textContent = choosing ? 'Escolha onde investigar. O anfitrião inicia o relógio.' :
+    state.room ? 'Examine a peça ou use a lista de pistas.' : 'O relógio começou. Escolha onde investigar.';
   $('statusText').textContent = state.room ? 'Você permanece neste ambiente até o retorno.' : 'Escolha um ambiente para investigar nesta volta.';
   $('roomPanel').classList.toggle('hidden', !playing || !state.room);
   for (const button of $('roomGrid').querySelectorAll('button')) button.disabled = !!state.room || !online;
@@ -224,6 +225,7 @@ function tickRoom() {
   const old = state.remaining;
   state.remaining = remainingSeconds(state.endAt);
   $('timer').textContent = fmt(state.remaining);
+  $('fictionTime').textContent = museumTime();
   if (state.room && Math.ceil(old) !== Math.ceil(state.remaining)) renderClues();
   if (online && isHost() && !moving && service.now() >= state.endAt + 1250) move('between');
 }
@@ -234,7 +236,7 @@ async function move(phase, answers) {
   updateLobby();
   if (room.phase === 'choose' || room.phase === 'playing') decorate();
   try {
-    await service.advance(code, room, phase, answers);
+    await service.advance(code, room, phase, phase === 'result' ? { ...answers, loopFinal: lcFinal() } : answers);
   } catch (error) {
     toast(messageFor(error));
     if (room?.phase === 'playing' && phase === 'between') await service.syncClock().catch(() => {});

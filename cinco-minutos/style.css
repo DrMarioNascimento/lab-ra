@@ -144,3 +144,40 @@
 .lc-gi{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;margin:0 3px;border-radius:11px;border:1.5px solid #e6c36b;background:#1a2229;color:#e6c36b;font:800 .78rem/1 system-ui;cursor:pointer;vertical-align:baseline;box-shadow:0 2px 0 #7a6230}.lc-gi:active{transform:translateY(1px);box-shadow:0 1px 0 #7a6230}.lc-gi[aria-expanded=true]{background:#e6c36b;color:#12171d}
 .lc-gx{display:block;margin:.35em 0;padding:.45em .65em;border-left:3px solid #e6c36b;background:#0e1519;border-radius:6px;font:.86rem/1.4 system-ui;color:#f3ead6}.lc-gx[hidden]{display:none}
 .lc-leg{display:flex;flex-wrap:wrap;gap:6px;margin:.4em 0}.lc-leg span{background:#0e1519;border:1px solid #3b4a54;border-radius:999px;padding:.25em .65em;font:.82rem system-ui;color:#f3ead6}.lc-dic{margin:.5em 0;font:.86rem/1.45 system-ui;color:#c9d6d5}.lc-dic summary{cursor:pointer;color:#e6c36b;font-weight:700}.lc-pre{font:.84rem/1.45 system-ui;color:#e6c36b;margin:.4em 0}
+
+/* A sala toma o lugar do mapa enquanto o relógio corre. */
+.board-tools { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem; }
+.route-choices { margin: 0 0 1rem; }
+.route-choices > p { margin: 0 0 .55rem; color: var(--muted); }
+.route-choices > div { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .55rem; }
+.route-choices button { display: grid; gap: .25rem; min-width: 0; white-space: normal; text-align: left; }
+.route-choices small { color: var(--muted); font-weight: normal; }
+.investigando .game-head {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  padding: .65rem 0;
+  background: #0c1722;
+}
+#phaseTitle:focus { outline: none; }
+.investigando #roomGrid:not(.hidden) { max-height: min(55vh, 28rem); overflow-y: auto; margin-bottom: .7rem; }
+.investigando .room-panel > h3 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.investigando .room-panel { margin-top: 0; }
+.investigando .lista-pistas { margin-top: .8rem; }
+.lista-pistas summary, #reflectionForm > summary, .loop-reflection > summary { cursor: pointer; }
+.loop-ending { border-color: var(--gold); }
+.loop-ending h3 { margin: .25rem 0 .6rem; }
+.loop-ending li + li { margin-top: .4rem; }
+.loop-reflection, #reflectionForm { border: 1px solid var(--line); border-radius: .65rem; padding: .75rem; margin: 1rem 0; }
+.lc-encaminhamento p { margin: 0 0 .5rem; }
+.lc-fab[hidden] { display: none; }
+.mb-wait { flex-basis: 100%; color: var(--muted); font-size: .86rem; overflow-wrap: anywhere; }
+@media (max-width: 600px) {
+  .route-choices > div { grid-template-columns: 1fr; }
+  .investigando .game-head { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: .45rem; }
+  .investigando .game-head h2 { font-size: clamp(1.1rem, 5vw, 1.65rem); }
+  .investigando .game-head .eyebrow, .investigando #phaseDescription { display: none; }
+  .investigando .clockbox { padding: .5rem .6rem; }
+  .investigando .clockbox strong { font-size: 1.55rem; }
+}
+.clue-list .clue:disabled { order: 1; }

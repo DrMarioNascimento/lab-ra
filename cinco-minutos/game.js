@@ -485,20 +485,67 @@ function clockAt(seconds){
   (seconds%60 ? 'min'+String(seconds%60).padStart(2,'0')+'s' : '');
 }
 
-function show(id){$('coopShortcut').classList.toggle('hidden',id==='start'||!!window.coop);['start','game','between','final','result'].forEach(x=>$(x).classList.toggle('hidden',x!==id));window.scrollTo({top:0,behavior:'instant'})}
+function show(id){
+ $('coopShortcut').classList.toggle('hidden', id === 'start' || !!window.coop);
+ ['start','game','between','final','result'].forEach(x => $(x).classList.toggle('hidden', x !== id));
+ if (id !== 'game') document.getElementById('lcDialog')?.close();
+ lcAtualizarBotao();
+ window.scrollTo({top:0,behavior:'instant'});
+}
 function toast(text){$('toast').textContent=text;$('toast').classList.add('show');clearTimeout(toastHandle);toastHandle=setTimeout(()=>$('toast').classList.remove('show'),2200)}
 function popup(id){if(!$(id).open)$(id).showModal()}
 function fmt(s){s=Math.max(0,Math.ceil(s));return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
-function museumTime(){
- const elapsed = Math.max(0, Math.min(300, Math.floor((state.duration-state.remaining)*300/state.duration)));
- const minutes = 55+Math.floor(elapsed/60);
- return (minutes<60?'21:':'22:')+String(minutes%60).padStart(2,'0')+':'+String(elapsed%60).padStart(2,'0');
-}
+function museumTime(){ return loopHora(state.duration, state.remaining); }
 function current(){return CASES[state.caseIndex]}
 function reset(){clearInterval(timerHandle);state={caseIndex:chooseCase(),loop:1,phase:'choose',room:null,duration:Number($('speed').value),remaining:Number($('speed').value),endAt:null,clues:[],hints:0,notes:'',answers:null,liveFinal:true,caseRules:2,archive:[],codes:sortearCodigos()};state.museu=sortearMuseu(chavesDoCaso(state.caseIndex));definirMuseu(state.museu);save();renderGame();show('game')}
-function enterRoom(id){if(window.coop){window.coop.choose(id);return}if(state.phase!=='choose')return;state.room=id;state.phase='playing';state.remaining=state.duration;state.endAt=Date.now()+state.remaining*1000;save();renderGame();tick();timerHandle=setInterval(tick,250)}
+function enterRoom(id){
+ const anterior = state.room;
+ if (window.coop) {
+  window.coop.choose(id);
+ } else if (state.phase === 'choose') {
+  state.room = id;
+  state.phase = 'playing';
+  state.remaining = state.duration;
+  state.endAt = Date.now() + state.remaining * 1000;
+  save();
+  renderGame();
+  tick();
+  timerHandle = setInterval(tick, 250);
+ }
+ if (state.room && state.room !== anterior) {
+  $('phaseTitle').focus({preventScroll:true});
+  window.scrollTo({top:0,behavior:'instant'});
+ }
+}
 function chavesDoCaso(i){ const t = TIME_PATHS[CASE_PATHS[i]]; return [CASES[i].room, ...(t ? [t.room, t.source] : [])]; }
 function aplicarMuseu(){ if ((MUSEU?.semente ?? 0) !== (state.museu || 0)) definirMuseu(state.museu || 0); }
+const ROTAS_INICIAIS = [
+ ['galeria', 'Conferir a peça'],
+ ['seguranca', 'Rastrear movimentações'],
+ ['eletrica', 'Investigar a energia']
+];
+function renderRouteChoices(preparando) {
+ const painel = $('routeChoices');
+ const aberta = state.loop === 1 && !state.room && !preparando;
+ painel.classList.toggle('hidden', !aberta);
+ painel.innerHTML = aberta ? '<p>Por onde você quer começar?</p><div>' + ROTAS_INICIAIS.map(([id, pergunta]) =>
+  '<button type="button" class="btn secondary" data-route="' + id + '"><strong>' + esc(pergunta) +
+  '</strong><small>' + esc(sala(id).name) + '</small></button>').join('') + '</div>' : '';
+ painel.querySelectorAll('[data-route]').forEach(b => b.onclick = () => {
+  const escolha = $('roomGrid').querySelector('[data-room="' + b.dataset.route + '"]');
+  if (escolha && !escolha.disabled) escolha.click();
+ });
+}
+function renderRoomFocus() {
+ const investigando = state.phase === 'playing' && !!state.room;
+ $('game').classList.toggle('investigando', investigando);
+ $('boardKicker').textContent = investigando ? 'INVESTIGAÇÃO' : 'MAPA DO MUSEU';
+ $('roomMapButton').classList.toggle('hidden', !investigando);
+ $('roomMapButton').setAttribute('aria-expanded', 'false');
+ $('roomMapButton').textContent = 'Ver mapa';
+ $('roomGrid').classList.toggle('hidden', investigando);
+ $('roomPanel').classList.toggle('hidden', !investigando);
+}
 function renderGame(){
  aplicarMuseu();
  const finalLoop = hasLiveFinal() && state.loop === 5;
@@ -509,13 +556,15 @@ function renderGame(){
  $('clockStatus').textContent=state.phase==='playing'?'tempo em andamento':'aguardando escolha';
  $('phaseTitle').textContent=state.room?sala(state.room).name:'Escolha onde investigar';
  $('phaseDescription').textContent=state.phase==='playing'?'Gire a peça e toque nos pontos que brilham para achar pistas.':'Todo mundo começa no '+INICIO.name+', no '+INICIO.andar+'. Escolha para onde ir.';
- $('boardTitle').textContent=state.phase==='playing'?'Ambiente escolhido':'Escolha um ambiente';
+ $('boardTitle').textContent = state.room ? (state.phase === 'playing' ? 'Examine a sala' : 'Ambiente escolhido') : 'Escolha um ambiente';
+ $('phaseTitle').tabIndex = -1;
  $('roomGrid').innerHTML='<div class="inicio" role="status"><span class="room-icon" aria-hidden="true">'+INICIO.icon+'</span><div><strong>'+INICIO.name+' · '+INICIO.andar+'</strong><small>'+(state.phase==='playing'?'Quando o tempo acabar, você volta para cá. A porta principal está trancada pela grade de segurança.':'Você está aqui. Todo mundo começa aqui, a cada volta. A porta principal está trancada pela grade de segurança.')+'</small></div></div>'+ANDARES.map(a=>'<h4 class="andar">'+a+'</h4>'+ROOMS.map(r=>sala(r.id)).filter(r=>r.andar===a).sort((x,y)=>x.lugar-y.lugar).map(r=>'<button class="room '+(state.room===r.id?'selected':'')+'" '+(state.phase==='playing'&&state.room?'disabled':'')+' data-room="'+r.id+'"><span class="room-icon" aria-hidden="true">'+r.icon+'</span><strong>'+esc(r.name)+'</strong><small>Lugar '+r.lugar+' · '+esc(r.sub)+'</small></button>').join('')).join('');
  document.querySelectorAll('[data-room]').forEach(b=>b.addEventListener('click',()=>enterRoom(b.dataset.room)));
- renderPrep();
+ const preparando = renderPrep();
+ renderRouteChoices(preparando);
  $('endLoop').classList.toggle('hidden', state.phase!=='playing' || ((finalLoop || state.caseRules === 2) && state.duration===300));
  $('statusText').textContent=state.phase==='playing'?'Você fica nesta sala até o tempo voltar. Aí você acorda no '+INICIO.name+'.':'Você visita uma sala por volta.';
- $('roomPanel').classList.toggle('hidden',state.phase!=='playing');
+ renderRoomFocus();
  if(state.phase==='playing'&&state.room)renderClues();
  if(window.coop)window.coop.decorate();
  $('notes').value=state.notes||'';renderJournal();
@@ -539,15 +588,18 @@ function renderClues(){
  const room = sala(state.room);
  const panel = $('roomPanel');
  const clues = scenarioClues()[room.id];
- const scene = [state.caseIndex, state.caseRules, !!window.coop, room.id, state.museu||0].join(':');
- if (panel.dataset.scene !== scene) {
+ const scene = [state.caseIndex, state.caseRules, !!window.coop, room.id, state.loop, state.museu||0].join(':');
+ const visiveis = clues.map(pista => pista.id).join(',');
+ if (panel.dataset.scene !== scene || panel.dataset.visiveis !== visiveis) {
+  const manterLista = panel.dataset.scene === scene && panel.querySelector('.lista-pistas')?.open;
   panel.dataset.scene = scene;
+  panel.dataset.visiveis = visiveis;
   const hotspots = clues.map((clue, i) => '<button type="button" class="hs" slot="hotspot-'+i+'" data-hs="'+clue.id+'" data-visibility-attribute="visible" data-position="0m 0m 0m" data-normal="0m 1m 0m" aria-label="Ponto de interesse na peça"></button>').join('');
   if (room.livro) {
    panel.innerHTML = '<h3>'+room.name+'</h3><p>'+roomDescriptions[room.id]+'</p>'+
     '<div class="peca livro"><iframe title="Livro da sala" src="'+new URL('livro/index.html?embed=1&solo=1&capa='+encodeURIComponent(room.capa||'Livro|REGISTRO'), PECAS_URL.href.replace('pecas/','')).href+'" allow="xr-spatial-tracking; camera; fullscreen" loading="eager"></iframe></div>'+
     '<p class="dica">Arraste a página para virar a folha. O que a página mostra fica registrado no seu caderno. Se o livro não abrir, use a lista.</p>'+
-    '<details class="lista-pistas"><summary>Não consegue ver o livro? Use a lista</summary><div class="clue-list">'+
+    '<details class="lista-pistas"><summary>Examinar pela lista</summary><div class="clue-list">'+
     clues.map(clue => '<button type="button" class="clue" data-clue="'+clue.id+'"><span>'+esc(clue.name)+'</span><small></small></button>').join('')+
     '</div></details><div id="intervention" hidden></div>';
    panel.querySelectorAll('[data-clue]').forEach(button => { button.onclick = () => collect(button.dataset.clue); });
@@ -556,15 +608,20 @@ function renderClues(){
   panel.innerHTML = '<h3>'+room.name+'</h3><p>'+roomDescriptions[room.id]+'</p>'+
    '<div class="peca"><model-viewer loading="eager" reveal="auto" src="'+new URL(room.peca+'.glb', PECAS_URL).href+'" alt="Peça da sala '+esc(room.name)+'" ar ar-modes="webxr scene-viewer quick-look" ar-scale="auto" ar-placement="floor" camera-controls touch-action="pan-y" interaction-prompt="none" shadow-intensity="0.6" exposure="1.15" field-of-view="26deg" min-field-of-view="12deg" max-field-of-view="45deg">'+hotspots+'<button type="button" slot="ar-button" class="btn secondary ar-btn">Ver no ambiente</button></model-viewer></div>'+
    '<p class="dica">Gire a peça e toque nos pontos que brilham. As pistas ficam escondidas nela.</p>'+
-   '<details class="lista-pistas"><summary>Não consegue ver a peça? Use a lista</summary><div class="clue-list">'+
+   '<details class="lista-pistas"><summary>Examinar pela lista</summary><div class="clue-list">'+
    clues.map(clue => '<button type="button" class="clue" data-clue="'+clue.id+'"><span>'+esc(clue.name)+'</span><small></small></button>').join('')+
    '</div></details><div id="intervention" hidden></div>';
   panel.querySelectorAll('[data-clue]').forEach(button => { button.onclick = () => collect(button.dataset.clue); });
   panel.querySelectorAll('[data-hs]').forEach(hs => { hs.onclick = () => collect(hs.dataset.hs); });
+  const lista = panel.querySelector('.lista-pistas');
+  panel.insertBefore(lista, panel.querySelector('.peca'));
+  lista.open = !!manterLista;
   const mv = panel.querySelector('model-viewer');
   if (mv) {
    mv.addEventListener('load', () => pontosDaPeca(mv, clues));
-   setTimeout(() => { if (!customElements.get('model-viewer')) panel.querySelector('.lista-pistas').open = true; }, 8000);
+   const abrirLista = () => { if (lista.isConnected) lista.open = true; };
+   mv.addEventListener('error', abrirLista, {once:true});
+   setTimeout(() => { if (!mv.loaded) abrirLista(); }, 5000);
   }
  }
  const elapsed = state.duration-state.remaining;
@@ -587,6 +644,16 @@ function renderClues(){
  });
  if (room.livro) atualizarLivro(clues, elapsed);
  renderNoitePanel();
+ const reserva = lcReservaDaSala();
+ let lembrete = panel.querySelector('.loop-reserva');
+ if (reserva && !lembrete) {
+  lembrete = document.createElement('p');
+  lembrete.className = 'loop-reserva muted';
+  panel.querySelector('.lista-pistas').before(lembrete);
+ }
+ if (lembrete?.textContent !== reserva && lembrete) lembrete.textContent = reserva;
+ if (!reserva) lembrete?.remove();
+ lcRenderEncaminhamento(panel);
  renderIntervention(room.id, storySeconds);
 }
 // Livro folheável (museu/livro): cada pista vira uma página, escrita quando chega a hora dela; ao virar para a página, a pista é registrada.
@@ -727,24 +794,46 @@ function renderJournal(){
  $('hints').innerHTML=hs.slice(0,state.hints).map((x,i)=>'<p><strong>Orientação '+(i+1)+':</strong> '+esc(x)+'</p>').join('');$('getHint').disabled=state.hints>=3;
 }
 function tick(){if(window.coop){window.coop.tick();return}if(!state||state.phase!=='playing')return;const old=state.remaining;state.remaining=Math.max(0,(state.endAt-Date.now())/1000);$('timer').textContent=fmt(state.remaining);$('fictionTime').textContent=museumTime();if(Math.ceil(old)!==Math.ceil(state.remaining))renderClues();else if(state.loop===5 && state.room)renderIntervention(state.room,elapsedStoryTime(window.coop?.now() ?? Date.now()));if(state.remaining<=0)finishLoop()}
+function renderBetweenPlan(){
+ const novas = state.clues.filter(pista => pista.loop === state.loop).length;
+ $('betweenProgress').textContent = novas === 1 ? '1 pista registrada nesta volta.'
+  : novas ? novas + ' pistas registradas nesta volta.' : 'Nenhuma pista registrada nesta volta.';
+ $('betweenShare').classList.toggle('hidden', !window.coop || state.loop === 5);
+ if (state.caseRules !== 2) return;
+ const s = lcS();
+ const assunto = s.diag ? 'Com o diagnóstico anexado, confira as exigências do conserto em Máquina → Atividades.'
+  : 'Compare os sinais. Procure dois tipos de sinal e uma pista que ajude a descartar outro defeito.';
+ const instrucoes = {
+  1: 'Volta 2 · Teste uma hipótese. ' + assunto,
+  2: 'Volta 3 · Prepare a intervenção. Confira o que precisa ser feito em outra sala ou numa volta anterior, como gravar o eco ou encaminhar a peça-guia.',
+  3: 'Volta 4 · Ensaie a ação final. Se for jogar sozinho, esta é a última volta para gravar o eco ou encaminhar a peça-guia quando o conserto exigir.',
+  4: window.coop
+   ? 'Volta 5 · Combinem quem vai operar a Máquina e quem leva as três provas para a Recepção. Guardem a energia necessária antes de explorar.'
+   : 'Volta 5 · Escolha o objetivo que seu caderno permite concluir. Confira as provas, a sala e a energia antes de começar.',
+  5: 'Os ciclos terminaram. Confira o desfecho que a sua investigação alcançou.'
+ };
+ $('betweenHint').textContent = instrucoes[state.loop];
+}
 function renderBetween(){
  const finished = state.loop === 5;
- const interventionNext = hasLiveFinal() && state.loop === 4;
- $('betweenEyebrow').innerHTML = '<span></span> '+(finished && brokeLoop() ? 'O TEMPO SEGUIU' : 'O TEMPO RETORNOU');
+ const interrompeu = state.caseRules === 2 ? lcS().conserto === 5 : brokeLoop();
+ $('betweenEyebrow').innerHTML = '<span></span> '+(finished && interrompeu ? 'O TEMPO SEGUIU' : 'O TEMPO RETORNOU');
  $('betweenCount').textContent = state.clues.length;
  $('betweenLoop').textContent = state.loop+' / 5';
  $('betweenTitle').textContent = finished
-  ? (brokeLoop() ? 'O relógio passou das 22h.' : 'O museu retornou às 21h55.')
+  ? (interrompeu ? 'O relógio passou das 22h.' : 'O museu retornou às 21h55.')
   : 'Você se lembra.';
  $('betweenStory').textContent = finished
-  ? (brokeLoop() ? 'A cadeia do retorno foi interrompida. O museu permanece no presente.' : 'O museu voltou às 21h55. Use o que você descobriu para reconstruir a noite.')
+  ? (interrompeu ? 'A cadeia do retorno foi interrompida. O museu permanece no presente.' : 'O museu voltou às 21h55. Use o que você descobriu para reconstruir a noite.')
   : (state.caseRules === 2 ? ENTRE_VOLTAS[Math.min(state.loop,ENTRE_VOLTAS.length)-1] : ENTRE_VOLTAS[0]);
  $('betweenHint').textContent = finished ? (state.caseRules === 2 && state.clues.length < 3 ? 'Com poucas pistas? Ao apresentar a hipótese, você pode consultar trechos do arquivo de fechamento.' : 'Seu caderno está disponível para a conclusão.')
   : brokeLoop() ? 'Você já interrompeu o retorno. Continue investigando para entender o que aconteceu e ajudar a turma.'
   : state.loop >= 2 ? 'Quando achar o equipamento do retorno, você pode tentar intervir. É uma tentativa por volta, e agir mais cedo vale bônus. Se faltou uma pista, peça orientação no caderno.'
   : 'O próximo ambiente pode confirmar ou mudar sua hipótese.';
  $('nextLoop').textContent = finished ? 'Apresentar hipótese' : 'Escolher próximo ambiente';
+ if (finished && state.caseRules === 2) $('nextLoop').textContent = 'Ir para o desfecho';
  renderCombos();
+ renderBetweenPlan();
  show('between');
 }
 function finishLoop(){
@@ -951,6 +1040,12 @@ function supportControl(axis){
   '<option value="">Nenhuma pista</option>'+clues.map(c => '<option value="'+esc(c.id)+'">'+esc(c.name+' · '+c.room)+'</option>').join('')+'</select>';
 }
 function renderForm(){
+ const central = state.caseRules === 2;
+ $('reflectionForm').open = !central;
+ $('answerForm').querySelector('button[type=submit]').textContent = central ? 'Ver meu desfecho' : 'Apresentar conclusão';
+ $('final').querySelector('.large').textContent = central
+  ? 'Veja até onde sua investigação chegou. As perguntas de reflexão são opcionais.'
+  : 'Use as pistas do dossiê para reconstruir a noite.';
  $('answerFields').innerHTML = '<p class="certeza-note">Escolha o quanto você confia em cada resposta. Com mais certeza você ganha mais pontos se acertar, mas perde pontos se errar. Em Quem e Por quê, aponte a pista que sustenta a resposta: sem ela, vale como palpite.</p>'+
   ANSWER_AXES.map(axis => '<div class="answer-field"><label for="'+axis.key+'">'+esc(axis.question)+
   '</label><select id="'+axis.key+'">'+options(axis.options)+'</select>'+certezaControl(axis)+supportControl(axis)+'</div>').join('');
@@ -995,8 +1090,9 @@ function renderResult(){
      'O museu voltou às 21h55. '+path.instruction+' O equipamento '+path.code+' fica em '+roomNameOf(path.room)+'.')
   : 'Nesta partida, a ação foi avaliada como hipótese.';
  const caderno = registrarCaderno(score);
+ const central = state.caseRules === 2;
  const bonusCedo = hasLiveFinal() && brokeLoop() && state.intervencaoVolta ? Math.max(0,(5-state.intervencaoVolta)*3) : 0;
- $('resultBody').innerHTML = '<div class="result-card"><strong>Caderno do museu</strong><p>Você já visitou '+caderno.noites+' de '+CASES.length+' noites diferentes ('+caderno.partidas+(caderno.partidas===1?' partida':' partidas')+' neste aparelho). Melhor pontuação nesta noite: '+caderno.melhor+'.</p></div>'+(bonusCedo ? '<div class="result-card"><strong>Você agiu na volta '+state.intervencaoVolta+' · bônus de '+bonusCedo+' pontos</strong><p>Quanto mais cedo você interrompe o retorno, maior o bônus. Ele vem além dos 100 pontos.</p></div>' : '')+'<p class="large">Investigação: <strong>'+score+' de 100 pontos</strong>. Cada pergunta vale 10 ou 15 pontos; resposta próxima vale metade. Palpite acerta 60%, provável 80% e certeza 100%, mas errar com certeza tira 30%.</p>'+
+ const reflexao = '<p class="large">Investigação: <strong>'+score+' de 100 pontos</strong>. Cada pergunta vale 10 ou 15 pontos; resposta próxima vale metade. Palpite acerta 60%, provável 80% e certeza 100%, mas errar com certeza tira 30%.</p>'+
   ANSWER_AXES.map(axis => {
    const got = pointsFor(axis, answers[axis.key], answers);
    const cz = answers[axis.key] ? 'Seu grau de certeza: '+(CERTEZAS[answers[axis.key+'__c']]?.label ?? CERTEZAS[CERTEZA_PADRAO].label)+'.' : '';
@@ -1008,13 +1104,25 @@ function renderResult(){
    return '<div class="result-card"><strong>'+axis.title+' · '+got+' de '+axis.pts+'</strong><p>Sua resposta: '+
    esc(axis.options[answers[axis.key]] || 'Ainda não sei')+'<br>Resultado desta partida: '+esc(axis.options[truth(axis.key)])+
    (cz || sup ? '<br>'+cz+sup : '')+'</p></div>'; }).join('')+
-  '<div class="result-card"><strong>O que aconteceu</strong><p>'+esc(c.detail.charAt(0).toUpperCase()+c.detail.slice(1))+
+  (central ? '' : '<div class="result-card"><strong>O que aconteceu</strong><p>'+esc(c.detail.charAt(0).toUpperCase()+c.detail.slice(1))+
   '. '+esc(labels[c.alarm][1])+'</p><p>'+esc(figures[c.figure])+'</p></div>'+reconstruction+
-  '<div class="result-card"><strong>Desfecho</strong><p>'+esc(ending)+'</p></div>'+
+  '<div class="result-card"><strong>Desfecho</strong><p>'+esc(ending)+'</p></div>')+
   teoriaResultado(answers)+blocoT()+
   (VALORES[state.caseIndex] ? '<div class="result-card"><strong>Para conversar</strong><p>'+esc(VALORES[state.caseIndex])+'</p></div>' : '');
+ const historico = '<div class="result-card"><strong>Caderno do museu</strong><p>Você já visitou '+caderno.noites+' de '+CASES.length+' noites diferentes neste aparelho.</p></div>';
+ const bonus = bonusCedo ? '<div class="result-card"><strong>Você agiu na volta '+state.intervencaoVolta+' · bônus de '+bonusCedo+' pontos</strong><p>Quanto mais cedo você interrompe o retorno, maior o bônus.</p></div>' : '';
+ const respondeu = ANSWER_AXES.some(axis => answers[axis.key]);
+ $('resultBody').innerHTML = central ? lcResumoFinal() + historico +
+  (respondeu ? '<details class="loop-reflection"><summary>Rever a reflexão</summary>'+reflexao+'</details>' : '')
+  : historico + bonus + reflexao;
 }
 document.addEventListener('click',e=>{let id=e.target.dataset.close;if(id)$(id).close()});
+$('roomMapButton').onclick = () => {
+ const aberto = $('roomGrid').classList.toggle('hidden') === false;
+ $('roomMapButton').setAttribute('aria-expanded', String(aberto));
+ $('roomMapButton').textContent = aberto ? 'Fechar mapa' : 'Ver mapa';
+};
+$('betweenShare').onclick = () => lcAbrir('trocar');
 $('helpOpen').onclick=$('howButton').onclick=()=>popup('helpDialog');
 $('startButton').onclick=reset;$('nextLoop').onclick=next;$('endLoop').onclick=finishLoop;
 ['openJournal','openJournalSide','betweenJournal','finalJournal'].forEach(x=>$(x).onclick=()=>{renderJournal();popup('journalDialog')});

@@ -1,7 +1,7 @@
 // Loop (MOSAICO) · sala do Mestre.
 // Liga o jogo de ../game.js a uma sala do firebase-room.js (projeto mosaico-loop): o Mestre abre a sala e conduz as voltas;
 // cada participante escolhe o próprio ambiente, guarda o próprio dossiê e envia a própria conclusão.
-// game.js continua intacto: aqui só se monta o `window.coop` que ele já espera (storageKey, choose, decorate, move, now, tick, open).
+// Liga as fases do jogo e o envio dos resultados ao transporte da sala.
 // Estado da sala (documento mosaico/{código}): etapa, volta, caso, seg, iniEm, rodada. Do jogador: amb, ambVolta, resp, respEm.
 import { transporteReal, transporteFalso, ms } from './transporte.mjs';
 import { CASES, ROOMS } from './conteudo.js';
@@ -87,7 +87,10 @@ function desenhar(leve) {
     $('betweenEyebrow').innerHTML = '<span></span> O TEMPO RETORNOU';
     $('betweenTitle').textContent = room.volta === 5 ? 'Os ciclos terminaram.' : 'Você se lembra.';
     $('betweenStory').textContent = 'As portas voltaram a fechar. Os objetos estão onde estavam. Você conserva o que descobriu.';
-    $('betweenHint').textContent = 'Releia o seu dossiê. O Mestre abre a próxima volta quando a turma estiver pronta.';
+    $('nextLoop').textContent = room.volta === 5 ? 'Abrir desfecho' : 'Abrir próxima volta';
+    $('nextLoop').classList.toggle('hidden', !eMestre());
+    $('nextLoop').onclick = () => avancar(room.volta === 5 ? 'final' : 'choose');
+    renderBetweenPlan();
     show('between');
   } else if (e === 'final') {
     renderForm();
@@ -97,6 +100,9 @@ function desenhar(leve) {
   } else {
     state.answers = euJogador().resp || {};
     renderResult();
+    const coletivo = loopFinalTurma(players.filter(p => !p.mestre && !p.expulso).map(p => p.resp));
+    if (coletivo) $('resultBody').insertAdjacentHTML('afterbegin', '<div class="result-card"><p class="kicker">DESFECHO DA TURMA</p><h3>' +
+      esc(coletivo.final) + '</h3><p>' + esc(LOOP_FINAIS[coletivo.final]) + '</p></div>');
     $('resultBody').insertAdjacentHTML('beforeend', blocoTurma());
     show('result');
   }
@@ -105,24 +111,23 @@ function desenhar(leve) {
 function marcarEnvio() {
   const mandou = !!euJogador().resp || enviou;
   const b = $('answerForm').querySelector('button[type=submit]');
-  b.textContent = mandou ? 'Conclusão enviada' : 'Enviar minha conclusão';
+  b.textContent = mandou ? 'Desfecho registrado' : 'Registrar meu desfecho';
   b.disabled = mandou;
   for (const k of EIXOS) $(k).disabled = mandou;
   lockAnswerExtras(mandou);
   $('final').querySelector('.large').textContent = mandou
-    ? 'Conclusão enviada. Aguarde: o Mestre revela o resultado para toda a turma.'
-    : 'O que aconteceu? Use as pistas do dossiê e responda às 8 perguntas. Se não souber, deixe em aberto.';
+    ? 'Seu desfecho foi registrado. O Mestre abre o resultado da turma.'
+    : 'Registre seu desfecho para o telão. As perguntas de reflexão são opcionais.';
 }
 
 function blocoTurma() {
-  const com = players.filter((p) => p.resp);
+  const com = players.filter(p => !p.mestre && p.resp && EIXOS.some(k => p.resp[k]));
   if (!com.length) return '';
   const linhas = EIXOS.map((k) => {
     const certos = com.filter((p) => p.resp[k] === truth(k)).length;
     return `<p>${ROTULO_EIXO[k]}: <strong>${certos} de ${com.length}</strong> acertaram</p>`;
   }).join('');
-  const quebraram = com.filter((p) => p.resp.interv === 'break').length;
-  return `<div class="result-card"><strong>A turma</strong>${linhas}<p>Quebraram o loop: <strong>${quebraram} de ${com.length}</strong></p></div>`;
+  return `<details class="loop-reflection"><summary>Respostas da turma à reflexão</summary>${linhas}</details>`;
 }
 
 // ---------------------------------------------------------------- o que o jogo chama
@@ -136,8 +141,8 @@ function choose(id) {
 
 function decorate() {
   const escolhendo = room.etapa === 'choose', jogando = room.etapa === 'playing';
-  $('boardTitle').textContent = state.room ? 'Ambiente escolhido' : 'Escolha um ambiente';
-  $('phaseDescription').textContent = escolhendo ? 'Escolha onde investigar. O Mestre inicia o relógio.' : 'Todos investigam no mesmo intervalo, cada um por conta própria.';
+  $('phaseDescription').textContent = escolhendo ? 'Escolha onde investigar. O Mestre inicia o relógio.' :
+    state.room ? 'Examine a peça ou use a lista de pistas.' : 'O relógio começou. Escolha onde investigar.';
   $('statusText').textContent = state.room ? 'Você permanece neste ambiente até o retorno.' : 'Escolha um ambiente para investigar nesta volta.';
   $('roomPanel').classList.toggle('hidden', !jogando || !state.room);
   for (const b of $('roomGrid').querySelectorAll('button')) b.disabled = !!state.room;
@@ -148,6 +153,7 @@ function tick() {
   const antes = state.remaining;
   state.remaining = restante();
   $('timer').textContent = fmt(state.remaining);
+  $('fictionTime').textContent = museumTime();
   if (state.room && Math.ceil(antes) !== Math.ceil(state.remaining)) renderClues();
   const fim = fimDaVolta();
   if (eMestre() && !movendo && fim != null && T.agora() >= fim + 1250) avancar('between');
@@ -157,9 +163,9 @@ function tick() {
 async function move(fase, respostas) {
   if (fase !== 'result' || !respostas) return;
   enviou = true; marcarEnvio();
-  // Junto com as respostas segue o que a pessoa fez na última volta: quebrou o loop, tentou e errou, ou não agiu.
-  const interv = state.intervention === 'break' ? 'break' : state.intervention ? 'other' : 'none';
-  const ok = await T.atualizarEu({ resp: { ...respostas, interv }, respEm: Date.now() });
+  const loopFinal = lcFinal();
+  const interv = lcS().conserto === 5 ? 'break' : state.intervention ? 'other' : 'none';
+  const ok = await T.atualizarEu({ resp: { ...respostas, interv, loopFinal }, respEm: Date.now() });
   if (!ok) { enviou = false; marcarEnvio(); toast('Não consegui enviar. Tente de novo.'); }
 }
 
@@ -192,26 +198,29 @@ function poderes(cls = '') {
 function barra() {
   const el = document.getElementById('mestreBar');
   if (!el || !eMestre() || !room) { if (el) el.classList.add('hidden'); return; }
-  const total = Math.max(players.filter((p) => !p.mestre).length, 1);
-  const noAmb = players.filter((p) => p.amb && p.ambVolta === room.volta).length;
-  const mandaram = players.filter((p) => p.resp).length;
-  const mm = (s) => String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(Math.ceil(s % 60)).padStart(2, '0');
+  const turma = players.filter(p => !p.mestre && !p.expulso);
+  const esperando = turma.filter(p => !p.amb || p.ambVolta !== room.volta);
+  const total = turma.length;
+  const noAmb = total - esperando.length;
+  const mandaram = turma.filter(p => p.resp).length;
   const e = room.etapa, v = room.volta;
   const btn = (id, rot, cls = 'primary') => `<button class="btn ${cls}" id="${id}" type="button" ${movendo ? 'disabled' : ''}>${rot}</button>`;
   let info = '', acao = '';
   if (room.aulaEncerrada) info = 'Aula encerrada para todos. Os dados ficam guardados.';
   else if (!ETAPAS.includes(e)) info = `Sala aberta · ${players.filter((p) => !p.mestre).length} na sala`;
   else if (e === 'choose') { info = `Volta ${v} de 5 · ${noAmb} de ${total} escolheram ambiente`; acao = btn('mbIniciar', 'Iniciar relógio da volta'); }
-  else if (e === 'playing') { info = `Volta ${v} de 5 em andamento · ${mm(restante())}`; acao = room.seg === 30 ? btn('mbEncerrar', 'Encerrar volta', 'secondary') : ''; }
+  else if (e === 'playing') { info = `Volta ${v} de 5 em andamento · ${fmt(restante())}`; acao = room.seg === 30 ? btn('mbEncerrar', 'Encerrar volta', 'secondary') : ''; }
   else if (e === 'between') { info = `Volta ${v} de 5 concluída`; acao = v < 5 ? btn('mbProxima', 'Abrir próxima volta') : btn('mbFinal', 'Abrir conclusão'); }
   else if (e === 'final') { info = `${mandaram} de ${total} enviaram a conclusão`; acao = btn('mbRevelar', 'Revelar resultados'); }
   else { info = `Resultado revelado · ${mandaram} de ${total} participaram`; acao = btn('mbNova', 'Nova partida'); }
   if (room.aulaEncerrada) acao = '';
   el.classList.remove('hidden');
-  const sinal = `${e}|${v}|${noAmb}|${mandaram}|${total}|${movendo}|${e === 'playing' ? Math.ceil(restante()) : ''}|${entradaLiberada()}|${!!room.aulaEncerrada}`;
+  const aguardando = e === 'choose' && esperando.length
+    ? '<span class="mb-wait">No saguão: ' + esperando.map(p => hh(p.nome || 'Participante')).join(', ') + '</span>' : '';
+  const sinal = `${e}|${v}|${noAmb}|${mandaram}|${total}|${movendo}|${e === 'playing' ? Math.ceil(restante()) : ''}|${entradaLiberada()}|${!!room.aulaEncerrada}|${aguardando}`;
   if (el.dataset.sinal === sinal) return;
   el.dataset.sinal = sinal;
-  el.innerHTML = `<span class="mb-rot">MESTRE</span><span class="mb-info" role="status">${info}</span>${acao}<span class="mb-poderes">${poderes()}</span>`;
+  el.innerHTML = `<span class="mb-rot">MESTRE</span><span class="mb-info" role="status">${info}</span>${acao}<span class="mb-poderes">${poderes()}</span>${aguardando}`;
   const liga = (id, para) => { const b = document.getElementById(id); if (b) b.onclick = () => avancar(para); };
   liga('mbIniciar', 'playing'); liga('mbEncerrar', 'between'); liga('mbProxima', 'choose'); liga('mbFinal', 'final'); liga('mbRevelar', 'result'); liga('mbNova', 'nova');
 }
@@ -221,8 +230,16 @@ function desenharTurma() {
   const d = document.getElementById('turmaDialog');
   if (!d || !d.open) return;
   const gente = players.filter((p) => !p.mestre);
+  const papeis = {prototipo:'Máquina', recepcao:'Revelação', seguranca:'Monitoramento'};
+  const posicao = p => {
+    if (!['choose','playing'].includes(room.etapa)) return '';
+    if (!p.amb || p.ambVolta !== room.volta) return ' · no saguão';
+    const papel = room.volta === 5 && papeis[p.amb];
+    const local = ROOMS.some(r => r.id === p.amb) ? sala(p.amb).name : p.amb;
+    return ' · ' + local + (papel ? ' (' + papel + ')' : '');
+  };
   d.innerHTML = `<p class="kicker">TURMA</p><h2>${gente.length} na sala</h2>
-    <ul class="turma-lista">${gente.map((p) => `<li class="${p.expulso ? 'fora' : ''}"><span>${hh(p.nome || 'Participante')}${p.expulso ? ' · fora da sala' : ''}</span>
+    <ul class="turma-lista">${gente.map((p) => `<li class="${p.expulso ? 'fora' : ''}"><span>${hh(p.nome || 'Participante')}${p.expulso ? ' · fora da sala' : hh(posicao(p))}</span>
       <button class="btn ${p.expulso ? 'secondary' : 'danger'} sm" data-exp="${hh(p.id)}" data-val="${p.expulso ? 0 : 1}" type="button">${p.expulso ? 'Readmitir' : 'Expulsar'}</button></li>`).join('') || '<li><span>Ninguém entrou ainda.</span></li>'}</ul>
     <button class="btn primary" data-fechar type="button">Fechar</button>`;
 }
