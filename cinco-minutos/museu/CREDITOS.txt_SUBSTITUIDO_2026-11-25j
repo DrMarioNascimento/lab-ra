@@ -1,0 +1,75 @@
+MUSEU EM 3D - CRÉDITOS E LICENÇAS
+
+Maquete derivada dos dados de arquitetura do projeto ThreeMuseum.
+Origem: https://github.com/SamG-Coder/ThreeMuseum
+Revisão: f247052675d80ff0188709cab5facb4035bfaa49
+Copyright (c) 2026 ThreeMuseum contributors.
+Inclui elementos de exposição originais identificados como D05, D06, B10, B11,
+B12, B13 e B16 do mesmo projeto; todos tratados no projeto de origem como MIT.
+Modificações (versão 2026-11-21): acabamentos de maquete (cores por andar, jardim, árvores, marquise), arquivo USDZ para RA no iPhone (gerar-usdz.py). Modificações anteriores: conversão dos registros arquitetônicos em GLB, remoção dos tetos,
+agrupamento das peças arquitetônicas por material, escala de maquete e inclusão
+de sete objetos em suas posições. Texturas procedurais, textos, iluminação e
+outros objetos do acervo original não foram reproduzidos integralmente.
+
+MIT License
+
+Copyright (c) 2026 ThreeMuseum contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+PEÇAS DAS SALAS (pasta pecas/)
+Os 30 modelos de exposição do ThreeMuseum (D01-D09, B01-B16, F02, L01, L02, C01) são MIT (Copyright (c) 2026 ThreeMuseum contributors).
+F01 (Triceratops): Smithsonian Institution, CC0 1.0 (https://3d.si.edu/object/3d/triceratops-horridus-marsh-1889:d8c623be-4ebc-11ea-b77f-2e728ce88125).
+Modificações: simplificação da malha e compressão (Draco e WebP) com glTF-Transform, para carregar no celular. Reconstruções interpretativas, sem valor de escala científica.
+
+
+PEÇAS VARIADAS (desde 20/11/2026) - Khronos glTF-Sample-Assets (https://github.com/KhronosGroup/glTF-Sample-Assets)
+N01 Xícara (DiffuseTransmissionTeacup), N05 Câmera antiga (AntiqueCamera, UX3D), N07 Rádio (BoomBox), N08 Garrafa (WaterBottle), N09 Carrinho (ToyCar), N10 Lanterna (Lantern, Microsoft), N12 Peixe (BarramundiFish), N13 Crânio (ScatteringSkull): CC0 1.0.
+N02 Cadeira (ChairDamaskPurplegold, Wayfair), N04 Capacete (DamagedHelmet, ctxwing), N06 Porta-velas de vidro (GlassHurricaneCandleHolder, Wayfair), N11 Mosquito no âmbar (MosquitoInAmber, Loïc Norgeot e Geoffrey Marchal), N14 Caminhão de leite (CesiumMilkTruck, Cesium), N15 Xadrez (ABeautifulGame, ASWF/MaterialX): CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/).
+N03 Relógio (ChronographWatch): baseado em "Chronograph Watch Mudmaster" de graphiccompressor (Sketchfab), CC BY 4.0.
+Modificações: simplificação da malha e compressão (Draco e WebP) com glTF-Transform. As peças D03, D04, D05, D06, D07, B03, B06, B08, B10, B11, B12, B13, B14, B15 e B16 do ThreeMuseum foram trocadas por estas e guardadas em pecas/_SUBSTITUIDO_2026-11-20/.
+
+
+PEÇAS GERADAS NO MESHY AI (22/11/2026) - geradas pelo autor do projeto no Meshy AI (https://www.meshy.ai). A licença de uso depende do plano do autor no Meshy; conferir antes de redistribuir fora do Loop.
+L03 Esfregão com balde (a mop with bucket), M01 Caixa de ferramentas antiga (Vintage Toolbox), S01 Central de monitoramento (Command Control Center).
+Modificações: junção de vértices, simplificação da malha, textura reduzida a 1024 px e compressão (Draco e WebP) com glTF-Transform. As peças N08 (Garrafa), N10 (Lanterna) e B07 deixaram de ser usadas no Loop e continuam na pasta pecas.
+
+PEÇAS EXTRAS DO MESHY AI (22/11/2026) - versões B e C de salas, geradas pelo autor do projeto; mesma observação de licença acima.
+L04 Ferramentas de limpeza, L05 Produtos de limpeza coloridos, M02 Baú de ferramentas de madeira, M03 Armário de ferramentas, N16 Rádio comunicador, L06 Bancada de projetos (Blueprint Workshop), L07 Conjunto de ferramentas de teste (Futuristic Toolset). Mesmas modificações das peças anteriores.
+
+PEÇAS DO ACERVO DO AUTOR (22/11/2026) - modelos já criados pelo autor para outros jogos do LAB-RA (O Eco do Amanhã e Casa da Costa), reaproveitados aqui como versões B e C de salas.
+R01 Relógio de custódia, R02 Relógio de caixa alta, E01 Quadro elétrico, I01 Fichário, P01 Mesa de recepção, P02 Mesa com notebook, M04 Gaveteiro, C02 Cortiça e alavancas, S02 Escrivaninha com monitor, F03 Farol. Também entram N10 (Lanterna) e B07 (inseto sob vidro), que já estavam na pasta.
+Modificações: junção de vértices, simplificação da malha, textura a 1024 px e compressão (Draco e WebP) com glTF-Transform.
+S03 Sala de imprensa com telas e E02 Central de energia do subsolo (prédio VestChip, de O Eco do Amanhã), modelos do autor; mesmas modificações.
+
+LIVRO FOLHEÁVEL (museu/livro, 22/11/2026) - cópia do livro do farol de O Impostor (Casa da Costa), do autor do projeto, adaptada para o Loop (modo solo, capa e páginas vindas do jogo). Usa three.js (MIT) e, na RA do iPhone, o 8th Wall Engine (© 2026 Niantic Spatial, Inc.) sob a XR Engine License (https://github.com/8thwall/engine/blob/main/LICENSE), fornecido sem garantias.
+T01 Máquina do tempo (protótipo 3D do autor do projeto, comprimida de 19 MB para 0,9 MB; malha simplificada, textura a 1024 px, Draco e WebP).
+
+PEÇAS NOVAS (22/11/2026) - coleção do autor do projeto, geradas por ele e depois comprimidas (malha simplificada, textura a 1024 px, Draco e WebP, com glTF-Transform). V01 a V52: crânio de mamute, costelas gigantes, mandíbula de tubarão, bicicleta de roda alta, carroça, bule, jarro azul, xadrez, dados, crânio de primata, máscara de pedra, cômoda, vitrine, escultura, refletor, microfone, planador, esqueleto de pássaro, amonite, trilobita, capacete, escudo, câmera, projetor, motor a vapor, garrafa soprada, lustre, concha, esqueleto de baleia, sofá, gramofone, cavalinho, pião, âmbar e inseto em âmbar.
+
+MAQUETE (22/11/2026): museu-andares.glb agora leva a peça 3D (versão A) de cada sala, posta por pecas-na-maquete.mjs (gltf-transform; textura a 512 px e Draco). As peças são as de museu/pecas e seguem os créditos acima. O museu-andares.usdz (RA do iPhone) continua só com a arquitetura.
+
+MAQUETE-TORRE (22/11/2026) - cópias próprias, sem compartilhar arquivo com outros jogos:
+ - Fachada: agência 0688 (prédio preto de A Manhã do Carro-Forte), empilhada em 5 andares.
+ - Segredos da noite no térreo: cofre (rec-cofre-balanca) e caixa de luz (rec-quadro-eletrico), de O Eco do Amanhã.
+ - Sala de cera: bonecos do Dilema do Bonde (cópias independentes).
+
+T02 (Carro de viagem no tempo): modelo 3D criado pelo professor no MeshAI a partir de descrição em texto (delorean_time_machine.glb, 182 MB), reduzido para 1,3 MB com museu/tempo/reduzir-glb.mjs. A primeira cabine feita por código ficou guardada em museu/tempo/.
+VEI_A/VEI_B/VEI_C: composições próprias (veículo principal + bicicleta de roda alta V04), geradas por museu/pecas-compostas.mjs a partir das peças N14, V05, V27 e V04.

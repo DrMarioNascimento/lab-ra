@@ -76,7 +76,22 @@ Prompt para versão 3D de melhor qualidade: "Cabine de viagem no tempo steampunk
 
 ## Loop — modelos 3D a obter (25/11/2026, da avaliação pelas escalas)
 
-Situação depois da rodada 6 das escalas (revisão 7, 25/11/2026): igual à da revisão 6. Continuam 7 aprovadas e 8 reprovadas, e as 8 reprovadas têm pedido com prompt (1, 2, 3, 4, 5, 7, 8 e 9); nenhum GLB foi trocado, recomprimido nem inventado. O que mudou foi só código: no "Ver o museu em 3D", a câmera agora centra a peça de cada sala acima do cartão, nas 15 salas, e a peça da maquete antiga que sobrava no Subsolo saiu.
+**Situação depois do lote 7 (revisão 8, 25/11/2026): nenhum pedido pendente.** O autor entregou os 8 modelos pedidos (1, 2, 3, 4, 5, 7, 8 e 9), gerados por ele em 25/11/2026. Todos entraram no jogo, comprimidos (meta 600 KB; até 800 KB quando a de 5% estragava detalhe), com tamanho real em metros para a RA (`museu/escala-real.mjs`). Os modelos antigos ficam no acervo. Só o pedido 6 (roleta da Recepção) continua, e é opcional. A Parte B das escalas precisa ser avaliada de novo com as peças novas.
+
+| Sala | Peça nova | Peso | Compressão | Tamanho real |
+|---|---|---|---|---|
+| Pátio · Quadro externo | Q01 | 587 KB | 5% dos triângulos | 2,3 m de altura |
+| Sala das coleções | D10 | 575 KB | 3,8% | 2,1 m |
+| Base da limpeza | L08 | 635 KB | 3% (a de 5% passava de 850 KB) | 1,6 m |
+| Sala da fotografia | N18 | 294 KB | 5% | canto de 3,2 m |
+| Sala dos sons | N17 | 326 KB | 5% | mesa de 1,9 m |
+| Área de descanso | DESC_B | 265 KB | 5% | canto de 3,3 m |
+| Sala dos relógios | REL_B | 617 KB | 5% | parede de 3,6 m |
+| Galeria especial | GAL_B (base GAL_B_base 241 KB + máscara V11) | 722 KB | 5% na base | base de ~1 m, máscara de 0,6 m |
+
+Também corrigido: o tamanho real das peças N07 (era 2 cm), N05 (era 7,2 m) e E02 (era 15 m; a peça é a sala inteira e entra na RA como maquete de 1,5 m).
+
+Histórico: Situação depois da rodada 6 das escalas (revisão 7, 25/11/2026): igual à da revisão 6. Continuam 7 aprovadas e 8 reprovadas, e as 8 reprovadas têm pedido com prompt (1, 2, 3, 4, 5, 7, 8 e 9); nenhum GLB foi trocado, recomprimido nem inventado. O que mudou foi só código: no "Ver o museu em 3D", a câmera agora centra a peça de cada sala acima do cartão, nas 15 salas, e a peça da maquete antiga que sobrava no Subsolo saiu.
 
 Situação depois da rodada 5 das escalas (revisão 6, 25/11/2026): as mesmas 7 aprovadas e 8 reprovadas; nenhum modelo foi trocado nem inventado. Antes de pedir, o acervo do LAB-RA foi conferido de novo (97 peças em `museu/pecas`; 342 modelos no repositório, em `biblioteca/`, `angulos/`, `angulos-licenciatura/` e `dilema-bonde-3d/`): não há porta de serviço, cafeteira, vitrine com base nem parede de relógios.
 

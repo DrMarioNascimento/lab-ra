@@ -1,0 +1,36 @@
+<!doctype html><meta charset="utf-8"><title>Gerar os pontos das peças (uso interno)</title>
+<p>Uso interno. Acha, em cada peça, lugares fixos na superfície para os pontos que brilham (os do jogo ficam em LOOP_PONTOS, em game.js). No console: <code>await pontos('Q01')</code>.</p>
+<script type="importmap">{"imports":{"three":"./sala3d/vendor/three.module.min.js","three/addons/":"./sala3d/vendor/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+const draco = new DRACOLoader(); draco.setDecoderPath('./sala3d/vendor/draco/');
+const L = new GLTFLoader(); L.setDRACOLoader(draco);
+const rng = s => () => { s = (s + 0x6D2B79F5) >>> 0; let t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+// pontos(id, n): n lugares na superfície da peça, vistos de frente e dos lados (nunca de trás nem de baixo), bem espalhados.
+// Cada lugar sai como [x, y, z, nx, ny, nz]: posição em fração da caixa da peça (centro = 0; -0.5 a 0.5) e a direção para onde a superfície olha.
+window.pontos = (id, n = 32, raios = 1400) => new Promise((ok, erro) => L.load('./pecas/' + id + '.glb', g => {
+  const o = g.scene; o.updateMatrixWorld(true);
+  const b = new THREE.Box3().setFromObject(o), c = b.getCenter(new THREE.Vector3()), t = b.getSize(new THREE.Vector3()), R = t.length();
+  const malhas = []; o.traverse(m => { if (m.isMesh) { m.material.side = THREE.DoubleSide; malhas.push(m); } });
+  const rnd = rng([...id].reduce((a, ch) => a * 31 + ch.charCodeAt(0) >>> 0, 7)), rc = new THREE.Raycaster(), hits = [], nm = new THREE.Matrix3();
+  for (let i = 0; i < raios; i++) {
+    const az = (rnd() * 150 - 75) * Math.PI / 180, el = (4 + rnd() * 38) * Math.PI / 180;
+    const dir = new THREE.Vector3(Math.cos(el) * Math.sin(az), Math.sin(el), Math.cos(el) * Math.cos(az));
+    const alvo = new THREE.Vector3(c.x + (rnd() - .5) * t.x * .92, c.y + (rnd() - .5) * t.y * .92, c.z + (rnd() - .5) * t.z * .92);
+    rc.set(alvo.clone().addScaledVector(dir, R * 2), dir.clone().negate());
+    const h = rc.intersectObjects(malhas, false)[0]; if (!h || !h.face) continue;
+    const nw = h.face.normal.clone().applyMatrix3(nm.getNormalMatrix(h.object.matrixWorld)).normalize(); if (nw.dot(dir) < 0) nw.negate();
+    if (h.point.y < b.min.y + t.y * .06 || nw.y < -.3 || nw.z < -.2) continue;   // fora: o piso da cena, o que olha para baixo e o que olha para trás
+    hits.push({ p: new THREE.Vector3((h.point.x - c.x) / t.x, (h.point.y - c.y) / t.y, (h.point.z - c.z) / t.z), n: nw });
+  }
+  if (hits.length < n) return erro('poucos pontos: ' + hits.length);
+  const meio = hits.reduce((a, h) => a.add(h.p), new THREE.Vector3()).multiplyScalar(1 / hits.length);
+  const esc = [hits.reduce((a, h) => h.p.distanceTo(meio) < a.p.distanceTo(meio) ? h : a)], dist = hits.map(h => h.p.distanceTo(esc[0].p));
+  while (esc.length < n) { let k = 0; for (let i = 1; i < hits.length; i++) if (dist[i] > dist[k]) k = i; esc.push(hits[k]); hits.forEach((h, i) => { dist[i] = Math.min(dist[i], h.p.distanceTo(hits[k].p)); }); }
+  const f = v => +v.toFixed(3);
+  ok(esc.map(h => [f(h.p.x), f(h.p.y), f(h.p.z), f(h.n.x), f(h.n.y), f(h.n.z)]));
+}, undefined, erro));
+window.pronto = true;
+</script>

@@ -306,5 +306,56 @@
    "altura_m": 1.39,
    "base_m": 0.15
   }
+ },
+ "tamanho_real_ra": {
+  "nota": "Tamanho real das peças das salas do Mosaico Loop para o \"Ver no ambiente\" (RA). maior_m = maior medida da peça, em metros; giro_y_graus = giro para a frente da cena ficar de frente. Quem aplica no GLB é museu/escala-real.mjs (nó \"escala_real\"; pode rodar de novo). GAL_B é montada por pecas-compostas.mjs (base GAL_B_base + máscara V11) e já sai em metros.",
+  "pecas": {
+   "Q01": {
+    "maior_m": 2.3,
+    "real": "pilar de tijolo com quadro de energia e para-raios, ~2,3 m de altura"
+   },
+   "D10": {
+    "maior_m": 2.1,
+    "real": "estante de aço com caixas, ~2,1 m de altura"
+   },
+   "L08": {
+    "maior_m": 1.6,
+    "real": "carrinho de limpeza com balde e esfregão, ~1,6 m de largura"
+   },
+   "N18": {
+    "maior_m": 3.2,
+    "giro_y_graus": 45,
+    "real": "canto de sala com câmera de fole no tripé (~1,5 m), parede de ~2,4 m"
+   },
+   "N17": {
+    "maior_m": 1.9,
+    "real": "mesa com gravador de rolo e rádio de válvulas, ~1,6 m de largura"
+   },
+   "DESC_B": {
+    "maior_m": 3.3,
+    "giro_y_graus": 40,
+    "real": "canto com porta de serviço (~2,1 m), mural e cafeteira, parede de ~2,5 m"
+   },
+   "REL_B": {
+    "maior_m": 3.6,
+    "real": "parede de relógios com relógio de caixa alta (~1,9 m)"
+   },
+   "GAL_B_base": {
+    "maior_m": 2.3,
+    "real": "base de madeira (~1,0 m de altura) com a redoma de vidro ao lado e parede com quadro"
+   },
+   "N07": {
+    "maior_m": 0.5,
+    "real": "rádio de ~0,5 m"
+   },
+   "N05": {
+    "maior_m": 1.5,
+    "real": "câmera com tripé, ~1,5 m de altura"
+   },
+   "E02": {
+    "maior_m": 1.5,
+    "real": "sala inteira da oficina (15 m de lado): na RA entra como maquete de mesa, 1:10"
+   }
+  }
  }
 }

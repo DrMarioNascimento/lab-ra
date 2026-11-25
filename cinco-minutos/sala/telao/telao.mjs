@@ -96,7 +96,7 @@ function pgMapa() {
   const esperando = gente().filter((p) => !naSala(p)).length;
   const tile = (cls, img, nome, andar, n) => `<div class="tl-sala ${cls} ${n ? 'cheia' : 'vazia'}">${n ? `<em>${n}</em>` : ''}${img}<b lang="pt-BR">${esc(nome)}</b><small>${esc(andar)}</small></div>`;
   return `<div class="tl-card tl-pg-mapa"><div class="tl-mapa">` +
-    tile('inicio', '<span class="ic3d" aria-hidden="true">🚪</span>', INICIO.name, INICIO.andar + ' · início', esperando) +
+    tile('inicio', `<img src="${ICONE('ui/saguao')}" alt="">`, INICIO.name, INICIO.andar + ' · início', esperando) +
     salasOrdenadas().map((r) => tile('an' + Math.max(0, ANDARES.indexOf(r.andar)), `<img src="${ICONE(r.peca)}" alt="">`, r.nome, r.andar, cont[r.id] || 0)).join('') + `</div></div>`;
 }
 function pgRelogio() {

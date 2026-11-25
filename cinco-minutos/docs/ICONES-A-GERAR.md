@@ -17,6 +17,21 @@ Regra do projeto: ícone só em render 3D, próprio do Loop. Onde existe objeto 
 - Ícone já trocado por miniatura: é só salvar o arquivo novo por cima, com o mesmo nome. Nenhum código muda.
 - Lista B (emoji em ficha): salvar o arquivo e trocar o emoji pelo nome indicado na coluna "Troca no código". Em `loop-central.js` a ficha aceita `'img:ui/<nome>'` no lugar do emoji; em `game.js` e `telao.mjs` basta pôr `<img src=".../ui/<nome>.webp">` dentro da ficha `.ic3d`.
 
+## Situação em 25/11/2026 (revisão 8): nenhum provisório
+
+Os 6 ícones da lista B foram gerados pelo autor e entraram em `museu/icones/ui/` (256 px, fundo transparente). Não há mais emoji provisório nas telas do Loop.
+
+| Ícone | Onde entrou |
+|---|---|
+| `saguao.webp` | Cartão do Saguão no mapa do celular (`game.js`) e do telão (`telao.mjs`) |
+| `manual.webp` | Etiqueta MANUAL no dossiê e no caderno (`loop-central.js`, `lcEtqIcone`) |
+| `uma-tentativa.webp` | Aba Revelar, "Uma tentativa na noite inteira" |
+| `missao.webp` | Cartão "Sua missão secreta" |
+| `energia.webp` | Linha de energia da sala, ficha Energia da Máquina, "1 de energia" das Atividades, instrução "Guarde energia", preparação; também o ⚡ pequeno ao lado do número (lista, faixas do gravador), em 18 px |
+| `fato-falta.webp` | Telão, "A noite": fato que ninguém achou e ficha "N fatos ficaram no escuro" |
+
+As 8 salas com peça nova ganharam miniatura nova (`Q01`, `D10`, `L08`, `N18`, `N17`, `DESC_B`, `REL_B`, `GAL_B`), feita em `gerar.html`. A lista B, abaixo, fica como histórico.
+
 ## Situação em 25/11/2026 (revisão 7)
 
 Revisão 7: nada mudou nesta lista. Os 6 provisórios da lista B continuam (a rodada 6 confirma que, trocados por render 3D bom, o critério de ícones passa). As páginas ganharam ícone de aba com a miniatura `T01`, que já existia (sem arte nova).
@@ -67,7 +82,7 @@ Se quiser ícones desenhados no estilo latão e esmalte no lugar dessas miniatur
 
 ## Apoios pequenos que continuam como emoji (permitido pelo padrão)
 
-Ao lado de texto, sem papel de ícone principal: 🔒 no botão "Conduzir como professor", ⚡ depois do número de energia, ✓ nos selos "no caderno" e "feito".
+Ao lado de texto, sem papel de ícone principal: 🔒 no botão "Conduzir como professor" e na tranca, ✓ nos selos "no caderno" e "feito". (O ⚡ virou a miniatura da energia na revisão 8.)
 
 ## Miniaturas de peça com novo enquadramento (feito na revisão 4)
 

@@ -73,3 +73,9 @@ MAQUETE-TORRE (22/11/2026) - cópias próprias, sem compartilhar arquivo com out
 
 T02 (Carro de viagem no tempo): modelo 3D criado pelo professor no MeshAI a partir de descrição em texto (delorean_time_machine.glb, 182 MB), reduzido para 1,3 MB com museu/tempo/reduzir-glb.mjs. A primeira cabine feita por código ficou guardada em museu/tempo/.
 VEI_A/VEI_B/VEI_C: composições próprias (veículo principal + bicicleta de roda alta V04), geradas por museu/pecas-compostas.mjs a partir das peças N14, V05, V27 e V04.
+
+PEÇAS DO LOOP GERADAS PELO AUTOR (25/11/2026) - modelos 3D feitos pelo autor do projeto para as salas do Mosaico Loop, por pedido com prompt (docs/PECAS-A-CONSEGUIR.md):
+Q01 Quadro externo com para-raios, D10 Estante de depósito com caixas, L08 Carrinho de limpeza, N18 Laboratório fotográfico, N17 Bancada de som com gravador, DESC_B Porta de serviço com cafeteira e mural, REL_B Parede de relógios, GAL_B_base Base de madeira com vitrine vazia.
+Modificações: junção de vértices, simplificação da malha, normais recalculadas, textura a 1024 px e compressão (Draco e WebP) com glTF-Transform; tamanho real em metros gravado por museu/escala-real.mjs.
+GAL_B: composição própria (GAL_B_base + máscara de pedra V11 em cima da base), gerada por museu/pecas-compostas.mjs.
+ÍCONES DA INTERFACE (25/11/2026) - museu/icones/ui/saguao, manual, uma-tentativa, missao, energia e fato-falta: renders 3D gerados pelo autor do projeto para o Loop.

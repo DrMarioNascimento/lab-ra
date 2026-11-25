@@ -1,5 +1,5 @@
 {
- "versao": "v4 revisão 7 (25/11/2026)",
+ "versao": "v4 revisão 8 (25/11/2026)",
  "noite": "v4",
  "causa_sorteada": "B_potencia",
  "causas_possiveis": [
@@ -2260,7 +2260,7 @@
    "textoPorSintoma": {
     "sint_carga": "Você conta da carga baixa. Ela responde: \"Carga baixa pode ser duas coisas. Não me pergunta qual: me diz como estão as luzes do museu e a luz da peça.\"",
     "sint_luz": "Você conta da luz fraca. Ela responde: \"Luz caindo a cada tentativa? Ou tem coisa puxando, ou tem coisa faltando. Vai até a caixa de fusíveis e me conta o que tem lá.\"",
-    "sint_pisca": "Você conta dos mostradores piscando. Ela responde: \"Sem ritmo? Ou ela perdeu os números, ou perdeu um pedaço. Olha a caixa de fusíveis. Depois me liga.\"",
+    "sint_pisca": "Você conta dos mostradores piscando. Ela responde: \"Sem ritmo? Do jeito que eu deixei, eles não piscam. Então ela não sabe onde está. Olha a caixa de fusíveis. Depois me liga.\"",
     "sint_relogios": "Você conta dos relógios tremendo. Ela responde: \"Relógio tremendo é ela perdida no tempo. Por quê, eu não sei daqui. Como está a luz da peça?\"",
     "sint_ancora": "Você conta da base apitando e piscando amarelo. Ela responde: \"Amarelo é ela procurando 300 anos. O que ela achou aí em cima, quem tem olho é você. Como está a peça?\"",
     "sint_fusivel": "Você conta do lacre cortado. Ela responde: \"Lacre cortado e fusível fora? Isso não quebra sozinho. Quem tirou, e por quê? Descobre antes de religar.\""
@@ -2278,7 +2278,7 @@
       "sint_luz"
      ]
     ],
-    "texto": "Ela para um segundo: \"Espera. Um aviso de número E um aviso de força? Pode ser um defeito só, ou dois. Procura uma leitura normal: isso separa uma coisa da outra.\""
+    "texto": "Ela para um segundo: \"Espera. Um aviso de número E um aviso de força? Pode ser um defeito só, ou dois. Procura uma parte que esteja bem: isso separa uma coisa da outra.\""
    },
    "etiqueta": "MANUAL"
   },
@@ -2495,7 +2495,7 @@
   {
    "id": "man_pot_1",
    "sala": "atelie",
-   "texto": "Manual, página 3: \"A Câmara puxa só do gerador, nunca da rede do museu. Sem força, só um pico forte resolve. A linha do para-raios desce pelo Quadro externo do pátio até a Câmara, no Subsolo.\"",
+   "texto": "Manual, página 3: \"A Câmara puxa só do gerador, nunca da rede do museu. No mesmo gerador ficam as luzes de serviço das salas. Sem força, só um pico forte resolve. A linha do para-raios desce pelo Quadro externo do pátio até a Câmara, no Subsolo.\"",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -5204,7 +5204,7 @@
   {
    "id": "aurelio_1",
    "sala": "galeria",
-   "texto": "Aurélio baixa a voz: \"Você também sentiu? O Téo me avisou no dia {dia}. Eu demorei para acreditar.\"",
+   "texto": "Aurélio baixa a voz: \"Você também sentiu? Peça de acervo não cheira a novo. O Téo me avisou no dia {dia}. Eu demorei para acreditar.\"",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -5313,12 +5313,12 @@
    "camada": "historia",
    "previa": "Nico, de novo",
    "custo": 1,
-   "porque": "Nico aperta alguma coisa no bolso do colete: \"É do Téo. Ele pediu: só entrego se ele não aparecer, e só para quem souber o número certo.\""
+   "porque": "Nico aperta alguma coisa no bolso do colete: \"É do Téo. Ele pediu: só entrego se ele não aparecer, só para quem souber o número certo, e só depois que o curador puser o laudo no papel.\""
   },
   {
    "id": "teo_radio",
    "sala": "sons",
-   "texto": "Com o pendrive no rádio, a voz do Téo: \"Se você achou o número, sabe que a da Galeria é cópia. Ontem o do patrocínio me estendeu um envelope pra eu 'não ter carregado nada'. Eu não peguei. Hoje eu falo com ele, cara a cara. Se eu não aparecer, não deixa a noite acabar sem prova.\"",
+   "texto": "Com o pendrive no rádio, a voz do Téo: \"Você achou o número. Então escuta: a da Galeria é cópia. Ontem o do patrocínio me estendeu um envelope pra eu 'não ter carregado nada'. Eu não peguei. Hoje eu falo com ele, cara a cara. Se eu não aparecer, não deixa a noite acabar sem prova.\"",
    "volta_min": 4,
    "volta_max": 5,
    "segundo_min": 0,
@@ -9797,7 +9797,7 @@
    "simultaneo": true,
    "volta_min": 2,
    "duracao_s": 60,
-   "papelA": "No Pátio, você segura a chave geral do térreo no Quadro externo. Enquanto você segura, a sua tela mostra a palavra: diga em voz alta. Soltou, a luz volta.",
+   "papelA": "No Pátio, você segura a chave geral do térreo, do lado de fora da tampa do Quadro externo. Enquanto você segura, a sua tela mostra a palavra: diga em voz alta. Soltou, a luz volta.",
    "papelB": "Na Área de descanso, no escuro, você escuta a palavra de quem segura a chave e segue as pegadas que brilham.",
    "entrada": {
     "estado": [],
@@ -10440,7 +10440,7 @@
     ],
     "mesma_volta": 5
    },
-   "texto": "A máquina para e a verdade fica. O relógio marca 5:01 pela primeira vez. Lá fora, uma sirene. Na Sala das coleções, o Téo abre os olhos. Aurélio olha para o telão, depois para você, e só consegue dizer: \"Obrigado por não esquecer.\""
+   "texto": "A máquina para e a verdade fica. O relógio marca 5:01 pela primeira vez. Lá fora, uma sirene. Na Sala das coleções, o Téo abre os olhos. Na Galeria, Aurélio olha para a base, depois para você, e só consegue dizer: \"Obrigado por não esquecer.\""
   },
   {
    "id": "final_parcial",

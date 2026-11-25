@@ -272,7 +272,7 @@ Onde esta seção contradiz o que está acima, vale esta. Origem: os quatro rela
 - **Sirene e Téo no final: condição de exibição.** A frase "Lá fora, uma sirene: o socorro do Téo." (Desligar, texto de base e os 5 por causa) e "Lá fora, uma sirene." (Ouro) só aparecem para quem tem `sato_teo` no caderno. No telão e no resultado da sala, aparecem se alguém da turma tem. Sem isso, o final é o mesmo texto sem a frase. Pelo mesmo motivo (técnica, m1), "Na Sala das coleções, o Téo abre os olhos." só aparece para quem viu o Téo (`teo_1`). A lista fica nos dados (`regras.final_frases`) e em `ritmo.js` (`LOOP_FINAL_COND`). Não muda qual final a pessoa alcança. Com isso, a sirene deixou de depender de um fato não escrito; a pergunta "a Dra. Sato lembra de uma volta para a outra?" continua aberta (abaixo).
 - **Ordem das listas.** A lista de cada sala segue a primeira vez que cada rótulo aparece nos dados; nos dados, cada par ficou logo depois do original. A sequência é a mesma nas 5 causas, em toda volta.
 - **Fita do telão.** "Quem trouxe" virou uma linha só: o primeiro nome de até 2 pessoas e "+N" ("Ana, João +38"), com o título da coluna em cima. Dois fatos foram encurtados para caber: "O do patrocínio assina a entrada à tarde e volta de noite pela porta de serviço" (o crachá do Braga já está na linha das 4:00) e "Ele liga a Câmara achando que ela apaga cinco minutos. Ela só repete" (os 50 segundos ficam na pista `raio_contagem`).
-- **Missões que fechavam com um toque** (fichas e motivação, A2). Téo: fecha com a primeira pegada dentro da tinta ou com o botão e a prateleira juntos. Aurélio: fecha com o que ele conta diante do diário (`aurelio_2`). Ivone: fecha com a fala da tinta (`ivone_red`) ou com a conversa do Seu Dirceu (`ivone_ali_2`); saem a folha de ponto e o caderno de materiais. Muda a decisão da revisão 5 para a missão da Ivone.
+- **Missões que fechavam com um toque** (fichas e motivação, A2). Téo: fecha com a primeira pegada dentro da tinta ou com o botão e a prateleira juntos. Aurélio: fecha com o que ele conta diante do diário (`aurelio_2`). Ivone: fecha com a fala da tinta (`ivone_red`) ou com a conversa do Seu Dirceu (`ivone_ali_2`); saem a folha de ponto e o caderno de materiais. Muda a decisão da revisão 5 para a missão da Ivone. (A conversa do Seu Dirceu fechava com um toque: corrigido na revisão 8.)
 - **Braga no veredito.** `coop_veredito`: "Tá. Essa rubrica é do Lenz, do patrocínio. Ele assina tudo assim." (a verdade dele começa com "Tá.", como na ficha).
 - **`teo_d3`.** "eu marco a base dela de vermelho" (saiu a palavra "cópia" de uma pista da volta 1).
 - **O Raio.** No papel do Pátio: "os 3 números que aparecem enquanto segura a chave" (a tela mostra um código que muda).
@@ -304,3 +304,30 @@ Continuam os da revisão 6. Na ordem em que a rodada 6 sugere decidir:
 - **Resposta errada em minijogo sem custo** e **entrada por papel nos consertos em dupla.**
 - **Missão do Nico** só é possível da volta 4 (as outras fecham antes): apontado sem proposta.
 - **Aviso de aula encerrada** e os **restos de formulário** citados acima.
+
+## Revisão 8 (25/11/2026) — depois da rodada 7 das escalas e do lote 7 de peças e ícones
+
+Onde esta seção contradiz o que está acima, vale esta. Origem: os quatro relatórios da rodada 7 (`docs/avaliacao/rodada7/`: história, fichas e motivação, padrão visual com peças 3D, conferência técnica) e o lote de 8 modelos 3D e 6 ícones entregue pelo autor em 25/11/2026. Foi aplicado tudo o que os relatórios classificam como texto, dado, CSS ou código, inclusive os menores. O resumo arquivo por arquivo está em `LOOP-CENTRAL.md`, "Revisão 8".
+
+### Escolhas feitas ao aplicar
+- **Pontos da peça 3D iguais nas 5 noites (técnica, bloqueante).** Cada sala do Loop tem 32 lugares fixos na superfície da peça (`LOOP_PONTOS`, gerados em `museu/pontos-pecas.html`, vistos de frente e dos lados). O lugar de cada pista sai da sala e do rótulo (`vagaDoPonto`), que são iguais nas 5 noites; o par inocente ocupa o ponto do sinal. Lugar, quantidade, ordem e aparência conferidos entre as 5 causas nas 15 salas e nas 5 voltas (`/tmp/roda/r8/pontos.mjs`). Os pontos agora ficam em cima da peça, não no ar ao redor dela.
+- **Missão da Ivone.** `lcTem('ivone_red') && (lcTem('ivone_1x') || lcTem('dis_cafeira'))`: a resposta é a fala da tinta, confirmada pelo pote que sumiu ou pelo bilhete da cafeteira.
+- **Interfone, mostradores piscando.** Uma frase só para as noites A, D e E: "Do jeito que eu deixei, eles não piscam." Nas noites A e E ela zerou; na D, deixou certos; nas três ela os deixou parados. Não dá nome ao defeito.
+- **Minijogo da fita (`traj_1`).** A pergunta deixou de pedir a escala (que a pista não pede): agora é se a pessoa entra ou sai, pelo ombro molhado (chove desde o começo da noite). Não é tranca nova.
+- **"Só do gerador" × lâmpadas que caem.** O manual passou a dizer que as luzes de serviço das salas estão no mesmo gerador. Nenhuma pista de luz mudou.
+- **`teo_radio`.** "Você achou o número. Então escuta: a da Galeria é cópia." (o número também está no livro e na etiqueta; quem prova a cópia é o Téo, não o número).
+- **Ouro.** "Na Galeria, Aurélio olha para a base, depois para você" (antes ele olhava para o telão, que fica na Recepção).
+- **Telão, "A noite andou".** Saiu a caixa de "banners" (na noite C ela não sai). O texto do celular continua por noite.
+- **Escala real para a RA.** `museu/escala-real.mjs` grava no GLB um nó com o tamanho em metros do registro `tamanho_real_ra` (`escala-pecas.json`). Corrigidos N07 (de 2 cm para 0,5 m), N05 (de 7,2 m para 1,5 m) e E02 (de 15 m para maquete de 1,5 m: a peça é a sala inteira da oficina). As 8 peças novas já entram em metros. No modo 3D nada muda.
+- **Galeria.** O modelo do autor veio só com a base de madeira e a redoma vazia ao lado (nada em cima da base). A máscara de pedra (V11, 0,6 m) é posta no centro do tampo da base por `pecas-compostas.mjs` (`GAL_B`). A redoma fica vazia, ao lado: não contradiz nenhuma pista.
+- **Ícones.** Os 6 provisórios viraram os ícones do autor (`museu/icones/ui/`). O ⚡ pequeno ao lado do número de energia também virou a miniatura (fica legível com 18 px). A energia das Atividades e das instruções passou da miniatura do quadro elétrico para a pilha; "Sem dupla?" passou a usar o rádio de dupla.
+
+### Não aplicado, e por quê
+- **Pontos de regra** da história e das fichas (lista "Ficou para decidir", abaixo) e **B1/B2** das fichas (preço do erro no minijogo; entrada por papel no conserto em dupla).
+- **Dica da aba Revelar desde o minuto 0**, **restos de formulário**, **frase "tem força chegando" na leitura da noite D** e **`coop_veredito` nos dois aparelhos**: decisões registradas nas revisões 6 e 7.
+- **Aviso "Obrigado por participar!"** (técnica m15): padrão de sala dos outros jogos; mudar aqui sem mudar nos outros quebra a regra de jogos iguais. Fica para o autor.
+- **Cópias antigas de 4 páginas** (técnica m13): não dá para criar hoje a cópia de uma versão que já foi substituída; nesta revisão todas as páginas mexidas têm cópia `_SUBSTITUIDO_2026-11-25j`.
+- **Camada antiga carregada e filtrada, `museu/` e `museu/torre/` sem `?loop=1`, `GDD.md`, identificadores internos** (m11, m17, m18): como nas revisões anteriores.
+
+### Ficou para decidir (pontos de regra; nenhum bloqueia)
+Continuam os da revisão 7, mais: **aviso de aula encerrada** em todos os jogos de sala ao mesmo tempo.

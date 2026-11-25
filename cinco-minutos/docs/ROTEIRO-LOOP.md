@@ -126,7 +126,7 @@ Cada volta tem três camadas: o **agora** (o que você vê), o **antes** (o que 
 - **Na Máquina:** a aba Dossiê abre "Por que a máquina travou?": você marca 3 pistas do caderno e escolhe o defeito. A aba Atividades abre os cartões das duplas.
 
 ### Volta 3 — "Agora as pessoas respondem diferente"
-- **Agora:** as testemunhas não lembram de você, mas reagem ao que você **mostra**. Ivone bate o dedo no recibo. Aurélio tira os óculos diante do diário e do laudo. Braga, vendo a escala e o bilhete, coça a nuca e admite: "O crachá é meu. Só que não tá comigo desde ontem." No gravador da Sala dos sons, um telefonema: "O seguro cai até o fim do mês ou eu não tenho mais empresa." A Dra. Sato só comenta o sinal que você viu com os próprios olhos, e devolve pergunta.
+- **Agora:** as testemunhas não lembram de você, mas reagem ao que você **mostra**. Ivone bate o dedo no recibo. Aurélio tira os óculos diante do diário e do laudo. Braga, vendo a escala e o bilhete, coça a nuca e admite: "Tá. O crachá é meu. Só que não tá comigo desde ontem." No gravador da Sala dos sons, um telefonema: "O seguro cai até o fim do mês ou eu não tenho mais empresa pra te pagar." A Dra. Sato só comenta o sinal que você viu com os próprios olhos, e devolve pergunta.
 - **Antes:** as fichas dos três suspeitos fecham: a tinta era da Ivone, o crachá era do Braga, a mão era de Lenz. O nome só sai nesta volta (antes dela, "Lenz" não está escrito em lugar nenhum), por um destes caminhos: prova da cópia + escala + bilhete diante do Braga; mostrar o bilhete ao homem de paletó quando ele passa pela Área de descanso, às 4:02 (você já viu ele passar numa volta e agora espera com o bilhete e o livro de visitas na mão) (no crachá da cintura dele, a foto é do Braga; o telefone toca e ele atende: "Lenz. Agora não."); ou a atividade Acusação e Defesa, que abre agora. Depois de admitir, o Braga deixa você ler a última página do livro da Central.
 - **Próximo loop:** quem joga sem dupla grava o eco ou deixa a peça no chão. Na noite de dois defeitos, o primeiro conserto já pode ficar gravado na Câmara.
 - **Na Máquina:** na aba Revelar, a prova "de quem era a mão" pode ganhar o selo "tem". Na aba Atividades entra Acusação e Defesa.
@@ -271,7 +271,7 @@ Cada pessoa também recebe uma **missão secreta**, só dela: o que o Braga esco
 
 | Papel | Onde | O que você faz |
 |---|---|---|
-| **Quem opera** | primeira sala do conserto | Opera o conserto (gira, baixa a alavanca, carrega a peça ou liga os pontos) e fala o que vê. |
+| **Quem opera** | primeira sala do conserto | Opera o conserto (digita os números, baixa a alavanca, carrega a peça ou liga os pontos) e fala o que vê. |
 | **Quem apoia** | segunda sala do conserto | Apoia o conserto da outra sala (dita, fecha a chave, segura a trava ou arma o disjuntor) e fala o que sabe. |
 | **Central** | Central de monitoramento | Fica na Central de monitoramento. Confirma em voz alta quem está onde e se os valores batem com o que cada pessoa tem no caderno. |
 | **Porta-voz** | Recepção | Leva as 3 provas no próprio caderno e faz o Revelar na volta 5, antes de 5:00. |
@@ -424,8 +424,25 @@ Vale sobre o que estiver escrito acima, nas partes 9 a 13.
 - **O nome, em Acusação e Defesa.** O Braga começa pela marca dele: "Tá. Essa rubrica é do Lenz, do patrocínio. Ele assina tudo assim."
 - **A folha no bolso do Téo.** "Se ele negar, eu marco a base dela de vermelho." (sem a palavra "cópia").
 - **Listas das salas.** A ordem dos itens é a mesma nas 5 noites.
-- **Missões secretas.** A do Téo, a do Aurélio e a da Ivone pedem mais do que um toque (a primeira pegada ou o botão e a prateleira; o Aurélio diante do diário; a fala da tinta ou a conversa do Seu Dirceu).
+- **Missões secretas.** A do Téo e a do Aurélio pedem mais do que um toque (a primeira pegada ou o botão e a prateleira; o Aurélio diante do diário). A da Ivone foi acertada na revisão 8 (parte 15).
 - **O Raio.** Quem está no Pátio lê os 3 números que aparecem enquanto segura a chave.
 - **Telão, "A noite".** Nenhuma linha corta texto; "Quem trouxe" cabe numa linha ("Ana, João +38"). Dois fatos ficaram mais curtos: a entrada ("O do patrocínio assina a entrada à tarde e volta de noite pela porta de serviço") e o engano ("Ele liga a Câmara achando que ela apaga cinco minutos. Ela só repete").
 - **"Ver o museu em 3D".** Tocar numa sala mostra a peça dela no meio da tela, inteira, acima do cartão.
 - **Entrada.** "Cinco minutos. A mesma noite. O museu recomeça. Você não."
+
+## 15. O que mudou na revisão 8 (25/11/2026)
+
+Vale sobre o que estiver escrito acima, nas partes 9 a 14. Nada do enredo mudou: só frases, peças 3D e ícones.
+
+- **Peças das salas.** Oito salas ganharam peça nova, feita para a história: Pátio (pilar de tijolo com o Quadro externo, cadeado vermelho, mostrador e para-raios), Sala das coleções (estante com caixas etiquetadas, caixa aberta e caixote), Base da limpeza (carrinho com balde, esfregão, frascos, luvas e um multímetro), Sala da fotografia (câmera de fole no tripé, fotos na parede e no varal, bandeja de revelação, álbum), Sala dos sons (gravador de rolo, rádio de válvulas, alto-falante de teste e metrônomo), Área de descanso (porta de serviço com leitor de crachá, visor, mural de cortiça, cafeteira), Sala dos relógios (parede de relógios com o relógio de caixa alta) e Galeria (a máscara de pedra em cima da base de madeira, com a redoma vazia ao lado).
+- **Missão da Ivone.** Fecha com a fala da tinta (`ivone_red`) junto do pote que sumiu (`ivone_1x`) ou do bilhete da cafeteira (`dis_cafeira`). A conversa do Seu Dirceu sobre o dia 14 não fecha mais a missão.
+- **Aurélio.** "Você também sentiu? Peça de acervo não cheira a novo. O Téo me avisou no dia {dia}. Eu demorei para acreditar."
+- **Dra. Sato.** Aos mostradores piscando: "Sem ritmo? Do jeito que eu deixei, eles não piscam. Então ela não sabe onde está." Serve para as noites A, D e E (zerados ou certos, parados). Ao par de avisos: "Procura uma parte que esteja bem". No Fio a Fio, sem dupla, ela diz "Liga." (no ajuste, "Gira.").
+- **Manual, página 3.** "A Câmara puxa só do gerador, nunca da rede do museu. No mesmo gerador ficam as luzes de serviço das salas." É por isso que as lâmpadas caem a cada tentativa.
+- **Apagão Combinado.** Quem está no Pátio segura a chave geral "do lado de fora da tampa do Quadro externo" (a tampa com cadeado continua fechada).
+- **Nico.** Antes do laudo, ele diz que só entrega "depois que o curador puser o laudo no papel".
+- **Pendrive.** "Você achou o número. Então escuta: a da Galeria é cópia." (achar o número não prova a cópia sozinho).
+- **Minijogos.** A fita da porta de serviço pergunta se a pessoa de paletó entra ou sai (ombro molhado: vem da rua), sem depender da escala. A foto antiga oferece quatro coisas que se gravam numa base; a caixa oferece quatro cheiros. Na luz rasante, o que aparece é "O verniz brilha por igual, de ponta a ponta".
+- **Dicionário.** "Base da peça": o suporte, e "embaixo da base" de uma peça é o fundo dela, onde fica o número.
+- **Finais.** No telão, "A noite andou" não fala mais da caixa de "banners" (na noite C a peça verdadeira fica no apoio). No Ouro, o Aurélio olha para a base, na Galeria (ele não sai de lá).
+- **Entrada.** "Cinco minutos. A mesma noite. O museu recomeça. Você não." nas três páginas.

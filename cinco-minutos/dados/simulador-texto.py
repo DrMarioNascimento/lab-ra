@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Mestre-motor da simulacao teorica do Loop (v4 revisao 3: 5 causas). Uso: python3 engine.py <comando> <grupo> [args]
+# Mestre-motor da simulacao teorica do Loop (v4 revisao 8: 5 causas; engine sem mudança de regra desde a revisao 3). Uso: python3 engine.py <comando> <grupo> [args]
 # Dados: variavel de ambiente LOOP_DATA (padrao: pistas-v4.json ao lado deste arquivo, senao /tmp/roda/v4_pistas.json). Estados: LOOP_ESTADOS.
 # Valores do conserto: os de valores_padrao, ou sorteados como o jogo faz quando LOOP_SEMENTE tem um numero
 # (dia 9 a 25; raio em 1:00, 1:05, 1:10, 1:15 ou 1:20; registro 105 a 994; ordem dos 3 pontos; chave do para-raios; cofre = registro de tras para a frente).

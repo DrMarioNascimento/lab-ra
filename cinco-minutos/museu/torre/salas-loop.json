@@ -10,7 +10,7 @@
   "galeria": {
    "nome": "Galeria especial",
    "sub": "A peça principal na base",
-   "peca": "GAL_A",
+   "peca": "GAL_B",
    "andar": "2º andar",
    "ordem": 1,
    "texto": "A peça principal na base. Aurélio não sai da frente dela."
@@ -25,16 +25,16 @@
   },
   "sons": {
    "nome": "Sala dos sons",
-   "sub": "Rádio da equipe",
-   "peca": "N07",
+   "sub": "Rádio, gravador e alto-falante",
+   "peca": "N17",
    "andar": "1º andar",
    "ordem": 2,
    "texto": "Um rádio, um gravador e a música de elevador."
   },
   "fotografia": {
    "nome": "Sala da fotografia",
-   "sub": "Câmera antiga e catálogo",
-   "peca": "N05",
+   "sub": "Câmera antiga, varal e álbum",
+   "peca": "N18",
    "andar": "1º andar",
    "ordem": 3,
    "texto": "Uma câmera antiga que dispara quando quer."
@@ -42,10 +42,10 @@
   "relogios": {
    "nome": "Sala dos relógios",
    "sub": "Relógios que param na queda de luz",
-   "peca": "REL_A",
+   "peca": "REL_B",
    "andar": "1º andar",
    "ordem": 4,
-   "texto": "Dezenas de relógios, cada um no seu passo."
+   "texto": "Uma parede de relógios, cada um no seu passo."
   },
   "recepcao": {
    "nome": "Recepção",
@@ -65,16 +65,16 @@
   },
   "corredor": {
    "nome": "Área de descanso",
-   "sub": "Porta de serviço e recados",
-   "peca": "DESC_A",
+   "sub": "Porta de serviço, mural e cafeteira",
+   "peca": "DESC_B",
    "andar": "Térreo",
    "ordem": 3,
    "texto": "A cafeteira, o mural e a porta de serviço."
   },
   "limpeza": {
    "nome": "Base da limpeza",
-   "sub": "Armário da equipe e carrinho",
-   "peca": "L05",
+   "sub": "Carrinho da equipe, balde e luvas",
+   "peca": "L08",
    "andar": "Térreo",
    "ordem": 4,
    "texto": "O armário da equipe, o carrinho e Seu Dirceu de rodo na mão."
@@ -90,7 +90,7 @@
   "deposito": {
    "nome": "Sala das coleções",
    "sub": "Caixas e movimentações",
-   "peca": "V12",
+   "peca": "D10",
    "andar": "Térreo",
    "ordem": 6,
    "texto": "Caixas empilhadas e uma mancha vermelha no chão."
@@ -114,7 +114,7 @@
   "patio": {
    "nome": "Pátio · Quadro externo",
    "sub": "Quadro de energia e para-raios",
-   "peca": "E01",
+   "peca": "Q01",
    "andar": "Térreo",
    "ordem": 9,
    "texto": "Chove. O Quadro externo fica embaixo do para-raios."

@@ -1,6 +1,6 @@
 # Loop · A Máquina (camada central)
 
-Arquivos: `dados/pistas-v4.json` (fonte dos dados, **278 pistas**, versão v4, **revisão 7 de 25/11/2026**) → `loop-central-dados.js` (gerado a partir dele), `loop-central.js` (regras e telas). Enredo: `ROTEIRO-LOOP.md`. Decisões aplicadas: `DECISOES-V4.md`. Botão **🧭 Máquina** no canto da tela.
+Arquivos: `dados/pistas-v4.json` (fonte dos dados, **278 pistas**, versão v4, **revisão 8 de 25/11/2026**) → `loop-central-dados.js` (gerado a partir dele), `loop-central.js` (regras e telas). Enredo: `ROTEIRO-LOOP.md`. Decisões aplicadas: `DECISOES-V4.md`. Botão **Máquina** na barra de baixo, com a miniatura da Câmara.
 
 - **Defeito por semente** (5 causas): A falta ajustar, B falta força, C peça presa (a máquina se segura na peça errada da base), D fusível tirado de propósito, E dois defeitos juntos (A + B, em voltas diferentes). Roteiro completo em `ROTEIRO-LOOP.md`. Os sinais de cada defeito só existem quando ele é o sorteado, mas a lista de cada sala mostra os mesmos rótulos nas 5 noites (onde o sinal não existe, o mesmo rótulo traz a coisa normal: campo `parDe` nos dados); o manual (páginas 1 a 6), a folha amassada da impressora, o apito curto da base e a caixa de "banners" com a peça verdadeira existem em todas as noites.
 - **Valores por semente** (nada decorável): dia da troca (9 a 25), hora do apagão (1:00, 1:05, 1:10, 1:15 ou 1:20), número de registro (3 algarismos), ordem dos 3 pontos de ligação, número da chave do para-raios e senha do cofre do Braga (o registro de trás para a frente). Nos dados os textos usam os marcadores `{dia}` `{hora}` `{reg}` `{reg_inv}` `{ordem}` `{ch}`; `valores_padrao` (14, 1:10, 472, 274, 3-1-2, chave 3) serve para os exemplos dos documentos. O validador sorteia os valores como o jogo.
@@ -254,7 +254,33 @@ Palavras que o jogo usa: **número de registro** (da peça), **base** (onde a pe
 
 **Não aplicado, e por quê:** ver `DECISOES-V4.md`, "Revisão 7 · Não aplicado" e "Ficou para decidir".
 
-## Checklist por volta (recalculado dos dados em 25/11/2026, revisão 7)
+## Revisão 8 — 25/11/2026
+
+**Por quê.** Na rodada 7, a história (8,9) e as fichas e motivação (4,9 e 4,5) passaram; a conferência técnica teve 1 bloqueante (os pontos da peça 3D mudavam de lugar e de quantidade com o defeito) e o padrão visual reprovou nos ícones (6 provisórios) e em 8 salas (peça). O autor entregou 8 modelos 3D e 6 ícones. Relatórios em `docs/avaliacao/rodada7/`; escolhas em `DECISOES-V4.md`, "Revisão 8".
+
+**Peças e ícones**
+- 8 peças novas em `museu/pecas/` (originais do autor, comprimidos: weld, simplify, normais refeitas, texturas 1024 em WebP, Draco): `Q01` Pátio (601 KB), `D10` Coleções (590 KB), `L08` Limpeza (651 KB), `N18` Fotografia (301 KB), `N17` Sons (334 KB), `DESC_B` Área de descanso (272 KB), `REL_B` Relógios (632 KB), `GAL_B` Galeria (base `GAL_B_base` + máscara V11, 739 KB). As antigas (E01, V12, L05, N05, N07, DESC_A, GAL_A, REL_A) continuam no acervo.
+- Miniaturas novas das 8 salas em `museu/icones/` (160 px). `LOOP_SALAS` (peça e legenda), `LOOP_DESC` dos relógios, `museu/torre/salas-loop.json` e `sala/conteudo.js` gerados de novo. Minijogos, fita do telão, Revelar e gravador usam as peças novas.
+- 6 ícones do autor em `museu/icones/ui/` (saguao, manual, uma-tentativa, missao, energia, fato-falta): nenhum emoji provisório na tela.
+- Tamanho real para a RA: `museu/escala-real.mjs` + `tamanho_real_ra` em `museu/escala-pecas.json` (8 novas, N07, N05, E02).
+
+**O que mudou no código**
+- **`game.js`.** `LOOP_PONTOS` e `vagaDoPonto`: lugar fixo de cada ponto na superfície da peça, escolhido pela sala e pelo rótulo (igual nas 5 noites). Saguão com o ícone novo; número de energia com a miniatura (`data-en`); peças novas em `LOOP_SALAS`.
+- **`loop-central.js`.** Missão da Ivone (`ivone_red` e o pote ou o bilhete). Minijogos `tombo_2`, `c_peca`, `traj_1` e a luz de `falsa_1`. "Liga." no Fio a Fio sem dupla. Dicionário: "Base da peça". Ícones de manual, missão, Revelar e energia.
+- **`ritmo.js`.** "A noite andou" sem a caixa; fita com as peças novas e a moldura vazia para o fato que ninguém achou; "Participante 2" não vira "Participante 2.".
+- **`noites-motor.js`, `sala/telao/telao.mjs`, `style.css`, `sala/sala.css`.** Ícones novos (energia, saguão, moldura).
+- **`individual.html` e `sala/index.html`.** "Cinco minutos. A mesma noite. O museu recomeça. Você não."
+
+**O que mudou nos dados** (`dados/pistas-v4.json`, 278 pistas, "v4 revisão 8")
+- `aurelio_1`, `man_3` (mostradores piscando; par de avisos), `coop_apagao_combinado.papelA`, `nico_1.porque`, `teo_radio`, `man_pot_1`, final Ouro. Nenhuma volta, tranca ou rótulo mudou.
+
+**Simulador de texto e validador.** Só o cabeçalho (revisão 8). Resultado: APROVADO nas 5 causas com 1, 2 e 3 pessoas.
+
+**Testes de tela** (fora do repositório, em `/tmp/roda/r8/`): `pontos.mjs` (novo: pontos da peça entre as 5 causas, 15 salas × 5 voltas; modo `dados` compara lugar, direção, aceso e ordem de todos os pontos, em 0:03 e 4:30; modo `tela` compara o que fica à vista, em 390×844 e 360×740, e mede nenhum par a menos de 44 px e nenhum ponto fora da peça).
+
+**Não aplicado, e por quê:** ver `DECISOES-V4.md`, "Revisão 8".
+
+## Checklist por volta (recalculado dos dados em 25/11/2026, revisão 8: nenhuma volta, horário nem tranca mudou)
 
 Conferido em `dados/pistas-v4.json` (campos `volta_min`, `volta_max`, `segundo_min`, `precisaDe`, `soNaCausa`, `parDe`, `grupos_fonte`, `atividades_coop`). Horários com `valores_padrao` (raio em 1:10); com outra hora sorteada, os horários ligados ao raio andam junto. Pistas por `volta_min`: **231 na volta 1, 25 na volta 2, 9 na volta 3, 9 na volta 4, 4 na volta 5** (278 no total). Ativas por noite: 207 (A), 208 (B), 207 (C), 207 (D), 212 (E).
 

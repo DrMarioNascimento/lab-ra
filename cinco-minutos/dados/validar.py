@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Validador automatico do Loop v4 revisao 7 (5 causas). Uso: python3 validar.py [n_bots] [-v] [--semente N] [--so-otimo]
+# Validador automatico do Loop v4 revisao 8 (5 causas). Uso: python3 validar.py [n_bots] [-v] [--semente N] [--so-otimo]
 # Dados: LOOP_DATA (padrao: pistas-v4.json ao lado deste arquivo, senao /tmp/roda/v4_pistas.json).
 # (a) ids e entradas alcancaveis  (b) otimo com 1, 2 e 3 pessoas  (c) bot aleatorio  (d) essenciais sem 2 caminhos  (f) papeis, formatos e tamanho  (g) previas iguais nas 5 causas, no conjunto e na SEQUENCIA  (h) frases condicionais dos finais
 # Revisao 3 (25/11/2026): os valores do conserto (dia, hora, registro, ordem, chave) sao SORTEADOS como no jogo, nao os de exemplo;
@@ -586,7 +586,7 @@ def checar_final_frases():
 # ------------------------------------------------------------------ relatorio
 def main():
     v = D['valores']; print(f'VALORES SORTEADOS (semente {SEMENTE}): dia {v["dia_da_troca"]}, raio em {v["hora_do_apagao"]} (janela {E.mmss(E.JANELA[0])} a {E.mmss(E.JANELA[1])}), registro {v["tombo"]}, ordem {v["ordem_circuito"]}, chave {v["chave_do_raio"]}, cofre {E.VAL["reg_inv"]}')
-    print(f'VALIDADOR LOOP v4 revisão 7 | dados: {E.DATA} | {len(D["pistas"])} pistas, {len(AT)} atividades, {len(D["salas"])} salas abertas (+{len(D.get("salas_em_reforma", []))} em reforma) | causas: {", ".join(CAUSAS_OK)}')
+    print(f'VALIDADOR LOOP v4 revisão 8 | dados: {E.DATA} | {len(D["pistas"])} pistas, {len(AT)} atividades, {len(D["salas"])} salas abertas (+{len(D.get("salas_em_reforma", []))} em reforma) | causas: {", ".join(CAUSAS_OK)}')
     bad = checar_ids(); ERROS.extend(bad)
     print(f'(a) ids referenciados: {"OK, todos existem" if not bad else "FALHA"}')
     for b in bad: print('   -', b)

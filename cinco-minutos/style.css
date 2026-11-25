@@ -566,3 +566,9 @@ body[data-tela=between] .toast{bottom:auto;top:calc(64px + env(safe-area-inset-t
 .sd-faixa.on{box-shadow:inset 0 1px 0 #ffffff2b,0 4px 0 #05090d,0 0 0 2px #e7b975}
 @media(prefers-reduced-motion:reduce){.sons-deck.tocando .sd-vu i,.sd-cursor{animation:none}}
 @media(max-width:380px){.tv-room{gap:.35rem;padding:.5rem .4rem;font-size:.75rem}.tv-room img{width:30px;height:30px}}
+
+/* Revisão 8: ícone de energia próprio do Loop (pilha de latão) no lugar do raio. O número continua texto; a miniatura entra por CSS. */
+.clue small[data-en]::after,.sd-faixa small[data-en]::after{content:"";display:inline-block;width:18px;height:18px;margin-left:4px;vertical-align:-4px;background:url(museu/icones/ui/energia.webp) center/contain no-repeat;filter:drop-shadow(0 1px 1px #000a)}
+.lc-en-ic{width:20px;height:20px;object-fit:contain;vertical-align:-4px;margin-left:5px;filter:drop-shadow(0 1px 1px #000a)}
+.energia{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px}
+.lc-estado em.lc-en-n{display:flex;align-items:center;font-style:normal}

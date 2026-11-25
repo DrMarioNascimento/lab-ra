@@ -234,7 +234,7 @@ body.em-cheia .tl-fs{opacity:.5}body.em-cheia .tl-fs:hover,body.em-cheia .tl-fs:
 .tl-fita li{grid-template-columns:4.2vw 11vw 1fr auto;font-size:clamp(1rem,1.75vw,1.9rem)}
 .tl-fita ol{gap:.5vh}
 .tl-fita .ic{width:3.6vw;height:3.6vw}.tl-fita .ic img{width:88%;height:88%;object-fit:contain;filter:drop-shadow(0 .2vw .2vw #000b)}
-.tl-fita .tl-vago{display:block;width:44%;height:44%;border-radius:50%;border:.25vw dashed #9fb2bd}
+.tl-fita .ic img.tl-vago{display:block;width:92%;height:92%;object-fit:contain}
 .tl-fita .tx small{font-size:max(.74em,1.3vw)}
 .tl-fita b{font-size:.82em}
 .tl-aba.tl-auto.on{color:#1f1b17;background:linear-gradient(180deg,#f2d3a0,#be8e4b);border-color:#f2d3a0}

@@ -348,7 +348,7 @@ function renderPrep(){
  const sel = kitDaPartida(), n = nt();
  if (noLoop()) {   // no Loop: a premissa é a da história; não há ferramentas (energia igual para todo mundo)
   $('roomGrid').innerHTML = '<div class="prep"><p class="kicker">PREPARAÇÃO</p><h3>Por que a máquina travou? O que aconteceu nesta noite?</h3><p>O museu repete os mesmos 5 minutos. Descubra por que a máquina travou e o que aconteceu aqui.</p>'+
-   '<p class="prep-energia"><span class="ic3d sm" aria-hidden="true"><img src="'+ICONE_URL('E01')+'" alt=""></span>Você tem '+CARGAS_BASE+' de energia por volta. Quase toda pista gasta 1.</p>'+
+   '<p class="prep-energia"><span class="ic3d sm" aria-hidden="true"><img src="'+ICONE_URL('ui/energia')+'" alt=""></span>Você tem '+CARGAS_BASE+' de energia por volta. Quase toda pista gasta 1.</p>'+
    '<button type="button" class="btn primary" data-nt="prep">Começar a noite</button></div>';
   return true;
  }
@@ -364,7 +364,7 @@ function renderNoitePanel(){
  let box = panel.querySelector('#noitePanel');
  if (!box) { box = document.createElement('div'); box.id = 'noitePanel'; const h = panel.querySelector('h3'); h ? h.after(box) : panel.prepend(box); }
  const cs = cargasRestantes(), mx = cargasMax();
- let html = '<p class="energia" aria-label="'+(noLoop() ? 'Energia' : 'Energia da lanterna')+': '+cs+' de '+mx+'"><span aria-hidden="true">'+(noLoop() ? '⚡' : '🔦')+'</span> Energia '+'●'.repeat(cs)+'○'.repeat(Math.max(0, mx - cs))+'<small> '+(kitDaPartida().map(f => FERRAMENTAS[f]?.icone).join(' '))+'</small></p>';
+ let html = '<p class="energia" aria-label="'+(noLoop() ? 'Energia' : 'Energia da lanterna')+': '+cs+' de '+mx+'">'+(noLoop() ? '<span class="ic3d sm" aria-hidden="true"><img src="'+ICONE_URL('ui/energia')+'" alt=""></span>' : '<span aria-hidden="true">🔦</span>')+' Energia '+'●'.repeat(cs)+'○'.repeat(Math.max(0, mx - cs))+'<small> '+(kitDaPartida().map(f => FERRAMENTAS[f]?.icone).join(' '))+'</small></p>';
  if (state.room === caixoteSala() && state.caseRules !== 2) {
   const cx = state.cx || (state.cx = {sel:[0,0,0], erros:{}, aberto:false}), tp = tipoCaixote();
   html += '<div class="caixote"><strong>📦 Caixote trancado</strong><p>'+esc(tp.frase)+'</p>';
