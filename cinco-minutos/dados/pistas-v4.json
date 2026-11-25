@@ -1,6 +1,6 @@
 {
  "versao": "v4 (25/11/2026)",
- "noite": "exemplo_v3",
+ "noite": "v4",
  "causa_sorteada": "B_potencia",
  "causas_possiveis": [
   "A_calibrar",
@@ -89,18 +89,18 @@
   "explica": "id da pista falsa honesta que esta pista esclarece",
   "volta_4": "ensaio sem punição: a máquina reage ou não reage",
   "volta_5": "vale",
-  "relogio": "Um só relógio em todos os textos: o minuto da volta (0:00 a 5:00). {hora} = 1 min 10 s dentro da volta. Não há hora do dia nem contagem regressiva.",
+  "relogio": "Um relógio só: o minuto da volta, de 0:00 a 5:00. A hora do raio é sorteada pela semente (padrão 1:10).",
   "custo": "campo custo da pista: 1 por padrão, 0 em clima e em explicação de falsa honesta, 2 nos fechamentos solo (foto_solo, roleta de entrada_solo, pegadas_solo).",
   "previa": "rótulo curto e inteiro que aparece no olhar, sem entregar o conteúdo.",
   "textoPorSintoma": "só em man_3: a Dra. Sato responde apenas aos grupos de sintoma que o próprio caderno já tem; o texto mostrado é a soma das respostas.",
   "condicao.chao": "a pista só aparece se o objeto foi deixado no chão daquela sala em volta anterior (comando deixar; 1 objeto de chão por pessoa por partida).",
-  "diagnostico_anexado": "ESTADO DO GRUPO, não é pista. Nasce com o comando anexar <causa> <exatamente 3 ids do dossiê do grupo> (da volta 2 em diante) ou sozinho ao concluir Painel e Manual (da volta 3 em diante). Vale até o fim da partida. É a primeira exigência de todo conserto.",
+  "diagnostico_anexado": "ESTADO DO GRUPO, não é pista. Nasce com o comando anexar <causa> <exatamente 3 ids do dossiê do grupo> (da volta 2 em diante) ou sozinho ao concluir Painel e Manual (da volta 2 em diante). Vale até o fim da partida. É a primeira exigência de todo conserto.",
   "entrada": "entrada calculada de cada atividade: estado (estados do grupo), grupos (o dossiê do grupo precisa de 1 fonte de cada) e pistas (ids exatos). A recusa lista o que falta e uma sala para procurar.",
   "aposta": "apostar = palpite do grupo para o telão, um só por volta, não liga a máquina. anexar = uma tentativa por volta, com exatamente 3 pistas; se as 3 não provam a causa, o dossiê diz o motivo e a tentativa da volta é gasta. Erro de digitação (id que o grupo não tem, número errado de pistas) não gasta.",
   "conserto": "atividades com conserto=true: na volta 4 são ensaio (respondem \"a máquina reage\" ou \"não reage\", sem punição) e dão produto_ensaio; na volta 5 valem e dão produto_final.",
-  "janela_segundos": "no Raio, os dois (ou o solo) precisam estar no lugar com o relógio entre 66 e 74 s. Chegou cedo: use esperar. Passou: só na próxima volta.",
+  "janela_segundos": "No Raio, quem participa precisa estar no lugar entre 6 s antes e 10 s depois do raio (com o padrão: 64 a 80 s).",
   "solo": "toda atividade tem caminho solo: solo_pistas (pistas de fechamento, mais caras) ou o bloco solo (eco no Raio; \"individual\" no ajuste e no circuito; \"chao\" na peça certa). Solo declarado tem 6 cargas por volta e não entra em dupla.",
-  "trocar": "só na pausa entre voltas; quem recebe gasta 1 carga da volta que começa; no máximo 1 pista recebida por pessoa por pausa.",
+  "trocar": "Na pausa entre voltas: grátis, até 3 pistas por pessoa.",
   "revelar": "só na volta 5, na Recepção, antes de 5:00, com 1 fonte de prova_falsa, 1 de trajeto e 1 de cracha no caderno de quem apresenta. Uma tentativa por grupo.",
   "esperar": "comando que adianta o relógio do jogador até o segundo pedido, sem gastar carga.",
   "coop_por_volta": "no máximo 2 atividades em dupla por pessoa por volta",
@@ -205,7 +205,7 @@
      ]
     },
     "dupla": {
-     "como": "Original e Cópia: os dois ficam com a prova no caderno.",
+     "como": "Lado a Lado: os dois ficam com a prova no caderno.",
      "custo_cargas": "1 por pessoa + 1 de par_foto",
      "atividade": "coop_original_copia"
     },
@@ -227,7 +227,7 @@
      ]
     },
     "dupla": {
-     "como": "Entrou, mas não saiu, ou Apagão Combinado.",
+     "como": "As Duas Listas, ou Apagão Combinado.",
      "custo_cargas": "1 por pessoa + 1 da pista par",
      "atividade": "coop_entrou_nao_saiu"
     },
@@ -242,7 +242,7 @@
    "pergunta": "De quem era a mão no crachá?",
    "chaves": {
     "solo": {
-     "como": "cracha_2 (bilhete), cracha_3 (Braga, pede cracha_1), cracha_4 (livro de visitas) ou teo_radio.",
+     "como": "Mostrar a escala e o bilhete ao Braga (com prova da cópia), ou mostrar o bilhete a quem passa no corredor perto das 4:00.",
      "custo_cargas": 1,
      "grupos": [
       "cracha"
@@ -823,7 +823,7 @@
   {
    "id": "b_verde_2",
    "sala": "atelie",
-   "texto": "A ficha de ensaio de hoje diz: \"Calibragem conferida antes da abertura. Três vistos.\"",
+   "texto": "A ficha de ensaio de hoje diz: \"Ajuste conferido antes da abertura. Três vistos.\"",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -3264,7 +3264,7 @@
    "essencialPara": [
     "C_ancora"
    ],
-   "porque": "Você só sabe em qual caixa procurar depois de achar as dicas da limpeza."
+   "porque": "Você só abre a caixa depois de desconfiar dela: pelo peso, pela guia de retirada ou pela gravação."
   },
   {
    "id": "teo_1",
@@ -3571,7 +3571,7 @@
    "id": "cracha_3",
    "sala": "seguranca",
    "texto": "Braga olha a escala e o bilhete no seu caderno e coça a nuca: \"Tá. O crachá é meu. Só que não tá comigo desde ontem. O Lenz, do patrocínio, pediu 'rapidinho' e eu... eu deixei quieto. Quer um café?\"",
-   "volta_min": 1,
+   "volta_min": 2,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
@@ -3606,7 +3606,7 @@
    "explica": "cracha_1",
    "previa": "Braga quer falar",
    "custo": 0,
-   "porque": "Braga só admite quando vê a escala e o bilhete juntos e entende que a peça é cópia: aí o crachá vira coisa séria."
+   "porque": "Braga só admite quando vê a escala e o bilhete juntos e entende que a peça é cópia. Na primeira volta você ainda não tem como juntar tudo isso."
   },
   {
    "id": "cracha_4",
@@ -6519,7 +6519,7 @@
    "id": "v4_braga",
    "sala": "seguranca",
    "texto": "No livro da Central, com a letra do Braga, riscado duas vezes antes de sair: \"Ontem o Lenz levou meu crachá e deixou bilhete. Eu devia ter registrado. Não registrei. Tive medo de perder o emprego por causa de um crachá.\"",
-   "volta_min": 1,
+   "volta_min": 2,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
@@ -6735,7 +6735,7 @@
    "id": "lenz_2",
    "sala": "corredor",
    "texto": "Você estende o bilhete quando ele passa. Ele nem para, sorri sem os olhos: \"Emprestado. Tá escrito aí: emprestado. Eu devolvo tudo que eu pego.\" No crachá pendurado na cintura dele, a foto é do Braga.",
-   "volta_min": 1,
+   "volta_min": 2,
    "volta_max": 5,
    "segundo_min": 238,
    "quemPodeVer": "todos",
@@ -6761,7 +6761,7 @@
    "previa": "Mostrar o bilhete (só perto das 4:00)",
    "custo": 1,
    "grupoFonte": "cracha",
-   "porque": "Você só sabe o que mostrar, e a quem, depois de ler o bilhete do armário e o livro de visitas."
+   "porque": "Você só pensa em esperar no corredor com o bilhete na mão depois de ter visto a noite inteira uma vez."
   },
   {
    "id": "mancha_2",
@@ -7567,7 +7567,7 @@
    "saida_solo": "Sem dupla: na Galeria especial, compare a foto do catálogo sem ajuda (2 de energia), ou junte outra prova de que a peça é cópia.",
    "formato_turma": {
     "3": "Dupla nas duas salas; Central vê os dois cadernos e marca as diferenças já ditas.",
-    "4": "Uma dupla faz esta; a outra faz 'Entrou, mas não saiu' na mesma volta.",
+    "4": "Uma dupla faz esta; a outra faz 'As Duas Listas' na mesma volta.",
     "15_grupos_de_3": "Cada grupo tem o próprio museu: os 5 grupos podem fazer ao mesmo tempo.",
     "15_grupo_unico": "Cópia por dupla (não muda o museu). Até 3 duplas ao mesmo tempo; o produto vai para o mural da turma uma vez só."
    },
@@ -7610,7 +7610,7 @@
    "saida_solo": "Sem dupla: na Central, confira as listas sem ajuda, com o livro de visitas no caderno (2 de energia).",
    "formato_turma": {
     "3": "Dupla nas duas salas; Central confere os nomes na linha do tempo.",
-    "4": "Feita pela segunda dupla enquanto a primeira faz 'Original e Cópia'.",
+    "4": "Feita pela segunda dupla enquanto a primeira faz 'Lado a Lado'.",
     "15_grupos_de_3": "Simultânea nos 5 grupos; os nomes da lista mudam de ordem por grupo.",
     "15_grupo_unico": "Cópia por dupla. Frente 'Culpado'. Não usar junto com 'Acusação e Defesa' pela mesma dupla na mesma volta."
    },

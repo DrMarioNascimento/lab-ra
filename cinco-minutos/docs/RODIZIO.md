@@ -1,3 +1,6 @@
+> **Aviso (25/11/2026).** A camada central do jogo (Câmara do tempo, 5 causas, Lenz, dossiê, atividades em dupla) segue, nesta pasta, `ROTEIRO-LOOP.md` e `LOOP-CENTRAL.md`.
+> O restante deste arquivo descreve a camada antiga das 15 noites, mantida como ambiente.
+
 # Museu vivo — tabela de rodízio (documento de projeto, não público)
 
 ## O que a planta permite

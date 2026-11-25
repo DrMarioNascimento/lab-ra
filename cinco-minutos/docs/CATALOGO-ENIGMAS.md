@@ -1,3 +1,6 @@
+> **Aviso (25/11/2026).** A camada central do jogo (Câmara do tempo, 5 causas, Lenz, dossiê, atividades em dupla) segue, nesta pasta, `ROTEIRO-LOOP.md` e `LOOP-CENTRAL.md`.
+> O restante deste arquivo descreve a camada antiga das 15 noites, mantida como ambiente.
+
 # Catálogo de enigmas e pistas (ideias do professor, 23/11/2026)
 Como funciona: o jogador toca na pista; se ela tem enigma (`enigma` em `noites-motor.js`), abre a janela "Decifrar" e a pista só é registrada (e a energia gasta) quando ele acerta. As dicas ficam em outras pistas da mesma sala. As respostas mudam a cada noite e levam a um fato verdadeiro do caso (onde está a figura, quem é, o que fazer, o alarme, o que houve).
 
@@ -26,3 +29,7 @@ Também feitos antes: 27 e 30 (carta de tinta invisível com calor), 42 (áudio 
 
 ## Pistas que mudam a cada volta (feitas)
 Etiqueta que antecipa o jogador (Galeria especial), câmera com atraso (Central de monitoramento, a partir da volta 2 e 4), diário do guarda e livro de visitantes com a letra do jogador (Recepção), retrato que reage até apontar a sala (Sala da fotografia), relógio que marca as voltas (Sala dos relógios), áudio-guia que fala com o jogador (Sala dos sons), relógio de bolso que some e volta com bilhete (Sala das coleções), mapa antigo com acesso secreto (Área de descanso, a partir da volta 3).
+
+## Na camada central (Loop · A Máquina) — registrado em 25/11/2026
+- **Cofre do Braga** (Central de monitoramento): a senha são 3 números tirados da máquina do Subsolo, na ordem dos desenhos da tampa: quantos mostradores (3), quantas luzes (1), quantos botões (1). A dica está num bilhete preso no cofre ("É igual à máquina lá embaixo: quantos mostradores, quantas luzes, quantos botões") e a contagem está na descrição da Câmara do tempo. Aberto, o cofre entrega o caderno de rondas do Braga, mais uma fonte da prova do trajeto.
+- **Armadilha do pêndulo** (Sala dos relógios): quem puxa a corda faz todos os relógios do museu saltarem 40 segundos, para todo mundo. Há uma plaquinha de aviso ao lado, com a letra do Seu Dirceu ("Não puxe a corda!"). Quem puxa lê, atrás do pêndulo: "quem entra pela porta de serviço não passa pela roleta".

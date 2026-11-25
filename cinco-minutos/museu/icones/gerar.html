@@ -1,0 +1,26 @@
+<!doctype html><meta charset="utf-8"><title>Gerar ícones 3D das peças (uso interno)</title>
+<canvas id="c" width="320" height="320"></canvas>
+<script type="importmap">{"imports":{"three":"../sala3d/vendor/three.module.min.js","three/addons/":"../sala3d/vendor/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+const cv = document.getElementById('c');
+const R = new THREE.WebGLRenderer({canvas: cv, antialias: true, alpha: true, preserveDrawingBuffer: true});
+R.outputColorSpace = THREE.SRGBColorSpace; R.toneMapping = THREE.ACESFilmicToneMapping; R.toneMappingExposure = 1.15; R.setClearColor(0x000000, 0);
+const cam = new THREE.PerspectiveCamera(32, 1, 0.01, 100);
+const draco = new DRACOLoader(); draco.setDecoderPath('../sala3d/vendor/draco/');
+const L = new GLTFLoader(); L.setDRACOLoader(draco);
+window.render = (id) => new Promise((ok, erro) => L.load('../pecas/' + id + '.glb', g => {
+  const S = new THREE.Scene();
+  S.add(new THREE.HemisphereLight(0xfff2dc, 0x1a2a3a, 1.25));
+  const k = new THREE.DirectionalLight(0xffe2b0, 2.6); k.position.set(2.5, 4, 3); S.add(k);
+  const f = new THREE.DirectionalLight(0x8fd0ff, 1.1); f.position.set(-3, 1.5, -2); S.add(f);
+  const o = g.scene; S.add(o);
+  const b = new THREE.Box3().setFromObject(o), c = b.getCenter(new THREE.Vector3()), t = b.getSize(new THREE.Vector3());
+  o.position.sub(c); const r = Math.max(t.x, t.y, t.z) * 0.5 || 1, d = r / Math.tan(16 * Math.PI / 180) * 1.18;
+  cam.position.set(d * 0.62, d * 0.38, d * 0.72); cam.lookAt(0, 0, 0); cam.near = d / 50; cam.far = d * 10; cam.updateProjectionMatrix();
+  R.render(S, cam); ok(cv.toDataURL('image/png'));
+}, undefined, erro));
+window.pronto = true;
+</script>

@@ -1,3 +1,6 @@
+> **Aviso (25/11/2026).** A camada central do jogo (Câmara do tempo, 5 causas, Lenz, dossiê, atividades em dupla) segue `docs/ROTEIRO-LOOP.md` e `docs/LOOP-CENTRAL.md`.
+> O restante deste arquivo descreve a camada antiga das 15 noites, mantida como ambiente.
+
 # Loop
 
 Bancada do LAB-RA com cinco voltas, 15 variações de um mistério, pistas temporizadas, caderno, orientações e tela de revelação. A sessão individual e o histórico de variações ficam no navegador. No modo individual, cada uma das 15 variações usa uma de quatro cadeias de retorno: emissão programada, alimentação de reserva, comando da produção ou cartão de referência. A quinta volta dá uma única tentativa de intervir: é preciso deduzir o equipamento (pelo código nos procedimentos e pelos diretórios), o comando e o horário. O desfecho depende do comando executado a tempo. A pontuação é independente da intervenção. Partidas salvas preservam as regras com que foram iniciadas.

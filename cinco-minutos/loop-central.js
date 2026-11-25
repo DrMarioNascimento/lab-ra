@@ -5,7 +5,10 @@
 const LC = LC_DADOS;
 const LC_PID = Object.fromEntries(LC.pistas.map(p => [p.id, p]));
 const LC_AT = Object.fromEntries(LC.atividades_coop.map(a => [a.id, a]));
-const LC_NOME = {A_calibrar:'Painel desregulado', B_potencia:'Falta de potência', C_ancora:'Peça certa presa', D_fusivel:'Algo desligado de propósito', E_dois:'Dois defeitos juntos'};
+const LC_NOME = {A_calibrar:'Painel desregulado', B_potencia:'Falta de potência', C_ancora:'Peça errada na base', D_fusivel:'Algo desligado de propósito', E_dois:'Dois defeitos juntos'};
+const LC_ICONE = {A_calibrar:'🔢', B_potencia:'⚡', C_ancora:'🏺', D_fusivel:'🔌', E_dois:'✌️'};
+const lcEtqClasse = e => /^SINAL/i.test(e || '') ? 'sinal' : /^LEITURA/i.test(e || '') ? 'normal' : /^MANUAL/i.test(e || '') ? 'manual' : 'outra';
+const lcEtqIcone = e => /^SINAL/i.test(e) ? '🚨' : /^LEITURA/i.test(e) ? '✅' : '📘';
 const LC_CAUSAS = ['A_calibrar','B_potencia','C_ancora','D_fusivel','E_dois'];
 // Valores do conserto sorteados pela semente (nada para decorar entre partidas). Os textos trazem marcadores {dia}, {hora}, {reg}...
 let LC_VC = null;
@@ -312,8 +315,8 @@ function lcPainelHtml(aba){
   h += '<h4>Por que a máquina travou?</h4><div class="lc-passos"><div class="lc-passo"><b>🚨🚨</b><span>2 sinais de tipos diferentes</span></div><div class="lc-passo"><b>✅</b><span>1 leitura normal</span></div><div class="lc-passo"><b>🎯</b><span>1 defeito</span></div></div>' + lcGlos('<p class="lc-dica">Marque 3 pistas do seu caderno e escolha o defeito. Uma tentativa por volta, da volta 2 em diante.</p><details class="lc-dic"><summary>Como funciona</summary><p>Um <b>sinal</b> mostra o que está errado na máquina. Dois sinais com a mesma etiqueta valem um só. Uma <b>leitura normal</b> mostra uma parte que está bem: ela afasta outro defeito. Manual, ferramenta e coisa estranha com explicação inocente não contam. Cada pessoa tem o seu caderno: para outra pessoa usar uma pista sua, passe na pausa.</p></details><details class="lc-dic"><summary>Dicionário das palavras</summary>' + LC_GLOS_LISTA.map(([n, t]) => '<p><b>' + n + '</b>: ' + esc(t) + '</p>').join('') + '</details>') + '';
   if (s.diag) h += '<p class="lc-ok">O dossiê já aceitou o diagnóstico. Vá para Atividades.</p>';
   else {
-   h += '<div class="lc-causas">' + LC_CAUSAS.map(c => '<label><input type="radio" name="lccausa" value="' + c + '"> ' + LC_NOME[c] + '</label>').join('') + '</div>';
-   h += '<div class="lc-provas">' + (meus.length ? meus.map(c => '<label><input type="checkbox" name="lcprova" value="' + c.id.slice(3) + '"> <b>' + esc(c.name) + '</b> <small>' + esc(c.etq ? c.etq + ' · ' : '') + esc(c.room) + '</small></label>').join('') : '<p class="muted">Você ainda não tem pistas da máquina no caderno.</p>') + '</div>';
+   h += '<div class="lc-causas">' + LC_CAUSAS.map(c => '<label class="lc-causa"><input type="radio" name="lccausa" value="' + c + '"><span class="ic">' + LC_ICONE[c] + '</span><span>' + LC_NOME[c] + '</span></label>').join('') + '</div>';
+   h += '<div class="lc-provas">' + (meus.length ? meus.map(c => '<label class="lc-prova ' + lcEtqClasse(c.etq) + '"><input type="checkbox" name="lcprova" value="' + c.id.slice(3) + '"><span class="tx"><b>' + esc(c.name) + '</b><small>' + esc(c.room) + '</small></span>' + (c.etq ? '<span class="chip">' + lcEtqIcone(c.etq) + ' ' + esc(c.etq.split(' · ')[1] || c.etq) + '</span>' : '') + '</label>').join('') : '<p class="muted">Você ainda não tem pistas da máquina no caderno.</p>') + '</div>';
    h += '<p class="lc-pre" id="lcPre">Marque 3 pistas: 2 sinais de tipos diferentes e 1 leitura normal.</p><button type="button" class="lc-btn" id="lcAnexar">Anexar ao dossiê</button>';
   }
   h += '<p class="lc-msg" id="lcMsg" role="status"></p>';

@@ -1,3 +1,6 @@
+> **Aviso (25/11/2026).** A camada central do jogo (Câmara do tempo, 5 causas, Lenz, dossiê, atividades em dupla) segue `docs/ROTEIRO-LOOP.md` e `docs/LOOP-CENTRAL.md`.
+> O restante deste arquivo descreve a camada antiga das 15 noites, mantida como ambiente.
+
 # GDD Loop
 
 **Documento de concepção e design de jogo**  

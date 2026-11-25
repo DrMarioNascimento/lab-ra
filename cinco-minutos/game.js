@@ -18,7 +18,7 @@ const ROOMS = [
   {id:'relogios', name:'Sala dos relógios', andar:'1º andar', icon:'⬡', sub:'Cada segundo conta', peca:'N03'},
   {id:'protecoes', name:'Sala das proteções', andar:'1º andar', icon:'✚', sub:'Capacete e história', peca:'N04'},
   {id:'fotografia', name:'Sala da fotografia', andar:'1º andar', icon:'☗', sub:'Câmera de outro tempo', peca:'N05'},
-  {id:'prototipo', name:'Subsolo · Câmara do tempo', andar:'Subsolo', icon:'◷', sub:'Protótipo e demonstração', peca:'D09'},
+  {id:'prototipo', name:'Subsolo · Câmara do tempo', andar:'Subsolo', icon:'◷', sub:'A máquina do tempo', peca:'T01'},
   {id:'eletrica', name:'Oficina elétrica', andar:'1º andar', icon:'⌁', sub:'Energia e equipamentos', peca:'B09'},
   {id:'deposito', name:'Sala das coleções', andar:'1º andar', icon:'▤', sub:'Inventário e movimentações', peca:'B02'},
   {id:'vidros', name:'Sala dos vidros', andar:'1º andar', icon:'▨', sub:'Transparência e brilho', peca:'N06'},
@@ -76,7 +76,7 @@ const PECAS_ALT = {
   limpeza:    [{peca:'L04', sub:'Ferramentas de limpeza'}, {peca:'L05', sub:'Produtos e panos coloridos'}],
   manutencao: [{peca:'M02', sub:'Baú de ferramentas'}, {peca:'M03', sub:'Armário de ferramentas'}],
   atelie:     [{peca:'L06', sub:'Projetos e bancada'}, {peca:'L07', sub:'Ferramentas de teste'}],
-  prototipo:  [{peca:'T01', sub:'Máquina do tempo (protótipo)'}, {peca:'T02', sub:'Carro de viagem no tempo'}],
+  prototipo:  [{peca:'T01', sub:'A máquina do tempo'}, {peca:'T01', sub:'A máquina do tempo'}],
   sons:       [{peca:'N16', sub:'Rádio comunicador'}, {peca:'V44', sub:'Gramofone'}],
   relogios:   [{peca:'R01', sub:'Relógio de custódia'}, {peca:'R02', sub:'Relógio de pêndulo'}],
   eletrica:   [{peca:'E01', sub:'Quadro elétrico'}, {peca:'E02', sub:'Central de energia'}],
@@ -565,7 +565,7 @@ function renderGame(){
  $('phaseDescription').textContent=state.phase==='playing'?'Gire a peça e toque nos pontos que brilham para achar pistas.':'Todo mundo começa no '+INICIO.name+', no '+INICIO.andar+'. Escolha para onde ir.';
  $('boardTitle').textContent = state.room ? (state.phase === 'playing' ? 'Examine a sala' : 'Ambiente escolhido') : 'Escolha um ambiente';
  $('phaseTitle').tabIndex = -1;
- $('roomGrid').innerHTML='<div class="inicio" role="status"><span class="room-icon" aria-hidden="true">'+INICIO.icon+'</span><div><strong>'+INICIO.name+' · '+INICIO.andar+'</strong><small>'+(state.phase==='playing'?'Quando o tempo acabar, você volta para cá. A porta principal está trancada pela grade de segurança.':'Você está aqui. Todo mundo começa aqui, a cada volta. A porta principal está trancada pela grade de segurança.')+'</small></div></div>'+ANDARES.map(a=>'<h4 class="andar">'+a+'</h4>'+ROOMS.map(r=>sala(r.id)).filter(r=>r.andar===a).sort((x,y)=>x.lugar-y.lugar).map(r=>'<button class="room '+(state.room===r.id?'selected':'')+'" '+(state.phase==='playing'&&state.room===r.id?'disabled':'')+' data-room="'+r.id+'"><span class="room-icon" aria-hidden="true">'+r.icon+'</span><strong>'+esc(r.name)+'</strong><small>Lugar '+r.lugar+' · '+esc(r.sub)+'</small></button>').join('')).join('');
+ $('roomGrid').innerHTML='<div class="inicio" role="status"><span class="room-icon" aria-hidden="true">'+INICIO.icon+'</span><div><strong>'+INICIO.name+' · '+INICIO.andar+'</strong><small>'+(state.phase==='playing'?'Quando o tempo acabar, você volta para cá. A porta principal está trancada pela grade de segurança.':'Você está aqui. Todo mundo começa aqui, a cada volta. A porta principal está trancada pela grade de segurança.')+'</small></div></div>'+ANDARES.map(a=>'<h4 class="andar">'+a+'</h4>'+ROOMS.map(r=>sala(r.id)).filter(r=>r.andar===a).sort((x,y)=>x.lugar-y.lugar).map(r=>'<button class="room an'+ANDARES.indexOf(a)+' '+(state.room===r.id?'selected':'')+'" '+(state.phase==='playing'&&state.room===r.id?'disabled':'')+' data-room="'+r.id+'">'+(r.peca?'<img class="room-3d" src="'+new URL('../icones/'+r.peca+'.webp',PECAS_URL).href+'" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'room-icon\',textContent:\''+r.icon+'\'}))">':'<span class="room-icon" aria-hidden="true">'+r.icon+'</span>')+'<strong>'+esc(r.name)+'</strong><small>'+esc(r.sub)+'</small></button>').join('')).join('');
  document.querySelectorAll('[data-room]').forEach(b=>b.addEventListener('click',()=>enterRoom(b.dataset.room)));
  const preparando = renderPrep();
  renderRouteChoices(preparando);
@@ -706,7 +706,7 @@ function interventionNote(why, path){
 function renderIntervention(roomId, elapsed){
  const panel = $('intervention');
  const ctl = controlAt(roomId);
- panel.hidden = !hasLiveFinal() || !ctl;
+ panel.hidden = !hasLiveFinal() || !ctl || state.caseRules === 2;   // no Loop, o conserto é pela Máquina
  if (panel.hidden) return;
  const path = timePath();
  const aberto = !!state.abertos?.[ctl.code];

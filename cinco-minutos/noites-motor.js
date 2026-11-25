@@ -398,7 +398,7 @@ function blocoT(){
 // ---- combinações entre voltas
 function renderCombos(){
  const old = $('comboBox'); if (old) old.remove();
- if (state.loop >= 5) return;
+ if (state.loop >= 5 || state.caseRules === 2) return;   // no Loop ninguém do museu lembra das voltas
  state.combos ||= {};
  const L = state.loop + 1, esc2 = state.combos[L] || [];
  const opcoes = [0,1,2,3].map(k => COMBOS[(state.caseIndex + k) % COMBOS.length]);
