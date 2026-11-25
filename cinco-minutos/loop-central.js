@@ -323,7 +323,7 @@ function lcPainelHtml(aba){
   h += s.revelado ? '<p class="lc-ok">Você já usou a tentativa: ' + (s.revelado.ok ? 'o nome fechou com as provas.' : 'o nome não fechou.') + '</p>' : '<input id="lcNome" placeholder="Nome de quem trocou a peça" autocomplete="off"><button type="button" class="lc-btn" id="lcRevelar">Registrar revelação</button>';
   h += '<p class="lc-ok">Final se a noite acabasse agora: <b>' + lcFinal() + '</b>. ' + esc(lcFinalTxt(lcFinal())) + '</p><p class="lc-msg" id="lcMsg" role="status"></p>';
  } else {
-  h += '<p class="lc-dica">Só na pausa entre voltas. Quem passa mostra o código; quem recebe digita (custa 1 de energia na volta seguinte, 1 pista por pausa). Contem com as próprias palavras.</p>';
+  h += '<p class="lc-dica">Só na pausa entre voltas. Quem passa mostra o código; quem recebe digita (não gasta energia, até 3 pistas por pausa). Contem com as próprias palavras.</p>';
   if (state.phase === 'playing') h += '<p class="muted">Espere a pausa entre as voltas.</p>';
   else {
    h += '<h4>Passar uma pista</h4><select id="lcPassar">' + meus.map(c => '<option value="' + c.id.slice(3) + '">' + esc(c.name) + '</option>').join('') + '</select><button type="button" class="lc-btn" id="lcCod">Gerar código</button><p class="lc-cod" id="lcCodTxt"></p>';
@@ -478,13 +478,13 @@ function lcRevelar(){
 const lcCodPista = pid => Array.from({length:4}, (_, i) => 'ABCDEFGHJKLMNPRSTUVXZ'[Math.floor(hashTxt('cp' + pid + i + semente()) * 21)]).join('');
 function lcReceber(cod){
  const s = lcS(), c = normResp(cod);
- if (s.recebeu[state.loop]) return lcMsg('Só 1 pista por pausa.');
+ if ((s.recebeu[state.loop] || 0) >= 3) return lcMsg('Só 3 pistas por pausa.');
  const p = LC.pistas.find(x => lcAtiva(x) && !x.daAtividade && lcCodPista(x.id) === c);
  if (!p) return lcMsg('Código inválido.');
  if (lcTem(p.id)) return lcMsg('Você já tem essa pista.');
- s.recebeu[state.loop] = true; s.debitos[state.loop + 1] = (s.debitos[state.loop + 1] || 0) + 1;
+ s.recebeu[state.loop] = (s.recebeu[state.loop] || 0) + 1;
  state.clues.push({id:lcId(p.id), room:lcNomeSala(p.sala), name:p.previa || p.id, text:lcTexto(p), tipo:'Relato', loop:state.loop, recebida:true}); save();
- lcMsg('Recebida: ' + (p.previa || p.id) + '. (-1 de energia na próxima volta.)');
+ lcMsg('Recebida: ' + (p.previa || p.id) + '. (Troca de pista não gasta energia.)');
 }
 let lcAba = 'dossie', lcTimer = 0, lcSeguro = false;
 function lcAbrir(aba){
