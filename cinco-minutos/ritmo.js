@@ -27,11 +27,11 @@ function loopFinalTurma(respostas) {
 // Fita do tempo: fatos da noite que a turma pode descobrir (o telão junta o que cada pessoa achou).
 const LOOP_LINHA = [
   {id:'copia', hora:'Antes', ic:'🖼️', txt:'A peça exposta é uma cópia'},
-  {id:'troca', hora:'Dia 14', ic:'🗓️', txt:'A peça verdadeira é trocada'},
-  {id:'entrada', hora:'21:40', ic:'🚪', txt:'Lenz entra no museu e não sai'},
-  {id:'raio', hora:'1:10', ic:'⚡', txt:'O raio atinge o Pátio e a luz apaga'},
-  {id:'camera', hora:'1:10', ic:'📷', txt:'A câmera 4 cai no apagão'},
-  {id:'teo', hora:'1:10', ic:'🪑', txt:'O Téo fica preso no meio da volta'},
+  {id:'troca', hora:'Dias antes', ic:'🗓️', txt:'A peça verdadeira é trocada'},
+  {id:'entrada', hora:'Antes', ic:'🚪', txt:'Lenz entra no museu e não sai'},
+  {id:'raio', hora:'Apagão', ic:'⚡', txt:'O raio atinge o Pátio e a luz apaga'},
+  {id:'camera', hora:'Apagão', ic:'📷', txt:'A câmera 4 cai no apagão'},
+  {id:'teo', hora:'Antes', ic:'🩸', txt:'O Téo confronta quem trocou a peça e é empurrado'},
   {id:'passagem', hora:'4:00', ic:'🧥', txt:'Alguém de paletó vai para o Subsolo'},
   {id:'cracha', hora:'4:00', ic:'🪪', txt:'O crachá emprestado do Braga abre a porta'},
   {id:'botao', hora:'4:10', ic:'🔘', txt:'O botão da Câmara é apertado'}

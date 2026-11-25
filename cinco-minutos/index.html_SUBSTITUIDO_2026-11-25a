@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#080e19">
+<title>Loop · Mosaico · LAB-RA</title>
+<script>
+/* Links e QR com código de sala vão direto para a sala. */
+(function () { var q = location.search; if (/[?&]sala=/.test(q)) location.replace("sala/index.html" + q + location.hash); })();
+</script>
+<link rel="stylesheet" href="style.css?v=4">
+<style>
+.ent{max-width:980px;margin:0 auto;padding:0 18px 48px}
+.ent-top{padding:34px 0 22px}
+.ent-top h1{font-size:clamp(2.6rem,8vw,4.6rem);margin:8px 0 10px}
+.ent-top p.frase{font:italic 1.15rem Georgia,serif;color:#e7c892;max-width:36rem;margin:0}
+.ent-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.ent-card{padding:22px;border:1px solid #b49f7355;border-radius:16px;background:linear-gradient(145deg,#152735ee,#0e1925f5);box-shadow:inset 0 1px #ffffff18,0 15px 35px #0005;display:flex;flex-direction:column;gap:12px}
+.ent-card h2{font-weight:400;font-size:1.6rem;margin:4px 0 0}
+.ent-card p.ajuda{font:.92rem/1.55 system-ui,sans-serif;color:var(--muted);margin:0}
+.ent-card input{width:100%;min-height:54px;padding:10px;text-align:center;text-transform:uppercase;font:700 1.5rem ui-monospace,Menlo,monospace;letter-spacing:.3em;color:var(--paper);background:#0a1721;border:1px solid var(--line);border-radius:12px}
+.ent-card .btn{width:100%}
+.btn.prof{color:#fff;background:linear-gradient(180deg,#9b6bf3,#6d34d6 55%,#5424b0);border-color:#c4a8ff;box-shadow:inset 0 1px 0 #ffffff40,0 4px 0 #2e1470,0 12px 24px #0005}
+.btn.prof:active{box-shadow:inset 0 1px 0 #ffffff25,0 1px 0 #2e1470}
+.chave{display:block;text-align:center;font:600 .78rem system-ui,sans-serif;letter-spacing:.06em;color:#cbb6ff}
+.ent-links{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:4px}
+.ent-links a{font:700 .8rem system-ui,sans-serif;color:var(--gold)}
+.ent-sozinho{margin-top:20px;text-align:center}
+.ent-sozinho a{color:#c9bba3;font:600 .85rem system-ui,sans-serif}
+@media(max-width:720px){.ent-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main class="ent">
+<header class="mast"><a class="back" href="../bancadas.html">LAB-RA</a><span class="mast-label">MOSAICO · <span>LOOP</span></span></header>
+<div class="ent-top">
+<p class="eyebrow"><span></span> MOSAICO</p>
+<h1>Loop</h1>
+<p class="frase">Cinco minutos. A mesma noite. O que aconteceu de verdade?</p>
+<p><a class="btn secondary" href="reserva/">Episódio visual: A peça que o museu esqueceu</a></p>
+</div>
+<div class="ent-grid">
+<section class="ent-card" aria-label="Participar">
+<p class="kicker">PARTICIPAR</p>
+<h2>Entrar com o código</h2>
+<p class="ajuda">Digite o código que aparece no telão. Não precisa de cadastro.</p>
+<input id="cod" maxlength="6" autocomplete="off" autocapitalize="characters" placeholder="CÓDIGO" aria-label="Código da sala">
+<button class="btn primary" id="entrar" type="button" disabled>Entrar</button>
+</section>
+<section class="ent-card" aria-label="Conduzir">
+<p class="kicker">CONDUZIR</p>
+<h2>Mestre da sala</h2>
+<p class="ajuda">Crie a sala e conduza pelo celular. No PC ou na TV da sala, abra o telão com o código.</p>
+<a class="btn prof" href="sala/index.html" id="prof"><span aria-hidden="true">🔒</span>&nbsp;Entrar como Professor</a>
+<span class="chave">Só o Professor tem a chave</span>
+<a class="btn secondary" href="sala/telao/index.html">Abrir telão</a>
+<div class="ent-links"><a href="sala/simulador/">Simulador de aula (testar no PC sem a turma)</a></div>
+</section>
+</div>
+<p class="ent-sozinho"><a href="individual.html">Jogar sozinho, sem sala</a></p>
+</main>
+<script>
+(function () {
+  var c = document.getElementById('cod'), b = document.getElementById('entrar');
+  function ok() { return c.value.length >= 5; }
+  c.addEventListener('input', function () { c.value = c.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); b.disabled = !ok(); });
+  function ir() { if (ok()) location.href = 'sala/index.html?sala=' + encodeURIComponent(c.value); }
+  b.addEventListener('click', ir);
+  c.addEventListener('keydown', function (e) { if (e.key === 'Enter') ir(); });
+})();
+</script>
+</body>
+</html>

@@ -498,10 +498,17 @@ function fmt(s){s=Math.max(0,Math.ceil(s));return String(Math.floor(s/60)).padSt
 function museumTime(){ return loopHora(state.duration, state.remaining); }
 function current(){return CASES[state.caseIndex]}
 function reset(){clearInterval(timerHandle);state={caseIndex:chooseCase(),loop:1,phase:'choose',room:null,duration:Number($('speed').value),remaining:Number($('speed').value),endAt:null,clues:[],hints:0,notes:'',answers:null,liveFinal:true,caseRules:2,archive:[],codes:sortearCodigos()};state.museu=sortearMuseu(chavesDoCaso(state.caseIndex));definirMuseu(state.museu);save();renderGame();show('game')}
+// Andar entre salas durante a volta: leva 10 segundos de caminhada (na proporção do relógio). O que está na mão vai junto.
+function agoraJogo(){ return window.coop?.now() ?? Date.now(); }
+function andando(){ return state.andandoAte && agoraJogo() < state.andandoAte; }
+function marcarCaminhada(){ state.andandoAte = agoraJogo() + 10000 * (state.duration / 300); setTimeout(() => { if (typeof renderClues === 'function' && state.phase === 'playing' && state.room) renderClues(); }, 10000 * (state.duration / 300) + 80); }
 function enterRoom(id){
  const anterior = state.room;
  if (window.coop) {
   window.coop.choose(id);
+ } else if (state.phase === 'playing' && state.room && id !== state.room) {
+  if (andando()) { toast('Você ainda está andando.'); return; }
+  state.room = id; marcarCaminhada(); save(); renderGame(); toast('Você vai para ' + sala(id).name + '. A caminhada leva 10 segundos.');
  } else if (state.phase === 'choose') {
   state.room = id;
   state.phase = 'playing';
@@ -558,12 +565,12 @@ function renderGame(){
  $('phaseDescription').textContent=state.phase==='playing'?'Gire a peça e toque nos pontos que brilham para achar pistas.':'Todo mundo começa no '+INICIO.name+', no '+INICIO.andar+'. Escolha para onde ir.';
  $('boardTitle').textContent = state.room ? (state.phase === 'playing' ? 'Examine a sala' : 'Ambiente escolhido') : 'Escolha um ambiente';
  $('phaseTitle').tabIndex = -1;
- $('roomGrid').innerHTML='<div class="inicio" role="status"><span class="room-icon" aria-hidden="true">'+INICIO.icon+'</span><div><strong>'+INICIO.name+' · '+INICIO.andar+'</strong><small>'+(state.phase==='playing'?'Quando o tempo acabar, você volta para cá. A porta principal está trancada pela grade de segurança.':'Você está aqui. Todo mundo começa aqui, a cada volta. A porta principal está trancada pela grade de segurança.')+'</small></div></div>'+ANDARES.map(a=>'<h4 class="andar">'+a+'</h4>'+ROOMS.map(r=>sala(r.id)).filter(r=>r.andar===a).sort((x,y)=>x.lugar-y.lugar).map(r=>'<button class="room '+(state.room===r.id?'selected':'')+'" '+(state.phase==='playing'&&state.room?'disabled':'')+' data-room="'+r.id+'"><span class="room-icon" aria-hidden="true">'+r.icon+'</span><strong>'+esc(r.name)+'</strong><small>Lugar '+r.lugar+' · '+esc(r.sub)+'</small></button>').join('')).join('');
+ $('roomGrid').innerHTML='<div class="inicio" role="status"><span class="room-icon" aria-hidden="true">'+INICIO.icon+'</span><div><strong>'+INICIO.name+' · '+INICIO.andar+'</strong><small>'+(state.phase==='playing'?'Quando o tempo acabar, você volta para cá. A porta principal está trancada pela grade de segurança.':'Você está aqui. Todo mundo começa aqui, a cada volta. A porta principal está trancada pela grade de segurança.')+'</small></div></div>'+ANDARES.map(a=>'<h4 class="andar">'+a+'</h4>'+ROOMS.map(r=>sala(r.id)).filter(r=>r.andar===a).sort((x,y)=>x.lugar-y.lugar).map(r=>'<button class="room '+(state.room===r.id?'selected':'')+'" '+(state.phase==='playing'&&state.room===r.id?'disabled':'')+' data-room="'+r.id+'"><span class="room-icon" aria-hidden="true">'+r.icon+'</span><strong>'+esc(r.name)+'</strong><small>Lugar '+r.lugar+' · '+esc(r.sub)+'</small></button>').join('')).join('');
  document.querySelectorAll('[data-room]').forEach(b=>b.addEventListener('click',()=>enterRoom(b.dataset.room)));
  const preparando = renderPrep();
  renderRouteChoices(preparando);
  $('endLoop').classList.toggle('hidden', state.phase!=='playing' || ((finalLoop || state.caseRules === 2) && state.duration===300));
- $('statusText').textContent=state.phase==='playing'?'Você fica nesta sala até o tempo voltar. Aí você acorda no '+INICIO.name+'.':'Você visita uma sala por volta.';
+ $('statusText').textContent=state.phase==='playing'?'Você pode ir a outra sala quando quiser: a caminhada leva 10 segundos. No fim da volta você acorda no '+INICIO.name+'.':'Escolha por onde começar.';
  renderRoomFocus();
  if(state.phase==='playing'&&state.room)renderClues();
  if(window.coop)window.coop.decorate();
@@ -767,7 +774,7 @@ function bloqueioPista(q, storySec){
  const tr = state.trava && state.trava[state.loop+':'+state.room]; if (tr && tr !== q.id) return 'Os seguranças chegaram. Esta sala fica vigiada até o fim da volta.';
  return '';
 }
-function collect(id){if(state.phase!=='playing'||(window.coop?.now() ?? Date.now())>=state.endAt){tick();return}const q=scenarioClues()[state.room].find(x=>x.id===id);if(!q||state.clues.some(x=>x.id===id)||state.duration-(state.endAt-(window.coop?.now() ?? Date.now()))/1000<q.time/300*state.duration)return;{const bl=bloqueioPista(q,(state.duration-(state.endAt-(window.coop?.now() ?? Date.now()))/1000)*300/state.duration);if(bl){toast(bl);return}}if(q.enigma&&!(state.resolvidos&&state.resolvidos[q.id])){abrirEnigma(q);return}if(q.lcp&&window.lcBancada&&lcBancada(q))return;if(!cobrarPista(q))return;const room=sala(state.room);state.clues.push({id:q.id,room:room.name,name:q.name,text:q.text,tipo:q.tipo,fatos:q.fatos,loop:state.loop,etq:q.etq||''});if(q.lcp)lcAposColetar(q);if(q.trava){(state.trava ||= {})[state.loop+':'+state.room]=q.id}save();renderClues();renderJournal();toast(q.trava?'Pista guardada. Os seguranças estão a caminho!':'Pista guardada no caderno')}
+function collect(id){if(andando()){toast('Você ainda está chegando na sala.');return}if(state.phase!=='playing'||(window.coop?.now() ?? Date.now())>=state.endAt){tick();return}const q=scenarioClues()[state.room].find(x=>x.id===id);if(!q||state.clues.some(x=>x.id===id)||state.duration-(state.endAt-(window.coop?.now() ?? Date.now()))/1000<q.time/300*state.duration)return;{const bl=bloqueioPista(q,(state.duration-(state.endAt-(window.coop?.now() ?? Date.now()))/1000)*300/state.duration);if(bl){toast(bl);return}}if(q.enigma&&!(state.resolvidos&&state.resolvidos[q.id])){abrirEnigma(q);return}if(q.lcp&&window.lcBancada&&lcBancada(q))return;if(!cobrarPista(q))return;const room=sala(state.room);state.clues.push({id:q.id,room:room.name,name:q.name,text:q.text,tipo:q.tipo,fatos:q.fatos,loop:state.loop,etq:q.etq||''});if(q.lcp)lcAposColetar(q);if(q.trava){(state.trava ||= {})[state.loop+':'+state.room]=q.id}save();renderClues();renderJournal();toast(q.trava?'Pista guardada. Os seguranças estão a caminho!':'Pista guardada no caderno')}
 function renderJournal(){
  const clues=state.clues||[];$('countBadge').textContent=clues.length;
  $('journalPreview').innerHTML=clues.length?clues.slice(-3).reverse().map(c=>'<div class="preview-item">'+esc(c.name)+' <br><small>'+esc(c.room)+'</small></div>').join(''):'<p class="muted">Suas descobertas aparecerão aqui.</p>';
@@ -805,8 +812,8 @@ function renderBetweenPlan(){
   : 'Compare os sinais. Procure dois tipos de sinal e uma pista que ajude a descartar outro defeito.';
  const instrucoes = {
   1: 'Volta 2 · Teste uma hipótese. ' + assunto,
-  2: 'Volta 3 · Prepare a intervenção. Confira o que precisa ser feito em outra sala ou numa volta anterior, como gravar o eco ou encaminhar a peça-guia.',
-  3: 'Volta 4 · Ensaie a ação final. Se for jogar sozinho, esta é a última volta para gravar o eco ou encaminhar a peça-guia quando o conserto exigir.',
+  2: 'Volta 3 · Prepare a intervenção. Confira o que precisa ser feito em outra sala ou numa volta anterior, como gravar o gesto no Pátio ou deixar a peça verdadeira no Subsolo.',
+  3: 'Volta 4 · Ensaie a ação final. Sem dupla, esta é a última volta para gravar o gesto no Pátio ou deixar a peça verdadeira no Subsolo, quando o conserto exigir.',
   4: window.coop
    ? 'Volta 5 · Combinem quem vai operar a Máquina e quem leva as três provas para a Recepção. Guardem a energia necessária antes de explorar.'
    : 'Volta 5 · Escolha o objetivo que seu caderno permite concluir. Confira as provas, a sala e a energia antes de começar.',

@@ -132,7 +132,9 @@ function blocoTurma() {
 
 // ---------------------------------------------------------------- o que o jogo chama
 function choose(id) {
-  if (state.room || !['choose', 'playing'].includes(room?.etapa)) return;
+  if (!['choose', 'playing'].includes(room?.etapa) || state.room === id) return;
+  if (state.room && room.etapa !== 'playing') return;
+  if (state.room) { if (andando()) return; marcarCaminhada(); toast('Você vai para outra sala. A caminhada leva 10 segundos.'); }
   const fim = fimDaVolta(); if (fim != null && T.agora() >= fim) return;
   state.room = id; save();
   T.atualizarEu({ amb: id, ambVolta: room.volta });
@@ -143,9 +145,9 @@ function decorate() {
   const escolhendo = room.etapa === 'choose', jogando = room.etapa === 'playing';
   $('phaseDescription').textContent = escolhendo ? 'Escolha onde investigar. O Mestre inicia o relógio.' :
     state.room ? 'Examine a peça ou use a lista de pistas.' : 'O relógio começou. Escolha onde investigar.';
-  $('statusText').textContent = state.room ? 'Você permanece neste ambiente até o retorno.' : 'Escolha um ambiente para investigar nesta volta.';
+  $('statusText').textContent = state.room ? 'Você pode ir a outra sala quando quiser: a caminhada leva 10 segundos.' : 'Escolha um ambiente para investigar nesta volta.';
   $('roomPanel').classList.toggle('hidden', !jogando || !state.room);
-  for (const b of $('roomGrid').querySelectorAll('button')) b.disabled = !!state.room;
+  for (const b of $('roomGrid').querySelectorAll('button')) b.disabled = !!state.room && (room.etapa !== 'playing' || b.dataset.room === state.room);
 }
 
 function tick() {

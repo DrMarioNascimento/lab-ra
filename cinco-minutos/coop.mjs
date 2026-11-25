@@ -199,8 +199,10 @@ function renderPhase() {
 }
 
 function choose(id) {
-  if (!online || state.room || !['choose', 'playing'].includes(room.phase)) return;
+  if (!online || !['choose', 'playing'].includes(room.phase) || state.room === id) return;
   if (state.endAt && service.now() >= state.endAt) return;
+  if (state.room && room.phase !== 'playing') return;
+  if (state.room) { if (andando()) return; marcarCaminhada(); toast('Você vai para outra sala. A caminhada leva 10 segundos.'); }
   state.room = id;
   save();
   renderGame();
@@ -215,7 +217,7 @@ function decorate() {
   $('endLoop').disabled = moving || !online;
   $('phaseDescription').textContent = choosing ? 'Escolha onde investigar. O anfitrião inicia o relógio.' :
     state.room ? 'Examine a peça ou use a lista de pistas.' : 'O relógio começou. Escolha onde investigar.';
-  $('statusText').textContent = state.room ? 'Você permanece neste ambiente até o retorno.' : 'Escolha um ambiente para investigar nesta volta.';
+  $('statusText').textContent = state.room ? 'Você pode ir a outra sala quando quiser: a caminhada leva 10 segundos.' : 'Escolha um ambiente para investigar nesta volta.';
   $('roomPanel').classList.toggle('hidden', !playing || !state.room);
   for (const button of $('roomGrid').querySelectorAll('button')) button.disabled = !!state.room || !online;
 }
