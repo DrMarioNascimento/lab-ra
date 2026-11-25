@@ -565,6 +565,7 @@ const ROTAS_INICIAIS = [
 ];
 function renderRouteChoices(preparando) {
  const painel = $('routeChoices');
+ if (state.caseRules === 2 && painel.previousElementSibling !== $('roomGrid')) $('roomGrid').after(painel);   // as 15 salas vêm primeiro
  const aberta = state.loop === 1 && !state.room && !preparando;
  painel.classList.toggle('hidden', !aberta);
  painel.innerHTML = aberta ? '<p>Por onde você quer começar?</p><div>' + ROTAS_INICIAIS.map(([id, pergunta]) =>
@@ -595,7 +596,8 @@ function renderGame(){
  $('clockStatus').textContent=state.phase==='playing'?'tempo correndo':'escolha a sala';
  $('phaseTitle').textContent=state.room?sala(state.room).name:'Escolha uma sala';
  $('phaseDescription').textContent=state.phase==='playing'?'Gire a peça e toque nos pontos que brilham.':'Toque numa sala para ir até lá.';
- $('boardTitle').textContent = state.room ? (state.phase === 'playing' ? 'Examine a sala' : 'Sala escolhida') : 'Para onde você vai?';
+ $('boardTitle').textContent = state.room ? (state.phase === 'playing' ? 'Examine a sala' : 'Sala escolhida') : (state.caseRules === 2 ? '' : 'Para onde você vai?');
+ $('boardTitle').hidden = !$('boardTitle').textContent;
  $('phaseTitle').tabIndex = -1;
  $('roomGrid').innerHTML='<div class="inicio" role="status"><span class="ic3d" aria-hidden="true">🚪</span><div><strong>'+INICIO.name+' · '+INICIO.andar+'</strong><small>'+(state.phase==='playing'?'No fim da volta, você volta para cá.':'Você está aqui. Toda volta começa aqui.')+'</small></div></div>'+ANDARES.map(a=>(state.caseRules===2?'':'<h4 class="andar">'+a+'</h4>')+ROOMS.filter(r=>state.caseRules!==2||salasDoLoop().has(r.id)).map(r=>sala(r.id)).filter(r=>r.andar===a).sort((x,y)=>x.lugar-y.lugar).map(r=>'<button class="room an'+ANDARES.indexOf(a)+' '+(state.room===r.id?'selected':'')+'" '+(state.phase==='playing'&&state.room===r.id?'disabled':'')+' data-room="'+r.id+'">'+(r.peca?'<img class="room-3d" src="'+new URL('../icones/'+r.peca+'.webp',PECAS_URL).href+'" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'room-icon\',textContent:\''+r.icon+'\'}))">':'<span class="room-icon" aria-hidden="true">'+r.icon+'</span>')+'<strong>'+esc(state.caseRules===2?r.name.split(' · ')[0]:r.name)+'</strong>'+(state.caseRules===2?'<small class="room-andar">'+esc(r.andar)+'</small>':'<small>'+esc(r.sub)+'</small>')+'</button>').join('')).join('');
  $('roomGrid').classList.toggle('loop-mapa', state.caseRules===2);
@@ -635,7 +637,30 @@ function pontosDaPeca(mv, clues){
    hs.dataset.position = x+'m '+y+'m '+z+'m'; hs.dataset.normal = Math.cos(ang)+'m 0m '+Math.sin(ang)+'m';
    mv.updateHotspot({ name: hs.slot, position: hs.dataset.position, normal: hs.dataset.normal });
   });
+  if (!mv._sep) { mv._sep = true; let q = 0; const ag = () => { if (q) return; q = requestAnimationFrame(() => { q = 0; separarPontos(mv); }); };
+   mv.addEventListener('camera-change', ag); new MutationObserver(ag).observe(mv, {subtree:true, attributes:true, attributeFilter:['data-visible','class']}); addEventListener('resize', ag); }
+  [60, 400, 1200, 2500].forEach(t => setTimeout(() => separarPontos(mv), t));
  } catch (e) { console.warn('pontos da peça', e); }
+}
+/** Separação mínima entre os pontos que estão à vista: nenhum par fica a menos de 44 px na tela. Só afasta o desenho do ponto; o lugar sorteado na peça continua o mesmo. */
+const PONTO_MIN = 48;
+function separarPontos(mv){
+ try {
+  if (!mv.isConnected) return;
+  const cx = mv.getBoundingClientRect(); if (!cx.width) return;
+  const todos = [...mv.querySelectorAll('.hs')], vis = todos.filter(h => h.classList.contains('on') && h.hasAttribute('data-visible'));
+  todos.forEach(h => { if (!vis.includes(h) && h._dx != null) { h._dx = h._dy = null; h.style.translate = ''; } });
+  const P = vis.map(h => { const r = h.getBoundingClientRect(), ox = h._dx || 0, oy = h._dy || 0; const bx = r.left + r.width / 2 - ox, by = r.top + r.height / 2 - oy; return {h, bx, by, x:bx, y:by}; });
+  const m = 20, lim = p => { p.x = Math.min(cx.right - m, Math.max(cx.left + m, p.x)); p.y = Math.min(cx.bottom - m, Math.max(cx.top + m, p.y)); };
+  P.forEach(lim);
+  for (let k = 0; k < 60; k++) { let mexeu = false;
+   for (let i = 0; i < P.length; i++) for (let j = i + 1; j < P.length; j++) {
+    let dx = P[j].x - P[i].x, dy = P[j].y - P[i].y, d = Math.hypot(dx, dy); if (d >= PONTO_MIN) continue;
+    if (d < 0.5) { const a = (i * 2.4 + j) % 6.283; dx = Math.cos(a); dy = Math.sin(a); d = 1; }
+    const e = (PONTO_MIN - d) / 2 + 0.5; P[i].x -= dx / d * e; P[i].y -= dy / d * e; P[j].x += dx / d * e; P[j].y += dy / d * e; lim(P[i]); lim(P[j]); mexeu = true; }
+   if (!mexeu) break; }
+  P.forEach(p => { const dx = Math.round(p.x - p.bx), dy = Math.round(p.y - p.by); if (dx !== (p.h._dx || 0) || dy !== (p.h._dy || 0)) { p.h._dx = dx; p.h._dy = dy; p.h.style.translate = (dx || dy) ? dx + 'px ' + dy + 'px' : ''; } });
+ } catch (e) {}
 }
 function renderClues(){
  const room = sala(state.room);
@@ -669,7 +694,7 @@ function renderClues(){
   const lista = panel.querySelector('.lista-pistas');
   panel.insertBefore(lista, panel.querySelector('.peca'));
   if (room.livroLoop) {
-   panel.querySelector('.dica').insertAdjacentHTML('afterend', '<div class="livro-loop"><button type="button" class="btn secondary wide" data-abrir-livro><span class="ic3d sm" aria-hidden="true"><img src="'+ICONE_URL('ui/caderno')+'" alt=""></span>'+esc(room.livroLoop.abrir)+'</button><div class="livro-acoes"></div></div>');
+   panel.querySelector('.dica').insertAdjacentHTML('afterend', '<div class="livro-loop"><div class="livro-vaga"><button type="button" class="livro-capa" data-abrir-livro><span class="livro-capa-t">'+esc(room.livroLoop.capa.split('|')[0])+'</span><span class="livro-capa-s">'+esc(room.livroLoop.capa.split('|')[1]||'')+'</span><span class="livro-capa-b"><span class="ic3d sm" aria-hidden="true"><img src="'+ICONE_URL('ui/caderno')+'" alt=""></span>'+esc(room.livroLoop.abrir)+'</span></button></div><div class="livro-acoes"></div><div class="livro-leitura"><div class="ll-cab"><b>Leitura</b></div><p>Abra o livro e vire a folha. O texto da página aparece aqui, em letra grande.</p></div></div>');
    panel.querySelector('[data-abrir-livro]').onclick = e => {
     const host = e.currentTarget.parentNode; if (host.querySelector('iframe')) return;
     e.currentTarget.insertAdjacentHTML('afterend', '<div class="peca livro"><iframe title="'+esc(room.livroLoop.abrir)+'" src="'+new URL('livro/index.html?embed=1&solo=1&capa='+encodeURIComponent(room.livroLoop.capa), PECAS_URL.href.replace('pecas/','')).href+'" allow="fullscreen" loading="eager"></iframe></div>');
@@ -732,8 +757,18 @@ function livroAcoes(room, clues){
  const panel = $('roomPanel'), host = panel.querySelector('.livro-acoes'); if (!host || !panel.querySelector('iframe')) return;
  const par = Number(panel.dataset.par || 0), cl = livroPistas(room, clues), tem = c => state.clues.some(x => x.id === c.id);
  const html = [cl[2*par], cl[2*par+1]].filter(c => c && !tem(c) && custoPista(c) > 0).map(c => '<button type="button" class="btn secondary wide" data-ler="'+c.id+'">Ler “'+esc(c.name)+'” · '+custoPista(c)+' de energia</button>').join('');
+ livroLeitura(panel, [cl[2*par], cl[2*par+1]].filter(Boolean), tem);
  if (host.dataset.k === html) return; host.dataset.k = html; host.innerHTML = html;
  host.querySelectorAll('[data-ler]').forEach(b => { b.onclick = () => collect(b.dataset.ler); });
+}
+// O livro em 3D é o objeto; a leitura fica embaixo dele, em letra de tela (a folha do livro fica pequena demais no celular). Uma página por vez.
+function livroLeitura(panel, pags, tem){
+ const box = panel.querySelector('.livro-leitura'); if (!box) return;
+ const n = Math.min(Number(box.dataset.pg || 0), Math.max(0, pags.length - 1)), c = pags[n];
+ const txt = !c ? 'Folhas em branco.' : tem(c) ? (window.lcGlos ? lcGlos(esc(c.text), true) : esc(c.text)) : custoPista(c) > 0 ? 'Página fechada. Para ler, toque no botão “Ler”.' : 'Vire a folha até aqui para ler.';
+ const html = '<div class="ll-cab"><b>' + esc(c ? c.name : 'Página') + '</b>' + (pags.length > 1 ? '<span>' + pags.map((_, k) => '<button type="button" class="ll-pg' + (k === n ? ' on' : '') + '" data-llpg="' + k + '" aria-label="Página ' + (k ? 'da direita' : 'da esquerda') + '">' + (k ? 'direita' : 'esquerda') + '</button>').join('') + '</span>' : '') + '</div><p>' + txt + '</p>';
+ if (box.dataset.k === html) return; box.dataset.k = html; box.innerHTML = html; box.hidden = false;
+ box.querySelectorAll('[data-llpg]').forEach(b => { b.onclick = () => { box.dataset.pg = b.dataset.llpg; box.dataset.k = ''; livroLeitura(panel, pags, tem); }; });
 }
 function atualizarLivro(clues, elapsed){
  const panel = $('roomPanel'), fr = panel.querySelector('iframe'); if (!fr) return;
@@ -865,7 +900,7 @@ function renderJournal(){
  const clues=state.clues||[];$('countBadge').textContent=clues.length;
  $('journalPreview').innerHTML=clues.length?clues.slice(-3).reverse().map(c=>'<div class="preview-item">'+fichaSala(c.room,'sm')+'<div>'+esc(c.name)+'<small>'+esc(c.room)+'</small></div></div>').join(''):'<p class="muted">O que você achar aparece aqui.</p>';
  const nb=document.getElementById('lcBarN'); if(nb) nb.textContent=clues.length;
- $('journalList').innerHTML=clues.length?clues.map(c=>'<article class="journal-item '+etqClasse(c.etq)+'">'+fichaSala(c.room)+'<div><b>'+esc(c.room)+' · Volta '+c.loop+(c.tipo?' · '+esc(c.tipo):'')+'</b><p><strong>'+esc(c.name)+':</strong> '+(window.lcGlos?lcGlos(esc(c.text)):esc(c.text))+'</p></div></article>').join(''):'<p class="muted">Seu caderno ainda está vazio.</p>';
+ $('journalList').innerHTML=clues.length?clues.map(c=>'<article class="journal-item '+etqClasse(c.etq)+'">'+fichaSala(c.room)+'<div><b>'+esc(c.room)+' · Volta '+c.loop+(c.tipo?' · '+esc(c.tipo):'')+'</b><p><strong>'+esc(c.name)+':</strong> '+(window.lcGlos?lcGlos(esc(c.text),true):esc(c.text))+'</p></div></article>').join(''):'<p class="muted">Seu caderno ainda está vazio.</p>';
  if (!window.coop && state.archive?.length) {
   $('journalList').insertAdjacentHTML('beforeend', state.archive.map(key => {
    const axis = ANSWER_AXES.find(item=>item.key===key);
@@ -905,8 +940,8 @@ function renderBetweenPlan(){
   : T('ui/alvo', 'Junte 2 sinais de tipos diferentes e 1 leitura normal.');
  const instrucoes = {
   1: [T('T01', 'Volta 2: teste um palpite na Máquina.'), assunto],
-  2: [T('M03', 'Volta 3: hora de preparar o conserto.'), T('T01', 'Veja o que você precisa deixar pronto em outra sala.'), T('E01', 'Sem dupla? Grave o gesto no Pátio ou deixe a peça verdadeira no Subsolo.')],
-  3: [T('T01', 'Volta 4: ensaie o conserto. Ainda não vale.'), T('E01', 'Sem dupla, esta é a última volta para gravar o gesto no Pátio ou deixar a peça verdadeira no Subsolo.')],
+  2: [T('M03', 'Volta 3: hora de preparar o conserto.'), T('T01', 'Veja o que você precisa deixar pronto em outra sala.'), T('E01', 'Sem dupla? Alguns consertos pedem duas voltas. Veja "Sem dupla?" na Máquina, aba Atividades.')],
+  3: [T('T01', 'Volta 4: ensaie o conserto. Ainda não vale.'), T('E01', 'Sem dupla, esta é a última volta para deixar pronto o que o conserto pede em duas voltas.')],
   4: window.coop
    ? [T('T01', 'Volta 5: agora vale. Quem opera a Máquina?'), T('P01', 'Quem leva as 3 provas para a Recepção?'), T('E01', 'Guarde energia para a sua parte.')]
    : [T('T01', 'Volta 5: agora vale.'), T('ui/caderno', 'Escolha o que o seu caderno deixa você terminar.'), T('P01', 'Confira as provas, a sala e a energia antes de começar.')],
@@ -914,7 +949,15 @@ function renderBetweenPlan(){
  };
  $('betweenHint').innerHTML = (state.loop === 4 && window.coop && typeof lcPapeisHtml === 'function' ? lcPapeisHtml() : '') + (instrucoes[state.loop] || []).map(([ic, txt]) => '<p class="bs-tarefa"><span class="ic3d sm" aria-hidden="true"><img src="'+ICONE_URL(ic)+'" alt=""></span><span>'+esc(txt)+'</span></p>').join('');
 }
+function fecharJanelas(aviso){
+ const abertas = document.querySelectorAll('#lcBancada[open], #lcDialog[open], #journalDialog[open]'); if (!abertas.length) return;
+ const tinhaMini = !!document.querySelector('#lcBancada[open]');
+ abertas.forEach(d => { try { d.close(); } catch (e) {} });
+ if (aviso && tinhaMini) toast('A volta acabou. A pista fica para a próxima.');
+}
+window.fecharJanelas = fecharJanelas;
 function renderBetween(){
+ fecharJanelas(true);
  const finished = state.loop === 5;
  const interrompeu = state.caseRules === 2 ? lcS().conserto === 5 : brokeLoop();
  $('betweenEyebrow').innerHTML = '<span></span> '+(finished && interrompeu ? 'O TEMPO SEGUIU' : 'O TEMPO RETORNOU');
@@ -937,6 +980,7 @@ function renderBetween(){
  show('between');
 }
 function finishLoop(){
+ fecharJanelas(true);
  if(window.coop){window.coop.move('between');return}
  if(!state||state.phase!=='playing')return;
  if (state.caseRules === 2 && state.duration === 300 && Date.now() < state.endAt) return;
@@ -948,6 +992,7 @@ function finishLoop(){
  renderBetween();
 }
 function next(){
+ fecharJanelas(false);
  if(window.coop){window.coop.move(state.loop>=5?'final':'choose');return}
  if(state.loop>=5){state.phase='final';save();renderForm();show('final');return}
  state.loop++;
@@ -1150,6 +1195,7 @@ function renderForm(){
   ? 'Veja até onde a sua investigação chegou.'
   : 'Use as pistas do dossiê para reconstruir a noite.';
  $('reflectionForm').hidden = central;
+ { const fr = $('finalResumo'); if (fr) fr.innerHTML = central && typeof lcFichasFinal === 'function' ? lcFichasFinal() : ''; }
  if (central) { $('answerFields').innerHTML = ''; renderArchive(); return; }   // o Loop não monta as 8 perguntas do caso antigo, nem escondidas
  $('answerFields').innerHTML = '<p class="certeza-note">Escolha o quanto você confia em cada resposta. Com mais certeza você ganha mais pontos se acertar, mas perde pontos se errar. Em Quem e Por quê, aponte a pista que sustenta a resposta: sem ela, vale como palpite.</p>'+
   ANSWER_AXES.map(axis => '<div class="answer-field"><label for="'+axis.key+'">'+esc(axis.question)+
@@ -1160,6 +1206,7 @@ function renderForm(){
 }
 function submit(event){
  event.preventDefault();
+ fecharJanelas(false);
  const answers = selectedAnswers();
  if(window.coop){window.coop.move('result',answers);return}
  state.answers = answers;
@@ -1244,7 +1291,7 @@ $('answerFields').addEventListener('click', e => {
 // Apresentação das telas (21/11/2026): passo a passo visual dentro do manual. Sem códigos fixos nem nomes de escala.
 const TV_SALA = (id, on) => '<span class="tv-room'+(on?' on':'')+'"><img src="'+ICONE_URL(LOOP_SALAS[id][2])+'" alt="">'+LOOP_SALAS[id][0].split(' · ').pop()+'</span>';
 const TOUR = [
- {c:'Fim de tarde no museu. Amanhã abre a maior exposição da casa. Na Galeria, o curador não tira o olho da peça principal: "Está linda, não está?" Ele não parece ter certeza.',t:'Escolha uma sala', d:'Toda volta começa no Saguão. Toque numa sala para ir até lá.',
+ {c:'Noite de véspera no museu. Amanhã abre a maior exposição da casa. Na Galeria, o curador não tira o olho da peça principal: "Está linda, não está?" Ele não parece ter certeza.',t:'Escolha uma sala', d:'Toda volta começa no Saguão. Toque numa sala para ir até lá.',
   v:()=>'<div class="tv-rooms">'+TV_SALA('galeria',1)+TV_SALA('seguranca')+TV_SALA('prototipo')+TV_SALA('recepcao')+'</div><p class="tv-floor">Saguão superior · você começa aqui</p>'},
  {c:'Cada sala guarda um objeto. Gire, chegue perto. O que importa quase nunca está de frente.',t:'Gire a peça', d:'Toque nos pontos que brilham. Cada um guarda uma pista. Eles aparecem com o tempo.',
   v:()=>'<div class="tv-piece"><img class="tv-obj3d" src="'+ICONE_URL('V11')+'" alt=""><b class="tv-dot d1"></b><b class="tv-dot d2"></b><b class="tv-dot d3"></b></div><p class="tv-floor">Arraste para girar · toque no brilho</p>'},

@@ -45,7 +45,7 @@
     var comSombra = op.sombra !== false;
     if (comSombra) { renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap; }
     var ANISO = Math.min(8, (renderer.capabilities.getMaxAnisotropy && renderer.capabilities.getMaxAnisotropy()) || 1);
-    var FUNDO = 0x0c0907;
+    var FUNDO = /[?&]embed=1/.test(location.search) ? 0x0f1c28 : 0x0c0907;   // embutido no jogo: azul-noite, como a moldura da peça
     var cena = new THREE.Scene(); cena.background = new THREE.Color(FUNDO);
     if (global.OIAmbiente) cena.environment = OIAmbiente(renderer); /* reflexos para os metais do padrão */
     var camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.005, 50);

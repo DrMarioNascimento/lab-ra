@@ -39,16 +39,19 @@ Os dias e os números abaixo são os do exemplo (dia 14, registro 472). Em cada 
 | **Numa reunião de patrocinadores** | A Dra. Sato explica: "A Câmara guarda um ambiente do jeito que ele estava cinco minutos atrás." Alguém sublinha a frase duas vezes e escreve na margem: "então apaga?" | Ata da reunião (Sala de conservação; só depois da carta da seguradora e de ouvir o homem de paletó na escada) |
 | **Ontem** | A Dra. Sato faz o último ensaio da Câmara e sai. A tempestade fecha a estrada. | Fichas e anotações de ensaio (Ateliê), registro técnico (Sala de conservação), interfone do Subsolo |
 | **Ontem** | Lenz pega o crachá do Braga "emprestado" e deixa um bilhete no armário da equipe, em papel de bloco de hotel, sem assinatura. Com esse crachá, a porta de serviço abre sem passar pela roleta. | Bilhete no armário (Base da limpeza), escala de crachás (Central), anotação "crachá: ver depois" (Recepção). O Braga só admite da volta 3 em diante, quando vê a escala e o bilhete juntos no seu caderno e você já provou que a peça é cópia: o Lenz ficou rondando o armário falando "rapidinho" e, quando o Braga voltou, tinha o bilhete no lugar do crachá |
+| **Hoje, à tarde** | Lenz entra pela frente, como visita: assina o livro de visitas e passa pela roleta de entrada, para ser visto. Sai pela porta de serviço, com o crachá do Braga: a roleta da saída não registra. | Livro de visitas e roleta de entrada (Recepção), foto de divulgação (Sala da fotografia), roleta da saída (Central), As Duas Listas |
 | **Hoje, fim da tarde** | Aurélio finalmente escreve o laudo: "Verniz novo. Mais leve que no registro. Esta não é a nossa peça." | Laudo do curador (Sala de conservação, da volta 2 em diante, depois do cheiro de verniz) |
 | **Hoje, fim da tarde** | Téo não espera a manhã. Grava um recado num pendrive e entrega ao Nico: "Só para quem souber o que está gravado embaixo da verdadeira." Pega o pote 7, de tinta vermelha de marcação, na bancada da Ivone. A ideia é marcar a base da cópia de vermelho: "Tinta não mente." | Nico (Base da limpeza), caderno de materiais da Ivone, bilhete na cafeteira, folha do diário no bolso do macacão do Téo |
-| **Hoje, começo da noite** | Lenz entra pela porta de serviço com o crachá do Braga, de sapato molhado da chuva. A ronda fotografa as marcas de sola no chão. O Braga vê e não registra. | Caderno de rondas dentro do cofre do Braga (Central), foto de ronda presa no Quadro externo (Pátio) e a legenda dela no mural (Área de descanso): só valem juntas |
-| **Menos de um minuto antes de 0:00** | Téo encontra Lenz na Sala das coleções e diz que sabe. Os dois discutem. Lenz empurra. Téo cai, o pote vira, a tinta se espalha. Téo não responde. Lenz pisa na tinta, não percebe e vai embora andando: cruza a Área de descanso e sai pela porta de serviço. Só volta às 4:00. | Botão de paletó no chão, pó arrastado na prateleira atrás do Téo (e, mais abaixo, a marca de dedos abertos de quem tentou segurar quem caía), primeira pegada dentro da tinta, a mancha, as pegadas que brilham no escuro (somem na porta de serviço), a marca de sola lisa de quem saiu pela porta |
+| **Hoje, começo da noite** | Lenz volta pela porta de serviço com o crachá do Braga, de sapato molhado da chuva. A ronda fotografa as marcas de sola no chão. O Braga vê e não registra. | Caderno de rondas dentro do cofre do Braga (Central), foto de ronda presa no Quadro externo (Pátio) e a legenda dela no mural (Área de descanso): só valem juntas |
+| **Uns trinta segundos antes de 0:00** | Téo encontra Lenz na Sala das coleções e diz que sabe. Os dois discutem. Lenz empurra. Téo cai, o pote vira, a tinta se espalha. Téo não responde. Lenz pisa na tinta, não percebe e vai embora andando: cruza a Área de descanso e sai pela porta de serviço. Só volta às 4:00. | Botão de paletó no chão, pó arrastado na prateleira atrás do Téo (e, mais abaixo, a marca de dedos abertos de quem tentou segurar quem caía), primeira pegada dentro da tinta, a mancha, as pegadas que brilham no escuro (somem na porta de serviço), a marca de sola lisa de quem saiu pela porta |
 
 ### O pendrive do Nico
 
 A senha é o **número de registro** da peça verdadeira, o número gravado embaixo da base. Nico só entrega a quem diz esse número e já leu o laudo do Aurélio, e só da volta 4 em diante.
 
-No rádio da Sala dos sons, a voz do Téo não acusa ninguém pelo nome e não sabe nada do que veio depois: "Quem pediu a 'limpeza' foi o patrocínio. Hoje eu falo com ele, cara a cara. Se eu não aparecer, não deixa a noite acabar sem prova." O nome, quem fecha é você.
+Nico só entrega a quem já falou com ele, já contou do Téo caído e já leu o laudo: o Téo pediu "só se eu não aparecer, e só para quem souber o número certo".
+
+No rádio da Sala dos sons, a voz do Téo não acusa ninguém pelo nome e não sabe nada do que veio depois: "Ontem o do patrocínio me estendeu um envelope pra eu 'não ter carregado nada'. Eu não peguei. Hoje eu falo com ele, cara a cara. Se eu não aparecer, não deixa a noite acabar sem prova." O nome, quem fecha é você.
 
 ### Por que Lenz trocou a peça
 
@@ -64,9 +67,9 @@ Ninguém quis ferir ninguém, e foi isso que estragou tudo. Lenz olhou para o T�
 
 Lenz entendeu errado. Achou que a máquina **apagava** cinco minutos. Você ouve isso da boca dele, no minuto 4:10, descendo a escada do Subsolo: "Cinco minutos. Só preciso de cinco minutos de volta." Ele vira a chave de ligar da Câmara, que já está virada, e sai sem olhar para você.
 
-A máquina obedece pela metade. Volta cinco minutos, trava e volta de novo. E de novo.
+A máquina obedece pela metade. Ela leva cinquenta segundos para armar. Dispara às 5:00 e devolve o museu a 0:00, segundos depois da queda. Lenz errou por menos de um minuto. Volta cinco minutos, trava e volta de novo. E de novo.
 
-Enquanto o museu gira, o Téo não piora. Nem melhora. Fica guardado, igual a uma peça numa vitrine. É o que a Dra. Sato responde quando você conta dele pelo interfone: "Para ele acordar, a noite tem que andar. Já pedi socorro pelo rádio da estrada: só chega se a noite andar." Parar a máquina é deixar o socorro chegar.
+Enquanto o museu gira, o Téo não piora. Nem melhora. Fica guardado, igual a uma peça numa vitrine. É o que a Dra. Sato responde quando você conta dele pelo interfone: "Para ele acordar, a noite tem que andar. Estou com o resgate da estrada no rádio. Peço socorro agora: só chega se a noite andar." Parar a máquina é deixar o socorro chegar.
 
 ## 3. Os cinco minutos que se repetem
 
@@ -79,7 +82,7 @@ Enquanto o museu gira, o Téo não piora. Nem melhora. Fica guardado, igual a um
 | 4:00 | O crachá do Braga abre a porta de serviço. A câmera da porta de serviço mostra alguém de paletó chegando, de crachá na mão. |
 | 4:02 | Essa pessoa cruza a Área de descanso olhando o relógio: "Tô só pegando um documento, rapidinho." |
 | 4:05 | Na Base da limpeza, Seu Dirceu aponta com o rodo: passou alguém de sapato social, com pressa, rumo à escada do Subsolo. |
-| 4:10 | Essa pessoa desce ao Subsolo e vira a chave de ligar da Câmara, que já está virada. |
+| 4:10 | Essa pessoa desce ao Subsolo e vira a chave de ligar da Câmara, que já está virada. Depois de ligada, a Câmara leva 50 segundos para armar. |
 | 5:00 | Tudo recomeça. |
 
 **O que muda a cada partida.** Nada aqui dá para decorar de uma partida para outra. O jogo sorteia:
@@ -98,7 +101,7 @@ Dentro da mesma partida, o raio cai sempre no mesmo minuto, volta após volta. �
 
 | Andar | Salas |
 |---|---|
-| 2º andar | Galeria especial |
+| 2º andar | Galeria especial (e o Saguão superior, onde toda volta começa) |
 | 1º andar | Sala de conservação, Sala dos sons, Sala da fotografia, Sala dos relógios |
 | Térreo | Recepção, Central de monitoramento, Área de descanso (com a porta de serviço), Base da limpeza, Ateliê de descobertas, Sala das coleções, Oficina técnica, Oficina elétrica, Pátio · Quadro externo |
 | Subsolo | Câmara do tempo |
@@ -119,19 +122,19 @@ Cada volta tem três camadas: o **agora** (o que você vê), o **antes** (o que 
 - **Página nova do dossiê:** planta + linha do tempo.
 
 ### Volta 2 — "Não é só cheiro"
-- **Agora:** a mancha está do mesmo tamanho. Você mede com o pé: a tinta para na mesma tábua. Só a marca que o seu sapato deixou da outra vez sumiu. A mancha está igual. Você é que não está. Você acha o laudo do Aurélio na Sala de conservação. No fundo de uma caixa, o molde de gesso. E a caixa de "banners" que pesa demais já tem motivo para ser aberta: dentro, a peça verdadeira.
+- **Agora:** a mancha está do mesmo tamanho. Você mede com o pé: a tinta para na mesma tábua. Ainda molhada, como se tivesse acabado de cair. O museu não guardou nada. Você, sim. Você acha o laudo do Aurélio na Sala de conservação. No fundo de uma caixa, o molde de gesso. E a caixa de "banners" que pesa demais já tem motivo para ser aberta: dentro, a peça verdadeira.
 - **Antes:** as páginas anteriores do diário, com a letra do Téo, e a carta da seguradora (quem assinou pelo patrocínio: uma rubrica, sem nome).
 - **Próximo loop:** primeira chance de **anexar o diagnóstico**. Abrem as atividades em dupla: Lado a Lado, As Duas Listas, Apagão Combinado, Painel e Manual, Correio do Loop. Quem pega a luva isolante depois do apagão deixa no chão do Pátio para a volta seguinte. Com o diagnóstico anexado, o conserto já pode ser ensaiado.
 - **Página nova:** "Por que a máquina travou?" (em branco, esperando 3 pistas).
 
 ### Volta 3 — "Agora as pessoas respondem diferente"
 - **Agora:** as testemunhas não lembram de você, mas reagem ao que você **mostra**. Ivone bate o dedo no recibo. Aurélio tira os óculos diante do diário e do laudo. Braga, vendo a escala e o bilhete, coça a nuca e admite: "O crachá é meu. Só que não tá comigo desde ontem." No gravador da Sala dos sons, um telefonema: "O seguro cai até o fim do mês ou eu não tenho mais empresa." A Dra. Sato só comenta o sinal que você viu com os próprios olhos, e devolve pergunta.
-- **Antes:** as fichas dos três suspeitos fecham: a tinta era da Ivone, o crachá era do Braga, a mão era de Lenz. O nome só sai nesta volta (antes dela, "Lenz" não está escrito em lugar nenhum), por um destes caminhos: prova da cópia + escala + bilhete diante do Braga; mostrar o bilhete ao homem de paletó quando ele entra pela porta de serviço, às 4:02 (no crachá da cintura dele, a foto é do Braga; o telefone toca e ele atende: "Lenz. Agora não."); ou a atividade Acusação e Defesa, que abre agora. Depois de admitir, o Braga deixa você ler a última página do livro da Central.
+- **Antes:** as fichas dos três suspeitos fecham: a tinta era da Ivone, o crachá era do Braga, a mão era de Lenz. O nome só sai nesta volta (antes dela, "Lenz" não está escrito em lugar nenhum), por um destes caminhos: prova da cópia + escala + bilhete diante do Braga; mostrar o bilhete ao homem de paletó quando ele passa pela Área de descanso, às 4:02 (você já viu ele passar numa volta e agora espera com o bilhete e o livro de visitas na mão) (no crachá da cintura dele, a foto é do Braga; o telefone toca e ele atende: "Lenz. Agora não."); ou a atividade Acusação e Defesa, que abre agora. Depois de admitir, o Braga deixa você ler a última página do livro da Central.
 - **Próximo loop:** quem joga sem dupla grava o eco ou deixa a peça no chão. Na noite de dois defeitos, o primeiro conserto já pode ficar gravado na Câmara.
 - **Página nova:** fichas dos suspeitos.
 
 ### Volta 4 — "Ensaio geral"
-- **Agora:** Nico, enfim, reage ao número de registro e entrega o pendrive; no rádio da Sala dos sons, a voz do Téo. Na escada, perto das 4:10, o homem de paletó para um segundo quando você diz, alto, que a peça é cópia: "Ninguém quer confusão hoje. Nem você." Na Central de monitoramento, alguém já pode confirmar em voz alta quem está onde.
+- **Agora:** Nico, enfim, reage ao número de registro e entrega o pendrive (você já contou do Téo caído e já leu o laudo); no rádio da Sala dos sons, a voz do Téo. Na escada, perto das 4:10, o homem de paletó para um segundo quando você diz, alto, que a peça é cópia: "Ninguém quer confusão hoje. Nem você." Na Central de monitoramento, alguém já pode confirmar em voz alta quem está onde.
 - **Antes:** as peças que faltam do motivo e do engano: a ata com "então apaga?" e o guardanapo no bolso do paletó reserva.
 - **Próximo loop:** o conserto roda como **ensaio**. A máquina responde "REAGE" ou "NÃO REAGE". Se algum valor estiver errado, ela só diz quantos estão certos, nunca qual. E avisa o que ainda pode falhar na hora de valer.
 - **Página nova:** "Ensaio feito. Repita para valer."
@@ -144,16 +147,16 @@ Cada volta tem três camadas: o **agora** (o que você vê), o **antes** (o que 
 
 ## 5. Cenas marcantes
 
-### Cena do diagnóstico — "Três carimbos"
-Você abre a página em branco do dossiê e escolhe 3 pistas. Elas não entram todas juntas. Entram uma por uma, e cada uma leva um carimbo com barulho de carimbo:
+### Cena do diagnóstico — "Ela escutou você"
+Você abre a página do dossiê, marca 3 pistas e escolhe o defeito. A resposta vem pista por pista:
 
-**SINAL DA MÁQUINA.** (pausa) **SINAL DA MÁQUINA.** (pausa) **LEITURA NORMAL.**
+"contou, sinal." "contou, sinal." "contou, leitura normal."
 
-No telão aparece o placar: "Contaram 2 de 2 sinais e 1 de 1 leitura normal." Aí acontece o que nunca aconteceu: no meio da volta, a luz do museu inteiro baixa por um segundo. No Subsolo, o zumbido da máquina para. Silêncio. No interfone, a Dra. Sato quase sussurra: "Quem fez isso? Ela... ela escutou você."
+E o placar: "2 de 2 sinais e 1 de 1 leitura normal." Lá embaixo, a Câmara dá um estalo, como quem escuta. Se você estiver no Subsolo, a Dra. Sato quase sussurra no interfone: "Quem fez isso? Ela... ela escutou você."
 
 A página deixa de ser papel e vira peça do dossiê. O conserto da noite acende.
 
-Se você errar, a cena também ensina. O carimbo bate **NÃO CONTOU** e diz por quê: "sinal repetido, mesmo tipo", "isso é história, não é sinal da máquina", "coisa estranha com explicação inocente". O placar mostra "1 de 2 sinais". Você perde a tentativa da volta e ganha a regra.
+Se você errar, a cena também ensina. A resposta diz por quê, pista por pista: "sinal repetido", "tem explicação inocente, não conta", "não é sinal nem leitura". Em cima, a conta: "Você tem 1 sinal; precisa de 2 diferentes." Você perde a tentativa da volta e ganha a regra.
 
 Na noite de dois defeitos tem um terceiro jeito: você anexa só um defeito, a máquina dá um tranco e o aviso **muda de lugar**. Mudou, não sumiu.
 
@@ -169,7 +172,7 @@ O clarão acerta o para-raios. A chave treme e quer abrir. Quem está no Pátio 
 A virada da cena: durante quatro voltas o apagão foi o seu inimigo. Na quinta você entende que **o apagão é o raio**, e o raio é a força que faltava.
 
 ### Cena do pendrive — "A voz"
-Da volta 4 em diante. Você diz o número de registro. Nico pisca, como quem acorda. Pela primeira vez ele não pede desculpa: "É isso. O Téo falou: só para quem souber o que está gravado embaixo da verdadeira." E põe o pendrive na sua mão. No rádio, o Téo fala com você sem te conhecer: "Eu carrego essa peça há seis anos e conheço o peso dela. Se eu não aparecer, não deixa a noite acabar sem prova."
+Da volta 4 em diante, para quem já contou do Téo caído e já leu o laudo. Você diz o número de registro. Nico pisca, como quem acorda. Pela primeira vez ele não pede desculpa: "É isso. O Téo falou: só para quem souber o que está gravado embaixo da verdadeira." E põe o pendrive na sua mão. No rádio, o Téo fala com você sem te conhecer: "Se você achou o número, sabe que a da Galeria é cópia. Hoje eu falo com ele, cara a cara. Se eu não aparecer, não deixa a noite acabar sem prova."
 
 ### Cena da caixa — "Pesa demais para banner"
 Em toda noite. Na Sala das coleções, você empurra com o pé uma caixa do patrocínio: "BANNERS – NÃO ABRIR". Da volta 2 em diante, com o cheiro de verniz no caderno, você tem motivo para abrir. Dentro da manta está a peça de 300 anos. Cheira a pó, não a verniz. Embaixo da base, o número gravado. A caixa é fato do crime em qualquer partida, e a peça verdadeira na mão vale como prova de que a da Galeria é cópia; na noite da peça presa (causa C) ela também é a ferramenta do conserto.
@@ -207,7 +210,7 @@ Sem dupla: você faz tudo no Subsolo, com manual, página do ajuste e os 3 valor
 **Virada.** Os números não estão escritos em parede nenhuma. São a verdade que você investigou.
 
 ### B — Falta força
-**História.** A máquina está ajustada, com três vistos na ficha. Mas o gerador foi regulado para o mínimo e, quando o raio derruba a rede, ele não dá conta dela. De tempos em tempos ela tenta ligar, perde o fôlego e desiste.
+**História.** A máquina está ajustada, com três vistos na ficha. Mas a Câmara puxa só do gerador, e o gerador foi regulado para o mínimo. Com raio ou sem raio, ele não dá conta dela. De tempos em tempos ela tenta ligar, perde o fôlego e desiste.
 
 **Sinais.** Ponteiro de carga no chão. As luzes enfraquecem a cada tentativa. Leitura normal: mostradores verdes e parados.
 
@@ -241,7 +244,7 @@ Sem dupla: você faz as duas partes, com procedimento, fusível, ordem e luva no
 **Virada.** O Téo pediu: "Só depois de provar o que aconteceu." Se você religar sem Revelar, você termina o serviço de Lenz.
 
 ### E — Dois defeitos juntos
-**História.** Nesta noite deu tudo errado ao mesmo tempo: os mostradores estavam zerados **e** o gerador estava no mínimo quando o raio derrubou a rede. As duas cenas (a tranca e o gerador) aparecem, e há uma terceira, só desta noite: o verso da ordem de serviço. No bilhete da Dra. Sato: "Se um dia forem dois defeitos: um por volta. Ela guarda o primeiro. O aviso muda de lugar, não some."
+**História.** Nesta noite deu tudo errado ao mesmo tempo: os mostradores estavam zerados **e** o gerador, de onde a Câmara puxa toda a força, estava no mínimo. As duas cenas (a tranca e o gerador) aparecem, e há uma terceira, só desta noite: o verso da ordem de serviço. No bilhete da Dra. Sato: "Se um dia forem dois defeitos: um por volta. Ela guarda o primeiro. O aviso muda de lugar, não some."
 
 **Sinais.** Misturados: mostradores piscando e carga baixa. Você anexa um sinal de número, um sinal de força e uma leitura normal. Um defeito só não faz os dois.
 
@@ -255,18 +258,18 @@ Sem dupla: a regra é a mesma. O ajuste numa volta, a alavanca valendo em outra;
 | Atividade | Salas | O que sai dela |
 |---|---|---|
 | **Lado a Lado** | Galeria especial + Sala da fotografia | Cada tela lista 3 coisas (da peça ou da foto). Lidas em voz alta, dão 3 diferenças: prova de que a peça é cópia |
-| **As Duas Listas** | Recepção + Central de monitoramento | Quem entrou e não saiu pela roleta (se saiu, foi por outra porta): prova do trajeto |
+| **As Duas Listas** | Recepção + Central de monitoramento | Cada tela mostra uma lista (o livro de visitas ou a roleta da saída). Quem entrou e não saiu pela roleta (se saiu, foi por outra porta): prova do trajeto |
 | **Apagão Combinado** | Pátio + Área de descanso | A palavra só aparece enquanto quem está no Pátio segura a chave geral. Pegadas que brilham no escuro: saem da Sala das coleções, cruzam a Área de descanso e somem na porta de serviço |
-| **Painel e Manual** | Subsolo + Ateliê | O Subsolo vê como estão os 3 símbolos; o Ateliê vê a legenda e marca. Sai a leitura completa do painel: no Anexar ela vale sozinha, mas quem escolhe o defeito é você |
+| **Painel e Manual** | Subsolo + Ateliê | No Subsolo, olhar o painel gasta 1 de energia e mostra como estão os 3 símbolos (fazer em dupla não cobra de novo); o Ateliê vê a legenda e marca. Sai a leitura completa do painel: no Anexar ela vale sozinha, mas quem escolhe o defeito é você |
 | **Correio do Loop** | Oficina técnica + Pátio | A luva isolante deixada no chão do Pátio para a volta seguinte |
-| **Acusação e Defesa** (da volta 3) | Central de monitoramento + Base da limpeza | Escala e bilhete lidos juntos: a letra do bilhete deita igual à assinatura do patrocínio no livro de visitas. É a do Lenz |
+| **Acusação e Defesa** (da volta 3) | Central de monitoramento + Base da limpeza | Cada tela mostra um papel (a escala ou o bilhete). Lidos juntos: a letra do bilhete deita igual ao visto do patrocínio no pé da escala. É a do Lenz |
 | **Três Números, O Raio, A Verdadeira, Fio a Fio** | conforme a causa | O conserto da noite (ensaio até a volta 4, vale na 5) |
 
 Na pausa entre voltas você pode passar pistas para outra pessoa: é de graça, até 3 por pessoa, e quem recebe conta com as próprias palavras. O que você gasta para investigar chama **energia**. Você tem 5 de energia por volta, com dupla ou sem dupla. Quase toda pista gasta 1; algumas não gastam nada e poucas gastam 2 (a tela mostra antes). Carga é só o ponteiro da máquina.
 
-Cada aparelho tem o próprio caderno. Para abrir uma atividade, você precisa do diagnóstico e das pistas de entrada no seu caderno: o que faltar, peça na pausa. Nos consertos em dupla, quem está no Subsolo é quem gira, liga ou digita; a outra pessoa diz a palavra da dupla e dita.
+Cada aparelho tem o próprio caderno. Para abrir uma atividade, você precisa das pistas de entrada no seu caderno; os consertos pedem também o diagnóstico. O que faltar, peça na pausa. Nos consertos em dupla, quem está no Subsolo digita o que ouve; a outra pessoa diz a palavra da dupla e dita o que está no caderno dela.
 
-Cada pessoa também recebe uma **missão secreta**, só dela: o que o Braga esconde; o que derrubou o Téo; quem ganha se a peça sumir; por que a tinta da Ivone não faz dela culpada; o que o Aurélio sabia; para onde vão as pegadas; o que tem na caixa que pesa demais; o que o Nico está guardando. Quem cumpre ganha +1 de energia na volta seguinte.
+Cada pessoa também recebe uma **missão secreta**, só dela: o que o Braga esconde; o que aconteceu com o Téo; quem ganha se a peça sumir; por que a tinta da Ivone não faz dela culpada; o que o Aurélio sabia; para onde vão as pegadas; o que tem na caixa que pesa demais; o que o Nico está guardando. Quem cumpre ganha +1 de energia na volta seguinte.
 
 ## 7. Volta 5 com cinco pessoas: ninguém sobra
 
@@ -286,7 +289,7 @@ Dica de tela de quem guarda o dossiê: *"Você guarda o dossiê. Confira as 3 pr
 
 ## 8. Os cinco finais
 
-Os textos abaixo são os mesmos que o jogo mostra.
+Os textos abaixo são os que cada aparelho mostra. O telão mostra a versão curta, no plural. Nomes na tela: Ouro, A noite andou, A verdade apareceu, Caso aberto, O museu esqueceu.
 
 ### Ouro — consertou e revelou
 > A máquina para e a verdade fica. O relógio marca 5:01 pela primeira vez. Lá fora, uma sirene. Na Sala das coleções, o Téo abre os olhos. Aurélio olha para o telão, depois para você, e só consegue dizer: "Obrigado por não esquecer."
@@ -364,7 +367,7 @@ Vale sobre o que estiver escrito acima, nas partes 9 e 10.
 - **Comparar a foto sem ajuda.** Passou para a volta 2. Na volta 1 ninguém sai com prova da cópia.
 - **Caixa de "banners".** Só abre na volta 2, com motivo. Na volta 1 você só empurra com o pé.
 - **Listas e pegadas.** As Duas Listas dizem "se saiu, foi por outra porta". Entre 0:00 e 4:00 ele está fora do prédio.
-- **Trajeto.** O caderno de rondas do cofre e a foto com a legenda mostram a mesma entrada, no começo da noite. Os dois valem como prova do trajeto.
+- **Trajeto.** O caderno de rondas do cofre e a foto com a legenda mostram a mesma volta pela porta de serviço, no começo da noite. As duas coisas valem como prova do trajeto.
 - **Pares de mesmo rótulo.** Onde o sinal não existe, o que você acha é um objeto de ambiente: medidor desligado, vidro embaçado, etiqueta colada em cima. Não mostra o defeito e não é leitura normal.
 - **Pendrive.** A gravação traz um fato novo: ontem o do patrocínio estendeu um envelope ao Téo, para ele "não ter carregado nada". Ele não pegou.
 - **Noite D.** O cadeado está aberto, só de aviso. A página dobrada do diário pede antes um sinal da caixa de fusíveis. Seu Dirceu viu o Téo subir para a Galeria de mão fechada e voltar de mão vazia: não sabe o que era.
@@ -372,7 +375,26 @@ Vale sobre o que estiver escrito acima, nas partes 9 e 10.
 - **Noite E.** Um conserto por volta, com ou sem dupla.
 - **Dra. Sato.** Está fora do prédio e só fala. Sem dupla, "com a Dra. Sato na linha", ela dita e confere: você prende a trava do apoio com o seu cinto, ou prende a chave do Pátio com a luva e ela, que vê o céu de fora, conta o raio.
 - **Painel e Manual.** Entrega a leitura completa do painel, sem o nome do defeito. Quem dá nome ao defeito é você, no Anexar.
-- **O manual não sabe das voltas.** Foi escrito antes desta noite. A página 6 diz "o que ela já guardou, ela não desfaz".
+- **O manual não sabe desta noite.** Foi escrito antes dela. Quando fala em "volta", fala de cada vez que a Câmara recomeça num ensaio. A página 6 diz "o que ela já guardou, ela não desfaz".
 - **Entrada.** "Cinco minutos. O museu recomeça. Você não." A entrada, a ajuda, a aba Revelar e as missões não contam mais a troca da peça nem o raio no minuto 0.
 - **Papéis da última volta.** Em sala, cada pessoa toca no seu papel na pausa da volta 4 (parte 7). O telão mostra nome e papel.
-- **Fim no telão.** O final da história, a fita da noite em ordem (com o motivo, o engano e o defeito da noite) e uma pergunta para conversar: "Consertar a noite ou contar a verdade: dava para fazer os dois? Se só desse uma, qual vocês escolhiam, e quem pagava por ela?"
+- **Fim no telão.** O final da história, a fita da noite em ordem (com o motivo, o engano e o defeito da noite) e uma pergunta para conversar: "Consertar a noite ou contar a verdade: dava para fazer as duas coisas? Se só desse uma, qual vocês escolhiam, e quem pagava por ela?"
+
+## 12. O que mudou na revisão 5 (25/11/2026)
+
+Vale sobre o que estiver escrito acima, nas partes 9 a 11.
+
+- **A entrada do Lenz, numa versão só.** Hoje à tarde ele entrou pela frente, como visita (livro de visitas e roleta de entrada), e saiu pela porta de serviço com o crachá do Braga, sem passar pela roleta da saída. No começo da noite voltou por ela (caderno de rondas, foto e legenda). Uns trinta segundos antes de 0:00 empurrou o Téo e saiu por ela. Às 4:00 de cada volta, volta por ela de novo.
+- **Cinquenta segundos.** Depois que a chave de ligar é virada, a Câmara leva 50 segundos para armar (plaquinha ao lado do relógio digital). Virada às 4:10, ela dispara às 5:00.
+- **A Câmara puxa só do gerador.** Está na página 3 do manual. Por isso a carga já está baixa no minuto 0 da noite da falta de força, com a rede do museu ligada.
+- **Dra. Sato e o socorro.** Ela só pede socorro depois que você conta do Téo.
+- **Aba Revelar.** Mostra só o nome do final que você teria se a noite acabasse agora, sem o texto. O final mínimo chama "O museu esqueceu".
+- **Painel e Manual.** No Subsolo, o painel só aparece depois de "Olhar o painel (1 de energia)". Fazer em dupla depois disso não cobra de novo.
+- **Trancas com motivo no mundo.** Nico só entrega o pendrive a quem já falou com ele, contou do Téo caído e leu o laudo. O Braga só fala com a escala, o bilhete e a prova da cópia na frente dele. Para estender o bilhete ao homem de paletó, você precisa já ter visto ele passar. O piso de volta (3, 3 e 4) continua.
+- **Noite D.** A página dobrada do diário não adianta mais o engano do Lenz: fala só de "o do patrocínio rondando o Subsolo".
+- **Dra. Sato na linha.** A confiança dela cobre uma informação que falte no caderno. Objeto (fusível, luva, peça) precisa estar com você.
+- **Minijogos.** Pedem o que está no caderno: a fita da porta de serviço pergunta de quem é o crachá (escala); a caixa pede o peso anotado na lista de entregas; a foto antiga pede o que você anotou diante da peça. Na Galeria, antes de mexer na luz, você responde o que uma peça de 300 anos mostraria.
+- **Acusação e Defesa e As Duas Listas.** Cada tela mostra um papel diferente. O visto do patrocínio fica no pé da escala de crachás.
+- **Três Números e Fio a Fio.** Os papéis dizem o que a tela faz: uma pessoa dita o que tem no caderno, a outra digita no Subsolo.
+- **Interfone.** A resposta ao sinal da base devolve pergunta ("Como está a peça?").
+- **Base da peça exposta.** Na volta 1 você acha um feltro novo embaixo dela; a falta do número fica para o Lado a Lado, da volta 2.

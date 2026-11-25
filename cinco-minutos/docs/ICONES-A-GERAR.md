@@ -17,11 +17,12 @@ Regra do projeto: ícone só em render 3D, próprio do Loop. Onde existe objeto 
 - Ícone já trocado por miniatura: é só salvar o arquivo novo por cima, com o mesmo nome. Nenhum código muda.
 - Lista B (emoji em ficha): salvar o arquivo e trocar o emoji pelo nome indicado na coluna "Troca no código". Em `loop-central.js` a ficha aceita `'img:ui/<nome>'` no lugar do emoji; em `game.js` e `telao.mjs` basta pôr `<img src=".../ui/<nome>.webp">` dentro da ficha `.ic3d`.
 
-## Situação em 25/11/2026 (revisão 4)
+## Situação em 25/11/2026 (revisão 5)
 
 - **Trocados por miniatura 3D do próprio acervo: 20.** Os 7 que eram cópia do Mosaico Vila Ética e 13 emojis.
 - **Continuam provisórios (emoji em ficha): 6.** Não há peça adequada em `museu/pecas`. Estão na lista B, abaixo.
 - As miniaturas saem de `museu/icones/gerar.html` (render da peça, com ângulo, aproximação e luz por parâmetro).
+- **Revisão 5, sem arte nova:** o ícone de tipo de pista passou para 32 px, em ficha clara e com a miniatura aproximada por CSS (20%); no telão, o círculo tracejado aparece uma vez só (ficha "N fatos ficaram no escuro"); a aba Atividades mostra as miniaturas das duas salas com 48 px.
 
 ### O que já foi trocado (nada a fazer)
 
@@ -59,7 +60,7 @@ Se quiser ícones desenhados no estilo latão e esmalte no lugar dessas miniatur
 | 3 | `uma-tentativa.webp` | ☝️ | Aba Revelar ("Uma tentativa na noite inteira") | `loop-central.js`, `lcPainelHtml()` | um carimbo de madeira com base de latão, de pé, com a almofada vermelha ao lado |
 | 4 | `missao.webp` | 🕵️ | Cartão "Sua missão secreta" | `loop-central.js`, `lcMissaoHtml()` | um envelope de papel pardo fechado com lacre de cera vermelha |
 | 5 | `energia.webp` | ⚡ | Ao lado do número de energia (ficha "Energia", rótulo "1 ⚡" das pistas, linha de energia da sala) | `loop-central.js`; `game.js`; `noites-motor.js` | uma pilha de latão com um anel dourado aceso e um raio pequeno gravado |
-| 6 | `fato-falta.webp` | círculo tracejado | Telão, fita do tempo: fato que ninguém achou | `ritmo.js`, `loopFitaHtml()` (classe `tl-vago`) | uma moldura de latão vazia com um ponto de interrogação em relevo no centro |
+| 6 | `fato-falta.webp` | círculo tracejado | Telão, fita do tempo: ficha única dos fatos que ninguém achou | `ritmo.js`, `loopFitaHtml()` (classe `tl-vago`) | uma moldura de latão vazia com um ponto de interrogação em relevo no centro |
 
 ## Apoios pequenos que continuam como emoji (permitido pelo padrão)
 
@@ -68,3 +69,14 @@ Ao lado de texto, sem papel de ícone principal: 🔒 no botão "Conduzir como p
 ## Miniaturas de peça com novo enquadramento (feito na revisão 4)
 
 `E02` (Oficina elétrica: câmera mais baixa e mais perto dos painéis), `R02` e `N05` (aproximadas na parte de cima, que é o que se reconhece) e `V41`. As salas da Galeria, dos relógios e da Área de descanso usam agora as peças compostas `GAL_A`, `REL_A` e `DESC_A`, com miniatura própria. Ainda vale conferir a `E02` no mapa: melhorou, mas "gerador e fusíveis" continua difícil de ler num quadro de 48 px.
+
+## Lista C · miniaturas a refazer (pedido da rodada 4; nenhuma é provisória)
+
+São miniaturas 3D do acervo que já estão no ar, mas leem mal no tamanho em que aparecem. Refazer em `museu/icones/gerar.html` (novo enquadramento) ou gerar com o prompt-base, e salvar por cima, com o mesmo nome.
+
+| # | Arquivo | Onde aparece | Problema | O que fazer / prompt (depois do prompt-base) |
+|---|---|---|---|---|
+| 1 | `E02.webp` | Oficina elétrica no mapa (40 a 48 px) e no telão | A sala inteira vira uma laje cinza | Enquadrar só o painel de fusíveis. Prompt: um painel de fusíveis de parede com porta aberta, três fileiras de fusíveis de vidro e um par de luvas de borracha pendurado ao lado |
+| 2 | `DESC_A.webp` | Área de descanso no mapa e na fita do telão | Sofá e cortiça têm 3,8 m de largura: viram dois traços | Enquadrar só a cortiça com as alavancas. Prompt: um quadro de cortiça com recados presos e uma fileira de alavancas de latão embaixo |
+| 3 | `ui/pista-registro.webp`, `ui/pista-observacao.webp`, `ui/pista-relato.webp`, `ui/pista-objeto.webp` | Lista da sala, 32 px | Quatro objetos escuros e parecidos | Fundo claro e silhueta forte. Prompts: uma ficha de arquivo de papel creme com um clipe de latão; um olho de vidro dentro de uma lupa de latão; um balão de fala esmaltado azul-petróleo com borda de latão; uma chave antiga de latão com etiqueta de papel |
+| 4 | `ui/participar.webp`, `ui/telao.webp`, `ui/sinal.webp`, `ui/simulador.webp` | Entrada; dossiê | Estilos misturados (móvel branco liso, farol de desenho, figuras de cera) ao lado de peças de latão escuro | Prompts: um balcão de entrada de madeira escura com sineta de latão; uma tela de projeção em moldura de latão sobre tripé; uma luz de aviso de latão com cúpula vermelha acesa; três celulares de latão em pé, lado a lado, com a tela acesa em verde-água |

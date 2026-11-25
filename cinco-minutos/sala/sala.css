@@ -256,3 +256,77 @@ body.em-cheia .tl-fs{opacity:.5}body.em-cheia .tl-fs:hover,body.em-cheia .tl-fs:
 #dragonRoomGate .dr-choice:active{transform:translateY(3px)}
 .tl-fita ol{gap:.25vh}.tl-fita li{grid-template-columns:3.4vw 13vw 1fr auto;font-size:clamp(.9rem,1.55vw,1.7rem);line-height:1.12}
 .tl-fita .ic{width:2.9vw;height:2.9vw}.tl-fita li b{white-space:nowrap}
+
+/* ---- Revisão 5 (25/11/2026): letras de apoio ≥ 1,35% da largura, mapa com miniatura grande, páginas ocupadas ---- */
+.tl-marca b{font-size:clamp(1.5rem,3vw,3rem);white-space:nowrap}
+.tl-codigo{font-size:max(1.35vw,.8rem)}
+.tl-aba,.tl-seta{font-size:max(1.5vw,1rem)}
+.tl-aba.tl-auto{font-size:max(1.35vw,.9rem);min-width:15vw}
+.tl-mini small{font-size:max(1.35vw,.75rem);letter-spacing:.08em}
+.tl-aviso{font-size:max(1.5vw,1rem)}
+.tl-andar{font-size:max(1.35vw,.8rem)}
+/* mapa */
+.tl-mapa .tl-sala{grid-template-rows:minmax(0,1fr) auto auto;align-content:stretch;padding:.6vh .4vw .8vh}
+.tl-mapa .tl-sala img{height:100%;max-height:11.5vh;min-height:8vh;width:auto;max-width:100%}
+.tl-mapa .tl-sala .ic3d{width:10vh;height:10vh;font-size:6vh}
+.tl-mapa .tl-sala b{font-size:max(1.62vw,1rem);line-height:1.08;overflow-wrap:normal;word-break:normal;hyphens:manual}
+.tl-mapa .tl-sala small{font-size:max(1.35vw,.8rem);letter-spacing:.04em}
+/* turma: os nomes crescem para ocupar a página */
+.tl-gente{height:calc(100% - 4.5vh);align-content:center;justify-content:center;gap:1.6vh 1.2vw}
+.tl-gente,.tl-card.tl-largo .tl-gente{font-size:max(1.9vw,1.1rem)}
+.tl-gente.grande,.tl-card.tl-largo .tl-gente.grande{font-size:max(3vw,1.4rem)}
+.tl-gente.medio,.tl-card.tl-largo .tl-gente.medio{font-size:max(1.6vw,1rem)}
+.tl-gente.mini,.tl-card.tl-largo .tl-gente.mini{font-size:max(1.35vw,.85rem);gap:1vh .8vw}
+.tl-gente i,.tl-missoes i{font-size:max(1.8vw,1rem)}
+.tl-missoes{align-content:center;height:calc(100% - 4.5vh)}.tl-missoes span{font-size:max(1.5vw,.95rem)}
+/* máquina */
+.tl-meio.pg-maquina .tl-metas{height:calc(100% - 6vh);align-items:stretch}
+.tl-meio.pg-maquina .tl-meta{align-content:center}
+.tl-meio.pg-maquina .tl-meta .ic3d.g{width:min(15vw,28vh);height:min(15vw,28vh)}
+.tl-meta span:last-child{font-size:max(1.8vw,1rem)}
+/* a noite: cada fato achado é um cartão; as linhas enchem a altura */
+.tl-fita{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr)}
+.tl-fita .tl-volta{margin:0 0 1vh}
+.tl-fita ol{border-left:0;padding:0;margin:0;gap:.9vh;grid-auto-rows:minmax(0,1fr);min-height:0}
+.tl-fita li{grid-template-columns:min(4.4vw,calc(62vh / var(--linhas,10))) 11vw minmax(0,1fr) auto;gap:1vw;padding:.3vh 1vw;min-height:0;border-radius:.8vw;font-size:max(1.5vw,.95rem);line-height:1.1;background:linear-gradient(180deg,#294051,#172633);box-shadow:inset 0 1px 0 #ffffff2b,0 .3vw 0 #05090d;overflow:hidden}
+.tl-fita .ic{width:100%;height:auto;aspect-ratio:1}
+.tl-fita li b{font-size:max(1.4vw,.9rem);white-space:nowrap}
+.tl-fita .tx small{font-size:max(1.35vw,.85rem);margin-top:.2vh}
+.tl-fita li>i{font-size:max(1.4vw,.9rem);opacity:.85;white-space:nowrap}
+.tl-fita li.falta{filter:none;opacity:1;background:#0e1a25;box-shadow:inset 0 .3vw .5vw #0008;color:#9fb2bd}
+.tl-fita li.falta b{font-size:max(2vw,1.2rem);color:#9fb2bd;text-align:center}
+/* entrada da sala sem código: arte, telão e simulador */
+#dragonRoomGate .dr-arte{display:block;width:84px;height:84px;object-fit:contain;margin:0 0 6px;filter:drop-shadow(0 6px 5px #000a)}
+#dragonRoomGate .dr-duo{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+#dragonRoomGate .dr-btn.sec{display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;color:#f3ead9;background:linear-gradient(180deg,#294051,#172633);border-color:#d7bd8b55;font-size:.9rem}
+#dragonRoomGate .dr-btn.sec img{width:30px;height:30px;object-fit:contain;filter:drop-shadow(0 3px 2px #0009)}
+#dragonRoomGate .dr-btn.sec:active{transform:translateY(3px);box-shadow:inset 0 1px 0 #ffffff15,0 1px 0 #05090d}
+/* simulador: telão maior em cima, turma logo embaixo numa faixa */
+.sim-telao{width:min(100%,calc((100vh - 300px) * 16 / 9))}
+.sim-turma{display:flex;flex-wrap:nowrap;justify-content:flex-start;gap:.7rem;overflow-x:auto;padding:0 1rem 1rem}
+.sim-fone{flex:none}
+
+.tl-volta{font-size:max(1.7vw,.9rem)}
+.tl-fs{font-size:max(1.35vw,.9rem)}
+
+/* cabeçalho numa linha só, sem cortar o código */
+.tl-topo{gap:1.2vw;min-width:0}.tl-raiz{grid-template-columns:minmax(0,1fr)}
+.tl-marca b{font-size:max(2.2vw,1.2rem)}
+.tl-codigo strong{font-size:max(2.6vw,1.4rem)}
+.tl-abas{gap:.5vw;min-width:0}
+.tl-aba,.tl-seta{font-size:max(1.4vw,.9rem);padding:.4vh .8vw;white-space:nowrap}
+.tl-aba.tl-auto{min-width:0;margin-left:.4vw}
+.tl-mini{min-width:0;padding:.4vh .8vw}.tl-mini small{white-space:nowrap}
+.tl-mini b{font-size:max(2.2vw,1.2rem)}
+/* turma: tamanho do nome conforme o espaço do cartão */
+.tl-gente.grande{font-size:max(2.3vw,1.2rem)}.tl-card.tl-largo .tl-gente.grande{font-size:max(3.4vw,1.5rem)}
+/* máquina: três fichas inteiras */
+.tl-meio.pg-maquina .tl-metas{height:auto;align-items:stretch}
+.tl-meio.pg-maquina .tl-meta .ic3d.g{width:min(13vw,24vh);height:min(13vw,24vh)}
+/* a noite: quem trouxe fica na coluna da direita; o fato fica numa linha ou duas */
+.tl-fita li{grid-template-columns:min(4.4vw,calc(62vh / var(--linhas,10))) 11vw minmax(0,1fr) minmax(0,auto)}
+.tl-fita li>i{display:grid;justify-items:end;text-align:right;max-width:27vw;font-style:normal;white-space:normal;line-height:1.1;opacity:1}
+.tl-fita li>i small{font:600 max(1.35vw,.85rem)/1.1 system-ui,sans-serif;color:#83c6ac}
+.tl-fita li>i span{font:700 max(1.35vw,.85rem)/1.2 system-ui,sans-serif;color:#b9c7cc}
+/* simulador: telão em cima e a turma inteira logo embaixo, quando a tela dá */
+.sim-telao{width:min(100%,calc(max(min(100vh - 300px,420px),100vh - 690px) * 16 / 9))}

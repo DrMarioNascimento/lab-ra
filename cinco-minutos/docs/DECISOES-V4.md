@@ -184,3 +184,40 @@ Onde esta seção contradiz o que está acima, vale esta. Origem: os quatro rela
 
 ### Ficou para decidir
 Nada.
+
+## Revisão 5 (25/11/2026) — depois da rodada 4 das escalas
+
+Onde esta seção contradiz o que está acima, vale esta. Origem: os quatro relatórios da rodada 4 (`docs/avaliacao/rodada4/`): conferência técnica (B1 a B6 e 16 menores), escala da história, fichas e motivação (A1 a A11) e padrão visual com peças 3D.
+
+### Decisões do responsável
+- **Painel e Manual.** No Subsolo, o painel só aparece depois de "Olhar o painel (1 de energia)". Fazer em dupla na mesma volta não cobra de novo. (Mexe na decisão "dupla com informação de verdade na tela", da revisão 4: a informação continua na tela, só que paga.)
+- **Aba Revelar.** Só o nome do final provisório, sem o texto.
+- **Fatos novos do mundo.** A Câmara leva 50 segundos para armar depois que a chave de ligar é virada (4:10 → 5:00). A Câmara puxa só do gerador.
+- **Entrada do Lenz, uma versão só.** Hoje à tarde entrou pela frente como visita (livro de visitas e roleta de entrada) e saiu pela porta de serviço com o crachá do Braga, sem passar pela roleta da saída. Antes de 0:00 voltou por ela; às 4:00 da volta, volta de novo por ela. Foi usada a versão do responsável (a do relatório da história é a mesma, com outras palavras). Pistas, fita do telão e ROTEIRO, parte 2, estão alinhados.
+- **Trancas com motivo no mundo** (`nico_1`, `cracha_3`, `lenz_2`), pelos campos `porque` e `precisaDe`: Nico só entrega "se o Téo não aparecer" (pede a primeira conversa, o Téo caído e o laudo); para o Braga é "só um crachá emprestado" até ver a prova da troca; o homem de paletó só para se a pessoa já viu ele passar. O piso de volta da escada (4, 3 e 3) continua nos dados.
+- **Noite D.** `d_teo_1` não adianta mais o engano do Lenz.
+- **Dra. Sato na linha.** Cobre só informação que falte no caderno, nunca objeto.
+- **Minijogos.** Os três que traziam a resposta no enunciado pedem o que está no caderno. Na foto antiga do catálogo foi usada uma pergunta nova (o que a pessoa anotou diante da peça da Galeria), em vez de tirar o minijogo: assim a foto continua sendo fonte do número sem depender das outras duas.
+- **Acusação e Defesa** com um papel em cada tela (escala e bilhete). **Três Números e Fio a Fio**: os papéis dizem o que a tela faz (ditar e digitar); não foi criada tela de símbolos nem de cores.
+- **Pausa.** A dica não fala de conserto que não existe na noite.
+- **Marca.** "Mosaico Loop" por inteiro em toda tela e título.
+- **Endereço `simulador/`** na raiz do jogo: redireciona para `sala/simulador/`, sem duplicar lógica.
+- **Visual.** Aplicado tudo o que não depende de arte nova. Os 6 emojis provisórios continuam (lista em `ICONES-A-GERAR.md`). Em `pontosDaPeca()` mudou só a separação mínima na tela.
+- **Peças.** Nenhuma trocada. O minijogo da luz da Galeria ganhou uma pergunta de história antes do controle. `PECAS-A-CONSEGUIR.md` tem a situação real (7 aprovadas, 8 reprovadas) e três pedidos novos.
+
+### Onde dois relatórios pediam coisas diferentes
+- **`lenz_mot_3`.** A técnica propôs "A voz tem pressa e engole o fim das frases."; a história, "Voz de homem, com pressa." Ficou a da técnica.
+- **`lenz_op_2`.** A técnica propôs a câmera antiga virada para a janela; a história, uma foto de divulgação tirada hoje à tarde. Ficou a da história, que casa com a entrada pela frente.
+- **`coop_veredito`.** A história ofereceu pedir o livro de visitas ou comparar com a própria escala. Ficou a escala: o visto do patrocínio entrou no pé dela, e a atividade continua pedindo só a escala.
+- **Minijogo da foto antiga.** As fichas propuseram tirar; o responsável pediu que pedisse o caderno. Ficou a pergunta nova.
+
+### Não aplicado, e por quê
+- **Identificadores internos com palavra antiga** (`tombo_*`, `coop_calibrar`, `chao_manopla`, `fh_pedestal`...): não aparecem na tela; trocar quebraria partidas guardadas e os testes.
+- **`data_2`, `motivo_1` e `c_esc_2` na volta 1** (história, 3.2-5): ponto do autor que não entrou na lista de decisões. Ficam como estão.
+- **`aurelio_0`** ("Ele não parece ter certeza"): defeito pequeno apontado, sem texto proposto. Ficou.
+- **Cartão de atividade aberto com mais de 60 palavras no total** (técnica, M13): cada bloco tem até 60; o cartão agora vem fechado e o caminho sem dupla fica recolhido.
+- **Arte nova** (6 emojis, reenquadramento das miniaturas E02 e DESC_A, cenas dos minijogos com render das peças, peça que reage ao apagão, recompressão): depende de arquivo novo. Está em `ICONES-A-GERAR.md` e `PECAS-A-CONSEGUIR.md`.
+- **Simulador de texto**: continua diferente do jogo no dossiê do grupo, na pré-conferência e no limite de 2 atividades em dupla (registrado desde a revisão 4).
+
+### Ficou para decidir
+Nada.

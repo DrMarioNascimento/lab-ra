@@ -29,7 +29,7 @@
   function avisar() { try { if (parent !== window) parent.postMessage({ oi: 'livro', evento: 'folha', par: par, aberto: angulo === ABERTO }, location.origin); } catch (e) {} }
 
   var b = OIBase.criar({
-    vista: SOLO ? { alvo: [0, 0.03, 0], dist: 0.42, distRetrato: 0.7, dir: [0.15, 0.95, 0.55] } : { alvo: [0.12, 0.12, 0], dist: 1.25, distRetrato: 2.1, dir: [0.2, 0.75, 1] },
+    vista: SOLO ? { alvo: [0, 0.03, 0], dist: 0.4, distRetrato: 0.7, dir: [0.05, 1, 0.34] } : { alvo: [0.12, 0.12, 0], dist: 1.25, distRetrato: 2.1, dir: [0.2, 0.75, 1] },
     raioDoChao: 0.8, alturaDoAparelho: 0.45, miraEscala: 1.4, exposicao: 0.7,
     textoMira: 'Aponte para uma mesa e toque em Pôr aqui.',
     textoInicio: 'O farol, com o livro de registro do Faroleiro.'
@@ -42,9 +42,14 @@
     for (var k = 0; k < 60; k++) { g.fillStyle = 'rgba(150,120,70,' + (Math.random() * 0.05) + ')'; g.beginPath(); g.arc(Math.random() * W, Math.random() * H, 10 + Math.random() * 40, 0, 6.3); g.fill(); }
     g.strokeStyle = '#c9c2b0'; g.lineWidth = 2; for (var y = 170; y < H - 60; y += 64) { g.beginPath(); g.moveTo(40, y); g.lineTo(W - 40, y); g.stroke(); }
     g.strokeStyle = '#d9a3a3'; g.beginPath(); g.moveTo(150, 40); g.lineTo(150, H - 40); g.stroke();
-    g.fillStyle = '#10131f'; g.font = 'italic 700 56px Georgia, serif'; g.fillText(titulo, 170, 130);
+    g.fillStyle = '#10131f'; var yy = 226;
+    if (SOLO) {   /* no Loop a leitura fica embaixo do livro, em letra de tela: na folha, o título vai três vezes maior */
+      g.font = 'italic 700 150px Georgia, serif'; var tl = '', ty = 190;
+      String(titulo).split(' ').forEach(function (p) { var t = tl ? tl + ' ' + p : p; if (tl && g.measureText(t).width > W - 210) { g.fillText(tl, 170, ty); ty += 160; tl = p; } else tl = t; });
+      if (tl) { g.fillText(tl, 170, ty); ty += 160; }
+      yy = Math.ceil((ty - 30 - 226) / 64) * 64 + 226;
+    } else { g.font = 'italic 700 56px Georgia, serif'; g.fillText(titulo, 170, 130); }
     g.font = 'italic 600 40px Georgia, serif';
-    var yy = 226;
     linhas.forEach(function (l) {                     /* quebra simples em linhas da pauta */
       var m = /^(\d{1,2}h\d{2})\s+—\s+(.*)$/.exec(l), hora = m ? m[1] : '', txt = m ? m[2] : l, pal = txt.split(' '), lin = '';
       if (hora) { g.font = '700 32px Georgia, serif'; g.fillText(hora, 30, yy); g.font = 'italic 600 40px Georgia, serif'; }

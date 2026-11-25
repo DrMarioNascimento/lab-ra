@@ -76,21 +76,45 @@ Prompt para versão 3D de melhor qualidade: "Cabine de viagem no tempo steampunk
 
 ## Loop — modelos 3D a obter (25/11/2026, da avaliação pelas escalas)
 
-Antes de pedir, o acervo do LAB-RA foi conferido (93 peças em museu/pecas). Das 15 salas da história, a avaliação da rodada 3 aprovou 5 (Câmara do tempo, Central de monitoramento, Recepção, Oficina técnica, Oficina elétrica) e reprovou 10. Das 10 reprovadas, 5 foram tratadas na revisão 4 sem modelo novo (ver "Composições e livro", logo abaixo) e esperam nova avaliação; as outras 5 não têm peça adequada no acervo e são as desta lista (o item 6 é opcional).
+Situação depois da rodada 4 das escalas (revisão 5, 25/11/2026). Antes de pedir, o acervo do LAB-RA foi conferido de novo (97 peças em `museu/pecas`; 342 modelos no repositório, em `biblioteca/`, `angulos/`, `angulos-licenciatura/` e `dilema-bonde-3d/`): não há porta de serviço, cafeteira, vitrine com base nem parede de relógios.
+
+**Das 15 salas da história, 7 estão aprovadas e 8 reprovadas.**
+
+| Sala | Peça | Peso | Situação | O que falta |
+|---|---|---|---|---|
+| Subsolo · Câmara do tempo | T01 | 868 KB | aprovada | recomprimir (meta 600 KB) |
+| Central de monitoramento | S01 | 839 KB | aprovada | recomprimir |
+| Recepção | P01 | 156 KB | aprovada | roleta, telefone e relógio só em texto (pedido 6, opcional) |
+| Oficina técnica | M03 | 820 KB | aprovada | recomprimir |
+| Oficina elétrica | E02 | 421 KB | aprovada | miniatura do mapa difícil de ler (ver `ICONES-A-GERAR.md`) |
+| Ateliê de descobertas | L06 + livro | 865 KB | aprovada | recomprimir |
+| Sala de conservação | I01 + livro | 232 KB | aprovada | nada |
+| Galeria especial | GAL_A | 481 KB | reprovada (ambiente) | pedido 8: base com vitrine. A dedução foi tratada na revisão 5: o minijogo da luz tem uma pergunta de história antes do controle |
+| Sala dos relógios | REL_A | 804 KB | reprovada (ambiente) | pedido 9: parede de relógios; recomprimir |
+| Área de descanso | DESC_A | 458 KB | reprovada (pertencimento, ambiente) | pedido 7: porta de serviço com cafeteira e mural |
+| Pátio · Quadro externo | E01 | 146 KB | reprovada (pertencimento, ambiente) | pedido 1 |
+| Sala das coleções | V12 | 747 KB | reprovada (pertencimento, ambiente) | pedido 2 |
+| Base da limpeza | L05 | 1.020 KB | reprovada (pertencimento, ambiente, peso) | pedido 3 |
+| Sala dos sons | N07 | 175 KB | reprovada (pertencimento, ambiente, novidade) | pedido 4 |
+| Sala da fotografia | N05 | 569 KB | reprovada (ambiente) | pedido 5 |
+
+Pesos medidos nos arquivos de `museu/pecas` (1 KB = 1.024 bytes).
 
 ### Composições e livro (feitos na revisão 4, sem modelo novo)
 
-| Sala | O que foi feito | Arquivo | Falta |
+| Sala | O que foi feito | Arquivo | Resultado na rodada 4 |
 |---|---|---|---|
-| Ateliê de descobertas | Livro de folhear como segunda peça: botão "Abrir o manual", com as 6 páginas do Manual da Câmara e a legenda dos símbolos | `LOOP_SALAS.atelie` (campo `livro`) | Reavaliar. O texto da página fica pequeno no celular (o caderno guarda o texto inteiro) |
-| Sala de conservação | Livro de folhear como segunda peça: "Abrir o livro de registro", com o livro de registro, os registros técnicos e as páginas do diário. Página que gasta energia fica fechada até a pessoa tocar em "Ler" | `LOOP_SALAS.conservacao` | Reavaliar. O fichário continua como peça principal |
-| Galeria especial | Máscara de pedra (V11) em cima de uma base de madeira escura feita por código | `museu/pecas/GAL_A.glb` (493 KB) | Os pontos que falam da base ainda caem por sorteio (`pontosDaPeca()` não foi mexido). A base é uma caixa lisa: uma base modelada ficaria melhor |
-| Sala dos relógios | Relógio de caixa alta (R02) + relógio de parede (R01), lado a lado | `museu/pecas/REL_A.glb` (823 KB) | Acima da meta de 600 KB: recomprimir as texturas. O ponto do pêndulo ainda cai por sorteio |
-| Área de descanso | Sofá (V41) + quadro de recados com alavancas (C02), lado a lado | `museu/pecas/DESC_A.glb` (470 KB) | Não tem porta de serviço nem cafeteira: continuam só em texto |
+| Ateliê de descobertas | Livro de folhear como segunda peça ("Abrir o manual") | `LOOP_SALAS.atelie` (campo `livro`) | Passou. Na revisão 5 a leitura da página fica embaixo do livro, em letra de tela |
+| Sala de conservação | Livro de folhear como segunda peça ("Abrir o livro de registro") | `LOOP_SALAS.conservacao` | Passou |
+| Galeria especial | Máscara de pedra (V11) sobre base feita por código | `museu/pecas/GAL_A.glb` | Reprovou: base lisa, sem vitrine (pedido 8) |
+| Sala dos relógios | Relógio de caixa alta (R02) + relógio de parede (R01) | `museu/pecas/REL_A.glb` | Reprovou: dois relógios para uma sala de "dezenas" (pedido 9) |
+| Área de descanso | Sofá (V41) + quadro de recados com alavancas (C02) | `museu/pecas/DESC_A.glb` | Reprovou: falta a porta de serviço, objeto central da sala (pedido 7) |
 
 As três peças compostas saem de `museu/pecas-compostas.mjs` (precisa do gltf-transform: `npm install @gltf-transform/core @gltf-transform/extensions @gltf-transform/functions draco3dgltf meshoptimizer`; uso: `node pecas-compostas.mjs museu/pecas GAL_A,REL_A,DESC_A`).
 
-**Não foi feito nesta revisão (fica para a próxima):** pontos em lugar fixo por peça (tabela no lugar do sorteio de `pontosDaPeca()`), peça que reage ao apagão (luz que cai), recompressão das peças acima de 600 KB (L05 com 1.045 KB; T01, L06, S01, M03 e REL_A entre 820 e 890 KB) e cenas dos minijogos com render das peças reais.
+**Feito na revisão 5 (código, sem trocar peça):** os pontos que estão à vista na peça nunca ficam a menos de 44 px um do outro na tela (o sorteio do lugar de cada pista não mudou); o minijogo da luz da Galeria pede uma dedução antes do controle; o livro de folhear tem o lugar reservado e a leitura embaixo.
+
+**Continua para depois:** pontos em lugar fixo por peça (tabela por peça), peça que reage ao apagão (luz que cai), recompressão das peças acima de 600 KB (L05 com 1.020 KB; T01, L06, S01, M03 e REL_A entre 804 e 868 KB; V12 com 747 KB) e cenas dos minijogos com render das peças reais.
 
 ### Modelos a pedir
 
@@ -114,6 +138,18 @@ Regras iguais às de `docs/PECAS-A-CONSEGUIR.md`: um conjunto só sobre base, se
 
 6. *(opcional)* **Recepção · roleta de entrada (`P03.glb`)**
    *"Waist-high tripod turnstile for a museum entrance next to a short reception counter with a guest book, a desk bell and an old telephone, small wall clock above, low-poly realistic, small floor base, brushed steel and dark wood, no people, no text, no logos, PBR textures, single object centered, GLB."*
+
+7. **Área de descanso · porta de serviço com cafeteira e mural (arquivo sugerido `DESC_B.glb`)**
+   *"Staff break corner of a small museum on a floor base, low-poly realistic: a grey metal service door with a badge reader beside the handle and a small electrical junction box on the wall above it, a narrow side table with a drip coffee maker and two mugs, a cork bulletin board on the wall with paper notes and one photo pinned to it, a small repeater display screen above the door, wet shoe prints on the floor tiles leading to the door, no people, no readable text, no logos, PBR textures, single object centered, GLB."*
+   Entra no lugar da composição `DESC_A` (sofá + cortiça). O sofá sai.
+
+8. **Galeria especial · base com vitrine (`GAL_B.glb`)**
+   *"Museum display plinth with glass case, empty inside, low-poly realistic: square dark wood pedestal 1 m high with a thin brass plate on the front, a small drawer in the base, a felt-covered top, a clear glass case standing open beside it, one small framed painting hanging slightly crooked on a wall panel behind, a faint trail of white plaster dust on the floor tile, small floor base, no object on the plinth, no people, no text, no logos, PBR textures, single object centered, GLB."*
+   A máscara de pedra (V11) continua sendo a peça principal: ela é posta em cima desta base por `museu/pecas-compostas.mjs`. A vitrine V13 do acervo (829 KB) foi conferida: é vitrine fechada, sem base nem gaveta, e não serve sozinha.
+
+9. **Sala dos relógios · parede de relógios (`REL_B.glb`)**
+   *"Wall of antique clocks in a museum room, low-poly realistic: a wood-paneled wall section on a small floor base with twelve different clocks hanging on it (round wall clocks, a cuckoo clock, a ship clock, two small electric clocks with visible cords), one tall grandfather clock with a visible pendulum and a pull cord standing in front, a small brass donor plaque under each clock with no readable text, no people, no logos, PBR textures, single object centered, GLB."*
+   Enquanto não chega: juntar o terceiro relógio do acervo (N03, 972 KB antes de comprimir) à composição `REL_A` e recomprimir o conjunto para a meta de 600 KB.
 
 Antes de gerar: conferir `angulos-licenciatura/assets/modelos/prateleira.glb` (para o item 2) e `balcao.glb`/`recep.glb` (para o item 6), que não abriram aqui por usarem compressão Meshopt.
 

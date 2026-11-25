@@ -64,7 +64,7 @@ function aceitar(r, ps) {
   if (room.etapa === 'playing' && ms(room.iniEm) == null) return;   // o horário do servidor ainda não voltou
   if (!window.coop || window.coop.storageKey !== chaveLocal()) { clearInterval(timerHandle); montarCoop(); tela = ''; }
   const nova = `${room.etapa}:${room.volta}:${room.rodada || 1}`;
-  if (tela !== nova) { tela = nova; desenhar(); }
+  if (tela !== nova) { const antes = tela; tela = nova; if (antes && typeof fecharJanelas === 'function') fecharJanelas(room.etapa === 'between'); desenhar(); }   // troca de etapa: nada fica aberto por cima da tela nova
   else if (room.etapa === 'choose' || room.etapa === 'playing') decorate();
   else if (room.etapa === 'final') marcarEnvio();          // não redesenha: a pessoa pode estar marcando as respostas
   else if (room.etapa === 'result') desenhar(true);       // a turma continua mandando; o resumo se atualiza
@@ -111,7 +111,7 @@ function desenhar(leve) {
 function marcarEnvio() {
   const mandou = !!euJogador().resp || enviou;
   const b = $('answerForm').querySelector('button[type=submit]');
-  b.textContent = mandou ? 'Desfecho registrado' : 'Registrar meu desfecho';
+  b.textContent = mandou ? 'Desfecho contado' : 'Contar meu desfecho';
   b.disabled = mandou;
   for (const k of EIXOS) { const el = $(k); if (el) el.disabled = mandou; }
   lockAnswerExtras(mandou);

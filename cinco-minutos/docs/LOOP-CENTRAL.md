@@ -18,7 +18,7 @@ Simulação: rodada 1 (10 grupos, 0 conserto) → versão 2 → rodada 2 (12 gru
 
 ## Novidades de 24/11/2026
 - **Detalhes que distraem**: 10 pistas novas (café, quadro torto, gato no quadro de energia, balde com multímetro, lâmpadas queimadas, relógio de pulso parado, rádio chiando, bilhete do eletricista, cola fresca, foto da festa). As que parecem sinal são "falsa honesta": não contam no anexar.
-- **Quebra-cabeça**: o cofre do Braga (Central de monitoramento) pede 3 números. Desde a revisão 3 a senha é sorteada: o número de registro da peça principal, de trás para a frente (o bilhete preso no cofre diz isso). Desde a revisão 2 o caderno de rondas que está dentro dele não conta mais como prova do trajeto (mostra o crachá em uso no começo da noite, não a descida ao Subsolo).
+- **Quebra-cabeça**: o cofre do Braga (Central de monitoramento) pede 3 números. Desde a revisão 3 a senha é sorteada: o número de registro da peça principal, de trás para a frente (o bilhete preso no cofre diz isso). Na revisão 2 o caderno de rondas que está dentro dele deixou de contar como prova do trajeto (voltou a valer na revisão 4: mostra a volta do paletó pela porta de serviço, no começo da noite).
 - **Armadilha do pêndulo** (Sala dos relógios): puxar a corda adianta 40 s no relógio de TODO mundo. Há uma plaquinha de aviso ao lado do pêndulo, com a letra do Seu Dirceu. Cada aparelho aplica uma vez; o aviso viaja pelos campos `alarmeVolta/alarmeSeg/alarmeId` do próprio jogador na sala do Mestre (regra nova em `firebase-loop/firestore.rules`: precisa publicar as regras para valer em todos os aparelhos; sem isso vale só para quem puxou).
 
 ## Ajuste 19:40 — mais pistas (Regra das Três Pistas)
@@ -34,7 +34,7 @@ Simulação: rodada 1 (10 grupos, 0 conserto) → versão 2 → rodada 2 (12 gru
 - Desfecho mostra quais das 3 provas a equipe reuniu. A Reserva continua na pasta `reserva/`, mas saiu da entrada do Loop (revisão 4).
 
 ## Missão secreta e pista de metades (24/11)
-- **Missão secreta** (8 no jogo): o que o Braga esconde; o que derrubou o Téo; quem ganha se a peça sumir; por que a Ivone não pode ter trocado; o que o Aurélio sabia; para onde vão as pegadas; onde a peça verdadeira está; o que o Nico está guardando. Cada pessoa recebe uma (card no dossiê). Cumprir rende +1 de energia na volta seguinte.
+- **Missão secreta** (8 no jogo): o que o Braga esconde; o que aconteceu com o Téo; quem ganha se a peça sumir; por que a tinta da Ivone não faz dela culpada; o que o Aurélio sabia; para onde vão as pegadas; o que tem na caixa que pesa demais; o que o Nico está guardando. Cada pessoa recebe uma (card no dossiê). Cumprir rende +1 de energia na volta seguinte.
 - **Pista de metades** (`assim_foto` no Pátio, `assim_leg` na Área de descanso): cada sala vê uma metade; quem já viu uma não vê a outra. Desde a revisão 2 nenhuma metade vale sozinha: a prova do trajeto é a pista `assim_par` ("Foto e legenda, juntas", Área de descanso, 1 de energia), que só abre com as duas metades no caderno (a segunda chega por "Passar pista" na pausa). Quem joga sem dupla continua fechando o trajeto pelas outras fontes do grupo.
 
 ## Vocabulário (vale desde 25/11/2026)
@@ -155,9 +155,41 @@ Palavras que o jogo usa: **número de registro** (da peça), **base** (onde a pe
 
 **Simulador de texto e validador** (`dados/simulador-texto.py`, `dados/validar.py`): um conserto por volta com ou sem dupla; Painel e Manual entrega a leitura e não anexa; anexar aceita a leitura completa sozinha. Resultado: APROVADO nas 5 causas com 1, 2 e 3 pessoas.
 
-## Checklist por volta (recalculado dos dados em 25/11/2026, revisão 4)
+## Revisão 5 — 25/11/2026
 
-Conferido em `dados/pistas-v4.json` (campos `volta_min`, `volta_max`, `segundo_min`, `precisaDe`, `soNaCausa`, `parDe`, `grupos_fonte`, `atividades_coop`). Horários com `valores_padrao` (raio em 1:10); com outra hora sorteada, os horários ligados ao raio andam junto. Pistas por `volta_min`: **231 na volta 1, 27 na volta 2, 7 na volta 3, 9 na volta 4, 4 na volta 5** (278 no total). Ativas por noite: 207 (A), 208 (B), 207 (C), 207 (D), 212 (E).
+**Por quê.** A rodada 4 das escalas não passou: conferência técnica (4 de 10 itens com falha, 6 correções bloqueantes e 16 menores), escala da história (8,7; quatro critérios em 8,5), fichas e motivação (dois bilhetes do Téo sem assinatura; motivação 4,3 de 4,5) e padrão visual (média 8,4; 7 de 15 peças aprovadas). Os quatro relatórios estão em `docs/avaliacao/rodada4/`. Tudo o que era texto, dado, tela ou código foi aplicado, com as decisões do responsável (lista em `DECISOES-V4.md`, "Revisão 5").
+
+**O que mudou no código** (`loop-central.js`, `game.js`, `ritmo.js`, `style.css`, `sala/`, `museu/livro/`, `simulador/`)
+- Aba Revelar: mostra só o nome do final ("Se a noite acabasse agora: ..."), sem o texto. O final mínimo chama "O museu esqueceu".
+- Painel e Manual: no Subsolo, o painel só aparece depois de "Olhar o painel (1 de energia)"; fazer em dupla na mesma volta não cobra de novo.
+- "Como funciona" com 58 palavras. No caderno, "etiqueta" e "ensaio" não abrem mais o dicionário (lá são palavras da história).
+- Recusa do dossiê: "Ainda não. Você tem 1 sinal; precisa de 2 diferentes." e a leitura de cada pista, uma por linha (pior caso medido: 55 palavras). Na noite de dois defeitos, o "MEIO CERTO" não diz mais qual opção escolher.
+- "Com a Dra. Sato na linha" cobre só informação que falte no caderno, nunca objeto (campo novo `solo.objetos`).
+- Minijogos pedem o que está no caderno: a fita da porta de serviço pergunta de quem é o crachá (escala); a caixa pede o peso da lista de entregas; a foto antiga pede o que a pessoa anotou diante da peça. Na Galeria, uma pergunta de história vem antes do controle da luz. Acusação e Defesa ganhou pergunta própria.
+- Missões: a do Braga não fecha mais com o álibi; a do dinheiro fecha também com o contrato; a da Ivone fecha com a fala da tinta e com o caderno de materiais. "O que aconteceu com o Téo".
+- Fita do telão: cada fato com as fontes certas (a passagem conta a escada do Subsolo e não conta a marca de quem saiu). Os fatos que ninguém achou viram uma ficha só.
+- Aba Atividades: cartão fechado mostra o nome e as duas salas; o texto entra ao tocar. O caminho sem dupla fica recolhido em "Sem dupla?" (aberto de saída no jogo sem turma). Quem não está no Subsolo num conserto vê "Confirmar a minha parte" (não gasta energia).
+- Fim da volta e troca de etapa fecham o minijogo, a Máquina e o caderno.
+- Pontos da peça: os que estão à vista nunca ficam a menos de 44 px um do outro (só a separação; o sorteio não mudou).
+- Padrão visual: ícone de tipo de pista em 32 px; resultado e tela final do celular com 3 fichas e miniaturas; manual curto com "Entendi" sempre à vista; as 15 salas inteiras em 360×740; letras de 12 px para cima na tela inicial; etiqueta do dossiê embaixo do nome; livro de folhear com lugar reservado e leitura embaixo, em letra de tela; telão com letras de apoio de 1,35% da largura para cima, cabeçalho numa linha, mapa sem palavra quebrada e com miniatura maior, nomes da turma ocupando a página.
+- Marca "Mosaico Loop" por inteiro nas telas e nos títulos. Endereço novo `simulador/` na raiz do jogo (abre `sala/simulador/`). `reserva/index.html` saiu do ar (redireciona para a entrada).
+
+**O que mudou nos dados** (`dados/pistas-v4.json`, 278 pistas, "v4 revisão 5")
+- Entrada do Lenz, numa versão só: hoje à tarde ele entrou pela frente como visita (livro de visitas e roleta de entrada) e saiu pela porta de serviço com o crachá do Braga; no começo da noite voltou por ela; às 4:00 de cada volta, volta de novo.
+- Fatos novos do mundo: a Câmara leva 50 segundos para armar depois de ligada (plaquinha ao lado do relógio digital); a Câmara puxa só do gerador (manual, página 3).
+- A Dra. Sato só pede socorro depois de ouvir do Téo. O interfone devolve pergunta também no sinal da base.
+- Trancas com motivo no mundo: Nico (pede a primeira conversa, o Téo caído e o laudo), Braga (frase nova) e o homem de paletó (pede ter visto ele passar). O piso de volta continua.
+- "O quadro, olhando de novo": frase de tranca que não supõe a primeira olhada, igual nas 5 causas.
+- Noite D: a página dobrada não adianta mais o engano. Base da peça: feltro novo na volta 1; a falta do número fica para o Lado a Lado.
+- Papéis reescritos: Lado a Lado, As Duas Listas (com as listas na tela), Acusação e Defesa (escala e bilhete, um em cada tela), Painel e Manual, Três Números e Fio a Fio (dizem o que a tela faz). Sem "os dois".
+- O visto do patrocínio fica no pé da escala de crachás; o veredito compara a letra com ele.
+- Os dois bilhetes do Téo sem assinatura ganharam "— T.". Meio conserto da noite E com `volta_min` 3. As 7 distrações com explicação no próprio texto têm o campo `explica`.
+
+**Simulador de texto e validador** (`dados/simulador-texto.py`, `dados/validar.py`): sem regra nova; o validador se apresenta como "revisão 5". Resultado: APROVADO nas 5 causas com 1, 2 e 3 pessoas.
+
+## Checklist por volta (recalculado dos dados em 25/11/2026, revisão 5)
+
+Conferido em `dados/pistas-v4.json` (campos `volta_min`, `volta_max`, `segundo_min`, `precisaDe`, `soNaCausa`, `parDe`, `grupos_fonte`, `atividades_coop`). Horários com `valores_padrao` (raio em 1:10); com outra hora sorteada, os horários ligados ao raio andam junto. Pistas por `volta_min`: **231 na volta 1, 25 na volta 2, 9 na volta 3, 9 na volta 4, 4 na volta 5** (278 no total). Ativas por noite: 207 (A), 208 (B), 207 (C), 207 (D), 212 (E).
 
 **Itens na lista de cada sala, na volta 1 (igual nas 5 causas):** Subsolo 18, Oficina elétrica 12, Pátio 16, Sala dos relógios 7, Central 16, Recepção 12, Sala de conservação 10, Ateliê 19, Sala das coleções 12, Galeria 8, Oficina técnica 10, Área de descanso 12, Base da limpeza 9, Sala dos sons 5, Sala da fotografia 9.
 
@@ -175,8 +207,8 @@ Conferido em `dados/pistas-v4.json` (campos `volta_min`, `volta_max`, `segundo_m
 | 4:00 | O crachá do Braga abre a porta de serviço | Câmera da porta de serviço (Central) |
 | 4:02 | Homem de paletó cruza a Área de descanso | Fala dele (volta 1) e "mostrar o bilhete" (volta 3) |
 | 4:05 | — | Seu Dirceu aponta com o rodo (Base da limpeza) |
-| 4:10 | Lenz desce e vira a chave de ligar da Câmara | "Cinco minutos de volta" (volta 1) e fala na escada (volta 4) |
-| 5:00 | Reinício | — |
+| 4:10 | Lenz desce e vira a chave de ligar da Câmara. Ela leva 50 segundos para armar | "Cinco minutos de volta" (volta 1) e fala na escada (volta 4) |
+| 5:00 | A Câmara dispara: reinício | — |
 
 Antes da hora, a lista mostra "ainda não" (sem contagem).
 
@@ -199,10 +231,10 @@ Antes da hora, a lista mostra "ainda não" (sem contagem).
 | | Conferir as listas sem dupla (Central) | volta 1 | Registro da roleta da saída + livro de visitas; 2 de energia |
 | | Chão da Área de descanso sem dupla (1:11) | volta 1 | Respingos de tinta já anotados; 2 de energia |
 | | Foto e legenda, juntas (Área de descanso) | volta 2 (a segunda metade só chega por Passar pista, na pausa; sem turma, as duas metades aparecem na volta 1) | As duas metades no caderno (Pátio + Área de descanso); 1 de energia |
-| | Caderno de rondas do Braga, no cofre (Central) | volta 1 | Abrir o cofre: o número de registro de trás para a frente; 1 de energia |
+| | Caderno de rondas do Braga, no cofre (Central): a volta pela porta de serviço, no começo da noite | volta 1 | Abrir o cofre: o número de registro de trás para a frente; 1 de energia |
 | | As Duas Listas (Recepção + Central); Apagão Combinado (Pátio + Área de descanso) | volta 2 | Dupla |
 | **Crachá (o nome)** | Braga admite (Central) | volta 3 | Escala + bilhete + uma prova da cópia (laudo, Lado a Lado, foto comparada sem dupla ou a peça verdadeira na mão) |
-| | Mostrar o bilhete ao homem de paletó (Área de descanso, 4:02) | volta 3 | Bilhete do armário + livro de visitas |
+| | Mostrar o bilhete ao homem de paletó (Área de descanso, 4:02) | volta 3 | Bilhete do armário + livro de visitas + já ter visto ele passar (4:02, grátis) |
 | | Acusação e Defesa (Central + Base da limpeza) | volta 3 | Dupla; escala + bilhete |
 
 Não contam como prova: o cheiro de verniz; o bilhete do armário e o livro de visitas soltos; a foto sem legenda ou a legenda sem foto, sozinhas.
@@ -214,19 +246,19 @@ Não contam como prova: o cheiro de verniz; o bilhete do armário e o livro de v
 - **Horários que importam:** o raio (anotar a hora) e a volta do paletó, às 4:00.
 
 ### Volta 2
-- **Abre:** +27 pistas: laudo do Aurélio, molde de gesso, a peça verdadeira na caixa, comparar a foto sem ajuda, páginas anteriores do diário (2), carta da seguradora, a mancha medida com o pé (para quem já viu a mancha), a escultura atrás da porta de vidro (para quem já viu o paletó passar), Nico explicando a Galeria (para quem já falou com ele), a música da Sala dos sons, objetos no chão (luva isolante no Pátio, peça verdadeira no Subsolo), produtos das atividades e ensaios. **Anexar o diagnóstico** (1 tentativa por volta). Atividades em dupla (`volta_min` 2): Lado a Lado, As Duas Listas, Apagão Combinado, Painel e Manual (entrega a leitura completa; não anexa), Correio do Loop; ensaio do conserto para quem já anexou.
+- **Abre:** +25 pistas: laudo do Aurélio, molde de gesso, a peça verdadeira na caixa, comparar a foto sem ajuda, páginas anteriores do diário (2), carta da seguradora, a mancha medida com o pé (para quem já viu a mancha), a escultura atrás da porta de vidro (para quem já viu o paletó passar), Nico explicando a Galeria (para quem já falou com ele), a música da Sala dos sons, objetos no chão (luva isolante no Pátio, peça verdadeira no Subsolo), produtos das atividades e ensaios (o meio conserto da noite E passou para a volta 3). **Anexar o diagnóstico** (1 tentativa por volta). Atividades em dupla (`volta_min` 2): Lado a Lado, As Duas Listas, Apagão Combinado, Painel e Manual (olhar o painel gasta 1 de energia; entrega a leitura completa; não anexa), Correio do Loop; ensaio do conserto para quem já anexou.
 - **Não pode vazar:** o nome (a carta da seguradora diz só "quem assinou pelo patrocínio"); conserto valendo (só na volta 5); eco do Raio (só da volta 3); meio conserto da noite E (só da volta 3); Revelar (só na volta 5).
 - **Conferência:** ensaios têm `volta_min` 2 e `volta_max` 4; consertos finais têm `volta_min` 5: OK. Eco: `volta_min_gravar` 3 e a pista do eco com `volta_min` 3: OK. Noite E: `regras.E_volta_min_meio` 3, lido pelo jogo e pelo simulador: OK.
 - **Horários que importam:** a luva isolante só sai do armário depois do apagão (1:10).
 
 ### Volta 3
-- **Abre:** +7 pistas (o nome "Lenz" nasce aqui): Braga admite, Acusação e Defesa (atividade e produto), mostrar o bilhete a quem entra pela porta de serviço (4:02), livro da Central, Aurélio diante do diário e do laudo, gravação do telefonema, eco da chave. Eco do Raio (gravar no Pátio dentro da janela). Noite E: primeiro conserto pode ficar gravado na Câmara.
+- **Abre:** +9 pistas (o nome "Lenz" nasce aqui): Braga admite, Acusação e Defesa (atividade e produto), mostrar o bilhete ao homem de paletó (4:02, para quem já viu ele passar), livro da Central, Aurélio diante do diário e do laudo, gravação do telefonema, eco da chave, os dois meios consertos da noite E. Eco do Raio (gravar no Pátio dentro da janela). Noite E: primeiro conserto pode ficar gravado na Câmara.
 - **Não pode vazar:** pendrive, voz do Téo, ata, guardanapo; conserto valendo; Revelar; os dois consertos da noite E na mesma volta (com ou sem dupla: ficam gravados como meio cada um).
 - **Conferência:** trava da noite E no código: OK.
 - **Horários que importam:** janela do Raio (1:04 a 1:20) para o eco; 4:02 para mostrar o bilhete.
 
 ### Volta 4
-- **Abre:** +9 pistas: pendrive do Nico (registro + laudo), voz do Téo no rádio (com o envelope que ele recusou) e a continuação da gravação (um texto por noite), ata da reunião, guardanapo no paletó reserva, fala do homem de paletó na escada (4:10), o painel depois do ensaio (para quem já ensaiou). Ensaio geral: a máquina responde REAGE / NÃO REAGE, diz quantos valores estão certos (nunca qual) e avisa o que ainda pode falhar. Quem fica na Central de monitoramento confirma em voz alta quem está onde.
+- **Abre:** +9 pistas: pendrive do Nico (primeira conversa + Téo caído + laudo + registro), voz do Téo no rádio (com o envelope que ele recusou) e a continuação da gravação (um texto por noite), ata da reunião, guardanapo no paletó reserva, fala do homem de paletó na escada (4:10), o painel depois do ensaio (para quem já ensaiou). Ensaio geral: a máquina responde REAGE / NÃO REAGE, diz quantos valores estão certos (nunca qual) e avisa o que ainda pode falhar. Quem fica na Central de monitoramento confirma em voz alta quem está onde.
 - **Não pode vazar:** conserto valendo; Revelar.
 - **Conferência:** última volta dos ensaios (`volta_max` 4): OK. Noite E: se o primeiro conserto não foi gravado até aqui, não há mais como chegar ao Desligar. Em sala, na pausa desta volta cada pessoa toca no seu papel da última volta.
 - **Horários que importam:** janela do Raio; quem vai apresentar precisa das 3 provas no próprio caderno até a pausa (passar pista: até 3).
@@ -238,7 +270,7 @@ Não contam como prova: o cheiro de verniz; o bilhete do armário e o livro de v
 - **Horários que importam:** janela do Raio (noites B e E); 5:00 é o limite do Revelar.
 
 ### Pendências
-Nenhuma aberta. O que as revisões 2 e 3 deixaram em aberto foi fechado assim:
+Nenhuma aberta (revisão 5). O que as revisões 2 e 3 deixaram em aberto foi fechado assim:
 
 | Assunto | Como ficou | Quem decidiu |
 |---|---|---|
