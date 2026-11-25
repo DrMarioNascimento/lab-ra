@@ -27,3 +27,6 @@ Simulação: rodada 1 (10 grupos, 0 conserto) → versão 2 → rodada 2 (12 gru
 - Bancada (`bancada.css`, `LC_MG` em loop-central.js): ao coletar tombo_2 (foto), falsa_1 (luz rasante), traj_1 (fita), c_esc_1 (caixa), cracha_1 (escala), abre o minigame; acertar entrega a pista. Errar não gasta carga; há "Pedir uma pista".
 - Ritmo: abre_1 (cartão do Téo na Recepção, objetivo claro na volta 1, custo 0); rev_3 (reviravolta da volta 3: o seguro foi pedido antes do dia 14, a troca foi planejada); ensaio da volta 4 agora diz o que ainda pode falhar na execução final (por causa).
 - Falta: cooperação Pátio/Corredor na bancada, final reconstruído no telão com as provas, mais minigames (cadeado, painel).
+
+## Vocabulário simples (24/11, 23h30)
+Trocadas nos textos do jogo: peça-guia → peça de referência; catraca → roleta de entrada; pedestal → base da peça; berço → apoio; tombo → número da peça; manopla → alavanca; calibrar/calibragem → ajustar/ajuste. Mantidos (palavras comuns): registro, disjuntor, fusível, patrocinador. IDs internos (A_calibrar, C_ancora) não mudam.
