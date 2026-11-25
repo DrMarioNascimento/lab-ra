@@ -507,3 +507,30 @@ function lcAtualizarBotao(){
  if (botao) botao.hidden = !state || !['choose','playing','between'].includes(state.phase);
 }
 if (typeof document !== 'undefined') { const i = setInterval(() => { if (document.body) { lcBotao(); clearInterval(i); } }, 300); }
+
+// ---- Bancada de investigação: minigames (vindos da Reserva) que abrem ao coletar certas pistas
+const LC_MG = {
+ tombo_2:{ativ:'fotoConsulta', resp:'012345', nome:'Remontar a foto antiga do catálogo', texto:'A foto está em seis pedaços. Reúna as partes pela continuidade da imagem e leia o número na base da peça.'},
+ falsa_1:{ativ:'marca', resp:4, nome:'Examinar a peça com luz rasante', texto:'Mude o ângulo da luz até a marca no selo ficar legível. A fissura nova mostra que a peça é outra.'},
+ traj_1:{ativ:'fita', resp:'Caixa deixa a bancada|Carrinho dobra o corredor|Crachá libera a porta|Caixa entra nas Coleções', nome:'Restaurar a fita da câmera', texto:'Monte a sequência da movimentação na ordem em que aconteceu.'},
+ c_esc_1:{ativ:'caixa', resp:'faixa/fundo/tampa', nome:'Abrir a caixa do depósito', texto:'Deslize, examine o fundo e abra a tampa. Observe o entalhe triangular.'},
+ cracha_1:{ativ:'livro', resp:0, nome:'Ler a escala de crachás', texto:'A escala mostra quem abre a porta de serviço às 4:00 da volta, toda volta. Qual crachá aparece?', opcoes:['Crachá do Braga','Crachá do Aurélio','Crachá da Ivone']}
+};
+function lcBancada(q){
+ const mg = LC_MG[q.lcp];
+ if (!mg || (state.resolvidos && state.resolvidos[q.id])) return false;
+ Promise.all([import('./reserva/banco.mjs'), import('./reserva/minigames.mjs')]).then(([B, M]) => {
+  if (!document.getElementById('bancadaCss')) { const l = document.createElement('link'); l.id = 'bancadaCss'; l.rel = 'stylesheet'; l.href = 'bancada.css?v=1'; document.head.appendChild(l); }
+  let d = document.getElementById('lcBancada');
+  if (!d) { d = document.createElement('dialog'); d.id = 'lcBancada'; d.className = 'lc-banc'; document.body.appendChild(d); }
+  const base = B.atividades[mg.ativ];
+  const A = Object.assign({}, base, {nome:mg.nome, texto:mg.texto}, mg.opcoes ? {opcoes:mg.opcoes} : {});
+  M.abrirMinigame(d, A, lcCausa().slice(0,1), async v => {
+   if (String(v) !== String(mg.resp)) return 'Ainda não encaixou. Confira o que está na tela e tente de novo.';
+   (state.resolvidos ||= {})[q.id] = true; save();
+   setTimeout(() => collect(q.id), 0);
+   return '';
+  });
+ }).catch(() => { (state.resolvidos ||= {})[q.id] = true; save(); collect(q.id); });
+ return true;
+}
