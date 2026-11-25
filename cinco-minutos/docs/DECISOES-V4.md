@@ -1,8 +1,8 @@
 # Loop v4 (25/11/2026) — decisões aplicadas nos dados e no código
-Fonte da verdade do enredo: docs/ROTEIRO-LOOP.md. Dados: cinco-minutos/dados/pistas-v4.json (278 pistas desde a revisão 3; as seções "Revisão 2", "Revisão 3" e "Revisão 4", no fim, valem sobre o que estiver acima, e a mais nova vale sobre as anteriores) → loop-central-dados.js.
+Fonte da verdade do enredo: docs/ROTEIRO-LOOP.md. Dados: cinco-minutos/dados/pistas-v4.json (278 pistas desde a revisão 3; as seções "Revisão 2", "Revisão 3", "Revisão 4", "Revisão 5" e "Revisão 6", no fim, valem sobre o que estiver acima, e a mais nova vale sobre as anteriores) → loop-central-dados.js.
 
 ## Mundo
-- Uma versão só para o Téo: confrontou o Lenz na Sala das coleções minutos antes de 0:00, foi empurrado, caiu ao lado do pote de tinta. Enquanto a Câmara gira ele "não piora nem melhora, fica guardado igual a uma peça numa vitrine" (pista sato_teo). Saíram as frases "encostou na Câmara / ficou preso entre as voltas".
+- Uma versão só para o Téo: confrontou o Lenz na Sala das coleções uns trinta segundos antes de 0:00, foi empurrado, caiu ao lado do pote de tinta. Enquanto a Câmara gira ele "não piora nem melhora, fica guardado igual a uma peça numa vitrine" (pista sato_teo). Saíram as frases "encostou na Câmara / ficou preso entre as voltas".
 - Regra de memória: ninguém do museu lembra das voltas. Lembram: o caderno de quem joga, o chão (objeto deixado), a Câmara (meio conserto, eco). Uma pessoa só muda de fala quando quem joga MOSTRA algo do caderno (campo precisaDe + porque).
 - O reinício é às 5:00 (não na queda de luz).
 - Sem hora do dia nos textos (saíram 21h40, 21h58, 18h): só minuto da volta, "fim da tarde", "ontem", "dia da troca".
@@ -30,7 +30,7 @@ Fonte da verdade do enredo: docs/ROTEIRO-LOOP.md. Dados: cinco-minutos/dados/pis
 - Recurso de quem joga: "energia" (carga é só o ponteiro da máquina).
 - Regras de jogo saíram das pistas (regras_quadro apagada; aviso_solo e v4_camara viraram objetos do mundo) e ficam na ajuda da Máquina.
 - Atividades renomeadas: "Lado a Lado" (antes Original e Cópia), "As Duas Listas" (antes Entrou, mas não saiu).
-- Missões secretas (5; hoje são 8): o que o Braga esconde; o que derrubou o Téo; quem ganha se a peça sumir; por que a Ivone não pode ter trocado; o que o Aurélio sabia.
+- Missões secretas (5; hoje são 8): o que o Braga esconde; o que aconteceu com o Téo; quem ganha se a peça sumir; por que a tinta da Ivone não faz dela culpada; o que o Aurélio sabia.
 - Vocabulário: número de registro (não tombo), base (não pedestal), apoio (não berço), luva isolante (não manopla), ajustar/ajuste (não calibrar), luz da peça / modo livre / peça presa (não âncora), pontos (não bornes).
 
 ## Revisão 2 (25/11/2026) — depois da rodada 2 das escalas
@@ -135,7 +135,7 @@ Onde esta seção contradiz o que está acima, vale esta. Origem: relatório da 
 - Gravação do Téo: duas pistas ("Pendrive no rádio" e "A gravação continua", esta com um texto por noite).
 - Tela: "a luva isolante", "a peça verdadeira" (nunca o nome interno); "sem dupla" e "em dupla" nas mensagens; papel "Guarda do dossiê".
 - Preparação, descrição das salas, passo a passo e tela final falam do mundo do Loop (saíram a premissa do caso antigo, o arquivo antigo e a lanterna).
-- Missões secretas: 8 no jogo (as 5 de antes e mais: para onde vão as pegadas; onde a peça verdadeira está; o que o Nico está guardando).
+- Missões secretas: 8 no jogo (as 5 de antes e mais: para onde vão as pegadas; o que tem na caixa que pesa demais; o que o Nico está guardando).
 
 ### Campos dos dados
 - `destrava` refeito a partir de `precisaDe`. Toda pista com `porque` tem a tranca escrita.
@@ -221,3 +221,43 @@ Onde esta seção contradiz o que está acima, vale esta. Origem: os quatro rela
 
 ### Ficou para decidir
 Nada.
+
+## Revisão 6 (25/11/2026) — depois da rodada 5 das escalas
+
+Onde esta seção contradiz o que está acima, vale esta. Origem: os quatro relatórios da rodada 5 (`docs/avaliacao/rodada5/`): escala da história (3.1 e 3.2, mais os defeitos menores), fichas e motivação (A1 a A9), conferência técnica (B1 a B4 e 15 menores) e padrão visual com peças 3D. Foi aplicado tudo o que os relatórios classificam como texto, dado, CSS ou código. O resumo do que mudou, arquivo por arquivo, está em `LOOP-CENTRAL.md`, "Revisão 6".
+
+### Escolhas feitas ao aplicar
+- **`coop_veredito`.** O relatório propôs "Braga espia por cima do seu ombro". A pista vai para os dois aparelhos da dupla, e um deles está na Base da limpeza; ficou "Na Central, Braga espia a escala e engole seco", que vale para os dois e mantém o Braga só na Central.
+- **Minijogo da caixa.** A história pediu o enunciado das três caixas com um adesivo só; as fichas pediram opções que só o caderno separa. Ficou o enunciado da história com 4 opções no formato das fichas ("Entrou leve e hoje pesa", "Entrou pesada e hoje está leve", "Entrou hoje, com escolta", "Ninguém pesou").
+- **Painel da noite D.** A opção "balançando no meio" foi trocada por "atrás de uma etiqueta de papel, tremendo" (continua com 4 opções e o mesmo gabarito). "Tem força chegando", na leitura completa, ficou: o ponteiro treme.
+- **Descrição do Subsolo.** Uma frase só, igual nas 5 noites e sem o sinal de carga baixa ("A Câmara do tempo zumbe no meio da sala. Ligada, e ninguém consegue desligar."). Mudar a descrição conforme a noite daria o sinal de graça.
+- **Desligar e o Téo.** Os textos ganharam "Lá fora, uma sirene: o socorro do Téo." É a mesma sirene do Ouro (a noite andou, o socorro chega).
+- **"Só você lembra".** Passo a passo e finais valem agora para uma pessoa e para a turma.
+- **Missão do dinheiro.** Só fecha com a carta, a gravação ou a ata (grupo do motivo); o contrato, que se pega com um toque no primeiro minuto, não fecha mais. Muda a decisão da revisão 5 ("fecha também com o contrato"), a pedido da rodada 5.
+- **B3 (61 palavras).** Foi escolhida a saída de código: rótulo em linha própria. O texto do interfone não mudou por causa disso.
+- **B4 ("Ver o museu em 3D").** O botão ficou. A torre ganhou o modo do Loop (`?loop=1`): 15 salas, 4 andares, peças do Loop.
+- **Mensagem da Máquina.** Além de guardar e repor, ela fica presa no pé da janela (sempre à vista, sem rolar a página).
+- **Telão no resultado.** As missões cumpridas saíram do cartão da Turma e ganharam página própria, agrupadas por missão: com 40 pessoas não cabiam de outro jeito sem cortar ou encolher a letra abaixo do mínimo.
+- **Sala dos sons.** A mecânica própria é o gravador: tocar a gravação com legenda. Usa só as pistas e as regras que já existem.
+- **Miniaturas.** `E02`, `DESC_A` e os 4 tipos de pista foram refeitas no gerador de miniaturas, com novo enquadramento. Não é arte nova: é outra foto do mesmo modelo.
+
+### Não aplicado, e por quê
+- **Regras e fatos novos**: ver "Ficou para decidir", abaixo.
+- **Os 6 emojis provisórios e as 8 peças reprovadas**: dependem de arte nova. Os pedidos estão em dia em `ICONES-A-GERAR.md` e `PECAS-A-CONSEGUIR.md`.
+- **Recompressão da `L05`**: o arquivo já está em Draco + WebP; baixar mais piora a peça.
+- **Pontos em lugar fixo na peça e peça que reage ao apagão**: continuam em "Continua para depois" de `PECAS-A-CONSEGUIR.md` (ajustes da Parte B que não aprovam sala nenhuma sem o modelo novo).
+- **Simulador de sala em notebook** (tamanho do telão e da turma em 1280×720) e **área ocupada no telão** (Desfecho, Relógio): ajustes "para o 10"; só a pergunta de "Para conversar" e o rótulo da entrada do telão foram aumentados.
+- **Identificadores internos com palavra antiga, `GDD.md` e a camada antiga carregada e filtrada**: como na revisão 5.
+
+### Ficou para decidir (pontos de regra da rodada 5; nenhum bloqueia)
+- **Resposta errada em minijogo sem custo** (fichas e motivação, B1): errar não custa nada e dá para passar tocando nas opções. A proposta é fechar a bancada e deixar o item "ainda não" por 30 segundos. É regra nova.
+- **Entrada por papel nos consertos em dupla** (fichas e motivação, B2): em Três Números, Fio a Fio e A Verdadeira os dois aparelhos precisam de tudo no próprio caderno, então quem dita não sabe nada que quem digita não saiba. A proposta é o aparelho do Subsolo pedir só diagnóstico e receita. Reabre a decisão da revisão 5 e pede o validador de novo.
+- **Piso de volta em `nico_1` (4), `cracha_3` (3) e `lenz_2` (3)** (história, 3.3-2): quem já tem tudo o que a frase pede ainda vê "ainda não".
+- **"Quem" e "por quê" quase inteiros na volta 1** (`data_2`, `motivo_1`, `c_esc_2`, `traj_3`; história, 3.3-1): a virada da volta 3 fica mais fraca. Decisão da revisão 5: ficam como estão.
+- **Revelar sem consertar é esquecido às 5:00** e **Revelar só na volta 5 sem motivo no mundo** (história, 3.3-3 e 3.3-4).
+- **Por que quem joga lembra** não é dito em lugar nenhum (história, 3.3-5).
+- **`d_teo_2` sem tranca** na noite D (as outras duas pistas do Téo pedem um sinal antes) e **`aurelio_1` na volta 1** só com o cheiro de verniz: mexer é mexer em tranca.
+- **A Dra. Sato, fora do prédio, é levada pelas voltas?** e **o que dispara o alarme das 2:40?** Nenhuma pista diz. Pedem um fato novo do mundo.
+- **`man_cal_3`**: o Téo copia a receita do ajuste "vai que precisa" em toda noite, e a ficha diz que só na noite do fusível ele sabe do risco. Sem texto proposto.
+- **Aviso de aula encerrada** ("O Professor encerrou a aula. Obrigado por participar!"): é o mesmo texto do padrão de sala dos outros jogos; não foi mudado só aqui.
+- **Restos de formulário** apontados sem texto proposto ("Marcadas: 3 de 3 · sinais: 2...", "A tentativa desta volta foi gasta.", botão "Registrar revelação") e o rótulo "MEIO CERTO".

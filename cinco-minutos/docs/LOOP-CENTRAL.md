@@ -1,6 +1,6 @@
 # Loop · A Máquina (camada central)
 
-Arquivos: `dados/pistas-v4.json` (fonte dos dados, **278 pistas**, versão v4, **revisão 4 de 25/11/2026**) → `loop-central-dados.js` (gerado a partir dele), `loop-central.js` (regras e telas). Enredo: `ROTEIRO-LOOP.md`. Decisões aplicadas: `DECISOES-V4.md`. Botão **🧭 Máquina** no canto da tela.
+Arquivos: `dados/pistas-v4.json` (fonte dos dados, **278 pistas**, versão v4, **revisão 6 de 25/11/2026**) → `loop-central-dados.js` (gerado a partir dele), `loop-central.js` (regras e telas). Enredo: `ROTEIRO-LOOP.md`. Decisões aplicadas: `DECISOES-V4.md`. Botão **🧭 Máquina** no canto da tela.
 
 - **Defeito por semente** (5 causas): A falta ajustar, B falta força, C peça presa (a máquina se segura na peça errada da base), D fusível tirado de propósito, E dois defeitos juntos (A + B, em voltas diferentes). Roteiro completo em `ROTEIRO-LOOP.md`. Os sinais de cada defeito só existem quando ele é o sorteado, mas a lista de cada sala mostra os mesmos rótulos nas 5 noites (onde o sinal não existe, o mesmo rótulo traz a coisa normal: campo `parDe` nos dados); o manual (páginas 1 a 6), a folha amassada da impressora, o apito curto da base e a caixa de "banners" com a peça verdadeira existem em todas as noites.
 - **Valores por semente** (nada decorável): dia da troca (9 a 25), hora do apagão (1:00, 1:05, 1:10, 1:15 ou 1:20), número de registro (3 algarismos), ordem dos 3 pontos de ligação, número da chave do para-raios e senha do cofre do Braga (o registro de trás para a frente). Nos dados os textos usam os marcadores `{dia}` `{hora}` `{reg}` `{reg_inv}` `{ordem}` `{ch}`; `valores_padrao` (14, 1:10, 472, 274, 3-1-2, chave 3) serve para os exemplos dos documentos. O validador sorteia os valores como o jogo.
@@ -10,7 +10,7 @@ Arquivos: `dados/pistas-v4.json` (fonte dos dados, **278 pistas**, versão v4, *
 - **Ensaio das voltas 2 a 4, volta 5 vale.** Finais: Ouro, Desligar, Revelar, Parcial, Mínimo (textos no campo `finais` dos dados, copiados na parte 8 do roteiro).
 - **Passar pista**: só na pausa, por código de 4 letras, grátis, até 3 por pessoa por pausa (sem servidor).
 - **Recurso de quem joga**: "energia". 5 por volta para todo mundo, com ou sem dupla (a missão secreta cumprida dá +1 na volta seguinte). A tela cobra o custo escrito nos dados (0, 1 ou 2). Carga é só o ponteiro da máquina.
-- **Cada aparelho por si**: caderno, diagnóstico e tentativa de Revelar são de cada aparelho. Para abrir uma atividade, o aparelho precisa do diagnóstico e das fontes de entrada no próprio caderno. Nos consertos em dupla, só o aparelho de quem está no Subsolo registra ensaio, meio conserto e conserto.
+- **Cada aparelho por si**: caderno, diagnóstico e tentativa de Revelar são de cada aparelho. Para abrir uma atividade, o aparelho precisa das fontes de entrada no próprio caderno; só os consertos pedem também o diagnóstico. Nos consertos em dupla, só o aparelho de quem está no Subsolo registra ensaio, meio conserto e conserto.
 - **Revelar**: só na volta 5, na Recepção, uma tentativa por aparelho.
 - Sem Firebase novo: tudo roda em cada aparelho. Dossiê compartilhado em tempo real exigiria regra nova do Firestore.
 
@@ -28,7 +28,7 @@ Simulação: rodada 1 (10 grupos, 0 conserto) → versão 2 → rodada 2 (12 gru
 
 ## União Loop + Reserva (24/11)
 - Base: Loop (5 causas, Mestre). A Reserva ("A peça que o museu esqueceu") fica como episódio e seus minigames viram a BANCADA do Loop.
-- Bancada (`bancada.css`, `LC_MG` em loop-central.js): ao coletar a foto antiga do catálogo, a peça principal (luz rasante), a fita da câmera da porta de serviço, a caixa de banners e a escala de crachás, abre o minigame; acertar entrega a pista. Errar não gasta energia; há "Pedir uma pista".
+- Bancada (`bancada.css`, `LC_MG` em loop-central.js): ao coletar a foto antiga do catálogo, a peça principal (luz rasante), a fita da câmera da porta de serviço, a caixa de banners e a escala de crachás, abre o minigame; acertar entrega a pista. (Na revisão 6 a escala de crachás deixou de ter minigame: a pista entra direto.) Errar não gasta energia; há "Pedir uma pista".
 - Ritmo: `abre_1` (cartão do Téo na Recepção, objetivo claro na volta 1, custo 0); `rev_3` (hoje é a ata da reunião com "então apaga?", o engano do Lenz); ensaio da volta 4 diz o que ainda pode falhar na execução final (por causa).
 - Um jogo só: o Loop é a base. Minigames da Reserva entram como bancada em 5 pistas e em 2 atividades em dupla (Lado a Lado, As Duas Listas). Cooperação Pátio/Área de descanso já existia no Loop (Apagão Combinado).
 - Desfecho mostra quais das 3 provas a equipe reuniu. A Reserva continua na pasta `reserva/`, mas saiu da entrada do Loop (revisão 4).
@@ -45,7 +45,7 @@ Palavras que o jogo usa: **número de registro** (da peça), **base** (onde a pe
 **Por quê.** O jogo passou pela avaliação das escalas (`ESCALAS_AVALIACAO_JOGOS.md`: história, personagens, Big Five e GAMS, conferência técnica) e a **rodada 1 foi reprovada**. Como manda o ciclo de renovação das escalas, o conteúdo foi corrigido para ser reavaliado do zero. O que mudou está em `DECISOES-V4.md`; resumo:
 
 **Mundo e história**
-- Uma versão só para o Téo: confrontou o Lenz na Sala das coleções minutos antes de 0:00, foi empurrado e caiu ao lado do pote de tinta. Enquanto a Câmara gira ele "não piora nem melhora, fica guardado igual a uma peça numa vitrine". Saíram as frases em que ele encostava na Câmara ou ficava preso entre as voltas.
+- Uma versão só para o Téo: confrontou o Lenz na Sala das coleções uns trinta segundos antes de 0:00, foi empurrado e caiu ao lado do pote de tinta. Enquanto a Câmara gira ele "não piora nem melhora, fica guardado igual a uma peça numa vitrine". Saíram as frases em que ele encostava na Câmara ou ficava preso entre as voltas.
 - Regra de memória: ninguém do museu lembra das voltas. Lembram o caderno de quem joga, o chão (objeto deixado) e a Câmara (meio conserto, eco). Uma pessoa só muda de fala quando quem joga MOSTRA algo do caderno (campos `precisaDe` + `porque`).
 - O reinício é às 5:00 (não na queda de luz). Não há mais hora do dia nos textos: só minuto da volta, "fim da tarde", "ontem", "dia da troca".
 - Vigia = Braga. Zelador = Seu Dirceu (figurante da limpeza).
@@ -187,7 +187,46 @@ Palavras que o jogo usa: **número de registro** (da peça), **base** (onde a pe
 
 **Simulador de texto e validador** (`dados/simulador-texto.py`, `dados/validar.py`): sem regra nova; o validador se apresenta como "revisão 5". Resultado: APROVADO nas 5 causas com 1, 2 e 3 pessoas.
 
-## Checklist por volta (recalculado dos dados em 25/11/2026, revisão 5)
+## Revisão 6 — 25/11/2026
+
+**Por quê.** A rodada 5 das escalas não passou por pouco: escala da história 8,8 (Jogo limpo e Consistência em 8,5), motivação 4,4 de 4,5 (as perguntas dos minijogos), conferência técnica com 4 correções bloqueantes (a mensagem e as marcas da Máquina sumindo com toque de verdade, um parágrafo do caderno com 61 palavras, o museu em 3D antigo) e padrão visual com média 8,6 (critérios 2, 3, 5 e 6 em 8). Os quatro relatórios estão em `docs/avaliacao/rodada5/`. Tudo o que era texto, dado, tela ou código foi aplicado; as mudanças de regra que os relatórios deixam para o autor não foram (lista em `DECISOES-V4.md`, "Revisão 6").
+
+**O que mudou no código** (`loop-central.js`, `game.js`, `ritmo.js`, `style.css`, `bancada.css`, `reserva/minigames.mjs`, `sala/`, `museu/torre/`, `museu/livro/`, `museu/icones/`, `telao/`)
+- **Máquina, mensagem e marcas (B1 e B2).** A última mensagem fica guardada e volta depois de cada redesenho; some ao trocar de aba, fechar a janela ou mudar de volta. Ela fica presa no pé da janela, sempre à vista. O redesenho de 2 em 2 segundos não mexe em nada quando o conteúdo é o mesmo; quando muda, repõe o defeito e as pistas marcadas, o que foi digitado, as explicações abertas e a rolagem. Não depende de foco (no iPhone, tocar numa caixa de marcar não dá foco). Depois de valor errado, os campos digitados ficam.
+- **Caderno (B3).** O rótulo da anotação fica em linha própria; o parágrafo é só o texto da pista (maior bloco medido: 57 palavras).
+- **"Ver o museu em 3D" (B4).** O botão do jogo abre `museu/torre/?loop=1`: só as 15 salas da história, em 4 andares (2º andar, 1º andar, Térreo, Subsolo), com a peça que cada sala tem no Loop. A lista vem de `museu/torre/salas-loop.json`, gerado de `LOOP_SALAS` e `LOOP_DESC`. Sem `?loop=1` a página continua como era.
+- **Minijogos.** A escala de crachás não tem mais pergunta (a pista entra direto). A foto antiga e a caixa têm 4 opções que só o caderno separa. Acusação e Defesa pergunta o que, na escala, foi escrito pela mesma mão do bilhete. Todo minijogo mostra a miniatura da sala ou da peça; a cena da luz mostra a máscara da Galeria. A linha da mensagem tem lugar reservado e o rótulo "Olhe de perto" tem 13 px.
+- **Sala dos sons, o gravador.** Cada pista da sala é uma faixa; tocar numa faixa é examinar a pista (mesmo custo, mesma tranca, mesma hora) e a legenda aparece aos poucos. O que já está no caderno toca de novo sem gastar. Sem pista nova e sem regra nova.
+- **Lista da sala.** O selo "✓ no caderno" ocupa a linha inteira (não corta em 390 nem em 360 px); em 360 px o nome da pista cabe em 3 linhas.
+- **Livro de folhear.** Os botões "Ler" têm lugar de altura fixa (o máximo de páginas pagas por par de folhas): abrir o livro e virar a folha não mexem na tela. A leitura não repete o título. A mesa da cena ficou azul-noite.
+- **Textos de tela.** Descrição do Subsolo igual nas 5 noites, sem o sinal de carga baixa. Entrada: "Noite de véspera no museu." Passo a passo sem "só você" (em sala, a turma inteira lembra) e com nome curto de sala. Missão secreta sem falar de turma e de telão no jogo sem turma; a do dinheiro não fecha mais com o contrato (um toque na volta 1). "Em dupla: cada pessoa numa sala". A Dra. Sato não diz mais "Tá." (é a marca do Braga). Valor único errado: "o valor não confere" (não "0 de 1 certos"). No caderno, "leitura normal" não abre mais a explicação de regra. Aba Revelar: a dica do crachá aponta a pergunta, não o caminho.
+- **Fita do telão.** O primeiro fato diz o que os papéis do dia da troca mostram ("A peça principal sai para 'limpeza' e volta no mesmo dia"); a cópia fica no fato seguinte.
+- **Telão com turma grande** (testado com 40 nomes, em 1280×720 e 1920×1080): nenhum cartão passa da caixa e nenhuma letra fica abaixo de 1,35% da largura. A letra dos nomes desce só o que for preciso; a largura de cada cartão acompanha a quantidade de nomes; se ainda faltar lugar, o papel sai da ficha. No resultado, as missões cumpridas ganharam página própria (uma linha por missão, com os nomes). As fichas do desfecho chamam "Achar o defeito", "Consertar a Máquina" e "Revelar a noite".
+- **Miniaturas** `E02`, `DESC_A` e os 4 tipos de pista refeitas com novo enquadramento (sem arte nova); fichas das 3 provas do resultado com 40 px e fundo claro. O aviso da pausa não cobre mais o botão "Escolher a próxima sala".
+- Endereço novo `telao/` na raiz do jogo (abre `sala/telao/`).
+
+**O que mudou nos dados** (`dados/pistas-v4.json`, 278 pistas, "v4 revisão 6")
+- `coop_veredito`: quem diz de quem é a rubrica é o Braga, na Central ("É do Lenz, do patrocínio. Ele assina tudo assim.").
+- Lado a Lado e `foto_solo`: feltro novo embaixo da base, sem número à vista (bate com `fh_base_perto` e `d_f2_1`).
+- `coop_catraca_ok`: saiu a frase do crachá na porta de serviço (não está em nenhuma das duas listas).
+- Painel e Manual, noite D: "ponteiro: atrás de uma etiqueta de papel, tremendo" (tela e opção de quem marca), igual a `fh_pont_d`.
+- `hora_5`: "gerador assumiu a luz" (a Câmara puxa do gerador desde o minuto 0).
+- `braga_1`: a fuga é o cunhado, não o café. `man_3`, lacre cortado: a Dra. Sato devolve pergunta. `c_peca` e `iso_1` sem "Ela está na sua mão". `traj_4`: a marca de sola aponta para a rua (o texto mostra, não conclui).
+- Finais: o Desligar (texto de base e os 5 por causa) diz o que acontece com o Téo ("Lá fora, uma sirene: o socorro do Téo."); nenhum final diz "só você" ou "a única memória".
+- Papéis da última volta: "Quem opera" e "Quem apoia" (antes Mão A e Mão B), com dicas novas.
+- Campo interno `trancas.hora_do_apagao` sem marca de gênero.
+
+**Simulador de texto e validador** (`dados/simulador-texto.py`, `dados/validar.py`): sem regra nova; o validador se apresenta como "revisão 6". Resultado: APROVADO nas 5 causas com 1, 2 e 3 pessoas.
+
+**Ficaram sem linha própria no registro da revisão 5** (apontado pela conferência técnica; todas já estavam aplicadas): a frase da pré-conferência ("Forma certa. Falta ver se o defeito é esse."); relógios de corda e elétricos (`a_rel_1`, `a_rel_2`, `fh_rel_recep`, `hora_2`); `fh_pont_d`; `mancha_2`; `dis_musica`; o pó branco de `dirceu_0`; o corte de "A peça exposta é cópia" em `coop_copia_ok` e `foto_solo`; a tranca nova de `eco_chave`.
+
+**Não aplicado, e por quê**
+- Mudanças de regra que os relatórios deixam para o autor: lista em `DECISOES-V4.md`, "Revisão 6 · Ficou para decidir".
+- Os 6 ícones provisórios e as 8 peças 3D reprovadas dependem de arte nova (`ICONES-A-GERAR.md`, `PECAS-A-CONSEGUIR.md`).
+- Recompressão da peça `L05`: já está em Draco + WebP; baixar mais piora a peça.
+- Simulador de sala em notebook (telão menor e turma mais alta em 1280×720): ajuste que não reprova; a fórmula atual do tamanho ficou.
+
+## Checklist por volta (recalculado dos dados em 25/11/2026, revisão 6)
 
 Conferido em `dados/pistas-v4.json` (campos `volta_min`, `volta_max`, `segundo_min`, `precisaDe`, `soNaCausa`, `parDe`, `grupos_fonte`, `atividades_coop`). Horários com `valores_padrao` (raio em 1:10); com outra hora sorteada, os horários ligados ao raio andam junto. Pistas por `volta_min`: **231 na volta 1, 25 na volta 2, 9 na volta 3, 9 na volta 4, 4 na volta 5** (278 no total). Ativas por noite: 207 (A), 208 (B), 207 (C), 207 (D), 212 (E).
 
@@ -264,13 +303,13 @@ Não contam como prova: o cheiro de verniz; o bilhete do armário e o livro de v
 - **Horários que importam:** janela do Raio; quem vai apresentar precisa das 3 provas no próprio caderno até a pausa (passar pista: até 3).
 
 ### Volta 5
-- **Abre:** +4 pistas (os consertos finais A, B, C, D). Conserto valendo. **Revelar**: só nesta volta, na Recepção, antes de 5:00, uma tentativa por aparelho, com 1 prova da cópia + 1 do trajeto + 1 do crachá no caderno de quem apresenta. Papéis: Mão A, Mão B, Central, Porta-voz, Guarda do dossiê (escolhidos na tela, na pausa da volta 4; a dica do papel aparece nesta volta).
+- **Abre:** +4 pistas (os consertos finais A, B, C, D). Conserto valendo. **Revelar**: só nesta volta, na Recepção, antes de 5:00, uma tentativa por aparelho, com 1 prova da cópia + 1 do trajeto + 1 do crachá no caderno de quem apresenta. Papéis: Quem opera, Quem apoia, Central, Porta-voz, Guarda do dossiê (escolhidos na tela, na pausa da volta 4; a dica do papel aparece nesta volta).
 - **Não pode vazar:** nada mais a segurar. Não há ensaio nesta volta.
 - **Conferência:** finais no campo `finais`: Desligar (causa certa, diagnóstico anexado, conserto na volta 5; texto próprio para cada uma das 5 causas), Revelar (3 provas, Recepção, volta 5, até 300 s), Ouro (os dois na volta 5), Parcial, Mínimo: OK. Trava do Revelar no código (`lcRevelar`): OK.
 - **Horários que importam:** janela do Raio (noites B e E); 5:00 é o limite do Revelar.
 
 ### Pendências
-Nenhuma aberta (revisão 5). O que as revisões 2 e 3 deixaram em aberto foi fechado assim:
+Nenhuma de texto, dado ou código (revisão 6). Os pontos de regra que a rodada 5 deixa para o autor estão em `DECISOES-V4.md`, "Revisão 6 · Ficou para decidir": não bloqueiam o jogo. O que as revisões 2 e 3 deixaram em aberto foi fechado assim:
 
 | Assunto | Como ficou | Quem decidiu |
 |---|---|---|
@@ -288,7 +327,7 @@ Nenhuma aberta (revisão 5). O que as revisões 2 e 3 deixaram em aberto foi fec
 | Dra. Sato sem dupla | Só fala: dita e confere | Responsável, revisão 4 |
 | Painel e Manual | Entrega a leitura completa; não anexa | Responsável, revisão 4 |
 | Etiqueta no caderno | Mantida; a pista recebida conserva a etiqueta | Responsável, revisão 4 |
-| Telão final | Final da história e fita completa em ordem; sem as 8 perguntas | Responsável, revisão 4 |
+| Telão final | Final da história e fita completa em ordem; sem as 8 perguntas. Desde a revisão 6, as missões cumpridas têm página própria | Responsável, revisão 4 |
 | Ensaio "2 de 3" | Já é o que o código faz: diz quantos, nunca qual. Dados e simulador alinhados | Regra desta revisão |
 | Papel Central, bloqueio do Apagão Combinado, objeto de volta à mão | Dados e documentos dizem o que o código faz (Central falada; sem bloqueio; objeto pode ser pego de novo) | Regra desta revisão |
 | Trava da noite E no navegador | Corrigida no código | Correção 1 da conferência técnica |

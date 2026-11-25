@@ -11,7 +11,7 @@ R.outputColorSpace = THREE.SRGBColorSpace; R.toneMapping = THREE.ACESFilmicToneM
 const cam = new THREE.PerspectiveCamera(32, 1, 0.01, 100);
 const draco = new DRACOLoader(); draco.setDecoderPath('../sala3d/vendor/draco/');
 const L = new GLTFLoader(); L.setDRACOLoader(draco);
-// opts (opcional): src = caminho de outro .glb; az, el = ângulos da câmera em graus; zoom = aproximação; alvoY = para onde olhar na altura (-1 base, 1 topo); px = lado da imagem
+// opts (opcional): src = caminho de outro .glb; az, el = ângulos da câmera em graus; zoom = aproximação; alvoY = para onde olhar na altura (-1 base, 1 topo); alvoX, alvoZ = para onde olhar de lado e no fundo (-1 a 1); px = lado da imagem
 window.render = (id, opts = {}) => new Promise((ok, erro) => L.load(opts.src || '../pecas/' + id + '.glb', g => {
   const S = new THREE.Scene();
   S.add(new THREE.HemisphereLight(0xfff2dc, 0x1a2a3a, 1.25));
@@ -23,7 +23,8 @@ window.render = (id, opts = {}) => new Promise((ok, erro) => L.load(opts.src || 
   if (opts.px && cv.width !== opts.px) R.setSize(opts.px, opts.px, false);
   R.toneMappingExposure = opts.exp || 1.15;   // exp: peças escuras pedem mais luz na miniatura
   const az = (opts.az ?? 40.7) * Math.PI / 180, el = (opts.el ?? 21.8) * Math.PI / 180, ty = (opts.alvoY || 0) * t.y * 0.5;
-  cam.position.set(d * Math.cos(el) * Math.sin(az), ty + d * Math.sin(el), d * Math.cos(el) * Math.cos(az)); cam.lookAt(0, ty, 0); cam.near = d / 50; cam.far = d * 10; cam.updateProjectionMatrix();
+  const tx = (opts.alvoX || 0) * t.x * 0.5, tz = (opts.alvoZ || 0) * t.z * 0.5;   // alvoX, alvoZ (-1 a 1): olhar para um canto da peça (reenquadrar só uma parte)
+  cam.position.set(tx + d * Math.cos(el) * Math.sin(az), ty + d * Math.sin(el), tz + d * Math.cos(el) * Math.cos(az)); cam.lookAt(tx, ty, tz); cam.near = d / 50; cam.far = d * 10; cam.updateProjectionMatrix();
   R.render(S, cam); ok(cv.toDataURL('image/png'));
 }, undefined, erro));
 window.pronto = true;

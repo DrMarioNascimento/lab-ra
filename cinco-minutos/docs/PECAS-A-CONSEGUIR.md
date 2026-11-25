@@ -76,7 +76,7 @@ Prompt para versão 3D de melhor qualidade: "Cabine de viagem no tempo steampunk
 
 ## Loop — modelos 3D a obter (25/11/2026, da avaliação pelas escalas)
 
-Situação depois da rodada 4 das escalas (revisão 5, 25/11/2026). Antes de pedir, o acervo do LAB-RA foi conferido de novo (97 peças em `museu/pecas`; 342 modelos no repositório, em `biblioteca/`, `angulos/`, `angulos-licenciatura/` e `dilema-bonde-3d/`): não há porta de serviço, cafeteira, vitrine com base nem parede de relógios.
+Situação depois da rodada 5 das escalas (revisão 6, 25/11/2026): as mesmas 7 aprovadas e 8 reprovadas; nenhum modelo foi trocado nem inventado. Antes de pedir, o acervo do LAB-RA foi conferido de novo (97 peças em `museu/pecas`; 342 modelos no repositório, em `biblioteca/`, `angulos/`, `angulos-licenciatura/` e `dilema-bonde-3d/`): não há porta de serviço, cafeteira, vitrine com base nem parede de relógios.
 
 **Das 15 salas da história, 7 estão aprovadas e 8 reprovadas.**
 
@@ -86,16 +86,16 @@ Situação depois da rodada 4 das escalas (revisão 5, 25/11/2026). Antes de ped
 | Central de monitoramento | S01 | 839 KB | aprovada | recomprimir |
 | Recepção | P01 | 156 KB | aprovada | roleta, telefone e relógio só em texto (pedido 6, opcional) |
 | Oficina técnica | M03 | 820 KB | aprovada | recomprimir |
-| Oficina elétrica | E02 | 421 KB | aprovada | miniatura do mapa difícil de ler (ver `ICONES-A-GERAR.md`) |
+| Oficina elétrica | E02 | 421 KB | aprovada | miniatura do mapa refeita na revisão 6 (estante de baterias); o modelo não tem painel de fusíveis |
 | Ateliê de descobertas | L06 + livro | 865 KB | aprovada | recomprimir |
 | Sala de conservação | I01 + livro | 232 KB | aprovada | nada |
-| Galeria especial | GAL_A | 481 KB | reprovada (ambiente) | pedido 8: base com vitrine. A dedução foi tratada na revisão 5: o minijogo da luz tem uma pergunta de história antes do controle |
+| Galeria especial | GAL_A | 481 KB | reprovada (ambiente) | pedido 8: base com vitrine. A dedução foi tratada na revisão 5 (pergunta de história antes do controle). Até a revisão 5 a cena do minijogo da luz mostrava um quadro de moldura laranja, não a máscara; na revisão 6 a cena passou a mostrar a própria máscara (`GAL_A`), com a luz andando por cima |
 | Sala dos relógios | REL_A | 804 KB | reprovada (ambiente) | pedido 9: parede de relógios; recomprimir |
 | Área de descanso | DESC_A | 458 KB | reprovada (pertencimento, ambiente) | pedido 7: porta de serviço com cafeteira e mural |
 | Pátio · Quadro externo | E01 | 146 KB | reprovada (pertencimento, ambiente) | pedido 1 |
 | Sala das coleções | V12 | 747 KB | reprovada (pertencimento, ambiente) | pedido 2 |
 | Base da limpeza | L05 | 1.020 KB | reprovada (pertencimento, ambiente, peso) | pedido 3 |
-| Sala dos sons | N07 | 175 KB | reprovada (pertencimento, ambiente, novidade) | pedido 4 |
+| Sala dos sons | N07 | 175 KB | reprovada (pertencimento, ambiente; a novidade foi tratada na revisão 6) | pedido 4. A mecânica própria da sala já existe: o gravador (ver abaixo). Quando o modelo novo chegar, é só trocar a peça: a mecânica não depende dele |
 | Sala da fotografia | N05 | 569 KB | reprovada (ambiente) | pedido 5 |
 
 Pesos medidos nos arquivos de `museu/pecas` (1 KB = 1.024 bytes).
@@ -114,7 +114,15 @@ As três peças compostas saem de `museu/pecas-compostas.mjs` (precisa do gltf-t
 
 **Feito na revisão 5 (código, sem trocar peça):** os pontos que estão à vista na peça nunca ficam a menos de 44 px um do outro na tela (o sorteio do lugar de cada pista não mudou); o minijogo da luz da Galeria pede uma dedução antes do controle; o livro de folhear tem o lugar reservado e a leitura embaixo.
 
-**Continua para depois:** pontos em lugar fixo por peça (tabela por peça), peça que reage ao apagão (luz que cai), recompressão das peças acima de 600 KB (L05 com 1.020 KB; T01, L06, S01, M03 e REL_A entre 804 e 868 KB; V12 com 747 KB) e cenas dos minijogos com render das peças reais.
+**Feito na revisão 6 (código, sem trocar peça):**
+- **Sala dos sons, mecânica própria: o gravador.** Cada pista da sala é uma faixa. Tocar numa faixa é examinar a pista, com as regras de sempre (mesmo custo, mesma tranca, mesma hora); a gravação "toca" com a legenda aparecendo aos poucos, e o que já está no caderno pode ser ouvido de novo sem gastar nada. Há um botão "Som" (desligado de saída) que põe um chiado de fita, feito por código. Não entrou pista nova. O que ainda depende de material novo: gravações de voz de verdade (Téo, o telefonema do homem de paletó) e o modelo da bancada de som (pedido 4).
+- **Galeria, minijogo da luz.** A cena mostra a máscara da Galeria, não mais um quadro.
+- **Minijogos.** Todos mostram a miniatura da sala ou da peça de que a pergunta fala.
+- **"Ver o museu em 3D".** Aberto a partir do jogo (`museu/torre/?loop=1`), mostra só as 15 salas da história, nos 4 andares da história, e troca a peça de cada sala pela peça que ela tem no Loop (lista em `museu/torre/salas-loop.json`, gerada de `LOOP_SALAS`).
+
+**Recompressão da L05 (1.020 KB): não feita.** O arquivo já está em Draco + WebP (574 KB de textura, 445 KB de malha). Com as ferramentas daqui, baixar mais só reduzindo a textura ou a malha, o que piora a peça. Fica para quando chegar o carrinho de limpeza (pedido 3), que resolve o peso.
+
+**Continua para depois:** pontos em lugar fixo por peça (tabela por peça), peça que reage ao apagão (luz que cai), recompressão das peças acima de 600 KB (L05 com 1.020 KB; T01, L06, S01, M03 e REL_A entre 804 e 868 KB; V12 com 747 KB) e render das peças em 5 luzes para a cena do minijogo da luz (hoje a luz é feita por CSS em cima da miniatura).
 
 ### Modelos a pedir
 

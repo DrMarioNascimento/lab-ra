@@ -17,11 +17,12 @@ Regra do projeto: ícone só em render 3D, próprio do Loop. Onde existe objeto 
 - Ícone já trocado por miniatura: é só salvar o arquivo novo por cima, com o mesmo nome. Nenhum código muda.
 - Lista B (emoji em ficha): salvar o arquivo e trocar o emoji pelo nome indicado na coluna "Troca no código". Em `loop-central.js` a ficha aceita `'img:ui/<nome>'` no lugar do emoji; em `game.js` e `telao.mjs` basta pôr `<img src=".../ui/<nome>.webp">` dentro da ficha `.ic3d`.
 
-## Situação em 25/11/2026 (revisão 5)
+## Situação em 25/11/2026 (revisão 6)
 
 - **Trocados por miniatura 3D do próprio acervo: 20.** Os 7 que eram cópia do Mosaico Vila Ética e 13 emojis.
 - **Continuam provisórios (emoji em ficha): 6.** Não há peça adequada em `museu/pecas`. Estão na lista B, abaixo.
 - As miniaturas saem de `museu/icones/gerar.html` (render da peça, com ângulo, aproximação e luz por parâmetro).
+- **Revisão 6, sem arte nova:** seis miniaturas refeitas em `gerar.html` com novo enquadramento (o gerador ganhou os parâmetros `alvoX` e `alvoZ`, para olhar para um canto da peça): `E02` (só a estante de baterias, com a placa de perigo), `DESC_A` (só a cortiça com as alavancas) e os 4 tipos de pista (fichário, câmera, gramofone e caixa de ferramentas mais perto e com mais luz). As versões anteriores ficaram ao lado, com o sufixo `_SUBSTITUIDO_2026-11-25h`. Os 5 minijogos "Olhe de perto" mostram a miniatura da sala ou da peça de que a pergunta fala, e a cena da luz mostra a máscara da Galeria (`GAL_A`). No resultado, as fichas das 3 provas têm 40 px e fundo claro.
 - **Revisão 5, sem arte nova:** o ícone de tipo de pista passou para 32 px, em ficha clara e com a miniatura aproximada por CSS (20%); no telão, o círculo tracejado aparece uma vez só (ficha "N fatos ficaram no escuro"); a aba Atividades mostra as miniaturas das duas salas com 48 px.
 
 ### O que já foi trocado (nada a fazer)
@@ -71,6 +72,8 @@ Ao lado de texto, sem papel de ícone principal: 🔒 no botão "Conduzir como p
 `E02` (Oficina elétrica: câmera mais baixa e mais perto dos painéis), `R02` e `N05` (aproximadas na parte de cima, que é o que se reconhece) e `V41`. As salas da Galeria, dos relógios e da Área de descanso usam agora as peças compostas `GAL_A`, `REL_A` e `DESC_A`, com miniatura própria. Ainda vale conferir a `E02` no mapa: melhorou, mas "gerador e fusíveis" continua difícil de ler num quadro de 48 px.
 
 ## Lista C · miniaturas a refazer (pedido da rodada 4; nenhuma é provisória)
+
+**Revisão 6:** os itens 1, 2 e 3 foram refeitos por novo enquadramento, sem arte nova (ver "Situação"). Continuam na lista só para quem quiser trocar por ícone desenhado: os prompts valem. O item 1 mostra a estante de baterias, porque o modelo `E02` não tem painel de fusíveis; para o painel, só com arte nova. O item 4 continua como está.
 
 São miniaturas 3D do acervo que já estão no ar, mas leem mal no tamanho em que aparecem. Refazer em `museu/icones/gerar.html` (novo enquadramento) ou gerar com o prompt-base, e salvar por cima, com o mesmo nome.
 

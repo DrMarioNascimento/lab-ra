@@ -1,5 +1,5 @@
 {
- "versao": "v4 revisão 5 (25/11/2026)",
+ "versao": "v4 revisão 6 (25/11/2026)",
  "noite": "v4",
  "causa_sorteada": "B_potencia",
  "causas_possiveis": [
@@ -277,7 +277,7 @@
      ]
     },
     "dupla": {
-     "como": "Um espera o apagão numa sala de relógio enquanto o outro segue investigando; depois conta em voz alta.",
+     "como": "Uma pessoa espera o apagão numa sala de relógio enquanto a outra segue investigando; depois conta em voz alta.",
      "custo_energia": "1 de quem viu"
     },
     "troca_dossie": {
@@ -2205,7 +2205,7 @@
     "sint_pisca": "Você conta dos mostradores piscando. Ela responde: \"Sem ritmo? Ou ela perdeu os números, ou perdeu um pedaço. Olha a caixa de fusíveis. Depois me liga.\"",
     "sint_relogios": "Você conta dos relógios tremendo. Ela responde: \"Relógio tremendo é ela perdida no tempo. Por quê, eu não sei daqui. Como está a luz da peça?\"",
     "sint_ancora": "Você conta da base apitando e piscando amarelo. Ela responde: \"Amarelo é ela procurando 300 anos. O que ela achou aí em cima, quem tem olho é você. Como está a peça?\"",
-    "sint_fusivel": "Você conta do lacre cortado. Ela responde: \"Lacre cortado e fusível fora não é defeito. É decisão de alguém. Descobre por que antes de religar.\""
+    "sint_fusivel": "Você conta do lacre cortado. Ela responde: \"Lacre cortado e fusível fora? Isso não quebra sozinho. Quem tirou, e por quê? Descobre antes de religar.\""
    },
    "previa": "Interfone: Dra. Sato",
    "custo": 1,
@@ -2989,7 +2989,7 @@
   {
    "id": "hora_5",
    "sala": "eletrica",
-   "texto": "Na Oficina elétrica, a fita de papel do gerador acabou de imprimir uma linha: \"luz caiu {hora} · gerador ligou {hora3}\".",
+   "texto": "Na Oficina elétrica, a fita de papel do gerador acabou de imprimir uma linha: \"luz caiu {hora} · gerador assumiu a luz {hora3}\".",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 73,
@@ -3472,7 +3472,7 @@
   {
    "id": "iso_1",
    "sala": "manutencao",
-   "texto": "A trava do armário soltou com a queda de luz. Lá dentro, uma luva isolante comprida, de eletricista. Ela está na sua mão.",
+   "texto": "A trava do armário soltou com a queda de luz. Lá dentro, uma luva isolante comprida, de eletricista. Você leva a luva com você.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 70,
@@ -4053,7 +4053,7 @@
   {
    "id": "c_peca",
    "sala": "deposito",
-   "texto": "Dentro da caixa de \"banners\", embrulhada numa manta: a peça verdadeira. Cheira a pó, não a verniz. Embaixo da base, o número gravado. Ela está na sua mão.",
+   "texto": "Dentro da caixa de \"banners\", embrulhada numa manta: a peça verdadeira. Cheira a pó, não a verniz. Embaixo da base, o número gravado. Você tira da caixa com as duas mãos.",
    "volta_min": 2,
    "volta_max": 5,
    "segundo_min": 0,
@@ -4318,7 +4318,7 @@
   {
    "id": "traj_4",
    "sala": "corredor",
-   "texto": "Na porta de serviço, a mesma que o crachá do Braga abre, ficou uma marca de sola lisa, de sapato social, de quem saiu por ela. Ao lado, a marca de uma bota de segurança: outro desenho.",
+   "texto": "Na porta de serviço, a mesma que o crachá do Braga abre, ficou uma marca de sola lisa, de sapato social, com a ponta virada para a rua. Ao lado, a marca de uma bota de segurança: outro desenho.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -4648,7 +4648,7 @@
   {
    "id": "braga_1",
    "sala": "seguranca",
-   "texto": "A câmera 4 caiu bem na hora do apagão. Braga dá de ombros rápido demais: \"Acontece. Sempre acontece. Senta aí, quer café?\"",
+   "texto": "A câmera 4 caiu bem na hora do apagão. Braga dá de ombros rápido demais: \"Acontece. Sempre acontece. Bateria velha, igual à do carro do meu cunhado.\"",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 75,
@@ -5528,7 +5528,7 @@
   {
    "id": "foto_solo",
    "sala": "galeria",
-   "texto": "Com a foto do catálogo anotada no caderno, você compara sem ajuda, indo e voltando com o olho: a rachadura está do outro lado e falta o número na base.",
+   "texto": "Com a foto do catálogo anotada no caderno, você compara sem ajuda, indo e voltando com o olho: a rachadura está do outro lado e, embaixo da base, onde a foto mostra o número, só tem feltro novo.",
    "volta_min": 2,
    "volta_max": 5,
    "segundo_min": 0,
@@ -5587,7 +5587,7 @@
   {
    "id": "coop_catraca_ok",
    "sala": "recepcao",
-   "texto": "Comparando as duas listas: o entregador e a fotógrafa passaram pela roleta da saída. O do patrocínio, não. Se saiu, foi por outra porta. E alguém abriu a porta de serviço com o crachá do Braga.",
+   "texto": "Comparando as duas listas: o entregador e a fotógrafa passaram pela roleta da saída. O do patrocínio, não. Se saiu, foi por outra porta.",
    "volta_min": 2,
    "volta_max": 5,
    "segundo_min": 0,
@@ -5826,7 +5826,7 @@
   {
    "id": "coop_veredito",
    "sala": "seguranca",
-   "texto": "A escala diz de quem é o crachá. O bilhete diz \"peguei emprestado\" numa letra corrida, deitada para a direita. Na própria escala, o visto de quem conferiu os crachás pelo patrocínio deita igual. Lado a lado com o bilhete, a rubrica vira letra: Lenz. O crachá era do Braga. A mão, não.",
+   "texto": "A escala diz de quem é o crachá. O bilhete diz \"peguei emprestado\" numa letra corrida, deitada para a direita. Na própria escala, o visto de quem conferiu os crachás pelo patrocínio deita igual. Na Central, Braga espia a escala e engole seco: \"Essa rubrica? É do Lenz, do patrocínio. Ele assina tudo assim.\"",
    "volta_min": 3,
    "volta_max": 5,
    "segundo_min": 0,
@@ -9692,7 +9692,7 @@
      "itens": [
       "rachadura do lado direito",
       "pedra clara, brilhando",
-      "base lisa, sem número"
+      "feltro novo embaixo da base, sem número à vista"
      ]
     },
     "B": {
@@ -9867,7 +9867,7 @@
        "luz redonda: amarela"
       ],
       "D_fusivel": [
-       "ponteiro: balançando no meio",
+       "ponteiro: atrás de uma etiqueta de papel, tremendo",
        "três janelas: piscando",
        "luz redonda: verde"
       ],
@@ -9898,7 +9898,7 @@
       "lá em cima, parado",
       "lá embaixo",
       "descendo aos poucos",
-      "balançando no meio"
+      "atrás de uma etiqueta de papel, tremendo"
      ],
      [
       "paradas",
@@ -10378,13 +10378,13 @@
      "regra": "um conserto gravado em volta anterior + o outro valendo na volta 5"
     }
    },
-   "texto": "Com o defeito consertado, você aperta \"Loop Reset\". O relógio passa de 5:00 e continua. Você devolveu a manhã ao museu. Cedo, uma caixa de \"banners\" sai pela porta da frente, com guia assinada. Ninguém viu o que você viu.",
+   "texto": "Com o defeito consertado, você aperta \"Loop Reset\". O relógio passa de 5:00 e continua. Lá fora, uma sirene: o socorro do Téo. Você devolveu a manhã ao museu. Cedo, uma caixa de \"banners\" sai pela porta da frente, com guia assinada. Ninguém viu o que você viu.",
    "texto_por_causa": {
-    "A_calibrar": "Você aperta \"Loop Reset\" e o relógio passa de 5:00. A tranca da Dra. Sato abriu com três verdades. Você usou as três e não contou nenhuma. Cedo, uma caixa de \"banners\" sai pela porta da frente, com guia assinada.",
-    "B_potencia": "Você aperta \"Loop Reset\" e o relógio passa de 5:00. O raio que apagava o museu acendeu a máquina. O gerador continua no mínimo, a pedido de quem trocou a peça. Só você sabe. Cedo, uma caixa de \"banners\" sai pela porta da frente.",
-    "C_ancora": "Você aperta \"Loop Reset\" e o relógio passa de 5:00. A máquina soltou a mentira e segurou a verdadeira. A cópia continua na base da Galeria, e amanhã vai ter fila para ver. Quem trocou as duas sai pela porta da frente.",
-    "D_fusivel": "Você aperta \"Loop Reset\" e o relógio passa de 5:00. O Téo desligou a máquina para a verdade não sumir. Você religou sem mostrar a verdade a ninguém. A manhã chega, limpa demais.",
-    "E_dois": "Você aperta \"Loop Reset\" e o relógio passa de 5:00. Dois defeitos, duas voltas, uma máquina inteira. A manhã chega para todo mundo. A verdade ficou no seu caderno, e uma caixa de \"banners\" sai cedo pela porta da frente."
+    "A_calibrar": "Você aperta \"Loop Reset\" e o relógio passa de 5:00. Lá fora, uma sirene: o socorro do Téo. A tranca da Dra. Sato abriu com três verdades. Você usou as três e não contou nenhuma. Cedo, uma caixa de \"banners\" sai pela porta da frente, com guia assinada.",
+    "B_potencia": "Você aperta \"Loop Reset\" e o relógio passa de 5:00. Lá fora, uma sirene: o socorro do Téo. O raio que apagava o museu acendeu a máquina. O gerador continua no mínimo, a pedido de quem trocou a peça. Quem tem caderno sabe. Cedo, uma caixa de \"banners\" sai pela porta da frente.",
+    "C_ancora": "Você aperta \"Loop Reset\" e o relógio passa de 5:00. Lá fora, uma sirene: o socorro do Téo. A máquina soltou a mentira e segurou a verdadeira. A cópia continua na base da Galeria, e amanhã vai ter fila para ver. Quem trocou as duas sai pela porta da frente.",
+    "D_fusivel": "Você aperta \"Loop Reset\" e o relógio passa de 5:00. Lá fora, uma sirene: o socorro do Téo. O Téo desligou a máquina para a verdade não sumir. Você religou sem mostrar a verdade a ninguém. A manhã chega, limpa demais.",
+    "E_dois": "Você aperta \"Loop Reset\" e o relógio passa de 5:00. Lá fora, uma sirene: o socorro do Téo. Dois defeitos, duas voltas, uma máquina inteira. A manhã chega para todo mundo. A verdade ficou no seu caderno, e uma caixa de \"banners\" sai cedo pela porta da frente."
    }
   },
   {
@@ -10436,7 +10436,7 @@
    "condicao": {
     "padrao": true
    },
-   "texto": "O museu esquece de novo. O raio cai, a luz volta, o homem de paletó desce a escada. O caderno não esquece. Você é a única memória daquela noite, e isso já é um começo."
+   "texto": "O museu esquece de novo. O raio cai, a luz volta, o homem de paletó desce a escada. O caderno não esquece. Você guarda a memória daquela noite, e isso já é um começo."
   }
  ],
  "formato_valores": {
@@ -10470,21 +10470,21 @@
   "papeis": [
    {
     "id": "A",
-    "nome": "Mão A",
+    "nome": "Quem opera",
     "onde": "primeira sala do conserto da noite",
-    "faz": "Executa a parte A do conserto (gira, baixa a alavanca, carrega a peça ou liga os pontos de ligação)."
+    "faz": "Opera o conserto na primeira sala (gira, baixa a alavanca, carrega a peça ou liga os pontos de ligação)."
    },
    {
     "id": "B",
-    "nome": "Mão B",
+    "nome": "Quem apoia",
     "onde": "segunda sala do conserto da noite",
-    "faz": "Executa a parte B do conserto (dita, fecha a chave {ch}, segura a trava ou arma o disjuntor)."
+    "faz": "Apoia o conserto da segunda sala (dita, fecha a chave {ch}, segura a trava ou arma o disjuntor)."
    },
    {
     "id": "Central",
     "nome": "Central",
     "onde": "seguranca",
-    "faz": "Fica na Central de monitoramento. Confirma em voz alta que as duas Mãos estão no lugar e que os valores batem com o que cada pessoa tem no caderno."
+    "faz": "Fica na Central de monitoramento. Confirma em voz alta que quem opera e quem apoia estão no lugar e que os valores batem com o que cada pessoa tem no caderno."
    },
    {
     "id": "PortaVoz",
@@ -10529,8 +10529,8 @@
    ]
   },
   "dica_de_tela": {
-   "A": "Você é a Mão A. Faça só a sua parte e fale o que vê.",
-   "B": "Você é a Mão B. Faça só a sua parte e fale o que sabe.",
+   "A": "Você opera o conserto. Faça só a sua parte e fale o que vê.",
+   "B": "Você apoia o conserto, da outra sala. Faça só a sua parte e fale o que sabe.",
    "Central": "Você é a Central. Fique na Central de monitoramento e confirme em voz alta quem está onde e se os valores batem.",
    "PortaVoz": "Você é Porta-voz. Vá para a Recepção com as 3 provas no caderno e diga o nome antes de 5:00.",
    "Guardiao": "Você guarda o dossiê. Confira as 3 provas de quem vai falar e conte o tempo em voz alta."

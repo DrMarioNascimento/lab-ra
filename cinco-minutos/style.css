@@ -514,3 +514,55 @@ details.lc-ativ .lc-salas small{font:600 .75rem/1.2 system-ui,sans-serif;color:#
 
 .tv-rooms{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.tv-room{min-width:0;overflow-wrap:anywhere}
 details.lc-semdupla{margin:8px 0 0}details.lc-semdupla>summary{margin:0}
+
+/* ===== Revisão 6 (25/11/2026) · depois da rodada 5 das escalas ===== */
+/* Máquina: a última mensagem fica presa no pé da janela, sempre à vista, até a pessoa trocar de aba */
+.lc-dialog .lc-msg{min-height:0;margin:0}
+.lc-dialog .lc-msg:not(:empty){position:sticky;bottom:0;z-index:3;margin:12px -6px 0;padding:10px 12px;max-height:46%;overflow:auto;border-radius:12px;border:1px solid #e7b97599;background:linear-gradient(180deg,#1d3040,#0b1824);box-shadow:inset 0 1px 0 #ffffff24,0 -8px 16px #000b,0 3px 0 #05090d}
+/* Caderno: o rótulo da anotação em linha própria; o parágrafo é só o texto da pista */
+.journal-item .ji-nome{display:block;margin:.3rem 0 0;font:700 .9375rem/1.25 system-ui,sans-serif;color:#f3ead9}
+.journal-item .ji-nome+p{margin-top:.15rem}
+/* Lista da sala: o selo "✓ no caderno" ocupa a linha inteira (não corta em 390 nem em 360 px) */
+.clue[data-estado=feita] .ic3d{display:none}
+.clue[data-estado=feita] small{grid-column:1/-1;padding:0 4px;letter-spacing:0}
+@media(max-width:380px){
+ .clue{grid-template-rows:minmax(0,1fr) 26px;gap:2px 6px;padding:5px 7px 6px 6px}
+ .clue>span{-webkit-line-clamp:3;font-size:.75rem;line-height:1.13}
+ .clue .ic3d,.clue .ic3d.sm{width:26px;height:26px}
+ .clue small{height:26px;line-height:26px;font:700 .75rem/26px system-ui,sans-serif}
+}
+/* Livro de folhear: os botões "Ler" têm lugar e altura fixos (a altura do lugar vem do jogo: o máximo de páginas pagas por par de folhas) */
+.livro-acoes{min-height:0;overflow:hidden;align-content:start}
+.livro-acoes .btn{height:56px;min-height:56px;padding:4px 12px;line-height:1.2;overflow:hidden}
+/* Resultado: fichas das 3 provas maiores e claras, para dar para ver o que são */
+.lc-fim-provas .ic3d.sm{width:40px;height:40px;border-radius:11px;background:radial-gradient(circle at 35% 22%,#56788f,#3a5568 72%)}
+.lc-fim-provas .ic3d.sm img{width:104%;height:104%;max-width:none}
+.lc-fim-provas span{min-height:52px}
+/* Manual, passo 1: nome curto da sala, sem quebrar no meio da palavra */
+.tv-room{overflow-wrap:normal;word-break:normal;hyphens:none}
+/* Aviso da pausa não cobre o botão "Escolher a próxima sala": sobe para o alto da tela */
+body[data-tela=between] .toast{bottom:auto;top:calc(64px + env(safe-area-inset-top))}
+/* Sala dos sons: o gravador (cada pista da sala é uma faixa; a legenda aparece aos poucos) */
+.sons-deck{display:grid;gap:8px;margin:10px 0;padding:10px;border-radius:14px;border:1px solid #b89f7266;background:linear-gradient(180deg,#1b2f40,#101e2b);box-shadow:inset 0 1px 0 #ffffff24,0 4px 0 #05090d}
+.sd-topo{display:flex;align-items:center;gap:8px}.sd-topo b{font:700 .9375rem system-ui,sans-serif;color:var(--gold)}
+.sd-vu{display:flex;align-items:flex-end;gap:3px;height:26px;margin-left:auto}
+.sd-vu i{display:block;width:5px;height:5px;border-radius:2px;background:#3a5568;transform-origin:bottom}
+.sons-deck.tocando .sd-vu i{background:linear-gradient(180deg,#f2d3a0,#83c6ac);height:26px;animation:sd-vu .7s ease-in-out infinite alternate}
+.sons-deck.tocando .sd-vu i:nth-child(2){animation-delay:-.2s}.sons-deck.tocando .sd-vu i:nth-child(3){animation-delay:-.45s}.sons-deck.tocando .sd-vu i:nth-child(4){animation-delay:-.1s}.sons-deck.tocando .sd-vu i:nth-child(5){animation-delay:-.55s}.sons-deck.tocando .sd-vu i:nth-child(6){animation-delay:-.3s}.sons-deck.tocando .sd-vu i:nth-child(7){animation-delay:-.65s}
+@keyframes sd-vu{from{transform:scaleY(.18)}to{transform:scaleY(1)}}
+.sd-som{min-height:44px;padding:0 12px;border-radius:10px;border:1px solid #d7bd8b55;background:linear-gradient(180deg,#294051,#172633);color:#f3ead9;font:700 .75rem system-ui,sans-serif;box-shadow:inset 0 1px 0 #ffffff2b,0 3px 0 #05090d;cursor:pointer}
+.sd-som:active{transform:translateY(2px);box-shadow:inset 0 1px 0 #ffffff15,0 1px 0 #05090d}.sd-som[aria-pressed=true]{background:linear-gradient(180deg,#a9dcc6,#5fa88c);color:#0c1f1a;border-color:#a9dcc6}
+.sd-legenda{height:172px;overflow:auto;padding:10px 12px;border-radius:12px;border:1px solid #e7b97566;background:#0b1824;box-shadow:inset 0 3px 8px #000a}
+.sd-nome{display:block;font:700 .8125rem/1.2 system-ui,sans-serif;letter-spacing:.04em;color:var(--gold)}
+.sd-texto{margin:6px 0 0;font:.9375rem/1.45 system-ui,sans-serif;color:#eef2f0}
+.sd-cursor{display:inline-block;width:.5em;height:1em;margin-left:2px;vertical-align:-2px;background:var(--gold);animation:sd-pisca .8s steps(2) infinite}@keyframes sd-pisca{50%{opacity:0}}
+.sd-faixas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.sd-faixa{display:grid;grid-template-rows:minmax(0,1fr) 20px;gap:2px;height:64px;padding:6px 8px;text-align:left;border-radius:12px;border:1px solid #8fb8e880;border-left:5px solid #8fb8e8;background:linear-gradient(180deg,#294051,#172633);color:#f0ece3;font:600 .8125rem/1.15 system-ui,sans-serif;box-shadow:inset 0 1px 0 #ffffff2b,0 4px 0 #05090d;cursor:pointer}
+.sd-faixa:active{transform:translateY(3px);box-shadow:inset 0 1px 0 #ffffff15,0 1px 0 #05090d}
+.sd-faixa span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.sd-faixa small{font:700 .75rem/20px system-ui,sans-serif;color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sd-faixa[data-estado=espera],.sd-faixa[data-estado=travada]{filter:saturate(.5) brightness(.8)}.sd-faixa[data-estado=espera] small,.sd-faixa[data-estado=travada] small{color:#a4b2bd}
+.sd-faixa[data-estado=feita]{border-color:#83c6ac;border-left-color:#83c6ac;background:linear-gradient(180deg,#16332f,#10241f)}.sd-faixa[data-estado=feita] small{color:#83c6ac}
+.sd-faixa.on{box-shadow:inset 0 1px 0 #ffffff2b,0 4px 0 #05090d,0 0 0 2px #e7b975}
+@media(prefers-reduced-motion:reduce){.sons-deck.tocando .sd-vu i,.sd-cursor{animation:none}}
+@media(max-width:380px){.tv-room{gap:.35rem;padding:.5rem .4rem;font-size:.75rem}.tv-room img{width:30px;height:30px}}

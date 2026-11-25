@@ -154,7 +154,7 @@ const LOOP_SALAS = {
 };
 // Descrição de cada sala no Loop (uma linha, do mundo da história).
 const LOOP_DESC = {
- prototipo:'A Câmara do tempo zumbe, tenta ligar e desiste.', patio:'Chove. O Quadro externo fica embaixo do para-raios.',
+ prototipo:'A Câmara do tempo zumbe no meio da sala. Ligada, e ninguém consegue desligar.', patio:'Chove. O Quadro externo fica embaixo do para-raios.',
  eletrica:'O gerador ronca baixo entre fios, fusíveis e luvas.', relogios:'Dezenas de relógios, cada um no seu passo.',
  seguranca:'Monitores, um cofre pequeno e o café do Braga.', recepcao:'O livro de visitas, a roleta e um telefone que toca.',
  conservacao:'Diário do acervo, laudos e registros em cima da mesa.', atelie:'A bancada da Ivone e o manual da Câmara.',
@@ -520,6 +520,7 @@ function clockAt(seconds){
 function show(id){
  $('coopShortcut').classList.toggle('hidden', id === 'start' || !!window.coop);
  ['start','game','between','final','result'].forEach(x => $(x).classList.toggle('hidden', x !== id));
+ document.body.dataset.tela = id;   // a folha de estilo sabe em que tela a pessoa está (o aviso da pausa sobe para não cobrir o botão)
  if (id !== 'game') document.getElementById('lcDialog')?.close();
  lcAtualizarBotao();
  window.scrollTo({top:0,behavior:'instant'});
@@ -701,6 +702,8 @@ function renderClues(){
     e.currentTarget.style.display = 'none'; panel.dataset.livro = ''; panel.dataset.par = '0';
    };
   }
+  if (room.livroLoop) livroReserva(room, clues);
+  if (room.id === 'sons' && state.caseRules === 2) gravadorMontar(panel, clues);
   lista.open = !!manterLista;
   const mv = panel.querySelector('model-viewer');
   if (mv) {
@@ -735,6 +738,8 @@ function renderClues(){
   if (button.getAttribute('aria-label') !== aria) button.setAttribute('aria-label', aria);
   if (button.lastElementChild.textContent !== label) button.lastElementChild.textContent = label;
   if (hs) { hs.classList.toggle('on', wait <= 0 && !bl); hs.classList.toggle('ok', registered); hs.disabled = registered && !repega; }
+  const fx = panel.querySelector('[data-faixa="'+clue.id+'"]');
+   if (fx) { const l2 = registered ? 'ouvir de novo' : label; if (fx.dataset.estado !== estado) fx.dataset.estado = estado; if (fx.lastElementChild.textContent !== l2) fx.lastElementChild.textContent = l2; if (fx.getAttribute('aria-label') !== aria) fx.setAttribute('aria-label', aria); }
  });
  if (room.livro || room.livroLoop) atualizarLivro(clues, elapsed);
  renderNoitePanel();
@@ -750,10 +755,59 @@ function renderClues(){
  lcRenderEncaminhamento(panel);
  renderIntervention(room.id, storySeconds);
 }
+// Sala dos sons: o gravador. Cada pista da sala é uma faixa. Tocar numa faixa é examinar a pista (mesmo custo, mesma tranca, mesma hora);
+// a gravação "toca" com a legenda aparecendo aos poucos, e o que já está no caderno pode ser ouvido de novo sem gastar nada. Não cria pista nem muda regra.
+let gravTocando = null, gravTimer = 0, gravSom = false, gravAudio = null;
+const gravTrechos = t => String(t).match(/[^.!?:…]+[.!?:…]+["”’')]*\s*|[^.!?:…]+$/g) || [String(t)];
+function gravadorMontar(panel, clues){
+ const dica = panel.querySelector('.dica'); if (!dica || panel.querySelector('.sons-deck')) return;
+ dica.insertAdjacentHTML('afterend', '<div class="sons-deck"><div class="sd-topo"><span class="ic3d sm" aria-hidden="true"><img src="'+ICONE_URL('N07')+'" alt=""></span><b>Gravador</b><span class="sd-vu" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><button type="button" class="sd-som" aria-pressed="'+gravSom+'">Som: '+(gravSom?'sim':'não')+'</button></div>'+
+  '<div class="sd-legenda" role="status"><b class="sd-nome">Escolha uma faixa</b><p class="sd-texto">Toque numa faixa para escutar. A legenda aparece aqui.</p></div>'+
+  '<div class="sd-faixas">'+clues.map(c => '<button type="button" class="sd-faixa" data-faixa="'+c.id+'"><span>'+esc(c.name)+'</span><small></small></button>').join('')+'</div></div>');
+ panel.querySelectorAll('[data-faixa]').forEach(b => { b.onclick = () => gravadorTocar(b.dataset.faixa); });
+ panel.querySelector('.sd-som').onclick = e => { gravSom = !gravSom; e.currentTarget.setAttribute('aria-pressed', String(gravSom)); e.currentTarget.textContent = 'Som: '+(gravSom?'sim':'não'); if (!gravSom) gravadorCalar(); };
+ gravadorPintar();
+}
+function gravadorTocar(id){
+ if (!state.clues.some(c => c.id === id)) collect(id);   // examinar a pista: as regras de sempre
+ const c = state.clues.find(x => x.id === id); if (!c) return;
+ gravTocando = {id, ini:Date.now(), n:gravTrechos(c.text).length};
+ clearInterval(gravTimer); gravTimer = setInterval(gravadorPintar, 250);
+ gravadorCalar(); if (gravSom) gravadorChiado(gravTocando.n * 1.1 + .4);
+ gravadorPintar();
+}
+function gravadorPintar(){
+ const deck = document.querySelector('#roomPanel .sons-deck'), c = gravTocando && state.clues.find(x => x.id === gravTocando.id);
+ if (!deck || !c || state.room !== 'sons') { clearInterval(gravTimer); gravadorCalar(); if (deck) deck.classList.remove('tocando'); return; }
+ const tr = gravTrechos(c.text), parado = matchMedia('(prefers-reduced-motion: reduce)').matches, k = parado ? tr.length : Math.min(tr.length, 1 + Math.floor((Date.now() - gravTocando.ini) / 1100)), fim = k >= tr.length;
+ const html = fim ? (window.lcGlos ? lcGlos(esc(c.text), true) : esc(c.text)) : esc(tr.slice(0, k).join('')) + '<i class="sd-cursor" aria-hidden="true"></i>';
+ const nome = deck.querySelector('.sd-nome'), tx = deck.querySelector('.sd-texto');
+ if (nome.textContent !== c.name) nome.textContent = c.name;
+ if (tx.dataset.k !== String(k) + c.id) { tx.dataset.k = String(k) + c.id; tx.innerHTML = html; }
+ deck.classList.toggle('tocando', !fim);
+ deck.querySelectorAll('[data-faixa]').forEach(b => b.classList.toggle('on', b.dataset.faixa === c.id));
+ if (fim) { clearInterval(gravTimer); }
+}
+function gravadorCalar(){ try { if (gravAudio) { gravAudio.stop(); gravAudio = null; } } catch (e) { gravAudio = null; } }
+function gravadorChiado(seg){   // chiado de fita, baixinho, só para quem ligou o som
+ try {
+  const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return; const ac = gravadorChiado.ac || (gravadorChiado.ac = new AC()); if (ac.state === 'suspended') ac.resume();
+  const buf = ac.createBuffer(1, Math.floor(ac.sampleRate * seg), ac.sampleRate), d = buf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (0.6 + 0.4 * Math.sin(i / 900));
+  const src = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain(); src.buffer = buf; f.type = 'bandpass'; f.frequency.value = 2400; g.gain.value = 0.035; src.connect(f); f.connect(g); g.connect(ac.destination); src.start(); gravAudio = src;
+ } catch (e) {}
+}
 // Livro folheável (museu/livro): cada pista vira uma página, escrita quando chega a hora dela; ao virar para a página, a pista é registrada.
 // No Loop (sala com livroLoop): as páginas são só as pistas da lista do livro. Página sem custo entra no caderno ao ser virada; página que gasta energia fica fechada até a pessoa tocar em "Ler" embaixo do livro.
 const livroPistas = (room, clues) => room.livroLoop ? room.livroLoop.ids.map(id => clues.find(c => c.lcp === id)).filter(Boolean) : clues;
+// altura fixa para os botões "Ler": o máximo de páginas pagas num par de folhas (nada sobe nem desce ao abrir o livro ou virar a folha)
+function livroReserva(room, clues){
+ const host = $('roomPanel').querySelector('.livro-acoes'); if (!host) return;
+ const cl = livroPistas(room, clues); let n = 0;
+ for (let i = 0; i < cl.length; i += 2) n = Math.max(n, [cl[i], cl[i+1]].filter(c => c && custoPista(c) > 0).length);
+ const h = n ? (n * 56 + (n - 1) * 6) + 'px' : '0px'; if (host.style.height !== h) host.style.height = h;
+}
 function livroAcoes(room, clues){
+ livroReserva(room, clues);
  const panel = $('roomPanel'), host = panel.querySelector('.livro-acoes'); if (!host || !panel.querySelector('iframe')) return;
  const par = Number(panel.dataset.par || 0), cl = livroPistas(room, clues), tem = c => state.clues.some(x => x.id === c.id);
  const html = [cl[2*par], cl[2*par+1]].filter(c => c && !tem(c) && custoPista(c) > 0).map(c => '<button type="button" class="btn secondary wide" data-ler="'+c.id+'">Ler “'+esc(c.name)+'” · '+custoPista(c)+' de energia</button>').join('');
@@ -765,7 +819,8 @@ function livroAcoes(room, clues){
 function livroLeitura(panel, pags, tem){
  const box = panel.querySelector('.livro-leitura'); if (!box) return;
  const n = Math.min(Number(box.dataset.pg || 0), Math.max(0, pags.length - 1)), c = pags[n];
- const txt = !c ? 'Folhas em branco.' : tem(c) ? (window.lcGlos ? lcGlos(esc(c.text), true) : esc(c.text)) : custoPista(c) > 0 ? 'Página fechada. Para ler, toque no botão “Ler”.' : 'Vire a folha até aqui para ler.';
+ const semTit = t => t.startsWith(c.name + ':') ? t.slice(c.name.length + 1).trim() : t;   // o título já está em cima: a leitura traz só o texto da página
+ const txt = !c ? 'Folhas em branco.' : tem(c) ? (window.lcGlos ? lcGlos(esc(semTit(c.text)), true) : esc(semTit(c.text))) : custoPista(c) > 0 ? 'Página fechada. Para ler, toque no botão “Ler”.' : 'Vire a folha até aqui para ler.';
  const html = '<div class="ll-cab"><b>' + esc(c ? c.name : 'Página') + '</b>' + (pags.length > 1 ? '<span>' + pags.map((_, k) => '<button type="button" class="ll-pg' + (k === n ? ' on' : '') + '" data-llpg="' + k + '" aria-label="Página ' + (k ? 'da direita' : 'da esquerda') + '">' + (k ? 'direita' : 'esquerda') + '</button>').join('') + '</span>' : '') + '</div><p>' + txt + '</p>';
  if (box.dataset.k === html) return; box.dataset.k = html; box.innerHTML = html; box.hidden = false;
  box.querySelectorAll('[data-llpg]').forEach(b => { b.onclick = () => { box.dataset.pg = b.dataset.llpg; box.dataset.k = ''; livroLeitura(panel, pags, tem); }; });
@@ -900,7 +955,7 @@ function renderJournal(){
  const clues=state.clues||[];$('countBadge').textContent=clues.length;
  $('journalPreview').innerHTML=clues.length?clues.slice(-3).reverse().map(c=>'<div class="preview-item">'+fichaSala(c.room,'sm')+'<div>'+esc(c.name)+'<small>'+esc(c.room)+'</small></div></div>').join(''):'<p class="muted">O que você achar aparece aqui.</p>';
  const nb=document.getElementById('lcBarN'); if(nb) nb.textContent=clues.length;
- $('journalList').innerHTML=clues.length?clues.map(c=>'<article class="journal-item '+etqClasse(c.etq)+'">'+fichaSala(c.room)+'<div><b>'+esc(c.room)+' · Volta '+c.loop+(c.tipo?' · '+esc(c.tipo):'')+'</b><p><strong>'+esc(c.name)+':</strong> '+(window.lcGlos?lcGlos(esc(c.text),true):esc(c.text))+'</p></div></article>').join(''):'<p class="muted">Seu caderno ainda está vazio.</p>';
+ $('journalList').innerHTML=clues.length?clues.map(c=>'<article class="journal-item '+etqClasse(c.etq)+'">'+fichaSala(c.room)+'<div><b>'+esc(c.room)+' · Volta '+c.loop+(c.tipo?' · '+esc(c.tipo):'')+'</b><strong class="ji-nome">'+esc(c.name)+'</strong><p>'+(window.lcGlos?lcGlos(esc(c.text),true):esc(c.text))+'</p></div></article>').join(''):'<p class="muted">Seu caderno ainda está vazio.</p>';
  if (!window.coop && state.archive?.length) {
   $('journalList').insertAdjacentHTML('beforeend', state.archive.map(key => {
    const axis = ANSWER_AXES.find(item=>item.key===key);
@@ -1289,13 +1344,13 @@ $('answerFields').addEventListener('click', e => {
  saveDraft();
 });
 // Apresentação das telas (21/11/2026): passo a passo visual dentro do manual. Sem códigos fixos nem nomes de escala.
-const TV_SALA = (id, on) => '<span class="tv-room'+(on?' on':'')+'"><img src="'+ICONE_URL(LOOP_SALAS[id][2])+'" alt="">'+LOOP_SALAS[id][0].split(' · ').pop()+'</span>';
+const TV_SALA = (id, on) => '<span class="tv-room'+(on?' on':'')+'"><img src="'+ICONE_URL(LOOP_SALAS[id][2])+'" alt="">'+((typeof LC_CURTO !== 'undefined' && LC_CURTO[id]) || LOOP_SALAS[id][0].split(' · ').pop())+'</span>';
 const TOUR = [
  {c:'Noite de véspera no museu. Amanhã abre a maior exposição da casa. Na Galeria, o curador não tira o olho da peça principal: "Está linda, não está?" Ele não parece ter certeza.',t:'Escolha uma sala', d:'Toda volta começa no Saguão. Toque numa sala para ir até lá.',
   v:()=>'<div class="tv-rooms">'+TV_SALA('galeria',1)+TV_SALA('seguranca')+TV_SALA('prototipo')+TV_SALA('recepcao')+'</div><p class="tv-floor">Saguão superior · você começa aqui</p>'},
  {c:'Cada sala guarda um objeto. Gire, chegue perto. O que importa quase nunca está de frente.',t:'Gire a peça', d:'Toque nos pontos que brilham. Cada um guarda uma pista. Eles aparecem com o tempo.',
   v:()=>'<div class="tv-piece"><img class="tv-obj3d" src="'+ICONE_URL('V11')+'" alt=""><b class="tv-dot d1"></b><b class="tv-dot d2"></b><b class="tv-dot d3"></b></div><p class="tv-floor">Arraste para girar · toque no brilho</p>'},
- {c:'Na Central, o Braga empurra uma xícara: "Chuva feia, hein? Pega um café." Daqui a cinco minutos ele vai dizer isso de novo. Só você vai saber.',t:'O tempo corre', d:'Cada volta tem 5 minutos. Quando acaba, o tempo volta. Só você lembra.',
+ {c:'Na Central, o Braga empurra uma xícara: "Chuva feia, hein? Pega um café." Daqui a cinco minutos ele vai dizer isso de novo, sem lembrar que já disse.',t:'O tempo corre', d:'Cada volta tem 5 minutos. Quando acaba, o tempo volta. O museu esquece. Você lembra.',
   v:()=>'<div class="tv-clock"><span>VOLTA 2 DE 5</span><strong>04:12</strong><small>Minuto da volta · 0:48</small></div><div class="tv-bar"><i></i></div>'},
  {c:'O museu esquece. O caderno lembra. O chão guarda. O que você anota volta com você. O que você deixa no chão fica lá.',t:'Seu caderno', d:'Tudo que você acha vai para o caderno. O que alguém conta nem sempre é fato.',
   v:()=>'<div class="tv-dossie"><p><span class="tv-chip obs">Observação</span> O que você viu</p><p><span class="tv-chip rel">Relato</span> O que alguém contou</p><p><span class="tv-chip reg">Registro</span> O que está escrito</p></div>'},

@@ -154,7 +154,7 @@ const LOOP_SALAS = {
 };
 // Descrição de cada sala no Loop (uma linha, do mundo da história).
 const LOOP_DESC = {
- prototipo:'A Câmara do tempo zumbe, tenta ligar e desiste.', patio:'Chove. O Quadro externo fica embaixo do para-raios.',
+ prototipo:'A Câmara do tempo zumbe no meio da sala. Ligada, e ninguém consegue desligar.', patio:'Chove. O Quadro externo fica embaixo do para-raios.',
  eletrica:'O gerador ronca baixo entre fios, fusíveis e luvas.', relogios:'Dezenas de relógios, cada um no seu passo.',
  seguranca:'Monitores, um cofre pequeno e o café do Braga.', recepcao:'O livro de visitas, a roleta e um telefone que toca.',
  conservacao:'Diário do acervo, laudos e registros em cima da mesa.', atelie:'A bancada da Ivone e o manual da Câmara.',

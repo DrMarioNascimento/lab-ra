@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#080e19">
+<title>Mosaico Loop · LAB-RA</title>
+<script>
+/* Links e QR com código de sala vão direto para a sala. */
+(function () { var q = location.search; if (/[?&]sala=/.test(q)) location.replace("sala/index.html" + q + location.hash); })();
+</script>
+<link rel="stylesheet" href="style.css?v=22">
+<style>
+.ent{max-width:980px;margin:0 auto;padding:0 18px 40px}
+.ent .mast{height:56px}
+.ent-top{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:14px;padding:14px 0 16px}
+.ent-arte{width:104px;height:104px;border-radius:22px;display:grid;place-items:center;background:radial-gradient(circle at 50% 30%,#2b4a5a,#0e1a25 72%);border:1px solid #e7b97566;box-shadow:inset 0 1px 0 #ffffff2b,0 5px 0 #05090d,0 14px 24px #0007}
+.ent-arte img{width:92px;height:92px;object-fit:contain;filter:drop-shadow(0 6px 5px #000a)}
+.ent-top h1{font-size:clamp(2rem,7.6vw,4.2rem);margin:2px 0 4px}
+.ent-top p.frase{font:600 .95rem/1.35 system-ui,sans-serif;color:#e7c892;margin:0}
+.ent-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.ent-card{padding:16px;border:1px solid #b49f7355;border-radius:16px;background:linear-gradient(145deg,#152735ee,#0e1925f5);box-shadow:inset 0 1px #ffffff18,0 5px 0 #05090d,0 15px 30px #0005;display:flex;flex-direction:column;gap:10px}
+.ent-card.cond{border-color:#a78bfa66;background:linear-gradient(145deg,#1d1f3cee,#0e1425f5)}
+.ent-cab{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.ent-cab img{width:58px;height:58px;object-fit:contain;filter:drop-shadow(0 5px 4px #0009)}
+.ent-card h2{font-weight:400;font-size:1.45rem;margin:2px 0 0}
+.ent-card .kicker{margin:0}
+.ent-card p.ajuda{font:.9rem/1.45 system-ui,sans-serif;color:var(--muted);margin:0}
+.ent-card input{width:100%;min-height:56px;padding:10px;text-align:center;text-transform:uppercase;font:700 1.5rem ui-monospace,Menlo,monospace;letter-spacing:.3em;color:var(--paper);background:#0a1721;border:1px solid var(--line);border-radius:12px;box-shadow:inset 0 3px 6px #0008}
+.ent-card .btn{width:100%}
+.btn.prof{gap:8px;min-height:58px;font-size:1rem;color:#fff;background:linear-gradient(180deg,#9b6bf3,#6d34d6 55%,#5424b0);border-color:#c4a8ff;box-shadow:inset 0 1px 0 #ffffff40,0 4px 0 #2e1470,0 12px 24px #0005}
+.btn.prof:active{box-shadow:inset 0 1px 0 #ffffff25,0 1px 0 #2e1470}
+.chave{display:block;text-align:center;font:600 .8rem system-ui,sans-serif;letter-spacing:.06em;color:#cbb6ff}
+.ent-duo{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ent-duo .btn{gap:8px;padding:10px}
+.ent-duo img,.ent-fim img{width:30px;height:30px;object-fit:contain;filter:drop-shadow(0 3px 2px #0009)}
+.ent-fim{display:grid;grid-template-columns:1fr;gap:10px;margin-top:16px}
+.ent-fim .btn{gap:8px;padding:10px;font-size:.84rem}
+@media(max-width:720px){.ent-grid{grid-template-columns:1fr;gap:12px}.ent-arte{width:84px;height:84px}.ent-arte img{width:74px;height:74px}}
+</style>
+</head>
+<body>
+<main class="ent">
+<header class="mast"><a class="back" href="../bancadas.html">Voltar</a><span class="mast-label">Mosaico <span>Loop</span></span></header>
+<div class="ent-top">
+<div class="ent-arte" aria-hidden="true"><img src="museu/icones/T01.webp" alt=""></div>
+<div>
+<h1>Mosaico Loop</h1>
+<p class="frase">Cinco minutos. A mesma noite. Só você lembra.</p></div>
+</div>
+<div class="ent-grid">
+<section class="ent-card" aria-label="Participar">
+<div class="ent-cab"><div><p class="kicker">PARTICIPAR</p><h2>Participar com código</h2></div><img src="museu/icones/ui/participar.webp" alt=""></div>
+<p class="ajuda">Digite o código que aparece no telão. Não precisa de cadastro.</p>
+<input id="cod" maxlength="6" autocomplete="off" autocapitalize="characters" placeholder="CÓDIGO" aria-label="Código da sala">
+<button class="btn primary" id="entrar" type="button" disabled>Entrar</button>
+</section>
+<section class="ent-card cond" aria-label="Conduzir">
+<div class="ent-cab"><div><p class="kicker">CONDUZIR</p><h2>Conduzir como professor</h2></div><img src="museu/icones/ui/conduzir.webp" alt=""></div>
+<p class="ajuda">Você cria a sala e conduz pelo celular. No PC ou na TV, abra o telão com o código.</p>
+<a class="btn prof" href="sala/index.html?conduzir=1" id="prof"><span aria-hidden="true">🔒</span>Conduzir como professor</a>
+<span class="chave">Só o Professor tem a chave</span>
+<div class="ent-duo"><a class="btn secondary" href="sala/telao/index.html"><img src="museu/icones/ui/telao.webp" alt="">Abrir telão</a><a class="btn secondary" href="simulador/"><img src="museu/icones/ui/simulador.webp" alt="">Simulador</a></div>
+</section>
+</div>
+<div class="ent-fim"><a class="btn secondary" href="individual.html"><img src="museu/icones/T01.webp" alt="">Jogar sem turma</a></div>
+</main>
+<script>
+(function () {
+  var c = document.getElementById('cod'), b = document.getElementById('entrar');
+  function ok() { return c.value.length >= 5; }
+  c.addEventListener('input', function () { c.value = c.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); b.disabled = !ok(); });
+  function ir() { if (ok()) location.href = 'sala/index.html?sala=' + encodeURIComponent(c.value); }
+  b.addEventListener('click', ir);
+  c.addEventListener('keydown', function (e) { if (e.key === 'Enter') ir(); });
+})();
+</script>
+</body>
+</html>

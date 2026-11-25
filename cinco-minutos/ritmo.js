@@ -1,7 +1,7 @@
 /* Relógio narrativo e finais compartilhados entre o jogo e o telão. */
 const LOOP_FINAIS = {
   Ouro: 'A máquina para e a verdade fica. O relógio marca 5:01 pela primeira vez. Lá fora, uma sirene. Na Sala das coleções, o Téo abre os olhos.',
-  Desligar: 'O relógio passa de 5:00 e continua. Vocês devolveram a manhã ao museu. Cedo, uma caixa de "banners" sai pela porta da frente. Ninguém viu o que vocês viram.',
+  Desligar: 'O relógio passa de 5:00 e continua. Lá fora, uma sirene: o socorro do Téo. Vocês devolveram a manhã ao museu. Cedo, uma caixa de "banners" sai pela porta da frente. Ninguém viu o que vocês viram.',
   Revelar: 'As 3 provas apareceram neste telão. Às 5:00 o museu esquece de novo. Os cadernos, não. A máquina ainda gira.',
   Parcial: 'O museu reinicia mais uma vez. Na Galeria, a cópia continua na base, cheirando a verniz. O caso fica aberto, e os cadernos de vocês são a peça principal.',
   'Mínimo': 'O museu esquece de novo. O raio cai, a luz volta, o homem de paletó desce a escada. Os cadernos não esquecem. Já é um começo.'
@@ -29,7 +29,7 @@ function loopFinalTurma(respostas) {
 // Fita do tempo: fatos da noite que a turma pode descobrir (o telão junta o que cada pessoa achou).
 // Na ordem em que aconteceu. ic = miniatura 3D da sala ou do objeto onde o fato se deu (museu/icones).
 const LOOP_LINHA = [
-  {id:'troca', hora:'Dias antes', ic:'V13', txt:'A peça verdadeira é trocada por uma cópia'},
+  {id:'troca', hora:'Dias antes', ic:'V13', txt:'A peça principal sai para "limpeza" e volta no mesmo dia'},
   {id:'motivo', hora:'Dias antes', ic:'P01', txt:'Se a peça sumir, o seguro paga o patrocinador'},
   {id:'copia', hora:'Hoje', ic:'V11', txt:'A peça da Galeria é cópia: verniz novo, peso errado'},
   {id:'entrada', hora:'Hoje', ic:'DESC_A', txt:'Alguém do patrocínio assina a entrada à tarde, não passa pela saída e volta de noite pela porta de serviço, com o crachá do Braga'},

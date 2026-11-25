@@ -62,7 +62,8 @@
       ajustarCaixaDaSombra(1);
     }
     var chao = new THREE.Mesh(new THREE.CircleGeometry(raioDoChao, 48).rotateX(-Math.PI / 2),
-      new THREE.MeshStandardMaterial({ color: 0x120c08, roughness: 0.95 }));
+      /[?&]embed=1/.test(location.search) ? new THREE.MeshBasicMaterial({ color: 0x020407, toneMapped: false })   // embutido no jogo: mesa azul-noite da paleta do Loop (na tela dá #14222e: a saída é sRGB e a cor aqui é linear)
+        : new THREE.MeshStandardMaterial({ color: 0x120c08, roughness: 0.95 }));
     chao.raycast = function () {}; cena.add(chao);
     var raiz = new THREE.Group(); cena.add(raiz);
 

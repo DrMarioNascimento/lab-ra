@@ -88,3 +88,22 @@
 .lc-banc .foto-grid .fragmento{box-shadow:0 3px 0 #05090d}
 .lc-banc .clip{border-color:#b89f724a}
 .lc-banc .ajuda{font-weight:700}
+
+/* Revisão 6 (25/11/2026): imagem em todo minijogo, a peça da Galeria na cena da luz, letra do rótulo e lugar reservado para a mensagem */
+.lc-banc{box-shadow:inset 0 1px 0 #ffffff22,0 6px 0 #05090d,0 20px 70px #000b}
+.lc-banc .kicker{font-size:.8125rem}
+.lc-banc .ajuda{min-height:3.1em;margin-bottom:.4rem}
+.lc-banc .mg-foto{display:flex;justify-content:center;gap:12px;margin:.3rem 0 .5rem}
+.lc-banc .mg-foto .ic3d{display:grid;place-items:center;width:96px;height:96px;border-radius:20px;overflow:hidden;border:1px solid #e7b97566;background:radial-gradient(circle at 35% 22%,#56788f,#22384a 72%);box-shadow:inset 0 1px 0 #ffffff45,inset 0 -8px 14px #0006,0 4px 0 #05090d}
+.lc-banc .mg-foto .ic3d img{width:92%;height:92%;object-fit:contain;filter:drop-shadow(0 4px 3px #000b)}
+.lc-banc .cena{height:clamp(110px,26vh,250px)}
+.lc-banc .cena-peca{position:relative;display:grid;place-items:center;cursor:pointer;background:radial-gradient(circle at 50% 40%,#22384a,#070d14 75%)}
+.lc-banc .cena-peca img{height:92%;max-width:92%;object-fit:contain;filter:brightness(.42) saturate(.7) drop-shadow(0 6px 5px #000c);transition:filter .2s}
+.lc-banc .cena-peca .facho{position:absolute;inset:0;pointer-events:none;background:linear-gradient(100deg,transparent 30%,#fff2c855 46%,#fff2c822 54%,transparent 70%);transform:translateX(-36%);transition:transform .2s}
+.lc-banc .cena-peca[data-passo="2"] .facho{transform:translateX(-18%)}.lc-banc .cena-peca[data-passo="3"] .facho{transform:translateX(0)}.lc-banc .cena-peca[data-passo="4"] .facho{transform:translateX(18%)}.lc-banc .cena-peca[data-passo="5"] .facho{transform:translateX(36%)}
+.lc-banc .cena-peca[data-passo="2"] img{filter:brightness(.5) saturate(.75) drop-shadow(0 6px 5px #000c)}.lc-banc .cena-peca[data-passo="3"] img{filter:brightness(.58) saturate(.8) drop-shadow(0 6px 5px #000c)}.lc-banc .cena-peca[data-passo="4"] img{filter:brightness(.5) saturate(.75) drop-shadow(0 6px 5px #000c)}.lc-banc .cena-peca[data-passo="5"] img{filter:brightness(.42) saturate(.7) drop-shadow(0 6px 5px #000c)}
+.lc-banc .cena-peca .brilho{position:absolute;inset:0;pointer-events:none;opacity:0;background:radial-gradient(ellipse at 50% 42%,#fff8dc66,transparent 62%);mix-blend-mode:screen;transition:opacity .2s}
+.lc-banc .cena-peca[data-achou="true"] img{filter:brightness(1.25) saturate(1.15) contrast(1.05) drop-shadow(0 6px 5px #000c)}
+.lc-banc .cena-peca[data-achou="true"] .brilho{opacity:1}
+@media(prefers-reduced-motion:reduce){.lc-banc .cena-peca img,.lc-banc .cena-peca .facho,.lc-banc .cena-peca .brilho{transition:none}}
+@media(max-height:760px){.lc-banc{padding:.8rem}.lc-banc .mg-foto .ic3d{width:80px;height:80px;border-radius:16px}.lc-banc h2{font-size:1.25rem}.lc-banc p{margin:.25rem 0 .55rem}}

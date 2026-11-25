@@ -153,9 +153,16 @@ export function abrirMinigame(dialog, atividade, causa, aoResolver) {
   } else if (atividade.tipo==='luz') {
     let angulo=1;
     const status=no('p','Luz 1 de 5');
-    const desenhar=cena('luz',()=>{range.value=String(angulo%5+1);range.oninput();},()=>angulo);
-    const range=no('input');range.type='range';range.min=1;range.max=5;range.value=1;range.setAttribute('aria-label','Posição da luz');
     const L=atividade.luz||{};
+    const proxima=()=>{range.value=String(angulo%5+1);range.oninput();};
+    let desenhar;
+    if (L.img) {   // no Loop a cena é a própria peça da sala (miniatura 3D), com a luz andando por cima
+      const h=no('div',null,'cena cena-peca'), im=no('img'), facho=no('span',null,'facho'), brilho=no('span',null,'brilho');
+      im.src=L.img; im.alt=''; h.setAttribute('aria-hidden','true'); h.append(im,facho,brilho); h.onclick=proxima; corpo.append(h);
+      desenhar=()=>{ h.dataset.passo=String(angulo); h.dataset.achou=String(angulo===(L.certo||4)); };
+      desenhar();
+    } else desenhar=cena('luz',proxima,()=>angulo);
+    const range=no('input');range.type='range';range.min=1;range.max=5;range.value=1;range.setAttribute('aria-label','Posição da luz');
     const registrar=botao(L.botao||'Registrar a fissura',()=>conferir(angulo),'primary');registrar.disabled=true;
     range.oninput=()=>{angulo=Number(range.value);const claro=angulo===(L.certo||4);status.textContent=claro?(L.achou||'A luz revelou a fissura que cruza o selo.'):'Luz '+angulo+' de 5 · '+(L.falta||'a marca ainda está encoberta')+'.';registrar.disabled=!claro;desenhar();};
     corpo.append(range,status,registrar);

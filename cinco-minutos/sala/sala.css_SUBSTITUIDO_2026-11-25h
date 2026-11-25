@@ -1,0 +1,332 @@
+/* Loop (MOSAICO) · sala: barra do Mestre, botão "i", espera, telão e simulador. Usa as cores de ../style.css. */
+
+/* Quem abre as etapas é o Mestre, pela barra: os botões do jogo individual ficam fora da sala. */
+#coopBegin, #endLoop, #nextLoop, #replay, #coopShortcut, #coopBar { display: none !important; }
+
+.text-button.info { width: 44px; height: 44px; padding: 0; border-radius: 50%; border: 1px solid var(--line); background: linear-gradient(180deg, #294051, #172633);
+  color: #f3ead9; font: 700 1.1rem Georgia, serif; box-shadow: inset 0 1px 0 #ffffff2b, 0 3px 0 #05090d; }
+.text-button.info:active { transform: translateY(2px); box-shadow: inset 0 1px 0 #ffffff15, 0 1px 0 #05090d; }
+
+.mestre-bar { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; margin: 0 0 1rem; padding: .6rem .9rem;
+  background: #0e1a25f2; border: 1px solid #7c3aed99; border-radius: .7rem; box-shadow: 0 6px 18px #0007; }
+.mestre-bar .mb-rot { font: 700 .68rem system-ui, sans-serif; letter-spacing: .19em; color: #ddd6fe; }
+.mestre-bar .mb-info { flex: 1 1 14rem; font: .9rem/1.4 system-ui, sans-serif; color: var(--paper); }
+.mestre-bar .btn { min-height: 46px; padding: 10px 18px; }
+
+.sala-espera { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; background: #080e19ee; }
+.sala-espera .card { max-width: 26rem; padding: 1.6rem; text-align: center; border: 1px solid var(--line); border-radius: 14px; background: linear-gradient(145deg, #152735, #0e1925); box-shadow: 0 15px 35px #0007; }
+.sala-espera h2 { font-weight: 400; margin: .4rem 0 1rem; }
+
+#ritmoDialog .actions { flex-direction: column; }
+
+/* ---------------------------------------------------------------- telão (16:9, lido de longe) */
+body.telao { margin: 0; padding: 0; max-width: none; width: 100vw; min-height: 100vh; overflow: hidden; }
+body.telao > #app { width: 100vw; max-width: none; margin: 0; padding: 0; }
+.tl-raiz { position: relative; width: 100vw; height: 100vh; display: grid; grid-template-rows: auto 1fr auto; gap: 1.6vh; padding: 3vh 3vw 2.4vh; box-sizing: border-box; }
+.tl-topo { display: flex; align-items: center; justify-content: space-between; gap: 2vw; }
+.tl-marca { display: flex; flex-direction: column; }
+.tl-marca small { font: 700 clamp(.7rem, 1.2vw, 1.1rem) system-ui, sans-serif; letter-spacing: .3em; color: var(--gold); }
+.tl-marca b { font: 400 clamp(2rem, 5vw, 4.6rem) Georgia, serif; letter-spacing: -.02em; color: #fff; line-height: 1; }
+.tl-codigo { text-align: right; font: 700 clamp(.8rem, 1.4vw, 1.3rem) system-ui, sans-serif; letter-spacing: .18em; color: var(--muted); }
+.tl-codigo strong { display: block; font: 400 clamp(1.8rem, 4vw, 3.8rem) Georgia, serif; letter-spacing: .12em; color: var(--gold); }
+.tl-meio { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 3vw; min-height: 0; align-items: stretch; }
+.tl-card { background: linear-gradient(145deg, #152735ee, #0e1925f5); border: 1px solid #b49f7355; border-radius: 1.4vw; box-shadow: inset 0 1px #ffffff18, 0 .9vw 2.2vw #0006; padding: 2.4vh 2vw; min-height: 0; }
+.tl-relogio { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 1.2vh; }
+.tl-volta { font: 700 clamp(.9rem, 1.7vw, 1.6rem) system-ui, sans-serif; letter-spacing: .22em; color: var(--gold); }
+.tl-tempo { font: 400 clamp(4rem, 14vw, 13rem) Georgia, serif; line-height: 1; color: #f6d6a0; font-variant-numeric: tabular-nums; }
+.tl-museu { font: 600 clamp(1rem, 2.2vw, 2rem) system-ui, sans-serif; color: var(--muted); }
+.tl-museu time { color: var(--gold); font-variant-numeric: tabular-nums; }
+.tl-sinal { min-height: 2.6em; font: 400 clamp(1.1rem, 2.4vw, 2.2rem)/1.35 Georgia, serif; color: #ecd9b4; }
+.tl-sinal:not(:empty) { border-inline-start: .4vw solid var(--gold); padding-inline-start: 1.2vw; text-align: left; }
+.tl-titulo { font: 400 clamp(2rem, 5vw, 4.4rem)/1.05 Georgia, serif; color: #fff; margin: 0 0 1.2vh; }
+.tl-texto { font: clamp(1.1rem, 2.1vw, 2rem)/1.45 system-ui, sans-serif; color: #c8d6d5; margin: 0; }
+.tl-mapa { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1vw; align-content: center; }
+.tl-sala { position: relative; padding: 1.6vh 1vw; border: 1px solid #b89f724a; border-radius: .9vw; background: linear-gradient(145deg, #2a4051, #162735); box-shadow: inset 0 1px #ffffff1a, 0 .4vw 0 #09121a; min-height: 11vh; }
+.tl-sala b { display: block; font: 400 clamp(.85rem, 1.5vw, 1.35rem) Georgia, serif; color: #f0ece3; line-height: 1.2; }
+.tl-sala i { font-style: normal; color: #e5bc7b; font-size: clamp(1rem, 2vw, 1.8rem); }
+.tl-sala em { position: absolute; top: .8vh; right: .8vw; min-width: 2.2em; padding: .1em .5em; text-align: center; font: 700 clamp(.9rem, 1.8vw, 1.6rem) system-ui, sans-serif; font-style: normal; color: #1f1b17; background: linear-gradient(180deg, #f2d3a0, #be8e4b); border-radius: 999px; }
+.tl-sala.vazia { opacity: .5; }
+.tl-gente { display: flex; flex-wrap: wrap; gap: .6vw 1vw; font: 600 clamp(.9rem, 1.6vw, 1.5rem) system-ui, sans-serif; color: #d9c6a8; }
+.tl-gente span { padding: .3em .8em; border: 1px solid #b89f7255; border-radius: 999px; background: #0e1a25; }
+.tl-rodape { display: flex; justify-content: space-between; align-items: end; gap: 2vw; }
+.tl-qr { width: clamp(110px, 16vh, 220px); height: clamp(110px, 16vh, 220px); padding: .6vh; background: #fff; border-radius: .6vw; }
+.tl-qr svg { width: 100%; height: 100%; display: block; }
+.tl-barras { display: grid; gap: 1.4vh; margin-top: 1vh; }
+.tl-barra { display: grid; grid-template-columns: 17vw 1fr 6vw; gap: 1vw; align-items: center; font: 600 clamp(.9rem, 1.7vw, 1.6rem) system-ui, sans-serif; color: #d9e1df; }
+.tl-barra div { height: 2.4vh; background: #0a1721; border: 1px solid #b89f7255; border-radius: 999px; overflow: hidden; }
+.tl-barra div i { display: block; height: 100%; background: linear-gradient(180deg, #f2d3a0, #be8e4b); }
+.tl-aviso { font: 600 clamp(.8rem, 1.3vw, 1.2rem) system-ui, sans-serif; color: var(--muted); }
+.tl-fs { position: fixed; right: 1.2vw; bottom: 1.2vh; z-index: 5; opacity: 0; transition: opacity .2s; min-height: 44px; padding: 8px 16px; }
+body.telao:hover .tl-fs, .mostra-fs .tl-fs, .tl-fs:focus-visible { opacity: 1; }
+.tl-entrada { min-height: 100vh; display: grid; place-items: center; padding: 20px; }
+.tl-entrada .card { width: min(26rem, 100%); padding: 1.6rem; border: 1px solid var(--line); border-radius: 14px; background: linear-gradient(145deg, #152735, #0e1925); }
+.tl-entrada input { width: 100%; margin: .7rem 0; padding: .8rem; font: 700 1.5rem Georgia, serif; letter-spacing: .2em; text-align: center; text-transform: uppercase; background: #0a1721; color: var(--paper); border: 1px solid var(--line); border-radius: .5rem; }
+.tl-erro { color: #fca5a5; font: .9rem system-ui, sans-serif; min-height: 1.2em; }
+
+/* ---------------------------------------------------------------- simulador: telão em cima, turma embaixo */
+body.sim { margin: 0; }
+.sim-topo { display: flex; align-items: center; gap: .8rem 1.2rem; flex-wrap: wrap; padding: .7rem 1rem; border-bottom: 1px solid var(--line); background: #0c1722; font: .9rem system-ui, sans-serif; }
+.sim-topo b { font: 400 1.2rem Georgia, serif; color: var(--gold); }
+.sim-topo label { display: flex; align-items: center; gap: .5rem; color: var(--muted); }
+.sim-topo .btn { min-height: 40px; padding: 6px 14px; font-size: .8rem; }
+.sim-telao { position: relative; width: min(100%, calc((100vh - 6rem) * 1.7778 * .55)); aspect-ratio: 16 / 9; margin: .8rem auto; border: 1px solid var(--line); border-radius: .6rem; overflow: hidden; background: #000; }
+.sim-telao iframe { width: 100%; height: 100%; border: 0; display: block; }
+.sim-turma { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: .9rem; padding: 0 1rem 2rem; }
+.sim-fone { border: 1px solid var(--line); border-radius: 1rem; background: #0a131c; padding: .4rem; }
+.sim-fone figcaption { font: 600 .75rem system-ui, sans-serif; color: var(--muted); padding: .2rem .4rem; display: flex; justify-content: space-between; }
+.sim-fone iframe { width: 100%; height: 480px; border: 0; border-radius: .7rem; background: var(--bg); }
+.sim-fone.mestre { grid-column: span 2; border-color: #7c3aed99; }
+.sim-fone.mestre iframe { height: 480px; }
+.sim-nota { padding: 0 1rem; color: var(--muted); font: .8rem system-ui, sans-serif; }
+
+.tl-andar { grid-column: 1 / -1; margin: .6vh 0 0; font: 700 clamp(.75rem, 1.2vw, 1.05rem) system-ui, sans-serif; letter-spacing: .16em; text-transform: uppercase; color: #e5bc7b; }
+
+.mestre-bar .mb-poderes, .espera-poderes { display: flex; flex-wrap: wrap; gap: .5rem; }
+.mestre-bar .mb-poderes { flex: 1 0 100%; padding-top: .5rem; border-top: 1px solid #ddd6fe22; }
+.espera-poderes { justify-content: center; margin-top: 1rem; }
+.btn.sm { min-height: 40px; padding: 6px 12px; font-size: .85rem; }
+.btn.danger { color: #fff; background: linear-gradient(180deg, #c2410c, #9a3412); border: 1px solid #fdba7470; box-shadow: 0 4px 0 #5a1f0a; }
+.btn.warn { color: #1f1b17; background: linear-gradient(180deg, #f5c86a, #d99a2b); border: 1px solid #fde68a70; box-shadow: 0 4px 0 #7a5410; }
+.btn.danger:active, .btn.warn:active { transform: translateY(3px); box-shadow: 0 1px 0 #3a1306; }
+.sala-fim { z-index: 60; }
+#turmaDialog { width: min(32rem, 94vw); padding: 1.4rem; color: #f0ece3; border: 1px solid var(--line); border-radius: 14px; background: linear-gradient(145deg, #152735, #0e1925); }
+#turmaDialog::backdrop { background: #000a; }
+.turma-lista { list-style: none; margin: .8rem 0 1.2rem; padding: 0; display: grid; gap: .5rem; max-height: 50vh; overflow: auto; }
+.turma-lista li { display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: .5rem .7rem; border-radius: 10px; background: #ffffff0d; }
+.turma-lista li.fora { opacity: .6; }
+
+.tl-mapa { grid-template-columns: repeat(6, 1fr); gap: .6vw; }
+.tl-mapa .tl-sala { min-height: 5.4vh; padding: .8vh .6vw; }
+.tl-mapa .tl-sala b { font-size: clamp(.6rem, 1vw, .95rem); }
+.tl-mapa .tl-sala i { font-size: clamp(.8rem, 1.3vw, 1.2rem); }
+.tl-mapa .tl-andar { margin: .3vh 0 0; }
+.tl-mapa .tl-sala em { top: .3vh; right: .3vw; min-width: 1.5em; padding: 0 .35em; font-size: clamp(.7rem, 1.1vw, 1rem); }
+.tl-sala.inicio { border-color: #e7b97566; background: linear-gradient(145deg, #33432f, #1a2a1f); }
+
+.tl-fita ol{list-style:none;margin:1vh 0 0;padding:0 0 0 1.2vw;border-left:.35vw solid #b49f73aa;display:grid;gap:1.1vh}
+.tl-fita li{display:grid;grid-template-columns:3.2vw 5vw 1fr auto;align-items:center;gap:1vw;font-size:clamp(1rem,1.9vw,1.9rem)}
+.tl-fita .ic{font-size:2.2vw;text-align:center}.tl-fita b{color:#f0c680}.tl-fita i{font-style:normal;opacity:.7;font-size:.8em}
+.tl-fita li.falta{opacity:.45}.tl-fita li.achou .tx{font-weight:600}
+
+/* ================================================================== Padrão visual · rodada 3 (25/11/2026) */
+/* Entrada da sala (firebase-room): mesma paleta e mesmos botões do jogo; professor em roxo com cadeado. */
+#dragonRoomGate{background:radial-gradient(ellipse at 75% 10%,#1d3841 0,transparent 45%),radial-gradient(ellipse at 0% 95%,#13283a 0,transparent 42%),#080e19!important;font-family:system-ui,-apple-system,'Segoe UI',sans-serif!important}
+#dragonRoomGate .dr-brand{color:#e7b975}
+#dragonRoomGate .dr-card{border-color:#b49f7355;background:linear-gradient(145deg,#152735ee,#0e1925f5);box-shadow:inset 0 1px #ffffff18,0 5px 0 #05090d,0 15px 35px #0006}
+#dragonRoomGate .dr-card p{color:#a4b2bd}
+#dragonRoomGate .dr-btn{min-height:54px;text-transform:none;letter-spacing:0;font:700 1rem/1.2 system-ui,sans-serif;color:#1f1b17;background:linear-gradient(180deg,#f2d3a0,#be8e4b);border:1px solid #f2d3a0;box-shadow:inset 0 1px 0 #ffffff2b,0 4px 0 #05090d,0 12px 24px #0005}
+#dragonRoomGate .dr-btn:active{transform:translateY(3px);box-shadow:inset 0 1px 0 #ffffff15,0 1px 0 #05090d}
+#dragonRoomGate .dr-btn.secondary{color:#f3ead9;background:linear-gradient(180deg,#294051,#172633);border-color:#d7bd8b55}
+#dragonRoomGate .dr-btn.prof{color:#fff;background:linear-gradient(180deg,#9b6bf3,#6d34d6 55%,#5424b0);border-color:#c4a8ff;box-shadow:inset 0 1px 0 #ffffff40,0 4px 0 #2e1470,0 12px 24px #0005}
+#dragonRoomGate .dr-btn.prof:active{box-shadow:inset 0 1px 0 #ffffff25,0 1px 0 #2e1470}
+#dragonRoomGate .dr-btn.danger{color:#fff;background:linear-gradient(180deg,#c2410c,#9a3412);border-color:#fdba7470;box-shadow:0 4px 0 #5a1f0a}
+#dragonRoomGate .dr-chave{display:block;margin-top:8px;text-align:center;font:600 .8rem system-ui,sans-serif;letter-spacing:.06em;color:#cbb6ff}
+#dragonRoomGate .dr-input{min-height:54px;background:#0a1721;border-color:#c9aa7250;box-shadow:inset 0 3px 6px #0008}
+#dragonRoomGate .dr-code,#dragonRoomGate .dr-forma:has(input:checked),#dragonRoomGate .dr-choice.on{color:#e7b975}
+#dragonRoomGate .dr-ident{color:#e7b975}
+#dragonRoomGate .dr-choice,#dragonRoomGate .dr-forma{background:linear-gradient(180deg,#203546,#172b3b);border-color:#d7bd8b55;box-shadow:inset 0 1px 0 #ffffff22,0 3px 0 #05090d}
+#dragonRoomGate .dr-choice.on,#dragonRoomGate .dr-forma:has(input:checked){border-color:#e7b975;transform:translateY(2px);box-shadow:inset 0 0 0 2px #e7b975,0 1px 0 #05090d;background:#23303a}
+.mestre-bar .mb-rot{padding:5px 10px;border-radius:99px;background:linear-gradient(180deg,#9b6bf3,#5424b0);color:#fff;box-shadow:0 2px 0 #2e1470}
+.btn.sm{min-height:44px}
+.sala-espera .card{box-shadow:inset 0 1px #ffffff18,0 5px 0 #05090d,0 15px 35px #0007}
+
+/* ---------------------------------------------------------------- telão em páginas por tema */
+body.telao{height:100vh}
+.tl-raiz{gap:1.4vh;padding:2.2vh 2.4vw 1.6vh;height:100vh;overflow:hidden}
+.tl-topo{gap:1.6vw}
+.tl-marca b{font-size:clamp(1.6rem,3.6vw,3.4rem)}
+.tl-codigo strong{font-size:clamp(1.5rem,3.2vw,3rem)}
+.tl-abas{display:flex;align-items:center;gap:.7vw;margin:0 auto}
+.tl-aba,.tl-seta{min-height:max(44px,5.6vh);padding:.4vh 1.3vw;border-radius:.9vw;border:1px solid #d7bd8b55;background:linear-gradient(180deg,#294051,#172633);color:#f3ead9;font:700 clamp(.9rem,1.5vw,1.5rem) system-ui,sans-serif;box-shadow:inset 0 1px 0 #ffffff2b,0 .35vw 0 #05090d;cursor:pointer}
+.tl-seta{padding:.2vh 1vw;font-size:clamp(1.2rem,2.2vw,2.2rem);line-height:1}
+.tl-aba:active,.tl-seta:active{transform:translateY(.25vw);box-shadow:inset 0 1px 0 #ffffff15,0 .1vw 0 #05090d}
+.tl-aba.on{color:#1f1b17;background:linear-gradient(180deg,#f2d3a0,#be8e4b);border-color:#f2d3a0;transform:translateY(.15vw);box-shadow:inset 0 1px 0 #fff5,0 .2vw 0 #05090d}
+.tl-aba.tl-auto{margin-left:.8vw;min-width:8.2vw;font-size:clamp(.8rem,1.2vw,1.2rem)}
+.tl-aba.tl-auto.on{color:#0c1f1a;background:linear-gradient(180deg,#a9dcc6,#5fa88c);border-color:#a9dcc6}
+.tl-mini{display:grid;justify-items:center;min-width:9vw;padding:.4vh 1vw;border-radius:.9vw;border:1px solid var(--line);background:#0e1a25;box-shadow:inset 0 1px #ffffff20,0 .35vw 0 #05090e}
+.tl-mini small{font:700 clamp(.65rem,.95vw,.95rem) system-ui,sans-serif;letter-spacing:.14em;color:var(--gold)}
+.tl-mini b{font:400 clamp(1.3rem,2.6vw,2.6rem)/1 Georgia,serif;color:#f6d6a0;font-variant-numeric:tabular-nums}
+.tl-meio{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:2vw;overflow:hidden}
+.tl-meio>.tl-largo,.tl-meio.pg-mapa>.tl-card{grid-column:1/-1}
+.tl-card{overflow:hidden;box-shadow:inset 0 1px #ffffff18,0 .5vw 0 #05090d,0 .9vw 2.2vw #0006}
+.tl-relogio{justify-content:center}
+.tl-tempo{font-size:clamp(4rem,min(17vw,34vh),17rem)}
+.tl-enorme{font-size:clamp(3rem,9vw,9rem)}
+.tl-texto{max-width:60ch}
+.tl-aviso{font-size:clamp(1rem,2vw,2rem)}
+.tl-num{display:flex;align-items:baseline;gap:1vw;font-variant-numeric:tabular-nums}.tl-num b{font:400 clamp(4rem,12vw,12rem)/1 Georgia,serif;color:#f6d6a0}.tl-num span{font:600 clamp(1.4rem,3vw,3rem) system-ui,sans-serif;color:var(--muted)}
+.tl-sinal{width:100%;min-height:2.8em;text-align:center}
+.tl-voltas{display:flex;gap:1vw}.tl-voltas b{display:grid;place-items:center;width:3.4vw;height:3.4vw;border-radius:50%;background:#16283a;border:1px solid #d7bd8b44;color:#7f93a1;font:700 1.5vw system-ui,sans-serif;box-shadow:inset 0 .3vw .4vw #0008}
+.tl-voltas b.feita{background:radial-gradient(circle at 35% 30%,#d1fae5,#83c6ac 55%,#2f7a62);color:#0c1f1a;box-shadow:0 .3vw 0 #0a3d2b}
+.tl-voltas b.agora{background:radial-gradient(circle at 35% 30%,#fff3c9,#e7b975 55%,#b8761a);color:#1f1b17;box-shadow:0 .3vw 0 #5a3a0c,0 0 0 .4vw #e7b97533}
+/* mapa: as 15 salas da história + Saguão, em 6 × 3, com a miniatura 3D e o nome que se lê de longe */
+.tl-pg-mapa{padding:1.6vh 1.4vw}
+.tl-mapa{grid-template-columns:repeat(6,minmax(0,1fr));grid-auto-rows:1fr;gap:1.6vh 1vw;height:100%;align-content:stretch}
+.tl-mapa .tl-sala{--ac:#e7b975;display:grid;grid-template-rows:minmax(0,1fr) auto auto;justify-items:center;align-items:center;gap:.4vh;min-height:0;padding:.8vh .5vw 1vh;text-align:center;border:.2vw solid color-mix(in srgb,var(--ac) 40%,transparent);border-radius:1.1vw;background:radial-gradient(ellipse at 50% 25%,color-mix(in srgb,var(--ac) 20%,transparent),transparent 62%),linear-gradient(160deg,#2a4051,#12202c);box-shadow:inset 0 1px 0 #ffffff2b,0 .45vw 0 #05090d;overflow:hidden}
+.tl-mapa .tl-sala.an0{--ac:#e7b975}.tl-mapa .tl-sala.an1{--ac:#83c6ac}.tl-mapa .tl-sala.an2{--ac:#8fb8e8}.tl-mapa .tl-sala.an3{--ac:#c9a0ff}
+.tl-mapa .tl-sala img{max-width:100%;height:100%;min-height:0;max-height:13vh;object-fit:contain;filter:drop-shadow(0 .5vw .4vw #000a)}
+.tl-mapa .tl-sala .ic3d{width:min(7vw,11vh);height:min(7vw,11vh);font-size:min(4vw,6vh);border-radius:1.2vw}
+.tl-mapa .tl-sala b{font:700 clamp(.95rem,1.55vw,1.7rem)/1.12 system-ui,sans-serif;color:#fff;overflow-wrap:anywhere}
+.tl-mapa .tl-sala small{font:700 clamp(.7rem,1vw,1.05rem) system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--ac)}
+.tl-mapa .tl-sala em{top:.6vh;right:.5vw;min-width:1.9em;padding:.05em .4em;font-size:clamp(1.1rem,2.2vw,2.3rem);box-shadow:0 .25vw 0 #5a3a0c}
+.tl-sala.vazia{opacity:1;filter:saturate(.55) brightness(.86)}
+.tl-mapa .tl-sala.cheia{border-color:var(--gold);box-shadow:inset 0 1px 0 #ffffff2b,0 .45vw 0 #05090d,0 0 0 .25vw #e7b97555}
+.tl-sala.inicio,.tl-mapa .tl-sala.inicio{--ac:#83c6ac;border-color:#83c6ac88;background:linear-gradient(145deg,#1f4a44,#12302c)}
+/* turma */
+.tl-gente{align-content:flex-start;gap:1.2vh 1vw;font-size:clamp(1.1rem,2vw,2.1rem);overflow:hidden}
+.tl-gente.medio{font-size:clamp(.95rem,1.55vw,1.6rem)}.tl-gente.mini{font-size:clamp(.8rem,1.15vw,1.2rem)}
+.tl-gente span{display:inline-flex;align-items:center;gap:.5vw;padding:.3em .8em;border-radius:999px;border:1px solid #b89f7255;background:linear-gradient(180deg,#203546,#172b3b);box-shadow:inset 0 1px 0 #ffffff22,0 .25vw 0 #05090d;color:#e8edf2}
+.tl-gente span.ok{border-color:#83c6ac;color:#fff}
+.tl-gente img{width:1.9em;height:1.9em;object-fit:contain;margin:-.3em 0 -.3em -.4em}
+.tl-gente i,.tl-missoes i{font:italic clamp(1rem,1.8vw,1.8rem) system-ui,sans-serif;color:var(--muted)}
+.tl-missoes{display:grid;gap:1.2vh;margin-top:1vh}
+.tl-missoes p{margin:0;display:grid;gap:.2vh;padding:1vh 1vw;border-radius:.9vw;border-left:.4vw solid #83c6ac;background:#0e1a25}
+.tl-missoes b{font:700 clamp(1.1rem,2vw,2rem) system-ui,sans-serif;color:#fff}.tl-missoes span{font:clamp(.95rem,1.5vw,1.5rem) system-ui,sans-serif;color:#c8d6d5}
+/* máquina: o que a turma precisa fazer (sem pistas) */
+.tl-metas{display:grid;grid-template-columns:repeat(3,1fr);gap:2vw;margin-top:2vh}
+.tl-meta{display:grid;justify-items:center;align-content:start;gap:1.4vh;padding:2.4vh 1.4vw;text-align:center;border-radius:1.2vw;border:1px solid #d7bd8b55;background:linear-gradient(160deg,#2a4051,#12202c);box-shadow:inset 0 1px 0 #ffffff2b,0 .5vw 0 #05090d}
+.tl-meta .ic3d.g{width:min(12vw,22vh);height:min(12vw,22vh);border-radius:2vw}
+.tl-meta b{font:400 clamp(1.4rem,2.9vw,3rem)/1.1 Georgia,serif;color:#fff}.tl-meta span:last-child{font:clamp(1rem,1.8vw,1.9rem)/1.3 system-ui,sans-serif;color:#c8d6d5}
+/* entrada da turma (QR) */
+.tl-ent{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2vw;align-items:center}
+.tl-ent .tl-qr{width:min(34vh,26vw);height:min(34vh,26vw)}
+.tl-rodape{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;min-height:max(46px,5.5vh)}
+.tl-dots{display:flex;gap:.8vw;justify-content:center}.tl-dots b{width:1.1vw;height:1.1vw;min-width:10px;min-height:10px;border-radius:50%;background:#3a4f5c}.tl-dots b.on{background:var(--gold);box-shadow:0 0 0 .3vw #e7b97544}
+/* tela cheia: sempre à vista */
+.tl-fs{opacity:1;right:1.4vw;bottom:1.2vh;min-height:46px;padding:8px 18px;font-size:clamp(.9rem,1.3vw,1.3rem);gap:.5em}
+body.em-cheia .tl-fs{opacity:.5}body.em-cheia .tl-fs:hover,body.em-cheia .tl-fs:focus-visible{opacity:1}
+.tl-fita ol{gap:.7vh}.tl-fita li{font-size:clamp(.95rem,1.7vw,1.8rem)}.tl-fita .tx small{display:block;font:600 .62em system-ui,sans-serif;color:#83c6ac}
+.tl-fita li.falta{opacity:1;filter:saturate(.4) brightness(.7)}
+.tl-barra{font-size:clamp(1rem,1.9vw,1.9rem)}
+/* entrada do telão (sem código): cartão grande para TV */
+.tl-entrada .card{width:min(60vw,720px);min-width:min(92vw,340px);padding:clamp(1.4rem,3vw,3rem);box-shadow:inset 0 1px #ffffff18,0 6px 0 #05090d,0 20px 50px #0008}
+.tl-ent-topo{display:flex;align-items:center;gap:1.2rem}.tl-ent-topo .ic3d{width:clamp(64px,8vw,120px);height:clamp(64px,8vw,120px);border-radius:22%}
+.tl-entrada h2{margin:.1em 0;font:400 clamp(1.8rem,4vw,3.6rem) Georgia,serif}
+.tl-ent-ajuda{font:clamp(1rem,1.6vw,1.6rem)/1.4 system-ui,sans-serif;color:var(--muted)}
+.tl-entrada input{min-height:clamp(60px,8vw,110px);font-size:clamp(1.6rem,4vw,3.4rem);box-shadow:inset 0 4px 8px #0008}
+.tl-entrada .btn{width:100%;min-height:clamp(56px,6vw,90px);font-size:clamp(1rem,2vw,2rem)}
+.tl-erro{font-size:clamp(.9rem,1.4vw,1.4rem)}
+
+/* ---------------------------------------------------------------- simulador: celulares inteiros, em escala */
+.sim-topo .btn{min-height:44px}
+.sim-topo label{min-height:44px}
+.sim-telao{width:min(100%,calc((100vh - 5.5rem) * 1.7778 * .6))}
+.sim-turma{grid-template-columns:repeat(auto-fill,246px);justify-content:center}
+.sim-fone{width:246px;padding:.35rem}
+.sim-fone.mestre{grid-column:auto;border-color:#7c3aed99;box-shadow:0 0 0 2px #7c3aed55}
+.sim-tela{position:relative;width:234px;height:507px;overflow:hidden;border-radius:.7rem;background:var(--bg)}
+.sim-fone .sim-tela iframe,.sim-fone.mestre .sim-tela iframe{position:absolute;left:0;top:0;width:390px;height:845px;border:0;border-radius:0;transform:scale(.6);transform-origin:0 0}
+.sim-nota{font-size:.8125rem}
+.sim-telao iframe{width:1280px;height:720px;transform-origin:0 0}
+.tl-mapa .tl-sala.inicio{grid-column:auto}
+.tl-mapa .tl-sala{grid-template-rows:auto auto auto;align-content:center}
+.tl-mapa .tl-sala img{height:8.5vh;max-height:none}
+.tl-mapa .tl-sala .ic3d{width:8.5vh;height:8.5vh;font-size:5vh;border-radius:1.6vh}
+.tl-mapa .tl-sala b{font-size:clamp(.95rem,1.5vw,1.65rem);line-height:1.1}
+.tl-fita li{grid-template-columns:3.4vw 8.6vw 1fr auto}
+.tl-fita .ic{display:grid;place-items:center;width:3.2vw;height:3.2vw;font-size:1.9vw;border-radius:.8vw;background:radial-gradient(circle at 35% 22%,#3d6076,#16283a 72%);border:1px solid #e7b97566;box-shadow:inset 0 1px 0 #ffffff45,0 .25vw 0 #05090d}
+
+/* ---- Revisão 4 (25/11/2026): telão legível de longe, páginas com desenho ---- */
+.tl-mapa .tl-sala b{font-size:clamp(1.2rem,1.9vw,2rem)}
+.tl-mapa .tl-sala small{font-size:clamp(.85rem,1.3vw,1.4rem)}
+.tl-sala.vazia{opacity:1;filter:saturate(.7)}.tl-mapa .tl-sala.vazia b{color:#dfe7ee}
+.tl-mapa .tl-sala img{height:7.2vh}
+.tl-fita li{grid-template-columns:4.2vw 11vw 1fr auto;font-size:clamp(1rem,1.75vw,1.9rem)}
+.tl-fita ol{gap:.5vh}
+.tl-fita .ic{width:3.6vw;height:3.6vw}.tl-fita .ic img{width:88%;height:88%;object-fit:contain;filter:drop-shadow(0 .2vw .2vw #000b)}
+.tl-fita .tl-vago{display:block;width:44%;height:44%;border-radius:50%;border:.25vw dashed #9fb2bd}
+.tl-fita .tx small{font-size:max(.74em,1.3vw)}
+.tl-fita b{font-size:.82em}
+.tl-aba.tl-auto.on{color:#1f1b17;background:linear-gradient(180deg,#f2d3a0,#be8e4b);border-color:#f2d3a0}
+.tl-aba.tl-auto{min-width:13vw}
+.tl-pausa{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:3vw;text-align:left}
+.tl-arte{width:min(18vw,34vh);height:min(18vw,34vh);object-fit:contain;filter:drop-shadow(0 1vw .8vw #000a)}
+.tl-pausa .tl-voltas b{width:3.4vw;height:3.4vw;font-size:1.7vw}
+.tl-pergunta{font-size:clamp(1.4rem,3.1vw,3.4rem);line-height:1.25}
+.tl-res{margin-top:1.4vh;gap:1.4vw}.tl-res .tl-meta{padding:1.2vh 1vw;gap:.6vh}.tl-res .tl-meta .ic3d.g{width:min(7vw,12vh);height:min(7vw,12vh)}
+.tl-res .tl-meta b{font-size:clamp(1.1rem,2vw,2.1rem)}.tl-res .tl-meta.ok{border-color:#83c6ac}.tl-res .tl-meta.ok span:last-child{color:#83c6ac;font-weight:700}.tl-res .tl-meta.nao{filter:saturate(.6)}
+.tl-card.tl-largo .tl-gente{font-size:clamp(1.3rem,2.4vw,2.6rem)}
+/* simulador: o botão de tela cheia fica na primeira linha */
+.sim-topo{flex-wrap:nowrap;overflow-x:auto}.sim-topo label,.sim-topo .btn,.sim-topo b{white-space:nowrap;flex:none}
+/* área do professor */
+#dragonRoomGate .dr-ident{text-transform:none;letter-spacing:0;font-size:1.05rem}
+#dragonRoomGate .dr-choice{display:grid;grid-template-columns:44px 1fr;column-gap:10px;align-items:center;text-align:left;box-shadow:inset 0 1px 0 #ffffff2b,0 4px 0 #05090d}
+#dragonRoomGate .dr-choice b,#dragonRoomGate .dr-choice span{grid-column:2;text-transform:none;letter-spacing:0}
+#dragonRoomGate .dr-choice .dr-ic{grid-row:1/3;width:44px;height:44px;object-fit:contain;filter:drop-shadow(0 3px 2px #000b)}
+#dragonRoomGate .dr-choice:active{transform:translateY(3px)}
+.tl-fita ol{gap:.25vh}.tl-fita li{grid-template-columns:3.4vw 13vw 1fr auto;font-size:clamp(.9rem,1.55vw,1.7rem);line-height:1.12}
+.tl-fita .ic{width:2.9vw;height:2.9vw}.tl-fita li b{white-space:nowrap}
+
+/* ---- Revisão 5 (25/11/2026): letras de apoio ≥ 1,35% da largura, mapa com miniatura grande, páginas ocupadas ---- */
+.tl-marca b{font-size:clamp(1.5rem,3vw,3rem);white-space:nowrap}
+.tl-codigo{font-size:max(1.35vw,.8rem)}
+.tl-aba,.tl-seta{font-size:max(1.5vw,1rem)}
+.tl-aba.tl-auto{font-size:max(1.35vw,.9rem);min-width:15vw}
+.tl-mini small{font-size:max(1.35vw,.75rem);letter-spacing:.08em}
+.tl-aviso{font-size:max(1.5vw,1rem)}
+.tl-andar{font-size:max(1.35vw,.8rem)}
+/* mapa */
+.tl-mapa .tl-sala{grid-template-rows:minmax(0,1fr) auto auto;align-content:stretch;padding:.6vh .4vw .8vh}
+.tl-mapa .tl-sala img{height:100%;max-height:11.5vh;min-height:8vh;width:auto;max-width:100%}
+.tl-mapa .tl-sala .ic3d{width:10vh;height:10vh;font-size:6vh}
+.tl-mapa .tl-sala b{font-size:max(1.62vw,1rem);line-height:1.08;overflow-wrap:normal;word-break:normal;hyphens:manual}
+.tl-mapa .tl-sala small{font-size:max(1.35vw,.8rem);letter-spacing:.04em}
+/* turma: os nomes crescem para ocupar a página */
+.tl-gente{height:calc(100% - 4.5vh);align-content:center;justify-content:center;gap:1.6vh 1.2vw}
+.tl-gente,.tl-card.tl-largo .tl-gente{font-size:max(1.9vw,1.1rem)}
+.tl-gente.grande,.tl-card.tl-largo .tl-gente.grande{font-size:max(3vw,1.4rem)}
+.tl-gente.medio,.tl-card.tl-largo .tl-gente.medio{font-size:max(1.6vw,1rem)}
+.tl-gente.mini,.tl-card.tl-largo .tl-gente.mini{font-size:max(1.35vw,.85rem);gap:1vh .8vw}
+.tl-gente i,.tl-missoes i{font-size:max(1.8vw,1rem)}
+.tl-missoes{align-content:center;height:calc(100% - 4.5vh)}.tl-missoes span{font-size:max(1.5vw,.95rem)}
+/* máquina */
+.tl-meio.pg-maquina .tl-metas{height:calc(100% - 6vh);align-items:stretch}
+.tl-meio.pg-maquina .tl-meta{align-content:center}
+.tl-meio.pg-maquina .tl-meta .ic3d.g{width:min(15vw,28vh);height:min(15vw,28vh)}
+.tl-meta span:last-child{font-size:max(1.8vw,1rem)}
+/* a noite: cada fato achado é um cartão; as linhas enchem a altura */
+.tl-fita{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr)}
+.tl-fita .tl-volta{margin:0 0 1vh}
+.tl-fita ol{border-left:0;padding:0;margin:0;gap:.9vh;grid-auto-rows:minmax(0,1fr);min-height:0}
+.tl-fita li{grid-template-columns:min(4.4vw,calc(62vh / var(--linhas,10))) 11vw minmax(0,1fr) auto;gap:1vw;padding:.3vh 1vw;min-height:0;border-radius:.8vw;font-size:max(1.5vw,.95rem);line-height:1.1;background:linear-gradient(180deg,#294051,#172633);box-shadow:inset 0 1px 0 #ffffff2b,0 .3vw 0 #05090d;overflow:hidden}
+.tl-fita .ic{width:100%;height:auto;aspect-ratio:1}
+.tl-fita li b{font-size:max(1.4vw,.9rem);white-space:nowrap}
+.tl-fita .tx small{font-size:max(1.35vw,.85rem);margin-top:.2vh}
+.tl-fita li>i{font-size:max(1.4vw,.9rem);opacity:.85;white-space:nowrap}
+.tl-fita li.falta{filter:none;opacity:1;background:#0e1a25;box-shadow:inset 0 .3vw .5vw #0008;color:#9fb2bd}
+.tl-fita li.falta b{font-size:max(2vw,1.2rem);color:#9fb2bd;text-align:center}
+/* entrada da sala sem código: arte, telão e simulador */
+#dragonRoomGate .dr-arte{display:block;width:84px;height:84px;object-fit:contain;margin:0 0 6px;filter:drop-shadow(0 6px 5px #000a)}
+#dragonRoomGate .dr-duo{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+#dragonRoomGate .dr-btn.sec{display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;color:#f3ead9;background:linear-gradient(180deg,#294051,#172633);border-color:#d7bd8b55;font-size:.9rem}
+#dragonRoomGate .dr-btn.sec img{width:30px;height:30px;object-fit:contain;filter:drop-shadow(0 3px 2px #0009)}
+#dragonRoomGate .dr-btn.sec:active{transform:translateY(3px);box-shadow:inset 0 1px 0 #ffffff15,0 1px 0 #05090d}
+/* simulador: telão maior em cima, turma logo embaixo numa faixa */
+.sim-telao{width:min(100%,calc((100vh - 300px) * 16 / 9))}
+.sim-turma{display:flex;flex-wrap:nowrap;justify-content:flex-start;gap:.7rem;overflow-x:auto;padding:0 1rem 1rem}
+.sim-fone{flex:none}
+
+.tl-volta{font-size:max(1.7vw,.9rem)}
+.tl-fs{font-size:max(1.35vw,.9rem)}
+
+/* cabeçalho numa linha só, sem cortar o código */
+.tl-topo{gap:1.2vw;min-width:0}.tl-raiz{grid-template-columns:minmax(0,1fr)}
+.tl-marca b{font-size:max(2.2vw,1.2rem)}
+.tl-codigo strong{font-size:max(2.6vw,1.4rem)}
+.tl-abas{gap:.5vw;min-width:0}
+.tl-aba,.tl-seta{font-size:max(1.4vw,.9rem);padding:.4vh .8vw;white-space:nowrap}
+.tl-aba.tl-auto{min-width:0;margin-left:.4vw}
+.tl-mini{min-width:0;padding:.4vh .8vw}.tl-mini small{white-space:nowrap}
+.tl-mini b{font-size:max(2.2vw,1.2rem)}
+/* turma: tamanho do nome conforme o espaço do cartão */
+.tl-gente.grande{font-size:max(2.3vw,1.2rem)}.tl-card.tl-largo .tl-gente.grande{font-size:max(3.4vw,1.5rem)}
+/* máquina: três fichas inteiras */
+.tl-meio.pg-maquina .tl-metas{height:auto;align-items:stretch}
+.tl-meio.pg-maquina .tl-meta .ic3d.g{width:min(13vw,24vh);height:min(13vw,24vh)}
+/* a noite: quem trouxe fica na coluna da direita; o fato fica numa linha ou duas */
+.tl-fita li{grid-template-columns:min(4.4vw,calc(62vh / var(--linhas,10))) 11vw minmax(0,1fr) minmax(0,auto)}
+.tl-fita li>i{display:grid;justify-items:end;text-align:right;max-width:27vw;font-style:normal;white-space:normal;line-height:1.1;opacity:1}
+.tl-fita li>i small{font:600 max(1.35vw,.85rem)/1.1 system-ui,sans-serif;color:#83c6ac}
+.tl-fita li>i span{font:700 max(1.35vw,.85rem)/1.2 system-ui,sans-serif;color:#b9c7cc}
+/* simulador: telão em cima e a turma inteira logo embaixo, quando a tela dá */
+.sim-telao{width:min(100%,calc(max(min(100vh - 300px,420px),100vh - 690px) * 16 / 9))}

@@ -549,7 +549,7 @@ def checar_previas():
 # ------------------------------------------------------------------ relatorio
 def main():
     v = D['valores']; print(f'VALORES SORTEADOS (semente {SEMENTE}): dia {v["dia_da_troca"]}, raio em {v["hora_do_apagao"]} (janela {E.mmss(E.JANELA[0])} a {E.mmss(E.JANELA[1])}), registro {v["tombo"]}, ordem {v["ordem_circuito"]}, chave {v["chave_do_raio"]}, cofre {E.VAL["reg_inv"]}')
-    print(f'VALIDADOR LOOP v4 revisão 5 | dados: {E.DATA} | {len(D["pistas"])} pistas, {len(AT)} atividades, {len(D["salas"])} salas abertas (+{len(D.get("salas_em_reforma", []))} em reforma) | causas: {", ".join(CAUSAS_OK)}')
+    print(f'VALIDADOR LOOP v4 revisão 6 | dados: {E.DATA} | {len(D["pistas"])} pistas, {len(AT)} atividades, {len(D["salas"])} salas abertas (+{len(D.get("salas_em_reforma", []))} em reforma) | causas: {", ".join(CAUSAS_OK)}')
     bad = checar_ids(); ERROS.extend(bad)
     print(f'(a) ids referenciados: {"OK, todos existem" if not bad else "FALHA"}')
     for b in bad: print('   -', b)

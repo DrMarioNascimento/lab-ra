@@ -56,7 +56,7 @@ function paginasDaEtapa() {
   if (room.fase === 'sala' || !e) return [['entrada', 'Entrada']];
   if (e === 'choose' || e === 'playing' || e === 'between') return [['relogio', 'Relógio'], ['mapa', 'Mapa'], ['turma', 'Turma'], ['maquina', 'Máquina']];
   if (e === 'final') return [['desfecho', 'Desfecho'], ['turma', 'Turma']];
-  return [['desfecho', 'Desfecho'], ['noite', 'A noite'], ['conversa', 'Para conversar'], ['turma', 'Turma']];
+  return [['desfecho', 'Desfecho'], ['noite', 'A noite'], ['conversa', 'Para conversar'], ['missoes', 'Missões'], ['turma', 'Turma']];
 }
 function irPara(i, manual) {
   const n = paginasDaEtapa().length; pag = ((i % n) + n) % n; trocaEm = Date.now() + GIRO_MS;
@@ -114,25 +114,32 @@ function pgRelogio() {
       <div class="tl-museu">Minuto da volta: <time id="tlMin">${loopHora(room.seg, jog ? seg : room.seg)}</time></div></div>
     <div class="tl-card tl-relogio tl-lado"><div class="tl-num"><b>${g.filter(naSala).length}</b><span>de ${g.length}</span></div><p class="tl-texto">já ${g.filter(naSala).length === 1 ? 'escolheu' : 'escolheram'} uma sala</p><div class="tl-sinal" id="tlSinal">${jog ? esc(sinal(seg)) : 'Escolham uma sala no celular.'}</div></div>`;
 }
+// Fichas com os nomes. O tamanho da letra começa grande e desce só o que for preciso para caber no cartão (função caber): com 40 pessoas nada fica cortado.
 function chips(lista, vazio) {
-  const cls = lista.length > 30 ? ' mini' : lista.length > 16 ? ' medio' : lista.length <= 8 ? ' grande' : '';
-  return `<div class="tl-gente${cls}" style="--n:${Math.max(1, lista.length)}">${lista.map(([nome, img, c]) => `<span class="${c || ''}">${img || ''}${esc(nome)}</span>`).join('') || `<i>${vazio}</i>`}</div>`;
+  const cls = lista.length <= 8 ? ' grande' : '';
+  return `<div class="tl-gente${cls}" style="--n:${Math.max(1, lista.length)}">${lista.map(([nome, img, c, papel]) => `<span class="${c || ''}">${img || ''}${esc(nome)}${papel ? `<small> · ${esc(papel)}</small>` : ''}</span>`).join('') || `<i>${vazio}</i>`}</div>`;
 }
+const fr = (n) => Math.max(10, Math.min(40, n));   // largura de cada cartão conforme a quantidade de nomes
 function pgTurma() {
   const g = gente(), e = room.etapa;
-  if (e === 'final' || e === 'result') {
+  if (e === 'result') return `<div class="tl-card tl-largo"><p class="tl-volta">QUEM JOGOU · ${g.length}</p>${chips(g.map(p => [p.nome || 'Participante', '', p.resp ? 'ok' : '']), 'Ninguém entrou.')}</div>`;
+  if (e === 'final') {
     const mandou = g.filter(p => p.resp), falta = g.filter(p => !p.resp);
-    const miss = e === 'result' ? g.filter(p => p.resp && p.resp.loopMissao) : [];
-    return `<div class="tl-card"><p class="tl-volta">${e === 'result' ? 'MISSÕES SECRETAS CUMPRIDAS' : 'JÁ CONTARAM'}</p>` +
-      (e === 'result' ? `<div class="tl-missoes">${miss.map(p => `<p><b>${esc(p.nome || 'Participante')}</b><span>${esc(p.resp.loopMissao)}</span></p>`).join('') || '<i>Ninguém cumpriu a missão secreta desta vez.</i>'}</div>`
-        : chips(mandou.map(p => [p.nome || 'Participante', '', 'ok']), 'Ninguém ainda.')) + `</div>
-      <div class="tl-card"><p class="tl-volta">${e === 'result' ? 'QUEM JOGOU' : 'FALTA CONTAR'}</p>${chips((e === 'result' ? g : falta).map(p => [p.nome || 'Participante', '', e === 'result' && p.resp ? 'ok' : '']), 'Todo mundo contou.')}</div>`;
+    return `<div class="tl-card" style="--fr:${fr(mandou.length)}"><p class="tl-volta">JÁ CONTARAM · ${mandou.length}</p>${chips(mandou.map(p => [p.nome || 'Participante', '', 'ok']), 'Ninguém ainda.')}</div>
+      <div class="tl-card" style="--fr:${fr(falta.length)}"><p class="tl-volta">FALTA CONTAR · ${falta.length}</p>${chips(falta.map(p => [p.nome || 'Participante', '', '']), 'Todo mundo contou.')}</div>`;
   }
   const dentro = g.filter(naSala), fora = g.filter(p => !naSala(p));
-  const rot = (p) => (p.nome || 'Participante') + (room.volta >= 4 && p.papel5 ? ' · ' + p.papel5 : '');   // papel escolhido na pausa da volta 4
-  const salas = `<div class="tl-card${fora.length ? '' : ' tl-largo'}"><p class="tl-volta">NAS SALAS · ${dentro.length}</p>${chips(dentro.map(p => [rot(p), LOOP_SALAS[p.amb] ? `<img src="${ICONE(LOOP_SALAS[p.amb][2])}" alt="" title="${esc(nomeSala(p.amb))}">` : '', 'ok']), 'Ninguém escolheu sala ainda.')}</div>`;
-  if (!dentro.length) return `<div class="tl-card tl-largo"><p class="tl-volta">NO SAGUÃO · ${fora.length}</p>${chips(fora.map(p => [rot(p), '', '']), 'Ninguém entrou ainda.')}</div>`;
-  return salas + (fora.length ? `<div class="tl-card"><p class="tl-volta">NO SAGUÃO · ${fora.length}</p>${chips(fora.map(p => [rot(p), '', '']), '')}</div>` : '');
+  const papel = (p) => (room.volta >= 4 && p.papel5 ? p.papel5 : '');   // papel escolhido na pausa da volta 4
+  const salas = `<div class="tl-card${fora.length ? '' : ' tl-largo'}" style="--fr:${fr(dentro.length)}"><p class="tl-volta">NAS SALAS · ${dentro.length}</p>${chips(dentro.map(p => [p.nome || 'Participante', LOOP_SALAS[p.amb] ? `<img src="${ICONE(LOOP_SALAS[p.amb][2])}" alt="" title="${esc(nomeSala(p.amb))}">` : '', 'ok', papel(p)]), 'Ninguém escolheu sala ainda.')}</div>`;
+  if (!dentro.length) return `<div class="tl-card tl-largo"><p class="tl-volta">NO SAGUÃO · ${fora.length}</p>${chips(fora.map(p => [p.nome || 'Participante', '', '', papel(p)]), 'Ninguém entrou ainda.')}</div>`;
+  return salas + (fora.length ? `<div class="tl-card" style="--fr:${fr(fora.length)}"><p class="tl-volta">NO SAGUÃO · ${fora.length}</p>${chips(fora.map(p => [p.nome || 'Participante', '', '', papel(p)]), '')}</div>` : '');
+}
+// Missões secretas cumpridas, no resultado: uma linha por missão, com os nomes de quem cumpriu (no máximo 8 linhas, com qualquer tamanho de turma).
+function pgMissoes() {
+  const miss = gente().filter(p => p.resp && p.resp.loopMissao), grupos = {};
+  for (const p of miss) (grupos[p.resp.loopMissao] ||= []).push(p.nome || 'Participante');
+  const linhas = Object.entries(grupos).sort((a, b) => b[1].length - a[1].length);
+  return `<div class="tl-card tl-largo"><p class="tl-volta">MISSÕES SECRETAS CUMPRIDAS · ${miss.length}</p><div class="tl-missoes${linhas.length > 4 ? ' duas' : ''}">${linhas.map(([m, ns]) => `<p><b>${esc(m)}</b><span>${ns.map(n => `<em>${esc(n)}</em>`).join('')}</span></p>`).join('') || '<i>Ninguém cumpriu a missão secreta desta vez.</i>'}</div></div>`;
 }
 function pgMaquina() {
   const f = (img, t, d) => `<div class="tl-meta">${ficha(img, 'g')}<b>${t}</b><span>${d}</span></div>`;
@@ -143,9 +150,9 @@ function pgMaquina() {
 }
 function pgEntrada() {
   const g = gente();
-  return `<div class="tl-card tl-ent"><div><h1 class="tl-titulo">Entrem na sala</h1><p class="tl-texto">Apontem a câmera do celular para o QR code ou digitem o código <b>${esc(codigo)}</b>.</p><p class="tl-aviso">O Professor inicia a partida.</p></div>
+  return `<div class="tl-card tl-ent${g.length > 16 ? ' estreito' : ''}" style="--fr:${g.length > 16 ? 16 : 40}"><div><h1 class="tl-titulo">Entrem na sala</h1><p class="tl-texto">Apontem a câmera para o QR code. Ou digitem o código <b>${esc(codigo)}</b>.</p><p class="tl-aviso">O Professor inicia a partida.</p></div>
       <div class="tl-qr" aria-label="QR code de entrada">${window.MosaicoQR ? window.MosaicoQR.svg(conviteUrl(), { nivel: 'M', margem: 2 }) : ''}</div></div>
-    <div class="tl-card"><h2 class="tl-titulo">${g.length} na sala</h2>${chips(g.map(p => [p.nome || 'Participante', '', 'ok']), 'Ninguém entrou ainda.')}</div>`;
+    <div class="tl-card" style="--fr:${fr(g.length) * 1.3}"><h2 class="tl-titulo">${g.length} na sala</h2>${chips(g.map(p => [p.nome || 'Participante', '', 'ok']), 'Ninguém entrou ainda.')}</div>`;
 }
 function pgDesfecho() {
   const g = gente();
@@ -160,7 +167,7 @@ function pgDesfecho() {
   const ficha = (img, ok, t) => `<div class="tl-meta ${ok ? 'ok' : 'nao'}">${`<span class="ic3d g" aria-hidden="true"><img src="${ICONE(img)}" alt=""></span>`}<b>${t}</b><span>${ok ? '✓ feito' : 'ficou aberto'}</span></div>`;
   return `<div class="tl-card tl-relogio tl-largo"><p class="tl-volta">DESFECHO DA TURMA</p><h1 class="tl-titulo tl-enorme">${esc(LOOP_FINAL_NOME[coletivo.final] || coletivo.final)}</h1>
       <p class="tl-texto">${esc(LOOP_FINAIS[coletivo.final])}</p>
-      <div class="tl-metas tl-res">${ficha('ui/alvo', enviados.some(p => p.resp.loopDefeito) || tem('Ouro', 'Desligar'), 'Defeito achado')}${ficha('T01', tem('Ouro', 'Desligar'), 'Máquina consertada')}${ficha('P01', tem('Ouro', 'Revelar'), 'Noite revelada')}</div>
+      <div class="tl-metas tl-res">${ficha('ui/alvo', enviados.some(p => p.resp.loopDefeito) || tem('Ouro', 'Desligar'), 'Achar o defeito')}${ficha('T01', tem('Ouro', 'Desligar'), 'Consertar a Máquina')}${ficha('P01', tem('Ouro', 'Revelar'), 'Revelar a noite')}</div>
       <p class="tl-aviso">${coletivo.registrados} de ${g.length} contaram o desfecho.</p></div>`;
 }
 function pgNoite() {
@@ -170,7 +177,22 @@ function pgNoite() {
 function pgConversa() {
   return `<div class="tl-card tl-relogio tl-largo tl-pausa"><img class="tl-arte" src="${ICONE('ui/dupla')}" alt=""><div><p class="tl-volta">PARA CONVERSAR</p><h1 class="tl-titulo tl-pergunta">${esc(LOOP_CONVERSA)}</h1></div></div>`;
 }
-const PG = { entrada: pgEntrada, relogio: pgRelogio, mapa: pgMapa, turma: pgTurma, maquina: pgMaquina, desfecho: pgDesfecho, noite: pgNoite, conversa: pgConversa };
+const PG = { entrada: pgEntrada, relogio: pgRelogio, mapa: pgMapa, turma: pgTurma, maquina: pgMaquina, desfecho: pgDesfecho, noite: pgNoite, conversa: pgConversa, missoes: pgMissoes };
+// Faz os nomes caberem no cartão: a letra desce até 1,35% da largura; se ainda sobrar, o papel sai da ficha; por último a letra desce até 1%.
+function caber() {
+  const vw = innerWidth / 100;
+  for (const c of app.querySelectorAll('.tl-card')) {
+    const alvos = [...c.querySelectorAll('.tl-gente,.tl-missoes')]; if (!alvos.length) continue;
+    c.classList.add('tl-col');   // título em cima, nomes no espaço que sobra
+    c.classList.remove('sem-papel'); alvos.forEach(a => { a.style.fontSize = ''; });
+    const sobra = () => c.scrollHeight - c.clientHeight > 1 || alvos.some(a => a.scrollHeight - a.clientHeight > 1);
+    const descer = (piso) => { let f = parseFloat(getComputedStyle(alvos[0]).fontSize); while (sobra() && f > piso) { f = Math.max(piso, f * .95); alvos.forEach(a => { a.style.fontSize = f + 'px'; }); } };
+    descer(1.35 * vw);
+    if (sobra() && c.querySelector('.tl-gente small')) { c.classList.add('sem-papel'); alvos.forEach(a => { a.style.fontSize = ''; }); descer(1.35 * vw); }
+    if (sobra()) descer(vw);
+  }
+}
+addEventListener('resize', () => { if (room) caber(); });
 
 function desenhar() {
   if (!room) { app.innerHTML = `<div class="tl-raiz">${cabeca()}<div class="tl-meio"><div class="tl-card tl-largo tl-relogio"><h1 class="tl-titulo">Sala não encontrada</h1><p class="tl-texto">Confira o código e abra de novo.</p></div></div></div>`; return; }
@@ -186,6 +208,7 @@ function desenhar() {
     const jog = ['choose', 'playing'].includes(room.etapa) && room.fase !== 'sala';
     const aviso = jog ? `${g.filter(naSala).length} de ${g.length} numa sala` : '';
     app.innerHTML = `<div class="tl-raiz">${cabeca(pags)}<div class="tl-meio pg-${pags[pag][0]}">${PG[pags[pag][0]]()}</div><div class="tl-rodape"><span class="tl-aviso">${aviso}</span>${dots}<span class="tl-fs-vao"></span></div></div>`;
+    caber();
     return;
   }
   if (room.etapa === 'playing' && room.fase !== 'sala') {

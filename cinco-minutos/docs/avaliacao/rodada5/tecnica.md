@@ -1,0 +1,103 @@
+# Mosaico Loop v4 revisão 5 — Conferência técnica (seção 4 das escalas), do zero
+
+**Resultado: NÃO PASSA.** Dos 10 itens, 7 passam (1, 2, 3, 4, 5, 8, 9) e 3 têm falha bloqueante (6, 7, 10). São 4 correções bloqueantes: 2 de código na janela da Máquina (o mesmo conserto resolve as duas), 1 de contagem (uma palavra a mais num parágrafo do caderno) e 1 de tela antiga (o museu em 3D da tela inicial). A seção 4 só aceita "passa limpo".
+
+As 6 correções bloqueantes da rodada 4 (B1 a B6) estão todas fechadas e foram conferidas de novo. Das 4 falhas de agora, nenhuma nasceu de correção errada: as 2 da Máquina existem pelo menos desde a versão de 24/11 e só aparecem com toque de verdade na tela (as rodadas anteriores chamavam a função direto); a do museu em 3D já existia e não tinha sido aberta; a do caderno aparece porque a medida agora é por parágrafo inteiro, com o rótulo.
+
+**Critério usado para classificar.** Bloqueante: quem joga vê a coisa errada, ou a partida perde uma resposta que as regras prometem. Menor: campo interno, comentário, documento, tela só do Professor, ou frase que depende de leitura.
+
+**Estado auditado (25/11/2026, 12:54 a 13:27).** Nenhum arquivo mudou durante a auditoria (174 arquivos, md5 do começo e do fim iguais: `aud3/snap_ini.txt` e `aud3/snap_fim.txt`).
+`dados/pistas-v4.json` 12:36:49 (278 pistas, "v4 revisão 5") · `loop-central.js` 12:43:09 · `game.js` 11:59:49 · `docs/LOOP-CENTRAL.md` 12:24:39.
+`loop-central-dados.js` é idêntico ao JSON. `/tmp/roda/sim/engine.py` e `validar.py` são idênticos a `dados/simulador-texto.py` e `dados/validar.py`.
+
+**Como foi conferido (tudo em `/tmp/roda/esc/r5/aud3/`, nada escrito no repositório).**
+- Dados: `an/dados.py`, `an/pares.py`, `an/palavras.py`, `an/docs.py`, `an/trio.py`, mais `n/dump.py` (as 278 pistas lidas uma a uma, com tranca, causa e etiqueta) e `n/pal.py` (palavras por texto e por rótulo + texto).
+- Tela real (`individual.html`, playwright): `pw/varre.mjs`, **10 partidas, 2 por causa (A, B, C, D, E)**, 5 voltas, 15 salas, 4 abas da Máquina com e sem diagnóstico e com o painel pago, mensagens, pausa, final: 3.210 telas e 9.480 itens de lista em `pw/corpus.json`. Os 5 horários de raio apareceram (1:00, 1:05, 1:10, 1:15, 1:20). Lido por `an/tela.py`, `an/vocab.py`, `an/linhas.py`, `an/lista_tela.py`, `an/conta_tela.py`, `n/item3.py`.
+- Código real: `pw/sem.mjs` (4.000 sementes), `pw/andar.mjs` (3.000), `pw/dist.mjs` (3.000), `pw/real_solo.mjs`, `pw/real_par.mjs`, `pw/mg.mjs`, `pw/extras.mjs`, `pw/extra2.mjs`, `pw/meu.mjs`, `pw/tranca_causa.mjs`, `pw/tel.mjs`, `pw/reserva.mjs`, `pw2/painel.mjs`, `pw2/glos.mjs`, `pw2/barra.mjs`, `pw2/cartoes.mjs`, `pw2/mgpeca.mjs`, `pw2/paginas.mjs`, `pw2/r404.mjs`.
+- Scripts novos em `n/`: `blocos.mjs` (palavras por bloco medido no DOM: 100.757 blocos, 1 partida por causa), `trava_all.mjs` (toque de verdade em toda pista travada), `extra.mjs` (pior caso real do Anexar, painel por clique, fim da volta, Dra. Sato), `msgclique.mjs`, `msgclique2.mjs`, `redesenha.mjs`, `dura.mjs` (o que fica na tela depois do toque), `conserto_teste.mjs` (prova da correção, aplicada só na página aberta), `mgluz.mjs` (minijogo da Galeria por clique), `entrada.mjs`, `torre.mjs`.
+- Scripts antigos corrigidos: `pw/varre.mjs` parava pelo total de partidas e deixou a noite B de fora na cópia de `r5/aud` (4 causas); agora só para com 2 partidas em cada uma das 5. `pw/simrun.mjs` passou a gravar a causa. `pw2/msgmax.mjs` ainda montava a recusa antiga do dossiê ("O dossiê não aceita"); o pior caso de agora foi medido com a função real em `n/extra.mjs`. `pw2/trava3.mjs` lia vazio em 2 das 9 pistas (rolagem do teste); `n/trava_all.mjs` centraliza o botão e confere as 64. `pw/mg.mjs` ainda testa `c_esc_1`, que não tem minijogo (resultado esperado).
+- Sala simulada: `pw/simrun.mjs`, 3 partidas inteiras (`sala/simulador/`, 3 participantes, Professor automático, até o resultado): 483, 450 e 466 linhas distintas de telão, Professor e participantes (noites E e D nas duas em que a causa foi gravada).
+- Simulador de texto: `validar.py 2000` com `LOOP_DATA` no repositório (`aud3/validar.txt`).
+
+## Tabela
+
+| # | Item | Resultado | Evidência |
+|---|---|---|---|
+| 1 | Cronologia e testemunhas | **PASSA** | Andares fixos: 0 contradição em 3.000 sementes. 17 pistas com horário; nos 9.480 itens de lista, 0 horário diferente do dado mais o deslocamento do raio; 250 textos de hora do apagão, todos com a hora sorteada. Alarme em 160 s no jogo e no telão. Entrada do Lenz numa versão só nos dados, na linha do tempo, no telão e no ROTEIRO: à tarde entra pela frente (livro de visitas e roleta de entrada), sai pela porta de serviço com o crachá; no começo da noite volta por ela (caderno de rondas, foto e legenda); uns 30 s antes de 0:00 empurra o Téo e sai; 4:00, 4:02, 4:05, 4:10; a Câmara leva 50 s para armar e dispara às 5:00. Pegadas somem na porta de serviço; marca de sola "de quem saiu por ela". Seu Dirceu só na Base da limpeza (5 falas, 1 sala); Nico só na Base da limpeza; Braga só na Central; Ivone só no Ateliê; Aurélio só na Galeria; Dra. Sato só por interfone e só pede socorro depois de ouvir do Téo; Téo só em papel e gravação. Os 5 pontos menores da rodada 4 (M1 a M5) estão fechados. Menores m1, m2. |
+| 2 | Origem, volta e quem vê | **PASSA** | 278 pistas, ids únicos, 15 salas, voltas válidas, `quemPodeVer` "todos" nas 278, 0 referência quebrada, 86 com `precisaDe` e as 86 com `porque`, 0 pista inalcançável nas 5 causas. Toque de verdade em toda pista travada, voltas 1 e 3, caderno vazio: 64 trancas × 5 causas = 320 toques, 320 com a frase certa na tela, 0 de energia gasta, 0 pista entrou no caderno, 0 botão coberto, 0 frase diferente entre as causas. Maior frase de tranca: 37 palavras. Nenhum item preso embaixo da barra (15 salas, 2 tamanhos). "O quadro, olhando de novo": frase nova, igual nas 5 causas, sem supor a primeira olhada. Pista recebida na pausa guarda a etiqueta. Nico, Braga e o homem de paletó com o motivo do mundo na frase. |
+| 3 | Palavras proibidas por volta e prévias | **PASSA** | "Lenz": 0 nas 1.300 telas das voltas 0 a 2 e 0 antes da volta 3 nas 3 salas simuladas; nasce em `cracha_3`, `lenz_2`, `v4_braga`, `coop_veredito` (volta 3). 216 rótulos de sala, 0 em causa única; mesma quantidade nas 15 salas e nas 5 causas, nos dados e na tela (18, 12, 16, 7, 16, 12, 10, 19, 12, 8, 10, 12, 9, 5, 9); 0 sala e 0 botão diferente; 0 rótulo com hora; 0 contagem regressiva em 3.210 telas. Aba Atividades da volta 1 igual nas 5 causas, sala por sala; 0 nome de defeito e 0 conserto da noite em 800 telas de Atividades sem diagnóstico. Painel e Manual: 0 painel à vista sem pagar em 3.110 telas; por clique, nas 5 causas: "Olhar o painel (1 de energia)" leva de 5 para 4, "Fazer em dupla" não cobra de novo, na volta seguinte o painel fecha. Aba Revelar: só o nome ("O museu esqueceu" na volta 1; "Caso aberto" só com o diagnóstico). Entrada, ajuda, preparação e mapa iguais nas 5 causas. Caixa de "banners" fora da volta 1. |
+| 4 | Fonte para cada fato essencial (1, 2 e 3 pessoas, 5 causas, simulador e código) | **PASSA** | **Simulador:** `validar.py` com 2.000 bots: ótimo com 1, 2 e 3 pessoas = Ouro na volta 5 nas 5 causas, com 5 jogos de valores sorteados; `trio.py` repete com 4 e 5; bot aleatório 0,00% a 0,10% de Ouro ou Desligar; 0 essencial sem 2 caminhos; 0 sala que fecha o diagnóstico sozinha; "APROVADO nas 5 causas". **Código real, 1 pessoa:** `collect()` de verdade, 5 de energia por volta: Ouro nas 5 causas (E: eco e meio conserto na 3, ensaio na 4, vale na 5). **Código real, 2 pessoas:** dois aparelhos, mesma semente: DESFECHO DA TURMA = Ouro nas 5 causas. **3 pessoas:** o código não tem regra por tamanho de grupo. Minijogos por clique: Galeria (pergunta + luz) nas 5 causas, caixa de "banners", cofre. Aviso: esses scripts chamam a função da atividade; com toque na tela o estado muda igual, mas a resposta não aparece (item 7). Menores m3, m4. |
+| 5 | Códigos decoráveis | **PASSA** | 4.000 sementes: dia 9 a 25 (17 valores, 216 a 254 cada), hora em 5 valores (781 a 828), registro 105 a 994 (881 distintos), 6 ordens, 3 chaves, 5 causas entre 19,3% e 20,9%; 0 partida com o trio padrão; 0 marcador `{…}` sobrando em 3.210 telas. Cofre: 123 e 311 recusados, registro de trás para a frente aceito. Opções dos minijogos nas 3 posições (955 a 1.043 em 3.000), luz nas posições 2 a 5. Exemplos de formato (31, 0:45, 050, 0-0-0, 000) fora da faixa de qualquer resposta. |
+| 6 | Contagem de palavras (até 60 por bloco de texto mostrado) | **NÃO PASSA** (1 bloqueante, por 1 palavra) | **Certo:** 100.757 blocos medidos no DOM nas 5 causas. Maior texto de pista: 58 (`man_3`); "Como funciona" 58; pendrive no rádio 60 com o rótulo; finais até 44; recusa do Anexar, pior caso real, 54; aceite 50; fim de atividade até 59; frase de tranca até 37; ajuda até 32; pausa até 31; telão e sala até 36 por linha; rótulos até 7. **Falha:** no caderno, cada anotação é um parágrafo só, com o rótulo em negrito na frente. "Interfone: Dra. Sato:" (3) + a resposta ao sinal de luz fraca (58) = **61 palavras** num parágrafo, nas noites B, D e E. O texto sozinho cabe; a rodada 4 media sem o rótulo. Menor m5. |
+| 7 | Documentação × dados × código | **NÃO PASSA** (2 bloqueantes) | **Certo:** cabeçalho dos dados e do `loop-central-dados.js` em "v4 revisão 5"; validador se apresenta como "revisão 5"; 0 termo antigo em ROTEIRO-LOOP, LOOP-CENTRAL, FICHAS, README e CATALOGO (parte central); `regras.aparelho`, `E_volta_min_meio` (3), cofre como prova do trajeto e segredo do Lenz (chave de ligar) batem com o código; papéis dizem o que a tela faz. **Falhas (toque de verdade, 4 tamanhos de tela):** (a) na aba Atividades, depois de tocar em qualquer botão de atividade, a janela é redesenhada e a linha da mensagem fica vazia; o aviso sai atrás da janela (97% a 100% coberto em 360×640, 390×844 e 1280×800; 69% em 412×915, o resto escurecido). Quem joga não lê "A palavra não confere", "A MÁQUINA NÃO REAGE: 2 de 3 certos", "ENSAIO: A MÁQUINA REAGE", "Fora da janela do raio", "Falta energia" nem, na pausa, "Código inválido" e "Recebida": o campo esvazia e nada aparece. (b) Na aba Dossiê, a resposta do Anexar (46 a 54 palavras, pista por pista) fica de 0,1 a 1,5 s na janela e some no redesenho de 2 em 2 segundos (8 medidas); a recusa não deixa nada escrito depois. No mesmo redesenho, o defeito e as 3 pistas marcadas se apagam quando o foco não está numa caixa de marcar (medido no Chrome tirando o foco; no iPhone o toque em caixa de marcar não dá foco, o que não pude medir aqui). O ROTEIRO (parte 4, volta 4; parte 5, cena do diagnóstico) e o LOOP-CENTRAL prometem essas respostas. Menores m6 a m10. |
+| 8 | Registro de revisão e checklist | **PASSA** | LOOP-CENTRAL tem "Revisão 5 — 25/11/2026" com por quê e o que mudou (código, dados, simulador). Comparei os dados guardados da revisão 4 com os de agora: 51 campos mudaram em 46 pistas; os grupos grandes estão no registro (entrada do Lenz, fatos novos, trancas, noite D, papéis, assinaturas, `explica`). Checklist: 231/25/9/9/4 = 278 e ativas 207/208/207/207/212, iguais aos dados; itens por sala iguais à tela nas 5 causas; +9, +9 e +4 conferidos por id; os 17 horários da tabela iguais a `segundo_min`; "Pendências: nenhuma aberta"; DECISOES "Ficou para decidir: Nada". Menor m11. |
+| 9 | Vocabulário de projeto e gênero no texto visível | **PASSA** | 3.210 telas + 1.399 linhas das 3 salas + campos visíveis dos dados: 0 identificador interno, 0 "solo", "coop", "semente", "rodada", "jogador", "investigador", "aluno", 0 "carga" como recurso, 0 "os dois". "Sozinho" e "Sozinha" só em fala de personagem ou de objeto. No caderno, "etiqueta" e "ensaio" não abrem mais o dicionário (0 vez; ficam 9 termos do mundo). "Professor" aparece como nome de quem conduz, no padrão de entrada pedido pelo autor. Menores m12 a m14. |
+| 10 | Tela real sem camada antiga | **NÃO PASSA** (1 bloqueante) | **Certo:** mapa com as 15 salas nas 50 telas de mapa; 9.480 itens de lista, 0 fora da história (13.215 pistas antigas filtradas); 0 "protótipo", "pedestal", "lanterna", "estrondo", "21h/22h", "caixote", "funcionária", "Faltou pista", "Episódio visual" em 3.210 telas e 1.399 linhas de sala; passo a passo com as 6 cenas no mundo do Loop; `reserva/` redireciona para a entrada; tela final sem formulário (0 campo); 0 texto antigo escondido no DOM; 0 erro de página. **Falha:** o botão "Ver o museu em 3D", na tela inicial do jogo sem turma e da sala, abre o museu antigo: 5 andares (4º ao térreo, sem Subsolo) e 30 salas. Galeria no 3º andar (no Loop, 2º), Sala dos relógios no 3º (1º), Sala da fotografia no 2º (1º), Sala das coleções no 2º (térreo), Ateliê e Área de descanso no 1º (térreo); não tem Sala de conservação nem Oficina elétrica; tem 15 salas que não existem no Loop (gigantes, predadores, veículos...). As pistas dependem dos andares fixos (ROTEIRO, parte 3). Menor m15. |
+
+## Antes | agora | motivo
+
+| # | Rodada 4 | Rodada 5 | Motivo |
+|---|---|---|---|
+| 1 | passa | passa | Os 5 pontos menores fechados (mancha, voz, foto de costas, relógios, entrada pela frente). |
+| 2 | não passa (1) | **passa** | Frase do "olhando de novo" trocada. Agora com 320 toques de verdade, contra 45. |
+| 3 | não passa (2) | **passa** | Aba Revelar só com o nome; painel só depois de pagar. |
+| 4 | passa | passa | Sem mudança de regra; refeito com os minijogos novos. |
+| 5 | passa | passa | Sem mudança. |
+| 6 | não passa (1) | não passa (1) | "Como funciona" caiu para 58. A falha de agora é outra: medida por parágrafo inteiro, a anotação do interfone tem 61 com o rótulo. Não é texto novo. |
+| 7 | passa | não passa (2) | Não caiu por correção: as 2 falhas já estavam na revisão 4 (e na versão de 24/11). Apareceram porque o teste passou a tocar nos botões em vez de chamar a função. |
+| 8 | passa | passa | Registro da revisão 5 completo; checklist bate. |
+| 9 | não passa (2) | **passa** | "os dois" saiu dos papéis; "etiqueta" e "ensaio" sem "?" no caderno. |
+| 10 | passa | não passa (1) | `reserva/` saiu do ar. O museu em 3D da tela inicial já existia e não tinha sido aberto. |
+
+## Correções bloqueantes (texto pronto)
+
+**B1 e B2. `loop-central.js`, janela da Máquina (item 7).** A última mensagem fica guardada e volta depois de cada redesenho; as marcas do Dossiê também. Testado em `n/conserto_teste.mjs`, só na página aberta: a mensagem continua à vista depois de 4,6 s, some ao trocar de aba, e as 3 marcas ficam sem foco.
+- Linha 451, trocar `function lcMsg(t){ t = lcTok(t); const m = document.getElementById('lcMsg'); if (m) m.textContent = t; ` por `let lcUlt = null; function lcMsg(t){ t = lcTok(t); lcUlt = {aba:lcAba, t}; const m = document.getElementById('lcMsg'); if (m) { m.textContent = t; m.scrollIntoView({block:'nearest'}); } `
+- Linha 567 (`lcAbrir`), antes de `lcAba = aba || lcAba;`: `if (aba && aba !== lcAba) lcUlt = null;` e, no `close` da linha 587: `lcUlt = null;`
+- Linha 602 (`lcDesenhar`), antes de `d.innerHTML = ...`: `const marc = {c:d.querySelector('[name=lccausa]:checked')?.value, p:[...d.querySelectorAll('[name=lcprova]:checked')].map(i => i.value)};`
+- Depois da linha 604: `if (forcar !== true) { if (marc.c) { const r = d.querySelector('[name=lccausa][value="' + marc.c + '"]'); if (r) r.checked = true; } marc.p.forEach(v => { const x = d.querySelector('[name=lcprova][value="' + v + '"]'); if (x) x.checked = true; }); if (marc.c || marc.p.length) lcPreConf(); } if (lcUlt && lcUlt.aba === lcAba) { const m = document.getElementById('lcMsg'); if (m && !m.textContent) m.textContent = lcUlt.t; }`
+Depois, conferir com `n/msgclique2.mjs` e `n/dura.mjs`: "naJanela" não pode vir vazio, e a resposta do Anexar tem que ficar até trocar de aba.
+
+**B3. Caderno, anotação do interfone com 61 palavras (item 6).** Duas saídas; a primeira não mexe em texto de pista.
+- Código (`game.js:903`): rótulo em linha própria. Trocar `'</b><p><strong>'+esc(c.name)+':</strong> '+` por `'</b><strong class="ji-nome">'+esc(c.name)+'</strong><p>'+` e pôr no `style.css`: `.journal-item .ji-nome{display:block}`.
+- Ou dados (`man_3.textoPorSintoma.sint_luz`, 6 palavras a menos; mexe em texto, volta à etapa 1): `Você conta da luz fraca. Ela responde: "Luz caindo a cada tentativa? Ou tem coisa puxando, ou faltando. Vai até a caixa de fusíveis e me conta."`
+Depois, conferir com `n/blocos.mjs` e `n/blocos_an.py`: "BLOCOS ACIMA DE 60: 0".
+
+**B4. "Ver o museu em 3D" abre o museu antigo (item 10). Pede aval: tira ou muda um botão da tela inicial.**
+- Tirar o botão de `individual.html:20` e de `sala/index.html:23`; ou
+- fazer `museu/torre/` mostrar só as 15 salas do Loop nos andares do Loop (2º andar, 1º andar, térreo, Subsolo).
+
+## Menores (não bloqueiam)
+
+**Cronologia (item 1)**
+- **m1.** Base da peça: quem levanta a peça vê "um feltro novo, colado de ponta a ponta" (`fh_base_perto`, `d_f2_1`); Lado a Lado e a foto comparada dizem "base lisa, sem número" e "falta o número na base". Não se contradizem, mas o feltro tampa o lugar do número.
+- **m2.** Telão, no resultado: o fato "A peça verdadeira é trocada por uma cópia" é creditado a quem achou só o recibo, a ficha ou o diário do dia da troca (`LC_FATO_PISTA.troca`).
+
+**Fontes (item 4)**
+- **m3.** O simulador de texto continua diferente do jogo no dossiê do grupo, na pré-conferência e no limite de 2 atividades em dupla (registrado em DECISOES).
+- **m4.** Em dupla, o aparelho que não está no Subsolo termina em "A verdade apareceu"; o Ouro aparece no DESFECHO DA TURMA. É a regra escrita em `regras.aparelho`.
+
+**Palavras (item 6)**
+- **m5.** Cartão de atividade aberto soma de 86 a 179 palavras e o "Dicionário das palavras" 209; cada bloco tem até 58 (decisão registrada: o limite vale por bloco e o cartão vem fechado).
+
+**Documentos, campos internos e frases (item 7)**
+- **m6.** ROTEIRO-LOOP: a parte 6 ainda diz que em Três Números uma pessoa "só vê símbolos" e que em Fio a Fio há "três fios de cores diferentes" (a parte 12 corrige); a parte 4 fala de páginas do dossiê que a tela não tem ("planta + linha do tempo", "fichas dos suspeitos", "folha final com dois botões"); a parte 12 dá o piso de volta como "3, 3 e 4" para Nico, Braga e paletó (é 4, 3 e 3); o título ainda é "Loop — Roteiro completo".
+- **m7.** No jogo sem turma, a missão secreta diz "conte (ou blefe) para a turma" e "a turma vê o seu nome no telão".
+- **m8.** Noite D: "A MÁQUINA NÃO REAGE: 0 de 1 certos". Minijogo da caixa: "Três caixas com adesivo do patrocínio"; a pista da sala mostra uma.
+- **m9.** Depois de valor errado, os campos digitados se apagam e é preciso digitar tudo de novo.
+- **m10.** `GDD.md` ainda tem termos antigos (21h/22h, calibrar, âncora); `trancas.hora_do_apagao` (campo interno) diz "um espera... o outro"; comentário com "os dois" em `loop-central.js:222`; `prova_falsa` lista `c_peca` por fora do `grupoFonte`; etiqueta "MANUAL" em 6 grupos; identificadores internos com palavra antiga (decisão registrada). Uma das cargas de `sala/simulador/` deu um aviso de 404 no console; `pw2/r404.mjs` não repetiu.
+
+**Registro (item 8)**
+- **m11.** `loop-central.js` foi salvo às 12:43, depois do registro (12:24). Mudanças pequenas sem linha própria no registro: a frase da pré-conferência ("Forma certa. Falta ver se o defeito é esse."); nos dados, relógios de corda e elétricos (`a_rel_1`, `a_rel_2`, `fh_rel_recep`, `hora_2`), `fh_pont_d`, `mancha_2`, `dis_musica`, `dirceu_0` (pó branco), o corte de "A peça exposta é cópia" em `coop_copia_ok` e `foto_solo`, e a tranca nova de `eco_chave`. O registro as cobre só pela frase geral ("tudo o que era texto foi aplicado").
+
+**Vocabulário e gênero (item 9)**
+- **m12.** Aviso de aula encerrada, no celular de quem participa: "O Professor encerrou a aula. Obrigado por participar!" (voz do sistema; não marca quem joga).
+- **m13.** Barra e confirmação do Professor: "Aula encerrada para todos", "Encerrar a aula para todos?".
+- **m14.** No caderno, "leitura normal" dentro da fala da Dra. Sato abre a explicação de regra ("Pista que mostra uma parte da máquina que está bem"). Uma ocorrência, no mesmo sentido da regra.
+
+**Camada antiga (item 10)**
+- **m15.** `sala/conteudo.js` e `game.js` ainda carregam as salas e pistas antigas; a tela filtra todas (13.215 filtradas, 0 mostrada).
+
+## Fim do ciclo
+
+A conferência técnica **não passou**. Faltam as 4 correções bloqueantes acima. B1 e B2 são código e não mexem em texto. B3 tem saída só de código; se for escolhida a saída de dados, a ordem das escalas manda voltar à etapa 1. B4 tira ou muda um botão da tela inicial e precisa do aval do responsável antes de entrar.

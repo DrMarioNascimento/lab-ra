@@ -51,7 +51,10 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 const $ = id => document.getElementById(id);
-const NOMES_ANDAR = ['Térreo', '1º andar', '2º andar', '3º andar', '4º andar'];
+// Aberto a partir do Mosaico Loop (?loop=1): só as 15 salas da história, nos andares da história (salas-loop.json, gerado de LOOP_SALAS em game.js).
+const LOOP = new URLSearchParams(location.search).get('loop') === '1';
+const LS = LOOP ? await (await fetch('salas-loop.json?v=20261125')).json() : null;
+let NOMES_ANDAR = LOOP ? LS.andares : ['Térreo', '1º andar', '2º andar', '3º andar', '4º andar'];
 const SALAS = await (await fetch(((new URLSearchParams(location.search).get('versao') || 'A').toUpperCase().replace(/[^BC]/g, '') ? 'salas-' + (new URLSearchParams(location.search).get('versao')).toUpperCase().replace(/[^BC]/g, '') : 'salas') + '.json?v=20261123k')).json();
 
 const R = new THREE.WebGLRenderer({canvas: $('c'), antialias: true});
@@ -69,7 +72,7 @@ const chao = new THREE.Mesh(new THREE.CircleGeometry(1.6, 64), new THREE.MeshSta
 
 const dr = new DRACOLoader(); dr.setDecoderPath('./vendor/draco/');
 const gl = new GLTFLoader(); gl.setDRACOLoader(dr);
-const andar = [], pos0 = [], alvoZ = [0, 0, 0, 0, 0], atualZ = [0, 0, 0, 0, 0];
+let andar = [], pos0 = [], alvoZ = [0, 0, 0, 0, 0], atualZ = [0, 0, 0, 0, 0];
 let torre = null, fachadaOn = true, aberto = -1, dentro = null;
 document.getElementById('bVers').textContent = 'Peças: ' + (new URLSearchParams(location.search).get('versao') || 'A').toUpperCase();
 document.getElementById('bVers').onclick = e => { e.preventDefault(); const a = (new URLSearchParams(location.search).get('versao') || 'A').toUpperCase(); location.search = '?versao=' + ({A:'B',B:'C',C:'A'}[a] || 'B'); };
@@ -79,21 +82,66 @@ const VERS = (new URLSearchParams(location.search).get('versao') || 'A').toUpper
 gl.load((VERS === 'A' ? 'torre.glb' : 'torre-' + VERS + '.glb') + '?v=20261123k', g => {
   torre = g.scene; S.add(torre);
   for (let k = 0; k < 5; k++) { andar[k] = torre.getObjectByName('andar_' + k); pos0[k] = andar[k].position.z; }
+  if (LOOP) montaLoop();
   montaAndares(); $('carr').style.display = 'none';
 }, undefined, e => { $('carr').textContent = 'Não consegui abrir o museu.'; console.error(e); });
 
-function nomeSala(no) { return SALAS[no.name.replace('sala_', '')] || {nome: no.name, sub: '', texto: ''}; }
+function nomeSala(no) { if (LOOP && no.userData.loop) return no.userData.loop; return SALAS[no.name.replace('sala_', '')] || {nome: no.name, sub: '', texto: ''}; }
+// Mosaico Loop: tira as 15 salas que não são da história e a fachada, e arruma as outras 15 em 4 andares (Subsolo, Térreo, 1º e 2º andar).
+function montaLoop() {
+  const PASSO_X = 6.35, PASSO_Z = 4.1333, ALT = 3.7, salas = {}, raiz = andar[0].parent;   // raiz: o nó que tem a escala da maquete
+  for (const a of andar) for (const n of [...a.children]) {
+    const id = n.name.startsWith('sala_') ? (SALAS[n.name.replace('sala_', '')] || {}).id : null;
+    if (id && LS.salas[id]) { n.userData.loop = LS.salas[id]; salas[id] = n; }
+  }
+  const novos = LS.andares.map((nome, i) => { const g = new THREE.Group(); g.name = 'andar_' + i; raiz.add(g); return g; });
+  LS.andares.forEach((nome, i) => {
+    const ids = Object.keys(salas).filter(id => LS.salas[id].andar === nome).sort((a, b) => LS.salas[a].ordem - LS.salas[b].ordem);
+    const cols = ids.length <= 1 ? 1 : ids.length <= 4 ? 2 : 3, lins = Math.ceil(ids.length / cols), y = .4 + i * ALT;
+    ids.forEach((id, j) => { const n = salas[id], c = j % cols, l = Math.floor(j / cols); n.position.set(-2 + (c - (cols - 1) / 2) * PASSO_X, y, .1 + ((lins - 1) / 2 - l) * PASSO_Z); novos[i].add(n); });
+    const laje = new THREE.Mesh(new THREE.BoxGeometry(cols * PASSO_X + .5, .14, lins * PASSO_Z + .5), new THREE.MeshStandardMaterial({color: [0x3a2f52, 0x5a4424, 0x1f4a44, 0x243f5c][i], roughness: .9}));
+    laje.position.set(-2, y - .12, .1); laje.name = 'laje_' + i; novos[i].add(laje);
+  });
+  for (const a of andar) raiz.remove(a);
+  andar = novos; pos0 = andar.map(a => a.position.z); alvoZ = andar.map(() => 0); atualZ = andar.map(() => 0);
+  fachadaOn = false; $('bFach').style.display = 'none'; $('bVers').style.display = 'none';
+  chao.position.y = (.4 + ALT - .3) * .025; chao.material.transparent = true; chao.material.opacity = .38; chao.material.depthWrite = false; chao.material.needsUpdate = true;   // o chão fica na altura do Térreo: o Subsolo aparece embaixo dele
+  $('titulo').firstChild.textContent = 'O museu do Mosaico Loop';
+  $('bSair').onclick = e => { e.preventDefault(); let mesma = false; try { mesma = !!document.referrer && new URL(document.referrer).origin === location.origin; } catch (err) {} if (mesma && history.length > 1) history.back(); else location.href = '../../index.html'; };
+  trocaPecas(salas);
+}
+// Em cada sala, a peça da maquete dá lugar à peça que a sala tem no Loop (museu/pecas), do mesmo tamanho e no mesmo lugar. Se alguma não carregar, fica a da maquete.
+function trocaPecas(salas) {
+  const fila = Object.entries(salas).filter(([id, n]) => LS.salas[id].peca && !n.getObjectByName('peca_' + LS.salas[id].peca));
+  const prox = () => {
+    const item = fila.shift(); if (!item) return; const [id, no] = item, velha = no.children.find(c => c.name.startsWith('peca_'));
+    if (!velha) return prox();
+    gl.load('../pecas/' + LS.salas[id].peca + '.glb', g => {
+      try {
+        torre.updateMatrixWorld(true);
+        const bv = new THREE.Box3().setFromObject(velha), a = no.worldToLocal(bv.min.clone()), b = no.worldToLocal(bv.max.clone()), tv = new THREE.Vector3().subVectors(b, a);
+        const nova = g.scene, bn = new THREE.Box3().setFromObject(nova), tn = bn.getSize(new THREE.Vector3()), cn = bn.getCenter(new THREE.Vector3());
+        const e = Math.max(tv.x, tv.y, tv.z) / (Math.max(tn.x, tn.y, tn.z) || 1), caixa = new THREE.Group();
+        nova.position.set(-cn.x, -bn.min.y, -cn.z); caixa.add(nova); caixa.scale.setScalar(e); caixa.position.set((a.x + b.x) / 2, Math.min(a.y, b.y), (a.z + b.z) / 2); caixa.name = 'peca_' + LS.salas[id].peca;
+        nova.traverse(o => { if (o.isLight) o.visible = false; });
+        no.add(caixa); no.remove(velha);
+      } catch (err) { console.warn('peça do Loop', id, err); }
+      prox();
+    }, undefined, () => prox());
+  };
+  prox();
+}
 function salasDoAndar(k) { return andar[k].children.filter(n => n.name.startsWith('sala_')); }
 function fachadas(k) { return andar[k].children.filter(n => n.name.startsWith('fachada_')); }
-function aplicaFachada() { for (let k = 0; k < 5; k++) fachadas(k).forEach(n => n.visible = fachadaOn && k !== aberto && dentro === null); }
+function aplicaFachada() { for (let k = 0; k < andar.length; k++) fachadas(k).forEach(n => n.visible = fachadaOn && k !== aberto && dentro === null); }
 
 function montaAndares() {
   const box = $('andares'); box.innerHTML = '';
-  for (let k = 4; k >= 0; k--) { const b = document.createElement('button'); b.type = 'button'; b.textContent = NOMES_ANDAR[k]; b.dataset.k = k; b.onclick = () => abre(aberto === k ? -1 : k); box.appendChild(b); }
+  for (let k = andar.length - 1; k >= 0; k--) { const b = document.createElement('button'); b.type = 'button'; b.textContent = NOMES_ANDAR[k]; b.dataset.k = k; b.onclick = () => abre(aberto === k ? -1 : k); box.appendChild(b); }
 }
 function abre(k) {
   if (dentro) sai(true);
-  aberto = k; for (let i = 0; i < 5; i++) alvoZ[i] = i === k ? SLIDE : 0;
+  aberto = k; for (let i = 0; i < andar.length; i++) alvoZ[i] = i === k ? SLIDE : 0;
   document.querySelectorAll('#andares button').forEach(b => b.classList.toggle('on', +b.dataset.k === k));
   const cx = $('salas'); cx.innerHTML = '';
   if (k >= 0) {
@@ -108,12 +156,12 @@ function entra(no, k) {
   dentro = no; const s = nomeSala(no);
   const centro = new THREE.Box3().setFromObject(no).getCenter(new THREE.Vector3());
   voaPara(new THREE.Vector3(centro.x + .11, centro.y + .17, centro.z + .3), new THREE.Vector3(centro.x, centro.y - .01, centro.z), 900);
-  for (let i = 0; i < 5; i++) andar[i].visible = i === k; aplicaFachada();
+  for (let i = 0; i < andar.length; i++) andar[i].visible = i === k; aplicaFachada();
   $('cAndar').textContent = NOMES_ANDAR[k]; $('cNome').textContent = s.nome; $('cTexto').textContent = s.texto || s.sub;
   $('cartao').style.display = 'block'; $('salas').style.display = 'none'; $('andares').style.display = 'none'; $('ajuda').style.opacity = 0;
 }
 function sai(rapido) {
-  dentro = null; for (let i = 0; i < 5; i++) andar[i].visible = true;
+  dentro = null; for (let i = 0; i < andar.length; i++) andar[i].visible = true;
   $('cartao').style.display = 'none'; $('salas').style.display = ''; $('andares').style.display = ''; aplicaFachada();
   if (!rapido && aberto >= 0) abre(aberto);
 }
@@ -142,7 +190,7 @@ $('c').addEventListener('pointerup', e => {
 function tam() { R.setSize(innerWidth, innerHeight, false); cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix(); }
 addEventListener('resize', tam); tam();
 R.setAnimationLoop(t => {
-  for (let k = 0; k < 5; k++) if (andar[k]) { atualZ[k] += (alvoZ[k] - atualZ[k]) * .12; andar[k].position.z = pos0[k] + atualZ[k]; }
+  for (let k = 0; k < andar.length; k++) if (andar[k]) { atualZ[k] += (alvoZ[k] - atualZ[k]) * .12; andar[k].position.z = pos0[k] + atualZ[k]; }
   if (voo) { const u = Math.min(1, (performance.now() - voo.t0) / voo.ms), e = ease(u); cam.position.lerpVectors(voo.p0, voo.p1, e); OC.target.lerpVectors(voo.a0, voo.a1, e); if (u >= 1) voo = null; }
   OC.update(); R.render(S, cam);
 });
