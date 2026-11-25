@@ -30,3 +30,8 @@ Simulação: rodada 1 (10 grupos, 0 conserto) → versão 2 → rodada 2 (12 gru
 
 ## Vocabulário simples (24/11, 23h30)
 Trocadas nos textos do jogo: peça-guia → peça de referência; catraca → roleta de entrada; pedestal → base da peça; berço → apoio; tombo → número da peça; manopla → alavanca; calibrar/calibragem → ajustar/ajuste. Mantidos (palavras comuns): registro, disjuntor, fusível, patrocinador. IDs internos (A_calibrar, C_ancora) não mudam.
+
+## União concluída (24/11, 23h50)
+- Um jogo só: o Loop é a base. Minigames da Reserva entram como bancada em 5 pistas e em 2 atividades em dupla (Original e Cópia, Entrou mas não saiu). Cooperação Pátio/Corredor já existia no Loop (Apagão Combinado).
+- Desfecho mostra quais das 3 provas a equipe reuniu. A Reserva fica na entrada como "Episódio visual", sem competir com o Loop.
+- Pendente: cadeado/painel como minigame; rodada 14 de simulação.

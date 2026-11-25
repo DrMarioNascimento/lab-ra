@@ -225,10 +225,12 @@ function lcFinal(){
 const lcFinalTxt = n => { const f = LC.finais.find(x => x.nome.toLowerCase() === n.toLowerCase() || x.nome === n.replace('í', 'i')) || {}; return (f.texto_por_causa && f.texto_por_causa[lcCausa()]) || f.texto || ''; };
 function lcResumoFinal() {
  const s = lcS(), final = lcFinal();
+ const provasTxt = ['prova_falsa','trajeto','cracha'].map(g => (lcTemGrupo(g) ? '✅ ' : '⬜ ') + LC.grupos_fonte[g].rotulo).join(' · ');
  const passos = [
   s.diag ? 'Diagnóstico anexado ao dossiê.' : 'Diagnóstico ainda em aberto.',
   s.conserto === 5 ? 'Máquina consertada na última volta.'
    : Object.keys(s.meio).length ? 'Parte do conserto ficou registrada.' : 'A máquina continua ativa.',
+  provasTxt,
   s.revelado?.ok ? 'A troca da peça foi revelada com as três provas.'
    : s.revelado ? 'O nome apresentado não fechou com as provas.' : 'A troca da peça ainda precisa ser revelada.'
  ];
@@ -385,6 +387,7 @@ const lcMM = t => Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0');
 function lcMsg(t){ const m = document.getElementById('lcMsg'); if (m) m.textContent = t; toast(t.length > 120 ? t.slice(0, 117) + '…' : t); }
 function lcAgir(cmd){
  const [tipo, aid, papel0] = cmd.split(':'), A = LC_AT[aid], s = lcS(), dlg = document.getElementById('lcDialog');
+ if (tipo === 'dupla' && LC_MGA[aid] && !(state.resolvidos && state.resolvidos['at:' + aid + ':' + state.loop])) return lcBancadaAtiv(aid, cmd);
  const lerVals = () => [...dlg.querySelectorAll('[data-lcval]')].map(i => i.value);
  if (tipo === 'deixar') {
   const mao = s.mao && s.mao.volta === state.loop ? s.mao : null, sala = A.acao_de_chao.sala_destino;
@@ -539,4 +542,25 @@ function lcBancada(q){
   });
  }).catch(() => { (state.resolvidos ||= {})[q.id] = true; save(); collect(q.id); });
  return true;
+}
+
+// minigame antes de atividades em dupla de investigação (comparar provas)
+const LC_MGA = {
+ coop_original_copia:{ativ:'comparar', resp:1, nome:'Comparar a peça da Galeria e a foto', texto:'Vocês viram a peça e a foto antiga. O que mostra que a peça da Galeria é uma cópia?', opcoes:['A cor da parede','A fissura nova que cruza o selo','A sombra de quem tirou a foto']},
+ coop_entrou_nao_saiu:{ativ:'livro', resp:0, nome:'Cruzar a fita e a roleta de entrada', texto:'A roleta registrou uma entrada e nenhuma saída. Qual registro deve ser cruzado com a fita da câmera?', opcoes:['Crachá 031 e a caixa 314','Crachá 013 e a caixa 341','Crachá 310 e a caixa 143']}
+};
+function lcBancadaAtiv(aid, cmd){
+ const mg = LC_MGA[aid];
+ Promise.all([import('./reserva/banco.mjs'), import('./reserva/minigames.mjs')]).then(([B, M]) => {
+  if (!document.getElementById('bancadaCss')) { const l = document.createElement('link'); l.id = 'bancadaCss'; l.rel = 'stylesheet'; l.href = 'bancada.css?v=1'; document.head.appendChild(l); }
+  let d = document.getElementById('lcBancada');
+  if (!d) { d = document.createElement('dialog'); d.id = 'lcBancada'; d.className = 'lc-banc'; document.body.appendChild(d); }
+  const A = Object.assign({}, B.atividades[mg.ativ], {nome:mg.nome, texto:mg.texto, opcoes:mg.opcoes});
+  M.abrirMinigame(d, A, lcCausa().slice(0,1), async v => {
+   if (String(v) !== String(mg.resp)) return 'Ainda não encaixou. Releiam as pistas do caderno e conversem.';
+   (state.resolvidos ||= {})['at:' + aid + ':' + state.loop] = true; save();
+   setTimeout(() => lcAgir(cmd), 0);
+   return '';
+  });
+ }).catch(() => { (state.resolvidos ||= {})['at:' + aid + ':' + state.loop] = true; lcAgir(cmd); });
 }
