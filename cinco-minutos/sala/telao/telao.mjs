@@ -83,6 +83,7 @@ function desenhar() {
     const reflexoes = enviados.filter(p => EIXOS.some(([k]) => p.resp[k]));
     meio = coletivo ? `<div class="tl-card"><p class="tl-volta">DESFECHO DA TURMA</p><h1 class="tl-titulo">${esc(coletivo.final)}</h1>
       <p class="tl-texto">${esc(LOOP_FINAIS[coletivo.final])}</p><p class="tl-texto">${coletivo.registrados} de ${g.length} registraram o desfecho.</p></div>`
+      + `<div class="tl-card">${loopFitaHtml(enviados.map(p => p.resp.loopFatos), g.length)}</div>`
       : `<div class="tl-card"><p class="tl-volta">CONCLUSÃO</p><h1 class="tl-titulo">${esc(enviados.length ? c?.subject : 'Investigação encerrada')}</h1>
         <p class="tl-texto">${esc(enviados.length ? c?.detail : 'A turma encerrou a investigação.')}</p></div>`;
     if (reflexoes.length) meio += `<div class="tl-card"><p class="tl-volta">REFLEXÃO DA TURMA</p><div class="tl-barras">${EIXOS.map(([k, rotulo]) => {

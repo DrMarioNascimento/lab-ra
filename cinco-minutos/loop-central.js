@@ -564,3 +564,7 @@ function lcBancadaAtiv(aid, cmd){
   });
  }).catch(() => { (state.resolvidos ||= {})['at:' + aid + ':' + state.loop] = true; lcAgir(cmd); });
 }
+
+// fatos da noite que este caderno comprova (o telão monta a fita do tempo com o que a turma toda achou)
+const LC_FATO_PISTA = {copia:['falsa_1','falsa_2','falsa_3'], troca:['data_1','data_2','data_3','teo_d3'], entrada:['lenz_op_1','cracha_4'], raio:['raio_1','raio_2'], camera:['braga_1x'], teo:['teo_cadeira','teo_1'], passagem:['traj_1','traj_2','traj_4'], cracha:['cracha_1','cracha_2','cracha_3'], botao:['traj_3']};
+window.lcFatos = () => Object.keys(LC_FATO_PISTA).filter(k => LC_FATO_PISTA[k].some(p => LC_PID[p] && lcTem(p)));

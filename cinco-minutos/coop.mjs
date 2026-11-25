@@ -236,7 +236,7 @@ async function move(phase, answers) {
   updateLobby();
   if (room.phase === 'choose' || room.phase === 'playing') decorate();
   try {
-    await service.advance(code, room, phase, phase === 'result' ? { ...answers, loopFinal: lcFinal() } : answers);
+    await service.advance(code, room, phase, phase === 'result' ? { ...answers, loopFinal: lcFinal(), loopFatos: window.lcFatos ? window.lcFatos() : [] } : answers);
   } catch (error) {
     toast(messageFor(error));
     if (room?.phase === 'playing' && phase === 'between') await service.syncClock().catch(() => {});

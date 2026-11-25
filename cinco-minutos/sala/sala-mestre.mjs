@@ -165,7 +165,7 @@ async function move(fase, respostas) {
   enviou = true; marcarEnvio();
   const loopFinal = lcFinal();
   const interv = lcS().conserto === 5 ? 'break' : state.intervention ? 'other' : 'none';
-  const ok = await T.atualizarEu({ resp: { ...respostas, interv, loopFinal }, respEm: Date.now() });
+  const ok = await T.atualizarEu({ resp: { ...respostas, interv, loopFinal, loopFatos: window.lcFatos ? window.lcFatos() : [] }, respEm: Date.now() });
   if (!ok) { enviou = false; marcarEnvio(); toast('Não consegui enviar. Tente de novo.'); }
 }
 
