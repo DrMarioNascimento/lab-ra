@@ -64,11 +64,24 @@ export function abrirMinigame(dialog, atividade, causa, aoResolver) {
 
   function cena(tipo, agir, passo) {
     const h=no('div',null,'cena');
-    h.append(no('span','Bancada · use os controles abaixo.'));
+    const modelo=no('div',null,'relevo relevo-'+tipo);
+    const imagem=no('div',null,'objeto');
+    imagem.setAttribute('aria-hidden','true');
+    if(tipo==='caixa') {
+      for(const parte of ['face','lateral','fundo','faixa','tampa','segredo']) imagem.append(no('span',null,parte));
+    } else if(tipo==='luz') {
+      for(const parte of ['obra','facho','marca']) imagem.append(no('span',null,parte));
+    } else {
+      for(const parte of ['mostrador-a','mostrador-b','mostrador-c','base']) imagem.append(no('span',null,parte));
+    }
+    modelo.append(imagem);
+    h.append(modelo);
     corpo.append(h);
+    function atualizar() { modelo.dataset.passo=String(passo()); h.dispatchEvent(new Event('cena')); }
+    atualizar();
     import('./cena.mjs').then(m=>m.montarCena(h,tipo,agir,passo)).then(f=>{if(ativa)dispose=f;else f();})
-      .catch(()=>{h.textContent='Bancada disponível pelos controles abaixo.';});
-    return () => h.dispatchEvent(new Event('cena'));
+      .catch(()=>{ if(ativa && !modelo.isConnected)h.replaceChildren(modelo); });
+    return atualizar;
   }
 
   if (atividade.tipo === 'caixa') {

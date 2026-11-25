@@ -1,7 +1,7 @@
 import { atividades, causas, ficcao, ordemCausas, pistas, provas, salas, voltas } from './banco.mjs';
 import { aplicar, conviteCandidatos, criarPartida, disponivel, finalEquipe, tempo } from './motor.mjs';
 import { comandar, ligarPartida, transporteFalso, transporteReal, transporteTelao } from './conexao.mjs';
-import { abrirMinigame } from './minigames.mjs';
+import { abrirMinigame } from './minigames.mjs?v=2';
 
 const app = document.querySelector('#app'), d = document.querySelector('#bancada');
 const qs = new URLSearchParams(location.search);
