@@ -7,7 +7,7 @@ const LC_PID = Object.fromEntries(LC.pistas.map(p => [p.id, p]));
 const LC_AT = Object.fromEntries(LC.atividades_coop.map(a => [a.id, a]));
 const LC_NOME = {A_calibrar:'Painel desregulado', B_potencia:'Falta de potência', C_ancora:'Peça de referência presa', D_fusivel:'Algo desligado de propósito', E_dois:'Dois defeitos juntos'};
 const LC_CAUSAS = ['A_calibrar','B_potencia','C_ancora','D_fusivel','E_dois'];
-const LC_JANELA = [66, 74];
+const LC_JANELA = [64, 80];
 const lcCausa = () => LC.causas_jogaveis[Math.floor(hashTxt('lc' + state.caseIndex + ':' + semente()) * LC.causas_jogaveis.length)];
 function lcS(){
  if (!state.lc || state.lc.ci !== state.caseIndex) state.lc = {ci:state.caseIndex, anexos:{}, diag:null, conserto:null, ensaio:[], meio:{}, revelado:null, chao:{}, eco:null, mao:null, chaoUsado:false, recebeu:{}, debitos:{}, feitas:{}};
@@ -65,10 +65,10 @@ window.lcGlos = lcGlos;
 function lcPreConf(){
  const el = document.getElementById('lcPre'); if (!el) return;
  const marc = Array.from(document.querySelectorAll('input[name=lcprova]:checked')).map(i => (state.clues || []).find(c => c.id === 'lc-' + i.value)).filter(Boolean);
- let sin = [], sis = 0, out = 0; for (const c of marc) { const e = (c.etq || '').toUpperCase(); if (e.startsWith('SINAL')) sin.push(e); else if (e.startsWith('SISTEMA')) sis++; else out++; }
+ let sin = [], sis = 0, out = 0; for (const c of marc) { const e = (c.etq || '').toUpperCase(); if (e.startsWith('SINAL')) sin.push(e); else if (e.startsWith('FUNCIONANDO')) sis++; else out++; }
  const tipos = new Set(sin).size, ok = marc.length === 3 && sin.length === 2 && tipos === 2 && sis === 1;
- let m = 'Marcadas: ' + marc.length + ' de 3 · 🚨 sinais: ' + sin.length + ' (' + tipos + ' tipo' + (tipos === 1 ? '' : 's') + ') · ✅ sistema inteiro: ' + sis + (out ? ' · outras: ' + out : '') + '.';
- if (marc.length === 3 && !ok) { if (out) m += ' Pista sem etiqueta de sinal ou de sistema inteiro não conta.'; if (sin.length === 2 && tipos < 2) m += ' Os dois sinais têm a mesma etiqueta: valem um só.'; else if (sin.length !== 2) m += ' Precisa de 2 sinais.'; if (sis !== 1) m += ' Precisa de 1 de sistema inteiro.'; }
+ let m = 'Marcadas: ' + marc.length + ' de 3 · 🚨 sinais: ' + sin.length + ' (' + tipos + ' tipo' + (tipos === 1 ? '' : 's') + ') · ✅ funcionando bem: ' + sis + (out ? ' · outras: ' + out : '') + '.';
+ if (marc.length === 3 && !ok) { if (out) m += ' Pista sem etiqueta de sinal ou de funcionando bem não conta.'; if (sin.length === 2 && tipos < 2) m += ' Os dois sinais têm a mesma etiqueta: valem um só.'; else if (sin.length !== 2) m += ' Precisa de 2 sinais.'; if (sis !== 1) m += ' Precisa de 1 de funcionando bem.'; }
  if (ok) m += ' Forma certa. (O jogo ainda confere se aponta o defeito.)';
  el.textContent = m;
 }
@@ -154,7 +154,7 @@ function lcValidaAnexo(causa, ids){
   else if (ap && g) { sinais[g] = i; linhas.push(rot + ': CONTOU como sinal.'); }
   else if (de.length) { desc.push(i); linhas.push(rot + ': CONTOU como descarte (outro sistema está inteiro).'); }
   else if ((g || '').startsWith('sint_')) linhas.push(rot + ': é sinal da máquina, mas não combina com o defeito escolhido. NÃO CONTOU.');
-  else if ((g || '').startsWith('desc_')) linhas.push(rot + ': mostra um sistema inteiro, mas não serve de descarte para esse defeito. NÃO CONTOU.');
+  else if ((g || '').startsWith('desc_')) linhas.push(rot + ': mostra algo funcionando bem, mas não serve de descarte para esse defeito. NÃO CONTOU.');
   else linhas.push(rot + ': não é sinal da máquina nem descarte (história, manual ou ferramenta). NÃO CONTOU.');
  }
  if (completo) return {ok:true, msg:'', linhas};
@@ -201,7 +201,7 @@ function lcProduzir(A, tipo){
 }
 const LC_ENSAIO = {
  A_calibrar:'O que ainda pode falhar: os 3 valores (dia, hora, registro) precisam estar certos no seu caderno na hora de valer.',
- B_potencia:'O que ainda pode falhar: a força só entra na janela do raio (1:06 a 1:14 da volta). Chegue à alavanca antes e combine com a dupla.',
+ B_potencia:'O que ainda pode falhar: a força só entra na janela do raio (1:04 a 1:20 da volta). Chegue à alavanca antes e combine com a dupla.',
  C_ancora:'O que ainda pode falhar: a peça verdadeira precisa estar no apoio, e ela só chega se for encaminhada numa volta anterior.',
  D_fusivel:'O que ainda pode falhar: a ordem dos conectores. Na volta 5 não dá para trocar a ordem depois de confirmar.',
  E_dois:'O que ainda pode falhar: um dos defeitos reagiu e o outro não. Os dois consertos precisam acontecer, em voltas diferentes.'
@@ -592,9 +592,9 @@ window.lcFatos = () => Object.keys(LC_FATO_PISTA).filter(k => LC_FATO_PISTA[k].s
 // Missão secreta: cada pessoa recebe um objetivo particular. Cumprir rende +1 de energia na volta seguinte.
 const LC_MISSOES = [
  {t:'Descubra se o Braga mente sobre onde estava. Procure o que prova o álibi dele.', ok:() => lcTemGrupo('alibi_braga') || lcTem('cracha_2')},
- {t:'Descubra o que houve com o Téo no meio da volta. Procure a cadeira, o diário ou a voz dele.', ok:() => lcTem('teo_cadeira') || lcTem('teo_d3') || lcTem('teo_radio')},
+ {t:'Descubra o que houve com o Téo no meio da volta. Procure a cadeira, o diário ou a voz dele.', ok:() => (state.clues || []).some(c => /teo_/.test(c.id))},
  {t:'Descubra por que o Lenz precisa do seguro. Procure cartas e gravações.', ok:() => lcTemGrupo('motivo_lenz')},
- {t:'Descubra a hora exata em que o raio cai no Pátio.', ok:() => lcTem('raio_1') || lcTem('hora_1')}
+ {t:'Descubra a hora exata em que o raio cai no Pátio.', ok:() => ['raio_1','hora_1','raio_contagem','hora_5'].some(lcTem)}
 ];
 function lcMissao(){ const s = lcS(); if (s.missao == null) s.missao = Math.floor(Math.random() * LC_MISSOES.length); return LC_MISSOES[s.missao % LC_MISSOES.length]; }
 function lcMissaoChecar(){
