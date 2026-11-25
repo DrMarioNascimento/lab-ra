@@ -121,6 +121,7 @@ function pistasCentral(base){
 function lcVisivel(q){ const p = LC_PID[q.lcp]; return !p || (lcPodeVer(p) && lcChaoOk(p)); }
 function lcBloqueio(q){
  const p = LC_PID[q.lcp]; if (!p) return '';
+ if (p.excl && lcTem(p.excl)) return 'Você já viu a outra metade desta pista. Peça à outra pessoa que veja esta e descreva em voz alta.';
  const pd = p.precisaDe || {}, falta = (pd.todas || []).find(i => !lcTem(i));
  if (falta && p.porque) return p.porque + ' (em ' + lcNomeSala(LC_PID[falta].sala) + ')';
  if (falta) return 'Falta achar algo antes, em ' + lcNomeSala(LC_PID[falta].sala) + '.';
@@ -130,6 +131,7 @@ function lcBloqueio(q){
 }
 function lcTextoClue(q){ const p = LC_PID[q.lcp]; return p ? lcTexto(p) : q.text; }
 function lcAposColetar(q){
+ lcMissaoChecar();
  const p = LC_PID[q.lcp]; if (!p) return;
  if (p.tipo === 'objeto' && p.objeto) lcS().mao = {obj:p.objeto, volta:state.loop};
  if (p.armadilha) lcArmadilha(p);
@@ -294,6 +296,7 @@ function lcPainelHtml(aba){
  h += '<p class="lc-status">Volta ' + state.loop + ' de 5 · ' + (s.diag ? '✅ Diagnóstico anexado' : '🔍 Diagnóstico aberto') + ' · ' + (s.conserto === 5 ? '✅ Máquina consertada' : s.ensaio.length ? '🧪 Ensaio feito' : '⚙️ Máquina travada') + ' · ' + lcCargas() + ' de energia</p>';
  const meus = (state.clues || []).filter(c => c.id.startsWith('lc-'));
  if (aba === 'dossie') {
+  h += lcMissaoHtml();
   h += '<h4>Por que a máquina travou?</h4>' + lcGlos('<p class="lc-dica">Escolha o defeito e <b>3 pistas</b> do seu caderno: <b>2 sinais de tipos diferentes</b> que apontem esse defeito + <b>1 prova de que outro sistema está inteiro</b>. Cada pista mostra uma etiqueta: <b>duas pistas com a mesma etiqueta são do mesmo tipo e valem um sinal só</b>. Uma tentativa por volta, a partir da volta 2. Coisa estranha com explicação inocente não conta, e manual ou ferramenta também não: só sinais da máquina. Cada pessoa tem o próprio caderno: para outra pessoa usar uma pista, passe na pausa.</p><div class="lc-leg"><span>🚨 <b>Sinal</b>: mostra o que está errado</span><span>✅ <b>Descarte</b>: mostra o que está funcionando</span><span>🏷️ <b>Etiqueta</b>: o tipo da pista</span></div><details class="lc-dic"><summary>Dicionário das palavras</summary>' + LC_GLOS_LISTA.map(([n, t]) => '<p><b>' + n + '</b>: ' + esc(t) + '</p>').join('') + '</details>') + '';
   if (s.diag) h += '<p class="lc-ok">O dossiê já aceitou o diagnóstico. Vá para Atividades.</p>';
   else {
@@ -585,3 +588,24 @@ function lcBancadaAtiv(aid, cmd){
 // fatos da noite que este caderno comprova (o telão monta a fita do tempo com o que a turma toda achou)
 const LC_FATO_PISTA = {copia:['falsa_1','falsa_2','falsa_3'], troca:['data_1','data_2','data_3','teo_d3'], entrada:['lenz_op_1','cracha_4'], raio:['raio_1','raio_2'], camera:['braga_1x'], teo:['teo_cadeira','teo_1'], passagem:['traj_1','traj_2','traj_4'], cracha:['cracha_1','cracha_2','cracha_3'], botao:['traj_3']};
 window.lcFatos = () => Object.keys(LC_FATO_PISTA).filter(k => LC_FATO_PISTA[k].some(p => LC_PID[p] && lcTem(p)));
+
+// Missão secreta: cada pessoa recebe um objetivo particular. Cumprir rende +1 de energia na volta seguinte.
+const LC_MISSOES = [
+ {t:'Descubra se o Braga mente sobre onde estava. Procure o que prova o álibi dele.', ok:() => lcTemGrupo('alibi_braga') || lcTem('cracha_2')},
+ {t:'Descubra o que houve com o Téo no meio da volta. Procure a cadeira, o diário ou a voz dele.', ok:() => lcTem('teo_cadeira') || lcTem('teo_d3') || lcTem('teo_radio')},
+ {t:'Descubra por que o Lenz precisa do seguro. Procure cartas e gravações.', ok:() => lcTemGrupo('motivo_lenz')},
+ {t:'Descubra a hora exata em que o raio cai no Pátio.', ok:() => lcTem('raio_1') || lcTem('hora_1')}
+];
+function lcMissao(){ const s = lcS(); if (s.missao == null) s.missao = Math.floor(Math.random() * LC_MISSOES.length); return LC_MISSOES[s.missao % LC_MISSOES.length]; }
+function lcMissaoChecar(){
+ const s = lcS(), m = lcMissao();
+ if (s.missaoOk || !m.ok()) return;
+ s.missaoOk = state.loop;
+ if (state.loop < 5) { s.debitos[state.loop + 1] = (s.debitos[state.loop + 1] || 0) - 1; toast('Missão secreta cumprida! +1 de energia na próxima volta.'); }
+ else toast('Missão secreta cumprida!');
+ save();
+}
+function lcMissaoHtml(){
+ const s = lcS(), m = lcMissao(); lcMissaoChecar();
+ return '<section class="lc-missao"><h4>🕵️ Sua missão secreta</h4><p>' + esc(m.t) + '</p><small>Só você sabe. Na pausa, conte (ou blefe) para a turma.' + (s.missaoOk ? '</small><p class="lc-ok">✅ Cumprida na volta ' + s.missaoOk + '.' : ' Cumprir rende +1 de energia na volta seguinte.') + '</small></section>';
+}

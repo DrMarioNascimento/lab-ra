@@ -35,3 +35,8 @@ Trocadas nos textos do jogo: peça-guia → peça de referência; catraca → ro
 - Um jogo só: o Loop é a base. Minigames da Reserva entram como bancada em 5 pistas e em 2 atividades em dupla (Original e Cópia, Entrou mas não saiu). Cooperação Pátio/Corredor já existia no Loop (Apagão Combinado).
 - Desfecho mostra quais das 3 provas a equipe reuniu. A Reserva fica na entrada como "Episódio visual", sem competir com o Loop.
 - Pendente: cadeado/painel como minigame; rodada 14 de simulação.
+
+## Missão secreta e pista de metades (24/11)
+- **Missão secreta**: cada pessoa recebe um objetivo particular (card no dossiê). Cumprir rende +1 de energia na volta seguinte.
+- **Pista de metades** (`assim_foto` no Pátio, `assim_leg` no Corredor): cada sala vê uma metade; quem já viu uma não vê a outra, então as duas pessoas precisam descrever em voz alta. Solo continua completável pelas outras pistas do grupo trajeto.
+- validar.py: APROVADO nas 5 causas (206 pistas).
