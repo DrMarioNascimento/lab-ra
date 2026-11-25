@@ -14,17 +14,20 @@ function caixoteTripla(){
 const tipoCaixote = () => CAIXOTE_TIPOS[state.caseIndex % 4];
 // ---- energia e ferramentas
 function kitDaPartida(){ return Array.isArray(state.kit) ? state.kit : []; }
-function cargasMax(){ return CARGAS_BASE + kitDaPartida().reduce((n, f) => n + (FERRAMENTAS[f]?.extra || 0), 0); }
+const noLoop = () => !!state && state.caseRules === 2;
+// No Loop a energia é 5 por volta para todo mundo, com ou sem dupla (sem ferramentas); a missão secreta cumprida dá +1 na volta seguinte.
+function cargasMax(){ return noLoop() ? CARGAS_BASE : CARGAS_BASE + kitDaPartida().reduce((n, f) => n + (FERRAMENTAS[f]?.extra || 0), 0); }
 function cargasRestantes(){
  if (state.cargasVolta !== state.loop) { state.cargasVolta = state.loop; state.cargas = Math.max(0, cargasMax() - ((state.lc && state.lc.debitos && state.lc.debitos[state.loop]) || 0)); }
  return state.cargas;
 }
-function custoPista(q){ if (q.custo0) return 0; return kitDaPartida().some(f => FERRAMENTAS[f]?.livre && FERRAMENTAS[f].livre === q.tipo) ? 0 : 1; }
-function sufixoCusto(q){ return custoPista(q) ? ' · 1 de energia' : ' · sem custo'; }
+function custoPista(q){ if (q.custo0) return 0; if (q.lcp) return q.custo || 1;   // pistas da Máquina: vale o custo escrito nos dados; ferramenta não zera
+ return kitDaPartida().some(f => FERRAMENTAS[f]?.livre && FERRAMENTAS[f].livre === q.tipo) ? 0 : 1; }
+function sufixoCusto(q){ const c = custoPista(q); return c ? ' · ' + c + ' de energia' : ' · sem custo'; }
 function cobrarPista(q){
  const custo = custoPista(q);
- if (custo && cargasRestantes() <= 0) { toast('Sem energia na lanterna. Nesta volta, só dá para examinar o que as suas ferramentas facilitam.'); return false; }
- if (custo) { state.cargas = cargasRestantes() - 1; }
+ if (custo && cargasRestantes() < custo) { toast(q.lcp ? (cargasRestantes() <= 0 ? 'Acabou a sua energia nesta volta. Ainda dá para olhar o que é grátis.' : 'Falta energia: esta pista gasta ' + custo + '.') : 'Sem energia na lanterna. Nesta volta, só dá para examinar o que as suas ferramentas facilitam.'); return false; }
+ if (custo) { state.cargas = cargasRestantes() - custo; }
  return true;
 }
 // ---- pistas da noite (rotina por horário, combinações da volta e dicas do caixote), junto das pistas de cada sala
@@ -342,6 +345,12 @@ function mergeNoite(base){
 function renderPrep(){
  if (state.prep || state.loop !== 1 || state.phase !== 'choose' || window.coop?.skipPrep) return false;
  const sel = kitDaPartida(), n = nt();
+ if (noLoop()) {   // no Loop: a premissa é a da história; não há ferramentas (energia igual para todo mundo)
+  $('roomGrid').innerHTML = '<div class="prep"><p class="kicker">PREPARAÇÃO</p><h3>Por que a máquina travou? Quem trocou a peça?</h3><p>O museu repete os mesmos 5 minutos. Descubra por que a máquina travou e quem trocou a peça principal.</p>'+
+   '<p>Você tem '+CARGAS_BASE+' de energia por volta. Cada pista examinada gasta 1.</p>'+
+   '<button type="button" class="btn primary" data-nt="prep">Começar a noite</button></div>';
+  return true;
+ }
  $('roomGrid').innerHTML = '<div class="prep"><p class="kicker">PREPARAÇÃO</p><h3>'+esc(n.p)+'</h3><p>'+esc(n.intro)+'</p>'+
   '<p><strong>Escolha 2 ferramentas.</strong> Elas valem a noite toda. A lanterna tem '+CARGAS_BASE+' de energia por volta, e cada pista examinada gasta 1.</p>'+
   '<div class="ferramentas">'+Object.entries(FERRAMENTAS).map(([k, f]) => '<button type="button" class="ferramenta" data-nt="kit:'+k+'" aria-pressed="'+sel.includes(k)+'"><span aria-hidden="true">'+f.icone+'</span><strong>'+f.nome+'</strong><small>'+f.texto+'</small></button>').join('')+'</div>'+
@@ -354,7 +363,7 @@ function renderNoitePanel(){
  let box = panel.querySelector('#noitePanel');
  if (!box) { box = document.createElement('div'); box.id = 'noitePanel'; const h = panel.querySelector('h3'); h ? h.after(box) : panel.prepend(box); }
  const cs = cargasRestantes(), mx = cargasMax();
- let html = '<p class="energia" aria-label="Energia da lanterna: '+cs+' de '+mx+'"><span aria-hidden="true">🔦</span> Energia '+'●'.repeat(cs)+'○'.repeat(Math.max(0, mx - cs))+'<small> '+(kitDaPartida().map(f => FERRAMENTAS[f]?.icone).join(' '))+'</small></p>';
+ let html = '<p class="energia" aria-label="'+(noLoop() ? 'Energia' : 'Energia da lanterna')+': '+cs+' de '+mx+'"><span aria-hidden="true">'+(noLoop() ? '⚡' : '🔦')+'</span> Energia '+'●'.repeat(cs)+'○'.repeat(Math.max(0, mx - cs))+'<small> '+(kitDaPartida().map(f => FERRAMENTAS[f]?.icone).join(' '))+'</small></p>';
  if (state.room === caixoteSala() && state.caseRules !== 2) {
   const cx = state.cx || (state.cx = {sel:[0,0,0], erros:{}, aberto:false}), tp = tipoCaixote();
   html += '<div class="caixote"><strong>📦 Caixote trancado</strong><p>'+esc(tp.frase)+'</p>';
@@ -436,7 +445,7 @@ document.addEventListener('click', e => {
  const b = e.target.closest('[data-nt]'); if (!b || !state) return;
  const [acao, arg] = b.dataset.nt.split(':');
  if (acao === 'kit') { const k = kitDaPartida().slice(); const i = k.indexOf(arg); if (i >= 0) k.splice(i, 1); else if (k.length < 2) k.push(arg); state.kit = k; save(); renderPrep(); }
- else if (acao === 'prep') { if (kitDaPartida().length === 2) { state.prep = true; state.cargasVolta = 0; save(); renderGame(); } }
+ else if (acao === 'prep') { if (noLoop() || kitDaPartida().length === 2) { state.prep = true; state.cargasVolta = 0; save(); renderGame(); } }
  else if (acao === 'combo') { state.combos ||= {}; const L = state.loop + 1, l = (state.combos[L] || []).slice(); const i = l.indexOf(arg); if (i >= 0) l.splice(i, 1); else if (l.length < 2) l.push(arg); state.combos[L] = l; save(); renderCombos(); }
  else if (acao === 'disco') { state.cx ||= {sel:[0,0,0], erros:{}, aberto:false}; const i = Number(arg); state.cx.sel[i] = (state.cx.sel[i] + 1) % SIMBOLOS.length; save(); renderNoitePanel(); }
  else if (acao === 'abrir') { state.cx ||= {sel:[0,0,0], erros:{}, aberto:false}; tentarCaixote(); save(); renderNoitePanel(); renderJournal(); }

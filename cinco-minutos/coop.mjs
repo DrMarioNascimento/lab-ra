@@ -188,7 +188,7 @@ function renderPhase() {
     $('answerFields').classList.toggle('hidden', !isHost());
     $('answerForm').querySelector('button[type=submit]').classList.toggle('hidden', !isHost());
     $('final').querySelector('.large').textContent = isHost()
-      ? 'Registre o desfecho do grupo. As perguntas são opcionais.'
+      ? 'Registre o desfecho do grupo.'
       : 'O anfitrião registra o desfecho depois da discussão do grupo.';
     show('final');
   } else {

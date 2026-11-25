@@ -13,9 +13,10 @@ function botao(texto, agir, cls = '') {
   return b;
 }
 
-let figura;
+let figura;   // {n, url}: a foto mostra o número de registro sorteado na partida
 function quadro() {
-  if (figura !== undefined) return figura;
+  const n = String(typeof window !== 'undefined' && window.lcTok ? window.lcTok('{reg}') : '472');   // fora do Loop (episódio da Reserva) fica o número de origem
+  if (figura && figura.n === n) return figura.url;
   const tela = document.createElement('canvas'); tela.width=480;tela.height=320;
   let ctx;
   try { ctx=tela.getContext('2d'); } catch { return ''; }
@@ -31,9 +32,9 @@ function quadro() {
   pol('#3d3222',[[118,250],[174,204],[215,225],[199,241]]);
   ctx.strokeStyle='#d7a95c';ctx.lineWidth=8;ctx.strokeRect(4,4,472,312);
   pol('#f1d19b',[[412,289],[443,249],[458,289]]);
-  ctx.fillStyle='#2e231a';ctx.font='bold 16px Georgia';ctx.fillText('472',421,286);
-  figura=tela.toDataURL('image/png');
-  return figura;
+  ctx.fillStyle='#2e231a';ctx.font='bold 16px Georgia';ctx.fillText(n,421,286);
+  figura={n, url:tela.toDataURL('image/png')};
+  return figura.url;
 }
 
 export function abrirMinigame(dialog, atividade, causa, aoResolver) {
@@ -156,7 +157,7 @@ export function abrirMinigame(dialog, atividade, causa, aoResolver) {
     const range=no('input');range.type='range';range.min=1;range.max=5;range.value=1;range.setAttribute('aria-label','Posição da luz');
     const L=atividade.luz||{};
     const registrar=botao(L.botao||'Registrar a fissura',()=>conferir(angulo),'primary');registrar.disabled=true;
-    range.oninput=()=>{angulo=Number(range.value);const claro=angulo===4;status.textContent=claro?(L.achou||'A luz revelou a fissura que cruza o selo.'):'Posição '+angulo+' de 5 · '+(L.falta||'a marca ainda está encoberta')+'.';registrar.disabled=!claro;desenhar();};
+    range.oninput=()=>{angulo=Number(range.value);const claro=angulo===(L.certo||4);status.textContent=claro?(L.achou||'A luz revelou a fissura que cruza o selo.'):'Posição '+angulo+' de 5 · '+(L.falta||'a marca ainda está encoberta')+'.';registrar.disabled=!claro;desenhar();};
     corpo.append(range,status,registrar);
   } else if (atividade.tipo==='maquina' && maquinaValores[causa]) {
     const seletores=[];

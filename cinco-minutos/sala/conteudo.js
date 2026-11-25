@@ -136,19 +136,34 @@ function sala(id){
  const alt = m.v ? PECAS_ALT[id]?.[m.v-1] : null;
  const r = {...base, name:m.nome, andar:m.andar, lugar:m.lugar, nomeBase:base.name, ...(alt ? alt : {})};
  const L = (typeof state !== 'undefined' && state && state.caseRules === 2) ? LOOP_SALAS[id] : null;   // no Loop: nome, peça e legenda da história
- if (L) { delete r.livro; delete r.capa; Object.assign(r, {name:L[0], sub:L[1], peca:L[2]}); }
+ if (L) { delete r.livro; delete r.capa; Object.assign(r, {name:L[0], sub:L[1], peca:L[2], andar:L[3], lugar:L[4]}); }
  return r;
 }
-// Salas da história do Loop: um nome só por sala (o mesmo das pistas e do roteiro) e a peça que pertence à cena.
+// Salas da história do Loop: um nome só por sala (o mesmo das pistas e do roteiro), a peça que pertence à cena e o andar FIXO (as pistas falam de escada, porta de vidro e de quem sobe para a Galeria).
+// [nome, legenda, peça, andar, ordem no andar]
 const LOOP_SALAS = {
- prototipo:['Subsolo · Câmara do tempo','A máquina do tempo','T01'], patio:['Pátio · Quadro externo','Quadro de energia e para-raios','E01'],
- eletrica:['Oficina elétrica','Gerador, fusíveis e luvas','E02'], relogios:['Sala dos relógios','Relógios que param na queda de luz','R02'],
- seguranca:['Central de monitoramento','Câmeras e crachás','S01'], recepcao:['Recepção','Livro de visitas e roleta','P01'],
- conservacao:['Sala de conservação','Registros e laudos do acervo','I01'], atelie:['Ateliê de descobertas','Bancada da Ivone e manual','L06'],
- deposito:['Sala das coleções','Caixas e movimentações','V12'], galeria:['Galeria especial','A peça principal','V11'],
- manutencao:['Oficina técnica','Ferramentas e fusíveis','M03'], corredor:['Corredor de serviço e descanso','Porta de serviço e recados','V41'],
- limpeza:['Base da limpeza','Armário da equipe e carrinho','L05'], sons:['Sala dos sons','Rádio da equipe','N07'], fotografia:['Sala da fotografia','Câmera antiga e catálogo','N05']
+ galeria:['Galeria especial','A peça principal','V11','2º andar',1],
+ conservacao:['Sala de conservação','Registros e laudos do acervo','I01','1º andar',1], sons:['Sala dos sons','Rádio da equipe','N07','1º andar',2],
+ fotografia:['Sala da fotografia','Câmera antiga e catálogo','N05','1º andar',3], relogios:['Sala dos relógios','Relógios que param na queda de luz','R02','1º andar',4],
+ recepcao:['Recepção','Livro de visitas e roleta','P01','Térreo',1], seguranca:['Central de monitoramento','Câmeras e crachás','S01','Térreo',2],
+ corredor:['Área de descanso','Porta de serviço e recados','V41','Térreo',3], limpeza:['Base da limpeza','Armário da equipe e carrinho','L05','Térreo',4],
+ atelie:['Ateliê de descobertas','Bancada da Ivone e manual','L06','Térreo',5], deposito:['Sala das coleções','Caixas e movimentações','V12','Térreo',6],
+ manutencao:['Oficina técnica','Ferramentas e fusíveis','M03','Térreo',7], eletrica:['Oficina elétrica','Gerador, fusíveis e luvas','E02','Térreo',8],
+ patio:['Pátio · Quadro externo','Quadro de energia e para-raios','E01','Térreo',9],
+ prototipo:['Subsolo · Câmara do tempo','A máquina do tempo','T01','Subsolo',1]
 };
+// Descrição de cada sala no Loop (uma linha, do mundo da história).
+const LOOP_DESC = {
+ prototipo:'A Câmara do tempo zumbe, tenta ligar e desiste.', patio:'Chove. O Quadro externo fica embaixo do para-raios.',
+ eletrica:'O gerador ronca baixo entre fios, fusíveis e luvas.', relogios:'Dezenas de relógios, cada um no seu passo.',
+ seguranca:'Monitores, um cofre pequeno e o café do Braga.', recepcao:'O livro de visitas, a roleta e um telefone que toca.',
+ conservacao:'Diário do acervo, laudos e registros em cima da mesa.', atelie:'A bancada da Ivone e o manual da Câmara.',
+ deposito:'Caixas empilhadas e uma mancha vermelha no chão.', galeria:'A peça principal na base. Aurélio não sai da frente dela.',
+ manutencao:'Ferramentas, um armário travado e a cadeira vazia do Téo.', corredor:'A cafeteira, o mural e a porta de serviço.',
+ limpeza:'O armário da equipe, o carrinho e Seu Dirceu de rodo na mão.', sons:'Um rádio, um gravador e a música de elevador.',
+ fotografia:'Uma câmera antiga que dispara quando quer.'
+};
+const descSala = id => (typeof state !== 'undefined' && state && state.caseRules === 2 && LOOP_DESC[id]) || roomDescriptions[id];
 // Troca, em qualquer texto de pista, o nome de origem das salas pelo nome da partida.
 function nomear(texto){
  if (typeof state !== 'undefined' && state && state.caseRules === 2) return texto;   // no Loop os nomes das salas são fixos

@@ -1,5 +1,5 @@
 # Loop v4 (25/11/2026) — decisões aplicadas nos dados e no código
-Fonte da verdade do enredo: docs/ROTEIRO-LOOP.md. Dados: cinco-minutos/dados/pistas-v4.json (229 pistas desde a revisão 2; ver a seção "Revisão 2" no fim, que vale sobre o que estiver acima) → loop-central-dados.js.
+Fonte da verdade do enredo: docs/ROTEIRO-LOOP.md. Dados: cinco-minutos/dados/pistas-v4.json (278 pistas desde a revisão 3; as seções "Revisão 2" e "Revisão 3", no fim, valem sobre o que estiver acima, e a 3 vale sobre a 2) → loop-central-dados.js.
 
 ## Mundo
 - Uma versão só para o Téo: confrontou o Lenz na Sala das coleções minutos antes de 0:00, foi empurrado, caiu ao lado do pote de tinta. Enquanto a Câmara gira ele "não piora nem melhora, fica guardado igual a uma peça numa vitrine" (pista sato_teo). Saíram as frases "encostou na Câmara / ficou preso entre as voltas".
@@ -69,7 +69,7 @@ Onde esta seção contradiz o que está acima, vale esta. Relatórios de origem:
 ### Quem sabe o quê
 - Dra. Sato: as respostas do interfone devolvem pergunta; não fala mais em verniz.
 - Téo: abre_1 e v4_teo sem prever o reinício; no trecho da noite C da gravação ele desconfia ("ainda não achei"), não sabe.
-- Lenz: lenz_1 só acontece quando quem joga fala; v5_lenz saiu da gaveta do museu (paletó reserva na chapelaria); lenz_mot_3 tem origem (rádio esquecido ligado na escada); traj_3: vira a chave de ligar, que já está virada (a máquina tem 1 botão só; a senha do cofre continua 311).
+- Lenz: lenz_1 só acontece quando quem joga fala; v5_lenz saiu da gaveta do museu (paletó reserva na chapelaria); lenz_mot_3 tem origem (rádio esquecido ligado na escada); traj_3: vira a chave de ligar, que já está virada (a máquina tem 1 botão só; a senha do cofre deixou de ser fixa na revisão 3).
 - Braga: uma versão só do crachá. O Lenz rondou o armário, pegou e deixou bilhete.
 - Ivone: ivone_red em cena e sem contradizer o bilhete da cafeteira; v5_ivone sem "hora anotada".
 - Diário: é um só, o diário do acervo (Sala de conservação). Duas folhas foram arrancadas: uma serve de marcador num álbum (Sala da fotografia), outra está no bolso do Téo (Sala das coleções). Assinatura sempre "— T.".
@@ -86,8 +86,67 @@ Onde esta seção contradiz o que está acima, vale esta. Relatórios de origem:
 ### Validador
 - `gruposExtras` aceito na conferência de grupos; para as provas do Revelar, fonte "sem trava" pode ter volta_min até 3.
 
-### Ficou para decidir (regra que pede código)
+### Ficou para decidir na revisão 2 (tudo fechado na revisão 3, abaixo)
 - Custo da escolha final (Revelar levando tempo de fala, "Loop Reset" pedindo alguém na tampa).
 - Energia de quem joga sem dupla: 5 ou 6 (hoje os dados dizem as duas coisas).
 - Noite E sem dupla: liberar o primeiro conserto na volta 2.
 - Ensaio respondendo "2 de 3" sem dizer qual valor está errado.
+
+## Revisão 3 (25/11/2026) — depois da conferência técnica da rodada 2
+
+Onde esta seção contradiz o que está acima, vale esta. Origem: relatório da conferência técnica (seção 4 das escalas), 10 itens, 43 correções numeradas. As 43 foram aplicadas.
+
+### Decisões do responsável (as correções que pediam aval)
+- **Cofre do Braga:** senha sorteada pela semente. É o número de registro da peça principal, de trás para a frente. O motivo existe no mundo: o bilhete do Braga preso no cofre ("Esqueci a senha de novo. É o número da peça principal, de trás pra frente."). Marcador novo nos dados: {reg_inv}. A descrição da Câmara no Subsolo não mudou.
+- **Pegadas:** saem da Sala das coleções, cruzam a Área de descanso e somem na porta de serviço. Lenz saiu por ela antes de 0:00 e só volta às 4:00, pela mesma porta. A linha do tempo ganhou essa linha. A foto de ronda e a legenda mostram a entrada dele no começo da noite.
+- **Revelar:** só na volta 5, na Recepção. Trava no código, na aba Revelar, nos dados e no simulador de texto.
+- **Andares fixos no Loop** e a sala `corredor` com um nome só: Área de descanso.
+- **Energia:** 5 por volta para todo mundo, com ou sem dupla. A preparação não oferece mais ferramentas (três delas zeravam pista e a quarta dava energia a mais). A missão secreta cumprida continua dando +1 na volta seguinte.
+- **Prévias:** sem "(só quando…)". Em cada sala, a lista tem o mesmo número de itens e os mesmos rótulos nas 5 causas: onde o sinal não existe, há um par de mesmo rótulo com texto inocente (campo `parDe`; 47 pares). O par tem o mesmo custo, o mesmo minuto e o mesmo ícone, e não conta no diagnóstico.
+- **Regra nos dados que o código não fazia:** os dados e os documentos passaram a dizer o que o código faz. Não entrou mecânica nova além das pedidas acima.
+
+### O que isso fechou (o "Ficou para decidir" da revisão 2)
+- Custo da escolha final: fica como o código faz. Desligar e Revelar não têm custo extra.
+- Energia de quem joga sem dupla: 5, igual à de todo mundo.
+- Noite E sem dupla: fica como o código faz. O primeiro conserto vale da volta 3 em diante (a trava agora funciona no navegador); sem dupla, os dois podem ser gravados na mesma volta.
+- Ensaio "2 de 3": já é o que o código faz. A máquina só diz quantos valores estão certos, nunca qual. Dados e simulador foram alinhados.
+
+### Cronologia
+- Seu Dirceu fica numa sala só, a Base da limpeza (a conversa sobre a Ivone foi para lá).
+- 4:00 o crachá abre a porta de serviço e a câmera da porta de serviço mostra o paletó chegando; 4:02 ele cruza a Área de descanso; 4:05 Seu Dirceu aponta; 4:10 ele desce.
+- A fita da câmera (minijogo) só tem o que a câmera vê: porta vazia, paletó entra no quadro, olha o relógio, crachá encosta na porta.
+- Caixa de fusíveis da Câmara: um lugar só, a Oficina técnica. Na Sala da fotografia ficam duas fotos de conferência no varal; na Sala dos sons, o estalo no alto-falante de teste.
+- A música da Sala dos sons só vira lembrança da volta 2 em diante.
+- Alarme: 2:40 nos dados, no jogo e no telão. A faixa de aviso não anuncia mais um estrondo aos 2:00 (a luz cai com o raio; a hora dele não sai de graça).
+
+### Lista da sala
+- Sem contagem regressiva: antes da hora, o item mostra "ainda não".
+- Rótulos trocados para não adiantar conteúdo (exemplos: "O para-raios", "Os relógios elétricos", "Armário de ferramentas", "A escada do Subsolo", "Quem passa pela porta de serviço").
+- O custo que a tela cobra é o dos dados: 0, 1 ou 2.
+- Objeto que já está no caderno pode ser pego de novo na sala dele, sem gastar energia.
+
+### Códigos
+- Exemplos de formato que nunca são resposta: dia 31, hora 0:45, registro 050, ordem 0-0-0.
+- A foto antiga do catálogo mostra o registro sorteado.
+- Minijogos: a ordem das opções muda com a semente; a posição certa da luz também (2 a 5).
+
+### Textos
+- Interfone da Dra. Sato: responde só ao sinal mais recente do caderno, ou só ao trecho dos dois avisos. Fica em até 60 palavras.
+- Gravação do Téo: duas pistas ("Pendrive no rádio" e "A gravação continua", esta com um texto por noite).
+- Tela: "a luva isolante", "a peça verdadeira" (nunca o nome interno); "sem dupla" e "em dupla" nas mensagens; papel "Guarda do dossiê".
+- Preparação, descrição das salas, passo a passo e tela final falam do mundo do Loop (saíram a premissa do caso antigo, o arquivo antigo e a lanterna).
+- Missões secretas: 8 no jogo (as 5 de antes e mais: para onde vão as pegadas; onde a peça verdadeira está; o que o Nico está guardando).
+
+### Campos dos dados
+- `destrava` refeito a partir de `precisaDe`. Toda pista com `porque` tem a tranca escrita.
+- Regras novas ou reescritas: `aparelho`, `precisaDe`, `entrada`, `diagnostico_anexado`, `objeto`, `central`, `revelar`, `solo`, `custo`, `previa`, `parDe`, `tipoTela`, `formato_valores`. O que só existe no simulador de texto está marcado assim.
+- "Energia" no lugar de "cargas" nos campos internos (`energia_por_volta`, `custo_energia`).
+- Cada aparelho tem o próprio caderno, o próprio diagnóstico e a própria tentativa de Revelar. Nos consertos em dupla, só o aparelho de quem está no Subsolo registra o conserto.
+
+### Validador e simulador de texto
+- Jogador ótimo com 1, 2 e 3 pessoas; valores sorteados como no jogo, com 5 sementes por rodada; aviso de prévia que muda com a causa (erro se existir numa causa só).
+- Teto de pistas ativas por noite: 230 (eram 190), por causa dos pares.
+- Simulador: energia 5, Revelar só na volta 5, tranca conferida no caderno de quem olha, valor errado sem dizer qual, Central sem devolução.
+
+### Ficou para decidir
+Nada.

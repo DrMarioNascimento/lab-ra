@@ -1,17 +1,38 @@
 #!/usr/bin/env python3
-# Mestre-motor da simulacao teorica do Loop (v3: 5 causas). Uso: python3 engine.py <comando> <grupo> [args]
-# Dados: variavel de ambiente LOOP_DATA (padrao /tmp/roda/v3_pistas.json). Estados: LOOP_ESTADOS (padrao /tmp/roda/sim/estados_v3).
-# A copia anterior (v2, so causas A e B) esta em engine_v2.py.
-import json, sys, os
-DATA = os.environ.get('LOOP_DATA', '/tmp/roda/v4_pistas.json')
-D = json.load(open(DATA))
+# Mestre-motor da simulacao teorica do Loop (v4 revisao 3: 5 causas). Uso: python3 engine.py <comando> <grupo> [args]
+# Dados: variavel de ambiente LOOP_DATA (padrao: pistas-v4.json ao lado deste arquivo, senao /tmp/roda/v4_pistas.json). Estados: LOOP_ESTADOS.
+# Valores do conserto: os de valores_padrao, ou sorteados como o jogo faz quando LOOP_SEMENTE tem um numero
+# (dia 9 a 25; raio em 1:00, 1:05, 1:10, 1:15 ou 1:20; registro 105 a 994; ordem dos 3 pontos; chave do para-raios; cofre = registro de tras para a frente).
+# Revisao 3 (25/11/2026): energia 5 por volta para todo mundo; Revelar so na volta 5; a maquina so diz quantos valores estao certos; a Central nao devolve energia.
+import json, sys, os, random
+_AQUI = os.path.dirname(os.path.abspath(__file__))
+DATA = os.environ.get('LOOP_DATA') or next((p for p in (os.path.join(_AQUI, 'pistas-v4.json'), '/tmp/roda/v4_pistas.json') if os.path.exists(p)), '/tmp/roda/v4_pistas.json')
+D = json.load(open(DATA, encoding='utf-8'))
+def sortear_valores(semente):
+    """Mesmas faixas do jogo (lcVals em loop-central.js). O sorteio em si usa outro gerador: o que importa aqui e nao depender dos valores de exemplo."""
+    r = random.Random(int(semente)); mm = lambda x: f'{x // 60}:{x % 60:02d}'
+    dia = 9 + r.randrange(17); off = r.choice([-10, -5, 0, 5, 10]); R = 70 + off; reg = 105 + r.randrange(890)
+    ordem = r.choice(['1-2-3', '1-3-2', '2-1-3', '2-3-1', '3-1-2', '3-2-1']); cp = r.choice([[1, 2, 3], [2, 3, 1], [3, 1, 2]])
+    return dict(off=off, dia=dia, dia_a=dia - 4, dia_b=dia - 2, hora=mm(R), hora3=mm(R + 3), j0=mm(R - 6), j1=mm(R + 10), reg=reg, reg_inv=str(reg)[::-1],
+                ordem=ordem, ordem_txt=ordem.replace('-', ', depois '), ch=cp[0], ch_b=cp[1], ch_c=cp[2])
+SEMENTE = os.environ.get('LOOP_SEMENTE')
+VAL = dict(D.get('valores_padrao', {}), off=0)
+if 'reg_inv' not in VAL: VAL['reg_inv'] = str(VAL.get('reg', ''))[::-1]
+if SEMENTE not in (None, ''): VAL = sortear_valores(SEMENTE)
 def _tok(o):
     if isinstance(o, dict): return {k: _tok(v) for k, v in o.items()}
     if isinstance(o, list): return [_tok(v) for v in o]
     if isinstance(o, str):
-        for k, v in D0.get('valores_padrao', {}).items(): o = o.replace('{' + k + '}', str(v))
+        for k in sorted(VAL, key=len, reverse=True): o = o.replace('{' + k + '}', str(VAL[k]))
     return o
 D0 = D; D = _tok(D)
+OFF = VAL.get('off', 0)
+D['valores'] = dict(D['valores'], dia_da_troca=VAL['dia'], hora_do_apagao=VAL['hora'], tombo=VAL['reg'], ordem_circuito=VAL['ordem'], chave_do_raio=VAL['ch'])
+for _x in D['pistas']:   # o que acontece em volta do raio anda junto com a hora sorteada (como lcT no jogo)
+    if 60 <= _x.get('segundo_min', 0) <= 100: _x['segundo_min'] += OFF
+for _a in D['atividades_coop']:
+    if _a.get('janela_segundos'): _a['janela_segundos'] = [64 + OFF, 80 + OFF]
+ENERGIA = D['regras'].get('energia_por_volta', 5)   # igual para todo mundo, com ou sem dupla
 P = {x['id']: x for x in D['pistas']}
 AT = {a['id']: a for a in D['atividades_coop']}
 GF = D['grupos_fonte']
@@ -21,7 +42,7 @@ CAUSAS = D['causas_possiveis']
 FMT = D.get('formato_valores', {})
 F_REV = next(f for f in D['finais'] if f['id'] == 'final_revelar')['condicao']
 PROVAS = F_REV['provas']['umaDeCadaGrupo']
-JANELA = (64, 80)
+JANELA = (64 + OFF, 80 + OFF)
 ANEXAR_VOLTA_MIN = 2
 
 def N(x): return int(str(x).upper().replace('J', ''))
@@ -44,6 +65,7 @@ def pode_ver(x, j):
     if q.startswith('portador_grupo_'): return any(tem_grupo(j['caderno'], g) for g in q[15:].split('|'))
     if q.startswith('portador_'): return q[9:] in j['caderno']
     return True
+def _de_chao(x): return isinstance(x.get('condicao'), dict) and bool(x['condicao'].get('chao'))
 def chao_ok(x, s):
     c = x.get('condicao')
     c = c.get('chao') if isinstance(c, dict) else None
@@ -51,18 +73,20 @@ def chao_ok(x, s):
     o = s['chao'].get(c['sala'])
     return bool(o) and o['objeto'] == c['objeto'] and o['volta'] < s['volta']
 def visivel(x, s, j):
-    if not ativa(x, s) or x.get('daAtividade'): return False
+    if not ativa(x, s) or (x.get('daAtividade') and not _de_chao(x)): return False
     if not (x['volta_min'] <= s['volta'] <= x['volta_max']): return False
     if x.get('segundo_min', 0) > j['seg']: return False
     return pode_ver(x, j) and chao_ok(x, s)
-def liberada(x, s):
-    u = uniao(s); pd = x['precisaDe']
+def liberada(x, s, j=None):
+    u = set(j['caderno']) if j is not None else uniao(s); pd = x['precisaDe']
     return all(i in u for i in pd['todas']) and (not pd['umaDe'] or any(i in u for i in pd['umaDe']))
 def texto(x, j, s=None):
     t = x['texto']
-    if x.get('textoPorSintoma'): t = ' '.join([t] + [v for g, v in x['textoPorSintoma'].items() if tem_grupo(j['caderno'], g)])
-    pp = x.get('textoPorPar')
-    if pp and all(any(tem_grupo(j['caderno'], g) for g in lado) for lado in pp['grupos']): t += ' ' + pp['texto']
+    if x.get('textoPorSintoma'):
+        gs = [g for g in x['textoPorSintoma'] if tem_grupo(j['caderno'], g)]; pp = x.get('textoPorPar')
+        par = bool(pp) and all(any(tem_grupo(j['caderno'], g) for g in lado) for lado in pp['grupos'])
+        ult = next((P[i].get('grupoFonte') for i in reversed(j['caderno']) if P[i].get('grupoFonte') in gs), None)
+        t = ' '.join(v for v in [t, pp['texto'] if par else x['textoPorSintoma'].get(ult)] if v)
     if s is not None and x.get('textoPorCausa', {}).get(s['causa']): t += ' ' + x['textoPorCausa'][s['causa']]
     return t
 def etq(x): return f' [{x["etiqueta"]}]' if x.get('etiqueta') else ''
@@ -104,11 +128,11 @@ def nao_desta_noite(s):
 def cmd_novo(g, n, causa=None, modo=None):
     n = int(n); causa = causa or D['causa_sorteada']; modos = (modo or ','.join(['coop'] * n)).split(',')
     s = dict(causa=causa, volta=1, apostas={}, anexos={}, coop_feitas=[], log=[], diag=None, chao={}, eco={}, meio={}, central={}, central_usou={}, conserto=None, ensaio=[], revelado=None, pausa=False, dicas={}, jog=[
-        dict(id=i + 1, modo=modos[i], cargas=6 if modos[i] == 'solo' else 5, sala='recepcao', seg=0, caderno=[], olhar=[], mao=None, chao_usado=False, coops=0, trocou=0) for i in range(n)])
+        dict(id=i + 1, modo=modos[i], cargas=ENERGIA, sala='recepcao', seg=0, caderno=[], olhar=[], mao=None, chao_usado=False, coops=0, trocou=0) for i in range(n)])
     save(g, s); print(f'Grupo {g}: {n} jogadores, volta 1. Salas abertas: {", ".join(D["salas"])}. Em reforma: {", ".join(D.get("salas_em_reforma", []))}. Todos começam na recepcao.')
 def cmd_status(g):
     s = load(g); print(f'Volta {s["volta"]}/5 | apostas no telão: {s["apostas"]} | tentativas de anexar: {s["anexos"]} | diagnóstico anexado: {"sim" if s["diag"] else "não"} | pausa: {"sim" if s["pausa"] else "não"} | chão: { {k: v["objeto"] for k, v in s["chao"].items()} }')
-    for j in s['jog']: print(f' J{j["id"]} [{j["modo"]}] sala={j["sala"]} cargas={j["cargas"]} relógio={mmss(j["seg"])} ({j["seg"]}s) caderno({len(j["caderno"])})' + (f' na mão: {j["mao"]}' if j['mao'] else ''))
+    for j in s['jog']: print(f' J{j["id"]} [{j["modo"]}] sala={j["sala"]} energia={j["cargas"]} relógio={mmss(j["seg"])} ({j["seg"]}s) caderno({len(j["caderno"])})' + (f' na mão: {j["mao"]}' if j['mao'] else ''))
 def cmd_ir(g, j, sala):
     s = load(g); jj = s['jog'][N(j) - 1]
     if fim(jj): print('A volta acabou para você. Use proxima.'); return
@@ -121,12 +145,12 @@ def cmd_esperar(g, j, ate):
     except (ValueError, IndexError): print('Use: esperar <grupo> <jogador> <até quando>. Vale o minuto da volta (1:06) ou o segundo da volta (66). É sempre "até", nunca "mais tanto".'); return
     if t <= jj['seg']: print(f'Seu relógio já está em {mmss(jj["seg"])} ({jj["seg"]}s). O esperar é "até o minuto tal da volta" e só anda para a frente.'); return
     if t > 300: print('A volta acaba em 300 s (5:00).'); return
-    agir(s); jj['seg'] = t; save(g, s); print(f'J{N(j)} esperou em {jj["sala"]}. Relógio: {mmss(t)} ({t}s). Não gastou carga.')
+    agir(s); jj['seg'] = t; save(g, s); print(f'J{N(j)} esperou em {jj["sala"]}. Relógio: {mmss(t)} ({t}s). Não gastou energia.')
 def cmd_olhar(g, j):
     s = load(g); jj = s['jog'][N(j) - 1]
     if fim(jj): print('A volta acabou para você.'); return
     agir(s)
-    todos = [x for x in D['pistas'] if x['sala'] == jj['sala'] and ativa(x, s) and not x.get('daAtividade')]
+    todos = [x for x in D['pistas'] if x['sala'] == jj['sala'] and ativa(x, s) and (not x.get('daAtividade') or _de_chao(x))]
     jj['olhar'] = [x['id'] for x in todos]; save(g, s)
     def repega(x): return x['tipo'] == 'objeto' and x.get('objeto') and jj['mao'] != x['objeto']
     vis = [(i, x) for i, x in enumerate(todos) if visivel(x, s, jj) and (x['id'] not in jj['caderno'] or repega(x))]
@@ -134,16 +158,16 @@ def cmd_olhar(g, j):
     quando = f'a primeira a partir de {mmss(min(x["segundo_min"] for x in futuras))}' if futuras else ''
     if not vis: print(f'Nada novo em {nome_sala(jj["sala"])} agora.' + (f' Tem {len(futuras)} coisa(s) que só aparecem mais tarde nesta volta ({quando}).' if futuras else '')); return
     u = uniao(s)
-    print(f'Em {nome_sala(jj["sala"])} [{jj["sala"]}] (relógio {mmss(jj["seg"])}, cargas={jj["cargas"]}). O número de cada pista é FIXO nesta sala:')
+    print(f'Em {nome_sala(jj["sala"])} [{jj["sala"]}] (relógio {mmss(jj["seg"])}, energia={jj["cargas"]}). O número de cada pista é FIXO nesta sala:')
     for i, x in vis:
         tag = ''
-        if not liberada(x, s):
-            pd = x['precisaDe']; falta = [k for k in pd['todas'] if k not in u] or pd['umaDe']
-            tag = f' [BLOQUEADA: antes, ache algo em {nome_sala(P[falta[0]]["sala"])}]'
+        if not liberada(x, s, jj):
+            pd = x['precisaDe']; falta = [k for k in pd['todas'] if k not in jj['caderno']] or pd['umaDe']
+            tag = f' [TRAVADA: {x.get("porque") or "falta achar algo antes"} (em {nome_sala(P[falta[0]]["sala"])})]'
         gr = ' [o grupo já tem; na pausa dá para usar trocar]' if x['id'] in u else ''
         c = custo(x)
-        if x['id'] in jj['caderno']: c = 0; gr = ' [já está no seu caderno: pegar o objeto de novo não custa carga]'
-        print(f'  [{i}] ({c} carga{"s" if c != 1 else ""}) {x["previa"]}{tag}{gr}')
+        if x['id'] in jj['caderno']: c = 0; gr = ' [já está no seu caderno: pegar o objeto de novo não gasta energia]'
+        print(f'  [{i}] ({c} de energia) {x["previa"]}{tag}{gr}')
     if futuras: print(f'  (mais {len(futuras)} coisa(s) aparecem depois nesta sala; {quando})')
 def cmd_coletar(g, j, idx, *resp):
     s = load(g); jj = s['jog'][N(j) - 1]
@@ -157,7 +181,7 @@ def cmd_coletar(g, j, idx, *resp):
     if x['sala'] != jj['sala']: print('Você mudou de sala. Use olhar de novo.'); return
     if x['id'] in jj['caderno']:
         if x['tipo'] == 'objeto' and x.get('objeto') and visivel(x, s, jj):
-            agir(s); jj['mao'] = x['objeto']; jj['seg'] += 10; save(g, s); print(f'Você pega de novo: "{x["objeto"]}" está na sua mão (0 carga). O que está na mão some no reinício; o que fica no chão, não.'); return
+            agir(s); jj['mao'] = x['objeto']; jj['seg'] += 10; save(g, s); print(f'Você pega de novo: "{x["objeto"]}" está na sua mão (sem gastar energia). O que está na mão some no reinício; o que fica no chão, não.'); return
         print('Você já tem essa pista.'); return
     if not visivel(x, s, jj): print('Essa pista ainda não está disponível (o museu muda com o tempo e com o que você já sabe).'); return
     c = custo(x)
@@ -165,11 +189,11 @@ def cmd_coletar(g, j, idx, *resp):
     if en:
         got = ''.join(ch for ch in ' '.join(resp).upper() if ch.isalnum())
         if got != str(en['resposta']).upper():
-            print(f'ENIGMA: {en["rotulo"]}. {en["enunciado"]} {en["cifrado"]}. ' + ('Resposta errada, tente de novo (não gasta carga). ' if got else '') + f'Para tentar: coletar <g> <j> {idx} <resposta>'); return
-    if jj['cargas'] < c: print(f'Faltam cargas: esta pista custa {c} e você tem {jj["cargas"]}.'); return
-    if not liberada(x, s):
-        pd = x['precisaDe']; u = uniao(s); falta = [k for k in pd['todas'] if k not in u] or pd['umaDe']
-        print(f'Bloqueada: falta ao grupo uma pista de {nome_sala(P[falta[0]]["sala"])} ("{P[falta[0]]["previa"]}").'); return
+            print(f'ENIGMA: {en["rotulo"]}. {en["enunciado"]} {en["cifrado"]}. ' + ('Resposta errada, tente de novo (não gasta energia). ' if got else '') + f'Para tentar: coletar <g> <j> {idx} <resposta>'); return
+    if jj['cargas'] < c: print(f'Falta energia: esta pista gasta {c} e você tem {jj["cargas"]}.'); return
+    if not liberada(x, s, jj):
+        pd = x['precisaDe']; falta = [k for k in pd['todas'] if k not in jj['caderno']] or pd['umaDe']
+        print(f'Travada: {x.get("porque") or "falta achar algo antes"} Falta no SEU caderno uma pista de {nome_sala(P[falta[0]]["sala"])} ("{P[falta[0]]["previa"]}"). Outra pessoa pode passar na pausa.'); return
     agir(s); jj['cargas'] -= c; jj['seg'] += 10; jj['caderno'].append(x['id'])
     if x['tipo'] == 'objeto' and x.get('objeto'): jj['mao'] = x['objeto']
     s['log'].append((s['volta'], jj['id'], x['id']))
@@ -177,12 +201,12 @@ def cmd_coletar(g, j, idx, *resp):
     if arm:
         for o in s['jog']: o['seg'] = min(300, o['seg'] + arm['seg'])
     save(g, s)
-    print(f'PISTA [{x["id"]}]{etq(x)} (-{c} carga): {texto(x, jj, s)}')
+    print(f'PISTA [{x["id"]}]{etq(x)} (-{c} de energia): {texto(x, jj, s)}')
     if arm: print(f'ALARME! O relógio de TODO mundo deu um salto de {arm["seg"]} s nesta volta.')
 def cmd_deixar(g, j):
     s = load(g); jj = s['jog'][N(j) - 1]
     if fim(jj): print('A volta acabou para você.'); return
-    if not jj['mao']: print('Você não tem nenhum objeto na mão nesta volta. (O que está na mão some no reinício; a manopla sai do armário da Oficina técnica depois do apagão de 1:10.)'); return
+    if not jj['mao']: print('Você não tem nenhum objeto na mão nesta volta. (O que está na mão some no reinício; a luva isolante sai do armário da Oficina técnica depois que a luz cai.)'); return
     if jj['chao_usado']: print('Você já usou o seu único objeto de chão nesta partida.'); return
     agir(s); obj = jj['mao']; s['chao'][jj['sala']] = dict(objeto=obj, volta=s['volta'], por=jj['id']); jj['chao_usado'] = True; jj['mao'] = None; jj['seg'] += 5; save(g, s)
     print(f'J{N(j)} deixou "{obj}" no chão de {nome_sala(jj["sala"])}. O chão guarda: na próxima volta qualquer pessoa do grupo acha aqui.')
@@ -215,18 +239,15 @@ def _valores(A, vals):
     return len(ks) - len(erradas), len(ks), erradas
 def _msg_erro(A, s, certos, tot, erradas, custo_txt, devolveu):
     o = f'A MÁQUINA NÃO REAGE: {certos} de {tot} valor(es) aceito(s). '
-    if s['volta'] <= 4: o += 'Ainda errado: ' + ', '.join(FMT.get(k, {}).get('rotulo', k) for k in erradas) + '. '
     o += 'Formato: ' + '; '.join(f'{FMT.get(k, {}).get("rotulo", k)} = {FMT.get(k, {}).get("como", "?")} (do jeito {FMT.get(k, {}).get("exemplo", "?")})' for k in A['valores_pedidos']) + '. '
-    o += '(A Central confirmou nesta volta: as cargas voltaram.)' if devolveu else f'({custo_txt}' + ('; ensaio sem punição)' if s['volta'] == 4 else ')')
+    o += f'({custo_txt}' + ('; ensaio sem punição)' if s['volta'] == 4 else ')')
     return o
 def _devolve(s):
-    v = str(s['volta'])
-    if s.get('central', {}).get(v) and not s.get('central_usou', {}).get(v): s.setdefault('central_usou', {})[v] = 1; return True
-    return False
+    return False   # revisão 3: como no jogo, nenhuma tentativa errada devolve energia
 def _janela(js):
     tarde = [q for q in js if q['seg'] > JANELA[1]]; cedo = [q for q in js if q['seg'] < JANELA[0]]
     if tarde: return f'O raio desta volta já passou (J{tarde[0]["id"]} está em {mmss(tarde[0]["seg"])}; a janela vai de {mmss(JANELA[0])} a {mmss(JANELA[1])}). Só na próxima volta.'
-    if cedo: return f'Cedo demais: J{cedo[0]["id"]} está em {mmss(cedo[0]["seg"])} e o raio só cai em 1:10. Use esperar até {JANELA[0]} (a janela vai de {mmss(JANELA[0])} a {mmss(JANELA[1])}).'
+    if cedo: return f'Cedo demais: J{cedo[0]["id"]} está em {mmss(cedo[0]["seg"])} e o raio ainda não caiu. Use esperar até {JANELA[0]} (a janela vai de {mmss(JANELA[0])} a {mmss(JANELA[1])}).'
     return None
 def _entrega(pid, js):
     for q in js:
@@ -234,7 +255,7 @@ def _entrega(pid, js):
     print(f'  → [{pid}]: {P[pid]["texto"]}')
 def _conserto(g, s, A, js, modo):
     """Volta 4 = ensaio (a maquina reage ou nao). Volta 5 = vale."""
-    if falta_outro(A, s, str(modo).startswith('solo')):
+    if falta_outro(A, s, str(modo).startswith('sem dupla')):
         s['meio'][A['id']] = s['volta']; s['coop_feitas'].append((s['volta'], A['id'], 'meio')); save(g, s)
         print(f'MEIO CONSERTO ({modo}) gravado na Câmara na volta {s["volta"]}. O AVISO MUDOU DE LUGAR. Mudou, não sumiu: falta o outro defeito, em OUTRA volta.'); _entrega(A['produto_meio'], js); save(g, s); return
     if s['volta'] <= 4:
@@ -249,7 +270,7 @@ def cmd_coop(g, aid, ja, jb, *vals):
     if N(ja) == N(jb): print('Atividade em dupla pede duas pessoas diferentes.'); return
     A_, B_ = s['jog'][N(ja) - 1], s['jog'][N(jb) - 1]
     if A_['sala'] == A['salas'][1] and B_['sala'] == A['salas'][0] and A['salas'][0] != A['salas'][1]: A_, B_ = B_, A_; ja, jb = jb, ja   # a ordem dos nomes nao importa
-    if 'solo' in (A_['modo'], B_['modo']): print('Quem declarou jogo solo não entra em dupla. O caminho solo desta atividade: ' + A.get('saida_solo', '')); return
+    if 'solo' in (A_['modo'], B_['modo']): print('Quem declarou jogo sem dupla não entra em dupla. O caminho sem dupla desta atividade: ' + A.get('saida_solo', '')); return
     if A.get('acao_de_chao'): print('O Correio do Loop não pede duas pessoas ao mesmo tempo: quem pegou o objeto usa "deixar" na sala certa; na volta seguinte qualquer pessoa pega no chão.'); return
     if s['volta'] < vmin(A, s): print(f'Só a partir da volta {vmin(A, s)}.'); return
     f = faltas(A, s)
@@ -259,7 +280,7 @@ def cmd_coop(g, aid, ja, jb, *vals):
     if A_['sala'] != A['salas'][0] or B_['sala'] != A['salas'][1]: print(f'Posição errada: J{N(ja)} deve estar em {A["salas"][0]} e J{N(jb)} em {A["salas"][1]}.'); return
     if A_['coops'] >= 2 or B_['coops'] >= 2: print('Limite: 2 atividades em dupla por pessoa por volta.'); return
     cp = A.get('custo_por_pessoa', 1)
-    if A_['cargas'] < cp or B_['cargas'] < cp: print(f'Falta carga: cada pessoa precisa de {cp} carga.'); return
+    if A_['cargas'] < cp or B_['cargas'] < cp: print(f'Falta energia: cada pessoa precisa de {cp}.'); return
     if A.get('janela_segundos'):
         m = _janela([A_, B_])
         if m: print(m); return
@@ -274,20 +295,20 @@ def cmd_coop(g, aid, ja, jb, *vals):
             if dev:
                 for q in (A_, B_): q['cargas'] += cp
             s['coop_feitas'].append((s['volta'], aid, 'erro')); save(g, s)
-            print(_msg_erro(A, s, certos, tot, erradas, f'-{cp} carga por pessoa', dev)); return
-    if A.get('conserto'): _conserto(g, s, A, (A_, B_), 'dupla'); return
-    print(f'ATIVIDADE FEITA: {A["nome"]} (-{cp} carga por pessoa, {A["duracao_s"]} s). Os dois recebem:')
+            print(_msg_erro(A, s, certos, tot, erradas, f'-{cp} de energia por pessoa', dev)); return
+    if A.get('conserto'): _conserto(g, s, A, (A_, B_), 'em dupla'); return
+    print(f'ATIVIDADE FEITA: {A["nome"]} (-{cp} de energia por pessoa, {A["duracao_s"]} s). Os dois recebem:')
     for pid in A['produz']:
         if pid in P and ativa(P[pid], s): _entrega(pid, (A_, B_))
     if A.get('anexa_diagnostico') and not s['diag']:
         s['diag'] = dict(volta=s['volta'], via=aid); s['apostas'].setdefault(str(s['volta']), s['causa']); print('  A leitura completa entra no dossiê: DIAGNÓSTICO ANEXADO.')
-    s['coop_feitas'].append((s['volta'], aid, 'dupla')); save(g, s)
+    s['coop_feitas'].append((s['volta'], aid, 'em dupla')); save(g, s)
 def cmd_solo(g, j, aid, *vals):
     s = load(g); A = AT.get(aid)
     if not A: print('Atividade inexistente.'); return
     q = s['jog'][N(j) - 1]; S = A.get('solo')
     if not ativa(A, s): print(nao_desta_noite(s)); return
-    if not S: print('Esta atividade não tem comando solo. O caminho solo dela é por pistas: ' + A.get('saida_solo', '')); return
+    if not S: print('Esta atividade não tem comando próprio sem dupla. O caminho sem dupla dela é por pistas: ' + A.get('saida_solo', '')); return
     if fim(q): print('A volta acabou para você.'); return
     f = faltas(A, s)
     if f: print('Ainda não dá. Falta ao grupo: ' + ' | '.join(f)); return
@@ -297,44 +318,44 @@ def cmd_solo(g, j, aid, *vals):
         if not (o and o['objeto'] == S['objeto'] and o['volta'] < s['volta']):
             print(f'Sem dupla, a peça precisa já estar no chão de {nome_sala(S["sala"])} desde uma volta ANTERIOR: pegue em {nome_sala(P[S["pista_objeto"]]["sala"])} [{P[S["pista_objeto"]]["sala"]}], desça e use deixar. Na volta seguinte, repita este comando.'); return
         if q['sala'] != S['sala']: print(f'Você precisa estar em {S["sala"]}.'); return
-        if q['cargas'] < S['custo']: print(f'A versão solo custa {S["custo"]} cargas.'); return
+        if q['cargas'] < S['custo']: print(f'Sem dupla, gasta {S["custo"]} de energia.'); return
         agir(s); q['cargas'] -= S['custo']; q['seg'] += S['duracao_s']
         certos, tot, erradas = _valores(A, vals)
         if certos != tot:
             dev = _devolve(s); q['cargas'] += S['custo'] if dev else 0
-            s['coop_feitas'].append((s['volta'], aid, 'erro')); save(g, s); print(_msg_erro(A, s, certos, tot, erradas, f'-{S["custo"]} cargas', dev)); return
-        _conserto(g, s, A, (q,), 'solo'); return
+            s['coop_feitas'].append((s['volta'], aid, 'erro')); save(g, s); print(_msg_erro(A, s, certos, tot, erradas, f'-{S["custo"]} de energia', dev)); return
+        _conserto(g, s, A, (q,), 'sem dupla'); return
     if S['tipo'] == 'eco':
         if q['sala'] == S['sala_gravar']:
             if s['volta'] < S['volta_min_gravar']: print(f'O eco só grava a partir da volta {S["volta_min_gravar"]}.'); return
             if s['eco'].get(aid): print(f'O eco já está gravado. Agora é a sua parte em {nome_sala(S["sala_executar"])}.'); return
-            if q['cargas'] < S['custo_gravar']: print(f'Gravar o eco custa {S["custo_gravar"]} cargas.'); return
+            if q['cargas'] < S['custo_gravar']: print(f'Gravar o eco gasta {S["custo_gravar"]} de energia.'); return
             m = _janela([q])
             if m: print(m); return
             agir(s); q['cargas'] -= S['custo_gravar']; q['seg'] += 20; s['eco'][aid] = s['volta']
-            print(f'ECO GRAVADO (-{S["custo_gravar"]} cargas).'); _entrega(S['produto_eco'], (q,)); save(g, s); return
+            print(f'ECO GRAVADO (-{S["custo_gravar"]} de energia).'); _entrega(S['produto_eco'], (q,)); save(g, s); return
         if q['sala'] == S['sala_executar']:
             if s['volta'] < vmin(A, s): print(f'Só a partir da volta {vmin(A, s)}.'); return
             if meio_repetido(A, s, True): print(MSG_MEIO); return
             if not s['eco'].get(aid) or s['eco'][aid] >= s['volta']: print(f'Sem dupla, falta o eco: numa volta anterior, grave a sua parte em {nome_sala(S["sala_gravar"])} [{S["sala_gravar"]}] com este mesmo comando, dentro da janela do raio.'); return
-            if q['cargas'] < S['custo_executar']: print(f'A parte solo custa {S["custo_executar"]} cargas.'); return
+            if q['cargas'] < S['custo_executar']: print(f'A parte sem dupla gasta {S["custo_executar"]} de energia.'); return
             m = _janela([q])
             if m: print(m); return
-            agir(s); q['cargas'] -= S['custo_executar']; q['seg'] += A['duracao_s']; _conserto(g, s, A, (q,), 'solo'); return
-        print(f'Caminho solo: grave o eco em {nome_sala(S["sala_gravar"])} [{S["sala_gravar"]}] e, em outra volta, aja em {nome_sala(S["sala_executar"])} [{S["sala_executar"]}].'); return
+            agir(s); q['cargas'] -= S['custo_executar']; q['seg'] += A['duracao_s']; _conserto(g, s, A, (q,), 'sem dupla'); return
+        print(f'Caminho sem dupla: grave o eco em {nome_sala(S["sala_gravar"])} [{S["sala_gravar"]}] e, em outra volta, aja em {nome_sala(S["sala_executar"])} [{S["sala_executar"]}].'); return
     if S['tipo'] == 'individual':
         if s['volta'] < vmin(A, s): print(f'Só a partir da volta {vmin(A, s)}.'); return
         if meio_repetido(A, s, True): print(MSG_MEIO); return
         fp = [GF[x]['rotulo'] for x in S['no_proprio_caderno'] if not tem_grupo(q['caderno'], x)]
         if fp: print('Sem dupla, tudo precisa estar no SEU caderno. Falta nele: ' + ' | '.join(fp) + '. (Colete você ou peça por trocar na pausa.)'); return
         if q['sala'] != S['sala']: print(f'Você precisa estar em {S["sala"]}.'); return
-        if q['cargas'] < S['custo']: print(f'A versão solo custa {S["custo"]} cargas.'); return
+        if q['cargas'] < S['custo']: print(f'Sem dupla, gasta {S["custo"]} de energia.'); return
         agir(s); q['cargas'] -= S['custo']; q['seg'] += S['duracao_s']
         certos, tot, erradas = _valores(A, vals)
         if certos != tot:
             dev = _devolve(s); q['cargas'] += S['custo'] if dev else 0
-            s['coop_feitas'].append((s['volta'], aid, 'erro')); save(g, s); print(_msg_erro(A, s, certos, tot, erradas, f'-{S["custo"]} cargas', dev)); return
-        _conserto(g, s, A, (q,), 'solo')
+            s['coop_feitas'].append((s['volta'], aid, 'erro')); save(g, s); print(_msg_erro(A, s, certos, tot, erradas, f'-{S["custo"]} de energia', dev)); return
+        _conserto(g, s, A, (q,), 'sem dupla')
 def _valida_anexo(causa, ids):
     """Devolve (ok, motivo, linhas): quantos sinais e descartes contaram e como o dossie leu cada pista."""
     lados = D.get('diagnostico_por_causa', {}).get(causa, {}).get('lados')
@@ -357,7 +378,7 @@ def _valida_anexo(causa, ids):
         placar = f'Contaram {ns} de 2 sinais (para dois defeitos: 1 sinal de número + 1 sinal de força) e {nd} de 1 descarte.'
     else: placar = f'Contaram {ns} de 2 sinais e {nd} de 1 descarte.'
     if ns < 2: return False, placar + ' Faltam sinais de tipos diferentes que apontem essa causa.', linhas
-    if not nd: return False, placar + ' Falta 1 pista que descarte outra causa: prova de que outro sistema está inteiro (ex.: calibragem conferida, fusíveis no lugar, carga cheia, modo livre).', linhas
+    if not nd: return False, placar + ' Falta 1 pista que descarte outra causa: prova de que outra parte está bem (ex.: números parados, fusíveis no lugar, carga cheia, modo livre).', linhas
     return True, placar, linhas
 def cmd_anexar(g, causa, *ids):
     s = load(g)
@@ -424,7 +445,7 @@ def cmd_missao(g, j):
     s = load(g); q = s['jog'][N(j) - 1]; m = MISSOES[(N(j) + sum(map(ord, g))) % 5]
     ok = m[1](q['caderno'])
     if ok and not q.get('missao_ok'): q['missao_ok'] = s['volta']; save(g, s)
-    print('SUA MISSÃO SECRETA (só você sabe; na pausa conte ou blefe): ' + m[0] + (f' ✅ Cumprida na volta {q["missao_ok"]}: +1 de carga na volta seguinte.' if q.get('missao_ok') else ' Cumprir rende +1 carga na volta seguinte.'))
+    print('SUA MISSÃO SECRETA (só você sabe; na pausa conte ou blefe): ' + m[0] + (f' ✅ Cumprida na volta {q["missao_ok"]}: +1 de energia na volta seguinte.' if q.get('missao_ok') else ' Cumprir rende +1 de energia na volta seguinte.'))
 def cmd_proxima(g):
     s = load(g)
     if s['volta'] >= 5: print('Já é a última volta. Use final.'); return
@@ -433,13 +454,14 @@ def cmd_proxima(g):
         m = MISSOES[(j['id'] + sum(map(ord, g))) % 5]
         if m[1](j['caderno']) and not j.get('missao_ok'): j['missao_ok'] = s['volta'] - 1
         extra = 1 if (j.get('missao_ok') == s['volta'] - 1) else 0
-        j.update(cargas=(6 if j['modo'] == 'solo' else 5) + extra, seg=0, sala='recepcao', olhar=[], mao=None, coops=0, trocou=0)
-    save(g, s); print(f'Volta {s["volta"]}. O museu esqueceu; os cadernos lembram; o chão guarda. Cargas reiniciadas, todos na recepcao. PAUSA: agora dá para trocar (1 pista por pessoa). A pausa acaba quando alguém se mexer.')
+        j.update(cargas=ENERGIA + extra, seg=0, sala='recepcao', olhar=[], mao=None, coops=0, trocou=0)
+    save(g, s); print(f'Volta {s["volta"]}. O museu esqueceu; os cadernos lembram; o chão guarda. Energia renovada, todos na recepcao. PAUSA: agora dá para trocar (até 3 pistas por pessoa). A pausa acaba quando alguém se mexer.')
 def provas_de(ids): return [k for k in PROVAS if tem_grupo(ids, k)]
 def nome_certo(n): return bool(n) and n.lower().startswith(D['culpado'].split()[0].lower())
 def cmd_revelar(g, j, culpado=''):
     s = load(g); q = s['jog'][N(j) - 1]
     if s['revelado'] is not None: print('O grupo já usou a sua única tentativa de Revelar.'); return
+    if s['volta'] != 5: print('O telão da Recepção só aceita o Revelar na última volta.'); return
     if fim(q): print('Passou de 5:00. O museu reiniciou antes.'); return
     if q['sala'] != F_REV['onde']: print(f'Para Revelar, quem apresenta precisa estar na {F_REV["onde"]}.'); return
     pv = provas_de(q['caderno'])
@@ -468,7 +490,7 @@ def cmd_caderno(g, j):
     s = load(g); jj = s['jog'][N(j) - 1]
     for i in jj['caderno']: print(f'- [{i}]{etq(P[i])} {texto(P[i], jj, s)}')
 def cmd_central(g, j, *vals):
-    """Papel Central: le as cameras e os cadernos do grupo e confirma em voz alta. 0 carga."""
+    """Papel Central (so no simulador de texto): le em voz alta onde cada pessoa esta e o que falta. Nao gasta nem devolve energia."""
     s = load(g); q = s['jog'][N(j) - 1]
     if s['volta'] < 4: print('O papel de Central acende na volta 4 (ensaio) e na volta 5 (vale). Antes disso, as câmeras só dão pistas comuns.'); return
     if fim(q): print('A volta acabou para você.'); return
@@ -476,20 +498,20 @@ def cmd_central(g, j, *vals):
     agir(s); q['seg'] += 10; s['central'][str(s['volta'])] = q['id']
     print(f'CENTRAL (J{q["id"]}, relógio {mmss(q["seg"])}). Leia em voz alta para o grupo:')
     for o in s['jog']:
-        if o['id'] != q['id']: print(f'  câmera: J{o["id"]} está em {nome_sala(o["sala"])}, relógio {mmss(o["seg"])}, {o["cargas"]} carga(s).')
+        if o['id'] != q['id']: print(f'  câmera: J{o["id"]} está em {nome_sala(o["sala"])}, relógio {mmss(o["seg"])}, energia {o["cargas"]}.')
     if not s['diag']: print('  dossiê: ainda SEM diagnóstico anexado. Sem ele nenhum conserto acende.')
     for A in [AT[a] for a in alvos(s)] if s['diag'] else []:
         f = faltas(A, s); on = {sl: [f'J{o["id"]}' for o in s['jog'] if o['sala'] == sl] for sl in A['salas']}
         print(f'  conserto "{A["nome"]}": ' + ('JÁ GRAVADO na Câmara. ' if A['id'] in s['meio'] else '') + ('entrada completa. ' if not f else 'FALTA ' + ' | '.join(f) + '. ') +
               ' '.join(f'{nome_sala(sl)}: {", ".join(on[sl]) or "ninguém"}.' for sl in A['salas']))
         for gk in A['entrada'].get('grupos', []): print(f'     {GF[gk]["rotulo"]}: no caderno de ' + (', '.join(f'J{o["id"]}' for o in s['jog'] if tem_grupo(o['caderno'], gk)) or 'ninguém'))
-        if A.get('janela_segundos'): print(f'     janela do raio: de {mmss(JANELA[0])} a {mmss(JANELA[1])}. Diga "chave fechada" e "alavanca pronta" antes de 1:10.')
+        if A.get('janela_segundos'): print(f'     janela do raio: de {mmss(JANELA[0])} a {mmss(JANELA[1])}. Diga "chave fechada" e "alavanca pronta" antes do raio.')
         if A.get('valores_pedidos') and vals:
             c, t, er = _valores(A, vals); print(f'     conferência dos valores ditos: {c} de {t} batem com o dossiê' + ('.' if c == t else '. Não confere: ' + ', '.join(FMT.get(k, {}).get('rotulo', k) for k in er) + '.'))
     pr = [f'J{o["id"]}' for o in s['jog'] if len(provas_de(o['caderno'])) == len(PROVAS)]
     print('  Revelar: ' + ('com as 3 provas no próprio caderno: ' + ', '.join(pr) if pr else 'NINGUÉM tem as 3 provas no próprio caderno ainda (' + ', '.join(f'J{o["id"]} tem {len(provas_de(o["caderno"]))}' for o in s['jog']) + ').'))
-    print('  Central confirmada nesta volta: a primeira tentativa errada de valores devolve as cargas.'); save(g, s)
-def cmd_ajuda(*a): print('OBJETIVO: descobrir por que a máquina do tempo travou, consertar até a volta 5 e provar quem trocou a peça. Volta 1: explorar e coletar; a partir da volta 2 dá para anexar o diagnóstico. GLOSSÁRIO: registro = número que identifica a peça; peça-guia = a peça a que a máquina se prende; ponto de ligação = onde o fio se encaixa; catraca = roleta da entrada; dossiê = o conjunto de pistas do grupo.\ncomandos: novo status ir esperar olhar coletar (coletar <g> <j> <n> [resposta]: se a pista for um enigma, escreva a resposta no fim) deixar trocar atividades coop solo central anexar apostar dica proxima revelar final caderno\nCustos: coletar pista = 1 carga (algumas 0). trocar pista (só na pausa, até 3 por pessoa) = grátis. Atividade em dupla = 1 carga de CADA pessoa. Solo = 3 cargas (o comando atividades lista os nomes). Cada volta aceita UM conserto só: dois na mesma volta viram meio conserto cada. Duas pistas com a mesma etiqueta valem um sinal só. anexar = grátis, 1 tentativa por volta, a partir da volta 2: 3 pistas (2 sinais de tipos diferentes + 1 descarte; em dois defeitos: 1 sinal de número + 1 de força + 1 descarte). revelar: na recepcao, qualquer volta, 1 tentativa, quem apresenta precisa ter no PRÓPRIO caderno as 3 provas (peça falsa, trajeto, crachá). esperar <g> <j> <minuto, ex.: 1:06>: avança o relógio SÓ de quem espera (cada jogador tem relógio próprio).')
+    print('  Central lida em voz alta. (Não muda a energia de ninguém.)'); save(g, s)
+def cmd_ajuda(*a): print('OBJETIVO: descobrir por que a máquina do tempo travou, consertar até a volta 5 e provar quem trocou a peça. Volta 1: explorar e coletar; a partir da volta 2 dá para anexar o diagnóstico. GLOSSÁRIO: registro = número que identifica a peça; ponto de ligação = onde o fio se encaixa; roleta = a da entrada, que gira quando você passa; dossiê = o conjunto de pistas do grupo.\ncomandos: novo status ir esperar olhar coletar (coletar <g> <j> <n> [resposta]: se a pista for um enigma, escreva a resposta no fim) deixar trocar atividades coop solo central anexar apostar dica proxima revelar final caderno\nCustos: coletar pista = 1 de energia (algumas 0, algumas 2). trocar pista (só na pausa, até 3 por pessoa) = grátis. Atividade em dupla = 1 de energia de CADA pessoa. Sem dupla = 3 de energia (o comando atividades lista os nomes). Cada volta aceita UM conserto só: dois na mesma volta viram meio conserto cada. Duas pistas com a mesma etiqueta valem um sinal só. anexar = grátis, 1 tentativa por volta, a partir da volta 2: 3 pistas (2 sinais de tipos diferentes + 1 descarte; em dois defeitos: 1 sinal de número + 1 de força + 1 descarte). revelar: na recepcao, só na volta 5, 1 tentativa, quem apresenta precisa ter no PRÓPRIO caderno as 3 provas (peça falsa, trajeto, crachá). esperar <g> <j> <minuto, ex.: 1:06>: avança o relógio SÓ de quem espera (cada jogador tem relógio próprio).')
 CMDS = {'novo': cmd_novo, 'status': cmd_status, 'ir': cmd_ir, 'esperar': cmd_esperar, 'olhar': cmd_olhar, 'coletar': cmd_coletar, 'deixar': cmd_deixar, 'trocar': cmd_trocar,
         'atividades': cmd_atividades, 'coop': cmd_coop, 'solo': cmd_solo, 'central': cmd_central, 'anexar': cmd_anexar, 'apostar': cmd_apostar, 'dica': cmd_dica, 'proxima': cmd_proxima,
         'proxima_volta': cmd_proxima, 'revelar': cmd_revelar, 'final': cmd_final, 'missao': cmd_missao, 'caderno': cmd_caderno}

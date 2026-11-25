@@ -2,7 +2,7 @@
 // O conteúdo fica em páginas por tema (Relógio, Mapa, Turma, Máquina; no fim: Desfecho, A noite, Turma, Perguntas),
 // com abas, setas do teclado e troca automática (que dá para parar). As salas são só as 15 da história (LOOP_SALAS).
 import { transporteTelao, transporteFalso, ms } from '../transporte.mjs';
-import { CASES, ANDARES, INICIO, LOOP_SALAS, EIXOS8, verdade, sala as salaMuseu, definirMuseu } from '../conteudo.js?v=2';
+import { CASES, ANDARES, INICIO, LOOP_SALAS, EIXOS8, verdade, sala as salaMuseu, definirMuseu } from '../conteudo.js?v=3';
 
 const P = new URLSearchParams(location.search);
 const FALSA = P.get('falsa') === '1';
@@ -45,8 +45,7 @@ function conviteUrl() { const u = new URL('../index.html', location.href); u.sea
 
 function sinal(seg) {   // texto coletivo: o que todos ouvem, nunca pistas
   const dec = room.seg ? (room.seg - seg) / room.seg * 300 : 0;
-  if (dec >= 165) return 'O alarme dispara no museu.';
-  if (dec >= 120) return 'Um estrondo ecoa pelos corredores…';
+  if (dec >= 160) return 'O alarme dispara no museu.';
   return '';
 }
 
@@ -89,7 +88,7 @@ function cabeca(pags) {
 const SALAS_IDS = Object.keys(LOOP_SALAS);
 function salasOrdenadas() {
   definirMuseu(room.museu || 0);
-  return SALAS_IDS.map((id) => { const m = salaMuseu(id) || {}; return { id, nome: LOOP_SALAS[id][0], peca: LOOP_SALAS[id][2], andar: m.andar || '', lugar: m.lugar || 0 }; })
+  return SALAS_IDS.map((id) => { return { id, nome: LOOP_SALAS[id][0], peca: LOOP_SALAS[id][2], andar: LOOP_SALAS[id][3] || '', lugar: LOOP_SALAS[id][4] || 0 }; })   // andar fixo da história
     .sort((x, y) => (ANDARES.indexOf(x.andar) - ANDARES.indexOf(y.andar)) || (x.lugar - y.lugar));
 }
 const nomeSala = (id) => (LOOP_SALAS[id] ? LOOP_SALAS[id][0] : id);

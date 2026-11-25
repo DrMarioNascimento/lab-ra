@@ -117,7 +117,7 @@ function marcarEnvio() {
   lockAnswerExtras(mandou);
   $('final').querySelector('.large').textContent = mandou
     ? 'Seu desfecho foi registrado. O Professor abre o resultado da turma.'
-    : 'Registre seu desfecho para o telão. As perguntas de reflexão são opcionais.';
+    : 'Registre seu desfecho para o telão.';
 }
 
 function blocoTurma() {

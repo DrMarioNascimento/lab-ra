@@ -73,3 +73,32 @@ Coloque os GLBs na mesma pasta de antes e me diga a sala e se é B ou C, por exe
 
 ## T02 – Cabine de viagem no tempo (provisória, feita por código)
 Prompt para versão 3D de melhor qualidade: "Cabine de viagem no tempo steampunk, base quadrada 1,3 m, altura 2,7 m, estrutura de latão, parte de baixo em madeira vinho, vidros nos quatro lados, relógios redondos no topo, calota de latão com luz no alto, anel luminoso turquesa no chão, desenho original (não imitar cabine policial nem carro DeLorean), GLB com texturas PBR."
+
+## Loop — modelos 3D a obter (25/11/2026, da avaliação pelas escalas)
+
+Antes de pedir, o acervo do LAB-RA foi conferido (93 peças em museu/pecas). Dez salas já foram trocadas por peças que existem. Estas cinco não têm peça adequada (e uma é opcional):
+
+
+Regras iguais às de `docs/PECAS-A-CONSEGUIR.md`: um conjunto só sobre base, sem pessoa, sem marca nem logotipo, GLB com textura PBR; a compressão (Draco + WebP, 1024 px, alvo ≤ 600 KB) é feita depois.
+
+1. **Pátio de luz · quadro externo com para-raios (arquivo sugerido `Q01.glb`)**
+   *"Outdoor electrical service panel in a small museum courtyard, low-poly realistic style: grey metal cabinet mounted on a short brick wall, door half open showing three large labeled breaker switches and one round analog power meter, a red padlock hanging on the door latch, a thick black cable running down the wall to the ground, a tall thin lightning rod with copper tip fixed to the wall beside the cabinet, small square stone floor base, a few wet paving stones, no people, no text, no logos, warm night lighting baked neutral, PBR textures, single object centered, GLB."*
+
+2. **Sala das coleções · estante de depósito com caixas (`D10.glb`)**
+   *"Museum storage room corner on a small floor base, low-poly realistic: one tall metal shelving unit with cardboard archive boxes of different sizes, paper tags tied to the boxes, one empty box lying open on the floor, one long box with a blanket corner sticking out, a rolled banner tube, a small crate of burnt light bulbs, dusty concrete floor tile, no people, no text, no logos, PBR textures, single object centered, GLB."*
+
+3. **Base da limpeza · carrinho de limpeza (`L08.glb`)**
+   *"Janitor cleaning cart for a museum, low-poly realistic: grey plastic cart with yellow mop bucket and wringer, mop standing in the bucket, shelf with generic unlabeled spray bottles and folded cloths, thick rubber gloves hanging on the handle, a small digital multimeter lying wet on the lower shelf, a paper receipt clipped to the side, small tiled floor base, no people, no brand names, no text, PBR textures, single object centered, GLB."*
+
+4. **Sala dos sons · bancada de som (`N17.glb`)**
+   *"Vintage sound test bench in a museum, low-poly realistic: wooden table with an old tube radio that has a built-in tape recorder and a small USB stick plugged in, one round test loudspeaker on a stand, a mechanical metronome, a coil of cable, and on the wall behind a small grey fuse cabinet with closed door, small wooden floor base, warm brass and walnut colors, no people, no text, no logos, PBR textures, single object centered, GLB."*
+
+5. **Sala da fotografia · laboratório fotográfico (`N18.glb`)**
+   *"Small photo darkroom corner in a museum, low-poly realistic: antique bellows camera on a wooden tripod, a wall panel with six framed black-and-white photos, a string with three photo prints hanging from clothespins, a developing tray with one wet print, a red safelight lamp on the wall, a photo album on a small table, small floor base, no people in the photos (use abstract shapes), no text, no logos, PBR textures, single object centered, GLB."*
+
+6. *(opcional)* **Recepção · roleta de entrada (`P03.glb`)**
+   *"Waist-high tripod turnstile for a museum entrance next to a short reception counter with a guest book, a desk bell and an old telephone, small wall clock above, low-poly realistic, small floor base, brushed steel and dark wood, no people, no text, no logos, PBR textures, single object centered, GLB."*
+
+Antes de gerar: conferir `angulos-licenciatura/assets/modelos/prateleira.glb` (para o item 2) e `balcao.glb`/`recep.glb` (para o item 6), que não abriram aqui por usarem compressão Meshopt.
+
+---

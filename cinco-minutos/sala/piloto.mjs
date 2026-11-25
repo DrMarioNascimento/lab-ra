@@ -11,7 +11,7 @@ export function pilotar(win, { acerto = 0.6 } = {}) {
       if (e === 'choose' && !win.state?.room && !win.state?.prep && d.querySelector('[data-nt="prep"]')) {
         // preparação da noite: duas ferramentas e começar
         const kits = [...d.querySelectorAll('[data-nt^="kit:"]')], marcados = kits.filter((k) => k.getAttribute('aria-pressed') === 'true');
-        if (marcados.length < 2) kits.find((k) => k.getAttribute('aria-pressed') !== 'true')?.click();
+        if (kits.length && marcados.length < 2) kits.find((k) => k.getAttribute('aria-pressed') !== 'true')?.click();
         else d.querySelector('[data-nt="prep"]').click();
       } else if (e === 'choose' && !win.state?.room) {
         const bs = [...d.querySelectorAll('#roomGrid button:not([disabled])')];

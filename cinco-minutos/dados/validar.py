@@ -1,10 +1,21 @@
 #!/usr/bin/env python3
-# Validador automatico do Loop v3 (5 causas). Uso: python3 validar.py [n_bots] [-v]   (dados: LOOP_DATA, padrao /tmp/roda/v4_pistas.json)
-# (a) ids e entradas alcancaveis  (b) otimo solo e otimo dupla  (c) bot aleatorio  (d) essenciais sem 2 caminhos  (f) papeis, formatos e tamanho
-# A copia anterior (v2, so causas A e B) esta em validar_v2.py.
-import sys, os, io, random, itertools, contextlib
+# Validador automatico do Loop v4 revisao 3 (5 causas). Uso: python3 validar.py [n_bots] [-v] [--semente N] [--so-otimo]
+# Dados: LOOP_DATA (padrao: pistas-v4.json ao lado deste arquivo, senao /tmp/roda/v4_pistas.json).
+# (a) ids e entradas alcancaveis  (b) otimo com 1, 2 e 3 pessoas  (c) bot aleatorio  (d) essenciais sem 2 caminhos  (f) papeis, formatos e tamanho  (g) previas iguais nas 5 causas
+# Revisao 3 (25/11/2026): os valores do conserto (dia, hora, registro, ordem, chave) sao SORTEADOS como no jogo, nao os de exemplo;
+# a semente sai no relatorio e outras sementes repetem o jogador otimo; energia 5 por volta para todo mundo; aviso de previa que muda com a causa.
+import sys, os, io, random, itertools, contextlib, subprocess, time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import engine as E
+def _arg(nome, padrao=None):
+    return sys.argv[sys.argv.index(nome) + 1] if nome in sys.argv and sys.argv.index(nome) + 1 < len(sys.argv) else padrao
+SEMENTE = int(_arg('--semente', os.environ.get('LOOP_SEMENTE') or int(time.time()) % 100000))
+os.environ['LOOP_SEMENTE'] = str(SEMENTE)
+try: import engine as E
+except ModuleNotFoundError:   # na pasta dados/ do repositorio o simulador chama simulador-texto.py
+    import importlib.util
+    _sp = importlib.util.spec_from_file_location('engine', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'simulador-texto.py'))
+    E = importlib.util.module_from_spec(_sp); sys.modules['engine'] = E; _sp.loader.exec_module(E)
+ENERGIA = E.ENERGIA; JAN0 = E.JANELA[0] + 2   # segundo seguro dentro da janela do raio sorteado
 E.MEM = {}
 D, P, AT, GF = E.D, E.P, E.AT, E.GF
 CAUSAS_OK = D.get('causas_jogaveis', ['A_calibrar', 'B_potencia'])
@@ -154,21 +165,21 @@ def fumaca(c):
             run('coletar', g, 1, idx); run('ir', g, 1, a['sala_destino']); o = run('deixar', g, 1); run('proxima', g); run('ir', g, 2, a['sala_destino']); run('olhar', g, 2)
             s = E.load(g); j2 = s['jog'][1]; ok = a['aparece_como'] in j2['olhar'] and E.visivel(P[a['aparece_como']], s, j2)
             out.append((A['id'], 'chao', ok)); continue
-        seg = 66 if A.get('janela_segundos') else 0
+        seg = JAN0 if A.get('janela_segundos') else 0
         for v in ([4, 5] if A.get('conserto') else [max(A['volta_min'], 2)]):
             s = novo(2, 'coop,coop', A); pos(s, v, A['salas'], seg); o = run('coop', g, A['id'], 1, 2, *vals); s = E.load(g)
             prod = (A['produto_ensaio'] if v == 4 else A['produto_final']) if A.get('conserto') else next(i for i in A['produz'] if p_ativa(P[i], c))
             out.append((A['id'], f'dupla V{v}', all(prod in j['caderno'] for j in s['jog']) and (not A.get('conserto') or v == 4 or s['conserto'] == 5)))
         if A.get('conserto'):   # ordem dos nomes invertida tambem vale
             s = novo(2, 'coop,coop', A); pos(s, 5, A['salas'], seg); run('coop', g, A['id'], 2, 1, *vals); out.append((A['id'], 'dupla com nomes invertidos', E.load(g)['conserto'] == 5))
-            if vals:   # valor errado nao conserta; com Central a carga volta
+            if vals:   # valor errado nao conserta, gasta a energia (a Central nao devolve nada) e a maquina nao diz QUAL valor errou
                 s = novo(3, 'coop,coop,coop', A); pos(s, 5, A['salas'] + ['seguranca'], seg); oc = run('central', g, 3); o = run('coop', g, A['id'], 1, 2, *['0'] * len(vals)); s = E.load(g)
-                out.append((A['id'], 'valor errado + Central devolve carga', s['conserto'] is None and 'CENTRAL' in oc and s['jog'][0]['cargas'] == 6 and 'Formato' in o))
+                out.append((A['id'], 'valor errado gasta energia e nao diz qual', s['conserto'] is None and 'CENTRAL' in oc and s['jog'][0]['cargas'] == 6 - A.get('custo_por_pessoa', 1) and 'Formato' in o and 'Ainda errado' not in o))
         S = A.get('solo')
         if S and S['tipo'] == 'eco':
-            s = novo(1, 'solo', A); pos(s, 3, [S['sala_gravar']], 66); run('solo', g, 1, A['id']); ok1 = bool(E.load(g)['eco'].get(A['id']))
-            pos(E.load(g), 4, [S['sala_executar']], 66); run('solo', g, 1, A['id']); ok2 = A['produto_ensaio'] in E.load(g)['jog'][0]['caderno']
-            pos(E.load(g), 5, [S['sala_executar']], 66); run('solo', g, 1, A['id']); ok3 = E.load(g)['conserto'] == 5
+            s = novo(1, 'solo', A); pos(s, 3, [S['sala_gravar']], JAN0); run('solo', g, 1, A['id']); ok1 = bool(E.load(g)['eco'].get(A['id']))
+            pos(E.load(g), 4, [S['sala_executar']], JAN0); run('solo', g, 1, A['id']); ok2 = A['produto_ensaio'] in E.load(g)['jog'][0]['caderno']
+            pos(E.load(g), 5, [S['sala_executar']], JAN0); run('solo', g, 1, A['id']); ok3 = E.load(g)['conserto'] == 5
             out.append((A['id'], 'solo eco V3 grava / V4 ensaio / V5 vale', ok1 and ok2 and ok3))
         if S and S['tipo'] == 'individual':
             s = novo(1, 'solo', A); pos(s, 4, [S['sala']], 0); run('solo', g, 1, A['id'], *vals); ok1 = A['produto_ensaio'] in E.load(g)['jog'][0]['caderno']
@@ -186,7 +197,7 @@ def fumaca(c):
             if i not in R: out.append((A['id'], f'pista solo {i}', False))
     if len(al) > 1:   # dois defeitos: um por volta
         A1, A2 = [AT[a] for a in sorted(al, key=lambda a: bool(AT[a].get('janela_segundos')))]
-        def faz(s, v, A): pos(s, v, A['salas'], 66 if A.get('janela_segundos') else 0); return run('coop', g, A['id'], 1, 2, *vals_de(A))
+        def faz(s, v, A): pos(s, v, A['salas'], JAN0 if A.get('janela_segundos') else 0); return run('coop', g, A['id'], 1, 2, *vals_de(A))
         s = novo(2, 'coop,coop'); o1 = faz(s, 3, A1); ok1 = E.load(g)['meio'].get(A1['id']) == 3 and A1['produto_meio'] in E.load(g)['jog'][0]['caderno']
         o1b = faz(E.load(g), 4, A1); ok1b = 'já está gravada' in o1b
         o2 = faz(E.load(g), 4, A2); ok2 = A2['produto_ensaio'] in E.load(g)['jog'][0]['caderno']
@@ -195,6 +206,9 @@ def fumaca(c):
         s = novo(2, 'coop,coop'); faz(s, 5, A2); faz(E.load(g), 5, A1); out.append(('dois defeitos', 'os dois na mesma volta 5 NAO consertam', E.load(g)['conserto'] is None and len(E.load(g)['meio']) == 2))
         s = novo(2, 'coop,coop'); faz(s, 4, A2); faz(E.load(g), 5, A1); out.append(('dois defeitos', f'{A2["id"]} gravado na V4, {A1["id"]} vale na V5', E.load(g)['conserto'] == 5))
     # anexar: feedback com placar; causa-metade na noite de dois defeitos
+    s = novo(1, 'solo'); pos(s, 4, ['recepcao'], 0); o = run('revelar', g, 1, D['culpado'].split()[0]); s = E.load(g)
+    out.append(('revelar', 'recusado antes da volta 5 (com as provas no caderno)', s['revelado'] is None and 'última volta' in o))
+    pos(s, 5, ['recepcao'], 0); o = run('revelar', g, 1, D['culpado'].split()[0]); out.append(('revelar', 'aceito na volta 5, na Recepção', bool(E.load(g)['revelado'] and E.load(g)['revelado']['ok'])))
     s = novo(1, 'solo'); s['diag'] = None; s['volta'] = 2; rd = req_diag(c); ids = [r[1][0] for r in rd]
     o = run('anexar', g, c, ids[0], ids[0].rsplit('_', 1)[0] + '_' + ('2' if not ids[0].endswith('2') else '1'), ids[2])
     out.append(('anexar', 'sinal repetido e recusado com placar "1 de 2 sinais"', ('PRÉ-CONFERÊNCIA' in o or ('Contaram 1 de 2 sinais' in o and 'REPETIDO' in o)) and E.load(g)['diag'] is None))
@@ -229,7 +243,7 @@ class Otimo:
         return any(i in ids for i in r[1])
     def plano(self, pid, j, vistos=()):
         """Lista de pistas a coletar (pre-requisitos primeiro) para o jogador j ter pid; None se nao da nesta volta."""
-        s = self.s(); x = P[pid]; jj = s['jog'][j]; u = E.uniao(s)
+        s = self.s(); x = P[pid]; jj = s['jog'][j]; u = set(jj['caderno'])   # revisao 3: precisaDe confere o caderno de quem coleta
         if pid in vistos or not p_ativa(x, self.c) or x.get('daAtividade') or not (x['volta_min'] <= s['volta'] <= x['volta_max']) or not E.chao_ok(x, s): return None
         seq = []; pd = x['precisaDe']
         for i in pd['todas']:
@@ -396,8 +410,8 @@ def bot(c, seed):
     rnd = random.Random(seed); g = 'bot'; n = rnd.choice([1, 2, 2, 3, 3, 4])
     modos = ['solo'] if n == 1 else [rnd.choice(['coop', 'coop', 'coop', 'solo']) for _ in range(n)]
     run('novo', g, n, c, ','.join(modos)); salas = D['salas']; ats = list(AT); sus = [x.split()[0] for x in D['suspeitos']]
-    POOL = dict(dia_da_troca=lambda: rnd.randint(1, 31), hora_do_apagao=lambda: rnd.choice(['1:10', '1:13', '2:40', '4:00', '4:10', '0:00', '5:00', '3:50']),
-                tombo=lambda: rnd.choice([472, rnd.randint(100, 999)]), ordem_circuito=lambda: rnd.choice(['1-2-3', '1-3-2', '2-1-3', '2-3-1', '3-1-2', '3-2-1']))
+    POOL = dict(dia_da_troca=lambda: rnd.randint(1, 31), hora_do_apagao=lambda: rnd.choice([D['valores']['hora_do_apagao'], '1:10', '1:13', '2:40', '4:00', '4:10', '0:00', '5:00', '3:50']),
+                tombo=lambda: rnd.choice([D['valores']['tombo'], rnd.randint(100, 999)]), ordem_circuito=lambda: rnd.choice(['1-2-3', '1-3-2', '2-1-3', '2-3-1', '3-1-2', '3-2-1']))
     def chute_vals(A): return [POOL[k]() for k in A.get('valores_pedidos', [])]
     for v in range(1, 6):
         for passo in range(70 * n):
@@ -411,7 +425,7 @@ def bot(c, seed):
             elif r < 0.70:
                 run('olhar', g, j); jj = E.load(g)['jog'][j - 1]
                 if jj['olhar']: run('coletar', g, j, rnd.randrange(len(jj['olhar'])))
-            elif r < 0.75: run('esperar', g, j, min(300, jj['seg'] + rnd.choice([5, 10, 20, 40, 66 - jj['seg'] if jj['seg'] < 66 else 30])))
+            elif r < 0.75: run('esperar', g, j, min(300, jj['seg'] + rnd.choice([5, 10, 20, 40, JAN0 - jj['seg'] if jj['seg'] < JAN0 else 30])))
             elif r < 0.80:
                 u = sorted(E.uniao(s))
                 if len(u) >= 3: run('anexar', g, rnd.choice(D['causas_possiveis']), *rnd.sample(u, 3))
@@ -421,13 +435,13 @@ def bot(c, seed):
                     run('ir', g, j, A['salas'][0]); run('ir', g, k, A['salas'][1])
                     if A.get('janela_segundos'):
                         for q in (j, k):
-                            if E.load(g)['jog'][q - 1]['seg'] < 66: run('esperar', g, q, 66)
+                            if E.load(g)['jog'][q - 1]['seg'] < JAN0: run('esperar', g, q, JAN0)
                 run('coop', g, A['id'], j, k, *chute_vals(A))
             elif r < 0.93:
                 A = AT[rnd.choice(ats)]; S = A.get('solo')
                 if S and rnd.random() < 0.6:
                     run('ir', g, j, rnd.choice([S.get('sala_gravar'), S.get('sala_executar')] if S['tipo'] == 'eco' else [S['sala']]) or 'prototipo')
-                    if A.get('janela_segundos') and E.load(g)['jog'][j - 1]['seg'] < 66: run('esperar', g, j, 66)
+                    if A.get('janela_segundos') and E.load(g)['jog'][j - 1]['seg'] < JAN0: run('esperar', g, j, JAN0)
                 run('solo', g, j, A['id'], *chute_vals(A))
             elif r < 0.95:
                 if rnd.random() < 0.5: run('ir', g, j, 'prototipo')   # testa o caminho do chao, nao a sorte da sala
@@ -471,7 +485,7 @@ def caminhos(c, R):
 def checar_v3(c):
     """(f) tamanho, formato dos valores escrito, papeis da volta 5."""
     bad = []; n = sum(1 for x in D['pistas'] if p_ativa(x, c))
-    if not 90 <= n <= 190: bad.append(f'{n} pistas ativas (esperado perto de 100)')
+    if not 90 <= n <= 230: bad.append(f'{n} pistas ativas (teto 230 desde a revisão 3: cada sinal ganhou par de mesmo rótulo nas outras noites)')
     for A in [AT[a] for a in E.alvos_de(c)]:
         for k in ('papelA', 'papelB', 'papelCentral'):
             if not A.get(k): bad.append(f'{A["id"]}: falta {k}')
@@ -492,12 +506,42 @@ def checar_v3(c):
     if not set(pv.get('dica_de_tela', {})) >= ids: bad.append('papeis_volta5: falta dica de tela para algum papel')
     return bad, n
 
+# ------------------------------------------------------------------ (g) previas: a lista de cada sala nao pode mudar com a causa
+def checar_previas():
+    """Devolve (erros, avisos). Erro: rotulo que existe numa causa so (denuncia o defeito). Aviso: rotulo que falta em alguma causa, lista de tamanho diferente,
+    ou par com custo, minuto, volta ou icone diferente do original."""
+    TL = {'comum': 'Registro', 'clima': 'Observação', 'coop': 'Relato', 'falsa_honesta': 'Observação', 'objeto': 'Objeto'}
+    erros = []; avisos = []
+    for sl in D['salas']:
+        por = {}
+        for x in D['pistas']:
+            if x['sala'] != sl or (x.get('daAtividade') and not E._de_chao(x)): continue
+            for c in CAUSAS_OK:
+                if p_ativa(x, c): por.setdefault(x['previa'], {}).setdefault(c, []).append(x)
+        for pv, cc in por.items():
+            falta = [c for c in CAUSAS_OK if c not in cc]
+            if len(cc) == 1: erros.append(f'previa "{pv}" ({sl}) existe em uma causa so: {list(cc)[0]}')
+            elif falta: avisos.append(f'previa "{pv}" ({sl}) nao existe em: {", ".join(falta)}')
+            if len(set(len(v) for v in cc.values())) > 1 and not falta: avisos.append(f'previa "{pv}" ({sl}) aparece um numero diferente de vezes conforme a causa')
+            marcas = {c: sorted((x['custo'], x.get('segundo_min', 0), x['volta_min'], x['volta_max'], x.get('tipoTela') or TL.get(x['tipo'], x['tipo']), bool(x.get('enigma'))) for x in v) for c, v in cc.items()}
+            if len(set(map(str, marcas.values()))) > 1: avisos.append(f'previa "{pv}" ({sl}): custo, minuto, volta ou icone mudam com a causa: ' + '; '.join(f'{c[0]}={m}' for c, m in marcas.items()))
+        tam = {c: sum(1 for v in por.values() if c in v for _ in v[c]) for c in CAUSAS_OK}
+        if len(set(tam.values())) > 1: avisos.append(f'sala {sl}: a lista tem tamanho diferente conforme a causa: {tam}')
+    return erros, avisos
+
 # ------------------------------------------------------------------ relatorio
 def main():
-    print(f'VALIDADOR LOOP v3 | dados: {E.DATA} | {len(D["pistas"])} pistas, {len(AT)} atividades, {len(D["salas"])} salas abertas (+{len(D.get("salas_em_reforma", []))} em reforma) | causas: {", ".join(CAUSAS_OK)}')
+    v = D['valores']; print(f'VALORES SORTEADOS (semente {SEMENTE}): dia {v["dia_da_troca"]}, raio em {v["hora_do_apagao"]} (janela {E.mmss(E.JANELA[0])} a {E.mmss(E.JANELA[1])}), registro {v["tombo"]}, ordem {v["ordem_circuito"]}, chave {v["chave_do_raio"]}, cofre {E.VAL["reg_inv"]}')
+    print(f'VALIDADOR LOOP v4 revisão 3 | dados: {E.DATA} | {len(D["pistas"])} pistas, {len(AT)} atividades, {len(D["salas"])} salas abertas (+{len(D.get("salas_em_reforma", []))} em reforma) | causas: {", ".join(CAUSAS_OK)}')
     bad = checar_ids(); ERROS.extend(bad)
     print(f'(a) ids referenciados: {"OK, todos existem" if not bad else "FALHA"}')
     for b in bad: print('   -', b)
+    pe, pa = checar_previas(); ERROS.extend(pe)
+    print(f'(g) prévias iguais nas 5 causas, sala por sala: {"OK" if not pe and not pa else ("FALHA" if pe else "AVISO")} ({len(pe)} em causa única, {len(pa)} aviso(s))')
+    for b in pe: print('   - ERRO:', b)
+    for b in pa: print('   - AVISO:', b)
+    for x in E.D0['pistas']:
+        if x.get('enigma') and '{' not in str(x['enigma']['resposta']): ERROS.append(f'{x["id"]}: a senha do enigma está fixa nos dados (deveria sair de um marcador sorteado)')
     resumo = []; taxas = []
     for nc, c in enumerate(CAUSAS_OK):
         bad3, n_at = checar_v3(c); print(f'\n=== {c} === ({n_at} pistas ativas) conserto: {" + ".join(E.alvos_de(c))}')
@@ -507,16 +551,18 @@ def main():
         ERROS.extend(f'{c}: pista inalcancavel {i}' for i in mortas)
         fz = fumaca(c); ruins = [f'{a} {m}' for a, m, ok in fz if not ok]; ERROS.extend(f'{c}: atividade falhou {r}' for r in ruins)
         print(f'(a) teste das atividades pelo motor ({len(fz)} caminhos: dupla, solo, Central, anexar): {"OK" if not ruins else "FALHA: " + "; ".join(ruins)}')
-        for n, rot in ((1, 'OTIMO SOLO  (1 pessoa, 6 cargas/volta)'), (2, 'OTIMO DUPLA (2 pessoas, 5 cargas/volta)')):
+        for n, rot in ((1, f'OTIMO SEM DUPLA (1 pessoa, {ENERGIA} de energia/volta)'), (2, f'OTIMO DUPLA (2 pessoas, {ENERGIA} de energia/volta cada)'), (3, f'OTIMO TRIO (3 pessoas, {ENERGIA} de energia/volta cada)')):
             o = Otimo(c, n).jogar(); h = o.hist; ok = o.final == 'Ouro'
             if not ok: ERROS.append(f'{c}: {rot} nao chegou ao Ouro ({o.final})')
-            orc = (6 if n == 1 else 10)
+            orc = ENERGIA * n
             print(f'(b) {rot}: final = {o.final} na volta 5 | diagnostico anexado V{h["diag"]} | conserto pronto V{h["pronto"]}' + (f' | eco V{h["eco"]}' if h['eco'] else '') + (f' | peca no chao V{h["chao"]}' if h['chao'] else '') +
-                  (f' | meio conserto V{h["meio"]}' if h['meio'] else '') + f' | ensaio V{h["ensaio"]} | conserto V{h["conserto"]} | cargas por volta {h["cargas"]} de {orc} (total {sum(h["cargas"])} de {orc * 5})')
+                  (f' | meio conserto V{h["meio"]}' if h['meio'] else '') + f' | ensaio V{h["ensaio"]} | conserto V{h["conserto"]} | energia gasta por volta {h["cargas"]} de {orc} (total {sum(h["cargas"])} de {orc * 5})')
+            if '--so-otimo' in sys.argv: resumo.append((c, n, o.final)); continue
             if '-v' in sys.argv or not ok:
                 for l in o.log: print('      ', l)
                 print('      ', o.saida_final)
             resumo.append((c, n, o.final))
+        if '--so-otimo' in sys.argv: continue
         cont = {}; diag = 0
         for i in range(NBOTS):
             f, d = bot(c, i * 7919 + nc + 1); cont[f] = cont.get(f, 0) + 1; diag += d
@@ -529,8 +575,20 @@ def main():
         print(f'    endurecimento: salas que fecham o diagnostico sozinhas: {soz or "nenhuma"}')
         print(f'(f) tamanho, formato dos valores e papeis da volta 5 (turma de 5 com Central): {"OK" if not bad3 else "FALHA: " + "; ".join(bad3)}')
         ERROS.extend(f'{c}: {x}' for x in out + bad3); ERROS.extend(f'{c}: sala {x} fecha o diagnostico sozinha' for x in soz)
-    print('\nRESUMO: ' + ' | '.join(f'{c}: solo={dict((k, f) for k, n, f in resumo if k == c and n == 1)[c]}, dupla={dict((k, f) for k, n, f in resumo if k == c and n == 2)[c]}, bot={tx:.2f}%' for c, tx in taxas))
-    print('RESULTADO: ' + ('APROVADO nas 5 causas: otimo solo e otimo dupla chegam ao Ouro; bot aleatorio abaixo de 2% em todas.' if not ERROS else f'REPROVADO ({len(ERROS)} problema(s))'))
+    fin = lambda c, n: next(f for k, m, f in resumo if k == c and m == n)
+    if '--so-otimo' in sys.argv:
+        print('SO-OTIMO semente ' + str(SEMENTE) + ': ' + ' | '.join(f'{c}: 1={fin(c, 1)}, 2={fin(c, 2)}, 3={fin(c, 3)}' for c in CAUSAS_OK) + (' | OK' if not ERROS else f' | FALHA ({len(ERROS)})'))
+        for e in ERROS: print('   -', e)
+        return 0 if not ERROS else 1
+    # o jogador otimo de novo, com outros valores sorteados (o resultado nao pode depender dos numeros)
+    outras = [SEMENTE + 101 * k for k in range(1, 5)]
+    for sm in outras:
+        r = subprocess.run([sys.executable, os.path.abspath(__file__), '10', '--semente', str(sm), '--so-otimo'], capture_output=True, text=True, env=dict(os.environ, LOOP_SEMENTE=str(sm)))
+        linha = next((l for l in r.stdout.splitlines() if l.startswith('SO-OTIMO')), 'sem resposta: ' + (r.stderr.strip().splitlines() or ['?'])[-1])
+        print('(b) ' + linha)
+        if r.returncode != 0: ERROS.append(f'semente {sm}: jogador otimo falhou ({linha})')
+    print('\nRESUMO: ' + ' | '.join(f'{c}: sem dupla={fin(c, 1)}, dupla={fin(c, 2)}, trio={fin(c, 3)}, bot={tx:.2f}%' for c, tx in taxas))
+    print('RESULTADO: ' + ('APROVADO nas 5 causas: otimo sem dupla, em dupla e em trio chegam ao Ouro (com 5 jogos de valores sorteados); bot aleatorio abaixo de 2% em todas; previas iguais nas 5 causas.' if not ERROS else f'REPROVADO ({len(ERROS)} problema(s))'))
     for e in ERROS: print('   -', e)
     return 0 if not ERROS else 1
 if __name__ == '__main__': sys.exit(main())

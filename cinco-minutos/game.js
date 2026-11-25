@@ -136,19 +136,34 @@ function sala(id){
  const alt = m.v ? PECAS_ALT[id]?.[m.v-1] : null;
  const r = {...base, name:m.nome, andar:m.andar, lugar:m.lugar, nomeBase:base.name, ...(alt ? alt : {})};
  const L = (typeof state !== 'undefined' && state && state.caseRules === 2) ? LOOP_SALAS[id] : null;   // no Loop: nome, peça e legenda da história
- if (L) { delete r.livro; delete r.capa; Object.assign(r, {name:L[0], sub:L[1], peca:L[2]}); }
+ if (L) { delete r.livro; delete r.capa; Object.assign(r, {name:L[0], sub:L[1], peca:L[2], andar:L[3], lugar:L[4]}); }
  return r;
 }
-// Salas da história do Loop: um nome só por sala (o mesmo das pistas e do roteiro) e a peça que pertence à cena.
+// Salas da história do Loop: um nome só por sala (o mesmo das pistas e do roteiro), a peça que pertence à cena e o andar FIXO (as pistas falam de escada, porta de vidro e de quem sobe para a Galeria).
+// [nome, legenda, peça, andar, ordem no andar]
 const LOOP_SALAS = {
- prototipo:['Subsolo · Câmara do tempo','A máquina do tempo','T01'], patio:['Pátio · Quadro externo','Quadro de energia e para-raios','E01'],
- eletrica:['Oficina elétrica','Gerador, fusíveis e luvas','E02'], relogios:['Sala dos relógios','Relógios que param na queda de luz','R02'],
- seguranca:['Central de monitoramento','Câmeras e crachás','S01'], recepcao:['Recepção','Livro de visitas e roleta','P01'],
- conservacao:['Sala de conservação','Registros e laudos do acervo','I01'], atelie:['Ateliê de descobertas','Bancada da Ivone e manual','L06'],
- deposito:['Sala das coleções','Caixas e movimentações','V12'], galeria:['Galeria especial','A peça principal','V11'],
- manutencao:['Oficina técnica','Ferramentas e fusíveis','M03'], corredor:['Corredor de serviço e descanso','Porta de serviço e recados','V41'],
- limpeza:['Base da limpeza','Armário da equipe e carrinho','L05'], sons:['Sala dos sons','Rádio da equipe','N07'], fotografia:['Sala da fotografia','Câmera antiga e catálogo','N05']
+ galeria:['Galeria especial','A peça principal','V11','2º andar',1],
+ conservacao:['Sala de conservação','Registros e laudos do acervo','I01','1º andar',1], sons:['Sala dos sons','Rádio da equipe','N07','1º andar',2],
+ fotografia:['Sala da fotografia','Câmera antiga e catálogo','N05','1º andar',3], relogios:['Sala dos relógios','Relógios que param na queda de luz','R02','1º andar',4],
+ recepcao:['Recepção','Livro de visitas e roleta','P01','Térreo',1], seguranca:['Central de monitoramento','Câmeras e crachás','S01','Térreo',2],
+ corredor:['Área de descanso','Porta de serviço e recados','V41','Térreo',3], limpeza:['Base da limpeza','Armário da equipe e carrinho','L05','Térreo',4],
+ atelie:['Ateliê de descobertas','Bancada da Ivone e manual','L06','Térreo',5], deposito:['Sala das coleções','Caixas e movimentações','V12','Térreo',6],
+ manutencao:['Oficina técnica','Ferramentas e fusíveis','M03','Térreo',7], eletrica:['Oficina elétrica','Gerador, fusíveis e luvas','E02','Térreo',8],
+ patio:['Pátio · Quadro externo','Quadro de energia e para-raios','E01','Térreo',9],
+ prototipo:['Subsolo · Câmara do tempo','A máquina do tempo','T01','Subsolo',1]
 };
+// Descrição de cada sala no Loop (uma linha, do mundo da história).
+const LOOP_DESC = {
+ prototipo:'A Câmara do tempo zumbe, tenta ligar e desiste.', patio:'Chove. O Quadro externo fica embaixo do para-raios.',
+ eletrica:'O gerador ronca baixo entre fios, fusíveis e luvas.', relogios:'Dezenas de relógios, cada um no seu passo.',
+ seguranca:'Monitores, um cofre pequeno e o café do Braga.', recepcao:'O livro de visitas, a roleta e um telefone que toca.',
+ conservacao:'Diário do acervo, laudos e registros em cima da mesa.', atelie:'A bancada da Ivone e o manual da Câmara.',
+ deposito:'Caixas empilhadas e uma mancha vermelha no chão.', galeria:'A peça principal na base. Aurélio não sai da frente dela.',
+ manutencao:'Ferramentas, um armário travado e a cadeira vazia do Téo.', corredor:'A cafeteira, o mural e a porta de serviço.',
+ limpeza:'O armário da equipe, o carrinho e Seu Dirceu de rodo na mão.', sons:'Um rádio, um gravador e a música de elevador.',
+ fotografia:'Uma câmera antiga que dispara quando quer.'
+};
+const descSala = id => (typeof state !== 'undefined' && state && state.caseRules === 2 && LOOP_DESC[id]) || roomDescriptions[id];
 // Troca, em qualquer texto de pista, o nome de origem das salas pelo nome da partida.
 function nomear(texto){
  if (typeof state !== 'undefined' && state && state.caseRules === 2) return texto;   // no Loop os nomes das salas são fixos
@@ -632,7 +647,7 @@ function renderClues(){
   panel.dataset.visiveis = visiveis;
   const hotspots = clues.map((clue, i) => '<button type="button" class="hs" slot="hotspot-'+i+'" data-hs="'+clue.id+'" data-visibility-attribute="visible" data-position="0m 0m 0m" data-normal="0m 1m 0m" aria-label="Ponto de interesse na peça"></button>').join('');
   if (room.livro) {
-   panel.innerHTML = '<h3>'+room.name+'</h3><p>'+roomDescriptions[room.id]+'</p>'+
+   panel.innerHTML = '<h3>'+room.name+'</h3><p>'+descSala(room.id)+'</p>'+
     '<div class="peca livro"><iframe title="Livro da sala" src="'+new URL('livro/index.html?embed=1&solo=1&capa='+encodeURIComponent(room.capa||'Livro|REGISTRO'), PECAS_URL.href.replace('pecas/','')).href+'" allow="xr-spatial-tracking; camera; fullscreen" loading="eager"></iframe></div>'+
     '<p class="dica">Arraste a página para virar a folha. O que a página mostra vai para o seu caderno. Se o livro não abrir, use a lista.</p>'+
     '<details class="lista-pistas"><summary>Examinar pela lista</summary><div class="clue-list">'+
@@ -641,7 +656,7 @@ function renderClues(){
    panel.querySelectorAll('[data-clue]').forEach(button => { button.onclick = () => collect(button.dataset.clue); });
    panel.dataset.livro = '';
   } else
-  panel.innerHTML = '<h3>'+room.name+'</h3><p>'+roomDescriptions[room.id]+'</p>'+
+  panel.innerHTML = '<h3>'+room.name+'</h3><p>'+descSala(room.id)+'</p>'+
    '<div class="peca"><model-viewer loading="eager" reveal="auto" src="'+new URL(room.peca+'.glb', PECAS_URL).href+'" alt="Peça da sala '+esc(room.name)+'" ar ar-modes="webxr scene-viewer quick-look" ar-scale="auto" ar-placement="floor" camera-controls touch-action="pan-y" interaction-prompt="none" shadow-intensity="0.6" exposure="1.15" field-of-view="26deg" min-field-of-view="12deg" max-field-of-view="45deg">'+hotspots+'<button type="button" slot="ar-button" class="btn secondary ar-btn">Ver no ambiente</button></model-viewer></div>'+
    '<p class="dica">Gire a peça e toque nos pontos que brilham. As pistas ficam escondidas nela.</p>'+
    '<details class="lista-pistas"><summary>Examinar pela lista</summary><div class="clue-list">'+
@@ -664,8 +679,8 @@ function renderClues(){
  const storySeconds = elapsed*300/state.duration;
  $('fictionTime').textContent = museumTime();
  const signal = $('museumSignal');
- const signalText = storySeconds >= 165 ? 'O alarme soa pelo museu.'
-  : storySeconds >= 120 ? 'Um estrondo ecoa. A iluminação principal se apaga.' : '';
+ const signalText = storySeconds >= 160 ? 'O alarme soa pelo museu.'
+  : (storySeconds >= 120 && state.caseRules !== 2) ? 'Um estrondo ecoa. A iluminação principal se apaga.' : '';   // no Loop a luz cai com o raio, na hora sorteada: a faixa não anuncia (seria a hora de graça)
  if (signal.textContent !== signalText) signal.textContent = signalText;
  clues.forEach(clue => {
   const button = panel.querySelector('[data-clue="'+clue.id+'"]');
@@ -674,14 +689,17 @@ function renderClues(){
   const wait = clue.time/300*state.duration-elapsed;
   const bl = !registered && wait <= 0 ? bloqueioPista(clue, storySeconds) : '';
   const fechado = clue.enigma&&!(state.resolvidos&&state.resolvidos[clue.id]);
-  const label = registered?'✓ no caderno':wait>0?'em '+fmt(wait):bl?'travada':fechado?'🔒 abrir':(typeof custoPista==='function'&&custoPista(clue)?'1 ⚡':'grátis');
-  const estado = registered?'feita':wait>0?'espera':bl?'travada':'livre';
-  button.disabled = registered || wait > 0 || !!bl;
+  const custoN = typeof custoPista==='function' ? custoPista(clue) : 0;
+  const pp = clue.lcp && typeof LC_PID !== 'undefined' ? LC_PID[clue.lcp] : null, repega = registered && !!pp && pp.tipo === 'objeto' && !!pp.objeto;   // objeto do caderno pode voltar para a mão
+  // no Loop a lista não conta quanto falta: a contagem entregaria a hora do raio
+  const label = repega?'pegar de novo · grátis':registered?'✓ no caderno':wait>0?(clue.lcp?'ainda não':'em '+fmt(wait)):bl?'travada':fechado?'🔒 abrir':(custoN?custoN+' ⚡':'grátis');
+  const estado = repega?'livre':registered?'feita':wait>0?'espera':bl?'travada':'livre';
+  button.disabled = (registered && !repega) || wait > 0 || !!bl;
   if (button.dataset.estado !== estado) button.dataset.estado = estado;
-  const aria = clue.name+': '+(registered?'já está no caderno':wait>0?'aparece em '+fmt(wait):bl?'travada agora':fechado?'tem tranca':(typeof custoPista==='function'&&custoPista(clue)?'gasta 1 de energia':'não gasta energia'));
+  const aria = clue.name+': '+(repega?'já está no caderno; pegar de novo não gasta energia':registered?'já está no caderno':wait>0?(clue.lcp?'ainda não apareceu':'aparece em '+fmt(wait)):bl?'travada agora':fechado?'tem tranca':(custoN?'gasta '+custoN+' de energia':'não gasta energia'));
   if (button.getAttribute('aria-label') !== aria) button.setAttribute('aria-label', aria);
   if (button.lastElementChild.textContent !== label) button.lastElementChild.textContent = label;
-  if (hs) { hs.classList.toggle('on', wait <= 0 && !bl); hs.classList.toggle('ok', registered); hs.disabled = registered; }
+  if (hs) { hs.classList.toggle('on', wait <= 0 && !bl); hs.classList.toggle('ok', registered); hs.disabled = registered && !repega; }
  });
  if (room.livro) atualizarLivro(clues, elapsed);
  renderNoitePanel();
@@ -808,7 +826,7 @@ function bloqueioPista(q, storySec){
  const tr = state.trava && state.trava[state.loop+':'+state.room]; if (tr && tr !== q.id) return 'Os seguranças chegaram. Esta sala fica vigiada até o fim da volta.';
  return '';
 }
-function collect(id){if(andando()){toast('Você ainda está chegando na sala.');return}if(state.phase!=='playing'||(window.coop?.now() ?? Date.now())>=state.endAt){tick();return}const q=scenarioClues()[state.room].find(x=>x.id===id);if(!q||state.clues.some(x=>x.id===id)||state.duration-(state.endAt-(window.coop?.now() ?? Date.now()))/1000<q.time/300*state.duration)return;{const bl=bloqueioPista(q,(state.duration-(state.endAt-(window.coop?.now() ?? Date.now()))/1000)*300/state.duration);if(bl){toast(bl);return}}if(q.enigma&&!(state.resolvidos&&state.resolvidos[q.id])){abrirEnigma(q);return}if(q.lcp&&window.lcBancada&&lcBancada(q))return;if(!cobrarPista(q))return;const room=sala(state.room);state.clues.push({id:q.id,room:room.name,name:q.name,text:q.text,tipo:q.tipo,fatos:q.fatos,loop:state.loop,etq:q.etq||''});if(q.lcp)lcAposColetar(q);if(q.trava){(state.trava ||= {})[state.loop+':'+state.room]=q.id}save();renderClues();renderJournal();toast(q.trava?'Pista no caderno. Os seguranças estão a caminho!':'Pista guardada no caderno')}
+function collect(id){if(andando()){toast('Você ainda está chegando na sala.');return}if(state.phase!=='playing'||(window.coop?.now() ?? Date.now())>=state.endAt){tick();return}const q=scenarioClues()[state.room].find(x=>x.id===id);{const pp=q&&q.lcp&&LC_PID[q.lcp];if(pp&&pp.tipo==='objeto'&&pp.objeto&&lcTem(q.lcp)){lcS().mao={obj:pp.objeto,volta:state.loop};save();renderClues();toast('Você pegou de novo. Está na sua mão.');return}}if(!q||state.clues.some(x=>x.id===id)||state.duration-(state.endAt-(window.coop?.now() ?? Date.now()))/1000<q.time/300*state.duration)return;{const bl=bloqueioPista(q,(state.duration-(state.endAt-(window.coop?.now() ?? Date.now()))/1000)*300/state.duration);if(bl){toast(bl);return}}if(q.enigma&&!(state.resolvidos&&state.resolvidos[q.id])){abrirEnigma(q);return}if(q.lcp&&window.lcBancada&&lcBancada(q))return;if(!cobrarPista(q))return;const room=sala(state.room);state.clues.push({id:q.id,room:room.name,name:q.name,text:q.text,tipo:q.tipo,fatos:q.fatos,loop:state.loop,etq:q.etq||''});if(q.lcp)lcAposColetar(q);if(q.trava){(state.trava ||= {})[state.loop+':'+state.room]=q.id}save();renderClues();renderJournal();toast(q.trava?'Pista no caderno. Os seguranças estão a caminho!':'Pista guardada no caderno')}
 function renderJournal(){
  const clues=state.clues||[];$('countBadge').textContent=clues.length;
  $('journalPreview').innerHTML=clues.length?clues.slice(-3).reverse().map(c=>'<div class="preview-item">'+fichaSala(c.room,'sm')+'<div>'+esc(c.name)+'<small>'+esc(c.room)+'</small></div></div>').join(''):'<p class="muted">O que você achar aparece aqui.</p>';
@@ -1013,6 +1031,7 @@ function partialRecord(key){
 }
 function renderArchive(){
  const panel = $('archivePanel');
+ if (state.caseRules === 2) { panel.classList.add('hidden'); return; }   // no Loop não existe o arquivo do caso antigo
  panel.classList.toggle('hidden', state.caseRules !== 2 || !!window.coop);
  if (state.caseRules !== 2 || window.coop) return;
 
@@ -1092,7 +1111,7 @@ function renderForm(){
  $('reflectionForm').open = !central;
  $('answerForm').querySelector('button[type=submit]').textContent = central ? 'Ver meu desfecho' : 'Apresentar conclusão';
  $('final').querySelector('.large').textContent = central
-  ? 'Veja até onde sua investigação chegou. As perguntas de reflexão são opcionais.'
+  ? 'Veja até onde a sua investigação chegou.'
   : 'Use as pistas do dossiê para reconstruir a noite.';
  $('reflectionForm').hidden = central;
  $('answerFields').innerHTML = '<p class="certeza-note">Escolha o quanto você confia em cada resposta. Com mais certeza você ganha mais pontos se acertar, mas perde pontos se errar. Em Quem e Por quê, aponte a pista que sustenta a resposta: sem ela, vale como palpite.</p>'+
@@ -1196,9 +1215,9 @@ const TOUR = [
   v:()=>'<div class="tv-clock"><span>VOLTA 2 DE 5</span><strong>04:12</strong><small>Minuto da volta · 0:48</small></div><div class="tv-bar"><i></i></div>'},
  {c:'No balcão, a ronda anota tudo: sala, minuto, quem passou. "Se algo der errado hoje", diz o guarda, "estes registros salvam a gente. Mas cuidado: nem tudo que contam é fato."',t:'Seu caderno', d:'Tudo que você acha vai para o caderno. O que alguém conta nem sempre é fato.',
   v:()=>'<div class="tv-dossie"><p><span class="tv-chip obs">Observação</span> O que você viu</p><p><span class="tv-chip rel">Relato</span> O que alguém contou</p><p><span class="tv-chip reg">Registro</span> O que está escrito</p></div>'},
- {c:'Falta pouco para fechar. De repente, um estrondo, o alarme toca e todo mundo fica imóvel. A grade desce. Agora é com você.',t:'A Máquina', d:'Descubra por que a máquina travou. Na 5ª volta, o conserto vale.',
+ {c:'De repente, um raio. A luz cai, volta mais fraca, e o museu inteiro recomeça. Agora é com você.',t:'A Máquina', d:'Descubra por que a máquina travou. Na 5ª volta, o conserto vale.',
   v:()=>'<div class="tv-panel"><b><img class="tv-mini" src="'+ICONE_URL('T01')+'" alt="">A Máquina</b><span class="tv-select">2 sinais + 1 leitura normal</span><span class="tv-btn">Escolher o defeito</span></div><p class="tv-floor">1 tentativa por volta</p>'},
- {c:'Quando o tempo se fecha, a ronda reúne todos. Cada um tem uma versão. Para acertar, você precisa de provas.',t:'Revelar', d:'Com 3 provas no caderno, vá à Recepção e diga quem trocou a peça. É uma tentativa só.',
+ {c:'Quando o tempo se fecha, a ronda reúne todos. Cada um tem uma versão. Para acertar, você precisa de provas.',t:'Revelar', d:'Na última volta, com 3 provas no caderno, vá à Recepção e diga quem trocou a peça. É uma tentativa só.',
   v:()=>'<div class="tv-rooms">'+TV_SALA('galeria')+TV_SALA('seguranca')+TV_SALA('limpeza')+TV_SALA('recepcao',1)+'</div><p class="tv-floor">3 provas · 1 nome · 1 tentativa</p>'}
 ];
 function montarTour(){
