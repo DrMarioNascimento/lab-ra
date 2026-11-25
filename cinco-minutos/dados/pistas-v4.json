@@ -311,7 +311,7 @@
   },
   {
    "id": "abrir_o_quadro",
-   "pergunta": "Como abrir a tampa do Quadro externo?",
+   "pergunta": "Como abrir a porta do Quadro externo?",
    "chaves": {
     "solo": {
      "como": "Uma chavinha (acesso_1, acesso_2 ou acesso_3). Com ela, quadro_aberto mostra a chave {ch} por dentro.",
@@ -991,7 +991,7 @@
   {
    "id": "b_luz_2",
    "sala": "corredor",
-   "texto": "A luz da Área de descanso enfraquece a cada tentativa da máquina. Até a geladeira para de zumbir.",
+   "texto": "A luz da Área de descanso enfraquece a cada tentativa da máquina. Até a cafeteira para de pingar.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -1928,7 +1928,7 @@
   {
    "id": "fh_fotos_parede",
    "sala": "fotografia",
-   "texto": "As fotos da parede são de inaugurações antigas do museu. Em todas, alguém corta uma fita.",
+   "texto": "As fotos da parede são em preto e branco, de detalhes do prédio: uma escada, um arco, umas colunas. Cada uma tem a data impressa no canto.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -2947,7 +2947,7 @@
   {
    "id": "d_fus_3",
    "sala": "fotografia",
-   "texto": "No varal da Sala da fotografia, duas fotos de conferência da caixa de fusíveis da Câmara. A de ontem: lacre inteiro. A de hoje, ainda úmida: lacre cortado e um lugar vazio.",
+   "texto": "No varal da Sala da fotografia, três fotos de conferência da caixa de fusíveis da Câmara. As de anteontem e de ontem: lacre inteiro. A de hoje, ainda úmida: lacre cortado e um lugar vazio.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -2983,7 +2983,7 @@
   {
    "id": "fh_varal",
    "sala": "fotografia",
-   "texto": "No varal da Sala da fotografia, duas fotos ainda úmidas: a fachada do museu com a faixa da festa, de dois ângulos.",
+   "texto": "No varal da Sala da fotografia, três fotos ainda úmidas: a fachada do museu com a faixa da festa, de três ângulos.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -3267,7 +3267,7 @@
   {
    "id": "chave_3",
    "sala": "patio",
-   "texto": "Pelo vidro da tampa do Quadro externo, você segue o cabo do para-raios com o olho. Ele termina na chave {ch}.",
+   "texto": "Pela fresta da porta do Quadro externo, você segue o cabo do para-raios com o olho. Ele termina na chave {ch}.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -3288,13 +3288,13 @@
    "essencialPara": [
     "B_potencia"
    ],
-   "previa": "Seguir o cabo pelo vidro",
+   "previa": "Seguir o cabo pela fresta",
    "custo": 1
   },
   {
    "id": "quadro_0",
    "sala": "patio",
-   "texto": "A tampa do Quadro externo tem um cadeado pequeno. Sem a chavinha, você só olha pelo vidro.",
+   "texto": "A porta do Quadro externo está entreaberta, mas um cadeado pequeno prende a trava: ela não abre mais que uma fresta. Sem a chavinha, você só espia por ali.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -3312,12 +3312,12 @@
    "tipo": "clima",
    "camada": "acesso",
    "custo": 0,
-   "previa": "A tampa do quadro"
+   "previa": "A porta do quadro"
   },
   {
    "id": "d_fus_2",
    "sala": "patio",
-   "texto": "Pelo vidro do Quadro externo: na chave \"Circuito da Câmara\", um cadeado vermelho pendurado, aberto, só de aviso. A etiqueta do cadeado está molhada e a tinta escorreu.",
+   "texto": "Pela fresta do Quadro externo: na chave \"Circuito da Câmara\", um segundo cadeado, amarelo, pendurado aberto, só de aviso. A etiqueta dele está molhada e a tinta escorreu.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -3340,7 +3340,7 @@
    "essencial": true,
    "tipo": "comum",
    "camada": "diagnostico",
-   "previa": "Pelo vidro do quadro",
+   "previa": "Pela fresta do quadro",
    "custo": 1,
    "grupoFonte": "sint_fusivel",
    "essencialPara": [
@@ -3354,7 +3354,7 @@
   {
    "id": "fh_vidro",
    "sala": "patio",
-   "texto": "Pelo vidro do Quadro externo, a chuva escorre e embaça tudo. Dá para ver que tem chaves lá dentro, não a posição delas.",
+   "texto": "Pela fresta do Quadro externo, a chuva respinga lá dentro e está escuro. Dá para ver que tem chaves, não a posição delas.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -3375,7 +3375,7 @@
    "essencial": false,
    "tipo": "comum",
    "camada": "clima",
-   "previa": "Pelo vidro do quadro",
+   "previa": "Pela fresta do quadro",
    "custo": 1,
    "soNaCausa": [
     "A_calibrar",
@@ -3388,7 +3388,7 @@
   {
    "id": "quadro_aberto",
    "sala": "patio",
-   "texto": "Com a chavinha, a tampa do Quadro externo abre. Por dentro, três chaves numeradas. O cabo grosso do para-raios está preso na chave {ch}.",
+   "texto": "Com a chavinha, o cadeado da trava solta e a porta do Quadro externo abre inteira. Por dentro, três chaves numeradas. O cabo grosso do para-raios está preso na chave {ch}.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -3415,7 +3415,7 @@
    ],
    "previa": "Abrir o quadro",
    "custo": 1,
-   "porque": "A tampa do Quadro externo tem um cadeado pequeno. Sem a chavinha, ela não abre."
+   "porque": "A porta do Quadro externo só abre uma fresta: um cadeado pequeno prende a trava. Sem a chavinha, ela não abre."
   },
   {
    "id": "acesso_1",
@@ -4082,7 +4082,7 @@
   {
    "id": "c_esc_1",
    "sala": "deposito",
-   "texto": "Uma caixa de transporte com adesivo do patrocinador: \"BANNERS – NÃO ABRIR\". Você empurra com o pé. Pesa demais pra banner.",
+   "texto": "Numa das caixas etiquetadas da estante, a etiqueta diz \"BANNERS – NÃO ABRIR\", com o adesivo do patrocinador por baixo. Você empurra a caixa. Pesa demais pra banner.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -4549,7 +4549,7 @@
   {
    "id": "cracha_2",
    "sala": "limpeza",
-   "texto": "No armário da equipe, um bilhete em papel de bloco de hotel: \"Braga, peguei teu crachá emprestado. Devolvo amanhã.\" Sem assinatura. Só a pressa na letra.",
+   "texto": "No armário da equipe, no corredor ao lado da Base da limpeza, um bilhete em papel de bloco de hotel: \"Braga, peguei teu crachá emprestado. Devolvo amanhã.\" Sem assinatura. Só a pressa na letra.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -6502,8 +6502,8 @@
    "id": "dis_balde",
    "sala": "limpeza",
    "tipo": "falsa_honesta",
-   "previa": "Balde e multímetro molhado",
-   "texto": "Um balde de água turva com um multímetro dentro, ainda pingando. No cabo do rodo, um bilhete: \"Desculpa, doutora. Compro outro. — Dirceu\"",
+   "previa": "Multímetro molhado",
+   "texto": "Um multímetro molhado, ainda pingando, na prateleira de baixo do carrinho. No cabo do esfregão, um bilhete: \"Desculpa, doutora. Compro outro. — Dirceu\"",
    "explicaNoTexto": true,
    "explica": "dis_balde"
   },
@@ -6554,8 +6554,8 @@
    "id": "dis_gato",
    "sala": "patio",
    "tipo": "clima",
-   "previa": "Um gato no quadro de energia",
-   "texto": "Tem um gato gordo dormindo em cima do Quadro externo. O Nico chama de Fusível. Ele não sai de lá por nada."
+   "previa": "Pelo de gato no quadro",
+   "texto": "Em cima do Quadro externo, pelo de gato grudado na pedra molhada. O Nico diz que é do Fusível, o gato gordo do museu, que dorme ali quando a chuva deixa."
   },
   {
    "volta_min": 1,
@@ -6892,7 +6892,7 @@
   {
    "id": "b_luz_4",
    "sala": "fotografia",
-   "texto": "A lâmpada vermelha do laboratório de fotos fica mais fraca cada vez que a Câmara tenta ligar, e volta ao normal logo depois.",
+   "texto": "A luminária de parede, em cima do varal, fica mais fraca cada vez que a Câmara tenta ligar, e volta ao normal logo depois.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -6924,14 +6924,14 @@
     "D_fusivel",
     "E_dois"
    ],
-   "previa": "Lâmpada do laboratório",
+   "previa": "Luminária do varal",
    "custo": 1,
    "etiqueta": "SINAL DA MÁQUINA · luz fraca"
   },
   {
    "id": "fh_lamp_lab",
    "sala": "fotografia",
-   "texto": "A lâmpada vermelha do laboratório de fotos está acesa. Na porta, a plaquinha: \"Revelando. Não abra.\"",
+   "texto": "A luminária de parede, em cima do varal, está acesa. Na bandeja de revelação, um papel: \"Revelando. Não mexa.\"",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -6953,7 +6953,7 @@
    "essencial": false,
    "tipo": "comum",
    "camada": "clima",
-   "previa": "Lâmpada do laboratório",
+   "previa": "Luminária do varal",
    "custo": 1,
    "soNaCausa": [
     "A_calibrar",
@@ -9090,7 +9090,7 @@
   {
    "id": "d_fus_2b",
    "sala": "patio",
-   "texto": "Você volta ao cadeado sabendo o que procurar. Por baixo da tinta escorrida, a letra é a do diário: \"Não religar. Fui eu. — T.\"",
+   "texto": "Você volta ao cadeado amarelo sabendo o que procurar. Por baixo da tinta escorrida, a letra é a do diário: \"Não religar. Fui eu. — T.\"",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -9116,12 +9116,12 @@
    "soNaCausa": [
     "D_fusivel"
    ],
-   "porque": "O vidro, a chuva, as chaves lá dentro. Sem saber o que procurar, você não vê nada de novo."
+   "porque": "A fresta, a chuva, as chaves lá dentro. Sem saber o que procurar, você não vê nada de novo."
   },
   {
    "id": "fh_quadro2",
    "sala": "patio",
-   "texto": "Você volta ao vidro do Quadro externo. A chuva continua escorrendo. Nada de novo.",
+   "texto": "Você volta à fresta do Quadro externo. A chuva continua respingando lá dentro. Nada de novo.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -9150,7 +9150,7 @@
     "E_dois"
    ],
    "parDe": "d_fus_2b",
-   "porque": "O vidro, a chuva, as chaves lá dentro. Sem saber o que procurar, você não vê nada de novo."
+   "porque": "A fresta, a chuva, as chaves lá dentro. Sem saber o que procurar, você não vê nada de novo."
   }
  ],
  "grupos_fonte": {
@@ -9797,7 +9797,7 @@
    "simultaneo": true,
    "volta_min": 2,
    "duracao_s": 60,
-   "papelA": "No Pátio, você segura a chave geral do térreo, do lado de fora da tampa do Quadro externo. Enquanto você segura, a sua tela mostra a palavra: diga em voz alta. Soltou, a luz volta.",
+   "papelA": "No Pátio, você segura a chave geral do térreo, do lado de fora da porta do Quadro externo. Enquanto você segura, a sua tela mostra a palavra: diga em voz alta. Soltou, a luz volta.",
    "papelB": "Na Área de descanso, no escuro, você escuta a palavra de quem segura a chave e segue as pegadas que brilham.",
    "entrada": {
     "estado": [],

@@ -158,9 +158,9 @@ const LOOP_DESC = {
  eletrica:'O gerador ronca baixo entre fios, fusíveis e luvas.', relogios:'Uma parede de relógios, cada um no seu passo.',
  seguranca:'Monitores, um cofre pequeno e o café do Braga.', recepcao:'O livro de visitas, a roleta e um telefone que toca.',
  conservacao:'Diário do acervo, laudos e registros em cima da mesa.', atelie:'A bancada da Ivone e o manual da Câmara.',
- deposito:'Caixas empilhadas e uma mancha vermelha no chão.', galeria:'A peça principal na base. Aurélio não sai da frente dela.',
+ deposito:'Uma estante de caixas etiquetadas e uma mancha vermelha no chão.', galeria:'A peça principal na base. Aurélio não sai da frente dela.',
  manutencao:'Ferramentas, um armário travado e a cadeira vazia do Téo.', corredor:'A cafeteira, o mural e a porta de serviço.',
- limpeza:'O armário da equipe, o carrinho e Seu Dirceu de rodo na mão.', sons:'Um rádio, um gravador e a música de elevador.',
+ limpeza:'O carrinho da equipe, o balde do esfregão e Seu Dirceu de pano na mão.', sons:'Um rádio, um gravador e a música de elevador.',
  fotografia:'Uma câmera antiga que dispara quando quer.'
 };
 const descSala = id => (typeof state !== 'undefined' && state && state.caseRules === 2 && LOOP_DESC[id]) || roomDescriptions[id];
