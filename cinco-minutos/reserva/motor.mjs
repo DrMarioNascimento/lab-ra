@@ -32,7 +32,7 @@ function adicionar(pessoa, equipe, ids, volta) {
 }
 
 export function disponivel(partida, uid, id, agora) {
-  const p = partida.pessoas[uid], a = atividades[id];
+  const p = partida.pessoas[uid], a = Object.hasOwn(atividades,id) ? atividades[id] : null;
   if (!p || !a || !a.salas.includes(p.sala) || partida.etapa !== 'investigacao') return 'Escolha o ambiente indicado.';
   if (tempo(partida, agora).restante <= 0) return 'A volta terminou.';
   const e = partida.equipes[p.equipe], f = e.fatos, v = partida.volta;
