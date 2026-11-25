@@ -5,7 +5,7 @@
 const LC = LC_DADOS;
 const LC_PID = Object.fromEntries(LC.pistas.map(p => [p.id, p]));
 const LC_AT = Object.fromEntries(LC.atividades_coop.map(a => [a.id, a]));
-const LC_NOME = {A_calibrar:'Painel desregulado', B_potencia:'Falta de potência', C_ancora:'Peça de referência presa', D_fusivel:'Algo desligado de propósito', E_dois:'Dois defeitos juntos'};
+const LC_NOME = {A_calibrar:'Painel desregulado', B_potencia:'Falta de potência', C_ancora:'Peça certa presa', D_fusivel:'Algo desligado de propósito', E_dois:'Dois defeitos juntos'};
 const LC_CAUSAS = ['A_calibrar','B_potencia','C_ancora','D_fusivel','E_dois'];
 const LC_JANELA = [64, 80];
 const lcCausa = () => LC.causas_jogaveis[Math.floor(hashTxt('lc' + state.caseIndex + ':' + semente()) * LC.causas_jogaveis.length)];
@@ -38,7 +38,7 @@ const lcSeg = () => state.phase === 'playing' ? (state.duration - (state.endAt -
 
 // ---- glossário na palavra: uma letrinha "?" ao lado do termo difícil abre e fecha a explicação ali mesmo (mesmo jeito do "i" das regras)
 const LC_GLOS = [
- ['peças? de referência', 'A peça que prende a máquina no tempo, como a âncora de um barco.'],
+ ['peças? certas?', 'A peça que prende a máquina no tempo, como a âncora de um barco.'],
  ['roleta de entradas?', 'A roleta da entrada, a que gira quando você passa.'],
  ['disjuntor(?:es)?', 'A chave do quadro de luz que desarma quando algo dá errado.'],
  ['fusíve(?:l|is)', 'Peça pequena que queima para proteger a energia.'],
@@ -51,7 +51,7 @@ const LC_GLOS = [
  ['etiquetas?', 'O tipo da pista. Duas pistas com a mesma etiqueta valem um sinal só.'],
  ['ensaio', 'Treino do conserto: na volta 4 você treina, na 5 vale.']
 ].map(([re, txt]) => ({re: new RegExp('(?<![\\p{L}])(' + re + ')(?![\\p{L}])', 'iu'), txt}));
-const LC_GLOS_LISTA = [['Registro','Número que identifica a peça, tipo o RG dela (ex.: 305).'],['Peça de referência','A peça que prende a máquina no tempo, como a âncora de um barco.'],['Ponto de ligação','Onde o fio se encaixa, tipo uma tomada.'],['Roleta de entrada','A roleta da entrada, a que gira quando você passa.'],['Ajustar','Acertar os números da máquina, como acertar um relógio.'],['Disjuntor','A chave do quadro de luz que desarma quando algo dá errado.'],['Fusível','Peça pequena que queima para proteger a energia.'],['Base da peça','O suporte onde a peça fica apoiada.'],['Patrocinador','Quem paga as despesas do museu e aparece com o nome numa exposição.'],['Restauro','Consertar uma obra antiga.'],['Dossiê','As pistas do grupo, juntas.'],['Eco','O som que volta. Aqui, a gravação que a máquina guarda.'],['Sinal','Pista que mostra o que está errado na máquina.'],['Descarte','Pista que mostra o que está funcionando, ou seja, o que NÃO é o defeito.'],['Etiqueta','O tipo da pista. Duas pistas com a mesma etiqueta valem um sinal só.'],['Ensaio','Treino do conserto: na volta 4 você treina, na 5 vale.']];
+const LC_GLOS_LISTA = [['Registro','Número que identifica a peça, tipo o RG dela (ex.: 305).'],['Peça certa','A peça que prende a máquina no tempo, como a âncora de um barco.'],['Ponto de ligação','Onde o fio se encaixa, tipo uma tomada.'],['Roleta de entrada','A roleta da entrada, a que gira quando você passa.'],['Ajustar','Acertar os números da máquina, como acertar um relógio.'],['Disjuntor','A chave do quadro de luz que desarma quando algo dá errado.'],['Fusível','Peça pequena que queima para proteger a energia.'],['Base da peça','O suporte onde a peça fica apoiada.'],['Patrocinador','Quem paga as despesas do museu e aparece com o nome numa exposição.'],['Restauro','Consertar uma obra antiga.'],['Dossiê','As pistas do grupo, juntas.'],['Eco','O som que volta. Aqui, a gravação que a máquina guarda.'],['Sinal','Pista que mostra o que está errado na máquina.'],['Descarte','Pista que mostra o que está funcionando, ou seja, o que NÃO é o defeito.'],['Etiqueta','O tipo da pista. Duas pistas com a mesma etiqueta valem um sinal só.'],['Ensaio','Treino do conserto: na volta 4 você treina, na 5 vale.']];
 function lcGlos(html){
  const usados = new Set();
  return String(html).replace(/(<[^>]*>)|([^<]+)/g, (m, tag, texto) => {
@@ -121,7 +121,7 @@ function pistasCentral(base){
 function lcVisivel(q){ const p = LC_PID[q.lcp]; return !p || (lcPodeVer(p) && lcChaoOk(p)); }
 function lcBloqueio(q){
  const p = LC_PID[q.lcp]; if (!p) return '';
- if (p.excl && lcTem(p.excl)) return 'Você já viu a outra metade desta pista. Peça à outra pessoa que veja esta e descreva em voz alta.';
+ if (p.excl && lcTem(p.excl) && !/individual/.test(location.pathname)) return 'Você já viu a outra metade desta pista. Peça à outra pessoa que veja esta e descreva em voz alta.';
  const pd = p.precisaDe || {}, falta = (pd.todas || []).find(i => !lcTem(i));
  if (falta && p.porque) return p.porque + ' (em ' + lcNomeSala(LC_PID[falta].sala) + ')';
  if (falta) return 'Falta achar algo antes, em ' + lcNomeSala(LC_PID[falta].sala) + '.';
@@ -265,9 +265,9 @@ function lcRenderEncaminhamento(panel) {
   return;
  }
  const texto = pode ? 'Encaminhe a peça ao ' + lcNomeSala(abrigo) + ' para poder usá-la em outra volta.'
-  : 'A peça de referência está guardada no ' + lcNomeSala(abrigo) + ' desde a volta ' + s.chao[abrigo].volta + '.';
+  : 'A peça certa está guardada no ' + lcNomeSala(abrigo) + ' desde a volta ' + s.chao[abrigo].volta + '.';
  const conteudo = '<p>' + esc(texto) + '</p>' + (pode
-  ? '<button type="button" class="btn secondary" data-encaminhar-peca>Encaminhar peça de referência · 1 de energia</button>' : '');
+  ? '<button type="button" class="btn secondary" data-encaminhar-peca>Encaminhar peça certa · 1 de energia</button>' : '');
  if (!box) {
   box = document.createElement('div');
   box.className = 'lc-encaminhamento note';
@@ -365,7 +365,7 @@ function lcAtivHtml(A){
  else if (S && S.tipo === 'chao') {
   const mao = s.mao && s.mao.volta === state.loop ? s.mao.obj : null;
   h += '<div class="lc-solo"><b>Sem dupla</b> (duas voltas): encaminhe a peça pela tela da sala onde a encontrou. Na volta seguinte, use-a na Câmara.';
-  if (mao === S.objeto && room === LC_PID.c_peca.sala && !s.chaoUsado && state.loop < 5) h += '<p>Você está com a peça. Volte à tela da sala e toque em “Encaminhar peça de referência”.</p>';
+  if (mao === S.objeto && room === LC_PID.c_peca.sala && !s.chaoUsado && state.loop < 5) h += '<p>Você está com a peça. Volte à tela da sala e toque em “Encaminhar peça certa”.</p>';
   if (vals) h += '<button type="button" class="lc-btn" data-lcagir="solochao:' + A.id + '">Agir usando a peça do chão (' + S.custo + ' de energia)</button>';
   if (vals) h += '<button type="button" class="lc-btn lc-sato" data-lcagir="solosato:' + A.id + '">📞 Numa volta só, com a Dra. Sato (' + (S.custo + 1) + ' de energia)</button><small>Estando com a peça verdadeira na mão, ela segura a trava pelo interfone.</small>';
   h += '</div>';
