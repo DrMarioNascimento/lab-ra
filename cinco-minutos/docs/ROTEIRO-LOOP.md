@@ -135,7 +135,7 @@ Cada volta tem três camadas: o **agora** (o que você vê), o **antes** (o que 
 - **Agora:** Nico, enfim, reage ao número de registro e entrega o pendrive (você já contou do Téo caído e já leu o laudo); no rádio da Sala dos sons, a voz do Téo. Na escada, perto das 4:10, o homem de paletó para um segundo quando você diz, alto, que a peça é cópia: "Ninguém quer confusão hoje. Nem você." Na Central de monitoramento, alguém já pode confirmar em voz alta quem está onde.
 - **Antes:** as peças que faltam do motivo e do engano: a ata com "então apaga?" e o guardanapo no bolso do paletó reserva.
 - **Próximo loop:** o conserto roda como **ensaio**. A máquina responde "REAGE" ou "NÃO REAGE". Se algum valor estiver errado, ela só diz quantos estão certos, nunca qual. E avisa o que ainda pode falhar na hora de valer.
-- **Na Máquina:** a resposta do ensaio ("ENSAIO: A MÁQUINA REAGE. Não valeu ainda: repita na volta 5."). Em sala, na pausa, cada pessoa toca no seu papel da última volta.
+- **Na Máquina:** a resposta do ensaio ("ENSAIO (em dupla): A MÁQUINA REAGE. Não valeu ainda: repita na volta 5."). Em sala, na pausa, cada pessoa toca no seu papel da última volta.
 
 ### Volta 5 — "Vale"
 - **Agora:** tudo o que você preparou acontece de verdade, com gente em salas diferentes ao mesmo tempo.
@@ -146,11 +146,9 @@ Cada volta tem três camadas: o **agora** (o que você vê), o **antes** (o que 
 ## 5. Cenas marcantes
 
 ### Cena do diagnóstico — "Ela escutou você"
-Você abre a página do dossiê, marca 3 pistas e escolhe o defeito. A resposta vem pista por pista:
+Você abre a página do dossiê, marca 3 pistas e escolhe o defeito. No acerto, a resposta é o placar e uma frase:
 
-"contou, sinal." "contou, sinal." "contou, leitura normal."
-
-E o placar: "2 de 2 sinais e 1 de 1 leitura normal." Lá embaixo, a Câmara dá um estalo, como quem escuta. Se você estiver no Subsolo, a Dra. Sato quase sussurra no interfone: "Quem fez isso? Ela... ela escutou você."
+"DIAGNÓSTICO ANEXADO. 2 de 2 sinais e 1 de 1 leitura normal." Lá embaixo, a Câmara dá um estalo, como quem escuta. Se você estiver no Subsolo, a Dra. Sato quase sussurra no interfone: "Quem fez isso? Ela... ela escutou você."
 
 A página deixa de ser papel e vira peça do dossiê. O conserto da noite acende.
 
@@ -292,7 +290,7 @@ Os textos abaixo são os que cada aparelho mostra. O telão mostra a versão cur
 ### Ouro — consertou e revelou
 > A máquina para e a verdade fica. O relógio marca 5:01 pela primeira vez. Lá fora, uma sirene. Na Sala das coleções, o Téo abre os olhos. Aurélio olha para o telão, depois para você, e só consegue dizer: "Obrigado por não esquecer."
 
-(A sirene é o socorro que a Dra. Sato pediu pelo rádio da estrada: só chega quando a noite anda, por isso aparece no Ouro e no Desligar. O Aurélio não lembra das voltas: fala do que acabou de ver no telão.)
+(A sirene é o socorro que a Dra. Sato pediu pelo rádio da estrada: só chega quando a noite anda, por isso aparece no Ouro e no Desligar. Ela só pede depois que alguém conta do Téo pelo interfone; por isso a frase da sirene só é mostrada a quem tem essa conversa no caderno, e a do Téo acordando, a quem viu o Téo. No telão, basta alguém da turma ter. O Aurélio não lembra das voltas: fala do que acabou de ver no telão.)
 
 ### Desligar — consertou, mas não revelou
 > Com o defeito consertado, você aperta "Loop Reset". O relógio passa de 5:00 e continua. Lá fora, uma sirene: o socorro do Téo. Você devolveu a manhã ao museu. Cedo, uma caixa de "banners" sai pela porta da frente, com guia assinada. Ninguém viu o que você viu.
@@ -414,3 +412,20 @@ Vale sobre o que estiver escrito acima, nas partes 9 a 12.
 - **Sala dos sons.** Cada pista da sala é uma faixa do gravador: tocar numa faixa é examinar a pista (mesmo custo, mesma tranca) e a legenda aparece aos poucos. O que já está no caderno pode ser ouvido de novo sem gastar nada.
 - **Telão no fim.** Cinco páginas: Desfecho, A noite, Para conversar, Missões (uma linha por missão, com os nomes de quem cumpriu) e Turma.
 - **"Ver o museu em 3D".** Aberto a partir do jogo, mostra só as 15 salas da história, nos andares da história (2º andar, 1º andar, Térreo e Subsolo).
+
+## 14. O que mudou na revisão 7 (25/11/2026)
+
+Vale sobre o que estiver escrito acima, nas partes 9 a 13.
+
+- **Embaixo da base.** A comparação da peça com a foto (Lado a Lado e a foto comparada sem ajuda) não olha mais embaixo da base: mostra o lado da rachadura, a cor da pedra e os riscos do tempo, que a peça exposta não tem. Embaixo da base só olha quem tem motivo para levantar a peça: acha feltro novo e, na noite do fusível, o F2 colado por cima dele. O número gravado só existe na peça verdadeira.
+- **A caixa.** A pergunta ao abrir é o que você sentiu diante da peça da Galeria (o cheiro de verniz, que a tranca da caixa já pede).
+- **A foto antiga.** A pergunta é o que a própria foto mostra: tirada de baixo, ela deixa ler o que está gravado na base.
+- **A sirene.** No Desligar e no Ouro, só aparece para quem contou do Téo à Dra. Sato pelo interfone (no telão, se alguém da turma contou). O Téo acordando, no Ouro, só aparece para quem viu o Téo.
+- **O nome, em Acusação e Defesa.** O Braga começa pela marca dele: "Tá. Essa rubrica é do Lenz, do patrocínio. Ele assina tudo assim."
+- **A folha no bolso do Téo.** "Se ele negar, eu marco a base dela de vermelho." (sem a palavra "cópia").
+- **Listas das salas.** A ordem dos itens é a mesma nas 5 noites.
+- **Missões secretas.** A do Téo, a do Aurélio e a da Ivone pedem mais do que um toque (a primeira pegada ou o botão e a prateleira; o Aurélio diante do diário; a fala da tinta ou a conversa do Seu Dirceu).
+- **O Raio.** Quem está no Pátio lê os 3 números que aparecem enquanto segura a chave.
+- **Telão, "A noite".** Nenhuma linha corta texto; "Quem trouxe" cabe numa linha ("Ana, João +38"). Dois fatos ficaram mais curtos: a entrada ("O do patrocínio assina a entrada à tarde e volta de noite pela porta de serviço") e o engano ("Ele liga a Câmara achando que ela apaga cinco minutos. Ela só repete").
+- **"Ver o museu em 3D".** Tocar numa sala mostra a peça dela no meio da tela, inteira, acima do cartão.
+- **Entrada.** "Cinco minutos. A mesma noite. O museu recomeça. Você não."

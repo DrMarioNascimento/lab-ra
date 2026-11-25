@@ -360,3 +360,16 @@ body.em-cheia .tl-fs{opacity:.5}body.em-cheia .tl-fs:hover,body.em-cheia .tl-fs:
 .tl-entrada .kicker{font-size:max(12px,1.2vw)}
 /* para conversar: a pergunta ocupa a página */
 .tl-pergunta{font-size:clamp(1.4rem,min(3.4vw,6.4vh),3.8rem)}
+
+/* Revisão 7 · fita da noite: nenhuma linha corta texto. "Quem trouxe" numa linha só (primeiros nomes e +N);
+   a letra da linha vem de --fz, que o telão baixa até 1,35% da largura quando a fita está cheia. */
+.tl-fita .tl-volta{display:flex;justify-content:space-between;align-items:baseline;gap:2vw}
+.tl-fita .tl-quem{padding-right:1vw;color:#83c6ac}
+.tl-fita li{font-size:var(--fz,max(1.5vw,.95rem));grid-template-columns:min(4.4vw,calc(52vh / var(--linhas,10))) 11vw minmax(0,1fr) minmax(0,auto)}   /* a miniatura cabe na altura da linha */
+.tl-fita li b{font-size:min(1em,max(1.4vw,.9rem))}
+.tl-fita li .tx{overflow-wrap:break-word}
+.tl-fita li>i{display:block;max-width:24vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}
+.tl-fita li>i small,.tl-fita li>i span{display:inline;font-size:min(1em,max(1.35vw,.85rem));white-space:nowrap}
+/* Revisão 7 · página Missões cheia (8 missões, 40 nomes): o nome nunca fica abaixo de 1,35% da largura; o espaço sai do respiro */
+.tl-missoes{gap:.4em}.tl-missoes p{padding:.3em .7em;gap:.25em}
+.tl-missoes span{font-size:max(.86em,1.35vw)}

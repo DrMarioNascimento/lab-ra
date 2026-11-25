@@ -2,7 +2,8 @@
 <html lang="pt-BR"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#0b0f14">
-<title>O museu · Loop</title>
+<title>O museu · Mosaico Loop</title>
+<link rel="icon" type="image/webp" href="../icones/T01.webp">
 <style>
 :root{--ouro:#efc878;--papel:#f4efe3;--fundo:#0b0f14}
 *{box-sizing:border-box}
@@ -27,6 +28,10 @@ button.on{border-color:var(--ouro);color:var(--ouro)}
 #cartao b{display:block;font:800 19px/1.2 system-ui}
 #cartao span{display:block;margin-top:2px;font:600 12px/1.3 system-ui;letter-spacing:.08em;text-transform:uppercase;color:#6b5a38}
 #cartao p{margin:6px 0 10px;font-size:14.5px;line-height:1.45;color:#3a3226}
+/* Mosaico Loop: o cartão da sala segue a paleta do jogo (azul-noite e ouro), com volume */
+body.loop #cartao{border:1px solid #5b6b78;border-left:5px solid var(--ouro);background:linear-gradient(160deg,#294051,#172633);color:var(--papel);box-shadow:inset 0 1px 0 #ffffff2b,0 5px 0 #05090d}
+body.loop #cartao span{color:var(--ouro)}
+body.loop #cartao p{margin:4px 0 8px;font-size:14px;line-height:1.35;color:#d9d2c0}
 #carr{position:fixed;inset:0;z-index:4;display:flex;align-items:center;justify-content:center;background:var(--fundo);font:600 14px system-ui;color:var(--ouro)}
 </style></head>
 <body>
@@ -104,6 +109,7 @@ function montaLoop() {
   });
   for (const a of andar) raiz.remove(a);
   andar = novos; pos0 = andar.map(a => a.position.z); alvoZ = andar.map(() => 0); atualZ = andar.map(() => 0);
+  document.body.classList.add('loop');
   fachadaOn = false; $('bFach').style.display = 'none'; $('bVers').style.display = 'none';
   chao.position.y = (.4 + ALT - .3) * .025; chao.material.transparent = true; chao.material.opacity = .38; chao.material.depthWrite = false; chao.material.needsUpdate = true;   // o chão fica na altura do Térreo: o Subsolo aparece embaixo dele
   $('titulo').firstChild.textContent = 'O museu do Mosaico Loop';
@@ -111,9 +117,12 @@ function montaLoop() {
   trocaPecas(salas);
 }
 // Em cada sala, a peça da maquete dá lugar à peça que a sala tem no Loop (museu/pecas), do mesmo tamanho e no mesmo lugar. Se alguma não carregar, fica a da maquete.
+let faltam = 0;   // peças do Loop que ainda não entraram
 function trocaPecas(salas) {
   const fila = Object.entries(salas).filter(([id, n]) => LS.salas[id].peca && !n.getObjectByName('peca_' + LS.salas[id].peca));
+  faltam = fila.length;
   const prox = () => {
+    faltam = fila.length;
     const item = fila.shift(); if (!item) return; const [id, no] = item, velha = no.children.find(c => c.name.startsWith('peca_'));
     if (!velha) return prox();
     gl.load('../pecas/' + LS.salas[id].peca + '.glb', g => {
@@ -124,7 +133,7 @@ function trocaPecas(salas) {
         const e = Math.max(tv.x, tv.y, tv.z) / (Math.max(tn.x, tn.y, tn.z) || 1), caixa = new THREE.Group();
         nova.position.set(-cn.x, -bn.min.y, -cn.z); caixa.add(nova); caixa.scale.setScalar(e); caixa.position.set((a.x + b.x) / 2, Math.min(a.y, b.y), (a.z + b.z) / 2); caixa.name = 'peca_' + LS.salas[id].peca;
         nova.traverse(o => { if (o.isLight) o.visible = false; });
-        no.add(caixa); no.remove(velha);
+        no.add(caixa); for (const c of no.children.filter(c => c.name.startsWith('peca_') && c !== caixa)) no.remove(c);   // na sala do Loop fica só a peça do Loop
       } catch (err) { console.warn('peça do Loop', id, err); }
       prox();
     }, undefined, () => prox());
@@ -154,15 +163,36 @@ function abre(k) {
 function worldPos(no, dz) { const p = new THREE.Vector3(); const c = new THREE.Box3().setFromObject(no).getCenter(p); return new THREE.Vector3(c.x, c.y, c.z + dz * .025); }
 function entra(no, k) {
   dentro = no; const s = nomeSala(no);
-  const centro = new THREE.Box3().setFromObject(no).getCenter(new THREE.Vector3());
-  voaPara(new THREE.Vector3(centro.x + .11, centro.y + .17, centro.z + .3), new THREE.Vector3(centro.x, centro.y - .01, centro.z), 900);
   for (let i = 0; i < andar.length; i++) andar[i].visible = i === k; aplicaFachada();
   $('cAndar').textContent = NOMES_ANDAR[k]; $('cNome').textContent = s.nome; $('cTexto').textContent = s.texto || s.sub;
   $('cartao').style.display = 'block'; $('salas').style.display = 'none'; $('andares').style.display = 'none'; $('ajuda').style.opacity = 0;
+  if (LOOP) { $('titulo').querySelector('small').textContent = NOMES_ANDAR[k] + ' · arraste para girar'; atualZ[k] = alvoZ[k]; andar[k].position.z = pos0[k] + atualZ[k]; salasDoAndar(k).forEach(n => n.visible = n === no); enquadra(no, k, 900); return; }   // só a sala escolhida fica à vista: nada de peça vizinha no meio da tela
+  const centro = new THREE.Box3().setFromObject(no).getCenter(new THREE.Vector3());
+  voaPara(new THREE.Vector3(centro.x + .11, centro.y + .17, centro.z + .3), new THREE.Vector3(centro.x, centro.y - .01, centro.z), 900);
+}
+// Mosaico Loop: a gaveta do andar termina de abrir na hora, a câmera mira a peça da sala (não o meio da sala)
+// e centra a peça na parte da tela que o cartão não cobre.
+const pecaDe = no => (no.userData.loop && no.userData.loop.peca && no.children.find(c => c.name === 'peca_' + no.userData.loop.peca)) || no.children.find(c => c.name.startsWith('peca_')) || no;
+function areaLivre() { const c = $('cartao'); return c.style.display === 'block' ? Math.max(120, Math.round(c.getBoundingClientRect().top) - 8) : innerHeight; }
+function miraLivre() {   // o centro da imagem sobe para o meio da área livre (acima do cartão)
+  const cob = dentro && LOOP ? innerHeight - areaLivre() : 0;
+  if (cob > 0) cam.setViewOffset(innerWidth, innerHeight + cob, 0, cob, innerWidth, innerHeight); else cam.clearViewOffset();
+  cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix();
+}
+function enquadra(no, k, ms) {
+  miraLivre(); torre.updateMatrixWorld(true);
+  const cx = new THREE.Box3().setFromObject(pecaDe(no)), c = cx.getCenter(new THREE.Vector3()), raio = Math.max(.012, cx.getSize(new THREE.Vector3()).length() / 2);
+  const livre = areaLivre(), cheio = innerHeight + (innerHeight - livre), t = Math.tan(THREE.MathUtils.degToRad(cam.fov / 2));
+  const tv = t * livre / cheio, th = t * innerWidth / cheio;   // meia abertura que sobra na altura livre e na largura
+  const dist = Math.min(OC.maxDistance, Math.max(OC.minDistance, raio / Math.min(tv, th) * 1.25));
+  const dir = new THREE.Vector3(.28, .95, 1).normalize();   // de frente e de cima: a câmera passa por cima da parede da frente
+  voaPara(c.clone().addScaledVector(dir, dist), c, ms);
 }
 function sai(rapido) {
+  if (dentro && LOOP && aberto >= 0) salasDoAndar(aberto).forEach(n => n.visible = true);
   dentro = null; for (let i = 0; i < andar.length; i++) andar[i].visible = true;
   $('cartao').style.display = 'none'; $('salas').style.display = ''; $('andares').style.display = ''; aplicaFachada();
+  miraLivre();
   if (!rapido && aberto >= 0) abre(aberto);
 }
 $('bVoltar').onclick = () => { const k = aberto; sai(true); abre(-1); void k; };
@@ -187,7 +217,7 @@ $('c').addEventListener('pointerup', e => {
   if (sala && k === aberto) entra(sala, k); else abre(aberto === k ? -1 : k);
 });
 
-function tam() { R.setSize(innerWidth, innerHeight, false); cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix(); }
+function tam() { R.setSize(innerWidth, innerHeight, false); cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix(); if (dentro && LOOP) enquadra(dentro, aberto, 300); }
 addEventListener('resize', tam); tam();
 R.setAnimationLoop(t => {
   for (let k = 0; k < andar.length; k++) if (andar[k]) { atualZ[k] += (alvoZ[k] - atualZ[k]) * .12; andar[k].position.z = pos0[k] + atualZ[k]; }
@@ -195,5 +225,9 @@ R.setAnimationLoop(t => {
   OC.update(); R.render(S, cam);
 });
 setTimeout(() => $('ajuda').style.opacity = 0, 12000);
-window.__t = {cam, OC, abre, entra: (id) => { const n = torre.getObjectByName('sala_' + id); let k = andar.findIndex(a => a.children.includes(n)); abre(k); setTimeout(() => entra(n, k), 50); }, sai, get aberto() { return aberto; }};
+window.__t = {cam, OC, abre, entra: (id) => { const n = torre.getObjectByName('sala_' + id); let k = andar.findIndex(a => a.children.includes(n)); abre(k); setTimeout(() => entra(n, k), 50); }, sai, get aberto() { return aberto; }, get faltam() { return faltam; },
+  medir() { if (!dentro) return null; torre.updateMatrixWorld(true); cam.updateMatrixWorld(true); const bx = new THREE.Box3().setFromObject(pecaDe(dentro)), xs = [], ys = [];
+    for (const x of [bx.min.x, bx.max.x]) for (const y of [bx.min.y, bx.max.y]) for (const z of [bx.min.z, bx.max.z]) { const v = new THREE.Vector3(x, y, z).project(cam); xs.push((v.x + 1) / 2 * innerWidth); ys.push((1 - v.y) / 2 * innerHeight); }
+    const c = bx.getCenter(new THREE.Vector3()).project(cam);
+    return {peca: pecaDe(dentro).name, temPeca: pecaDe(dentro) !== dentro, x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys), cx: (c.x + 1) / 2 * innerWidth, cy: (1 - c.y) / 2 * innerHeight, livre: areaLivre(), voando: !!voo, larg: innerWidth}; }};
 </script></body></html>

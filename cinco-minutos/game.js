@@ -761,16 +761,17 @@ let gravTocando = null, gravTimer = 0, gravSom = false, gravAudio = null;
 const gravTrechos = t => String(t).match(/[^.!?:…]+[.!?:…]+["”’')]*\s*|[^.!?:…]+$/g) || [String(t)];
 function gravadorMontar(panel, clues){
  const dica = panel.querySelector('.dica'); if (!dica || panel.querySelector('.sons-deck')) return;
- dica.insertAdjacentHTML('afterend', '<div class="sons-deck"><div class="sd-topo"><span class="ic3d sm" aria-hidden="true"><img src="'+ICONE_URL('N07')+'" alt=""></span><b>Gravador</b><span class="sd-vu" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><button type="button" class="sd-som" aria-pressed="'+gravSom+'">Som: '+(gravSom?'sim':'não')+'</button></div>'+
+ dica.insertAdjacentHTML('afterend', '<div class="sons-deck"><div class="sd-topo"><span class="ic3d sm" aria-hidden="true"><img src="'+ICONE_URL('N07')+'" alt=""></span><b>Gravador</b><span class="sd-vu" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><button type="button" class="sd-som" aria-pressed="'+gravSom+'">'+(gravSom?'Som ligado':'Som desligado')+'</button></div>'+
   '<div class="sd-legenda" role="status"><b class="sd-nome">Escolha uma faixa</b><p class="sd-texto">Toque numa faixa para escutar. A legenda aparece aqui.</p></div>'+
   '<div class="sd-faixas">'+clues.map(c => '<button type="button" class="sd-faixa" data-faixa="'+c.id+'"><span>'+esc(c.name)+'</span><small></small></button>').join('')+'</div></div>');
  panel.querySelectorAll('[data-faixa]').forEach(b => { b.onclick = () => gravadorTocar(b.dataset.faixa); });
- panel.querySelector('.sd-som').onclick = e => { gravSom = !gravSom; e.currentTarget.setAttribute('aria-pressed', String(gravSom)); e.currentTarget.textContent = 'Som: '+(gravSom?'sim':'não'); if (!gravSom) gravadorCalar(); };
+ panel.querySelector('.sd-som').onclick = e => { gravSom = !gravSom; e.currentTarget.setAttribute('aria-pressed', String(gravSom)); e.currentTarget.textContent = gravSom?'Som ligado':'Som desligado'; if (!gravSom) gravadorCalar(); };
  gravadorPintar();
 }
 function gravadorTocar(id){
  if (!state.clues.some(c => c.id === id)) collect(id);   // examinar a pista: as regras de sempre
- const c = state.clues.find(x => x.id === id); if (!c) return;
+ const c = state.clues.find(x => x.id === id);
+ if (!c) { const b = document.querySelector('[data-faixa="'+id+'"]'); if (b && b.dataset.estado === 'espera') toast('Esta gravação ainda não existe. A noite precisa andar mais um pouco.'); return; }
  gravTocando = {id, ini:Date.now(), n:gravTrechos(c.text).length};
  clearInterval(gravTimer); gravTimer = setInterval(gravadorPintar, 250);
  gravadorCalar(); if (gravSom) gravadorChiado(gravTocando.n * 1.1 + .4);

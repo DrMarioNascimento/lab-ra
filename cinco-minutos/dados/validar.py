@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-# Validador automatico do Loop v4 revisao 3 (5 causas). Uso: python3 validar.py [n_bots] [-v] [--semente N] [--so-otimo]
+# Validador automatico do Loop v4 revisao 7 (5 causas). Uso: python3 validar.py [n_bots] [-v] [--semente N] [--so-otimo]
 # Dados: LOOP_DATA (padrao: pistas-v4.json ao lado deste arquivo, senao /tmp/roda/v4_pistas.json).
-# (a) ids e entradas alcancaveis  (b) otimo com 1, 2 e 3 pessoas  (c) bot aleatorio  (d) essenciais sem 2 caminhos  (f) papeis, formatos e tamanho  (g) previas iguais nas 5 causas
+# (a) ids e entradas alcancaveis  (b) otimo com 1, 2 e 3 pessoas  (c) bot aleatorio  (d) essenciais sem 2 caminhos  (f) papeis, formatos e tamanho  (g) previas iguais nas 5 causas, no conjunto e na SEQUENCIA  (h) frases condicionais dos finais
 # Revisao 3 (25/11/2026): os valores do conserto (dia, hora, registro, ordem, chave) sao SORTEADOS como no jogo, nao os de exemplo;
 # a semente sai no relatorio e outras sementes repetem o jogador otimo; energia 5 por volta para todo mundo; aviso de previa que muda com a causa.
 import sys, os, io, random, itertools, contextlib, subprocess, time
@@ -546,10 +546,47 @@ def checar_previas():
         if len(set(tam.values())) > 1: avisos.append(f'sala {sl}: a lista tem tamanho diferente conforme a causa: {tam}')
     return erros, avisos
 
+# ------------------------------------------------------------------ (g2) a ORDEM da lista de cada sala nao pode mudar com a causa (revisao 7)
+def checar_ordem():
+    """Devolve (erros, avisos). Compara a SEQUENCIA (nao so o conjunto) das previas de cada sala, em cada volta, entre as 5 causas.
+    Erro: a sequencia que a tela mostra (o jogo ordena pela primeira vez que o rotulo aparece nos dados) muda com a causa.
+    Aviso: a ordem crua dos dados muda com a causa (a tela corrige, mas o par deve ficar junto do original nos dados)."""
+    ordk = {}
+    for i, x in enumerate(D['pistas']): ordk.setdefault((x['sala'], x['previa']), i)
+    erros = []; avisos = []; n = 0
+    for sl in D['salas']:
+        for v in range(1, D['regras'].get('voltas', 5) + 1):
+            tela = {}; crua = {}
+            for c in CAUSAS_OK:
+                vis = [x for x in D['pistas'] if x['sala'] == sl and p_ativa(x, c) and not (x.get('daAtividade') and not E._de_chao(x)) and x['volta_min'] <= v <= x.get('volta_max', 5)]
+                crua[c] = [x['previa'] for x in vis]
+                tela[c] = [x['previa'] for x in sorted(vis, key=lambda x: ordk[(x['sala'], x['previa'])])]
+            n += 1; base = CAUSAS_OK[0]
+            for c in CAUSAS_OK[1:]:
+                if tela[c] != tela[base]:
+                    k = next((i for i, (a, b) in enumerate(zip(tela[base], tela[c])) if a != b), min(len(tela[base]), len(tela[c])))
+                    erros.append(f'ordem da lista ({sl}, volta {v}) muda entre {base} e {c} na posicao {k + 1}: "{tela[base][k] if k < len(tela[base]) else "-"}" x "{tela[c][k] if k < len(tela[c]) else "-"}"')
+                elif crua[c] != crua[base]: avisos.append(f'ordem crua dos dados ({sl}, volta {v}) muda entre {base} e {c}: ponha cada par logo depois do original')
+    return erros, avisos, n
+
+# ------------------------------------------------------------------ (h) frases dos finais que dependem do caderno (revisao 7)
+def checar_final_frases():
+    bad = []; ff = D['regras'].get('final_frases', {}).get('frases', [])
+    textos = [t for f in D['finais'] for t in [f.get('texto', '')] + list((f.get('texto_por_causa') or {}).values())]
+    for fr in ff:
+        if not any(fr['frase'] in t for t in textos): bad.append(f'final_frases: a frase {fr["frase"]!r} nao esta em nenhum final')
+        for i in fr.get('precisaUmaDe', []):
+            if i not in P: bad.append(f'final_frases: pista {i} nao existe')
+    for t in textos:
+        sobra = t
+        for fr in ff: sobra = sobra.replace(fr['frase'], '')
+        if 'sirene' in sobra or 'socorro' in sobra: bad.append(f'final com sirene ou socorro fora das frases condicionais: {t[:60]}...')
+    return bad, len(ff)
+
 # ------------------------------------------------------------------ relatorio
 def main():
     v = D['valores']; print(f'VALORES SORTEADOS (semente {SEMENTE}): dia {v["dia_da_troca"]}, raio em {v["hora_do_apagao"]} (janela {E.mmss(E.JANELA[0])} a {E.mmss(E.JANELA[1])}), registro {v["tombo"]}, ordem {v["ordem_circuito"]}, chave {v["chave_do_raio"]}, cofre {E.VAL["reg_inv"]}')
-    print(f'VALIDADOR LOOP v4 revisão 6 | dados: {E.DATA} | {len(D["pistas"])} pistas, {len(AT)} atividades, {len(D["salas"])} salas abertas (+{len(D.get("salas_em_reforma", []))} em reforma) | causas: {", ".join(CAUSAS_OK)}')
+    print(f'VALIDADOR LOOP v4 revisão 7 | dados: {E.DATA} | {len(D["pistas"])} pistas, {len(AT)} atividades, {len(D["salas"])} salas abertas (+{len(D.get("salas_em_reforma", []))} em reforma) | causas: {", ".join(CAUSAS_OK)}')
     bad = checar_ids(); ERROS.extend(bad)
     print(f'(a) ids referenciados: {"OK, todos existem" if not bad else "FALHA"}')
     for b in bad: print('   -', b)
@@ -557,6 +594,13 @@ def main():
     print(f'(g) prévias iguais nas 5 causas, sala por sala: {"OK" if not pe and not pa else ("FALHA" if pe else "AVISO")} ({len(pe)} em causa única, {len(pa)} aviso(s))')
     for b in pe: print('   - ERRO:', b)
     for b in pa: print('   - AVISO:', b)
+    oe, oa, on = checar_ordem(); ERROS.extend(oe)
+    print(f'(g2) sequência das prévias igual nas 5 causas, por sala e por volta ({on} combinações): {"OK" if not oe and not oa else ("FALHA" if oe else "AVISO")} ({len(oe)} com ordem diferente na tela, {len(oa)} aviso(s) de ordem crua)')
+    for b in oe: print('   - ERRO:', b)
+    for b in oa[:12]: print('   - AVISO:', b)
+    fe, fn = checar_final_frases(); ERROS.extend(fe)
+    print(f'(h) frases dos finais que dependem do caderno ({fn}): {"OK" if not fe else "FALHA"}')
+    for b in fe: print('   - ERRO:', b)
     for x in E.D0['pistas']:
         if x.get('enigma') and '{' not in str(x['enigma']['resposta']): ERROS.append(f'{x["id"]}: a senha do enigma está fixa nos dados (deveria sair de um marcador sorteado)')
     resumo = []; taxas = []

@@ -166,7 +166,7 @@ function pgDesfecho() {
   const fs = enviados.map(p => p.resp.loopFinal), tem = (...l) => fs.some(x => l.includes(x));
   const ficha = (img, ok, t) => `<div class="tl-meta ${ok ? 'ok' : 'nao'}">${`<span class="ic3d g" aria-hidden="true"><img src="${ICONE(img)}" alt=""></span>`}<b>${t}</b><span>${ok ? '✓ feito' : 'ficou aberto'}</span></div>`;
   return `<div class="tl-card tl-relogio tl-largo"><p class="tl-volta">DESFECHO DA TURMA</p><h1 class="tl-titulo tl-enorme">${esc(LOOP_FINAL_NOME[coletivo.final] || coletivo.final)}</h1>
-      <p class="tl-texto">${esc(LOOP_FINAIS[coletivo.final])}</p>
+      <p class="tl-texto">${esc(loopFinalTexto(coletivo.final, enviados.map(p => p.resp)))}</p>
       <div class="tl-metas tl-res">${ficha('ui/alvo', enviados.some(p => p.resp.loopDefeito) || tem('Ouro', 'Desligar'), 'Achar o defeito')}${ficha('T01', tem('Ouro', 'Desligar'), 'Consertar a Máquina')}${ficha('P01', tem('Ouro', 'Revelar'), 'Revelar a noite')}</div>
       <p class="tl-aviso">${coletivo.registrados} de ${g.length} contaram o desfecho.</p></div>`;
 }
@@ -192,7 +192,17 @@ function caber() {
     if (sobra()) descer(vw);
   }
 }
-addEventListener('resize', () => { if (room) caber(); });
+// A fita da noite: nenhuma linha corta texto. A letra desce até 1,35% da largura (e, só se ainda faltar lugar, até 1%).
+function caberFita() {
+  const vw = innerWidth / 100;
+  for (const f of app.querySelectorAll('.tl-fita')) {
+    f.style.removeProperty('--fz'); const lis = [...f.querySelectorAll('li')]; if (!lis.length) continue;
+    const corta = () => lis.some(li => li.scrollHeight - li.clientHeight > 1 || [...li.children].some(c => c.scrollWidth - c.clientWidth > 1 && !c.matches('i')));
+    let z = parseFloat(getComputedStyle(lis[0]).fontSize);
+    for (const piso of [1.35 * vw, vw]) while (corta() && z > piso) { z = Math.max(piso, z * .96); f.style.setProperty('--fz', z + 'px'); }
+  }
+}
+addEventListener('resize', () => { if (room) { caber(); caberFita(); } });
 
 function desenhar() {
   if (!room) { app.innerHTML = `<div class="tl-raiz">${cabeca()}<div class="tl-meio"><div class="tl-card tl-largo tl-relogio"><h1 class="tl-titulo">Sala não encontrada</h1><p class="tl-texto">Confira o código e abra de novo.</p></div></div></div>`; return; }
@@ -208,7 +218,7 @@ function desenhar() {
     const jog = ['choose', 'playing'].includes(room.etapa) && room.fase !== 'sala';
     const aviso = jog ? `${g.filter(naSala).length} de ${g.length} numa sala` : '';
     app.innerHTML = `<div class="tl-raiz">${cabeca(pags)}<div class="tl-meio pg-${pags[pag][0]}">${PG[pags[pag][0]]()}</div><div class="tl-rodape"><span class="tl-aviso">${aviso}</span>${dots}<span class="tl-fs-vao"></span></div></div>`;
-    caber();
+    caber(); caberFita();
     return;
   }
   if (room.etapa === 'playing' && room.fase !== 'sala') {

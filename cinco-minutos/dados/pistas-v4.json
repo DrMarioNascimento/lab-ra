@@ -1,5 +1,5 @@
 {
- "versao": "v4 revisão 6 (25/11/2026)",
+ "versao": "v4 revisão 7 (25/11/2026)",
  "noite": "v4",
  "causa_sorteada": "B_potencia",
  "causas_possiveis": [
@@ -116,7 +116,30 @@
   "tipoTela": "ícone da pista na lista quando ele precisa ser igual ao do par de mesmo rótulo (hoje só em c_anc_1).",
   "parDe": "id da pista de que esta é par: mesmo rótulo, mesma sala, mesmo custo e mesmo minuto, em outra causa, com texto inocente: um objeto de ambiente, que não mostra o defeito da noite nem uma leitura normal de verdade. A tranca do par é a mesma nas 5 causas. Par não tem grupo nem etiqueta: não conta no diagnóstico.",
   "sato": "A Dra. Sato está fora do prédio e só fala. Nos caminhos sem dupla \"com a Dra. Sato na linha\" ela dita e confere pelo interfone; quem joga faz tudo com as próprias mãos (prende a trava com o cinto, prende a chave com a luva). No Raio, de fora, ela vê o céu e conta o clarão. A confiança dela cobre só uma informação que falte no caderno (um valor, a página do manual); objeto (fusível, luva, peça) precisa estar com quem joga.",
-  "papeis_volta5": "Na pausa da volta 4, em sala, cada pessoa toca num papel; a tela da volta 5 mostra a dica do papel e o telão mostra nome e papel. Não muda regra nenhuma."
+  "papeis_volta5": "Na pausa da volta 4, em sala, cada pessoa toca num papel; a tela da volta 5 mostra a dica do papel e o telão mostra nome e papel. Não muda regra nenhuma.",
+  "final_frases": {
+   "regra": "Frases do final que só aparecem para quem tem a fonte no caderno (no telão e no resultado da sala: se alguém da turma tem). Sem a fonte, o final é mostrado sem a frase. É condição de exibição: não muda qual final a pessoa alcança.",
+   "frases": [
+    {
+     "frase": " Lá fora, uma sirene: o socorro do Téo.",
+     "precisaUmaDe": [
+      "sato_teo"
+     ]
+    },
+    {
+     "frase": " Lá fora, uma sirene.",
+     "precisaUmaDe": [
+      "sato_teo"
+     ]
+    },
+    {
+     "frase": " Na Sala das coleções, o Téo abre os olhos.",
+     "precisaUmaDe": [
+      "teo_1"
+     ]
+    }
+   ]
+  }
  },
  "estados_do_grupo": {
   "diagnostico_anexado": "o dossiê aceitou a causa (no jogo, um por aparelho; ver regras.diagnostico_anexado)",
@@ -362,7 +385,7 @@
      ]
     },
     "dupla": {
-     "como": "Três Números: uma pessoa gira no Subsolo, a outra dita no Ateliê. Cada aparelho precisa do diagnóstico e das fontes no próprio caderno: passem pistas na pausa.",
+     "como": "Três Números: uma pessoa digita no Subsolo, a outra dita no Ateliê. Cada aparelho precisa do diagnóstico e das fontes no próprio caderno: passem pistas na pausa.",
      "custo_energia": "1 por pessoa por tentativa + 4 de pistas no grupo",
      "atividade": "coop_calibrar"
     },
@@ -378,7 +401,7 @@
   },
   {
    "id": "soltar_a_ancora",
-   "pergunta": "Como soltar a máquina da peça falsa?",
+   "pergunta": "Como soltar a máquina da peça errada?",
    "soNaCausa": [
     "C_ancora"
    ],
@@ -600,6 +623,72 @@
    "etiqueta": "SINAL DA MÁQUINA · carga baixa"
   },
   {
+   "id": "a_cheia_1",
+   "sala": "prototipo",
+   "texto": "O ponteiro de carga está no máximo.",
+   "volta_min": 1,
+   "volta_max": 5,
+   "segundo_min": 0,
+   "quemPodeVer": "todos",
+   "precisaDe": {
+    "todas": [],
+    "umaDe": []
+   },
+   "revela": {
+    "aponta": [],
+    "descarta": [
+     "B_potencia"
+    ],
+    "destrava": [
+     "fh_os_a",
+     "fh_email_a"
+    ]
+   },
+   "essencial": true,
+   "tipo": "comum",
+   "camada": "diagnostico",
+   "grupoFonte": "desc_potencia",
+   "essencialPara": [
+    "A_calibrar"
+   ],
+   "soNaCausa": [
+    "A_calibrar"
+   ],
+   "previa": "O ponteiro de carga",
+   "custo": 1,
+   "etiqueta": "LEITURA NORMAL · ponteiro de carga"
+  },
+  {
+   "id": "fh_pont_d",
+   "sala": "prototipo",
+   "texto": "O ponteiro de carga tem uma etiqueta de papel colada no vidro: \"aferir\". Ela tampa os números.",
+   "volta_min": 1,
+   "volta_max": 5,
+   "segundo_min": 0,
+   "quemPodeVer": "todos",
+   "precisaDe": {
+    "todas": [],
+    "umaDe": []
+   },
+   "revela": {
+    "aponta": [],
+    "descarta": [],
+    "destrava": [
+     "fh_os_cd",
+     "fh_email_cd"
+    ]
+   },
+   "essencial": false,
+   "tipo": "comum",
+   "camada": "clima",
+   "previa": "O ponteiro de carga",
+   "custo": 1,
+   "soNaCausa": [
+    "D_fusivel"
+   ],
+   "parDe": "a_cheia_1"
+  },
+  {
    "id": "b_carga_2",
    "sala": "seguranca",
    "texto": "Na câmera do Subsolo, a agulha de carga sobe um pouco e cai. Toda vez igual.",
@@ -642,6 +731,72 @@
    "previa": "Câmera do Subsolo, a agulha",
    "custo": 1,
    "etiqueta": "SINAL DA MÁQUINA · carga baixa"
+  },
+  {
+   "id": "a_cheia_3",
+   "sala": "seguranca",
+   "texto": "A câmera mostra a agulha de carga parada lá em cima.",
+   "volta_min": 1,
+   "volta_max": 5,
+   "segundo_min": 0,
+   "quemPodeVer": "todos",
+   "precisaDe": {
+    "todas": [],
+    "umaDe": []
+   },
+   "revela": {
+    "aponta": [],
+    "descarta": [
+     "B_potencia"
+    ],
+    "destrava": [
+     "fh_os_a",
+     "fh_email_a"
+    ]
+   },
+   "essencial": true,
+   "tipo": "comum",
+   "camada": "diagnostico",
+   "grupoFonte": "desc_potencia",
+   "essencialPara": [
+    "A_calibrar"
+   ],
+   "soNaCausa": [
+    "A_calibrar"
+   ],
+   "previa": "Câmera do Subsolo, a agulha",
+   "custo": 1,
+   "etiqueta": "LEITURA NORMAL · ponteiro de carga"
+  },
+  {
+   "id": "fh_cam_agulha_d",
+   "sala": "seguranca",
+   "texto": "Na câmera do Subsolo, um reflexo de lâmpada cai bem em cima da agulha de carga. Não dá para ler.",
+   "volta_min": 1,
+   "volta_max": 5,
+   "segundo_min": 0,
+   "quemPodeVer": "todos",
+   "precisaDe": {
+    "todas": [],
+    "umaDe": []
+   },
+   "revela": {
+    "aponta": [],
+    "descarta": [],
+    "destrava": [
+     "fh_os_cd",
+     "fh_email_cd"
+    ]
+   },
+   "essencial": false,
+   "tipo": "comum",
+   "camada": "clima",
+   "previa": "Câmera do Subsolo, a agulha",
+   "custo": 1,
+   "soNaCausa": [
+    "D_fusivel"
+   ],
+   "parDe": "a_cheia_3"
   },
   {
    "id": "b_carga_3",
@@ -720,6 +875,41 @@
     "A_calibrar"
    ],
    "parDe": "b_carga_3"
+  },
+  {
+   "id": "d_fus_4",
+   "sala": "sons",
+   "texto": "O alto-falante de teste repete um estalo seco a cada tentativa da Câmara.",
+   "volta_min": 1,
+   "volta_max": 5,
+   "segundo_min": 0,
+   "quemPodeVer": "todos",
+   "precisaDe": {
+    "todas": [],
+    "umaDe": []
+   },
+   "revela": {
+    "aponta": [
+     "D_fusivel"
+    ],
+    "descarta": [],
+    "destrava": [
+     "d_teo_1",
+     "d_ord_1",
+     "fh_os_cd",
+     "fh_email_cd"
+    ]
+   },
+   "essencial": false,
+   "tipo": "comum",
+   "camada": "diagnostico",
+   "previa": "Alto-falante de teste",
+   "custo": 1,
+   "grupoFonte": "sint_fusivel",
+   "soNaCausa": [
+    "D_fusivel"
+   ],
+   "etiqueta": "SINAL DA MÁQUINA · caixa de fusíveis"
   },
   {
    "id": "b_luz_1",
@@ -989,6 +1179,50 @@
    "previa": "Os 3 mostradores",
    "custo": 1,
    "etiqueta": "LEITURA NORMAL · mostradores"
+  },
+  {
+   "id": "a_pisca_1",
+   "sala": "prototipo",
+   "texto": "Os 3 mostradores piscam, cada um num número que não faz sentido.",
+   "volta_min": 1,
+   "volta_max": 5,
+   "segundo_min": 0,
+   "quemPodeVer": "todos",
+   "precisaDe": {
+    "todas": [],
+    "umaDe": []
+   },
+   "revela": {
+    "aponta": [
+     "A_calibrar",
+     "D_fusivel",
+     "E_dois"
+    ],
+    "descarta": [],
+    "destrava": [
+     "a_hist_1",
+     "fh_ficha_d",
+     "a_hist_2",
+     "fh_fita_d"
+    ]
+   },
+   "essencial": true,
+   "tipo": "comum",
+   "camada": "diagnostico",
+   "grupoFonte": "sint_pisca",
+   "essencialPara": [
+    "A_calibrar",
+    "D_fusivel",
+    "E_dois"
+   ],
+   "soNaCausa": [
+    "A_calibrar",
+    "D_fusivel",
+    "E_dois"
+   ],
+   "previa": "Os 3 mostradores",
+   "custo": 1,
+   "etiqueta": "SINAL DA MÁQUINA · mostradores piscando"
   },
   {
    "id": "b_verde_2",
@@ -1369,50 +1603,6 @@
    "parDe": "fus_ok_2"
   },
   {
-   "id": "a_pisca_1",
-   "sala": "prototipo",
-   "texto": "Os 3 mostradores piscam, cada um num número que não faz sentido.",
-   "volta_min": 1,
-   "volta_max": 5,
-   "segundo_min": 0,
-   "quemPodeVer": "todos",
-   "precisaDe": {
-    "todas": [],
-    "umaDe": []
-   },
-   "revela": {
-    "aponta": [
-     "A_calibrar",
-     "D_fusivel",
-     "E_dois"
-    ],
-    "descarta": [],
-    "destrava": [
-     "a_hist_1",
-     "fh_ficha_d",
-     "a_hist_2",
-     "fh_fita_d"
-    ]
-   },
-   "essencial": true,
-   "tipo": "comum",
-   "camada": "diagnostico",
-   "grupoFonte": "sint_pisca",
-   "essencialPara": [
-    "A_calibrar",
-    "D_fusivel",
-    "E_dois"
-   ],
-   "soNaCausa": [
-    "A_calibrar",
-    "D_fusivel",
-    "E_dois"
-   ],
-   "previa": "Os 3 mostradores",
-   "custo": 1,
-   "etiqueta": "SINAL DA MÁQUINA · mostradores piscando"
-  },
-  {
    "id": "a_pisca_2",
    "sala": "seguranca",
    "texto": "Na câmera do Subsolo, os mostradores piscam fora de ritmo.",
@@ -1764,72 +1954,6 @@
    "parDe": "a_rel_3"
   },
   {
-   "id": "a_cheia_1",
-   "sala": "prototipo",
-   "texto": "O ponteiro de carga está no máximo.",
-   "volta_min": 1,
-   "volta_max": 5,
-   "segundo_min": 0,
-   "quemPodeVer": "todos",
-   "precisaDe": {
-    "todas": [],
-    "umaDe": []
-   },
-   "revela": {
-    "aponta": [],
-    "descarta": [
-     "B_potencia"
-    ],
-    "destrava": [
-     "fh_os_a",
-     "fh_email_a"
-    ]
-   },
-   "essencial": true,
-   "tipo": "comum",
-   "camada": "diagnostico",
-   "grupoFonte": "desc_potencia",
-   "essencialPara": [
-    "A_calibrar"
-   ],
-   "soNaCausa": [
-    "A_calibrar"
-   ],
-   "previa": "O ponteiro de carga",
-   "custo": 1,
-   "etiqueta": "LEITURA NORMAL · ponteiro de carga"
-  },
-  {
-   "id": "fh_pont_d",
-   "sala": "prototipo",
-   "texto": "O ponteiro de carga tem uma etiqueta de papel colada no vidro: \"aferir\". Ela tampa os números.",
-   "volta_min": 1,
-   "volta_max": 5,
-   "segundo_min": 0,
-   "quemPodeVer": "todos",
-   "precisaDe": {
-    "todas": [],
-    "umaDe": []
-   },
-   "revela": {
-    "aponta": [],
-    "descarta": [],
-    "destrava": [
-     "fh_os_cd",
-     "fh_email_cd"
-    ]
-   },
-   "essencial": false,
-   "tipo": "comum",
-   "camada": "clima",
-   "previa": "O ponteiro de carga",
-   "custo": 1,
-   "soNaCausa": [
-    "D_fusivel"
-   ],
-   "parDe": "a_cheia_1"
-  },
-  {
    "id": "a_cheia_2",
    "sala": "patio",
    "texto": "O medidor do Quadro externo marca carga cheia na linha que desce para o Subsolo.",
@@ -1892,72 +2016,6 @@
     "E_dois"
    ],
    "parDe": "a_cheia_2"
-  },
-  {
-   "id": "a_cheia_3",
-   "sala": "seguranca",
-   "texto": "A câmera mostra a agulha de carga parada lá em cima.",
-   "volta_min": 1,
-   "volta_max": 5,
-   "segundo_min": 0,
-   "quemPodeVer": "todos",
-   "precisaDe": {
-    "todas": [],
-    "umaDe": []
-   },
-   "revela": {
-    "aponta": [],
-    "descarta": [
-     "B_potencia"
-    ],
-    "destrava": [
-     "fh_os_a",
-     "fh_email_a"
-    ]
-   },
-   "essencial": true,
-   "tipo": "comum",
-   "camada": "diagnostico",
-   "grupoFonte": "desc_potencia",
-   "essencialPara": [
-    "A_calibrar"
-   ],
-   "soNaCausa": [
-    "A_calibrar"
-   ],
-   "previa": "Câmera do Subsolo, a agulha",
-   "custo": 1,
-   "etiqueta": "LEITURA NORMAL · ponteiro de carga"
-  },
-  {
-   "id": "fh_cam_agulha_d",
-   "sala": "seguranca",
-   "texto": "Na câmera do Subsolo, um reflexo de lâmpada cai bem em cima da agulha de carga. Não dá para ler.",
-   "volta_min": 1,
-   "volta_max": 5,
-   "segundo_min": 0,
-   "quemPodeVer": "todos",
-   "precisaDe": {
-    "todas": [],
-    "umaDe": []
-   },
-   "revela": {
-    "aponta": [],
-    "descarta": [],
-    "destrava": [
-     "fh_os_cd",
-     "fh_email_cd"
-    ]
-   },
-   "essencial": false,
-   "tipo": "comum",
-   "camada": "clima",
-   "previa": "Câmera do Subsolo, a agulha",
-   "custo": 1,
-   "soNaCausa": [
-    "D_fusivel"
-   ],
-   "parDe": "a_cheia_3"
   },
   {
    "id": "a_falsa_1",
@@ -4285,6 +4343,72 @@
    "grupoFonte": "bilhete_teo"
   },
   {
+   "id": "c_anc_3",
+   "sala": "limpeza",
+   "texto": "Seu Dirceu, da limpeza, reclama: \"Desde ontem é isso: a base lá da Galeria apita, acende amarelo, e ninguém atende. Já avisei duas vezes.\"",
+   "volta_min": 1,
+   "volta_max": 5,
+   "segundo_min": 0,
+   "quemPodeVer": "todos",
+   "precisaDe": {
+    "todas": [],
+    "umaDe": []
+   },
+   "revela": {
+    "aponta": [
+     "C_ancora"
+    ],
+    "descarta": [],
+    "destrava": [
+     "fh_base_perto"
+    ]
+   },
+   "essencial": true,
+   "tipo": "comum",
+   "camada": "diagnostico",
+   "previa": "Seu Dirceu, de pano na mão",
+   "custo": 1,
+   "grupoFonte": "sint_ancora",
+   "essencialPara": [
+    "C_ancora"
+   ],
+   "soNaCausa": [
+    "C_ancora"
+   ],
+   "etiqueta": "SINAL DA MÁQUINA · base apitando"
+  },
+  {
+   "id": "dirceu_0",
+   "sala": "limpeza",
+   "texto": "Seu Dirceu torce o pano no balde: \"Noite de festa é noite de chão sujo. Até embaixo daquela peça da Galeria tem pó branco. Amanhã ninguém lembra quem limpou.\"",
+   "volta_min": 1,
+   "volta_max": 5,
+   "segundo_min": 0,
+   "quemPodeVer": "todos",
+   "precisaDe": {
+    "todas": [],
+    "umaDe": []
+   },
+   "revela": {
+    "aponta": [],
+    "descarta": [],
+    "destrava": [
+     "fh_base_perto"
+    ]
+   },
+   "essencial": false,
+   "tipo": "comum",
+   "camada": "clima",
+   "previa": "Seu Dirceu, de pano na mão",
+   "custo": 1,
+   "soNaCausa": [
+    "A_calibrar",
+    "B_potencia",
+    "E_dois"
+   ],
+   "parDe": "c_anc_3"
+  },
+  {
    "id": "traj_3",
    "sala": "prototipo",
    "texto": "No minuto 4:10, alguém de paletó desce a escada falando sozinho: \"Cinco minutos. Só preciso de cinco minutos de volta.\" Vira a chave de ligar da Câmara, que já está virada, e sai sem olhar para você.",
@@ -4826,6 +4950,40 @@
    "custo": 1
   },
   {
+   "id": "c_anc_1",
+   "sala": "galeria",
+   "texto": "A base da peça principal apita baixinho e pisca amarelo. Ninguém atende.",
+   "volta_min": 1,
+   "volta_max": 5,
+   "segundo_min": 0,
+   "quemPodeVer": "todos",
+   "precisaDe": {
+    "todas": [],
+    "umaDe": []
+   },
+   "revela": {
+    "aponta": [
+     "C_ancora"
+    ],
+    "descarta": [],
+    "destrava": []
+   },
+   "essencial": true,
+   "tipo": "comum",
+   "camada": "diagnostico",
+   "previa": "A base da peça principal",
+   "custo": 1,
+   "grupoFonte": "sint_ancora",
+   "essencialPara": [
+    "C_ancora"
+   ],
+   "soNaCausa": [
+    "C_ancora"
+   ],
+   "etiqueta": "SINAL DA MÁQUINA · base apitando",
+   "tipoTela": "Observação"
+  },
+  {
    "id": "fh_pedestalx",
    "sala": "galeria",
    "texto": "Papel colado atrás da base: \"Bateria do sensor fraca. Apita. Trocar.\"",
@@ -4881,40 +5039,6 @@
     "C_ancora"
    ],
    "parDe": "fh_pedestalx"
-  },
-  {
-   "id": "c_anc_1",
-   "sala": "galeria",
-   "texto": "A base da peça principal apita baixinho e pisca amarelo. Ninguém atende.",
-   "volta_min": 1,
-   "volta_max": 5,
-   "segundo_min": 0,
-   "quemPodeVer": "todos",
-   "precisaDe": {
-    "todas": [],
-    "umaDe": []
-   },
-   "revela": {
-    "aponta": [
-     "C_ancora"
-    ],
-    "descarta": [],
-    "destrava": []
-   },
-   "essencial": true,
-   "tipo": "comum",
-   "camada": "diagnostico",
-   "previa": "A base da peça principal",
-   "custo": 1,
-   "grupoFonte": "sint_ancora",
-   "essencialPara": [
-    "C_ancora"
-   ],
-   "soNaCausa": [
-    "C_ancora"
-   ],
-   "etiqueta": "SINAL DA MÁQUINA · base apitando",
-   "tipoTela": "Observação"
   },
   {
    "id": "c_anc_2",
@@ -4978,72 +5102,6 @@
     "E_dois"
    ],
    "parDe": "c_anc_2"
-  },
-  {
-   "id": "c_anc_3",
-   "sala": "limpeza",
-   "texto": "Seu Dirceu, da limpeza, reclama: \"Desde ontem é isso: a base lá da Galeria apita, acende amarelo, e ninguém atende. Já avisei duas vezes.\"",
-   "volta_min": 1,
-   "volta_max": 5,
-   "segundo_min": 0,
-   "quemPodeVer": "todos",
-   "precisaDe": {
-    "todas": [],
-    "umaDe": []
-   },
-   "revela": {
-    "aponta": [
-     "C_ancora"
-    ],
-    "descarta": [],
-    "destrava": [
-     "fh_base_perto"
-    ]
-   },
-   "essencial": true,
-   "tipo": "comum",
-   "camada": "diagnostico",
-   "previa": "Seu Dirceu, de pano na mão",
-   "custo": 1,
-   "grupoFonte": "sint_ancora",
-   "essencialPara": [
-    "C_ancora"
-   ],
-   "soNaCausa": [
-    "C_ancora"
-   ],
-   "etiqueta": "SINAL DA MÁQUINA · base apitando"
-  },
-  {
-   "id": "dirceu_0",
-   "sala": "limpeza",
-   "texto": "Seu Dirceu torce o pano no balde: \"Noite de festa é noite de chão sujo. Até embaixo daquela peça da Galeria tem pó branco. Amanhã ninguém lembra quem limpou.\"",
-   "volta_min": 1,
-   "volta_max": 5,
-   "segundo_min": 0,
-   "quemPodeVer": "todos",
-   "precisaDe": {
-    "todas": [],
-    "umaDe": []
-   },
-   "revela": {
-    "aponta": [],
-    "descarta": [],
-    "destrava": [
-     "fh_base_perto"
-    ]
-   },
-   "essencial": false,
-   "tipo": "comum",
-   "camada": "clima",
-   "previa": "Seu Dirceu, de pano na mão",
-   "custo": 1,
-   "soNaCausa": [
-    "A_calibrar",
-    "B_potencia",
-    "E_dois"
-   ],
-   "parDe": "c_anc_3"
   },
   {
    "id": "fh_fusivel",
@@ -5494,7 +5552,7 @@
   {
    "id": "coop_copia_ok",
    "sala": "galeria",
-   "texto": "Vocês acham 3 diferenças: o lado da rachadura, a cor da pedra e o número da base.",
+   "texto": "Vocês acham 3 diferenças: o lado da rachadura, a cor da pedra e os riscos do tempo, que a peça exposta não tem.",
    "volta_min": 2,
    "volta_max": 5,
    "segundo_min": 0,
@@ -5528,7 +5586,7 @@
   {
    "id": "foto_solo",
    "sala": "galeria",
-   "texto": "Com a foto do catálogo anotada no caderno, você compara sem ajuda, indo e voltando com o olho: a rachadura está do outro lado e, embaixo da base, onde a foto mostra o número, só tem feltro novo.",
+   "texto": "Com a foto do catálogo anotada no caderno, você compara sem ajuda, indo e voltando com o olho: a rachadura está do outro lado e a pedra, fosca e riscada na foto, aqui brilha lisa.",
    "volta_min": 2,
    "volta_max": 5,
    "segundo_min": 0,
@@ -5824,9 +5882,130 @@
    "etiqueta": "LEITURA COMPLETA · painel"
   },
   {
+   "id": "coop_painel_C",
+   "sala": "prototipo",
+   "texto": "Leitura completa do painel: números parados, fusíveis no lugar. A carga cai e a luz da peça está amarela.",
+   "volta_min": 2,
+   "volta_max": 5,
+   "segundo_min": 0,
+   "quemPodeVer": "todos",
+   "precisaDe": {
+    "todas": [],
+    "umaDe": [
+     "man_1",
+     "man_2",
+     "man_3"
+    ]
+   },
+   "revela": {
+    "aponta": [
+     "C_ancora"
+    ],
+    "descarta": [
+     "A_calibrar",
+     "B_potencia",
+     "D_fusivel",
+     "E_dois"
+    ],
+    "destrava": []
+   },
+   "essencial": false,
+   "tipo": "coop",
+   "camada": "coop",
+   "previa": "Leitura do painel",
+   "custo": 1,
+   "soNaCausa": [
+    "C_ancora"
+   ],
+   "daAtividade": "coop_painel_manual",
+   "diagnosticoCompleto": true,
+   "porque": "Os símbolos do painel não dizem nada para quem não tem a legenda.",
+   "etiqueta": "LEITURA COMPLETA · painel"
+  },
+  {
+   "id": "coop_painel_D",
+   "sala": "prototipo",
+   "texto": "Leitura completa do painel: tem força chegando e a luz da peça está verde. Os mostradores piscam, a luz cai, e o encaixe do fusível-mestre está vazio.",
+   "volta_min": 2,
+   "volta_max": 5,
+   "segundo_min": 0,
+   "quemPodeVer": "todos",
+   "precisaDe": {
+    "todas": [],
+    "umaDe": [
+     "man_1",
+     "man_2",
+     "man_3"
+    ]
+   },
+   "revela": {
+    "aponta": [
+     "D_fusivel"
+    ],
+    "descarta": [
+     "A_calibrar",
+     "B_potencia",
+     "C_ancora",
+     "E_dois"
+    ],
+    "destrava": []
+   },
+   "essencial": false,
+   "tipo": "coop",
+   "camada": "coop",
+   "previa": "Leitura do painel",
+   "custo": 1,
+   "soNaCausa": [
+    "D_fusivel"
+   ],
+   "daAtividade": "coop_painel_manual",
+   "diagnosticoCompleto": true,
+   "porque": "Os símbolos do painel não dizem nada para quem não tem a legenda.",
+   "etiqueta": "LEITURA COMPLETA · painel"
+  },
+  {
+   "id": "coop_painel_E",
+   "sala": "prototipo",
+   "texto": "Leitura completa do painel: luz da peça verde, fusíveis no lugar. Mostradores fora do ponto E carga baixa.",
+   "volta_min": 2,
+   "volta_max": 5,
+   "segundo_min": 0,
+   "quemPodeVer": "todos",
+   "precisaDe": {
+    "todas": [],
+    "umaDe": [
+     "man_1",
+     "man_2",
+     "man_3"
+    ]
+   },
+   "revela": {
+    "aponta": [
+     "E_dois"
+    ],
+    "descarta": [
+     "C_ancora",
+     "D_fusivel"
+    ],
+    "destrava": []
+   },
+   "essencial": false,
+   "tipo": "coop",
+   "camada": "coop",
+   "previa": "Leitura do painel",
+   "custo": 1,
+   "soNaCausa": [
+    "E_dois"
+   ],
+   "daAtividade": "coop_painel_manual",
+   "diagnosticoCompleto": true,
+   "porque": "Os símbolos do painel não dizem nada para quem não tem a legenda.",
+   "etiqueta": "LEITURA COMPLETA · painel"
+  },
+  {
    "id": "coop_veredito",
    "sala": "seguranca",
-   "texto": "A escala diz de quem é o crachá. O bilhete diz \"peguei emprestado\" numa letra corrida, deitada para a direita. Na própria escala, o visto de quem conferiu os crachás pelo patrocínio deita igual. Na Central, Braga espia a escala e engole seco: \"Essa rubrica? É do Lenz, do patrocínio. Ele assina tudo assim.\"",
+   "texto": "A escala diz de quem é o crachá. O bilhete diz \"peguei emprestado\" numa letra corrida, deitada para a direita. Na própria escala, o visto de quem conferiu os crachás pelo patrocínio deita igual. Na Central, Braga espia a escala e engole seco: \"Tá. Essa rubrica é do Lenz, do patrocínio. Ele assina tudo assim.\"",
    "volta_min": 3,
    "volta_max": 5,
    "segundo_min": 0,
@@ -6029,47 +6208,6 @@
    "porque": "O botão \"Loop Reset\" não responde. A trava de segurança ainda não soltou."
   },
   {
-   "id": "coop_painel_C",
-   "sala": "prototipo",
-   "texto": "Leitura completa do painel: números parados, fusíveis no lugar. A carga cai e a luz da peça está amarela.",
-   "volta_min": 2,
-   "volta_max": 5,
-   "segundo_min": 0,
-   "quemPodeVer": "todos",
-   "precisaDe": {
-    "todas": [],
-    "umaDe": [
-     "man_1",
-     "man_2",
-     "man_3"
-    ]
-   },
-   "revela": {
-    "aponta": [
-     "C_ancora"
-    ],
-    "descarta": [
-     "A_calibrar",
-     "B_potencia",
-     "D_fusivel",
-     "E_dois"
-    ],
-    "destrava": []
-   },
-   "essencial": false,
-   "tipo": "coop",
-   "camada": "coop",
-   "previa": "Leitura do painel",
-   "custo": 1,
-   "soNaCausa": [
-    "C_ancora"
-   ],
-   "daAtividade": "coop_painel_manual",
-   "diagnosticoCompleto": true,
-   "porque": "Os símbolos do painel não dizem nada para quem não tem a legenda.",
-   "etiqueta": "LEITURA COMPLETA · painel"
-  },
-  {
    "id": "coop_ancora_ensaio",
    "sala": "prototipo",
    "texto": "Ensaio feito: a peça verdadeira encosta no apoio e você digita registro {reg}, dia {dia}. A luz da peça passa de amarelo para verde por um instante. A máquina reage.",
@@ -6134,47 +6272,6 @@
    ],
    "daAtividade": "coop_ancora",
    "porque": "O botão \"Loop Reset\" não responde. A trava de segurança ainda não soltou."
-  },
-  {
-   "id": "coop_painel_D",
-   "sala": "prototipo",
-   "texto": "Leitura completa do painel: tem força chegando e a luz da peça está verde. Os mostradores piscam, a luz cai, e o encaixe do fusível-mestre está vazio.",
-   "volta_min": 2,
-   "volta_max": 5,
-   "segundo_min": 0,
-   "quemPodeVer": "todos",
-   "precisaDe": {
-    "todas": [],
-    "umaDe": [
-     "man_1",
-     "man_2",
-     "man_3"
-    ]
-   },
-   "revela": {
-    "aponta": [
-     "D_fusivel"
-    ],
-    "descarta": [
-     "A_calibrar",
-     "B_potencia",
-     "C_ancora",
-     "E_dois"
-    ],
-    "destrava": []
-   },
-   "essencial": false,
-   "tipo": "coop",
-   "camada": "coop",
-   "previa": "Leitura do painel",
-   "custo": 1,
-   "soNaCausa": [
-    "D_fusivel"
-   ],
-   "daAtividade": "coop_painel_manual",
-   "diagnosticoCompleto": true,
-   "porque": "Os símbolos do painel não dizem nada para quem não tem a legenda.",
-   "etiqueta": "LEITURA COMPLETA · painel"
   },
   {
    "id": "coop_circuito_ensaio",
@@ -6309,45 +6406,6 @@
    ],
    "daAtividade": "coop_raio",
    "porque": "A Câmara ainda não guardou nada. Ela só segura uma parte inteira."
-  },
-  {
-   "id": "coop_painel_E",
-   "sala": "prototipo",
-   "texto": "Leitura completa do painel: luz da peça verde, fusíveis no lugar. Mostradores fora do ponto E carga baixa.",
-   "volta_min": 2,
-   "volta_max": 5,
-   "segundo_min": 0,
-   "quemPodeVer": "todos",
-   "precisaDe": {
-    "todas": [],
-    "umaDe": [
-     "man_1",
-     "man_2",
-     "man_3"
-    ]
-   },
-   "revela": {
-    "aponta": [
-     "E_dois"
-    ],
-    "descarta": [
-     "C_ancora",
-     "D_fusivel"
-    ],
-    "destrava": []
-   },
-   "essencial": false,
-   "tipo": "coop",
-   "camada": "coop",
-   "previa": "Leitura do painel",
-   "custo": 1,
-   "soNaCausa": [
-    "E_dois"
-   ],
-   "daAtividade": "coop_painel_manual",
-   "diagnosticoCompleto": true,
-   "porque": "Os símbolos do painel não dizem nada para quem não tem a legenda.",
-   "etiqueta": "LEITURA COMPLETA · painel"
   },
   {
    "volta_min": 1,
@@ -6943,6 +7001,40 @@
    "etiqueta": "SINAL DA MÁQUINA · mostradores piscando"
   },
   {
+   "id": "b_verde_4",
+   "sala": "corredor",
+   "texto": "O visor repetidor da Área de descanso, ao lado da porta de serviço, mostra os 3 números da Câmara parados e certos, sem piscar, a cada tentativa.",
+   "volta_min": 1,
+   "volta_max": 5,
+   "segundo_min": 0,
+   "quemPodeVer": "todos",
+   "precisaDe": {
+    "todas": [],
+    "umaDe": []
+   },
+   "revela": {
+    "aponta": [],
+    "descarta": [
+     "A_calibrar"
+    ],
+    "destrava": [
+     "fh_ficha_bc",
+     "fh_fita_bc"
+    ]
+   },
+   "essencial": false,
+   "tipo": "comum",
+   "camada": "diagnostico",
+   "grupoFonte": "desc_calibrar",
+   "soNaCausa": [
+    "B_potencia",
+    "C_ancora"
+   ],
+   "previa": "Visor repetidor",
+   "custo": 1,
+   "etiqueta": "LEITURA NORMAL · mostradores"
+  },
+  {
    "id": "a_rel_4",
    "sala": "sons",
    "texto": "O metrônomo da Sala dos sons bate fora do compasso, como se o tempo escorregasse entre uma batida e outra.",
@@ -7063,75 +7155,6 @@
     "E_dois"
    ],
    "parDe": "c_anc_4"
-  },
-  {
-   "id": "d_fus_4",
-   "sala": "sons",
-   "texto": "O alto-falante de teste repete um estalo seco a cada tentativa da Câmara.",
-   "volta_min": 1,
-   "volta_max": 5,
-   "segundo_min": 0,
-   "quemPodeVer": "todos",
-   "precisaDe": {
-    "todas": [],
-    "umaDe": []
-   },
-   "revela": {
-    "aponta": [
-     "D_fusivel"
-    ],
-    "descarta": [],
-    "destrava": [
-     "d_teo_1",
-     "d_ord_1",
-     "fh_os_cd",
-     "fh_email_cd"
-    ]
-   },
-   "essencial": false,
-   "tipo": "comum",
-   "camada": "diagnostico",
-   "previa": "Alto-falante de teste",
-   "custo": 1,
-   "grupoFonte": "sint_fusivel",
-   "soNaCausa": [
-    "D_fusivel"
-   ],
-   "etiqueta": "SINAL DA MÁQUINA · caixa de fusíveis"
-  },
-  {
-   "id": "b_verde_4",
-   "sala": "corredor",
-   "texto": "O visor repetidor da Área de descanso, ao lado da porta de serviço, mostra os 3 números da Câmara parados e certos, sem piscar, a cada tentativa.",
-   "volta_min": 1,
-   "volta_max": 5,
-   "segundo_min": 0,
-   "quemPodeVer": "todos",
-   "precisaDe": {
-    "todas": [],
-    "umaDe": []
-   },
-   "revela": {
-    "aponta": [],
-    "descarta": [
-     "A_calibrar"
-    ],
-    "destrava": [
-     "fh_ficha_bc",
-     "fh_fita_bc"
-    ]
-   },
-   "essencial": false,
-   "tipo": "comum",
-   "camada": "diagnostico",
-   "grupoFonte": "desc_calibrar",
-   "soNaCausa": [
-    "B_potencia",
-    "C_ancora"
-   ],
-   "previa": "Visor repetidor",
-   "custo": 1,
-   "etiqueta": "LEITURA NORMAL · mostradores"
   },
   {
    "id": "a_cheia_4",
@@ -7674,7 +7697,7 @@
   {
    "id": "teo_d3",
    "sala": "deposito",
-   "texto": "No bolso do macacão do Téo, uma folha arrancada do diário, com a data de hoje: \"Hoje à noite eu falo com ele. Se ele negar, eu marco a base da cópia de vermelho. Tinta não mente. — T.\"",
+   "texto": "No bolso do macacão do Téo, uma folha arrancada do diário, com a data de hoje: \"Hoje à noite eu falo com ele. Se ele negar, eu marco a base dela de vermelho. Tinta não mente. — T.\"",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -9692,7 +9715,7 @@
      "itens": [
       "rachadura do lado direito",
       "pedra clara, brilhando",
-      "feltro novo embaixo da base, sem número à vista"
+      "superfície lisa, sem um risco"
      ]
     },
     "B": {
@@ -9700,7 +9723,7 @@
      "itens": [
       "rachadura do lado esquerdo",
       "pedra escura, fosca",
-      "número gravado na base"
+      "riscos finos e desgaste nas bordas"
      ]
     }
    }
@@ -9836,7 +9859,7 @@
    "formato_turma": {
     "3": "Dupla nas duas salas; Central anota os 3 passos na ordem.",
     "4": "A segunda dupla busca o que o conserto da noite pede (valores, alavanca, peça verdadeira ou fusível).",
-    "15_grupos_de_3": "Símbolos e legenda embaralhados por grupo: copiar do vizinho não serve.",
+    "15_grupos_de_3": "O painel de cada grupo mostra a noite daquele grupo: copiar do vizinho não serve.",
     "15_grupo_unico": "Cópia por dupla, símbolos diferentes para cada dupla. Até 2 duplas ao mesmo tempo. Frente 'Máquina'."
    },
    "custo_por_pessoa": 1,
@@ -10061,7 +10084,7 @@
     "E_dois"
    ],
    "papelA": "No Subsolo, você vê o relógio digital e o ponteiro de carga. Você canta a contagem e baixa a alavanca \"Carregar\" no clarão. Você digita os 3 números que ouvir antes de baixar a alavanca.",
-   "papelB": "No Pátio, na chuva, de luva isolante, você abre o Quadro externo com a chavinha, fecha a chave {ch} e segura. Você não vê relógio nenhum. Você lê em voz alta os 3 números gravados na chave.",
+   "papelB": "No Pátio, na chuva, de luva isolante, você abre o Quadro externo com a chavinha, fecha a chave {ch} e segura. Você não vê relógio nenhum. Você lê em voz alta os 3 números que aparecem enquanto segura a chave.",
    "papelCentral": "Você fica na Central. Escute as duas pessoas e confirme em voz alta.",
    "entrada": {
     "estado": [
@@ -10165,13 +10188,13 @@
      "hora_apagao",
      "tombo"
     ],
-    "como": "Sem dupla, é você quem traduz e gira: precisa ter no SEU caderno uma página do manual, a página do ajuste e os 3 valores. Custa 3 de energia."
+    "como": "Sem dupla, é você quem lê e digita: precisa ter no SEU caderno uma página do manual, a página do ajuste e os 3 valores. Custa 3 de energia."
    },
    "saida_solo": "no Subsolo, com os 3 valores no seu caderno (3 de energia). O que faltar pode vir de outra pessoa na pausa.",
    "formato_turma": {
     "3": "Dupla nas duas salas; Central confere os 3 números em voz alta.",
     "4": "A segunda dupla fica na Recepção com as 3 provas para o Revelar (final Ouro).",
-    "15_grupos_de_3": "Símbolos embaralhados por grupo: copiar do vizinho não serve.",
+    "15_grupos_de_3": "Os 3 valores são sorteados por grupo: copiar do vizinho não serve.",
     "15_grupo_unico": "Uma máquina só: 1 dupla por tentativa (fila), a turma confere os números em voz alta, a frente \"Culpado\" vai para a Recepção.",
     "5": "Dupla no conserto, Central nas câmeras, Porta-voz na Recepção com as 3 provas e Guarda do dossiê, que confere cadernos e conta o tempo em voz alta."
    },
@@ -10316,7 +10339,7 @@
     "3": "Dupla nas duas salas; Central conta os pontos de ligação pela câmera.",
     "4": "A quarta pessoa fica na Recepção com as 3 provas para o Revelar (final Ouro).",
     "5": "Pontos de ligação, Esquema, Central nas câmeras, Porta-voz na Recepção e Guarda do dossiê (confere se as provas estão no caderno do Porta-voz ANTES de religar).",
-    "15_grupos_de_3": "Cores embaralhadas por grupo: copiar do vizinho não serve.",
+    "15_grupos_de_3": "A ordem dos 3 pontos é sorteada por grupo: copiar do vizinho não serve.",
     "15_grupo_unico": "Um circuito só: 1 dupla por tentativa, a turma repete a ordem em coro, a frente \"Culpado\" vai para a Recepção."
    }
   }
@@ -10472,7 +10495,7 @@
     "id": "A",
     "nome": "Quem opera",
     "onde": "primeira sala do conserto da noite",
-    "faz": "Opera o conserto na primeira sala (gira, baixa a alavanca, carrega a peça ou liga os pontos de ligação)."
+    "faz": "Opera o conserto na primeira sala (digita, baixa a alavanca, carrega a peça ou liga os pontos de ligação)."
    },
    {
     "id": "B",

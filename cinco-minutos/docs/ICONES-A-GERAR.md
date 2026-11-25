@@ -17,7 +17,9 @@ Regra do projeto: ícone só em render 3D, próprio do Loop. Onde existe objeto 
 - Ícone já trocado por miniatura: é só salvar o arquivo novo por cima, com o mesmo nome. Nenhum código muda.
 - Lista B (emoji em ficha): salvar o arquivo e trocar o emoji pelo nome indicado na coluna "Troca no código". Em `loop-central.js` a ficha aceita `'img:ui/<nome>'` no lugar do emoji; em `game.js` e `telao.mjs` basta pôr `<img src=".../ui/<nome>.webp">` dentro da ficha `.ic3d`.
 
-## Situação em 25/11/2026 (revisão 6)
+## Situação em 25/11/2026 (revisão 7)
+
+Revisão 7: nada mudou nesta lista. Os 6 provisórios da lista B continuam (a rodada 6 confirma que, trocados por render 3D bom, o critério de ícones passa). As páginas ganharam ícone de aba com a miniatura `T01`, que já existia (sem arte nova).
 
 - **Trocados por miniatura 3D do próprio acervo: 20.** Os 7 que eram cópia do Mosaico Vila Ética e 13 emojis.
 - **Continuam provisórios (emoji em ficha): 6.** Não há peça adequada em `museu/pecas`. Estão na lista B, abaixo.

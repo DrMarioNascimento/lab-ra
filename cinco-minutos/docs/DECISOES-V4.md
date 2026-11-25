@@ -1,5 +1,5 @@
 # Loop v4 (25/11/2026) — decisões aplicadas nos dados e no código
-Fonte da verdade do enredo: docs/ROTEIRO-LOOP.md. Dados: cinco-minutos/dados/pistas-v4.json (278 pistas desde a revisão 3; as seções "Revisão 2", "Revisão 3", "Revisão 4", "Revisão 5" e "Revisão 6", no fim, valem sobre o que estiver acima, e a mais nova vale sobre as anteriores) → loop-central-dados.js.
+Fonte da verdade do enredo: docs/ROTEIRO-LOOP.md. Dados: cinco-minutos/dados/pistas-v4.json (278 pistas desde a revisão 3; as seções "Revisão 2" a "Revisão 7", no fim, valem sobre o que estiver acima, e a mais nova vale sobre as anteriores) → loop-central-dados.js.
 
 ## Mundo
 - Uma versão só para o Téo: confrontou o Lenz na Sala das coleções uns trinta segundos antes de 0:00, foi empurrado, caiu ao lado do pote de tinta. Enquanto a Câmara gira ele "não piora nem melhora, fica guardado igual a uma peça numa vitrine" (pista sato_teo). Saíram as frases "encostou na Câmara / ficou preso entre as voltas".
@@ -229,7 +229,7 @@ Onde esta seção contradiz o que está acima, vale esta. Origem: os quatro rela
 ### Escolhas feitas ao aplicar
 - **`coop_veredito`.** O relatório propôs "Braga espia por cima do seu ombro". A pista vai para os dois aparelhos da dupla, e um deles está na Base da limpeza; ficou "Na Central, Braga espia a escala e engole seco", que vale para os dois e mantém o Braga só na Central.
 - **Minijogo da caixa.** A história pediu o enunciado das três caixas com um adesivo só; as fichas pediram opções que só o caderno separa. Ficou o enunciado da história com 4 opções no formato das fichas ("Entrou leve e hoje pesa", "Entrou pesada e hoje está leve", "Entrou hoje, com escolta", "Ninguém pesou").
-- **Painel da noite D.** A opção "balançando no meio" foi trocada por "atrás de uma etiqueta de papel, tremendo" (continua com 4 opções e o mesmo gabarito). "Tem força chegando", na leitura completa, ficou: o ponteiro treme.
+- **Painel da noite D.** A opção "balançando no meio" foi trocada por "atrás de uma etiqueta de papel, tremendo" (continua com 4 opções e o mesmo gabarito). A leitura completa do painel (`coop_painel_D`) não foi trocada: continua dizendo "tem força chegando". O que mostra isso na tela de quem olha o painel é o ponteiro tremendo atrás da etiqueta.
 - **Descrição do Subsolo.** Uma frase só, igual nas 5 noites e sem o sinal de carga baixa ("A Câmara do tempo zumbe no meio da sala. Ligada, e ninguém consegue desligar."). Mudar a descrição conforme a noite daria o sinal de graça.
 - **Desligar e o Téo.** Os textos ganharam "Lá fora, uma sirene: o socorro do Téo." É a mesma sirene do Ouro (a noite andou, o socorro chega).
 - **"Só você lembra".** Passo a passo e finais valem agora para uma pessoa e para a turma.
@@ -261,3 +261,46 @@ Onde esta seção contradiz o que está acima, vale esta. Origem: os quatro rela
 - **`man_cal_3`**: o Téo copia a receita do ajuste "vai que precisa" em toda noite, e a ficha diz que só na noite do fusível ele sabe do risco. Sem texto proposto.
 - **Aviso de aula encerrada** ("O Professor encerrou a aula. Obrigado por participar!"): é o mesmo texto do padrão de sala dos outros jogos; não foi mudado só aqui.
 - **Restos de formulário** apontados sem texto proposto ("Marcadas: 3 de 3 · sinais: 2...", "A tentativa desta volta foi gasta.", botão "Registrar revelação") e o rótulo "MEIO CERTO".
+
+## Revisão 7 (25/11/2026) — depois da rodada 6 das escalas
+
+Onde esta seção contradiz o que está acima, vale esta. Origem: os quatro relatórios da rodada 6 (`docs/avaliacao/rodada6/`): escala da história (3.1 e 3.2, mais os defeitos menores), fichas e motivação (A1 a A7), conferência técnica (B1, B2 e 18 menores) e padrão visual com peças 3D (critérios 5 e 8). Foi aplicado tudo o que os relatórios classificam como texto, dado, CSS ou código. O resumo arquivo por arquivo está em `LOOP-CENTRAL.md`, "Revisão 7".
+
+### Escolhas feitas ao aplicar
+- **A comparação não olha mais embaixo da base.** Lado a Lado, `coop_copia_ok` e `foto_solo` comparam o lado da rachadura, a cor da pedra e os riscos do tempo (a foto mostra riscos e desgaste; a peça exposta é lisa). O que há embaixo da base só aparece para quem tem motivo para levantar a peça: feltro novo (`fh_base_perto`) e, na noite do fusível, o F2 colado por cima do feltro (`d_f2_1`). O número gravado continua só na peça verdadeira (`tombo_1`, `tombo_2`, `c_peca`, `nico_1`). Muda a decisão da revisão 5 ("a falta do número fica para o Lado a Lado") e a da revisão 6 (feltro na comparação), que tinham criado a contradição na noite D.
+- **Releitura da base.** Depois da mudança foram relidas, nas 5 causas, todas as pistas que falam de base, feltro, número, F2 e peça (`falsa_1`, `fh_pedestal`, `fh_pedestalx`, `fh_papel_base_c`, `c_anc_1` a `c_anc_4`, `fh_base_perto`, `d_f2_1`, `d_f2_2`, `d_teo_1`, `d_teo_2`, `dirceu_0`, `teo_d1`, `teo_d3`, `teo_radio_2c`, `teo_radio_2d`, `tombo_1` a `tombo_3`, `c_peca`, `nico_1`, `v5_lenz`, `coop_copia_ok`, `foto_solo`, os manuais e os consertos C e D): nenhuma diz o contrário de outra.
+- **Sirene e Téo no final: condição de exibição.** A frase "Lá fora, uma sirene: o socorro do Téo." (Desligar, texto de base e os 5 por causa) e "Lá fora, uma sirene." (Ouro) só aparecem para quem tem `sato_teo` no caderno. No telão e no resultado da sala, aparecem se alguém da turma tem. Sem isso, o final é o mesmo texto sem a frase. Pelo mesmo motivo (técnica, m1), "Na Sala das coleções, o Téo abre os olhos." só aparece para quem viu o Téo (`teo_1`). A lista fica nos dados (`regras.final_frases`) e em `ritmo.js` (`LOOP_FINAL_COND`). Não muda qual final a pessoa alcança. Com isso, a sirene deixou de depender de um fato não escrito; a pergunta "a Dra. Sato lembra de uma volta para a outra?" continua aberta (abaixo).
+- **Ordem das listas.** A lista de cada sala segue a primeira vez que cada rótulo aparece nos dados; nos dados, cada par ficou logo depois do original. A sequência é a mesma nas 5 causas, em toda volta.
+- **Fita do telão.** "Quem trouxe" virou uma linha só: o primeiro nome de até 2 pessoas e "+N" ("Ana, João +38"), com o título da coluna em cima. Dois fatos foram encurtados para caber: "O do patrocínio assina a entrada à tarde e volta de noite pela porta de serviço" (o crachá do Braga já está na linha das 4:00) e "Ele liga a Câmara achando que ela apaga cinco minutos. Ela só repete" (os 50 segundos ficam na pista `raio_contagem`).
+- **Missões que fechavam com um toque** (fichas e motivação, A2). Téo: fecha com a primeira pegada dentro da tinta ou com o botão e a prateleira juntos. Aurélio: fecha com o que ele conta diante do diário (`aurelio_2`). Ivone: fecha com a fala da tinta (`ivone_red`) ou com a conversa do Seu Dirceu (`ivone_ali_2`); saem a folha de ponto e o caderno de materiais. Muda a decisão da revisão 5 para a missão da Ivone.
+- **Braga no veredito.** `coop_veredito`: "Tá. Essa rubrica é do Lenz, do patrocínio. Ele assina tudo assim." (a verdade dele começa com "Tá.", como na ficha).
+- **`teo_d3`.** "eu marco a base dela de vermelho" (saiu a palavra "cópia" de uma pista da volta 1).
+- **O Raio.** No papel do Pátio: "os 3 números que aparecem enquanto segura a chave" (a tela mostra um código que muda).
+- **Desfecho no celular.** As três fichas têm os títulos do telão: "Achar o defeito", "Consertar a Máquina", "Revelar a noite".
+- **Museu em 3D.** No modo do Mosaico Loop, tocar numa sala termina de abrir a gaveta na hora, deixa só aquela sala à vista, mira a peça dela e centra a peça na parte da tela que o cartão não cobre. O cartão ficou na paleta do jogo (azul-noite e ouro, com volume). A segunda peça da maquete que sobrava no Subsolo saiu.
+
+### Onde dois relatórios pediam coisas diferentes
+- **Minijogo da foto antiga (`tombo_2`).** A história pediu perguntar o que a própria foto mostra (a pista não tem tranca, então nada do caderno é garantido); as fichas pediram manter a pergunta do verniz, só sem "você anotou". Ficou a da história: "A foto antiga mostra a peça escura, fosca. Ela foi tirada de baixo. O que aparece gravado na base?", com 4 opções. Saiu "cor de pó" (a foto e o Lado a Lado dizem "escura, fosca").
+- **Fita do telão.** As fichas ofereciam estilo ou texto; o padrão visual pediu "Quem trouxe" numa linha e o fato em até 2 linhas. Foram feitas as três coisas, e o telão ainda baixa a letra da fita até 1,35% da largura se alguma linha não couber.
+- **Minijogo da caixa (`c_peca`).** Pergunta o que a tranca garante no caderno: o cheiro de verniz ("O que você sentiu diante da peça da Galeria que faz você abrir esta?").
+
+### Não aplicado, e por quê
+- **Regras e fatos novos**: ver "Ficou para decidir", abaixo.
+- **Os 6 emojis provisórios e as 8 peças reprovadas**: dependem de arte nova (`ICONES-A-GERAR.md`, `PECAS-A-CONSEGUIR.md`, em dia).
+- **Dica da aba Revelar desde o minuto 0** (história, Estrutura): apontada sem texto proposto. Trocar por algo mais direto entregaria a troca da peça no minuto 0; ficou.
+- **Restos de formulário e voz de sistema** ("ATIVIDADE FEITA:", "ENSAIO (em dupla):", "MEIO CERTO", "Marcadas: 3 de 3...", "Registrar revelação", "Você não chutou..."): sem texto proposto; continuam em "Ficou para decidir".
+- **Nomes de sala quebrados com hífen no mapa do celular** e **"Jogar sem turma" abaixo da dobra em 360×740**: retoques; mexer na quebra pode fazer nome passar do cartão.
+- **Camada antiga carregada e filtrada** (`sala/conteudo.js`, `game.js`), **`museu/torre/` sem `?loop=1` e `museu/`** (museu antigo, sem botão que leve até lá), **`GDD.md`** e **identificadores internos com palavra antiga**: como nas revisões 5 e 6.
+- **Simulador de texto**: continua diferente do jogo no dossiê do grupo, na pré-conferência e no limite de atividades em dupla. Ele também não mostra finais nem missões, então a sirene e as missões novas não mexem nele.
+
+### Ficou para decidir (pontos de regra; nenhum bloqueia)
+Continuam os da revisão 6. Na ordem em que a rodada 6 sugere decidir:
+- **A Dra. Sato, fora do prédio, é levada pelas voltas?** Uma frase resolve (ela fica fora do alcance da Câmara e lembra; ou o pedido de socorro vale na volta em que é feito). Hoje a sirene aparece para quem contou do Téo em qualquer volta.
+- **"Quem" e "por quê" quase inteiros na volta 1** (`data_2`, `motivo_1`, `c_esc_2`, `cracha_1`, `traj_3`).
+- **Piso de volta em `nico_1` (4), `cracha_3` (3) e `lenz_2` (3).**
+- **Revelar sem consertar é esquecido às 5:00** e **Revelar só na volta 5 sem motivo no mundo.**
+- **Por que quem joga lembra.**
+- **`d_teo_2` sem tranca, `aurelio_1` na volta 1, `man_cal_3`, o alarme das 2:40.**
+- **Resposta errada em minijogo sem custo** e **entrada por papel nos consertos em dupla.**
+- **Missão do Nico** só é possível da volta 4 (as outras fecham antes): apontado sem proposta.
+- **Aviso de aula encerrada** e os **restos de formulário** citados acima.

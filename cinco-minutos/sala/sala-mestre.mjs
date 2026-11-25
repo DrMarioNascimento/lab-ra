@@ -102,7 +102,7 @@ function desenhar(leve) {
     renderResult();
     const coletivo = loopFinalTurma(players.filter(p => !p.mestre && !p.expulso).map(p => p.resp));
     if (coletivo) $('resultBody').insertAdjacentHTML('afterbegin', '<div class="result-card"><p class="kicker">DESFECHO DA TURMA</p><h3>' +
-      esc(LOOP_FINAL_NOME[coletivo.final] || coletivo.final) + '</h3><p>' + esc(LOOP_FINAIS[coletivo.final]) + '</p></div><div class="result-card"><p class="kicker">PARA CONVERSAR</p><p>' + esc(LOOP_CONVERSA) + '</p></div>');
+      esc(LOOP_FINAL_NOME[coletivo.final] || coletivo.final) + '</h3><p>' + esc(loopFinalTexto(coletivo.final, players.filter(p => !p.mestre && !p.expulso).map(p => p.resp))) + '</p></div><div class="result-card"><p class="kicker">PARA CONVERSAR</p><p>' + esc(LOOP_CONVERSA) + '</p></div>');
     $('resultBody').insertAdjacentHTML('beforeend', blocoTurma());
     show('result');
   }
@@ -168,7 +168,7 @@ async function move(fase, respostas) {
   enviou = true; marcarEnvio();
   const loopFinal = lcFinal();
   const interv = lcS().conserto === 5 ? 'break' : state.intervention ? 'other' : 'none';
-  const ok = await T.atualizarEu({ resp: { ...respostas, interv, loopFinal, loopFatos: window.lcFatos ? window.lcFatos() : [], loopDefeito: window.lcDefeito ? window.lcDefeito() : '', loopPapel: (typeof lcPapelNome === 'function' && lcPapelNome(lcS().papel5)) || '', loopMissao: lcS().missaoOk ? lcMissao().t : '' }, respEm: Date.now() });
+  const ok = await T.atualizarEu({ resp: { ...respostas, interv, loopFinal, loopFatos: window.lcFatos ? window.lcFatos() : [], loopSato: typeof lcTem === 'function' && lcTem('sato_teo'), loopTeo: typeof lcTem === 'function' && lcTem('teo_1'), loopDefeito: window.lcDefeito ? window.lcDefeito() : '', loopPapel: (typeof lcPapelNome === 'function' && lcPapelNome(lcS().papel5)) || '', loopMissao: lcS().missaoOk ? lcMissao().t : '' }, respEm: Date.now() });
   if (!ok) { enviou = false; marcarEnvio(); toast('Não consegui enviar. Tente de novo.'); }
 }
 
