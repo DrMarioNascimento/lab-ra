@@ -78,6 +78,7 @@ export const atividades = {
   eco:{nome:'Preparar o eco e conferir conectores', salas:['patio','oficina','colecoes'], tipo:'ordem', desde:3, precisa:['diagnostico'], da:['eco','circuito'], texto:'A gravação de manutenção preserva a sequência do Pátio. Ordene preparação, disparo e transferência.', itens:['Preparar','Disparar','Transferir']},
   bancada:{nome:'Ensaiar a operação', salas:['camara','colecoes'], tipo:'maquina', desde:3, ate:4, precisa:['diagnostico'], da:['ensaio'], texto:'Registre o ensaio. Na causa dupla, o primeiro trabalho fica gravado antes da última volta.'},
   fixar:{nome:'Consertar a Câmara', salas:['camara'], tipo:'maquina', desde:5, precisa:['diagnostico','preparo'], da:['conserto'], texto:'Confirme os controles segundo o diagnóstico e o registro da noite.'},
+  glifos:{nome:'Conferir a inscrição', salas:['galeria'], tipo:'glifos', texto:'Qual símbolo não bate com a tábua?', opcoes:['5','4','3','2'], certo:0},
   revelar:{nome:'Revelar a troca ao museu', salas:['camara','recepcao'], tipo:'comparar', desde:4, precisa:provas, da:['revelada'], texto:'Encaminhe prova da cópia, trajeto e identificação a Aurélio. Quem usou o crachá emprestado para retirar a caixa?', opcoes:['Ivone','Lenz','Braga'], certo:1}
 };
 

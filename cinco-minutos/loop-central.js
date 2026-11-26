@@ -72,7 +72,7 @@ const LC_GLOS = [
  ['etiquetas?', 'O tipo da pista. Duas pistas com a mesma etiqueta valem um sinal só.', 1],
  ['ensaio', 'Treino do conserto: das voltas 2 a 4 você treina, na 5 vale.', 1]
 ].map(([re, txt, jogo]) => ({re: new RegExp('(?<![\\p{L}])(' + re + ')(?![\\p{L}])', 'iu'), txt, jogo: !!jogo}));   // jogo: palavra de regra; no caderno ela é palavra da história e fica sem "?"
-const LC_GLOS_LISTA = [['Registro','Número que identifica a peça, tipo o RG dela (ex.: 050).'],['Luz da peça','A luz do painel que acende amarela quando a Câmara está presa a uma peça e a peça da base não é a registrada.'],['Ponto de ligação','Onde o fio se encaixa, tipo uma tomada.'],['Roleta de entrada','A roleta da entrada, a que gira quando você passa.'],['Ajustar','Acertar os números da máquina, como acertar um relógio.'],['Disjuntor','A chave do quadro de luz que desarma quando algo dá errado.'],['Fusível','Peça pequena que queima para proteger a energia.'],['Base da peça','O suporte onde a peça fica apoiada. "Embaixo da base" de uma peça é o fundo dela, onde fica o número gravado.'],['Patrocinador','Quem paga as despesas do museu e aparece com o nome numa exposição.'],['Restauro','Consertar uma obra antiga.'],['Dossiê','A página da Máquina onde você prova o defeito com 3 pistas do seu caderno.'],['Eco','O som que volta. Aqui, a gravação que a máquina guarda.'],['Sinal','Pista que mostra o que está errado na máquina.'],['Leitura normal','Pista que mostra uma parte da máquina que está bem. Ela afasta outro defeito.'],['Etiqueta','O tipo da pista. Duas pistas com a mesma etiqueta valem um sinal só.'],['Ensaio','Treino do conserto: das voltas 2 a 4 você treina, na 5 vale.']];
+const LC_GLOS_LISTA = [['Peça principal','A máscara de pedra de uns 300 anos, a peça mais importante da Galeria. Na testa, ela tem uma frase numa escrita antiga.'],['Inscrição','Frase gravada na pedra. Para ler a da máscara, use a tábua do livro de registro.'],['Registro','Número que identifica a peça, tipo o RG dela (ex.: 050).'],['Luz da peça','A luz do painel que acende amarela quando a Câmara está presa a uma peça e a peça da base não é a registrada.'],['Ponto de ligação','Onde o fio se encaixa, tipo uma tomada.'],['Roleta de entrada','A roleta da entrada, a que gira quando você passa.'],['Ajustar','Acertar os números da máquina, como acertar um relógio.'],['Disjuntor','A chave do quadro de luz que desarma quando algo dá errado.'],['Fusível','Peça pequena que queima para proteger a energia.'],['Base da peça','O suporte onde a peça fica apoiada. "Embaixo da base" de uma peça é o fundo dela, onde fica o número gravado.'],['Patrocinador','Quem paga as despesas do museu e aparece com o nome numa exposição.'],['Restauro','Consertar uma obra antiga.'],['Dossiê','A página da Máquina onde você prova o defeito com 3 pistas do seu caderno.'],['Eco','O som que volta. Aqui, a gravação que a máquina guarda.'],['Sinal','Pista que mostra o que está errado na máquina.'],['Leitura normal','Pista que mostra uma parte da máquina que está bem. Ela afasta outro defeito.'],['Etiqueta','O tipo da pista. Duas pistas com a mesma etiqueta valem um sinal só.'],['Ensaio','Treino do conserto: das voltas 2 a 4 você treina, na 5 vale.']];
 function lcGlos(html, soMundo){
  const usados = new Set();
  return String(html).replace(/(<[^>]*>)|([^<]+)/g, (m, tag, texto) => {
@@ -654,6 +654,28 @@ function lcAtualizarBotao(){
 }
 if (typeof document !== 'undefined') { const i = setInterval(() => { if (document.body) { lcBotao(); clearInterval(i); } }, 300); }
 
+// ---- Escrita antiga da máscara (revisão 10): escrita inventada, própria do Loop. Os símbolos são conteúdo de pista (não ícone de interface).
+// O sprite (museu/icones/ui/glifos.svg) vai embutido no body: <use> apontando para arquivo externo falha no Safari e em file://.
+const LC_GLIFOS = [['ver','ver'],['dizer','dizer'],['rosto','rosto'],['pedra','pedra'],['casa','casa'],['guardar','guardar'],['tempo','tempo'],['ir','ir'],['voltar','voltar'],['dia','dia'],['noite','noite'],['vida','vida']];
+const LC_INSC = {copia:['rosto','pedra','ver','noite','guardar-esp','tempo'], verdadeira:['rosto','pedra','ver','noite','guardar','tempo']};
+let lcGlifosPedido = false;
+function lcGlifosSprite(){
+ if (lcGlifosPedido || typeof document === 'undefined' || !document.body) return; lcGlifosPedido = true;
+ if (!document.getElementById('bancadaCss')) { const l = document.createElement('link'); l.id = 'bancadaCss'; l.rel = 'stylesheet'; l.href = new URL('bancada.css?v=4', LC_BASE).href; document.head.appendChild(l); }
+ fetch(new URL('museu/icones/ui/glifos.svg?v=1', LC_BASE).href).then(r => r.ok ? r.text() : '').then(t => { if (!t || document.getElementById('lcGlifos')) return; const d = document.createElement('div'); d.id = 'lcGlifos'; d.hidden = true; d.setAttribute('aria-hidden', 'true'); d.innerHTML = t; document.body.prepend(d); }).catch(() => { lcGlifosPedido = false; });
+}
+if (typeof document !== 'undefined') { const i = setInterval(() => { if (document.body) { lcGlifosSprite(); clearInterval(i); } }, 300); }
+const lcGl = id => '<svg class="glifo" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><use href="#g-' + id + '"/></svg>';
+// bloco desenhado embaixo do texto da pista (o texto continua inteiro: leitor de tela e simulador de texto leem só ele)
+function lcGlifosHtml(cid){
+ const p = typeof LC_PID !== 'undefined' && LC_PID[String(cid).replace(/^lc-/, '')]; if (!p || !p.glifos) return '';
+ lcGlifosSprite();
+ if (p.glifos === 'tabua') return '<div class="lc-gl tabua" aria-hidden="true">' + LC_GLIFOS.map(([g, w]) => '<span class="t">' + lcGl(g) + '<small>' + w + '</small></span>').join('') + '</div>';
+ const ins = LC_INSC[p.glifos]; if (!ins) return '';
+ return '<div class="lc-gl faixa-pedra" aria-hidden="true">' + ins.map(lcGl).join('') + '</div>';
+}
+if (typeof window !== 'undefined') window.lcGlifosHtml = lcGlifosHtml;
+
 // ---- Bancada de investigação: minigames (vindos da Reserva) que abrem ao coletar certas pistas
 const LC_MG = {
  tombo_2:{ativ:'livro', resp:0, img:['N18'], nome:'Ler a foto antiga do catálogo', texto:'A foto antiga mostra a peça escura, fosca. Ela foi tirada de baixo. O que aparece gravado na base?', opcoes:['Um número de três algarismos','O nome de quem doou','O ano em que a peça chegou','A marca de quem restaurou'],
@@ -665,6 +687,8 @@ const LC_MG = {
   dicas:['Luz de frente esconde. Luz de lado mostra a superfície.','Quase no fim do curso da luz, a superfície aparece inteira.']},
  traj_1:{ativ:'livro', resp:0, img:['S01'], nome:'Olhar a fita da porta de serviço', texto:'A fita mostra a porta de serviço às 4:00. Alguém de paletó encosta um crachá no leitor. No tapete, embaixo da pessoa, aparecem gotas. Pelo que você sabe da noite, ela está entrando ou saindo?', opcoes:['Entrando: vem da rua','Saindo: vai para a rua','Só passando, sem abrir a porta'],
   dicas:['Repare no que pinga no tapete.','Lá fora chove desde o começo da noite.']},
+ insc_copia:{ativ:'glifos', resp:0, img:['V11'], nome:'Ler a inscrição da máscara', texto:'Confira cada símbolo da máscara com a tábua do livro de registro. Um deles não bate. Qual?', insc:['rosto','pedra','ver','noite','guardar-esp','tempo'], opcoes:['5','4','3','2'],
+  dicas:['Ponha a tábua ao lado e confira símbolo por símbolo, da esquerda para a direita.','Não olhe só o desenho: olhe para que lado ele abre.']},
  c_peca:{ativ:'livro', resp:0, img:['D10'], nome:'Abrir a caixa de banners', texto:'Agora você tem motivo. Na estante, caixas etiquetadas; só uma tem o adesivo do patrocínio. O que você sentiu diante da peça da Galeria que faz você abrir esta?', opcoes:['Cheiro de verniz fresco','Cheiro de pó antigo','Cheiro de tinta vermelha','Cheiro de cola'],
   dicas:['A primeira coisa que se nota diante da peça principal está no seu caderno.','Peça de 300 anos não cheira a coisa nova.']}
 };
@@ -682,12 +706,12 @@ function lcBancada(q){
  const mg1 = LC_MG[q.lcp], pre = mg1 && mg1.antes && !(state.resolvidos && state.resolvidos[q.id + ':antes']);   // pergunta de história antes do controle: a pessoa deduz, o controle só confirma
  const mg0 = pre ? mg1.antes : mg1, mg = mg0 && lcMgSorteado(q.lcp + (pre ? ':antes' : ''), mg0);
  if (!mg || (state.resolvidos && state.resolvidos[q.id])) return false;
- Promise.all([import('./reserva/banco.mjs'), import('./reserva/minigames.mjs?v=6')]).then(([B, M]) => {
-  if (!document.getElementById('bancadaCss')) { const l = document.createElement('link'); l.id = 'bancadaCss'; l.rel = 'stylesheet'; l.href = new URL('bancada.css?v=3', LC_BASE).href; document.head.appendChild(l); }
+ Promise.all([import('./reserva/banco.mjs'), import('./reserva/minigames.mjs?v=7')]).then(([B, M]) => {
+  if (!document.getElementById('bancadaCss')) { const l = document.createElement('link'); l.id = 'bancadaCss'; l.rel = 'stylesheet'; l.href = new URL('bancada.css?v=4', LC_BASE).href; document.head.appendChild(l); }
   let d = document.getElementById('lcBancada');
   if (!d) { d = document.createElement('dialog'); d.id = 'lcBancada'; d.className = 'lc-banc'; document.body.appendChild(d); }
   const base = B.atividades[mg.ativ];
-  const A = Object.assign({}, base, {nome:mg.nome, texto:mg.texto}, mg.opcoes ? {opcoes:mg.opcoes} : {}, mg.itens ? {itens:mg.itens, clipes:mg.clipes} : {}, mg.luz ? {luz:Object.assign({}, mg.luz, mg.luz.img ? {img:lcIc(mg.luz.img)} : {})} : {}, mg.dicas ? {dicas:mg.dicas} : {});
+  const A = Object.assign({}, base, {nome:mg.nome, texto:mg.texto}, mg.opcoes ? {opcoes:mg.opcoes} : {}, mg.itens ? {itens:mg.itens, clipes:mg.clipes} : {}, mg.luz ? {luz:Object.assign({}, mg.luz, mg.luz.img ? {img:lcIc(mg.luz.img)} : {})} : {}, mg.insc ? {insc:mg.insc, tabua:LC_GLIFOS} : {}, mg.dicas ? {dicas:mg.dicas} : {});
   const aoAbrir = () => lcMgFoto(d, mg);
   M.abrirMinigame(d, A, lcCausa().slice(0,1), async v => {
    if (String(v) !== String(mg.resp)) return pre ? 'Ainda não. Pense no que o tempo faz com uma peça.' : 'Ainda não fechou. Olhe de novo o que está na tela e no seu caderno.';
@@ -712,8 +736,8 @@ const LC_MGA = {
 };
 function lcBancadaAtiv(aid, cmd){
  const mg = lcMgSorteado(aid, LC_MGA[aid]);
- Promise.all([import('./reserva/banco.mjs'), import('./reserva/minigames.mjs?v=6')]).then(([B, M]) => {
-  if (!document.getElementById('bancadaCss')) { const l = document.createElement('link'); l.id = 'bancadaCss'; l.rel = 'stylesheet'; l.href = new URL('bancada.css?v=3', LC_BASE).href; document.head.appendChild(l); }
+ Promise.all([import('./reserva/banco.mjs'), import('./reserva/minigames.mjs?v=7')]).then(([B, M]) => {
+  if (!document.getElementById('bancadaCss')) { const l = document.createElement('link'); l.id = 'bancadaCss'; l.rel = 'stylesheet'; l.href = new URL('bancada.css?v=4', LC_BASE).href; document.head.appendChild(l); }
   let d = document.getElementById('lcBancada');
   if (!d) { d = document.createElement('dialog'); d.id = 'lcBancada'; d.className = 'lc-banc'; document.body.appendChild(d); }
   const A = Object.assign({}, B.atividades[mg.ativ], {nome:mg.nome, texto:mg.texto, opcoes:mg.opcoes}, mg.dicas ? {dicas:mg.dicas} : {});
@@ -728,7 +752,7 @@ function lcBancadaAtiv(aid, cmd){
 }
 
 // fatos da noite que este caderno comprova (o telão monta a fita do tempo com o que a turma toda achou)
-const LC_FATO_PISTA = {troca:['data_1','data_2','data_3'], motivo:['motivo_1','lenz_mot_2','lenz_mot_3','v5_lenz'], copia:['falsa_2','falsa_3','coop_copia_ok','foto_solo','c_peca'], entrada:['lenz_op_1','cracha_4','cofre_ronda','assim_par'], teo:['empurra_1','empurra_2','lenz_3'], raio:['raio_1','raio_2'], passagem:['traj_1','traj_2','traj_3'], cracha:['cracha_3','lenz_2','coop_veredito'], engano:['rev_3']};
+const LC_FATO_PISTA = {troca:['data_1','data_2','data_3'], motivo:['motivo_1','lenz_mot_2','lenz_mot_3','v5_lenz'], copia:['falsa_2','falsa_3','coop_copia_ok','foto_solo','c_peca','insc_copia'], entrada:['lenz_op_1','cracha_4','cofre_ronda','assim_par'], teo:['empurra_1','empurra_2','lenz_3'], raio:['raio_1','raio_2'], passagem:['traj_1','traj_2','traj_3'], cracha:['cracha_3','lenz_2','coop_veredito'], engano:['rev_3']};
 window.lcFatos = () => Object.keys(LC_FATO_PISTA).filter(k => LC_FATO_PISTA[k].some(p => LC_PID[p] && lcTem(p)));
 window.lcDefeito = () => lcS().diag ? LC_NOME[lcCausa()] : '';   // décima linha da fita: o defeito da noite, de quem anexou o diagnóstico
 

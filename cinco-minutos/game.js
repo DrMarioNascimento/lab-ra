@@ -143,7 +143,7 @@ function sala(id){
 // [nome, legenda, peça, andar, ordem no andar, extras]  extras.livro = {capa, abrir, ids}: livro de folhear como segunda peça da sala, com as pistas listadas (na ordem das páginas)
 const LOOP_SALAS = {
  galeria:['Galeria especial','A peça principal na base','GAL_B','2º andar',1],
- conservacao:['Sala de conservação','Registros e laudos do acervo','I01','1º andar',1,{livro:{capa:'Livro de registro|ACERVO DO MUSEU', abrir:'Abrir o livro de registro', ids:['tombo_1','livre_1','c_modo_1','b_verde_3','fh_carimbo','data_3','d_teo_1','fh_dobrada','teo_d1']}}], sons:['Sala dos sons','Rádio, gravador e alto-falante','N17','1º andar',2],
+ conservacao:['Sala de conservação','Registros e laudos do acervo','I01','1º andar',1,{livro:{capa:'Livro de registro|ACERVO DO MUSEU', abrir:'Abrir o livro de registro', ids:['tombo_1','insc_tabua','livre_1','c_modo_1','b_verde_3','fh_carimbo','data_3','d_teo_1','fh_dobrada','teo_d1']}}], sons:['Sala dos sons','Rádio, gravador e alto-falante','N17','1º andar',2],
  fotografia:['Sala da fotografia','Câmera antiga, varal e álbum','N18','1º andar',3], relogios:['Sala dos relógios','Relógios que param na queda de luz','REL_B','1º andar',4],
  recepcao:['Recepção','Livro de visitas e roleta','P01','Térreo',1], seguranca:['Central de monitoramento','Câmeras e crachás','S01','Térreo',2],
  corredor:['Área de descanso','Porta de serviço, mural e cafeteira','DESC_B','Térreo',3], limpeza:['Base da limpeza','Carrinho da equipe, balde e luvas','L08','Térreo',4],
@@ -857,7 +857,7 @@ function livroLeitura(panel, pags, tem){
  const n = Math.min(Number(box.dataset.pg || 0), Math.max(0, pags.length - 1)), c = pags[n];
  const semTit = t => t.startsWith(c.name + ':') ? t.slice(c.name.length + 1).trim() : t;   // o título já está em cima: a leitura traz só o texto da página
  const txt = !c ? 'Folhas em branco.' : tem(c) ? (window.lcGlos ? lcGlos(esc(semTit(c.text)), true) : esc(semTit(c.text))) : custoPista(c) > 0 ? 'Página fechada. Para ler, toque no botão “Ler”.' : 'Vire a folha até aqui para ler.';
- const html = '<div class="ll-cab"><b>' + esc(c ? c.name : 'Página') + '</b>' + (pags.length > 1 ? '<span>' + pags.map((_, k) => '<button type="button" class="ll-pg' + (k === n ? ' on' : '') + '" data-llpg="' + k + '" aria-label="Página ' + (k ? 'da direita' : 'da esquerda') + '">' + (k ? 'direita' : 'esquerda') + '</button>').join('') + '</span>' : '') + '</div><p>' + txt + '</p>';
+ const html = '<div class="ll-cab"><b>' + esc(c ? c.name : 'Página') + '</b>' + (pags.length > 1 ? '<span>' + pags.map((_, k) => '<button type="button" class="ll-pg' + (k === n ? ' on' : '') + '" data-llpg="' + k + '" aria-label="Página ' + (k ? 'da direita' : 'da esquerda') + '">' + (k ? 'direita' : 'esquerda') + '</button>').join('') + '</span>' : '') + '</div><p>' + txt + '</p>' + (c && c.lcp && tem(c) && window.lcGlifosHtml ? lcGlifosHtml(c.lcp) : '');   // a tábua da escrita antiga aparece aqui, embaixo do livro (na folha 3D a letra fica pequena demais)
  if (box.dataset.k === html) return; box.dataset.k = html; box.innerHTML = html; box.hidden = false;
  box.querySelectorAll('[data-llpg]').forEach(b => { b.onclick = () => { box.dataset.pg = b.dataset.llpg; box.dataset.k = ''; livroLeitura(panel, pags, tem); }; });
 }
@@ -991,7 +991,7 @@ function renderJournal(){
  const clues=state.clues||[];$('countBadge').textContent=clues.length;
  $('journalPreview').innerHTML=clues.length?clues.slice(-3).reverse().map(c=>'<div class="preview-item">'+fichaSala(c.room,'sm')+'<div>'+esc(c.name)+'<small>'+esc(c.room)+'</small></div></div>').join(''):'<p class="muted">O que você achar aparece aqui.</p>';
  const nb=document.getElementById('lcBarN'); if(nb) nb.textContent=clues.length;
- $('journalList').innerHTML=clues.length?clues.map(c=>'<article class="journal-item '+etqClasse(c.etq)+'">'+fichaSala(c.room)+'<div><b>'+esc(c.room)+' · Volta '+c.loop+(c.tipo?' · '+esc(c.tipo):'')+'</b><strong class="ji-nome">'+esc(c.name)+'</strong><p>'+(window.lcGlos?lcGlos(esc(c.text),true):esc(c.text))+'</p></div></article>').join(''):'<p class="muted">Seu caderno ainda está vazio.</p>';
+ $('journalList').innerHTML=clues.length?clues.map(c=>'<article class="journal-item '+etqClasse(c.etq)+'">'+fichaSala(c.room)+'<div><b>'+esc(c.room)+' · Volta '+c.loop+(c.tipo?' · '+esc(c.tipo):'')+'</b><strong class="ji-nome">'+esc(c.name)+'</strong><p>'+(window.lcGlos?lcGlos(esc(c.text),true):esc(c.text))+'</p></div>'+(window.lcGlifosHtml?lcGlifosHtml(c.id):'')+'</article>').join(''):'<p class="muted">Seu caderno ainda está vazio.</p>';
  if (!window.coop && state.archive?.length) {
   $('journalList').insertAdjacentHTML('beforeend', state.archive.map(key => {
    const axis = ANSWER_AXES.find(item=>item.key===key);

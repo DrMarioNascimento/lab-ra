@@ -1,5 +1,5 @@
 # Loop v4 (25/11/2026) — decisões aplicadas nos dados e no código
-Fonte da verdade do enredo: docs/ROTEIRO-LOOP.md. Dados: cinco-minutos/dados/pistas-v4.json (278 pistas desde a revisão 3; as seções "Revisão 2" a "Revisão 9", no fim, valem sobre o que estiver acima, e a mais nova vale sobre as anteriores) → loop-central-dados.js.
+Fonte da verdade do enredo: docs/ROTEIRO-LOOP.md. Dados: cinco-minutos/dados/pistas-v4.json (278 pistas da revisão 3 à 9, 281 desde a revisão 10; as seções "Revisão 2" a "Revisão 10", no fim, valem sobre o que estiver acima, e a mais nova vale sobre as anteriores) → loop-central-dados.js.
 
 ## Mundo
 - Uma versão só para o Téo: confrontou o Lenz na Sala das coleções uns trinta segundos antes de 0:00, foi empurrado, caiu ao lado do pote de tinta. Enquanto a Câmara gira ele "não piora nem melhora, fica guardado igual a uma peça numa vitrine" (pista sato_teo). Saíram as frases "encostou na Câmara / ficou preso entre as voltas".
@@ -362,3 +362,29 @@ Onde esta seção contradiz o que está acima, vale esta. Origem: os quatro rela
 
 ### Ficou para decidir (pontos de regra; nenhum bloqueia)
 Continuam os da revisão 8.
+
+## Revisão 10 (25/11/2026) — lote 9: a inscrição da máscara
+
+Onde esta seção contradiz o que está acima, vale esta. Origem: enigma desenhado e aprovado pelo autor (preparação em `/tmp/roda/esc/r9/inscricao/`, fora do repositório; o validador já tinha aprovado uma cópia dos dados com as pistas novas). Aplicado sobre os dados da revisão 9, sem desfazer nada dela. O resumo arquivo por arquivo está em `LOOP-CENTRAL.md`, "Revisão 10".
+
+### Decisão do autor (25/11/2026)
+- **Escrita própria do Loop.** A escrita da máscara é inventada para o Mosaico Loop. Os 12 símbolos são **desenhados** (entalhe dourado na pedra, com volume e luz), **não são emoji nem ícone**. São **conteúdo de pista**, não ícone de interface: por isso não entram na lista de ícones a gerar e ficam num arquivo próprio do Loop (`museu/icones/ui/glifos.svg`), sem uso por outro jogo.
+- **O nome "máscara" fica.** Combina com a peça 3D da Galeria (a máscara de pedra em cima da base de madeira).
+
+### Escolhas feitas ao aplicar
+- **Três pistas.** `insc_tabua` (página do livro de registro da Conservação, logo depois de `tombo_1`; volta 1; 1 de energia), `insc_copia` ("Inscrição na máscara", Galeria; volta 2; 1 de energia; precisa `falsa_1` + `insc_tabua`; prova da cópia; abre `cracha_3` e `lenz_1` como as outras provas), `insc_verdadeira` ("A testa, de perto", Sala das coleções; volta 2; grátis; precisa `c_peca` + `insc_tabua`; observação que confirma a frase certa).
+- **Texto mais limpo.** `insc_copia` tinha 60 palavras na proposta; ficou com 51: "Na testa da máscara, seis símbolos. Você confere com a tábua: o quinto está virado, como num espelho, e assim não existe. A frase não fecha: "O rosto de pedra vê a noite e … o tempo." Quem gravou a peça não erraria a própria escrita. Quem copiou com pressa, sim." `insc_tabua` (43) e `insc_verdadeira` (41) ficaram como na proposta.
+- **"Peça principal" e "máscara".** Até aqui nenhuma pista dizia "máscara". Conferido: nenhuma pista descreve a peça principal de um jeito que contradiga uma máscara de pedra (pedra, rachadura, 300 anos, 4,2 kg, base). A ligação fica dita em quatro lugares: a tábua ("Livro de registro, página da peça principal: 'Máscara de pedra, uns 300 anos...'"), o dicionário da Máquina (entradas novas "Peça principal" e "Inscrição"), o ROTEIRO (parte 1 e parte 17) e esta seção.
+- **Minijogo.** Tipo novo `glifos` na bancada: a faixa da máscara, a tábua do caderno e "Um deles não bate. Qual?", com 4 opções (5º, 4º, 3º e 2º símbolo), cada uma com o desenho; a ordem muda com a semente (`lcMgSorteado`, sem mudança). Errar não gasta nada e não fecha a janela; o 5º símbolo é a resposta. Dicas: "Ponha a tábua ao lado e confira símbolo por símbolo, da esquerda para a direita." e "Não olhe só o desenho: olhe para que lado ele abre."
+- **Onde a tábua aparece.** Na leitura embaixo do livro e no caderno. Dentro da folha 3D do livro fica só o texto (a letra ficaria pequena demais). No caderno a inscrição vai em 2 linhas de 3 para os símbolos ficarem com 44 px em celular de 360 px; no minijogo ela fica numa linha só.
+- **Igual nas 5 causas.** As 3 pistas valem em todas as noites; listas, ordem, rótulos e pontos da peça conferidos iguais nas 5 (validador g e g2, `ordem.mjs`, `pontos.mjs`).
+
+### Não aplicado, e por quê
+- **FICHAS.md** não mudou: nenhum personagem fala da inscrição (as três pistas são documento e observação).
+- **Fala do Téo** em `v4_teo` ("A peça tem o mesmo desenho e pesa diferente"): não mexida. Lida junto com a inscrição, pode soar como se a cópia fosse perfeita no desenho; fica para o autor decidir (ver "Ficou para decidir").
+
+### Ficou para decidir (nenhum bloqueia)
+Continuam os da revisão 8, mais:
+- **"Tábua" com dois sentidos.** O chão da Sala das coleções é de tábuas ("a tinta para na mesma tábua") e a página dos símbolos se chama "tábua". O contexto separa, mas dá para trocar a da escrita por "chave de leitura" ou "quadro dos símbolos", se o autor preferir.
+- **`v4_teo`, "o mesmo desenho".** Manter (o Téo fala do formato da peça) ou trocar por algo como "A peça tem a mesma cara e pesa diferente."
+

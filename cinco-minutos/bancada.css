@@ -107,3 +107,28 @@
 .lc-banc .cena-peca[data-achou="true"] .brilho{opacity:1}
 @media(prefers-reduced-motion:reduce){.lc-banc .cena-peca img,.lc-banc .cena-peca .facho,.lc-banc .cena-peca .brilho{transition:none}}
 @media(max-height:760px){.lc-banc{padding:.8rem}.lc-banc .mg-foto .ic3d{width:80px;height:80px;border-radius:16px}.lc-banc h2{font-size:1.25rem}.lc-banc p{margin:.25rem 0 .55rem}}
+
+/* Revisão 10 (25/11/2026): escrita antiga da máscara. Símbolos entalhados em pedra (sprite museu/icones/ui/glifos.svg), dourado da paleta do Loop.
+   .lc-gl = bloco embaixo do texto da pista (caderno e leitura do livro); .lc-banc = minijogo "Ler a inscrição da máscara". */
+.lc-gl .glifo,.lc-banc .faixa-pedra .glifo,.lc-banc .tabua-mini .glifo,.lc-banc .opc-glifos .glifo{display:block;width:44px;height:44px;flex:none;color:#d9be8a;overflow:visible}
+.lc-gl.tabua .glifo,.lc-banc .tabua-mini .glifo{color:#e7b975}
+.lc-gl.faixa-pedra,.lc-banc .faixa-pedra,.lc-gl.tabua .t,.lc-banc .tabua-mini .t{background:
+ url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 .8 0 0 0 0 .75 0 0 0 0 .6 0 0 0 .13 0'/%3E%3C/filter%3E%3Crect width='90' height='90' filter='url(%23n)'/%3E%3C/svg%3E"),
+ radial-gradient(circle at 35% 25%,#46504c,#262d2c 60%,#171c1c);border:1px solid #6d6a5a66;border-radius:10px;box-shadow:inset 0 1px 0 #ffffff1c,inset 0 -2px 4px #0007,0 3px 0 #05090c,0 6px 12px #0006}
+.lc-gl{margin:.55rem 0 .2rem}
+.lc-gl.faixa-pedra,.lc-banc .faixa-pedra{display:grid;grid-template-columns:repeat(6,44px);gap:3px;justify-content:center;padding:7px 6px;border-radius:12px;max-width:max-content;margin-inline:auto}
+.lc-gl.tabua{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;max-width:320px;padding:8px;border:1px solid #c9aa7250;border-radius:14px;background:#e9dcc214}
+.lc-gl.tabua .t,.lc-banc .tabua-mini .t{display:grid;justify-items:center;gap:1px;padding:5px 1px 4px}
+.lc-gl.tabua small,.lc-banc .tabua-mini small{font:600 .78rem/1.1 system-ui,sans-serif;color:#f1e6cf}
+.lc-banc .faixa-pedra{margin:.15rem auto .5rem}
+.lc-banc .tabua-mini{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px;margin:.2rem 0 .3rem}
+.lc-banc .tabua-mini small{font-size:.7rem}
+.lc-banc .opc-glifos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:.7rem 0 .2rem}
+.lc-banc .opc-glifos button{justify-content:flex-start;gap:8px;min-height:60px;margin:0;padding:6px 10px}
+.lc-banc .opc-glifos button span{font:700 .9rem/1.15 system-ui,sans-serif;text-align:left}
+@media(max-width:375px){.lc-gl.faixa-pedra,.lc-banc .faixa-pedra{gap:2px;padding:6px 4px}.lc-banc .tabua-mini{gap:3px}.lc-banc .opc-glifos button{padding:6px 7px;gap:6px}}
+/* no caderno o desenho ocupa a largura do cartão inteiro; a inscrição vai em 2 linhas de 3 (lida da esquerda para a direita, de cima para baixo) para os símbolos ficarem com 44 px no celular */
+.journal-item>.lc-gl{grid-column:1/-1;justify-self:center;width:100%}
+.journal-item>.lc-gl.faixa-pedra{grid-template-columns:repeat(3,44px);gap:6px 10px;padding:8px 14px;width:max-content}
+.journal-item>.lc-gl.tabua{max-width:340px}
+@media(max-width:375px){.lc-gl.tabua small,.lc-banc .tabua-mini small{font-size:.68rem;letter-spacing:-.01em}}

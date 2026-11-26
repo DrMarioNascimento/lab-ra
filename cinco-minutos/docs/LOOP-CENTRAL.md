@@ -1,6 +1,6 @@
 # Loop · A Máquina (camada central)
 
-Arquivos: `dados/pistas-v4.json` (fonte dos dados, **278 pistas**, versão v4, **revisão 8 de 25/11/2026**) → `loop-central-dados.js` (gerado a partir dele), `loop-central.js` (regras e telas). Enredo: `ROTEIRO-LOOP.md`. Decisões aplicadas: `DECISOES-V4.md`. Botão **Máquina** na barra de baixo, com a miniatura da Câmara.
+Arquivos: `dados/pistas-v4.json` (fonte dos dados, **281 pistas**, versão v4, **revisão 10 de 25/11/2026**) → `loop-central-dados.js` (gerado a partir dele), `loop-central.js` (regras e telas). Enredo: `ROTEIRO-LOOP.md`. Decisões aplicadas: `DECISOES-V4.md`. Botão **Máquina** na barra de baixo, com a miniatura da Câmara.
 
 - **Defeito por semente** (5 causas): A falta ajustar, B falta força, C peça presa (a máquina se segura na peça errada da base), D fusível tirado de propósito, E dois defeitos juntos (A + B, em voltas diferentes). Roteiro completo em `ROTEIRO-LOOP.md`. Os sinais de cada defeito só existem quando ele é o sorteado, mas a lista de cada sala mostra os mesmos rótulos nas 5 noites (onde o sinal não existe, o mesmo rótulo traz a coisa normal: campo `parDe` nos dados); o manual (páginas 1 a 6), a folha amassada da impressora, o apito curto da base e a caixa de "banners" com a peça verdadeira existem em todas as noites.
 - **Valores por semente** (nada decorável): dia da troca (9 a 25), hora do apagão (1:00, 1:05, 1:10, 1:15 ou 1:20), número de registro (3 algarismos), ordem dos 3 pontos de ligação, número da chave do para-raios e senha do cofre do Braga (o registro de trás para a frente). Nos dados os textos usam os marcadores `{dia}` `{hora}` `{reg}` `{reg_inv}` `{ordem}` `{ch}`; `valores_padrao` (14, 1:10, 472, 274, 3-1-2, chave 3) serve para os exemplos dos documentos. O validador sorteia os valores como o jogo.
@@ -314,11 +314,37 @@ Palavras que o jogo usa: **número de registro** (da peça), **base** (onde a pe
 
 **Não aplicado, e por quê:** ver `DECISOES-V4.md`, "Revisão 9".
 
-## Checklist por volta (recalculado dos dados em 25/11/2026, revisão 9: nenhuma volta, horário nem tranca mudou)
+## Revisão 10 — 25/11/2026
 
-Conferido em `dados/pistas-v4.json` (campos `volta_min`, `volta_max`, `segundo_min`, `precisaDe`, `soNaCausa`, `parDe`, `grupos_fonte`, `atividades_coop`). Horários com `valores_padrao` (raio em 1:10); com outra hora sorteada, os horários ligados ao raio andam junto. Pistas por `volta_min`: **231 na volta 1, 25 na volta 2, 9 na volta 3, 9 na volta 4, 4 na volta 5** (278 no total). Ativas por noite: 207 (A), 208 (B), 207 (C), 207 (D), 212 (E).
+**Por quê.** Enigma novo, desenhado e aprovado pelo autor (lote 9): **a inscrição da máscara**. Mais um caminho para a prova da cópia, que se confere sozinho e é visual. Material de preparação em `/tmp/roda/esc/r9/inscricao/` (fora do repositório). Enredo em `ROTEIRO-LOOP.md`, parte 17; escolhas em `DECISOES-V4.md`, "Revisão 10".
 
-**Itens na lista de cada sala, na volta 1 (igual nas 5 causas):** Subsolo 18, Oficina elétrica 12, Pátio 16, Sala dos relógios 7, Central 16, Recepção 12, Sala de conservação 10, Ateliê 19, Sala das coleções 12, Galeria 8, Oficina técnica 10, Área de descanso 12, Base da limpeza 9, Sala dos sons 5, Sala da fotografia 9.
+**Decisão do autor (25/11/2026).** A escrita é inventada, própria do Loop. Os símbolos são desenhados (não emoji, não ícone) e são conteúdo de pista, não ícone de interface. O nome "máscara" fica (combina com a peça 3D da Galeria).
+
+**Arquivo novo**
+- `museu/icones/ui/glifos.svg`: 12 símbolos (`g-ver`, `g-dizer`, `g-rosto`, `g-pedra`, `g-casa`, `g-guardar`, `g-tempo`, `g-ir`, `g-voltar`, `g-dia`, `g-noite`, `g-vida`) e 2 virados que não estão na tábua (`g-guardar-esp`, `g-noite-esp`), viewBox 48×48. Entalhe: beirada clara embaixo e à direita, parede escura, fundo do sulco em `currentColor` (dourado `#e7b975` na tábua, `#d9be8a` na pedra). No virado, o desenho vira e a luz não. Próprio do Loop: nenhum outro jogo usa este arquivo.
+
+**O que mudou no código**
+- **`loop-central.js`.** `LC_GLIFOS` (ordem da tábua) e `LC_INSC` (cópia e verdadeira); `lcGlifosSprite()` busca o sprite e embute no `body` (o `<use>` para arquivo externo falha no Safari e em file://) e já carrega `bancada.css`; `lcGlifosHtml(id)` desenha a tábua (4 × 3) ou a faixa (6 símbolos) quando a pista tem o campo `glifos` (o texto continua inteiro, para leitor de tela e simulador de texto); `LC_MG.insc_copia` (`ativ:'glifos'`, `insc`, `opcoes:['5','4','3','2']`, `resp:0`, `img:['V11']`); `lcBancada` repassa `insc` e a tábua; `LC_FATO_PISTA.copia` com `insc_copia`; dicionário com "Peça principal" e "Inscrição". `minigames.mjs?v=7`, `bancada.css?v=4`.
+- **`game.js`.** Livro da Conservação: `insc_tabua` logo depois de `tombo_1`; na leitura embaixo do livro, a tábua desenhada aparece depois do texto da página (na folha 3D fica só o texto). No caderno, o desenho ocupa a largura do cartão: a tábua 4 × 3 e a inscrição em 2 linhas de 3, com 44 px por símbolo em 390 e 360 px.
+- **`reserva/minigames.mjs`.** Ramo novo `tipo === 'glifos'`: faixa da máscara, tábua do caderno (6 × 2) e 4 botões com o símbolo e "Nº símbolo" (SVG por `createElementNS`).
+- **`reserva/banco.mjs`.** Atividade `glifos` ("Conferir a inscrição").
+- **`bancada.css`.** Pedra com grão e volume para a faixa e as casas da tábua; botões de 60 px com profundidade 3D; símbolos com 44 px.
+- **`individual.html`, `sala/index.html`.** `loop-central-dados.js?v=35`, `loop-central.js?v=40`, `game.js?v=47`.
+
+**O que mudou nos dados** (`dados/pistas-v4.json`, **281 pistas**, "v4 revisão 10")
+- Novas: `insc_tabua` (Conservação, volta 1, custo 1, comum, rótulo "Tábua da escrita antiga", `glifos:'tabua'`, destrava as duas abaixo), `insc_copia` (Galeria, volta 2, custo 1, comum, essencial, grupo `prova_falsa`, `essencialPara:['final_revelar']`, precisa `falsa_1` + `insc_tabua`, destrava `cracha_3` e `lenz_1`, rótulo "Inscrição na máscara", `glifos:'copia'`), `insc_verdadeira` (Sala das coleções, volta 2, custo 0, clima, precisa `c_peca` + `insc_tabua`, rótulo "A testa, de perto", `glifos:'verdadeira'`).
+- Mudaram: `grupos_fonte.prova_falsa.fontes` (+`insc_copia`, 6 fontes), `falsa_1.revela.destrava` (+`insc_copia`), `c_peca.revela.destrava` (+`insc_verdadeira`), `cracha_3.precisaDe.umaDe` e `lenz_1.precisaDe.umaDe` (+`insc_copia`), `trancas.provar_a_falsificacao.chaves.solo.como`, `regras.escada` (volta 2 com "inscrição da máscara"), regra nova `regras.glifos`. Nada da revisão 9 foi desfeito.
+- **Rótulos novos: 3.** Nenhuma volta, horário, `soNaCausa` ou tranca das pistas antigas mudou.
+
+**Simulador de texto e validador** (`dados/validar.py`, `dados/simulador-texto.py`). Só o cabeçalho (revisão 10): leem as pistas novas pelos dados (nenhuma contagem fixa). Resultado: APROVADO nas 5 causas (`/tmp/roda/esc/r10/validar.txt`).
+
+**Testes de tela** (fora do repositório): os da revisão 9 e o novo `/tmp/roda/r10/insc.mjs` (por toque, numa partida: tábua, inscrição da cópia, minijogo com um erro e um acerto, prova da cópia no Revelar, inscrição verdadeira depois de `c_peca`; 390×844 e 360×740). `/tmp/pwt/r5.mjs` passou a esperar "revisão 10".
+
+## Checklist por volta (recalculado dos dados em 25/11/2026, revisão 10: 3 pistas novas; nenhuma volta, horário nem tranca antiga mudou)
+
+Conferido em `dados/pistas-v4.json` (campos `volta_min`, `volta_max`, `segundo_min`, `precisaDe`, `soNaCausa`, `parDe`, `grupos_fonte`, `atividades_coop`). Horários com `valores_padrao` (raio em 1:10); com outra hora sorteada, os horários ligados ao raio andam junto. Pistas por `volta_min`: **232 na volta 1, 27 na volta 2, 9 na volta 3, 9 na volta 4, 4 na volta 5** (281 no total). Por tipo: 216 comuns, 26 de dupla, 21 de observação (clima), 16 falsas honestas, 2 objetos. Ativas por noite: 210 (A), 211 (B), 210 (C), 210 (D), 215 (E) (as 3 novas valem nas 5 noites).
+
+**Itens na lista de cada sala, na volta 1 (igual nas 5 causas):** Subsolo 18, Oficina elétrica 12, Pátio 16, Sala dos relógios 7, Central 16, Recepção 12, Sala de conservação 11, Ateliê 19, Sala das coleções 12, Galeria 8, Oficina técnica 10, Área de descanso 12, Base da limpeza 9, Sala dos sons 5, Sala da fotografia 9.
 
 **Horários fixos de toda volta**
 
@@ -353,6 +379,7 @@ Antes da hora, a lista mostra "ainda não" (sem contagem).
 | | Laudo do Aurélio (Sala de conservação); molde de gesso (Sala das coleções) | volta 2 | Ter sentido o cheiro de verniz |
 | | A peça verdadeira, dentro da caixa de "banners" (Sala das coleções) | volta 2 | Cheiro de verniz + uma pista da caixa (peso, guia de retirada ou gravação do Braga) |
 | | Lado a Lado (Galeria + Sala da fotografia): rachadura, cor da pedra e riscos do tempo | volta 2 | Dupla; foto grande do catálogo |
+| | Inscrição na máscara (Galeria): o quinto símbolo está virado e não existe na tábua | volta 2 | Cheiro de verniz + tábua do livro de registro (Sala de conservação, volta 1, 1 de energia); 1 de energia; minijogo |
 | **Trajeto** | Marca de sola na porta de serviço (Área de descanso) | volta 1 | 1 de energia |
 | | Câmera da porta de serviço (Central, 4:00); Seu Dirceu (Base da limpeza, 4:05); escada do Subsolo (4:10) | volta 1 | Só depois que o paletó passa |
 | | Conferir as listas sem dupla (Central) | volta 1 | Registro da roleta da saída + livro de visitas; 2 de energia |
@@ -360,20 +387,20 @@ Antes da hora, a lista mostra "ainda não" (sem contagem).
 | | Foto e legenda, juntas (Área de descanso) | volta 2 (a segunda metade só chega por Passar pista, na pausa; sem turma, as duas metades aparecem na volta 1) | As duas metades no caderno (Pátio + Área de descanso); 1 de energia |
 | | Caderno de rondas do Braga, no cofre (Central): a volta pela porta de serviço, no começo da noite | volta 1 | Abrir o cofre: o número de registro de trás para a frente; 1 de energia |
 | | As Duas Listas (Recepção + Central); Apagão Combinado (Pátio + Área de descanso) | volta 2 | Dupla |
-| **Crachá (o nome)** | Braga admite (Central) | volta 3 | Escala + bilhete + uma prova da cópia (laudo, Lado a Lado, foto comparada sem dupla ou a peça verdadeira na mão) |
+| **Crachá (o nome)** | Braga admite (Central) | volta 3 | Escala + bilhete + uma prova da cópia (laudo, Lado a Lado, foto comparada sem dupla, a peça verdadeira na mão ou a inscrição da máscara) |
 | | Mostrar o bilhete ao homem de paletó (Área de descanso, 4:02) | volta 3 | Bilhete do armário + livro de visitas + já ter visto ele passar (4:02, grátis) |
 | | Acusação e Defesa (Central + Base da limpeza) | volta 3 | Dupla; escala + bilhete |
 
 Não contam como prova: o cheiro de verniz; o bilhete do armário e o livro de visitas soltos; a foto sem legenda ou a legenda sem foto, sozinhas.
 
 ### Volta 1
-- **Abre:** 231 pistas (todas as salas). Sinais da máquina e leituras normais da noite, e os pares de mesmo rótulo, que são objetos de ambiente; manual, páginas 1 a 6, e a folha amassada da impressora; Téo caído, mancha, botão de paletó e prateleira; cheiro de verniz (suspeita); recibo, ficha e diário do dia da troca; as 3 fontes do registro; raio e hora do apagão; bilhete do crachá sem assinatura; escala; livro de visitas sem nome; contrato; caixa de "banners" fechada; cartão do Téo na Recepção; cofre do Braga (pede o registro, de trás para a frente) e pêndulo; Nico reparando em quem chega. Nenhuma atividade em dupla. Diagnóstico ainda fechado ("A página de diagnóstico abre na volta 2").
+- **Abre:** 232 pistas (todas as salas). Sinais da máquina e leituras normais da noite, e os pares de mesmo rótulo, que são objetos de ambiente; manual, páginas 1 a 6, e a folha amassada da impressora; Téo caído, mancha, botão de paletó e prateleira; cheiro de verniz (suspeita); recibo, ficha e diário do dia da troca; as 3 fontes do registro; a tábua da escrita antiga (livro de registro, página logo depois do número); raio e hora do apagão; bilhete do crachá sem assinatura; escala; livro de visitas sem nome; contrato; caixa de "banners" fechada; cartão do Téo na Recepção; cofre do Braga (pede o registro, de trás para a frente) e pêndulo; Nico reparando em quem chega. Nenhuma atividade em dupla. Diagnóstico ainda fechado ("A página de diagnóstico abre na volta 2").
 - **Não pode vazar:** o nome do culpado; laudo, molde, a peça verdadeira, a comparação da foto sem ajuda; páginas anteriores do diário, carta da seguradora, gravação; o pendrive; a ata; a causa pela lista da sala; a hora do raio pela lista; o conserto da noite pela aba Atividades (só aparece com o diagnóstico anexado); a troca da peça pelos textos de entrada, ajuda, aba Revelar e missões.
-- **Conferência:** laudo, molde, caixa aberta, diário anterior e carta têm `volta_min` 2; "Braga admite", "mostrar o bilhete", Acusação e Defesa, livro da Central e gravação têm `volta_min` 3; pendrive, voz do Téo, ata, guardanapo e fala na escada têm `volta_min` 4. O nome "Lenz" não aparece em nenhuma pista de volta 1: OK. Prévias iguais nas 5 causas, sala por sala (0 rótulos em causa única): OK. Mesma sequência nas 5 causas, em toda sala e toda volta (validador g2 e `ordem.mjs`): OK. Lista sem contagem regressiva: OK. Aba Atividades sem conserto antes do diagnóstico, nas 5 causas: OK. Tranca igual nas 5 causas (`pares.py`: diferenças por campo = nenhuma): OK. Minijogo da caixa fora da volta 1: OK.
+- **Conferência:** laudo, molde, caixa aberta, inscrição na máscara, testa da peça verdadeira, diário anterior e carta têm `volta_min` 2; "Braga admite", "mostrar o bilhete", Acusação e Defesa, livro da Central e gravação têm `volta_min` 3; pendrive, voz do Téo, ata, guardanapo e fala na escada têm `volta_min` 4. O nome "Lenz" não aparece em nenhuma pista de volta 1: OK. Prévias iguais nas 5 causas, sala por sala (0 rótulos em causa única): OK. Mesma sequência nas 5 causas, em toda sala e toda volta (validador g2 e `ordem.mjs`): OK. Lista sem contagem regressiva: OK. Aba Atividades sem conserto antes do diagnóstico, nas 5 causas: OK. Tranca igual nas 5 causas (`pares.py`: diferenças por campo = nenhuma): OK. Minijogo da caixa fora da volta 1: OK.
 - **Horários que importam:** o raio (anotar a hora) e a volta do paletó, às 4:00.
 
 ### Volta 2
-- **Abre:** +25 pistas: laudo do Aurélio, molde de gesso, a peça verdadeira na caixa, comparar a foto sem ajuda, páginas anteriores do diário (2), carta da seguradora, a mancha medida com o pé (para quem já viu a mancha), a escultura atrás da porta de vidro (para quem já viu o paletó passar), Nico explicando a Galeria (para quem já falou com ele), a música da Sala dos sons, objetos no chão (luva isolante no Pátio, peça verdadeira no Subsolo), produtos das atividades e ensaios (o meio conserto da noite E passou para a volta 3). **Anexar o diagnóstico** (1 tentativa por volta). Atividades em dupla (`volta_min` 2): Lado a Lado, As Duas Listas, Apagão Combinado, Painel e Manual (olhar o painel gasta 1 de energia; entrega a leitura completa; não anexa), Correio do Loop; ensaio do conserto para quem já anexou.
+- **Abre:** +27 pistas: laudo do Aurélio, molde de gesso, a peça verdadeira na caixa, comparar a foto sem ajuda, a inscrição na máscara (com minijogo) e a testa da peça verdadeira (depois de abrir a caixa), páginas anteriores do diário (2), carta da seguradora, a mancha medida com o pé (para quem já viu a mancha), a escultura atrás da porta de vidro (para quem já viu o paletó passar), Nico explicando a Galeria (para quem já falou com ele), a música da Sala dos sons, objetos no chão (luva isolante no Pátio, peça verdadeira no Subsolo), produtos das atividades e ensaios (o meio conserto da noite E passou para a volta 3). **Anexar o diagnóstico** (1 tentativa por volta). Atividades em dupla (`volta_min` 2): Lado a Lado, As Duas Listas, Apagão Combinado, Painel e Manual (olhar o painel gasta 1 de energia; entrega a leitura completa; não anexa), Correio do Loop; ensaio do conserto para quem já anexou.
 - **Não pode vazar:** o nome (a carta da seguradora diz só "quem assinou pelo patrocínio"); conserto valendo (só na volta 5); eco do Raio (só da volta 3); meio conserto da noite E (só da volta 3); Revelar (só na volta 5).
 - **Conferência:** ensaios têm `volta_min` 2 e `volta_max` 4; consertos finais têm `volta_min` 5: OK. Eco: `volta_min_gravar` 3 e a pista do eco com `volta_min` 3: OK. Noite E: `regras.E_volta_min_meio` 3, lido pelo jogo e pelo simulador: OK.
 - **Horários que importam:** a luva isolante só sai do armário depois do apagão (1:10).
@@ -397,10 +424,11 @@ Não contam como prova: o cheiro de verniz; o bilhete do armário e o livro de v
 - **Horários que importam:** janela do Raio (noites B e E); 5:00 é o limite do Revelar.
 
 ### Pendências
-Nenhuma de texto, dado ou código (revisão 9). Os pontos de regra que as rodadas 5 e 6 deixam para o autor estão em `DECISOES-V4.md`, "Revisão 7 · Ficou para decidir": não bloqueiam o jogo. O que as revisões 2 e 3 deixaram em aberto foi fechado assim:
+Nenhuma de texto, dado ou código (revisão 10). Os pontos de regra que as rodadas 5 e 6 deixam para o autor estão em `DECISOES-V4.md`, "Revisão 7 · Ficou para decidir": não bloqueiam o jogo. O que as revisões 2 e 3 deixaram em aberto foi fechado assim:
 
 | Assunto | Como ficou | Quem decidiu |
 |---|---|---|
+| Escrita da máscara (revisão 10) | Inventada, própria do Loop; símbolos desenhados (não emoji, não ícone), conteúdo de pista e não ícone de interface; o nome "máscara" fica | Autor, 25/11/2026 |
 | Seletor "Bem-vindo / Bem-vinda / Tanto faz" e "Como quer ser chamado" na entrada com código | Intencional, padrão de todos os Mosaicos: não é defeito de gênero nem de ícone; não mexer | Autor, 25/11/2026 |
 | Energia de quem joga sem dupla | 5 por volta para todo mundo | Responsável, 25/11/2026 |
 | Revelar | Só na volta 5, na Recepção | Responsável, 25/11/2026 |

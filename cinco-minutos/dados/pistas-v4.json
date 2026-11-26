@@ -1,5 +1,5 @@
 {
- "versao": "v4 revisão 9 (25/11/2026)",
+ "versao": "v4 revisão 10 (25/11/2026)",
  "noite": "v4",
  "causa_sorteada": "B_potencia",
  "causas_possiveis": [
@@ -110,7 +110,7 @@
   "E_volta_min_meio": 3,
   "central": "A Central é um papel falado: quem fica na Central de monitoramento confirma em voz alta quem está onde e se os valores batem. O aparelho não tem comando próprio para isso e nenhuma tentativa errada devolve energia. (O simulador de texto tem o comando central só para ler em voz alta onde cada pessoa está.)",
   "objeto": "pista de objeto que já está no caderno pode ser pega de novo na sala dela, sem gastar energia: o objeto volta para a mão (botão \"pegar de novo · grátis\").",
-  "escada": "volta_min: 2 = laudo, molde, peça verdadeira, comparação da foto sem ajuda, páginas anteriores do diário, carta da seguradora; 3 = nome (Braga admite, mostrar o bilhete, Acusação e Defesa), livro da Central, Aurélio e o diário, gravação do telefonema; 4 = ata, guardanapo, pendrive, voz do Téo, fala na escada. Toda pista com volta_min > 1 tem porque escrito como frase do mundo; a tela mostra a frase (no toque da pista travada) quando ela está travada por precisaDe, e a aba Atividades mostra a do produto enquanto a atividade não abre.",
+  "escada": "volta_min: 2 = laudo, molde, peça verdadeira, inscrição da máscara, comparação da foto sem ajuda, páginas anteriores do diário, carta da seguradora; 3 = nome (Braga admite, mostrar o bilhete, Acusação e Defesa), livro da Central, Aurélio e o diário, gravação do telefonema; 4 = ata, guardanapo, pendrive, voz do Téo, fala na escada. Toda pista com volta_min > 1 tem porque escrito como frase do mundo; a tela mostra a frase (no toque da pista travada) quando ela está travada por precisaDe, e a aba Atividades mostra a do produto enquanto a atividade não abre.",
   "energia_por_volta": 5,
   "aparelho": "O jogo roda em cada aparelho, sem dossiê compartilhado. Cada aparelho tem o próprio caderno, o próprio diagnóstico e a própria tentativa de Revelar. Para abrir uma atividade, o aparelho precisa das fontes de entrada no próprio caderno; só os consertos pedem também o diagnóstico anexado. Nos consertos em dupla, só o aparelho de quem está no Subsolo registra ensaio, meio conserto e conserto; quem está na outra sala diz a palavra da dupla e não gasta energia.",
   "tipoTela": "ícone da pista na lista quando ele precisa ser igual ao do par de mesmo rótulo (hoje só em c_anc_1).",
@@ -139,7 +139,8 @@
      ]
     }
    ]
-  }
+  },
+  "glifos": "campo glifos da pista (tabua | copia | verdadeira): a tela desenha, junto do texto, a tábua de 12 símbolos ou a inscrição de 6 símbolos (sprite glifos.svg). O texto da pista continua valendo sozinho para leitor de tela e para o simulador de texto."
  },
  "estados_do_grupo": {
   "diagnostico_anexado": "o dossiê aceitou a causa (no jogo, um por aparelho; ver regras.diagnostico_anexado)",
@@ -227,7 +228,7 @@
    "pergunta": "A peça é cópia?",
    "chaves": {
     "solo": {
-     "como": "Laudo ou molde (falsa_2, falsa_3, da volta 2, depois do cheiro de verniz), a peça verdadeira na mão (c_peca, da volta 2) ou foto_solo (da volta 2). O cheiro de verniz sozinho não é prova.",
+     "como": "Laudo ou molde (falsa_2, falsa_3, da volta 2, depois do cheiro de verniz), a peça verdadeira na mão (c_peca, da volta 2), foto_solo (da volta 2) ou a inscrição da máscara conferida com a tábua (insc_copia, da volta 2). O cheiro de verniz sozinho não é prova.",
      "custo_energia": "0 a 2",
      "grupos": [
       "prova_falsa"
@@ -3666,7 +3667,8 @@
      "falsa_2",
      "falsa_3",
      "c_peca",
-     "aurelio_1"
+     "aurelio_1",
+     "insc_copia"
     ]
    },
    "essencial": false,
@@ -4018,6 +4020,33 @@
    "custo": 1
   },
   {
+   "volta_min": 1,
+   "volta_max": 5,
+   "segundo_min": 0,
+   "quemPodeVer": "todos",
+   "precisaDe": {
+    "todas": [],
+    "umaDe": []
+   },
+   "revela": {
+    "aponta": [],
+    "descarta": [],
+    "destrava": [
+     "insc_copia",
+     "insc_verdadeira"
+    ]
+   },
+   "id": "insc_tabua",
+   "sala": "conservacao",
+   "texto": "Livro de registro, página da peça principal: \"Máscara de pedra, uns 300 anos. Na testa, uma frase numa escrita antiga. Para ler, use a tábua.\" Embaixo, doze símbolos desenhados a nanquim, cada um com a palavra ao lado. Repare: alguns são quase iguais.",
+   "glifos": "tabua",
+   "essencial": false,
+   "tipo": "comum",
+   "camada": "historia",
+   "previa": "Tábua da escrita antiga",
+   "custo": 1
+  },
+  {
    "id": "tombo_2",
    "sala": "fotografia",
    "texto": "Foto antiga do catálogo, tirada de baixo: dá para ler {reg} na base da peça.",
@@ -4132,7 +4161,8 @@
     "destrava": [
      "chao_peca",
      "cracha_3",
-     "lenz_1"
+     "lenz_1",
+     "insc_verdadeira"
     ]
    },
    "essencial": true,
@@ -4150,6 +4180,35 @@
    "gruposExtras": [
     "prova_falsa"
    ]
+  },
+  {
+   "volta_min": 2,
+   "volta_max": 5,
+   "segundo_min": 0,
+   "quemPodeVer": "todos",
+   "precisaDe": {
+    "todas": [
+     "c_peca",
+     "insc_tabua"
+    ],
+    "umaDe": []
+   },
+   "revela": {
+    "aponta": [],
+    "descarta": [],
+    "destrava": []
+   },
+   "id": "insc_verdadeira",
+   "sala": "deposito",
+   "texto": "Na testa da peça verdadeira, os mesmos seis símbolos, gastos pelo tempo. Aqui nenhum está virado. Com a tábua, a frase fecha: \"O rosto de pedra vê a noite e guarda o tempo.\" Vale pôr ao lado da máscara da Galeria.",
+   "glifos": "verdadeira",
+   "essencial": false,
+   "tipo": "clima",
+   "camada": "historia",
+   "grupoFonte": null,
+   "previa": "A testa, de perto",
+   "custo": 0,
+   "porque": "Sem abrir a caixa e sem a tábua do livro de registro, não há o que ler aqui."
   },
   {
    "id": "teo_1",
@@ -4597,7 +4656,8 @@
      "falsa_2",
      "coop_copia_ok",
      "foto_solo",
-     "c_peca"
+     "c_peca",
+     "insc_copia"
     ]
    },
    "revela": {
@@ -5615,6 +5675,41 @@
    ],
    "previa": "Comparar a foto sem ajuda",
    "porque": "Sem a foto grande do catálogo, você não tem com o que comparar."
+  },
+  {
+   "volta_min": 2,
+   "volta_max": 5,
+   "segundo_min": 0,
+   "quemPodeVer": "todos",
+   "precisaDe": {
+    "todas": [
+     "falsa_1",
+     "insc_tabua"
+    ],
+    "umaDe": []
+   },
+   "revela": {
+    "aponta": [],
+    "descarta": [],
+    "destrava": [
+     "cracha_3",
+     "lenz_1"
+    ]
+   },
+   "id": "insc_copia",
+   "sala": "galeria",
+   "texto": "Na testa da máscara, seis símbolos. Você confere com a tábua: o quinto está virado, como num espelho, e assim não existe. A frase não fecha: \"O rosto de pedra vê a noite e … o tempo.\" Quem gravou a peça não erraria a própria escrita. Quem copiou com pressa, sim.",
+   "glifos": "copia",
+   "essencial": true,
+   "tipo": "comum",
+   "camada": "historia",
+   "grupoFonte": "prova_falsa",
+   "essencialPara": [
+    "final_revelar"
+   ],
+   "previa": "Inscrição na máscara",
+   "custo": 1,
+   "porque": "Na testa da máscara há uma fileira de símbolos. Sem estranhar a peça e sem a tábua para ler, é só enfeite."
   },
   {
    "id": "par_catraca",
@@ -8040,7 +8135,7 @@
   {
    "id": "v4_teo",
    "sala": "manutencao",
-   "texto": "Atrás do quadro de avisos da oficina, um bilhete que você não tinha visto: \"A peça tem o mesmo desenho e pesa diferente. Eu sei o que eu carrego. Não deixem a exposição abrir sem provar quem foi. — T.\"",
+   "texto": "Atrás do quadro de avisos da oficina, um bilhete que você não tinha visto: \"A peça tem a mesma cara e pesa diferente. Eu sei o que eu carrego. Não deixem a exposição abrir sem provar quem foi. — T.\"",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -8269,7 +8364,8 @@
      "falsa_2",
      "coop_copia_ok",
      "foto_solo",
-     "c_peca"
+     "c_peca",
+     "insc_copia"
     ]
    },
    "revela": {
@@ -9386,7 +9482,8 @@
     "falsa_3",
     "coop_copia_ok",
     "foto_solo",
-    "c_peca"
+    "c_peca",
+    "insc_copia"
    ],
    "salas": [
     "conservacao",

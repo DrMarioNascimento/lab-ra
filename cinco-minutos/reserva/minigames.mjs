@@ -205,6 +205,16 @@ export function abrirMinigame(dialog, atividade, causa, aoResolver) {
       botao('Confirmar',()=>conferir(m?sequencia.join('|'):sequencia.map(i=>itens[i]).join('|')),'primary'));
   } else if(atividade.tipo==='comparar') {
     corpo.append(...atividade.opcoes.map((x,i)=>botao(x,()=>conferir(i))));
+  } else if(atividade.tipo==='glifos' && Array.isArray(atividade.insc)) {
+    // escrita antiga da máscara: os símbolos vêm do sprite embutido na página (#g-…); SVG criado com createElementNS
+    const NS='http://www.w3.org/2000/svg', gl=id=>{const s=document.createElementNS(NS,'svg');s.setAttribute('viewBox','0 0 48 48');s.setAttribute('class','glifo');s.setAttribute('aria-hidden','true');const u=document.createElementNS(NS,'use');u.setAttribute('href','#g-'+id);s.append(u);return s;};
+    const faixa=no('div',null,'faixa-pedra'); faixa.setAttribute('role','img'); faixa.setAttribute('aria-label','Inscrição da máscara, com '+atividade.insc.length+' símbolos');
+    atividade.insc.forEach(id=>faixa.append(gl(id)));
+    corpo.append(no('p','Na testa da máscara','kicker'),faixa);
+    if (Array.isArray(atividade.tabua)) { const t=no('div',null,'tabua-mini'); t.setAttribute('aria-hidden','true'); atividade.tabua.forEach(([id,w])=>{const c=no('span',null,'t'); c.append(gl(id),no('small',w)); t.append(c);}); corpo.append(no('p','Do seu caderno: a tábua do livro de registro','kicker'),t); }
+    const grade=no('div',null,'opc-glifos');
+    atividade.opcoes.forEach((n,i)=>{const b=botao('',()=>conferir(i)); b.append(gl(atividade.insc[Number(n)-1]),no('span',n+'º símbolo')); b.setAttribute('aria-label',n+'º símbolo'); grade.append(b);});
+    corpo.append(grade);
   } else if(atividade.tipo==='sintomas') {
     const dados=causas[causa];
     const selecao=new Set(), registros=no('div',null,'sintomas');

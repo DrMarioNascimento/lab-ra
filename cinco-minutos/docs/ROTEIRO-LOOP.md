@@ -24,6 +24,8 @@ Tudo neste roteiro usa um relógio só: o minuto da volta, de 0:00 a 5:00. Às 5
 - **Nico**, guia do museu. Repara em todo mundo ("Você tá com cara de quem não jantou"), perde o fio e guarda um pendrive e uma frase: "Desculpa, eu já te disse isso?"
 - **Seu Dirceu**, da limpeza. Fica sempre na Base da limpeza. Esfregão e pano na mão, vê quem passa e reclama do que apita. É quem conta que alguém de sapato social desceu com pressa "e nem boa-noite".
 
+**A peça principal** é uma **máscara de pedra** de uns 300 anos, em cima da base de madeira da Galeria especial (a peça 3D da Galeria). As pistas a chamam de "peça principal"; o livro de registro diz o que ela é: "Máscara de pedra, uns 300 anos. Na testa, uma frase numa escrita antiga." A escrita é inventada para o Loop: 12 símbolos, cada um com a sua palavra na tábua do livro de registro. Na peça verdadeira a frase é "O rosto de pedra vê a noite e guarda o tempo." Na cópia, quem copiou com pressa gravou o quinto símbolo (guardar) virado, como num espelho.
+
 ## 2. A noite antes do crime
 
 Você nunca vê esta parte. Você monta, pedaço por pedaço.
@@ -114,13 +116,13 @@ Cada volta tem três camadas: o **agora** (o que você vê), o **antes** (o que 
 
 ### Volta 1 — "Tem algo errado aqui"
 - **Agora:** na mesa da Recepção, um cartão do Téo: "Se eu não aparecer na montagem hoje, não pergunta pra ninguém: anota. Começa pela peça." Você acha o Téo, a mancha vermelha, a peça que cheira a verniz e, no Subsolo, a Câmara ligada com os comandos travados. A máquina já mostra o sinal da noite (mostradores, ponteiro de carga, luz da peça ou lacre cortado). O manual está inteiro no Ateliê, páginas 1 a 6, em qualquer noite.
-- **Antes:** o recibo do dia da troca, o número de registro, o bilhete do crachá (sem assinatura, só a pressa na letra), o livro de visitas com três assinaturas e nenhuma saída (uma delas "do patrocínio, apressada, quase um risco": sem nome).
+- **Antes:** o recibo do dia da troca, o número de registro, a tábua da escrita antiga (no livro de registro, na página logo depois do número), o bilhete do crachá (sem assinatura, só a pressa na letra), o livro de visitas com três assinaturas e nenhuma saída (uma delas "do patrocínio, apressada, quase um risco": sem nome).
 - **O que ainda não dá:** o nome, o laudo, a caixa aberta, a comparação da foto (tudo isso é da volta 2 em diante). O cheiro de verniz é suspeita, não é prova. Nesta volta você junta suspeita, não acusação.
 - **Próximo loop:** você descobre que o apagão é um raio e em que minuto ele cai. Na volta que vem, você já sabe onde estar.
 - **Na Máquina:** a aba Dossiê mostra a sua missão secreta e avisa que a página de diagnóstico abre na volta 2. A aba Revelar já mostra as 3 provas que faltam.
 
 ### Volta 2 — "Não é só cheiro"
-- **Agora:** a mancha está do mesmo tamanho. Você mede com o pé: a tinta para na mesma tábua. Ainda molhada, como se tivesse acabado de cair. O museu não guardou nada. Você, sim. Você acha o laudo do Aurélio na Sala de conservação. No fundo de uma caixa, o molde de gesso. E a caixa de "banners" que pesa demais já tem motivo para ser aberta: dentro, a peça verdadeira.
+- **Agora:** a mancha está do mesmo tamanho. Você mede com o pé: a tinta para na mesma tábua. Ainda molhada, como se tivesse acabado de cair. O museu não guardou nada. Você, sim. Você acha o laudo do Aurélio na Sala de conservação. No fundo de uma caixa, o molde de gesso. E a caixa de "banners" que pesa demais já tem motivo para ser aberta: dentro, a peça verdadeira. Com a tábua no caderno, você confere a inscrição na testa da máscara da Galeria: o quinto símbolo está virado e a frase não fecha. Na testa da peça verdadeira, os mesmos seis símbolos fecham a frase.
 - **Antes:** as páginas anteriores do diário, com a letra do Téo, e a carta da seguradora (quem assinou pelo patrocínio: uma rubrica, sem nome).
 - **Próximo loop:** primeira chance de **anexar o diagnóstico**. Abrem as atividades em dupla: Lado a Lado, As Duas Listas, Apagão Combinado, Painel e Manual, Correio do Loop. Quem pega a luva isolante depois do apagão deixa no chão do Pátio para a volta seguinte. Com o diagnóstico anexado, o conserto já pode ser ensaiado.
 - **Na Máquina:** a aba Dossiê abre "Por que a máquina travou?": você marca 3 pistas do caderno e escolhe o defeito. A aba Atividades abre os cartões das duplas.
@@ -171,7 +173,7 @@ A virada da cena: durante quatro voltas o apagão foi o seu inimigo. Na quinta, 
 Da volta 4 em diante, para quem já contou do Téo caído e já leu o laudo. Você diz o número de registro. Nico pisca, como quem acorda. Pela primeira vez ele não pede desculpa: "É isso. O Téo falou: só para quem souber o que está gravado embaixo da verdadeira." E põe o pendrive na sua mão. No rádio, o Téo fala com você sem te conhecer: "Você achou o número. Então escuta: a da Galeria é cópia. Hoje eu falo com ele, cara a cara. Se eu não aparecer, não deixa a noite acabar sem prova."
 
 ### Cena da caixa — "Pesa demais para banner"
-Em toda noite. Na Sala das coleções, numa das caixas etiquetadas da estante, você empurra a caixa do patrocínio: "BANNERS – NÃO ABRIR". Pesa demais pra banner. Da volta 2 em diante, com o cheiro de verniz no caderno, você tem motivo para abrir. Dentro da manta está a peça de 300 anos. Cheira a pó, não a verniz. Embaixo da base, o número gravado. A caixa é fato do crime em qualquer partida, e a peça verdadeira na mão vale como prova de que a da Galeria é cópia; na noite da peça presa (causa C) ela também é a ferramenta do conserto.
+Em toda noite. Na Sala das coleções, numa das caixas etiquetadas da estante, você empurra a caixa do patrocínio: "BANNERS – NÃO ABRIR". Pesa demais pra banner. Da volta 2 em diante, com o cheiro de verniz no caderno, você tem motivo para abrir. Dentro da manta está a peça de 300 anos. Cheira a pó, não a verniz. Embaixo da base, o número gravado; na testa, a frase inteira, sem nenhum símbolo virado. A caixa é fato do crime em qualquer partida, e a peça verdadeira na mão vale como prova de que a da Galeria é cópia; na noite da peça presa (causa C) ela também é a ferramenta do conserto.
 
 ### Cena do empurrão — "A um braço de distância"
 Em toda noite, depois de achar o Téo. Um botão de paletó com um fiapo de linha, perto da mão dele. Na prateleira, na altura do ombro, o pó arrastado por uma mão espalmada; mais abaixo, a marca de dedos abertos, descendo: alguém tentou segurar quem caía. E, para quem já viu as pegadas brilharem, a primeira delas: começa dentro da tinta, de frente para o Téo. Quem pisou ali foi embora andando, não correndo.
@@ -461,3 +463,14 @@ Vale sobre o que estiver escrito acima, nas partes 9 a 15. Nada do enredo mudou:
 - **Seu Dirceu.** Esfregão e pano na mão (saiu o rodo).
 - **Ouro.** "A notícia das 3 provas sobe até a Galeria. Aurélio olha para a base, depois para quem chega, e só consegue dizer: 'Obrigado por não esquecer.'"
 - **Entrada com código em sala.** O seletor "Bem-vindo / Bem-vinda / Tanto faz" e o campo "Como quer ser chamado" são padrão de todos os Mosaicos, por decisão do autor (25/11/2026).
+
+## 17. O que mudou na revisão 10 (25/11/2026)
+
+Vale sobre o que estiver escrito acima, nas partes 9 a 16. Entrou um enigma novo, desenhado e aprovado pelo autor: **a inscrição da máscara**. Nada do enredo mudou; a prova da cópia ganhou mais um caminho.
+
+- **Onde entra.** Volta 1, Sala de conservação: no livro de registro, a página logo depois do número é a **tábua** (`insc_tabua`, 1 de energia): os 12 símbolos, cada um com a sua palavra. Volta 2, Galeria: **"Inscrição na máscara"** (`insc_copia`, 1 de energia), para quem já sentiu o cheiro de verniz e tem a tábua; abre o minijogo "Ler a inscrição da máscara" (a faixa da máscara e a tábua lado a lado; "Um deles não bate. Qual?"; 4 opções com o desenho do símbolo; a ordem muda com a semente). Volta 2, Sala das coleções: **"A testa, de perto"** (`insc_verdadeira`, grátis), só depois de abrir a caixa (`c_peca`): a frase fecha.
+- **Por que é prova da cópia.** Quem gravou a peça não erraria a própria escrita. Na máscara da Galeria, o quinto símbolo está virado, como num espelho: virado, ele não existe na tábua, e a frase não fecha ("O rosto de pedra vê a noite e … o tempo."). Quem copiou com pressa errou. É uma prova que se confere sozinha, com a tábua na mão, como a foto comparada sem ajuda. Entra no grupo da prova da cópia (agora com 6 fontes: laudo, molde, Lado a Lado, foto sem ajuda, peça verdadeira e inscrição), abre o Braga ("Braga, de novo") e a fala do Lenz na escada, como as outras, e conta na fita do tempo do telão ("o que foi feito"). Nenhuma prova ficou sendo a única.
+- **A peça verdadeira confirma.** "A testa, de perto" não é prova (é observação): mostra a frase certa para pôr ao lado da cópia.
+- **Peça principal = máscara de pedra.** As pistas antigas continuam dizendo "peça principal"; o livro de registro, a tábua, o dicionário da Máquina ("Peça principal" e "Inscrição") e este roteiro (parte 1) dizem que é a máscara de pedra. Nenhuma pista descreve a peça de outro jeito (pedra, rachadura, 300 anos, 4,2 kg).
+- **Decisão do autor (25/11/2026).** A escrita é **inventada, própria do Loop**. Os símbolos são **desenhados** (entalhe dourado na pedra, com volume), **não são emoji nem ícone**: são **conteúdo de pista**, não ícone de interface. O desenho fica num arquivo do próprio Loop (`museu/icones/ui/glifos.svg`).
+
