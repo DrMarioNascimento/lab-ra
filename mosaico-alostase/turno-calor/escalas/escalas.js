@@ -1,4 +1,4 @@
-import { ESCALAS_CALOR, horaCivilDaEscala, simularEscalaCalor, PASSO_LEITURA_MIN } from '../../motor/escala-calor.js?v=2';
+import { ESCALAS_CALOR, horaCivilDaEscala, simularEscalaCalor, PASSO_LEITURA_MIN } from '../../motor/escala-calor.js?v=3';
 import { conferirEscalaComMorris, conferirEscalaComShafer } from '../../motor/conferencia-escala.js?v=2';
 import { desenharSerie, indiceNaSerie } from '../../hidratacao/grafico.js?v=3';
 
@@ -6,13 +6,14 @@ const el = (id) => document.getElementById(id);
 const diaria = [
   ['pas24h', 'Pressão sistólica média em 24 h', 'mmHg', 1],
   ['pad24h', 'Pressão diastólica média em 24 h', 'mmHg', 1],
-  ['quedaPasPct', 'Queda sistólica durante o sono', '%', 1],
+  ['quedaPasPct', 'Queda sistólica no sono efetivo', '%', 1],
+  ['quedaPasJanelaPct', 'Queda sistólica na janela de sono', '%', 1],
   ['osmInicial', 'Osmolalidade às 08:00', 'mOsm/kg', 1],
   ['indiceAclima', 'Aclimatação cardiovascular', '%', 0],
   ['indiceSuorAclima', 'Aclimatação da sudorese', '%', 0],
   ['cargaSono', 'Carga persistente de desalinhamento', '%', 0],
   ['faseH', 'Atraso do relógio biológico', 'h', 1],
-  ['sonoForaDaFaseH', 'Sono fora da noite biológica', 'h', 1],
+  ['sonoForaDaFaseH', 'Janela de sono fora da noite biológica', 'h', 1],
   ['dividaSono7dH', 'Dívida de sono em sete dias', 'h', 1],
   ['vigiliaMaxH', 'Maior vigília contínua no dia', 'h', 1],
   ['picoTemperaturaC', 'Pico de temperatura central', '°C', 2],
@@ -67,7 +68,7 @@ function atualizarHora() {
   el('hora-rotulo').textContent = rotulo;
   el('hora-selecionada').setAttribute('aria-valuetext', rotulo);
   const pontos = pontosNoDia().map((p) => p.detalhe[h]);
-  el('leitura').innerHTML = linha('Atividade', pontos.map((p) => p.dormindo ? 'Sono' : p.emTurno ? 'Durante o turno' : 'Vigília fora do turno'))
+  el('leitura').innerHTML = linha('Atividade', pontos.map((p) => p.dormindo ? 'Sono' : p.desperto ? 'Acordado na janela de sono' : p.emTurno ? 'Durante o turno' : 'Vigília fora do turno'))
     + serieLinhas(horaria, pontos);
   grafico('curva-dia', 'variavel-dia', pontosNoDia().map((p) => p.detalhe), horaria, h, (i) => horario(i * PASSO_LEITURA_MIN));
 }
@@ -80,6 +81,10 @@ function atualizarDia() {
   const pontos = pontosNoDia();
   el('resumo').innerHTML = linha('Escala do dia', pontos.map(({ plano }) => plano.tipo))
     + linha('Sono programado', pontos.map(({ plano }) => `${horario(plano.inicioSono)}–${horario(plano.inicioSono + plano.duracaoSono)}`))
+    + serieLinhas([
+      ['sonoEfetivoMin', 'Tempo efetivamente dormido', 'min', 0],
+      ['acordadoNaJanelaMin', 'Tempo acordado na janela', 'min', 0],
+    ], pontos)
     + serieLinhas(diaria, pontos)
     + serieLinhas([
       ['osmPreTurno', 'Osmolalidade no início do turno', 'mOsm/kg', 1],
@@ -96,11 +101,12 @@ function atualizarComparacao() {
   const curta = el('sono-modo').value === 'curto';
   series = ['a', 'b'].map((id, i) => {
     const chave = el(`escala-${id}`).value;
+    const despertares = id === 'b' ? Number(el('despertares-b').value) : 0;
     const nome = ESCALAS_CALOR[chave];
     for (const campo of ['titulo', 'hora']) el(`${campo}-${id}`).textContent = nome;
-    el(`legenda-${id}`).textContent = `${i ? 'Tracejada' : 'Contínua'} · ${nome}`;
-    const entrada = curta && chave !== 'diurna' ? `${chave}-curta` : chave;
-    if (!cache.has(entrada)) cache.set(entrada, simularEscalaCalor(chave, { encurtarSonoNoturno: curta }));
+    el(`legenda-${id}`).textContent = `${i ? 'Tracejada' : 'Contínua'} · ${nome}${despertares ? ` · ${despertares} despertares` : ''}`;
+    const entrada = JSON.stringify([chave, curta && chave !== 'diurna', despertares]);
+    if (!cache.has(entrada)) cache.set(entrada, simularEscalaCalor(chave, { encurtarSonoNoturno: curta, despertares }));
     return cache.get(entrada);
   });
   atualizarDia();
@@ -113,7 +119,7 @@ function tabelaEstudos() {
     linha(nome, [`${numero(estudo)} ± ${numero(dp)}%`, medicao(motor, '%'), `${numero(motor - estudo, 1, true)} p.p.`])).join('');
 }
 
-for (const id of ['escala-a', 'escala-b', 'sono-modo']) el(id).addEventListener('change', atualizarComparacao);
+for (const id of ['escala-a', 'escala-b', 'sono-modo', 'despertares-b']) el(id).addEventListener('change', atualizarComparacao);
 el('variavel').addEventListener('change', atualizarDia);
 el('variavel-dia').addEventListener('change', atualizarHora);
 el('dia-selecionado').addEventListener('input', atualizarDia);

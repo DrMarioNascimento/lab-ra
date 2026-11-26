@@ -28,6 +28,7 @@
         <label>Escala A <select id="escala-a"></select></label>
         <label>Escala B <select id="escala-b"></select></label>
         <label>Sono programado <select id="sono-modo"><option value="igual">8 horas em todas as escalas</option><option value="curto">6 horas em dias de trabalho noturno</option></select></label>
+        <label>Despertares na escala B <select id="despertares-b"><option value="0">Sem despertares programados</option><option value="4">4 de 5 minutos</option><option value="8">8 de 5 minutos</option></select></label>
       </div>
       <label>Variável ao longo dos dias <select id="variavel"></select></label>
       <canvas id="curva" class="calor-curva" aria-hidden="true"></canvas>
@@ -87,11 +88,12 @@
         <li>Água, sódio, temperatura e índices renais passam de um dia para o seguinte. A aclimatação cresce com minutos de trabalho no calor acima de 37,5 °C de temperatura central calculada. Em dias sem exposição, os índices cardiovascular e de sudorese diminuem. O motor usa meia-vida didática de 14 dias para a sudorese.</li>
         <li>O relógio se ajusta parcialmente aos horários de sono. O modelo estima a fração do sono fora da noite biológica sem inferir a exposição individual à luz.</li>
         <li>A fração do sono fora da fase e a variabilidade de horários nos últimos sete dias alimentam um índice separado. Este índice cresce ou recua com meia-vida didática de 14 dias, atua na pressão sistólica durante o sono e usa uma amplitude máxima ilustrativa de 6 mmHg.</li>
-        <li>A pressão de sono acompanha o tempo acordado e dormindo. A dívida em sete dias usa o limiar de 15,84 horas de vigília do motor original. Com 8 horas programadas por dia, essa conta produz a mesma dívida nas três escalas, embora a pressão de sono possa diferir.</li>
+        <li>Quando ativados, os despertares da escala B ocorrem em todas as janelas, inclusive nas folgas. Alteram as pressões e a frequência cardíaca na hora, o tempo efetivamente dormido e a dívida de sono. A fase continua seguindo o horário de sono programado. <a href="../../conferencia/despertares/">Conferência dos pulsos em laboratório</a></li>
+        <li>A pressão de sono acompanha o tempo acordado e dormindo. A dívida em sete dias usa o limiar de 15,84 horas de vigília do motor original. Com 8 horas contínuas por dia, a dívida é a mesma nas três escalas, embora a pressão de sono possa diferir.</li>
         <li>A queda de pressão é calculada entre as médias de vigília e de sono de cada dia. Na projeção, a vigília inclui o trabalho. O volume ingerido e o aporte diário de sódio de 2,4 g são parâmetros da simulação.</li>
       </ul>
     </details>
   </main>
-  <script type="module" src="./escalas.js?v=2"></script>
+  <script type="module" src="./escalas.js?v=3"></script>
 </body>
 </html>

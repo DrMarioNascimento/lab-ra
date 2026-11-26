@@ -1,4 +1,4 @@
-import { conferirMorris2016, simularSonoPressao, JANELAS_SONO_PRESSAO } from '../../motor/sono-pressao.js';
+import { conferirMorris2016, simularSonoPressao, JANELAS_SONO_PRESSAO } from '../../motor/sono-pressao.js?v=2';
 import { desenharSerie, indiceNaSerie } from '../../hidratacao/grafico.js?v=4';
 
 const el = (id) => document.getElementById(id);

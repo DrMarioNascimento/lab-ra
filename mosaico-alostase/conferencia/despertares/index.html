@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Despertares experimentais e pressão · Mosaico Alostase</title>
+  <link rel="stylesheet" href="../../jogo/estilo.css?v=9">
+  <link rel="stylesheet" href="../../cardiovascular/bancada.css">
+  <link rel="stylesheet" href="../../turno-calor/calor.css">
+  <style>.bancada select { max-width: 100%; }</style>
+</head>
+<body>
+  <main class="bancada">
+    <nav class="calor-nav">
+      <a href="../sono-pressao/">← Sono e pressão em 24 horas</a>
+      <a href="../../turno-calor/escalas/">Escalas em 28 dias</a>
+    </nav>
+    <header class="abertura">
+      <h1>Despertares experimentais e pressão</h1>
+      <p>Carrington e Trinder estudaram dez adultos jovens em quatro condições. Compararam o sono sem interrupções com despertares induzidos após 120, 60 ou 30 segundos de sono.</p>
+    </header>
+    <section class="painel">
+      <h2>Variações em escala de segundos</h2>
+      <p>As duas curvas representam a sistólica em 20 minutos. A tracejada inclui os pulsos de pressão dos despertares programados. A linha contínua representa o nível de sono entre os pulsos.</p>
+      <label>Condição simulada <select id="condicao"></select></label>
+      <canvas class="calor-curva" id="curva" aria-hidden="true"></canvas>
+      <p class="calor-legenda"><span>Contínua · nível de sono</span><span>Tracejada · inclui os pulsos</span></p>
+      <div class="controle-hora">
+        <label for="tempo">Minutos e segundos <output id="tempo-rotulo"></output></label>
+        <input id="tempo" type="range" min="0" max="1199" value="35" step="1">
+      </div>
+      <p id="leitura"></p>
+    </section>
+    <section class="painel">
+      <h2>Comparação com a figura 4 do estudo</h2>
+      <p>A tabela mostra quanto a média da fase ficou acima do nível pré-despertar. Os valores do estudo são leituras aproximadas da figura. A unidade é ponto percentual da pressão sistólica média da sessão.</p>
+      <table>
+        <thead><tr><th scope="col">Condição</th><th scope="col">Estudo</th><th scope="col">Motor</th><th scope="col">Motor − estudo</th></tr></thead>
+        <tbody id="comparacao"></tbody>
+      </table>
+      <p class="calor-detalhe">No estudo, a sistólica média da fase ficou acima do nível pré-despertar. A análise da sistólica pré-despertar não encontrou diferença significativa entre as condições. Esse contraste orienta o uso dos pulsos como efeitos transitórios.</p>
+      <p><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2603493/#F4">Carrington e Trinder, 2008 · experimento 1 e figura 4</a></p>
+    </section>
+    <details class="painel">
+      <summary>Como o recorte foi simulado</summary>
+      <ul>
+        <li>O experimento começou após o início do sono e durou até 90 minutos ou até o sono REM. A comparação usa o recorte de 20 minutos da fase 5, após o estabelecimento do sono. O motor mantém uma pressão de base constante nesse recorte.</li>
+        <li>O intervalo modelado soma o tempo de sono planejado no protocolo à duração média do despertar em cada condição. O momento real de voltar a dormir variava entre participantes.</li>
+        <li>O motor mantém os pulsos de 15 mmHg com duração de 12 segundos usados na bancada anterior. O estudo de Carrington e Trinder descreve picos iniciais maiores em algumas condições. Os valores medidos ficaram reservados para conferência dos pulsos existentes.</li>
+        <li>A pressão de referência usada na normalização é aproximada pela média simulada de 30 minutos antes e 90 minutos depois do início do sono.</li>
+      </ul>
+    </details>
+  </main>
+  <script type="module" src="./despertares.js"></script>
+</body>
+</html>

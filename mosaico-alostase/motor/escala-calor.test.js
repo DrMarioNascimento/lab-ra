@@ -91,3 +91,15 @@ test('Morris reproduz os quatro alvos e a conferência externa preserva o contra
   const contraste = diurno.motor - noturno.motor;
   assert.ok(contraste > 0 && Math.abs(contraste - (diurno.estudo - noturno.estudo)) < 1.5);
 });
+
+test('despertares opcionais alteram o sono efetivo sem mudar a escala nem seus horários programados', () => {
+  const referencia = cenarios[1][0];
+  const [d] = simularEscalaCalor('noturna', { dias: 1, despertares: 4 });
+  assert.deepEqual(d.plano, referencia.plano);
+  assert.equal(d.aguaL, referencia.aguaL);
+  assert.equal(d.faseH, referencia.faseH);
+  assert.equal(d.acordadoNaJanelaMin, 20);
+  assert.equal(d.sonoEfetivoMin, referencia.sonoEfetivoMin - 20);
+  assert.ok(d.quedaPasJanelaPct < referencia.quedaPasJanelaPct);
+  assert.ok(d.dividaSono7dH > referencia.dividaSono7dH);
+});

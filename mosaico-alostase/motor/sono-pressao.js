@@ -1,4 +1,5 @@
 import { MINUTOS_DIA, simularCardiovascular } from './cardiovascular.js';
+import { mediaMinutoDoPulso } from './pulso-despertar.js';
 import { ajustarPressaoDaRotina, fracaoSonoForaDaFase, mediasPressao } from './pressao-desalinhamento.js?v=2';
 
 export const JANELAS_SONO_PRESSAO = Object.freeze({ noturna: [1380, 420], diurna: [660, 1140] });
@@ -7,9 +8,6 @@ const MAX_DESPERTARES = 12;
 const MAX_DURACAO_MIN = 10;
 const modDia = (min) => (min + MINUTOS_DIA) % MINUTOS_DIA;
 
-// Pico sistólico de cerca de 15 mmHg e de FC de 8 bpm, retorno em cerca de 12 s
-// (Trinder e colegas, sintetizado por de Zambotti et al.). Área do pulso triangular / 60 s.
-const pulsoDoDespertar = (pico) => pico * 12 / (2 * 60);
 const ascensaoAcordadoMin = 1;
 const retornoAoSonoMin = 3;
 
@@ -27,6 +25,41 @@ function resumo(pontos) {
   };
 }
 
+export function aplicarDespertaresPressao(curva, acordado, { inicio, duracaoJanela, despertares, duracaoMin }) {
+  const pontos = curva.map((p) => ({ ...p, naJanela: p.dormindo, desperto: false, evento: false }));
+  const eventos = Array.from({ length: despertares }, (_, i) =>
+    Math.round(duracaoJanela * (i + 1) / (despertares + 1)));
+  let proximo = 0, acordadoAte = 0, residuo = 0;
+  for (let desdeInicio = 0; desdeInicio < duracaoJanela && despertares; desdeInicio++) {
+    const p = pontos[modDia(inicio + desdeInicio)];
+    const evento = desdeInicio === eventos[proximo];
+    if (evento) {
+      acordadoAte = desdeInicio + duracaoMin;
+      proximo++;
+    }
+    const desperto = desdeInicio < acordadoAte;
+    const alvo = Number(desperto), tau = desperto ? ascensaoAcordadoMin : retornoAoSonoMin;
+    const fator = Math.exp(-1 / tau);
+    const peso = alvo + (residuo - alvo) * tau * (1 - fator);
+    residuo = alvo + (residuo - alvo) * fator;
+    const v = acordado[p.min];
+    p.sis += peso * (v.sis - p.sis) + (evento ? mediaMinutoDoPulso('sis') : 0);
+    p.dia += peso * (v.dia - p.dia);
+    p.fc += peso * (v.fc - p.fc) + (evento ? mediaMinutoDoPulso('fc') : 0);
+    p.dormindo = !desperto;
+    p.desperto = desperto;
+    p.evento = evento;
+  }
+  return { pontos, minutosDespertares: eventos.map((m) => modDia(inicio + m)) };
+}
+
+export function vigiliaEquivalente(acordado, basal, curva) {
+  const inicio = curva.findIndex((p) => !p.dormindo);
+  const sis = curva[inicio].sis - basal[inicio].sis;
+  const dia = curva[inicio].dia - basal[inicio].dia;
+  return acordado.map((p) => ({ ...p, sis: p.sis + sis, dia: p.dia + dia }));
+}
+
 export function simularSonoPressao({ janela = 'noturna', despertares = 0, duracaoMin = 0, faseH = 0,
   comDesalinhamento = false } = {}) {
   if (!Object.hasOwn(JANELAS_SONO_PRESSAO, janela) || !Number.isInteger(despertares) || despertares < 0 || despertares > MAX_DESPERTARES
@@ -38,38 +71,11 @@ export function simularSonoPressao({ janela = 'noturna', despertares = 0, duraca
   const basal = simularCardiovascular({ sono, faseInicialH: faseH });
   const fora = fracaoSonoForaDaFase(inicio, DURACAO_JANELA_MIN, () => faseH);
   const curva = comDesalinhamento ? ajustarPressaoDaRotina(basal, fora) : basal;
-  const pontos = curva.map(({ min, sis, dia, fc, dormindo }) => ({
-    min, sis, dia, fc, dormindo, naJanela: dormindo, desperto: false, evento: false,
-  }));
-  const eventos = Array.from({ length: despertares }, (_, i) =>
-    Math.round(DURACAO_JANELA_MIN * (i + 1) / (despertares + 1)));
-  if (eventos.length > 0) {
-    const acordado = simularCardiovascular({ janelasSono: [], faseInicialH: faseH });
-    const primeiroMinAcordado = curva.findIndex((p) => !p.dormindo);
-    const ajusteVigiliaSis = curva[primeiroMinAcordado].sis - basal[primeiroMinAcordado].sis;
-    const ajusteVigiliaDia = curva[primeiroMinAcordado].dia - basal[primeiroMinAcordado].dia;
-    let proximo = 0, acordadoAte = 0, residuo = 0;
-    for (let desdeInicio = 0; desdeInicio < DURACAO_JANELA_MIN; desdeInicio++) {
-      const p = pontos[modDia(inicio + desdeInicio)];
-      const evento = desdeInicio === eventos[proximo];
-      if (evento) {
-        acordadoAte = desdeInicio + duracaoMin;
-        proximo++;
-      }
-      const desperto = desdeInicio < acordadoAte;
-      const alvo = Number(desperto), tau = desperto ? ascensaoAcordadoMin : retornoAoSonoMin;
-      const peso = alvo + (residuo - alvo) * tau * (1 - Math.exp(-1 / tau));
-      residuo = alvo + (residuo - alvo) * Math.exp(-1 / tau);
-      const v = acordado[p.min];
-      p.sis += peso * (v.sis + ajusteVigiliaSis - p.sis) + (evento ? pulsoDoDespertar(15) : 0);
-      p.dia += peso * (v.dia + ajusteVigiliaDia - p.dia);
-      p.fc += peso * (v.fc - p.fc) + (evento ? pulsoDoDespertar(8) : 0);
-      p.dormindo = !desperto;
-      p.desperto = desperto;
-      p.evento = evento;
-    }
-  }
-  return { pontos, minutosDespertares: eventos.map((m) => modDia(inicio + m)), resumo: resumo(pontos) };
+  const acordado = despertares ? vigiliaEquivalente(simularCardiovascular({ janelasSono: [], faseInicialH: faseH }), basal, curva) : null;
+  const { pontos, minutosDespertares } = aplicarDespertaresPressao(curva, acordado, {
+    inicio, duracaoJanela: DURACAO_JANELA_MIN, despertares, duracaoMin,
+  });
+  return { pontos, minutosDespertares, resumo: resumo(pontos) };
 }
 
 export function conferirMorris2016() {
