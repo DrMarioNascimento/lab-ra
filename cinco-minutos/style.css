@@ -493,15 +493,18 @@ details.lc-ativ .lc-salas small{font:600 .75rem/1.2 system-ui,sans-serif;color:#
 .help-pe{position:sticky;bottom:0;margin:0 -16px;padding:10px 16px 14px;background:linear-gradient(180deg,#111f2d00,#111f2d 28%)}
 .help-pe .btn{width:100%}
 /* livro de folhear: o lugar dele já vem reservado; a leitura fica embaixo, em letra de tela */
-.livro-vaga{position:relative;height:min(62vh,460px);border-radius:14px;overflow:hidden;border:1px solid #b89f724a;background:radial-gradient(circle at 50% 35%,#24394a,#0c1621 70%)}
+.livro-vaga{position:relative;height:calc(min(62vh,460px) - 24px);border-radius:14px;overflow:hidden;border:1px solid #b89f724a;background:radial-gradient(circle at 50% 35%,#24394a,#0c1621 70%)}
 .livro-vaga .peca.livro{height:100%;margin:0;border:0}.livro-loop .livro-vaga .peca.livro iframe{height:100%}
 .livro-capa{position:absolute;inset:26px 18%;display:grid;align-content:center;justify-items:center;gap:10px;padding:18px 12px;border-radius:6px 14px 14px 6px;border:1px solid #c9aa72;border-left:10px solid #3a2414;background:linear-gradient(135deg,#6b3f22,#4a2a16 55%,#351d0f);box-shadow:inset 0 1px 0 #ffffff30,inset 0 0 0 6px #0000001f,0 6px 0 #05090d,0 18px 28px #000a;color:#f2d3a0;cursor:pointer;text-align:center}
 .livro-capa:active{transform:translateY(3px);box-shadow:inset 0 1px 0 #ffffff20,0 2px 0 #05090d}
 .livro-capa-t{font:400 1.5rem/1.15 Georgia,serif;color:#f6e3bd}.livro-capa-s{font:700 .75rem system-ui,sans-serif;letter-spacing:.14em;color:#d5b881}
 .livro-capa-b{display:inline-flex;align-items:center;gap:8px;margin-top:10px;min-height:44px;padding:6px 14px;border-radius:12px;background:linear-gradient(180deg,#f2d3a0,#be8e4b);color:#1f1b17;font:700 .875rem system-ui,sans-serif;box-shadow:0 3px 0 #05090d}
 .livro-acoes{min-height:52px;display:grid;gap:6px;align-content:start}
-.livro-leitura{height:168px;overflow:auto;padding:10px 12px;border-radius:12px;border:1px solid #e7b97566;background:linear-gradient(180deg,#22384a,#152533);box-shadow:inset 0 1px 0 #ffffff22,0 3px 0 #05090d}
+.livro-leitura{height:192px;overflow:auto;padding:10px 12px;border-radius:12px;border:1px solid #e7b97566;background:linear-gradient(180deg,#22384a,#152533);box-shadow:inset 0 1px 0 #ffffff22,0 3px 0 #05090d}
 .livro-leitura p{margin:6px 0 0;font:.9375rem/1.45 system-ui,sans-serif;color:#eef2f0}
+/* revisão 11: com a tábua desenhada, a leitura usa também o vão dos botões "Ler" (classe grande) e a tábua vai em 2 linhas de 6, para caber inteira sem rolar */
+.livro-leitura .lc-gl.tabua{grid-template-columns:repeat(6,minmax(0,1fr));gap:3px;padding:3px;max-width:none;margin:.25rem 0 0}.livro-leitura .lc-gl.tabua .t{padding:2px 0 1px}.livro-leitura .lc-gl.tabua small{line-height:1.05}
+.livro-leitura.grande{padding:6px 10px 5px}.livro-leitura.grande p{margin-top:3px;font-size:.84375rem;line-height:1.32}.livro-leitura.grande .ll-cab b{font-size:.8125rem}
 .ll-cab{display:flex;align-items:center;justify-content:space-between;gap:8px}.ll-cab b{font:700 .875rem/1.2 system-ui,sans-serif;color:var(--gold)}
 .ll-cab span{display:flex;gap:6px}.ll-pg{min-height:36px;padding:4px 10px;border-radius:9px;border:1px solid #9fb2bd66;background:#0b1824;color:#b9c7cc;font:700 .75rem system-ui,sans-serif;position:relative}
 .ll-pg::after{content:"";position:absolute;inset:-5px}.ll-pg.on{background:var(--gold);color:#1f1b17;border-color:var(--gold)}

@@ -1,5 +1,5 @@
 {
- "versao": "v4 revisão 10 (25/11/2026)",
+ "versao": "v4 revisão 11 (26/11/2026)",
  "noite": "v4",
  "causa_sorteada": "B_potencia",
  "causas_possiveis": [
@@ -3416,7 +3416,10 @@
    ],
    "previa": "Abrir o quadro",
    "custo": 1,
-   "porque": "A porta do Quadro externo está fechada, presa pelo cadeado da trava. Sem a chavinha, ela não abre: pela fresta da borda você só espia."
+   "porque": "A porta do Quadro externo está fechada, presa pelo cadeado da trava. Sem a chavinha, ela não abre: pela fresta da borda você só espia.",
+   "textoPorCausa": {
+    "D_fusivel": "Na chave do cabo da Câmara, um segundo cadeado, amarelo, pendurado aberto."
+   }
   },
   {
    "id": "acesso_1",
@@ -3789,7 +3792,7 @@
   {
    "id": "falsa_3",
    "sala": "deposito",
-   "texto": "No fundo de uma caixa, raspas de gesso e um molde com o formato da peça principal.",
+   "texto": "No fundo de uma caixa, raspas de gesso e um molde com o formato da peça principal. A testa do molde é lisa.",
    "volta_min": 2,
    "volta_max": 5,
    "segundo_min": 0,
@@ -4038,7 +4041,7 @@
    },
    "id": "insc_tabua",
    "sala": "conservacao",
-   "texto": "Livro de registro, página da peça principal: \"Máscara de pedra, uns 300 anos. Na testa, uma frase numa escrita antiga. Para ler, use a tábua.\" Embaixo, doze símbolos desenhados a nanquim, cada um com a palavra ao lado. Repare: alguns são quase iguais.",
+   "texto": "Livro de registro, página da peça principal: \"Máscara de pedra, uns 300 anos. Na testa, uma frase numa escrita antiga. Para ler, use a tábua.\" Embaixo, doze símbolos a nanquim, cada um com sua palavra. Alguns são quase iguais.",
    "glifos": "tabua",
    "essencial": false,
    "tipo": "comum",
@@ -5264,7 +5267,7 @@
   {
    "id": "aurelio_1",
    "sala": "galeria",
-   "texto": "Aurélio baixa a voz: \"Você também sentiu? Peça de acervo não cheira a novo. O Téo me avisou no dia {dia}. Eu demorei para acreditar.\"",
+   "texto": "Aurélio baixa a voz: \"Você também sentiu? Peça de acervo não cheira a novo. O Téo me avisou no dia {dia}. Eu demorei para acreditar. Na testa dela tem uma frase; eu sei de cor, nunca mais li.\"",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -5373,7 +5376,7 @@
    "camada": "historia",
    "previa": "Nico, de novo",
    "custo": 1,
-   "porque": "Nico aperta alguma coisa no bolso do colete: \"É do Téo. Ele pediu: só entrego se ele não aparecer, só para quem souber o número certo, e só depois que o curador puser o laudo no papel.\""
+   "porque": "Nico aperta alguma coisa no bolso do colete: \"É do Téo. Ele pediu... espera. Só entrego se ele não aparecer. E só para quem souber o número certo. E... o laudo! Só depois do laudo no papel. Desculpa.\""
   },
   {
    "id": "teo_radio",
@@ -5698,7 +5701,7 @@
    },
    "id": "insc_copia",
    "sala": "galeria",
-   "texto": "Na testa da máscara, seis símbolos. Você confere com a tábua: o quinto está virado, como num espelho, e assim não existe. A frase não fecha: \"O rosto de pedra vê a noite e … o tempo.\" Quem gravou a peça não erraria a própria escrita. Quem copiou com pressa, sim.",
+   "texto": "Na testa da máscara, seis símbolos riscados à mão, de traço novo. Você confere com a tábua: o quinto está virado, como num espelho, e assim não existe. A frase não fecha: \"O rosto de pedra vê a noite e … o tempo.\"",
    "glifos": "copia",
    "essencial": true,
    "tipo": "comum",
@@ -7254,7 +7257,7 @@
   {
    "id": "a_cheia_4",
    "sala": "patio",
-   "texto": "O medidor de potência ao lado do quadro de energia mostra a barra cheia até o fim: a força está chegando na Câmara.",
+   "texto": "Embaixo do medidor redondo, a chavinha do ponteiro de potência está ligada. O ponteiro pequeno vai até o fim: a força está chegando na Câmara.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -7277,14 +7280,14 @@
    "soNaCausa": [
     "A_calibrar"
    ],
-   "previa": "Medidor de potência",
+   "previa": "Embaixo do medidor",
    "custo": 1,
    "etiqueta": "LEITURA NORMAL · ponteiro de carga"
   },
   {
    "id": "fh_med_pot_bce",
    "sala": "patio",
-   "texto": "O medidor de potência ao lado do quadro de energia está desligado. No vidro, um papel: \"aferir depois da festa\".",
+   "texto": "Embaixo do medidor redondo, a chavinha do ponteiro de potência está desligada. Colado nela, um papel: \"aferir depois da festa\".",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -7301,7 +7304,7 @@
    "essencial": false,
    "tipo": "comum",
    "camada": "clima",
-   "previa": "Medidor de potência",
+   "previa": "Embaixo do medidor",
    "custo": 1,
    "soNaCausa": [
     "B_potencia",
@@ -7313,7 +7316,7 @@
   {
    "id": "fh_med_pot_d",
    "sala": "patio",
-   "texto": "O medidor de potência ao lado do quadro de energia está desligado. No vidro, um papel: \"aferir depois da festa\".",
+   "texto": "Embaixo do medidor redondo, a chavinha do ponteiro de potência está desligada. Colado nela, um papel: \"aferir depois da festa\".",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -7330,7 +7333,7 @@
    "essencial": false,
    "tipo": "comum",
    "camada": "clima",
-   "previa": "Medidor de potência",
+   "previa": "Embaixo do medidor",
    "custo": 1,
    "soNaCausa": [
     "D_fusivel"
@@ -7541,7 +7544,7 @@
   {
    "id": "lenz_meio_2",
    "sala": "limpeza",
-   "texto": "No carrinho de limpeza, um recibo de aluguel de carregador de caixas, em nome do patrocinador.",
+   "texto": "No carrinho de limpeza, um recibo de aluguel de caixa de transporte com espuma, em nome do patrocinador.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -9797,7 +9800,8 @@
     "foto_solo",
     "falsa_2",
     "falsa_3",
-    "c_peca"
+    "c_peca",
+    "insc_copia"
    ],
    "custo_por_pessoa": 1,
    "papelCentral": "Você fica na Central. Escute as duas pessoas e confirme em voz alta.",

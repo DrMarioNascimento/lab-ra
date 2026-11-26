@@ -143,7 +143,7 @@ function sala(id){
 // [nome, legenda, peça, andar, ordem no andar, extras]  extras.livro = {capa, abrir, ids}: livro de folhear como segunda peça da sala, com as pistas listadas (na ordem das páginas)
 const LOOP_SALAS = {
  galeria:['Galeria especial','A peça principal na base','GAL_B','2º andar',1],
- conservacao:['Sala de conservação','Registros e laudos do acervo','I01','1º andar',1,{livro:{capa:'Livro de registro|ACERVO DO MUSEU', abrir:'Abrir o livro de registro', ids:['tombo_1','livre_1','c_modo_1','b_verde_3','fh_carimbo','data_3','d_teo_1','fh_dobrada','teo_d1']}}], sons:['Sala dos sons','Rádio, gravador e alto-falante','N17','1º andar',2],
+ conservacao:['Sala de conservação','Registros e laudos do acervo','I01','1º andar',1,{livro:{capa:'Livro de registro|ACERVO DO MUSEU', abrir:'Abrir o livro de registro', ids:['tombo_1','insc_tabua','livre_1','c_modo_1','b_verde_3','fh_carimbo','data_3','d_teo_1','fh_dobrada','teo_d1']}}], sons:['Sala dos sons','Rádio, gravador e alto-falante','N17','1º andar',2],
  fotografia:['Sala da fotografia','Câmera antiga, varal e álbum','N18','1º andar',3], relogios:['Sala dos relógios','Relógios que param na queda de luz','REL_B','1º andar',4],
  recepcao:['Recepção','Livro de visitas e roleta','P01','Térreo',1], seguranca:['Central de monitoramento','Câmeras e crachás','S01','Térreo',2],
  corredor:['Área de descanso','Porta de serviço, mural e cafeteira','DESC_B','Térreo',3], limpeza:['Base da limpeza','Carrinho da equipe, balde e luvas','L08','Térreo',4],
@@ -154,7 +154,7 @@ const LOOP_SALAS = {
 };
 // Descrição de cada sala no Loop (uma linha, do mundo da história).
 const LOOP_DESC = {
- prototipo:'A Câmara do tempo zumbe no meio da sala. Ligada, e ninguém consegue desligar.', patio:'Chove. O Quadro externo, fechado a cadeado, fica embaixo do para-raios.',
+ prototipo:'A Câmara do tempo zumbe no meio da sala. Ligada, e ninguém consegue desligar.', patio:'Chuva fina na pedra molhada. O Quadro externo, fechado a cadeado, fica embaixo do para-raios.',
  eletrica:'O gerador ronca baixo entre fios, fusíveis e luvas.', relogios:'Uma parede de relógios, cada um no seu passo.',
  seguranca:'Monitores, um cofre pequeno e o café do Braga.', recepcao:'O livro de visitas, a roleta e um telefone que toca.',
  conservacao:'Diário do acervo, laudos e registros em cima da mesa.', atelie:'A bancada da Ivone e o manual da Câmara.',

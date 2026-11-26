@@ -211,9 +211,10 @@ export function abrirMinigame(dialog, atividade, causa, aoResolver) {
     const faixa=no('div',null,'faixa-pedra'); faixa.setAttribute('role','img'); faixa.setAttribute('aria-label','Inscrição da máscara, com '+atividade.insc.length+' símbolos');
     atividade.insc.forEach(id=>faixa.append(gl(id)));
     corpo.append(no('p','Na testa da máscara','kicker'),faixa);
-    if (Array.isArray(atividade.tabua)) { const t=no('div',null,'tabua-mini'); t.setAttribute('aria-hidden','true'); atividade.tabua.forEach(([id,w])=>{const c=no('span',null,'t'); c.append(gl(id),no('small',w)); t.append(c);}); corpo.append(no('p','Do seu caderno: a tábua do livro de registro','kicker'),t); }
+    if (Array.isArray(atividade.tabua)) { const t=no('div',null,'tabua-mini'); t.setAttribute('aria-hidden','true'); atividade.tabua.forEach(([id,w])=>{const c=no('span',null,'t'); c.append(gl(id),no('small',w)); t.append(c);}); corpo.append(no('p','A tábua, do seu caderno','kicker'),t); }
     const grade=no('div',null,'opc-glifos');
-    atividade.opcoes.forEach((n,i)=>{const b=botao('',()=>conferir(i)); b.append(gl(atividade.insc[Number(n)-1]),no('span',n+'º símbolo')); b.setAttribute('aria-label',n+'º símbolo'); grade.append(b);});
+    // só a posição, sem o desenho: quem responde precisa olhar a faixa e a tábua (revisão 11)
+    atividade.opcoes.forEach((n,i)=>grade.append(botao(n+'º símbolo',()=>conferir(i))));
     corpo.append(grade);
   } else if(atividade.tipo==='sintomas') {
     const dados=causas[causa];

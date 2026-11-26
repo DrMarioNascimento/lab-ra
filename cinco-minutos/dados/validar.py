@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Validador automatico do Loop v4 revisao 10 (5 causas). Uso: python3 validar.py [n_bots] [-v] [--semente N] [--so-otimo]
+# Validador automatico do Loop v4 revisao 11 (5 causas). Uso: python3 validar.py [n_bots] [-v] [--semente N] [--so-otimo]
 # Dados: LOOP_DATA (padrao: pistas-v4.json ao lado deste arquivo, senao /tmp/roda/v4_pistas.json).
 # (a) ids e entradas alcancaveis  (b) otimo com 1, 2 e 3 pessoas  (c) bot aleatorio  (d) essenciais sem 2 caminhos  (f) papeis, formatos e tamanho  (g) previas iguais nas 5 causas, no conjunto e na SEQUENCIA  (h) frases condicionais dos finais
 # Revisao 3 (25/11/2026): os valores do conserto (dia, hora, registro, ordem, chave) sao SORTEADOS como no jogo, nao os de exemplo;

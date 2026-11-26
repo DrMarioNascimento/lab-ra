@@ -47,13 +47,13 @@ Nada deste arquivo aparece para quem joga. Níveis: **A** alto, **M** médio, **
 
 | Pessoa | Traço | Cena (id da pista) |
 |---|---|---|
-| Aurélio | Ansiedade, foge da lacuna | `aurelio_0` (não tem certeza diante da peça), `aurelio_2` ("Era medo meu.") |
+| Aurélio | Ansiedade, foge da lacuna | `aurelio_0` (não tem certeza diante da peça), `aurelio_1` ("Na testa dela tem uma frase; eu sei de cor, nunca mais li."), `aurelio_2` ("Era medo meu.") |
 | Téo | Honestidade, não larga a lacuna, aceita risco | `data_3`, `teo_d3` ("Tinta não mente."), `v4_teo`, `teo_radio` |
 | Ivone | Método; pouca curiosidade pelas pessoas | `ivone_1x` ("Eu não perco pote."), `ivone_2` ("Devia ter perguntado por quê."), `v5_ivone` (a pesagem), `ivone_red` (aponta a porta de vidro sem olhar) |
 | Braga | Quer agradar, não aguenta pressão | `braga_1`, `dis_cafe`, `traj_aviso` ("Chuva feia, hein? Pega um café"), `c_esc_3` ("Meu cunhado também mexe com transporte. Café?"), `cracha_3` ("Quer um café?"), `v4_braga` |
 | Lenz | Pouca amabilidade e honestidade, risco, pressão | `lenz_0`, `lenz_1`, `lenz_2` ("Eu devolvo tudo que eu pego."), `traj_3`, `v5_lenz` |
 | Dra. Sato | Abertura, não larga a lacuna | `man_3` ("Me conta o que você viu com os seus olhos."; devolve pergunta), `man_2` ("Ou não."), `man_anc_2` ("Nunca aconteceu, mas vai que"), `a_hist_1`, `e_hist_1` ("Então ninguém liga isto sem mim.") |
-| Nico | Pouca ordem, muita atenção às pessoas | `nico_0` (repara em quem chega: "cara de quem não jantou", "a Ivone hoje tá brava"), `nico_0b` (perde o fio e repara no Braga pondo a mão no cinto), `nico_1` (pela primeira vez não pede desculpa), `fh_fusivelx` (o fusível da cafeteira) |
+| Nico | Pouca ordem, muita atenção às pessoas | `nico_0` (repara em quem chega: "cara de quem não jantou", "a Ivone hoje tá brava"), `nico_0b` (perde o fio e repara no Braga pondo a mão no cinto), `nico_1` (antes do número, a regra do Téo sai aos tropeços: "Ele pediu... espera.", "E... o laudo!", "Desculpa."; com o número, pela primeira vez não pede desculpa), `fh_fusivelx` (o fusível da cafeteira) |
 | Seu Dirceu | (figurante, sem traço extremo) | `traj_2` ("Nem boa-noite."), `c_anc_3` ("Já avisei duas vezes."), `ivone_ali_2` (queixo no cabo do esfregão) |
 
 Observação: os traços só orientam a voz de cada fala. O jogo mostra falas e cenas, nunca os traços.
@@ -69,3 +69,5 @@ Revisão 5 (25/11/2026), a pedido da rodada 4 das escalas: os dois bilhetes do T
 Revisões 6 e 7 (25/11/2026), a pedido das rodadas 5 e 6 das escalas: em Acusação e Defesa quem diz de quem é a rubrica é o Braga, na Central, e a fala começa com a marca dele ("Tá. Essa rubrica é do Lenz, do patrocínio. Ele assina tudo assim."); a Dra. Sato não diz "Tá."; a Dra. Sato não vê o prédio, mas vê o céu (é assim que ela conta o raio), e fala pelo interfone do Subsolo; a folha no bolso do Téo diz "a base dela", sem "cópia"; a sirene do socorro só aparece no final de quem contou do Téo à Dra. Sato.
 
 Revisões 8 e 9 (25/11/2026), a pedido das rodadas 7 e 8 das escalas: o Aurélio ganhou "Peça de acervo não cheira a novo" e, no Ouro, fica na Galeria, olhando a base, e agradece depois que a notícia das 3 provas sobe até ele; o Seu Dirceu fala de esfregão ou de pano na mão (saiu o rodo); o armário da equipe, de onde o Lenz levou o crachá, fica ao lado da Base da limpeza; o Nico, sobre o gato do Pátio, é citado em fala relatada ("Segundo o Nico").
+
+Revisão 11 (26/11/2026), a pedido da rodada 9 das escalas: a fala do Nico antes do número (`nico_1`, quando ainda não abre) ganhou o tropeço da ficha (pede desculpa, se repete, perde o fio); o Aurélio, em `aurelio_1`, fala da frase na testa da máscara (sabe de cor e nunca mais leu: por isso não viu o símbolo virado). No bilhete do Téo (`v4_teo`) ficou "a mesma cara" no lugar de "o mesmo desenho". Nada muda o que cada pista prova.

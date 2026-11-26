@@ -1,6 +1,6 @@
 # Loop · A Máquina (camada central)
 
-Arquivos: `dados/pistas-v4.json` (fonte dos dados, **281 pistas**, versão v4, **revisão 10 de 25/11/2026**) → `loop-central-dados.js` (gerado a partir dele), `loop-central.js` (regras e telas). Enredo: `ROTEIRO-LOOP.md`. Decisões aplicadas: `DECISOES-V4.md`. Botão **Máquina** na barra de baixo, com a miniatura da Câmara.
+Arquivos: `dados/pistas-v4.json` (fonte dos dados, **281 pistas**, versão v4, **revisão 11 de 26/11/2026**) → `loop-central-dados.js` (gerado a partir dele), `loop-central.js` (regras e telas). Enredo: `ROTEIRO-LOOP.md`. Decisões aplicadas: `DECISOES-V4.md`. Botão **Máquina** na barra de baixo, com a miniatura da Câmara.
 
 - **Defeito por semente** (5 causas): A falta ajustar, B falta força, C peça presa (a máquina se segura na peça errada da base), D fusível tirado de propósito, E dois defeitos juntos (A + B, em voltas diferentes). Roteiro completo em `ROTEIRO-LOOP.md`. Os sinais de cada defeito só existem quando ele é o sorteado, mas a lista de cada sala mostra os mesmos rótulos nas 5 noites (onde o sinal não existe, o mesmo rótulo traz a coisa normal: campo `parDe` nos dados); o manual (páginas 1 a 6), a folha amassada da impressora, o apito curto da base e a caixa de "banners" com a peça verdadeira existem em todas as noites.
 - **Valores por semente** (nada decorável): dia da troca (9 a 25), hora do apagão (1:00, 1:05, 1:10, 1:15 ou 1:20), número de registro (3 algarismos), ordem dos 3 pontos de ligação, número da chave do para-raios e senha do cofre do Braga (o registro de trás para a frente). Nos dados os textos usam os marcadores `{dia}` `{hora}` `{reg}` `{reg_inv}` `{ordem}` `{ch}`; `valores_padrao` (14, 1:10, 472, 274, 3-1-2, chave 3) serve para os exemplos dos documentos. O validador sorteia os valores como o jogo.
@@ -280,7 +280,7 @@ Palavras que o jogo usa: **número de registro** (da peça), **base** (onde a pe
 
 **Testes de tela** (fora do repositório, em `/tmp/roda/r8/`): `pontos.mjs` (novo: pontos da peça entre as 5 causas, 15 salas × 5 voltas; modo `dados` compara lugar, direção, aceso e ordem de todos os pontos, em 0:03 e 4:30; modo `tela` compara o que fica à vista, em 390×844 e 360×740, e mede nenhum par a menos de 44 px e nenhum ponto fora da peça).
 
-- **Revisão 8 · ajuste de texto às peças novas.** Texto das pistas alinhado ao que os 8 modelos mostram, sem mudar enredo, regra, tranca, culpado nem fonte de fato. Pátio: o quadro tem porta entreaberta presa pelo cadeado na trava; sem a chavinha só se espia pela fresta (`quadro_0`, `quadro_aberto`, `chave_3`, `fh_vidro`, `fh_quadro2`, `d_fus_2b`; tranca `abrir_o_quadro` e `coop_apagao_combinado.papelA` dizem "porta"); o cadeado de aviso de `d_fus_2`/`d_fus_2b` passou a amarelo, para não se confundir com o vermelho da trava; o gato vira pelo de gato (`dis_gato`). Fotografia: 3 fotos no varal (`d_fus_3`, `fh_varal`); a lâmpada vermelha virou a luminária de parede em cima do varal (`b_luz_4`, `fh_lamp_lab`); fotos da parede são detalhes do prédio (`fh_fotos_parede`). Limpeza: o armário da equipe fica no corredor ao lado (`cracha_2`, `LOOP_DESC`); multímetro molhado na prateleira de baixo do carrinho, bilhete no cabo do esfregão (`dis_balde`). Coleções: a caixa de "banners" é uma das caixas etiquetadas da estante (`c_esc_1`, `LOOP_DESC`). Área de descanso: sem geladeira (`b_luz_2`). Rótulos novos nos pares mantêm o mesmo rótulo entre sinal e par inocente. Validador APROVADO; lc3, mg, r5 e pontos (volta 1) sem erro.
+- **Revisão 8 · ajuste de texto às peças novas.** Texto das pistas alinhado ao que os 8 modelos mostram, sem mudar enredo, regra, tranca, culpado nem fonte de fato. Pátio: o quadro tem porta entreaberta presa pelo cadeado na trava (desde a revisão 9: fechada, só com a fresta); sem a chavinha só se espia pela fresta (`quadro_0`, `quadro_aberto`, `chave_3`, `fh_vidro`, `fh_quadro2`, `d_fus_2b`; tranca `abrir_o_quadro` e `coop_apagao_combinado.papelA` dizem "porta"); o cadeado de aviso de `d_fus_2`/`d_fus_2b` passou a amarelo, para não se confundir com o vermelho da trava; o gato vira pelo de gato (`dis_gato`). Fotografia: 3 fotos no varal (`d_fus_3`, `fh_varal`); a lâmpada vermelha virou a luminária de parede em cima do varal (`b_luz_4`, `fh_lamp_lab`); fotos da parede são detalhes do prédio (`fh_fotos_parede`). Limpeza: o armário da equipe fica no corredor ao lado (`cracha_2`, `LOOP_DESC`; desde a revisão 9: "ao lado da Base da limpeza"); multímetro molhado na prateleira de baixo do carrinho, bilhete no cabo do esfregão (`dis_balde`). Coleções: a caixa de "banners" é uma das caixas etiquetadas da estante (`c_esc_1`, `LOOP_DESC`). Área de descanso: sem geladeira (`b_luz_2`). Rótulos novos nos pares mantêm o mesmo rótulo entre sinal e par inocente. Validador APROVADO; lc3, mg, r5 e pontos (volta 1) sem erro.
 
 **Não aplicado, e por quê:** ver `DECISOES-V4.md`, "Revisão 8".
 
@@ -340,7 +340,36 @@ Palavras que o jogo usa: **número de registro** (da peça), **base** (onde a pe
 
 **Testes de tela** (fora do repositório): os da revisão 9 e o novo `/tmp/roda/r10/insc.mjs` (por toque, numa partida: tábua, inscrição da cópia, minijogo com um erro e um acerto, prova da cópia no Revelar, inscrição verdadeira depois de `c_peca`; 390×844 e 360×740). `/tmp/pwt/r5.mjs` passou a esperar "revisão 10".
 
-## Checklist por volta (recalculado dos dados em 25/11/2026, revisão 10: 3 pistas novas; nenhuma volta, horário nem tranca antiga mudou)
+## Revisão 11 — 26/11/2026
+
+**Por quê.** Na rodada 9, história, fichas e técnica passaram (a Consistência no limite: `v4_teo` trocado sem registro e um segundo medidor no Pátio); o visual reprovou no celular (rótulos da tábua com 11 px, minijogo dos símbolos rolando, tábua escondida na caixa do livro) e a Galeria reprovou em Pertencimento (testa da máscara lisa). Relatórios em `docs/avaliacao/rodada9/`; escolhas em `DECISOES-V4.md`, "Revisão 11".
+
+**Peça e miniatura**
+- `museu/pecas/GAL_B.glb` (796 KB, caixa igual à anterior): a máscara ganhou a inscrição da cópia na testa (6 símbolos, o 5º virado), feita por `museu/pecas-compostas.mjs` (funções `texturasTesta` e `gravarTesta`: película da superfície da testa, 1 mm acima, com cor de entalhe e mapa de relevo, desenhada de `museu/icones/ui/glifos.svg`; precisa de sharp na pasta do gltf-transform). Anterior com `_SUBSTITUIDO_2026-11-26a`.
+- `museu/icones/GAL_B.webp` refeita (objeto inteiro, com margem). `museu/torre/salas-loop.json` e `sala/conteudo.js` gerados de novo.
+
+**O que mudou no código**
+- **`game.js`.** `PECA_PERTO` e `pertoDaPeca`: na Galeria, zoom até 5° (os outros continuam em 12°), câmera mirando a máscara (`-0.12m 1.3m 0.03m`) à mesma distância (8,32 m). `PECA_CANTO` com `D10`. `LOOP_PONTOS.GAL_B`: lugar 3 (pista "Inscrição na máscara") no alto da testa; lugar 8 ("Um quadro torto") no quadro; os outros 30 iguais. `LOOP_DESC.patio`: "Chuva fina na pedra molhada. O Quadro externo, fechado a cadeado, fica embaixo do para-raios." Livro: `livroGrande` (a leitura usa o vão dos botões "Ler" quando a página tem a tábua e não sobra botão).
+- **`loop-central.js`.** `LC_MG.insc_copia` sem a miniatura (`img`). `minigames.mjs?v=8`, `bancada.css?v=5`.
+- **`reserva/minigames.mjs`.** Ramo `glifos`: respostas só com "Nº símbolo" (sem o desenho); título da tábua "A tábua, do seu caderno".
+- **`bancada.css`.** Rótulos da tábua com 12 px em Georgia; respostas com 52 px, centradas.
+- **`style.css`.** Livro: `.livro-vaga` 24 px menor, `.livro-leitura` 192 px, classe `grande` e tábua em 2 linhas de 6 na leitura.
+- **`sala/sala.css`.** Mapa do telão: a miniatura começa abaixo da contagem.
+- **`museu/torre/index.html`.** Título numa plaqueta escura.
+- **Versões nas páginas.** `style.css?v=24`, `loop-central-dados.js?v=36`, `loop-central.js?v=41`, `game.js?v=48`, `sala.css?v=7`.
+- **`dados/validar.py` e `dados/simulador-texto.py`.** Só o cabeçalho (revisão 11).
+
+**O que mudou nos dados** (`dados/pistas-v4.json`, 281 pistas, "v4 revisão 11")
+- Mudaram: `a_cheia_4`, `fh_med_pot_bce`, `fh_med_pot_d` (texto e rótulo "Embaixo do medidor"), `insc_copia`, `insc_tabua`, `falsa_3`, `quadro_aberto` (`textoPorCausa` da noite D), `lenz_meio_2`, `nico_1.porque`, `aurelio_1`, `atividades_coop.coop_original_copia.solo_pistas` (+`insc_copia`). `v4_teo` ("a mesma cara") já estava assim desde a revisão 10, sem registro: registrado agora.
+- **Rótulos que mudaram: 3** (um par de três, com o mesmo rótulo novo). Nenhuma volta, horário, tranca, `precisaDe`, `soNaCausa` ou fonte de fato mudou; nenhuma pista entrou ou saiu.
+
+**Simulador de texto e validador.** Só o cabeçalho. Resultado: APROVADO nas 5 causas (`/tmp/roda/esc/r11/validar.txt`).
+
+**Testes de tela** (fora do repositório): os da revisão 10, mais `/tmp/roda/esc/r11/gal/testa_jogo.mjs` (testa da máscara de perto, 390 e 360) e `/tmp/roda/esc/r11/scr/mgest.mjs` e `ll.mjs` (minijogo e livro sem rolar).
+
+**Não aplicado, e por quê:** ver `DECISOES-V4.md`, "Revisão 11".
+
+## Checklist por volta (recalculado dos dados em 26/11/2026, revisão 11: nenhuma pista entrou ou saiu; nenhuma volta, horário nem tranca mudou)
 
 Conferido em `dados/pistas-v4.json` (campos `volta_min`, `volta_max`, `segundo_min`, `precisaDe`, `soNaCausa`, `parDe`, `grupos_fonte`, `atividades_coop`). Horários com `valores_padrao` (raio em 1:10); com outra hora sorteada, os horários ligados ao raio andam junto. Pistas por `volta_min`: **232 na volta 1, 27 na volta 2, 9 na volta 3, 9 na volta 4, 4 na volta 5** (281 no total). Por tipo: 216 comuns, 26 de dupla, 21 de observação (clima), 16 falsas honestas, 2 objetos. Ativas por noite: 210 (A), 211 (B), 210 (C), 210 (D), 215 (E) (as 3 novas valem nas 5 noites).
 
@@ -424,7 +453,7 @@ Não contam como prova: o cheiro de verniz; o bilhete do armário e o livro de v
 - **Horários que importam:** janela do Raio (noites B e E); 5:00 é o limite do Revelar.
 
 ### Pendências
-Nenhuma de texto, dado ou código (revisão 10). Os pontos de regra que as rodadas 5 e 6 deixam para o autor estão em `DECISOES-V4.md`, "Revisão 7 · Ficou para decidir": não bloqueiam o jogo. O que as revisões 2 e 3 deixaram em aberto foi fechado assim:
+Nenhuma de texto, dado ou código (revisão 11). Os pontos de regra que as rodadas 5 e 6 deixam para o autor estão em `DECISOES-V4.md`, "Revisão 7 · Ficou para decidir": não bloqueiam o jogo. O que as revisões 2 e 3 deixaram em aberto foi fechado assim:
 
 | Assunto | Como ficou | Quem decidiu |
 |---|---|---|
