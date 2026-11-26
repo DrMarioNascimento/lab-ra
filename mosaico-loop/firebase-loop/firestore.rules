@@ -1,0 +1,133 @@
+rules_version = '2';
+
+// Loop (MOSAICO) · projeto mosaico-loop. Sala conduzida por um Mestre (login Google, e-mail em config/mestres).
+// Sala com telão: mosaico/{código}, subcoleções jogadores, telao, relogios. Jogo sem turma em grupo: loopRooms e loopClocks. Todo o resto é negado.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function salaPath(id) { return /databases/$(database)/documents/mosaico/$(id); }
+    function salaExiste(id) { return exists(salaPath(id)); }
+    function sala(id) { return get(salaPath(id)).data; }
+    function ativa(id) { return salaExiste(id) && sala(id).ativa == true; }
+    function mestre(id) { return signedIn() && salaExiste(id) && sala(id).mestreUid == request.auth.uid; }
+    function participante(id) { return signedIn() && exists(/databases/$(database)/documents/mosaico/$(id)/jogadores/$(request.auth.uid)); }
+    function dentro(id) { return mestre(id) || participante(id); }
+    function emailMestre() {
+      return signedIn() && request.auth.token.email is string && request.auth.token.email_verified == true
+        && exists(/databases/$(database)/documents/config/mestres)
+        && request.auth.token.email in get(/databases/$(database)/documents/config/mestres).data.emails;
+    }
+
+    // Salas cooperativas do jogo sem turma (individual.html: coop.mjs e rooms.mjs), de 2 a 6 pessoas.
+    // Coleções loopRooms e loopClocks (Revisão 15; antes ficavam no projeto Firebase antigo).
+    function uid() {
+      return request.auth.uid;
+    }
+    function validName(name) {
+      return name is string && name.size() >= 1 && name.size() <= 24;
+    }
+    function validAnswers(answers) {
+      return answers is map && answers.keys().hasAll(['event', 'alarm', 'figure', 'action'])
+        && answers.keys().hasOnly(['event', 'alarm', 'figure', 'action'])
+        && answers.event in ['', 'proteger', 'troca', 'entrega', 'surpresa', 'documento', 'deslocamento', 'retorno', 'falsa']
+        && answers.alarm in ['', 'sensor', 'manual', 'teste']
+        && answers.figure in ['', 'guarda', 'artista', 'visitante', 'restauradora', 'funcionario']
+        && answers.action in ['', 'avisar', 'confirmar', 'combinar', 'revisar', 'isolar'];
+    }
+
+    match /loopRooms/{code} {
+      function before() { return resource.data; }
+      function after() { return request.resource.data; }
+      function liveRoom() {
+        return request.time < before().createdAt + duration.value(4, 'h');
+      }
+      function only(fields) {
+        return after().diff(before()).affectedKeys().hasOnly(fields);
+      }
+      function join() {
+        return before().phase == 'lobby' && !(uid() in before().members)
+          && only(['members']) && after().members.size() <= 6
+          && after().members.diff(before().members).affectedKeys().hasOnly([uid()])
+          && validName(after().members[uid()]);
+      }
+      function leave() {
+        return before().phase == 'lobby' && before().host != uid() && uid() in before().members
+          && only(['members']) && !(uid() in after().members)
+          && after().members.diff(before().members).affectedKeys().hasOnly([uid()]);
+      }
+      function advance() {
+        return before().host == uid() && only(['phase', 'loop', 'startedAt', 'answers'])
+          && (
+            (before().phase == 'lobby' && before().members.size() >= 2
+              && after().phase == 'choose' && only(['phase']))
+            || (before().phase == 'choose' && after().phase == 'playing'
+              && only(['phase', 'startedAt']) && after().startedAt == request.time)
+            || (before().phase == 'playing' && after().phase == 'between' && only(['phase'])
+              && (before().seconds == 30 || request.time >= before().startedAt + duration.value(before().seconds, 's')))
+            || (before().phase == 'between' && before().loop < 5 && after().phase == 'choose'
+              && after().loop == before().loop + 1 && after().startedAt == null
+              && only(['phase', 'loop', 'startedAt']))
+            || (before().phase == 'between' && before().loop == 5 && after().phase == 'final'
+              && only(['phase']))
+            || (before().phase == 'final' && after().phase == 'result'
+              && only(['phase', 'answers']) && validAnswers(after().answers))
+          );
+      }
+      allow get: if signedIn() && code.matches('^[A-Z2-9]{12}$')
+        && (resource == null || (liveRoom() && (before().phase == 'lobby' || uid() in before().members)));
+      allow create: if signedIn() && code.matches('^[A-Z2-9]{12}$')
+        && after().keys().hasOnly(['host', 'members', 'phase', 'loop', 'caseIndex', 'createdAt', 'startedAt', 'seconds', 'answers'])
+        && after().host == uid() && after().phase == 'lobby' && after().loop == 1
+        && after().members is map && after().members.keys().hasOnly([uid()]) && validName(after().members[uid()])
+        && after().caseIndex is int && after().caseIndex >= 0 && after().caseIndex < 15
+        && after().createdAt == request.time && after().startedAt == null && after().answers == null
+        && after().seconds in [30, 300];
+      allow update: if signedIn() && liveRoom() && (join() || leave() || advance());
+    }
+
+    match /loopClocks/{userId} {
+      allow get: if signedIn() && uid() == userId;
+      allow create, update: if signedIn() && uid() == userId
+        && request.resource.data.keys().hasOnly(['time'])
+        && request.resource.data.time == request.time;
+    }
+
+    match /config/mestres { allow read: if signedIn(); allow write: if false; }
+
+    match /mosaico/{salaId} {
+      allow create: if emailMestre() && request.resource.data.mestreUid == request.auth.uid
+        && request.resource.data.ativa == true && request.resource.data.fase == 'sala';
+      allow get: if signedIn() && (!salaExiste(salaId) || resource.data.ativa == true || dentro(salaId));
+      allow list: if false;
+      allow update: if mestre(salaId) && request.resource.data.mestreUid == resource.data.mestreUid;
+      allow delete: if false;
+
+      match /jogadores/{jogadorId} {
+        allow read: if signedIn() && ativa(salaId);
+        allow create: if signedIn() && ativa(salaId) && jogadorId == request.auth.uid
+          && request.resource.data.nome is string && request.resource.data.nome.size() >= 1 && request.resource.data.nome.size() <= 60;
+        // o participante só mexe no que é dele: ambiente da volta e conclusão (uma vez)
+        allow update: if ativa(salaId) && (mestre(salaId)
+          || (jogadorId == request.auth.uid
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['pronto','atualizadoEmMs','alarmeVolta','alarmeSeg','alarmeId','amb','ambVolta','resp','respEm','forma','papelCognitivo','camadaAcessibilidade'])
+              && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['resp']) || !('resp' in resource.data))));
+        allow delete: if false;
+      }
+
+      // o telão entra anônimo e só se anuncia
+      match /telao/{id} {
+        allow read: if signedIn() && ativa(salaId);
+        allow create, update: if signedIn() && ativa(salaId) && id == request.auth.uid && request.resource.data.vistoEmMs is int;
+        allow delete: if false;
+      }
+
+      // cada aparelho mede a diferença entre o relógio dele e o do servidor
+      match /relogios/{id} {
+        allow read, create, update: if signedIn() && ativa(salaId) && id == request.auth.uid;
+        allow delete: if false;
+      }
+
+      match /{outra}/{documento=**} { allow read, write: if false; }
+    }
+  }
+}
