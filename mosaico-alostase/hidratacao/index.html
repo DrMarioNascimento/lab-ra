@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Hidratação e circulação · Mosaico Alostase</title>
+  <link rel="stylesheet" href="../jogo/estilo.css?v=9">
+  <link rel="stylesheet" href="../cardiovascular/bancada.css">
+  <link rel="stylesheet" href="./laboratorio.css">
+</head>
+<body>
+  <main class="bancada">
+    <nav><a href="../">← Mosaico Alostase</a></nav>
+    <header class="abertura">
+      <h1>Hidratação e circulação</h1>
+      <p>Compare o mesmo exercício em condições diferentes. Abra um instante para ver a sequência de cálculos.</p>
+    </header>
+    <section class="painel" aria-labelledby="comparar">
+      <h2 id="comparar">Comparar rotinas</h2>
+      <div class="duas-rotinas controles">
+        <label class="legenda-a">Rotina A <select id="rotina-a"></select></label>
+        <label class="legenda-b">Rotina B <select id="rotina-b"></select></label>
+      </div>
+      <p>Mesmo adulto de referência, mesmas refeições e sessão aeróbia das 17h30 às 18h15 a 40% do VO₂máx.</p>
+      <div id="resumos" class="duas-rotinas"></div>
+    </section>
+    <section class="painel" aria-labelledby="curvas">
+      <div class="cabecalho-painel"><h2 id="curvas">Curvas do dia</h2><label>Variável <select id="variavel"></select></label></div>
+      <p><span class="legenda-a">— Rotina A</span> · <span class="legenda-b">╌ Rotina B</span></p>
+      <canvas id="grafico" aria-hidden="true"></canvas>
+      <div class="controle-hora">
+        <label for="instante">Horário <output id="hora" for="instante"></output></label>
+        <input type="range" id="instante" min="0" max="287" value="219">
+        <button type="button" class="btn sec sm" id="fim-exercicio">Fim do exercício</button>
+      </div>
+    </section>
+    <section class="painel" aria-labelledby="titulo-leitura"><h2 id="titulo-leitura">O que acontece neste horário</h2><div id="contas" class="duas-rotinas"></div></section>
+    <details class="painel">
+      <summary>Parâmetros e evidências</summary>
+      <ul>
+        <li>O balanço contabiliza água e sódio no intestino, na circulação e nas perdas. O suor responde ao cenário de calor e esforço. A taxa de suor e o sódio no suor variam entre pessoas. <a href="https://pubmed.ncbi.nlm.nih.gov/28332116/">Baker, 2017</a></li>
+        <li>O acoplamento do volume plasmático ao volume sistólico e à FC é didático. Estudos em exercício prolongado associam desidratação e calor a alterações hemodinâmicas, com magnitude dependente do protocolo. <a href="https://pubmed.ncbi.nlm.nih.gov/9104860/">González-Alonso e colegas</a></li>
+        <li>As taxas de perda basal, a absorção e os ganhos da compensação são parâmetros do cenário. Nesta versão, as saídas urinárias são fixas. O volume plasmático e a osmolalidade são resultados do modelo de compartimentos.</li>
+      </ul>
+    </details>
+  </main>
+  <script type="module" src="./laboratorio.js?v=1"></script>
+</body>
+</html>
