@@ -3,7 +3,7 @@ import { resumirCardiovascular, simularCardiovascular } from '../motor/cardiovas
 import { PARAMETROS_HIDRICOS } from '../motor/hidratacao.js';
 import { regularRim } from '../motor/renal.js';
 import { simularSemana } from '../motor/semana.js';
-import { simularTrajetoria } from '../motor/trajetoria.js?v=3';
+import { simularTrajetoria } from '../motor/trajetoria.js?v=4';
 
 const n = (v, casas = 1) => v.toLocaleString('pt-BR', { maximumFractionDigits: casas, minimumFractionDigits: casas });
 const pa = (p) => `${n(p.sis)} / ${n(p.dia)} mmHg`;
@@ -25,6 +25,9 @@ const faseCincoDias = semanaFixa.dias[4].faseCircadianaH;
 const semanaFolgas = simularTrajetoria('escalaFolgas', 7);
 const soma = (dados, chave) => dados.dias.reduce((total, d) => total + d[chave], 0);
 
+const plantaoLuzSuave = simularTrajetoria('luzSuave', 7);
+const plantaoLuzIntensa = simularTrajetoria('luzIntensa', 7);
+
 const fontes = {
   staessen: ['Staessen · 3.476 normotensos', 'https://pubmed.ncbi.nlm.nih.gov/1826069/'],
   speed: ['Speed · amostra ativa, medida em repouso', 'https://pubmed.ncbi.nlm.nih.gov/37115739/'],
@@ -37,6 +40,8 @@ const fontes = {
   processoS: ['Borbély e colegas · modelo de dois processos', 'https://pubmed.ncbi.nlm.nih.gov/26762182/'],
   turno: ['Gamboa Madeira e colegas · 45 estudos', 'https://pubmed.ncbi.nlm.nih.gov/34201492/'],
   metabolico: ['Pan e colegas · duas coortes de enfermeiras', 'https://pubmed.ncbi.nlm.nih.gov/22162955/'],
+  curvaLuz: ['Khalsa e colegas · curva de resposta de fase', 'https://doi.org/10.1113/jphysiol.2003.040477'],
+  doseLuz: ['Zeitzer e colegas · dose–resposta à luz', 'https://doi.org/10.1111/j.1469-7793.2000.00695.x'],
   luz: ['Smith, Cullnan e Eastman · tabela 2', 'https://stacks.cdc.gov/view/cdc/187008/cdc_187008_DS1.pdf'],
   ritmo: ['Russo e colegas · respiração lenta em pessoas saudáveis', 'https://doi.org/10.1183/20734735.009817'],
   vfc: ['Laborde e colegas · revisão e meta-análise', 'https://pubmed.ncbi.nlm.nih.gov/35623448/'],
@@ -73,8 +78,13 @@ const tabelas = [
     ['Atraso da fase da melatonina', 'Cerca de 4 h com intervenção de luz/escuro e 1 h no controle, após três plantões simulados e duas folgas', `${n(faseCincoDias, 2)} h no 5º dia de sono diurno do cenário fixo`, 'Comparação de ordem de grandeza sob protocolos distintos. O motor usa a agenda de sono como aproximação; o estudo mediu DLMO sob luz fraca.', 'luz'],
     ['Carga igual na comparação de escalas', 'O horário e a adaptação da fase são dimensões distintas da duração do sono', `${soma(semanaFixa, 'horasSono')} / ${soma(semanaFolgas, 'horasSono')} h de sono e ${soma(semanaFixa, 'trabalhoH')} / ${soma(semanaFolgas, 'trabalhoH')} h de trabalho por semana`, 'Controle do cenário, com o horário do sono como diferença experimental.', 'fase'],
   ]],
+  ['Luz programada durante o plantão', [
+    ['Horário da luz e direção do ajuste', 'O estudo observou atraso antes do mínimo da temperatura central e avanço depois desse mínimo.', 'Nas faixas próximas ao nadir do modelo, luz antes produz atraso e luz depois produz avanço.', 'A direção segue a curva humana; a forma e o ganho são aproximações.', 'curvaLuz'],
+    ['Intensidade e saturação', 'Em um protocolo de início da noite biológica, cerca de 100 lux provocaram aproximadamente metade da resposta obtida com luz intensa.', 'O modelo usa 120 lux como ponto didático de meia resposta.', 'A relação depende do protocolo, da duração e do espectro. Lux fotópicos são uma aproximação.', 'doseLuz'],
+    ['Cinco plantões e duas folgas', 'Em estudo distinto, após três plantões simulados e duas folgas, a fase da melatonina atrasou cerca de 4 h com intervenção de luz/escuro e 1 h no controle.', `${n(plantaoLuzSuave.estadoFinal.faseCircadianaH, 2)} h com 100 lux e ${n(plantaoLuzIntensa.estadoFinal.faseCircadianaH, 2)} h com 2.500 lux ao fim da semana.`, 'Comparação de ordem de grandeza. Somente a intensidade das 0h às 2h muda nesta simulação; os protocolos do estudo incluíram outras intervenções.', 'luz'],
+  ]],
   ['Pausas na agenda', [
-    ['Ritmo respiratório programado', '4–10 ciclos/min na revisão de respiração lenta', '5, 6 ou 7 ciclos/min durante a pausa', 'Frequência orientada na agenda. A prática de biofeedback abre separadamente.', 'ritmo'],
+    ['Ritmo respiratório programado', '4–10 ciclos/min na revisão de respiração lenta', '5, 6 ou 7 ciclos/min durante a pausa', 'Frequência orientada na agenda. A prática abre separadamente. A página também calcula os ciclos por minuto a partir de uma contagem manual.', 'ritmo'],
     ['Variabilidade da frequência cardíaca', 'Aumento de indicadores vagais de VFC durante a respiração lenta na meta-análise', 'Ritmo marcado no horário da sessão', 'A VFC exigiria sinais batimento a batimento. As curvas do Mosaico não atribuem um valor numérico de VFC à pausa.', 'vfc'],
     ['Meditação e reatividade ao estresse', 'Revisão de sessões únicas encontrou resultados favoráveis em parte dos estudos, com protocolos e desfechos diferentes', 'Minutos programados de pausa', 'Meditação e oração podem ser agendadas. Nenhuma redução fixa de PA ou cortisol é atribuída automaticamente a essas atividades.', 'meditacao'],
   ]],

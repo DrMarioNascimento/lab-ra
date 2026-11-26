@@ -2,7 +2,7 @@
 export const TIPOS_AGENDA = Object.freeze({
   dormir: 'Sono', trabalho: 'Trabalho', lazer: 'Lazer', estudo: 'Estudo',
   exercicio: 'Exercício', refeicao: 'Refeição', bebida: 'Líquidos',
-  meditacao: 'Meditação', oracao: 'Oração', biofeedback: 'Biofeedback respiratório',
+  meditacao: 'Meditação', oracao: 'Oração', biofeedback: 'Biofeedback respiratório', luz: 'Exposição à luz',
 });
 const DIA = 1440;
 const mod = (m) => (m % DIA + DIA) % DIA;
@@ -11,7 +11,7 @@ const dentroFaixa = (x, min, max) => Number.isFinite(x) && x >= min && x <= max;
 export const DIAS_AGENDA = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
 export const TODOS_DIAS = [0, 1, 2, 3, 4, 5, 6];
 export const TIPOS_PAUSA = ['meditacao', 'oracao', 'biofeedback'];
-export const tipoIntervalo = (t) => ['dormir', 'trabalho', 'lazer', 'estudo', ...TIPOS_PAUSA].includes(t);
+export const tipoIntervalo = (t) => ['dormir', 'trabalho', 'lazer', 'estudo', 'luz', ...TIPOS_PAUSA].includes(t);
 const duracao = (e) => tipoIntervalo(e.tipo) ? mod(e.fim - e.inicio) : (e.tipo === 'exercicio' ? e.duracao : 5);
 const SEMANA = DIA * 7;
 const ciclo = (m) => (m % SEMANA + SEMANA) % SEMANA;
@@ -53,9 +53,23 @@ export function agendaEscala(tipo = 'diurno') {
   return [...sono, trabalho, ...refeicoes, ...bebidas];
 }
 
+export function agendaLuzPlantao(luzPlantaoLux) {
+  return [...agendaEscala('folgas'),
+    { tipo: 'luz', inicio: 0, fim: 120, lux: luzPlantaoLux, dias: [1, 2, 3, 4, 5] },
+    { tipo: 'luz', inicio: 360, fim: 390, lux: 300, dias: [1, 2, 3, 4, 5] },
+    { tipo: 'luz', inicio: 480, fim: 540, lux: 2000, dias: [0, 6] },
+    { tipo: 'luz', inicio: 780, fim: 840, lux: 2000, dias: [5] },
+  ];
+}
+
+export function agendaComPausa(tipo) {
+  const escala = agendaEscala('folgas');
+  return TIPOS_PAUSA.includes(tipo) ? [...escala, { tipo, inicio: 180, fim: 190, ritmo: 6, dias: [1] }] : escala;
+}
+
 export function conferirAgenda(eventos) {
   if (!Array.isArray(eventos) || eventos.length > 48) throw new RangeError('Use até 48 eventos em cada agenda.');
-  const sono = new Set(), exercicio = new Set(), pausas = new Set();
+  const sono = new Set(), exercicio = new Set(), pausas = new Set(), luz = new Set();
   eventos.forEach((e, i) => {
     const prefixo = `Evento ${i + 1}`;
     if (!Object.hasOwn(TIPOS_AGENDA, e.tipo) || !minutoValido(e.inicio)) throw new RangeError(`${prefixo}. Confira a atividade e o início em intervalos de 5 min.`);
@@ -68,12 +82,13 @@ export function conferirAgenda(eventos) {
     if (e.tipo === 'exercicio' && (![15, 30, 45].includes(e.duracao) || ![30, 40, 60].includes(e.intensidade))) {
       throw new RangeError(`${prefixo}. Confira a duração e a intensidade do exercício.`);
     }
+    if (e.tipo === 'luz' && !dentroFaixa(e.lux, 0, 10000)) throw new RangeError(`${prefixo}. Use de 0 a 10.000 lux.`);
     if (e.tipo === 'biofeedback' && ![5, 6, 7].includes(e.ritmo ?? 6)) throw new RangeError(`${prefixo}. Escolha um dos ritmos disponíveis.`);
     if (e.tipo === 'refeicao' && !dentroFaixa(e.carboG, 0, 100)) throw new RangeError(`${prefixo}. Use de 0 a 100 g de carboidrato.`);
     if (e.tipo === 'bebida' && (!dentroFaixa(e.aguaMl, 0, 1000) || !dentroFaixa(e.sodioMg, 0, 1500))) {
       throw new RangeError(`${prefixo}. Use de 0 a 1.000 mL de água e de 0 a 1.500 mg de sódio no evento.`);
     }
-    const destino = e.tipo === 'dormir' ? sono : e.tipo === 'exercicio' ? exercicio : TIPOS_PAUSA.includes(e.tipo) ? pausas : null;
+    const destino = e.tipo === 'dormir' ? sono : e.tipo === 'exercicio' ? exercicio : TIPOS_PAUSA.includes(e.tipo) ? pausas : e.tipo === 'luz' ? luz : null;
     if (!destino) return;
     for (const dia of dias) for (let passo = 0; passo < duracao(e); passo += 5) {
       const local = ciclo(dia * DIA + e.inicio + passo);
@@ -82,7 +97,7 @@ export function conferirAgenda(eventos) {
     }
   });
   for (const e of eventos) {
-    if (e.tipo === 'dormir') continue;
+    if (e.tipo === 'dormir' || (e.tipo === 'luz' && e.lux === 0)) continue;
     for (const dia of diasDe(e)) for (let passo = 0; passo < duracao(e); passo += 5) {
       const m = ciclo(dia * DIA + e.inicio + passo);
       if (sono.has(m)) throw new RangeError(`${TIPOS_AGENDA[e.tipo]} às ${relogio(e.inicio)} coincide com o sono (${DIAS_AGENDA[dia]}).`);
@@ -110,11 +125,13 @@ export function prepararAgenda(eventos) {
     const bebidas = daqui.filter((e) => e.tipo === 'bebida').map((e) => [e.inicio, e.aguaMl, e.sodioMg]);
     const atividades = ['trabalho', 'estudo', 'lazer'].flatMap((tipo) => locais.filter((e) => e.tipo === tipo));
     const pausas = locais.filter((e) => TIPOS_PAUSA.includes(e.tipo));
+    const luzes = locais.filter((e) => e.tipo === 'luz');
     const ativo = (e, min) => min >= e.inicio && min < e.inicio + duracao(e);
     return { janelasSono, sessoes, sessoesCardio, refeicoes, bebidas,
       atividadeEm: (min) => atividades.find((e) => ativo(e, min))?.tipo,
       pausaEm: (min) => pausas.find((e) => ativo(e, min)),
+      luxEm: (min) => luzes.find((e) => ativo(e, min))?.lux ?? 0,
     };
   });
-  return { ...semana[0], dia: (indice) => semana[(indice % 7 + 7) % 7] };
+  return { ...semana[0], temLuz: eventos.some((e) => e.tipo === 'luz'), dia: (indice) => semana[(indice % 7 + 7) % 7] };
 }

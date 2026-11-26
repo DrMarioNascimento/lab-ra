@@ -1,4 +1,4 @@
-import { agendaEscala, agendaInicial, DIAS_AGENDA, relogio, TIPOS_AGENDA, TODOS_DIAS, tipoIntervalo } from '../motor/agenda.js?v=2';
+import { agendaEscala, agendaInicial, agendaLuzPlantao, DIAS_AGENDA, relogio, TIPOS_AGENDA, TODOS_DIAS, tipoIntervalo } from '../motor/agenda.js?v=3';
 
 const lerHora = (v) => {
   if (!v) return NaN;
@@ -6,7 +6,7 @@ const lerHora = (v) => {
   return h * 60 + m;
 };
 const valorPadrao = (tipo, inicio = 1080) => ({
-  tipo, inicio, fim: (inicio + 60) % 1440, duracao: 30, intensidade: 40, carboG: 50, aguaMl: 300, sodioMg: 0, ritmo: 6,
+  tipo, inicio, fim: (inicio + 60) % 1440, duracao: 30, intensidade: 40, carboG: 50, aguaMl: 300, sodioMg: 0, ritmo: 6, lux: 100,
 });
 
 export function criarEditor(container, copiar) {
@@ -50,6 +50,7 @@ export function criarEditor(container, copiar) {
       adicionar('Tipo', 'tipo', { escolhas: TIPOS_AGENDA });
       adicionar('Início', 'inicio', { type: 'time', step: 300 });
       if (tipoIntervalo(evento.tipo)) adicionar('Fim', 'fim', { type: 'time', step: 300 });
+      if (evento.tipo === 'luz') adicionar('Iluminância (lux)', 'lux', { type: 'number', min: 0, max: 10000, step: 'any' });
       if (evento.tipo === 'biofeedback') adicionar('Ritmo orientado', 'ritmo', { escolhas: { 5: '5 ciclos/min', 6: '6 ciclos/min', 7: '7 ciclos/min' } });
       if (evento.tipo === 'exercicio') {
         adicionar('Duração', 'duracao', { escolhas: { 15: '15 min', 30: '30 min', 45: '45 min' } });
@@ -99,7 +100,8 @@ export function criarEditor(container, copiar) {
     desenhar();
   }));
   container.querySelector('[data-carregar-escala]').addEventListener('click', () => {
-    eventos = agendaEscala(container.querySelector('[data-escala]').value);
+    const modelo = container.querySelector('[data-escala]').value;
+    eventos = modelo === 'luzSuave' ? agendaLuzPlantao(100) : modelo === 'luzIntensa' ? agendaLuzPlantao(2500) : agendaEscala(modelo);
     desenhar();
   });
   container.querySelector('[data-pausa]').addEventListener('click', () => {

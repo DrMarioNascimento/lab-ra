@@ -1,6 +1,6 @@
 // Bancada de 24 h. As rotinas dos outros modos continuam usando seus próprios motores.
 import { formaRelogio, pesoSono, pressaoArterial } from './hemodinamica.js?v=2';
-import { faseNoMinuto } from './fase-circadiana.js';
+import { faseEmPerfil, faseNoMinuto } from './fase-circadiana.js?v=2';
 import { P } from './parametros.js';
 import { fracaoReservaVO2, frequenciaNoEsforco } from './treino.js';
 
@@ -60,7 +60,7 @@ export function simularCardiovascular(rotina) {
   const erro = conferirCardiovascular(rotina);
   if (erro) throw new RangeError(erro);
 
-  const { sono, exercicio, janelasSono, exercicioCalendario = false, faseInicialH = 0, faseFinalH = faseInicialH } = rotina;
+  const { sono, exercicio, janelasSono, exercicioCalendario = false, faseInicialH = 0, faseFinalH = faseInicialH, perfilFase = null } = rotina;
   const blocosSono = janelasSono ? [] : [{ inicio: sono[0] / 60, fim: sono[1] / 60 }];
   const rampaSonoMin = P.pressaoArterial.rampaSonoH.valor * 60;
   const { perfilPadrao, repousoDiurno, repousoNoturno, vo2Repouso } = P.treino;
@@ -79,7 +79,7 @@ export function simularCardiovascular(rotina) {
     const peso = janelasSono
       ? (janela ? Math.min(1, (min - janela[0]) / rampaSonoMin, (janela[1] - min) / rampaSonoMin) : 0)
       : pesoSono(hora, blocosSono);
-    const fase = faseNoMinuto(faseInicialH, faseFinalH, min);
+    const fase = perfilFase ? faseEmPerfil(perfilFase, min) : faseNoMinuto(faseInicialH, faseFinalH, min);
     const relogio = formaRelogio(hora - fase);
     const quedaSonoFC = quedaFC * MODELO_CARDIO.pesoSonoFC * peso;
     const quedaRelogioFC = quedaFC * (1 - MODELO_CARDIO.pesoSonoFC) * relogio;

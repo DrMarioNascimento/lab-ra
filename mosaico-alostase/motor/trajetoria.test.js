@@ -90,3 +90,20 @@ test('três escalas controlam as durações e o horário de folga altera a fase 
   assert.equal(fixa.estadoFinal.pressaoSono, noite.estadoFinal.pressaoSono);
   assert.notEqual(fixa.dias[55].sonoForaFaseH, noite.dias[55].sonoForaFaseH);
 });
+
+test('o caso de luz mantém trabalho e sono iguais e muda a fase a partir da primeira exposição diferente', () => {
+  const a = simularTrajetoria('luzSuave', 7, { detalharDia: 1 });
+  const b = simularTrajetoria('luzIntensa', 7, { detalharDia: 1 });
+  assert.deepEqual(a.dias.map((d) => d.horasSono), b.dias.map((d) => d.horasSono));
+  assert.deepEqual(a.dias.map((d) => d.trabalhoH), b.dias.map((d) => d.trabalhoH));
+  assert.equal(a.dias.reduce((s, d) => s + d.trabalhoH, 0), 40);
+  assert.equal(b.dias.reduce((s, d) => s + d.horasSono, 0), 56);
+  assert.equal(a.leitura[0].faseCircadianaH, b.leitura[0].faseCircadianaH);
+  assert.equal(b.leitura[1].luzLux, 2500);
+  assert.ok(b.leitura[1].faseCircadianaH > a.leitura[1].faseCircadianaH);
+  assert.ok(b.estadoFinal.faseCircadianaH > a.estadoFinal.faseCircadianaH);
+  assert.ok(b.dias[6].faseCircadianaH < b.dias[5].faseCircadianaH);
+  const controle = simularTrajetoria('luzIntensa', 7, { modoFase: 'fixa', detalharDia: 1 });
+  assert.equal(controle.leitura[1].luzLux, 2500);
+  assert.equal(controle.estadoFinal.faseCircadianaH, 0);
+});

@@ -69,3 +69,14 @@ test('exercício semanal de meia-noite aplica somente a sessão que realmente co
   assert.equal(amanha.leitura.find((p) => p.min === 20).exercicio, false);
   assert.equal(amanha.leitura.at(-1).exercicio, false);
 });
+
+test('luz é independente da atividade e os pulsos cruzam a meia-noite sem duplicar', () => {
+  const entrada = { tipo: 'luz', inicio: 1430, fim: 15, dias: [0], lux: 450 };
+  const agenda = prepararAgenda([...agendaInicial(true), entrada]);
+  assert.equal(agenda.dia(0).luxEm(1435), 450);
+  assert.equal(agenda.dia(1).luxEm(10), 450);
+  assert.equal(agenda.dia(1).atividadeEm(10), 'trabalho');
+  assert.equal(agenda.dia(1).luxEm(15), 0);
+  assert.equal(agenda.dia(2).luxEm(10), 0);
+  assert.throws(() => conferirAgenda([...agendaInicial(true), { ...entrada, inicio: 480, fim: 600 }]), /coincide com o sono/);
+});

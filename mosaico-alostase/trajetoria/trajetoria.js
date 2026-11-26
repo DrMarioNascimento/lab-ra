@@ -1,8 +1,8 @@
-import { agruparTrajetoria, HORIZONTES, PERFIS_TRAJETORIA, simularTrajetoria } from '../motor/trajetoria.js?v=3';
+import { agruparTrajetoria, HORIZONTES, PERFIS_TRAJETORIA, simularTrajetoria } from '../motor/trajetoria.js?v=4';
 import { PASSO_INTEGRADO } from '../motor/bancada-hidrica.js?v=2';
 import { desenharSerie } from '../hidratacao/grafico.js?v=2';
-import { criarEditor } from './editor.js?v=2';
-import { DIAS_AGENDA } from '../motor/agenda.js?v=2';
+import { criarEditor } from './editor.js?v=3';
+import { DIAS_AGENDA } from '../motor/agenda.js?v=3';
 
 const el = (id) => document.getElementById(id);
 const perfis = [el('perfil-a'), el('perfil-b')];
@@ -27,7 +27,8 @@ const medidas = {
   atividadeNoturnaH: ['Atividade noturna no período', 'h', 1],
   trabalhoNoturnoH: ['Trabalho noturno no período', 'h', 1],
   trabalhoH: ['Trabalho no período', 'h', 1],
-  faseCircadianaH: ['Atraso da fase no fim do período', 'h', 2],
+  faseCircadianaH: ['Deslocamento no fim do período (+ atraso, − avanço)', 'h', 2],
+  luzLuxH: ['Iluminância acumulada no período', 'lux·h', 0],
   sonoForaFaseH: ['Sono fora da noite biológica', 'h/dia', 2],
   pausaMin: ['Tempo programado de pausas no período', 'min', 0],
   biofeedbackMin: ['Biofeedback respiratório no período', 'min', 0],
@@ -43,7 +44,8 @@ const medidasDia = {
   urinaLHora: ['Fluxo urinário', 'L/h', 3], adh: ['Vasopressina', 'índice', 1],
   renina: ['Renina', 'índice', 1], angII: ['Angiotensina II', 'índice', 1],
   aldosterona: ['Aldosterona', 'índice', 1], anp: ['ANP', 'índice', 1], tfg: ['Filtração glomerular estimada', 'mL/min', 1],
-  faseCircadianaH: ['Atraso da fase circadiana', 'h', 2],
+  faseCircadianaH: ['Deslocamento da fase (+ atraso, − avanço)', 'h', 2],
+  luzLux: ['Luz programada', 'lux', 0],
   ritmoOrientado: ['Ritmo respiratório programado (0 fora da pausa)', 'ciclos/min', 0],
   pressaoSono: ['Pressão de sono', '0 a 1', 3], vigiliaContinua: ['Vigília contínua', 'h', 1], cortisol: ['Cortisol', 'µg/dL', 2], glicemia: ['Glicemia', 'mg/dL', 1],
 };
@@ -56,6 +58,8 @@ const hhmm = (i) => {
 const valor = (p, k) => p[k] ?? p.renal[k] ?? p.renal.regulacao[k];
 const classe = (i) => i ? 'rotina-b' : 'rotina-a';
 let rotinas = [], configuracoes = [], resultados = [], agregados = [], curvas = [];
+const observacoes = new Map();
+const chaveObservacao = (rotina, i = instante.value) => `${rotina}:${dia.value}:${i}`;
 const paineisAgenda = [el('agenda-a'), el('agenda-b')];
 const editores = paineisAgenda.map((painel, i) => criarEditor(painel, (eventos) => {
   const outro = 1 - i;
@@ -108,13 +112,20 @@ function mostrarInstante() {
   el('hora').value = hhmm(i);
   instante.setAttribute('aria-valuetext', hhmm(i));
   desenharSerie(painelDia, curvas.map((a) => a.map((x) => valor(x, variavel.value))), curvas[0].length, i, hhmm, casas);
-  el('leitura-dia').innerHTML = curvas.map((a, j) => `<article class="leitura-cardio ${classe(j)}">
+  const temBiofeedback = curvas.some((a) => a[i].ritmoOrientado);
+  el('leitura-dia').innerHTML = curvas.map((a, j) => {
+    const observacao = observacoes.get(chaveObservacao(j, i));
+    return `<article class="leitura-cardio ${classe(j)}">
     <h3>Rotina ${j ? 'B' : 'A'}</h3>
     <p>${nome} <strong>${fmt(valor(a[i], variavel.value), casas)} ${unidade}</strong></p>
     <p><strong>${a[i].atividade || (a[i].dormindo ? 'Em sono' : 'Em vigília')}</strong> · ${fmt(a[i].vigiliaContinua, 1)} h seguidas em vigília.</p>
+    ${a[i].luzLux ? `<p>Luz programada: ${fmt(a[i].luzLux, 0)} lux.</p>` : ''}
     ${a[i].ritmoOrientado ? `<p>Ritmo programado: ${a[i].ritmoOrientado} ciclos/min. <a href="https://fisiologia.drmarionascimento.com.br/biofeedback-respiratorio.html">Abrir a prática de biofeedback</a></p>` : ''}
+    ${observacao ? `<p>Frequência registrada: ${fmt(observacao.ciclos * 60 / observacao.segundos, 1)} ciclos/min.</p>` : ''}
+    ${temBiofeedback ? `<button type="button" class="btn sec sm" data-observar="${j}">Contar minha respiração</button>` : ''}
     <p>FC ${fmt(a[i].fc, 1)} bpm · plasma ${fmt(a[i].plasmaL, 3)} L · ADH ${fmt(a[i].renal.regulacao.adh, 1)} · glicemia ${fmt(a[i].glicemia, 1)} mg/dL.</p>
-    </article>`).join('');
+    </article>`;
+  }).join('');
 }
 
 function mostrarDia() {
@@ -143,7 +154,7 @@ function mostrarExposicao() {
     <p>${r.noitesEmClaro} noites sem dormir das 23h às 07h · maior vigília seguida de ${fmt(r.vigilia, 1)} h. Índice de vigília em excesso no último bloco de até 7 dias: ${fmt(r.saldoSono, 2)} h.</p></article>`).join('');
 }
 
-function recalcular() {
+function recalcular({ comparacaoPausa = false } = {}) {
   const n = Number(horizonte.value);
   const novas = perfis.map((s) => s.value);
   const escolhaFase = el('fase-circadiana').value;
@@ -151,7 +162,7 @@ function recalcular() {
     frequenciaNoturna: el('frequencia-noturna').value,
     sonoDiurno: el('sono-diurno').value === 'sim',
     eventos: id === 'personalizada' ? editores[i].ler() : null,
-    faseParcial: escolhaFase === 'padrao' ? null : escolhaFase === 'parcial',
+    modoFase: escolhaFase === 'padrao' ? null : escolhaFase,
   }));
   const erro = el('erro-agenda');
   let novosResultados;
@@ -174,9 +185,12 @@ function recalcular() {
   rotinas = novas;
   configuracoes = opcoes;
   resultados = novosResultados;
+  observacoes.clear();
   prepararGrafico();
   dia.replaceChildren(...resultados[0].dias.map((x) => new Option(`Dia ${x.dia} · ${DIAS_AGENDA[(x.dia - 1) % 7]}`, x.dia)));
   dia.value = n > 1 && novas.some((id) => PERFIS_TRAJETORIA[id].noite) ? 2 : 1;
+  el('resumo-luz').hidden = !(novas.includes('luzSuave') && novas.includes('luzIntensa'));
+  el('resumo-pausa').hidden = !comparacaoPausa;
   el('resumo-escala').hidden = !novas.every((id) => id.startsWith('escala'));
   el('situacao').textContent = `${n} ${n === 1 ? 'dia calculado' : 'dias calculados'} por rotina.`;
   mostrarDia();
@@ -186,6 +200,7 @@ function recalcular() {
 perfis.forEach((s) => s.addEventListener('change', ajustarControles));
 function compararTurno(id, dias) {
   perfis[0].value = 'regular';
+  el('fase-circadiana').value = 'padrao';
   perfis[1].value = id;
   horizonte.value = dias;
   passoGrafico.value = 'marcos';
@@ -197,6 +212,38 @@ function compararTurno(id, dias) {
   ajustarControles();
   recalcular();
 }
+el('atalho-luz').addEventListener('click', () => {
+  perfis[0].value = 'luzSuave';
+  perfis[1].value = 'luzIntensa';
+  horizonte.value = '7';
+  passoGrafico.value = 'dias';
+  el('fase-circadiana').value = 'luz';
+  indicador.value = 'faseCircadianaH';
+  variavel.value = 'luzLux';
+  instante.value = 12;
+  ajustarControles();
+  recalcular();
+  dia.value = '2';
+  mostrarDia();
+});
+el('atalho-pausa').addEventListener('click', () => {
+  const tipo = el('pausa-comparar').value;
+  const cenarios = { biofeedback: 'pausaBiofeedback', meditacao: 'pausaMeditacao', oracao: 'pausaOracao' };
+  perfis[0].value = 'pausaControle';
+  perfis[1].value = cenarios[tipo];
+  horizonte.value = '2';
+  passoGrafico.value = 'dias';
+  el('fase-circadiana').value = 'fixa';
+  indicador.value = 'pausaMin';
+  variavel.value = tipo === 'biofeedback' ? 'ritmoOrientado' : 'pressaoSono';
+  instante.value = 36;
+  ajustarControles();
+  recalcular({ comparacaoPausa: true });
+  periodo.value = 1;
+  dia.value = '2';
+  mostrarPeriodo();
+  mostrarDia();
+});
 el('atalho-escalas').addEventListener('click', () => {
   perfis[0].value = 'escalaNoite';
   perfis[1].value = 'escalaFolgas';
@@ -239,6 +286,56 @@ el('exportar').addEventListener('click', () => {
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 });
+const observacao = el('observacao');
+const janela = el('janela-observacao');
+const tempo = el('tempo-observacao');
+let relogioObservacao = null, alvoObservacao = 0;
+function pararContagem() {
+  clearInterval(relogioObservacao);
+  relogioObservacao = null;
+}
+el('leitura-dia').addEventListener('click', (evento) => {
+  const botao = evento.target.closest('[data-observar]');
+  if (!botao) return;
+  alvoObservacao = Number(botao.dataset.observar);
+  const previa = observacoes.get(chaveObservacao(alvoObservacao));
+  el('alvo-observacao').textContent = `Rotina ${alvoObservacao ? 'B' : 'A'} · dia ${dia.value}, ${hhmm(Number(instante.value))}`;
+  tempo.value = '';
+  janela.value = previa?.segundos ?? 60;
+  el('ciclos-contados').value = previa?.ciclos ?? '';
+  el('frequencia-observada').value = '';
+  observacao.showModal();
+});
+el('fechar-observacao').addEventListener('click', () => observacao.close());
+observacao.addEventListener('close', () => {
+  pararContagem();
+  el('leitura-dia').querySelector(`[data-observar="${alvoObservacao}"]`)?.focus();
+});
+janela.addEventListener('change', () => {
+  pararContagem();
+  tempo.value = '';
+  el('frequencia-observada').value = '';
+});
+el('contar-tempo').addEventListener('click', () => {
+  pararContagem();
+  const fim = performance.now() + Number(janela.value) * 1000;
+  const atualizar = () => {
+    const segundos = Math.max(0, Math.ceil((fim - performance.now()) / 1000));
+    tempo.value = segundos ? `${segundos} s` : 'Tempo concluído';
+    if (!segundos) pararContagem();
+  };
+  relogioObservacao = setInterval(atualizar, 250);
+  atualizar();
+});
+el('form-observacao').addEventListener('submit', (evento) => {
+  evento.preventDefault();
+  const ciclos = Number(el('ciclos-contados').value);
+  const segundos = Number(janela.value);
+  observacoes.set(chaveObservacao(alvoObservacao), { ciclos, segundos });
+  el('frequencia-observada').value = `${fmt(ciclos * 60 / segundos, 1)} ciclos/min pela sua contagem.`;
+  mostrarInstante();
+});
+
 ajustarControles();
 recalcular();
 const observer = new ResizeObserver(() => {
