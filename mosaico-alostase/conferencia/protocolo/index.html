@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Protocolo térmico · Mosaico Alostase</title>
+  <link rel="stylesheet" href="../../jogo/estilo.css?v=9">
+  <link rel="stylesheet" href="../../cardiovascular/bancada.css">
+  <style>
+    table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: .9rem; }
+    th, td { padding: .55rem .25rem; text-align: left; border-bottom: 1px solid #40536b; overflow-wrap: anywhere; }
+    th:first-child { width: 19%; }
+    .referencia { color: #a9c6da; }
+    .trecho { margin: .75rem 0; }
+    #curva { height: 215px; width: 100%; }
+    @media(max-width:420px) { table { font-size: .78rem; } }
+  </style>
+</head>
+<body>
+  <main class="bancada">
+    <nav><a href="../">← Tabelas fisiológicas</a> · <a href="../../trajetoria/">Trajetórias</a></nav>
+    <header class="abertura">
+      <h1>Conferência do protocolo de corrida</h1>
+      <p>Che Muhamed e colegas acompanharam 11 corredores treinados em uma esteira. A corrida estável durou 60 minutos a 31 °C e 70% do VO₂máx, em cinco umidades relativas.</p>
+    </header>
+    <section class="painel">
+      <h2>Temperatura central estimada</h2>
+      <label>Umidade da corrida <select id="umidade"></select></label>
+      <canvas id="curva" aria-hidden="true"></canvas>
+      <p id="desfecho" aria-live="polite"></p>
+    </section>
+    <section class="painel">
+      <h2>Valores do estudo e do motor</h2>
+      <p>As linhas marcadas com † foram usadas no ajuste. As outras linhas e a temperatura ficaram para conferir o que o motor reproduzia.</p>
+      <label class="trecho">Momento de comparação <select id="trecho"><option value="0">30 minutos</option><option value="1">60 minutos</option></select></label>
+      <table>
+        <thead><tr><th scope="col">Umidade</th><th scope="col">Calor<br>W/m²</th><th scope="col">Suor<br>g/min</th></tr></thead>
+        <tbody id="comparacao"></tbody>
+      </table>
+      <p>O motor aproxima 1 mL de suor de 1 g. As taxas simuladas correspondem a médias em janelas de 30 minutos.</p>
+    </section>
+    <details class="painel">
+      <summary>Como foi feita a reprodução</summary>
+      <p>O perfil médio usa 72 kg, 1,80 m e VO₂máx de 61 mL/kg/min. No estudo, a velocidade do ar acompanhava a da esteira de cada corredor. O motor usa 3,3 m/s como estimativa do perfil médio, uma corrida contínua e o estado térmico inicial didático. A etapa representa a corrida estável sem ingestão durante o esforço. No modelo, os efeitos de água e circulação não realimentam a curva de temperatura desta conferência.</p>
+      <p>Os ganhos de troca e de sudorese foram escolhidos com base nas duas condições extremas de umidade aos 30 minutos (calor armazenado e taxa de suor). Há uma supressão parcial do suor quando a produção supera a capacidade de evaporar. As linhas de conferência registram também os desvios, inclusive a subestimação da elevação de temperatura retal.</p>
+      <p><a href="https://doi.org/10.1080/23328940.2016.1182669">Che Muhamed e colegas, tabela 1 e resultados</a></p>
+    </details>
+  </main>
+  <script type="module" src="./protocolo.js"></script>
+</body>
+</html>

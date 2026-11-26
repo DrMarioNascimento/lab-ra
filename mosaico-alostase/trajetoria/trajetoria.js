@@ -1,5 +1,5 @@
-import { agruparTrajetoria, HORIZONTES, PERFIS_TRAJETORIA, simularTrajetoria } from '../motor/trajetoria.js?v=5';
-import { PASSO_INTEGRADO } from '../motor/bancada-hidrica.js?v=4';
+import { agruparTrajetoria, HORIZONTES, PERFIS_TRAJETORIA, simularTrajetoria } from '../motor/trajetoria.js?v=6';
+import { PASSO_INTEGRADO } from '../motor/bancada-hidrica.js?v=5';
 import { desenharSerie, indiceNaSerie } from '../hidratacao/grafico.js?v=3';
 import { criarEditor } from './editor.js?v=3';
 import { DIAS_AGENDA } from '../motor/agenda.js?v=3';
@@ -53,7 +53,12 @@ const medidasDia = {
 const termicasPeriodo = {
   picoCentralC: ['Pico de temperatura central estimada', '°C', 2],
   suorEvaporadoL: ['Suor evaporado médio por dia', 'L', 2],
+  tempoCalorMin: ['Minutos de exercício acima de 37,5 °C', 'min', 0],
   calorSessaoKJ: ['Calor retido durante o exercício no período', 'kJ', 0],
+};
+const indicadoresAclima = {
+  indiceAclima: ['Adaptação cardiovascular ao calor (índice)', '% da amplitude do modelo', 1],
+  indiceSuorAclima: ['Adaptação da sudorese (índice)', '% da amplitude do modelo', 1],
 };
 const termicasDia = {
   centralC: ['Temperatura central estimada', '°C', 2],
@@ -63,9 +68,9 @@ const termicasDia = {
   suorEscorridoMl: ['Suor não evaporado por intervalo', 'mL/5 min', 1],
   calorRetidoKJ: ['Variação do calor armazenado por intervalo', 'kJ/5 min', 1],
 };
-Object.assign(medidas, termicasPeriodo);
+Object.assign(medidas, termicasPeriodo, indicadoresAclima);
 Object.assign(medidasDia, termicasDia);
-const nomeHorizonte = { 1: '24 horas', 2: '48 horas', 7: '7 dias', 28: '4 semanas', 56: '8 semanas', 90: '90 dias', 180: '180 dias', 365: '365 dias' };
+const nomeHorizonte = { 1: '24 horas', 2: '48 horas', 7: '7 dias', 12: '12 dias', 28: '4 semanas', 56: '8 semanas', 90: '90 dias', 180: '180 dias', 365: '365 dias' };
 const fmt = (v, casas) => v.toLocaleString('pt-BR', { maximumFractionDigits: casas, minimumFractionDigits: casas });
 const hhmm = (i) => {
   const min = i * PASSO_INTEGRADO;
@@ -151,18 +156,18 @@ function sincronizarJanela() {
   instante.max = zoom ? '231' : '287';
 }
 
-function ativarIndicadoresTermicos(ativo) {
-  for (const [select, grupo, padrao] of [[indicador, termicasPeriodo, 'minPlasma'], [variavel, termicasDia, 'fc']]) {
+function ativarIndicadoresTermicos(ativo, aclima) {
+  for (const [select, grupo, padrao, habilitado] of [[indicador, termicasPeriodo, 'minPlasma', ativo], [variavel, termicasDia, 'fc', ativo], [indicador, indicadoresAclima, 'minPlasma', aclima]]) {
     for (const opt of select.options) {
       if (Object.hasOwn(grupo, opt.value)) {
-        opt.disabled = !ativo;
-        opt.hidden = !ativo;
+        opt.disabled = !habilitado;
+        opt.hidden = !habilitado;
       }
     }
-    if (!ativo && Object.hasOwn(grupo, select.value)) select.value = padrao;
+    if (!habilitado && Object.hasOwn(grupo, select.value)) select.value = padrao;
   }
   el('controle-janela-termica').hidden = !ativo;
-  el('resumo-termico').hidden = !ativo;
+  el('resumo-termico').hidden = !rotinas.every((id) => ['arSeco', 'arUmido'].includes(id));
   sincronizarJanela();
 }
 
@@ -217,6 +222,23 @@ function mostrarExposicao() {
     <p>${r.noitesEmClaro} noites sem dormir das 23h às 07h · maior vigília seguida de ${fmt(r.vigilia, 1)} h. Índice de vigília em excesso no último bloco de até 7 dias: ${fmt(r.saldoSono, 2)} h.</p></article>`).join('');
 }
 
+function mostrarAclimatacao() {
+  const comparacao = rotinas[0] === 'aclimaFresco' && rotinas[1] === 'aclimaQuente';
+  el('resumo-aclima').hidden = !comparacao;
+  el('painel-aclima').hidden = !comparacao || resultados[0].dias.length < 12;
+  if (el('painel-aclima').hidden) return;
+  const [a, b] = resultados;
+  const exibidos = [a.dias[0], a.dias[11], b.dias[11]];
+  const linhas = [
+    ['Temperatura central no fim', 'centralFimC', 2, '°C'],
+    ['FC no início do último intervalo', 'fcFinalBpm', 1, 'bpm'],
+    ['Início da sudorese', 'inicioSuorMin', 0, 'min'],
+    ['Suor produzido na caminhada', 'suorSessaoL', 2, 'L'],
+  ];
+  el('tabela-aclima').querySelector('tbody').innerHTML = linhas.map(([rotulo, chave, casas, unidade]) =>
+    `<tr><th scope="row">${rotulo}</th>${exibidos.map((p) => `<td>${Number.isFinite(p[chave]) ? fmt(p[chave], casas) + ' ' + unidade : '—'}</td>`).join('')}</tr>`).join('');
+}
+
 function recalcular({ comparacaoPausa = false } = {}) {
   const n = Number(horizonte.value);
   const novas = perfis.map((s) => s.value);
@@ -249,7 +271,8 @@ function recalcular({ comparacaoPausa = false } = {}) {
   configuracoes = opcoes;
   resultados = novosResultados;
   observacoes.clear();
-  ativarIndicadoresTermicos(novas.every((id) => PERFIS_TRAJETORIA[id].termico));
+  ativarIndicadoresTermicos(novas.every((id) => PERFIS_TRAJETORIA[id].termico),
+    novas.every((id) => PERFIS_TRAJETORIA[id].aclimatacao));
   prepararGrafico();
   dia.replaceChildren(...resultados[0].dias.map((x) => new Option(`Dia ${x.dia} · ${DIAS_AGENDA[(x.dia - 1) % 7]}`, x.dia)));
   dia.value = n > 1 && novas.some((id) => PERFIS_TRAJETORIA[id].noite) ? 2 : 1;
@@ -259,6 +282,7 @@ function recalcular({ comparacaoPausa = false } = {}) {
   el('situacao').textContent = `${n} ${n === 1 ? 'dia calculado' : 'dias calculados'} por rotina.`;
   mostrarDia();
   mostrarExposicao();
+  mostrarAclimatacao();
 }
 
 perfis.forEach((s) => s.addEventListener('change', ajustarControles));
@@ -277,6 +301,30 @@ function compararTurno(id, dias) {
   ajustarControles();
   recalcular();
 }
+function mostrarTesteAclima(d) {
+  dia.value = d;
+  prepararGrafico(d);
+  instante.value = '219';
+  mostrarDia();
+}
+el('ver-inicial-aclima').addEventListener('click', () => mostrarTesteAclima(1));
+el('ver-final-aclima').addEventListener('click', () => mostrarTesteAclima(12));
+el('atalho-aclima').addEventListener('click', () => {
+  perfis[0].value = 'aclimaFresco';
+  perfis[1].value = 'aclimaQuente';
+  horizonte.value = '12';
+  passoGrafico.value = 'dias';
+  janelaTermica.value = 'sessao';
+  el('fase-circadiana').value = 'padrao';
+  indicador.value = 'indiceAclima';
+  variavel.value = 'centralC';
+  instante.min = '207';
+  instante.max = '231';
+  instante.value = '219';
+  ajustarControles();
+  recalcular();
+  mostrarTesteAclima(12);
+});
 el('atalho-termico').addEventListener('click', () => {
   perfis[0].value = 'arSeco';
   perfis[1].value = 'arUmido';

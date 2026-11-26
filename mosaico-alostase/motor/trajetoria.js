@@ -1,5 +1,6 @@
 // Motor contínuo da bancada integrada. Estado hídrico, excreção e pressão de sono atravessam a meia-noite.
-import { BEBIDAS_BASE, CENARIOS_HIDRICOS, PASSO_INTEGRADO, SESSAO, simularHidratacao } from './bancada-hidrica.js?v=4';
+import { BEBIDAS_BASE, CENARIOS_HIDRICOS, PASSO_INTEGRADO, SESSAO, simularHidratacao } from './bancada-hidrica.js?v=5';
+import { INICIAL_ACLIMATACAO, atualizarAclimatacao } from './aclimatacao.js';
 import { simularCardiovascular } from './cardiovascular.js?v=4';
 import { hidratar } from './hidratacao.js';
 import { cortisolBase, efeitoExercicioCortisol, efeitoRefeicaoGlicemia } from './motor.js';
@@ -8,7 +9,7 @@ import { regularRim } from './renal.js';
 import { agendaComPausa, agendaEscala, agendaLuzPlantao, agendaInicial, prepararAgenda, TIPOS_AGENDA } from './agenda.js?v=3';
 import { emNoiteBiologica, faseEmPerfil, faseNoMinuto, passoFaseCircadiana, perfilDeFaseComLuz } from './fase-circadiana.js?v=2';
 
-export const HORIZONTES = [1, 2, 7, 28, 56, 90, 180, 365];
+export const HORIZONTES = [1, 2, 7, 12, 28, 56, 90, 180, 365];
 export const PERFIS_TRAJETORIA = Object.freeze({
   regular: { nome: 'Rotina sem sessão programada', treino: false, sonoCurto: false, ambiente: 'fresco' },
   treino: { nome: 'Três sessões semanais em ambiente fresco', treino: true, sonoCurto: false, ambiente: 'fresco' },
@@ -27,6 +28,8 @@ export const PERFIS_TRAJETORIA = Object.freeze({
   pausaBiofeedback: { nome: 'Plantão · pausa de biofeedback', agenda: agendaComPausa('biofeedback'), ambiente: 'fresco' },
   pausaMeditacao: { nome: 'Plantão · pausa de meditação', agenda: agendaComPausa('meditacao'), ambiente: 'fresco' },
   pausaOracao: { nome: 'Plantão · pausa de oração', agenda: agendaComPausa('oracao'), ambiente: 'fresco' },
+  aclimaFresco: { nome: 'Aclimatação · treino no fresco', aclimatacao: true, ambiente: 'aclimaFresco', termico: true },
+  aclimaQuente: { nome: 'Aclimatação · treino no calor', aclimatacao: true, ambiente: 'arUmido', termico: true },
   arSeco: { nome: 'Caminhada a 31 °C · ar seco (25%)', treino: true, ambiente: 'arSeco', termico: true },
   arUmido: { nome: 'Caminhada a 31 °C · ar úmido (75%)', treino: true, ambiente: 'arUmido', termico: true },
   personalizada: { nome: 'Agenda personalizada', ambiente: 'fresco' },
@@ -48,7 +51,8 @@ export function passoAdaptacaoFC(antes, treina) {
 function plano(dia, perfil) {
   const semana = dia % 7;
   const dorme = perfil.sonoCurto && semana < 5 ? 60 : 1380;
-  const sessao = perfil.treino && [0, 2, 4].includes(semana) ? SESSAO : null;
+  const treina = perfil.aclimatacao ? dia < 12 : perfil.treino && [0, 2, 4].includes(semana);
+  const sessao = treina ? SESSAO : null;
   return { sono: [dorme, 420], sessao };
 }
 
@@ -123,7 +127,7 @@ export function simularTrajetoria(perfilId, dias, { detalharDia = -1, frequencia
   const modelarLuz = Boolean(calendario && modo === 'luz');
   const saida = [];
   const baseCardio = new Map();
-  let agua = hidratar(), temperatura;
+  let agua = hidratar(), temperatura, estadoAclima = INICIAL_ACLIMATACAO;
   let pressaoSono = 0.5, quedaFC = 0, sessoesAnteriores = calendario?.dia(-1).sessoes ?? [], vigiliaMin = 0, faseH = 0;
   let leitura = [];
   const saldosSono = [];
@@ -151,12 +155,16 @@ export function simularTrajetoria(perfilId, dias, { detalharDia = -1, frequencia
     }
     // O ganho no fim do dia passa a valer na manhã seguinte.
     const cardio = quedaFC ? ajustarFCBasal(base, quedaFC) : base;
-    const cenario = CENARIOS_HIDRICOS[perfil.ambiente];
+    const testeComum = perfil.aclimatacao && (dia === 0 || dia === 11);
+    const ambiente = CENARIOS_HIDRICOS[testeComum ? 'arUmido' : perfil.ambiente];
+    // A reposição é a mesma nas duas rotinas e nos testes de comparação.
+    const cenario = perfil.aclimatacao ? { ...ambiente, bebidaMl: 450 } : ambiente;
     // O cenário adia o evento de ingestão que cai no sono diurno até o horário de acordar.
     const primeiraVigilia = (min) => janelasSono?.find(([inicio, fim]) => min >= inicio && min < fim)?.[1] ?? min;
     const bebidas = agendaLivre?.bebidas ?? (agenda ? BEBIDAS_BASE.map(([min, a, s]) => [primeiraVigilia(min), a, s]) : BEBIDAS_BASE);
     const refeicoes = agendaLivre?.refeicoes ?? (agenda ? REFEICOES.map((m) => ({ ...m, hora: primeiraVigilia(m.hora * 60) / 60 })) : REFEICOES);
     const faseHidrica = simularHidratacao(cenario, { estado: agua, estadoTermico: temperatura, cardio, sessao, bebidas,
+      aclimatacao: perfil.aclimatacao ? estadoAclima : null,
       guardarPontos: dia === detalharDia, regular: regularRim, reposicaoAposSessao: !agendaLivre, limitarDominio: perfilId === 'personalizada' });
     agua = faseHidrica.estado;
     temperatura = faseHidrica.estadoTermico;
@@ -220,7 +228,10 @@ export function simularTrajetoria(perfilId, dias, { detalharDia = -1, frequencia
       faseCircadianaH: faseFinalH, sonoForaFaseH: sonoForaFaseMin / 60, pausaMin, biofeedbackMin, luzLuxH: luzLuxMin / 60,
       ureseL: faseHidrica.totais.urinaL, suorL: faseHidrica.totais.suorL, treinoMin: sessoes.reduce((soma, e) => soma + e.duracao, 0),
       ...faseHidrica.resumo,
+      ...(perfil.aclimatacao ? { indiceAclima: 100 * estadoAclima.cardiovascular, indiceSuorAclima: 100 * estadoAclima.suor } : {}),
     });
+    // Os dois testes de comparação ficam fora da contagem das dez exposições do cenário.
+    if (perfil.aclimatacao && !testeComum) estadoAclima = atualizarAclimatacao(estadoAclima, faseHidrica.resumo.tempoCalorMin);
     faseH = faseFinalH;
     refeicoesAnteriores = refeicoes;
     sessoesAnteriores = sessoes;
@@ -257,6 +268,7 @@ export function agruparTrajetoria(dias) {
       ...(tipico.picoCentralC === undefined ? {} : {
         picoCentralC: Math.max(...trecho.map((p) => p.picoCentralC)),
         suorEvaporadoL: media('suorEvaporadoL'),
+        tempoCalorMin: trecho.reduce((s, p) => s + p.tempoCalorMin, 0),
         calorSessaoKJ: trecho.reduce((s, p) => s + p.calorSessaoKJ, 0),
       }),
     });

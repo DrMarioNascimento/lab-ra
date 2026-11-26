@@ -29,6 +29,9 @@
     #observacao label { display: block; margin: .5rem 0; }
     #observacao input { width: 5.5em; padding: .35rem; }
     #grafico-dia { cursor: crosshair; }
+    #tabela-aclima { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: .9rem; }
+    #tabela-aclima th, #tabela-aclima td { padding: .5rem .25rem; text-align: left; overflow-wrap: anywhere; border-bottom: 1px solid #40536b; }
+    #tabela-aclima th:first-child { width: 29%; }
     .conta-termica { margin-top: .65rem; padding-top: .55rem; border-top: 1px solid #40536b; }
     .conta-termica summary { cursor: pointer; font-weight: 700; }
     .conta-termica ul { margin: .55rem 0; padding-left: 1.15rem; }
@@ -85,6 +88,7 @@
         <button type="submit" class="btn ok">Calcular trajetórias</button>
         <div class="agenda-opcoes">
           <button type="button" class="btn sec sm" id="atalho-noite">Comparar uma noite em claro</button>
+          <button type="button" class="btn sec sm" id="atalho-aclima">Comparar aclimatação em dez sessões</button>
           <button type="button" class="btn sec sm" id="atalho-termico">Comparar caminhada no ar seco e úmido</button>
           <button type="button" class="btn sec sm" id="atalho-luz">Comparar luz em cinco plantões</button>
           <button type="button" class="btn sec sm" id="atalho-escalas">Comparar folgas em 8 semanas</button>
@@ -97,6 +101,7 @@
         <p id="erro-agenda" role="alert" hidden></p>
       </form>
       <p id="situacao" role="status"></p>
+      <p id="resumo-aclima" hidden>Os dois grupos fazem o mesmo teste inicial e final a 31 °C e 75% de umidade. Entre os testes, fazem dez caminhadas com o mesmo esforço. A rotina A treina a 22 °C e a rotina B a 31 °C. A ingestão programada é igual nas duas rotinas, com 450 mL ao final de cada caminhada.</p>
       <p id="resumo-termico" hidden>Mesma caminhada das 17h30 às 18h15, a 31 °C, a 40% do VO₂máx, com 300 mL de água ao terminar em ambas as rotinas. Muda apenas a umidade (25% ou 75%). As duas rotinas descansam por uma hora a 24 °C e 45% de umidade.</p>
       <p id="resumo-luz" hidden>Os dois cenários têm a mesma escala, as mesmas refeições e o mesmo sono. Muda apenas a luz das 0h às 2h durante os cinco plantões. Você pode carregar os dois modelos no editor para mudar outros horários, inclusive a volta para casa.</p>
       <p id="resumo-pausa" hidden>As duas rotinas têm a mesma escala. A rotina B recebe uma pausa na terça-feira, das 3h às 3h10.</p>
@@ -114,6 +119,20 @@
         <button class="btn sec sm" type="button" id="exportar">Baixar indicadores diários</button>
       </div>
       <div id="resultados" class="duas-rotinas"></div>
+    </section>
+
+    <section class="painel" id="painel-aclima" hidden>
+      <h2>Antes e depois das dez sessões</h2>
+      <p>O teste inicial é igual nas duas rotinas. O teste final repete a caminhada no calor para avaliar as diferenças.</p>
+      <table id="tabela-aclima">
+        <thead><tr><th scope="col">Medida</th><th scope="col">Teste inicial</th><th scope="col">Teste final A · fresco</th><th scope="col">Teste final B · calor</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <div class="agenda-opcoes">
+        <button type="button" class="btn sec sm" id="ver-inicial-aclima">Ver teste inicial</button>
+        <button type="button" class="btn sec sm" id="ver-final-aclima">Ver teste final</button>
+      </div>
+      <p><a href="../conferencia/protocolo/">Conferir a reprodução do protocolo de corrida</a> · <a href="../conferencia/">Consultar estudos de aclimatação</a></p>
     </section>
 
     <section class="painel" aria-labelledby="dia">
@@ -142,6 +161,7 @@
         <li>A adaptação da FC de repouso converge para uma redução de 4 bpm no cenário de treino. A magnitude é uma referência didática e a meia-vida de 28 dias é uma escolha do modelo. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6306777/">Reimers e colegas</a></li>
         <li>Os cenários de lazer e plantão isolam a vigília. Cafeína, álcool, iluminação e intensidade física exigem entradas específicas. O turno permanente usa 6 h de sono diurno programado como exemplo, e a agenda personalizada permite mudar essa duração.</li>
         <li>No ajuste circadiano parcial, o sono programado serve de aproximação para as pistas de horário. O atraso pode se aproximar de 6 h, com meia-vida didática de 3 dias para atrasar e 2 dias para voltar. A fase altera as curvas basais de cortisol, FC e PA. <a href="https://stacks.cdc.gov/view/cdc/187008/cdc_187008_DS1.pdf">Smith e Eastman, tabela 2</a></li>
+        <li>Na comparação de aclimatação, contam para o índice apenas os minutos de exercício a partir de 37,5 °C de temperatura central e em ambiente de pelo menos 30 °C. O limiar, os ganhos e os índices são hipóteses didáticas. A rotina reduz a FC durante o teste no calor e altera o início e a produção de suor.</li>
         <li>Nos cenários térmicos, o corpo é representado por dois compartimentos, central e pele. O cálculo combina produção metabólica de calor, perdas seca e respiratória e evaporação. A água de todo o suor entra no balanço hídrico. As temperaturas são estimativas didáticas. O cenário fixa roupa e movimento do ar e considera caminhada sem radiação solar direta. <a href="../conferencia/">Tabelas fisiológicas</a></li>
         <li>No modo de luz programada, a dose usa iluminância aproximada ao nível dos olhos e o horário em relação à fase biológica. O efeito satura e fica limitado a ±8 h no cenário didático. Horários sem exposição anotada valem 0 lux neste modo. <a href="../conferencia/">Conferir protocolos e hipóteses</a></li>
         <li>Meditação, oração e biofeedback respiratório ocupam tempo da agenda. O biofeedback exibe o ritmo programado quando ativo. O motor não aplica uma mudança automática de PA, FC ou cortisol por causa de uma pausa.</li>
@@ -162,6 +182,6 @@
       <button type="button" id="fechar-observacao" class="btn sec sm">Fechar</button>
     </form>
   </dialog>
-  <script src="./trajetoria.js?v=5" type="module"></script>
+  <script src="./trajetoria.js?v=6" type="module"></script>
 </body>
 </html>
