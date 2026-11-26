@@ -1,6 +1,6 @@
-import { agruparTrajetoria, HORIZONTES, PERFIS_TRAJETORIA, simularTrajetoria } from '../motor/trajetoria.js?v=4';
-import { PASSO_INTEGRADO } from '../motor/bancada-hidrica.js?v=2';
-import { desenharSerie } from '../hidratacao/grafico.js?v=2';
+import { agruparTrajetoria, HORIZONTES, PERFIS_TRAJETORIA, simularTrajetoria } from '../motor/trajetoria.js?v=5';
+import { PASSO_INTEGRADO } from '../motor/bancada-hidrica.js?v=4';
+import { desenharSerie, indiceNaSerie } from '../hidratacao/grafico.js?v=3';
 import { criarEditor } from './editor.js?v=3';
 import { DIAS_AGENDA } from '../motor/agenda.js?v=3';
 
@@ -12,6 +12,7 @@ const dia = el('dia-detalhe');
 const instante = el('instante');
 const painel = el('grafico');
 const painelDia = el('grafico-dia');
+const janelaTermica = el('janela-termica');
 const indicador = el('indicador');
 const passoGrafico = el('passo-grafico');
 const variavel = el('variavel-dia');
@@ -49,13 +50,28 @@ const medidasDia = {
   ritmoOrientado: ['Ritmo respiratório programado (0 fora da pausa)', 'ciclos/min', 0],
   pressaoSono: ['Pressão de sono', '0 a 1', 3], vigiliaContinua: ['Vigília contínua', 'h', 1], cortisol: ['Cortisol', 'µg/dL', 2], glicemia: ['Glicemia', 'mg/dL', 1],
 };
+const termicasPeriodo = {
+  picoCentralC: ['Pico de temperatura central estimada', '°C', 2],
+  suorEvaporadoL: ['Suor evaporado médio por dia', 'L', 2],
+  calorSessaoKJ: ['Calor retido durante o exercício no período', 'kJ', 0],
+};
+const termicasDia = {
+  centralC: ['Temperatura central estimada', '°C', 2],
+  peleC: ['Temperatura da pele estimada', '°C', 2],
+  suorProduzidoMl: ['Suor produzido por intervalo', 'mL/5 min', 1],
+  suorEvaporadoMl: ['Suor evaporado por intervalo', 'mL/5 min', 1],
+  suorEscorridoMl: ['Suor não evaporado por intervalo', 'mL/5 min', 1],
+  calorRetidoKJ: ['Variação do calor armazenado por intervalo', 'kJ/5 min', 1],
+};
+Object.assign(medidas, termicasPeriodo);
+Object.assign(medidasDia, termicasDia);
 const nomeHorizonte = { 1: '24 horas', 2: '48 horas', 7: '7 dias', 28: '4 semanas', 56: '8 semanas', 90: '90 dias', 180: '180 dias', 365: '365 dias' };
 const fmt = (v, casas) => v.toLocaleString('pt-BR', { maximumFractionDigits: casas, minimumFractionDigits: casas });
 const hhmm = (i) => {
   const min = i * PASSO_INTEGRADO;
   return [Math.floor(min / 60), min % 60].map((v) => String(v).padStart(2, '0')).join(':');
 };
-const valor = (p, k) => p[k] ?? p.renal[k] ?? p.renal.regulacao[k];
+const valor = (p, k) => p[k] ?? p.termorregulacao?.[k] ?? p.renal[k] ?? p.renal.regulacao[k];
 const classe = (i) => i ? 'rotina-b' : 'rotina-a';
 let rotinas = [], configuracoes = [], resultados = [], agregados = [], curvas = [];
 const observacoes = new Map();
@@ -106,23 +122,70 @@ function prepararGrafico(diaPreferido = null) {
   mostrarPeriodo();
 }
 
+function contaDoCalor(t) {
+  if (!t) return '';
+  return `<details class="conta-termica" open>
+    <summary>Conta do calor nos próximos 5 minutos</summary>
+    <p>${fmt(t.temperatura, 0)} °C · ${fmt(t.umidade, 0)}% de umidade</p>
+    <ul>
+      <li>Calor metabólico: ${fmt(t.calorMetabolicoW, 1)} W</li>
+      <li>Troca seca: ${fmt(t.perdaSecaW, 1)} W de perda (valor negativo indica ganho)</li>
+      <li>Perda pela respiração: ${fmt(t.perdaRespiratoriaW, 1)} W</li>
+      <li>Resfriamento por evaporação: ${fmt(t.evaporacaoW, 1)} W</li>
+    </ul>
+    <p>Saldo = calor metabólico − troca seca − respiração − evaporação.
+    <strong>${fmt(t.armazenamentoW, 1)} W</strong> em média, ou <strong>${fmt(t.calorRetidoKJ, 1)} kJ</strong> no intervalo.</p>
+    <p>Dos ${fmt(t.suorProduzidoMl, 1)} mL secretados, ${fmt(t.suorEvaporadoMl, 1)} mL evaporam e
+    ${fmt(t.suorEscorridoMl, 1)} mL não evaporam. O total secretado entra como perda hídrica.</p>
+  </details>`;
+}
+
+function usarDiaInteiro() {
+  janelaTermica.value = 'dia';
+  sincronizarJanela();
+}
+
+function sincronizarJanela() {
+  const zoom = !el('controle-janela-termica').hidden && janelaTermica.value === 'sessao';
+  instante.min = zoom ? '207' : '0';
+  instante.max = zoom ? '231' : '287';
+}
+
+function ativarIndicadoresTermicos(ativo) {
+  for (const [select, grupo, padrao] of [[indicador, termicasPeriodo, 'minPlasma'], [variavel, termicasDia, 'fc']]) {
+    for (const opt of select.options) {
+      if (Object.hasOwn(grupo, opt.value)) {
+        opt.disabled = !ativo;
+        opt.hidden = !ativo;
+      }
+    }
+    if (!ativo && Object.hasOwn(grupo, select.value)) select.value = padrao;
+  }
+  el('controle-janela-termica').hidden = !ativo;
+  el('resumo-termico').hidden = !ativo;
+  sincronizarJanela();
+}
+
 function mostrarInstante() {
   const i = Number(instante.value);
   const [nome, unidade, casas] = medidasDia[variavel.value];
   el('hora').value = hhmm(i);
   instante.setAttribute('aria-valuetext', hhmm(i));
-  desenharSerie(painelDia, curvas.map((a) => a.map((x) => valor(x, variavel.value))), curvas[0].length, i, hhmm, casas);
+  const inicio = Number(instante.min), fim = Number(instante.max);
+  desenharSerie(painelDia, curvas.map((a) => a.slice(inicio, fim + 1).map((x) => valor(x, variavel.value))),
+    fim - inicio + 1, i - inicio, (x) => hhmm(inicio + x), casas);
   const temBiofeedback = curvas.some((a) => a[i].ritmoOrientado);
   el('leitura-dia').innerHTML = curvas.map((a, j) => {
     const observacao = observacoes.get(chaveObservacao(j, i));
     return `<article class="leitura-cardio ${classe(j)}">
     <h3>Rotina ${j ? 'B' : 'A'}</h3>
     <p>${nome} <strong>${fmt(valor(a[i], variavel.value), casas)} ${unidade}</strong></p>
-    <p><strong>${a[i].atividade || (a[i].dormindo ? 'Em sono' : 'Em vigília')}</strong> · ${fmt(a[i].vigiliaContinua, 1)} h seguidas em vigília.</p>
+    <p><strong>${a[i].atividade || (a[i].dormindo ? 'Em sono' : a[i].exercicio ? 'Em exercício' : 'Em vigília')}</strong> · ${fmt(a[i].vigiliaContinua, 1)} h seguidas em vigília.</p>
     ${a[i].luzLux ? `<p>Luz programada: ${fmt(a[i].luzLux, 0)} lux.</p>` : ''}
     ${a[i].ritmoOrientado ? `<p>Ritmo programado: ${a[i].ritmoOrientado} ciclos/min. <a href="https://fisiologia.drmarionascimento.com.br/biofeedback-respiratorio.html">Abrir a prática de biofeedback</a></p>` : ''}
     ${observacao ? `<p>Frequência registrada: ${fmt(observacao.ciclos * 60 / observacao.segundos, 1)} ciclos/min.</p>` : ''}
     ${temBiofeedback ? `<button type="button" class="btn sec sm" data-observar="${j}">Contar minha respiração</button>` : ''}
+    ${contaDoCalor(a[i].termorregulacao)}
     <p>FC ${fmt(a[i].fc, 1)} bpm · plasma ${fmt(a[i].plasmaL, 3)} L · ADH ${fmt(a[i].renal.regulacao.adh, 1)} · glicemia ${fmt(a[i].glicemia, 1)} mg/dL.</p>
     </article>`;
   }).join('');
@@ -186,6 +249,7 @@ function recalcular({ comparacaoPausa = false } = {}) {
   configuracoes = opcoes;
   resultados = novosResultados;
   observacoes.clear();
+  ativarIndicadoresTermicos(novas.every((id) => PERFIS_TRAJETORIA[id].termico));
   prepararGrafico();
   dia.replaceChildren(...resultados[0].dias.map((x) => new Option(`Dia ${x.dia} · ${DIAS_AGENDA[(x.dia - 1) % 7]}`, x.dia)));
   dia.value = n > 1 && novas.some((id) => PERFIS_TRAJETORIA[id].noite) ? 2 : 1;
@@ -199,6 +263,7 @@ function recalcular({ comparacaoPausa = false } = {}) {
 
 perfis.forEach((s) => s.addEventListener('change', ajustarControles));
 function compararTurno(id, dias) {
+  usarDiaInteiro();
   perfis[0].value = 'regular';
   el('fase-circadiana').value = 'padrao';
   perfis[1].value = id;
@@ -212,7 +277,23 @@ function compararTurno(id, dias) {
   ajustarControles();
   recalcular();
 }
+el('atalho-termico').addEventListener('click', () => {
+  perfis[0].value = 'arSeco';
+  perfis[1].value = 'arUmido';
+  horizonte.value = '1';
+  passoGrafico.value = 'marcos';
+  janelaTermica.value = 'sessao';
+  el('fase-circadiana').value = 'padrao';
+  indicador.value = 'picoCentralC';
+  variavel.value = 'centralC';
+  instante.min = '207';
+  instante.max = '231';
+  instante.value = '216';
+  ajustarControles();
+  recalcular();
+});
 el('atalho-luz').addEventListener('click', () => {
+  usarDiaInteiro();
   perfis[0].value = 'luzSuave';
   perfis[1].value = 'luzIntensa';
   horizonte.value = '7';
@@ -227,6 +308,7 @@ el('atalho-luz').addEventListener('click', () => {
   mostrarDia();
 });
 el('atalho-pausa').addEventListener('click', () => {
+  usarDiaInteiro();
   const tipo = el('pausa-comparar').value;
   const cenarios = { biofeedback: 'pausaBiofeedback', meditacao: 'pausaMeditacao', oracao: 'pausaOracao' };
   perfis[0].value = 'pausaControle';
@@ -245,6 +327,7 @@ el('atalho-pausa').addEventListener('click', () => {
   mostrarDia();
 });
 el('atalho-escalas').addEventListener('click', () => {
+  usarDiaInteiro();
   perfis[0].value = 'escalaNoite';
   perfis[1].value = 'escalaFolgas';
   horizonte.value = '56';
@@ -273,11 +356,20 @@ passoGrafico.addEventListener('change', () => prepararGrafico(Number(dia.value))
 dia.addEventListener('change', mostrarDia);
 variavel.addEventListener('change', mostrarInstante);
 instante.addEventListener('input', mostrarInstante);
+janelaTermica.addEventListener('change', () => {
+  sincronizarJanela();
+  mostrarInstante();
+});
+painelDia.addEventListener('click', (evento) => {
+  const inicio = Number(instante.min);
+  instante.value = inicio + indiceNaSerie(painelDia, evento.clientX, Number(instante.max) - inicio + 1);
+  mostrarInstante();
+});
 el('exportar').addEventListener('click', () => {
   const chaves = Object.keys(medidas);
   const linhas = [['rotina', 'cenario', 'dia', ...chaves].join(';')];
   for (const [i, { dias }] of resultados.entries()) {
-    for (const p of dias) linhas.push([i ? 'B' : 'A', rotinas[i], p.dia, ...chaves.map((k) => p[k].toFixed(4).replace('.', ','))].join(';'));
+    for (const p of dias) linhas.push([i ? 'B' : 'A', rotinas[i], p.dia, ...chaves.map((k) => p[k]?.toFixed(4).replace('.', ',') ?? '')].join(';'));
   }
   const url = URL.createObjectURL(new Blob(['\ufeff', linhas.join('\r\n')], { type: 'text/csv;charset=utf-8' }));
   const a = document.createElement('a');

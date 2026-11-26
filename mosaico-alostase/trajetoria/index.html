@@ -28,6 +28,11 @@
     #observacao::backdrop { background: #05101bba; }
     #observacao label { display: block; margin: .5rem 0; }
     #observacao input { width: 5.5em; padding: .35rem; }
+    #grafico-dia { cursor: crosshair; }
+    .conta-termica { margin-top: .65rem; padding-top: .55rem; border-top: 1px solid #40536b; }
+    .conta-termica summary { cursor: pointer; font-weight: 700; }
+    .conta-termica ul { margin: .55rem 0; padding-left: 1.15rem; }
+    .conta-termica li { margin: .25rem 0; }
   </style>
 </head>
 <body>
@@ -80,6 +85,7 @@
         <button type="submit" class="btn ok">Calcular trajetórias</button>
         <div class="agenda-opcoes">
           <button type="button" class="btn sec sm" id="atalho-noite">Comparar uma noite em claro</button>
+          <button type="button" class="btn sec sm" id="atalho-termico">Comparar caminhada no ar seco e úmido</button>
           <button type="button" class="btn sec sm" id="atalho-luz">Comparar luz em cinco plantões</button>
           <button type="button" class="btn sec sm" id="atalho-escalas">Comparar folgas em 8 semanas</button>
           <button type="button" class="btn sec sm" id="atalho-turno">Comparar trabalho noturno em um ano</button>
@@ -91,6 +97,7 @@
         <p id="erro-agenda" role="alert" hidden></p>
       </form>
       <p id="situacao" role="status"></p>
+      <p id="resumo-termico" hidden>Mesma caminhada das 17h30 às 18h15, a 31 °C, a 40% do VO₂máx, com 300 mL de água ao terminar em ambas as rotinas. Muda apenas a umidade (25% ou 75%). As duas rotinas descansam por uma hora a 24 °C e 45% de umidade.</p>
       <p id="resumo-luz" hidden>Os dois cenários têm a mesma escala, as mesmas refeições e o mesmo sono. Muda apenas a luz das 0h às 2h durante os cinco plantões. Você pode carregar os dois modelos no editor para mudar outros horários, inclusive a volta para casa.</p>
       <p id="resumo-pausa" hidden>As duas rotinas têm a mesma escala. A rotina B recebe uma pausa na terça-feira, das 3h às 3h10.</p>
       <p id="resumo-escala" hidden>Nos três modelos de escala, estão programadas 40 h de trabalho e 56 h de sono por semana.</p>
@@ -116,6 +123,7 @@
         <label for="instante">Horário <output id="hora"></output></label>
         <input id="instante" type="range" min="0" max="287" value="219">
       </div>
+      <label id="controle-janela-termica" hidden>Janela do gráfico <select id="janela-termica"><option value="dia">Dia inteiro</option><option value="sessao">Caminhada e recuperação</option></select></label>
       <canvas id="grafico-dia" aria-hidden="true"></canvas>
       <div id="leitura-dia" class="duas-rotinas"></div>
     </section>
@@ -134,6 +142,7 @@
         <li>A adaptação da FC de repouso converge para uma redução de 4 bpm no cenário de treino. A magnitude é uma referência didática e a meia-vida de 28 dias é uma escolha do modelo. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6306777/">Reimers e colegas</a></li>
         <li>Os cenários de lazer e plantão isolam a vigília. Cafeína, álcool, iluminação e intensidade física exigem entradas específicas. O turno permanente usa 6 h de sono diurno programado como exemplo, e a agenda personalizada permite mudar essa duração.</li>
         <li>No ajuste circadiano parcial, o sono programado serve de aproximação para as pistas de horário. O atraso pode se aproximar de 6 h, com meia-vida didática de 3 dias para atrasar e 2 dias para voltar. A fase altera as curvas basais de cortisol, FC e PA. <a href="https://stacks.cdc.gov/view/cdc/187008/cdc_187008_DS1.pdf">Smith e Eastman, tabela 2</a></li>
+        <li>Nos cenários térmicos, o corpo é representado por dois compartimentos, central e pele. O cálculo combina produção metabólica de calor, perdas seca e respiratória e evaporação. A água de todo o suor entra no balanço hídrico. As temperaturas são estimativas didáticas. O cenário fixa roupa e movimento do ar e considera caminhada sem radiação solar direta. <a href="../conferencia/">Tabelas fisiológicas</a></li>
         <li>No modo de luz programada, a dose usa iluminância aproximada ao nível dos olhos e o horário em relação à fase biológica. O efeito satura e fica limitado a ±8 h no cenário didático. Horários sem exposição anotada valem 0 lux neste modo. <a href="../conferencia/">Conferir protocolos e hipóteses</a></li>
         <li>Meditação, oração e biofeedback respiratório ocupam tempo da agenda. O biofeedback exibe o ritmo programado quando ativo. O motor não aplica uma mudança automática de PA, FC ou cortisol por causa de uma pausa.</li>
         <li>O saldo de sono resume até sete dias de vigília em excesso como índice didático. Glicemia e cortisol reaproveitam os modelos de refeição, horário e exercício. A trajetória anual mostra a repetição das rotinas e a adaptação modelada da FC.</li>
@@ -153,6 +162,6 @@
       <button type="button" id="fechar-observacao" class="btn sec sm">Fechar</button>
     </form>
   </dialog>
-  <script src="./trajetoria.js?v=4" type="module"></script>
+  <script src="./trajetoria.js?v=5" type="module"></script>
 </body>
 </html>

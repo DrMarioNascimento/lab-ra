@@ -1,3 +1,13 @@
+const eixos = { esquerda: 58, direita: 20 };
+
+export function indiceNaSerie(canvas, clientX, pontos) {
+  const area = canvas.getBoundingClientRect();
+  const largura = area.width - eixos.esquerda - eixos.direita;
+  if (largura <= 0 || pontos < 2) return 0;
+  const fracao = (clientX - area.left - eixos.esquerda) / largura;
+  return Math.round(Math.max(0, Math.min(1, fracao)) * (pontos - 1));
+}
+
 export function desenharSerie(canvas, pares, pontos, selecionado, eixo, casas) {
   const w = canvas.clientWidth, h = canvas.clientHeight;
   const escala = devicePixelRatio || 1;
@@ -11,7 +21,7 @@ export function desenharSerie(canvas, pares, pontos, selecionado, eixo, casas) {
   const intervalo = Math.max(maior - menor, 10 ** (-casas) * 4);
   const baixo = menor - intervalo * 0.08;
   const alto = baixo + intervalo * 1.16;
-  const x = (i) => 58 + (w - 78) * (pontos > 1 ? i / (pontos - 1) : 0.5);
+  const x = (i) => eixos.esquerda + (w - eixos.esquerda - eixos.direita) * (pontos > 1 ? i / (pontos - 1) : 0.5);
   const y = (v) => h - 28 - (h - 48) * (v - baixo) / (alto - baixo);
   const num = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: casas });
 
@@ -22,8 +32,8 @@ export function desenharSerie(canvas, pares, pontos, selecionado, eixo, casas) {
   for (let i = 0; i <= 4; i++) {
     const valor = baixo + (alto - baixo) * i / 4;
     ctx.beginPath();
-    ctx.moveTo(58, y(valor));
-    ctx.lineTo(w - 20, y(valor));
+    ctx.moveTo(eixos.esquerda, y(valor));
+    ctx.lineTo(w - eixos.direita, y(valor));
     ctx.stroke();
     ctx.fillText(num.format(valor), 53, y(valor) + 4);
   }

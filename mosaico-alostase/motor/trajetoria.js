@@ -1,5 +1,5 @@
 // Motor contínuo da bancada integrada. Estado hídrico, excreção e pressão de sono atravessam a meia-noite.
-import { BEBIDAS_BASE, CENARIOS_HIDRICOS, PASSO_INTEGRADO, SESSAO, simularHidratacao } from './bancada-hidrica.js?v=3';
+import { BEBIDAS_BASE, CENARIOS_HIDRICOS, PASSO_INTEGRADO, SESSAO, simularHidratacao } from './bancada-hidrica.js?v=4';
 import { simularCardiovascular } from './cardiovascular.js?v=4';
 import { hidratar } from './hidratacao.js';
 import { cortisolBase, efeitoExercicioCortisol, efeitoRefeicaoGlicemia } from './motor.js';
@@ -27,6 +27,8 @@ export const PERFIS_TRAJETORIA = Object.freeze({
   pausaBiofeedback: { nome: 'Plantão · pausa de biofeedback', agenda: agendaComPausa('biofeedback'), ambiente: 'fresco' },
   pausaMeditacao: { nome: 'Plantão · pausa de meditação', agenda: agendaComPausa('meditacao'), ambiente: 'fresco' },
   pausaOracao: { nome: 'Plantão · pausa de oração', agenda: agendaComPausa('oracao'), ambiente: 'fresco' },
+  arSeco: { nome: 'Caminhada a 31 °C · ar seco (25%)', treino: true, ambiente: 'arSeco', termico: true },
+  arUmido: { nome: 'Caminhada a 31 °C · ar úmido (75%)', treino: true, ambiente: 'arUmido', termico: true },
   personalizada: { nome: 'Agenda personalizada', ambiente: 'fresco' },
 });
 const REFEICOES = Object.freeze([7.5, 13, 20].map((hora) => ({ hora, carboG: 50 })));
@@ -121,7 +123,7 @@ export function simularTrajetoria(perfilId, dias, { detalharDia = -1, frequencia
   const modelarLuz = Boolean(calendario && modo === 'luz');
   const saida = [];
   const baseCardio = new Map();
-  let agua = hidratar();
+  let agua = hidratar(), temperatura;
   let pressaoSono = 0.5, quedaFC = 0, sessoesAnteriores = calendario?.dia(-1).sessoes ?? [], vigiliaMin = 0, faseH = 0;
   let leitura = [];
   const saldosSono = [];
@@ -154,9 +156,10 @@ export function simularTrajetoria(perfilId, dias, { detalharDia = -1, frequencia
     const primeiraVigilia = (min) => janelasSono?.find(([inicio, fim]) => min >= inicio && min < fim)?.[1] ?? min;
     const bebidas = agendaLivre?.bebidas ?? (agenda ? BEBIDAS_BASE.map(([min, a, s]) => [primeiraVigilia(min), a, s]) : BEBIDAS_BASE);
     const refeicoes = agendaLivre?.refeicoes ?? (agenda ? REFEICOES.map((m) => ({ ...m, hora: primeiraVigilia(m.hora * 60) / 60 })) : REFEICOES);
-    const faseHidrica = simularHidratacao(cenario, { estado: agua, cardio, sessao, bebidas,
+    const faseHidrica = simularHidratacao(cenario, { estado: agua, estadoTermico: temperatura, cardio, sessao, bebidas,
       guardarPontos: dia === detalharDia, regular: regularRim, reposicaoAposSessao: !agendaLivre, limitarDominio: perfilId === 'personalizada' });
     agua = faseHidrica.estado;
+    temperatura = faseHidrica.estadoTermico;
     let picoGlicemia = 0, mediaCortisol = 0, pressaoAoAcordar = 0;
     let sonoMin = 0, vigiliaMaxMin = 0, atividadeNoturnaMin = 0, sonoDiurnoMin = 0, trabalhoNoturnoMin = 0, trabalhoMin = 0, noitesEmClaro = 0;
     let sonoForaFaseMin = 0, pausaMin = 0, biofeedbackMin = 0, luzLuxMin = 0;
@@ -251,6 +254,11 @@ export function agruparTrajetoria(dias) {
       trabalhoH: trecho.reduce((s, p) => s + p.trabalhoH, 0), sonoForaFaseH: media('sonoForaFaseH'),
       pausaMin: trecho.reduce((s, p) => s + p.pausaMin, 0), biofeedbackMin: trecho.reduce((s, p) => s + p.biofeedbackMin, 0),
       luzLuxH: trecho.reduce((s, p) => s + p.luzLuxH, 0),
+      ...(tipico.picoCentralC === undefined ? {} : {
+        picoCentralC: Math.max(...trecho.map((p) => p.picoCentralC)),
+        suorEvaporadoL: media('suorEvaporadoL'),
+        calorSessaoKJ: trecho.reduce((s, p) => s + p.calorSessaoKJ, 0),
+      }),
     });
   }
   for (let i = 0; i < 7; i++) adicionar(i, i + 1, `Dia ${i + 1}`, `D${i + 1}`);

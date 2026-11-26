@@ -3,7 +3,8 @@ import { resumirCardiovascular, simularCardiovascular } from '../motor/cardiovas
 import { PARAMETROS_HIDRICOS } from '../motor/hidratacao.js';
 import { regularRim } from '../motor/renal.js';
 import { simularSemana } from '../motor/semana.js';
-import { simularTrajetoria } from '../motor/trajetoria.js?v=4';
+import { simularTrajetoria } from '../motor/trajetoria.js?v=5';
+import { AREA_TERMICA_M2 } from '../motor/termorregulacao.js';
 
 const n = (v, casas = 1) => v.toLocaleString('pt-BR', { maximumFractionDigits: casas, minimumFractionDigits: casas });
 const pa = (p) => `${n(p.sis)} / ${n(p.dia)} mmHg`;
@@ -28,9 +29,22 @@ const soma = (dados, chave) => dados.dias.reduce((total, d) => total + d[chave],
 const plantaoLuzSuave = simularTrajetoria('luzSuave', 7);
 const plantaoLuzIntensa = simularTrajetoria('luzIntensa', 7);
 
+const termicos = ['arSeco', 'arUmido'].map((id) => simularTrajetoria(id, 1, { detalharDia: 0 }).leitura);
+const inicioCaminhada = SESSAO.inicio / 5;
+const termicoEm = (pontos, min) => pontos[inicioCaminhada + min / 5].termorregulacao;
+const exercicioTermico = (pontos, minutos) => pontos.slice(inicioCaminhada, inicioCaminhada + minutos / 5).map((p) => p.termorregulacao);
+const mediaCalor30 = (pontos) => exercicioTermico(pontos, 30).reduce((s, p) => s + p.armazenamentoW, 0) / (6 * AREA_TERMICA_M2);
+const fimExercicioC = termicos.map((pontos) => termicoEm(pontos, 45).centralC);
+const recuperacao15C = termicos.map((pontos) => termicoEm(pontos, 60).centralC);
+const evap45 = termicos.map((pontos) => exercicioTermico(pontos, 45).reduce((s, p) => s + p.suorEvaporadoMl, 0));
+const secretado45 = termicos.map((pontos) => exercicioTermico(pontos, 45).reduce((s, p) => s + p.suorProduzidoMl, 0));
+
 const fontes = {
   staessen: ['Staessen · 3.476 normotensos', 'https://pubmed.ncbi.nlm.nih.gov/1826069/'],
   speed: ['Speed · amostra ativa, medida em repouso', 'https://pubmed.ncbi.nlm.nih.gov/37115739/'],
+  termico: ['Che Muhamed e colegas · tabela 1, corredores treinados', 'https://doi.org/10.1080/23328940.2016.1182669'],
+  latente: ['Gagnon e colegas · calorimetria direta', 'https://pmc.ncbi.nlm.nih.gov/articles/PMC3690695/'],
+  recuperacao: ['Kenny e McGinn · tabela 1', 'https://doi.org/10.1152/japplphysiol.00517.2016'],
   suor: ['Baker · faixa em atletas', 'https://www.gssiweb.org/docs/default-source/sse-docs/baker_sse_161.pdf'],
   osmo: ['Fluids and Electrolytes · faixa laboratorial', 'https://www.ncbi.nlm.nih.gov/books/NBK610839/'],
   urina: ['MedlinePlus · cerca de 2 L de ingestão de líquidos', 'https://medlineplus.gov/ency/article/003425.htm'],
@@ -64,6 +78,12 @@ const tabelas = [
     ['Osmolalidade plasmática', '275–295 mOsm/kg', `${faixa(calor.pontos.map((p) => p.osmolalidade))} mOsm/kg`, 'Mínimo e máximo do dia no calor.', 'osmo'],
     ['Urina em 24 h', '0,8–2,0 L', `${n(fresco.totais.urinaL, 2)} L (fresco) / ${n(calor.totais.urinaL, 2)} L (calor)`, 'O cenário inclui 2,4 L de água de bebidas e refeições.', 'urina'],
     ['Filtração glomerular de repouso', '≈120 mL/min', `${n(tfgBasal)} mL/min`, 'Valor basal adotado no modelo.', 'tfg'],
+  ]],
+  ['Termorregulação no ar seco e úmido', [
+    ['Calor armazenado em 30 minutos', 'Em corrida a 31 °C e 70% do VO₂máx, 66,3 W/m² a 23% de umidade e 100,2 W/m² a 71% (n = 11).', `${n(mediaCalor30(termicos[0]))} W/m² no seco e ${n(mediaCalor30(termicos[1]))} W/m² no úmido.`, 'Mesma direção. A caminhada simulada usa 40% do VO₂máx e umidades de 25% e 75%.', 'termico'],
+    ['Temperatura central e recuperação', 'Em um protocolo de ciclismo a 24 °C e 49% de umidade, a temperatura esofágica subiu 0,7 °C em 45 min e estava 0,4 °C acima do repouso aos 15 min de recuperação.', `${n(fimExercicioC[0], 2)} → ${n(recuperacao15C[0], 2)} °C no seco e ${n(fimExercicioC[1], 2)} → ${n(recuperacao15C[1], 2)} °C no úmido.`, 'Comparação da ordem de grandeza e da recuperação. As temperaturas do motor são estimativas de um compartimento e os protocolos são distintos.', 'recuperacao'],
+    ['Resfriamento pela evaporação', 'A evaporação de 1 g de suor a 30 °C retira cerca de 2.426 J, nas condições da calorimetria direta.', `${n(100 * evap45[0] / secretado45[0], 0)}% do suor produzido evaporou no seco e ${n(100 * evap45[1] / secretado45[1], 0)}% no úmido durante a caminhada.`, 'Frações simuladas. Todo o suor produzido conta na perda hídrica. O resfriamento evaporativo usa somente a parcela evaporada.', 'latente'],
+    ['Produção total de suor', 'Após 30 min de corrida, a tabela apresenta 20,8 g/min a 23% e 19,4 g/min a 71%.', `${n(exercicioTermico(termicos[0], 30).reduce((s, p) => s + p.suorProduzidoMl, 0) / 30)} mL/min no seco e ${n(exercicioTermico(termicos[1], 30).reduce((s, p) => s + p.suorProduzidoMl, 0) / 30)} mL/min no úmido nos primeiros 30 min.`, 'O motor prevê mais secreção no úmido neste cenário. O estudo de corrida não mostrou a mesma diferença entre umidades. Intensidade, ventilação e amostra também diferem.', 'termico'],
   ]],
   ['Semanas e meses', [
     ['FC de repouso após treino de endurance', 'Redução média de 2,7–5,8 bpm entre análises por sexo', `−${n(quedaFC, 2)} bpm após 12 semanas`, 'Comparação de magnitude. A meta-análise reúne intervenções com durações diferentes. O motor usa uma meia-vida didática.', 'treino'],
