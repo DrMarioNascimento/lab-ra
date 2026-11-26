@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Restrição de sono e recuperação · Mosaico Alostase</title>
+  <link rel="stylesheet" href="../../jogo/estilo.css?v=9">
+  <link rel="stylesheet" href="../../cardiovascular/bancada.css">
+  <link rel="stylesheet" href="../../turno-calor/calor.css">
+  <style>.bancada select { max-width: 100%; } .bancada caption { padding: .5rem 0; text-align: left; }</style>
+</head>
+<body>
+  <main class="bancada">
+    <nav class="calor-nav">
+      <a href="../">← Tabelas fisiológicas</a>
+      <a href="../sono-pressao/">Sono contínuo e fragmentado</a>
+      <a href="../../turno-calor/escalas/">Escalas de 28 dias</a>
+    </nav>
+    <header class="abertura">
+      <h1>Restrição de sono e recuperação</h1>
+      <p>No estudo de Covassin e colegas, 20 jovens adultos passaram pelas duas condições de um ensaio cruzado. O controle teve 9 horas de oportunidade de sono. Na condição restrita, foram 9 noites de 4 horas e, depois, 3 noites com retorno às 9 horas.</p>
+    </header>
+    <section class="painel">
+      <h2>Pressão sistólica ao longo do protocolo</h2>
+      <p>O gráfico mostra a diferença entre restrição e controle, em mmHg. A linha contínua usa só os horários de sono. A tracejada acrescenta um efeito que se acumula durante a restrição e diminui na recuperação. Os círculos marcam os pontos do estudo.</p>
+      <div class="controle-hora">
+        <label>Medida <select id="metrica"></select></label>
+        <label>Meia-vida simulada na recuperação <select id="meia-vida">
+          <option value="1">1 dia</option>
+          <option value="2" selected>2 dias</option>
+          <option value="4">4 dias</option>
+        </select></label>
+      </div>
+      <canvas class="calor-curva" id="curva" aria-hidden="true"></canvas>
+      <p class="calor-legenda"><span>Contínua · só horários</span><span>Tracejada · com efeito acumulado</span></p>
+      <div class="controle-hora">
+        <label for="dia">Dia <output id="dia-rotulo"></output></label>
+        <input id="dia" type="range" min="1" max="16" value="15" step="1">
+      </div>
+      <table>
+        <thead><tr><th scope="col">No dia escolhido</th><th scope="col">Restrição − controle</th></tr></thead>
+        <tbody id="leitura"></tbody>
+      </table>
+    </section>
+    <section class="painel">
+      <h2>Conferência dos pontos medidos</h2>
+      <table id="tabela">
+        <caption id="medida"></caption>
+        <thead><tr><th scope="col">Dia</th><th scope="col">Estudo<br>IC de 95%</th><th scope="col">Só horários</th><th scope="col">Com efeito acumulado</th></tr></thead>
+        <tbody id="comparacao"></tbody>
+      </table>
+      <p id="criterio" class="calor-detalhe" aria-live="polite"></p>
+      <p><a href="https://pubmed.ncbi.nlm.nih.gov/34247512/">Covassin e colegas, 2021 · tabela 2 e figura 2</a></p>
+    </section>
+    <details class="painel">
+      <summary>Como foi feito o cálculo</summary>
+      <ul>
+        <li>Nos dias 1 a 4 ambos os cenários usam 22:00–07:00. Nos dias 5 a 13 o cenário de restrição usa 00:30–04:30. Nos dias 14 a 16 a janela volta a 22:00–07:00. As duas janelas têm o mesmo ponto médio de 02:30, e a fase circadiana do motor é fixa.</li>
+        <li>A comparação durante o sono usa 00:30–04:30. Durante a vigília, usa 07:00–22:00. O cálculo usa a janela programada como aproximação do sono efetivo medido no estudo.</li>
+        <li>O efeito acumulado aumenta a sistólica durante a janela de sono conforme o peso do sono no motor. Assume meia-vida de dois dias para o acúmulo. O único valor usado no ajuste foi a sistólica durante o sono comparável no dia 12.</li>
+        <li>As meias-vidas de recuperação selecionáveis são hipóteses para comparar trajetórias. Os pontos da recuperação e as médias de 24 horas foram reservados para conferência.</li>
+      </ul>
+    </details>
+  </main>
+  <script type="module" src="./restricao.js"></script>
+</body>
+</html>
