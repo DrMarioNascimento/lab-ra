@@ -1,5 +1,6 @@
 // Peças compostas dos veículos (cópias próprias): cada versão da sala dos veículos leva a bicicleta de roda alta ao lado, em escala real relativa.
 // Uso (pasta do gltf-transform): node pecas-compostas.mjs <pasta pecas> [saídas separadas por vírgula; sem isso, faz todas]
+// Revisão 14 (26/11/2026): GAL_B ganha também a rachadura fina do lado direito da máscara (o lado direito de quem olha a peça de frente), que o Lado a Lado e a comparação da foto citam: mesma técnica da inscrição (película da superfície, 1 mm acima, cor + relevo), só nos triângulos perto do traço, para o arquivo seguir abaixo de 800 KB.
 // Revisão 11 (26/11/2026): GAL_B ganha a inscrição da cópia gravada na testa da máscara (6 símbolos de icones/ui/glifos.svg, o 5º virado): uma película da própria superfície da testa, 1 mm acima dela, com textura de entalhe (cor + relevo). Precisa de sharp na pasta do gltf-transform.
 // Revisão 8 (25/11/2026): GAL_B = base de madeira com a redoma ao lado (GAL_B_base, modelo do autor, já em metros por escala-real.mjs) + a máscara de pedra (V11) em cima da base.
 // Revisão 4 (25/11/2026): composições das salas do Loop. GAL_A = máscara de pedra (V11) em cima de uma base; REL_A = relógio de caixa alta (R02) + relógio de parede (R01); DESC_A = sofá (V41) + quadro de recados (C02).
@@ -38,7 +39,7 @@ for (const [saida, principal] of Object.entries(COMBOS)) {
 
 // ---- salas do Loop: duas peças lado a lado, ou uma peça em cima de uma base feita aqui (caixa de madeira escura)
 const REAL2 = { V11: 0.45, R02: 2.0, R01: 1.1, V41: 2.0, C02: 1.5 };
-const LOOP = { GAL_B: { sobre: 'V11', maior: 0.6, cena: 'GAL_B_base', topo: { x: [-0.6, 0.25], z: [-0.35, 0.45], yMax: 1.12 }, testa: ['rosto','pedra','ver','noite','guardar-esp','tempo'] }, GAL_A: { sobre: 'V11', base: [0.5, 0.95, 0.5] }, REL_A: { lado: ['R02', 'R01'], gap: .35 }, DESC_A: { lado: ['V41', 'C02'], gap: .3 } };
+const LOOP = { GAL_B: { sobre: 'V11', maior: 0.6, cena: 'GAL_B_base', topo: { x: [-0.6, 0.25], z: [-0.35, 0.45], yMax: 1.12 }, testa: ['rosto','pedra','ver','noite','guardar-esp','tempo'], racha: true }, GAL_A: { sobre: 'V11', base: [0.5, 0.95, 0.5] }, REL_A: { lado: ['R02', 'R01'], gap: .35 }, DESC_A: { lado: ['V41', 'C02'], gap: .3 } };
 function caixa(doc, buf, [lx, ly, lz]) {   // caixa com base no chão (y de 0 a ly), 24 vértices com normal por face
  const x = lx / 2, z = lz / 2, P = [], N = [], I = [];
  const faces = [[[0,0,1],[[-x,0,z],[x,0,z],[x,ly,z],[-x,ly,z]]],[[0,0,-1],[[x,0,-z],[-x,0,-z],[-x,ly,-z],[x,ly,-z]]],[[1,0,0],[[x,0,z],[x,0,-z],[x,ly,-z],[x,ly,z]]],[[-1,0,0],[[-x,0,-z],[-x,0,z],[-x,ly,z],[-x,ly,-z]]],[[0,1,0],[[-x,ly,z],[x,ly,z],[x,ly,-z],[-x,ly,-z]]],[[0,-1,0],[[-x,0,-z],[x,0,-z],[x,0,z],[-x,0,z]]]];
@@ -67,7 +68,7 @@ async function texturasTesta(ordem) {
  const A = alt.data, nrm = Buffer.alloc(W * H * 3), k = 5 / 255, h = (x, y) => -A[Math.min(H - 1, Math.max(0, y)) * W + Math.min(W - 1, Math.max(0, x))];
  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) { let nx = -(h(x + 1, y) - h(x - 1, y)) * k / 2, ny = (h(x, y + 1) - h(x, y - 1)) * k / 2, nz = 1; const l = Math.hypot(nx, ny, nz), o = (y * W + x) * 3;
   nrm[o] = Math.round((nx / l * .5 + .5) * 255); nrm[o+1] = Math.round((ny / l * .5 + .5) * 255); nrm[o+2] = Math.round((nz / l * .5 + .5) * 255); }
- return { aspecto: W / H, cor: await sharp(C, { raw: { width: W, height: H, channels: 4 } }).webp({ quality: 82, alphaQuality: 85 }).toBuffer(), normal: await sharp(nrm, { raw: { width: W, height: H, channels: 3 } }).webp({ quality: 80 }).toBuffer() };
+ return { aspecto: W / H, cor: await sharp(C, { raw: { width: W, height: H, channels: 4 } }).webp({ quality: 78, alphaQuality: 80 }).toBuffer(), normal: await sharp(nrm, { raw: { width: W, height: H, channels: 3 } }).webp({ quality: 80 }).toBuffer() };
 }
 async function gravarTesta(doc, buf, noPeca, ordem) {
  let prim = null; noPeca.traverse(n => { const m = n.getMesh(); if (m && !prim) prim = m.listPrimitives()[0]; });
@@ -90,6 +91,50 @@ async function gravarTesta(doc, buf, noPeca, ordem) {
  let best = null; for (let i = 0; i < P.length / 3; i++) if (Math.abs(P[i*3]) < 0.05 && N[i*3+2] > 0.1) { const dv = v(i) - (v1 + 0.06); if (dv > 0 && (!best || dv < best.dv)) best = { dv, i }; }
  console.log('  inscrição na testa:', II.length / 3, 'triângulos; faixa v', V0.toFixed(3), '±', (HV / 2).toFixed(3), '; ponto acima da faixa (V11):', best && [P[best.i*3], P[best.i*3+1], P[best.i*3+2], N[best.i*3], N[best.i*3+1], N[best.i*3+2]].map(x => +x.toFixed(4)).join(','));
  return best && { p: [P[best.i*3], P[best.i*3+1], P[best.i*3+2]], n: [N[best.i*3], N[best.i*3+1], N[best.i*3+2]] };
+}
+// ---- rachadura fina (revisão 14). Coordenadas da V11 (sem escala), projeção de frente: u = x, v = y. Lado direito de quem olha = +x.
+// Desce da ponta direita da sobrancelha pela bochecha, passando longe do olho, com um galho curto; não encosta na inscrição nem no ponto da testa.
+const RACHA = { U0: 0.26, U1: 0.60, V0: -0.46, V1: 0.46, PX: 320, perto: 0.022, sobe: 0.004,
+ traco: [[0.45, 0.40], [0.41, 0.30], [0.44, 0.20], [0.38, 0.08], [0.41, -0.04], [0.35, -0.16], [0.38, -0.28], [0.33, -0.40]], galho: [[0.41, -0.04], [0.48, -0.10], [0.53, -0.13]] };
+function rachaLinhas() {   // o traço com quebras miúdas (fixas: mesma semente), em coordenadas da V11
+ let s = 11; const rnd = () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
+ const quebra = L => { const o = [L[0]]; for (let i = 1; i < L.length; i++) { const [a, b] = [L[i - 1], L[i]], dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy);
+  for (let k = 1; k <= 4; k++) { const f = k / 4, j = k < 4 ? (rnd() - .5) * 0.012 : 0; o.push([a[0] + dx * f - dy / l * j, a[1] + dy * f + dx / l * j]); } } return o; };
+ return [quebra(RACHA.traco), quebra(RACHA.galho)];
+}
+async function texturasRacha() {
+ const R = RACHA, W = Math.round((R.U1 - R.U0) * R.PX), H = Math.round((R.V1 - R.V0) * R.PX), [t, g] = rachaLinhas();
+ const d = L => 'M' + L.map(([x, y]) => ((x - R.U0) * R.PX).toFixed(1) + ' ' + ((R.V1 - y) * R.PX).toFixed(1)).join(' L');
+ const svg = (cor, l1, l2, fundo) => `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">${fundo ? `<rect width="100%" height="100%" fill="${fundo}"/>` : ''}<g fill="none" stroke="${cor}" stroke-linecap="round" stroke-linejoin="round"><path d="${d(t)}" stroke-width="${l1}"/><path d="${d(g)}" stroke-width="${l2}"/></g></svg>`;
+ // cor: fenda escura e fina, com a borda um pouco mais clara (pedra lascada); fora do traço, transparente
+ const borda = await sharp(Buffer.from(svg('#8d8475', 5.2, 3.4))).blur(0.7).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+ const miolo = await sharp(Buffer.from(svg('#1b1714', 2.6, 1.6))).blur(0.4).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+ const C = Buffer.alloc(W * H * 4); for (let i = 0; i < W * H; i++) { const ab = borda.data[i*4+3] / 255 * 0.35, am = miolo.data[i*4+3] / 255 * 0.92, a = am + ab * (1 - am);
+  for (let k = 0; k < 3; k++) C[i*4+k] = a ? Math.round((miolo.data[i*4+k] * am + borda.data[i*4+k] * ab * (1 - am)) / a) : 0; C[i*4+3] = Math.round(a * 255); }
+ // relevo: sulco (mais fundo no meio)
+ const alt = await sharp(Buffer.from(svg('#fff', 3.5, 2.4, '#000'))).greyscale().blur(1.3).raw().toBuffer({ resolveWithObject: true });
+ const A = alt.data, nrm = Buffer.alloc(W * H * 3), k = 6 / 255, h = (x, y) => -A[Math.min(H - 1, Math.max(0, y)) * W + Math.min(W - 1, Math.max(0, x))];
+ for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) { let nx = -(h(x + 1, y) - h(x - 1, y)) * k / 2, ny = (h(x, y + 1) - h(x, y - 1)) * k / 2, nz = 1; const l = Math.hypot(nx, ny, nz), o = (y * W + x) * 3;
+  nrm[o] = Math.round((nx / l * .5 + .5) * 255); nrm[o+1] = Math.round((ny / l * .5 + .5) * 255); nrm[o+2] = Math.round((nz / l * .5 + .5) * 255); }
+ return { cor: await sharp(C, { raw: { width: W, height: H, channels: 4 } }).webp({ quality: 70, alphaQuality: 60 }).toBuffer(), normal: await sharp(nrm, { raw: { width: W, height: H, channels: 3 } }).webp({ quality: 60 }).toBuffer(), linhas: [t, g] };
+}
+async function gravarRacha(doc, buf, noPeca) {
+ const tex = await texturasRacha(), R = RACHA;
+ let prim = null; noPeca.traverse(n => { const m = n.getMesh(); if (m && !prim && n.getName() !== 'inscricao') prim = m.listPrimitives()[0]; });
+ const P = prim.getAttribute('POSITION').getArray(), N = prim.getAttribute('NORMAL').getArray(), I = prim.getIndices().getArray();
+ const seg = (px, py, [ax, ay], [bx, by]) => { const dx = bx - ax, dy = by - ay, f = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy))); return Math.hypot(px - ax - f * dx, py - ay - f * dy); };
+ const dist = i => Math.min(...tex.linhas.flatMap(L => L.slice(1).map((b, k) => seg(P[i*3], P[i*3+1], L[k], b))));
+ const perto = i => N[i*3+2] > 0.1 && P[i*3+2] > -0.1 && dist(i) < R.perto;
+ const mapa = new Map(), PP = [], NN = [], UV = [], II = [];
+ const idx = i => { if (!mapa.has(i)) { mapa.set(i, PP.length / 3); for (let k = 0; k < 3; k++) { PP.push(P[i*3+k] + N[i*3+k] * R.sobe); NN.push(N[i*3+k]); } UV.push((P[i*3] - R.U0) / (R.U1 - R.U0), (R.V1 - P[i*3+1]) / (R.V1 - R.V0)); } return mapa.get(i); };
+ for (let t = 0; t < I.length; t += 3) { const [i0, i1, i2] = [I[t], I[t+1], I[t+2]]; if (perto(i0) || perto(i1) || perto(i2)) II.push(idx(i0), idx(i1), idx(i2)); }
+ const img = (b, n) => doc.createTexture(n).setImage(b).setMimeType('image/webp');
+ const mat = doc.createMaterial('rachadura').setBaseColorTexture(img(tex.cor, 'rachadura_cor')).setNormalTexture(img(tex.normal, 'rachadura_relevo')).setNormalScale(1.4).setRoughnessFactor(0.9).setMetallicFactor(0).setAlphaMode('BLEND');
+ for (const ti of [mat.getBaseColorTextureInfo(), mat.getNormalTextureInfo()]) ti.setWrapS(33071).setWrapT(33071);
+ const acc = (t, arr) => doc.createAccessor().setType(t).setArray(arr).setBuffer(buf);
+ const pr = doc.createPrimitive().setAttribute('POSITION', acc('VEC3', new Float32Array(PP))).setAttribute('NORMAL', acc('VEC3', new Float32Array(NN))).setAttribute('TEXCOORD_0', acc('VEC2', new Float32Array(UV))).setIndices(acc('SCALAR', new Uint32Array(II))).setMaterial(mat);
+ noPeca.addChild(doc.createNode('rachadura').setMesh(doc.createMesh('rachadura').addPrimitive(pr)));
+ console.log('  rachadura no lado direito:', II.length / 3, 'triângulos; texturas', tex.cor.length, '+', tex.normal.length, 'bytes');
 }
 for (const [saida, cfg] of Object.entries(LOOP)) {
  if (SO.length && !SO.includes(saida)) continue;
@@ -114,6 +159,7 @@ for (const [saida, cfg] of Object.entries(LOOP)) {
   const it = await por(cfg.sobre); it.no.setTranslation([mx - cx(it), topo - it.b.min[1]*it.e, mz - cz(it)]); console.log('  tampo da base a', topo.toFixed(3), 'm; centro', mx.toFixed(3), mz.toFixed(3));
   if (cfg.testa) { TESTA.tex = await texturasTesta(cfg.testa); const pt = await gravarTesta(doc, buf, it.no, cfg.testa);
    if (pt) { const T = it.no.getTranslation(), e = it.e, w = pt.p.map((c, k) => T[k] + c * e); console.log('  ponto da inscrição na peça (m):', w.map(x => +x.toFixed(4)).join(','), 'normal', pt.n.map(x => +x.toFixed(3)).join(',')); } }
+  if (cfg.racha) await gravarRacha(doc, buf, it.no);
  }
  else if (cfg.sobre) { const it = await por(cfg.sobre); raiz.addChild(caixa(doc, buf, cfg.base)); it.no.setTranslation([-cx(it), cfg.base[1] - it.b.min[1]*it.e, -cz(it)]); }
  else { const [p, v] = [await por(cfg.lado[0]), await por(cfg.lado[1])], total = w(p) + cfg.gap + w(v), x0 = -total / 2;

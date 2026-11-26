@@ -1,5 +1,5 @@
 {
- "versao": "v4 revisão 13 (26/11/2026)",
+ "versao": "v4 revisão 14 (26/11/2026)",
  "noite": "v4",
  "causa_sorteada": "B_potencia",
  "causas_possiveis": [
@@ -5589,7 +5589,7 @@
   {
    "id": "par_foto",
    "sala": "fotografia",
-   "texto": "Você acha a foto grande do catálogo da peça principal. Para comparar, alguém precisa estar na frente da peça.",
+   "texto": "Você acha a foto grande do catálogo da peça principal: pedra escura, riscos finos, bordas gastas. Para comparar, alguém precisa estar na frente da peça.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -6342,7 +6342,7 @@
   {
    "id": "conserto_C",
    "sala": "prototipo",
-   "texto": "A peça de 300 anos deita no apoio. Registro {reg}, trocada no dia {dia}. A máquina entende há quantos dias segurava a peça errada e solta. A luz da peça fica verde e não pisca mais. Lá em cima, a base para de apitar. Agora o botão \"Loop Reset\" responde.",
+   "texto": "A peça de 300 anos deita no apoio. Registro {reg}, trocada no dia {dia}. A máquina para de puxar. A luz da peça fica verde e não pisca mais. Lá em cima, a base para de apitar. Agora o botão \"Loop Reset\" responde.",
    "volta_min": 5,
    "volta_max": 5,
    "segundo_min": 0,
@@ -6408,7 +6408,7 @@
   {
    "id": "conserto_D",
    "sala": "prototipo",
-   "texto": "F2 no encaixe. Os três pontos: {ordem_txt}. O disjuntor arma com um estalo e a luz do museu firma. Você refez o que o Téo desfez, do jeito que ele pediu. Agora o botão \"Loop Reset\" responde.",
+   "texto": "F2 no encaixe. Os três pontos: {ordem_txt}. O disjuntor arma com um estalo e a luz do museu firma. Agora o botão \"Loop Reset\" responde.",
    "volta_min": 5,
    "volta_max": 5,
    "segundo_min": 0,
@@ -6892,7 +6892,7 @@
   {
    "id": "teo_cadeira",
    "sala": "manutencao",
-   "texto": "A cadeira do Téo está vazia, com o crachá dele preso no encosto. Na mesa, a marmita fechada. Ele não voltou para jantar.",
+   "texto": "A cadeira do Téo está vazia, com o crachá dele preso no encosto. Na mesa, a marmita fechada.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -8504,7 +8504,7 @@
   {
    "id": "lenz_3",
    "sala": "deposito",
-   "texto": "Ao lado do Téo, a pegada de sola lisa começa dentro da tinta. Quem pisou aqui estava de frente para ele, a um braço de distância.",
+   "texto": "Ao lado do Téo, a pegada de sola lisa começa dentro da tinta, com a ponta virada para ele. Entre a pegada e o ombro dele, cabe um braço esticado.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -9028,7 +9028,7 @@
   {
    "id": "e_hist_1",
    "sala": "eletrica",
-   "texto": "No verso da ordem de serviço do gerador, a letra da Dra. Sato: \"Zerada E sem força? Então ninguém liga isto sem mim. Ninguém.\" Alguém ligou.",
+   "texto": "No verso da ordem de serviço do gerador, a letra da Dra. Sato: \"Zerada E sem força? Então ninguém liga isto sem mim. Ninguém.\"",
    "previa": "Verso da ordem de serviço",
    "volta_min": 1,
    "volta_max": 5,
@@ -9814,7 +9814,7 @@
     "A": {
      "titulo": "A peça exposta",
      "itens": [
-      "rachadura do lado direito",
+      "rachadura fina do lado direito",
       "pedra cinza, mais clara",
       "bordas inteiras, sem desgaste"
      ]

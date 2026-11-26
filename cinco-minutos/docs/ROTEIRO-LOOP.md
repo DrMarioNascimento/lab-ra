@@ -49,7 +49,7 @@ Os dias e os números abaixo são os do exemplo (dia 14, registro 472). Em cada 
 
 ### O pendrive do Nico
 
-A senha é o **número de registro** da peça verdadeira, o número gravado embaixo da base. Nico só entrega da volta 4 em diante, a quem diz esse número e já falou com ele, já contou do Téo caído e já leu o laudo: o Téo pediu "só se eu não aparecer, e só para quem souber o número certo".
+A senha é o **número de registro** da peça verdadeira, o número gravado embaixo da base. Nico só entrega da volta 4 em diante, a quem diz esse número e já falou com ele, já viu o Téo caído e já leu o laudo: o Téo pediu "só se eu não aparecer, e só para quem souber o número certo".
 
 No rádio da Sala dos sons, a voz do Téo não acusa ninguém pelo nome e não sabe nada do que veio depois: "Ontem o do patrocínio me estendeu um envelope pra eu 'não ter carregado nada'. Eu não peguei. Hoje eu falo com ele, cara a cara. Se eu não aparecer, não deixa a noite acabar sem prova." O nome, quem fecha é você.
 
@@ -134,7 +134,7 @@ Cada volta tem três camadas: o **agora** (o que você vê), o **antes** (o que 
 - **Na Máquina:** na aba Revelar, a prova "de quem era a mão" pode ganhar o selo "tem". Na aba Atividades entra Acusação e Defesa.
 
 ### Volta 4 — "Ensaio geral"
-- **Agora:** Nico, enfim, reage ao número de registro e entrega o pendrive (você já contou do Téo caído e já leu o laudo); no rádio da Sala dos sons, a voz do Téo. Na escada, perto das 4:10, o homem de paletó para um segundo quando você diz, alto, que a peça é cópia: "Ninguém quer confusão hoje. Nem você." Na Central de monitoramento, alguém já pode confirmar em voz alta quem está onde.
+- **Agora:** Nico, enfim, reage ao número de registro e entrega o pendrive (você já viu o Téo caído e já leu o laudo); no rádio da Sala dos sons, a voz do Téo. Na escada, perto das 4:10, o homem de paletó para um segundo quando você diz, alto, que a peça é cópia: "Ninguém quer confusão hoje. Nem você." Na Central de monitoramento, alguém já pode confirmar em voz alta quem está onde.
 - **Antes:** as peças que faltam do motivo e do engano: a ata com "então apaga?" e o guardanapo no bolso do paletó reserva.
 - **Próximo loop:** o conserto roda como **ensaio**. A máquina responde "REAGE" ou "NÃO REAGE". Se algum valor estiver errado, ela só diz quantos estão certos, nunca qual. E avisa o que ainda pode falhar na hora de valer.
 - **Na Máquina:** a resposta do ensaio ("ENSAIO (em dupla): A MÁQUINA REAGE. Não valeu ainda: repita na volta 5."). Em sala, na pausa, cada pessoa toca no seu papel da última volta.
@@ -170,7 +170,7 @@ O clarão acerta o para-raios. A chave treme e quer abrir. Quem está no Pátio 
 A virada da cena: durante quatro voltas o apagão foi o seu inimigo. Na quinta, o raio que você só anotava vira **a força que faltava**.
 
 ### Cena do pendrive — "A voz"
-Da volta 4 em diante, para quem já contou do Téo caído e já leu o laudo. Você diz o número de registro. Nico pisca, como quem acorda. Pela primeira vez ele não pede desculpa: "É isso. O Téo falou: só para quem souber o que está gravado embaixo da verdadeira." E põe o pendrive na sua mão. No rádio, o Téo fala com você sem te conhecer: "Você achou o número. Então escuta: a da Galeria é cópia. Hoje eu falo com ele, cara a cara. Se eu não aparecer, não deixa a noite acabar sem prova."
+Da volta 4 em diante, para quem já viu o Téo caído e já leu o laudo. Você diz o número de registro. Nico pisca, como quem acorda. Pela primeira vez ele não pede desculpa: "É isso. O Téo falou: só para quem souber o que está gravado embaixo da verdadeira." E põe o pendrive na sua mão. No rádio, o Téo fala com você sem te conhecer: "Você achou o número. Então escuta: a da Galeria é cópia. Hoje eu falo com ele, cara a cara. Se eu não aparecer, não deixa a noite acabar sem prova."
 
 ### Cena da caixa — "Pesa demais para banner"
 Em toda noite. Na Sala das coleções, numa das caixas etiquetadas da estante, você empurra a caixa do patrocínio: "BANNERS – NÃO ABRIR". Pesa demais pra banner. Da volta 2 em diante, com o cheiro de verniz no caderno, você tem motivo para abrir. Dentro da manta está a peça de 300 anos. Cheira a pó, não a verniz. Embaixo da base, o número gravado; na testa, a frase inteira, sem nenhum símbolo virado. A caixa é fato do crime em qualquer partida, e a peça verdadeira na mão vale como prova de que a da Galeria é cópia; na noite da peça presa (causa C) ela também é a ferramenta do conserto.
@@ -185,7 +185,7 @@ Só nas noites em que falta ajustar (A e E). Depois de ver os mostradores piscan
 Só nas noites em que falta força (B e E). Depois de ver a força faltando, você repara na ordem de serviço colada no gerador, na Oficina elétrica: "Regular para o mínimo durante a montagem. Economia pedida pelo patrocínio para a festa." Na Recepção, um e-mail impresso do patrocínio repete: "Gerador no mínimo até a festa. Cada litro de diesel sai do nosso bolso." Quem deixou a máquina sem fôlego foi a mesma pressa que trocou a peça.
 
 ### Cena dos dois defeitos — "Ninguém liga isto sem mim"
-Só na noite de dois defeitos (E). Depois da tranca e do gerador, você descola a ordem de serviço e lê o verso, com a letra da Dra. Sato: "Zerada E sem força? Então ninguém liga isto sem mim. Ninguém." Alguém ligou.
+Só na noite de dois defeitos (E). Depois da tranca e do gerador, você descola a ordem de serviço e lê o verso, com a letra da Dra. Sato: "Zerada E sem força? Então ninguém liga isto sem mim. Ninguém." (E a Câmara está ligada.)
 
 ### Cena do papel — "Só depois de provar"
 Só na noite do circuito (D), e só depois de você ver um sinal da caixa de fusíveis (antes disso, você não mexe nele sem motivo). Na mão fechada do Téo tem um papel dobrado. Você abre devagar: "Ordem pra religar: 3-1-2. Só depois de provar o que aconteceu." (A ordem muda a cada partida.)
@@ -444,7 +444,7 @@ Vale sobre o que estiver escrito acima, nas partes 9 a 14. Nada do enredo mudou:
 - **Apagão Combinado.** Quem está no Pátio segura a chave geral "do lado de fora da porta do Quadro externo" (a porta, presa pelo cadeado da trava, continua fechada).
 - **Nico.** Antes do laudo, ele diz que só entrega "depois do laudo no papel" (na revisão 11 a fala ganhou o tropeço dele: "Ele pediu... espera.").
 - **Pendrive.** "Você achou o número. Então escuta: a da Galeria é cópia." (achar o número não prova a cópia sozinho).
-- **Minijogos.** A fita da porta de serviço pergunta se a pessoa de paletó entra ou sai, sem depender da escala (na revisão 9 a pista vira as gotas no tapete, parte 16). A foto antiga oferece quatro coisas que se gravam numa base; a caixa oferece quatro cheiros. Na luz rasante, o que aparece é "O verniz brilha por igual, de ponta a ponta".
+- **Minijogos.** A fita da porta de serviço pergunta se a pessoa de paletó entra ou sai, sem depender da escala (na revisão 9 a pista vira as gotas no tapete, parte 16). A foto antiga oferece quatro coisas que se gravam numa base; a caixa oferece quatro cheiros (revisão 14: quatro etiquetas, parte 20). Na luz rasante, o que aparece é "O verniz cobre tudo por igual, até o grão da pedra. Nenhuma borda gasta, nenhum risco de uso." (revisão 14; até a revisão 13, "O verniz brilha por igual, de ponta a ponta", que a imagem da máscara fosca desmentia).
 - **Dicionário.** "Base da peça": o suporte, e "embaixo da base" de uma peça é o fundo dela, onde fica o número.
 - **Finais.** No telão, "A noite andou" não fala mais da caixa de "banners" (na noite C a peça verdadeira fica no apoio). No Ouro, o Aurélio olha para a base, na Galeria (ele não sai de lá); na revisão 9, a notícia das provas chega até ele (parte 8).
 - **Entrada.** "Cinco minutos. A mesma noite. O museu recomeça. Você não." nas três páginas.
@@ -493,10 +493,24 @@ Vale sobre o que estiver escrito acima, nas partes 9 a 18. A rodada 10 passou em
 
 - **Pátio, uma palavra para cada coisa.** "Chavinha" agora é só a chave do cadeado da porta do Quadro externo. Embaixo do medidor redondo fica **o interruptor do ponteiro de potência** (`a_cheia_4`: ligado; `fh_med_pot_bce` e `fh_med_pot_d`: desligado, com o papel "aferir depois da festa").
 - **Noite D, quadro aberto.** "Na mesma chave, um segundo cadeado, amarelo, pendurado aberto." (a chave do cabo grosso do para-raios, que é o cabo que vai para a Câmara).
-- **A comparação bate com a peça 3D.** A máscara da Galeria é fosca e granulada. A diferença que se vê na foto do catálogo é o **desgaste nas bordas**: na foto, bordas gastas; na peça exposta, bordas inteiras, sem desgaste (`foto_solo`, `coop_copia_ok` e a tela da peça no Lado a Lado: "pedra cinza, mais clara", "bordas inteiras, sem desgaste"). O lado da rachadura e a cor da pedra continuam. A prova é a mesma: a peça exposta não tem as marcas da foto.
+- **A comparação bate com a peça 3D.** (Revisão 14: a rachadura fina do lado direito agora está desenhada na máscara 3D; parte 20.) A máscara da Galeria é fosca e granulada. A diferença que se vê na foto do catálogo é o **desgaste nas bordas**: na foto, bordas gastas; na peça exposta, bordas inteiras, sem desgaste (`foto_solo`, `coop_copia_ok` e a tela da peça no Lado a Lado: "pedra cinza, mais clara", "bordas inteiras, sem desgaste"). O lado da rachadura e a cor da pedra continuam. A prova é a mesma: a peça exposta não tem as marcas da foto.
 - **Narrador sem conclusão.** Saíram "Vale pôr ao lado da máscara da Galeria." (`insc_verdadeira`), "O museu esqueceu. O chão guardou." (`chao_peca`) e "O museu não guardou nada." (`mancha_2`). O fato de cada pista ficou.
 - **Fita do telão.** "A peça da Galeria é cópia: verniz novo, peso e escrita errados" (a inscrição também conta).
-- **Frases da sala.** Pátio: "Dá para ouvir a chuva fina." (a peça tem a pedra, não a chuva caindo). Oficina técnica: "Num canto, longe da bancada, a cadeira vazia do Téo." (a cadeira fica fora da peça 3D).
+- **Frases da sala.** Pátio: "Dá para ouvir a chuva fina." (a peça tem a pedra, não a chuva caindo; revisão 14: "A tempestade não para, e a pedra está toda molhada."). Oficina técnica: "Num canto, longe da bancada, a cadeira vazia do Téo." (a cadeira fica fora da peça 3D).
 - **Minijogos.** Caixa de banners: a segunda dica aponta para o caderno ("No caderno, procure a pista “A peça principal”."), sem dizer a resposta. Antes da luz: "Pelo que você já anotou e leu sobre a peça principal, o que a luz de lado deveria mostrar nela?", com a dica do "Dicionário das palavras" (idade da peça). Na luz de lado, a imagem é a máscara da Galeria com a inscrição na testa.
 - **A testa à vista desde a volta 1 (intencional).** A peça 3D da Galeria mostra a inscrição em todas as voltas e em todas as noites: a máscara é cenário, qualquer pessoa pode olhar. Sozinha ela não prova nada: só com a tábua dá para ver o símbolo virado, e a prova só entra no caderno com a pista "Inscrição na máscara", da volta 2.
 - **Dicionário.** "Inscrição: frase escrita na própria peça, com símbolos." (a da cópia é riscada, não gravada na pedra).
+
+## 20. O que mudou na revisão 14 (26/11/2026) · lote 12
+
+Vale sobre o que estiver escrito acima, nas partes 9 a 19. Nada do enredo mudou: nenhuma regra, tranca, volta, horário, fonte, rótulo ou "quem, como e por quê". As 5 causas seguem com o mesmo peso.
+
+- **A luz de lado bate com a imagem.** A máscara da Galeria é pedra fosca, granulada, com verniz fino por cima. Na posição certa da luz: "O verniz cobre tudo por igual, até o grão da pedra. Nenhuma borda gasta, nenhum risco de uso." O cheiro de verniz (`falsa_1`), o laudo ("Verniz novo") e a peça verdadeira ("Cheira a pó, não a verniz") já combinavam com verniz fino e ficam iguais.
+- **A rachadura é da peça exposta.** O Lado a Lado diz que a peça da Galeria tem a rachadura do lado direito e a foto, do lado esquerdo. Agora a máscara 3D mostra essa rachadura: fina, do lado direito de quem olha, descendo da sobrancelha pela bochecha; dá para ver chegando perto. Na tela da peça: "rachadura fina do lado direito".
+- **Uma chuva só: tempestade.** Pátio: "A tempestade não para, e a pedra está toda molhada." Combina com a estrada fechada, o raio, "Chuva feia, hein?" e "chove desde o começo da noite".
+- **Foto grande do catálogo.** `par_foto` diz como a peça verdadeira aparece: "pedra escura, riscos finos, bordas gastas" (o mesmo da tela da foto no Lado a Lado). Prova continua sendo comparar com a peça.
+- **Minijogos que só o caderno decide.** Antes da luz (só para quem tem a foto grande no caderno): "Como é a peça de verdade, nessa foto?", com 4 combinações de cor, superfície e bordas. Caixa da estante: "Pelo que o seu caderno diz da caixa do patrocínio, qual você abre?", com 4 etiquetas (BANNERS – NÃO ABRIR, MOLDURAS – FRÁGIL, LÂMPADAS – NÃO EMPILHAR, CATÁLOGOS – NÃO MOLHAR). As dicas mandam para o caderno.
+- **Narrador sem conclusão.** `conserto_C` ("A máquina para de puxar."), `conserto_D` (sem "Você refez o que o Téo desfez"), `lenz_3` ("com a ponta virada para ele. Entre a pegada e o ombro dele, cabe um braço esticado."), `e_hist_1` (sem "Alguém ligou."), `teo_cadeira` (sem "Ele não voltou para jantar.").
+- **Telas da Máquina no tom do jogo.** "Você marcou 3 de 3: ...", "Quase." (no lugar de "MEIO CERTO"), o diagnóstico aceito diz o que os sinais mostram (sem "Você não chutou"), botão "Revelar agora".
+- **Desfecho no celular.** Embaixo das 3 provas, as fichas dos fatos da noite que vieram do caderno daquela pessoa, com a mesma miniatura da fita do telão.
+- **Planta.** No Térreo, a Sala das esculturas aparece fechada, em reforma (hachura, fita na porta, cadeado), sem toque, com a porta de vidro para a Área de descanso e a escada do Subsolo ao lado (é por essa porta que a pista `pose` vê a escultura apontando para a escada). Igual em todas as noites e voltas.

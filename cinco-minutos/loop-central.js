@@ -89,9 +89,9 @@ function lcPreConf(){
  let sin = [], sis = 0, out = 0, comp = 0; for (const c of marc) { const e = (c.etq || '').toUpperCase(); if (e.startsWith('SINAL')) sin.push(e); else if (e.startsWith('LEITURA COMPLETA')) comp++; else if (e.startsWith('LEITURA')) sis++; else out++; }
  if (comp) { el.textContent = 'Você marcou a leitura completa do painel: ela vale sozinha. Falta escolher o defeito.'; return; }
  const tipos = new Set(sin).size, ok = marc.length === 3 && sin.length === 2 && tipos === 2 && sis === 1;
- let m = 'Marcadas: ' + marc.length + ' de 3 · sinais: ' + sin.length + ' (' + tipos + ' tipo' + (tipos === 1 ? '' : 's') + ') · leitura normal: ' + sis + (out ? ' · outras: ' + out : '') + '.';
+ let m = 'Você marcou ' + marc.length + ' de 3: ' + sin.length + (sin.length === 1 ? ' sinal' : ' sinais') + ' (' + tipos + ' tipo' + (tipos === 1 ? '' : 's') + '), ' + sis + (sis === 1 ? ' leitura normal' : ' leituras normais') + (out ? ' e ' + out + (out === 1 ? ' outra' : ' outras') : '') + '.';
  if (marc.length === 3 && !ok) { if (out) m += ' Pista sem etiqueta de sinal ou de leitura normal não conta.'; if (sin.length === 2 && tipos < 2) m += ' Os dois sinais têm a mesma etiqueta: valem um só.'; else if (sin.length !== 2) m += ' Precisa de 2 sinais.'; if (sis !== 1) m += ' Precisa de 1 leitura normal.'; }
- if (ok) m += ' Forma certa. Falta ver se o defeito é esse.';
+ if (ok) m += ' Assim está certo. Falta ver se o defeito é esse.';
  el.textContent = m;
 }
 document.addEventListener('change', e => { if (e.target && e.target.name === 'lcprova') lcPreConf(); });
@@ -208,11 +208,11 @@ function lcAnexar(causa, ids){
  const v = lcValidaAnexo(causa, ids);
  s.anexos[state.loop] = causa;
  if (!v.ok) { save(); return 'Ainda não.' + (completa ? '' : ' ' + v.msg) + '\n' + v.linhas.join('\n') + '\nNova tentativa na próxima volta.'; }
- if (lcCausa() === 'E_dois' && (causa === 'A_calibrar' || causa === 'B_potencia')) { save(); return 'MEIO CERTO: as provas combinam, mas a máquina só dá um tranco e o aviso muda de lugar. Mudou, não sumiu. A tentativa desta volta foi gasta.'; }
+ if (lcCausa() === 'E_dois' && (causa === 'A_calibrar' || causa === 'B_potencia')) { save(); return 'Quase. As provas combinam, mas a máquina só dá um tranco e o aviso muda de lugar. Mudou, não sumiu. A tentativa desta volta foi gasta.'; }
  if (causa !== lcCausa()) { save(); return 'As provas até combinam, mas A MÁQUINA NÃO REAGE: o defeito escolhido não é esse. Releia os sinais do caderno antes da próxima tentativa. (A tentativa desta volta foi gasta.)'; }
  s.diag = {volta:state.loop}; save();
  return 'DIAGNÓSTICO ANEXADO.' + (v.msg ? ' ' + v.msg : '') + (state.room === 'prototipo' ? ' No interfone, a Dra. Sato quase sussurra: "Quem fez isso? Ela... ela escutou você." ' : ' Lá embaixo, a Câmara dá um estalo, como quem escuta. ') +
-  (v.msg ? 'Você não chutou: dois sinais diferentes apontando para o mesmo lado e uma leitura dizendo "aqui não é".' : 'Você não chutou: a leitura completa do painel mostrou o defeito e você soube dar nome a ele.') + ' O conserto da máquina pode acender.';
+  (v.msg ? 'Os seus dois sinais apontam para o mesmo lado, e a sua leitura normal diz "aqui não é".' : 'A leitura completa do painel mostrou o defeito, e você deu nome a ele.') + ' Agora o conserto da máquina pode acender.';
 }
 function lcFaltas(A){
  const e = A.entrada, f = [];
@@ -276,7 +276,15 @@ function lcResumoFinal() {
  const s = lcS(), final = lcFinal();
  const provas = '<div class="lc-fim-provas">' + ['prova_falsa','trajeto','cracha'].map(g => '<span class="' + (lcTemGrupo(g) ? 'ok' : 'falta') + '">' + lcFicha(LC_PV_IC[g], 'sm').replace(' loading="lazy"', '') + esc(LC.grupos_fonte[g].rotulo.charAt(0).toUpperCase() + LC.grupos_fonte[g].rotulo.slice(1)) + '</span>').join('') + '</div>';
  return '<div class="result-card loop-ending"><p class="kicker">DESFECHO DA MÁQUINA</p><h3>' + esc(LOOP_FINAL_NOME[final] || final) + '</h3>' + lcFichasFinal() + '<p>' +
-  esc(lcFinalTxt(final) || loopFinalTexto(final, [{loopSato:lcTem('sato_teo'), loopTeo:lcTem('teo_1')}])) + '</p><p class="kicker">AS 3 PROVAS NO SEU CADERNO</p>' + provas + '</div>';
+  esc(lcFinalTxt(final) || loopFinalTexto(final, [{loopSato:lcTem('sato_teo'), loopTeo:lcTem('teo_1')}])) + '</p><p class="kicker">AS 3 PROVAS NO SEU CADERNO</p>' + provas + lcFatosFinal() + '</div>';
+}
+// fatos da noite que vieram do caderno desta pessoa (os mesmos da fita do telão, com a mesma miniatura), em fichas curtas
+const LC_FATO_CURTO = {troca:'A troca da peça', motivo:'O dinheiro do seguro', copia:'A cópia na Galeria', entrada:'A volta pela porta de serviço', teo:'O empurrão no Téo', raio:'O raio e o apagão', passagem:'A descida ao Subsolo', cracha:'A mão no crachá', engano:'O engano com a Câmara'};
+function lcFatosFinal() {
+ const L = typeof LOOP_LINHA !== 'undefined' ? LOOP_LINHA : Object.keys(LC_FATO_CURTO).map(id => ({id, ic:'ui/caderno'})), meus = new Set(window.lcFatos ? window.lcFatos() : []), ach = L.filter(f => meus.has(f.id));
+ const ficha = (ic, t, cls) => '<li class="' + cls + '">' + lcFicha('img:' + ic).replace(' loading="lazy"', '') + '<span>' + esc(t) + '</span></li>';
+ return '<p class="kicker">O QUE O SEU CADERNO TROUXE · ' + ach.length + ' DE ' + L.length + ' FATOS</p><ul class="lc-fim-fatos">' +
+  (ach.length ? ach.map(f => ficha(f.ic, LC_FATO_CURTO[f.id] || f.txt, 'ok')).join('') : ficha('ui/fato-falta', 'Nenhum fato da noite saiu do seu caderno desta vez.', 'falta vazio')) + '</ul>';
 }
 
 function lcPodeEncaminharPeca() {
@@ -366,7 +374,7 @@ function lcPainelHtml(aba){
   const pv = ['prova_falsa','trajeto','cracha'];
   h += '<ul class="lc-lista lc-p3">' + pv.map(g => { const tem = lcTemGrupo(g); return '<li class="' + (tem ? 'ok' : 'falta') + '">' + lcFicha(PV_IC[g]) + '<div><b>' + esc(LC.grupos_fonte[g].rotulo) + '</b><small>' + (tem ? 'Está no seu caderno.' : LC_ONDE[g]) + '</small></div><i class="lc-selo">' + (tem ? '✓ tem' : 'falta') + '</i></li>'; }).join('') + '</ul>';
   h += s.revelado ? '<p class="lc-ok">' + (s.revelado.ok ? 'Três provas, três perguntas respondidas: o que foi feito, por onde passou, de quem era a mão. O nome fechou.' : 'Você já usou a tentativa: o nome não fechou.') + '</p>' : state.loop !== 5 ? '<p class="muted">O telão da Recepção só aceita o Revelar na última volta.</p>'
-   : '<input id="lcNome" placeholder="Diga o nome" autocomplete="off"><button type="button" class="lc-btn" id="lcRevelar">Registrar revelação</button>';
+   : '<input id="lcNome" placeholder="Diga o nome" autocomplete="off"><button type="button" class="lc-btn" id="lcRevelar">Revelar agora</button>';
   h += '<p class="lc-ok">Se a noite acabasse agora: <b>' + (LOOP_FINAL_NOME[lcFinal()] || lcFinal()) + '</b>.</p><p class="lc-msg" id="lcMsg" role="status"></p>';
  } else {
   h += '<div class="lc-passos">' + passo('img:ui/caderno', 'Quem passa mostra o código') + passo('img:ui/participar', 'Quem recebe digita') + passo('img:ui/dupla', 'Conte com as suas palavras') + '</div><p class="lc-dica">Só na pausa entre as voltas. Não gasta energia. Até 3 pistas por pausa.</p>';
@@ -680,17 +688,17 @@ if (typeof window !== 'undefined') window.lcGlifosHtml = lcGlifosHtml;
 const LC_MG = {
  tombo_2:{ativ:'livro', resp:0, img:['N18'], nome:'Ler a foto antiga do catálogo', texto:'A foto antiga mostra a peça escura, fosca. Ela foi tirada de baixo. O que aparece gravado na base?', opcoes:['Um número de três algarismos','O nome de quem doou','O ano em que a peça chegou','A marca de quem restaurou'],
   dicas:['Foto de catálogo serve para identificar a peça.','O que identifica uma peça não muda quando ela troca de sala.']},
- falsa_1:{ativ:'marca', resp:4, nome:'Olhar a peça com luz de lado', texto:'Agora confira: mude o ângulo da luz e veja o que a peça mostra de verdade.',
-  antes:{ativ:'livro', resp:0, img:['GAL_B'], nome:'Antes de acender a luz', texto:'Pelo que você já anotou e leu sobre a peça principal, o que a luz de lado deveria mostrar nela?', opcoes:['Riscos, poeira e desgaste por toda parte','Um brilho liso e igual, sem marca nenhuma','Rachaduras só de um lado, o resto liso'],
-   dicas:['Na Máquina, aba Dossiê, o “Dicionário das palavras” diz a idade da peça principal.','Três séculos de mão, pano e mudança deixam marca.']},
-  luz:{achou:'O verniz brilha por igual, de ponta a ponta.', falta:'ainda não apareceu nada', botao:'Anotar o que apareceu', img:'GAL_B_mascara'},
+ falsa_1:{ativ:'marca', resp:4, nome:'Olhar a peça com luz de lado', texto:'Mude o ângulo da luz e veja o que a peça mostra de verdade.',
+  antes:{se:['par_foto'], ativ:'livro', resp:0, img:['GAL_B'], nome:'Antes de acender a luz', texto:'Você tem no caderno a foto grande do catálogo. Como é a peça de verdade, nessa foto? A luz de lado vai dizer se esta aqui é igual.', opcoes:['Pedra escura, riscos finos, bordas gastas','Pedra escura, lisa, bordas inteiras','Pedra cinza, riscos finos, bordas inteiras','Pedra cinza, lisa, bordas gastas'],
+   dicas:['No caderno, procure a pista “Foto grande do catálogo”.','Confira uma coisa de cada vez: a cor da pedra, a superfície, as bordas.']},
+  luz:{achou:'O verniz cobre tudo por igual, até o grão da pedra. Nenhuma borda gasta, nenhum risco de uso.', falta:'ainda não apareceu nada', botao:'Anotar o que apareceu', img:'GAL_B_mascara'},
   dicas:['Luz de frente esconde. Luz de lado mostra a superfície.','Quase no fim do curso da luz, a superfície aparece inteira.']},
  traj_1:{ativ:'livro', resp:0, img:['S01'], nome:'Olhar a fita da porta de serviço', texto:'A fita mostra a porta de serviço às 4:00. Alguém de paletó encosta um crachá no leitor. No tapete, embaixo da pessoa, aparecem gotas. Pelo que você sabe da noite, ela está entrando ou saindo?', opcoes:['Entrando: vem da rua','Saindo: vai para a rua','Só passando, sem abrir a porta'],
   dicas:['Repare no que pinga no tapete.','Lá fora chove desde o começo da noite.']},
  insc_copia:{ativ:'glifos', resp:0, nome:'Ler a inscrição da máscara', texto:'Confira cada símbolo da máscara com a tábua do livro de registro. Um deles não bate. Qual?', insc:['rosto','pedra','ver','noite','guardar-esp','tempo'], opcoes:['5','4','3','2'],
   dicas:['Ponha a tábua ao lado e confira símbolo por símbolo, da esquerda para a direita.','Não olhe só o desenho: olhe para que lado ele abre.']},
- c_peca:{ativ:'livro', resp:0, img:['D10'], nome:'Abrir a caixa de banners', texto:'Agora você tem motivo. Na estante, caixas etiquetadas; só uma tem o adesivo do patrocínio. O que você sentiu diante da peça da Galeria que faz você abrir esta?', opcoes:['Cheiro de verniz fresco','Cheiro de pó antigo','Cheiro de tinta vermelha','Cheiro de cola'],
-  dicas:['A primeira coisa que se nota diante da peça principal está no seu caderno.','No caderno, procure a pista “A peça principal”.']}
+ c_peca:{ativ:'livro', resp:0, img:['D10'], nome:'Abrir uma caixa da estante', texto:'Agora você tem motivo. Na estante, quatro caixas iguais, cada uma com a sua etiqueta. Pelo que o seu caderno diz da caixa do patrocínio, qual você abre?', opcoes:['BANNERS – NÃO ABRIR','MOLDURAS – FRÁGIL','LÂMPADAS – NÃO EMPILHAR','CATÁLOGOS – NÃO MOLHAR'],
+  dicas:['No caderno, procure o que se diz de uma caixa do patrocínio: na estante, na guia de retirada da Recepção ou na lista de entregas.','A caixa certa entrou leve e agora pesa demais para o que a etiqueta diz.']}
 };
 // A ordem das opções (e a posição certa da luz) muda com a semente: nada para decorar entre partidas.
 function lcMgSorteado(id, mg){
@@ -703,7 +711,7 @@ function lcMgSorteado(id, mg){
 const lcMgFoto = (d, mg) => { try { d.tabIndex = -1; d.style.outline = 'none'; d.focus({preventScroll:true}); } catch (e) {}   // nenhuma resposta abre com cara de escolhida (o foco fica na janela)
  if (!mg.img || !mg.img.length) return; const f = document.createElement('div'); f.className = 'mg-foto'; f.setAttribute('aria-hidden', 'true'); f.innerHTML = mg.img.map(n => '<span class="ic3d"><img src="' + lcIc(n) + '" alt=""></span>').join(''); const h = d.querySelector('h2'); if (h) h.before(f); };
 function lcBancada(q){
- const mg1 = LC_MG[q.lcp], pre = mg1 && mg1.antes && !(state.resolvidos && state.resolvidos[q.id + ':antes']);   // pergunta de história antes do controle: a pessoa deduz, o controle só confirma
+ const mg1 = LC_MG[q.lcp], pre = mg1 && mg1.antes && (!mg1.antes.se || mg1.antes.se.some(lcTem)) && !(state.resolvidos && state.resolvidos[q.id + ':antes']);   // pergunta de história antes do controle: a pessoa deduz, o controle só confirma
  const mg0 = pre ? mg1.antes : mg1, mg = mg0 && lcMgSorteado(q.lcp + (pre ? ':antes' : ''), mg0);
  if (!mg || (state.resolvidos && state.resolvidos[q.id])) return false;
  Promise.all([import('./reserva/banco.mjs'), import('./reserva/minigames.mjs?v=8')]).then(([B, M]) => {
@@ -714,7 +722,7 @@ function lcBancada(q){
   const A = Object.assign({}, base, {nome:mg.nome, texto:mg.texto}, mg.opcoes ? {opcoes:mg.opcoes} : {}, mg.itens ? {itens:mg.itens, clipes:mg.clipes} : {}, mg.luz ? {luz:Object.assign({}, mg.luz, mg.luz.img ? {img:lcIc(mg.luz.img)} : {})} : {}, mg.insc ? {insc:mg.insc, tabua:LC_GLIFOS} : {}, mg.dicas ? {dicas:mg.dicas} : {});
   const aoAbrir = () => lcMgFoto(d, mg);
   M.abrirMinigame(d, A, lcCausa().slice(0,1), async v => {
-   if (String(v) !== String(mg.resp)) return pre ? 'Ainda não. Pense no que o tempo faz com uma peça.' : 'Ainda não fechou. Olhe de novo o que está na tela e no seu caderno.';
+   if (String(v) !== String(mg.resp)) return pre ? 'Ainda não. Releia no caderno a foto grande do catálogo.' : 'Ainda não fechou. Olhe de novo o que está na tela e no seu caderno.';
    if (pre) { (state.resolvidos ||= {})[q.id + ':antes'] = true; save(); setTimeout(() => lcBancada(q), 60); return ''; }
    (state.resolvidos ||= {})[q.id] = true; save();
    setTimeout(() => collect(q.id), 0);

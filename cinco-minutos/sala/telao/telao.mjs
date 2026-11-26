@@ -2,7 +2,7 @@
 // O conteúdo fica em páginas por tema (Relógio, Mapa, Turma, Máquina; no fim: Desfecho, A noite, Para conversar, Turma),
 // com abas, setas do teclado e troca automática (que dá para parar). As salas são só as 15 da história (LOOP_SALAS).
 import { transporteTelao, transporteFalso, ms } from '../transporte.mjs';
-import { ANDARES, INICIO, LOOP_SALAS, definirMuseu } from '../conteudo.js?v=5';
+import { ANDARES, INICIO, LOOP_SALAS, definirMuseu } from '../conteudo.js?v=6';
 
 const P = new URLSearchParams(location.search);
 const FALSA = P.get('falsa') === '1';

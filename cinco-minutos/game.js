@@ -154,7 +154,7 @@ const LOOP_SALAS = {
 };
 // Descrição de cada sala no Loop (uma linha, do mundo da história).
 const LOOP_DESC = {
- prototipo:'A Câmara do tempo zumbe no meio da sala. Ligada, e ninguém consegue desligar.', patio:'Dá para ouvir a chuva fina. O Quadro externo, fechado a cadeado, fica embaixo do para-raios.',
+ prototipo:'A Câmara do tempo zumbe no meio da sala. Ligada, e ninguém consegue desligar.', patio:'A tempestade não para, e a pedra está toda molhada. O Quadro externo, fechado a cadeado, fica embaixo do para-raios.',
  eletrica:'O gerador ronca baixo entre fios, fusíveis e luvas.', relogios:'Uma parede de relógios, cada um no seu passo.',
  seguranca:'Monitores, um cofre pequeno e o café do Braga.', recepcao:'O livro de visitas, a roleta e um telefone que toca.',
  conservacao:'Diário do acervo, laudos e registros em cima da mesa.', atelie:'A bancada da Ivone e o manual da Câmara.',
@@ -583,14 +583,16 @@ function renderRouteChoices(preparando) {
 // Coleções e Ateliê dão para a Área de descanso (porta de serviço na parede de fora), armário da equipe colado na Base da limpeza,
 // Central ao lado da Recepção, Oficina elétrica com porta para o Pátio (fora do prédio), escada ligando os andares.
 // Trocar de orelha não custa nada; tocar numa sala de outro andar segue a mesma caminhada de 10 s.
+// Revisão 14: a Sala das esculturas (em reforma) entra no Térreo como sala fechada, sem toque: porta de vidro para a Área de descanso,
+// ao lado da escada (a pista `pose` vê a escultura por essa porta); um corredor estreito liga a escada, a Recepção, a Central e a Base da limpeza.
 // {andar, colunas, linhas, áreas da grade, portas [área, lado t/b/l/r, posição, tipo], altura do prédio na folha (0 = o resto da folha), escada [andar, seta]}
 const PLANTA = [
  {andar:'2º andar', cl:'a2', alt:'64%', cols:'56px minmax(0,1.25fr) minmax(0,1fr)', rows:'minmax(0,1fr)', areas:['esc sag gal'],
   portas:[['esc','r','center'],['sag','r','center']], esc:[['1º andar','▼']]},
  {andar:'1º andar', cl:'a1', alt:'84%', cols:'56px minmax(0,1fr) minmax(0,1fr)', rows:'minmax(0,1fr) 20px minmax(0,1fr)', areas:['esc cons sons','esc corr corr','esc foto rel'],
   portas:[['esc','r','center'],['cons','b','center'],['sons','b','center'],['foto','t','center'],['rel','t','center']], esc:[['2º andar','▲'],['Térreo','▼']]},
- {andar:'Térreo', cl:'a0', alt:0, fora:true, cols:'minmax(0,1fr) minmax(0,1.32fr) minmax(0,1fr)', rows:'minmax(0,1fr) minmax(0,1fr) 54px minmax(0,1fr)', areas:['ele ate desc','tec col desc','esc esc hall','rec cen limp'],
-  portas:[['ele','t','start'],['ele','b','center'],['tec','b','center'],['col','b','center'],['desc','b','center'],['ate','r','center','vidro'],['col','r','center'],['desc','r','end','fora'],['rec','t','center'],['cen','t','center'],['limp','t','center'],['rec','r','center'],['rec','b','center','fora'],['esc','r','center']], esc:[['1º andar','▲'],['Subsolo','▼']]},
+ {andar:'Térreo', cl:'a0', alt:0, fora:true, cols:'minmax(0,1fr) minmax(0,1.32fr) minmax(0,1fr)', rows:'minmax(0,1fr) minmax(0,1fr) 54px 14px minmax(0,1fr)', areas:['ele ate desc','tec col desc','esc esc est','hall hall hall','rec cen limp'],
+  portas:[['ele','t','start'],['ele','b','center'],['tec','b','center'],['col','b','center'],['est','t','center','vidro'],['ate','r','center','vidro'],['col','r','center'],['desc','r','end','fora'],['rec','t','center'],['cen','t','center'],['limp','t','center'],['rec','r','center'],['rec','b','center','fora'],['esc','b','center'],['est','b','center','fechada']], esc:[['1º andar','▲'],['Subsolo','▼']]},
  {andar:'Subsolo', cl:'as', alt:'56%', cols:'56px minmax(0,1fr)', rows:'minmax(0,1fr)', areas:['esc pro'], portas:[['esc','r','center']], esc:[['Térreo','▲']]}
 ];
 const PLANTA_AREA = {gal:'galeria', cons:'conservacao', sons:'sons', foto:'fotografia', rel:'relogios', ele:'eletrica', ate:'atelie', desc:'corredor', tec:'manutencao', col:'deposito', rec:'recepcao', cen:'seguranca', limp:'limpeza', pro:'prototipo'};
@@ -611,6 +613,7 @@ function plantaLoop(){
    if (a === 'esc') h += '<div class="pl-esc" style="grid-area:esc">' + f.esc.map(([an, seta]) => '<button type="button" class="pl-sobe" data-andar="' + PLANTA.findIndex(x => x.andar === an) + '" aria-label="Ver a planta: ' + e(an) + '"><span aria-hidden="true">' + seta + '</span>' + e(f.fora ? an : an.replace(' andar', '')) + '</button>').join('') + '</div>';
    else if (a === 'corr') h += '<div class="pl-corr" style="grid-area:corr" aria-hidden="true"></div>';
    else if (a === 'hall') h += '<div class="pl-hall" style="grid-area:hall" aria-hidden="true"></div>';
+   else if (a === 'est') h += '<div class="pl-reforma" style="grid-area:est" role="img" aria-label="Sala das esculturas, em reforma: fechada"><i class="pl-cadeado" aria-hidden="true"></i><span class="pl-nm" aria-hidden="true"><b>Esculturas</b><small>em reforma</small></span></div>';
    else if (a === 'sag') h += '<div class="pl-sag" style="grid-area:sag"><img src="' + ICONE_URL('ui/saguao') + '" alt=""><span class="pl-nm"><b>' + e(INICIO.name) + '</b><small>Toda volta começa aqui.</small></span>' + pino + '</div>';
    else h += botao(PLANTA_AREA[a], a);
   }
@@ -1474,7 +1477,7 @@ $('answerFields').addEventListener('click', e => {
 const TV_SALA = (id, on) => '<span class="tv-room'+(on?' on':'')+'"><img src="'+ICONE_URL(LOOP_SALAS[id][2])+'" alt="">'+((typeof LC_CURTO !== 'undefined' && LC_CURTO[id]) || LOOP_SALAS[id][0].split(' · ').pop())+'</span>';
 const TOUR = [
  {c:'Noite de véspera no museu. Amanhã abre a maior exposição da casa. Na Galeria, o curador não tira o olho da peça principal: "Está linda, não está?" Ele não parece ter certeza.',t:'Escolha uma sala', d:'Toda volta começa no Saguão. Toque numa sala para ir até lá.',
-  v:()=>'<div class="tv-rooms">'+TV_SALA('galeria',1)+TV_SALA('seguranca')+TV_SALA('prototipo')+TV_SALA('recepcao')+'</div><p class="tv-floor">Saguão superior · você começa aqui</p>'},
+  v:()=>'<div class="tv-planta" aria-hidden="true"><div class="tvp-orelhas"><i class="on">2º andar</i><i>1º</i><i>Térreo</i><i>Subsolo</i></div><div class="tvp-folha"><span class="tvp-esc"></span><span class="tvp-sag"><img src="'+ICONE_URL('ui/saguao')+'" alt=""><b>Saguão superior</b><i class="tvp-pino"></i></span><span class="tvp-gal"><img src="'+ICONE_URL(LOOP_SALAS.galeria[2])+'" alt=""><b>Galeria</b></span></div></div><p class="tv-floor">Saguão superior · você começa aqui</p>'},
  {c:'Cada sala guarda um objeto. Gire, chegue perto. O que importa quase nunca está de frente.',t:'Gire a peça', d:'Toque nos pontos que brilham. Cada um guarda uma pista. Eles aparecem com o tempo.',
   v:()=>'<div class="tv-piece"><img class="tv-obj3d" src="'+ICONE_URL('V11')+'" alt=""><b class="tv-dot d1"></b><b class="tv-dot d2"></b><b class="tv-dot d3"></b></div><p class="tv-floor">Arraste para girar · toque no brilho</p>'},
  {c:'Na Central, o Braga empurra uma xícara: "Chuva feia, hein? Pega um café." Daqui a cinco minutos ele vai dizer isso de novo, sem lembrar que já disse.',t:'O tempo corre', d:'Cada volta tem 5 minutos. Quando acaba, o tempo volta. O museu esquece. Você lembra.',
