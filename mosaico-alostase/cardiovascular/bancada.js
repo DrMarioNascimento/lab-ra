@@ -50,7 +50,7 @@ function mostrarCalculos() {
     const p = resultados[i][pontoSelecionado];
     const c = p.calculo;
     const exercicio = p.emEsforco || p.emRecuperacao;
-    return `<article class="leitura rotina-${id}">
+    return `<article class="leitura-cardio rotina-${id}">
       <h3>Rotina ${id.toUpperCase()}</h3>
       <p>${estadoVisual(p)}${p.amostraMAPA ? ' · ponto da MAPA simulada' : ''}</p>
       <dl class="valores">

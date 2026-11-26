@@ -45,16 +45,16 @@ canvas { display: block; width: 100%; height: 114px; cursor: crosshair; }
 .controle-hora input[type=range] { flex: 1 1 170px; min-width: 0; }
 #hora-rotulo { font-size: 1.15rem; font-weight: 700; font-variant-numeric: tabular-nums; }
 .controle-hora input[type=range], input[type=checkbox] { accent-color: #5ee2de; }
-.leitura {
+.leitura-cardio {
   border-left: 3px solid var(--serie); padding: 10px; background: #0b1525; border-radius: 8px;
   overflow-wrap: anywhere;
 }
-.leitura h3 { margin: 0; }
-.leitura p { color: #c5d3e8; margin: 4px 0 10px; }
-.leitura details { margin-top: 8px; font-size: .85rem; }
-.leitura summary, .painel > summary { cursor: pointer; }
-.leitura ul, .painel > ul { padding-left: 20px; }
-.leitura li, .painel > ul li { margin: 6px 0; }
+.leitura-cardio h3 { margin: 0; }
+.leitura-cardio p { color: #c5d3e8; margin: 4px 0 10px; }
+.leitura-cardio details { margin-top: 8px; font-size: .85rem; }
+.leitura-cardio summary, .painel > summary { cursor: pointer; }
+.leitura-cardio ul, .painel > ul { padding-left: 20px; }
+.leitura-cardio li, .painel > ul li { margin: 6px 0; }
 .valores { display: flex; flex-wrap: wrap; column-gap: 14px; row-gap: 7px; margin: 0; }
 .valores div { display: grid; }
 .valores dt { font-size: .76rem; color: #bbc9dd; }
