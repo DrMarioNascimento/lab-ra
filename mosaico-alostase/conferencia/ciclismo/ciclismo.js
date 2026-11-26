@@ -1,4 +1,4 @@
-import { REFERENCIAS_CICLISMO, simularProtocoloCalorHidrico } from '../../motor/protocolo-calor-hidrico.js';
+import { REFERENCIAS_CICLISMO, simularProtocoloCalorHidrico } from '../../motor/protocolo-calor-hidrico.js?v=2';
 
 const variaveis = {
   perdaMassaPct: { nome: 'Perda de massa corporal', min: 120, unidade: '%', delta: 'p.p.', casas: 1, ajuste: true },

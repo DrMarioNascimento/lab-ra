@@ -1,0 +1,5 @@
+#conferencia { scroll-margin: 1rem; }
+.atalhos-dia { display: flex; flex-wrap: wrap; gap: .4rem; margin: .5rem 0; }
+#resumo th, #leitura th { width: 42%; }
+#curva, #curva-dia { background: #0b1525; border-radius: 10px; margin-top: .75rem; }
+#hora-rotulo, #dia-rotulo { display: inline; font-weight: 700; font-variant-numeric: tabular-nums; }

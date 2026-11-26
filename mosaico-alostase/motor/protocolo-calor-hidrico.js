@@ -1,4 +1,4 @@
-import { simularCalorIntegrado } from './calor-integrado.js';
+import { simularCalorIntegrado } from './calor-integrado.js?v=2';
 
 // Perda de massa da publicação original. FC e VS aos 110 min e temperatura retal aos 120 min
 // são leituras aproximadas da figura 1-5 de Funnell (2020).

@@ -1,0 +1,120 @@
+import { INICIAL_ACLIMATACAO, atualizarAclimatacao, ajusteCardiacoNoCalor } from './aclimatacao.js';
+import { calcularIntervaloCalor } from './calor-integrado.js?v=2';
+import { simularCardiovascular } from './cardiovascular.js';
+import { faseNoMinuto, passoFaseCircadiana } from './fase-circadiana.js';
+import { P } from './parametros.js';
+import { fracaoSonoForaDaFase, mediasPressao, pressaoComDesalinhamento } from './pressao-desalinhamento.js';
+import { ambienteTurnoCalor, FIM_TURNO_MIN, respostaCardioTurno, TURNOS_CALOR } from './turno-calor.js?v=2';
+
+export const ESCALAS_CALOR = Object.freeze({ diurna: 'Diurna fixa', noturna: 'Noturna fixa', alternada: 'Alternada' });
+export const DIAS_ESCALA_CALOR = 28;
+export const PASSO_LEITURA_MIN = 15;
+const DIA = 1440;
+const ORIGEM = 8 * 60;
+const DURACAO_SONO_H = 8;
+const INICIO_SONO_DIURNO = 23 * 60 - ORIGEM;
+const DESCONTO_TURNO_CURTO_H = 2;
+export const horaCivilDaEscala = (min) => (min + ORIGEM) % DIA;
+
+export function planoEscalaCalor(escala, indice, encurtarSonoNoturno = false) {
+  const semana = Math.floor(indice / 7);
+  const diaNaSemana = indice % 7;
+  const folga = diaNaSemana >= 5;
+  const noturno = escala === 'noturna' || (escala === 'alternada' && semana % 2 === 1);
+  let inicioSono = noturno ? 0 : INICIO_SONO_DIURNO;
+  if (escala === 'alternada' && folga) {
+    // Antecipa/atrasa o sono em duas folgas entre blocos. Cada dia conserva um único episódio.
+    inicioSono = (noturno ? diaNaSemana - 4 : 7 - diaNaSemana) * 300;
+  }
+  const sonoH = DURACAO_SONO_H - (encurtarSonoNoturno && noturno && !folga ? DESCONTO_TURNO_CURTO_H : 0);
+  const duracaoSono = sonoH * 60;
+  const inicioTrabalho = folga ? null : (noturno ? 22 : 14) * 60 - ORIGEM;
+  return { inicioSono, duracaoSono, inicioTrabalho, tipo: folga ? 'Folga' : noturno ? 'Noturno' : 'Diurno' };
+}
+
+function bebidasDoDia({ inicioSono, duracaoSono, inicioTrabalho }) {
+  if (inicioTrabalho !== null) {
+    const base = [-360, -180, -60, 300, 420].map((offset) => [inicioTrabalho + offset, 440, 480]);
+    return [...base, ...TURNOS_CALOR.pausas.bebidas.map(([min, ml]) => [inicioTrabalho + min, ml, 0])];
+  }
+  const vigiliaMin = DIA - duracaoSono;
+  return [0.10, 0.30, 0.50, 0.70, 0.90].map((p) => {
+    const min = Math.floor(p * vigiliaMin);
+    return [min < inicioSono ? min : min + duracaoSono, 440, 480];
+  });
+}
+
+function sonoCivil(inicio, duracao) {
+  const min = horaCivilDaEscala(inicio);
+  return [[min, Math.min(min + duracao, DIA)], ...(min + duracao > DIA ? [[0, min + duracao - DIA]] : [])];
+}
+
+export function simularEscalaCalor(escala, { dias = DIAS_ESCALA_CALOR, encurtarSonoNoturno = false } = {}) {
+  if (!Object.hasOwn(ESCALAS_CALOR, escala) || !Number.isInteger(dias) || dias < 1 || dias > DIAS_ESCALA_CALOR) {
+    throw new RangeError('Informe uma escala e um horizonte entre 1 e 28 dias.');
+  }
+  const resultado = [];
+  let estado, faseH = 0, aclimatacao = INICIAL_ACLIMATACAO, pressaoSono = 0.5, vigiliaMin = 0;
+  const saldos = [];
+  const fatorSono = Math.exp(-1 / (60 * P.pressaoSono.tauQuedaH.valor));
+  const fatorVigilia = Math.exp(-1 / (60 * P.pressaoSono.tauSubidaH.valor));
+  for (let indice = 0; indice < dias; indice++) {
+    const plano = planoEscalaCalor(escala, indice, encurtarSonoNoturno);
+    const { inicioSono, duracaoSono, inicioTrabalho } = plano;
+    const fimSono = inicioSono + duracaoSono;
+    const dormeEm = (min) => min >= inicioSono && min < fimSono;
+    const faseFinal = passoFaseCircadiana(faseH, sonoCivil(inicioSono, duracaoSono), true);
+    const faseEm = (min) => faseNoMinuto(faseH, faseFinal, min);
+    const foraDaFase = fracaoSonoForaDaFase(ORIGEM + inicioSono, duracaoSono, (min) => faseEm(min - ORIGEM));
+    // A bancada usa a rampa de sono com o bloco inteiro, inclusive quando cruza a meia-noite.
+    const sono = [horaCivilDaEscala(inicioSono), horaCivilDaEscala(fimSono)];
+    const fasePorHorario = Array.from({ length: DIA + 1 }, (_, min) => faseEm((min + DIA - ORIGEM) % DIA));
+    const repouso = simularCardiovascular({ sono, perfilFase: { passoMin: 1, pontos: fasePorHorario } });
+    const resposta = respostaCardioTurno((min) => pressaoComDesalinhamento(repouso[horaCivilDaEscala(min)], foraDaFase));
+    const ateFimTrabalho = inicioTrabalho === null ? 0 : inicioTrabalho + FIM_TURNO_MIN;
+    const emTurno = (min) => inicioTrabalho !== null && min >= inicioTrabalho && min < ateFimTrabalho;
+    let ultimoEsforcoMin = -Infinity;
+    const integrar = calcularIntervaloCalor({ duracaoMin: DIA, estadoInicial: estado, bebidas: bebidasDoDia(plano),
+      ambienteNoMinuto(min) {
+        if (emTurno(min)) return { ...ambienteTurnoCalor(min - inicioTrabalho), aclimatacao };
+        return { temperatura: dormeEm(min) ? 22 : 24, umidade: 50, esforco: 0 };
+      },
+      basalNoMinuto(min, clima) {
+        const basal = resposta(min, clima);
+        if (clima.esforco) ultimoEsforcoMin = min;
+        return { ...basal, fc: basal.fc - ajusteCardiacoNoCalor(aclimatacao, min - ultimoEsforcoMin) };
+      },
+    });
+    const minutos = integrar.pontos.slice(0, DIA);
+    let vigiliaMax = 0;
+    const detalhe = [];
+    for (const p of minutos) {
+      p.dormindo = dormeEm(p.min);
+      vigiliaMin = p.dormindo ? 0 : vigiliaMin + 1;
+      vigiliaMax = Math.max(vigiliaMin, vigiliaMax);
+      if (p.min % PASSO_LEITURA_MIN === 0) {
+        detalhe.push({ min: p.min, sis: p.sis, dia: p.dia, fc: p.fc, osmolalidade: p.osmolalidade,
+          centralC: p.centralC, pressaoSono, faseH: faseEm(p.min), plasmaL: p.plasmaL, renina: p.regulacao.renina,
+          dormindo: p.dormindo, emTurno: emTurno(p.min) });
+      }
+      pressaoSono = p.dormindo ? pressaoSono * fatorSono : 1 - (1 - pressaoSono) * fatorVigilia;
+    }
+    const fim = integrar.pontos.at(-1);
+    const inicio = integrar.pontos[0];
+    const preTurno = inicioTrabalho === null ? null : minutos[inicioTrabalho];
+    const posTurno = inicioTrabalho === null ? null : minutos[ateFimTrabalho];
+    const picoTemperaturaC = minutos.reduce((pico, p) => Math.max(pico, p.centralC), fim.centralC);
+    saldos.push(24 - duracaoSono / 60 - P.dividaSono.vigiliaCriticaH.valor);
+    resultado.push({ dia: indice + 1, plano, ...mediasPressao(minutos), faseH: faseFinal,
+      sonoForaDaFaseH: foraDaFase * duracaoSono / 60,
+      dividaSono7dH: Math.max(0, saldos.slice(-7).reduce((soma, saldo) => soma + saldo, 0)),
+      indiceAclima: aclimatacao.cardiovascular * 100, minutosQuentes: integrar.minutosQuentes,
+      osmInicial: inicio.osmolalidade, osmFinal: fim.osmolalidade, osmPreTurno: preTurno?.osmolalidade ?? null,
+      osmPosTurno: posTurno?.osmolalidade ?? null, pressaoSonoInicio: inicioTrabalho === null ? null : detalhe[inicioTrabalho / PASSO_LEITURA_MIN].pressaoSono,
+      aguaL: fim.aguaMl / 1000, suorL: fim.suor, picoTemperaturaC, vigiliaMaxH: vigiliaMax / 60, detalhe });
+    estado = integrar.estadoFinal;
+    aclimatacao = atualizarAclimatacao(aclimatacao, integrar.minutosQuentes);
+    faseH = faseFinal;
+  }
+  return resultado;
+}

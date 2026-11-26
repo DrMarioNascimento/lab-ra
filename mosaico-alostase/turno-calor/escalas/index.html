@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Escalas no calor em 28 dias · Mosaico Alostase</title>
+  <link rel="stylesheet" href="../../jogo/estilo.css?v=9">
+  <link rel="stylesheet" href="../../cardiovascular/bancada.css">
+  <link rel="stylesheet" href="../calor.css">
+  <link rel="stylesheet" href="./escalas.css">
+</head>
+<body>
+  <main class="bancada">
+    <nav class="calor-nav">
+      <a href="../">← Turno no calor</a>
+      <a href="../../trajetoria/">Trajetórias fisiológicas</a>
+      <a href="#conferencia">Conferência fisiológica</a>
+    </nav>
+    <header class="abertura">
+      <h1>Escalas no calor em 28 dias</h1>
+      <p>Compare o que muda durante cinco jornadas consecutivas, o que se recupera em duas folgas e o que ainda aparece no início do próximo turno.</p>
+    </header>
+    <section class="painel">
+      <h2>Comparar duas escalas</h2>
+      <p>As três escalas têm 20 jornadas de quatro horas. A cada hora há 50 minutos a 32 °C e 65% de umidade e 10 minutos de pausa a 26 °C. A água total é de 3,4 L nos dias de trabalho e 2,2 L nas folgas, incluindo a ingestão fora da jornada.</p>
+      <div class="controle-hora">
+        <label>Escala A <select id="escala-a"></select></label>
+        <label>Escala B <select id="escala-b"></select></label>
+        <label>Sono programado <select id="sono-modo"><option value="igual">8 horas em todas as escalas</option><option value="curto">6 horas em dias de trabalho noturno</option></select></label>
+      </div>
+      <label>Variável ao longo dos dias <select id="variavel"></select></label>
+      <canvas id="curva" class="calor-curva" aria-hidden="true"></canvas>
+      <p class="calor-legenda"><span id="legenda-a"></span><span id="legenda-b"></span></p>
+      <div class="controle-hora">
+        <label for="dia-selecionado">Dia <output id="dia-rotulo"></output></label>
+        <input id="dia-selecionado" type="range" min="1" max="28" value="7" step="1">
+      </div>
+      <div class="atalhos-dia">
+        <button class="btn sec sm" data-dia="5" type="button">Fim do bloco</button>
+        <button class="btn sec sm" data-dia="7" type="button">Segunda folga</button>
+        <button class="btn sec sm" data-dia="8" type="button">Volta ao trabalho</button>
+      </div>
+      <table>
+        <thead><tr><th scope="col">No dia selecionado</th><th scope="col" id="titulo-a"></th><th scope="col" id="titulo-b"></th></tr></thead>
+        <tbody id="resumo"></tbody>
+      </table>
+    </section>
+    <section class="painel">
+      <h2>Dentro do dia selecionado</h2>
+      <p>O dia simulado vai das 08:00 às 08:00 seguintes. Consulte a pressão e o sono no mesmo horário das duas escalas.</p>
+      <label>Variável de 24 horas <select id="variavel-dia"></select></label>
+      <canvas id="curva-dia" class="calor-curva" aria-hidden="true"></canvas>
+      <div class="controle-hora">
+        <label for="hora-selecionada">Horário <output id="hora-rotulo"></output></label>
+        <input id="hora-selecionada" type="range" min="0" max="95" value="72" step="1">
+      </div>
+      <table>
+        <thead><tr><th scope="col">No horário escolhido</th><th scope="col" id="hora-a"></th><th scope="col" id="hora-b"></th></tr></thead>
+        <tbody id="leitura"></tbody>
+      </table>
+    </section>
+    <section id="conferencia" class="painel">
+      <h2>Conferência fisiológica</h2>
+      <h3>Morris e colegas · inversão de 12 horas em laboratório</h3>
+      <p>Diferença entre a condição invertida e a alinhada. O motor reproduz a janela monitorada de 24 horas, com sono às 23:00–07:00 ou às 11:00–19:00, fase fixa e repouso. Os dois valores marcados com † orientam o ajuste. O efeito total do motor também inclui a variação de pressão do relógio ao longo do dia.</p>
+      <table>
+        <thead><tr><th scope="col">Mudança em mmHg</th><th scope="col">Estudo</th><th scope="col">Motor</th><th scope="col">Motor − estudo</th></tr></thead>
+        <tbody id="morris"></tbody>
+      </table>
+      <p class="calor-detalhe">O protocolo original durou três dias por condição. A conferência usa o recorte de pressão arterial, sem reproduzir o cochilo de transição, a luz ou as coletas. O estudo encontrou diferenças nas médias de 24 horas, sem efeito significativo na queda percentual da pressão durante a oportunidade de sono.</p>
+      <h3>Shafer e colegas · pressão durante o sono noturno</h3>
+      <p>A tabela original expressa a queda com sinal negativo. Aqui ela aparece como magnitude positiva. A MAPA de 24 horas incluiu sono à noite nos dois grupos. O cálculo usa os horários de sono e o atraso de fase aproximados pelas médias publicadas, com duração de sono média dos sete dias.</p>
+      <table>
+        <thead><tr><th scope="col">Queda sistólica no sono</th><th scope="col">Estudo · média ± DP</th><th scope="col">Motor</th><th scope="col">Motor − estudo</th></tr></thead>
+        <tbody id="shafer"></tbody>
+      </table>
+      <p class="calor-detalhe">A comparação usa dados de grupo de um estudo observacional. Com esses horários, o motor estima uma queda perto de 10% nos dois grupos. A diferença de 4,1 pontos percentuais do estudo praticamente desaparece na simulação.</p>
+      <p><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5858578/">Morris e colegas, 2017 · protocolo e resultados</a><br>
+        <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10954583/">Shafer e colegas, 2024 · tabela 1</a></p>
+    </section>
+    <details class="painel">
+      <summary>Hipóteses da projeção de 28 dias</summary>
+      <ul>
+        <li>Nas escalas fixas, o horário de sono se mantém nas folgas. Na alternada, ele se desloca cinco horas em cada uma das duas folgas para preparar o próximo bloco.</li>
+        <li>Água, sódio, temperatura e índices renais passam de um dia para o seguinte. A aclimatação cresce com minutos de trabalho no calor acima de 37,5 °C de temperatura central calculada. O componente cardiovascular decai nas folgas.</li>
+        <li>O relógio se ajusta parcialmente aos horários de sono. O modelo estima a fração do sono fora da noite biológica sem inferir a exposição individual à luz.</li>
+        <li>A pressão de sono acompanha o tempo acordado e dormindo. A dívida em sete dias usa o limiar de 15,84 horas de vigília do motor original. Com 8 horas programadas por dia, essa conta produz a mesma dívida nas três escalas, embora a pressão de sono possa diferir.</li>
+        <li>A queda de pressão é calculada entre as médias de vigília e de sono de cada dia. Na projeção, a vigília inclui o trabalho. O volume ingerido e o aporte diário de sódio de 2,4 g são parâmetros da simulação.</li>
+      </ul>
+    </details>
+  </main>
+  <script type="module" src="./escalas.js"></script>
+</body>
+</html>

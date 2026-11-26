@@ -1,4 +1,4 @@
-import { atividadeNoTurno, FIM_TURNO_MIN, FIM_OBSERVACAO_MIN, simularTurnoCalor } from '../motor/turno-calor.js';
+import { atividadeNoTurno, FIM_TURNO_MIN, FIM_OBSERVACAO_MIN, simularTurnoCalor } from '../motor/turno-calor.js?v=2';
 import { desenharSerie, indiceNaSerie } from '../hidratacao/grafico.js?v=3';
 
 const el = (id) => document.getElementById(id);
