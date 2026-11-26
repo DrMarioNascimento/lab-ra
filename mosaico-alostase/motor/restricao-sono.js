@@ -42,6 +42,17 @@ const deltaAgenda = media(curvaRestrita, (p) => p.sis, ...SONO_RESTRITO)
   - media(curvaControle, (p) => p.sis, ...SONO_RESTRITO);
 const ganho = (alvo - deltaAgenda) / (pesoSonoComparavel * cargaAjuste);
 
+// Usa o ganho já calibrado em Covassin, inclusive em outros protocolos.
+export function proximaCargaRestricao(carga, duracaoSonoMin, meiaVidaRecuperacao = 2, referenciaSonoMin = 540) {
+  const alvoCarga = Math.max(0, Math.min(1, (referenciaSonoMin - duracaoSonoMin) / (referenciaSonoMin - 240)));
+  const meiaVida = alvoCarga > 0 ? MEIA_VIDA_EXPOSICAO_DIAS : meiaVidaRecuperacao;
+  return alvoCarga + (carga - alvoCarga) * 2 ** (-1 / meiaVida);
+}
+
+export function aplicarCargaRestricao(curva, carga) {
+  return curva.map((p) => ({ ...p, sis: p.sis + ganho * carga * p.calculo.peso }));
+}
+
 function resumo(curva) {
   const pas = (p) => p.sis;
   return {
@@ -59,11 +70,9 @@ export function simularRestricaoSono({ meiaVidaRecuperacao = 2 } = {}) {
   let carga = 0;
   for (let dia = 1; dia <= FIM_PROTOCOLO; dia++) {
     const restrito = dia >= INICIO_RESTRICAO && dia <= FIM_RESTRICAO;
-    const alvoCarga = Number(restrito);
-    const meiaVida = restrito ? MEIA_VIDA_EXPOSICAO_DIAS : meiaVidaRecuperacao;
-    carga = alvoCarga + (carga - alvoCarga) * 2 ** (-1 / meiaVida);
+    carga = proximaCargaRestricao(carga, restrito ? 240 : 540, meiaVidaRecuperacao);
     const basal = restrito ? curvaRestrita : curvaControle;
-    const curva = basal.map((p) => ({ sis: p.sis + ganho * carga * p.calculo.peso }));
+    const curva = aplicarCargaRestricao(basal, carga);
     dias.push({
       dia, fase: dia < INICIO_RESTRICAO ? 'Adaptação' : restrito ? 'Restrição' : 'Recuperação',
       janela: restrito ? SONO_RESTRITO : SONO_CONTROLE, controle, agenda: delta(resumo(basal)),

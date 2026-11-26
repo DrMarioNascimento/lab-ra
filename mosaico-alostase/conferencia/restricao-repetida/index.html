@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Noites curtas e recuperação entre blocos · Mosaico Alostase</title>
+  <link rel="stylesheet" href="../../jogo/estilo.css?v=9">
+  <link rel="stylesheet" href="../../cardiovascular/bancada.css">
+  <link rel="stylesheet" href="../../turno-calor/calor.css">
+</head>
+<body>
+  <main class="bancada">
+    <nav class="calor-nav">
+      <a href="../restricao-sono/">← Restrição de sono e recuperação</a>
+      <a href="../../turno-calor/escalas/?recuperacao=1">Comparar uma e duas noites de recuperação</a>
+    </nav>
+    <header class="abertura">
+      <h1>Noites curtas e recuperação entre blocos</h1>
+      <p>Yang e colegas compararam um controle de 8 horas com quatro blocos de três noites de 4 horas, cada um seguido de uma noite de 8 horas. O protocolo incluiu mais duas noites de recuperação no final.</p>
+    </header>
+    <section class="painel">
+      <h2>Pressão ao longo do protocolo</h2>
+      <p>O número do dia identifica a noite que começa naquele dia. O controle tem 8 horas de sono programado em todas as noites.</p>
+      <label>Medida <select id="metrica"></select></label>
+      <canvas id="curva" class="calor-curva" aria-hidden="true"></canvas>
+      <p class="calor-legenda"><span>Contínua · controle</span><span>Tracejada · noites curtas e recuperação</span></p>
+      <div class="controle-hora">
+        <label for="dia">Dia <output id="dia-rotulo"></output></label>
+        <input id="dia" type="range" min="1" max="21" value="7">
+      </div>
+      <p id="janela"></p>
+      <table>
+        <thead><tr><th scope="col">Medida</th><th scope="col">Controle</th><th scope="col">Restrição</th></tr></thead>
+        <tbody id="leitura"></tbody>
+      </table>
+    </section>
+    <section class="painel">
+      <h2>Conferência com Yang e colegas</h2>
+      <p>O modelo usa os parâmetros anteriores. O estudo comparou a queda de pressão das primeiras 4 horas de sono com a vigília das 11h às 23h. A média diária publicada cobre 20 horas, das 11h às 7h. A curva de 24 horas acima é uma saída adicional do motor. Para a pressão, a comparação abaixo usa os resultados descritos no artigo.</p>
+      <table>
+        <thead><tr><th scope="col">Desfecho</th><th scope="col">Estudo</th><th scope="col">Motor</th></tr></thead>
+        <tbody id="conferencia"></tbody>
+      </table>
+      <p><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6052859/">Yang e colegas, 2017 · figuras 1 a 3 e tabela 1</a></p>
+    </section>
+    <details class="painel">
+      <summary>Como o motor representa o protocolo</summary>
+      <p>A janela é 23:00–07:00 no controle e nas noites de recuperação e 03:00–07:00 nas noites curtas. O motor mantém a fase circadiana fixa e usa as janelas programadas para estimar sono e vigília. O efeito acumulado da restrição atua na sistólica, com os parâmetros da bancada baseada em Covassin. A diastólica responde aos estados de sono e vigília da curva basal.</p>
+    </details>
+  </main>
+  <script type="module" src="./restricao-repetida.js"></script>
+</body>
+</html>

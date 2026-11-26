@@ -1,4 +1,4 @@
-import { ESCALAS_CALOR, horaCivilDaEscala, simularEscalaCalor, PASSO_LEITURA_MIN } from '../../motor/escala-calor.js?v=3';
+import { ESCALAS_CALOR, horaCivilDaEscala, simularEscalaCalor, PASSO_LEITURA_MIN } from '../../motor/escala-calor.js?v=4';
 import { conferirEscalaComMorris, conferirEscalaComShafer } from '../../motor/conferencia-escala.js?v=2';
 import { desenharSerie, indiceNaSerie } from '../../hidratacao/grafico.js?v=3';
 
@@ -6,6 +6,7 @@ const el = (id) => document.getElementById(id);
 const diaria = [
   ['pas24h', 'Pressão sistólica média em 24 h', 'mmHg', 1],
   ['pad24h', 'Pressão diastólica média em 24 h', 'mmHg', 1],
+  ['quedaPadPct', 'Queda diastólica no sono efetivo', '%', 1],
   ['quedaPasPct', 'Queda sistólica no sono efetivo', '%', 1],
   ['quedaPasJanelaPct', 'Queda sistólica na janela de sono', '%', 1],
   ['osmInicial', 'Osmolalidade às 08:00', 'mOsm/kg', 1],
@@ -87,6 +88,8 @@ function atualizarDia() {
     ], pontos)
     + serieLinhas(diaria, pontos)
     + serieLinhas([
+      ['pasPreTurno', 'Sistólica no início do turno', 'mmHg', 1],
+      ['padPreTurno', 'Diastólica no início do turno', 'mmHg', 1],
       ['osmPreTurno', 'Osmolalidade no início do turno', 'mOsm/kg', 1],
       ['osmPosTurno', 'Osmolalidade ao fim do turno', 'mOsm/kg', 1],
       ['pressaoSonoInicio', 'Pressão de sono no início do turno', '', 2],
@@ -98,15 +101,19 @@ function atualizarDia() {
 }
 
 function atualizarComparacao() {
-  const curta = el('sono-modo').value === 'curto';
+  const pareada = el('recuperacao-pareada').checked;
+  el('explicacao-recuperacao').hidden = !pareada;
+  for (const id of ['escala-b', 'sono-modo', 'despertares-b']) el(id).disabled = pareada;
+  const curta = !pareada && el('sono-modo').value === 'curto';
   series = ['a', 'b'].map((id, i) => {
-    const chave = el(`escala-${id}`).value;
-    const despertares = id === 'b' ? Number(el('despertares-b').value) : 0;
-    const nome = ESCALAS_CALOR[chave];
+    const chave = el(`escala-${pareada ? 'a' : id}`).value;
+    const despertares = !pareada && id === 'b' ? Number(el('despertares-b').value) : 0;
+    const noitesRecuperacao = pareada ? i + 1 : null;
+    const nome = pareada ? (i === 0 ? 'Uma noite de recuperação' : 'Duas noites de recuperação') : ESCALAS_CALOR[chave];
     for (const campo of ['titulo', 'hora']) el(`${campo}-${id}`).textContent = nome;
     el(`legenda-${id}`).textContent = `${i ? 'Tracejada' : 'Contínua'} · ${nome}${despertares ? ` · ${despertares} despertares` : ''}`;
-    const entrada = JSON.stringify([chave, curta && chave !== 'diurna', despertares]);
-    if (!cache.has(entrada)) cache.set(entrada, simularEscalaCalor(chave, { encurtarSonoNoturno: curta, despertares }));
+    const entrada = JSON.stringify([chave, curta && chave !== 'diurna', despertares, noitesRecuperacao]);
+    if (!cache.has(entrada)) cache.set(entrada, simularEscalaCalor(chave, { encurtarSonoNoturno: curta, despertares, noitesRecuperacao }));
     return cache.get(entrada);
   });
   atualizarDia();
@@ -119,7 +126,7 @@ function tabelaEstudos() {
     linha(nome, [`${numero(estudo)} ± ${numero(dp)}%`, medicao(motor, '%'), `${numero(motor - estudo, 1, true)} p.p.`])).join('');
 }
 
-for (const id of ['escala-a', 'escala-b', 'sono-modo', 'despertares-b']) el(id).addEventListener('change', atualizarComparacao);
+for (const id of ['escala-a', 'escala-b', 'sono-modo', 'despertares-b', 'recuperacao-pareada']) el(id).addEventListener('change', atualizarComparacao);
 el('variavel').addEventListener('change', atualizarDia);
 el('variavel-dia').addEventListener('change', atualizarHora);
 el('dia-selecionado').addEventListener('input', atualizarDia);
@@ -137,6 +144,12 @@ for (const botao of document.querySelectorAll('[data-dia]')) botao.addEventListe
   el('dia-selecionado').value = inicioSemana + Number(botao.dataset.dia);
   atualizarDia();
 });
+if (new URLSearchParams(location.search).get('recuperacao') === '1') {
+  el('recuperacao-pareada').checked = true;
+  el('escala-a').value = 'noturna';
+  el('dia-selecionado').value = '8';
+  el('variavel').value = 'dividaSono7dH';
+}
 atualizarComparacao();
 tabelaEstudos();
 new ResizeObserver(atualizarDia).observe(el('curva'));
