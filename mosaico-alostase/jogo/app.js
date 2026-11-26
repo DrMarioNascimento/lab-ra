@@ -33,6 +33,9 @@ function telaModos() {
     <section class="card modo"><div class="rotulo">Sala de aula</div><h2>Com telão e a turma nos celulares</h2>
       <p class="muted">O professor abre a sala; a turma estima no celular e o telão revela onde a turma acertou.</p>
       <a class="btn sec block" href="sala/index.html" style="text-align:center;text-decoration:none;display:block;padding-top:14px">Entrar na sala de aula</a></section>
+    <section class="card modo"><div class="rotulo">Bancada cardiovascular</div><h2>Frequência cardíaca e pressão em 24 horas</h2>
+      <p class="muted">Compare duas rotinas e confira os cálculos em cada horário.</p>
+      <a class="btn sec block" href="cardiovascular/" style="text-align:center;text-decoration:none;display:block;padding-top:14px">Abrir a bancada cardiovascular</a></section>
     <p class="aviso">O organismo do jogo é um modelo médio de adulto saudável. Não é o seu corpo e não serve de diagnóstico clínico.</p>`;
   $('#m-prog').onclick = telaInicio;
   $('#m-diag').onclick = () => { sub.textContent = 'Modo Diagnóstico'; telaEntradaDiag(tela, telaModos); };

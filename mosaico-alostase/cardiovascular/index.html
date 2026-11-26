@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex">
+  <title>Bancada cardiovascular · Mosaico Alostase</title>
+  <link rel="stylesheet" href="../jogo/estilo.css?v=9">
+  <link rel="stylesheet" href="bancada.css">
+</head>
+<body>
+  <main class="bancada">
+    <nav><a href="../">← Mosaico Alostase</a></nav>
+    <header class="abertura">
+      <h1>Seu coração em 24 horas</h1>
+      <p>Compare duas rotinas de um adulto saudável. Selecione um horário para ver como o motor calcula a frequência cardíaca e a pressão.</p>
+    </header>
+
+    <section class="painel" aria-labelledby="rotinas">
+      <h2 id="rotinas">Rotinas do dia</h2>
+      <form id="controles">
+        <fieldset class="sono">
+          <legend>Sono das duas rotinas</legend>
+          <label>Hora de dormir <input name="dormir" type="time" value="23:00" required></label>
+          <label>Hora de acordar <input name="acordar" type="time" value="07:00" required></label>
+        </fieldset>
+        <div class="duas-rotinas">
+          <fieldset class="rotina-a" data-rotina="a">
+            <legend>Rotina A</legend>
+            <label class="chave-sessao"><input name="exercicio-a" type="checkbox"> Exercício aeróbio</label>
+            <div class="sessao" hidden>
+              <label>Início <input name="inicio-a" type="time" value="08:00" required disabled></label>
+              <label>Duração <select name="duracao-a" disabled><option value="15">15 min</option><option value="30" selected>30 min</option><option value="45">45 min</option></select></label>
+              <label>% do VO₂máx <select name="intensidade-a" disabled><option value="30">30%</option><option value="40" selected>40%</option><option value="60">60%</option></select></label>
+            </div>
+          </fieldset>
+          <fieldset class="rotina-b" data-rotina="b">
+            <legend>Rotina B</legend>
+            <label class="chave-sessao"><input name="exercicio-b" type="checkbox" checked> Exercício aeróbio</label>
+            <div class="sessao">
+              <label>Início <input name="inicio-b" type="time" value="17:30" required></label>
+              <label>Duração <select name="duracao-b"><option value="15">15 min</option><option value="30" selected>30 min</option><option value="45">45 min</option></select></label>
+              <label>% do VO₂máx <select name="intensidade-b"><option value="30">30%</option><option value="40" selected>40%</option><option value="60">60%</option></select></label>
+            </div>
+          </fieldset>
+        </div>
+        <button class="btn ok" type="submit">Recalcular as duas rotinas</button>
+        <p id="erro" role="alert" hidden></p>
+      </form>
+    </section>
+
+    <section class="painel trajetorias" aria-labelledby="titulo-trajetorias">
+      <h2 id="titulo-trajetorias">Curvas do dia</h2>
+      <div class="legenda">
+        <span class="legenda-a">— Rotina A</span>
+        <span class="legenda-b">╌ Rotina B</span>
+        <span><i class="sono-amostra"></i> Sono</span>
+        <label><input id="mapa" type="checkbox" checked> Pontos da MAPA simulada</label>
+      </div>
+      <div class="graficos">
+        <figure><figcaption>Frequência cardíaca <span>bpm</span></figcaption><canvas id="fc" aria-hidden="true"></canvas></figure>
+        <figure><figcaption>Pressão sistólica <span>mmHg</span></figcaption><canvas id="sis" aria-hidden="true"></canvas></figure>
+        <figure><figcaption>Pressão diastólica <span>mmHg</span></figcaption><canvas id="dia" aria-hidden="true"></canvas></figure>
+      </div>
+      <div class="controle-hora">
+        <label for="horario">Horário selecionado <output id="hora-rotulo" for="horario">17:50</output></label>
+        <input id="horario" type="range" min="0" max="1439" value="1070">
+        <label>Ir para <input id="hora-exata" type="time" value="17:50"></label>
+        <button class="btn sec sm" id="fim-b" type="button">Fim do exercício B</button>
+      </div>
+    </section>
+
+    <section class="painel" aria-labelledby="titulo-calculos">
+      <h2 id="titulo-calculos">Cálculos no horário selecionado</h2>
+      <div id="calculos" class="duas-rotinas"></div>
+    </section>
+
+    <section class="painel" aria-labelledby="titulo-medias">
+      <div class="cabecalho-painel">
+        <h2 id="titulo-medias">Médias por período</h2>
+        <button class="btn sec sm" id="csv" type="button">Baixar série em CSV</button>
+      </div>
+      <p>As médias usam os pontos calculados a cada minuto. O CSV inclui as duas rotinas e os componentes das contas.</p>
+      <table id="medias">
+        <thead><tr><th scope="col">Período</th><th scope="col">Rotina</th><th scope="col">FC<br><small>bpm</small></th><th scope="col">PAS<br><small>mmHg</small></th><th scope="col">PAD<br><small>mmHg</small></th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <details class="painel">
+      <summary>Como o modelo foi construído</summary>
+      <ul>
+        <li>A pressão basal reutiliza a curva do Mosaico para adultos normotensos. Os pontos da MAPA são amostras do modelo a cada 20 minutos na vigília e 30 minutos no sono. <a href="https://pubmed.ncbi.nlm.nih.gov/1826069/">Staessen e colegas</a> · <a href="https://doi.org/10.1161/HYP.0000000000000087">AHA</a></li>
+        <li>A FC basal representa repouso. Usa a forma diária descrita por Degaute e os valores de repouso diurno e noturno da amostra ativa de Speed. Esses estudos descrevem amostras e protocolos diferentes. <a href="https://pubmed.ncbi.nlm.nih.gov/1885228/">Degaute e colegas</a> · <a href="https://pubmed.ncbi.nlm.nih.gov/37115739/">Speed e colegas</a></li>
+        <li>A sessão representa exercício aeróbio dinâmico. Usa a estimativa do Mosaico para o perfil de 21 anos e VO₂máx de 45 mL/kg/min. A PAS recebe uma subida aproximada de 10 mmHg por MET acima de 1, e a PAD segue a curva basal como hipótese didática. <a href="https://pubmed.ncbi.nlm.nih.gov/11153730/">Tanaka e colegas</a> · <a href="https://pubmed.ncbi.nlm.nih.gov/9139182/">Swain e Leutholtz</a> · <a href="https://www.scielo.br/j/abc/a/6v97HMjszjSvFvhGbV3x7vJ/?format=html">Diretriz Brasileira de Ergometria</a></li>
+        <li>A subida e a recuperação usam curvas exponenciais didáticas. Esta etapa representa a recuperação imediata em direção à basal. A PAM é uma aproximação pela pressão de pulso. Modelo educacional de adulto saudável.</li>
+      </ul>
+    </details>
+  </main>
+  <script type="module" src="bancada.js"></script>
+</body>
+</html>
