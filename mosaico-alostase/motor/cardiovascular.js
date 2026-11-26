@@ -1,5 +1,6 @@
 // Bancada de 24 h. As rotinas dos outros modos continuam usando seus próprios motores.
 import { formaRelogio, pesoSono, pressaoArterial } from './hemodinamica.js?v=2';
+import { faseNoMinuto } from './fase-circadiana.js';
 import { P } from './parametros.js';
 import { fracaoReservaVO2, frequenciaNoEsforco } from './treino.js';
 
@@ -27,7 +28,7 @@ function emJanela(min, janelasSono) {
   return janelasSono.find(([inicio, fim]) => min >= inicio && min < fim);
 }
 
-export function conferirCardiovascular({ sono, exercicio, janelasSono }) {
+export function conferirCardiovascular({ sono, exercicio, janelasSono, exercicioCalendario = false }) {
   const duracaoSono = sono ? moduloDia(sono[1] - sono[0]) : 0;
   if (janelasSono !== undefined && (!Array.isArray(janelasSono) || janelasSono.some((janela) => {
     if (!Array.isArray(janela) || janela.length !== 2 || !janela.every(Number.isInteger)) return true;
@@ -39,7 +40,8 @@ export function conferirCardiovascular({ sono, exercicio, janelasSono }) {
   }
   if (!exercicio) return '';
   const { inicio, duracao, intensidade } = exercicio;
-  if (!horaInteiraValida(inicio) || ![15, 30, 45].includes(duracao) || ![30, 40, 60].includes(intensidade)) {
+  const inicioValido = exercicioCalendario ? Number.isInteger(inicio) && inicio >= -70 && inicio < MINUTOS_DIA : horaInteiraValida(inicio);
+  if (!inicioValido || ![15, 30, 45].includes(duracao) || ![30, 40, 60].includes(intensidade)) {
     return 'Escolha um horário, uma duração e uma intensidade disponíveis.';
   }
   // Intervalos semiabertos: é possível começar a caminhar no minuto em que o sono termina.
@@ -58,7 +60,7 @@ export function simularCardiovascular(rotina) {
   const erro = conferirCardiovascular(rotina);
   if (erro) throw new RangeError(erro);
 
-  const { sono, exercicio, janelasSono } = rotina;
+  const { sono, exercicio, janelasSono, exercicioCalendario = false, faseInicialH = 0, faseFinalH = faseInicialH } = rotina;
   const blocosSono = janelasSono ? [] : [{ inicio: sono[0] / 60, fim: sono[1] / 60 }];
   const rampaSonoMin = P.pressaoArterial.rampaSonoH.valor * 60;
   const { perfilPadrao, repousoDiurno, repousoNoturno, vo2Repouso } = P.treino;
@@ -77,21 +79,23 @@ export function simularCardiovascular(rotina) {
     const peso = janelasSono
       ? (janela ? Math.min(1, (min - janela[0]) / rampaSonoMin, (janela[1] - min) / rampaSonoMin) : 0)
       : pesoSono(hora, blocosSono);
-    const relogio = formaRelogio(hora);
+    const fase = faseNoMinuto(faseInicialH, faseFinalH, min);
+    const relogio = formaRelogio(hora - fase);
     const quedaSonoFC = quedaFC * MODELO_CARDIO.pesoSonoFC * peso;
     const quedaRelogioFC = quedaFC * (1 - MODELO_CARDIO.pesoSonoFC) * relogio;
     const fcBasal = repousoDiurno.valor - quedaSonoFC - quedaRelogioFC;
-    const paBasal = pressaoArterial(hora, blocosSono, { pesoSono: peso });
-    const decorrido = exercicio ? moduloDia(min - exercicio.inicio) : 0;
-    const emEsforco = !!exercicio && decorrido < exercicio.duracao;
-    const emRecuperacao = !!exercicio && !emEsforco && decorrido < exercicio.duracao + 10;
+    const paBasal = pressaoArterial(hora, blocosSono, { pesoSono: peso, deslocamentoRelogioH: fase });
+    const desdeInicio = exercicio ? min - exercicio.inicio : 0;
+    const decorrido = exercicioCalendario ? desdeInicio : moduloDia(desdeInicio);
+    const emEsforco = !!exercicio && decorrido >= 0 && decorrido < exercicio.duracao;
+    const emRecuperacao = !!exercicio && decorrido >= exercicio.duracao && decorrido < exercicio.duracao + 10;
     const alvoFC = exercicio ? frequenciaNoEsforco({
       idade, grupo: perfilPadrao.grupo, fcRepouso: fcBasal, fracReserva,
     }) : null;
-    const deltaFC = exercicio
+    const deltaFC = exercicio && decorrido >= 0
       ? (alvoFC.valor - fcBasal) * respostaAoExercicio(decorrido, exercicio.duracao, MODELO_CARDIO.tauRecuperacaoFC)
       : 0;
-    const deltaPAS = exercicio
+    const deltaPAS = exercicio && decorrido >= 0
       ? deltaAlvoPAS * respostaAoExercicio(decorrido, exercicio.duracao, MODELO_CARDIO.tauRecuperacaoPAS)
       : 0;
     const sis = paBasal.sis + deltaPAS;

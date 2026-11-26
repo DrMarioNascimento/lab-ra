@@ -19,6 +19,11 @@
     .agenda-detalhes { margin: .65rem 0; }
     #erro-agenda { color: #ffc7b9; margin: .6rem 0; }
     #evidencia-noturna p { margin: .55rem 0; }
+    .dias-evento { display: flex; flex-wrap: wrap; gap: .3rem .55rem; flex-basis: 100%; }
+    .dias-evento label { display: flex; align-items: center; font-size: .85rem; }
+    .dias-evento input { margin: 0; }
+    .controle-fase { display: block; margin: .6rem 0; }
+    .agenda-opcoes select { width: auto; max-width: 100%; }
   </style>
 </head>
 <body>
@@ -38,33 +43,51 @@
         </div>
         <details class="agenda-detalhes" id="agenda-a" hidden>
           <summary>Editar agenda A</summary>
-          <p>Esta agenda se repete diariamente. Um fim anterior ao início atravessa a meia-noite.</p>
+          <p>Esta agenda se repete a cada semana, começando na segunda-feira. Marque os dias em que a atividade começa. Um fim anterior ao início atravessa a meia-noite.</p>
           <div class="agenda-opcoes"><button type="button" data-modelo="diurno" class="btn sec sm">Modelo diurno</button><button type="button" data-modelo="noturno" class="btn sec sm">Modelo noturno</button><button type="button" data-copiar class="btn sec sm">Copiar agenda A para B</button></div>
+          <div class="agenda-opcoes">
+            <label>Modelo de escala <select data-escala><option value="diurno">Diurna</option><option value="noturno">Noturna fixa</option><option value="folgas">Noturna com retorno nas folgas</option></select></label>
+            <button type="button" data-carregar-escala class="btn sec sm">Carregar escala</button>
+            <label>Tipo de pausa <select data-tipo-pausa><option value="meditacao">Meditação</option><option value="oracao">Oração</option><option value="biofeedback">Biofeedback respiratório</option></select></label>
+            <button type="button" data-pausa class="btn sec sm">Adicionar pausa</button>
+          </div>
           <div data-lista></div><button type="button" data-adicionar class="btn sec sm">Adicionar atividade à rotina A</button>
         </details>
         <details class="agenda-detalhes" id="agenda-b" hidden>
           <summary>Editar agenda B</summary>
-          <p>Esta agenda se repete diariamente. Um fim anterior ao início atravessa a meia-noite.</p>
+          <p>Esta agenda se repete a cada semana, começando na segunda-feira. Marque os dias em que a atividade começa. Um fim anterior ao início atravessa a meia-noite.</p>
           <div class="agenda-opcoes"><button type="button" data-modelo="diurno" class="btn sec sm">Modelo diurno</button><button type="button" data-modelo="noturno" class="btn sec sm">Modelo noturno</button><button type="button" data-copiar class="btn sec sm">Copiar agenda B para A</button></div>
+          <div class="agenda-opcoes">
+            <label>Modelo de escala <select data-escala><option value="diurno">Diurna</option><option value="noturno">Noturna fixa</option><option value="folgas">Noturna com retorno nas folgas</option></select></label>
+            <button type="button" data-carregar-escala class="btn sec sm">Carregar escala</button>
+            <label>Tipo de pausa <select data-tipo-pausa><option value="meditacao">Meditação</option><option value="oracao">Oração</option><option value="biofeedback">Biofeedback respiratório</option></select></label>
+            <button type="button" data-pausa class="btn sec sm">Adicionar pausa</button>
+          </div>
           <div data-lista></div><button type="button" data-adicionar class="btn sec sm">Adicionar atividade à rotina B</button>
         </details>
         <div class="agenda-opcoes" id="opcoes-noite" hidden>
           <label>Frequência da noite em claro <select id="frequencia-noturna"><option value="uma">Só na primeira noite</option><option value="semanal">Uma noite por semana</option></select></label>
           <label>Sono diurno após a noite em claro <select id="sono-diurno"><option value="nao">Sem sono diurno</option><option value="sim">08h às 12h</option></select></label>
         </div>
+        <label class="controle-fase" id="opcoes-fase" hidden>Fase circadiana
+          <select id="fase-circadiana"><option value="padrao">Usar o padrão da escala</option><option value="fixa">Manter fase de referência</option><option value="parcial">Simular ajuste parcial</option></select>
+        </label>
         <label>Tempo simulado <select id="horizonte"></select></label>
         <button type="submit" class="btn ok">Calcular trajetórias</button>
         <div class="agenda-opcoes">
           <button type="button" class="btn sec sm" id="atalho-noite">Comparar uma noite em claro</button>
+          <button type="button" class="btn sec sm" id="atalho-escalas">Comparar folgas em 8 semanas</button>
           <button type="button" class="btn sec sm" id="atalho-turno">Comparar trabalho noturno em um ano</button>
         </div>
         <p id="erro-agenda" role="alert" hidden></p>
       </form>
       <p id="situacao" role="status"></p>
+      <p id="resumo-escala" hidden>Nos três modelos de escala, estão programadas 40 h de trabalho e 56 h de sono por semana.</p>
     </section>
 
     <section class="painel" aria-labelledby="resumo">
       <div class="cabecalho-painel"><h2 id="resumo">Evolução das rotinas</h2><label>Indicador <select id="indicador"></select></label></div>
+      <label>Visualização <select id="passo-grafico"><option value="marcos">Marcos da trajetória</option><option value="dias">Todos os dias</option></select></label>
       <p><span class="legenda-a">— Rotina A</span> · <span class="legenda-b">╌ Rotina B</span></p>
       <canvas id="grafico" aria-hidden="true"></canvas>
       <div class="controle-hora">
@@ -90,7 +113,7 @@
       <h2>O que se sabe a longo prazo</h2>
       <div id="exposicao-noturna" class="duas-rotinas"></div>
       <p>Em trabalhadores noturnos permanentes, a meta-análise encontrou PA sistólica em média <strong>2,52 mmHg maior</strong> (IC95% 0,75 a 4,29) e diastólica <strong>1,76 mmHg maior</strong> (0,41 a 3,12) que nos trabalhadores diurnos. São diferenças entre grupos. O estudo não fornece um aumento para cada noite nem uma trajetória individual. <a href="https://pubmed.ncbi.nlm.nih.gov/34201492/">Gamboa Madeira e colegas</a></p>
-      <p>A adaptação do relógio biológico ao turno varia. As curvas conservam a fase de referência e a duração do sono que você programou. As horas de sono diurno e trabalho noturno medem a exposição, e as curvas de pressão de sono mostram a resposta didática. <a href="https://pubmed.ncbi.nlm.nih.gov/18533325/">Folkard</a> · <a href="../conferencia/">Tabelas fisiológicas</a></p>
+      <p>A adaptação do relógio biológico ao turno varia. Use a fase fixa como controle ou simule um ajuste parcial. O ajuste é exploratório e não estima a fase real de uma pessoa. As horas de sono diurno e trabalho noturno medem a exposição, e as curvas de pressão de sono mostram a resposta didática. <a href="https://pubmed.ncbi.nlm.nih.gov/18533325/">Folkard</a> · <a href="../conferencia/">Tabelas fisiológicas</a></p>
     </section>
     <details class="painel">
       <summary>Hipóteses da simulação</summary>
@@ -99,10 +122,12 @@
         <li>Os primeiros 7 pontos são diários. Da semana 2 à 8, os pontos são semanais. Dez meses didáticos completam 365 dias e podem ter 30 ou 31 dias.</li>
         <li>A adaptação da FC de repouso converge para uma redução de 4 bpm no cenário de treino. A magnitude é uma referência didática e a meia-vida de 28 dias é uma escolha do modelo. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6306777/">Reimers e colegas</a></li>
         <li>Os cenários de lazer e plantão isolam a vigília. Cafeína, álcool, iluminação e intensidade física exigem entradas específicas. O turno permanente usa 6 h de sono diurno programado como exemplo, e a agenda personalizada permite mudar essa duração.</li>
+        <li>No ajuste circadiano parcial, o sono programado serve de aproximação para as pistas de horário. O atraso pode se aproximar de 6 h, com meia-vida didática de 3 dias para atrasar e 2 dias para voltar. A fase altera as curvas basais de cortisol, FC e PA. <a href="https://stacks.cdc.gov/view/cdc/187008/cdc_187008_DS1.pdf">Smith e Eastman, tabela 2</a></li>
+        <li>Meditação, oração e biofeedback respiratório ocupam tempo da agenda. O biofeedback exibe o ritmo programado quando ativo. O motor não aplica uma mudança automática de PA, FC ou cortisol por causa de uma pausa.</li>
         <li>O saldo de sono resume até sete dias de vigília em excesso como índice didático. Glicemia e cortisol reaproveitam os modelos de refeição, horário e exercício. A trajetória anual mostra a repetição das rotinas e a adaptação modelada da FC.</li>
       </ul>
     </details>
   </main>
-  <script src="./trajetoria.js?v=2" type="module"></script>
+  <script src="./trajetoria.js?v=3" type="module"></script>
 </body>
 </html>

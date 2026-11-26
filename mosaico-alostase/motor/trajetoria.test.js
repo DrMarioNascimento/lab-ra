@@ -72,3 +72,21 @@ test('o turno permanente mantém 6 h de sono diurno e aplica a mesma agenda à p
   assert.ok(Math.abs(ultimo.saldoSono7d - 15.12) < 0.00001);
   assert.ok(ultimo.pamMedia > 60 && ultimo.pamMedia < 110);
 });
+
+test('três escalas controlam as durações e o horário de folga altera a fase sem criar sono', () => {
+  const ids = ['escalaDia', 'escalaNoite', 'escalaFolgas'];
+  const [dia, noite, folgas] = ids.map((id) => simularTrajetoria(id, 56));
+  for (const { dias } of [dia, noite, folgas]) for (let i = 0; i < dias.length; i += 7) {
+    const semana = dias.slice(i, i + 7);
+    assert.equal(semana.reduce((s, d) => s + d.horasSono, 0), 56);
+    assert.equal(semana.reduce((s, d) => s + d.trabalhoH, 0), 40);
+  }
+  assert.equal(dia.estadoFinal.faseCircadianaH, 0);
+  assert.ok(noite.dias[4].faseCircadianaH >= 3 && noite.dias[4].faseCircadianaH <= 5);
+  assert.ok(noite.estadoFinal.faseCircadianaH > folgas.estadoFinal.faseCircadianaH);
+  assert.ok(folgas.dias[6].faseCircadianaH < folgas.dias[5].faseCircadianaH);
+  const fixa = simularTrajetoria('escalaNoite', 56, { faseParcial: false });
+  assert.equal(fixa.estadoFinal.faseCircadianaH, 0);
+  assert.equal(fixa.estadoFinal.pressaoSono, noite.estadoFinal.pressaoSono);
+  assert.notEqual(fixa.dias[55].sonoForaFaseH, noite.dias[55].sonoForaFaseH);
+});

@@ -1,7 +1,8 @@
-import { agruparTrajetoria, HORIZONTES, PERFIS_TRAJETORIA, simularTrajetoria } from '../motor/trajetoria.js?v=2';
+import { agruparTrajetoria, HORIZONTES, PERFIS_TRAJETORIA, simularTrajetoria } from '../motor/trajetoria.js?v=3';
 import { PASSO_INTEGRADO } from '../motor/bancada-hidrica.js?v=2';
 import { desenharSerie } from '../hidratacao/grafico.js?v=2';
-import { criarEditor } from './editor.js';
+import { criarEditor } from './editor.js?v=2';
+import { DIAS_AGENDA } from '../motor/agenda.js?v=2';
 
 const el = (id) => document.getElementById(id);
 const perfis = [el('perfil-a'), el('perfil-b')];
@@ -12,6 +13,7 @@ const instante = el('instante');
 const painel = el('grafico');
 const painelDia = el('grafico-dia');
 const indicador = el('indicador');
+const passoGrafico = el('passo-grafico');
 const variavel = el('variavel-dia');
 const medidas = {
   fcMedia: ['FC média', 'bpm', 1], pamMedia: ['Pressão arterial média', 'mmHg', 1],
@@ -24,6 +26,11 @@ const medidas = {
   sonoDiurnoH: ['Sono diurno médio', 'h/dia', 1],
   atividadeNoturnaH: ['Atividade noturna no período', 'h', 1],
   trabalhoNoturnoH: ['Trabalho noturno no período', 'h', 1],
+  trabalhoH: ['Trabalho no período', 'h', 1],
+  faseCircadianaH: ['Atraso da fase no fim do período', 'h', 2],
+  sonoForaFaseH: ['Sono fora da noite biológica', 'h/dia', 2],
+  pausaMin: ['Tempo programado de pausas no período', 'min', 0],
+  biofeedbackMin: ['Biofeedback respiratório no período', 'min', 0],
   noitesEmClaro: ['Noites das 23h às 07h sem dormir', 'noites', 0],
   picoGlicemia: ['Pico de glicemia', 'mg/dL', 1], mediaCortisol: ['Cortisol médio', 'µg/dL', 2],
   treinoMin: ['Minutos de exercício no período', 'min', 0],
@@ -36,6 +43,8 @@ const medidasDia = {
   urinaLHora: ['Fluxo urinário', 'L/h', 3], adh: ['Vasopressina', 'índice', 1],
   renina: ['Renina', 'índice', 1], angII: ['Angiotensina II', 'índice', 1],
   aldosterona: ['Aldosterona', 'índice', 1], anp: ['ANP', 'índice', 1], tfg: ['Filtração glomerular estimada', 'mL/min', 1],
+  faseCircadianaH: ['Atraso da fase circadiana', 'h', 2],
+  ritmoOrientado: ['Ritmo respiratório programado (0 fora da pausa)', 'ciclos/min', 0],
   pressaoSono: ['Pressão de sono', '0 a 1', 3], vigiliaContinua: ['Vigília contínua', 'h', 1], cortisol: ['Cortisol', 'µg/dL', 2], glicemia: ['Glicemia', 'mg/dL', 1],
 };
 const nomeHorizonte = { 1: '24 horas', 2: '48 horas', 7: '7 dias', 28: '4 semanas', 56: '8 semanas', 90: '90 dias', 180: '180 dias', 365: '365 dias' };
@@ -82,6 +91,17 @@ function mostrarPeriodo() {
     <p>${nome} <strong>${fmt(a[i][indicador.value], casas)} ${unidade}</strong></p></article>`).join('');
 }
 
+function prepararGrafico(diaPreferido = null) {
+  agregados = resultados.map((r) => passoGrafico.value === 'dias'
+    ? r.dias.map((d) => ({ ...d, inicio: d.dia, fim: d.dia, nome: `Dia ${d.dia}`, nomeCurto: `D${d.dia}` }))
+    : agruparTrajetoria(r.dias));
+  periodo.max = agregados[0].length - 1;
+  periodo.disabled = agregados[0].length === 1;
+  const i = diaPreferido ? agregados[0].findIndex((p) => p.inicio <= diaPreferido && p.fim >= diaPreferido) : 0;
+  periodo.value = Math.max(0, i);
+  mostrarPeriodo();
+}
+
 function mostrarInstante() {
   const i = Number(instante.value);
   const [nome, unidade, casas] = medidasDia[variavel.value];
@@ -92,6 +112,7 @@ function mostrarInstante() {
     <h3>Rotina ${j ? 'B' : 'A'}</h3>
     <p>${nome} <strong>${fmt(valor(a[i], variavel.value), casas)} ${unidade}</strong></p>
     <p><strong>${a[i].atividade || (a[i].dormindo ? 'Em sono' : 'Em vigília')}</strong> · ${fmt(a[i].vigiliaContinua, 1)} h seguidas em vigília.</p>
+    ${a[i].ritmoOrientado ? `<p>Ritmo programado: ${a[i].ritmoOrientado} ciclos/min. <a href="https://fisiologia.drmarionascimento.com.br/biofeedback-respiratorio.html">Abrir a prática de biofeedback</a></p>` : ''}
     <p>FC ${fmt(a[i].fc, 1)} bpm · plasma ${fmt(a[i].plasmaL, 3)} L · ADH ${fmt(a[i].renal.regulacao.adh, 1)} · glicemia ${fmt(a[i].glicemia, 1)} mg/dL.</p>
     </article>`).join('');
 }
@@ -105,6 +126,7 @@ function mostrarDia() {
 function ajustarControles() {
   perfis.forEach((s, i) => { paineisAgenda[i].hidden = s.value !== 'personalizada'; });
   el('opcoes-noite').hidden = !perfis.some((s) => PERFIS_TRAJETORIA[s.value]?.noite);
+  el('opcoes-fase').hidden = !perfis.some((s) => PERFIS_TRAJETORIA[s.value]?.agenda || s.value === 'personalizada');
 }
 
 function mostrarExposicao() {
@@ -124,10 +146,12 @@ function mostrarExposicao() {
 function recalcular() {
   const n = Number(horizonte.value);
   const novas = perfis.map((s) => s.value);
+  const escolhaFase = el('fase-circadiana').value;
   const opcoes = novas.map((id, i) => ({
     frequenciaNoturna: el('frequencia-noturna').value,
     sonoDiurno: el('sono-diurno').value === 'sim',
     eventos: id === 'personalizada' ? editores[i].ler() : null,
+    faseParcial: escolhaFase === 'padrao' ? null : escolhaFase === 'parcial',
   }));
   const erro = el('erro-agenda');
   let novosResultados;
@@ -150,14 +174,11 @@ function recalcular() {
   rotinas = novas;
   configuracoes = opcoes;
   resultados = novosResultados;
-  agregados = resultados.map((r) => agruparTrajetoria(r.dias));
-  periodo.max = agregados[0].length - 1;
-  periodo.disabled = agregados[0].length === 1;
-  periodo.value = 0;
-  dia.replaceChildren(...resultados[0].dias.map((x) => new Option(`Dia ${x.dia}`, x.dia)));
+  prepararGrafico();
+  dia.replaceChildren(...resultados[0].dias.map((x) => new Option(`Dia ${x.dia} · ${DIAS_AGENDA[(x.dia - 1) % 7]}`, x.dia)));
   dia.value = n > 1 && novas.some((id) => PERFIS_TRAJETORIA[id].noite) ? 2 : 1;
+  el('resumo-escala').hidden = !novas.every((id) => id.startsWith('escala'));
   el('situacao').textContent = `${n} ${n === 1 ? 'dia calculado' : 'dias calculados'} por rotina.`;
-  mostrarPeriodo();
   mostrarDia();
   mostrarExposicao();
 }
@@ -167,6 +188,7 @@ function compararTurno(id, dias) {
   perfis[0].value = 'regular';
   perfis[1].value = id;
   horizonte.value = dias;
+  passoGrafico.value = 'marcos';
   el('frequencia-noturna').value = 'uma';
   el('sono-diurno').value = 'nao';
   indicador.value = id === 'turno' ? 'saldoSono7d' : 'vigiliaMaxH';
@@ -175,6 +197,18 @@ function compararTurno(id, dias) {
   ajustarControles();
   recalcular();
 }
+el('atalho-escalas').addEventListener('click', () => {
+  perfis[0].value = 'escalaNoite';
+  perfis[1].value = 'escalaFolgas';
+  horizonte.value = '56';
+  passoGrafico.value = 'dias';
+  el('fase-circadiana').value = 'padrao';
+  indicador.value = 'faseCircadianaH';
+  variavel.value = 'pressaoSono';
+  instante.value = 84;
+  ajustarControles();
+  recalcular();
+});
 el('atalho-noite').addEventListener('click', () => compararTurno('plantao', '2'));
 el('atalho-turno').addEventListener('click', () => compararTurno('turno', '365'));
 
@@ -188,6 +222,7 @@ periodo.addEventListener('input', () => {
   mostrarDia();
 });
 indicador.addEventListener('change', mostrarPeriodo);
+passoGrafico.addEventListener('change', () => prepararGrafico(Number(dia.value)));
 dia.addEventListener('change', mostrarDia);
 variavel.addEventListener('change', mostrarInstante);
 instante.addEventListener('input', mostrarInstante);

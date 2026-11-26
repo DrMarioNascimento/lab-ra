@@ -3,7 +3,7 @@ import { resumirCardiovascular, simularCardiovascular } from '../motor/cardiovas
 import { PARAMETROS_HIDRICOS } from '../motor/hidratacao.js';
 import { regularRim } from '../motor/renal.js';
 import { simularSemana } from '../motor/semana.js';
-import { simularTrajetoria } from '../motor/trajetoria.js?v=2';
+import { simularTrajetoria } from '../motor/trajetoria.js?v=3';
 
 const n = (v, casas = 1) => v.toLocaleString('pt-BR', { maximumFractionDigits: casas, minimumFractionDigits: casas });
 const pa = (p) => `${n(p.sis)} / ${n(p.dia)} mmHg`;
@@ -20,6 +20,11 @@ const diurno = simularTrajetoria('regular', 2, { detalharDia: 1 });
 const turno = simularTrajetoria('turno', 365);
 const noiteAno = turno.dias.reduce((s, p) => s + p.trabalhoNoturnoH, 0);
 
+const semanaFixa = simularTrajetoria('escalaNoite', 7);
+const faseCincoDias = semanaFixa.dias[4].faseCircadianaH;
+const semanaFolgas = simularTrajetoria('escalaFolgas', 7);
+const soma = (dados, chave) => dados.dias.reduce((total, d) => total + d[chave], 0);
+
 const fontes = {
   staessen: ['Staessen · 3.476 normotensos', 'https://pubmed.ncbi.nlm.nih.gov/1826069/'],
   speed: ['Speed · amostra ativa, medida em repouso', 'https://pubmed.ncbi.nlm.nih.gov/37115739/'],
@@ -32,6 +37,10 @@ const fontes = {
   processoS: ['Borbély e colegas · modelo de dois processos', 'https://pubmed.ncbi.nlm.nih.gov/26762182/'],
   turno: ['Gamboa Madeira e colegas · 45 estudos', 'https://pubmed.ncbi.nlm.nih.gov/34201492/'],
   metabolico: ['Pan e colegas · duas coortes de enfermeiras', 'https://pubmed.ncbi.nlm.nih.gov/22162955/'],
+  luz: ['Smith, Cullnan e Eastman · tabela 2', 'https://stacks.cdc.gov/view/cdc/187008/cdc_187008_DS1.pdf'],
+  ritmo: ['Russo e colegas · respiração lenta em pessoas saudáveis', 'https://doi.org/10.1183/20734735.009817'],
+  vfc: ['Laborde e colegas · revisão e meta-análise', 'https://pubmed.ncbi.nlm.nih.gov/35623448/'],
+  meditacao: ['Mandlik e colegas · estudo de sessão única', 'https://doi.org/10.1002/smi.3324'],
   fase: ['Folkard · revisão da fase da melatonina', 'https://pubmed.ncbi.nlm.nih.gov/18533325/'],
   sono: ['Van Dongen · protocolo com 14 noites', 'https://pubmed.ncbi.nlm.nih.gov/12683469/'],
 };
@@ -60,7 +69,14 @@ const tabelas = [
     ['Pressão de sono às 07h', 'O Processo S cresce na vigília e cai no sono', `${n(diurno.dias[1].pressaoAoAcordar, 3)} com sono / ${n(plantao.dias[1].pressaoAoAcordar, 3)} após plantão`, 'Conferência da direção. A escala de 0 a 1 pertence ao motor.', 'processoS'],
     ['Pressão arterial em trabalhadores noturnos permanentes', '+2,52 mmHg sistólica (IC95% 0,75–4,29) e +1,76 mmHg diastólica (0,41–3,12) entre grupos', `${n(noiteAno, 0)} h de trabalho na janela 22h–07h em 365 dias`, 'O motor calcula a exposição. A diferença entre grupos é referência externa, sem ajuste individual nem prazo de aparecimento.', 'turno'],
     ['Diabetes tipo 2 e turno noturno rotativo', 'Após 20 anos ou mais de exposição em duas coortes de enfermeiras, HR 1,24 (IC95% 1,13–1,37) após ajuste pelo IMC', 'O motor calcula a glicemia ligada aos horários e às refeições', 'O risco ao longo de décadas vem das coortes e pertence ao contexto clínico. Esse resultado diz respeito a turnos rotativos.', 'metabolico'],
-    ['Ajuste do relógio biológico ao turno', 'A adaptação da fase da melatonina variou entre trabalhadores', 'Fase de referência fixa; 6 h/dia de sono diurno no cenário pronto', 'Hipótese didática da rotina. O motor não estima a adaptação individual.', 'fase'],
+    ['Ajuste do relógio biológico ao turno', 'A adaptação da fase da melatonina variou entre trabalhadores', 'A fase fixa serve de controle. As escalas semanais também permitem ajuste parcial.', 'Hipótese didática sem medição da luz nem da adaptação individual.', 'fase'],
+    ['Atraso da fase da melatonina', 'Cerca de 4 h com intervenção de luz/escuro e 1 h no controle, após três plantões simulados e duas folgas', `${n(faseCincoDias, 2)} h no 5º dia de sono diurno do cenário fixo`, 'Comparação de ordem de grandeza sob protocolos distintos. O motor usa a agenda de sono como aproximação; o estudo mediu DLMO sob luz fraca.', 'luz'],
+    ['Carga igual na comparação de escalas', 'O horário e a adaptação da fase são dimensões distintas da duração do sono', `${soma(semanaFixa, 'horasSono')} / ${soma(semanaFolgas, 'horasSono')} h de sono e ${soma(semanaFixa, 'trabalhoH')} / ${soma(semanaFolgas, 'trabalhoH')} h de trabalho por semana`, 'Controle do cenário, com o horário do sono como diferença experimental.', 'fase'],
+  ]],
+  ['Pausas na agenda', [
+    ['Ritmo respiratório programado', '4–10 ciclos/min na revisão de respiração lenta', '5, 6 ou 7 ciclos/min durante a pausa', 'Frequência orientada na agenda. A prática de biofeedback abre separadamente.', 'ritmo'],
+    ['Variabilidade da frequência cardíaca', 'Aumento de indicadores vagais de VFC durante a respiração lenta na meta-análise', 'Ritmo marcado no horário da sessão', 'A VFC exigiria sinais batimento a batimento. As curvas do Mosaico não atribuem um valor numérico de VFC à pausa.', 'vfc'],
+    ['Meditação e reatividade ao estresse', 'Revisão de sessões únicas encontrou resultados favoráveis em parte dos estudos, com protocolos e desfechos diferentes', 'Minutos programados de pausa', 'Meditação e oração podem ser agendadas. Nenhuma redução fixa de PA ou cortisol é atribuída automaticamente a essas atividades.', 'meditacao'],
   ]],
 ];
 

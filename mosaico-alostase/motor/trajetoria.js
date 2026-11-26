@@ -1,11 +1,12 @@
 // Motor contínuo da bancada integrada. Estado hídrico, excreção e pressão de sono atravessam a meia-noite.
 import { BEBIDAS_BASE, CENARIOS_HIDRICOS, PASSO_INTEGRADO, SESSAO, simularHidratacao } from './bancada-hidrica.js?v=3';
-import { simularCardiovascular } from './cardiovascular.js?v=2';
+import { simularCardiovascular } from './cardiovascular.js?v=3';
 import { hidratar } from './hidratacao.js';
 import { cortisolBase, efeitoExercicioCortisol, efeitoRefeicaoGlicemia } from './motor.js';
 import { P } from './parametros.js';
 import { regularRim } from './renal.js';
-import { agendaInicial, prepararAgenda, TIPOS_AGENDA } from './agenda.js';
+import { agendaEscala, agendaInicial, prepararAgenda, TIPOS_AGENDA } from './agenda.js?v=2';
+import { emNoiteBiologica, faseNoMinuto, passoFaseCircadiana } from './fase-circadiana.js';
 
 export const HORIZONTES = [1, 2, 7, 28, 56, 90, 180, 365];
 export const PERFIS_TRAJETORIA = Object.freeze({
@@ -17,6 +18,9 @@ export const PERFIS_TRAJETORIA = Object.freeze({
   plantao: { nome: 'Trabalho noturno (22h–07h)', noite: { inicio: 1320, atividade: 'Plantão' }, ambiente: 'fresco' },
   lazer: { nome: 'Lazer noturno (23h–07h)', noite: { inicio: 1380, atividade: 'Lazer' }, ambiente: 'fresco' },
   turno: { nome: 'Turno noturno permanente (22h–07h, sono 08h–14h)', agenda: agendaInicial(true), ambiente: 'fresco' },
+  escalaDia: { nome: 'Escala diurna · 5 jornadas por semana', agenda: agendaEscala('diurno'), faseParcial: true, ambiente: 'fresco' },
+  escalaNoite: { nome: 'Escala noturna · sono diurno nas folgas', agenda: agendaEscala('noturno'), faseParcial: true, ambiente: 'fresco' },
+  escalaFolgas: { nome: 'Escala noturna · retorna ao sono noturno nas folgas', agenda: agendaEscala('folgas'), faseParcial: true, ambiente: 'fresco' },
   personalizada: { nome: 'Agenda personalizada', ambiente: 'fresco' },
 });
 const REFEICOES = Object.freeze([7.5, 13, 20].map((hora) => ({ hora, carboG: 50 })));
@@ -66,18 +70,19 @@ function refeicao(hora, m, diaAnterior) {
   return efeitoRefeicaoGlicemia(m, (hora - m.hora + (diaAnterior ? 24 : 0)) * 60);
 }
 
-function pulsoCortisol(hora, sessao, diaAnterior) {
+function pulsoCortisol(hora, sessao, diaAnterior, faseH) {
   if (!sessao) return 0;
   const inicio = sessao.inicio / 60;
   return efeitoExercicioCortisol({ inicio, fim: inicio + sessao.duracao / 60, vo2: sessao.intensidade },
-    (hora - inicio + (diaAnterior ? 24 : 0)) * 60);
+    (hora - inicio + (diaAnterior ? 24 : 0)) * 60, faseH);
 }
 
-function cardioDaAgenda(janelasSono, sessoes) {
-  const basal = simularCardiovascular({ janelasSono });
+function cardioDaAgenda(janelasSono, sessoes, fase) {
+  const opcoes = { janelasSono, ...fase };
+  const basal = simularCardiovascular(opcoes);
   if (!sessoes.length) return basal;
   const series = sessoes.map((exercicio) => ({
-    exercicio, pontos: simularCardiovascular({ janelasSono, exercicio }),
+    exercicio, pontos: simularCardiovascular({ ...opcoes, exercicio, exercicioCalendario: true }),
   }));
   return basal.map((p, min) => {
     let fc = p.fc, sis = p.sis, intensidadeAtiva = 0;
@@ -100,30 +105,40 @@ function ajustarFCBasal(pontos, queda) {
 }
 
 /** O mesmo horizonte compartilha o mesmo estado inicial, independentemente do número de dias exibido. */
-export function simularTrajetoria(perfilId, dias, { detalharDia = -1, frequenciaNoturna = 'uma', sonoDiurno = false, eventos = null } = {}) {
+export function simularTrajetoria(perfilId, dias, { detalharDia = -1, frequenciaNoturna = 'uma', sonoDiurno = false, eventos = null, faseParcial = null } = {}) {
   if (!Object.hasOwn(PERFIS_TRAJETORIA, perfilId) || !Number.isInteger(dias) || dias < 1 || dias > 365) throw new RangeError('Escolha um cenário e um horizonte de 1 a 365 dias.');
   const perfil = PERFIS_TRAJETORIA[perfilId];
-  const agendaLivre = perfilId === 'personalizada' || perfil.agenda ? prepararAgenda(eventos ?? perfil.agenda ?? agendaInicial()) : null;
+  const calendario = perfilId === 'personalizada' || perfil.agenda ? prepararAgenda(eventos ?? perfil.agenda ?? agendaInicial()) : null;
+  const modelarFase = Boolean(calendario && (faseParcial ?? perfil.faseParcial));
   const saida = [];
   const baseCardio = new Map();
   let agua = hidratar();
-  let pressaoSono = 0.5, quedaFC = 0, sessoesAnteriores = agendaLivre?.sessoes ?? [], vigiliaMin = 0;
+  let pressaoSono = 0.5, quedaFC = 0, sessoesAnteriores = calendario?.dia(-1).sessoes ?? [], vigiliaMin = 0, faseH = 0;
   let leitura = [];
   const saldosSono = [];
-  let refeicoesAnteriores = agendaLivre?.refeicoes ?? REFEICOES;
+  let refeicoesAnteriores = calendario?.dia(-1).refeicoes ?? REFEICOES;
   let sonoNaNoiteMin = 0;
 
   for (let dia = 0; dia < dias; dia++) {
+    const agendaLivre = calendario?.dia(dia);
     const { sono, sessao } = plano(dia, perfil);
     const agenda = perfil.noite ? agendaNoturna(dia, perfil, frequenciaNoturna, sonoDiurno) : null;
     const janelasSono = agendaLivre?.janelasSono ?? agenda?.janelasSono;
     const sessoes = agendaLivre?.sessoes ?? (sessao ? [sessao] : []);
-    const cache = agendaLivre ? 'agenda' : JSON.stringify([sono, Boolean(sessao), janelasSono]);
-    if (!baseCardio.has(cache)) baseCardio.set(cache, agendaLivre
-      ? cardioDaAgenda(janelasSono, sessoes)
-      : simularCardiovascular({ sono, exercicio: sessao, janelasSono }));
+    const faseFinalH = passoFaseCircadiana(faseH, janelasSono ?? [], modelarFase);
+    const fase = { faseInicialH: faseH, faseFinalH };
+    const cache = agendaLivre ? `agenda:${dia % 7}` : JSON.stringify([sono, Boolean(sessao), janelasSono]);
+    let base;
+    if (faseH || faseFinalH) {
+      base = cardioDaAgenda(janelasSono, agendaLivre.sessoesCardio, fase);
+    } else {
+      if (!baseCardio.has(cache)) baseCardio.set(cache, agendaLivre
+        ? cardioDaAgenda(janelasSono, agendaLivre.sessoesCardio, fase)
+        : simularCardiovascular({ sono, exercicio: sessao, janelasSono }));
+      base = baseCardio.get(cache);
+    }
     // O ganho no fim do dia passa a valer na manhã seguinte.
-    const cardio = ajustarFCBasal(baseCardio.get(cache), quedaFC);
+    const cardio = quedaFC ? ajustarFCBasal(base, quedaFC) : base;
     const cenario = CENARIOS_HIDRICOS[perfil.ambiente];
     // O cenário adia o evento de ingestão que cai no sono diurno até o horário de acordar.
     const primeiraVigilia = (min) => janelasSono?.find(([inicio, fim]) => min >= inicio && min < fim)?.[1] ?? min;
@@ -133,9 +148,11 @@ export function simularTrajetoria(perfilId, dias, { detalharDia = -1, frequencia
       guardarPontos: dia === detalharDia, regular: regularRim, reposicaoAposSessao: !agendaLivre, limitarDominio: perfilId === 'personalizada' });
     agua = faseHidrica.estado;
     let picoGlicemia = 0, mediaCortisol = 0, pressaoAoAcordar = 0;
-    let sonoMin = 0, vigiliaMaxMin = 0, atividadeNoturnaMin = 0, sonoDiurnoMin = 0, trabalhoNoturnoMin = 0, noitesEmClaro = 0;
+    let sonoMin = 0, vigiliaMaxMin = 0, atividadeNoturnaMin = 0, sonoDiurnoMin = 0, trabalhoNoturnoMin = 0, trabalhoMin = 0, noitesEmClaro = 0;
+    let sonoForaFaseMin = 0, pausaMin = 0, biofeedbackMin = 0;
     for (let i = 0; i < PASSOS_DIA; i++) {
       const min = i * PASSO_INTEGRADO, hora = min / 60;
+      const faseAtual = faseNoMinuto(faseH, faseFinalH, min);
       if (min === FIM_NOITE) {
         pressaoAoAcordar = pressaoSono;
         noitesEmClaro = Number(dia > 0 && !sonoNaNoiteMin);
@@ -143,26 +160,33 @@ export function simularTrajetoria(perfilId, dias, { detalharDia = -1, frequencia
       }
       const { dormindo } = cardio[min];
       const tipoAgenda = agendaLivre?.atividadeEm(min);
-      const atividade = agenda?.atividadeNaHora(min) || TIPOS_AGENDA[tipoAgenda] || '';
+      const pausa = agendaLivre?.pausaEm(min);
+      const nomeAtividade = agenda?.atividadeNaHora(min) || TIPOS_AGENDA[tipoAgenda] || '';
+      const atividade = pausa ? TIPOS_AGENDA[pausa.tipo] : nomeAtividade;
+      if (pausa) pausaMin += PASSO_INTEGRADO;
+      if (pausa?.tipo === 'biofeedback') biofeedbackMin += PASSO_INTEGRADO;
+      if (tipoAgenda === 'trabalho' || nomeAtividade === 'Plantão') trabalhoMin += PASSO_INTEGRADO;
       const madrugada = min < FIM_NOITE || min >= 1320;
       if (atividade && madrugada) atividadeNoturnaMin += PASSO_INTEGRADO;
-      if ((tipoAgenda === 'trabalho' || atividade === 'Plantão') && madrugada) trabalhoNoturnoMin += PASSO_INTEGRADO;
+      if ((tipoAgenda === 'trabalho' || nomeAtividade === 'Plantão') && madrugada) trabalhoNoturnoMin += PASSO_INTEGRADO;
       if (dormindo) {
         sonoMin += PASSO_INTEGRADO;
+        if (!emNoiteBiologica(min, faseAtual)) sonoForaFaseMin += PASSO_INTEGRADO;
         if (min < FIM_NOITE || min >= INICIO_SONO_HABITUAL) sonoNaNoiteMin += PASSO_INTEGRADO;
         if (min >= 420 && min < 1320) sonoDiurnoMin += PASSO_INTEGRADO;
         vigiliaMin = 0;
       }
-      const subida = refeicoes.reduce((soma, m, j) => soma + refeicao(hora, m, false)
-        + refeicao(hora, refeicoesAnteriores[j], true), 0);
+      const subida = refeicoes.reduce((soma, m) => soma + refeicao(hora, m, false), 0)
+        + refeicoesAnteriores.reduce((soma, m) => soma + refeicao(hora, m, true), 0);
       const glicemia = P.glicemia.base.valor + Math.min(subida, P.glicemia.subidaMax.valor);
-      const cortisol = cortisolBase(hora)
-        + sessoes.reduce((soma, j) => soma + pulsoCortisol(hora, j, false), 0)
-        + sessoesAnteriores.reduce((soma, j) => soma + pulsoCortisol(hora, j, true), 0);
+      const cortisol = cortisolBase(hora - faseAtual)
+        + sessoes.reduce((soma, j) => soma + pulsoCortisol(hora, j, false, faseAtual), 0)
+        + sessoesAnteriores.reduce((soma, j) => soma + pulsoCortisol(hora, j, true, faseAtual), 0);
       picoGlicemia = Math.max(picoGlicemia, glicemia);
       mediaCortisol += cortisol / PASSOS_DIA;
       if (dia === detalharDia) leitura.push({
         ...faseHidrica.pontos[i], glicemia, cortisol, pressaoSono, dormindo, atividade, vigiliaContinua: vigiliaMin / 60,
+        faseCircadianaH: faseAtual, ritmoOrientado: pausa?.tipo === 'biofeedback' ? pausa.ritmo ?? 6 : 0,
       });
       if (!dormindo) vigiliaMin += PASSO_INTEGRADO;
       if (perfilId === 'personalizada' && vigiliaMin > 48 * 60) {
@@ -177,16 +201,18 @@ export function simularTrajetoria(perfilId, dias, { detalharDia = -1, frequencia
     saida.push({
       dia: dia + 1, horasSono, saldoSono7d, pressaoAoAcordar, quedaFC, picoGlicemia, mediaCortisol,
       vigiliaMaxH: vigiliaMaxMin / 60, atividadeNoturnaH: atividadeNoturnaMin / 60,
-      sonoDiurnoH: sonoDiurnoMin / 60, trabalhoNoturnoH: trabalhoNoturnoMin / 60, noitesEmClaro,
+      sonoDiurnoH: sonoDiurnoMin / 60, trabalhoNoturnoH: trabalhoNoturnoMin / 60, trabalhoH: trabalhoMin / 60, noitesEmClaro,
+      faseCircadianaH: faseFinalH, sonoForaFaseH: sonoForaFaseMin / 60, pausaMin, biofeedbackMin,
       ureseL: faseHidrica.totais.urinaL, suorL: faseHidrica.totais.suorL, treinoMin: sessoes.reduce((soma, e) => soma + e.duracao, 0),
       ...faseHidrica.resumo,
     });
+    faseH = faseFinalH;
     refeicoesAnteriores = refeicoes;
     sessoesAnteriores = sessoes;
     quedaFC = passoAdaptacaoFC(quedaFC, perfil.treino);
   }
 
-  return { dias: saida, leitura, estadoFinal: { agua, pressaoSono, quedaFC } };
+  return { dias: saida, leitura, estadoFinal: { agua, pressaoSono, quedaFC, faseCircadianaH: faseH } };
 }
 
 export function agruparTrajetoria(dias) {
@@ -210,6 +236,8 @@ export function agruparTrajetoria(dias) {
       atividadeNoturnaH: trecho.reduce((s, p) => s + p.atividadeNoturnaH, 0),
       sonoDiurnoH: media('sonoDiurnoH'), trabalhoNoturnoH: trecho.reduce((s, p) => s + p.trabalhoNoturnoH, 0),
       noitesEmClaro: trecho.reduce((s, p) => s + p.noitesEmClaro, 0),
+      trabalhoH: trecho.reduce((s, p) => s + p.trabalhoH, 0), sonoForaFaseH: media('sonoForaFaseH'),
+      pausaMin: trecho.reduce((s, p) => s + p.pausaMin, 0), biofeedbackMin: trecho.reduce((s, p) => s + p.biofeedbackMin, 0),
     });
   }
   for (let i = 0; i < 7; i++) adicionar(i, i + 1, `Dia ${i + 1}`, `D${i + 1}`);
