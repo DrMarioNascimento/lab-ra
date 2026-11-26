@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Sono e pressão em 24 horas · Mosaico Alostase</title>
+  <link rel="stylesheet" href="../../jogo/estilo.css?v=9">
+  <link rel="stylesheet" href="../../cardiovascular/bancada.css">
+  <link rel="stylesheet" href="../../turno-calor/calor.css">
+  <style>
+    .bancada select { max-width: 100%; }
+    .faixa-sono { display: flex; height: 12px; border-radius: 8px; overflow: hidden; margin: 0 20px 0 58px; background: #314158; }
+    .faixa-sono span { background: #345c87; }
+    .faixa-sono .vigilia { background: #314158; }
+    .faixa-sono .desperto { background: #ffbd7b; min-width: 1px; }
+    .acoes-sono { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: .75rem; }
+    .cabecalho-sono { width: 43%; }
+  </style>
+</head>
+<body>
+  <main class="bancada">
+    <nav class="calor-nav">
+      <a href="../">← Tabelas fisiológicas</a>
+      <a href="../plantao-matinal/">Conferência de 90 dias</a>
+    </nav>
+    <header class="abertura">
+      <h1>Sono e pressão em 24 horas</h1>
+      <p>Compare duas rotinas com a mesma janela de sono e a mesma fase circadiana. Mude a quantidade e a duração dos despertares para ver o que acontece com a pressão média.</p>
+    </header>
+    <section class="painel">
+      <h2>Sono contínuo e sono fragmentado</h2>
+      <div class="controle-hora">
+        <label>Janela de sono <select id="janela">
+          <option value="noturna">23:00–07:00</option>
+          <option value="diurna">11:00–19:00</option>
+        </select></label>
+        <label>Duração de cada despertar <select id="duracao">
+          <option value="0">Pulso breve</option>
+          <option value="1">1 minuto</option>
+          <option value="2">2 minutos</option>
+          <option value="5" selected>5 minutos</option>
+          <option value="7">7 minutos</option>
+          <option value="10">10 minutos</option>
+        </select></label>
+      </div>
+      <div class="controle-hora">
+        <label for="quantidade">Despertares <output id="quantidade-rotulo"></output></label>
+        <input id="quantidade" type="range" min="0" max="12" value="4" step="1">
+      </div>
+      <div class="controle-hora">
+        <label>Curva <select id="variavel"><option value="sis">Pressão sistólica (mmHg)</option><option value="fc">Frequência cardíaca (bpm)</option></select></label>
+        <label>Visualizar <select id="periodo"><option value="dia">24 horas</option><option value="sono">Somente a janela de sono</option></select></label>
+      </div>
+      <canvas id="curva" class="calor-curva" aria-hidden="true"></canvas>
+      <div id="faixa" class="faixa-sono" aria-hidden="true"></div>
+      <p class="calor-legenda"><span>Contínua · sono sem interrupções</span><span>Tracejada · cenário com despertares</span></p>
+      <p>A faixa azul marca a janela de sono. As marcas alaranjadas indicam despertares.</p>
+      <div class="controle-hora">
+        <label for="hora">Horário <output id="hora-rotulo"></output></label>
+        <input id="hora" type="range" min="0" max="1439" value="0" step="1">
+      </div>
+      <div class="acoes-sono"><button id="proximo-evento" class="btn sec sm" type="button">Ir ao próximo despertar</button></div>
+      <table>
+        <thead><tr><th scope="col" class="cabecalho-sono">No horário escolhido</th><th scope="col">Contínuo</th><th scope="col">Fragmentado</th></tr></thead>
+        <tbody id="momento"></tbody>
+      </table>
+    </section>
+    <section class="painel">
+      <h2>O que explica a queda</h2>
+      <p>A tabela calcula a queda de duas formas. Uma usa toda a janela de sono, incluindo os despertares. A outra usa os minutos efetivamente dormidos e conta os despertares prolongados como vigília.</p>
+      <table>
+        <thead><tr><th scope="col" class="cabecalho-sono">Média ou duração</th><th scope="col">Contínuo</th><th scope="col">Fragmentado</th></tr></thead>
+        <tbody id="medias"></tbody>
+      </table>
+      <p id="efeito" class="calor-detalhe" aria-live="polite"></p>
+    </section>
+    <section class="painel" id="morris">
+      <h2>Conferência com Morris e colegas, 2016</h2>
+      <p>O estudo inverteu a rotina em 12 horas em adultos saudáveis. A tabela mostra a mudança da condição alinhada para a invertida. A simulação usa a fase fixa, a janela de 23:00–07:00 na condição alinhada e de 11:00–19:00 na invertida.</p>
+      <table>
+        <thead><tr><th scope="col">Mudança com a inversão</th><th scope="col">Estudo</th><th scope="col">Motor contínuo</th><th scope="col">Motor + 56 min acordado</th></tr></thead>
+        <tbody id="comparacao"></tbody>
+      </table>
+      <p class="calor-detalhe">O estudo encontrou 56 minutos a menos de sono por polissonografia. Para testar quanto isso poderia explicar, o motor distribui esse tempo em oito despertares de sete minutos na condição invertida. Os desfechos de pressão de 2016 ficaram reservados para conferência. O ajuste circadiano é o já usado no Alostase a partir do estudo de 2017.</p>
+      <p><a href="https://pubmed.ncbi.nlm.nih.gov/26858430/">Morris e colegas, 2016 · protocolo e resultados</a></p>
+    </section>
+    <details class="painel">
+      <summary>Como o motor calcula os despertares</summary>
+      <ul>
+        <li>O pulso breve usa picos de referência de cerca de 15 mmHg de pressão e 8 bpm de frequência cardíaca. Como a tela trabalha com médias de um minuto, um pulso triangular de 12 segundos contribui com cerca de 1,5 mmHg e 0,8 bpm no minuto do evento.</li>
+        <li>Nos despertares de vários minutos, pressão e frequência se aproximam dos valores simulados de vigília no mesmo horário. As constantes de subida e retorno à curva do sono são hipóteses do modelo, de 1 e 3 minutos.</li>
+        <li>A fase do relógio é a mesma nas duas rotinas da bancada. Os eventos são igualmente espaçados dentro da janela. O cálculo representa despertares e pulsos, sem estimar os estágios individuais do sono.</li>
+      </ul>
+      <p><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5993613/">de Zambotti e colegas · resposta cardiovascular ao despertar</a><br>
+        <a href="https://doi.org/10.1056/NEJM199302043280502">Somers e colegas · pressão e frequência cardíaca nos estágios de sono</a></p>
+    </details>
+  </main>
+  <script type="module" src="./sono-pressao.js"></script>
+</body>
+</html>

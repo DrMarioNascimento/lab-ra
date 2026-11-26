@@ -29,7 +29,10 @@ function atualizarDia() {
   el('dia-rotulo').textContent = rotulo;
   el('dia').setAttribute('aria-valuetext', rotulo);
   const pontos = chaves.map((coorte) => series[coorte][dia]);
-  el('dia-leitura').innerHTML = linha('Queda sistólica no sono', pontos.map((p) => fmt(p.quedaPasPct)))
+  el('dia-leitura').innerHTML = linha('Sistólica média em vigília', pontos.map((p) => fmt(p.pasVigilia, 'mmHg')))
+    + linha('Sistólica média durante o sono', pontos.map((p) => fmt(p.pasSono, 'mmHg')))
+    + linha('Diferença vigília − sono', pontos.map((p) => fmt(p.pasVigilia - p.pasSono, 'mmHg')))
+    + linha('Queda sistólica no sono', pontos.map((p) => fmt(p.quedaPasPct)))
     + linha('Janela de sono', pontos.map((p) => `${horario(p.inicio)}–${horario(p.fim)}`))
     + linha('Variação no início do sono', pontos.map((p) => fmt(p.variabilidadeH, 'h')))
     + linha('Fase estimada', pontos.map((p) => fmt(p.faseH, 'h')))
