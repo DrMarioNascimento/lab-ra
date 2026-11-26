@@ -11,11 +11,12 @@ function capacidades(massaKg) {
 }
 const psat = (c) => 0.61078 * Math.exp(17.27 * c / (c + 237.3));
 
-function fluxoTermico(estado, { temperatura, umidade, esforco, protocolo, aclimatacao }) {
+function fluxoTermico(estado, { temperatura, umidade, esforco, protocolo, aclimatacao, estadoHidrico }) {
   const { centralC, peleC } = estado;
   const vo2 = Math.max(P.vo2Repouso, (protocolo?.vo2Max ?? P.vo2Max) * esforco);
-  // Caminhada nivelada. O cenário considera trabalho mecânico externo líquido igual a zero.
-  const calorMetabolicoW = vo2 * (protocolo?.massaKg ?? P.massaKg) * P.equivalenteO2 / 60000;
+  // Sem potência mecânica medida, o protocolo de bicicleta aproxima o trabalho externo por uma fração do metabolismo.
+  const calorMetabolicoW = vo2 * (protocolo?.massaKg ?? P.massaKg) * P.equivalenteO2 / 60000
+    * (1 - (protocolo?.fracaoTrabalhoExterno ?? 0));
   const perdaRespiratoriaW = calorMetabolicoW * (0.073 - 0.00035 * (temperatura - 22) - 0.00008 * (umidade - 45));
   // No estudo de corrida a velocidade do ar acompanha a esteira.
   const fatorAr = protocolo ? (protocolo.ventoMps / protocolo.ventoReferenciaMps) ** 0.6 : 1;
@@ -24,8 +25,13 @@ function fluxoTermico(estado, { temperatura, umidade, esforco, protocolo, aclima
   const ganhoSeco = protocolo?.ganhoSeco ?? 1;
   const ganhoEvap = protocolo?.ganhoEvap ?? 1;
   const perdaSecaW = (6.95 + 4 * esforco) * fatorAr * ganhoSeco * (peleC - temperatura);
-  const transportePeleW = (19 + (16 + 30 * esforco) * Math.max(0, centralC - 37) + 85 * esforco) * (centralC - peleC);
-  const limiar = 37.10 - (aclimatacao?.suor ?? 0) * 0.25;
+  const desvioOsm = estadoHidrico?.desvioOsm ?? 0;
+  const deficitPlasma = estadoHidrico?.deficitPlasma ?? 0;
+  const limiarCutaneo = 37 + 0.025 * desvioOsm;
+  const condutancia = 19 + ((16 + 30 * esforco) * Math.max(0, centralC - limiarCutaneo) + 85 * esforco)
+    * Math.max(0.60, 1 - (protocolo?.ganhoDeficitCutaneo ?? 1.35) * deficitPlasma);
+  const transportePeleW = condutancia * (centralC - peleC);
+  const limiar = 37.10 - (aclimatacao?.suor ?? 0) * 0.25 + (protocolo?.ganhoOsmSudorese ?? 0.055) * desvioOsm;
   const ganhoSuor = 1 + 0.35 * (aclimatacao?.suor ?? 0);
   const ativacao = aclimatacao ? Math.min(1, Math.max(0, (centralC - limiar) / 0.18)) : 1;
   const suorPotencialLHora = Math.min(protocolo?.maxSuor ?? 1.5, ativacao * ganhoSuor * (partidaSuor * esforco

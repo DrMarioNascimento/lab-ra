@@ -9,10 +9,9 @@ export const PARAMETROS_HIDRICOS = Object.freeze({
   sodioSuorMgL: 800,
 });
 const { mgPorMmolSodio, meiaVidaAbsorcaoMin, sodioSuorMgL } = PARAMETROS_HIDRICOS;
-export const hidratar = () => ({ aguaL: PERFIL_HIDRICO.aguaL, sodioDeltaMg: 0, aguaDigestivaL: 0, sodioDigestivoMg: 0 });
+export const hidratar = (ref = PERFIL_HIDRICO) => ({ aguaL: ref.aguaL, sodioDeltaMg: 0, aguaDigestivaL: 0, sodioDigestivoMg: 0 });
 
-export function compartimentos(estado) {
-  const ref = PERFIL_HIDRICO;
+export function compartimentos(estado, ref = PERFIL_HIDRICO) {
   const osmolesSodio = 2 * estado.sodioDeltaMg / mgPorMmolSodio;
   const osmolalidade = (ref.osmolalidade * ref.aguaL + osmolesSodio) / estado.aguaL;
   const extracelularL = (ref.osmolalidade * ref.extracelularL + osmolesSodio) / osmolalidade;
@@ -58,13 +57,14 @@ export function passoHidrico(estado, entrada, dtMin, excrecao = perdaBasal()) {
   };
 }
 
-export function acoplarCirculacao(basal, plasmaL, intensidade, angiotensinaII = 100) {
+export function acoplarCirculacao(basal, plasmaL, intensidade, angiotensinaII = 100, { plasmaReferenciaL = PERFIL_HIDRICO.plasmaL,
+  vsReferencia = 72 + 60 * intensidade, cargaTermica = 0 } = {}) {
   // Ganhos didáticos. A resposta usa o volume plasmático como aproximação do enchimento.
-  const razaoPlasma = plasmaL / PERFIL_HIDRICO.plasmaL;
-  const vsReferencia = 72 + 60 * intensidade;
-  const fatorVS = razaoPlasma ** 0.85;
+  const razaoPlasma = plasmaL / plasmaReferenciaL;
+  // A carga térmica resume o efeito do calor sobre enchimento e frequência, com ganho didático.
+  const fatorVS = razaoPlasma ** 0.85 * Math.max(0.7, 1 - 0.065 * cargaTermica);
   const volumeSistolico = vsReferencia * fatorVS;
-  const fc = basal.fc * fatorVS ** -0.7;
+  const fc = basal.fc * fatorVS ** -0.7 + 1.5 * cargaTermica;
   const debito = fc * volumeSistolico / 1000;
   const debitoReferencia = basal.fc * vsReferencia / 1000;
   // O sinal do passo anterior altera o tônus no passo atual. Ganho limitado e didático.

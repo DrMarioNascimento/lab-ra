@@ -1,0 +1,17 @@
+.bancada table { table-layout: fixed; }
+.bancada th, .bancada td { overflow-wrap: anywhere; vertical-align: top; padding: .6rem .35rem; }
+.bancada td small { display: block; margin-top: .2rem; }
+.bancada .controle-hora { margin: 1rem 0; }
+.bancada .controle-hora label { font-weight: 600; }
+.calor-curva { height: 240px; }
+.calor-legenda { display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; margin-top: .7rem; }
+.calor-legenda span:first-child { color: #5ee2de; }
+.calor-legenda span:last-child { color: #ffbd7b; }
+.calor-detalhe { margin-top: 1rem; }
+.calor-detalhe p { color: #c5d3e8; }
+.calor-nav { display: flex; flex-wrap: wrap; gap: .3rem 1rem; }
+@media (max-width: 480px) {
+  .bancada table { font-size: .85rem; }
+  .bancada table th, .bancada table td { padding-inline: .19rem; }
+  .calor-curva { height: 200px; }
+}

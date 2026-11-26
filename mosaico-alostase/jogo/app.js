@@ -45,6 +45,9 @@ function telaModos() {
     <section class="card modo"><div class="rotulo">Trajetórias fisiológicas</div><h2>O que a rotina muda ao longo do tempo?</h2>
       <p class="muted">Compare de 24 horas a 365 dias e abra a fisiologia de qualquer dia.</p>
       <a class="btn sec block" href="trajetoria/" style="text-align:center;text-decoration:none;display:block;padding-top:14px">Abrir trajetórias fisiológicas</a></section>
+    <section class="card modo"><div class="rotulo">Turno no calor</div><h2>O mesmo volume de água em horários diferentes</h2>
+      <p class="muted">Compare calor, equilíbrio hídrico e circulação durante um turno diurno ou noturno.</p>
+      <a class="btn sec block" href="turno-calor/" style="text-align:center;text-decoration:none;display:block;padding-top:14px">Comparar água nas pausas e ao fim</a></section>
     <p class="aviso">O organismo do jogo é um modelo médio de adulto saudável. Não é o seu corpo e não serve de diagnóstico clínico.</p>`;
   $('#m-prog').onclick = telaInicio;
   $('#m-diag').onclick = () => { sub.textContent = 'Modo Diagnóstico'; telaEntradaDiag(tela, telaModos); };

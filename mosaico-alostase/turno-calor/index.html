@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Turno no calor · Mosaico Alostase</title>
+  <link rel="stylesheet" href="../jogo/estilo.css?v=9">
+  <link rel="stylesheet" href="../cardiovascular/bancada.css">
+  <link rel="stylesheet" href="./calor.css">
+</head>
+<body>
+  <main class="bancada">
+    <nav class="calor-nav">
+      <a href="../">← Mosaico Alostase</a>
+      <a href="../trajetoria/">Trajetórias fisiológicas</a>
+      <a href="../conferencia/ciclismo/">Conferência com o ciclismo</a>
+    </nav>
+    <header class="abertura">
+      <h1>Turno no calor</h1>
+      <p>O que muda no corpo quando a quantidade de água é a mesma e só muda o horário da ingestão?</p>
+    </header>
+    <section class="painel">
+      <h2>Quatro horas de trabalho e duas de recuperação</h2>
+      <p>A cada hora, são 50 minutos de atividade a 27% do VO₂máx, a 32 °C e 65% de umidade relativa e 10 minutos de pausa a 26 °C. As duas rotinas recebem 1,2 L de água no total.</p>
+      <div class="controle-hora">
+        <label>Início do turno <select id="inicio"><option value="14">14:00 · diurno</option><option value="22">22:00 · noturno</option></select></label>
+        <label>Variável <select id="variavel"></select></label>
+      </div>
+      <canvas id="curva" class="calor-curva" aria-hidden="true"></canvas>
+      <p class="calor-legenda"><span>Linha contínua · 300 mL em cada pausa</span><span>Linha tracejada · 1.200 mL ao fim</span></p>
+      <div class="controle-hora">
+        <label for="momento">Horário <output id="hora"></output></label>
+        <input id="momento" type="range" min="0" max="360" value="240" step="1">
+      </div>
+      <p id="fase" aria-live="polite"></p>
+      <table>
+        <thead><tr><th scope="col">Variável</th><th scope="col">Água nas pausas</th><th scope="col">Água no fim</th></tr></thead>
+        <tbody id="estado"></tbody>
+      </table>
+    </section>
+    <section class="painel">
+      <h2>Fim do turno e recuperação</h2>
+      <p>Compare o estado hídrico imediatamente antes da dose do fim, uma hora depois e duas horas depois.</p>
+      <table>
+        <thead><tr><th scope="col">Osmolalidade plasmática</th><th scope="col">Água nas pausas</th><th scope="col">Água no fim</th></tr></thead>
+        <tbody id="marcos"></tbody>
+      </table>
+    </section>
+    <details class="painel">
+      <summary>Como o motor encadeia as variáveis</summary>
+      <p class="calor-detalhe">A atividade produz calor. O suor secretado sai do balanço hídrico e a parte que evapora retira calor. As mudanças na osmolalidade e no volume plasmático alteram o limiar de sudorese e a transferência de calor para a pele. O volume plasmático e a temperatura participam do cálculo do volume sistólico e da frequência cardíaca. A pressão e os compartimentos hídricos entram na regulação renal do passo seguinte.</p>
+      <p>O motor registra a ingestão no horário escolhido e calcula a absorção ao longo do tempo. O turno noturno atravessa a meia-noite, com a pessoa acordada e a linha de base cardiovascular variando conforme o horário. Os volumes fazem parte de um exemplo didático. Os índices hormonais têm repouso igual a 100.</p>
+      <p><a href="../conferencia/ciclismo/">Conferir o acoplamento em um protocolo publicado</a></p>
+    </details>
+  </main>
+  <script type="module" src="./turno.js"></script>
+</body>
+</html>
