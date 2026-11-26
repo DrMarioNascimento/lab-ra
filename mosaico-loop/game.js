@@ -585,14 +585,17 @@ function renderRouteChoices(preparando) {
 // Trocar de orelha não custa nada; tocar numa sala de outro andar segue a mesma caminhada de 10 s.
 // Revisão 14: a Sala das esculturas (em reforma) entra no Térreo como sala fechada, sem toque: porta de vidro para a Área de descanso,
 // ao lado da escada (a pista `pose` vê a escultura por essa porta); um corredor estreito liga a escada, a Recepção, a Central e a Base da limpeza.
+// Revisão 16: a Área de descanso volta a ter porta para o corredor, bem em frente à Base da limpeza (caminho 4:02 → 4:05 → escada do Subsolo
+// e a fala da Ivone sobre o Seu Dirceu); a Sala das esculturas fica entre a escada e a Área de descanso, com o vidro virado para ela.
+// Grade de 4 colunas só para isso (Ateliê, Coleções e Central ocupam as duas do meio, como antes). A Sala das coleções abre só para a Área de descanso. Conferido como grafo em /tmp/roda/r15/caminho.mjs.
 // {andar, colunas, linhas, áreas da grade, portas [área, lado t/b/l/r, posição, tipo], altura do prédio na folha (0 = o resto da folha), escada [andar, seta]}
 const PLANTA = [
  {andar:'2º andar', cl:'a2', alt:'64%', cols:'56px minmax(0,1.25fr) minmax(0,1fr)', rows:'minmax(0,1fr)', areas:['esc sag gal'],
   portas:[['esc','r','center'],['sag','r','center']], esc:[['1º andar','▼']]},
  {andar:'1º andar', cl:'a1', alt:'84%', cols:'56px minmax(0,1fr) minmax(0,1fr)', rows:'minmax(0,1fr) 20px minmax(0,1fr)', areas:['esc cons sons','esc corr corr','esc foto rel'],
   portas:[['esc','r','center'],['cons','b','center'],['sons','b','center'],['foto','t','center'],['rel','t','center']], esc:[['2º andar','▲'],['Térreo','▼']]},
- {andar:'Térreo', cl:'a0', alt:0, fora:true, cols:'minmax(0,1fr) minmax(0,1.32fr) minmax(0,1fr)', rows:'minmax(0,1fr) minmax(0,1fr) 54px 14px minmax(0,1fr)', areas:['ele ate desc','tec col desc','esc esc est','hall hall hall','rec cen limp'],
-  portas:[['ele','t','start'],['ele','b','center'],['tec','b','center'],['col','b','center'],['est','t','center','vidro'],['ate','r','center','vidro'],['col','r','center'],['desc','r','end','fora'],['rec','t','center'],['cen','t','center'],['limp','t','center'],['rec','r','center'],['rec','b','center','fora'],['esc','b','center'],['est','b','center','fechada']], esc:[['1º andar','▲'],['Subsolo','▼']]},
+ {andar:'Térreo', cl:'a0', alt:0, fora:true, cols:'minmax(0,1fr) minmax(0,.4fr) minmax(0,.92fr) minmax(0,1fr)', rows:'minmax(0,1fr) minmax(0,1fr) 54px 14px minmax(0,1fr)', areas:['ele ate ate desc','tec col col desc','esc esc est desc','hall hall hall hall','rec cen cen limp'],
+  portas:[['ele','t','start'],['ele','b','center'],['tec','b','center'],['desc','b','center'],['est','r','center','vidro'],['ate','r','center','vidro'],['col','r','center'],['desc','r','end','fora'],['rec','t','center'],['cen','t','center'],['limp','t','center'],['rec','r','center'],['rec','b','center','fora'],['esc','b','center'],['est','b','center','fechada']], esc:[['1º andar','▲'],['Subsolo','▼']]},
  {andar:'Subsolo', cl:'as', alt:'56%', cols:'56px minmax(0,1fr)', rows:'minmax(0,1fr)', areas:['esc pro'], portas:[['esc','r','center']], esc:[['Térreo','▲']]}
 ];
 const PLANTA_AREA = {gal:'galeria', cons:'conservacao', sons:'sons', foto:'fotografia', rel:'relogios', ele:'eletrica', ate:'atelie', desc:'corredor', tec:'manutencao', col:'deposito', rec:'recepcao', cen:'seguranca', limp:'limpeza', pro:'prototipo'};

@@ -264,7 +264,7 @@ function lcFinal(){
 const lcFinalFrases = t => ((LC.regras.final_frases || {}).frases || []).reduce((x, fr) => fr.precisaUmaDe.some(lcTem) ? x : x.split(fr.frase).join(''), t);
 const lcFinalTxt = n => { const f = LC.finais.find(x => x.nome.toLowerCase() === n.toLowerCase() || x.nome === n.replace('í', 'i')) || {}; return lcFinalFrases((f.texto_por_causa && f.texto_por_causa[lcCausa()]) || f.texto || ''); };
 window.lcFinalFontes = () => ({sato:lcTem('sato_teo'), teo:lcTem('teo_1')});   // vai junto do desfecho para o telão e para o resultado da sala
-const LC_PV_IC = {prova_falsa:'img:V11', trajeto:'img:S01', cracha:'img:L08'};
+const LC_PV_IC = {prova_falsa:'img:GAL_B', trajeto:'img:S01', cracha:'img:L08'};
 // três fichas do desfecho (as mesmas do telão): defeito, máquina, noite. Miniatura grande e selo: verde-água quando feito, "ficou aberto" quando não.
 function lcFichasFinal() {
  const s = lcS(), F = (ic, t, ok, sim, nao) => '<div class="lc-fim ' + (ok ? 'ok' : 'aberto') + '">' + lcFicha(ic, 'g') + '<b>' + t + '</b><i>' + (ok ? sim : nao) + '</i></div>';
@@ -669,7 +669,7 @@ const LC_INSC = {copia:['rosto','pedra','ver','noite','guardar-esp','tempo'], ve
 let lcGlifosPedido = false;
 function lcGlifosSprite(){
  if (lcGlifosPedido || typeof document === 'undefined' || !document.body) return; lcGlifosPedido = true;
- if (!document.getElementById('bancadaCss')) { const l = document.createElement('link'); l.id = 'bancadaCss'; l.rel = 'stylesheet'; l.href = new URL('bancada.css?v=6', LC_BASE).href; document.head.appendChild(l); }
+ if (!document.getElementById('bancadaCss')) { const l = document.createElement('link'); l.id = 'bancadaCss'; l.rel = 'stylesheet'; l.href = new URL('bancada.css?v=7', LC_BASE).href; document.head.appendChild(l); }
  fetch(new URL('museu/icones/ui/glifos.svg?v=1', LC_BASE).href).then(r => r.ok ? r.text() : '').then(t => { if (!t || document.getElementById('lcGlifos')) return; const d = document.createElement('div'); d.id = 'lcGlifos'; d.hidden = true; d.setAttribute('aria-hidden', 'true'); d.innerHTML = t; document.body.prepend(d); }).catch(() => { lcGlifosPedido = false; });
 }
 if (typeof document !== 'undefined') { const i = setInterval(() => { if (document.body) { lcGlifosSprite(); clearInterval(i); } }, 300); }
@@ -689,16 +689,16 @@ const LC_MG = {
  tombo_2:{ativ:'livro', resp:0, img:['N18'], nome:'Ler a foto antiga do catálogo', texto:'A foto antiga mostra a peça escura, fosca. Ela foi tirada de baixo. O que aparece gravado na base?', opcoes:['Um número de três algarismos','O nome de quem doou','O ano em que a peça chegou','A marca de quem restaurou'],
   dicas:['Foto de catálogo serve para identificar a peça.','O que identifica uma peça não muda quando ela troca de sala.']},
  falsa_1:{ativ:'marca', resp:4, nome:'Olhar a peça com luz de lado', texto:'Mude o ângulo da luz e veja o que a peça mostra de verdade.',
-  antes:{se:['par_foto'], ativ:'livro', resp:0, img:['GAL_B'], nome:'Antes de acender a luz', texto:'Você tem no caderno a foto grande do catálogo. Como é a peça de verdade, nessa foto? A luz de lado vai dizer se esta aqui é igual.', opcoes:['Pedra escura, riscos finos, bordas gastas','Pedra escura, lisa, bordas inteiras','Pedra cinza, riscos finos, bordas inteiras','Pedra cinza, lisa, bordas gastas'],
-   dicas:['No caderno, procure a pista “Foto grande do catálogo”.','Confira uma coisa de cada vez: a cor da pedra, a superfície, as bordas.']},
-  luz:{achou:'O verniz cobre tudo por igual, até o grão da pedra. Nenhuma borda gasta, nenhum risco de uso.', falta:'ainda não apareceu nada', botao:'Anotar o que apareceu', img:'GAL_B_mascara'},
+  antes:{se:['par_foto'], ativ:'livro', resp:0, img:['GAL_B','N18'], nome:'Antes de acender a luz', texto:'Se esta peça for a mesma da foto grande do catálogo, o que a luz de lado tem de mostrar nela?', opcoes:['Arranhada, beiradas roídas','Lisinha, beiradas retas','Arranhada, beiradas retas','Lisinha, beiradas roídas'],
+   dicas:['No caderno, procure a pista “Foto grande do catálogo”.','Confira uma coisa de cada vez: primeiro a superfície, depois as beiradas.']},
+  luz:{achou:'O verniz cobre tudo por igual, até o grão. Nenhuma borda gasta, nenhum risco de uso.', falta:'ainda não apareceu nada', botao:'Anotar o que apareceu', img:'GAL_B_mascara'},
   dicas:['Luz de frente esconde. Luz de lado mostra a superfície.','Quase no fim do curso da luz, a superfície aparece inteira.']},
  traj_1:{ativ:'livro', resp:0, img:['S01'], nome:'Olhar a fita da porta de serviço', texto:'A fita mostra a porta de serviço às 4:00. Alguém de paletó encosta um crachá no leitor. No tapete, embaixo da pessoa, aparecem gotas. Pelo que você sabe da noite, ela está entrando ou saindo?', opcoes:['Entrando: vem da rua','Saindo: vai para a rua','Só passando, sem abrir a porta'],
   dicas:['Repare no que pinga no tapete.','Lá fora chove desde o começo da noite.']},
  insc_copia:{ativ:'glifos', resp:0, nome:'Ler a inscrição da máscara', texto:'Confira cada símbolo da máscara com a tábua do livro de registro. Um deles não bate. Qual?', insc:['rosto','pedra','ver','noite','guardar-esp','tempo'], opcoes:['5','4','3','2'],
   dicas:['Ponha a tábua ao lado e confira símbolo por símbolo, da esquerda para a direita.','Não olhe só o desenho: olhe para que lado ele abre.']},
  c_peca:{ativ:'livro', resp:0, img:['D10'], nome:'Abrir uma caixa da estante', texto:'Agora você tem motivo. Na estante, quatro caixas iguais, cada uma com a sua etiqueta. Pelo que o seu caderno diz da caixa do patrocínio, qual você abre?', opcoes:['BANNERS – NÃO ABRIR','MOLDURAS – FRÁGIL','LÂMPADAS – NÃO EMPILHAR','CATÁLOGOS – NÃO MOLHAR'],
-  dicas:['No caderno, procure o que se diz de uma caixa do patrocínio: na estante, na guia de retirada da Recepção ou na lista de entregas.','A caixa certa entrou leve e agora pesa demais para o que a etiqueta diz.']}
+  dicas:['No caderno, procure o que se diz de uma caixa do patrocínio.','A caixa certa entrou leve e agora pesa demais para o que a etiqueta diz.']}
 };
 // A ordem das opções (e a posição certa da luz) muda com a semente: nada para decorar entre partidas.
 function lcMgSorteado(id, mg){
@@ -710,19 +710,20 @@ function lcMgSorteado(id, mg){
 }
 const lcMgFoto = (d, mg) => { try { d.tabIndex = -1; d.style.outline = 'none'; d.focus({preventScroll:true}); } catch (e) {}   // nenhuma resposta abre com cara de escolhida (o foco fica na janela)
  if (!mg.img || !mg.img.length) return; const f = document.createElement('div'); f.className = 'mg-foto'; f.setAttribute('aria-hidden', 'true'); f.innerHTML = mg.img.map(n => '<span class="ic3d"><img src="' + lcIc(n) + '" alt=""></span>').join(''); const h = d.querySelector('h2'); if (h) h.before(f); };
+const LC_MG_ERRO = {antes:'Ainda não. Releia no caderno a foto grande do catálogo.', outro:'Ainda não fechou. Olhe de novo o que está na tela e no seu caderno.', dupla:'Ainda não fechou. Releia as pistas do caderno e converse com a sua dupla.'};
 function lcBancada(q){
  const mg1 = LC_MG[q.lcp], pre = mg1 && mg1.antes && (!mg1.antes.se || mg1.antes.se.some(lcTem)) && !(state.resolvidos && state.resolvidos[q.id + ':antes']);   // pergunta de história antes do controle: a pessoa deduz, o controle só confirma
  const mg0 = pre ? mg1.antes : mg1, mg = mg0 && lcMgSorteado(q.lcp + (pre ? ':antes' : ''), mg0);
  if (!mg || (state.resolvidos && state.resolvidos[q.id])) return false;
- Promise.all([import('./reserva/banco.mjs'), import('./reserva/minigames.mjs?v=8')]).then(([B, M]) => {
-  if (!document.getElementById('bancadaCss')) { const l = document.createElement('link'); l.id = 'bancadaCss'; l.rel = 'stylesheet'; l.href = new URL('bancada.css?v=6', LC_BASE).href; document.head.appendChild(l); }
+ Promise.all([import('./reserva/banco.mjs'), import('./reserva/minigames.mjs?v=9')]).then(([B, M]) => {
+  if (!document.getElementById('bancadaCss')) { const l = document.createElement('link'); l.id = 'bancadaCss'; l.rel = 'stylesheet'; l.href = new URL('bancada.css?v=7', LC_BASE).href; document.head.appendChild(l); }
   let d = document.getElementById('lcBancada');
   if (!d) { d = document.createElement('dialog'); d.id = 'lcBancada'; d.className = 'lc-banc'; document.body.appendChild(d); }
   const base = B.atividades[mg.ativ];
-  const A = Object.assign({}, base, {nome:mg.nome, texto:mg.texto}, mg.opcoes ? {opcoes:mg.opcoes} : {}, mg.itens ? {itens:mg.itens, clipes:mg.clipes} : {}, mg.luz ? {luz:Object.assign({}, mg.luz, mg.luz.img ? {img:lcIc(mg.luz.img)} : {})} : {}, mg.insc ? {insc:mg.insc, tabua:LC_GLIFOS} : {}, mg.dicas ? {dicas:mg.dicas} : {});
+  const A = Object.assign({}, base, {nome:mg.nome, texto:mg.texto, reserva:[LC_MG_ERRO.antes, LC_MG_ERRO.outro]}, mg.opcoes ? {opcoes:mg.opcoes} : {}, mg.itens ? {itens:mg.itens, clipes:mg.clipes} : {}, mg.luz ? {luz:Object.assign({}, mg.luz, mg.luz.img ? {img:lcIc(mg.luz.img)} : {})} : {}, mg.insc ? {insc:mg.insc, tabua:LC_GLIFOS} : {}, mg.dicas ? {dicas:mg.dicas} : {});
   const aoAbrir = () => lcMgFoto(d, mg);
   M.abrirMinigame(d, A, lcCausa().slice(0,1), async v => {
-   if (String(v) !== String(mg.resp)) return pre ? 'Ainda não. Releia no caderno a foto grande do catálogo.' : 'Ainda não fechou. Olhe de novo o que está na tela e no seu caderno.';
+   if (String(v) !== String(mg.resp)) return pre ? LC_MG_ERRO.antes : LC_MG_ERRO.outro;
    if (pre) { (state.resolvidos ||= {})[q.id + ':antes'] = true; save(); setTimeout(() => lcBancada(q), 60); return ''; }
    (state.resolvidos ||= {})[q.id] = true; save();
    setTimeout(() => collect(q.id), 0);
@@ -744,13 +745,13 @@ const LC_MGA = {
 };
 function lcBancadaAtiv(aid, cmd){
  const mg = lcMgSorteado(aid, LC_MGA[aid]);
- Promise.all([import('./reserva/banco.mjs'), import('./reserva/minigames.mjs?v=8')]).then(([B, M]) => {
-  if (!document.getElementById('bancadaCss')) { const l = document.createElement('link'); l.id = 'bancadaCss'; l.rel = 'stylesheet'; l.href = new URL('bancada.css?v=6', LC_BASE).href; document.head.appendChild(l); }
+ Promise.all([import('./reserva/banco.mjs'), import('./reserva/minigames.mjs?v=9')]).then(([B, M]) => {
+  if (!document.getElementById('bancadaCss')) { const l = document.createElement('link'); l.id = 'bancadaCss'; l.rel = 'stylesheet'; l.href = new URL('bancada.css?v=7', LC_BASE).href; document.head.appendChild(l); }
   let d = document.getElementById('lcBancada');
   if (!d) { d = document.createElement('dialog'); d.id = 'lcBancada'; d.className = 'lc-banc'; document.body.appendChild(d); }
-  const A = Object.assign({}, B.atividades[mg.ativ], {nome:mg.nome, texto:mg.texto, opcoes:mg.opcoes}, mg.dicas ? {dicas:mg.dicas} : {});
+  const A = Object.assign({}, B.atividades[mg.ativ], {nome:mg.nome, texto:mg.texto, opcoes:mg.opcoes, reserva:[LC_MG_ERRO.dupla]}, mg.dicas ? {dicas:mg.dicas} : {});
   M.abrirMinigame(d, A, lcCausa().slice(0,1), async v => {
-   if (String(v) !== String(mg.resp)) return 'Ainda não fechou. Releia as pistas do caderno e converse com a sua dupla.';
+   if (String(v) !== String(mg.resp)) return LC_MG_ERRO.dupla;
    (state.resolvidos ||= {})['at:' + aid + ':' + state.loop] = true; save();
    setTimeout(() => lcAgir(cmd), 0);
    return '';

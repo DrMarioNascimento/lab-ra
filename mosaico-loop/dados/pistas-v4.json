@@ -1,5 +1,5 @@
 {
- "versao": "v4 revisão 14 (26/11/2026)",
+ "versao": "v4 revisão 16 (26/11/2026)",
  "noite": "v4",
  "causa_sorteada": "B_potencia",
  "causas_possiveis": [
@@ -536,7 +536,7 @@
   {
    "id": "maq_ver",
    "sala": "prototipo",
-   "texto": "No Subsolo, a Câmara do tempo está ligada: 3 mostradores, 1 ponteiro de carga, 1 luz da peça e o botão vermelho \"Loop Reset\". Os comandos estão travados.",
+   "texto": "No Subsolo, a Câmara do tempo zumbe, ligada. Na frente dela, mostradores, um ponteiro de carga, a luz da peça e um botão vermelho: \"Loop Reset\". Você tenta os comandos. Nada se mexe.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -3792,7 +3792,7 @@
   {
    "id": "falsa_3",
    "sala": "deposito",
-   "texto": "No fundo de uma caixa, raspas de gesso e um molde com o formato da peça principal. A testa do molde é lisa.",
+   "texto": "No fundo de uma caixa, raspas de gesso e um molde com o formato da peça principal. A testa do molde é lisa. Presa na tampa, uma folha com a foto do catálogo, impressa ao contrário.",
    "volta_min": 2,
    "volta_max": 5,
    "segundo_min": 0,
@@ -4554,7 +4554,7 @@
   {
    "id": "c_esc_3",
    "sala": "seguranca",
-   "texto": "Braga puxa a gravação do dia {dia} sem parar de falar: \"Tá. Olha aí: duas caixas iguais entram na Sala das coleções. Só uma sobe pra Galeria. Engraçado, né? Meu cunhado também mexe com transporte. Café?\"",
+   "texto": "Braga puxa a gravação do dia {dia} sem parar de falar: \"Tá. Olha aí: duas caixas de banners iguais entram na Sala das coleções. Só uma sobe pra Galeria. Engraçado, né? Meu cunhado também mexe com transporte. Café?\"",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -5615,7 +5615,7 @@
   {
    "id": "coop_copia_ok",
    "sala": "galeria",
-   "texto": "Vocês acham 3 diferenças: o lado da rachadura, a cor da pedra e o desgaste nas bordas, que a peça exposta não tem.",
+   "texto": "Vocês acham 3 diferenças: o lado da rachadura, a cor e o desgaste nas bordas, que a peça exposta não tem.",
    "volta_min": 2,
    "volta_max": 5,
    "segundo_min": 0,
@@ -9815,7 +9815,7 @@
      "titulo": "A peça exposta",
      "itens": [
       "rachadura fina do lado direito",
-      "pedra cinza, mais clara",
+      "cor cinza, mais clara",
       "bordas inteiras, sem desgaste"
      ]
     },

@@ -103,7 +103,7 @@ Dentro da mesma partida, o raio cai sempre no mesmo minuto, volta após volta. �
 |---|---|
 | 2º andar | Galeria especial (e o Saguão superior, onde toda volta começa) |
 | 1º andar | Sala de conservação, Sala dos sons, Sala da fotografia, Sala dos relógios |
-| Térreo | Recepção, Central de monitoramento, Área de descanso (com a porta de serviço), Base da limpeza, Ateliê de descobertas, Sala das coleções, Oficina técnica, Oficina elétrica, Pátio · Quadro externo |
+| Térreo | Recepção, Central de monitoramento, Área de descanso (com a porta de serviço), Base da limpeza, Ateliê de descobertas, Sala das coleções, Oficina técnica, Oficina elétrica, Pátio · Quadro externo (e a Sala das esculturas, em reforma: fechada) |
 | Subsolo | Câmara do tempo |
 
 A sala dos recados, da cafeteira e da porta de serviço chama **Área de descanso**, sempre. A câmera da Central que olha para essa porta, do lado de fora, chama "câmera da porta de serviço".
@@ -117,7 +117,7 @@ Cada volta tem três camadas: o **agora** (o que você vê), o **antes** (o que 
 ### Volta 1 — "Tem algo errado aqui"
 - **Agora:** na mesa da Recepção, um cartão do Téo: "Se eu não aparecer na montagem hoje, não pergunta pra ninguém: anota. Começa pela peça." Você acha o Téo, a mancha vermelha, a peça que cheira a verniz e, no Subsolo, a Câmara ligada com os comandos travados. A máquina já mostra o sinal da noite (mostradores, ponteiro de carga, luz da peça ou lacre cortado). O manual está inteiro no Ateliê, páginas 1 a 6, em qualquer noite.
 - **Antes:** o recibo do dia da troca, o número de registro, a tábua da escrita antiga (no livro de registro, na página logo depois do número), o bilhete do crachá (sem assinatura, só a pressa na letra), o livro de visitas com três assinaturas e nenhuma saída (uma delas "do patrocínio, apressada, quase um risco": sem nome).
-- **O que ainda não dá:** o nome, o laudo, a caixa aberta, a comparação da foto (tudo isso é da volta 2 em diante). O cheiro de verniz é suspeita, não é prova. Nesta volta você junta suspeita, não acusação.
+- **O que ainda não dá:** o nome, o laudo, a caixa aberta, a comparação da foto que vale como prova (Lado a Lado ou foto sem ajuda; tudo isso é da volta 2 em diante). Quem já tem a foto grande no caderno pode, na luz de lado, ver que bordas e superfície não batem com a foto: fica a desconfiança, sem prova no caderno. O cheiro de verniz é suspeita, não é prova. Nesta volta você junta suspeita, não acusação.
 - **Próximo loop:** você descobre que o apagão é um raio e em que minuto ele cai. Na volta que vem, você já sabe onde estar.
 - **Na Máquina:** a aba Dossiê mostra a sua missão secreta e avisa que a página de diagnóstico abre na volta 2. A aba Revelar já mostra as 3 provas que faltam.
 
@@ -362,7 +362,7 @@ Vale sobre o que estiver escrito acima, na parte 9.
 Vale sobre o que estiver escrito acima, nas partes 9 e 10.
 
 - **O nome.** "Lenz" só aparece da volta 3 em diante. A carta da seguradora (volta 2) diz "quem assinou pelo patrocínio: uma rubrica apressada". O nome nasce em cena: ele atende o telefone perto da porta de serviço, o Braga admite, ou a letra do bilhete vira nome em Acusação e Defesa.
-- **Comparar a foto sem ajuda.** Passou para a volta 2. Na volta 1 ninguém sai com prova da cópia.
+- **Comparar a foto sem ajuda.** Passou para a volta 2. Na volta 1 ninguém sai com prova da cópia. (Revisão 16: na volta 1, quem tem a foto grande no caderno já confronta a peça com ela na luz de lado; isso não entra no caderno como prova.)
 - **Caixa de "banners".** Só abre na volta 2, com motivo. Na volta 1 você só empurra a caixa na estante.
 - **Listas e pegadas.** As Duas Listas dizem "se saiu, foi por outra porta". Entre 0:00 e 4:00 ele está fora do prédio.
 - **Trajeto.** O caderno de rondas do cofre e a foto com a legenda mostram a mesma volta pela porta de serviço, no começo da noite. As duas coisas valem como prova do trajeto.
@@ -514,3 +514,18 @@ Vale sobre o que estiver escrito acima, nas partes 9 a 19. Nada do enredo mudou:
 - **Telas da Máquina no tom do jogo.** "Você marcou 3 de 3: ...", "Quase." (no lugar de "MEIO CERTO"), o diagnóstico aceito diz o que os sinais mostram (sem "Você não chutou"), botão "Revelar agora".
 - **Desfecho no celular.** Embaixo das 3 provas, as fichas dos fatos da noite que vieram do caderno daquela pessoa, com a mesma miniatura da fita do telão.
 - **Planta.** No Térreo, a Sala das esculturas aparece fechada, em reforma (hachura, fita na porta, cadeado), sem toque, com a porta de vidro para a Área de descanso e a escada do Subsolo ao lado (é por essa porta que a pista `pose` vê a escultura apontando para a escada). Igual em todas as noites e voltas.
+
+## 21. O que mudou na revisão 16 (26/11/2026) · lote 13
+
+Vale sobre o que estiver escrito acima, nas partes 9 a 20. Nada do enredo mudou: nenhuma regra, tranca, volta, horário, fonte, rótulo ou "quem, como e por quê". As 5 causas seguem com o mesmo peso.
+
+- **Planta do Térreo.** A Área de descanso volta a ter porta para o corredor, bem em frente à Base da limpeza. O homem de paletó cruza a Área de descanso (4:02), sai no corredor diante do Seu Dirceu (4:05) e segue até a escada do Subsolo (4:10), sem entrar na Sala das coleções. Da Base da limpeza, o Seu Dirceu vê a porta da Área de descanso (`ivone_red`). A Sala das esculturas, em reforma e fechada, fica entre a escada e a Área de descanso, com a porta de vidro virada para ela: pelo vidro, a escultura aponta para a escada, ao lado (`pose`). A Sala das coleções abre só para a Área de descanso.
+- **A cópia não é de pedra.** É de gesso e verniz (parte 2). Na luz de lado: "O verniz cobre tudo por igual, até o grão. Nenhuma borda gasta, nenhum risco de uso." No Lado a Lado, a tela A diz "cor cinza, mais clara", e o resultado diz "o lado da rachadura, a cor e o desgaste nas bordas".
+- **Por que a rachadura está do outro lado.** Na caixa do molde (`falsa_3`), presa na tampa, uma folha com a foto do catálogo impressa ao contrário. Quem fez a cópia trabalhou olhando uma imagem espelhada: a rachadura foi parar do outro lado e o quinto símbolo saiu virado. Nenhuma pista conclui isso por quem joga.
+- **Caixa da estante.** Na gravação do Braga (`c_esc_3`): "duas caixas de banners iguais". As três pistas que abrem a caixa falam de banners. Primeira dica do minijogo: "No caderno, procure o que se diz de uma caixa do patrocínio."
+- **Antes de acender a luz** (só com a foto grande no caderno): "Se esta peça for a mesma da foto grande do catálogo, o que a luz de lado tem de mostrar nela?" Quatro combinações de superfície e beiradas; a certa, "Arranhada, beiradas roídas", não repete as palavras da foto: é preciso entender. Depois a luz confirma ou desmente.
+- **Luz de lado na volta 1.** Fica como o jogo faz: quem já tem a foto grande confronta a peça com ela na volta 1, sem prova no caderno (partes 4 e 11).
+- **Câmara no Subsolo** (`maq_ver`): "No Subsolo, a Câmara do tempo zumbe, ligada. Na frente dela, mostradores, um ponteiro de carga, a luz da peça e um botão vermelho: "Loop Reset". Você tenta os comandos. Nada se mexe."
+- **Desfecho e fita do telão.** "A cópia na Galeria" e a prova "a peça é cópia" mostram a miniatura da peça da Galeria, com a inscrição e a rachadura.
+- **Minijogos parados.** Nada sobe nem desce na janela: nem ao mexer a luz, nem ao pedir dica, nem ao errar.
+

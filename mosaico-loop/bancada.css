@@ -134,3 +134,10 @@
 @media(max-width:375px){.lc-gl.tabua small,.lc-banc .tabua-mini small{font-size:.75rem;letter-spacing:-.02em}}
 /* revisão 13: a imagem da luz de lado (máscara com a inscrição, 320 px) cabe inteira na cena: a única casa da grade tem a altura da cena, e os 92% passam a valer */
 .lc-banc .cena-peca{grid-template:minmax(0,1fr)/minmax(0,1fr)}
+/* revisão 16: dica, erro e estado da luz já nascem com a altura do texto mais alto que pode aparecer (os textos possíveis ficam empilhados e invisíveis na mesma casa) */
+.lc-banc .reserva-alt{display:grid;align-items:start}
+.lc-banc .reserva-alt>span{grid-area:1/1}
+.lc-banc .reserva-alt>.medida{visibility:hidden}
+.lc-banc .reserva-alt>.medida::before{content:attr(data-t)}
+.lc-banc .luz-estado{margin:.35rem 0 .6rem}
+@media(max-height:760px){.lc-banc .cena{height:clamp(110px,24vh,250px)}}   /* com a dica reservada, a luz de lado cabe sem rolar em 360×740 */

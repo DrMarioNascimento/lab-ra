@@ -13,6 +13,18 @@ function botao(texto, agir, cls = '') {
   return b;
 }
 
+// Texto que muda dentro do minijogo (dica, erro, estado da luz): a caixa já nasce com a altura do texto mais alto que pode aparecer nela,
+// para nada subir, descer ou piscar (revisão 16). Os textos possíveis ficam empilhados e invisíveis na mesma casa da grade.
+function reservar(el, textos) {
+  el.classList.add('reserva-alt');
+  const vis=no('span',el.textContent||null,'vis');
+  el.replaceChildren(vis);
+  for (const t of textos.filter(Boolean)) { const m=no('span',null,'medida'); m.dataset.t=t; m.setAttribute('aria-hidden','true'); el.append(m); }   // o texto vai num ::before (fora do textContent da caixa)
+  el.dizer=t=>{vis.textContent=t||'';};
+  return el;
+}
+const dizer=(el,t)=>{ if (el.dizer) el.dizer(t); else el.textContent=t; };
+
 let figura;   // {n, url}: a foto mostra o número de registro sorteado na partida
 function quadro() {
   const n = String(typeof window !== 'undefined' && window.lcTok ? window.lcTok('{reg}') : '472');   // fora do Loop (episódio da Reserva) fica o número de origem
@@ -42,12 +54,13 @@ export function abrirMinigame(dialog, atividade, causa, aoResolver) {
   const corpo=no('div',null,'puzzle');
   const aviso=no('p',null,'ajuda');
   aviso.setAttribute('role','status');
+  const dicasAll=atividade.dicas ?? ['Leia o que está registrado no dossiê.','Compare a origem de cada registro com o que a bancada pede.'];
+  reservar(aviso,[...dicasAll,...(atividade.reserva||[])]);
   dialog.append(corpo,aviso);
   let nivel=0, dispose=()=>{}, ocupado=false;
   const controles=no('div',null,'row');
   controles.append(botao('Pedir uma pista',()=>{
-    const dicas=atividade.dicas ?? ['Leia o que está registrado no dossiê.','Compare a origem de cada registro com o que a bancada pede.'];
-    aviso.textContent=dicas[Math.min(nivel++,dicas.length-1)];
+    dizer(aviso,dicasAll[Math.min(nivel++,dicasAll.length-1)]);
   }),botao('Voltar à sala',()=>dialog.close()));
   dialog.append(controles);
   let ativa = true;
@@ -59,7 +72,7 @@ export function abrirMinigame(dialog, atividade, causa, aoResolver) {
     const msg=await aoResolver(v);
     ocupado=false;
     if (!ativa) return;
-    if (msg) aviso.textContent=msg;
+    if (msg) dizer(aviso,msg);
     else dialog.close();
   }
 
@@ -88,9 +101,9 @@ export function abrirMinigame(dialog, atividade, causa, aoResolver) {
   if (atividade.tipo === 'caixa') {
     let passo=0;
     function mover(qual) {
-      if (qual !== ['faixa','fundo','tampa'][passo]) { aviso.textContent='O painel resiste. Uma peça precisa liberar a seguinte.'; return; }
+      if (qual !== ['faixa','fundo','tampa'][passo]) { dizer(aviso,'O painel resiste. Uma peça precisa liberar a seguinte.'); return; }
       passo++;
-      aviso.textContent=['','O entalhe apareceu. Examine o fundo.','A trava cedeu. Abra a tampa.','A chave está dentro da caixa.'][passo];
+      dizer(aviso,['','O entalhe apareceu. Examine o fundo.','A trava cedeu. Abra a tampa.','A chave está dentro da caixa.'][passo]);
       desenhar();
       if (passo===3) conferir('faixa/fundo/tampa');
     }
@@ -120,9 +133,9 @@ export function abrirMinigame(dialog, atividade, causa, aoResolver) {
     };
     function colocar(slot, i) {
       if (!Number.isInteger(i) || i<0 || i>5 || pos.includes(i)) return;
-      if (slot!==i) { aviso.textContent='As bordas não continuam aqui. Tente outro encaixe.';return; }
+      if (slot!==i) { dizer(aviso,'As bordas não continuam aqui. Tente outro encaixe.');return; }
       pos[slot]=i; escolhida=null;
-      aviso.textContent=pos.filter(n=>n!==null).length+' de 6 encaixes.';
+      dizer(aviso,pos.filter(n=>n!==null).length+' de 6 encaixes.');
       renovar();
       if(pos.every(n=>n!==null)) conferir(pos.join(''));
     }
@@ -139,7 +152,7 @@ export function abrirMinigame(dialog, atividade, causa, aoResolver) {
         const b=botao('',()=>{
           escolhida=i;
           for(const item of bandeja.children)item.setAttribute('aria-pressed',String(item===b));
-          aviso.textContent='Fragmento selecionado. Escolha uma posição.';
+          dizer(aviso,'Fragmento selecionado. Escolha uma posição.');
         },'encaixe');
         b.disabled=pos.includes(i);b.draggable=!b.disabled;pintar(b,i);
         b.setAttribute('aria-label','Fragmento '+(n+1)+' · '+detalhes[i]);
@@ -152,8 +165,8 @@ export function abrirMinigame(dialog, atividade, causa, aoResolver) {
     renovar();
   } else if (atividade.tipo==='luz') {
     let angulo=1;
-    const status=no('p','Luz 1 de 5');
     const L=atividade.luz||{};
+    const status=reservar(no('p','Luz 1 de 5 · '+(L.falta||'a marca ainda está encoberta')+'.','luz-estado'),[L.achou||'A luz revelou a fissura que cruza o selo.','Luz 5 de 5 · '+(L.falta||'a marca ainda está encoberta')+'.']);
     const proxima=()=>{range.value=String(angulo%5+1);range.oninput();};
     let desenhar;
     if (L.img) {   // no Loop a cena é a própria peça da sala (miniatura 3D), com a luz andando por cima
@@ -164,7 +177,7 @@ export function abrirMinigame(dialog, atividade, causa, aoResolver) {
     } else desenhar=cena('luz',proxima,()=>angulo);
     const range=no('input');range.type='range';range.min=1;range.max=5;range.value=1;range.setAttribute('aria-label','Posição da luz');
     const registrar=botao(L.botao||'Registrar a fissura',()=>conferir(angulo),'primary');registrar.disabled=true;
-    range.oninput=()=>{angulo=Number(range.value);const claro=angulo===(L.certo||4);status.textContent=claro?(L.achou||'A luz revelou a fissura que cruza o selo.'):'Luz '+angulo+' de 5 · '+(L.falta||'a marca ainda está encoberta')+'.';registrar.disabled=!claro;desenhar();};
+    range.oninput=()=>{angulo=Number(range.value);const claro=angulo===(L.certo||4);dizer(status,claro?(L.achou||'A luz revelou a fissura que cruza o selo.'):'Luz '+angulo+' de 5 · '+(L.falta||'a marca ainda está encoberta')+'.');registrar.disabled=!claro;desenhar();};
     corpo.append(range,status,registrar);
   } else if (atividade.tipo==='maquina' && maquinaValores[causa]) {
     const seletores=[];
@@ -176,7 +189,7 @@ export function abrirMinigame(dialog, atividade, causa, aoResolver) {
       label.append(select);seletores.push(select);corpo.append(label);
     }
     corpo.append(botao('Confirmar procedimento',()=>{
-      if(seletores.some(x=>x.value==='')){aviso.textContent='Complete os três ajustes.';return;}
+      if(seletores.some(x=>x.value==='')){dizer(aviso,'Complete os três ajustes.');return;}
       conferir(seletores.map(x=>x.value).join('|'));
     },'primary'));
   } else if (atividade.tipo==='ordem' || atividade.tipo==='maquina') {
@@ -225,7 +238,7 @@ export function abrirMinigame(dialog, atividade, causa, aoResolver) {
       label.append(input,document.createTextNode(texto));registros.append(label);
     }
     corpo.append(registros,...Object.entries(causas).map(([id,x])=>botao(x.nome,()=>{
-      if(selecao.size!==3||selecao.has(3))aviso.textContent='Selecione dois sinais técnicos e o registro que descarta outra hipótese.';
+      if(selecao.size!==3||selecao.has(3))dizer(aviso,'Selecione dois sinais técnicos e o registro que descarta outra hipótese.');
       else conferir(id);
     })));
   } else corpo.append(botao('Registrar no dossiê',()=>conferir(true),'primary'));
