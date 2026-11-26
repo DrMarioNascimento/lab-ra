@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Conferência fisiológica · Mosaico Alostase</title>
+  <link rel="stylesheet" href="../jogo/estilo.css?v=9">
+  <link rel="stylesheet" href="../cardiovascular/bancada.css">
+  <style>
+    .conferencia table { table-layout: fixed; }
+    .conferencia th,.conferencia td { vertical-align: top; overflow-wrap: anywhere; }
+    .conferencia th:first-child { width: 28%; }
+    .conferencia tbody small { display: block; padding-top: .3rem; }
+    .conferencia td,.conferencia th { padding: .65rem .35rem; }
+  </style>
+</head>
+<body>
+  <main class="bancada conferencia">
+    <nav><a href="../">← Mosaico Alostase</a></nav>
+    <header class="abertura">
+      <h1>Conferência fisiológica</h1>
+      <p>Compare os resultados que o motor calcula hoje com tabelas publicadas. As referências descrevem grupos e condições de medida.</p>
+    </header>
+    <div id="tabelas"></div>
+    <details class="painel">
+      <summary>Como ler a comparação</summary>
+      <p>Uma faixa publicada avalia a ordem de grandeza. Um valor usado na própria construção do motor é uma âncora de calibração. A validação independente da forma da curva exige dados medidos no mesmo protocolo, com postura, sono, horário e esforço registrados.</p>
+      <p>Renina, angiotensina II, aldosterona, ADH e ANP usam índices relativos, com base 100. As intervenções conferem a direção dos mecanismos e a conservação de água e sódio. As curvas hormonais quantitativas dependeriam de séries medidas no protocolo de comparação.</p>
+    </details>
+  </main>
+  <script type="module" src="./tabelas.js?v=1"></script>
+</body>
+</html>

@@ -1,4 +1,5 @@
 import { CENARIOS_HIDRICOS, PASSO_INTEGRADO, SESSAO, simularHidratacao } from '../motor/bancada-hidrica.js';
+import { regularRim } from '../motor/renal.js';
 import { desenharSerie } from './grafico.js';
 
 const elemento = (id) => document.getElementById(id);
@@ -17,6 +18,21 @@ const variaveis = {
   volumeSistolico: ['Volume sistólico', 'mL', 1], debito: ['Débito cardíaco', 'L/min', 2],
   resistencia: ['Resistência vascular sistêmica', 'mmHg·min/L', 2],
 };
+const comRim = new URLSearchParams(location.search).get('rim') === '1';
+if (comRim) {
+  elemento('titulo-modulo').textContent = 'Rim e pressão arterial';
+  document.title = 'Rim e pressão arterial · Mosaico Alostase';
+  elemento('nota-rim').textContent = 'Neste módulo, a excreção muda a cada intervalo conforme o estado do corpo.';
+  elemento('refs-rim').hidden = false;
+  Object.assign(variaveis, {
+    adh: ['Vasopressina (ADH)', 'índice', 1], renina: ['Renina', 'índice', 1],
+    angII: ['Angiotensina II', 'índice', 1], aldosterona: ['Aldosterona', 'índice', 1], anp: ['ANP', 'índice', 1],
+    tfg: ['Filtração glomerular estimada', 'mL/min', 1], nacl: ['Entrega de NaCl à mácula densa', 'índice', 1],
+    urinaLHora: ['Fluxo urinário', 'L/h', 3], sodioUrinaMgHora: ['Excreção urinária de sódio', 'mg/h', 1],
+    osmolalidadeUrina: ['Osmolalidade urinária', 'mOsm/kg', 0], sede: ['Sede simulada', '0 a 10', 1],
+  });
+}
+const valorDe = (p, chave) => p[chave] ?? p.renal?.[chave] ?? p.renal?.regulacao[chave];
 let simulacoes = [];
 
 const fmt = (valor, casas = 1) => valor.toLocaleString('pt-BR', { maximumFractionDigits: casas, minimumFractionDigits: casas });
@@ -26,11 +42,11 @@ const classe = (i) => i === 0 ? 'rotina-a' : 'rotina-b';
 for (const [k, nome] of Object.entries(nomes)) {
   seletores.forEach((el) => el.add(new Option(nome, k)));
 }
-seletores[1].value = 'calor';
+seletores[1].value = comRim ? 'adiada' : 'calor';
 for (const [k, [nome, unidade]] of Object.entries(variaveis)) variavel.add(new Option(`${nome} (${unidade})`, k));
 
 function recalcular() {
-  simulacoes = seletores.map((el) => simularHidratacao(CENARIOS_HIDRICOS[el.value]));
+  simulacoes = seletores.map((el) => simularHidratacao(CENARIOS_HIDRICOS[el.value], { regular: comRim ? regularRim : undefined }));
   elemento('resumos').innerHTML = simulacoes.map(({ totais, resumo }, i) =>
     `<article class="leitura-cardio ${classe(i)}"><h3>${nomes[seletores[i].value]}</h3>
     <p>Suor no dia ${fmt(totais.suorL * 1000, 0)} mL · FC máxima no cenário ${fmt(resumo.maxFC)} bpm.</p></article>`).join('');
@@ -42,17 +58,19 @@ function selecionar(indice) {
   const hora = hhmm(indice * PASSO_INTEGRADO);
   instante.setAttribute('aria-valuetext', hora);
   elemento('hora').value = hora;
-  desenharSerie(grafico, simulacoes.map(({ pontos }) => pontos.map((p) => p[variavel.value])), simulacoes[0].pontos.length,
+  desenharSerie(grafico, simulacoes.map(({ pontos }) => pontos.map((p) => valorDe(p, variavel.value))), simulacoes[0].pontos.length,
     indice, (i) => hhmm(i * PASSO_INTEGRADO), casas);
   elemento('contas').innerHTML = simulacoes.map(({ pontos }, i) => {
     const p = pontos[indice];
     return `<article class="leitura-cardio ${classe(i)}"><h3>Rotina ${i === 0 ? 'A' : 'B'}</h3>
-      <p>${nome} <strong>${fmt(p[variavel.value], casas)} ${unidade}</strong></p>
+      <p>${nome} <strong>${fmt(valorDe(p, variavel.value), casas)} ${unidade}</strong></p>
       <ul class="conta">
         <li>No intervalo de 5 min, o corpo absorve ${fmt(p.aguaAbsorvida * 1000, 0)} mL e perde ${fmt(p.suorL * 1000, 0)} mL no suor, ${fmt(p.urinaL * 1000, 0)} mL na urina e ${fmt(p.perdaInsensivelL * 1000, 0)} mL em perdas insensíveis.</li>
         <li>O estado inicial do intervalo tem ${fmt(p.plasmaL, 3)} L de plasma, ${fmt(p.osmolalidade)} mOsm/kg e sódio plasmático de ${fmt(p.sodio)} mmol/L.</li>
         <li>Débito = FC (${fmt(p.fc)}) × volume sistólico (${fmt(p.volumeSistolico)} mL) ÷ 1.000 ≈ ${fmt(p.debito, 2)} L/min.</li>
         <li>PAM ≈ débito × resistência vascular (${fmt(p.resistencia, 2)}) = ${fmt(p.pam)} mmHg.</li>
+        ${p.renal ? `<li>ADH ${fmt(p.renal.regulacao.adh)} acompanha osmolalidade e volume. O fluxo urinário neste intervalo é ${fmt(p.renal.urinaLHora, 3)} L/h.</li>
+        <li>Entrega de NaCl ${fmt(p.renal.nacl)} · renina ${fmt(p.renal.regulacao.renina)} · angiotensina II ${fmt(p.renal.regulacao.angII)} · aldosterona ${fmt(p.renal.regulacao.aldosterona)} · ANP ${fmt(p.renal.regulacao.anp)}. Os sinais modificam a excreção de sódio, aqui em ${fmt(p.renal.sodioUrinaMgHora)} mg/h.</li>` : ''}
       </ul></article>`;
   }).join('');
 }

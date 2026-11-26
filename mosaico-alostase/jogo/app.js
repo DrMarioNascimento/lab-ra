@@ -39,6 +39,9 @@ function telaModos() {
     <section class="card modo"><div class="rotulo">Hidratação e circulação</div><h2>Como o calor altera a resposta ao exercício?</h2>
       <p class="muted">Acompanhe suor, volume plasmático, osmolalidade e suas relações com o coração.</p>
       <a class="btn sec block" href="hidratacao/" style="text-align:center;text-decoration:none;display:block;padding-top:14px">Abrir hidratação e circulação</a></section>
+    <section class="card modo"><div class="rotulo">Fisiologia renal</div><h2>Como o rim ajusta água e sódio?</h2>
+      <p class="muted">Acompanhe pressão, vasopressina, renina, angiotensina II, aldosterona e o que muda na urina.</p>
+      <a class="btn sec block" href="hidratacao/?rim=1" style="text-align:center;text-decoration:none;display:block;padding-top:14px">Abrir rim e pressão arterial</a></section>
     <p class="aviso">O organismo do jogo é um modelo médio de adulto saudável. Não é o seu corpo e não serve de diagnóstico clínico.</p>`;
   $('#m-prog').onclick = telaInicio;
   $('#m-diag').onclick = () => { sub.textContent = 'Modo Diagnóstico'; telaEntradaDiag(tela, telaModos); };

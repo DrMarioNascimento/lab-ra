@@ -11,9 +11,9 @@
 </head>
 <body>
   <main class="bancada">
-    <nav><a href="../">← Mosaico Alostase</a></nav>
+    <nav><a href="../">← Mosaico Alostase</a> · <a href="../conferencia/">Tabelas fisiológicas</a></nav>
     <header class="abertura">
-      <h1>Hidratação e circulação</h1>
+      <h1 id="titulo-modulo">Hidratação e circulação</h1>
       <p>Compare o mesmo exercício em condições diferentes. Abra um instante para ver a sequência de cálculos.</p>
     </header>
     <section class="painel" aria-labelledby="comparar">
@@ -41,10 +41,11 @@
       <ul>
         <li>O balanço contabiliza água e sódio no intestino, na circulação e nas perdas. O suor responde ao cenário de calor e esforço. A taxa de suor e o sódio no suor variam entre pessoas. <a href="https://pubmed.ncbi.nlm.nih.gov/28332116/">Baker, 2017</a></li>
         <li>O acoplamento do volume plasmático ao volume sistólico e à FC é didático. Estudos em exercício prolongado associam desidratação e calor a alterações hemodinâmicas, com magnitude dependente do protocolo. <a href="https://pubmed.ncbi.nlm.nih.gov/9104860/">González-Alonso e colegas</a></li>
-        <li>As taxas de perda basal, a absorção e os ganhos da compensação são parâmetros do cenário. Nesta versão, as saídas urinárias são fixas. O volume plasmático e a osmolalidade são resultados do modelo de compartimentos.</li>
+        <li>As taxas de perda basal, a absorção e os ganhos da compensação são parâmetros do cenário. <span id="nota-rim">A bancada de hidratação usa saídas urinárias fixas como controle.</span> O volume plasmático e a osmolalidade são resultados do modelo de compartimentos.</li>
+      <li id="refs-rim" hidden>Os sinais de ADH, renina, angiotensina II, aldosterona e ANP são índices relativos ao repouso (100). As relações seguem a fisiologia e as magnitudes são hipóteses do motor. <a href="https://www.ncbi.nlm.nih.gov/books/NBK279157/">Endotext, vasopressina</a> · <a href="https://www.ncbi.nlm.nih.gov/books/NBK470410/">SRAA</a> · <a href="https://www.ncbi.nlm.nih.gov/books/NBK562257/">ANP</a></li>
       </ul>
     </details>
   </main>
-  <script type="module" src="./laboratorio.js?v=1"></script>
+  <script type="module" src="./laboratorio.js?v=2"></script>
 </body>
 </html>

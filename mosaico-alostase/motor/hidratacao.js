@@ -70,5 +70,5 @@ export function acoplarCirculacao(basal, plasmaL, intensidade) {
   const resistencia = basal.pam / debitoReferencia * fatorVS ** -0.4;
   const pam = debito * resistencia;
   const pulso = (basal.sis - basal.dia) * fatorVS;
-  return { fc, volumeSistolico, debito, resistencia, pam, sis: pam + 2 * pulso / 3, dia: pam - pulso / 3 };
+  return { fc, volumeSistolico, debito, resistencia, pam, razaoPressao: pam / basal.pam, sis: pam + 2 * pulso / 3, dia: pam - pulso / 3 };
 }
