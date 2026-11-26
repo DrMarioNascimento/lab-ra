@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Pressão no sono após mudança de escala · Mosaico Alostase</title>
+  <link rel="stylesheet" href="../../jogo/estilo.css?v=9">
+  <link rel="stylesheet" href="../../cardiovascular/bancada.css">
+  <link rel="stylesheet" href="../../turno-calor/calor.css">
+  <style>.bancada select { max-width: 100%; }</style>
+</head>
+<body>
+  <main class="bancada">
+    <nav class="calor-nav">
+      <a href="../">← Tabelas fisiológicas</a>
+      <a href="../../turno-calor/escalas/#conferencia">Conferência das escalas no calor</a>
+    </nav>
+    <header class="abertura">
+      <h1>Pressão no sono após mudança de escala</h1>
+      <p>McHill e colegas acompanharam motoristas de ônibus recém-contratados. Após o treinamento diurno, quatro continuaram na jornada diurna e dezesseis passaram a trabalhar com saídas frequentes no início da manhã. A pressão ambulatorial foi medida em dias de folga.</p>
+    </header>
+    <section class="painel">
+      <h2>Evolução no motor</h2>
+      <p>Explore a queda da pressão sistólica no sono ao longo dos 90 dias após a mudança. As linhas mostram a queda simulada em %. Os círculos marcam as três visitas do estudo.</p>
+      <label>Fase do relógio biológico <select id="fase">
+        <option value="fixa">Fixa para os dois grupos</option>
+        <option value="parcial">Ajuste parcial pelo horário de dormir</option>
+      </select></label>
+      <canvas class="calor-curva" id="curva" aria-hidden="true"></canvas>
+      <p class="calor-legenda"><span>Linha contínua · jornada diurna</span><span>Linha tracejada · jornada cedo</span></p>
+      <div class="controle-hora">
+        <label for="dia">Dia <output id="dia-rotulo"></output></label>
+        <input id="dia" type="range" min="0" max="90" value="90" step="1">
+      </div>
+      <table>
+        <thead><tr><th scope="col">Dia selecionado</th><th scope="col">Diurna</th><th scope="col">Cedo</th></tr></thead>
+        <tbody id="dia-leitura"></tbody>
+      </table>
+    </section>
+    <section class="painel">
+      <h2>Estudo e simulação</h2>
+      <p>A queda é expressa como magnitude positiva. Os valores iniciais e de 30 dias são leituras aproximadas da figura 4b. Os valores aos 90 dias foram retirados do texto.</p>
+      <label>Grupo na tabela <select id="grupo">
+        <option value="matinal">Jornada cedo</option>
+        <option value="diurna">Jornada diurna</option>
+      </select></label>
+      <table>
+        <thead><tr><th scope="col">Visita</th><th scope="col">Estudo</th><th scope="col">Motor</th><th scope="col">Motor − estudo</th></tr></thead>
+        <tbody id="comparacao"></tbody>
+      </table>
+      <p id="resultado" class="calor-detalhe" aria-live="polite"></p>
+      <p id="limite"></p>
+      <p><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8919200/">McHill e colegas, 2022 · artigo e figuras</a></p>
+    </section>
+    <details class="painel">
+      <summary>Hipóteses usadas na conferência</summary>
+      <ul>
+        <li>O motor usa os horários médios de sono e as medianas aproximadas da variabilidade de horário da figura 3. Cada janela representa o grupo e inclui o tempo entre o início e o fim do sono.</li>
+        <li>Entre visitas, o motor interpola os parâmetros do sono dia a dia. Os 42 dias de treinamento diurno usam o perfil inicial de cada grupo.</li>
+        <li>As janelas de pressão são simuladas sem um período de trabalho, como na coleta em folga. O modelo usa a janela média semanal de sono como aproximação para o dia da medida.</li>
+        <li>A fase fixa serve de referência. O ajuste parcial usa o horário de dormir como aproximação da fase. Os valores de queda da pressão de McHill ficam reservados para conferência e os ganhos do motor são os da versão anterior.</li>
+      </ul>
+    </details>
+  </main>
+  <script type="module" src="./plantao-matinal.js"></script>
+</body>
+</html>
