@@ -272,9 +272,11 @@ Palavras que o jogo usa: **número de registro** (da peça), **base** (onde a pe
 - **`individual.html` e `sala/index.html`.** "Cinco minutos. A mesma noite. O museu recomeça. Você não."
 
 **O que mudou nos dados** (`dados/pistas-v4.json`, 278 pistas, "v4 revisão 8")
-- `aurelio_1`, `man_3` (mostradores piscando; par de avisos), `coop_apagao_combinado.papelA`, `nico_1.porque`, `teo_radio`, `man_pot_1`, final Ouro. Nenhuma volta, tranca ou rótulo mudou.
+- `aurelio_1`, `man_3` (mostradores piscando; par de avisos), `coop_apagao_combinado.papelA`, `nico_1.porque`, `teo_radio`, `man_pot_1`, final Ouro. Nenhuma volta nem tranca mudou. Rótulos: 8 mudaram (`chave_3`, `quadro_0`, `d_fus_2`, `fh_vidro`, `dis_balde`, `dis_gato`, `b_luz_4`, `fh_lamp_lab`), sempre iguais entre sinal e par inocente, e a pergunta da tranca `abrir_o_quadro` passou a dizer "porta".
 
 **Simulador de texto e validador.** Só o cabeçalho (revisão 8). Resultado: APROVADO nas 5 causas com 1, 2 e 3 pessoas.
+
+**Ferramenta interna.** `museu/pontos-pecas.html` gera `LOOP_PONTOS` (sem link no jogo).
 
 **Testes de tela** (fora do repositório, em `/tmp/roda/r8/`): `pontos.mjs` (novo: pontos da peça entre as 5 causas, 15 salas × 5 voltas; modo `dados` compara lugar, direção, aceso e ordem de todos os pontos, em 0:03 e 4:30; modo `tela` compara o que fica à vista, em 390×844 e 360×740, e mede nenhum par a menos de 44 px e nenhum ponto fora da peça).
 
@@ -282,7 +284,37 @@ Palavras que o jogo usa: **número de registro** (da peça), **base** (onde a pe
 
 **Não aplicado, e por quê:** ver `DECISOES-V4.md`, "Revisão 8".
 
-## Checklist por volta (recalculado dos dados em 25/11/2026, revisão 8: nenhuma volta, horário nem tranca mudou)
+## Revisão 9 — 25/11/2026
+
+**Por quê.** Na rodada 8, a conferência técnica e as fichas passaram; a história ficou em 8,9 com Consistência do documento em 8,5 (o ajuste de texto às peças não tinha chegado ao ROTEIRO e à FICHAS, e sobravam choques pequenos no texto: minijogo da caixa, fresta do quadro); o padrão visual reprovou o Pátio (porta aberta no modelo × fresta no texto) e a Sala das coleções (sem mancha). O autor entregou duas peças novas. Relatórios em `docs/avaliacao/rodada8/`; escolhas em `DECISOES-V4.md`, "Revisão 9".
+
+**Decisão do autor (25/11/2026).** O seletor "Bem-vindo / Bem-vinda / Tanto faz" (com 👨 👩 👥) e o campo "Como quer ser chamado", na tela de entrar com código (`sala/firebase-room.js`), são intencionais e padrão de todos os Mosaicos: não são defeito de gênero nem de ícone. Não mexer.
+
+**Peças e miniaturas**
+- `museu/pecas/Q01.glb` (Pátio, 451 KB: quadro fechado com cadeado vermelho na trava e fresta, mostrador na parede, cabo entrando no topo, para-raios, adesivo amarelo e papel branco na porta, pedra molhada) e `museu/pecas/D10.glb` (Coleções, 438 KB: estante com caixas etiquetadas, caixa vazia caída, caixote de lâmpadas, tubo de banner, poça vermelha com pote virado). Chão em y = 0, de frente, tamanho real por `museu/escala-real.mjs` (`tamanho_real_ra`: 2,3 m e 2,1 m; descrições novas em `escala-pecas.json`). Anteriores com `_SUBSTITUIDO_2026-11-25l`.
+- Miniaturas das 8 peças novas (Q01, D10, L08, N18, N17, DESC_B, REL_B, GAL_B) refeitas em `museu/icones/`: objeto inteiro, com margem, fundo transparente, 160 px.
+- `LOOP_PONTOS` de Q01 e D10 gerados de novo em `museu/pontos-pecas.html` (ferramenta interna, sem link no jogo, que acha os 32 lugares fixos da superfície de cada peça).
+- `museu/torre/salas-loop.json` gerado de novo (Limpeza e Coleções estavam com o texto antigo; Pátio com "fechado a cadeado"). `sala/conteudo.js` gerado de novo.
+
+**O que mudou no código**
+- **`game.js`.** `LOOP_PONTOS` (Q01, D10); `LOOP_DESC.patio` ("Chove. O Quadro externo, fechado a cadeado, fica embaixo do para-raios."); `PECA_CANTO` e `giroDaPeca`: nos 5 cantos de sala (N18, N17, DESC_B, REL_B, GAL_B) o giro fica entre −75° e 75° da frente.
+- **`loop-central.js`.** Minijogos `traj_1` (a pergunta não traz a resposta: gotas no tapete) e `c_peca` (a caixa da estante).
+- **`style.css`.** Ícone de energia da lista com 22 px (era 18).
+- **`sala/telao/telao.mjs` e `sala/sala.css`.** Página "Missões" com o ícone da missão em cada linha.
+- **`index.html`.** Em tela baixa (até 780 px de altura e 720 de largura), a entrada fica mais compacta: em 360×740 tudo cabe sem rolar, até "Jogar sem turma"; os botões continuam com 52 px ou mais.
+- **`dados/validar.py` e `dados/simulador-texto.py`.** Só o cabeçalho (revisão 9).
+
+**O que mudou nos dados** (`dados/pistas-v4.json`, 278 pistas, "v4 revisão 9")
+- Pátio: `quadro_0`, `quadro_aberto.porque`, `chave_3`, `d_fus_2`, `fh_vidro`, `man_pot_3`, `fh_disj`, `fh_disjx` (texto e rótulo "Giz na parede"), `a_falsa_2x` e `fh_etq_chave` (texto e o mesmo rótulo novo, "Adesivo na porta do quadro"), `iso_aviso`, `a_cheia_2`, `fh_med_quadro`, `dis_gato`. Coleções: `dis_lampadas`, `falsa_3.porque`. Outras: `cracha_2`, `cracha_3`, `traj_2` (texto e rótulo "Seu Dirceu, de esfregão na mão"), `ivone_ali_2`, `fh_folha_d`, final Ouro.
+- **Rótulos que mudaram: 4** (`a_falsa_2x` e `fh_etq_chave`, par, com o mesmo rótulo novo; `fh_disjx`; `traj_2`). Nenhuma volta, horário, tranca, `precisaDe`, `soNaCausa` ou fonte de fato mudou; nenhuma pista entrou ou saiu.
+
+**Simulador de texto e validador.** Só o cabeçalho. Resultado em `/tmp/roda/esc/r9/validar.txt`.
+
+**Testes de tela** (fora do repositório): os do registro da revisão 8 (`/tmp/pwt`, `/tmp/roda/r6`, `/tmp/roda/r7`, `/tmp/roda/r8/pontos.mjs`), rodados depois da troca das peças. Os testes antigos `x/toques7.mjs` e `n6/mini.mjs` da rodada 8 esperam o comportamento anterior (ver DECISOES).
+
+**Não aplicado, e por quê:** ver `DECISOES-V4.md`, "Revisão 9".
+
+## Checklist por volta (recalculado dos dados em 25/11/2026, revisão 9: nenhuma volta, horário nem tranca mudou)
 
 Conferido em `dados/pistas-v4.json` (campos `volta_min`, `volta_max`, `segundo_min`, `precisaDe`, `soNaCausa`, `parDe`, `grupos_fonte`, `atividades_coop`). Horários com `valores_padrao` (raio em 1:10); com outra hora sorteada, os horários ligados ao raio andam junto. Pistas por `volta_min`: **231 na volta 1, 25 na volta 2, 9 na volta 3, 9 na volta 4, 4 na volta 5** (278 no total). Ativas por noite: 207 (A), 208 (B), 207 (C), 207 (D), 212 (E).
 
@@ -301,7 +333,7 @@ Conferido em `dados/pistas-v4.json` (campos `volta_min`, `volta_max`, `segundo_m
 | 2:40 | Alarme | — |
 | 4:00 | O crachá do Braga abre a porta de serviço | Câmera da porta de serviço (Central) |
 | 4:02 | Homem de paletó cruza a Área de descanso | Fala dele (volta 1) e "mostrar o bilhete" (volta 3) |
-| 4:05 | — | Seu Dirceu aponta com o rodo (Base da limpeza) |
+| 4:05 | — | Seu Dirceu aponta com o esfregão (Base da limpeza) |
 | 4:10 | Lenz desce e vira a chave de ligar da Câmara. Ela leva 50 segundos para armar | "Cinco minutos de volta" (volta 1) e fala na escada (volta 4) |
 | 5:00 | A Câmara dispara: reinício | — |
 
@@ -365,10 +397,11 @@ Não contam como prova: o cheiro de verniz; o bilhete do armário e o livro de v
 - **Horários que importam:** janela do Raio (noites B e E); 5:00 é o limite do Revelar.
 
 ### Pendências
-Nenhuma de texto, dado ou código (revisão 7). Os pontos de regra que as rodadas 5 e 6 deixam para o autor estão em `DECISOES-V4.md`, "Revisão 7 · Ficou para decidir": não bloqueiam o jogo. O que as revisões 2 e 3 deixaram em aberto foi fechado assim:
+Nenhuma de texto, dado ou código (revisão 9). Os pontos de regra que as rodadas 5 e 6 deixam para o autor estão em `DECISOES-V4.md`, "Revisão 7 · Ficou para decidir": não bloqueiam o jogo. O que as revisões 2 e 3 deixaram em aberto foi fechado assim:
 
 | Assunto | Como ficou | Quem decidiu |
 |---|---|---|
+| Seletor "Bem-vindo / Bem-vinda / Tanto faz" e "Como quer ser chamado" na entrada com código | Intencional, padrão de todos os Mosaicos: não é defeito de gênero nem de ícone; não mexer | Autor, 25/11/2026 |
 | Energia de quem joga sem dupla | 5 por volta para todo mundo | Responsável, 25/11/2026 |
 | Revelar | Só na volta 5, na Recepção | Responsável, 25/11/2026 |
 | Senha do cofre | Sorteada: o registro de trás para a frente | Responsável, 25/11/2026 |

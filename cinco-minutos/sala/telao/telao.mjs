@@ -139,7 +139,7 @@ function pgMissoes() {
   const miss = gente().filter(p => p.resp && p.resp.loopMissao), grupos = {};
   for (const p of miss) (grupos[p.resp.loopMissao] ||= []).push(p.nome || 'Participante');
   const linhas = Object.entries(grupos).sort((a, b) => b[1].length - a[1].length);
-  return `<div class="tl-card tl-largo"><p class="tl-volta">MISSÕES SECRETAS CUMPRIDAS · ${miss.length}</p><div class="tl-missoes${linhas.length > 4 ? ' duas' : ''}">${linhas.map(([m, ns]) => `<p><b>${esc(m)}</b><span>${ns.map(n => `<em>${esc(n)}</em>`).join('')}</span></p>`).join('') || '<i>Ninguém cumpriu a missão secreta desta vez.</i>'}</div></div>`;
+  return `<div class="tl-card tl-largo"><p class="tl-volta">MISSÕES SECRETAS CUMPRIDAS · ${miss.length}</p><div class="tl-missoes${linhas.length > 4 ? ' duas' : ''}">${linhas.map(([m, ns]) => `<p><b><img src="${ICONE('ui/missao')}" alt="">${esc(m)}</b><span>${ns.map(n => `<em>${esc(n)}</em>`).join('')}</span></p>`).join('') || '<i>Ninguém cumpriu a missão secreta desta vez.</i>'}</div></div>`;
 }
 function pgMaquina() {
   const f = (img, t, d) => `<div class="tl-meta">${ficha(img, 'g')}<b>${t}</b><span>${d}</span></div>`;

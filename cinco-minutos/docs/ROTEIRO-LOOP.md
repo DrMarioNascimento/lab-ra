@@ -22,7 +22,7 @@ Tudo neste roteiro usa um relógio só: o minuto da volta, de 0:00 a 5:00. Às 5
 - **Lenz**, do patrocínio. Paletó, sapato social, pressa. Entra pela porta de serviço às 4:00, passa por você e fala "rapidinho".
 - **Dra. Sato**, a engenheira da Câmara do tempo. Está presa fora do prédio por causa da tempestade. Fala com você só pelo interfone do Subsolo, e só comenta o que você contar que viu.
 - **Nico**, guia do museu. Repara em todo mundo ("Você tá com cara de quem não jantou"), perde o fio e guarda um pendrive e uma frase: "Desculpa, eu já te disse isso?"
-- **Seu Dirceu**, da limpeza. Fica sempre na Base da limpeza. Rodo na mão, vê quem passa e reclama do que apita. É quem conta que alguém de sapato social desceu com pressa "e nem boa-noite".
+- **Seu Dirceu**, da limpeza. Fica sempre na Base da limpeza. Esfregão e pano na mão, vê quem passa e reclama do que apita. É quem conta que alguém de sapato social desceu com pressa "e nem boa-noite".
 
 ## 2. A noite antes do crime
 
@@ -38,7 +38,7 @@ Os dias e os números abaixo são os do exemplo (dia 14, registro 472). Em cada 
 | **Os dias seguintes** | Aurélio adia. Não quer acreditar que foi enganado na véspera da maior exposição do museu. | Aurélio, na Galeria: fala baixo quando você já sentiu o cheiro de verniz, e tira os óculos quando você mostra o diário e o laudo |
 | **Numa reunião de patrocinadores** | A Dra. Sato explica: "A Câmara guarda um ambiente do jeito que ele estava cinco minutos atrás." Alguém sublinha a frase duas vezes e escreve na margem: "então apaga?" | Ata da reunião (Sala de conservação; só depois da carta da seguradora e de ouvir o homem de paletó na escada) |
 | **Ontem** | A Dra. Sato faz o último ensaio da Câmara e sai. A tempestade fecha a estrada. | Fichas e anotações de ensaio (Ateliê), registro técnico (Sala de conservação), interfone do Subsolo |
-| **Ontem** | Lenz pega o crachá do Braga "emprestado" e deixa um bilhete no armário da equipe, em papel de bloco de hotel, sem assinatura. Com esse crachá, a porta de serviço abre sem passar pela roleta. | Bilhete no armário (Base da limpeza), escala de crachás (Central), anotação "crachá: ver depois" (Recepção). O Braga só admite da volta 3 em diante, quando vê a escala e o bilhete juntos no seu caderno e você já provou que a peça é cópia: o Lenz ficou rondando o armário falando "rapidinho" e, quando o Braga voltou, tinha o bilhete no lugar do crachá |
+| **Ontem** | Lenz pega o crachá do Braga "emprestado" e deixa um bilhete no armário da equipe, ao lado da Base da limpeza, em papel de bloco de hotel, sem assinatura. Com esse crachá, a porta de serviço abre sem passar pela roleta. | Bilhete no armário (ao lado da Base da limpeza), escala de crachás (Central), anotação "crachá: ver depois" (Recepção). O Braga só admite da volta 3 em diante, quando vê a escala e o bilhete juntos no seu caderno e você já provou que a peça é cópia: o Lenz ficou rondando o armário falando "rapidinho" e, quando o Braga voltou, tinha o bilhete no lugar do crachá |
 | **Hoje, à tarde** | Lenz entra pela frente, como visita: assina o livro de visitas e passa pela roleta de entrada, para ser visto. Sai pela porta de serviço, com o crachá do Braga: a roleta da saída não registra. | Livro de visitas e roleta de entrada (Recepção), foto de divulgação (Sala da fotografia), roleta da saída (Central), As Duas Listas |
 | **Hoje, fim da tarde** | Aurélio finalmente escreve o laudo: "Verniz novo. Mais leve que no registro. Esta não é a nossa peça." | Laudo do curador (Sala de conservação, da volta 2 em diante, depois do cheiro de verniz) |
 | **Hoje, fim da tarde** | Téo não espera a manhã. Grava um recado num pendrive e entrega ao Nico: "Só para quem souber o que está gravado embaixo da verdadeira." Pega o pote 7, de tinta vermelha de marcação, na bancada da Ivone. A ideia é marcar a base da cópia de vermelho: "Tinta não mente." | Nico (Base da limpeza), caderno de materiais da Ivone, bilhete na cafeteira, folha do diário no bolso do macacão do Téo |
@@ -53,7 +53,7 @@ No rádio da Sala dos sons, a voz do Téo não acusa ninguém pelo nome e não s
 
 ### Por que Lenz trocou a peça
 
-O contrato do patrocínio diz: se a peça principal sumir, o seguro paga uma fortuna ao patrocinador. A empresa de Lenz está quebrada ("o seguro cai até o fim do mês ou eu não tenho mais empresa"). O plano tinha três passos: pôr a cópia na base, tirar a verdadeira do prédio dentro de uma caixa de "banners" com retirada marcada para amanhã cedo, e deixar a peça ser dada como perdida. Seguro no bolso e peça de 300 anos para vender por fora.
+O contrato do patrocínio diz: se a peça principal sumir, o seguro paga uma fortuna ao patrocinador. A empresa de Lenz está quebrada ("o seguro cai até o fim do mês ou eu não tenho mais empresa pra te pagar"). O plano tinha três passos: pôr a cópia na base, tirar a verdadeira do prédio dentro de uma caixa de "banners" com retirada marcada para amanhã cedo, e deixar a peça ser dada como perdida. Seguro no bolso e peça de 300 anos para vender por fora.
 
 Faltava um passo. Téo chegou antes.
 
@@ -79,7 +79,7 @@ Enquanto o museu gira, o Téo não piora. Nem melhora. Fica guardado, igual a um
 | 2:40 | O alarme dispara. |
 | 4:00 | O crachá do Braga abre a porta de serviço. A câmera da porta de serviço mostra alguém de paletó chegando, de crachá na mão. |
 | 4:02 | Essa pessoa cruza a Área de descanso olhando o relógio: "Tô só pegando um documento, rapidinho." |
-| 4:05 | Na Base da limpeza, Seu Dirceu aponta com o rodo: passou alguém de sapato social, com pressa, rumo à escada do Subsolo. |
+| 4:05 | Na Base da limpeza, Seu Dirceu aponta com o esfregão: passou alguém de sapato social, com pressa, rumo à escada do Subsolo. |
 | 4:10 | Essa pessoa desce ao Subsolo e vira a chave de ligar da Câmara, que já está virada. Depois de ligada, a Câmara leva 50 segundos para armar. |
 | 5:00 | Tudo recomeça. |
 
@@ -168,10 +168,10 @@ O clarão acerta o para-raios. A chave treme e quer abrir. Quem está no Pátio 
 A virada da cena: durante quatro voltas o apagão foi o seu inimigo. Na quinta, o raio que você só anotava vira **a força que faltava**.
 
 ### Cena do pendrive — "A voz"
-Da volta 4 em diante, para quem já contou do Téo caído e já leu o laudo. Você diz o número de registro. Nico pisca, como quem acorda. Pela primeira vez ele não pede desculpa: "É isso. O Téo falou: só para quem souber o que está gravado embaixo da verdadeira." E põe o pendrive na sua mão. No rádio, o Téo fala com você sem te conhecer: "Se você achou o número, sabe que a da Galeria é cópia. Hoje eu falo com ele, cara a cara. Se eu não aparecer, não deixa a noite acabar sem prova."
+Da volta 4 em diante, para quem já contou do Téo caído e já leu o laudo. Você diz o número de registro. Nico pisca, como quem acorda. Pela primeira vez ele não pede desculpa: "É isso. O Téo falou: só para quem souber o que está gravado embaixo da verdadeira." E põe o pendrive na sua mão. No rádio, o Téo fala com você sem te conhecer: "Você achou o número. Então escuta: a da Galeria é cópia. Hoje eu falo com ele, cara a cara. Se eu não aparecer, não deixa a noite acabar sem prova."
 
 ### Cena da caixa — "Pesa demais para banner"
-Em toda noite. Na Sala das coleções, você empurra com o pé uma caixa do patrocínio: "BANNERS – NÃO ABRIR". Da volta 2 em diante, com o cheiro de verniz no caderno, você tem motivo para abrir. Dentro da manta está a peça de 300 anos. Cheira a pó, não a verniz. Embaixo da base, o número gravado. A caixa é fato do crime em qualquer partida, e a peça verdadeira na mão vale como prova de que a da Galeria é cópia; na noite da peça presa (causa C) ela também é a ferramenta do conserto.
+Em toda noite. Na Sala das coleções, numa das caixas etiquetadas da estante, você empurra a caixa do patrocínio: "BANNERS – NÃO ABRIR". Pesa demais pra banner. Da volta 2 em diante, com o cheiro de verniz no caderno, você tem motivo para abrir. Dentro da manta está a peça de 300 anos. Cheira a pó, não a verniz. Embaixo da base, o número gravado. A caixa é fato do crime em qualquer partida, e a peça verdadeira na mão vale como prova de que a da Galeria é cópia; na noite da peça presa (causa C) ela também é a ferramenta do conserto.
 
 ### Cena do empurrão — "A um braço de distância"
 Em toda noite, depois de achar o Téo. Um botão de paletó com um fiapo de linha, perto da mão dele. Na prateleira, na altura do ombro, o pó arrastado por uma mão espalmada; mais abaixo, a marca de dedos abertos, descendo: alguém tentou segurar quem caía. E, para quem já viu as pegadas brilharem, a primeira delas: começa dentro da tinta, de frente para o Téo. Quem pisou ali foi embora andando, não correndo.
@@ -189,7 +189,7 @@ Só na noite de dois defeitos (E). Depois da tranca e do gerador, você descola 
 Só na noite do circuito (D), e só depois de você ver um sinal da caixa de fusíveis (antes disso, você não mexe nele sem motivo). Na mão fechada do Téo tem um papel dobrado. Você abre devagar: "Ordem pra religar: 3-1-2. Só depois de provar o que aconteceu." (A ordem muda a cada partida.)
 
 ### Cena do cadeado — "Olhando de novo"
-Só na noite do circuito (D). No Quadro externo, pendurado na chave "Circuito da Câmara", um cadeado vermelho, aberto, só de aviso, com a etiqueta molhada e a tinta escorrida. Não dá para ler. Você só reconhece a letra depois de ler a página dobrada do diário. Aí volta e enxerga, por baixo da tinta: "Não religar. Fui eu. — T."
+Só na noite do circuito (D). A porta do Quadro externo está fechada, presa pelo cadeado da trava (o vermelho, pequeno); pela fresta da borda dá para espiar. Lá dentro, pendurado na chave onde chega o cabo da Câmara, um segundo cadeado, amarelo, aberto, só de aviso, com a etiqueta molhada e a tinta escorrida. Não dá para ler. Você só reconhece a letra depois de ler a página dobrada do diário. Aí volta e enxerga, por baixo da tinta: "Não religar. Fui eu. — T."
 
 ## 6. As cinco causas do travamento
 
@@ -226,11 +226,11 @@ Sem dupla: numa volta você leva a peça e deixa no chão do Subsolo, ao lado do
 **Virada.** A prova do crime é a ferramenta do conserto. A máquina estava agarrada numa mentira.
 
 ### D — Alguém desligou de propósito
-**História.** Antes de encontrar Lenz, o Téo passou no Subsolo. Ele tinha ouvido o do patrocínio perguntar à doutora se a Câmara "desfaz" as coisas, e entendeu o risco: se ela ligasse inteira, a noite sumia e ninguém nunca saberia. Então cortou o lacre, tirou o fusível-mestre F2, soltou os três pontos de ligação e pendurou na chave "Circuito da Câmara" um cadeado vermelho, aberto, de aviso. Escondeu o fusível embaixo da base da cópia, "embaixo da mentira". Por isso, quando Lenz virou a chave de ligar, a máquina ligou manca e travou.
+**História.** Antes de encontrar Lenz, o Téo passou no Subsolo. Ele tinha ouvido o do patrocínio perguntar à doutora se a Câmara "desfaz" as coisas, e entendeu o risco: se ela ligasse inteira, a noite sumia e ninguém nunca saberia. Então cortou o lacre, tirou o fusível-mestre F2, soltou os três pontos de ligação e pendurou na chave onde chega o cabo da Câmara, dentro do Quadro externo, um cadeado amarelo, aberto, de aviso. Escondeu o fusível embaixo da base da cópia, "embaixo da mentira". Por isso, quando Lenz virou a chave de ligar, a máquina ligou manca e travou.
 
 O travamento não é defeito. É um pedido de socorro.
 
-**Sinais.** Lacre cortado e lugar do F2 vazio. Cadeado vermelho de aviso no quadro. A página dobrada do diário e o papel na mão do Téo pedem antes um desses sinais. No varal da Sala da fotografia, duas fotos de conferência da caixa de fusíveis: a de ontem com o lacre inteiro, a de hoje com o lacre cortado e um lugar vazio. No alto-falante de teste da Sala dos sons, um estalo seco a cada tentativa. A folha amassada na bandeja da impressora ("F2, pontos na ordem de quem soltou, disjuntor") existe em toda noite e não diz qual é o defeito. Mostradores piscando e luz fraca. Leitura normal: a máquina roda em modo livre e a força chega cheia no quadro.
+**Sinais.** Lacre cortado e lugar do F2 vazio. Cadeado amarelo de aviso dentro do quadro (visto pela fresta). A página dobrada do diário e o papel na mão do Téo pedem antes um desses sinais. No varal da Sala da fotografia, três fotos de conferência da caixa de fusíveis: as de anteontem e de ontem com o lacre inteiro, a de hoje, ainda úmida, com o lacre cortado e um lugar vazio. Na folha de conferência da Oficina elétrica, a linha dos fusíveis da Câmara ficou em branco. No alto-falante de teste da Sala dos sons, um estalo seco a cada tentativa. A folha amassada na bandeja da impressora ("F2, pontos na ordem de quem soltou, disjuntor") existe em toda noite e não diz qual é o defeito. Mostradores piscando e luz fraca. Leitura normal: a máquina roda em modo livre e a força chega cheia no quadro.
 
 **Cuidado.** Na bancada da Oficina elétrica tem um fusível queimado que parece a resposta. A etiqueta ao lado diz "iluminação da fachada". Coisa estranha com explicação inocente.
 
@@ -288,9 +288,9 @@ Dica de tela de quem guarda o dossiê: *"Você guarda o dossiê. Confira as 3 pr
 Os textos abaixo são os que cada aparelho mostra. O telão mostra a versão curta, no plural. Nomes na tela: Ouro, A noite andou, A verdade apareceu, Caso aberto, O museu esqueceu.
 
 ### Ouro — consertou e revelou
-> A máquina para e a verdade fica. O relógio marca 5:01 pela primeira vez. Lá fora, uma sirene. Na Sala das coleções, o Téo abre os olhos. Aurélio olha para o telão, depois para você, e só consegue dizer: "Obrigado por não esquecer."
+> A máquina para e a verdade fica. O relógio marca 5:01 pela primeira vez. Lá fora, uma sirene. Na Sala das coleções, o Téo abre os olhos. A notícia das 3 provas sobe até a Galeria. Aurélio olha para a base, depois para quem chega, e só consegue dizer: "Obrigado por não esquecer."
 
-(A sirene é o socorro que a Dra. Sato pediu pelo rádio da estrada: só chega quando a noite anda, por isso aparece no Ouro e no Desligar. Ela só pede depois que alguém conta do Téo pelo interfone; por isso a frase da sirene só é mostrada a quem tem essa conversa no caderno, e a do Téo acordando, a quem viu o Téo. No telão, basta alguém da turma ter. O Aurélio não lembra das voltas: fala do que acabou de ver no telão.)
+(A sirene é o socorro que a Dra. Sato pediu pelo rádio da estrada: só chega quando a noite anda, por isso aparece no Ouro e no Desligar. Ela só pede depois que alguém conta do Téo pelo interfone; por isso a frase da sirene só é mostrada a quem tem essa conversa no caderno, e a do Téo acordando, a quem viu o Téo. No telão, basta alguém da turma ter. O Aurélio não lembra das voltas e não sai da Galeria: fala do que a noite mostrou, a notícia das provas que sobe da Recepção e o relógio passando de 5:00.)
 
 ### Desligar — consertou, mas não revelou
 > Com o defeito consertado, você aperta "Loop Reset". O relógio passa de 5:00 e continua. Lá fora, uma sirene: o socorro do Téo. Você devolveu a manhã ao museu. Cedo, uma caixa de "banners" sai pela porta da frente, com guia assinada. Ninguém viu o que você viu.
@@ -361,7 +361,7 @@ Vale sobre o que estiver escrito acima, nas partes 9 e 10.
 
 - **O nome.** "Lenz" só aparece da volta 3 em diante. A carta da seguradora (volta 2) diz "quem assinou pelo patrocínio: uma rubrica apressada". O nome nasce em cena: ele atende o telefone perto da porta de serviço, o Braga admite, ou a letra do bilhete vira nome em Acusação e Defesa.
 - **Comparar a foto sem ajuda.** Passou para a volta 2. Na volta 1 ninguém sai com prova da cópia.
-- **Caixa de "banners".** Só abre na volta 2, com motivo. Na volta 1 você só empurra com o pé.
+- **Caixa de "banners".** Só abre na volta 2, com motivo. Na volta 1 você só empurra a caixa na estante.
 - **Listas e pegadas.** As Duas Listas dizem "se saiu, foi por outra porta". Entre 0:00 e 4:00 ele está fora do prédio.
 - **Trajeto.** O caderno de rondas do cofre e a foto com a legenda mostram a mesma volta pela porta de serviço, no começo da noite. As duas coisas valem como prova do trajeto.
 - **Pares de mesmo rótulo.** Onde o sinal não existe, o que você acha é um objeto de ambiente: medidor desligado, vidro embaçado, etiqueta colada em cima. Não mostra o defeito e não é leitura normal.
@@ -401,7 +401,7 @@ Vale sobre o que estiver escrito acima, nas partes 9 a 12.
 
 - **O nome, em Acusação e Defesa.** A dupla procura na escala o que foi escrito pela mesma mão do bilhete (o visto do patrocínio, no pé da folha). Quem diz de quem é a rubrica é o Braga, na Central: "É do Lenz, do patrocínio. Ele assina tudo assim."
 - **Embaixo da base.** A peça exposta tem feltro novo embaixo da base, sem número à vista (Lado a Lado e a foto comparada sem ajuda dizem isso, igual ao que se acha na volta 1).
-- **A caixa.** Na Sala das coleções há caixas de transporte empilhadas; só uma tem o adesivo do patrocínio. A pergunta ao abrir é o que a lista de entregas anotou sobre ela.
+- **A caixa.** Na estante da Sala das coleções há caixas etiquetadas; só uma tem o adesivo do patrocínio. A pergunta ao abrir é o que a lista de entregas anotou sobre ela.
 - **As Duas Listas.** O resultado diz só o que as duas listas dizem: o do patrocínio não saiu pela roleta. O crachá na porta de serviço tem fonte própria (a câmera e o caderno de rondas).
 - **A escala de crachás** entra direto no caderno, sem pergunta.
 - **Painel da noite D.** O ponteiro fica atrás de uma etiqueta de papel, tremendo: não dá para ler o número, como nas outras pistas dessa noite.
@@ -434,15 +434,30 @@ Vale sobre o que estiver escrito acima, nas partes 9 a 13.
 
 Vale sobre o que estiver escrito acima, nas partes 9 a 14. Nada do enredo mudou: só frases, peças 3D e ícones.
 
-- **Peças das salas.** Oito salas ganharam peça nova, feita para a história: Pátio (pilar de tijolo com o Quadro externo, cadeado vermelho, mostrador e para-raios), Sala das coleções (estante com caixas etiquetadas, caixa aberta e caixote), Base da limpeza (carrinho com balde, esfregão, frascos, luvas e um multímetro), Sala da fotografia (câmera de fole no tripé, fotos na parede e no varal, bandeja de revelação, álbum), Sala dos sons (gravador de rolo, rádio de válvulas, alto-falante de teste e metrônomo), Área de descanso (porta de serviço com leitor de crachá, visor, mural de cortiça, cafeteira), Sala dos relógios (parede de relógios com o relógio de caixa alta) e Galeria (a máscara de pedra em cima da base de madeira, com a redoma vazia ao lado).
+- **Peças das salas.** Oito salas ganharam peça nova, feita para a história: Pátio (pilar de tijolo com o Quadro externo, cadeado na trava, mostrador e para-raios; trocada na revisão 9, parte 16), Sala das coleções (estante com caixas etiquetadas, caixa aberta e caixote; trocada na revisão 9), Base da limpeza (carrinho com balde, esfregão, frascos, luvas e um multímetro), Sala da fotografia (câmera de fole no tripé, fotos na parede e no varal, bandeja de revelação, álbum), Sala dos sons (gravador de rolo, rádio de válvulas, alto-falante de teste e metrônomo), Área de descanso (porta de serviço com leitor de crachá, visor, mural de cortiça, cafeteira), Sala dos relógios (parede de relógios com o relógio de caixa alta) e Galeria (a máscara de pedra em cima da base de madeira, com a redoma vazia ao lado).
 - **Missão da Ivone.** Fecha com a fala da tinta (`ivone_red`) junto do pote que sumiu (`ivone_1x`) ou do bilhete da cafeteira (`dis_cafeira`). A conversa do Seu Dirceu sobre o dia 14 não fecha mais a missão.
 - **Aurélio.** "Você também sentiu? Peça de acervo não cheira a novo. O Téo me avisou no dia {dia}. Eu demorei para acreditar."
 - **Dra. Sato.** Aos mostradores piscando: "Sem ritmo? Do jeito que eu deixei, eles não piscam. Então ela não sabe onde está." Serve para as noites A, D e E (zerados ou certos, parados). Ao par de avisos: "Procura uma parte que esteja bem". No Fio a Fio, sem dupla, ela diz "Liga." (no ajuste, "Gira.").
 - **Manual, página 3.** "A Câmara puxa só do gerador, nunca da rede do museu. No mesmo gerador ficam as luzes de serviço das salas." É por isso que as lâmpadas caem a cada tentativa.
-- **Apagão Combinado.** Quem está no Pátio segura a chave geral "do lado de fora da tampa do Quadro externo" (a tampa com cadeado continua fechada).
+- **Apagão Combinado.** Quem está no Pátio segura a chave geral "do lado de fora da porta do Quadro externo" (a porta, presa pelo cadeado da trava, continua fechada).
 - **Nico.** Antes do laudo, ele diz que só entrega "depois que o curador puser o laudo no papel".
 - **Pendrive.** "Você achou o número. Então escuta: a da Galeria é cópia." (achar o número não prova a cópia sozinho).
-- **Minijogos.** A fita da porta de serviço pergunta se a pessoa de paletó entra ou sai (ombro molhado: vem da rua), sem depender da escala. A foto antiga oferece quatro coisas que se gravam numa base; a caixa oferece quatro cheiros. Na luz rasante, o que aparece é "O verniz brilha por igual, de ponta a ponta".
+- **Minijogos.** A fita da porta de serviço pergunta se a pessoa de paletó entra ou sai, sem depender da escala (na revisão 9 a pista vira as gotas no tapete, parte 16). A foto antiga oferece quatro coisas que se gravam numa base; a caixa oferece quatro cheiros. Na luz rasante, o que aparece é "O verniz brilha por igual, de ponta a ponta".
 - **Dicionário.** "Base da peça": o suporte, e "embaixo da base" de uma peça é o fundo dela, onde fica o número.
-- **Finais.** No telão, "A noite andou" não fala mais da caixa de "banners" (na noite C a peça verdadeira fica no apoio). No Ouro, o Aurélio olha para a base, na Galeria (ele não sai de lá).
+- **Finais.** No telão, "A noite andou" não fala mais da caixa de "banners" (na noite C a peça verdadeira fica no apoio). No Ouro, o Aurélio olha para a base, na Galeria (ele não sai de lá); na revisão 9, a notícia das provas chega até ele (parte 8).
 - **Entrada.** "Cinco minutos. A mesma noite. O museu recomeça. Você não." nas três páginas.
+- **Ajuste de texto às peças novas.** Texto das pistas alinhado ao que os 8 modelos mostram, sem mudar enredo, regra, tranca, culpado nem fonte de fato. Pátio: o cadeado de aviso da noite D é amarelo, para não se confundir com o vermelho da trava. Fotografia: 3 fotos no varal (anteontem, ontem, hoje); a lâmpada vermelha virou a luminária de parede em cima do varal; fotos da parede são detalhes do prédio. Limpeza: multímetro molhado na prateleira de baixo do carrinho, bilhete no cabo do esfregão. Coleções: a caixa de "banners" é uma das caixas etiquetadas da estante. Área de descanso: cafeteira, sem geladeira. A porta do quadro ficou como diz a parte 16.
+
+## 16. O que mudou na revisão 9 (25/11/2026)
+
+Vale sobre o que estiver escrito acima, nas partes 9 a 15. Nada do enredo mudou: só frases e duas peças 3D.
+
+- **Peças novas do Pátio e da Sala das coleções.** Pátio: o Quadro externo está **fechado**, preso pelo cadeado vermelho da trava, com uma fresta fina na borda; mostrador redondo na parede ao lado; cabo grosso descendo pela parede e entrando no topo do quadro; para-raios de cobre; adesivo amarelo e papel branco colados na porta; piso de pedra molhada. Coleções: estante com caixas etiquetadas, caixa vazia caída de lado, caixote de lâmpadas, tubo de banner, poça vermelha com o pote virado no chão de tábuas.
+- **O quadro, pela fresta.** "A porta do Quadro externo está fechada, presa pelo cadeado da trava. Pela fresta da borda dá para espiar." Pela fresta você vê as chaves e se estão abertas ou fechadas (`man_pot_3`, `fh_disj`), conta a posição delas (`chave_3`: "Contando da esquerda...") e enxerga o cadeado amarelo da noite D, mas não lê as etiquetas das chaves (`fh_vidro`). O que está escrito do lado de fora fica na porta e na parede: adesivo amarelo (`a_falsa_2x`, `fh_etq_chave`, rótulo "Adesivo na porta do quadro"), papel branco (`iso_aviso`), giz na parede (`fh_disjx`: "Disjuntor do café cai com a chuva."). O medidor é o mostrador redondo da parede (`a_cheia_2`, `fh_med_quadro`). O gato dorme em cima do pilar (`dis_gato`, "Segundo o Nico").
+- **Noite D.** O cadeado amarelo fica na chave onde chega o cabo da Câmara (saiu a etiqueta "Circuito da Câmara", que não era nenhuma das três chaves numeradas). A folha de conferência diz que a linha dos fusíveis da Câmara ficou em branco (antes: "ficou para amanhã", contra a foto de hoje).
+- **Coleções.** Caixote de lâmpadas aberto (`dis_lampadas`); "caixas e mais caixas na estante" (`falsa_3`). Minijogo da caixa: "Na estante, caixas etiquetadas; só uma tem o adesivo do patrocínio."
+- **Minijogo da fita.** A pergunta não traz a resposta: "No tapete, embaixo da pessoa, aparecem gotas. Pelo que você sabe da noite, ela está entrando ou saindo?" Dicas: "Repare no que pinga no tapete." e "Lá fora chove desde o começo da noite."
+- **Armário da equipe.** "No armário da equipe, ao lado da Base da limpeza" (sem a palavra "corredor"); o Braga diz "ali do lado da limpeza".
+- **Seu Dirceu.** Esfregão e pano na mão (saiu o rodo).
+- **Ouro.** "A notícia das 3 provas sobe até a Galeria. Aurélio olha para a base, depois para quem chega, e só consegue dizer: 'Obrigado por não esquecer.'"
+- **Entrada com código em sala.** O seletor "Bem-vindo / Bem-vinda / Tanto faz" e o campo "Como quer ser chamado" são padrão de todos os Mosaicos, por decisão do autor (25/11/2026).

@@ -663,9 +663,9 @@ const LC_MG = {
    dicas:['Luz de frente esconde. Luz de lado mostra a superfície.','Três séculos de mão, pano e mudança deixam marca.']},
   luz:{achou:'O verniz brilha por igual, de ponta a ponta.', falta:'ainda não apareceu nada', botao:'Anotar o que apareceu', img:'V11'},
   dicas:['Luz de frente esconde. Luz de lado mostra a superfície.','Quase no fim do curso da luz, a superfície aparece inteira.']},
- traj_1:{ativ:'livro', resp:0, img:['S01'], nome:'Olhar a fita da porta de serviço', texto:'A fita mostra a porta de serviço às 4:00. Alguém de paletó, com o ombro molhado, encosta um crachá no leitor. Essa pessoa está entrando ou saindo?', opcoes:['Entrando: vem da rua','Saindo: vai para a rua','Só passando, sem abrir a porta'],
-  dicas:['Lá fora chove desde o começo da noite.','Quem está saindo do museu ainda está de roupa seca.']},
- c_peca:{ativ:'livro', resp:0, img:['D10'], nome:'Abrir a caixa de banners', texto:'Agora você tem motivo. Três caixas de transporte empilhadas; só uma tem o adesivo do patrocínio. O que você sentiu diante da peça da Galeria que faz você abrir esta?', opcoes:['Cheiro de verniz fresco','Cheiro de pó antigo','Cheiro de tinta vermelha','Cheiro de cola'],
+ traj_1:{ativ:'livro', resp:0, img:['S01'], nome:'Olhar a fita da porta de serviço', texto:'A fita mostra a porta de serviço às 4:00. Alguém de paletó encosta um crachá no leitor. No tapete, embaixo da pessoa, aparecem gotas. Pelo que você sabe da noite, ela está entrando ou saindo?', opcoes:['Entrando: vem da rua','Saindo: vai para a rua','Só passando, sem abrir a porta'],
+  dicas:['Repare no que pinga no tapete.','Lá fora chove desde o começo da noite.']},
+ c_peca:{ativ:'livro', resp:0, img:['D10'], nome:'Abrir a caixa de banners', texto:'Agora você tem motivo. Na estante, caixas etiquetadas; só uma tem o adesivo do patrocínio. O que você sentiu diante da peça da Galeria que faz você abrir esta?', opcoes:['Cheiro de verniz fresco','Cheiro de pó antigo','Cheiro de tinta vermelha','Cheiro de cola'],
   dicas:['A primeira coisa que se nota diante da peça principal está no seu caderno.','Peça de 300 anos não cheira a coisa nova.']}
 };
 // A ordem das opções (e a posição certa da luz) muda com a semente: nada para decorar entre partidas.

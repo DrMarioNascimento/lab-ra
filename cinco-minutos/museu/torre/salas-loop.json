@@ -77,7 +77,7 @@
    "peca": "L08",
    "andar": "Térreo",
    "ordem": 4,
-   "texto": "O armário da equipe, o carrinho e Seu Dirceu de rodo na mão."
+   "texto": "O carrinho da equipe, o balde do esfregão e Seu Dirceu de pano na mão."
   },
   "atelie": {
    "nome": "Ateliê de descobertas",
@@ -93,7 +93,7 @@
    "peca": "D10",
    "andar": "Térreo",
    "ordem": 6,
-   "texto": "Caixas empilhadas e uma mancha vermelha no chão."
+   "texto": "Uma estante de caixas etiquetadas e uma mancha vermelha no chão."
   },
   "manutencao": {
    "nome": "Oficina técnica",
@@ -117,7 +117,7 @@
    "peca": "Q01",
    "andar": "Térreo",
    "ordem": 9,
-   "texto": "Chove. O Quadro externo fica embaixo do para-raios."
+   "texto": "Chove. O Quadro externo, fechado a cadeado, fica embaixo do para-raios."
   },
   "prototipo": {
    "nome": "Subsolo · Câmara do tempo",

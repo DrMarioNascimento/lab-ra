@@ -373,3 +373,5 @@ body.em-cheia .tl-fs{opacity:.5}body.em-cheia .tl-fs:hover,body.em-cheia .tl-fs:
 /* Revisão 7 · página Missões cheia (8 missões, 40 nomes): o nome nunca fica abaixo de 1,35% da largura; o espaço sai do respiro */
 .tl-missoes{gap:.4em}.tl-missoes p{padding:.3em .7em;gap:.25em}
 .tl-missoes span{font-size:max(.86em,1.35vw)}
+/* Revisão 9: ícone da missão em cada linha da página Missões do telão */
+.tl-missoes b{display:flex;align-items:center;gap:.45em}.tl-missoes b img{width:1.7em;height:1.7em;flex:none;object-fit:contain;filter:drop-shadow(0 .15em .15em #000a)}

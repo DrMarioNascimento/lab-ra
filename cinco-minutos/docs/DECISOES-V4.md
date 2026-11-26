@@ -1,5 +1,5 @@
 # Loop v4 (25/11/2026) — decisões aplicadas nos dados e no código
-Fonte da verdade do enredo: docs/ROTEIRO-LOOP.md. Dados: cinco-minutos/dados/pistas-v4.json (278 pistas desde a revisão 3; as seções "Revisão 2" a "Revisão 7", no fim, valem sobre o que estiver acima, e a mais nova vale sobre as anteriores) → loop-central-dados.js.
+Fonte da verdade do enredo: docs/ROTEIRO-LOOP.md. Dados: cinco-minutos/dados/pistas-v4.json (278 pistas desde a revisão 3; as seções "Revisão 2" a "Revisão 9", no fim, valem sobre o que estiver acima, e a mais nova vale sobre as anteriores) → loop-central-dados.js.
 
 ## Mundo
 - Uma versão só para o Téo: confrontou o Lenz na Sala das coleções uns trinta segundos antes de 0:00, foi empurrado, caiu ao lado do pote de tinta. Enquanto a Câmara gira ele "não piora nem melhora, fica guardado igual a uma peça numa vitrine" (pista sato_teo). Saíram as frases "encostou na Câmara / ficou preso entre as voltas".
@@ -115,7 +115,7 @@ Onde esta seção contradiz o que está acima, vale esta. Origem: relatório da 
 - Seu Dirceu fica numa sala só, a Base da limpeza (a conversa sobre a Ivone foi para lá).
 - 4:00 o crachá abre a porta de serviço e a câmera da porta de serviço mostra o paletó chegando; 4:02 ele cruza a Área de descanso; 4:05 Seu Dirceu aponta; 4:10 ele desce.
 - A fita da câmera (minijogo) só tem o que a câmera vê: porta vazia, paletó entra no quadro, olha o relógio, crachá encosta na porta.
-- Caixa de fusíveis da Câmara: um lugar só, a Oficina técnica. Na Sala da fotografia ficam duas fotos de conferência no varal; na Sala dos sons, o estalo no alto-falante de teste.
+- Caixa de fusíveis da Câmara: um lugar só, a Oficina técnica. Na Sala da fotografia ficam três fotos de conferência no varal (anteontem, ontem e hoje); na Sala dos sons, o estalo no alto-falante de teste.
 - A música da Sala dos sons só vira lembrança da volta 2 em diante.
 - Alarme: 2:40 nos dados, no jogo e no telão. A faixa de aviso não anuncia mais um estrondo aos 2:00 (a luz cai com o raio; a hora dele não sai de graça).
 
@@ -332,3 +332,33 @@ Onde esta seção contradiz o que está acima, vale esta. Origem: os quatro rela
 
 ### Ficou para decidir (pontos de regra; nenhum bloqueia)
 Continuam os da revisão 7, mais: **aviso de aula encerrada** em todos os jogos de sala ao mesmo tempo.
+
+## Revisão 9 (25/11/2026) — depois da rodada 8 das escalas e do lote 8 de peças
+
+Onde esta seção contradiz o que está acima, vale esta. Origem: os quatro relatórios da rodada 8 (`docs/avaliacao/rodada8/`: história, fichas e motivação, conferência técnica, padrão visual com peças 3D) e duas peças novas do autor (Pátio e Sala das coleções). Foi aplicado o que os relatórios classificam como texto, dado, CSS ou código. O resumo arquivo por arquivo está em `LOOP-CENTRAL.md`, "Revisão 9".
+
+### Decisão do autor (25/11/2026)
+- **Seletor de entrada.** Na tela de entrar com código (`sala/firebase-room.js`), o seletor "Bem-vindo / Bem-vinda / Tanto faz" (com 👨 👩 👥) e o campo "Como quer ser chamado" são **intencionais e padrão de todos os Mosaicos**. Não são defeito de gênero nem de ícone e não devem ser mudados nem apontados como falha nas próximas rodadas.
+
+### Escolhas feitas ao aplicar
+- **Peças novas.** `Q01` (Pátio): o Quadro externo agora está **fechado**, preso por cadeado vermelho na trava, com uma fresta fina na borda; mostrador redondo na parede ao lado; cabo grosso descendo pela parede até o topo do quadro; para-raios de cobre; adesivo amarelo e papel branco na porta; piso de pedra molhada. `D10` (Coleções): estante com caixas etiquetadas, caixa vazia caída de lado, caixote de lâmpadas, tubo de banner, poça vermelha com o pote virado no chão de tábuas. Chão em y = 0, de frente, tamanho real (2,3 m e 2,1 m), pontos fixos (`LOOP_PONTOS`) gerados de novo para as duas.
+- **O que se vê pela fresta (uma regra só).** Pela fresta da borda dá para ver as chaves e se estão abertas ou fechadas, contar a posição delas e ver o cadeado amarelo da noite D; **não dá para ler as etiquetas das chaves**. Assim: `quadro_0` (porta fechada, presa pelo cadeado da trava; pela fresta dá para espiar), `quadro_aberto.porque`, `chave_3` ("Contando da esquerda, ele termina na chave {ch}"), `fh_vidro` ("Dá para ver as chaves, mas não ler as etiquetas delas"), `man_pot_3` (o cabo desce pela parede e entra no topo; "Pela fresta, a chave dele está aberta"), `fh_disj` ("Pela fresta..., um disjuntor lá dentro está caído"). O que se lê fica do lado de fora: `a_falsa_2x` e `fh_etq_chave` viraram adesivo amarelo na porta (os dois com o mesmo rótulo novo, "Adesivo na porta do quadro"), `iso_aviso` é o papel branco, `fh_disjx` virou giz na parede ("Disjuntor do café cai com a chuva.", rótulo "Giz na parede"). O medidor é o mostrador redondo da parede (`a_cheia_2`, `fh_med_quadro`). Nenhuma pista mudou o que prova, a tranca ou a volta. O cadeado amarelo de aviso continua lá dentro; o vermelho é o da trava.
+- **Noite D.** `d_fus_2`: o cadeado amarelo fica "na chave onde chega o cabo da Câmara" (saiu "Circuito da Câmara", que não era nenhuma das três chaves numeradas). `fh_folha_d`: "A dos fusíveis da Câmara ficou em branco" (antes "o resto ficou para amanhã", contra a foto de conferência de hoje em `d_fus_3`). O sinal continua o mesmo: a folha não diz que os fusíveis estão no lugar.
+- **Coleções.** As pistas batem com a peça: estante (`c_esc_1`, `empurra_2`), caixa vazia da peça principal (`tombo_3`), poça e pote (`teo_1`, `mancha`, `mancha_2`, `lenz_3`), chão de tábuas. Mudaram só `dis_lampadas` (caixote aberto: "Na madeira, a caneta") e `falsa_3.porque` ("Caixas e mais caixas na estante").
+- **Minijogos.** `c_peca`: "Na estante, caixas etiquetadas; só uma tem o adesivo do patrocínio." `traj_1`: a pergunta não traz mais a resposta ("No tapete, embaixo da pessoa, aparecem gotas. Pelo que você sabe da noite, ela está entrando ou saindo?"; dicas "Repare no que pinga no tapete." e "Lá fora chove desde o começo da noite.").
+- **Armário da equipe.** `cracha_2`: "No armário da equipe, ao lado da Base da limpeza" (sem "corredor", que é o nome interno da Área de descanso); `cracha_3`: "ali do lado da limpeza".
+- **Seu Dirceu.** Esfregão e pano na mão: `traj_2` (texto e rótulo "Seu Dirceu, de esfregão na mão") e `ivone_ali_2` (saiu o rodo, que a peça da Limpeza não tem).
+- **Gato.** `dis_gato`: "Em cima do pilar... Segundo o Nico, é do Fusível" (fala relatada: o Nico não está no Pátio).
+- **Ouro.** "A notícia das 3 provas sobe até a Galeria. Aurélio olha para a base, depois para quem chega, e só consegue dizer: 'Obrigado por não esquecer.'" (53 palavras). Ele agradece porque a notícia chega até ele, sem sair da Galeria.
+- **Tela.** Energia da lista com 22 px; ícone da missão em cada linha da página "Missões" do telão; giro da peça limitado a 75° para cada lado nos 5 cantos de sala (N18, N17, DESC_B, REL_B, GAL_B); na entrada, em celular de tela baixa (até 780 px de altura), "Jogar sem turma" fica à vista sem rolar em 360×740. Miniaturas das 8 peças novas refeitas com o objeto inteiro e margem.
+- **Documentos.** ROTEIRO (partes 1 a 15 e a parte 16 nova) e FICHAS alinhados: cadeado de aviso amarelo, três fotos, caixa na estante, porta do quadro, Aurélio na Galeria no Ouro, Seu Dirceu de esfregão, armário ao lado da Base da limpeza.
+
+### Não aplicado, e por quê
+- **Pontos de regra** ("Ficou para decidir", abaixo), **B1/B2/B3** das fichas e as frases de narrador e rótulos de formulário da Prosa: pedem decisão do autor.
+- **Seletor de entrada** (visual, critérios 2 e 7): decisão do autor, acima.
+- **Testes antigos** `x/toques7.mjs` e `n6/mini.mjs` (rodada 8): esperam o comportamento anterior (a conversa do Seu Dirceu fechando a missão da Ivone; o minijogo abrindo de novo na segunda sala). O jogo segue a regra nova; os testes não foram mexidos.
+- **Peso das peças** acima de 600 KB (GAL_B, L08, REL_B) e animação das peças: arte, não texto.
+- **Técnica m1, m2, m6, m7, m8, m9, m13, m16 a m20:** decisões já registradas ou camada antiga filtrada, como nas revisões anteriores. **m5** (32 rótulos no Subsolo para 32 lugares): preventiva; nenhuma pista nova entrou no Subsolo.
+
+### Ficou para decidir (pontos de regra; nenhum bloqueia)
+Continuam os da revisão 8.

@@ -1,5 +1,5 @@
 {
- "versao": "v4 revisão 8 (25/11/2026)",
+ "versao": "v4 revisão 9 (25/11/2026)",
  "noite": "v4",
  "causa_sorteada": "B_potencia",
  "causas_possiveis": [
@@ -1578,7 +1578,7 @@
   {
    "id": "fh_folha_d",
    "sala": "eletrica",
-   "texto": "Folha de conferência da Oficina elétrica, de hoje: só a linha da iluminação da fachada está preenchida. O resto ficou para amanhã.",
+   "texto": "Folha de conferência da Oficina elétrica, de hoje: a linha da iluminação da fachada está preenchida. A dos fusíveis da Câmara ficou em branco.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -1956,7 +1956,7 @@
   {
    "id": "a_cheia_2",
    "sala": "patio",
-   "texto": "O medidor do Quadro externo marca carga cheia na linha que desce para o Subsolo.",
+   "texto": "O medidor redondo, na parede ao lado do Quadro externo, marca carga cheia na linha que desce para o Subsolo.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -1991,7 +1991,7 @@
   {
    "id": "fh_med_quadro",
    "sala": "patio",
-   "texto": "O medidor do Quadro externo está com o vidro embaçado por dentro. Não dá para ler a linha que desce para o Subsolo.",
+   "texto": "O medidor redondo, na parede ao lado do Quadro externo, está com o vidro embaçado por dentro. Não dá para ler a linha que desce para o Subsolo.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -2069,7 +2069,7 @@
   {
    "id": "a_falsa_2x",
    "sala": "patio",
-   "texto": "Etiqueta ao lado da chave {ch}: \"Fica aberta sempre. Só fecha em teste.\"",
+   "texto": "Adesivo amarelo na porta do Quadro externo: \"Chave {ch}: fica aberta sempre. Só fecha em teste.\"",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -2092,12 +2092,12 @@
     "C_ancora",
     "D_fusivel"
    ],
-   "previa": "Etiqueta de uma chave"
+   "previa": "Adesivo na porta do quadro"
   },
   {
    "id": "fh_etq_chave",
    "sala": "patio",
-   "texto": "Etiqueta ao lado da chave {ch}: \"Linha do para-raios. Não mexer sem luva.\"",
+   "texto": "Adesivo amarelo na porta do Quadro externo: \"Chave {ch}: linha do para-raios. Não mexer sem luva.\"",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -2114,7 +2114,7 @@
    "essencial": false,
    "tipo": "comum",
    "camada": "clima",
-   "previa": "Etiqueta de uma chave",
+   "previa": "Adesivo na porta do quadro",
    "custo": 0,
    "soNaCausa": [
     "B_potencia",
@@ -2743,7 +2743,7 @@
   {
    "id": "man_pot_3",
    "sala": "patio",
-   "texto": "No Quadro externo, um cabo grosso entra com a etiqueta \"Para-raios → Câmara\". A chave dele está aberta.",
+   "texto": "Um cabo grosso desce pela parede e entra no topo do Quadro externo, com a etiqueta \"Para-raios → Câmara\". Pela fresta, a chave dele está aberta.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -3267,7 +3267,7 @@
   {
    "id": "chave_3",
    "sala": "patio",
-   "texto": "Pela fresta da porta do Quadro externo, você segue o cabo do para-raios com o olho. Ele termina na chave {ch}.",
+   "texto": "Pela fresta da borda do Quadro externo, você segue o cabo do para-raios com o olho. Contando da esquerda, ele termina na chave {ch}.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -3294,7 +3294,7 @@
   {
    "id": "quadro_0",
    "sala": "patio",
-   "texto": "A porta do Quadro externo está entreaberta, mas um cadeado pequeno prende a trava: ela não abre mais que uma fresta. Sem a chavinha, você só espia por ali.",
+   "texto": "A porta do Quadro externo está fechada, presa pelo cadeado da trava. Pela fresta da borda dá para espiar. Sem a chavinha, ela não abre.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -3317,7 +3317,7 @@
   {
    "id": "d_fus_2",
    "sala": "patio",
-   "texto": "Pela fresta do Quadro externo: na chave \"Circuito da Câmara\", um segundo cadeado, amarelo, pendurado aberto, só de aviso. A etiqueta dele está molhada e a tinta escorreu.",
+   "texto": "Pela fresta do Quadro externo: na chave onde chega o cabo da Câmara, um segundo cadeado, amarelo, pendurado aberto, só de aviso. A etiqueta dele está molhada e a tinta escorreu.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -3354,7 +3354,7 @@
   {
    "id": "fh_vidro",
    "sala": "patio",
-   "texto": "Pela fresta do Quadro externo, a chuva respinga lá dentro e está escuro. Dá para ver que tem chaves, não a posição delas.",
+   "texto": "Pela fresta do Quadro externo, a chuva respinga lá dentro e está escuro. Dá para ver as chaves, mas não ler as etiquetas delas.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -3415,7 +3415,7 @@
    ],
    "previa": "Abrir o quadro",
    "custo": 1,
-   "porque": "A porta do Quadro externo só abre uma fresta: um cadeado pequeno prende a trava. Sem a chavinha, ela não abre."
+   "porque": "A porta do Quadro externo está fechada, presa pelo cadeado da trava. Sem a chavinha, ela não abre: pela fresta da borda você só espia."
   },
   {
    "id": "acesso_1",
@@ -3507,7 +3507,7 @@
   {
    "id": "iso_aviso",
    "sala": "patio",
-   "texto": "Aviso colado no Quadro externo: \"Chave {ch}: só de luva isolante.\"",
+   "texto": "Papel branco colado na porta do Quadro externo: \"Chave {ch}: só de luva isolante.\"",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -3812,7 +3812,7 @@
    ],
    "previa": "Fundo de uma caixa",
    "custo": 0,
-   "porque": "Caixas e mais caixas empilhadas. Você não sabe em qual mexer."
+   "porque": "Caixas e mais caixas na estante. Você não sabe em qual mexer."
   },
   {
    "id": "data_1",
@@ -4287,7 +4287,7 @@
   {
    "id": "traj_2",
    "sala": "limpeza",
-   "texto": "Seu Dirceu aponta com o rodo: \"Passou um agora, de sapato social, com pressa, rumo à escada do Subsolo. Nem boa-noite.\"",
+   "texto": "Seu Dirceu aponta com o esfregão: \"Passou um agora, de sapato social, com pressa, rumo à escada do Subsolo. Nem boa-noite.\"",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 245,
@@ -4310,7 +4310,7 @@
    "essencialPara": [
     "final_revelar"
    ],
-   "previa": "Seu Dirceu, de rodo na mão",
+   "previa": "Seu Dirceu, de esfregão na mão",
    "custo": 0
   },
   {
@@ -4549,7 +4549,7 @@
   {
    "id": "cracha_2",
    "sala": "limpeza",
-   "texto": "No armário da equipe, no corredor ao lado da Base da limpeza, um bilhete em papel de bloco de hotel: \"Braga, peguei teu crachá emprestado. Devolvo amanhã.\" Sem assinatura. Só a pressa na letra.",
+   "texto": "No armário da equipe, ao lado da Base da limpeza, um bilhete em papel de bloco de hotel: \"Braga, peguei teu crachá emprestado. Devolvo amanhã.\" Sem assinatura. Só a pressa na letra.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -4583,7 +4583,7 @@
   {
    "id": "cracha_3",
    "sala": "seguranca",
-   "texto": "Braga olha a escala e o bilhete e coça a nuca: \"Tá. O crachá é meu. Só que não tá comigo desde ontem. O Lenz, do patrocínio, ficou rondando o armário da equipe, falando 'rapidinho'. Quando eu voltei, tinha o bilhete no lugar do crachá. E eu... eu deixei quieto. Quer um café?\"",
+   "texto": "Braga olha a escala e o bilhete e coça a nuca: \"Tá. O crachá é meu. Só que não tá comigo desde ontem. O Lenz, do patrocínio, ficou rondando o armário da equipe, ali do lado da limpeza, falando 'rapidinho'. Quando eu voltei, tinha o bilhete no lugar do crachá. E eu... eu deixei quieto. Quer um café?\"",
    "volta_min": 3,
    "volta_max": 5,
    "segundo_min": 0,
@@ -4872,7 +4872,7 @@
   {
    "id": "fh_disj",
    "sala": "patio",
-   "texto": "Um disjuntor do Quadro externo está caído.",
+   "texto": "Pela fresta do Quadro externo, um disjuntor lá dentro está caído.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -4897,7 +4897,7 @@
   {
    "id": "fh_disjx",
    "sala": "patio",
-   "texto": "A etiqueta do disjuntor caído diz: \"Café\".",
+   "texto": "Escrito a giz na parede, ao lado do Quadro externo: \"Disjuntor do café cai com a chuva.\"",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -4916,7 +4916,7 @@
    "camada": "diagnostico",
    "explica": "fh_disj",
    "custo": 0,
-   "previa": "Etiqueta do disjuntor"
+   "previa": "Giz na parede"
   },
   {
    "id": "fh_pedestal",
@@ -6476,7 +6476,7 @@
    "sala": "deposito",
    "tipo": "falsa_honesta",
    "previa": "Caixa de lâmpadas",
-   "texto": "Uma caixa cheia de lâmpadas queimadas. Na tampa, a caneta: \"troca geral de março\".",
+   "texto": "Um caixote cheio de lâmpadas queimadas. Na madeira, a caneta: \"troca geral de março\".",
    "explicaNoTexto": true,
    "explica": "dis_lampadas"
   },
@@ -6555,7 +6555,7 @@
    "sala": "patio",
    "tipo": "clima",
    "previa": "Pelo de gato no quadro",
-   "texto": "Em cima do Quadro externo, pelo de gato grudado na pedra molhada. O Nico diz que é do Fusível, o gato gordo do museu, que dorme ali quando a chuva deixa."
+   "texto": "Em cima do pilar do Quadro externo, pelo de gato grudado na pedra molhada. Segundo o Nico, é do Fusível, o gato gordo do museu, que dorme ali quando a chuva deixa."
   },
   {
    "volta_min": 1,
@@ -7542,7 +7542,7 @@
   {
    "id": "ivone_ali_2",
    "sala": "limpeza",
-   "texto": "Seu Dirceu apoia o queixo no cabo do rodo: \"A Ivone? No dia {dia} ficou o dia inteiro no Ateliê, de porta aberta, que eu passei pano ali três vezes. Saiu pro ônibus antes de escurecer. Ela nem deixa eu encostar na bancada.\"",
+   "texto": "Seu Dirceu apoia o queixo no cabo do esfregão: \"A Ivone? No dia {dia} ficou o dia inteiro no Ateliê, de porta aberta, que eu passei pano ali três vezes. Saiu pro ônibus antes de escurecer. Ela nem deixa eu encostar na bancada.\"",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -10440,7 +10440,7 @@
     ],
     "mesma_volta": 5
    },
-   "texto": "A máquina para e a verdade fica. O relógio marca 5:01 pela primeira vez. Lá fora, uma sirene. Na Sala das coleções, o Téo abre os olhos. Na Galeria, Aurélio olha para a base, depois para você, e só consegue dizer: \"Obrigado por não esquecer.\""
+   "texto": "A máquina para e a verdade fica. O relógio marca 5:01 pela primeira vez. Lá fora, uma sirene. Na Sala das coleções, o Téo abre os olhos. A notícia das 3 provas sobe até a Galeria. Aurélio olha para a base, depois para quem chega, e só consegue dizer: \"Obrigado por não esquecer.\""
   },
   {
    "id": "final_parcial",
