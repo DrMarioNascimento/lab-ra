@@ -534,14 +534,14 @@ function reset(){clearInterval(timerHandle);state={caseIndex:chooseCase(),loop:1
 // Andar entre salas durante a volta: leva 10 segundos de caminhada (na proporção do relógio). O que está na mão vai junto.
 function agoraJogo(){ return window.coop?.now() ?? Date.now(); }
 function andando(){ return state.andandoAte && agoraJogo() < state.andandoAte; }
-function marcarCaminhada(){ state.andandoAte = agoraJogo() + 10000 * (state.duration / 300); setTimeout(() => { if (typeof renderClues === 'function' && state.phase === 'playing' && state.room) renderClues(); }, 10000 * (state.duration / 300) + 80); }
+function marcarCaminhada(){ state.andandoDe = state.room; state.andandoAte = agoraJogo() + 10000 * (state.duration / 300); setTimeout(() => { if (typeof plantaAtualizar === 'function') plantaAtualizar(); if (typeof renderClues === 'function' && state.phase === 'playing' && state.room) renderClues(); }, 10000 * (state.duration / 300) + 80); }   // andandoDe: o alfinete da planta fica na sala de onde se saiu até chegar
 function enterRoom(id){
  const anterior = state.room;
  if (window.coop) {
   window.coop.choose(id);
  } else if (state.phase === 'playing' && state.room && id !== state.room) {
   if (andando()) { toast('Você ainda está andando.'); return; }
-  state.room = id; marcarCaminhada(); save(); renderGame(); toast('Você vai para ' + sala(id).name + '. Andar até lá leva 10 segundos.');
+  marcarCaminhada(); state.room = id; save(); renderGame(); toast('Você vai para ' + sala(id).name + '. Andar até lá leva 10 segundos.');
  } else if (state.phase === 'choose') {
   state.room = id;
   state.phase = 'playing';
@@ -577,6 +577,84 @@ function renderRouteChoices(preparando) {
   if (escolha && !escolha.disabled) escolha.click();
  });
 }
+// ---- Planta do museu (revisão 12, pedido do autor): no Loop, o mapa do celular é uma planta baixa em papel, numa pasta de arquiteto
+// com uma orelha por andar (a folha do andar escolhido aparece inteira), na paleta do Limiar Ético (só aqui).
+// Paredes = o vão da grade sobre a tinta; portas = aberturas no traço. A disposição é a mesma em todas as causas e voltas:
+// Coleções e Ateliê dão para a Área de descanso (porta de serviço na parede de fora), armário da equipe colado na Base da limpeza,
+// Central ao lado da Recepção, Oficina elétrica com porta para o Pátio (fora do prédio), escada ligando os andares.
+// Trocar de orelha não custa nada; tocar numa sala de outro andar segue a mesma caminhada de 10 s.
+// {andar, colunas, linhas, áreas da grade, portas [área, lado t/b/l/r, posição, tipo], altura do prédio na folha (0 = o resto da folha), escada [andar, seta]}
+const PLANTA = [
+ {andar:'2º andar', cl:'a2', alt:'64%', cols:'56px minmax(0,1.25fr) minmax(0,1fr)', rows:'minmax(0,1fr)', areas:['esc sag gal'],
+  portas:[['esc','r','center'],['sag','r','center']], esc:[['1º andar','▼']]},
+ {andar:'1º andar', cl:'a1', alt:'84%', cols:'56px minmax(0,1fr) minmax(0,1fr)', rows:'minmax(0,1fr) 20px minmax(0,1fr)', areas:['esc cons sons','esc corr corr','esc foto rel'],
+  portas:[['esc','r','center'],['cons','b','center'],['sons','b','center'],['foto','t','center'],['rel','t','center']], esc:[['2º andar','▲'],['Térreo','▼']]},
+ {andar:'Térreo', cl:'a0', alt:0, fora:true, cols:'minmax(0,1fr) minmax(0,1.32fr) minmax(0,1fr)', rows:'minmax(0,1fr) minmax(0,1fr) 54px minmax(0,1fr)', areas:['ele ate desc','tec col desc','esc esc hall','rec cen limp'],
+  portas:[['ele','t','start'],['ele','b','center'],['tec','b','center'],['col','b','center'],['desc','b','center'],['ate','r','center','vidro'],['col','r','center'],['desc','r','end','fora'],['rec','t','center'],['cen','t','center'],['limp','t','center'],['rec','r','center'],['rec','b','center','fora'],['esc','r','center']], esc:[['1º andar','▲'],['Subsolo','▼']]},
+ {andar:'Subsolo', cl:'as', alt:'56%', cols:'56px minmax(0,1fr)', rows:'minmax(0,1fr)', areas:['esc pro'], portas:[['esc','r','center']], esc:[['Térreo','▲']]}
+];
+const PLANTA_AREA = {gal:'galeria', cons:'conservacao', sons:'sons', foto:'fotografia', rel:'relogios', ele:'eletrica', ate:'atelie', desc:'corredor', tec:'manutencao', col:'deposito', rec:'recepcao', cen:'seguranca', limp:'limpeza', pro:'prototipo'};
+function plantaLoop(){
+ const e = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const pino = '<i class="pl-pino" aria-hidden="true"></i>', tem = salasDoLoop();
+ const botao = (id, area) => {
+  const st = area ? ' style="grid-area:' + area + '"' : '';
+  if (!tem.has(id)) return '<div class="pl-vazio"' + st + ' aria-hidden="true"></div>';
+  const s = sala(id), p = s.name.split(' · '), [nm, sub] = id === 'prototipo' ? [p[1] || p[0], ''] : [p[0], id === 'patio' ? p[1] || '' : ''];
+  return '<button type="button" class="pl-sala' + (id === 'limpeza' ? ' armario' : '') + '" data-room="' + id + '"' + st + (state.phase === 'playing' && state.room === id ? ' disabled' : '') + ' aria-label="' + e(s.name) + '">' +
+   (s.peca ? '<img src="' + new URL('../icones/' + s.peca + '.webp', PECAS_URL).href + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' : '') +
+   '<span class="pl-nm"><b>' + e(nm) + '</b>' + (sub ? '<small>' + e(sub) + '</small>' : '') + '</span>' + pino + '</button>';
+ };
+ const folha = (f, i) => {
+  let h = '';
+  for (const a of new Set(f.areas.join(' ').split(' '))) {
+   if (a === 'esc') h += '<div class="pl-esc" style="grid-area:esc">' + f.esc.map(([an, seta]) => '<button type="button" class="pl-sobe" data-andar="' + PLANTA.findIndex(x => x.andar === an) + '" aria-label="Ver a planta: ' + e(an) + '"><span aria-hidden="true">' + seta + '</span>' + e(f.fora ? an : an.replace(' andar', '')) + '</button>').join('') + '</div>';
+   else if (a === 'corr') h += '<div class="pl-corr" style="grid-area:corr" aria-hidden="true"></div>';
+   else if (a === 'hall') h += '<div class="pl-hall" style="grid-area:hall" aria-hidden="true"></div>';
+   else if (a === 'sag') h += '<div class="pl-sag" style="grid-area:sag"><img src="' + ICONE_URL('ui/saguao') + '" alt=""><span class="pl-nm"><b>' + e(INICIO.name) + '</b><small>Toda volta começa aqui.</small></span>' + pino + '</div>';
+   else h += botao(PLANTA_AREA[a], a);
+  }
+  h += f.portas.map(([a, lado, pos, tipo]) => '<i class="pl-porta ' + lado + (tipo ? ' ' + tipo : '') + '" style="grid-area:' + a + ';' + (lado === 't' || lado === 'b' ? 'justify-self:' : 'align-self:') + pos + '" aria-hidden="true"></i>').join('');
+  const rosa = '<svg class="pl-rosa" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 4.5 15 13h-6z" class="n"/><path d="M12 21.5 9 13h6z"/><text x="12" y="4" text-anchor="middle">N</text></svg>';
+  const carimbo = '<span class="pl-carimbo" aria-hidden="true"><small>Museu · planta</small>' + e(f.andar) + '</span>';
+  return '<section class="pl-folha ' + f.cl + '" id="plFolha' + i + '" role="tabpanel" aria-labelledby="plOrelha' + i + '" hidden>' +
+   (f.fora ? '<div class="pl-topo"><div class="pl-fora">' + botao('patio', '') + '</div><div class="pl-canto">' + rosa + carimbo + '</div></div>' : '') +
+   '<div class="pl-predio" style="' + (f.alt ? 'height:' + f.alt + ';' : 'flex:1;') + 'grid-template-columns:' + f.cols + ';grid-template-rows:' + f.rows + ';grid-template-areas:' + f.areas.map(x => "'" + x + "'").join(' ') + '">' + h + '</div>' +
+   (f.fora ? '' : '<div class="pl-canto">' + rosa + carimbo + '</div>') + '</section>';
+ };
+ return '<div class="planta"><p class="pl-leg" aria-hidden="true"><span><i class="pl-pino"></i>Você está aqui</span><span><i class="pl-tr"></i>Para onde você vai</span></p>' +
+  '<p class="sr-only pl-status" role="status"></p>' +
+  '<div class="pl-orelhas" role="tablist" aria-label="Andares do museu">' + PLANTA.map((f, i) => '<button type="button" class="pl-orelha" role="tab" id="plOrelha' + i + '" aria-controls="plFolha' + i + '" data-andar="' + i + '" aria-selected="false">' + e(f.andar) + pino + '</button>').join('') + '</div>' +
+  '<div class="pl-pasta">' + PLANTA.map(folha).join('') + '</div></div>';
+}
+// Andar (índice em PLANTA) de uma sala; o Saguão superior fica no 2º andar.
+const plantaAndarDe = id => !id ? -1 : PLANTA.findIndex(f => f.andar === (id === 'saguao' ? INICIO.andar : sala(id)?.andar));
+function plantaOnde(){
+ const anda = state.phase === 'playing' && state.room && andando();
+ return {aqui: !state.room ? 'saguao' : anda ? (state.andandoDe || '') : state.room, indo: anda ? state.room : ''};
+}
+// Mostra a folha de um andar (sem custo: só troca a orelha). Sem andar: abre onde a pessoa está.
+function plantaMostrar(i){
+ const g = typeof document !== 'undefined' && document.getElementById('roomGrid'); if (!g || !g.querySelector('.planta')) return;
+ if (i == null || i < 0) { const o = plantaOnde(); i = plantaAndarDe(o.aqui || o.indo); if (i < 0) i = 0; }
+ g.querySelectorAll('.pl-orelha').forEach(b => { const on = +b.dataset.andar === i; b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1; });
+ g.querySelectorAll('.pl-folha').forEach((f, k) => { f.hidden = k !== i; });
+}
+// Marca onde você está (alfinete) e, durante a caminhada, para onde vai (tracejado), nas salas e nas orelhas. Só troca classes: nada muda de tamanho.
+function plantaAtualizar(){
+ const g = typeof document !== 'undefined' && document.getElementById('roomGrid'); if (!g || !g.querySelector('.planta')) return;
+ const {aqui, indo} = plantaOnde(), aA = plantaAndarDe(aqui), aI = plantaAndarDe(indo);
+ g.querySelectorAll('.pl-sala').forEach(b => { const id = b.dataset.room, nm = sala(id).name;
+  b.classList.toggle('aqui', id === aqui); b.classList.toggle('indo', id === indo); b.classList.toggle('selected', id === state.room);
+  b.setAttribute('aria-label', nm + (id === aqui ? ', você está aqui' : id === indo ? ', você está indo para cá' : '')); });
+ g.querySelectorAll('.pl-orelha').forEach(b => { const k = +b.dataset.andar; b.classList.toggle('aqui', k === aA); b.classList.toggle('indo', k === aI && aI !== aA);
+  b.setAttribute('aria-label', PLANTA[k].andar + (k === aA ? ', você está aqui' : k === aI ? ', você está indo para cá' : '')); });
+ const sg = g.querySelector('.pl-sag'); if (sg) sg.classList.toggle('aqui', aqui === 'saguao');
+ const st = g.querySelector('.pl-status'); if (st) st.textContent = indo ? 'Você está indo para ' + sala(indo).name + '.' : aqui === 'saguao' ? 'Você está aqui: ' + INICIO.name + '. Toda volta começa aqui.' : aqui ? 'Você está aqui: ' + sala(aqui).name + '.' : '';
+ g.querySelectorAll('[data-andar]').forEach(b => { b.onclick = () => { plantaMostrar(+b.dataset.andar); if (b.classList.contains('pl-orelha')) b.focus({preventScroll:true}); }; });
+ const tl = g.querySelector('.pl-orelhas'); if (tl) tl.onkeydown = ev => { const d = ev.key === 'ArrowRight' ? 1 : ev.key === 'ArrowLeft' ? -1 : 0; if (!d) return; const at = +(tl.querySelector('[aria-selected="true"]')?.dataset.andar || 0), n = (at + d + PLANTA.length) % PLANTA.length; plantaMostrar(n); tl.children[n].focus(); };
+ if (!g.querySelector('.pl-folha:not([hidden])')) plantaMostrar();
+}
 function renderRoomFocus() {
  const investigando = state.phase === 'playing' && !!state.room;
  $('game').classList.toggle('investigando', investigando);
@@ -600,9 +678,10 @@ function renderGame(){
  $('boardTitle').textContent = state.room ? (state.phase === 'playing' ? 'Examine a sala' : 'Sala escolhida') : (state.caseRules === 2 ? '' : 'Para onde você vai?');
  $('boardTitle').hidden = !$('boardTitle').textContent;
  $('phaseTitle').tabIndex = -1;
- $('roomGrid').innerHTML='<div class="inicio" role="status"><span class="ic3d" aria-hidden="true"><img src="'+ICONE_URL('ui/saguao')+'" alt=""></span><div><strong>'+INICIO.name+' · '+INICIO.andar+'</strong><small>'+(state.phase==='playing'?'No fim da volta, você volta para cá.':'Você está aqui. Toda volta começa aqui.')+'</small></div></div>'+ANDARES.map(a=>(state.caseRules===2?'':'<h4 class="andar">'+a+'</h4>')+ROOMS.filter(r=>state.caseRules!==2||salasDoLoop().has(r.id)).map(r=>sala(r.id)).filter(r=>r.andar===a).sort((x,y)=>x.lugar-y.lugar).map(r=>'<button class="room an'+ANDARES.indexOf(a)+' '+(state.room===r.id?'selected':'')+'" '+(state.phase==='playing'&&state.room===r.id?'disabled':'')+' data-room="'+r.id+'">'+(r.peca?'<img class="room-3d" src="'+new URL('../icones/'+r.peca+'.webp',PECAS_URL).href+'" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'room-icon\',textContent:\''+r.icon+'\'}))">':'<span class="room-icon" aria-hidden="true">'+r.icon+'</span>')+'<strong>'+esc(state.caseRules===2?r.name.split(' · ')[0]:r.name)+'</strong>'+(state.caseRules===2?'<small class="room-andar">'+esc(r.andar)+'</small>':'<small>'+esc(r.sub)+'</small>')+'</button>').join('')).join('');
- $('roomGrid').classList.toggle('loop-mapa', state.caseRules===2);
+ $('roomGrid').innerHTML=state.caseRules===2?plantaLoop():'<div class="inicio" role="status"><span class="ic3d" aria-hidden="true"><img src="'+ICONE_URL('ui/saguao')+'" alt=""></span><div><strong>'+INICIO.name+' · '+INICIO.andar+'</strong><small>'+(state.phase==='playing'?'No fim da volta, você volta para cá.':'Você está aqui. Toda volta começa aqui.')+'</small></div></div>'+ANDARES.map(a=>(state.caseRules===2?'':'<h4 class="andar">'+a+'</h4>')+ROOMS.filter(r=>state.caseRules!==2||salasDoLoop().has(r.id)).map(r=>sala(r.id)).filter(r=>r.andar===a).sort((x,y)=>x.lugar-y.lugar).map(r=>'<button class="room an'+ANDARES.indexOf(a)+' '+(state.room===r.id?'selected':'')+'" '+(state.phase==='playing'&&state.room===r.id?'disabled':'')+' data-room="'+r.id+'">'+(r.peca?'<img class="room-3d" src="'+new URL('../icones/'+r.peca+'.webp',PECAS_URL).href+'" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'room-icon\',textContent:\''+r.icon+'\'}))">':'<span class="room-icon" aria-hidden="true">'+r.icon+'</span>')+'<strong>'+esc(state.caseRules===2?r.name.split(' · ')[0]:r.name)+'</strong>'+(state.caseRules===2?'<small class="room-andar">'+esc(r.andar)+'</small>':'<small>'+esc(r.sub)+'</small>')+'</button>').join('')).join('');
+ $('roomGrid').classList.toggle('loop-mapa', state.caseRules===2); $('roomGrid').classList.toggle('planta-on', state.caseRules===2);
  document.querySelectorAll('[data-room]').forEach(b=>b.addEventListener('click',()=>enterRoom(b.dataset.room)));
+ plantaAtualizar();
  const preparando = renderPrep();
  renderRouteChoices(preparando);
  $('endLoop').classList.toggle('hidden', state.phase!=='playing' || ((finalLoop || state.caseRules === 2) && state.duration===300));
@@ -1375,6 +1454,7 @@ $('roomMapButton').onclick = () => {
  const aberto = $('roomGrid').classList.toggle('hidden') === false;
  $('roomMapButton').setAttribute('aria-expanded', String(aberto));
  $('roomMapButton').textContent = aberto ? 'Fechar mapa' : 'Ver mapa';
+ if (aberto) plantaMostrar();   // a planta abre no andar onde você está
 };
 $('betweenShare').onclick = () => lcAbrir('trocar');
 $('helpOpen').onclick=$('howButton').onclick=()=>popup('helpDialog');

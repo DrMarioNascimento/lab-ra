@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" type="image/webp" href="../../museu/icones/T01.webp">
+<title>Mosaico Loop · Simulador</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="../../style.css?v=24">
+<link rel="stylesheet" href="../sala.css?v=7">
+</head>
+<body class="sim">
+<div class="sim-topo">
+  <b>Mosaico Loop · Simulador</b>
+  <label>Turma <input id="n" type="range" min="1" max="12" value="6" style="width:90px"> <span id="nv">6</span></label>
+  <label>Ritmo <select id="seg"><option value="30">Teste rápido (30 s)</option><option value="300">Completo (5 min)</option></select></label>
+  <label><input id="auto" type="checkbox" checked> Turma joga sozinha</label>
+  <label><input id="mauto" type="checkbox"> Professor automático</label>
+  <button class="btn secondary" id="rec" type="button">Recomeçar</button>
+  <button class="btn primary" id="cheia" type="button">Tela cheia</button>
+</div>
+<div class="sim-telao"><iframe id="tl" title="Telão" allow="fullscreen"></iframe></div>
+<p class="sim-nota">Telão em cima, turma embaixo. O quadro do Professor conduz a partida.</p>
+<div class="sim-turma" id="turma"></div>
+<script type="module">
+import { limparSalaFalsa } from '../transporte.mjs';
+import { pilotar } from '../piloto.mjs?v=3';
+const SALA = 'SIMUL';
+const $ = (id) => document.getElementById(id);
+let paradas = [];
+function montar() {
+  paradas.forEach((f) => f()); paradas = [];
+  limparSalaFalsa(SALA);
+  const n = Number($('n').value), seg = $('seg').value;
+  $('nv').textContent = n;
+  const q = (extra) => '../index.html?falsa=1&sala=' + SALA + '&seg=' + seg + extra;
+  $('tl').src = '../telao/index.html?falsa=1&sala=' + SALA;
+  const t = $('turma'); t.innerHTML = '';
+  const fig = (rot, url, cls) => { const f = document.createElement('figure'); f.className = 'sim-fone ' + cls; f.innerHTML = '<figcaption><span>' + rot + '</span></figcaption><div class="sim-tela"><iframe title="' + rot + '"></iframe></div>'; t.appendChild(f); const i = f.querySelector('iframe'); i.src = url; return i; };
+  const m = fig('Professor', q('&papel=master&uid=mestre&nome=Professor'), 'mestre');
+  const quadros = [m];
+  for (let k = 1; k <= n; k++) quadros.push(fig('Participante ' + k, q('&papel=guest&uid=p' + k + '&nome=Participante%20' + k), ''));
+  quadros.forEach((i, k) => i.addEventListener('load', () => {
+    if (k === 0) { if ($('mauto').checked) mestreAuto(i.contentWindow); return; }
+    if ($('auto').checked) paradas.push(pilotar(i.contentWindow));
+  }));
+}
+function mestreAuto(w) {
+  let escolhaDesde = 0, ultimaVolta = 0;
+  const id = setInterval(() => {
+    try {
+      const L = w.LoopSala; if (!L?.room) return;
+      const e = L.room.etapa, v = L.room.volta;
+      if (L.room.fase === 'sala') { w.document.getElementById('mbComecar')?.click(); return; }
+      const ativos = L.players.filter(p => !p.mestre && !p.expulso);
+      if (e === 'choose') {
+        if (v !== ultimaVolta) { ultimaVolta = v; escolhaDesde = Date.now(); }
+        const todosProntos = ativos.length > 0 && ativos.every(p => p.amb && p.ambVolta === v);
+        if (!todosProntos && Date.now() - escolhaDesde < 15000) return;
+      }
+      const alvo = e === 'choose' ? 'playing' : e === 'between' ? (v < 5 ? 'choose' : 'final') : e === 'final' ? 'result' : null;
+      if (alvo && (e !== 'final' || ativos.every(p => p.resp))) setTimeout(() => L.avancar(alvo), 1500);
+    } catch {}
+  }, 3000);
+  paradas.push(() => clearInterval(id));
+}
+$('cheia').onclick = () => { const el = $('tl'); (el.requestFullscreen || el.webkitRequestFullscreen)?.call(el); };
+// O telão do simulador é desenhado em 1280 × 720 e reduzido por inteiro: fica igual ao da TV, só menor.
+const ajustarTelao = () => { const el = $('tl'); el.style.transform = 'scale(' + (el.parentElement.clientWidth / 1280) + ')'; };
+addEventListener('resize', ajustarTelao); ajustarTelao();
+$('n').oninput = () => { $('nv').textContent = $('n').value; };
+$('n').onchange = $('seg').onchange = $('rec').onclick = montar;
+montar();
+</script>
+</body>
+</html>

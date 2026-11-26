@@ -575,3 +575,105 @@ body[data-tela=between] .toast{bottom:auto;top:calc(64px + env(safe-area-inset-t
 .lc-en-ic{width:20px;height:20px;object-fit:contain;vertical-align:-4px;margin-left:5px;filter:drop-shadow(0 1px 1px #000a)}
 .energia{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px}
 .lc-estado em.lc-en-n{display:flex;align-items:center;font-style:normal}
+
+/* ---- Planta do museu (Loop, revisão 12): pasta de arquiteto com orelhas, paleta do Limiar Ético só nesta parte ---- */
+#roomGrid.planta-on{display:block}
+.planta{--papel:#fffdf7;--papel-2:#f1ead9;--papel-3:#eee7d6;--tinta:#20283a;--tinta-2:#374154;--tinta-3:#4d5566;--petroleo:#205b58;--petroleo-escuro:#164643;--petroleo-claro:#e0f0eb;--sol:#f2b441;--sol-2:#e09a1f;--sol-base:#a86d0a;--borda:#d8cbab;--contorno:#77674b;--base:#cdbf9f;--base-2:#b3a37f;--nota:#ffe6a3;--noite:#26355f;--folha-h:clamp(380px,calc(100svh - 318px),520px);
+ display:grid;gap:10px;max-width:560px;margin:0 auto;color:var(--tinta);font-family:system-ui,-apple-system,'Segoe UI',sans-serif}
+.planta .pl-leg{display:flex;justify-content:center;gap:16px;margin:0;padding:5px 12px;justify-self:center;font:700 12px/1.2 system-ui,sans-serif;color:var(--tinta);background:#fff3d6;border:1px solid var(--borda);border-radius:999px;box-shadow:inset 0 1px 0 #fff,0 2px 0 var(--base),0 8px 12px -6px #0008}
+.planta .pl-leg span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.planta .pl-leg .pl-pino{display:block;position:relative;top:auto;right:auto;width:13px;height:13px}
+.pl-tr{display:inline-block;width:16px;height:12px;border:2px dashed var(--petroleo);border-radius:2px;background:var(--petroleo-claro)}
+/* orelhas: a ativa fica na frente, colada na folha; as outras atrás, mais escuras, com volume */
+.pl-orelhas{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:0 6px;margin-bottom:-11px;position:relative;z-index:2}
+.pl-orelha{position:relative;min-width:0;min-height:46px;padding:6px 2px 12px;border:1px solid var(--contorno);border-bottom:0;border-radius:12px 12px 0 0;cursor:pointer;
+ font:700 13px/1.1 system-ui,-apple-system,'Segoe UI',sans-serif;color:var(--tinta-2);white-space:nowrap;
+ background:linear-gradient(var(--papel-2),var(--papel-3) 70%,#e3d9c2);box-shadow:inset 0 1px 0 #fff9,inset 0 -6px 6px -4px #77674b55,0 -2px 6px -3px #0006;
+ transform:translateY(4px);transition:transform .1s,box-shadow .1s,background .2s;-webkit-tap-highlight-color:transparent}
+.pl-orelha:active:not([aria-selected="true"]){transform:translateY(7px);box-shadow:inset 0 2px 4px #3c2d0a40}
+.pl-orelha[aria-selected="true"]{z-index:3;color:var(--tinta);transform:none;border-color:var(--borda);background:linear-gradient(#fffefb,var(--papel));box-shadow:inset 0 1px 0 #fff,0 -3px 8px -3px #0007;cursor:default}
+.pl-orelha[aria-selected="true"]:after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:4px;background:var(--papel)}
+.pl-orelha:focus-visible{outline:3px solid #f8d49a;outline-offset:1px}
+.pl-orelha .pl-pino{top:-7px;right:2px;width:15px;height:15px}
+.pl-orelha.indo:before{content:"";position:absolute;inset:3px 3px 6px;border-radius:9px 9px 0 0;pointer-events:none;
+ background:linear-gradient(90deg,var(--petroleo) 50%,transparent 0) 0 0/10px 2px repeat-x,linear-gradient(var(--petroleo) 50%,transparent 0) 0 0/2px 10px repeat-y,linear-gradient(var(--petroleo) 50%,transparent 0) 100% 0/2px 10px repeat-y;animation:pl-formiga2 .7s linear infinite}
+@keyframes pl-formiga2{to{background-position:10px 0,0 -10px,100% 10px}}
+/* a folha do andar: altura fixa (não pula ao trocar de orelha) */
+.pl-pasta{position:relative}
+.pl-folha{position:relative;display:flex;flex-direction:column;justify-content:center;gap:8px;height:var(--folha-h);padding:12px 8px 8px;border:1px solid var(--borda);border-radius:10px;
+ background:linear-gradient(90deg,#d8cbab33 1px,transparent 1px) 0 0/12px 12px,linear-gradient(#d8cbab33 1px,transparent 1px) 0 0/12px 12px,linear-gradient(180deg,#fffdf7,var(--papel) 40%,#fbf4e3);
+ box-shadow:inset 0 1px 0 #fff,0 4px 0 var(--base),0 5px 0 var(--base-2),0 16px 26px -12px #000b}
+.pl-folha[hidden]{display:none}
+.pl-folha.a0{justify-content:flex-start}
+/* carimbo do andar (canto da planta) e rosa dos ventos */
+.pl-canto{display:flex;align-items:center;justify-content:flex-end;gap:8px}
+.pl-carimbo{display:grid;padding:3px 9px 4px;border:1.5px solid var(--tinta);font:700 13px/1.15 Georgia,'Times New Roman',serif;letter-spacing:.06em;text-transform:uppercase;color:var(--tinta);background:var(--papel)}
+.pl-carimbo small{font:600 12px/1.1 system-ui,sans-serif;letter-spacing:0;text-transform:none;color:var(--tinta-3)}
+.pl-rosa{width:32px;height:32px;fill:none;stroke:var(--tinta-3);stroke-width:1.2}
+.pl-rosa .n{fill:var(--tinta-3)}.pl-rosa text{font:700 6px system-ui;fill:var(--tinta-3);stroke:none}
+/* paredes: o fundo da grade é a tinta; o vão entre as células é a parede */
+.pl-predio{position:relative;display:grid;gap:2px;padding:3px;background:var(--tinta);border-radius:2px}
+.pl-folha.as .pl-predio{width:82%;margin:0 auto}
+.pl-predio>*{min-width:0;min-height:0}
+.pl-corr,.pl-hall{background:#f7f0df}
+.pl-esc{display:flex;flex-direction:column;justify-content:space-around;gap:4px;padding:4px 3px;background:repeating-linear-gradient(180deg,var(--papel) 0 6px,#4d556699 6px 7px)}
+.a0 .pl-esc{flex-direction:column;background:repeating-linear-gradient(90deg,var(--papel) 0 6px,#4d556699 6px 7px)}
+.pl-sobe{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-height:48px;padding:2px;border:1px solid var(--contorno);border-radius:8px;cursor:pointer;
+ font:700 12px/1.1 system-ui,sans-serif;color:var(--petroleo-escuro);background:linear-gradient(#f7fffc,var(--petroleo-claro));box-shadow:inset 0 1px 0 #fff,0 3px 0 #7ca9a1,0 4px 0 var(--petroleo);transition:transform .1s,box-shadow .1s}
+.pl-sobe:active{transform:translateY(3px);box-shadow:inset 0 2px 4px #16464338,0 1px 0 var(--petroleo)}
+.pl-sobe span{font-size:10px}
+.a0 .pl-esc{flex-direction:row;padding:3px 6px}.a0 .pl-sobe{flex:1;flex-direction:row;gap:5px;min-height:44px}
+.pl-vazio{background:var(--papel-3)}
+/* portas: abertura no traço da parede */
+.pl-porta{z-index:2;pointer-events:none;background:var(--papel);width:20px;height:2px}
+.pl-porta.t{align-self:start;margin-top:-2px}.pl-porta.b{align-self:end;margin-bottom:-2px}
+.pl-porta.l,.pl-porta.r{width:2px;height:20px}.pl-porta.l{justify-self:start;margin-left:-2px}.pl-porta.r{justify-self:end;margin-right:-2px}
+.pl-porta.fora{height:3px}.pl-porta.fora.b{margin-bottom:-3px}.pl-porta.fora.r{width:3px;height:20px;margin-right:-3px}
+.pl-porta.vidro{background:#8cc7bd;height:30px}
+/* salas: papel em relevo; afundam ao tocar */
+.pl-sala{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:44px;padding:4px 4px 8px;border:0;border-radius:0;color:var(--tinta);text-align:center;cursor:pointer;
+ background:linear-gradient(#fffefb,var(--papel) 55%,var(--papel-2));
+ box-shadow:inset 0 1px 0 #fff,inset 1px 0 0 #fff,inset -1px 0 0 var(--borda),inset 0 -4px 0 var(--base),inset 0 -5px 0 var(--base-2);
+ transition:box-shadow .1s,background .2s;-webkit-tap-highlight-color:transparent}
+.pl-sala>*{transition:transform .1s}
+.pl-sala img{width:36px;height:36px;object-fit:contain;filter:drop-shadow(0 3px 2px #20283a66);pointer-events:none}
+.a1 .pl-sala img,.a2 .pl-sala img,.as .pl-sala img{width:56px;height:56px}
+.pl-nm{display:flex;flex-direction:column;align-items:center}
+.pl-sala b,.pl-sag b{font:700 13px/1.15 system-ui,-apple-system,'Segoe UI',sans-serif;hyphens:none;overflow-wrap:normal;word-break:normal}
+.a1 .pl-sala b,.a2 .pl-sala b,.as .pl-sala b,.pl-sag b{font-size:14px}
+.pl-sala small,.pl-sag small{font:600 12px/1.15 system-ui,-apple-system,'Segoe UI',sans-serif;color:var(--tinta-3)}
+.pl-sala:active:not(:disabled){background:var(--papel-3);box-shadow:inset 0 3px 6px #3c2d0a47,inset 0 -1px 0 #fff}
+.pl-sala:active:not(:disabled)>*{transform:translateY(2px)}
+.pl-sala:focus-visible,.pl-sobe:focus-visible{outline:3px solid var(--noite);outline-offset:-3px}
+.pl-sala:disabled{cursor:default}
+.pl-sala:disabled:not(.aqui):not(.indo){opacity:.55;box-shadow:none;background:var(--papel-2)}
+/* armário da equipe, colado na Base da limpeza */
+.pl-sala.armario:before{content:"";position:absolute;left:3px;top:3px;width:12px;height:18px;border:1.5px solid var(--tinta-3);background:repeating-linear-gradient(135deg,transparent 0 3px,#77674b66 3px 4px)}
+/* Pátio: do lado de fora do prédio, piso de pedra */
+.pl-topo{display:flex;align-items:flex-end;justify-content:space-between;gap:6px}
+.pl-fora{flex:0 0 60%;margin-bottom:-8px;border:1.5px dashed var(--tinta-3);border-bottom:0}
+.pl-fora .pl-sala{width:100%;min-height:58px;flex-direction:row;gap:8px;justify-content:flex-start;padding:4px 8px 7px;text-align:left;
+ background:repeating-linear-gradient(45deg,transparent 0 6px,#77674b2e 6px 7px),linear-gradient(90deg,#d8cbab66 1px,transparent 1px) 0 0/14px 10px,linear-gradient(#d8cbab66 1px,transparent 1px) 0 0/14px 10px,#efe7d3}
+.pl-fora .pl-nm{align-items:flex-start}
+.a0 .pl-canto{flex-direction:column;align-items:flex-end;gap:2px;padding-bottom:2px}
+/* Saguão superior: onde toda volta começa (não é tocável) */
+.pl-sag{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:6px;text-align:center;background:linear-gradient(#f2faf7,var(--petroleo-claro))}
+.pl-sag img{width:52px;height:52px;object-fit:contain;filter:drop-shadow(0 3px 2px #20283a66)}
+/* Você está aqui: alfinete em --sol, com volume */
+.pl-pino{display:none;position:absolute;top:4px;right:5px;width:18px;height:18px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:1px solid var(--sol-base);
+ background:radial-gradient(circle at 35% 35%,#ffe7ad,var(--sol) 45%,var(--sol-2));box-shadow:-1px 2px 0 var(--sol-base),-2px 4px 4px #0006;pointer-events:none}
+.pl-pino:after{content:"";position:absolute;inset:28%;border-radius:50%;background:#fffdf7;box-shadow:inset 0 1px 1px #a86d0a88}
+.aqui>.pl-pino{display:block}
+.pl-sala.aqui,.pl-sag.aqui{background:linear-gradient(#fff6d8,var(--nota));box-shadow:inset 0 0 0 2px var(--sol-2),inset 0 -4px 0 #e9c46a}
+.pl-sala.aqui b{color:#3a2700}
+/* Para onde você vai: tracejado andando em --petroleo */
+.pl-sala.indo{background:linear-gradient(#f4fbf8,var(--petroleo-claro))}
+.pl-sala.indo:after{content:"";position:absolute;inset:2px;pointer-events:none;
+ background:linear-gradient(90deg,var(--petroleo) 50%,transparent 0) 0 0/10px 2px repeat-x,linear-gradient(90deg,var(--petroleo) 50%,transparent 0) 0 100%/10px 2px repeat-x,linear-gradient(var(--petroleo) 50%,transparent 0) 0 0/2px 10px repeat-y,linear-gradient(var(--petroleo) 50%,transparent 0) 100% 0/2px 10px repeat-y;
+ animation:pl-formiga .7s linear infinite}
+.pl-sala.indo b{color:var(--petroleo-escuro)}
+@keyframes pl-formiga{to{background-position:10px 0,-10px 100%,0 -10px,100% 10px}}
+@media(prefers-reduced-motion:reduce){.pl-sala.indo:after,.pl-orelha.indo:before{animation:none}}
+/* com a sala aberta, o botão Mapa mostra a planta inteira (sem caixa de rolagem) logo abaixo do cabeçalho fixo */
+.investigando #roomGrid.planta-on:not(.hidden){max-height:none;overflow:visible}
+#roomGrid.planta-on{scroll-margin-top:150px}

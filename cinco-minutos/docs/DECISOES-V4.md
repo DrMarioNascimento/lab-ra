@@ -1,5 +1,5 @@
 # Loop v4 (25/11/2026) — decisões aplicadas nos dados e no código
-Fonte da verdade do enredo: docs/ROTEIRO-LOOP.md. Dados: cinco-minutos/dados/pistas-v4.json (278 pistas da revisão 3 à 9, 281 desde a revisão 10; as seções "Revisão 2" a "Revisão 11", no fim, valem sobre o que estiver acima, e a mais nova vale sobre as anteriores) → loop-central-dados.js.
+Fonte da verdade do enredo: docs/ROTEIRO-LOOP.md. Dados: cinco-minutos/dados/pistas-v4.json (278 pistas da revisão 3 à 9, 281 desde a revisão 10; as seções "Revisão 2" a "Revisão 12", no fim, valem sobre o que estiver acima, e a mais nova vale sobre as anteriores) → loop-central-dados.js.
 
 ## Mundo
 - Uma versão só para o Téo: confrontou o Lenz na Sala das coleções uns trinta segundos antes de 0:00, foi empurrado, caiu ao lado do pote de tinta. Enquanto a Câmara gira ele "não piora nem melhora, fica guardado igual a uma peça numa vitrine" (pista sato_teo). Saíram as frases "encostou na Câmara / ficou preso entre as voltas".
@@ -415,4 +415,21 @@ Onde esta seção contradiz o que está acima, vale esta. Origem: os quatro rela
 
 ### Ficou para decidir (nenhum bloqueia)
 Continuam os da revisão 10, menos `v4_teo` (registrado acima).
+
+## Revisão 12 (26/11/2026) · planta do museu no estilo do Limiar Ético (pedido do autor)
+
+Onde esta seção contradiz o que está acima, vale esta. Origem: dois pedidos do autor para o cartão "Mapa do museu" do celular: (1) "fazer mais estilo planta e usar a paleta de cores que foi usada no Limiar Ético, mas só nessa parte de planta do museu"; (2) a escolha do andar em formato de orelha (pasta de arquiteto). Protótipo em `/tmp/roda/planta/` (fora do repositório). Só interface: nenhuma pista, regra, custo, horário ou tranca mudou.
+
+- **Planta em vez da grade.** No Loop, o mapa do celular é uma planta baixa: folha de papel clara com quadriculado leve, paredes em traço de tinta, salas como retângulos de tamanhos diferentes encostados, portas como aberturas na parede, corredor e saguão, escada em cada folha (com botões para os outros andares), carimbo do andar no canto ("Museu · planta / TÉRREO") e rosa dos ventos. O modo antigo (`caseRules` diferente de 2) continua com a grade de antes.
+- **Pasta com 4 orelhas.** "2º andar", "1º andar", "Térreo", "Subsolo". A orelha ativa fica na frente, colada à folha, na cor do papel; as outras ficam atrás, mais escuras, com volume e afundando ao toque (46 px de altura). A folha abre sempre no andar onde a pessoa está (inclusive ao tocar em Mapa); trocar de orelha não custa nada e não mexe na regra de andar: tocar numa sala de outro andar segue a mesma caminhada de 10 s. Altura da folha fixa (`--folha-h`, de 380 a 520 px conforme a altura da tela), igual nos 4 andares: nada pula ao trocar.
+- **Disposição (igual nas 5 causas e em todas as voltas).** 2º andar: escada, Saguão superior ("Toda volta começa aqui."), Galeria especial. 1º andar: escada e corredor entre Conservação, Sons, Fotografia e Relógios. Térreo: Pátio do lado de fora (piso de pedra, contorno tracejado) com porta para a Oficina elétrica; Oficina elétrica sobre a Oficina técnica; Ateliê (porta de vidro) e Sala das coleções dando para a Área de descanso, que tem a porta de serviço na parede de fora; hall com a escada; Recepção (entrada principal) ao lado da Central de monitoramento; armário da equipe desenhado colado na Base da limpeza. Subsolo: escada e Câmara do tempo. Nada disso contradiz as pistas (pegadas da Sala das coleções pela Área de descanso até a porta de serviço; "a porta de vidro dá para a Área de descanso inteira"; armário ao lado da Base da limpeza; escada do Subsolo).
+- **Estados.** "Você está aqui": alfinete em `--sol` com volume, na sala (fundo `--nota`) e na orelha do andar. Durante a caminhada, o alfinete fica na sala de onde se saiu (novo `state.andandoDe`, gravado por `marcarCaminhada`) e a sala de destino ganha tracejado andando em `--petroleo`; se o destino é em outro andar, a orelha dele também. Ao chegar, as marcas se atualizam sem redesenhar a planta. Sala onde se está fica sem toque (como antes). Legenda fixa: "Você está aqui" e "Para onde você vai".
+- **Miniaturas 3D.** Continuam em cada sala (36 px no Térreo, 56 px nos outros andares; Saguão com 52 px).
+- **Nomes.** Inteiros, sem hifenização (quebram só entre palavras), 13 ou 14 px; o Subsolo aparece como "Câmara do tempo" (o andar está na orelha e no carimbo) e o Pátio como "Pátio / Quadro externo".
+- **Paleta.** As variáveis do Limiar Ético (`limiar-etica/um-dia/estilo.css`) ficam declaradas só dentro de `.planta`; o resto do jogo segue escuro. Volume como no Limiar: aresta de baixo em `--base`/`--base-2`, sombra interna ao tocar.
+- **Telão.** Não muda (o telão não usa este componente).
+
+### Ficou para decidir (nenhum bloqueia)
+- A disposição das salas é proposta nossa, coerente com as pistas; se o autor imaginar o prédio de outro jeito, basta trocar a tabela `PLANTA` em `game.js`.
+- O 2º andar e o Subsolo têm poucas salas e ficam com salas grandes e papel sobrando (a folha tem a mesma altura em todos os andares, para não pular).
 

@@ -369,6 +369,19 @@ Palavras que o jogo usa: **número de registro** (da peça), **base** (onde a pe
 
 **Não aplicado, e por quê:** ver `DECISOES-V4.md`, "Revisão 11".
 
+## Revisão 12 — 26/11/2026 · planta do museu no estilo do Limiar Ético (pedido do autor)
+
+**Por quê.** O autor pediu que o mapa do celular fosse "mais estilo planta", com a paleta do Limiar Ético só nessa parte, e depois que a escolha do andar fosse por orelhas (pasta de arquiteto). Escolhas em `DECISOES-V4.md`, "Revisão 12". Protótipo em `/tmp/roda/planta/` (fora do repositório).
+
+**O que mudou no código**
+- **`game.js`.** Novo bloco antes de `renderRoomFocus`: tabela `PLANTA` (grade de cada andar, portas, escada), `PLANTA_AREA`, `plantaLoop()` (HTML da pasta com orelhas e folhas), `plantaAndarDe`, `plantaOnde`, `plantaMostrar(andar)` (troca de orelha, sem custo) e `plantaAtualizar()` (alfinete, tracejado, rótulos para leitor de tela; só troca classes). `renderGame` usa `plantaLoop()` no Loop (o modo antigo segue com a grade) e chama `plantaAtualizar()`. `marcarCaminhada` grava `state.andandoDe` e, ao chegar, chama `plantaAtualizar()`; em `enterRoom`, `marcarCaminhada()` vem antes de trocar `state.room`. O botão "Ver mapa" abre a planta no andar onde a pessoa está. Salas continuam como `button[data-room]` (mesmo `enterRoom`, mesma caminhada de 10 s).
+- **`style.css`.** Bloco "Planta do museu" no fim (classes `pl-*`, variáveis do Limiar só dentro de `.planta`); com a sala aberta, a planta aparece inteira (sem caixa de rolagem) e o botão Mapa rola até ela abaixo do cabeçalho fixo.
+- **Versões nas páginas.** `style.css?v=25` (`individual.html`, `sala/index.html`, `sala/simulador/index.html`), `game.js?v=49` (`individual.html`, `sala/index.html`). `sala/conteudo.js` gerado de novo: igual (o bloco novo fica fora do trecho copiado).
+
+**O que mudou nos dados.** Nada (`dados/pistas-v4.json` continua "v4 revisão 11").
+
+**Testes de tela** (fora do repositório): `/tmp/roda/planta/jogo.mjs` (planta em 390×844 e 360×740: início no Saguão, na Recepção, caminhando para o Subsolo, chegada, as 4 orelhas; confere que a folha cabe acima da barra, nenhum nome cortado, alvos ≥ 44 px, letra ≥ 12 px). Capturas em `/tmp/roda/planta/final/`.
+
 ## Checklist por volta (recalculado dos dados em 26/11/2026, revisão 11: nenhuma pista entrou ou saiu; nenhuma volta, horário nem tranca mudou)
 
 Conferido em `dados/pistas-v4.json` (campos `volta_min`, `volta_max`, `segundo_min`, `precisaDe`, `soNaCausa`, `parDe`, `grupos_fonte`, `atividades_coop`). Horários com `valores_padrao` (raio em 1:10); com outra hora sorteada, os horários ligados ao raio andam junto. Pistas por `volta_min`: **232 na volta 1, 27 na volta 2, 9 na volta 3, 9 na volta 4, 4 na volta 5** (281 no total). Por tipo: 216 comuns, 26 de dupla, 21 de observação (clima), 16 falsas honestas, 2 objetos. Ativas por noite: 210 (A), 211 (B), 210 (C), 210 (D), 215 (E) (as 3 novas valem nas 5 noites).
