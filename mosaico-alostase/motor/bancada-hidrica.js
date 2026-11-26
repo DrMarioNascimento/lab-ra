@@ -1,5 +1,5 @@
 import { simularCardiovascular } from './cardiovascular.js';
-import { acoplarCirculacao, compartimentos, hidratar, passoHidrico } from './hidratacao.js';
+import { acoplarCirculacao, compartimentos, hidratar, passoHidrico } from './hidratacao.js?v=2';
 
 export const PASSO_INTEGRADO = 5;
 export const SESSAO = Object.freeze({ inicio: 17 * 60 + 30, duracao: 45, intensidade: 40 });
@@ -34,7 +34,7 @@ export function simularHidratacao(cenario, {
     const exercicio = cardio[min].emEsforco;
     const intensidade = exercicio ? sessao.intensidade / 100 : 0;
     const comp = compartimentos(estado);
-    const circulacao = acoplarCirculacao(cardio[min], comp.plasmaL, intensidade);
+    const circulacao = acoplarCirculacao(cardio[min], comp.plasmaL, intensidade, estado.regulacao?.angII);
     const renal = regular?.(estado, comp, circulacao, PASSO_INTEGRADO);
     const proximo = passoHidrico(estado, {
       aguaMl, sodioMg, temperatura: exercicio ? cenario.temperatura : 22, umidade: cenario.umidade, esforco: intensidade,

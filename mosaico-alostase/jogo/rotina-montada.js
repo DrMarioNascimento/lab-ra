@@ -1,5 +1,5 @@
 // Mosaico Alostase · modo Diagnóstico: da escolha do aluno à rotina que o motor entende (sem tela).
-import { simularDia } from '../motor/motor.js';
+import { PASSO_MIN, simularDia } from '../motor/motor.js';
 import { P } from '../motor/parametros.js';
 import { frequenciaNoEsforco, fracaoReservaVO2 } from '../motor/treino.js';
 
@@ -100,7 +100,15 @@ export function leitura(rotina, dia = simularDia(rotina)) {
   const r = residuoSono(rotina, dia);
   if (r.aoAcordar - r.comOitoHoras > 0.05) notas.push(`Com ${f(r.horas, r.horas % 1 ? 1 : 0)} horas de sono, a necessidade de sono ao acordar fica em ${f(r.aoAcordar, 2)}; com 8 horas ficaria em ${f(r.comOitoHoras, 2)}.`);
   for (const j of rotina.jornadas.filter((x) => x.tipo === 'exercicio')) {
-    const p = dia.pontos.find((x) => Math.abs(x.hora - mod24(j.fim)) < 1e-6), pct = Math.round((p.cortisol / p.cortisolBase - 1) * 100);
+    const pos = mod24(j.fim) * 60 / PASSO_MIN;
+    const antes = dia.pontos[Math.floor(pos)];
+    const depois = dia.pontos[Math.ceil(pos) % dia.pontos.length];
+    const fHora = pos - Math.floor(pos);
+    const p = {
+      cortisol: antes.cortisol + (depois.cortisol - antes.cortisol) * fHora,
+      cortisolBase: antes.cortisolBase + (depois.cortisolBase - antes.cortisolBase) * fHora,
+    };
+    const pct = Math.round((p.cortisol / p.cortisolBase - 1) * 100);
     const pd = P.treino.perfilPadrao, fe = frequenciaNoEsforco({ idade: pd.idade, grupo: pd.grupo, fracReserva: fracaoReservaVO2(j.vo2 / 100, pd.vo2max) }), a5 = (v) => Math.round(v / 5) * 5;
     notas.push(`Durante o exercício a frequência cardíaca de um adulto de ${pd.idade} anos fica por volta de ${a5(fe.valor)} bpm${fe.faixa[1] - fe.faixa[0] >= 10 ? ` (entre ${a5(fe.faixa[0])} e ${a5(fe.faixa[1])})` : ''}; a frequência máxima varia cerca de 10 bpm de pessoa para pessoa.`);
     notas.push(pct > 0 ? `Ao fim do exercício o cortisol fica ${pct}% acima do esperado para o horário (${f(p.cortisol)} contra ${f(p.cortisolBase)} µg/dL).` : 'O exercício leve não tira o cortisol da curva do horário.');

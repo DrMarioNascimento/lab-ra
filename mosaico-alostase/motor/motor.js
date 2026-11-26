@@ -69,6 +69,13 @@ export function efeitoRefeicaoGlicemia(m, min) {
   return g.subidaPor50g.valor * (m.carboG / 50) * u * Math.exp(1 - u);
 }
 
+// Aproximação histórica do jogo. O protocolo de Scheer mediu o efeito com cerca de 12 h fora de fase.
+export function fatorGlicemiaCircadiana(deslocamentoRelogioH = 0) {
+  const distancia = Math.abs(mod24(deslocamentoRelogioH + 12) - 12);
+  const { aumento, deslocMinH, deslocPlenoH } = P.glicemia.desalinhamento;
+  return 1 + aumento * Math.max(0, Math.min(1, (distancia - deslocMinH) / (deslocPlenoH - deslocMinH)));
+}
+
 /**
  * Simula um dia. A rotina é repetida no dia anterior para a pressão de sono
  * e os efeitos que atravessam a meia-noite começarem no lugar certo.
@@ -90,8 +97,7 @@ export function simularDia(rotina) {
   const efeitoEx = (j, min) => efeitoExercicioCortisol(j, min, r.deslocamentoRelogioH);
   const efeitoRefeicao = efeitoRefeicaoGlicemia;
 
-  const dd = Math.abs(((r.deslocamentoRelogioH + 12) % 24 + 24) % 24 - 12), da = g.desalinhamento;
-  const fatorDesalinhamento = 1 + da.aumento * Math.max(0, Math.min(1, (dd - da.deslocMinH) / (da.deslocPlenoH - da.deslocMinH)));
+  const fatorDesalinhamento = fatorGlicemiaCircadiana(r.deslocamentoRelogioH);
   let S = 0.5;
   const pontos = [];
   for (let k = 0; k < 2 * N; k++) {                    // dia de aquecimento + dia de leitura

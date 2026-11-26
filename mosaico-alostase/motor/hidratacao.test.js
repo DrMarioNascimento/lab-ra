@@ -37,3 +37,12 @@ test('a compensação cardiovascular reduz VS, eleva FC e mantém as identidades
   perto(b.pam, b.debito * b.resistencia);
   perto(b.pam, b.dia + (b.sis - b.dia) / 3);
 });
+
+test('a angiotensina II do intervalo anterior altera a resistência e a pressão atuais', () => {
+  const basal = { fc: 70, sis: 120, dia: 75, pam: 90 };
+  const a = acoplarCirculacao(basal, 3, 0, 100);
+  const b = acoplarCirculacao(basal, 3, 0, 125);
+  assert.ok(b.resistencia > a.resistencia);
+  assert.ok(b.pam > a.pam);
+  assert.equal(b.debito, a.debito);
+});

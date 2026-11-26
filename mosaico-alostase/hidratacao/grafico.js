@@ -11,7 +11,7 @@ export function desenharSerie(canvas, pares, pontos, selecionado, eixo, casas) {
   const intervalo = Math.max(maior - menor, 10 ** (-casas) * 4);
   const baixo = menor - intervalo * 0.08;
   const alto = baixo + intervalo * 1.16;
-  const x = (i) => 58 + (w - 78) * i / (pontos - 1);
+  const x = (i) => 58 + (w - 78) * (pontos > 1 ? i / (pontos - 1) : 0.5);
   const y = (v) => h - 28 - (h - 48) * (v - baixo) / (alto - baixo);
   const num = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: casas });
 
@@ -22,13 +22,13 @@ export function desenharSerie(canvas, pares, pontos, selecionado, eixo, casas) {
   for (let i = 0; i <= 4; i++) {
     const valor = baixo + (alto - baixo) * i / 4;
     ctx.beginPath();
-    ctx.moveTo(x(0), y(valor));
-    ctx.lineTo(x(pontos - 1), y(valor));
+    ctx.moveTo(58, y(valor));
+    ctx.lineTo(w - 20, y(valor));
     ctx.stroke();
     ctx.fillText(num.format(valor), 53, y(valor) + 4);
   }
   ctx.textAlign = 'center';
-  for (let i = 0; i <= 4; i++) {
+  for (let i = 0; i <= (pontos > 1 ? 4 : 0); i++) {
     const indice = Math.round((pontos - 1) * i / 4);
     ctx.fillText(eixo(indice), x(indice), h - 9);
   }
@@ -39,6 +39,12 @@ export function desenharSerie(canvas, pares, pontos, selecionado, eixo, casas) {
     ctx.beginPath();
     serie.forEach((v, j) => ctx[j ? 'lineTo' : 'moveTo'](x(j), y(v)));
     ctx.stroke();
+    if (pontos === 1) {
+      ctx.fillStyle = ctx.strokeStyle;
+      ctx.beginPath();
+      ctx.arc(x(0), y(serie[0]), 3, 0, Math.PI * 2);
+      ctx.fill();
+    }
   }
   ctx.setLineDash([]);
   ctx.strokeStyle = '#f0f5ff';

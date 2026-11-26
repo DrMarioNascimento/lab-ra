@@ -14,6 +14,9 @@ Jogo pedagógico de fisiologia da rotina. Terceira versão, criada em 17/11/2026
 - `motor/`: motor de um dia, hora a hora (cortisol, glicemia e pressão de sono), sem interface. `parametros.js` traz cada número com a origem; `PENDENCIAS` lista o que o motor ainda não calcula. Para conferir: `npm test` nesta pasta.
 - `motor/hemodinamica.js`: pressão arterial de um normotenso ao longo do dia (parte do sono e parte do relógio). Ainda não aparece no jogo.
 - `cardiovascular/` e `motor/cardiovascular.js`: bancada de 24 h com pressão e frequência cardíaca, dois cenários de exercício, inspeção das contas e CSV. Os pontos da MAPA e as curvas são simulados.
+- `hidratacao/`: comparação de exercício em ambiente fresco, quente e com horários de reposição diferentes. O modo `?rim=1` fecha a regulação de água e sódio com ADH, SRAA e ANP em índices relativos.
+- `conferencia/`: tabelas derivadas dos resultados atuais do motor, com referências e limites de comparação.
+- `trajetoria/`: continuidade do estado corporal de um dia a 365 dias, com 24 marcos no horizonte anual, exame de cada dia e CSV. A adaptação calculada é a redução didática da FC de repouso.
 - `motor/treino.js`: frequência cardíaca no esforço (FCmáx de Tanaka, reserva de FC). Ainda não aparece no jogo.
 - `motor/semana.js`: sete dias seguidos, com dívida de sono, pressão de sono contínua e REM perdido somado.
 - `docs/motor-um-dia-conferencia.png`: as curvas das três rotinas de exemplo.

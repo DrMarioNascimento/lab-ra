@@ -1,6 +1,6 @@
-import { CENARIOS_HIDRICOS, PASSO_INTEGRADO, SESSAO, simularHidratacao } from '../motor/bancada-hidrica.js';
+import { CENARIOS_HIDRICOS, PASSO_INTEGRADO, SESSAO, simularHidratacao } from '../motor/bancada-hidrica.js?v=2';
 import { regularRim } from '../motor/renal.js';
-import { desenharSerie } from './grafico.js';
+import { desenharSerie } from './grafico.js?v=2';
 
 const elemento = (id) => document.getElementById(id);
 const seletores = [elemento('rotina-a'), elemento('rotina-b')];
@@ -70,7 +70,7 @@ function selecionar(indice) {
         <li>Débito = FC (${fmt(p.fc)}) × volume sistólico (${fmt(p.volumeSistolico)} mL) ÷ 1.000 ≈ ${fmt(p.debito, 2)} L/min.</li>
         <li>PAM ≈ débito × resistência vascular (${fmt(p.resistencia, 2)}) = ${fmt(p.pam)} mmHg.</li>
         ${p.renal ? `<li>ADH ${fmt(p.renal.regulacao.adh)} acompanha osmolalidade e volume. O fluxo urinário neste intervalo é ${fmt(p.renal.urinaLHora, 3)} L/h.</li>
-        <li>Entrega de NaCl ${fmt(p.renal.nacl)} · renina ${fmt(p.renal.regulacao.renina)} · angiotensina II ${fmt(p.renal.regulacao.angII)} · aldosterona ${fmt(p.renal.regulacao.aldosterona)} · ANP ${fmt(p.renal.regulacao.anp)}. Os sinais modificam a excreção de sódio, aqui em ${fmt(p.renal.sodioUrinaMgHora)} mg/h.</li>` : ''}
+        <li>Entrega de NaCl ${fmt(p.renal.nacl)} · renina ${fmt(p.renal.regulacao.renina)} · angiotensina II ${fmt(p.renal.regulacao.angII)} · aldosterona ${fmt(p.renal.regulacao.aldosterona)} · ANP ${fmt(p.renal.regulacao.anp)}. Os sinais modificam a excreção de sódio, aqui em ${fmt(p.renal.sodioUrinaMgHora)} mg/h. O sinal anterior de angiotensina II multiplica a resistência atual por ${fmt(p.ganhoAngII, 3)}.</li>` : ''}
       </ul></article>`;
   }).join('');
 }

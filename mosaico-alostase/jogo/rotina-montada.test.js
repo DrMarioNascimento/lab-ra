@@ -57,3 +57,10 @@ test('leitura: o exercício mostra a frequência cardíaca esperada e a faixa', 
   assert.ok(bpm(nota(treino)) <= 195, 'não passa da FCmáx');
   assert.ok(bpm(nota(leve)) > 54);
 });
+
+test('a leitura aceita sessão de 15 min terminando entre amostras do motor', () => {
+  const e = escolhasPadrao();
+  e.exercicio = { hora: 18, nivel: 'intenso', dur: 15 };
+  assert.deepEqual(conferir(e), []);
+  assert.ok(leitura(montarRotina(e)).some((texto) => texto.includes('frequência cardíaca')));
+});

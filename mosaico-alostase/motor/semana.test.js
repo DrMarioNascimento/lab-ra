@@ -71,3 +71,14 @@ test('jornada noturna a semana toda: o sono cai na fase ativa do cortisol todos 
   assert.ok(s.resumo.every((r) => r.sonoNaFaseAtiva));
   assert.ok(!simularSemana(sete(ROTINAS.diurna)).resumo.some((r) => r.sonoNaFaseAtiva));
 });
+
+test('o mesmo deslocamento explícito produz cortisol e glicemia iguais no dia e na semana', () => {
+  const rotina = { sono: [{ inicio: 23, fim: 7 }], refeicoes: [{ hora: 8, carboG: 50 }],
+    jornadas: [{ tipo: 'exercicio', inicio: 18, fim: 18.5, vo2: 70 }], deslocamentoRelogioH: 6 };
+  const dia = simularDia(rotina);
+  const semana = simularSemana(Array(7).fill(rotina));
+  for (const [i, p] of dia.pontos.entries()) {
+    assert.equal(p.cortisol, semana.pontos[i].cortisol);
+    assert.equal(p.glicemia, semana.pontos[i].glicemia);
+  }
+});

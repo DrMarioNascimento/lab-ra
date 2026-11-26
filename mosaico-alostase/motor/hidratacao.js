@@ -58,7 +58,7 @@ export function passoHidrico(estado, entrada, dtMin, excrecao = perdaBasal()) {
   };
 }
 
-export function acoplarCirculacao(basal, plasmaL, intensidade) {
+export function acoplarCirculacao(basal, plasmaL, intensidade, angiotensinaII = 100) {
   // Ganhos didáticos. A resposta usa o volume plasmático como aproximação do enchimento.
   const razaoPlasma = plasmaL / PERFIL_HIDRICO.plasmaL;
   const vsReferencia = 72 + 60 * intensidade;
@@ -67,8 +67,10 @@ export function acoplarCirculacao(basal, plasmaL, intensidade) {
   const fc = basal.fc * fatorVS ** -0.7;
   const debito = fc * volumeSistolico / 1000;
   const debitoReferencia = basal.fc * vsReferencia / 1000;
-  const resistencia = basal.pam / debitoReferencia * fatorVS ** -0.4;
+  // O sinal do passo anterior altera o tônus no passo atual. Ganho limitado e didático.
+  const ganhoAngII = 1 + Math.max(-0.04, Math.min(0.06, (angiotensinaII - 100) * 0.001));
+  const resistencia = basal.pam / debitoReferencia * fatorVS ** -0.4 * ganhoAngII;
   const pam = debito * resistencia;
   const pulso = (basal.sis - basal.dia) * fatorVS;
-  return { fc, volumeSistolico, debito, resistencia, pam, razaoPressao: pam / basal.pam, sis: pam + 2 * pulso / 3, dia: pam - pulso / 3 };
+  return { fc, volumeSistolico, debito, resistencia, pam, ganhoAngII, razaoPressao: pam / basal.pam, sis: pam + 2 * pulso / 3, dia: pam - pulso / 3 };
 }
