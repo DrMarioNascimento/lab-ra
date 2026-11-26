@@ -1,6 +1,6 @@
 // Motor contínuo da bancada integrada. Estado hídrico, excreção e pressão de sono atravessam a meia-noite.
-import { BEBIDAS_BASE, CENARIOS_HIDRICOS, PASSO_INTEGRADO, SESSAO, simularHidratacao } from './bancada-hidrica.js?v=5';
-import { INICIAL_ACLIMATACAO, atualizarAclimatacao } from './aclimatacao.js';
+import { BEBIDAS_BASE, CENARIOS_HIDRICOS, PASSO_INTEGRADO, SESSAO, simularHidratacao } from './bancada-hidrica.js?v=6';
+import { INICIAL_ACLIMATACAO, atualizarAclimatacao } from './aclimatacao.js?v=2';
 import { simularCardiovascular } from './cardiovascular.js?v=4';
 import { hidratar } from './hidratacao.js';
 import { cortisolBase, efeitoExercicioCortisol, efeitoRefeicaoGlicemia } from './motor.js';

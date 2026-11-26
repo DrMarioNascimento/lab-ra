@@ -1,7 +1,7 @@
 import { simularCardiovascular } from './cardiovascular.js';
 import { acoplarCirculacao, compartimentos, hidratar, passoHidrico } from './hidratacao.js?v=3';
 import { INICIAL_TERMICO, passoTermico } from './termorregulacao.js?v=2';
-import { ajusteCardiacoNoCalor } from './aclimatacao.js';
+import { ajusteCardiacoNoCalor } from './aclimatacao.js?v=2';
 
 export const PASSO_INTEGRADO = 5;
 export const SESSAO = Object.freeze({ inicio: 17 * 60 + 30, duracao: 45, intensidade: 40 });
@@ -48,9 +48,11 @@ export function simularHidratacao(cenario, {
       throw new RangeError('A rotina saiu do domínio hídrico desta simulação. Confira a ingestão e o esforço.');
     }
     const basal = cardio[min];
-    const recuperacaoMin = sessao ? min - sessao.inicio - sessao.duracao : -1;
-    const respostaCalor = aclimatacao && cenario.temperatura >= 30 && (exercicio || basal.emRecuperacao)
-      ? ajusteCardiacoNoCalor(aclimatacao, Math.max(0, recuperacaoMin)) : 0;
+    const excessoFC = basal.calculo?.deltaFC ?? 0;
+    const aumentoEstavel = (basal.calculo?.alvoFC ?? 0) - (basal.calculo?.fcBasal ?? 0);
+    const respostaCalor = aclimatacao && cenario.temperatura >= 30 && aumentoEstavel > 0
+      ? Math.min(excessoFC, ajusteCardiacoNoCalor(aclimatacao, excessoFC / aumentoEstavel, (sessao?.intensidade ?? 0) / 100))
+      : 0;
     const circulacao = acoplarCirculacao(respostaCalor ? { ...basal, fc: basal.fc - respostaCalor } : basal,
       comp.plasmaL, intensidade, estado.regulacao?.angII);
     const renal = regular?.(estado, comp, circulacao, PASSO_INTEGRADO);

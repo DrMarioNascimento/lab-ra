@@ -3,7 +3,7 @@ import { resumirCardiovascular, simularCardiovascular } from '../motor/cardiovas
 import { PARAMETROS_HIDRICOS } from '../motor/hidratacao.js';
 import { regularRim } from '../motor/renal.js';
 import { simularSemana } from '../motor/semana.js';
-import { simularTrajetoria } from '../motor/trajetoria.js?v=6';
+import { simularTrajetoria } from '../motor/trajetoria.js?v=7';
 import { AREA_TERMICA_M2 } from '../motor/termorregulacao.js?v=2';
 
 const n = (v, casas = 1) => v.toLocaleString('pt-BR', { maximumFractionDigits: casas, minimumFractionDigits: casas });
@@ -47,6 +47,7 @@ const fontes = {
   speed: ['Speed · amostra ativa, medida em repouso', 'https://pubmed.ncbi.nlm.nih.gov/37115739/'],
   aclima: ['Lorenzo e colegas · tabela 2', 'https://doi.org/10.1152/japplphysiol.00495.2010'],
   suc: ['Heathcote e colegas · revisão de aquecimento passivo', 'https://pmc.ncbi.nlm.nih.gov/articles/PMC6306444/'],
+  decaimento: ['Daanen e colegas · revisão sistemática', 'https://pubmed.ncbi.nlm.nih.gov/29129022/'],
   diasCalor: ['Estudo de aclimatação isoterma · tabela 1', 'https://pmc.ncbi.nlm.nih.gov/articles/PMC10119217/'],
   perdaAclima: ['Daanen, Racinais e Périard · revisão e meta-análise', 'https://doi.org/10.1007/s40279-017-0808-x'],
   termico: ['Che Muhamed e colegas · tabela 1, corredores treinados', 'https://doi.org/10.1080/23328940.2016.1182669'],
@@ -96,6 +97,7 @@ const tabelas = [
     ['Frequência cardíaca no fim do esforço', 'No ciclismo a 40 °C, a FC passou de 165 a 150 bpm entre a primeira e a décima exposição.', `${deltaAclima('fcFinalBpm', 1)} bpm no teste final, grupo calor menos grupo fresco.`, 'A magnitude do ciclismo é uma referência para o ganho do motor. A caminhada simulada usa outro protocolo.', 'aclima'],
     ['Temperatura central no fim do esforço', 'No mesmo ciclismo, 39,3 °C na primeira exposição e 38,8 °C na décima.', `${deltaAclima('centralFimC', 2)} °C no teste final, calor menos fresco.`, 'No teste úmido, a capacidade de evaporação limita o efeito térmico do aumento de suor.', 'aclima'],
     ['Sudorese no teste final', 'Em aclimatação isoterma a 50 °C, o estudo observou cerca de +0,4 L/h no dia 5 e +0,6 L/h no dia 10, em relação ao dia 1.', `${n((aclimatado.suorSessaoL - controleCalor.suorSessaoL) * 60 / 45, 2)} L/h no teste final, calor menos fresco.`, 'Faixa de comparação. O motor usa exposição mais leve e não reproduz o protocolo isotermo.', 'diasCalor'],
+    ['Perda da adaptação da sudorese', 'Os estudos de perda de aclimatação mostram variação na retenção da resposta do suor.', 'Meia-vida de 14 dias sem exposição suficiente.', 'Hipótese didática para representar perda gradual, sem valor individual inferido.', 'decaimento'],
     ['Início da sudorese', 'Uma revisão relatou redução aproximada de 4 min em protocolos de repouso no calor e limiar central cerca de 0,31 °C menor em outros estudos.', `${controleCalor.inicioSuorMin} min no grupo fresco e ${aclimatado.inicioSuorMin} min no grupo calor.`, 'Estimativa didática. O início é o primeiro minuto em que o modelo secretaria pelo menos 0,10 L/h.', 'suc'],
     ['Perda da adaptação', 'Revisão estimou perda de aproximadamente 2,5% das adaptações de FC e temperatura por dia sem exposição. A evidência para o suor é menos definida.', 'O índice cardiovascular decai 2,5% por dia sem estímulo. O índice de suor fica estável neste recorte.', 'Hipóteses explícitas do motor. A queda da frequência durante o esforço usa o índice cardiovascular, e a temperatura responde ao balanço térmico.', 'perdaAclima'],
   ]],

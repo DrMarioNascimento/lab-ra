@@ -63,7 +63,7 @@
     <section id="conferencia" class="painel">
       <h2>Conferência fisiológica</h2>
       <h3>Morris e colegas · inversão de 12 horas em laboratório</h3>
-      <p>Diferença entre a condição invertida e a alinhada. O motor reproduz a janela monitorada de 24 horas, com sono às 23:00–07:00 ou às 11:00–19:00, fase fixa e repouso. Os dois valores marcados com † orientam o ajuste. O efeito total do motor também inclui a variação de pressão do relógio ao longo do dia.</p>
+      <p>Diferença entre a condição invertida e a alinhada. O motor reproduz a janela monitorada de 24 horas, com sono às 23:00–07:00 ou às 11:00–19:00, fase fixa e repouso. Os quatro valores da tabela são alvos de calibração. O ajuste usa o efeito líquido da inversão, considerando a variação de pressão que o relógio já produz no motor.</p>
       <table>
         <thead><tr><th scope="col">Mudança em mmHg</th><th scope="col">Estudo</th><th scope="col">Motor</th><th scope="col">Motor − estudo</th></tr></thead>
         <tbody id="morris"></tbody>
@@ -75,21 +75,23 @@
         <thead><tr><th scope="col">Queda sistólica no sono</th><th scope="col">Estudo · média ± DP</th><th scope="col">Motor</th><th scope="col">Motor − estudo</th></tr></thead>
         <tbody id="shafer"></tbody>
       </table>
-      <p class="calor-detalhe">A comparação usa dados de grupo de um estudo observacional. Com esses horários, o motor estima uma queda perto de 10% nos dois grupos. A diferença de 4,1 pontos percentuais do estudo praticamente desaparece na simulação.</p>
+      <p class="calor-detalhe">A comparação usa dados de grupo de um estudo observacional. O motor usa a variabilidade publicada dos horários de início do sono como aproximação da exposição crônica. As quedas de pressão medidas neste estudo ficam reservadas para conferência.</p>
       <p><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5858578/">Morris e colegas, 2017 · protocolo e resultados</a><br>
-        <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10954583/">Shafer e colegas, 2024 · tabela 1</a></p>
+        <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10954583/">Shafer e colegas, 2024 · tabela 1</a><br>
+        <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8919200/">McHill e colegas · seguimento após mudança de escala</a></p>
     </section>
     <details class="painel">
       <summary>Hipóteses da projeção de 28 dias</summary>
       <ul>
         <li>Nas escalas fixas, o horário de sono se mantém nas folgas. Na alternada, ele se desloca cinco horas em cada uma das duas folgas para preparar o próximo bloco.</li>
-        <li>Água, sódio, temperatura e índices renais passam de um dia para o seguinte. A aclimatação cresce com minutos de trabalho no calor acima de 37,5 °C de temperatura central calculada. O componente cardiovascular decai nas folgas.</li>
+        <li>Água, sódio, temperatura e índices renais passam de um dia para o seguinte. A aclimatação cresce com minutos de trabalho no calor acima de 37,5 °C de temperatura central calculada. Em dias sem exposição, os índices cardiovascular e de sudorese diminuem. O motor usa meia-vida didática de 14 dias para a sudorese.</li>
         <li>O relógio se ajusta parcialmente aos horários de sono. O modelo estima a fração do sono fora da noite biológica sem inferir a exposição individual à luz.</li>
+        <li>A fração do sono fora da fase e a variabilidade de horários nos últimos sete dias alimentam um índice separado. Este índice cresce ou recua com meia-vida didática de 14 dias, atua na pressão sistólica durante o sono e usa uma amplitude máxima ilustrativa de 6 mmHg.</li>
         <li>A pressão de sono acompanha o tempo acordado e dormindo. A dívida em sete dias usa o limiar de 15,84 horas de vigília do motor original. Com 8 horas programadas por dia, essa conta produz a mesma dívida nas três escalas, embora a pressão de sono possa diferir.</li>
         <li>A queda de pressão é calculada entre as médias de vigília e de sono de cada dia. Na projeção, a vigília inclui o trabalho. O volume ingerido e o aporte diário de sódio de 2,4 g são parâmetros da simulação.</li>
       </ul>
     </details>
   </main>
-  <script type="module" src="./escalas.js"></script>
+  <script type="module" src="./escalas.js?v=2"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-import { acoplarCirculacao, compartimentos, hidratar, passoHidrico, PERFIL_HIDRICO } from './hidratacao.js?v=4';
+import { acoplarCirculacao, compartimentos, hidratar, passoHidrico, PERFIL_HIDRICO } from './hidratacao.js?v=5';
 import { regularRim, REGULACAO_BASAL } from './renal.js?v=2';
 import { INICIAL_TERMICO, passoTermico } from './termorregulacao.js?v=3';
 
@@ -7,7 +7,7 @@ export function simularCalorIntegrado(opcoes) {
 }
 
 export function calcularIntervaloCalor({ duracaoMin, ambienteNoMinuto, basalNoMinuto, bebidas = [],
-  massaKg = PERFIL_HIDRICO.massaKg, inicialTermico = INICIAL_TERMICO, estadoInicial }) {
+  massaKg = PERFIL_HIDRICO.massaKg, inicialTermico = INICIAL_TERMICO, estadoInicial, parametrosCirculacao }) {
   const escala = massaKg / PERFIL_HIDRICO.massaKg;
   const ref = { ...PERFIL_HIDRICO, massaKg, aguaL: PERFIL_HIDRICO.aguaL * escala,
     extracelularL: PERFIL_HIDRICO.extracelularL * escala, plasmaL: PERFIL_HIDRICO.plasmaL * escala };
@@ -27,6 +27,8 @@ export function calcularIntervaloCalor({ duracaoMin, ambienteNoMinuto, basalNoMi
     const comp = compartimentos(agua, ref);
     const basal = basalNoMinuto(min, ambiente);
     const cardio = acoplarCirculacao(basal, comp.plasmaL, ambiente.esforco, agua.regulacao?.angII, {
+      ...parametrosCirculacao,
+      deficitAguaPct: -comp.variacaoAguaPct,
       plasmaReferenciaL: ref.plasmaL,
       vsReferencia: basal.vsReferencia,
       cargaTermica: Math.max(0, temperatura.centralC - 37.2),

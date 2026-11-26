@@ -1,4 +1,5 @@
-import { simularCalorIntegrado } from './calor-integrado.js?v=2';
+import { simularCalorIntegrado } from './calor-integrado.js?v=3';
+import { ajusteCardiacoNoCalor } from './aclimatacao.js?v=2';
 import { simularCardiovascular } from './cardiovascular.js';
 import { fracaoReservaVO2, frequenciaNoEsforco } from './treino.js';
 
@@ -37,13 +38,15 @@ export function ambienteTurnoCalor(min) {
   return { temperatura: atividade === 'Pausa' ? 26 : 24, umidade: 50, esforco: 0 };
 }
 
-export function respostaCardioTurno(basalEm) {
+export function respostaCardioTurno(basalEm, aclimatacao = null) {
   let resposta = 0;
   return (min, ambiente) => {
     const { fc, sis, dia } = basalEm(min);
     const alvo = frequenciaNoEsforco({ idade: 35, fcRepouso: fc, fracReserva: RESERVA }).valor;
     const pressaoSistolica = sis + (INTENSIDADE * 45 / 3.5 - 1) * 10 * resposta;
-    const basal = { fc: fc + (alvo - fc) * resposta, sis: pressaoSistolica, dia,
+    const excessoFC = (alvo - fc) * resposta;
+    const ajusteFC = aclimatacao ? Math.min(excessoFC, ajusteCardiacoNoCalor(aclimatacao, resposta, INTENSIDADE)) : 0;
+    const basal = { fc: fc + excessoFC - ajusteFC, sis: pressaoSistolica, dia,
       pam: (pressaoSistolica + 2 * dia) / 3, vsReferencia: 72 + 60 * INTENSIDADE * resposta };
     resposta += ((ambiente.esforco ? 1 : 0) - resposta) * (1 - Math.exp(-1 / 1.5));
     return basal;

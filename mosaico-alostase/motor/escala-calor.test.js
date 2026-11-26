@@ -2,6 +2,9 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { ESCALAS_CALOR, planoEscalaCalor, simularEscalaCalor } from './escala-calor.js';
 import { conferirEscalaComMorris, conferirEscalaComShafer } from './conferencia-escala.js';
+import { simularCardiovascular } from './cardiovascular.js';
+import { ajustarPressaoDaRotina, atualizarCargaSono, mediasPressao, variabilidadeInicioSono } from './pressao-desalinhamento.js';
+import { atualizarAclimatacao, MEIA_VIDA_SUOR_DIAS } from './aclimatacao.js';
 
 const cenarios = Object.keys(ESCALAS_CALOR).map((escala) => simularEscalaCalor(escala));
 
@@ -33,6 +36,8 @@ test('estado hídrico atravessa dias e a folga reduz osmolalidade sem zerar a ac
     assert.ok(dias[7].osmPreTurno < dias[4].osmPreTurno);
     assert.ok(dias[5].indiceAclima > dias[6].indiceAclima);
     assert.ok(dias[7].indiceAclima > 0);
+    assert.ok(dias[5].indiceSuorAclima > dias[6].indiceSuorAclima);
+    assert.ok(dias[7].indiceSuorAclima > 0);
   }
   assert.deepEqual(simularEscalaCalor('noturna', { dias: 3 }), cenarios[1].slice(0, 3));
 });
@@ -48,11 +53,41 @@ test('controle de sono mantém horário e isola duas horas a menos nos dias de t
   assert.ok(curta[11].pressaoSonoInicio > controle[11].pressaoSonoInicio);
 });
 
-test('a conferência conserva o sinal do efeito de 24 h e expõe o desvio do contraste de Shafer', () => {
-  const [pas, pad] = conferirEscalaComMorris();
-  assert.ok(pas.motor > 0 && Math.abs(pas.motor - pas.estudo) < 0.4);
-  assert.ok(pad.motor > 0 && Math.abs(pad.motor - pad.estudo) < 0.4);
+test('o ajuste de aclimatação preserva a FC de repouso ao iniciar o turno', () => {
+  for (const dias of cenarios) {
+    const d = dias[11];
+    assert.ok(d.indiceAclima > 90);
+    const inicio = d.plano.inicioTrabalho / 15;
+    const fcAntes = d.detalhe[inicio - 1].fc;
+    const fcInicial = d.detalhe[inicio].fc;
+    assert.ok(Math.abs(fcInicial - fcAntes) < 2);
+    assert.ok(d.detalhe[inicio + 1].fc > fcInicial);
+  }
+});
+
+test('a aclimatação da sudorese cai à metade após a meia-vida sem exposição', () => {
+  let estado = { cardiovascular: 0.8, suor: 0.8 };
+  for (let dia = 0; dia < MEIA_VIDA_SUOR_DIAS; dia++) estado = atualizarAclimatacao(estado, 0);
+  assert.ok(Math.abs(estado.suor - 0.4) < 1e-9);
+  assert.ok(atualizarAclimatacao(estado, 90).suor > estado.suor);
+});
+
+test('carga persistente se acumula e reduz a queda sistólica sem alterar a pressão em vigília', () => {
+  const curva = simularCardiovascular({ sono: [1380, 420] });
+  const agudo = mediasPressao(ajustarPressaoDaRotina(curva, 0));
+  let carga = 0;
+  for (let dia = 0; dia < 14; dia++) carga = atualizarCargaSono(carga, 1);
+  assert.ok(Math.abs(carga - 0.5) < 1e-9);
+  const persistente = mediasPressao(ajustarPressaoDaRotina(curva, 0, carga));
+  assert.equal(persistente.pasVigilia, agudo.pasVigilia);
+  assert.ok(persistente.quedaPasPct < agudo.quedaPasPct);
+  assert.ok(atualizarCargaSono(carga, 0) < carga);
+  assert.ok(Math.abs(variabilidadeInicioSono([23, 1]) - variabilidadeInicioSono([11, 13])) < 1e-9);
+});
+
+test('Morris reproduz os quatro alvos e a conferência externa preserva o contraste de Shafer', () => {
+  for (const { motor, estudo } of conferirEscalaComMorris()) assert.ok(Math.abs(motor - estudo) < 1e-9);
   const [diurno, noturno] = conferirEscalaComShafer();
-  assert.ok(Math.abs(diurno.motor - noturno.motor) < 0.2);
-  assert.ok(diurno.estudo - noturno.estudo > 4);
+  const contraste = diurno.motor - noturno.motor;
+  assert.ok(contraste > 0 && Math.abs(contraste - (diurno.estudo - noturno.estudo)) < 1.5);
 });

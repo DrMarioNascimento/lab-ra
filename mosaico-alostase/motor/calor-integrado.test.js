@@ -11,6 +11,8 @@ test('ciclismo: reposição gradual preserva a ordem dos desfechos medidos', () 
     const referencia = REFERENCIAS_CICLISMO[i];
     aproximar(resultado.perdaMassaPct, referencia.perdaMassaPct, 0.15);
     aproximar(resultado.centralC, referencia.centralC, 0.20);
+    aproximar(resultado.fc, referencia.fc, 3);
+    aproximar(resultado.volumeSistolico, referencia.volumeSistolico, 3);
     if (i === 0) continue;
     const anterior = series[i - 1];
     assert.ok(resultado.fc < anterior.fc);

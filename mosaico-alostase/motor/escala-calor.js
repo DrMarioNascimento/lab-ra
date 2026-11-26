@@ -1,10 +1,10 @@
-import { INICIAL_ACLIMATACAO, atualizarAclimatacao, ajusteCardiacoNoCalor } from './aclimatacao.js';
-import { calcularIntervaloCalor } from './calor-integrado.js?v=2';
+import { INICIAL_ACLIMATACAO, atualizarAclimatacao } from './aclimatacao.js?v=2';
+import { calcularIntervaloCalor } from './calor-integrado.js?v=3';
 import { simularCardiovascular } from './cardiovascular.js';
 import { faseNoMinuto, passoFaseCircadiana } from './fase-circadiana.js';
 import { P } from './parametros.js';
-import { fracaoSonoForaDaFase, mediasPressao, pressaoComDesalinhamento } from './pressao-desalinhamento.js';
-import { ambienteTurnoCalor, FIM_TURNO_MIN, respostaCardioTurno, TURNOS_CALOR } from './turno-calor.js?v=2';
+import { ajustarPressaoDaRotina, atualizarCargaSono, desafioSonoPersistente, fracaoSonoForaDaFase, mediasPressao, variabilidadeInicioSono } from './pressao-desalinhamento.js?v=2';
+import { ambienteTurnoCalor, FIM_TURNO_MIN, respostaCardioTurno, TURNOS_CALOR } from './turno-calor.js?v=3';
 
 export const ESCALAS_CALOR = Object.freeze({ diurna: 'Diurna fixa', noturna: 'Noturna fixa', alternada: 'Alternada' });
 export const DIAS_ESCALA_CALOR = 28;
@@ -56,6 +56,8 @@ export function simularEscalaCalor(escala, { dias = DIAS_ESCALA_CALOR, encurtarS
   const resultado = [];
   let estado, faseH = 0, aclimatacao = INICIAL_ACLIMATACAO, pressaoSono = 0.5, vigiliaMin = 0;
   const saldos = [];
+  const iniciosSono = [];
+  let cargaSono = 0;
   const fatorSono = Math.exp(-1 / (60 * P.pressaoSono.tauQuedaH.valor));
   const fatorVigilia = Math.exp(-1 / (60 * P.pressaoSono.tauSubidaH.valor));
   for (let indice = 0; indice < dias; indice++) {
@@ -70,20 +72,16 @@ export function simularEscalaCalor(escala, { dias = DIAS_ESCALA_CALOR, encurtarS
     const sono = [horaCivilDaEscala(inicioSono), horaCivilDaEscala(fimSono)];
     const fasePorHorario = Array.from({ length: DIA + 1 }, (_, min) => faseEm((min + DIA - ORIGEM) % DIA));
     const repouso = simularCardiovascular({ sono, perfilFase: { passoMin: 1, pontos: fasePorHorario } });
-    const resposta = respostaCardioTurno((min) => pressaoComDesalinhamento(repouso[horaCivilDaEscala(min)], foraDaFase));
+    const pressaoAjustada = ajustarPressaoDaRotina(repouso, foraDaFase, cargaSono);
+    const resposta = respostaCardioTurno((min) => pressaoAjustada[horaCivilDaEscala(min)], aclimatacao);
     const ateFimTrabalho = inicioTrabalho === null ? 0 : inicioTrabalho + FIM_TURNO_MIN;
     const emTurno = (min) => inicioTrabalho !== null && min >= inicioTrabalho && min < ateFimTrabalho;
-    let ultimoEsforcoMin = -Infinity;
     const integrar = calcularIntervaloCalor({ duracaoMin: DIA, estadoInicial: estado, bebidas: bebidasDoDia(plano),
       ambienteNoMinuto(min) {
         if (emTurno(min)) return { ...ambienteTurnoCalor(min - inicioTrabalho), aclimatacao };
         return { temperatura: dormeEm(min) ? 22 : 24, umidade: 50, esforco: 0 };
       },
-      basalNoMinuto(min, clima) {
-        const basal = resposta(min, clima);
-        if (clima.esforco) ultimoEsforcoMin = min;
-        return { ...basal, fc: basal.fc - ajusteCardiacoNoCalor(aclimatacao, min - ultimoEsforcoMin) };
-      },
+      basalNoMinuto: resposta,
     });
     const minutos = integrar.pontos.slice(0, DIA);
     let vigiliaMax = 0;
@@ -108,10 +106,15 @@ export function simularEscalaCalor(escala, { dias = DIAS_ESCALA_CALOR, encurtarS
     resultado.push({ dia: indice + 1, plano, ...mediasPressao(minutos), faseH: faseFinal,
       sonoForaDaFaseH: foraDaFase * duracaoSono / 60,
       dividaSono7dH: Math.max(0, saldos.slice(-7).reduce((soma, saldo) => soma + saldo, 0)),
-      indiceAclima: aclimatacao.cardiovascular * 100, minutosQuentes: integrar.minutosQuentes,
+      indiceAclima: aclimatacao.cardiovascular * 100, indiceSuorAclima: aclimatacao.suor * 100,
+      cargaSono: cargaSono * 100, minutosQuentes: integrar.minutosQuentes,
       osmInicial: inicio.osmolalidade, osmFinal: fim.osmolalidade, osmPreTurno: preTurno?.osmolalidade ?? null,
       osmPosTurno: posTurno?.osmolalidade ?? null, pressaoSonoInicio: inicioTrabalho === null ? null : detalhe[inicioTrabalho / PASSO_LEITURA_MIN].pressaoSono,
       aguaL: fim.aguaMl / 1000, suorL: fim.suor, picoTemperaturaC, vigiliaMaxH: vigiliaMax / 60, detalhe });
+    // O efeito persistente do dia só entra nos cálculos a partir do dia seguinte.
+    iniciosSono.push(inicioSono / 60);
+    if (iniciosSono.length > 7) iniciosSono.shift();
+    cargaSono = atualizarCargaSono(cargaSono, desafioSonoPersistente(foraDaFase, variabilidadeInicioSono(iniciosSono)));
     estado = integrar.estadoFinal;
     aclimatacao = atualizarAclimatacao(aclimatacao, integrar.minutosQuentes);
     faseH = faseFinal;

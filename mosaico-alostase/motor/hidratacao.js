@@ -58,13 +58,16 @@ export function passoHidrico(estado, entrada, dtMin, excrecao = perdaBasal()) {
 }
 
 export function acoplarCirculacao(basal, plasmaL, intensidade, angiotensinaII = 100, { plasmaReferenciaL = PERFIL_HIDRICO.plasmaL,
-  vsReferencia = 72 + 60 * intensidade, cargaTermica = 0 } = {}) {
+  vsReferencia = 72 + 60 * intensidade, cargaTermica = 0,
+  deficitAguaPct = 0, ganhoDeficitAguaVS = 0, potenciaCompensacaoFC = 0.7 } = {}) {
   // Ganhos didáticos. A resposta usa o volume plasmático como aproximação do enchimento.
   const razaoPlasma = plasmaL / plasmaReferenciaL;
   // A carga térmica resume o efeito do calor sobre enchimento e frequência, com ganho didático.
-  const fatorVS = razaoPlasma ** 0.85 * Math.max(0.7, 1 - 0.065 * cargaTermica);
+  // No ensaio de ciclismo, perdas maiores de água reduzem adicionalmente o enchimento efetivo.
+  const fatorAgua = Math.max(0.7, 1 - ganhoDeficitAguaVS * Math.max(0, deficitAguaPct - 1.6));
+  const fatorVS = razaoPlasma ** 0.85 * Math.max(0.7, 1 - 0.065 * cargaTermica) * fatorAgua;
   const volumeSistolico = vsReferencia * fatorVS;
-  const fc = basal.fc * fatorVS ** -0.7 + 1.5 * cargaTermica;
+  const fc = basal.fc * fatorVS ** -potenciaCompensacaoFC + 1.5 * cargaTermica;
   const debito = fc * volumeSistolico / 1000;
   const debitoReferencia = basal.fc * vsReferencia / 1000;
   // O sinal do passo anterior altera o tônus no passo atual. Ganho limitado e didático.

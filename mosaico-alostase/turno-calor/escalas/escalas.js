@@ -1,5 +1,5 @@
-import { ESCALAS_CALOR, horaCivilDaEscala, simularEscalaCalor, PASSO_LEITURA_MIN } from '../../motor/escala-calor.js';
-import { conferirEscalaComMorris, conferirEscalaComShafer } from '../../motor/conferencia-escala.js';
+import { ESCALAS_CALOR, horaCivilDaEscala, simularEscalaCalor, PASSO_LEITURA_MIN } from '../../motor/escala-calor.js?v=2';
+import { conferirEscalaComMorris, conferirEscalaComShafer } from '../../motor/conferencia-escala.js?v=2';
 import { desenharSerie, indiceNaSerie } from '../../hidratacao/grafico.js?v=3';
 
 const el = (id) => document.getElementById(id);
@@ -9,6 +9,8 @@ const diaria = [
   ['quedaPasPct', 'Queda sistólica durante o sono', '%', 1],
   ['osmInicial', 'Osmolalidade às 08:00', 'mOsm/kg', 1],
   ['indiceAclima', 'Aclimatação cardiovascular', '%', 0],
+  ['indiceSuorAclima', 'Aclimatação da sudorese', '%', 0],
+  ['cargaSono', 'Carga persistente de desalinhamento', '%', 0],
   ['faseH', 'Atraso do relógio biológico', 'h', 1],
   ['sonoForaDaFaseH', 'Sono fora da noite biológica', 'h', 1],
   ['dividaSono7dH', 'Dívida de sono em sete dias', 'h', 1],
@@ -26,7 +28,7 @@ const horaria = [
   ['pressaoSono', 'Pressão de sono (0 a 1)', '', 2],
   ['renina', 'Índice de renina (basal 100)', '', 0],
 ];
-const numero = (x, casas = 1, sinal = false) => x.toLocaleString('pt-BR', {
+const numero = (x, casas = 1, sinal = false) => (Math.abs(x) < 0.5 * 10 ** (-casas) ? 0 : x).toLocaleString('pt-BR', {
   minimumFractionDigits: casas, maximumFractionDigits: casas, signDisplay: sinal ? 'exceptZero' : 'auto',
 });
 const medicao = (v, unidade, casas = 1) => v === null ? '—' : `${numero(v, casas)} ${unidade}`.trim();
@@ -105,8 +107,8 @@ function atualizarComparacao() {
 }
 
 function tabelaEstudos() {
-  el('morris').innerHTML = conferirEscalaComMorris().map(({ nome, estudo, motor, ancora }) =>
-    linha(nome + (ancora ? ' †' : ''), [numero(estudo, 1, true), numero(motor, 1, true), numero(motor - estudo, 1, true)])).join('');
+  el('morris').innerHTML = conferirEscalaComMorris().map(({ nome, estudo, motor }) =>
+    linha(nome, [numero(estudo, 1, true), numero(motor, 1, true), numero(motor - estudo, 1, true)])).join('');
   el('shafer').innerHTML = conferirEscalaComShafer().map(({ nome, estudo, dp, motor }) =>
     linha(nome, [`${numero(estudo)} ± ${numero(dp)}%`, medicao(motor, '%'), `${numero(motor - estudo, 1, true)} p.p.`])).join('');
 }

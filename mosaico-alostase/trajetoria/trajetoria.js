@@ -1,5 +1,5 @@
-import { agruparTrajetoria, HORIZONTES, PERFIS_TRAJETORIA, simularTrajetoria } from '../motor/trajetoria.js?v=6';
-import { PASSO_INTEGRADO } from '../motor/bancada-hidrica.js?v=5';
+import { agruparTrajetoria, HORIZONTES, PERFIS_TRAJETORIA, simularTrajetoria } from '../motor/trajetoria.js?v=7';
+import { PASSO_INTEGRADO } from '../motor/bancada-hidrica.js?v=6';
 import { desenharSerie, indiceNaSerie } from '../hidratacao/grafico.js?v=3';
 import { criarEditor } from './editor.js?v=3';
 import { DIAS_AGENDA } from '../motor/agenda.js?v=3';

@@ -1,4 +1,4 @@
-import { simularCalorIntegrado } from './calor-integrado.js?v=2';
+import { simularCalorIntegrado } from './calor-integrado.js?v=3';
 
 // Perda de massa da publicação original. FC e VS aos 110 min e temperatura retal aos 120 min
 // são leituras aproximadas da figura 1-5 de Funnell (2020).
@@ -17,7 +17,9 @@ const ambiente = Object.freeze({
     fracaoTrabalhoExterno: 0.23, partidaSuor: 1.42, sensibilidadeSuor: 0.63, ganhoEvap: 1.788,
     ganhoSeco: 1.312, ganhoDeficitCutaneo: 3.993, ganhoOsmSudorese: 0.041, maxSuor: 2.3 },
 });
-const basal = Object.freeze({ fc: 135, sis: 168, dia: 76, pam: (168 + 2 * 76) / 3, vsReferencia: 139 });
+// Ajuste cardiovascular nos extremos de reposição. As condições intermediárias conferem a resposta.
+const parametrosCirculacao = Object.freeze({ ganhoDeficitAguaVS: 0.047, potenciaCompensacaoFC: 0.63 });
+const basal = Object.freeze({ fc: 136.5, sis: 168, dia: 76, pam: (168 + 2 * 76) / 3, vsReferencia: 139 });
 
 export function simularProtocoloCalorHidrico(reposicaoPct) {
   const ref = REFERENCIAS_CICLISMO.find((r) => r.reposicaoPct === reposicaoPct);
@@ -25,7 +27,7 @@ export function simularProtocoloCalorHidrico(reposicaoPct) {
   // Fracionamento uniforme modelado, com início após 15 minutos.
   const bebidas = Array.from({ length: 7 }, (_, i) => [(i + 1) * 15, ref.ml / 7]);
   const pontos = simularCalorIntegrado({ duracaoMin: 120, ambienteNoMinuto: () => ambiente,
-    basalNoMinuto: () => basal, bebidas, massaKg: MASSA, inicialTermico: { centralC: 37.15, peleC: 33.5 } });
+    basalNoMinuto: () => basal, bebidas, massaKg: MASSA, parametrosCirculacao, inicialTermico: { centralC: 37.15, peleC: 33.5 } });
   return { pontos, perdaMassaPct: pontos[120].perdaMassaPct, centralC: pontos[120].centralC,
     fc: pontos[110].fc, volumeSistolico: pontos[110].volumeSistolico, debito: pontos[110].debito };
 }
