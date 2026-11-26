@@ -56,12 +56,12 @@ const BASE = { sis: calibrar(P.pressaoArterial.sistolica), dia: calibrar(P.press
  * Pressão esperada numa hora do dia, para uma pessoa normotensa.
  * @param {number} hora hora do relógio (0 a 24)
  * @param {Array} sono blocos { inicio, fim }
- * @param {object} [opc] { deslocamentoRelogioH, trabalhoNoturnoCronico }
+ * @param {object} [opc] { deslocamentoRelogioH, trabalhoNoturnoCronico, pesoSono }
  */
 export function pressaoArterial(hora, sono, opc = {}) {
   const { sistolica, diastolica, partePostura, efeitoCronicoNoturnoSistolica: es, efeitoCronicoNoturnoDiastolica: ed } = P.pressaoArterial;
   const desloc = opc.deslocamentoRelogioH || 0;
-  const w = pesoSono(hora, sono);
+  const w = opc.pesoSono ?? pesoSono(hora, sono);
   const c = formaRelogio(hora - desloc);
   const cron = opc.trabalhoNoturnoCronico ? 1 : 0;
   const f = (par, base, efeito) => base - partePostura.valor * (par.vigilia - par.sono) * w - (1 - partePostura.valor) * (par.vigilia - par.sono) * c + cron * efeito.valor;

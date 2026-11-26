@@ -16,7 +16,7 @@ export const CENARIOS_HIDRICOS = Object.freeze({
 
 export function simularHidratacao(cenario, {
   estado = hidratar(), cardio = simularCardiovascular({ sono: SONO, exercicio: SESSAO }), sessao = SESSAO,
-  bebidas = BEBIDAS_BASE, guardarPontos = true, regular,
+  bebidas = BEBIDAS_BASE, guardarPontos = true, regular, reposicaoAposSessao = true, limitarDominio = false,
 } = {}) {
   const pontos = [];
   const totais = { suorL: 0, urinaL: 0, perdaInsensivelL: 0, sodioSuorMg: 0, sodioUrinaMg: 0, aguaMl: 0, sodioMg: 0 };
@@ -26,14 +26,17 @@ export function simularHidratacao(cenario, {
     agenda.set(min, [a + agua, s + sodio]);
   }
   for (const [min, agua, sodio] of bebidas) agendar(min, agua, sodio);
-  if (sessao) agendar(sessao.inicio + sessao.duracao + cenario.bebidaDepoisMin, cenario.bebidaMl, cenario.sodioMg);
+  if (sessao && reposicaoAposSessao) agendar(sessao.inicio + sessao.duracao + cenario.bebidaDepoisMin, cenario.bebidaMl, cenario.sodioMg);
 
   let maxFC = 0, minPlasma = Infinity, maxOsm = 0, somaPA = 0, somaFC = 0;
   for (let min = 0; min < 1440; min += PASSO_INTEGRADO) {
     const [aguaMl, sodioMg] = agenda.get(min) ?? [0, 0];
     const exercicio = cardio[min].emEsforco;
-    const intensidade = exercicio ? sessao.intensidade / 100 : 0;
+    const intensidade = exercicio ? cardio[min].intensidadeAtiva ?? (sessao.intensidade / 100) : 0;
     const comp = compartimentos(estado);
+    if (limitarDominio && (comp.osmolalidade < 270 || comp.osmolalidade > 300 || comp.plasmaL < 2.5 || comp.plasmaL > 3.5)) {
+      throw new RangeError('A rotina saiu do domínio hídrico desta simulação. Confira a ingestão e o esforço.');
+    }
     const circulacao = acoplarCirculacao(cardio[min], comp.plasmaL, intensidade, estado.regulacao?.angII);
     const renal = regular?.(estado, comp, circulacao, PASSO_INTEGRADO);
     const proximo = passoHidrico(estado, {

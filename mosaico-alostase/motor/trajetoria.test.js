@@ -37,3 +37,38 @@ test('as rotinas de exercício e sono mantêm água, osmolalidade e excreção e
   assert.ok(curto.saldoSono7d > normal.saldoSono7d);
   assert.ok(curto.pressaoAoAcordar > normal.pressaoAoAcordar);
 });
+
+test('plantão e lazer passam pela madrugada sem sono e conservam a vigília até a noite seguinte', () => {
+  const controle = simularTrajetoria('regular', 2);
+  for (const id of ['plantao', 'lazer']) {
+    const caso = simularTrajetoria(id, 2, { detalharDia: 1 });
+    assert.equal(caso.leitura[0].dormindo, false);
+    assert.equal(caso.leitura[0].vigiliaContinua, 17);
+    const sete = caso.leitura.find((p) => p.min === 420);
+    assert.equal(sete.vigiliaContinua, 24);
+    assert.equal(sete.dormindo, false);
+    assert.equal(caso.dias[1].vigiliaMaxH, 40);
+    assert.equal(caso.dias[1].noitesEmClaro, 1);
+    assert.ok(caso.dias[1].pressaoAoAcordar > controle.dias[1].pressaoAoAcordar);
+  }
+});
+
+test('sono diurno interrompe a vigília e a frequência semanal só repete a noite nos dias programados', () => {
+  const caso = simularTrajetoria('plantao', 10, { detalharDia: 1, frequenciaNoturna: 'semanal', sonoDiurno: true });
+  assert.equal(caso.leitura.find((p) => p.min === 480).dormindo, true);
+  assert.equal(caso.leitura.find((p) => p.min === 720).dormindo, false);
+  assert.equal(caso.dias[1].vigiliaMaxH, 25);
+  assert.equal(caso.dias[1].sonoDiurnoH, 4);
+  assert.equal(caso.dias[8].noitesEmClaro, 1);
+  assert.equal(caso.dias[4].noitesEmClaro, 0);
+});
+
+test('o turno permanente mantém 6 h de sono diurno e aplica a mesma agenda à projeção de um ano', () => {
+  const { dias } = simularTrajetoria('turno', 365);
+  const ultimo = dias.at(-1);
+  assert.equal(ultimo.sonoDiurnoH, 6);
+  assert.equal(ultimo.trabalhoNoturnoH, 9);
+  assert.equal(dias.reduce((s, d) => s + d.trabalhoNoturnoH, 0), 3285);
+  assert.ok(Math.abs(ultimo.saldoSono7d - 15.12) < 0.00001);
+  assert.ok(ultimo.pamMedia > 60 && ultimo.pamMedia < 110);
+});

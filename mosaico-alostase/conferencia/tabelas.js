@@ -3,7 +3,7 @@ import { resumirCardiovascular, simularCardiovascular } from '../motor/cardiovas
 import { PARAMETROS_HIDRICOS } from '../motor/hidratacao.js';
 import { regularRim } from '../motor/renal.js';
 import { simularSemana } from '../motor/semana.js';
-import { simularTrajetoria } from '../motor/trajetoria.js';
+import { simularTrajetoria } from '../motor/trajetoria.js?v=2';
 
 const n = (v, casas = 1) => v.toLocaleString('pt-BR', { maximumFractionDigits: casas, minimumFractionDigits: casas });
 const pa = (p) => `${n(p.sis)} / ${n(p.dia)} mmHg`;
@@ -15,6 +15,11 @@ const tfgBasal = calor.pontos[0].renal.tfg;
 const quedaFC = simularTrajetoria('treino', 85).dias.at(-1).quedaFC;
 const restricao = simularSemana(Array(14).fill({ sono: [{ inicio: 1, fim: 7 }], refeicoes: [], jornadas: [] }));
 
+const plantao = simularTrajetoria('plantao', 2, { detalharDia: 1 });
+const diurno = simularTrajetoria('regular', 2, { detalharDia: 1 });
+const turno = simularTrajetoria('turno', 365);
+const noiteAno = turno.dias.reduce((s, p) => s + p.trabalhoNoturnoH, 0);
+
 const fontes = {
   staessen: ['Staessen · 3.476 normotensos', 'https://pubmed.ncbi.nlm.nih.gov/1826069/'],
   speed: ['Speed · amostra ativa, medida em repouso', 'https://pubmed.ncbi.nlm.nih.gov/37115739/'],
@@ -23,6 +28,11 @@ const fontes = {
   urina: ['MedlinePlus · cerca de 2 L de ingestão de líquidos', 'https://medlineplus.gov/ency/article/003425.htm'],
   tfg: ['Physiology, Glomerular Filtration Rate', 'https://www.ncbi.nlm.nih.gov/books/NBK500032/'],
   treino: ['Reimers · meta-análise de intervenções', 'https://pmc.ncbi.nlm.nih.gov/articles/PMC6306777/'],
+  privacao: ['Skorucak e colegas · privação total de sono', 'https://doi.org/10.1093/sleep/zsy078'],
+  processoS: ['Borbély e colegas · modelo de dois processos', 'https://pubmed.ncbi.nlm.nih.gov/26762182/'],
+  turno: ['Gamboa Madeira e colegas · 45 estudos', 'https://pubmed.ncbi.nlm.nih.gov/34201492/'],
+  metabolico: ['Pan e colegas · duas coortes de enfermeiras', 'https://pubmed.ncbi.nlm.nih.gov/22162955/'],
+  fase: ['Folkard · revisão da fase da melatonina', 'https://pubmed.ncbi.nlm.nih.gov/18533325/'],
   sono: ['Van Dongen · protocolo com 14 noites', 'https://pubmed.ncbi.nlm.nih.gov/12683469/'],
 };
 
@@ -44,6 +54,13 @@ const tabelas = [
   ['Semanas e meses', [
     ['FC de repouso após treino de endurance', 'Redução média de 2,7–5,8 bpm entre análises por sexo', `−${n(quedaFC, 2)} bpm após 12 semanas`, 'Comparação de magnitude. A meta-análise reúne intervenções com durações diferentes. O motor usa uma meia-vida didática.', 'treino'],
     ['Índice de vigília em excesso', 'Referência de 15,84 h de vigília, ajustada a lapsos de atenção', `${n(restricao.dividaFinal, 2)} h em 14 dias de 6 h de sono`, 'Reconstrução do índice cumulativo do protocolo. A trajetória usa uma janela de sete dias, sem extrapolar desempenho cognitivo.', 'sono'],
+  ]],
+  ['Noite em claro e turno permanente', [
+    ['Vigília contínua', 'Cerca de 40 h de vigília sustentada no protocolo de privação total', `${n(plantao.dias[1].vigiliaMaxH, 0)} h no plantão sem sono diurno`, 'Comparação da duração do protocolo. Os horários do cenário determinam este valor.', 'privacao'],
+    ['Pressão de sono às 07h', 'O Processo S cresce na vigília e cai no sono', `${n(diurno.dias[1].pressaoAoAcordar, 3)} com sono / ${n(plantao.dias[1].pressaoAoAcordar, 3)} após plantão`, 'Conferência da direção. A escala de 0 a 1 pertence ao motor.', 'processoS'],
+    ['Pressão arterial em trabalhadores noturnos permanentes', '+2,52 mmHg sistólica (IC95% 0,75–4,29) e +1,76 mmHg diastólica (0,41–3,12) entre grupos', `${n(noiteAno, 0)} h de trabalho na janela 22h–07h em 365 dias`, 'O motor calcula a exposição. A diferença entre grupos é referência externa, sem ajuste individual nem prazo de aparecimento.', 'turno'],
+    ['Diabetes tipo 2 e turno noturno rotativo', 'Após 20 anos ou mais de exposição em duas coortes de enfermeiras, HR 1,24 (IC95% 1,13–1,37) após ajuste pelo IMC', 'O motor calcula a glicemia ligada aos horários e às refeições', 'O risco ao longo de décadas vem das coortes e pertence ao contexto clínico. Esse resultado diz respeito a turnos rotativos.', 'metabolico'],
+    ['Ajuste do relógio biológico ao turno', 'A adaptação da fase da melatonina variou entre trabalhadores', 'Fase de referência fixa; 6 h/dia de sono diurno no cenário pronto', 'Hipótese didática da rotina. O motor não estima a adaptação individual.', 'fase'],
   ]],
 ];
 
