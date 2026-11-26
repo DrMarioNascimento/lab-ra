@@ -38,7 +38,7 @@ function loopFinalTurma(respostas) {
 const LOOP_LINHA = [
   {id:'troca', hora:'Dias antes', ic:'V13', txt:'A peça principal sai para "limpeza" e volta no mesmo dia'},
   {id:'motivo', hora:'Dias antes', ic:'P01', txt:'Se a peça sumir, o seguro paga o patrocinador'},
-  {id:'copia', hora:'Hoje', ic:'V11', txt:'A peça da Galeria é cópia: verniz novo, peso errado'},
+  {id:'copia', hora:'Hoje', ic:'V11', txt:'A peça da Galeria é cópia: verniz novo, peso e escrita errados'},
   {id:'entrada', hora:'Hoje', ic:'DESC_B', txt:'O do patrocínio assina a entrada à tarde e volta de noite pela porta de serviço'},
   {id:'teo', hora:'Antes de 0:00', ic:'D10', txt:'O Téo confronta quem trocou a peça e é empurrado'},
   {id:'raio', hora:'Apagão', ic:'Q01', txt:'O raio atinge o Pátio e a luz apaga'},

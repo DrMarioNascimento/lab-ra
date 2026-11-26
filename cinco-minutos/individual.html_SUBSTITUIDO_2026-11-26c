@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#080e19">
+<link rel="icon" type="image/webp" href="museu/icones/T01.webp"><title>Mosaico Loop · Jogo sem turma · LAB-RA</title>
+<link rel="stylesheet" href="style.css?v=25">
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.1.0/model-viewer.min.js"></script>
+</head>
+<body>
+<main id="app">
+<header class="mast"><a class="back" href="index.html">Voltar</a><span class="mast-label">Mosaico <span>Loop</span></span><button class="text-button coop-shortcut hidden" id="coopShortcut" data-coop type="button">Jogar em grupo</button><button class="text-button" id="helpOpen" type="button">Como jogar</button></header>
+<aside id="coopBar" class="coop-bar hidden" aria-label="Sala cooperativa">
+  <span id="coopBarText" role="status"></span>
+  <button class="text-button" id="coopControls" type="button">Sala e convite</button>
+</aside>
+<section id="start" class="screen hero">
+  <div class="hero-copy"><div class="eyebrow"><span></span> UM MISTÉRIO A CADA VOLTA</div><p class="pretitle">Noite de véspera no museu.</p><h1>Mosaico Loop</h1><p class="intro">Cinco minutos. A mesma noite. O museu recomeça. Você não.</p><p class="papel-frase">Nesta atividade você vive o papel de quem lembra das voltas. O museu esquece. Você e o seu caderno, não.</p><p class="support">Ande pelas salas, guarde pistas no caderno e conserte a máquina antes que a quinta volta acabe.</p>
+  <div class="hero-actions"><button class="btn primary" id="startButton"><span class="ic3d sm" aria-hidden="true"><img src="museu/icones/T01.webp" alt=""></span>Jogar sem turma</button><button class="btn secondary" id="coopOpen" data-coop type="button"><span class="ic3d sm" aria-hidden="true"><img src="museu/icones/ui/dupla.webp" alt=""></span>Jogar em grupo</button><a class="btn secondary" href="museu/torre/?loop=1"><span class="ic3d sm" aria-hidden="true"><img src="museu/icones/V11.webp" alt=""></span>Ver o museu em 3D</a><button class="btn secondary" id="howButton"><span class="ic3d sm" aria-hidden="true"><img src="museu/icones/ui/caderno.webp" alt=""></span>Ver como funciona</button></div><div class="fine"><span>5 voltas</span><span>1 máquina travada</span><span>1 noite para entender</span></div></div>
+  <div class="hero-art" aria-hidden="true"><div class="halo"></div><div class="clock"><div class="clock-inner"><span class="roman r12">XII</span><span class="roman r3">III</span><span class="roman r6">VI</span><span class="roman r9">IX</span><span class="hand hour"></span><span class="hand minute"></span><span class="pin"></span></div></div><div class="plaque">5 : 00 <i>O TEMPO RECOMEÇA</i></div><div class="floor"></div></div>
+</section>
+<section id="game" class="screen hidden">
+  <div class="game-head"><div><p class="eyebrow small"><span></span> MUSEU · INVESTIGAÇÃO</p><h2 id="phaseTitle">Escolha onde investigar</h2><p id="phaseDescription">Cada sala mostra um pedaço da mesma noite.</p></div><div class="clockbox"><span id="loopLabel">VOLTA 1 DE 5</span><strong id="timer">05:00</strong><small id="clockStatus">aguardando escolha</small><small class="cb-min"><span class="cb-rot">Minuto da volta · </span><time id="fictionTime">0:00</time></small></div></div>
+  <p id="loopBrief" class="note hidden">Última volta. Agora o conserto vale. Abra a Máquina e veja o que falta.</p>
+  <p id="museumSignal" class="note museum-signal" role="status"></p>
+  <div class="game-grid"><section class="board"><div class="section-heading"><div><p class="kicker" id="boardKicker">MAPA DO MUSEU</p><h3 id="boardTitle">Escolha uma sala</h3></div><div class="board-tools"><button class="text-button hidden" id="roomMapButton" type="button" aria-controls="roomGrid" aria-expanded="false">Mapa</button><button class="text-button journal-trigger" id="openJournal">Caderno <span id="countBadge">0</span></button></div></div><div id="routeChoices" class="route-choices hidden"></div><div id="roomGrid" class="rooms"></div><div id="roomPanel" class="room-panel hidden"></div><div class="board-foot"><p id="statusText">Escolha por onde começar.</p><button class="btn primary hidden" id="coopBegin" type="button">Iniciar relógio</button><button class="btn secondary hidden" id="endLoop">Encerrar volta</button></div></section>
+  <aside class="side"><div class="side-top"><p class="kicker">SEU CADERNO</p><h3>O que você já sabe?</h3><p>O que você anota no caderno fica com você quando o tempo volta.</p></div><div id="journalPreview" class="journal-preview"></div><button class="btn secondary wide" id="openJournalSide">Abrir meu caderno</button><div class="side-sep"></div><p class="kicker">SUA ANOTAÇÃO</p><label class="sr-only" for="notes">Seus palpites</label><textarea id="notes" placeholder="Um palpite, uma dúvida, um detalhe..."></textarea><p class="muted">Sua anotação fica guardada neste aparelho até o fim da partida.</p></aside></div>
+</section>
+<section id="between" class="screen hidden narrow"><p class="eyebrow" id="betweenEyebrow"><span></span> O TEMPO RETORNOU</p><h2 id="betweenTitle">Você se lembra.</h2><p class="large" id="betweenStory">As portas fecharam de novo. Tudo voltou para o lugar. Mas você lembra do que achou.</p><div class="between-stats"><div class="bs-ficha"><span class="ic3d" aria-hidden="true"><img src="museu/icones/ui/caderno.webp" alt=""></span><div><strong id="betweenCount">0</strong><span>pistas no caderno</span></div></div><div class="bs-ficha"><span class="ic3d" aria-hidden="true"><img src="museu/icones/R02.webp" alt=""></span><div><strong id="betweenLoop">1 / 5</strong><span>voltas concluídas</span><i class="bs-voltas" id="betweenDots" aria-hidden="true"><b></b><b></b><b></b><b></b><b></b></i></div></div></div><div id="betweenHint" class="note bs-tarefas">A próxima sala pode confirmar ou mudar o seu palpite.</div><p id="betweenProgress" class="muted"></p><div class="actions"><button class="btn primary" id="nextLoop">Escolher a próxima sala</button><button class="btn secondary" id="betweenJournal">Abrir meu caderno</button><button class="btn secondary hidden" id="betweenShare" type="button">Passar pista</button></div></section>
+<section id="final" class="screen hidden narrow"><p class="eyebrow"><span></span> ÚLTIMA DECISÃO</p><div class="final-topo"><span class="ic3d final-arte" aria-hidden="true"><img src="museu/icones/ui/caderno.webp" alt=""></span><div><h2>Reconstrua a noite.</h2><p class="large">Veja até onde a sua investigação chegou.</p></div></div><div id="finalResumo"></div><details id="archivePanel" class="archive-panel hidden"><summary>Ver o arquivo</summary><p>O arquivo tem registros pela metade. Compare os trechos e deixe em aberto o que você ainda não sabe.</p><p id="archiveStatus" role="status"></p><div id="archiveSections"></div></details><form id="answerForm"><details id="reflectionForm"><summary>Responder às perguntas da investigação</summary><div id="answerFields"></div></details><div class="actions"><button class="btn primary" type="submit">Apresentar conclusão</button><button class="btn secondary" type="button" id="finalJournal">Abrir meu caderno</button></div></form></section>
+<section id="result" class="screen hidden narrow"><p class="eyebrow"><span></span> REVELAÇÃO</p><h2>A noite, reconstruída.</h2><div id="resultBody"></div><div class="actions"><button class="btn primary" id="replay">Jogar outra vez</button><a class="btn secondary" href="index.html">Voltar à entrada</a></div><p class="muted">Outra partida pode trazer outro defeito na máquina.</p></section>
+</main>
+<dialog id="journalDialog"><div class="dialog-head"><div><p class="kicker">SUA INVESTIGAÇÃO</p><h2><span class="ic3d" aria-hidden="true"><img src="museu/icones/ui/caderno.webp" alt=""></span>Meu caderno</h2></div><button class="close" data-close="journalDialog" aria-label="Fechar caderno">×</button></div><div id="journalList"></div><div class="helpbox"><h3>Travou?</h3><p>Você pode pedir até 3 dicas. Pedir dica não tira nada de você.</p><button class="btn secondary" id="getHint">Pedir dica</button><div id="hints"></div></div></dialog>
+<dialog id="helpDialog"><div class="dialog-head"><div><p class="kicker">ANTES DE COMEÇAR</p><h2>Cinco minutos. Depois, tudo de novo.</h2></div><button class="close" data-close="helpDialog" aria-label="Fechar instruções">×</button></div><div class="help-content"><p id="papelFrase"><strong>Nesta atividade você vive o papel de quem lembra das voltas. O museu esquece. Você e o seu caderno, não.</strong></p><div id="tour"></div><details class="ritmo"><summary>Ritmo da partida</summary><label class="sr-only" for="speed">Ritmo da partida</label><select id="speed"><option value="300">Completo · 5 minutos por volta</option><option value="30">Teste rápido · 30 segundos por volta</option></select></details></div><div class="help-pe"><button class="btn primary" data-close="helpDialog">Entendi</button></div></dialog>
+<dialog id="coopDialog">
+  <div class="dialog-head">
+    <div><p class="kicker">INVESTIGAÇÃO COOPERATIVA</p><h2>Sala do grupo</h2></div>
+    <button class="close" data-close="coopDialog" aria-label="Fechar sala" type="button">×</button>
+  </div>
+  <div id="coopEntry" class="coop-content">
+    <p>De 2 a 6 participantes. Cada pessoa anda pelas salas com o próprio caderno. Conversem entre as voltas para reconstruir a noite.</p>
+    <label for="coopName">Apelido</label>
+    <input id="coopName" maxlength="24" autocomplete="off" placeholder="Seu apelido">
+    <form id="coopJoinForm">
+      <label for="coopCodeInput">Código do convite</label>
+      <input id="coopCodeInput" maxlength="16" autocomplete="off" autocapitalize="characters" spellcheck="false">
+      <button class="btn primary" type="submit">Entrar com código</button>
+    </form>
+    <label for="coopSpeed">Ritmo da sala</label>
+    <select id="coopSpeed"><option value="300">Completo · 5 minutos por volta</option><option value="30">Teste rápido · 30 segundos por volta</option></select>
+    <button class="btn secondary" id="coopCreate" type="button">Criar sala</button>
+  </div>
+  <div id="coopLobby" class="coop-content hidden">
+    <div><span class="kicker">CÓDIGO DA SALA</span><strong id="coopCode" class="coop-code"></strong></div>
+    <button class="btn secondary" id="coopCopy" type="button">Copiar convite</button>
+    <input class="hidden" id="coopLink" aria-label="Link do convite" readonly>
+    <ul id="coopMembers"></ul>
+    <p id="coopLobbyHint"></p>
+    <div class="actions"><button class="btn primary hidden" id="coopStart" type="button">Começar investigação</button><button class="btn secondary" id="coopLeave" type="button">Voltar ao início</button></div>
+  </div>
+  <p id="coopStatus" role="status" aria-live="polite"></p>
+</dialog>
+<div id="toast" class="toast" role="status"></div>
+<script src="ritmo.js?v=9"></script><script src="noites.js?v=1"></script><script src="loop-central-dados.js?v=36"></script><script src="loop-central.js?v=41"></script><script src="noites-motor.js?v=19"></script><script src="game.js?v=49"></script>
+<script type="module" src="coop.mjs?v=10"></script>
+</body></html>

@@ -101,7 +101,7 @@
    "peca": "M03",
    "andar": "Térreo",
    "ordem": 7,
-   "texto": "Ferramentas, um armário travado e a cadeira vazia do Téo."
+   "texto": "Ferramentas e um armário travado. Num canto, longe da bancada, a cadeira vazia do Téo."
   },
   "eletrica": {
    "nome": "Oficina elétrica",
@@ -117,7 +117,7 @@
    "peca": "Q01",
    "andar": "Térreo",
    "ordem": 9,
-   "texto": "Chuva fina na pedra molhada. O Quadro externo, fechado a cadeado, fica embaixo do para-raios."
+   "texto": "Dá para ouvir a chuva fina. O Quadro externo, fechado a cadeado, fica embaixo do para-raios."
   },
   "prototipo": {
    "nome": "Subsolo · Câmara do tempo",

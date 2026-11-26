@@ -154,12 +154,12 @@ const LOOP_SALAS = {
 };
 // Descrição de cada sala no Loop (uma linha, do mundo da história).
 const LOOP_DESC = {
- prototipo:'A Câmara do tempo zumbe no meio da sala. Ligada, e ninguém consegue desligar.', patio:'Chuva fina na pedra molhada. O Quadro externo, fechado a cadeado, fica embaixo do para-raios.',
+ prototipo:'A Câmara do tempo zumbe no meio da sala. Ligada, e ninguém consegue desligar.', patio:'Dá para ouvir a chuva fina. O Quadro externo, fechado a cadeado, fica embaixo do para-raios.',
  eletrica:'O gerador ronca baixo entre fios, fusíveis e luvas.', relogios:'Uma parede de relógios, cada um no seu passo.',
  seguranca:'Monitores, um cofre pequeno e o café do Braga.', recepcao:'O livro de visitas, a roleta e um telefone que toca.',
  conservacao:'Diário do acervo, laudos e registros em cima da mesa.', atelie:'A bancada da Ivone e o manual da Câmara.',
  deposito:'Uma estante de caixas etiquetadas e uma mancha vermelha no chão.', galeria:'A peça principal na base. Aurélio não sai da frente dela.',
- manutencao:'Ferramentas, um armário travado e a cadeira vazia do Téo.', corredor:'A cafeteira, o mural e a porta de serviço.',
+ manutencao:'Ferramentas e um armário travado. Num canto, longe da bancada, a cadeira vazia do Téo.', corredor:'A cafeteira, o mural e a porta de serviço.',
  limpeza:'O carrinho da equipe, o balde do esfregão e Seu Dirceu de pano na mão.', sons:'Um rádio, um gravador e a música de elevador.',
  fotografia:'Uma câmera antiga que dispara quando quer.'
 };

@@ -1,5 +1,5 @@
 {
- "versao": "v4 revisão 11 (26/11/2026)",
+ "versao": "v4 revisão 13 (26/11/2026)",
  "noite": "v4",
  "causa_sorteada": "B_potencia",
  "causas_possiveis": [
@@ -2678,7 +2678,7 @@
   {
    "id": "chao_peca",
    "sala": "prototipo",
-   "texto": "A peça verdadeira está no chão do Subsolo, do lado do apoio, exatamente onde foi deixada. O museu esqueceu. O chão guardou.",
+   "texto": "A peça verdadeira está no chão do Subsolo, do lado do apoio, exatamente onde foi deixada.",
    "volta_min": 2,
    "volta_max": 5,
    "segundo_min": 0,
@@ -3418,7 +3418,7 @@
    "custo": 1,
    "porque": "A porta do Quadro externo está fechada, presa pelo cadeado da trava. Sem a chavinha, ela não abre: pela fresta da borda você só espia.",
    "textoPorCausa": {
-    "D_fusivel": "Na chave do cabo da Câmara, um segundo cadeado, amarelo, pendurado aberto."
+    "D_fusivel": "Na mesma chave, um segundo cadeado, amarelo, pendurado aberto."
    }
   },
   {
@@ -4203,7 +4203,7 @@
    },
    "id": "insc_verdadeira",
    "sala": "deposito",
-   "texto": "Na testa da peça verdadeira, os mesmos seis símbolos, gastos pelo tempo. Aqui nenhum está virado. Com a tábua, a frase fecha: \"O rosto de pedra vê a noite e guarda o tempo.\" Vale pôr ao lado da máscara da Galeria.",
+   "texto": "Na testa da peça verdadeira, os mesmos seis símbolos, gastos pelo tempo. Aqui nenhum está virado. Com a tábua, a frase fecha: \"O rosto de pedra vê a noite e guarda o tempo.\"",
    "glifos": "verdadeira",
    "essencial": false,
    "tipo": "clima",
@@ -5615,7 +5615,7 @@
   {
    "id": "coop_copia_ok",
    "sala": "galeria",
-   "texto": "Vocês acham 3 diferenças: o lado da rachadura, a cor da pedra e os riscos do tempo, que a peça exposta não tem.",
+   "texto": "Vocês acham 3 diferenças: o lado da rachadura, a cor da pedra e o desgaste nas bordas, que a peça exposta não tem.",
    "volta_min": 2,
    "volta_max": 5,
    "segundo_min": 0,
@@ -5649,7 +5649,7 @@
   {
    "id": "foto_solo",
    "sala": "galeria",
-   "texto": "Com a foto do catálogo anotada no caderno, você compara sem ajuda, indo e voltando com o olho: a rachadura está do outro lado e a pedra, fosca e riscada na foto, aqui brilha lisa.",
+   "texto": "Com a foto do catálogo anotada no caderno, você compara sem ajuda, indo e voltando com o olho: a rachadura está do outro lado e as bordas, gastas na foto, aqui estão inteiras, sem desgaste nenhum.",
    "volta_min": 2,
    "volta_max": 5,
    "segundo_min": 0,
@@ -7257,7 +7257,7 @@
   {
    "id": "a_cheia_4",
    "sala": "patio",
-   "texto": "Embaixo do medidor redondo, a chavinha do ponteiro de potência está ligada. O ponteiro pequeno vai até o fim: a força está chegando na Câmara.",
+   "texto": "Embaixo do medidor redondo, o interruptor do ponteiro de potência está ligado. O ponteiro pequeno vai até o fim: a força está chegando na Câmara.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -7287,7 +7287,7 @@
   {
    "id": "fh_med_pot_bce",
    "sala": "patio",
-   "texto": "Embaixo do medidor redondo, a chavinha do ponteiro de potência está desligada. Colado nela, um papel: \"aferir depois da festa\".",
+   "texto": "Embaixo do medidor redondo, o interruptor do ponteiro de potência está desligado. Colado nele, um papel: \"aferir depois da festa\".",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -7316,7 +7316,7 @@
   {
    "id": "fh_med_pot_d",
    "sala": "patio",
-   "texto": "Embaixo do medidor redondo, a chavinha do ponteiro de potência está desligada. Colado nela, um papel: \"aferir depois da festa\".",
+   "texto": "Embaixo do medidor redondo, o interruptor do ponteiro de potência está desligado. Colado nele, um papel: \"aferir depois da festa\".",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -8423,7 +8423,7 @@
   {
    "id": "mancha_2",
    "sala": "deposito",
-   "texto": "Você mede a mancha com o pé: a tinta escorre até a mesma tábua e para. Ainda molhada, como se tivesse acabado de cair. O museu não guardou nada.",
+   "texto": "Você mede a mancha com o pé: a tinta escorre até a mesma tábua e para. Ainda molhada, como se tivesse acabado de cair.",
    "volta_min": 2,
    "volta_max": 5,
    "segundo_min": 0,
@@ -9815,8 +9815,8 @@
      "titulo": "A peça exposta",
      "itens": [
       "rachadura do lado direito",
-      "pedra clara, brilhando",
-      "superfície lisa, sem um risco"
+      "pedra cinza, mais clara",
+      "bordas inteiras, sem desgaste"
      ]
     },
     "B": {

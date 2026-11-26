@@ -1,0 +1,131 @@
+{
+ "nota": "Gerado de LOOP_SALAS e LOOP_DESC (game.js). Usado por museu/torre/?loop=1. Se mudar sala, andar ou peça no jogo, gere de novo.",
+ "andares": [
+  "Subsolo",
+  "Térreo",
+  "1º andar",
+  "2º andar"
+ ],
+ "salas": {
+  "galeria": {
+   "nome": "Galeria especial",
+   "sub": "A peça principal na base",
+   "peca": "GAL_B",
+   "andar": "2º andar",
+   "ordem": 1,
+   "texto": "A peça principal na base. Aurélio não sai da frente dela."
+  },
+  "conservacao": {
+   "nome": "Sala de conservação",
+   "sub": "Registros e laudos do acervo",
+   "peca": "I01",
+   "andar": "1º andar",
+   "ordem": 1,
+   "texto": "Diário do acervo, laudos e registros em cima da mesa."
+  },
+  "sons": {
+   "nome": "Sala dos sons",
+   "sub": "Rádio, gravador e alto-falante",
+   "peca": "N17",
+   "andar": "1º andar",
+   "ordem": 2,
+   "texto": "Um rádio, um gravador e a música de elevador."
+  },
+  "fotografia": {
+   "nome": "Sala da fotografia",
+   "sub": "Câmera antiga, varal e álbum",
+   "peca": "N18",
+   "andar": "1º andar",
+   "ordem": 3,
+   "texto": "Uma câmera antiga que dispara quando quer."
+  },
+  "relogios": {
+   "nome": "Sala dos relógios",
+   "sub": "Relógios que param na queda de luz",
+   "peca": "REL_B",
+   "andar": "1º andar",
+   "ordem": 4,
+   "texto": "Uma parede de relógios, cada um no seu passo."
+  },
+  "recepcao": {
+   "nome": "Recepção",
+   "sub": "Livro de visitas e roleta",
+   "peca": "P01",
+   "andar": "Térreo",
+   "ordem": 1,
+   "texto": "O livro de visitas, a roleta e um telefone que toca."
+  },
+  "seguranca": {
+   "nome": "Central de monitoramento",
+   "sub": "Câmeras e crachás",
+   "peca": "S01",
+   "andar": "Térreo",
+   "ordem": 2,
+   "texto": "Monitores, um cofre pequeno e o café do Braga."
+  },
+  "corredor": {
+   "nome": "Área de descanso",
+   "sub": "Porta de serviço, mural e cafeteira",
+   "peca": "DESC_B",
+   "andar": "Térreo",
+   "ordem": 3,
+   "texto": "A cafeteira, o mural e a porta de serviço."
+  },
+  "limpeza": {
+   "nome": "Base da limpeza",
+   "sub": "Carrinho da equipe, balde e luvas",
+   "peca": "L08",
+   "andar": "Térreo",
+   "ordem": 4,
+   "texto": "O carrinho da equipe, o balde do esfregão e Seu Dirceu de pano na mão."
+  },
+  "atelie": {
+   "nome": "Ateliê de descobertas",
+   "sub": "Bancada da Ivone e manual",
+   "peca": "L06",
+   "andar": "Térreo",
+   "ordem": 5,
+   "texto": "A bancada da Ivone e o manual da Câmara."
+  },
+  "deposito": {
+   "nome": "Sala das coleções",
+   "sub": "Caixas e movimentações",
+   "peca": "D10",
+   "andar": "Térreo",
+   "ordem": 6,
+   "texto": "Uma estante de caixas etiquetadas e uma mancha vermelha no chão."
+  },
+  "manutencao": {
+   "nome": "Oficina técnica",
+   "sub": "Ferramentas e fusíveis",
+   "peca": "M03",
+   "andar": "Térreo",
+   "ordem": 7,
+   "texto": "Ferramentas, um armário travado e a cadeira vazia do Téo."
+  },
+  "eletrica": {
+   "nome": "Oficina elétrica",
+   "sub": "Gerador, fusíveis e luvas",
+   "peca": "E02",
+   "andar": "Térreo",
+   "ordem": 8,
+   "texto": "O gerador ronca baixo entre fios, fusíveis e luvas."
+  },
+  "patio": {
+   "nome": "Pátio · Quadro externo",
+   "sub": "Quadro de energia e para-raios",
+   "peca": "Q01",
+   "andar": "Térreo",
+   "ordem": 9,
+   "texto": "Chuva fina na pedra molhada. O Quadro externo, fechado a cadeado, fica embaixo do para-raios."
+  },
+  "prototipo": {
+   "nome": "Subsolo · Câmara do tempo",
+   "sub": "A máquina do tempo",
+   "peca": "T01",
+   "andar": "Subsolo",
+   "ordem": 1,
+   "texto": "A Câmara do tempo zumbe no meio da sala. Ligada, e ninguém consegue desligar."
+  }
+ }
+}

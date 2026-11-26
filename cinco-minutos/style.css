@@ -677,3 +677,6 @@ body[data-tela=between] .toast{bottom:auto;top:calc(64px + env(safe-area-inset-t
 /* com a sala aberta, o botão Mapa mostra a planta inteira (sem caixa de rolagem) logo abaixo do cabeçalho fixo */
 .investigando #roomGrid.planta-on:not(.hidden){max-height:none;overflow:visible}
 #roomGrid.planta-on{scroll-margin-top:150px}
+/* revisão 13: no livro, em celular estreito, a coluna de cada ficha da tábua fica do tamanho da casa: o desenho (44 px) e o rótulo ficam centrados, e o rótulo mais largo ("guardar") não passa da borda; relógio de exemplo do manual com letra de 12 px */
+@media(max-width:375px){.livro-leitura .lc-gl.tabua .t{grid-template-columns:minmax(0,1fr)}.livro-leitura .lc-gl.tabua small{letter-spacing:-.03em}}
+.tv-clock span{font-size:.75rem}

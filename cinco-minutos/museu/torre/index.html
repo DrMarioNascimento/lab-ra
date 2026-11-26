@@ -60,7 +60,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 const $ = id => document.getElementById(id);
 // Aberto a partir do Mosaico Loop (?loop=1): só as 15 salas da história, nos andares da história (salas-loop.json, gerado de LOOP_SALAS em game.js).
 const LOOP = new URLSearchParams(location.search).get('loop') === '1';
-const LS = LOOP ? await (await fetch('salas-loop.json?v=20261125')).json() : null;
+const LS = LOOP ? await (await fetch('salas-loop.json?v=20261126c')).json() : null;
 let NOMES_ANDAR = LOOP ? LS.andares : ['Térreo', '1º andar', '2º andar', '3º andar', '4º andar'];
 const SALAS = await (await fetch(((new URLSearchParams(location.search).get('versao') || 'A').toUpperCase().replace(/[^BC]/g, '') ? 'salas-' + (new URLSearchParams(location.search).get('versao')).toUpperCase().replace(/[^BC]/g, '') : 'salas') + '.json?v=20261123k')).json();
 
@@ -168,6 +168,7 @@ function entra(no, k) {
   for (let i = 0; i < andar.length; i++) andar[i].visible = i === k; aplicaFachada();
   $('cAndar').textContent = NOMES_ANDAR[k]; $('cNome').textContent = s.nome; $('cTexto').textContent = s.texto || s.sub;
   $('cartao').style.display = 'block'; $('salas').style.display = 'none'; $('andares').style.display = 'none'; $('ajuda').style.opacity = 0;
+  const perto = LOOP && s.peca === 'GAL_B'; OC.minDistance = perto ? .045 : .12; OC.zoomToCursor = perto;   // revisão 13: na Galeria dá para chegar bem perto da testa da máscara (o zoom vai para onde está o dedo) e ler a inscrição
   if (LOOP) { $('titulo').querySelector('small').textContent = NOMES_ANDAR[k] + ' · arraste para girar'; atualZ[k] = alvoZ[k]; andar[k].position.z = pos0[k] + atualZ[k]; salasDoAndar(k).forEach(n => n.visible = n === no); enquadra(no, k, 900); return; }   // só a sala escolhida fica à vista: nada de peça vizinha no meio da tela
   const centro = new THREE.Box3().setFromObject(no).getCenter(new THREE.Vector3());
   voaPara(new THREE.Vector3(centro.x + .11, centro.y + .17, centro.z + .3), new THREE.Vector3(centro.x, centro.y - .01, centro.z), 900);
@@ -192,6 +193,7 @@ function enquadra(no, k, ms) {
 }
 function sai(rapido) {
   if (dentro && LOOP && aberto >= 0) salasDoAndar(aberto).forEach(n => n.visible = true);
+  OC.minDistance = .12; OC.zoomToCursor = false;
   dentro = null; for (let i = 0; i < andar.length; i++) andar[i].visible = true;
   $('cartao').style.display = 'none'; $('salas').style.display = ''; $('andares').style.display = ''; aplicaFachada();
   miraLivre();

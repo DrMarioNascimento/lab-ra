@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#0b0f14">
+<title>O museu · Mosaico Loop</title>
+<link rel="icon" type="image/webp" href="../icones/T01.webp">
+<style>
+:root{--ouro:#efc878;--papel:#f4efe3;--fundo:#0b0f14}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;height:100dvh;background:var(--fundo);color:var(--papel);font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;overflow:hidden;touch-action:none;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+#c{position:fixed;inset:0;width:100%;height:100%;display:block}
+#hud{position:fixed;inset:0;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left))}
+#topo{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+#titulo{font:700 17px/1.2 system-ui;text-shadow:0 2px 10px #000}
+#titulo small{display:block;margin-top:3px;font:600 11px/1.3 system-ui;letter-spacing:.14em;text-transform:uppercase;color:var(--ouro)}
+button,a.bt{pointer-events:auto;font:700 14px system-ui;color:var(--papel);border:1px solid #5b6b78;background:linear-gradient(#1c2a36,#121b24);border-radius:12px;min-height:44px;padding:0 14px;box-shadow:0 4px 0 #080d12;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+button:active{transform:translateY(3px);box-shadow:0 1px 0 #080d12}
+button.ouro{background:linear-gradient(#f3d078,#d9a93a);color:#201707;border:0;box-shadow:0 4px 0 #6f4d17}
+button.on{border-color:var(--ouro);color:var(--ouro)}
+#baixo{display:grid;gap:8px}
+#andares{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+#andares button{min-width:56px}
+#salas{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-width:560px;width:100%;margin:0 auto}
+#salas button{font-size:12.5px;line-height:1.2;padding:6px;min-height:46px}
+#salas:empty{display:none}
+#ajuda{text-align:center;font:500 13px/1.4 system-ui;color:#d9d2c0;text-shadow:0 1px 6px #000;transition:opacity .5s}
+#cartao{pointer-events:auto;max-width:560px;width:100%;margin:0 auto;padding:12px 14px;border:1px solid #75664e;border-left:5px solid #9a7842;border-radius:12px;background:linear-gradient(160deg,#e7dfca,#b9aa8d);color:#211d17;display:none}
+#cartao b{display:block;font:800 19px/1.2 system-ui}
+#cartao span{display:block;margin-top:2px;font:600 12px/1.3 system-ui;letter-spacing:.08em;text-transform:uppercase;color:#6b5a38}
+#cartao p{margin:6px 0 10px;font-size:14.5px;line-height:1.45;color:#3a3226}
+/* Mosaico Loop: o cartão da sala segue a paleta do jogo (azul-noite e ouro), com volume */
+body.loop #cartao{border:1px solid #5b6b78;border-left:5px solid var(--ouro);background:linear-gradient(160deg,#294051,#172633);color:var(--papel);box-shadow:inset 0 1px 0 #ffffff2b,0 5px 0 #05090d}
+body.loop #cartao span{color:var(--ouro)}
+/* revisão 11: o título fica numa plaqueta escura, para a parede da sala (ferramentas, quadros) não passar por cima dele */
+body.loop #titulo{padding:6px 10px 7px;border-radius:12px;border:1px solid #5b6b7899;background:linear-gradient(160deg,#172633f0,#0d1720e6);box-shadow:inset 0 1px 0 #ffffff22,0 4px 0 #05090d}
+body.loop #cartao p{margin:4px 0 8px;font-size:14px;line-height:1.35;color:#d9d2c0}
+#carr{position:fixed;inset:0;z-index:4;display:flex;align-items:center;justify-content:center;background:var(--fundo);font:600 14px system-ui;color:var(--ouro)}
+</style></head>
+<body>
+<canvas id="c"></canvas>
+<div id="carr">Montando o museu…</div>
+<div id="hud">
+  <div id="topo"><div id="titulo">O museu<small>Toque num andar para abrir a gaveta</small></div>
+    <div style="display:flex;gap:6px"><a class="bt" id="bVers" href="#">Peças: A</a><button id="bFach" type="button" class="on">Fachada</button><a class="bt" id="bSair" href="../">Sair</a></div></div>
+  <div id="baixo">
+    <div id="ajuda">Arraste para girar · pince para aproximar · toque num andar</div>
+    <div id="cartao"><span id="cAndar"></span><b id="cNome"></b><p id="cTexto"></p><button id="bVoltar" type="button" class="ouro">Voltar ao museu</button></div>
+    <div id="salas"></div>
+    <div id="andares"></div>
+  </div>
+</div>
+<script type="importmap">{"imports":{"three":"./vendor/three.module.min.js","three/addons/":"./vendor/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const $ = id => document.getElementById(id);
+// Aberto a partir do Mosaico Loop (?loop=1): só as 15 salas da história, nos andares da história (salas-loop.json, gerado de LOOP_SALAS em game.js).
+const LOOP = new URLSearchParams(location.search).get('loop') === '1';
+const LS = LOOP ? await (await fetch('salas-loop.json?v=20261125')).json() : null;
+let NOMES_ANDAR = LOOP ? LS.andares : ['Térreo', '1º andar', '2º andar', '3º andar', '4º andar'];
+const SALAS = await (await fetch(((new URLSearchParams(location.search).get('versao') || 'A').toUpperCase().replace(/[^BC]/g, '') ? 'salas-' + (new URLSearchParams(location.search).get('versao')).toUpperCase().replace(/[^BC]/g, '') : 'salas') + '.json?v=20261123k')).json();
+
+const R = new THREE.WebGLRenderer({canvas: $('c'), antialias: true});
+R.setPixelRatio(Math.min(devicePixelRatio, 2)); R.outputColorSpace = THREE.SRGBColorSpace;
+R.toneMapping = THREE.ACESFilmicToneMapping; R.toneMappingExposure = .9;
+const S = new THREE.Scene(); S.background = new THREE.Color(0x0e1319);
+S.environment = new THREE.PMREMGenerator(R).fromScene(new RoomEnvironment(), 0.04).texture;
+S.add(new THREE.HemisphereLight(0xdfe8f5, 0x3a3228, .55));
+const sol = new THREE.DirectionalLight(0xfff0d8, 1.4); sol.position.set(.6, 1.2, 1); S.add(sol);
+const cam = new THREE.PerspectiveCamera(42, 1, .01, 20);
+const OC = new OrbitControls(cam, $('c')); OC.enableDamping = true; OC.dampingFactor = .08; OC.minDistance = .12; OC.maxDistance = 2.2; OC.maxPolarAngle = Math.PI * .52;
+const VISTA = {pos: new THREE.Vector3(.65, .42, .95), alvo: new THREE.Vector3(-.08, .22, .02)};
+cam.position.copy(VISTA.pos); OC.target.copy(VISTA.alvo);
+const chao = new THREE.Mesh(new THREE.CircleGeometry(1.6, 64), new THREE.MeshStandardMaterial({color: 0x1b222b, roughness: 1})); chao.rotation.x = -Math.PI / 2; chao.position.y = -.002; S.add(chao);
+
+const dr = new DRACOLoader(); dr.setDecoderPath('./vendor/draco/');
+const gl = new GLTFLoader(); gl.setDRACOLoader(dr);
+let andar = [], pos0 = [], alvoZ = [0, 0, 0, 0, 0], atualZ = [0, 0, 0, 0, 0];
+let torre = null, fachadaOn = true, aberto = -1, dentro = null;
+document.getElementById('bVers').textContent = 'Peças: ' + (new URLSearchParams(location.search).get('versao') || 'A').toUpperCase();
+document.getElementById('bVers').onclick = e => { e.preventDefault(); const a = (new URLSearchParams(location.search).get('versao') || 'A').toUpperCase(); location.search = '?versao=' + ({A:'B',B:'C',C:'A'}[a] || 'B'); };
+const SLIDE = 11;                                     // metros do prédio (a torre tem escala 0,025)
+
+const VERS = (new URLSearchParams(location.search).get('versao') || 'A').toUpperCase().replace(/[^ABC]/g, 'A');
+gl.load((VERS === 'A' ? 'torre.glb' : 'torre-' + VERS + '.glb') + '?v=20261123k', g => {
+  torre = g.scene; S.add(torre);
+  for (let k = 0; k < 5; k++) { andar[k] = torre.getObjectByName('andar_' + k); pos0[k] = andar[k].position.z; }
+  if (LOOP) montaLoop();
+  montaAndares(); $('carr').style.display = 'none';
+}, undefined, e => { $('carr').textContent = 'Não consegui abrir o museu.'; console.error(e); });
+
+function nomeSala(no) { if (LOOP && no.userData.loop) return no.userData.loop; return SALAS[no.name.replace('sala_', '')] || {nome: no.name, sub: '', texto: ''}; }
+// Mosaico Loop: tira as 15 salas que não são da história e a fachada, e arruma as outras 15 em 4 andares (Subsolo, Térreo, 1º e 2º andar).
+function montaLoop() {
+  const PASSO_X = 6.35, PASSO_Z = 4.1333, ALT = 3.7, salas = {}, raiz = andar[0].parent;   // raiz: o nó que tem a escala da maquete
+  for (const a of andar) for (const n of [...a.children]) {
+    const id = n.name.startsWith('sala_') ? (SALAS[n.name.replace('sala_', '')] || {}).id : null;
+    if (id && LS.salas[id]) { n.userData.loop = LS.salas[id]; salas[id] = n; }
+  }
+  const novos = LS.andares.map((nome, i) => { const g = new THREE.Group(); g.name = 'andar_' + i; raiz.add(g); return g; });
+  LS.andares.forEach((nome, i) => {
+    const ids = Object.keys(salas).filter(id => LS.salas[id].andar === nome).sort((a, b) => LS.salas[a].ordem - LS.salas[b].ordem);
+    const cols = ids.length <= 1 ? 1 : ids.length <= 4 ? 2 : 3, lins = Math.ceil(ids.length / cols), y = .4 + i * ALT;
+    ids.forEach((id, j) => { const n = salas[id], c = j % cols, l = Math.floor(j / cols); n.position.set(-2 + (c - (cols - 1) / 2) * PASSO_X, y, .1 + ((lins - 1) / 2 - l) * PASSO_Z); novos[i].add(n); });
+    const laje = new THREE.Mesh(new THREE.BoxGeometry(cols * PASSO_X + .5, .14, lins * PASSO_Z + .5), new THREE.MeshStandardMaterial({color: [0x3a2f52, 0x5a4424, 0x1f4a44, 0x243f5c][i], roughness: .9}));
+    laje.position.set(-2, y - .12, .1); laje.name = 'laje_' + i; novos[i].add(laje);
+  });
+  for (const a of andar) raiz.remove(a);
+  andar = novos; pos0 = andar.map(a => a.position.z); alvoZ = andar.map(() => 0); atualZ = andar.map(() => 0);
+  document.body.classList.add('loop');
+  fachadaOn = false; $('bFach').style.display = 'none'; $('bVers').style.display = 'none';
+  chao.position.y = (.4 + ALT - .3) * .025; chao.material.transparent = true; chao.material.opacity = .38; chao.material.depthWrite = false; chao.material.needsUpdate = true;   // o chão fica na altura do Térreo: o Subsolo aparece embaixo dele
+  $('titulo').firstChild.textContent = 'O museu do Mosaico Loop';
+  $('bSair').onclick = e => { e.preventDefault(); let mesma = false; try { mesma = !!document.referrer && new URL(document.referrer).origin === location.origin; } catch (err) {} if (mesma && history.length > 1) history.back(); else location.href = '../../index.html'; };
+  trocaPecas(salas);
+}
+// Em cada sala, a peça da maquete dá lugar à peça que a sala tem no Loop (museu/pecas), do mesmo tamanho e no mesmo lugar. Se alguma não carregar, fica a da maquete.
+let faltam = 0;   // peças do Loop que ainda não entraram
+function trocaPecas(salas) {
+  const fila = Object.entries(salas).filter(([id, n]) => LS.salas[id].peca && !n.getObjectByName('peca_' + LS.salas[id].peca));
+  faltam = fila.length;
+  const prox = () => {
+    faltam = fila.length;
+    const item = fila.shift(); if (!item) return; const [id, no] = item, velha = no.children.find(c => c.name.startsWith('peca_'));
+    if (!velha) return prox();
+    gl.load('../pecas/' + LS.salas[id].peca + '.glb', g => {
+      try {
+        torre.updateMatrixWorld(true);
+        const bv = new THREE.Box3().setFromObject(velha), a = no.worldToLocal(bv.min.clone()), b = no.worldToLocal(bv.max.clone()), tv = new THREE.Vector3().subVectors(b, a);
+        const nova = g.scene, bn = new THREE.Box3().setFromObject(nova), tn = bn.getSize(new THREE.Vector3()), cn = bn.getCenter(new THREE.Vector3());
+        const e = Math.max(tv.x, tv.y, tv.z) / (Math.max(tn.x, tn.y, tn.z) || 1), caixa = new THREE.Group();
+        nova.position.set(-cn.x, -bn.min.y, -cn.z); caixa.add(nova); caixa.scale.setScalar(e); caixa.position.set((a.x + b.x) / 2, Math.min(a.y, b.y), (a.z + b.z) / 2); caixa.name = 'peca_' + LS.salas[id].peca;
+        nova.traverse(o => { if (o.isLight) o.visible = false; });
+        no.add(caixa); for (const c of no.children.filter(c => c.name.startsWith('peca_') && c !== caixa)) no.remove(c);   // na sala do Loop fica só a peça do Loop
+      } catch (err) { console.warn('peça do Loop', id, err); }
+      prox();
+    }, undefined, () => prox());
+  };
+  prox();
+}
+function salasDoAndar(k) { return andar[k].children.filter(n => n.name.startsWith('sala_')); }
+function fachadas(k) { return andar[k].children.filter(n => n.name.startsWith('fachada_')); }
+function aplicaFachada() { for (let k = 0; k < andar.length; k++) fachadas(k).forEach(n => n.visible = fachadaOn && k !== aberto && dentro === null); }
+
+function montaAndares() {
+  const box = $('andares'); box.innerHTML = '';
+  for (let k = andar.length - 1; k >= 0; k--) { const b = document.createElement('button'); b.type = 'button'; b.textContent = NOMES_ANDAR[k]; b.dataset.k = k; b.onclick = () => abre(aberto === k ? -1 : k); box.appendChild(b); }
+}
+function abre(k) {
+  if (dentro) sai(true);
+  aberto = k; for (let i = 0; i < andar.length; i++) alvoZ[i] = i === k ? SLIDE : 0;
+  document.querySelectorAll('#andares button').forEach(b => b.classList.toggle('on', +b.dataset.k === k));
+  const cx = $('salas'); cx.innerHTML = '';
+  if (k >= 0) {
+    salasDoAndar(k).forEach(n => { const s = nomeSala(n); const b = document.createElement('button'); b.type = 'button'; b.textContent = s.nome; b.onclick = () => entra(n, k); cx.appendChild(b); });
+    $('titulo').querySelector('small').textContent = NOMES_ANDAR[k] + ' aberto · escolha uma sala';
+    voaPara(new THREE.Vector3(.5, .32 + k * .0, .8).add(new THREE.Vector3(0, .1 * k, 0)), worldPos(andar[k], SLIDE).add(new THREE.Vector3(0, 0, 0)), 900);
+  } else { $('titulo').querySelector('small').textContent = 'Toque num andar para abrir a gaveta'; voaPara(VISTA.pos, VISTA.alvo, 800); }
+  aplicaFachada();
+}
+function worldPos(no, dz) { const p = new THREE.Vector3(); const c = new THREE.Box3().setFromObject(no).getCenter(p); return new THREE.Vector3(c.x, c.y, c.z + dz * .025); }
+function entra(no, k) {
+  dentro = no; const s = nomeSala(no);
+  for (let i = 0; i < andar.length; i++) andar[i].visible = i === k; aplicaFachada();
+  $('cAndar').textContent = NOMES_ANDAR[k]; $('cNome').textContent = s.nome; $('cTexto').textContent = s.texto || s.sub;
+  $('cartao').style.display = 'block'; $('salas').style.display = 'none'; $('andares').style.display = 'none'; $('ajuda').style.opacity = 0;
+  if (LOOP) { $('titulo').querySelector('small').textContent = NOMES_ANDAR[k] + ' · arraste para girar'; atualZ[k] = alvoZ[k]; andar[k].position.z = pos0[k] + atualZ[k]; salasDoAndar(k).forEach(n => n.visible = n === no); enquadra(no, k, 900); return; }   // só a sala escolhida fica à vista: nada de peça vizinha no meio da tela
+  const centro = new THREE.Box3().setFromObject(no).getCenter(new THREE.Vector3());
+  voaPara(new THREE.Vector3(centro.x + .11, centro.y + .17, centro.z + .3), new THREE.Vector3(centro.x, centro.y - .01, centro.z), 900);
+}
+// Mosaico Loop: a gaveta do andar termina de abrir na hora, a câmera mira a peça da sala (não o meio da sala)
+// e centra a peça na parte da tela que o cartão não cobre.
+const pecaDe = no => (no.userData.loop && no.userData.loop.peca && no.children.find(c => c.name === 'peca_' + no.userData.loop.peca)) || no.children.find(c => c.name.startsWith('peca_')) || no;
+function areaLivre() { const c = $('cartao'); return c.style.display === 'block' ? Math.max(120, Math.round(c.getBoundingClientRect().top) - 8) : innerHeight; }
+function miraLivre() {   // o centro da imagem sobe para o meio da área livre (acima do cartão)
+  const cob = dentro && LOOP ? innerHeight - areaLivre() : 0;
+  if (cob > 0) cam.setViewOffset(innerWidth, innerHeight + cob, 0, cob, innerWidth, innerHeight); else cam.clearViewOffset();
+  cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix();
+}
+function enquadra(no, k, ms) {
+  miraLivre(); torre.updateMatrixWorld(true);
+  const cx = new THREE.Box3().setFromObject(pecaDe(no)), c = cx.getCenter(new THREE.Vector3()), raio = Math.max(.012, cx.getSize(new THREE.Vector3()).length() / 2);
+  const livre = areaLivre(), cheio = innerHeight + (innerHeight - livre), t = Math.tan(THREE.MathUtils.degToRad(cam.fov / 2));
+  const tv = t * livre / cheio, th = t * innerWidth / cheio;   // meia abertura que sobra na altura livre e na largura
+  const dist = Math.min(OC.maxDistance, Math.max(OC.minDistance, raio / Math.min(tv, th) * 1.25));
+  const dir = new THREE.Vector3(.28, .95, 1).normalize();   // de frente e de cima: a câmera passa por cima da parede da frente
+  voaPara(c.clone().addScaledVector(dir, dist), c, ms);
+}
+function sai(rapido) {
+  if (dentro && LOOP && aberto >= 0) salasDoAndar(aberto).forEach(n => n.visible = true);
+  dentro = null; for (let i = 0; i < andar.length; i++) andar[i].visible = true;
+  $('cartao').style.display = 'none'; $('salas').style.display = ''; $('andares').style.display = ''; aplicaFachada();
+  miraLivre();
+  if (!rapido && aberto >= 0) abre(aberto);
+}
+$('bVoltar').onclick = () => { const k = aberto; sai(true); abre(-1); void k; };
+$('bFach').onclick = () => { fachadaOn = !fachadaOn; $('bFach').classList.toggle('on', fachadaOn); aplicaFachada(); };
+
+// câmera: voo suave
+let voo = null;
+function voaPara(p, alvo, ms) { voo = {p0: cam.position.clone(), a0: OC.target.clone(), p1: p.clone(), a1: alvo.clone(), t0: performance.now(), ms}; }
+const ease = t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+
+// toque: gaveta
+const ray = new THREE.Raycaster(), m2 = new THREE.Vector2(); let d0 = null;
+$('c').addEventListener('pointerdown', e => d0 = {x: e.clientX, y: e.clientY, t: performance.now()});
+$('c').addEventListener('pointerup', e => {
+  if (!d0 || !torre) return; const mov = Math.hypot(e.clientX - d0.x, e.clientY - d0.y), dt = performance.now() - d0.t; d0 = null;
+  if (mov > 8 || dt > 500 || dentro) return;
+  m2.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1); ray.setFromCamera(m2, cam);
+  const hit = ray.intersectObjects(torre.children, true)[0]; if (!hit) return;
+  let n = hit.object, sala = null, k = -1;
+  while (n) { if (n.name.startsWith('sala_')) sala = n; const i = andar.indexOf(n); if (i >= 0) { k = i; break; } n = n.parent; }
+  if (k < 0) return;
+  if (sala && k === aberto) entra(sala, k); else abre(aberto === k ? -1 : k);
+});
+
+function tam() { R.setSize(innerWidth, innerHeight, false); cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix(); if (dentro && LOOP) enquadra(dentro, aberto, 300); }
+addEventListener('resize', tam); tam();
+R.setAnimationLoop(t => {
+  for (let k = 0; k < andar.length; k++) if (andar[k]) { atualZ[k] += (alvoZ[k] - atualZ[k]) * .12; andar[k].position.z = pos0[k] + atualZ[k]; }
+  if (voo) { const u = Math.min(1, (performance.now() - voo.t0) / voo.ms), e = ease(u); cam.position.lerpVectors(voo.p0, voo.p1, e); OC.target.lerpVectors(voo.a0, voo.a1, e); if (u >= 1) voo = null; }
+  OC.update(); R.render(S, cam);
+});
+setTimeout(() => $('ajuda').style.opacity = 0, 12000);
+window.__t = {cam, OC, abre, entra: (id) => { const n = torre.getObjectByName('sala_' + id); let k = andar.findIndex(a => a.children.includes(n)); abre(k); setTimeout(() => entra(n, k), 50); }, sai, get aberto() { return aberto; }, get faltam() { return faltam; },
+  medir() { if (!dentro) return null; torre.updateMatrixWorld(true); cam.updateMatrixWorld(true); const bx = new THREE.Box3().setFromObject(pecaDe(dentro)), xs = [], ys = [];
+    for (const x of [bx.min.x, bx.max.x]) for (const y of [bx.min.y, bx.max.y]) for (const z of [bx.min.z, bx.max.z]) { const v = new THREE.Vector3(x, y, z).project(cam); xs.push((v.x + 1) / 2 * innerWidth); ys.push((1 - v.y) / 2 * innerHeight); }
+    const c = bx.getCenter(new THREE.Vector3()).project(cam);
+    return {peca: pecaDe(dentro).name, temPeca: pecaDe(dentro) !== dentro, x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys), cx: (c.x + 1) / 2 * innerWidth, cy: (1 - c.y) / 2 * innerHeight, livre: areaLivre(), voando: !!voo, larg: innerWidth}; }};
+</script></body></html>

@@ -72,7 +72,7 @@ const LC_GLOS = [
  ['etiquetas?', 'O tipo da pista. Duas pistas com a mesma etiqueta valem um sinal só.', 1],
  ['ensaio', 'Treino do conserto: das voltas 2 a 4 você treina, na 5 vale.', 1]
 ].map(([re, txt, jogo]) => ({re: new RegExp('(?<![\\p{L}])(' + re + ')(?![\\p{L}])', 'iu'), txt, jogo: !!jogo}));   // jogo: palavra de regra; no caderno ela é palavra da história e fica sem "?"
-const LC_GLOS_LISTA = [['Peça principal','A máscara de pedra de uns 300 anos, a peça mais importante da Galeria. Na testa, ela tem uma frase numa escrita antiga.'],['Inscrição','Frase gravada na pedra. Para ler a da máscara, use a tábua do livro de registro.'],['Registro','Número que identifica a peça, tipo o RG dela (ex.: 050).'],['Luz da peça','A luz do painel que acende amarela quando a Câmara está presa a uma peça e a peça da base não é a registrada.'],['Ponto de ligação','Onde o fio se encaixa, tipo uma tomada.'],['Roleta de entrada','A roleta da entrada, a que gira quando você passa.'],['Ajustar','Acertar os números da máquina, como acertar um relógio.'],['Disjuntor','A chave do quadro de luz que desarma quando algo dá errado.'],['Fusível','Peça pequena que queima para proteger a energia.'],['Base da peça','O suporte onde a peça fica apoiada. "Embaixo da base" de uma peça é o fundo dela, onde fica o número gravado.'],['Patrocinador','Quem paga as despesas do museu e aparece com o nome numa exposição.'],['Restauro','Consertar uma obra antiga.'],['Dossiê','A página da Máquina onde você prova o defeito com 3 pistas do seu caderno.'],['Eco','O som que volta. Aqui, a gravação que a máquina guarda.'],['Sinal','Pista que mostra o que está errado na máquina.'],['Leitura normal','Pista que mostra uma parte da máquina que está bem. Ela afasta outro defeito.'],['Etiqueta','O tipo da pista. Duas pistas com a mesma etiqueta valem um sinal só.'],['Ensaio','Treino do conserto: das voltas 2 a 4 você treina, na 5 vale.']];
+const LC_GLOS_LISTA = [['Peça principal','A máscara de pedra de uns 300 anos, a peça mais importante da Galeria. Na testa, ela tem uma frase numa escrita antiga.'],['Inscrição','Frase escrita na própria peça, com símbolos. Para ler a da máscara, use a tábua do livro de registro.'],['Registro','Número que identifica a peça, tipo o RG dela (ex.: 050).'],['Luz da peça','A luz do painel que acende amarela quando a Câmara está presa a uma peça e a peça da base não é a registrada.'],['Ponto de ligação','Onde o fio se encaixa, tipo uma tomada.'],['Roleta de entrada','A roleta da entrada, a que gira quando você passa.'],['Ajustar','Acertar os números da máquina, como acertar um relógio.'],['Disjuntor','A chave do quadro de luz que desarma quando algo dá errado.'],['Fusível','Peça pequena que queima para proteger a energia.'],['Base da peça','O suporte onde a peça fica apoiada. "Embaixo da base" de uma peça é o fundo dela, onde fica o número gravado.'],['Patrocinador','Quem paga as despesas do museu e aparece com o nome numa exposição.'],['Restauro','Consertar uma obra antiga.'],['Dossiê','A página da Máquina onde você prova o defeito com 3 pistas do seu caderno.'],['Eco','O som que volta. Aqui, a gravação que a máquina guarda.'],['Sinal','Pista que mostra o que está errado na máquina.'],['Leitura normal','Pista que mostra uma parte da máquina que está bem. Ela afasta outro defeito.'],['Etiqueta','O tipo da pista. Duas pistas com a mesma etiqueta valem um sinal só.'],['Ensaio','Treino do conserto: das voltas 2 a 4 você treina, na 5 vale.']];
 function lcGlos(html, soMundo){
  const usados = new Set();
  return String(html).replace(/(<[^>]*>)|([^<]+)/g, (m, tag, texto) => {
@@ -661,7 +661,7 @@ const LC_INSC = {copia:['rosto','pedra','ver','noite','guardar-esp','tempo'], ve
 let lcGlifosPedido = false;
 function lcGlifosSprite(){
  if (lcGlifosPedido || typeof document === 'undefined' || !document.body) return; lcGlifosPedido = true;
- if (!document.getElementById('bancadaCss')) { const l = document.createElement('link'); l.id = 'bancadaCss'; l.rel = 'stylesheet'; l.href = new URL('bancada.css?v=5', LC_BASE).href; document.head.appendChild(l); }
+ if (!document.getElementById('bancadaCss')) { const l = document.createElement('link'); l.id = 'bancadaCss'; l.rel = 'stylesheet'; l.href = new URL('bancada.css?v=6', LC_BASE).href; document.head.appendChild(l); }
  fetch(new URL('museu/icones/ui/glifos.svg?v=1', LC_BASE).href).then(r => r.ok ? r.text() : '').then(t => { if (!t || document.getElementById('lcGlifos')) return; const d = document.createElement('div'); d.id = 'lcGlifos'; d.hidden = true; d.setAttribute('aria-hidden', 'true'); d.innerHTML = t; document.body.prepend(d); }).catch(() => { lcGlifosPedido = false; });
 }
 if (typeof document !== 'undefined') { const i = setInterval(() => { if (document.body) { lcGlifosSprite(); clearInterval(i); } }, 300); }
@@ -681,16 +681,16 @@ const LC_MG = {
  tombo_2:{ativ:'livro', resp:0, img:['N18'], nome:'Ler a foto antiga do catálogo', texto:'A foto antiga mostra a peça escura, fosca. Ela foi tirada de baixo. O que aparece gravado na base?', opcoes:['Um número de três algarismos','O nome de quem doou','O ano em que a peça chegou','A marca de quem restaurou'],
   dicas:['Foto de catálogo serve para identificar a peça.','O que identifica uma peça não muda quando ela troca de sala.']},
  falsa_1:{ativ:'marca', resp:4, nome:'Olhar a peça com luz de lado', texto:'Agora confira: mude o ângulo da luz e veja o que a peça mostra de verdade.',
-  antes:{ativ:'livro', resp:0, img:['GAL_B'], nome:'Antes de acender a luz', texto:'A peça principal tem 300 anos. Com a luz de lado, o que uma peça dessa idade mostraria?', opcoes:['Riscos, poeira e desgaste por toda parte','Um brilho liso e igual, sem marca nenhuma','Rachaduras só de um lado, o resto liso'],
-   dicas:['Luz de frente esconde. Luz de lado mostra a superfície.','Três séculos de mão, pano e mudança deixam marca.']},
-  luz:{achou:'O verniz brilha por igual, de ponta a ponta.', falta:'ainda não apareceu nada', botao:'Anotar o que apareceu', img:'V11'},
+  antes:{ativ:'livro', resp:0, img:['GAL_B'], nome:'Antes de acender a luz', texto:'Pelo que você já anotou e leu sobre a peça principal, o que a luz de lado deveria mostrar nela?', opcoes:['Riscos, poeira e desgaste por toda parte','Um brilho liso e igual, sem marca nenhuma','Rachaduras só de um lado, o resto liso'],
+   dicas:['Na Máquina, aba Dossiê, o “Dicionário das palavras” diz a idade da peça principal.','Três séculos de mão, pano e mudança deixam marca.']},
+  luz:{achou:'O verniz brilha por igual, de ponta a ponta.', falta:'ainda não apareceu nada', botao:'Anotar o que apareceu', img:'GAL_B_mascara'},
   dicas:['Luz de frente esconde. Luz de lado mostra a superfície.','Quase no fim do curso da luz, a superfície aparece inteira.']},
  traj_1:{ativ:'livro', resp:0, img:['S01'], nome:'Olhar a fita da porta de serviço', texto:'A fita mostra a porta de serviço às 4:00. Alguém de paletó encosta um crachá no leitor. No tapete, embaixo da pessoa, aparecem gotas. Pelo que você sabe da noite, ela está entrando ou saindo?', opcoes:['Entrando: vem da rua','Saindo: vai para a rua','Só passando, sem abrir a porta'],
   dicas:['Repare no que pinga no tapete.','Lá fora chove desde o começo da noite.']},
  insc_copia:{ativ:'glifos', resp:0, nome:'Ler a inscrição da máscara', texto:'Confira cada símbolo da máscara com a tábua do livro de registro. Um deles não bate. Qual?', insc:['rosto','pedra','ver','noite','guardar-esp','tempo'], opcoes:['5','4','3','2'],
   dicas:['Ponha a tábua ao lado e confira símbolo por símbolo, da esquerda para a direita.','Não olhe só o desenho: olhe para que lado ele abre.']},
  c_peca:{ativ:'livro', resp:0, img:['D10'], nome:'Abrir a caixa de banners', texto:'Agora você tem motivo. Na estante, caixas etiquetadas; só uma tem o adesivo do patrocínio. O que você sentiu diante da peça da Galeria que faz você abrir esta?', opcoes:['Cheiro de verniz fresco','Cheiro de pó antigo','Cheiro de tinta vermelha','Cheiro de cola'],
-  dicas:['A primeira coisa que se nota diante da peça principal está no seu caderno.','Peça de 300 anos não cheira a coisa nova.']}
+  dicas:['A primeira coisa que se nota diante da peça principal está no seu caderno.','No caderno, procure a pista “A peça principal”.']}
 };
 // A ordem das opções (e a posição certa da luz) muda com a semente: nada para decorar entre partidas.
 function lcMgSorteado(id, mg){
@@ -707,7 +707,7 @@ function lcBancada(q){
  const mg0 = pre ? mg1.antes : mg1, mg = mg0 && lcMgSorteado(q.lcp + (pre ? ':antes' : ''), mg0);
  if (!mg || (state.resolvidos && state.resolvidos[q.id])) return false;
  Promise.all([import('./reserva/banco.mjs'), import('./reserva/minigames.mjs?v=8')]).then(([B, M]) => {
-  if (!document.getElementById('bancadaCss')) { const l = document.createElement('link'); l.id = 'bancadaCss'; l.rel = 'stylesheet'; l.href = new URL('bancada.css?v=5', LC_BASE).href; document.head.appendChild(l); }
+  if (!document.getElementById('bancadaCss')) { const l = document.createElement('link'); l.id = 'bancadaCss'; l.rel = 'stylesheet'; l.href = new URL('bancada.css?v=6', LC_BASE).href; document.head.appendChild(l); }
   let d = document.getElementById('lcBancada');
   if (!d) { d = document.createElement('dialog'); d.id = 'lcBancada'; d.className = 'lc-banc'; document.body.appendChild(d); }
   const base = B.atividades[mg.ativ];
@@ -737,7 +737,7 @@ const LC_MGA = {
 function lcBancadaAtiv(aid, cmd){
  const mg = lcMgSorteado(aid, LC_MGA[aid]);
  Promise.all([import('./reserva/banco.mjs'), import('./reserva/minigames.mjs?v=8')]).then(([B, M]) => {
-  if (!document.getElementById('bancadaCss')) { const l = document.createElement('link'); l.id = 'bancadaCss'; l.rel = 'stylesheet'; l.href = new URL('bancada.css?v=5', LC_BASE).href; document.head.appendChild(l); }
+  if (!document.getElementById('bancadaCss')) { const l = document.createElement('link'); l.id = 'bancadaCss'; l.rel = 'stylesheet'; l.href = new URL('bancada.css?v=6', LC_BASE).href; document.head.appendChild(l); }
   let d = document.getElementById('lcBancada');
   if (!d) { d = document.createElement('dialog'); d.id = 'lcBancada'; d.className = 'lc-banc'; document.body.appendChild(d); }
   const A = Object.assign({}, B.atividades[mg.ativ], {nome:mg.nome, texto:mg.texto, opcoes:mg.opcoes}, mg.dicas ? {dicas:mg.dicas} : {});

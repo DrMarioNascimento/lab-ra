@@ -1,0 +1,134 @@
+/* Bancada de investigação (minigames vindos da Reserva), isolada no diálogo do Loop. */
+.lc-banc{--gold:#f1c27d;--line:#3b4b4c;--ink:#f4ebd8;--muted:#b9b09b;--pane:#1b292d;color:var(--ink);width:min(94vw,650px);max-height:88dvh;overflow:auto;background:#162226;border:1px solid #927b59;border-radius:16px;padding:1rem}
+.lc-banc::backdrop{background:#070c0de8}
+.lc-banc h2{font-family:Georgia,serif;font-size:1.4rem;margin:.2em 0 .4em}.lc-banc .kicker{letter-spacing:.13em;text-transform:uppercase;font-size:.72rem;color:var(--gold);margin:0}
+.lc-banc p{line-height:1.5;margin:.35rem 0 .8rem}
+.lc-banc button{font:inherit;display:inline-flex;align-items:center;justify-content:center;padding:.6rem .9rem;border-radius:10px;border:1px solid #6b7a78;background:linear-gradient(#34474a,#25353a);color:var(--ink);cursor:pointer;min-height:44px;box-shadow:0 3px 0 #101a1c}
+.lc-banc button:active:not(:disabled){transform:translateY(2px);box-shadow:0 1px 0 #101a1c}
+.lc-banc button:disabled{opacity:.55}.lc-banc .primary{background:linear-gradient(#f3ce91,#ce9854);color:#1a1c18;border-color:#e7b77a}
+.lc-banc .row{display:flex;flex-wrap:wrap;gap:.6rem;margin:.7rem 0}
+.lc-banc select,.lc-banc input:not([type=checkbox]){font:inherit;border:1px solid var(--line);background:#132124;color:var(--ink);border-radius:8px;padding:.5rem}
+.lc-banc .puzzle button{margin:.15rem .35rem .3rem 0}
+.lc-banc .cena{height:clamp(130px,37vh,250px);padding:0;margin:0 0 .6rem;display:grid;place-items:center;overflow:hidden}
+.lc-banc .cena canvas{width:100%;height:100%;touch-action:none}
+.lc-banc .ajuda{color:var(--gold);min-height:1.45rem}
+.lc-banc .puzzle input[type=range]{width:100%;accent-color:var(--gold)}
+.lc-banc .foto-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;max-width:390px;margin:.4rem auto}
+.lc-banc .foto-grid .encaixe{aspect-ratio:1.1;margin:0;padding:.2rem;background:#34444a no-repeat;border:1px solid #687676;box-shadow:none}
+.lc-banc .foto-grid .fragmento{background-size:300% 200%;background-color:#5e5943}
+.lc-banc .foto-grid button[aria-pressed=true]{outline:2px solid var(--gold)}
+.lc-banc .bandeja{padding-top:.6rem;border-top:1px solid var(--line)}
+.lc-banc .sintomas{display:grid;gap:.45rem;margin-bottom:.55rem}
+.lc-banc .sintomas label{display:flex;align-items:center;gap:.55rem}
+.lc-banc .puzzle>label{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:.4rem;margin:.55rem 0}
+.lc-banc .fita{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.4rem}
+.lc-banc .fita button{display:grid;gap:.35rem;justify-content:stretch;text-align:left;margin:0;padding:.4rem}
+.lc-banc .clip{display:block;position:relative;height:62px;border:1px solid #54665d;overflow:hidden;background:linear-gradient(151deg,#24382e 38%,#56634a 39%,#253730 42%,#1a2924 58%,#495342 59%,#29362c 60%);}
+.lc-banc .clip::before,.lc-banc .clip::after{content:"";position:absolute;border:1px solid #a8ac85;background:#67745c;bottom:14%;right:31%;width:31%;height:35%}
+.lc-banc .clip-bancada::after{width:72%;height:8%;right:12%;bottom:11%}
+.lc-banc .clip-carrinho::after{width:43%;height:12%;right:27%;border-radius:0 0 12px 12px}
+.lc-banc .clip-porta::before{width:42%;height:81%;right:29%;bottom:0}
+.lc-banc .clip-porta::after{width:8%;height:13%;bottom:39%;right:32%;background:#dddd9a}
+.lc-banc .clip-colecoes::after{width:27%;height:38%;right:18%;bottom:39%}
+.lc-banc .porta-grafica{height:140px;margin:.6rem auto;max-width:290px;border:2px solid #af9465;border-radius:10px;background:repeating-linear-gradient(90deg,#714a30 0,#8a613d 9%,#775136 18%,#67442c 22%);display:grid;place-items:center;perspective:320px}
+.lc-banc .chave-grafica{width:65px;height:13px;background:#d6b568;box-shadow:0 2px 5px #050a0b;position:relative;border-radius:8px;transform-origin:90% 50%;transition:transform .22s ease}
+.lc-banc .chave-grafica::before{content:"";width:21px;height:21px;position:absolute;left:-9px;top:-4px;border:5px solid #d6b568;border-radius:50%;background:#67442c}
+.lc-banc .porta-grafica[data-giro="1"] .chave-grafica{transform:rotate(46deg)}
+.lc-banc .porta-grafica[data-giro="2"] .chave-grafica{transform:rotate(90deg)}
+@media(prefers-reduced-motion:reduce){.lc-banc .chave-grafica{transition:none}}
+.lc-banc .relevo{display:grid;place-items:center;width:100%;height:100%;overflow:hidden;background:radial-gradient(ellipse at center,#354745,#202d2e 60%,#172123)}
+.lc-banc .objeto{position:relative;width:min(64%,218px);height:82px;perspective:360px}
+.lc-banc .objeto span{position:absolute;display:block}
+.lc-banc .relevo-caixa .face{inset:0;background:repeating-linear-gradient(176deg,#93623f 0,#a57149 7px,#775033 10px,#945f38 17px);border:2px solid #d49d5f;box-shadow:0 13px 16px #0008;border-radius:3px;z-index:2}
+.lc-banc .relevo-caixa .lateral{left:100%;top:0;width:26%;height:100%;transform-origin:left;transform:skewY(-25deg);background:#694128;border:1px solid #bc8c56}
+.lc-banc .relevo-caixa .tampa{left:-2%;width:105%;height:46%;top:-41%;transform:skewX(-41deg);transform-origin:bottom right;background:repeating-linear-gradient(135deg,#714a2d 0,#714a2d 12px,#b5804d 13px,#b5804d 16px,#8f603a 17px,#a37353 25px);border:2px solid #e4ac66;border-radius:5px;transition:transform .25s,top .25s;z-index:3}
+.lc-banc .relevo-caixa .faixa,.lc-banc .relevo-caixa .fundo{width:42%;height:25%;left:9%;top:40%;border:1px solid #f1c58a;background:#b38651;z-index:4;transition:transform .28s,opacity .28s}
+.lc-banc .relevo-caixa .faixa::before{content:"△";color:#4e3523;padding-left:8%;font-size:.75rem}
+.lc-banc .relevo-caixa .fundo{left:54%;top:54%;background:#805636;opacity:0}
+.lc-banc .relevo-caixa .segredo{left:43%;top:-13%;width:35%;height:10%;background:#ecbe70;border:2px solid #f0d391;border-radius:7px;box-shadow:0 0 14px #eec38690;opacity:0;transition:opacity .25s;z-index:4}
+.lc-banc .relevo-caixa .segredo::before{content:"";position:absolute;width:18px;height:18px;border:5px solid #e7bc74;border-radius:50%;top:-9px;left:-13px}
+.lc-banc .relevo-caixa[data-passo="1"] .faixa,.lc-banc .relevo-caixa[data-passo="2"] .faixa,.lc-banc .relevo-caixa[data-passo="3"] .faixa{transform:translateX(55%)}
+.lc-banc .relevo-caixa:not([data-passo="0"]) .fundo{opacity:1}
+.lc-banc .relevo-caixa[data-passo="2"] .fundo,.lc-banc .relevo-caixa[data-passo="3"] .fundo{transform:translateX(30%)}
+.lc-banc .relevo-caixa[data-passo="3"] .tampa{top:-78%;transform:skewX(-16deg) rotateZ(-12deg)}
+.lc-banc .relevo-caixa[data-passo="3"] .segredo{opacity:1}
+.lc-banc .relevo-luz .objeto{height:112px}
+.lc-banc .relevo-luz .obra{inset:0;border:6px double #cca16e;border-radius:4px;background:linear-gradient(145deg,#b68a5f,#7f7c64 48%,#374b48 50%,#283a3a 65%,#567063);box-shadow:0 8px 15px #0006}
+.lc-banc .relevo-luz .facho{inset:0;opacity:.35;background:linear-gradient(97deg,transparent 20%,#fff2c8 45%,transparent 62%);transition:transform .16s;transform:translateX(-28%)}
+.lc-banc .relevo-luz[data-passo="2"] .facho{transform:translateX(-15%)}
+.lc-banc .relevo-luz[data-passo="3"] .facho{transform:translateX(0)}
+.lc-banc .relevo-luz[data-passo="4"] .facho{transform:translateX(18%)}
+.lc-banc .relevo-luz[data-passo="5"] .facho{transform:translateX(35%)}
+.lc-banc .relevo-luz .marca{bottom:16%;right:14%;width:24px;height:17px;border:2px solid #eebd6e;transform:rotate(-8deg);opacity:.22}
+.lc-banc .relevo-luz .marca::after{content:"";position:absolute;width:2px;height:120%;background:#120f0a;left:42%;transform:rotate(41deg)}
+.lc-banc .relevo-luz[data-passo="4"] .marca{opacity:1}
+.lc-banc .relevo-maquina .objeto{border:2px solid #968563;border-radius:8px;background:linear-gradient(140deg,#4e6061,#2e3d3f 46%,#192529);box-shadow:0 8px 18px #0008}
+.lc-banc .relevo-maquina [class^="mostrador-"]{width:18%;height:49%;top:17%;border-radius:50%;background:radial-gradient(circle,#ba9563,#63503b 38%,#121e20 47%,#9d8156 49%,#342a25 61%,#131f20);border:1px solid #ccaa73}
+.lc-banc .mostrador-a{left:13%}
+.lc-banc .mostrador-b{left:41%}
+.lc-banc .mostrador-c{right:13%}
+.lc-banc .relevo-maquina .base{height:10%;left:9%;right:9%;bottom:12%;border-radius:6px;background:#7c6747}
+@media(prefers-reduced-motion:reduce){.lc-banc .relevo span{transition:none!important}}
+.lc-banc .cena{background:#203034;border:1px solid var(--line);border-radius:12px}
+
+/* Padrão visual · rodada 3 (25/11/2026): mesma paleta e mesma letra do resto do Loop (azul-noite, dourado #e7b975, verde-água #83c6ac). */
+.lc-banc{--gold:#e7b975;--line:#c9aa7250;--ink:#edf0ec;--muted:#a4b2bd;--pane:#101e2b;background:#111f2d;border-color:#d0ad7480;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;box-shadow:0 20px 70px #000b}
+.lc-banc::backdrop{background:#000b}
+.lc-banc h2{font-weight:400}
+.lc-banc p{font:.95rem/1.5 system-ui,sans-serif}
+.lc-banc button{min-height:48px;border-color:#d7bd8b55;background:linear-gradient(180deg,#294051,#172633);font:700 .9rem/1.2 system-ui,sans-serif;box-shadow:inset 0 1px 0 #ffffff2b,0 4px 0 #05090d}
+.lc-banc button:active:not(:disabled){transform:translateY(3px);box-shadow:inset 0 1px 0 #ffffff15,0 1px 0 #05090d}
+.lc-banc .primary{background:linear-gradient(180deg,#f2d3a0,#be8e4b);color:#1f1b17;border-color:#f2d3a0}
+.lc-banc .puzzle button{margin:.2rem .4rem .55rem 0}
+.lc-banc select,.lc-banc input:not([type=checkbox]):not([type=range]){min-height:48px;background:#142a37;border-color:#a5a48670}
+.lc-banc .puzzle input[type=range]{height:44px}
+.lc-banc .cena{background:radial-gradient(circle at 50% 35%,#24394a,#0c1621 70%);border-color:#b89f724a}
+.lc-banc .relevo{background:radial-gradient(ellipse at center,#24394a,#12202c 60%,#0c1621)}
+.lc-banc .foto-grid .encaixe{background-color:#0b161f;border-color:#3b4f5e;box-shadow:inset 0 2px 6px #000a}
+.lc-banc .foto-grid .fragmento{box-shadow:0 3px 0 #05090d}
+.lc-banc .clip{border-color:#b89f724a}
+.lc-banc .ajuda{font-weight:700}
+
+/* Revisão 6 (25/11/2026): imagem em todo minijogo, a peça da Galeria na cena da luz, letra do rótulo e lugar reservado para a mensagem */
+.lc-banc{box-shadow:inset 0 1px 0 #ffffff22,0 6px 0 #05090d,0 20px 70px #000b}
+.lc-banc .kicker{font-size:.8125rem}
+.lc-banc .ajuda{min-height:3.1em;margin-bottom:.4rem}
+.lc-banc .mg-foto{display:flex;justify-content:center;gap:12px;margin:.3rem 0 .5rem}
+.lc-banc .mg-foto .ic3d{display:grid;place-items:center;width:96px;height:96px;border-radius:20px;overflow:hidden;border:1px solid #e7b97566;background:radial-gradient(circle at 35% 22%,#56788f,#22384a 72%);box-shadow:inset 0 1px 0 #ffffff45,inset 0 -8px 14px #0006,0 4px 0 #05090d}
+.lc-banc .mg-foto .ic3d img{width:92%;height:92%;object-fit:contain;filter:drop-shadow(0 4px 3px #000b)}
+.lc-banc .cena{height:clamp(110px,26vh,250px)}
+.lc-banc .cena-peca{position:relative;display:grid;place-items:center;cursor:pointer;background:radial-gradient(circle at 50% 40%,#22384a,#070d14 75%)}
+.lc-banc .cena-peca img{height:92%;max-width:92%;object-fit:contain;filter:brightness(.42) saturate(.7) drop-shadow(0 6px 5px #000c);transition:filter .2s}
+.lc-banc .cena-peca .facho{position:absolute;inset:0;pointer-events:none;background:linear-gradient(100deg,transparent 30%,#fff2c855 46%,#fff2c822 54%,transparent 70%);transform:translateX(-36%);transition:transform .2s}
+.lc-banc .cena-peca[data-passo="2"] .facho{transform:translateX(-18%)}.lc-banc .cena-peca[data-passo="3"] .facho{transform:translateX(0)}.lc-banc .cena-peca[data-passo="4"] .facho{transform:translateX(18%)}.lc-banc .cena-peca[data-passo="5"] .facho{transform:translateX(36%)}
+.lc-banc .cena-peca[data-passo="2"] img{filter:brightness(.5) saturate(.75) drop-shadow(0 6px 5px #000c)}.lc-banc .cena-peca[data-passo="3"] img{filter:brightness(.58) saturate(.8) drop-shadow(0 6px 5px #000c)}.lc-banc .cena-peca[data-passo="4"] img{filter:brightness(.5) saturate(.75) drop-shadow(0 6px 5px #000c)}.lc-banc .cena-peca[data-passo="5"] img{filter:brightness(.42) saturate(.7) drop-shadow(0 6px 5px #000c)}
+.lc-banc .cena-peca .brilho{position:absolute;inset:0;pointer-events:none;opacity:0;background:radial-gradient(ellipse at 50% 42%,#fff8dc66,transparent 62%);mix-blend-mode:screen;transition:opacity .2s}
+.lc-banc .cena-peca[data-achou="true"] img{filter:brightness(1.25) saturate(1.15) contrast(1.05) drop-shadow(0 6px 5px #000c)}
+.lc-banc .cena-peca[data-achou="true"] .brilho{opacity:1}
+@media(prefers-reduced-motion:reduce){.lc-banc .cena-peca img,.lc-banc .cena-peca .facho,.lc-banc .cena-peca .brilho{transition:none}}
+@media(max-height:760px){.lc-banc{padding:.8rem}.lc-banc .mg-foto .ic3d{width:80px;height:80px;border-radius:16px}.lc-banc h2{font-size:1.25rem}.lc-banc p{margin:.25rem 0 .55rem}}
+
+/* Revisão 10 (25/11/2026): escrita antiga da máscara. Símbolos entalhados em pedra (sprite museu/icones/ui/glifos.svg), dourado da paleta do Loop.
+   .lc-gl = bloco embaixo do texto da pista (caderno e leitura do livro); .lc-banc = minijogo "Ler a inscrição da máscara". */
+.lc-gl .glifo,.lc-banc .faixa-pedra .glifo,.lc-banc .tabua-mini .glifo,.lc-banc .opc-glifos .glifo{display:block;width:44px;height:44px;flex:none;color:#d9be8a;overflow:visible}
+.lc-gl.tabua .glifo,.lc-banc .tabua-mini .glifo{color:#e7b975}
+.lc-gl.faixa-pedra,.lc-banc .faixa-pedra,.lc-gl.tabua .t,.lc-banc .tabua-mini .t{background:
+ url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 .8 0 0 0 0 .75 0 0 0 0 .6 0 0 0 .13 0'/%3E%3C/filter%3E%3Crect width='90' height='90' filter='url(%23n)'/%3E%3C/svg%3E"),
+ radial-gradient(circle at 35% 25%,#46504c,#262d2c 60%,#171c1c);border:1px solid #6d6a5a66;border-radius:10px;box-shadow:inset 0 1px 0 #ffffff1c,inset 0 -2px 4px #0007,0 3px 0 #05090c,0 6px 12px #0006}
+.lc-gl{margin:.55rem 0 .2rem}
+.lc-gl.faixa-pedra,.lc-banc .faixa-pedra{display:grid;grid-template-columns:repeat(6,44px);gap:3px;justify-content:center;padding:7px 6px;border-radius:12px;max-width:max-content;margin-inline:auto}
+.lc-gl.tabua{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;max-width:320px;padding:8px;border:1px solid #c9aa7250;border-radius:14px;background:#e9dcc214}
+.lc-gl.tabua .t,.lc-banc .tabua-mini .t{display:grid;justify-items:center;gap:1px;padding:5px 1px 4px}
+.lc-gl.tabua small,.lc-banc .tabua-mini small{font:400 .8rem/1.1 Georgia,'Times New Roman',serif;color:#f1e6cf}
+.lc-banc .faixa-pedra{margin:.15rem auto .5rem}
+.lc-banc .tabua-mini{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px;margin:.2rem 0 .3rem}
+.lc-banc .tabua-mini small{font-size:.75rem;letter-spacing:-.01em}
+.lc-banc .opc-glifos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:.35rem 0 0}
+.lc-banc .opc-glifos button{justify-content:center;min-height:52px;margin:0;padding:6px 10px}
+.lc-banc .opc-glifos button span{font:700 .9rem/1.15 system-ui,sans-serif;text-align:left}
+@media(max-width:375px){.lc-gl.faixa-pedra,.lc-banc .faixa-pedra{gap:2px;padding:6px 4px}.lc-banc .tabua-mini{gap:3px}.lc-banc .opc-glifos button{padding:6px 7px;gap:6px}}
+/* no caderno o desenho ocupa a largura do cartão inteiro; a inscrição vai em 2 linhas de 3 (lida da esquerda para a direita, de cima para baixo) para os símbolos ficarem com 44 px no celular */
+.journal-item>.lc-gl{grid-column:1/-1;justify-self:center;width:100%}
+.journal-item>.lc-gl.faixa-pedra{grid-template-columns:repeat(3,44px);gap:6px 10px;padding:8px 14px;width:max-content}
+.journal-item>.lc-gl.tabua{max-width:340px}
+@media(max-width:375px){.lc-gl.tabua small,.lc-banc .tabua-mini small{font-size:.75rem;letter-spacing:-.02em}}

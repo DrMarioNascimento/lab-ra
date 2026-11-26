@@ -1,6 +1,6 @@
 # Loop · A Máquina (camada central)
 
-Arquivos: `dados/pistas-v4.json` (fonte dos dados, **281 pistas**, versão v4, **revisão 11 de 26/11/2026**) → `loop-central-dados.js` (gerado a partir dele), `loop-central.js` (regras e telas). Enredo: `ROTEIRO-LOOP.md`. Decisões aplicadas: `DECISOES-V4.md`. Botão **Máquina** na barra de baixo, com a miniatura da Câmara.
+Arquivos: `dados/pistas-v4.json` (fonte dos dados, **281 pistas**, versão v4, **revisão 13 de 26/11/2026**) → `loop-central-dados.js` (gerado a partir dele), `loop-central.js` (regras e telas). Enredo: `ROTEIRO-LOOP.md`. Decisões aplicadas: `DECISOES-V4.md`. Botão **Máquina** na barra de baixo, com a miniatura da Câmara.
 
 - **Defeito por semente** (5 causas): A falta ajustar, B falta força, C peça presa (a máquina se segura na peça errada da base), D fusível tirado de propósito, E dois defeitos juntos (A + B, em voltas diferentes). Roteiro completo em `ROTEIRO-LOOP.md`. Os sinais de cada defeito só existem quando ele é o sorteado, mas a lista de cada sala mostra os mesmos rótulos nas 5 noites (onde o sinal não existe, o mesmo rótulo traz a coisa normal: campo `parDe` nos dados); o manual (páginas 1 a 6), a folha amassada da impressora, o apito curto da base e a caixa de "banners" com a peça verdadeira existem em todas as noites.
 - **Valores por semente** (nada decorável): dia da troca (9 a 25), hora do apagão (1:00, 1:05, 1:10, 1:15 ou 1:20), número de registro (3 algarismos), ordem dos 3 pontos de ligação, número da chave do para-raios e senha do cofre do Braga (o registro de trás para a frente). Nos dados os textos usam os marcadores `{dia}` `{hora}` `{reg}` `{reg_inv}` `{ordem}` `{ch}`; `valores_padrao` (14, 1:10, 472, 274, 3-1-2, chave 3) serve para os exemplos dos documentos. O validador sorteia os valores como o jogo.
@@ -241,7 +241,7 @@ Palavras que o jogo usa: **número de registro** (da peça), **base** (onde a pe
 - **Minijogo antes de atividade em dupla** (comportamento que não estava escrito): abre uma vez por atividade e por volta em cada aparelho; trocar de sala na mesma volta leva direto à palavra da dupla.
 
 **O que mudou nos dados** (`dados/pistas-v4.json`, 278 pistas, "v4 revisão 7")
-- Lado a Lado (telas A e B), `coop_copia_ok` e `foto_solo`: a comparação é rachadura, cor da pedra e riscos do tempo; nada de "embaixo da base".
+- Lado a Lado (telas A e B), `coop_copia_ok` e `foto_solo`: a comparação é rachadura, cor da pedra e riscos do tempo (revisão 13: desgaste nas bordas); nada de "embaixo da base".
 - `coop_veredito`: "Tá. Essa rubrica é do Lenz, do patrocínio. Ele assina tudo assim."
 - `teo_d3`: "a base dela" (sem "cópia"). `coop_raio.papelB`: "os 3 números que aparecem enquanto segura a chave".
 - `regras.final_frases` (novo): as 3 frases de final que dependem do caderno.
@@ -349,7 +349,7 @@ Palavras que o jogo usa: **número de registro** (da peça), **base** (onde a pe
 - `museu/icones/GAL_B.webp` refeita (objeto inteiro, com margem). `museu/torre/salas-loop.json` e `sala/conteudo.js` gerados de novo.
 
 **O que mudou no código**
-- **`game.js`.** `PECA_PERTO` e `pertoDaPeca`: na Galeria, zoom até 5° (os outros continuam em 12°), câmera mirando a máscara (`-0.12m 1.3m 0.03m`) à mesma distância (8,32 m). `PECA_CANTO` com `D10`. `LOOP_PONTOS.GAL_B`: lugar 3 (pista "Inscrição na máscara") no alto da testa; lugar 8 ("Um quadro torto") no quadro; os outros 30 iguais. `LOOP_DESC.patio`: "Chuva fina na pedra molhada. O Quadro externo, fechado a cadeado, fica embaixo do para-raios." Livro: `livroGrande` (a leitura usa o vão dos botões "Ler" quando a página tem a tábua e não sobra botão).
+- **`game.js`.** `PECA_PERTO` e `pertoDaPeca`: na Galeria, zoom até 5° (os outros continuam em 12°), câmera mirando a máscara (`-0.12m 1.3m 0.03m`) à mesma distância (8,32 m). `PECA_CANTO` com `D10`. `LOOP_PONTOS.GAL_B`: lugar 3 (pista "Inscrição na máscara") no alto da testa; lugar 8 ("Um quadro torto") no quadro; os outros 30 iguais. `LOOP_DESC.patio`: "Chuva fina na pedra molhada. O Quadro externo, fechado a cadeado, fica embaixo do para-raios." (revisão 13: "Dá para ouvir a chuva fina. ...") Livro: `livroGrande` (a leitura usa o vão dos botões "Ler" quando a página tem a tábua e não sobra botão).
 - **`loop-central.js`.** `LC_MG.insc_copia` sem a miniatura (`img`). `minigames.mjs?v=8`, `bancada.css?v=5`.
 - **`reserva/minigames.mjs`.** Ramo `glifos`: respostas só com "Nº símbolo" (sem o desenho); título da tábua "A tábua, do seu caderno".
 - **`bancada.css`.** Rótulos da tábua com 12 px em Georgia; respostas com 52 px, centradas.
@@ -382,7 +382,30 @@ Palavras que o jogo usa: **número de registro** (da peça), **base** (onde a pe
 
 **Testes de tela** (fora do repositório): `/tmp/roda/planta/jogo.mjs` (planta em 390×844 e 360×740: início no Saguão, na Recepção, caminhando para o Subsolo, chegada, as 4 orelhas; confere que a folha cabe acima da barra, nenhum nome cortado, alvos ≥ 44 px, letra ≥ 12 px). Capturas em `/tmp/roda/planta/final/`.
 
-## Checklist por volta (recalculado dos dados em 26/11/2026, revisão 11: nenhuma pista entrou ou saiu; nenhuma volta, horário nem tranca mudou)
+## Revisão 13 — 26/11/2026 · retoques da rodada 10
+
+**Por quê.** A rodada 10 das escalas saiu limpa (relatórios em `docs/avaliacao/rodada10/`); a revisão 12 (planta) recomeçou a contagem. Entram de uma vez os retoques menores apontados na rodada 10, para a rodada 11 ter folga. Escolhas e o que não foi aplicado em `DECISOES-V4.md`, "Revisão 13".
+
+**O que mudou nos dados** (`dados/pistas-v4.json`, 281 pistas, "v4 revisão 13")
+- Texto: `a_cheia_4`, `fh_med_pot_bce`, `fh_med_pot_d` ("o interruptor do ponteiro de potência", no lugar de "a chavinha"); `quadro_aberto.textoPorCausa.D_fusivel` ("Na mesma chave, ..."); `foto_solo` e `coop_copia_ok` (desgaste nas bordas); `insc_verdadeira`, `chao_peca`, `mancha_2` (sem a frase final de narrador); `atividades_coop.coop_original_copia.telaPapel.A` ("pedra cinza, mais clara", "bordas inteiras, sem desgaste").
+- **Rótulos que mudaram: 0.** Nenhuma volta, horário, tranca, `precisaDe`, `soNaCausa`, custo, fonte ou etiqueta mudou; nenhuma pista entrou ou saiu. O checklist abaixo continua valendo.
+
+**O que mudou no código**
+- **`loop-central.js`.** `LC_MG.c_peca`: segunda dica aponta para o caderno. `LC_MG.falsa_1.antes`: pergunta e primeira dica (Dicionário das palavras). `LC_MG.falsa_1.luz.img`: `GAL_B_mascara` (antes `V11`, testa lisa). Dicionário: "Inscrição".
+- **`ritmo.js`.** Fato "copia" da fita: "verniz novo, peso e escrita errados".
+- **`game.js`.** `LOOP_DESC.patio` e `LOOP_DESC.manutencao`. `sala/conteudo.js` e `museu/torre/salas-loop.json` gerados de novo (só essas duas frases mudaram).
+- **`museu/torre/index.html`.** Na Galeria (`?loop=1`), `OC.minDistance` 0,045 (as outras salas seguem com 0,12) e `zoomToCursor` (o zoom vai para onde está o dedo ou o cursor); ao sair, volta ao normal. `salas-loop.json?v=20261126c`.
+- **`museu/icones/GAL_B_mascara.webp`** (novo, 320 px): a máscara da GAL_B atual (nó `V11`, com a película da inscrição), de frente, renderizada por script com a mesma luz de `museu/icones/gerar.html` (`/tmp/roda/esc/r12/scr/mascara.mjs`, fora do repositório). Cópia própria do Loop.
+- **`style.css`.** Livro em até 375 px: a coluna de cada ficha da tábua do tamanho da casa (desenho de 44 px e rótulo centrados; "guardar" dentro da ficha). `.tv-clock span` com 12 px (relógio de exemplo do manual).
+- **`bancada.css`.** `.cena-peca` com uma casa de grade da altura da cena: a imagem da luz de lado (320 px) cabe inteira (antes passaria da borda de baixo). `bancada.css?v=6` (as 3 chamadas em `loop-central.js`).
+- **Versões nas páginas.** `style.css?v=26`, `loop-central-dados.js?v=37`, `loop-central.js?v=42`, `game.js?v=50`, `ritmo.js?v=10` (`individual.html`, `sala/index.html`; `sala/simulador/index.html` só o `style.css`); `ritmo.js?v=10` em `sala/telao/index.html`; `conteudo.js?v=5` em `sala/telao/telao.mjs`.
+- **`dados/validar.py`.** Cabeçalho e linha impressa: "revisão 13" (a linha impressa ainda dizia "revisão 10"). `/tmp/roda/sim/validar.py` igual.
+
+**Simulador de texto e validador.** APROVADO nas 5 causas (`/tmp/roda/esc/r12/validar.txt`).
+
+**Testes de tela** (fora do repositório): os das revisões 9 a 12 e `/tmp/roda/esc/r12/scr/` (livro em 360, museu 3D na Galeria, minijogo da luz). `/tmp/pwt/r5.mjs` passou a esperar "revisão 13".
+
+## Checklist por volta (recalculado dos dados em 26/11/2026, revisão 13: nenhuma pista entrou ou saiu; nenhuma volta, horário, tranca nem rótulo mudou)
 
 Conferido em `dados/pistas-v4.json` (campos `volta_min`, `volta_max`, `segundo_min`, `precisaDe`, `soNaCausa`, `parDe`, `grupos_fonte`, `atividades_coop`). Horários com `valores_padrao` (raio em 1:10); com outra hora sorteada, os horários ligados ao raio andam junto. Pistas por `volta_min`: **232 na volta 1, 27 na volta 2, 9 na volta 3, 9 na volta 4, 4 na volta 5** (281 no total). Por tipo: 216 comuns, 26 de dupla, 21 de observação (clima), 16 falsas honestas, 2 objetos. Ativas por noite: 210 (A), 211 (B), 210 (C), 210 (D), 215 (E) (as 3 novas valem nas 5 noites).
 
@@ -420,7 +443,7 @@ Antes da hora, a lista mostra "ainda não" (sem contagem).
 | **Prova da cópia** | Comparar a foto sem dupla (Galeria) | volta 2 | Ter a foto grande do catálogo; 2 de energia |
 | | Laudo do Aurélio (Sala de conservação); molde de gesso (Sala das coleções) | volta 2 | Ter sentido o cheiro de verniz |
 | | A peça verdadeira, dentro da caixa de "banners" (Sala das coleções) | volta 2 | Cheiro de verniz + uma pista da caixa (peso, guia de retirada ou gravação do Braga) |
-| | Lado a Lado (Galeria + Sala da fotografia): rachadura, cor da pedra e riscos do tempo | volta 2 | Dupla; foto grande do catálogo |
+| | Lado a Lado (Galeria + Sala da fotografia): rachadura, cor da pedra e desgaste nas bordas | volta 2 | Dupla; foto grande do catálogo |
 | | Inscrição na máscara (Galeria): o quinto símbolo está virado e não existe na tábua | volta 2 | Cheiro de verniz + tábua do livro de registro (Sala de conservação, volta 1, 1 de energia); 1 de energia; minijogo |
 | **Trajeto** | Marca de sola na porta de serviço (Área de descanso) | volta 1 | 1 de energia |
 | | Câmera da porta de serviço (Central, 4:00); Seu Dirceu (Base da limpeza, 4:05); escada do Subsolo (4:10) | volta 1 | Só depois que o paletó passa |
@@ -466,7 +489,7 @@ Não contam como prova: o cheiro de verniz; o bilhete do armário e o livro de v
 - **Horários que importam:** janela do Raio (noites B e E); 5:00 é o limite do Revelar.
 
 ### Pendências
-Nenhuma de texto, dado ou código (revisão 11). Os pontos de regra que as rodadas 5 e 6 deixam para o autor estão em `DECISOES-V4.md`, "Revisão 7 · Ficou para decidir": não bloqueiam o jogo. O que as revisões 2 e 3 deixaram em aberto foi fechado assim:
+Nenhuma de texto, dado ou código (revisão 13). Os pontos de regra que as rodadas 5 e 6 deixam para o autor estão em `DECISOES-V4.md`, "Revisão 7 · Ficou para decidir": não bloqueiam o jogo. O que as revisões 2 e 3 deixaram em aberto foi fechado assim:
 
 | Assunto | Como ficou | Quem decidiu |
 |---|---|---|
