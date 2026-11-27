@@ -33,6 +33,24 @@
       </table>
       <p id="acumulado"></p>
     </section>
+    <section class="painel" id="glicemia-reconstruida" aria-labelledby="titulo-glicemia">
+      <h2 id="titulo-glicemia">Glicemia reconstruída</h2>
+      <p>A curva parte da glicemia medida no início do exercício e soma o saldo acumulado dos fluxos. Use o mesmo controle de tempo do gráfico acima.</p>
+      <canvas id="curva-glicemia" class="calor-curva" aria-hidden="true"></canvas>
+      <p>Os círculos marcam as médias medidas no estudo. A linha mostra o cálculo em mmol/L.</p>
+      <p id="leitura-glicemia"></p>
+      <table>
+        <caption>Glicemia medida e reconstruída (mmol/L)</caption>
+        <thead><tr><th scope="col">Após a refeição</th><th scope="col">Estudo (média ± EP)</th><th scope="col">Cálculo</th></tr></thead>
+        <tbody id="comparacao-glicemia"></tbody>
+      </table>
+      <p id="ajuste-glicemia"></p>
+      <details>
+        <summary>Como o saldo vira concentração</summary>
+        <p>O saldo acumulado é interpretado por kg de massa livre de gordura, conforme a normalização indicada no resumo do artigo. O cálculo usa a razão das médias da Tabela 1, 50,9 kg de massa livre de gordura para 70,9 kg de massa corporal. Divide então pelo volume aparente de 0,13 L/kg corporal, obtido de 0,20 L/kg × 0,65 na equação 1. A conversão final é de µmol para mmol.</p>
+        <p>A curva usa poucos pontos de fluxo e interpolação linear. O estudo estimou os fluxos por traçadores e dados de glicose. Esta comparação confere a reconstrução aproximada dentro do próprio protocolo. A medição aos 195 min fica fora da janela reconstruída.</p>
+      </details>
+    </section>
     <section class="painel">
       <h2>Conferir com o estudo</h2>
       <p>Schiavon e colegas estudaram 12 adultos saudáveis que se exercitaram a 50% do VO₂máx, duas horas após uma refeição mista. Os traçadores permitiram estimar as entradas e a retirada de glicose.</p>
@@ -46,9 +64,9 @@
     <details class="painel">
       <summary>Como o balanço é calculado</summary>
       <p>A entrada total soma a glicose da refeição que aparece na circulação e a produção endógena. O saldo instantâneo subtrai a retirada da entrada. Entre as referências, o modelo interpola cada fluxo e integra o saldo desde o começo do exercício.</p>
-      <p>A tabela mantém a normalização por kg da Figura 3. O saldo acumulado é uma quantidade por kg. A glicemia em mmol/L aparece como observação do estudo. A retirada representa o corpo todo, incluindo músculo e outros tecidos.</p>
+      <p>A tabela mantém a normalização por kg da Figura 3. O saldo acumulado é uma quantidade por kg. A reconstrução da glicemia usa o saldo integrado e o volume aparente de distribuição. A retirada representa o corpo todo, incluindo músculo e outros tecidos.</p>
     </details>
   </main>
-  <script type="module" src="./exercicio.js"></script>
+  <script type="module" src="./exercicio.js?v=2"></script>
 </body>
 </html>

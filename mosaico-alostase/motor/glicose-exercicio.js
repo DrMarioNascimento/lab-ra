@@ -30,3 +30,21 @@ export function simularFluxosExercicio() {
     return { minuto, refeicao, endogena, retirada, entrada, saldo, acumulado };
   });
 }
+
+// Schiavon et al. (2013), Figura 1 e resultados de glicose plasmática.
+export const GLICEMIA_EXERCICIO_OBSERVADA = [
+  { minuto: 120, mmolL: 6.3, ep: 0.6 },
+  { minuto: 140, mmolL: 4.0, ep: 0.3 },
+  { minuto: 195, mmolL: 4.3, ep: 0.2 },
+];
+// A razão das médias da Tabela 1 aproxima a massa livre de gordura por kg corporal.
+const FRACAO_MASSA_LIVRE_GORDURA = 50.9 / 70.9;
+const VOLUME_EFETIVO_L_KG = 0.200 * 0.65;
+
+export function reconstruirGlicemiaExercicio(pontos = simularFluxosExercicio()) {
+  const glicemiaInicial = GLICEMIA_EXERCICIO_OBSERVADA[0].mmolL;
+  return pontos.map(({ minuto, acumulado }) => {
+    const deltaMmolL = acumulado * FRACAO_MASSA_LIVRE_GORDURA / (1000 * VOLUME_EFETIVO_L_KG);
+    return { minuto, deltaMmolL, mmolL: glicemiaInicial + deltaMmolL };
+  });
+}
