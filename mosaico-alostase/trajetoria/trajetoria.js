@@ -1,7 +1,7 @@
-import { agruparTrajetoria, HORIZONTES, PERFIS_TRAJETORIA, simularTrajetoria } from '../motor/trajetoria.js?v=7';
+import { agruparTrajetoria, HORIZONTES, PERFIS_TRAJETORIA, simularTrajetoria } from '../motor/trajetoria.js?v=8';
 import { PASSO_INTEGRADO } from '../motor/bancada-hidrica.js?v=6';
 import { desenharSerie, indiceNaSerie } from '../hidratacao/grafico.js?v=3';
-import { criarEditor } from './editor.js?v=3';
+import { criarEditor } from './editor.js?v=4';
 import { DIAS_AGENDA } from '../motor/agenda.js?v=3';
 
 const el = (id) => document.getElementById(id);
@@ -34,7 +34,8 @@ const medidas = {
   pausaMin: ['Tempo programado de pausas no período', 'min', 0],
   biofeedbackMin: ['Biofeedback respiratório no período', 'min', 0],
   noitesEmClaro: ['Noites das 23h às 07h sem dormir', 'noites', 0],
-  picoGlicemia: ['Pico de glicemia', 'mg/dL', 1], mediaCortisol: ['Cortisol médio', 'µg/dL', 2],
+  picoGlicemia: ['Pico de glicemia', 'mg/dL', 1],
+  deltaAucCafe: ['Efeito acumulado no café padronizado', 'mmol/L × min', 2], mediaCortisol: ['Cortisol médio', 'µg/dL', 2],
   treinoMin: ['Minutos de exercício no período', 'min', 0],
 };
 const medidasDia = {
@@ -70,7 +71,7 @@ const termicasDia = {
 };
 Object.assign(medidas, termicasPeriodo, indicadoresAclima);
 Object.assign(medidasDia, termicasDia);
-const nomeHorizonte = { 1: '24 horas', 2: '48 horas', 7: '7 dias', 12: '12 dias', 28: '4 semanas', 56: '8 semanas', 90: '90 dias', 180: '180 dias', 365: '365 dias' };
+const nomeHorizonte = { 1: '24 horas', 2: '48 horas', 5: '5 dias', 7: '7 dias', 12: '12 dias', 28: '4 semanas', 56: '8 semanas', 90: '90 dias', 180: '180 dias', 365: '365 dias' };
 const fmt = (v, casas) => v.toLocaleString('pt-BR', { maximumFractionDigits: casas, minimumFractionDigits: casas });
 const hhmm = (i) => {
   const min = i * PASSO_INTEGRADO;
@@ -106,6 +107,7 @@ function mostrarPeriodo() {
   const i = Number(periodo.value);
   const p = agregados[0][i];
   const [nome, unidade, casas] = medidas[indicador.value];
+  el('leitura-glicemia-acumulada').hidden = indicador.value !== 'deltaAucCafe';
   const intervalo = p.inicio === p.fim ? '' : ` · dias ${p.inicio} a ${p.fim}`;
   el('periodo-rotulo').value = p.nome + intervalo + (p.parcial ? ' · parcial' : '');
   periodo.setAttribute('aria-valuetext', el('periodo-rotulo').value);
@@ -191,6 +193,7 @@ function mostrarInstante() {
     ${observacao ? `<p>Frequência registrada: ${fmt(observacao.ciclos * 60 / observacao.segundos, 1)} ciclos/min.</p>` : ''}
     ${temBiofeedback ? `<button type="button" class="btn sec sm" data-observar="${j}">Contar minha respiração</button>` : ''}
     ${contaDoCalor(a[i].termorregulacao)}
+    ${variavel.value === 'glicemia' ? `<p>Efeito acumulado no café padronizado de <strong>${fmt(resultados[j].dias[Number(dia.value) - 1].deltaAucCafe, 2)} mmol/L × min</strong> em relação ao dia 1.</p>` : ''}
     <p>FC ${fmt(a[i].fc, 1)} bpm · plasma ${fmt(a[i].plasmaL, 3)} L · ADH ${fmt(a[i].renal.regulacao.adh, 1)} · glicemia ${fmt(a[i].glicemia, 1)} mg/dL.</p>
     </article>`;
   }).join('');
@@ -278,6 +281,7 @@ function recalcular({ comparacaoPausa = false } = {}) {
   dia.value = n > 1 && novas.some((id) => PERFIS_TRAJETORIA[id].noite) ? 2 : 1;
   el('resumo-luz').hidden = !(novas.includes('luzSuave') && novas.includes('luzIntensa'));
   el('resumo-pausa').hidden = !comparacaoPausa;
+  el('resumo-lanche').hidden = !(n === 5 && novas.includes('carboAs19') && novas.includes('carboAs0030'));
   el('resumo-escala').hidden = !novas.every((id) => id.startsWith('escala'));
   el('situacao').textContent = `${n} ${n === 1 ? 'dia calculado' : 'dias calculados'} por rotina.`;
   mostrarDia();
@@ -386,6 +390,22 @@ el('atalho-escalas').addEventListener('click', () => {
   instante.value = 84;
   ajustarControles();
   recalcular();
+});
+el('atalho-lanche').addEventListener('click', () => {
+  usarDiaInteiro();
+  perfis[0].value = 'carboAs19';
+  perfis[1].value = 'carboAs0030';
+  horizonte.value = '5';
+  passoGrafico.value = 'dias';
+  el('fase-circadiana').value = 'padrao';
+  indicador.value = 'deltaAucCafe';
+  variavel.value = 'glicemia';
+  instante.value = 78;
+  ajustarControles();
+  recalcular();
+  dia.value = '4';
+  prepararGrafico(4);
+  mostrarDia();
 });
 el('atalho-noite').addEventListener('click', () => compararTurno('plantao', '2'));
 el('atalho-turno').addEventListener('click', () => compararTurno('turno', '365'));

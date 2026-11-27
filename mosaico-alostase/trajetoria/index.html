@@ -58,7 +58,7 @@
           <p>Esta agenda se repete a cada semana, começando na segunda-feira. Marque os dias em que a atividade começa. Um fim anterior ao início atravessa a meia-noite.</p>
           <div class="agenda-opcoes"><button type="button" data-modelo="diurno" class="btn sec sm">Modelo diurno</button><button type="button" data-modelo="noturno" class="btn sec sm">Modelo noturno</button><button type="button" data-copiar class="btn sec sm">Copiar agenda A para B</button></div>
           <div class="agenda-opcoes">
-            <label>Modelo de escala <select data-escala><option value="diurno">Diurna</option><option value="noturno">Noturna fixa</option><option value="folgas">Noturna com retorno nas folgas</option><option value="luzSuave">Plantão com 100 lux</option><option value="luzIntensa">Plantão com 2.500 lux</option></select></label>
+            <label>Modelo de escala <select data-escala><option value="diurno">Diurna</option><option value="noturno">Noturna fixa</option><option value="folgas">Noturna com retorno nas folgas</option><option value="luzSuave">Plantão com 100 lux</option><option value="luzIntensa">Plantão com 2.500 lux</option><option value="carboAs19">Quatro plantões · lanche às 19h</option><option value="carboAs0030">Quatro plantões · lanche às 00h30</option></select></label>
             <button type="button" data-carregar-escala class="btn sec sm">Carregar escala</button>
             <label>Tipo de pausa <select data-tipo-pausa><option value="meditacao">Meditação</option><option value="oracao">Oração</option><option value="biofeedback">Biofeedback respiratório</option></select></label>
             <button type="button" data-pausa class="btn sec sm">Adicionar pausa</button>
@@ -70,7 +70,7 @@
           <p>Esta agenda se repete a cada semana, começando na segunda-feira. Marque os dias em que a atividade começa. Um fim anterior ao início atravessa a meia-noite.</p>
           <div class="agenda-opcoes"><button type="button" data-modelo="diurno" class="btn sec sm">Modelo diurno</button><button type="button" data-modelo="noturno" class="btn sec sm">Modelo noturno</button><button type="button" data-copiar class="btn sec sm">Copiar agenda B para A</button></div>
           <div class="agenda-opcoes">
-            <label>Modelo de escala <select data-escala><option value="diurno">Diurna</option><option value="noturno">Noturna fixa</option><option value="folgas">Noturna com retorno nas folgas</option><option value="luzSuave">Plantão com 100 lux</option><option value="luzIntensa">Plantão com 2.500 lux</option></select></label>
+            <label>Modelo de escala <select data-escala><option value="diurno">Diurna</option><option value="noturno">Noturna fixa</option><option value="folgas">Noturna com retorno nas folgas</option><option value="luzSuave">Plantão com 100 lux</option><option value="luzIntensa">Plantão com 2.500 lux</option><option value="carboAs19">Quatro plantões · lanche às 19h</option><option value="carboAs0030">Quatro plantões · lanche às 00h30</option></select></label>
             <button type="button" data-carregar-escala class="btn sec sm">Carregar escala</button>
             <label>Tipo de pausa <select data-tipo-pausa><option value="meditacao">Meditação</option><option value="oracao">Oração</option><option value="biofeedback">Biofeedback respiratório</option></select></label>
             <button type="button" data-pausa class="btn sec sm">Adicionar pausa</button>
@@ -92,6 +92,7 @@
           <button type="button" class="btn sec sm" id="atalho-termico">Comparar caminhada no ar seco e úmido</button>
           <button type="button" class="btn sec sm" id="atalho-luz">Comparar luz em cinco plantões</button>
           <button type="button" class="btn sec sm" id="atalho-escalas">Comparar folgas em 8 semanas</button>
+          <button type="button" class="btn sec sm" id="atalho-lanche">Comparar o mesmo lanche às 19h e às 00h30</button>
           <button type="button" class="btn sec sm" id="atalho-turno">Comparar trabalho noturno em um ano</button>
         </div>
         <div class="agenda-opcoes">
@@ -105,11 +106,13 @@
       <p id="resumo-termico" hidden>Mesma caminhada das 17h30 às 18h15, a 31 °C, a 40% do VO₂máx, com 300 mL de água ao terminar em ambas as rotinas. Muda apenas a umidade (25% ou 75%). As duas rotinas descansam por uma hora a 24 °C e 45% de umidade.</p>
       <p id="resumo-luz" hidden>Os dois cenários têm a mesma escala, as mesmas refeições e o mesmo sono. Muda apenas a luz das 0h às 2h durante os cinco plantões. Você pode carregar os dois modelos no editor para mudar outros horários, inclusive a volta para casa.</p>
       <p id="resumo-pausa" hidden>As duas rotinas têm a mesma escala. A rotina B recebe uma pausa na terça-feira, das 3h às 3h10.</p>
+      <p id="resumo-lanche" hidden>Quatro plantões e uma noite de recuperação. As rotinas têm o mesmo sono, trabalho e ingestão de carboidrato e água. A rotina B desloca 20 g de carboidrato das 19h para as 00h30.</p>
       <p id="resumo-escala" hidden>Nos três modelos de escala, estão programadas 40 h de trabalho e 56 h de sono por semana.</p>
     </section>
 
     <section class="painel" aria-labelledby="resumo">
       <div class="cabecalho-painel"><h2 id="resumo">Evolução das rotinas</h2><label>Indicador <select id="indicador"></select></label></div>
+      <p id="leitura-glicemia-acumulada" hidden>Estimativa de como a área sob a curva de glicose mudaria após um café padronizado em relação ao dia 1 da própria rotina. Nos marcos, vale o último dia do período. <a href="../conferencia/glicemia-rotinas/">Conferir na Tabela 3</a></p>
       <label>Visualização <select id="passo-grafico"><option value="marcos">Marcos da trajetória</option><option value="dias">Todos os dias</option></select></label>
       <p><span class="legenda-a">— Rotina A</span> · <span class="legenda-b">╌ Rotina B</span></p>
       <canvas id="grafico" aria-hidden="true"></canvas>
@@ -165,6 +168,7 @@
         <li>Nos cenários térmicos, o corpo é representado por dois compartimentos, central e pele. O cálculo combina produção metabólica de calor, perdas seca e respiratória e evaporação. A água de todo o suor entra no balanço hídrico. As temperaturas são estimativas didáticas. O cenário fixa roupa e movimento do ar e considera caminhada sem radiação solar direta. <a href="../conferencia/">Tabelas fisiológicas</a></li>
         <li>No modo de luz programada, a dose usa iluminância aproximada ao nível dos olhos e o horário em relação à fase biológica. O efeito satura e fica limitado a ±8 h no cenário didático. Horários sem exposição anotada valem 0 lux neste modo. <a href="../conferencia/">Conferir protocolos e hipóteses</a></li>
         <li>Meditação, oração e biofeedback respiratório ocupam tempo da agenda. O biofeedback exibe o ritmo programado quando ativo. O motor não aplica uma mudança automática de PA, FC ou cortisol por causa de uma pausa.</li>
+        <li>O efeito glicêmico acumulado depende da vigília de 00h a 06h e da fração dos carboidratos ingeridos nesse intervalo, calculada sobre a ingestão nas 24 h anteriores às 06h30. A contribuição alimentar satura aos 30%. A área estimada para o café padronizado é exibida separadamente da curva de glicemia diária. O limite de quatro exposições equivalentes, a recuperação e as projeções fora do protocolo são hipóteses didáticas.</li>
         <li>O saldo de sono resume até sete dias de vigília em excesso como índice didático. Glicemia e cortisol reaproveitam os modelos de refeição, horário e exercício. A trajetória anual mostra a repetição das rotinas e a adaptação modelada da FC.</li>
       </ul>
     </details>
@@ -182,6 +186,6 @@
       <button type="button" id="fechar-observacao" class="btn sec sm">Fechar</button>
     </form>
   </dialog>
-  <script src="./trajetoria.js?v=7" type="module"></script>
+  <script src="./trajetoria.js?v=8" type="module"></script>
 </body>
 </html>

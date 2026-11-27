@@ -15,9 +15,10 @@ export const ROTINAS = Object.freeze({
 });
 
 const CARBO_DIA_G = 200;
-const NOITE_REF = 6 * 60;
+export const FIM_MADRUGADA_GLICEMIA = 6 * 60;
 const FATOR_RECUPERACAO = 0.5; // Hipótese didática: meia-vida de um dia.
-const CAFE = 390;
+export const HORA_CAFE_GLICEMIA = 390;
+const CAFE = HORA_CAFE_GLICEMIA;
 const CAFE_PCT = 30;
 const tabela3 = {
   0: { media: 0.63, ic: [0.25, 1.02] },
@@ -30,8 +31,6 @@ export const PORCOES = [0, 10, 30];
 const local = (relogio) => (relogio - INICIO_MIN + JANELA_MIN) % JANELA_MIN;
 const intervalo = (inicio, fim) => [local(inicio), local(fim) || JANELA_MIN];
 const horaEm = (min, [inicio, fim]) => min >= inicio && min < fim;
-const cafeEm = ({ vigilia, alimentacao }) =>
-  (tabela3[0].media * vigilia + (tabela3[30].media - tabela3[0].media) * alimentacao) / (NOITES_PROTOCOLO - 1);
 const ogttEm = ({ vigilia, alimentacao }) =>
   (tabela2[0].observado * vigilia + (tabela2[30].observado - tabela2[0].observado) * alimentacao)
     / (NOITES_PROTOCOLO * FATOR_RECUPERACAO);
@@ -50,17 +49,28 @@ function agenda(rotina, dia, horizonte, porcao, horasSono) {
   return { noturna, recuperacao, atividade, sono, refeicoes, energiaMadrugada };
 }
 
-function atualizarEstado(estado, plano) {
-  let minutosAcordado = 0;
-  for (let hora = 0; hora < NOITE_REF; hora += PASSO_MIN) {
-    if (!horaEm(local(hora), plano.sono)) minutosAcordado += PASSO_MIN;
-  }
-  const exposicao = minutosAcordado / NOITE_REF;
+export const ESTADO_GLICEMICO_INICIAL = Object.freeze({ vigilia: 0, alimentacao: 0 });
+
+export function passoGlicemiaAcumulada(estado, minutosAcordado, fracaoCarboMadrugada) {
+  const exposicao = minutosAcordado / FIM_MADRUGADA_GLICEMIA;
   const retencao = FATOR_RECUPERACAO ** (1 - exposicao);
+  const exposicaoAlimentar = Math.min(1, fracaoCarboMadrugada / 0.30);
   return {
     vigilia: Math.min(NOITES_PROTOCOLO, estado.vigilia * retencao + exposicao),
-    alimentacao: Math.min(NOITES_PROTOCOLO, estado.alimentacao * retencao + plano.energiaMadrugada / 30),
+    alimentacao: Math.min(NOITES_PROTOCOLO, estado.alimentacao * retencao + exposicaoAlimentar),
   };
+}
+
+export function aucCafeEstimado({ vigilia, alimentacao }) {
+  return (tabela3[0].media * vigilia + (tabela3[30].media - tabela3[0].media) * alimentacao) / (NOITES_PROTOCOLO - 1);
+}
+
+function atualizarEstado(estado, plano) {
+  let minutosAcordado = 0;
+  for (let hora = 0; hora < FIM_MADRUGADA_GLICEMIA; hora += PASSO_MIN) {
+    if (!horaEm(local(hora), plano.sono)) minutosAcordado += PASSO_MIN;
+  }
+  return passoGlicemiaAcumulada(estado, minutosAcordado, plano.energiaMadrugada / 100);
 }
 
 function pressaoSonoNaJanela(pressao, sono) {
@@ -85,16 +95,16 @@ export function simularGlicemiaRotina(id, horizonte, porcao, horasSono = 8) {
     throw new RangeError('Confira a rotina, o horizonte, a porção e o horário de sono.');
   }
   const rotina = ROTINAS[id];
-  let estado = { vigilia: 0, alimentacao: 0 };
+  let estado = ESTADO_GLICEMICO_INICIAL;
   let referencia;
   let pressaoSono = 0.5;
   const dias = Array.from({ length: horizonte }, (_, dia) => {
     const plano = agenda(rotina, dia, horizonte, porcao, horasSono);
     estado = atualizarEstado(estado, plano);
-    referencia ??= cafeEm(estado);
+    referencia ??= aucCafeEstimado(estado);
     const pressao = pressaoSonoNaJanela(pressaoSono, plano.sono);
     pressaoSono = pressao.final;
-    return { ...plano, estado, pressaoSonoNoCafe: pressao.noCafe, deltaCafe: cafeEm(estado) - referencia,
+    return { ...plano, estado, pressaoSonoNoCafe: pressao.noCafe, deltaCafe: aucCafeEstimado(estado) - referencia,
       deltaOgtt: plano.recuperacao && rotina.escala !== 'dia' && horasSono === 8 ? ogttEm(estado) : null,
       rotuloAtividade: plano.atividade ? rotina.atividade : 'Recuperação' };
   });
@@ -123,4 +133,30 @@ export function conferirGlicemiaRotinas() {
       ogtt: { media: tabela2[porcao].observado, ic: tabela2[porcao].ic, modelo: dias[4].deltaOgtt },
     };
   });
+}
+
+/** A semana editável replica os cinco dias da bancada e inclui duas rotinas diurnas. */
+export function agendaCompararLanche(porcao) {
+  if (!PORCOES.includes(porcao)) throw new RangeError('Escolha uma porção da bancada.');
+  const eventos = new Map();
+  function adicionar(dia, min, dados) {
+    const absoluto = (dia - 1) * JANELA_MIN + INICIO_MIN + min;
+    const diaSemana = (Math.floor(absoluto / JANELA_MIN) + 7) % 7;
+    const inicio = (absoluto + JANELA_MIN) % JANELA_MIN;
+    const evento = { ...dados, inicio };
+    const chave = JSON.stringify(evento);
+    if (!eventos.has(chave)) eventos.set(chave, { ...evento, dias: [] });
+    eventos.get(chave).dias.push(diaSemana);
+  }
+  for (let dia = 0; dia < 7; dia++) {
+    const rotina = dia < 5 ? ROTINAS.trabalhoNoite : ROTINAS.trabalhoDia;
+    const plano = agenda(rotina, dia, 5, porcao, 8);
+    for (const [tipo, faixa] of [['dormir', plano.sono], ['trabalho', plano.atividade]]) {
+      if (faixa) adicionar(dia, faixa[0], { tipo, fim: (INICIO_MIN + faixa[1]) % JANELA_MIN });
+    }
+    for (const r of plano.refeicoes) adicionar(dia, r.min, { tipo: 'refeicao', carboG: r.carboG });
+  }
+  const bebidas = [[390, 450, 300], [1005, 450, 300], [1020, 350, 600], [1140, 500, 550], [1260, 450, 550]]
+    .map(([inicio, aguaMl, sodioMg]) => ({ tipo: 'bebida', inicio, aguaMl, sodioMg }));
+  return [...eventos.values(), ...bebidas];
 }

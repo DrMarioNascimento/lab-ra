@@ -9,7 +9,10 @@ import { regularRim } from './renal.js';
 import { agendaComPausa, agendaEscala, agendaLuzPlantao, agendaInicial, prepararAgenda, TIPOS_AGENDA } from './agenda.js?v=3';
 import { emNoiteBiologica, faseEmPerfil, faseNoMinuto, passoFaseCircadiana, perfilDeFaseComLuz } from './fase-circadiana.js?v=2';
 
-export const HORIZONTES = [1, 2, 7, 12, 28, 56, 90, 180, 365];
+import { ESTADO_GLICEMICO_INICIAL, FIM_MADRUGADA_GLICEMIA, HORA_CAFE_GLICEMIA,
+  agendaCompararLanche, aucCafeEstimado, passoGlicemiaAcumulada } from './glicemia-rotinas.js?v=2';
+
+export const HORIZONTES = [1, 2, 5, 7, 12, 28, 56, 90, 180, 365];
 export const PERFIS_TRAJETORIA = Object.freeze({
   regular: { nome: 'Rotina sem sessão programada', treino: false, sonoCurto: false, ambiente: 'fresco' },
   treino: { nome: 'Três sessões semanais em ambiente fresco', treino: true, sonoCurto: false, ambiente: 'fresco' },
@@ -32,6 +35,8 @@ export const PERFIS_TRAJETORIA = Object.freeze({
   aclimaQuente: { nome: 'Aclimatação · treino no calor', aclimatacao: true, ambiente: 'arUmido', termico: true },
   arSeco: { nome: 'Caminhada a 31 °C · ar seco (25%)', treino: true, ambiente: 'arSeco', termico: true },
   arUmido: { nome: 'Caminhada a 31 °C · ar úmido (75%)', treino: true, ambiente: 'arUmido', termico: true },
+  carboAs19: { nome: 'Quatro plantões · lanche às 19h', agenda: agendaCompararLanche(0), ambiente: 'fresco' },
+  carboAs0030: { nome: 'Quatro plantões · lanche às 00h30', agenda: agendaCompararLanche(10), ambiente: 'fresco' },
   personalizada: { nome: 'Agenda personalizada', ambiente: 'fresco' },
 });
 const REFEICOES = Object.freeze([7.5, 13, 20].map((hora) => ({ hora, carboG: 50 })));
@@ -116,6 +121,19 @@ function ajustarFCBasal(pontos, queda) {
   });
 }
 
+function fracaoCarboMadrugada(anteriores, atuais) {
+  let carboTotal = 0, carboMadrugada = 0;
+  for (const refeicao of anteriores) {
+    if (refeicao.hora * 60 >= HORA_CAFE_GLICEMIA) carboTotal += refeicao.carboG;
+  }
+  for (const refeicao of atuais) {
+    const min = refeicao.hora * 60;
+    if (min < HORA_CAFE_GLICEMIA) carboTotal += refeicao.carboG;
+    if (min < FIM_MADRUGADA_GLICEMIA) carboMadrugada += refeicao.carboG;
+  }
+  return carboTotal ? carboMadrugada / carboTotal : 0;
+}
+
 /** O mesmo horizonte compartilha o mesmo estado inicial, independentemente do número de dias exibido. */
 export function simularTrajetoria(perfilId, dias, { detalharDia = -1, frequenciaNoturna = 'uma', sonoDiurno = false, eventos = null, faseParcial = null, modoFase = null } = {}) {
   if (!Object.hasOwn(PERFIS_TRAJETORIA, perfilId) || !Number.isInteger(dias) || dias < 1 || dias > 365) throw new RangeError('Escolha um cenário e um horizonte de 1 a 365 dias.');
@@ -133,6 +151,7 @@ export function simularTrajetoria(perfilId, dias, { detalharDia = -1, frequencia
   const saldosSono = [];
   let refeicoesAnteriores = calendario?.dia(-1).refeicoes ?? REFEICOES;
   let sonoNaNoiteMin = 0;
+  let glicemiaAcumulada = ESTADO_GLICEMICO_INICIAL, aucCafeInicial;
 
   for (let dia = 0; dia < dias; dia++) {
     const agendaLivre = calendario?.dia(dia);
@@ -218,11 +237,19 @@ export function simularTrajetoria(perfilId, dias, { detalharDia = -1, frequencia
       vigiliaMaxMin = Math.max(vigiliaMaxMin, vigiliaMin);
       pressaoSono = atualizaSono(pressaoSono, dormindo);
     }
+    let minutosAcordado = 0;
+    for (let min = 0; min < FIM_MADRUGADA_GLICEMIA; min += PASSO_INTEGRADO) {
+      if (!cardio[min].dormindo) minutosAcordado += PASSO_INTEGRADO;
+    }
+    glicemiaAcumulada = passoGlicemiaAcumulada(glicemiaAcumulada, minutosAcordado, fracaoCarboMadrugada(refeicoesAnteriores, refeicoes));
+    const aucCafe = aucCafeEstimado(glicemiaAcumulada);
+    aucCafeInicial ??= aucCafe;
+    const deltaAucCafe = aucCafe - aucCafeInicial;
     const horasSono = sonoMin / 60;
     saldosSono.push(24 - horasSono - P.dividaSono.vigiliaCriticaH.valor);
     const saldoSono7d = Math.max(0, saldosSono.slice(-7).reduce((a, b) => a + b, 0));
     saida.push({
-      dia: dia + 1, horasSono, saldoSono7d, pressaoAoAcordar, quedaFC, picoGlicemia, mediaCortisol,
+      dia: dia + 1, horasSono, saldoSono7d, pressaoAoAcordar, quedaFC, picoGlicemia, deltaAucCafe, mediaCortisol,
       vigiliaMaxH: vigiliaMaxMin / 60, atividadeNoturnaH: atividadeNoturnaMin / 60,
       sonoDiurnoH: sonoDiurnoMin / 60, trabalhoNoturnoH: trabalhoNoturnoMin / 60, trabalhoH: trabalhoMin / 60, noitesEmClaro,
       faseCircadianaH: faseFinalH, sonoForaFaseH: sonoForaFaseMin / 60, pausaMin, biofeedbackMin, luzLuxH: luzLuxMin / 60,
@@ -238,7 +265,7 @@ export function simularTrajetoria(perfilId, dias, { detalharDia = -1, frequencia
     quedaFC = passoAdaptacaoFC(quedaFC, perfil.treino);
   }
 
-  return { dias: saida, leitura, estadoFinal: { agua, pressaoSono, quedaFC, faseCircadianaH: faseH } };
+  return { dias: saida, leitura, estadoFinal: { agua, pressaoSono, quedaFC, faseCircadianaH: faseH, glicemiaAcumulada } };
 }
 
 export function agruparTrajetoria(dias) {

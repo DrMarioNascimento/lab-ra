@@ -1,5 +1,7 @@
 import { agendaEscala, agendaInicial, agendaLuzPlantao, DIAS_AGENDA, relogio, TIPOS_AGENDA, TODOS_DIAS, tipoIntervalo } from '../motor/agenda.js?v=3';
 
+import { agendaCompararLanche } from '../motor/glicemia-rotinas.js?v=2';
+
 const lerHora = (v) => {
   if (!v) return NaN;
   const [h, m] = v.split(':').map(Number);
@@ -101,7 +103,13 @@ export function criarEditor(container, copiar) {
   }));
   container.querySelector('[data-carregar-escala]').addEventListener('click', () => {
     const modelo = container.querySelector('[data-escala]').value;
-    eventos = modelo === 'luzSuave' ? agendaLuzPlantao(100) : modelo === 'luzIntensa' ? agendaLuzPlantao(2500) : agendaEscala(modelo);
+    const modelos = {
+      luzSuave: () => agendaLuzPlantao(100),
+      luzIntensa: () => agendaLuzPlantao(2500),
+      carboAs19: () => agendaCompararLanche(0),
+      carboAs0030: () => agendaCompararLanche(10),
+    };
+    eventos = modelos[modelo]?.() ?? agendaEscala(modelo);
     desenhar();
   });
   container.querySelector('[data-pausa]').addEventListener('click', () => {

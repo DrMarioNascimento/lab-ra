@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { agendaCompararLanche, conferirGlicemiaRotinas, PORCOES, simularGlicemiaRotina } from './glicemia-rotinas.js';
 import { agruparTrajetoria, PERFIS_TRAJETORIA, simularTrajetoria } from './trajetoria.js';
 
 test('24 h e sete dias têm o mesmo primeiro dia; água e sono passam à meia-noite', () => {
@@ -106,4 +107,37 @@ test('o caso de luz mantém trabalho e sono iguais e muda a fase a partir da pri
   const controle = simularTrajetoria('luzIntensa', 7, { modoFase: 'fixa', detalharDia: 1 });
   assert.equal(controle.leitura[1].luzLux, 2500);
   assert.equal(controle.estadoFinal.faseCircadianaH, 0);
+});
+
+test('agenda de quatro plantões reproduz a trajetória da bancada e a conferência da tabela 3', () => {
+  const tabela = conferirGlicemiaRotinas();
+  for (const porcao of PORCOES) {
+    const eventos = agendaCompararLanche(porcao);
+    const bancada = simularGlicemiaRotina('trabalhoNoite', 5, porcao);
+    const traj = simularTrajetoria('personalizada', 5, { eventos });
+    assert.deepEqual(traj.dias.map((d) => d.deltaAucCafe), bancada.dias.map((d) => d.deltaCafe));
+    assert.equal(traj.dias[3].deltaAucCafe, tabela.find((r) => r.porcao === porcao).cafe.modelo);
+    assert.ok(traj.dias[4].deltaAucCafe < traj.dias[3].deltaAucCafe);
+  }
+});
+
+test('mudar o horário do lanche altera a curva imediata e o indicador sem mudar sono e outros sistemas', () => {
+  const a = simularTrajetoria('carboAs19', 5, { detalharDia: 3 });
+  const b = simularTrajetoria('carboAs0030', 5, { detalharDia: 3 });
+  for (const medida of ['horasSono', 'trabalhoH', 'pamMedia', 'minPlasma']) {
+    assert.deepEqual(a.dias.map((d) => d[medida]), b.dias.map((d) => d[medida]));
+  }
+  const idx01h = 60 / 5;
+  assert.ok(b.leitura[idx01h].glicemia > a.leitura[idx01h].glicemia);
+  assert.ok(b.dias[3].deltaAucCafe > a.dias[3].deltaAucCafe);
+  assert.equal(simularTrajetoria('escalaDia', 7).dias.at(-1).deltaAucCafe, 0);
+});
+
+test('estado tem histórico independente do horizonte escolhido e fica limitado na projeção', () => {
+  const curta = simularTrajetoria('carboAs0030', 5);
+  const longa = simularTrajetoria('carboAs0030', 28);
+  assert.deepEqual(longa.dias.slice(0, 5), curta.dias);
+  assert.ok(longa.estadoFinal.glicemiaAcumulada.vigilia <= 4);
+  assert.ok(longa.estadoFinal.glicemiaAcumulada.alimentacao <= 4);
+  assert.equal(agruparTrajetoria(longa.dias).at(-1).deltaAucCafe, longa.dias.at(-1).deltaAucCafe);
 });
