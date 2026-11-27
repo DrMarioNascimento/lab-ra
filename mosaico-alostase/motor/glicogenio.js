@@ -82,3 +82,31 @@ export function simularRegulacaoHepatica(insulina = 1, glucagon = 1) {
     return { razaoRelativa, taxa };
   });
 }
+
+// Compartimento aparente de glicose, como na parametrização de Schiavon et al. (2013).
+const VOLUME_EFETIVO_DL_KG = 0.200 * 0.65 * 10;
+// Hipótese didática de remoção do desvio em relação ao cenário de referência.
+const CONSTANTE_REMOCAO_MIN = Math.log(2) / 30;
+const FRACAO_RETIDA = Math.exp(-CONSTANTE_REMOCAO_MIN);
+const GANHO_ENTRADA = (1 - FRACAO_RETIDA) / CONSTANTE_REMOCAO_MIN;
+
+/** Balanço da perturbação hepática em passos de um minuto no mesmo protocolo. */
+export function efeitoHepaticoNaGlicemia(regulacao, referencia) {
+  let noCompartimento = 0, liberacaoAcumulada = 0, taxaAnterior = 0;
+  return regulacao.map(({ taxa }, minuto) => {
+    const deltaFluxo = taxa - referencia[minuto].taxa;
+    if (minuto > 0) {
+      const entradaNoIntervalo = (taxaAnterior + deltaFluxo) / 2;
+      liberacaoAcumulada += entradaNoIntervalo;
+      noCompartimento = FRACAO_RETIDA * noCompartimento + GANHO_ENTRADA * entradaNoIntervalo;
+    }
+    taxaAnterior = deltaFluxo;
+    return {
+      deltaFluxo,
+      deltaGlicemiaMgDl: noCompartimento / VOLUME_EFETIVO_DL_KG,
+      liberacaoAcumuladaMgKg: liberacaoAcumulada,
+      saldoMgKg: noCompartimento,
+      remocaoAcumuladaMgKg: liberacaoAcumulada - noCompartimento,
+    };
+  });
+}

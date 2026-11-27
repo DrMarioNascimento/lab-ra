@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { glicogenioAposRefeicao, variacaoGlicogenioEmJejum, fluxoHepaticoAposRefeicao, simularFluxoHepatico, simularRegulacaoHepatica, CONFERENCIA_GLICOGENIO_120 } from './glicogenio.js';
+import { glicogenioAposRefeicao, variacaoGlicogenioEmJejum, fluxoHepaticoAposRefeicao, simularFluxoHepatico, simularRegulacaoHepatica, efeitoHepaticoNaGlicemia, CONFERENCIA_GLICOGENIO_120 } from './glicogenio.js';
 
 test('a curva pós-prandial reproduz a concentração inicial e o pico publicado', () => {
   assert.equal(glicogenioAposRefeicao(0), 207);
@@ -47,4 +47,25 @@ test('regulação hormonal usa as duas âncoras e responde à perturbação dos 
     assert.ok(serie.every(({ taxa }) => taxa >= 0 && taxa <= 1.9));
   }
   assert.throws(() => simularRegulacaoHepatica(0), RangeError);
+});
+
+test('balanço glicêmico mantém a referência e conserva o desvio de massa', () => {
+  const referencia = simularRegulacaoHepatica();
+  assert.ok(efeitoHepaticoNaGlicemia(referencia, referencia).every((p) => p.deltaGlicemiaMgDl === 0));
+  for (const [insulina, glucagon, sinal] of [[1.2, 1, -1], [1, 1.2, 1]]) {
+    const serie = efeitoHepaticoNaGlicemia(simularRegulacaoHepatica(insulina, glucagon), referencia);
+    assert.equal(serie[0].deltaGlicemiaMgDl, 0);
+    assert.equal(Math.sign(serie[60].deltaGlicemiaMgDl), sinal);
+    for (const p of serie) {
+      assert.ok(Math.abs(p.liberacaoAcumuladaMgKg - p.remocaoAcumuladaMgKg - p.saldoMgKg) < 1e-10);
+    }
+  }
+});
+
+test('a integração reproduz a solução para fonte constante e a conversão de unidades', () => {
+  const entrada = Array.from({ length: 31 }, () => ({ taxa: 1 }));
+  const referencia = entrada.map(() => ({ taxa: 0 }));
+  const { deltaGlicemiaMgDl, liberacaoAcumuladaMgKg } = efeitoHepaticoNaGlicemia(entrada, referencia).at(-1);
+  assert.equal(liberacaoAcumuladaMgKg, 30);
+  assert.ok(Math.abs(deltaGlicemiaMgDl - 0.5 * 30 / Math.log(2) / 1.3) < 1e-10);
 });

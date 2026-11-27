@@ -61,7 +61,23 @@
         <tbody id="conferencia-regulacao"></tbody>
       </table>
       <p>A entrada é a razão glucagon/insulina, lida aproximadamente da Figura 3 e dividida pelo valor de jejum. O cálculo aumenta com essa razão e tem como teto a produção de jejum. O basal e os 60 min calibram a resposta. Os outros tempos conferem o ajuste. Perto de 30 min, o cálculo mantém produção residual, enquanto o estudo relata supressão próxima de zero.</p>
-      <p>Os controles são hipóteses didáticas. Nesta etapa, o sinal altera a produção hepática. As concentrações no sangue e a reserva de glicogênio seguem suas curvas de referência. <a href="https://doi.org/10.1172/JCI118379">Taylor e colegas, 1996 · Figura 3</a></p>
+      <p>Os controles são hipóteses didáticas. O sinal altera a produção hepática e alimenta o cálculo de diferença na glicemia abaixo. A reserva de glicogênio segue a curva experimental. <a href="https://doi.org/10.1172/JCI118379">Taylor e colegas, 1996 · Figura 3</a></p>
+      <details open id="balanco-glicose">
+        <summary>Da produção hepática à glicemia</summary>
+        <p>O gráfico mostra quanto a glicemia mudaria <strong>apenas pela diferença na produção do fígado</strong>. A linha de zero representa os sinais de insulina e glucagon em 100%.</p>
+        <canvas id="curva-balanco" class="calor-curva" aria-hidden="true"></canvas>
+        <p class="calor-legenda"><span>Contínua · referência</span><span>Tracejada · diferença estimada (mg/dL)</span></p>
+        <p id="leitura-balanco"></p>
+        <table>
+          <caption>Balanço desde a refeição em relação ao caso de referência (mg/kg)</caption>
+          <tbody>
+            <tr><th scope="row">Diferença acumulada na quantidade liberada pelo fígado</th><td id="balanco-entrada"></td></tr>
+            <tr><th scope="row">Diferença acumulada na quantidade removida</th><td id="balanco-remocao"></td></tr>
+            <tr><th scope="row">Diferença que permanece no compartimento</th><td id="balanco-saldo"></td></tr>
+          </tbody>
+        </table>
+        <p>A cada minuto, a diferença de produção entra no compartimento aparente de glicose e o desvio remanescente diminui com uma meia-vida didática de 30 min. O volume efetivo de 0,13 L/kg vem da parametrização publicada por Schiavon e colegas. O modelo começa com a mesma glicemia nos dois cenários e usa o mesmo parâmetro de remoção. A curva apresenta uma diferença em mg/dL. <a href="https://doi.org/10.1152/ajpendo.00182.2013">Schiavon e colegas, 2013 · equação 1</a></p>
+      </details>
     </section>
     <section class="painel">
       <h2>Conferir com os estudos</h2>
@@ -75,6 +91,6 @@
       <p>A concentração de glicogênio é expressa por litro de tecido hepático. As curvas atuais de glicose e hormônios usam outra refeição e outro estudo. <a href="../">Ver glicose, insulina e glucagon</a></p>
     </section>
   </main>
-  <script type="module" src="./glicogenio.js?v=3"></script>
+  <script type="module" src="./glicogenio.js?v=4"></script>
 </body>
 </html>
