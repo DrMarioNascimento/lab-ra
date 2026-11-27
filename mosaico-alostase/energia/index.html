@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Glicose, insulina e glucagon · Mosaico Alostase</title>
+  <link rel="stylesheet" href="../jogo/estilo.css?v=9">
+  <link rel="stylesheet" href="../cardiovascular/bancada.css">
+  <link rel="stylesheet" href="../turno-calor/calor.css">
+  <style>
+    .energia select { max-width: 100%; }
+    .energia table { table-layout: fixed; }
+    .energia th, .energia td { padding: .55rem .35rem; overflow-wrap: anywhere; }
+  </style>
+</head>
+<body>
+  <main class="bancada energia">
+    <nav class="calor-nav"><a href="../">← Mosaico Alostase</a><a href="../conferencia/">Tabelas fisiológicas</a></nav>
+    <header class="abertura">
+      <h1>Glicose, insulina e glucagon</h1>
+      <p>Acompanhe as três medidas antes e depois de uma refeição padronizada. Compare com um dia em que a mesma refeição se repete.</p>
+    </header>
+    <section class="painel" aria-labelledby="curvas-energia">
+      <h2 id="curvas-energia">Curvas de 24 horas</h2>
+      <div class="controle-hora">
+        <label>Variável <select id="medida"></select></label>
+        <label>Refeições na comparação
+          <select id="rotina">
+            <option value="duas">08h e 14h</option>
+            <option value="tres">08h, 13h e 19h</option>
+          </select>
+        </label>
+      </div>
+      <p id="unidade"></p>
+      <canvas id="curva" class="calor-curva" aria-hidden="true"></canvas>
+      <p class="calor-legenda"><span>Contínua · refeição única às 08h</span><span>Tracejada · refeições repetidas</span><span>Círculos · medianas da tabela para a refeição única</span></p>
+      <label for="tempo">Horário <output id="hora"></output></label>
+      <input id="tempo" type="range" min="0" max="288" step="1" value="102">
+      <p id="leitura"></p>
+    </section>
+    <section class="painel" aria-labelledby="tabela-energia">
+      <h2 id="tabela-energia">Conferir com a refeição do estudo</h2>
+      <p>Os dados vêm de 28 participantes sem diabetes após uma refeição líquida com 50 g de carboidrato, 13 g de proteína e 11 g de gordura. Os percentis descrevem a dispersão no grupo em cada horário.</p>
+      <table>
+        <caption id="tabela-legenda"></caption>
+        <thead><tr><th scope="col">Após a refeição</th><th scope="col">Percentil 2,5</th><th scope="col">Mediana</th><th scope="col">Percentil 97,5</th></tr></thead>
+        <tbody id="tabela-pontos"></tbody>
+      </table>
+      <p>Nessa refeição mista, a mediana do glucagon subiu aos 15 min. Os picos amostrados de glicose e insulina ocorreram aos 30 min. <a href="https://doi.org/10.1177/0004563220975658">Meek e colegas, 2021 · Tabela Suplementar 2</a></p>
+    </section>
+    <details class="painel">
+      <summary>Como as curvas são calculadas</summary>
+      <p>Nos horários da tabela, a refeição única reproduz as medianas publicadas. Entre coletas, o cálculo interpola linearmente. Depois de quatro horas, o desvio volta em direção ao basal com meia-vida de 60 min, uma hipótese didática. A linha de refeições repetidas soma os desvios de cada refeição sobre o mesmo basal.</p>
+      <p>A projeção mantém o basal antes da primeira refeição e usa a mesma resposta a cada refeição, em qualquer horário. Glicose, insulina e glucagon são calculados como curvas separadas nesta etapa. Os pontos da tabela descrevem somente a refeição única.</p>
+    </details>
+  </main>
+  <script type="module" src="./energia.js"></script>
+</body>
+</html>
