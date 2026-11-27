@@ -100,10 +100,10 @@ Situação depois da rodada 5 das escalas (revisão 6, 25/11/2026): as mesmas 7 
 | Sala | Peça | Peso | Situação | O que falta |
 |---|---|---|---|---|
 | Subsolo · Câmara do tempo | T01 | 868 KB | aprovada | recomprimir (meta 600 KB) |
-| Central de monitoramento | S01 | 839 KB | aprovada | recomprimir |
-| Recepção | P01 | 156 KB | aprovada | roleta, telefone e relógio só em texto (pedido 6, opcional) |
+| Central de monitoramento | S01_B (revisão 17; era S01) | 793 KB | composta por código sobre a S01 | cofre pequeno, xícaras, livros e gaveta entraram; relevo a 768 px |
+| Recepção | P01_B (revisão 17; era P01) | 196 KB | composta por código sobre a P01 | roleta, telefone, relógios, quadro de consumo e chapelaria entraram |
 | Oficina técnica | M03 | 820 KB | aprovada | recomprimir |
-| Oficina elétrica | E02 | 421 KB | aprovada | miniatura do mapa refeita na revisão 6 (estante de baterias); o modelo não tem painel de fusíveis |
+| Oficina elétrica | E02_B (revisão 17; era E02) | 353 KB | composta por código sobre a E02, sem teto | gerador, bancada com gaveta, painel de ferramentas, luvas, painel de fusíveis, medidor e procedimento entraram |
 | Ateliê de descobertas | L06 + livro | 865 KB | aprovada | recomprimir |
 | Sala de conservação | I01 + livro | 232 KB | aprovada | nada |
 | Galeria especial | GAL_A | 481 KB | reprovada (ambiente) | pedido 8: base com vitrine. A dedução foi tratada na revisão 5 (pergunta de história antes do controle). Até a revisão 5 a cena do minijogo da luz mostrava um quadro de moldura laranja, não a máscara; na revisão 6 a cena passou a mostrar a própria máscara (`GAL_A`), com a luz andando por cima |

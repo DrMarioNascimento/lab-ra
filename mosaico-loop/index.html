@@ -9,7 +9,7 @@
 /* Links e QR com código de sala vão direto para a sala. */
 (function () { var q = location.search; if (/[?&]sala=/.test(q)) location.replace("sala/index.html" + q + location.hash); })();
 </script>
-<link rel="stylesheet" href="style.css?v=28">
+<link rel="stylesheet" href="style.css?v=29">
 <style>
 .ent{max-width:980px;margin:0 auto;padding:0 18px 40px}
 .ent .mast{height:56px}
@@ -58,10 +58,10 @@
 <button class="btn primary" id="entrar" type="button" disabled>Entrar</button>
 </section>
 <section class="ent-card cond" aria-label="Conduzir">
-<div class="ent-cab"><div><p class="kicker">CONDUZIR</p><h2>Conduzir como professor</h2></div><img src="museu/icones/ui/conduzir.webp" alt=""></div>
-<p class="ajuda">Você cria a sala e conduz pelo celular. No PC ou na TV, abra o telão com o código.</p>
-<a class="btn prof" href="sala/index.html?conduzir=1" id="prof"><span aria-hidden="true">🔒</span>Conduzir como professor</a>
-<span class="chave">Só o Professor tem a chave</span>
+<div class="ent-cab"><div><p class="kicker">CONDUZIR</p><h2>Conduzir como curador</h2></div><img src="museu/icones/ui/conduzir.webp" alt=""></div>
+<p class="ajuda">Você cria a sala e joga junto. No jogo, o botão Sala traz QR, turma e voltas. No PC ou na TV, abra o telão.</p>
+<a class="btn prof" href="sala/index.html?conduzir=1" id="prof"><span aria-hidden="true">🔒</span>Conduzir como curador</a>
+<span class="chave">Só o Curador tem a chave</span>
 <div class="ent-duo"><a class="btn secondary" href="sala/telao/index.html"><img src="museu/icones/ui/telao.webp" alt="">Abrir telão</a><a class="btn secondary" href="simulador/"><img src="museu/icones/ui/simulador.webp" alt="">Simulador</a></div>
 </section>
 </div>

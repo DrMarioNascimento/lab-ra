@@ -1,6 +1,6 @@
 # Loop · A Máquina (camada central)
 
-Arquivos: `dados/pistas-v4.json` (fonte dos dados, **281 pistas**, versão v4, **revisão 16 de 26/11/2026**) → `loop-central-dados.js` (gerado a partir dele), `loop-central.js` (regras e telas). Enredo: `ROTEIRO-LOOP.md`. Decisões aplicadas: `DECISOES-V4.md`. Botão **Máquina** na barra de baixo, com a miniatura da Câmara.
+Arquivos: `dados/pistas-v4.json` (fonte dos dados, **281 pistas**, versão v4, **revisão 17 de 26/11/2026**) → `loop-central-dados.js` (gerado a partir dele), `loop-central.js` (regras e telas). Enredo: `ROTEIRO-LOOP.md`. Decisões aplicadas: `DECISOES-V4.md`. Botão **Máquina** na barra de baixo, com a miniatura da Câmara.
 
 - **Defeito por semente** (5 causas): A falta ajustar, B falta força, C peça presa (a máquina se segura na peça errada da base), D fusível tirado de propósito, E dois defeitos juntos (A + B, em voltas diferentes). Roteiro completo em `ROTEIRO-LOOP.md`. Os sinais de cada defeito só existem quando ele é o sorteado, mas a lista de cada sala mostra os mesmos rótulos nas 5 noites (onde o sinal não existe, o mesmo rótulo traz a coisa normal: campo `parDe` nos dados); o manual (páginas 1 a 6), a folha amassada da impressora, o apito curto da base e a caixa de "banners" com a peça verdadeira existem em todas as noites.
 - **Valores por semente** (nada decorável): dia da troca (9 a 25), hora do apagão (1:00, 1:05, 1:10, 1:15 ou 1:20), número de registro (3 algarismos), ordem dos 3 pontos de ligação, número da chave do para-raios e senha do cofre do Braga (o registro de trás para a frente). Nos dados os textos usam os marcadores `{dia}` `{hora}` `{reg}` `{reg_inv}` `{ordem}` `{ch}`; `valores_padrao` (14, 1:10, 472, 274, 3-1-2, chave 3) serve para os exemplos dos documentos. O validador sorteia os valores como o jogo.
@@ -95,7 +95,7 @@ Palavras que o jogo usa: **número de registro** (da peça), **base** (onde a pe
 - Noite E: a trava do primeiro conserto (volta 3) passou a valer no navegador (o jogo lê `regras.E_volta_min_meio`).
 - Revelar só na volta 5: trava no código, texto novo na aba Revelar e no passo a passo.
 - A lista da sala não conta mais o tempo que falta: mostra "ainda não" (a contagem entregava a hora do raio).
-- A foto do catálogo mostra o registro sorteado. As opções dos minijogos mudam de ordem com a semente e a posição da luz também (2 a 5).
+- A foto do catálogo mostra o registro sorteado. As opções dos minijogos mudam de ordem com a semente e a posição da luz também (2 a 5; revisão 17: só as de lado, 2, 4 ou 5).
 - A fita da câmera da porta de serviço só tem o que a câmera vê, até o crachá encostar na porta.
 - Objeto na mão aparece com nome de gente ("a luva isolante", "a peça verdadeira"). Mensagens dizem "sem dupla" e "em dupla".
 - A tela cobra o custo escrito nos dados (as 5 pistas de custo 2 passam a custar 2).
@@ -241,7 +241,7 @@ Palavras que o jogo usa: **número de registro** (da peça), **base** (onde a pe
 - **Minijogo antes de atividade em dupla** (comportamento que não estava escrito): abre uma vez por atividade e por volta em cada aparelho; trocar de sala na mesma volta leva direto à palavra da dupla.
 
 **O que mudou nos dados** (`dados/pistas-v4.json`, 278 pistas, "v4 revisão 7")
-- Lado a Lado (telas A e B), `coop_copia_ok` e `foto_solo`: a comparação é rachadura, cor da pedra e riscos do tempo (revisão 13: desgaste nas bordas); nada de "embaixo da base".
+- Lado a Lado (telas A e B), `coop_copia_ok` e `foto_solo`: a comparação é rachadura, cor e riscos do tempo (revisão 13: desgaste nas bordas; revisão 16: "a cor", sem "pedra"); nada de "embaixo da base".
 - `coop_veredito`: "Tá. Essa rubrica é do Lenz, do patrocínio. Ele assina tudo assim."
 - `teo_d3`: "a base dela" (sem "cópia"). `coop_raio.papelB`: "os 3 números que aparecem enquanto segura a chave".
 - `regras.final_frases` (novo): as 3 frases de final que dependem do caderno.
@@ -450,7 +450,29 @@ Palavras que o jogo usa: **número de registro** (da peça), **base** (onde a pe
 
 **Testes de tela** (fora do repositório): os de antes e dois novos, `/tmp/roda/r15/caminho.mjs` (a planta como grafo: caminhos que as pistas exigem) e `/tmp/roda/r15/luzalt.mjs` (altura dos minijogos: luz nas 5 posições, dicas e erro). `/tmp/pwt/r5.mjs` e `/tmp/roda/r6/cap.mjs` passaram a escolher a resposta nova de "Antes de acender a luz".
 
-## Checklist por volta (recalculado dos dados em 26/11/2026, revisão 13; nas revisões 14 e 16 nenhuma pista entrou ou saiu e nenhuma volta, horário, tranca nem rótulo mudou)
+## Revisão 17 — 26/11/2026 · lote 14, depois das rodadas 17 a 19
+
+Detalhes e motivos: `DECISOES-V4.md`, "Revisão 17". Nenhuma regra, tranca, volta, horário, fonte, rótulo, custo ou ordem mudou; nenhuma pista entrou ou saiu.
+- **`museu/pecas-compostas.mjs`.** Novo `kit(doc, buf)` (geometria com uv, texturas desenhadas com sharp, materiais) e três peças montadas por código, só quando pedidas: `node pecas-compostas.mjs <pasta pecas> E02_B,P01_B,S01_B`. `E02_B` (Oficina elétrica, 353 KB): canto sem teto sobre a E02, com gerador (fita de papel, ordem de serviço e verso), bancada com gaveteiro lacrado, fusível, prancheta, painel de ferramentas com a chavinha, gancho com luvas, painel de fusíveis, medidor, procedimento e lâmpadas. `P01_B` (Recepção, 196 KB) e `S01_B` (Central, 793 KB, relevo da S01 a 768 px): ver DECISOES. Ícones `museu/icones/E02_B.webp`, `P01_B.webp`, `S01_B.webp` (160 px, com margem) e `GAL_B_testa.webp` (testa da máscara). `museu/CREDITOS.txt` e a nota de `museu/escala-pecas.json` com as três peças.
+- **`museu/pontos-pecas.html`.** `pontosNos(id, nós)`: um lugar por nó `alvo_*`, em cima do objeto.
+- **`game.js`.** `LOOP_SALAS`: eletrica → `E02_B`, recepcao → `P01_B`, seguranca → `S01_B`. `LOOP_PONTOS`: `E02_B`, `P01_B`, `S01_B` novos; nas outras salas, 105 vagas postas em cima do objeto que a pista cita (`/tmp/roda/r16/remap.json`). `PECA_CANTO` + E02_B e P01_B; `PECA_PERTO` E02_B (82%), P01_B (78%), S01_B (80%). `sala/conteudo.js` e `museu/torre/salas-loop.json` gerados de novo.
+- **`museu/torre/index.html`.** Esconde nós `teto*` das peças das salas.
+- **`loop-central.js`.** Luz de lado: certa em 2, 4 ou 5. Dica da fita: "Lá fora chove desde ontem." `lcBancada`: "Antes de acender a luz" abre com a altura da janela da luz (cópia escondida mede; `bancada.css` ganhou `.lc-banc.mede::backdrop`, v=8). Miniaturas: `GAL_B_testa` na prova da cópia; `P01_B` e `S01_B` no lugar de `P01` e `S01`.
+- **`ritmo.js`.** `LOOP_LINHA`: cópia com `GAL_B_testa`; motivo e passagem com `P01_B` e `S01_B`.
+- **Dados (revisão 17).** `traj_2` (+ resposta à Ivone), `nico_0` (cafeteira), `empurra_2`, `man_3`, `coop_catraca_ok`, `catraca_solo` (sem fecho de narrador). `loop-central-dados.js` gerado de novo; leitura de volta igual.
+- **Checklist abaixo.** "a cor" (era "cor da pedra"). Nenhuma volta, horário, tranca nem rótulo mudou.
+
+## Revisão 17 (continuação) — 26/11/2026 · lote 15: pedidos do autor
+
+Detalhes e motivos: `DECISOES-V4.md`, "Revisão 17 (continuação)". Nenhuma pista, texto, regra, tranca, volta, horário, fonte, rótulo, custo ou ordem mudou.
+- **`game.js` · pontos escondidos.** `ACHAR` (perto 0,45 e zoom 0,6 da vista inicial · folga 1,18 · raio 0,30 · folga do raio 1,2 · bate 0,06; zoom até 8°), `revelarPontos(mv)` (na troca de câmera, junto com `separarPontos`), `achouJa`/`tocouJa`/`marcarAchado` (`state.achados` e `state.tocados`, chave sala|rótulo, ficam de uma volta para a outra), `controlesDaPeca` (tocar na peça mira e aproxima; botões +, − e ⟲), `window.acharAoAcaso` (simulador). Na sala: `model-viewer.achar` com `disable-tap`; lista "Examinar o que você achou" com só os achados e "Nada achado ainda nesta sala."; dica "Gire e chegue perto: os detalhes só aparecem de perto." até o primeiro achado. Livro: virar a folha acha as duas páginas. Gravador: faixa só depois de achada. Passo a passo 2: "Gire e chegue perto"; passo 1: "o curador Aurélio".
+- **`style.css` (v=29).** `.achar .hs` (some até `.perto` ou `.tocado`; brilho que cresce), `.peca-ctl`, `.lista-vazia`, lupa do passo a passo.
+- **`sala/sala-mestre.mjs` (v=15) · Curador da sala.** A barra fixa do mestre saiu; botão **Sala** no alto (`#salaBtn`, só no aparelho de quem abriu a sala, pisca quando há o que fazer) abre `#salaDialog`: situação e ação da volta, QR e código, abrir telão, turma (expulsar/readmitir), entrada, encerrar a aula, sair. `naTurma`: o Curador conta quando joga. Textos: "Curador da sala".
+- **`sala/firebase-room.js` (v=5) · entrada pelo QR** no padrão do Mosaico Vila (cartão PARTICIPAR, código grande, "Seu nome", "Como o jogo deve receber você?" sem nada marcado, Entrar, erro na linha, "Não precisa de cadastro."); manual com "Entendi" logo depois de entrar, "i" na espera. Textos do papel: Curador. O botão flutuante da sala fica escondido (`data-dragon-sala-host`).
+- **`index.html`, `sala/telao/telao.mjs`, `sala/simulador/index.html`, `sala/piloto.mjs` (v=4), `sala/sala.css` (v=8).** "Conduzir como curador", "Só o Curador tem a chave"; telão conta o Curador que joga; quadro "Curador da sala" no simulador; piloto procura antes de examinar.
+- **Dados.** `versao` "v4 revisão 17 (26/11/2026) · lotes 14 e 15" e `regras.achar`. `loop-central-dados.js` gerado de novo; leitura de volta igual.
+
+## Checklist por volta (recalculado dos dados em 26/11/2026, revisão 13; nas revisões 14, 16 e 17 nenhuma pista entrou ou saiu e nenhuma volta, horário, tranca nem rótulo mudou)
 
 Conferido em `dados/pistas-v4.json` (campos `volta_min`, `volta_max`, `segundo_min`, `precisaDe`, `soNaCausa`, `parDe`, `grupos_fonte`, `atividades_coop`). Horários com `valores_padrao` (raio em 1:10); com outra hora sorteada, os horários ligados ao raio andam junto. Pistas por `volta_min`: **232 na volta 1, 27 na volta 2, 9 na volta 3, 9 na volta 4, 4 na volta 5** (281 no total). Por tipo: 216 comuns, 26 de dupla, 21 de observação (clima), 16 falsas honestas, 2 objetos. Ativas por noite: 210 (A), 211 (B), 210 (C), 210 (D), 215 (E) (as 3 novas valem nas 5 noites).
 
@@ -488,7 +510,7 @@ Antes da hora, a lista mostra "ainda não" (sem contagem).
 | **Prova da cópia** | Comparar a foto sem dupla (Galeria) | volta 2 | Ter a foto grande do catálogo; 2 de energia |
 | | Laudo do Aurélio (Sala de conservação); molde de gesso (Sala das coleções) | volta 2 | Ter sentido o cheiro de verniz |
 | | A peça verdadeira, dentro da caixa de "banners" (Sala das coleções) | volta 2 | Cheiro de verniz + uma pista da caixa (peso, guia de retirada ou gravação do Braga) |
-| | Lado a Lado (Galeria + Sala da fotografia): rachadura, cor da pedra e desgaste nas bordas | volta 2 | Dupla; foto grande do catálogo |
+| | Lado a Lado (Galeria + Sala da fotografia): rachadura, a cor e desgaste nas bordas | volta 2 | Dupla; foto grande do catálogo |
 | | Inscrição na máscara (Galeria): o quinto símbolo está virado e não existe na tábua | volta 2 | Cheiro de verniz + tábua do livro de registro (Sala de conservação, volta 1, 1 de energia); 1 de energia; minijogo |
 | **Trajeto** | Marca de sola na porta de serviço (Área de descanso) | volta 1 | 1 de energia |
 | | Câmera da porta de serviço (Central, 4:00); Seu Dirceu (Base da limpeza, 4:05); escada do Subsolo (4:10) | volta 1 | Só depois que o paletó passa |

@@ -141,3 +141,4 @@
 .lc-banc .reserva-alt>.medida::before{content:attr(data-t)}
 .lc-banc .luz-estado{margin:.35rem 0 .6rem}
 @media(max-height:760px){.lc-banc .cena{height:clamp(110px,24vh,250px)}}   /* com a dica reservada, a luz de lado cabe sem rolar em 360×740 */
+.lc-banc.mede::backdrop{background:transparent}  /* revisão 17: cópia escondida que mede a altura da luz de lado */

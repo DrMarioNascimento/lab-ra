@@ -60,7 +60,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 const $ = id => document.getElementById(id);
 // Aberto a partir do Mosaico Loop (?loop=1): só as 15 salas da história, nos andares da história (salas-loop.json, gerado de LOOP_SALAS em game.js).
 const LOOP = new URLSearchParams(location.search).get('loop') === '1';
-const LS = LOOP ? await (await fetch('salas-loop.json?v=20261126d')).json() : null;
+const LS = LOOP ? await (await fetch('salas-loop.json?v=20261126g')).json() : null;
 let NOMES_ANDAR = LOOP ? LS.andares : ['Térreo', '1º andar', '2º andar', '3º andar', '4º andar'];
 const SALAS = await (await fetch(((new URLSearchParams(location.search).get('versao') || 'A').toUpperCase().replace(/[^BC]/g, '') ? 'salas-' + (new URLSearchParams(location.search).get('versao')).toUpperCase().replace(/[^BC]/g, '') : 'salas') + '.json?v=20261123k')).json();
 
@@ -134,7 +134,7 @@ function trocaPecas(salas) {
         const nova = g.scene, bn = new THREE.Box3().setFromObject(nova), tn = bn.getSize(new THREE.Vector3()), cn = bn.getCenter(new THREE.Vector3());
         const e = Math.max(tv.x, tv.y, tv.z) / (Math.max(tn.x, tn.y, tn.z) || 1), caixa = new THREE.Group();
         nova.position.set(-cn.x, -bn.min.y, -cn.z); caixa.add(nova); caixa.scale.setScalar(e); caixa.position.set((a.x + b.x) / 2, Math.min(a.y, b.y), (a.z + b.z) / 2); caixa.name = 'peca_' + LS.salas[id].peca;
-        nova.traverse(o => { if (o.isLight) o.visible = false; });
+        nova.traverse(o => { if (o.isLight) o.visible = false; if (/^teto/.test(o.name)) o.visible = false; });   // revisão 17: peça de sala com teto (E02) mostra o interior no museu
         no.add(caixa); for (const c of no.children.filter(c => c.name.startsWith('peca_') && c !== caixa)) no.remove(c);   // na sala do Loop fica só a peça do Loop
       } catch (err) { console.warn('peça do Loop', id, err); }
       prox();

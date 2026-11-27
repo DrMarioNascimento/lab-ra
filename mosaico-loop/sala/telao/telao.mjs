@@ -2,7 +2,7 @@
 // O conteúdo fica em páginas por tema (Relógio, Mapa, Turma, Máquina; no fim: Desfecho, A noite, Para conversar, Turma),
 // com abas, setas do teclado e troca automática (que dá para parar). As salas são só as 15 da história (LOOP_SALAS).
 import { transporteTelao, transporteFalso, ms } from '../transporte.mjs';
-import { ANDARES, INICIO, LOOP_SALAS, definirMuseu } from '../conteudo.js?v=6';
+import { ANDARES, INICIO, LOOP_SALAS, definirMuseu } from '../conteudo.js?v=7';
 
 const P = new URLSearchParams(location.search);
 const FALSA = P.get('falsa') === '1';
@@ -29,7 +29,7 @@ document.addEventListener('fullscreenchange', rotuloFs); document.addEventListen
 
 function entrada(erro) {
   app.innerHTML = `<div class="tl-entrada"><form class="card" id="f"><div class="tl-ent-topo">${ficha('ui/telao')}<div><p class="kicker">MOSAICO LOOP</p><h2>Telão da sala</h2></div></div>
-    <p class="tl-ent-ajuda">Digite o código que está no celular do Professor.</p>
+    <p class="tl-ent-ajuda">Digite o código que está no celular do Curador da sala.</p>
     <input id="c" maxlength="8" autocomplete="off" placeholder="CÓDIGO" aria-label="Código da sala"><div class="tl-erro">${esc(erro || '')}</div>
     <button class="btn primary" type="submit">Abrir telão</button></form></div>`;
   document.getElementById('f').onsubmit = (e) => { e.preventDefault(); const c = document.getElementById('c').value.trim().toUpperCase(); if (c) { const u = new URL(location.href); u.searchParams.set('sala', c); location.href = u; } };
@@ -37,7 +37,7 @@ function entrada(erro) {
 
 let T, room = null, players = [];
 const restante = () => { const i = ms(room?.iniEm); return i == null ? room?.seg ?? 300 : Math.max(0, Math.min(room.seg, (i + room.seg * 1000 - T.agora()) / 1000)); };
-const gente = () => players.filter(p => !p.mestre && !p.expulso);
+const gente = () => players.filter(p => !p.expulso && (!p.mestre || !!p.amb || !!p.resp));   // o Curador da sala entra na conta quando joga (escolheu sala ou contou o desfecho)
 const naSala = (p) => !!(p.amb && p.ambVolta === room.volta);
 
 function conviteUrl() { const u = new URL('../index.html', location.href); u.search = ''; u.searchParams.set('sala', codigo); return u.toString(); }
@@ -149,8 +149,8 @@ function pgMaquina() {
     f('P01', 'Revelar o que aconteceu', '3 provas no caderno, um nome, na Recepção') + `</div></div>`;
 }
 function pgEntrada() {
-  const g = gente();
-  return `<div class="tl-card tl-ent${g.length > 16 ? ' estreito' : ''}" style="--fr:${g.length > 16 ? 16 : 40}"><div><h1 class="tl-titulo">Entrem na sala</h1><p class="tl-texto">Apontem a câmera para o QR code. Ou digitem o código <b>${esc(codigo)}</b>.</p><p class="tl-aviso">O Professor inicia a partida.</p></div>
+  const g = players.filter(p => !p.expulso);   // na entrada, todo mundo que entrou aparece (o Curador da sala também joga)
+  return `<div class="tl-card tl-ent${g.length > 16 ? ' estreito' : ''}" style="--fr:${g.length > 16 ? 16 : 40}"><div><h1 class="tl-titulo">Entrem na sala</h1><p class="tl-texto">Apontem a câmera para o QR code. Ou digitem o código <b>${esc(codigo)}</b>.</p><p class="tl-aviso">O Curador da sala inicia a partida.</p></div>
       <div class="tl-qr" aria-label="QR code de entrada">${window.MosaicoQR ? window.MosaicoQR.svg(conviteUrl(), { nivel: 'M', margem: 2 }) : ''}</div></div>
     <div class="tl-card" style="--fr:${fr(g.length) * 1.3}"><h2 class="tl-titulo">${g.length} na sala</h2>${chips(g.map(p => [p.nome || 'Participante', '', 'ok']), 'Ninguém entrou ainda.')}</div>`;
 }
@@ -206,7 +206,7 @@ addEventListener('resize', () => { if (room) { caber(); caberFita(); } });
 
 function desenhar() {
   if (!room) { app.innerHTML = `<div class="tl-raiz">${cabeca()}<div class="tl-meio"><div class="tl-card tl-largo tl-relogio"><h1 class="tl-titulo">Sala não encontrada</h1><p class="tl-texto">Confira o código e abra de novo.</p></div></div></div>`; return; }
-  if (room.aulaEncerrada) { app.innerHTML = `<div class="tl-raiz">${cabeca()}<div class="tl-meio"><div class="tl-card tl-largo tl-relogio"><p class="tl-volta">AULA ENCERRADA</p><h1 class="tl-titulo">Obrigado por participar!</h1><p class="tl-texto">O Professor encerrou a aula.</p></div></div></div>`; chaveTela = ''; return; }
+  if (room.aulaEncerrada) { app.innerHTML = `<div class="tl-raiz">${cabeca()}<div class="tl-meio"><div class="tl-card tl-largo tl-relogio"><p class="tl-volta">AULA ENCERRADA</p><h1 class="tl-titulo">Obrigado por participar!</h1><p class="tl-texto">O Curador da sala encerrou a aula.</p></div></div></div>`; chaveTela = ''; return; }
   const pags = paginasDaEtapa();
   if (pag >= pags.length) pag = 0;
   const g = gente();

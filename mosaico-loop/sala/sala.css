@@ -377,3 +377,32 @@ body.em-cheia .tl-fs{opacity:.5}body.em-cheia .tl-fs:hover,body.em-cheia .tl-fs:
 .tl-missoes b{display:flex;align-items:center;gap:.45em}.tl-missoes b img{width:1.7em;height:1.7em;flex:none;object-fit:contain;filter:drop-shadow(0 .15em .15em #000a)}
 /* revisão 11: a contagem de pessoas fica em cima e a miniatura começa logo abaixo dela (não cobre mais a ponta da peça) */
 .tl-mapa .tl-sala img{box-sizing:border-box;padding-top:calc(clamp(1.1rem,2.2vw,2.3rem) * .55);object-position:center bottom}
+
+/* Revisão 17: botão "Sala" do Curador da sala (no alto, ao lado do "i") e o painel de gerenciamento por cima do jogo */
+.text-button.sala-btn{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:6px 14px 6px 8px;font:700 .9rem system-ui,sans-serif;color:#fff;border-color:#c4a8ff;background:linear-gradient(180deg,#9b6bf3,#6d34d6 55%,#5424b0);box-shadow:inset 0 1px 0 #ffffff40,0 3px 0 #2e1470,0 8px 16px #0005}
+.text-button.sala-btn:active{transform:translateY(2px);box-shadow:inset 0 1px 0 #ffffff25,0 1px 0 #2e1470}
+.text-button.sala-btn .ic3d.sm{width:28px;height:28px}
+.text-button.sala-btn.acao-necessaria{animation:salaPulso 1.6s infinite}
+@keyframes salaPulso{0%,100%{box-shadow:inset 0 1px 0 #ffffff40,0 3px 0 #2e1470,0 0 0 0 #c4a8ffaa}60%{box-shadow:inset 0 1px 0 #ffffff40,0 3px 0 #2e1470,0 0 0 9px #c4a8ff00}}
+@media (prefers-reduced-motion:reduce){.text-button.sala-btn.acao-necessaria{animation:none;outline:2px solid #c4a8ff}}
+.sala-dialog{width:min(560px,calc(100% - 20px));max-height:calc(100dvh - 20px);padding:16px;border:1px solid #a78bfa66;border-radius:18px;color:var(--paper);background:linear-gradient(145deg,#1d1f3c,#0e1425);box-shadow:inset 0 1px #ffffff18,0 6px 0 #05090d,0 20px 40px #000a}
+.sala-dialog::backdrop{background:#04070dcc}
+.sala-cab{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}
+.sala-cab h2{margin:2px 0 0;font-weight:400}
+.sala-cab .btn{min-height:46px}
+.sala-bloco{padding:12px;margin:0 0 10px;border-radius:14px;background:#ffffff0b;border:1px solid #ffffff14;box-shadow:inset 0 1px #ffffff12,0 3px 0 #05090d}
+.sala-bloco .kicker{margin:0 0 6px}
+.sala-info{margin:0 0 8px;font:600 1rem/1.35 system-ui,sans-serif}
+.sala-agora .btn.wide{width:100%;min-height:52px}
+.sala-espera-nomes{margin:8px 0 0;font:.85rem/1.35 system-ui,sans-serif;color:var(--muted)}
+.sala-convite{display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:center}
+.sala-qr{background:#fff;border-radius:10px;padding:4px;line-height:0}
+.sala-qr svg{width:100%;height:auto}
+.sala-cod{font:800 1.7rem ui-monospace,Menlo,monospace;letter-spacing:.22em;color:#e7c892;margin:0 0 4px}
+.sala-convite p.muted{margin:0 0 8px;font-size:.85rem}
+.sala-convite .btn{display:inline-flex;align-items:center;gap:8px;min-height:46px}
+.sala-dialog .turma-lista{max-height:none;margin:0}
+.sala-dialog .turma-lista .btn.sm{min-height:44px}
+.sala-poderes{display:flex;flex-wrap:wrap;gap:8px}
+.sala-poderes .btn{flex:1 1 140px;min-height:48px}
+@media(max-width:400px){.sala-convite{grid-template-columns:118px 1fr}.sala-cod{font-size:1.35rem}.mast .back{padding-inline:10px}}

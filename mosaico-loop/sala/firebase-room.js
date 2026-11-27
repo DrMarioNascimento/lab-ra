@@ -78,6 +78,27 @@ function qrDe(url,rotulo){
 function qr(c){const url=joinUrl(c);if(window.MosaicoQR)return window.MosaicoQR.svg(url,{nivel:'M',margem:4,rotulo:'QR para entrar na sala'});return `<div class="room-qr-fallback">${esc(c)}</div>`;}
 
 function css(){const st=document.createElement('style');st.textContent=`
+#dragonRoomGate .dr-ent{max-width:420px}
+.dr-topo{display:flex;align-items:center;gap:12px}
+.dr-topo-ic{width:58px;height:58px;object-fit:contain;filter:drop-shadow(0 5px 4px #000a)}
+.dr-kicker{font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#a4b2bd}
+.dr-titulo{margin:2px 0 0;font:700 24px/1.1 Georgia,serif;color:#f4f9fd}
+.dr-rot{margin:0!important;font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#83c6ac!important}
+.dr-ent .dr-card{display:flex;flex-direction:column;gap:10px}
+.dr-ent .dr-card h2{margin:0;font-size:24px}
+.dr-ent .dr-input{margin-top:0}
+.dr-cod{text-align:center;text-transform:uppercase;font:700 24px ui-monospace,Menlo,monospace!important;letter-spacing:.3em}
+.dr-cod::placeholder{letter-spacing:.3em}
+.dr-nome{font-weight:600}
+.dr-aviso{margin:0;font-size:13px;color:#a4b2bd!important}
+.dr-pergunta{margin:2px 0 -4px}
+.dr-ent .dr-formas{margin:0}
+.dr-ent .dr-forma{min-height:82px}
+.dr-ent .dr-forma .lb{font:700 14px system-ui,sans-serif;white-space:nowrap}
+.dr-ent .dr-btn{margin-top:0}
+.dr-erro{margin:0;min-height:1.2em;font-size:14px;color:#ff9b86!important}
+.dr-info{position:absolute;top:max(14px,env(safe-area-inset-top));right:14px;width:44px;height:44px;border-radius:50%;border:1px solid #c9aa7250;background:linear-gradient(180deg,#294051,#172633);color:#e8edf2;font:700 18px Georgia,serif;box-shadow:inset 0 1px 0 #ffffff22,0 3px 0 #05090d;cursor:pointer}
+.dr-info:active{transform:translateY(2px);box-shadow:inset 0 1px 0 #ffffff15,0 1px 0 #05090d}
 #dragonRoomGate{position:fixed;inset:0;z-index:99999;background:radial-gradient(900px 600px at 50% -10%,#16242a 0,transparent 55%),#061014;color:#f0eadc;font-family:Inter,system-ui,sans-serif;overflow:auto}.dr-shell{width:min(620px,calc(100% - 28px));margin:auto;padding:max(24px,env(safe-area-inset-top)) 0 max(36px,env(safe-area-inset-bottom))}.dr-brand{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:#e8a94a;font-weight:800}.dr-card{margin-top:18px;padding:20px;border:1px solid rgba(159,228,255,.52);border-radius:14px;background:linear-gradient(165deg,#1a3348,#153044 60%,#102838);box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 18px 50px rgba(0,0,0,.55),0 0 40px rgba(127,212,255,.10)}.dr-card h1,.dr-card h2{font-family:Georgia,serif;margin:.25rem 0 .6rem;color:#f4f9fd}.dr-card h1{font-size:clamp(38px,10vw,62px);line-height:.95}.dr-card p{color:#afbdc5;line-height:1.5}.dr-btn{width:100%;min-height:52px;margin-top:10px;border:0;border-radius:10px;padding:12px 14px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;background:linear-gradient(180deg,#8ee4ad,#3ea86a);color:#062011;box-shadow:inset 0 1px #d4f5e2,0 5px 0 #1b5c38,0 12px 22px #000a}.dr-btn.secondary{background:linear-gradient(180deg,#162a38,#0c1b26);color:#dce8ed;box-shadow:inset 0 1px rgba(255,255,255,.08),0 4px 0 #030709,0 10px 18px #0008;border:1px solid #46667a}.dr-btn.danger{background:linear-gradient(#7d2d2a,#4b1715);color:#fff3ef;box-shadow:inset 0 1px rgba(255,255,255,.08),0 5px 0 #1b0706}.dr-input{width:100%;min-height:50px;margin-top:10px;border-radius:9px;border:1px solid #3a4c56;background:#071014;color:#fff;padding:12px;font-size:17px}.dr-code{font:800 clamp(40px,12vw,70px)/1 monospace;letter-spacing:.13em;color:#ffc46b;text-align:center;margin:12px 0}.dr-qr{width:min(300px,80vw);margin:14px auto;background:white;padding:10px;border-radius:12px}.dr-qr svg{display:block;width:100%;height:auto}.dr-list{display:grid;gap:0;margin-top:14px;padding:6px;border-radius:10px;background:#03080d;border:1px solid rgba(20,36,48,.95);border-left:4px solid #6aa8ca;box-shadow:inset 0 3px 10px rgba(0,0,0,.72),inset 2px 0 6px rgba(0,0,0,.45)}.dr-player{padding:10px 12px;border:0;border-bottom:1px solid rgba(45,63,72,.7);border-radius:0;background:transparent;display:flex;justify-content:space-between;gap:10px}.dr-player:last-child{border-bottom:0}.dr-note{font-size:13px;color:#82959f}.dr-error{margin-top:12px;padding:10px;border-left:3px solid #e56b52;background:#28110e;color:#ffd4ca}.room-qr-fallback{color:#111;font:800 36px monospace;text-align:center;padding:40px 5px}.dr-formas{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}.dr-forma{position:relative;min-height:100px;border:1px solid rgba(45,68,82,.75);border-radius:11px;background:#060d14;color:#dce8ed;padding:10px 5px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;cursor:pointer;box-shadow:inset 0 2px 6px rgba(0,0,0,.45)}.dr-forma input{position:absolute;opacity:0}.dr-forma:has(input:checked){border-color:#e8a94a;background:#25190e;color:#ffc46b;box-shadow:inset 0 0 0 2px #e8a94a,inset 0 0 16px rgba(232,169,74,.1)}.dr-forma .em{font-size:28px}.dr-forma .lb{font-family:Georgia,serif;font-size:16px;text-align:center}.dr-ident{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#e8a94a;font-weight:800;margin-top:15px}.dr-choice{width:100%;margin-top:9px;padding:14px;border:1px solid rgba(45,68,82,.75);border-radius:10px;background:#060d14;color:#dce8ed;text-align:left;cursor:pointer;box-shadow:inset 0 2px 6px rgba(0,0,0,.45)}.dr-choice.on{border-color:#e8a94a;background:#25190e;color:#ffc46b;box-shadow:inset 0 0 0 2px #e8a94a,inset 0 0 16px rgba(232,169,74,.1)}.dr-choice b,.dr-choice span{display:block}.dr-choice span{margin-top:5px;color:#9eafb8;font-size:13px}.dr-master-info{padding:14px;border-left:3px solid #e8a94a;background:#0a1318;border-radius:8px}.dr-master-info p{margin:.45rem 0}
 /* O ALERTA DO PROFESSOR. Copiado em espírito da Mesa da Casa (v1/MOSAICO-mesa.html,
    .btn-menu-mestre.acao-necessaria): quando a partida para esperando uma decisão
@@ -97,20 +118,20 @@ function css(){const st=document.createElement('style');st.textContent=`
 #dragonSalaBtn{position:fixed;z-index:100002;right:max(14px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom));min-width:140px;height:48px;border:1px solid #4d6774;border-radius:10px;background:#071014;color:#bdeeff;font:800 13px Inter,system-ui,sans-serif;letter-spacing:.04em;text-transform:none;box-shadow:0 6px 22px rgba(0,0,0,.5);cursor:pointer}#dragonSalaPanel{position:fixed;z-index:100003;inset:0;background:rgba(0,0,0,.72);display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:24px 14px}#dragonSalaPanel .dr-sala-card{width:min(620px,100%);margin:auto;background:linear-gradient(165deg,#1a3348,#153044 60%,#102838);border:1px solid rgba(159,228,255,.52);border-radius:14px;padding:18px;color:#e6edf2;box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 18px 50px rgba(0,0,0,.55),0 0 40px rgba(127,212,255,.10);font-family:Inter,system-ui,sans-serif}.dr-sala-head{display:flex;justify-content:space-between;gap:12px;align-items:center}.dr-sala-head h2{font:600 34px Georgia,serif;margin:0;color:#f4f9fd}.dr-close{border:1px solid #46667a;background:linear-gradient(180deg,#162a38,#0c1b26);color:#e6edf2;border-radius:8px;padding:10px 14px;cursor:pointer;font-weight:800;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 3px 0 #020609}.dr-sala-section{margin-top:14px;padding-top:14px;border-top:1px solid #26343c}.dr-sala-section summary{cursor:pointer;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#afc8d5}.dr-sala-code{font:800 38px monospace;letter-spacing:.15em;text-align:center;color:#ffc46b;margin:12px 0}.dr-sala-qr{width:min(250px,75vw);margin:auto;background:#fff;padding:10px;border-radius:10px}.dr-sala-qr svg{display:block;width:100%;height:auto}.dr-sala-actions{display:grid;gap:8px;margin-top:12px}
 `;document.head.appendChild(st)}
 function gate(){let el=document.getElementById('dragonRoomGate');if(!el){el=document.createElement('div');el.id='dragonRoomGate';document.body.appendChild(el)}return el}
-function formas(selected='m'){return `<div class="dr-formas">${Object.entries(FORMAS).map(([id,f])=>`<label class="dr-forma"><input type="radio" name="drForma" value="${id}" ${id===selected?'checked':''}><span class="em">${f.emoji}</span><span class="lb">${f.label}</span></label>`).join('')}</div>`}
-function formaAtual(){return document.querySelector('input[name="drForma"]:checked')?.value||'m'}
+function formas(selected=''){return `<p class="dr-aviso dr-pergunta">Como o jogo deve receber você?</p><div class="dr-formas" role="radiogroup" aria-label="Como o jogo deve receber você">${Object.entries(FORMAS).map(([id,f])=>`<label class="dr-forma"><input type="radio" name="drForma" value="${id}" ${id===selected?'checked':''}><span class="em">${f.emoji}</span><span class="lb">${f.label}</span></label>`).join('')}</div>`}
+function formaAtual(){return document.querySelector('input[name="drForma"]:checked')?.value||''}
 
 function menu(error=''){
   /* Celular gate: só Abrir | Entrar. Ensaiar fica na porta Solo do hub; Telão
      na porta Telão do hub. Sem segundo seletor de modo aqui. */
-  gate().innerHTML=`<div class="dr-shell"><div class="dr-brand">${esc(TITLE)}</div><div class="dr-card pf-card"><div data-qr-intro><div data-qr-copy><img class="dr-arte" src="../museu/icones/T01.webp" alt=""><h1>${esc(TITLE)}</h1><p>Você abre a sala neste celular. A turma entra pelo QR code ou pelo código. No PC ou na TV, abra o telão com o mesmo código.</p></div><div data-acesso-qr-slot></div></div>${error?`<div class="dr-error">${esc(error)}</div>`:''}<button class="dr-btn" id="drJoin">Participar com código</button><button class="dr-btn prof" id="drOpen"><span aria-hidden="true">🔒</span> Conduzir como professor</button><span class="dr-chave">Só o Professor tem a chave</span><div class="dr-duo"><a class="dr-btn sec" href="telao/index.html"><img src="../museu/icones/ui/telao.webp" alt="">Abrir telão</a><a class="dr-btn sec" href="../simulador/"><img src="../museu/icones/ui/simulador.webp" alt="">Simulador</a></div></div></div>`;
+  gate().innerHTML=`<div class="dr-shell"><div class="dr-brand">${esc(TITLE)}</div><div class="dr-card pf-card"><div data-qr-intro><div data-qr-copy><img class="dr-arte" src="../museu/icones/T01.webp" alt=""><h1>${esc(TITLE)}</h1><p>Você abre a sala neste celular. A turma entra pelo QR code ou pelo código. No PC ou na TV, abra o telão com o mesmo código.</p></div><div data-acesso-qr-slot></div></div>${error?`<div class="dr-error">${esc(error)}</div>`:''}<button class="dr-btn" id="drJoin">Participar com código</button><button class="dr-btn prof" id="drOpen"><span aria-hidden="true">🔒</span> Conduzir como curador</button><span class="dr-chave">Só o Curador tem a chave</span><div class="dr-duo"><a class="dr-btn sec" href="telao/index.html"><img src="../museu/icones/ui/telao.webp" alt="">Abrir telão</a><a class="dr-btn sec" href="../simulador/"><img src="../museu/icones/ui/simulador.webp" alt="">Simulador</a></div></div></div>`;
   document.getElementById('drOpen').onclick=()=>{intencao='sala';renderMasterGate()};
   document.getElementById('drJoin').onclick=()=>formEntrar('');
 }
 /* A tela grande não escolhe nome nem forma: só precisa saber de que sala é.
    Daqui ela vai para telao.html, que entra anônima e passa a se anunciar. */
 function formTelao(err=''){
-  gate().innerHTML=`<div class="dr-shell"><div class="dr-brand">${esc(TITLE)} · TELÃO</div><div class="dr-card pf-card"><h2>Abrir a tela grande</h2><p>Digite o código que está no aparelho do Professor. Esta tela só mostra: ninguém joga por ela.</p><input class="dr-input" id="drTelaoCode" maxlength="6" placeholder="CÓDIGO" value="${esc(q||'')}" autocapitalize="characters">${err?`<div class="dr-error">${esc(err)}</div>`:''}<button class="dr-btn" id="drTelaoGo">📺 Abrir o telão</button><button class="dr-btn secondary" id="drTelaoBack">Voltar</button></div></div>`;
+  gate().innerHTML=`<div class="dr-shell"><div class="dr-brand">${esc(TITLE)} · TELÃO</div><div class="dr-card pf-card"><h2>Abrir a tela grande</h2><p>Digite o código que está no aparelho do Curador da sala. Esta tela só mostra: ninguém joga por ela.</p><input class="dr-input" id="drTelaoCode" maxlength="6" placeholder="CÓDIGO" value="${esc(q||'')}" autocapitalize="characters">${err?`<div class="dr-error">${esc(err)}</div>`:''}<button class="dr-btn" id="drTelaoGo">📺 Abrir o telão</button><button class="dr-btn secondary" id="drTelaoBack">Voltar</button></div></div>`;
   document.getElementById('drTelaoBack').onclick=()=>menu();
   document.getElementById('drTelaoGo').onclick=()=>{
     const c=(document.getElementById('drTelaoCode').value||'').trim().toUpperCase();
@@ -128,7 +149,7 @@ function renderMasterGate(error=''){
   const corpo=ensaio
     ? `<div class="dr-master-info"><p>Nenhuma sala é aberta e ninguém entra por QR. Percorra a partida neste aparelho.</p></div>`
     : `<div class="dr-ident">Como as voltas avançam?</div><button class="dr-choice ${ritmo==='automatico'?'on':''}" data-rhythm="automatico"><img class="dr-ic" src="../museu/icones/R02.webp" alt=""><b>Automático (melhor)</b><span>O jogo anda quando a turma termina.</span></button><button class="dr-choice ${ritmo==='conduzido'?'on':''}" data-rhythm="conduzido"><img class="dr-ic" src="../museu/icones/ui/conduzir.webp" alt=""><b>Eu libero</b><span>Você toca para passar de volta.</span></button>`;
-  gate().innerHTML=`<div class="dr-shell"><div class="dr-brand">${esc(TITLE)} · ÁREA DO PROFESSOR</div><div class="dr-card pf-card"><h2>${ensaio?'Ensaiar neste aparelho':'Conduzir como professor'}</h2>${corpo}${error?`<div class="dr-error">${esc(error)}</div>`:''}<button class="dr-btn" id="drGoogle">${ensaio?'Ensaiar com Google':'Abrir com Google'}</button><button class="dr-btn secondary" id="drBack">Cancelar</button></div></div>`;
+  gate().innerHTML=`<div class="dr-shell"><div class="dr-brand">${esc(TITLE)} · ÁREA DO CURADOR</div><div class="dr-card pf-card"><h2>${ensaio?'Ensaiar neste aparelho':'Conduzir como curador'}</h2>${corpo}${error?`<div class="dr-error">${esc(error)}</div>`:''}<button class="dr-btn" id="drGoogle">${ensaio?'Ensaiar com Google':'Abrir com Google'}</button><button class="dr-btn secondary" id="drBack">Cancelar</button></div></div>`;
   document.querySelectorAll('[data-rhythm]').forEach(b=>b.onclick=()=>{ritmo=b.dataset.rhythm;renderMasterGate()});
   /* A SENHA SAIU (03/09/2026), e com ela uma tela inteira do caminho do Professor.
      Ela era sha256 de uma constante escrita no próprio arquivo, e o desbloqueio
@@ -292,14 +313,18 @@ function pintarTelao(){
 async function formEntrar(err='',asMaster=false){
   /* Papel cognitivo + camada no mesmo ecrã do nome (não é wizard).
      Persistência local + campos no doc do jogador. Telão não passa por aqui. */
-  const aviso=asMaster?`<div class="dr-master-info"><p>Sala criada. Durante a partida você continua jogando normalmente.</p><p>O botão <b>Sala</b> fica disponível o tempo todo: por ele você acompanha os participantes, consulta QR e código, e encerra a sala.</p></div>`:'';
+  const aviso=asMaster?`<div class="dr-master-info"><p>Sala criada. Você joga como todo mundo: escolha o seu nome e entre.</p><p>Dentro do jogo, o botão <b>Sala</b> fica no alto da tela, só para você: QR e código, quem entrou, telão, voltas e encerrar.</p></div>`:'';
   const MPC=await ensurePapelCamada();
   MPC?.injetarCss?.();
   const escolha=MPC?MPC.carregar(casoPapel()):{papel:'investigador',camada:'livre'};
   const blocoPapel=MPC?MPC.htmlSeletor(casoPapel(),escolha):'';
-  gate().innerHTML=`<div class="dr-shell"><div class="dr-brand">${esc(TITLE)}${asMaster?' · ÁREA DO PROFESSOR':''}</div><div class="dr-card pf-card"><h2>${asMaster?'Sua sala está aberta':'Quem chega agora?'}</h2><p>Escolha o nome que a turma vai ver nesta partida. Não precisa ser o seu.</p>${aviso}<input class="dr-input" id="drCode" maxlength="6" placeholder="CÓDIGO" value="${esc(code||q||'')}" ${asMaster?'readonly':''}><div class="dr-ident">Nome nesta partida</div><input class="dr-input" id="drName" maxlength="24" placeholder="Como quer ser chamado" autocomplete="off">${formas('m')}${blocoPapel}${err?`<div class="dr-error">${esc(err)}</div>`:''}<button class="dr-btn" id="drEnter">Entrar</button>${asMaster?'':'<button class="dr-btn secondary" id="drBack">Voltar</button>'}</div></div>`;
+  /* Revisão 17 (pedido do autor): a entrada pelo QR segue a dos outros Mosaicos do LAB-RA (Mosaico Vila): ícone e "Sala de jogo" no alto,
+     cartão PARTICIPAR · Entrar com o código, código grande, "Seu nome", a pergunta "Como o jogo deve receber você?" sem nada marcado, Entrar,
+     linha de erro e "Não precisa de cadastro.". Só a paleta e o nome do jogo mudam. */
+  const salvo=(()=>{try{return {n:localStorage.getItem('mosaico-loop-nome')||'',f:localStorage.getItem('mosaico-loop-forma')||''}}catch{return {n:'',f:''}}})();
+  gate().innerHTML=`<div class="dr-shell dr-ent"><div class="dr-topo"><img class="dr-topo-ic" src="../museu/icones/T01.webp" alt=""><div><div class="dr-kicker">${asMaster?'Sala de jogo · Curador':'Sala de jogo'}</div><h1 class="dr-titulo">${esc(TITLE)}</h1></div></div><div class="dr-card pf-card"><p class="dr-rot">${asMaster?'SUA SALA ESTÁ ABERTA':'PARTICIPAR'}</p><h2>${asMaster?'Entre também como participante':'Entrar com o código'}</h2>${aviso}<input class="dr-input dr-cod" id="drCode" maxlength="6" placeholder="CÓDIGO" value="${esc(code||q||'')}" autocomplete="off" autocapitalize="characters" aria-label="Código da sala" ${asMaster?'readonly':''}><input class="dr-input dr-nome" id="drName" maxlength="24" placeholder="Seu nome" value="${esc(salvo.n)}" autocomplete="given-name" aria-label="Seu nome">${formas(salvo.f)}${blocoPapel}<button class="dr-btn" id="drEnter">Entrar</button><p class="dr-erro" id="drErro" role="alert">${esc(err||'')}</p><p class="dr-aviso">Não precisa de cadastro.</p></div></div>`;
+  gate().querySelector('#drCode')?.addEventListener('input',e=>{e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'')});
   if(MPC)MPC.ligarSeletor(gate().querySelector('.mpc-bloco'),escolha);
-  document.getElementById('drBack')?.addEventListener('click',()=>menu());
   document.getElementById('drEnter').onclick=()=>entrar(asMaster);
   setTimeout(()=>document.getElementById('drName')?.focus(),20)
 }
@@ -318,7 +343,11 @@ async function entrar(asMaster=false){
     const MPC=window.MosaicoPapelCamada;
     const escolha=MPC?MPC.lerSeletor(gate().querySelector('.mpc-bloco'),MPC.carregar(casoPapel())):{papel:'investigador',camada:'livre'};
     if(MPC)MPC.salvar(casoPapel(),escolha);
-    if(code.length!==6||!nome)return formEntrar('Informe o código e seu nome.',asMaster);
+    const avisar=t=>{const e=document.getElementById('drErro');if(e)e.textContent=t;};
+    if(code.length!==6){avisar('Digite o código de 6 letras ou números.');return;}
+    if(!nome){avisar('Digite seu nome.');document.getElementById('drName')?.focus();return;}
+    if(!forma){avisar('Escolha: Bem-vindo, Bem-vinda ou Tanto faz.');return;}
+    try{localStorage.setItem('mosaico-loop-nome',nome);localStorage.setItem('mosaico-loop-forma',forma);}catch{}
     /* Autenticar antes de ler. A regra de `get` exige signedIn(), e um
        aparelho que chega pelo QR não tem sessão nenhuma: lendo primeiro, o
        convidado levava "Missing or insufficient permissions" antes mesmo de
@@ -326,7 +355,7 @@ async function entrar(asMaster=false){
        Google. O padrão manda que a autenticação anônima do convidado
        aconteça em segundo plano — é este o lugar dela. */
     let u;
-    if(asMaster){u=pendingUser||auth.currentUser;if(!u)throw new Error('Professor não autenticado.');}
+    if(asMaster){u=pendingUser||auth.currentUser;if(!u)throw new Error('Curador não autenticado.');}
     else{
       /* Autenticar antes de ler. Deep link / ponte Celular→Noite: se o Google
          ainda é o mestreUid da sala, mantém a sessão — senão vira anônimo. */
@@ -341,10 +370,10 @@ async function entrar(asMaster=false){
     }
     /* SUBSTITUIDO 14/10: gravava sempre o jogador inteiro, mesmo quando ele já existia. */
     const jaTem=asMaster?null:await getDoc(playerRef(code,u.uid)).catch(()=>null);
-    if(jaTem&&jaTem.exists()&&jaTem.data().expulso===true)return formEntrar('Você foi retirado desta sala pelo Professor.',false);
+    if(jaTem&&jaTem.exists()&&jaTem.data().expulso===true)return formEntrar('Você foi retirado desta sala pelo Curador da sala.',false);
     if(!asMaster&&!(jaTem&&jaTem.exists())){
-      if(snap.data().aulaEncerrada===true)return formEntrar('Esta aula foi encerrada pelo Professor.',false);
-      if(snap.data().entradaLiberada===false)return formEntrar('A entrada ainda não foi liberada pelo Professor.',false);
+      if(snap.data().aulaEncerrada===true)return formEntrar('Esta aula foi encerrada pelo Curador da sala.',false);
+      if(snap.data().entradaLiberada===false)return formEntrar('A entrada ainda não foi liberada pelo Curador da sala.',false);
     }
     if(jaTem&&jaTem.exists()){
       await updateDoc(playerRef(code,u.uid),{forma,pronto:true,papelCognitivo:escolha.papel,camadaAcessibilidade:escolha.camada,atualizadoEmMs:Date.now()});
@@ -377,7 +406,11 @@ function ouvir(){
 }
 function renderLobby(){
   if(!code||!room)return;const master=role==='master';
-  gate().innerHTML=`<div class="dr-shell"><div class="dr-brand">${esc(TITLE)} · ${master?'Professor':'Sala'}</div><div class="dr-card pf-card"><h2>${master?'Sala aberta':'Você entrou'}</h2><div class="dr-code">${esc(code)}</div>${master?`<div class="dr-qr">${qr(code)}</div><p class="dr-note">QR e código ficam nesta sala durante toda a entrada dos participantes.</p>`:''}<div class="dr-list">${players.map(p=>{const f=FORMAS[p.forma]||FORMAS.n;return `<div class="dr-player"><span>${f.emoji} ${esc(p.nome||'Jogador')}</span><b>${p.mestre?'Professor':'Jogador'}</b></div>`}).join('')||'<div class="dr-player"><span>Aguardando jogadores…</span></div>'}</div>${master?`<button class="dr-btn" id="drStart">Iniciar partida</button>`:`<p class="dr-note">Aguardando o Professor iniciar a partida…</p>`}</div></div>`;
+  gate().innerHTML=`<div class="dr-shell"><div class="dr-brand">${esc(TITLE)} · ${master?'Curador':'Sala'}</div><div class="dr-card pf-card"><h2>${master?'Sala aberta':'Você entrou'}</h2><div class="dr-code">${esc(code)}</div>${master?`<div class="dr-qr">${qr(code)}</div><p class="dr-note">QR e código ficam nesta sala durante toda a entrada dos participantes.</p>`:''}<div class="dr-list">${players.map(p=>{const f=FORMAS[p.forma]||FORMAS.n;return `<div class="dr-player"><span>${f.emoji} ${esc(p.nome||'Jogador')}</span><b>${p.mestre?'Curador da sala':'Jogador'}</b></div>`}).join('')||'<div class="dr-player"><span>Aguardando jogadores…</span></div>'}</div>${master?`<button class="dr-btn" id="drStart">Iniciar partida</button>`:`<p class="dr-note">Aguardando o Curador da sala iniciar a partida…</p>`}</div></div>`;
+  /* Revisão 17: como nos outros Mosaicos, o manual do jogador abre logo depois de entrar (na espera), com "Entendi"; o "i" reabre. */
+  gate().querySelector('.dr-shell')?.insertAdjacentHTML('beforeend','<button class="dr-info" id="drInfo" type="button" aria-label="Como jogar">i</button>');
+  document.getElementById('drInfo').onclick=()=>abrirManual();
+  manualDaEntrada();
   if(master)document.getElementById('drStart').onclick=async()=>{
     const patch={fase:'jogo',iniciadaEmMs:Date.now()};
     try{
@@ -388,6 +421,15 @@ function renderLobby(){
     }catch(e){console.error('MOSAICO: DragonSalaAntesDeIniciar',e);return}
     await updateDoc(roomRef(code),patch);
   }
+}
+function abrirManual(){const d=document.getElementById('helpDialog');if(d&&!d.open)d.showModal();}
+function manualDaEntrada(){
+  const uid=auth.currentUser?.uid;if(!code||!uid)return;
+  const chave='mosaico-loop-manual-'+code+'-'+uid;   // a mesma chave que a sala usa: o manual não abre de novo quando a partida começa
+  const eu=players.find(p=>p.id===uid)||{},sd=document.getElementById('saudacao'),nome=String(eu.nome||'').trim();
+  if(sd&&nome&&!sd.textContent){sd.textContent=({m:'Bem-vindo',f:'Bem-vinda'}[eu.forma]||'Olá')+', '+nome+'.';sd.classList.remove('hidden');}
+  try{if(sessionStorage.getItem(chave))return;sessionStorage.setItem(chave,'1');}catch{}
+  abrirManual();
 }
 function liberar(detail){
   gameReleased=true;document.getElementById('dragonRoomGate')?.remove();
@@ -468,8 +510,8 @@ function atualizarSalaPersistente(){
   /* A ação do Professor entra ANTES do código e do QR, e aberta. Ela é o motivo
      de o botão estar piscando: quem abre o painel por causa do alerta tem de
      encontrar o que fazer no primeiro olhar, não dentro do terceiro acordeão. */
-  const bloco=acaoMestre?`<div class="dr-acao"><b>Ação do Professor necessária</b><p>${esc(acaoMestre.texto||'')}</p><button class="dr-btn" id="drAcaoMestre">${esc(acaoMestre.rotulo)}</button></div>`:'';
-  p.innerHTML=`<div class="dr-sala-card pf-card"><div class="dr-sala-head"><div><div class="dr-brand">Professor · ${esc(TITLE)}</div><h2>Sala</h2><p class="dr-note">${room?.ritmo==='conduzido'?'Ritmo conduzido pelo Professor':'Ritmo automático'}</p></div><button class="dr-close" id="drSalaClose">Fechar</button></div>${bloco}<details class="dr-sala-section" open><summary>Código e QR</summary><div class="dr-sala-code">${esc(code)}</div><div class="dr-sala-qr">${qr(code)}</div></details><details class="dr-sala-section"><summary>Participantes · ${players.length}</summary><div class="dr-list">${players.map(x=>`<div class="dr-player"><span>${esc(x.nome||'Jogador')}</span><b>${x.mestre?'Professor':'Jogador'}</b></div>`).join('')}</div></details><details class="dr-sala-section"><summary>Controle partida</summary><div class="dr-sala-actions"><p class="dr-note">${room?.ritmo==='conduzido'?'Ritmo conduzido pelo Professor: avance pelo painel quando a turma estiver pronta.':'Ritmo automático: o jogo avança quando todos terminam.'}</p></div></details><details class="dr-sala-section"><summary>Encerrar sala</summary><div class="dr-sala-actions"><button class="dr-btn danger" id="drEndRoom">Encerrar sala</button></div></details></div>`;
+  const bloco=acaoMestre?`<div class="dr-acao"><b>Ação do Curador necessária</b><p>${esc(acaoMestre.texto||'')}</p><button class="dr-btn" id="drAcaoMestre">${esc(acaoMestre.rotulo)}</button></div>`:'';
+  p.innerHTML=`<div class="dr-sala-card pf-card"><div class="dr-sala-head"><div><div class="dr-brand">Curador · ${esc(TITLE)}</div><h2>Sala</h2><p class="dr-note">${room?.ritmo==='conduzido'?'Ritmo conduzido pelo Curador':'Ritmo automático'}</p></div><button class="dr-close" id="drSalaClose">Fechar</button></div>${bloco}<details class="dr-sala-section" open><summary>Código e QR</summary><div class="dr-sala-code">${esc(code)}</div><div class="dr-sala-qr">${qr(code)}</div></details><details class="dr-sala-section"><summary>Participantes · ${players.length}</summary><div class="dr-list">${players.map(x=>`<div class="dr-player"><span>${esc(x.nome||'Jogador')}</span><b>${x.mestre?'Professor':'Jogador'}</b></div>`).join('')}</div></details><details class="dr-sala-section"><summary>Controle partida</summary><div class="dr-sala-actions"><p class="dr-note">${room?.ritmo==='conduzido'?'Ritmo conduzido pelo Professor: avance pelo painel quando a turma estiver pronta.':'Ritmo automático: o jogo avança quando todos terminam.'}</p></div></details><details class="dr-sala-section"><summary>Encerrar sala</summary><div class="dr-sala-actions"><button class="dr-btn danger" id="drEndRoom">Encerrar sala</button></div></details></div>`;
   pintarTelao();
   document.getElementById('drSalaClose').onclick=()=>{salaAberta=false;atualizarSalaPersistente()};
   /* Fecha o painel junto: o Professor tocou porque queria voltar para a mesa, e

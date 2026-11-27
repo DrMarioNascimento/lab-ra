@@ -308,7 +308,7 @@
   }
  },
  "tamanho_real_ra": {
-  "nota": "Tamanho real das peças das salas do Mosaico Loop para o \"Ver no ambiente\" (RA). maior_m = maior medida da peça, em metros; giro_y_graus = giro para a frente da cena ficar de frente. Quem aplica no GLB é museu/escala-real.mjs (nó \"escala_real\"; pode rodar de novo). GAL_B é montada por pecas-compostas.mjs (base GAL_B_base + máscara V11) e já sai em metros.",
+  "nota": "Tamanho real das peças das salas do Mosaico Loop para o \"Ver no ambiente\" (RA). maior_m = maior medida da peça, em metros; giro_y_graus = giro para a frente da cena ficar de frente. Quem aplica no GLB é museu/escala-real.mjs (nó \"escala_real\"; pode rodar de novo). GAL_B é montada por pecas-compostas.mjs (base GAL_B_base + máscara V11) e já sai em metros. E02_B (revisão 17, Oficina elétrica: canto de sala de 4,4 m x 3,2 m com paredes de 3 m, sobre a E02) também é montada por pecas-compostas.mjs e já sai em metros, com o chão em y = 0; o mesmo vale para P01_B (Recepção, 3,4 m de largura) e S01_B (Central, anel de 5,7 m, mesas a 0,8 m).",
   "pecas": {
    "Q01": {
     "maior_m": 2.3,

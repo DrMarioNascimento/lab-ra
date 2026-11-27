@@ -145,10 +145,10 @@ const LOOP_SALAS = {
  galeria:['Galeria especial','A peça principal na base','GAL_B','2º andar',1],
  conservacao:['Sala de conservação','Registros e laudos do acervo','I01','1º andar',1,{livro:{capa:'Livro de registro|ACERVO DO MUSEU', abrir:'Abrir o livro de registro', ids:['tombo_1','insc_tabua','livre_1','c_modo_1','b_verde_3','fh_carimbo','data_3','d_teo_1','fh_dobrada','teo_d1']}}], sons:['Sala dos sons','Rádio, gravador e alto-falante','N17','1º andar',2],
  fotografia:['Sala da fotografia','Câmera antiga, varal e álbum','N18','1º andar',3], relogios:['Sala dos relógios','Relógios que param na queda de luz','REL_B','1º andar',4],
- recepcao:['Recepção','Livro de visitas e roleta','P01','Térreo',1], seguranca:['Central de monitoramento','Câmeras e crachás','S01','Térreo',2],
+ recepcao:['Recepção','Livro de visitas e roleta','P01_B','Térreo',1], seguranca:['Central de monitoramento','Câmeras e crachás','S01_B','Térreo',2],
  corredor:['Área de descanso','Porta de serviço, mural e cafeteira','DESC_B','Térreo',3], limpeza:['Base da limpeza','Carrinho da equipe, balde e luvas','L08','Térreo',4],
  atelie:['Ateliê de descobertas','Bancada da Ivone e manual','L06','Térreo',5,{livro:{capa:'Manual da Câmara|DRA. SATO', abrir:'Abrir o manual', ids:['man_1','man_cal_1','man_pot_1','man_anc_1','man_circ_1','man_dois_1','man_legenda']}}], deposito:['Sala das coleções','Caixas e movimentações','D10','Térreo',6],
- manutencao:['Oficina técnica','Ferramentas e fusíveis','M03','Térreo',7], eletrica:['Oficina elétrica','Gerador, fusíveis e luvas','E02','Térreo',8],
+ manutencao:['Oficina técnica','Ferramentas e fusíveis','M03','Térreo',7], eletrica:['Oficina elétrica','Gerador, fusíveis e luvas','E02_B','Térreo',8],
  patio:['Pátio · Quadro externo','Quadro de energia e para-raios','Q01','Térreo',9],
  prototipo:['Subsolo · Câmara do tempo','A máquina do tempo','T01','Subsolo',1]
 };

@@ -108,6 +108,8 @@ Dentro da mesma partida, o raio cai sempre no mesmo minuto, volta após volta. �
 
 A sala dos recados, da cafeteira e da porta de serviço chama **Área de descanso**, sempre. A câmera da Central que olha para essa porta, do lado de fora, chama "câmera da porta de serviço".
 
+**Procurar na peça (revisão 17).** Ao entrar numa sala, nada brilha e a lista está vazia. Gire e chegue perto: um detalhe só aparece, com um brilho que cresce, quando você está perto e olhando para ele. Achou, ele entra na lista; examinar gasta energia como sempre. O que já está no seu caderno, ou que você achou numa volta anterior, já aparece achado: você lembra.
+
 **O que a lista de cada sala mostra.** Os mesmos rótulos em qualquer noite. Onde o sinal de um defeito não existe, o mesmo rótulo mostra a coisa normal. A lista nunca diz quanto falta para algo aparecer: só "ainda não".
 
 ## 4. O que o museu revela a cada volta
@@ -176,7 +178,7 @@ Da volta 4 em diante, para quem já viu o Téo caído e já leu o laudo. Você d
 Em toda noite. Na Sala das coleções, numa das caixas etiquetadas da estante, você empurra a caixa do patrocínio: "BANNERS – NÃO ABRIR". Pesa demais pra banner. Da volta 2 em diante, com o cheiro de verniz no caderno, você tem motivo para abrir. Dentro da manta está a peça de 300 anos. Cheira a pó, não a verniz. Embaixo da base, o número gravado; na testa, a frase inteira, sem nenhum símbolo virado. A caixa é fato do crime em qualquer partida, e a peça verdadeira na mão vale como prova de que a da Galeria é cópia; na noite da peça presa (causa C) ela também é a ferramenta do conserto.
 
 ### Cena do empurrão — "A um braço de distância"
-Em toda noite, depois de achar o Téo. Um botão de paletó com um fiapo de linha, perto da mão dele. Na prateleira, na altura do ombro, o pó arrastado por uma mão espalmada; mais abaixo, a marca de dedos abertos, descendo: alguém tentou segurar quem caía. E, para quem já viu as pegadas brilharem, a primeira delas: começa dentro da tinta, de frente para o Téo. Quem pisou ali foi embora andando, não correndo.
+Em toda noite, depois de achar o Téo. Um botão de paletó com um fiapo de linha, perto da mão dele. Na prateleira, na altura do ombro, o pó arrastado por uma mão espalmada; mais abaixo, a marca de dedos abertos, descendo (revisão 17: a pista só mostra a marca; que alguém tentou se segurar ao cair, quem joga deduz). E, para quem já viu as pegadas brilharem, a primeira delas: começa dentro da tinta, de frente para o Téo. Quem pisou ali foi embora andando, não correndo.
 
 ### Cena da tranca — "É a minha tranca"
 Só nas noites em que falta ajustar (A e E). Depois de ver os mostradores piscando, a ficha de ensaio de ontem chama a sua atenção no Ateliê: "Zerei os três mostradores antes de sair. Sem os números certos ela não vai a lugar nenhum. É a minha tranca." No painel do Subsolo, uma fita adesiva sobre os mostradores diz o mesmo: "Zerados. De propósito. Não é defeito, é tranca." A Dra. Sato trancou a máquina com a verdade. Só abre quem investigou.
@@ -256,7 +258,7 @@ Sem dupla: a regra é a mesma. O ajuste numa volta, a alavanca valendo em outra;
 | Atividade | Salas | O que sai dela |
 |---|---|---|
 | **Lado a Lado** | Galeria especial + Sala da fotografia | Cada tela lista 3 coisas (da peça ou da foto). Lidas em voz alta, dão 3 diferenças: prova de que a peça é cópia |
-| **As Duas Listas** | Recepção + Central de monitoramento | Cada tela mostra uma lista (o livro de visitas ou a roleta da saída). Quem entrou e não saiu pela roleta (se saiu, foi por outra porta): prova do trajeto |
+| **As Duas Listas** | Recepção + Central de monitoramento | Cada tela mostra uma lista (o livro de visitas ou a roleta da saída). Quem entrou e não saiu pela roleta: prova do trajeto |
 | **Apagão Combinado** | Pátio + Área de descanso | A palavra só aparece enquanto quem está no Pátio segura a chave geral. Pegadas que brilham no escuro: saem da Sala das coleções, cruzam a Área de descanso e somem na porta de serviço |
 | **Painel e Manual** | Subsolo + Ateliê | No Subsolo, olhar o painel gasta 1 de energia e mostra como estão os 3 símbolos (fazer em dupla não cobra de novo); o Ateliê vê a legenda e marca. Sai a leitura completa do painel: no Anexar ela vale sozinha, mas quem escolhe o defeito é você |
 | **Correio do Loop** | Oficina técnica + Pátio | A luva isolante deixada no chão do Pátio para a volta seguinte |
@@ -364,7 +366,7 @@ Vale sobre o que estiver escrito acima, nas partes 9 e 10.
 - **O nome.** "Lenz" só aparece da volta 3 em diante. A carta da seguradora (volta 2) diz "quem assinou pelo patrocínio: uma rubrica apressada". O nome nasce em cena: ele atende o telefone perto da porta de serviço, o Braga admite, ou a letra do bilhete vira nome em Acusação e Defesa.
 - **Comparar a foto sem ajuda.** Passou para a volta 2. Na volta 1 ninguém sai com prova da cópia. (Revisão 16: na volta 1, quem tem a foto grande no caderno já confronta a peça com ela na luz de lado; isso não entra no caderno como prova.)
 - **Caixa de "banners".** Só abre na volta 2, com motivo. Na volta 1 você só empurra a caixa na estante.
-- **Listas e pegadas.** As Duas Listas dizem "se saiu, foi por outra porta". Entre 0:00 e 4:00 ele está fora do prédio.
+- **Listas e pegadas.** As Duas Listas mostram quem entrou e não saiu pela roleta (a conclusão, outra porta, fica com quem joga). Entre 0:00 e 4:00 ele está fora do prédio.
 - **Trajeto.** O caderno de rondas do cofre e a foto com a legenda mostram a mesma volta pela porta de serviço, no começo da noite. As duas coisas valem como prova do trajeto.
 - **Pares de mesmo rótulo.** Onde o sinal não existe, o que você acha é um objeto de ambiente: medidor desligado, vidro embaçado, etiqueta colada em cima. Não mostra o defeito e não é leitura normal.
 - **Pendrive.** A gravação traz um fato novo: ontem o do patrocínio estendeu um envelope ao Téo, para ele "não ter carregado nada". Ele não pegou.
@@ -419,7 +421,7 @@ Vale sobre o que estiver escrito acima, nas partes 9 a 12.
 
 Vale sobre o que estiver escrito acima, nas partes 9 a 13.
 
-- **Embaixo da base.** A comparação da peça com a foto (Lado a Lado e a foto comparada sem ajuda) não olha mais embaixo da base: mostra o lado da rachadura, a cor da pedra e o desgaste nas bordas (até a revisão 12, "os riscos do tempo"; ver parte 19), que a peça exposta não tem. Embaixo da base só olha quem tem motivo para levantar a peça: acha feltro novo e, na noite do fusível, o F2 colado por cima dele. O número gravado só existe na peça verdadeira.
+- **Embaixo da base.** A comparação da peça com a foto (Lado a Lado e a foto comparada sem ajuda) não olha mais embaixo da base: mostra o lado da rachadura, a cor e o desgaste nas bordas (até a revisão 12, "os riscos do tempo"; ver parte 19), que a peça exposta não tem. Embaixo da base só olha quem tem motivo para levantar a peça: acha feltro novo e, na noite do fusível, o F2 colado por cima dele. O número gravado só existe na peça verdadeira.
 - **A caixa.** A pergunta ao abrir é o que você sentiu diante da peça da Galeria (o cheiro de verniz, que a tranca da caixa já pede).
 - **A foto antiga.** A pergunta é o que a própria foto mostra: tirada de baixo, ela deixa ler o que está gravado na base.
 - **A sirene.** No Desligar e no Ouro, só aparece para quem contou do Téo à Dra. Sato pelo interfone (no telão, se alguém da turma contou). O Téo acordando, no Ouro, só aparece para quem viu o Téo.
@@ -458,7 +460,7 @@ Vale sobre o que estiver escrito acima, nas partes 9 a 15. Nada do enredo mudou:
 - **O quadro, pela fresta.** "A porta do Quadro externo está fechada, presa pelo cadeado da trava. Pela fresta da borda dá para espiar." Pela fresta você vê as chaves e se estão abertas ou fechadas (`man_pot_3`, `fh_disj`), conta a posição delas (`chave_3`: "Contando da esquerda...") e enxerga o cadeado amarelo da noite D, mas não lê as etiquetas das chaves (`fh_vidro`). O que está escrito do lado de fora fica na porta e na parede: adesivo amarelo (`a_falsa_2x`, `fh_etq_chave`, rótulo "Adesivo na porta do quadro"), papel branco (`iso_aviso`), giz na parede (`fh_disjx`: "Disjuntor do café cai com a chuva."). O medidor é um só, o mostrador redondo da parede (`a_cheia_2`, `fh_med_quadro`); o interruptor do ponteiro de potência, embaixo dele, é a outra leitura (`a_cheia_4`, `fh_med_pot_bce`, `fh_med_pot_d`, revisão 11). O gato dorme em cima do pilar (`dis_gato`, "Segundo o Nico").
 - **Noite D.** O cadeado amarelo fica na chave onde chega o cabo da Câmara (saiu a etiqueta "Circuito da Câmara", que não era nenhuma das três chaves numeradas). A folha de conferência diz que a linha dos fusíveis da Câmara ficou em branco (antes: "ficou para amanhã", contra a foto de hoje).
 - **Coleções.** Caixote de lâmpadas aberto (`dis_lampadas`); "caixas e mais caixas na estante" (`falsa_3`). Minijogo da caixa: "Na estante, caixas etiquetadas; só uma tem o adesivo do patrocínio."
-- **Minijogo da fita.** A pergunta não traz a resposta: "No tapete, embaixo da pessoa, aparecem gotas. Pelo que você sabe da noite, ela está entrando ou saindo?" Dicas: "Repare no que pinga no tapete." e "Lá fora chove desde o começo da noite."
+- **Minijogo da fita.** A pergunta não traz a resposta: "No tapete, embaixo da pessoa, aparecem gotas. Pelo que você sabe da noite, ela está entrando ou saindo?" Dicas: "Repare no que pinga no tapete." e "Lá fora chove desde ontem." (revisão 17; era "desde o começo da noite")
 - **Armário da equipe.** "No armário da equipe, ao lado da Base da limpeza" (sem a palavra "corredor"); o Braga diz "ali do lado da limpeza".
 - **Seu Dirceu.** Esfregão e pano na mão (saiu o rodo).
 - **Ouro.** "A notícia das 3 provas sobe até a Galeria. Aurélio olha para a base, depois para quem chega, e só consegue dizer: 'Obrigado por não esquecer.'"
@@ -507,7 +509,7 @@ Vale sobre o que estiver escrito acima, nas partes 9 a 19. Nada do enredo mudou:
 
 - **A luz de lado bate com a imagem.** A máscara da Galeria é pedra fosca, granulada, com verniz fino por cima. Na posição certa da luz: "O verniz cobre tudo por igual, até o grão da pedra. Nenhuma borda gasta, nenhum risco de uso." O cheiro de verniz (`falsa_1`), o laudo ("Verniz novo") e a peça verdadeira ("Cheira a pó, não a verniz") já combinavam com verniz fino e ficam iguais.
 - **A rachadura é da peça exposta.** O Lado a Lado diz que a peça da Galeria tem a rachadura do lado direito e a foto, do lado esquerdo. Agora a máscara 3D mostra essa rachadura: fina, do lado direito de quem olha, descendo da sobrancelha pela bochecha; dá para ver chegando perto. Na tela da peça: "rachadura fina do lado direito".
-- **Uma chuva só: tempestade.** Pátio: "A tempestade não para, e a pedra está toda molhada." Combina com a estrada fechada, o raio, "Chuva feia, hein?" e "chove desde o começo da noite".
+- **Uma chuva só: tempestade.** Pátio: "A tempestade não para, e a pedra está toda molhada." Combina com a estrada fechada, o raio, "Chuva feia, hein?" e "chove desde ontem" (revisão 17: a tempestade que fechou a estrada ontem é a mesma).
 - **Foto grande do catálogo.** `par_foto` diz como a peça verdadeira aparece: "pedra escura, riscos finos, bordas gastas" (o mesmo da tela da foto no Lado a Lado). Prova continua sendo comparar com a peça.
 - **Minijogos que só o caderno decide.** Antes da luz (só para quem tem a foto grande no caderno): "Como é a peça de verdade, nessa foto?", com 4 combinações de cor, superfície e bordas. Caixa da estante: "Pelo que o seu caderno diz da caixa do patrocínio, qual você abre?", com 4 etiquetas (BANNERS – NÃO ABRIR, MOLDURAS – FRÁGIL, LÂMPADAS – NÃO EMPILHAR, CATÁLOGOS – NÃO MOLHAR). As dicas mandam para o caderno.
 - **Narrador sem conclusão.** `conserto_C` ("A máquina para de puxar."), `conserto_D` (sem "Você refez o que o Téo desfez"), `lenz_3` ("com a ponta virada para ele. Entre a pegada e o ombro dele, cabe um braço esticado."), `e_hist_1` (sem "Alguém ligou."), `teo_cadeira` (sem "Ele não voltou para jantar.").
@@ -521,7 +523,7 @@ Vale sobre o que estiver escrito acima, nas partes 9 a 20. Nada do enredo mudou:
 
 - **Planta do Térreo.** A Área de descanso volta a ter porta para o corredor, bem em frente à Base da limpeza. O homem de paletó cruza a Área de descanso (4:02), sai no corredor diante do Seu Dirceu (4:05) e segue até a escada do Subsolo (4:10), sem entrar na Sala das coleções. Da Base da limpeza, o Seu Dirceu vê a porta da Área de descanso (`ivone_red`). A Sala das esculturas, em reforma e fechada, fica entre a escada e a Área de descanso, com a porta de vidro virada para ela: pelo vidro, a escultura aponta para a escada, ao lado (`pose`). A Sala das coleções abre só para a Área de descanso.
 - **A cópia não é de pedra.** É de gesso e verniz (parte 2). Na luz de lado: "O verniz cobre tudo por igual, até o grão. Nenhuma borda gasta, nenhum risco de uso." No Lado a Lado, a tela A diz "cor cinza, mais clara", e o resultado diz "o lado da rachadura, a cor e o desgaste nas bordas".
-- **Por que a rachadura está do outro lado.** Na caixa do molde (`falsa_3`), presa na tampa, uma folha com a foto do catálogo impressa ao contrário. Quem fez a cópia trabalhou olhando uma imagem espelhada: a rachadura foi parar do outro lado e o quinto símbolo saiu virado. Nenhuma pista conclui isso por quem joga.
+- **Por que a rachadura está do outro lado.** Na caixa do molde (`falsa_3`), presa na tampa, uma folha com a foto do catálogo impressa ao contrário. Quem fez a cópia trabalhou olhando uma imagem espelhada: por isso a rachadura foi parar do outro lado. O quinto símbolo virado é erro de quem riscou a frase com pressa, como diz a parte 1 (corrigido na revisão 17: uma imagem espelhada viraria os seis símbolos e a ordem). Nenhuma pista conclui isso por quem joga.
 - **Caixa da estante.** Na gravação do Braga (`c_esc_3`): "duas caixas de banners iguais". As três pistas que abrem a caixa falam de banners. Primeira dica do minijogo: "No caderno, procure o que se diz de uma caixa do patrocínio."
 - **Antes de acender a luz** (só com a foto grande no caderno): "Se esta peça for a mesma da foto grande do catálogo, o que a luz de lado tem de mostrar nela?" Quatro combinações de superfície e beiradas; a certa, "Arranhada, beiradas roídas", não repete as palavras da foto: é preciso entender. Depois a luz confirma ou desmente.
 - **Luz de lado na volta 1.** Fica como o jogo faz: quem já tem a foto grande confronta a peça com ela na volta 1, sem prova no caderno (partes 4 e 11).
@@ -529,3 +531,25 @@ Vale sobre o que estiver escrito acima, nas partes 9 a 20. Nada do enredo mudou:
 - **Desfecho e fita do telão.** "A cópia na Galeria" e a prova "a peça é cópia" mostram a miniatura da peça da Galeria, com a inscrição e a rachadura.
 - **Minijogos parados.** Nada sobe nem desce na janela: nem ao mexer a luz, nem ao pedir dica, nem ao errar.
 
+## 22. O que mudou na revisão 17 (26/11/2026) · lote 14
+
+Vale sobre o que estiver escrito acima, nas partes 9 a 21. Nada do enredo mudou: nenhuma regra, tranca, volta, horário, fonte, rótulo ou "quem, como e por quê". As 5 causas seguem com o mesmo peso.
+
+- **Oficina elétrica com o que a sala promete.** A peça 3D agora é uma oficina de verdade (E02_B): o gerador a diesel com a fita de papel saindo da impressora e a ordem de serviço colada, com a parte de cima dobrada mostrando o verso; a bancada com a gaveta de baixo lacrada ("F2 · reserva"), o fusível ao lado da etiqueta da fachada e a folha de conferência na prancheta; o painel de ferramentas com a chavinha num prego; o gancho com as luvas; o painel de fusíveis, o medidor da base da Galeria, o procedimento plastificado e as lâmpadas antigas. Cada pista da sala brilha em cima do seu objeto. Nenhum texto de pista mudou.
+- **Recepção e Central também.** A Recepção ganhou a roleta, o telefone, o relógio de mesa, o relógio de parede, o quadro de consumo e a chapelaria com o paletó; a Central ganhou o cofre pequeno do Braga (com o bilhete), as duas xícaras, o livro de ronda, o livro da Central, a escala de crachás e a gaveta. Nas outras salas, os pontos das pistas que falam de um objeto da peça passaram a cair em cima dele.
+- **Luz de lado.** A posição certa é sempre de lado (nunca a do meio, de frente): a dica "Luz de frente esconde" não contradiz mais a tela.
+- **Seu Dirceu responde à Ivone.** Em `traj_2`, depois do homem de paletó: "A Ivone, não: desde o fim da tarde, passou uma vez só, até a cafeteira e de volta." Fecha o "Pergunta ao Seu Dirceu" de `ivone_red` sem pista nova.
+- **Uma chuva só.** A dica da fita: "Lá fora chove desde ontem." (a tempestade que fechou a estrada).
+- **Área de descanso, sempre.** O Nico: "Tem bolacha perto da cafeteira, pega lá." (era "na copa").
+- **Prosa.** Saíram os fechos de narrador: `empurra_2` termina em "descendo."; `man_3` termina na fala da Dra. Sato; as Duas Listas terminam em "O do patrocínio, não."
+- **Foto ao contrário.** Explica só a rachadura do outro lado (parte 21, corrigida); o quinto símbolo virado é erro de quem riscou com pressa (parte 1).
+- **Miniatura da cópia.** Na fita do telão e no desfecho, a cópia aparece pela testa, com a faixa da inscrição à vista.
+- **Antes de acender a luz.** Abre já com a altura da janela da luz: na troca, nada cresce nem pula.
+
+## 23. O que mudou na revisão 17, lote 15 (26/11/2026) · pedidos do autor
+
+Vale sobre o que estiver escrito acima. Nada do enredo mudou: nenhuma pista, texto, regra, tranca, volta, horário, fonte, rótulo ou "quem, como e por quê". As 5 causas seguem com o mesmo peso.
+
+- **Procurar de verdade.** Os detalhes da peça ficam escondidos (parte 3, "Procurar na peça"). Nada brilha ao entrar; gire e chegue perto. Tocar num lugar da peça mira e aproxima; a pinça e o botão + também aproximam. Ao se afastar, o detalhe que você não tocou some de novo, mas continua na lista. Não existe contador de quantos detalhes a sala tem.
+- **Curador da sala.** Neste jogo, quem abre a sala é o Curador da sala (não "Professor"). Ele entra com nome e joga como todo mundo; o botão Sala, no alto da tela dele, traz QR e código, turma, telão, voltas e encerrar. O personagem do museu continua "o curador Aurélio".
+- **Entrada pelo QR** igual à dos outros Mosaicos: código, seu nome, "Como o jogo deve receber você?" (Bem-vindo, Bem-vinda ou Tanto faz) e Entrar. O manual abre logo depois, com "Entendi"; o "i" reabre.

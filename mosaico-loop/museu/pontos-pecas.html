@@ -1,5 +1,5 @@
 <!doctype html><meta charset="utf-8"><title>Gerar os pontos das peças (uso interno)</title>
-<p>Uso interno. Acha, em cada peça, lugares fixos na superfície para os pontos que brilham (os do jogo ficam em LOOP_PONTOS, em game.js). No console: <code>await pontos('Q01')</code>.</p>
+<p>Uso interno. Acha, em cada peça, lugares fixos na superfície para os pontos que brilham (os do jogo ficam em LOOP_PONTOS, em game.js). No console: <code>await pontos('Q01')</code>. Peças com nós "alvo_*" (revisão 17, E02_B): <code>await pontosNos('E02_B', ['alvo_gancho_luvas', ...])</code> põe cada lugar em cima do objeto daquele nó.</p>
 <script type="importmap">{"imports":{"three":"./sala3d/vendor/three.module.min.js","three/addons/":"./sala3d/vendor/jsm/"}}</script>
 <script type="module">
 import * as THREE from 'three';
@@ -31,6 +31,33 @@ window.pontos = (id, n = 32, raios = 1400) => new Promise((ok, erro) => L.load('
   while (esc.length < n) { let k = 0; for (let i = 1; i < hits.length; i++) if (dist[i] > dist[k]) k = i; esc.push(hits[k]); hits.forEach((h, i) => { dist[i] = Math.min(dist[i], h.p.distanceTo(hits[k].p)); }); }
   const f = v => +v.toFixed(3);
   ok(esc.map(h => [f(h.p.x), f(h.p.y), f(h.p.z), f(h.n.x), f(h.n.y), f(h.n.z)]));
+}, undefined, erro));
+// Revisão 17 · pontosNos(id, nomes, extras): um lugar por nó, em cima do objeto. Mira o meio da caixa do nó vindo da frente (um pouco de cima e do lado
+// do objeto, como a câmera da sala) e fica com o primeiro toque que cai no próprio nó; se outra coisa tapa, usa o meio da face da frente do nó.
+// extras = quantos lugares a mais, repetindo os primeiros (a lista do jogo tem 32). Mesma saída de pontos(): [x, y, z, nx, ny, nz] em fração da caixa da peça.
+window.pontosNos = (id, nomes, total = 32) => new Promise((ok, erro) => L.load('./pecas/' + id + '.glb', g => {
+  const o = g.scene; o.updateMatrixWorld(true);
+  const b = new THREE.Box3().setFromObject(o), c = b.getCenter(new THREE.Vector3()), t = b.getSize(new THREE.Vector3()), R = t.length();
+  const malhas = []; o.traverse(m => { if (m.isMesh) { m.material.side = THREE.DoubleSide; malhas.push(m); } });
+  const rc = new THREE.Raycaster(), nm = new THREE.Matrix3(), f = v => +v.toFixed(3), saida = [], log = [];
+  const dentroDe = (m, alvo) => { for (let p = m; p; p = p.parent) if (p === alvo) return true; return false; };
+  for (const nome of nomes) {
+    const alvo = o.getObjectByName(nome); if (!alvo) return erro('sem o nó ' + nome);
+    const bn = new THREE.Box3().setFromObject(alvo), cn = bn.getCenter(new THREE.Vector3()), sn = bn.getSize(new THREE.Vector3());
+    let achou = null;
+    for (const [az, el] of [[0, 14], [-12, 14], [12, 14], [0, 30], [-25, 20], [25, 20], [0, 4]]) {
+      const lado = Math.max(-30, Math.min(30, (cn.x - c.x) / t.x * -40)), a = (az + lado) * Math.PI / 180, e = el * Math.PI / 180;
+      const dir = new THREE.Vector3(Math.cos(e) * Math.sin(a), Math.sin(e), Math.cos(e) * Math.cos(a));
+      rc.set(cn.clone().addScaledVector(dir, R * 2), dir.clone().negate());
+      const h = rc.intersectObjects(malhas, false)[0];
+      if (h && h.face && dentroDe(h.object, alvo)) { const nw = h.face.normal.clone().applyMatrix3(nm.getNormalMatrix(h.object.matrixWorld)).normalize(); if (nw.dot(dir) < 0) nw.negate(); achou = {p: h.point, n: nw, como: 'toque ' + az + '/' + el}; break; }
+    }
+    if (!achou) achou = {p: new THREE.Vector3(cn.x, cn.y, bn.max.z), n: new THREE.Vector3(0, 0, 1), como: 'face da frente'};
+    log.push(nome + ': ' + achou.como);
+    saida.push([f((achou.p.x - c.x) / t.x), f((achou.p.y - c.y) / t.y), f((achou.p.z - c.z) / t.z), f(achou.n.x), f(achou.n.y), f(achou.n.z)]);
+  }
+  for (let i = 0; saida.length < total; i++) saida.push(saida[i % nomes.length]);
+  console.log(log.join('\n')); ok(saida);
 }, undefined, erro));
 window.pronto = true;
 </script>

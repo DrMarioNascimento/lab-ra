@@ -50,7 +50,7 @@
   "recepcao": {
    "nome": "Recepção",
    "sub": "Livro de visitas e roleta",
-   "peca": "P01",
+   "peca": "P01_B",
    "andar": "Térreo",
    "ordem": 1,
    "texto": "O livro de visitas, a roleta e um telefone que toca."
@@ -58,7 +58,7 @@
   "seguranca": {
    "nome": "Central de monitoramento",
    "sub": "Câmeras e crachás",
-   "peca": "S01",
+   "peca": "S01_B",
    "andar": "Térreo",
    "ordem": 2,
    "texto": "Monitores, um cofre pequeno e o café do Braga."
@@ -106,7 +106,7 @@
   "eletrica": {
    "nome": "Oficina elétrica",
    "sub": "Gerador, fusíveis e luvas",
-   "peca": "E02",
+   "peca": "E02_B",
    "andar": "Térreo",
    "ordem": 8,
    "texto": "O gerador ronca baixo entre fios, fusíveis e luvas."

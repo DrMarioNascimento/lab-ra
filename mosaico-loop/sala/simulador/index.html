@@ -6,7 +6,7 @@
 <link rel="icon" type="image/webp" href="../../museu/icones/T01.webp">
 <title>Mosaico Loop · Simulador</title>
 <meta name="robots" content="noindex">
-<link rel="stylesheet" href="../../style.css?v=28">
+<link rel="stylesheet" href="../../style.css?v=29">
 <link rel="stylesheet" href="../sala.css?v=7">
 </head>
 <body class="sim">
@@ -15,16 +15,16 @@
   <label>Turma <input id="n" type="range" min="1" max="12" value="6" style="width:90px"> <span id="nv">6</span></label>
   <label>Ritmo <select id="seg"><option value="30">Teste rápido (30 s)</option><option value="300">Completo (5 min)</option></select></label>
   <label><input id="auto" type="checkbox" checked> Turma joga sozinha</label>
-  <label><input id="mauto" type="checkbox"> Professor automático</label>
+  <label><input id="mauto" type="checkbox"> Curador automático</label>
   <button class="btn secondary" id="rec" type="button">Recomeçar</button>
   <button class="btn primary" id="cheia" type="button">Tela cheia</button>
 </div>
 <div class="sim-telao"><iframe id="tl" title="Telão" allow="fullscreen"></iframe></div>
-<p class="sim-nota">Telão em cima, turma embaixo. O quadro do Professor conduz a partida.</p>
+<p class="sim-nota">Telão em cima, turma embaixo. O Curador da sala joga e conduz pelo botão Sala.</p>
 <div class="sim-turma" id="turma"></div>
 <script type="module">
 import { limparSalaFalsa } from '../transporte.mjs';
-import { pilotar } from '../piloto.mjs?v=3';
+import { pilotar } from '../piloto.mjs?v=4';
 const SALA = 'SIMUL';
 const $ = (id) => document.getElementById(id);
 let paradas = [];
@@ -37,7 +37,7 @@ function montar() {
   $('tl').src = '../telao/index.html?falsa=1&sala=' + SALA;
   const t = $('turma'); t.innerHTML = '';
   const fig = (rot, url, cls) => { const f = document.createElement('figure'); f.className = 'sim-fone ' + cls; f.innerHTML = '<figcaption><span>' + rot + '</span></figcaption><div class="sim-tela"><iframe title="' + rot + '"></iframe></div>'; t.appendChild(f); const i = f.querySelector('iframe'); i.src = url; return i; };
-  const m = fig('Professor', q('&papel=master&uid=mestre&nome=Professor'), 'mestre');
+  const m = fig('Curador da sala', q('&papel=master&uid=mestre&nome=Curador'), 'mestre');
   const quadros = [m];
   for (let k = 1; k <= n; k++) quadros.push(fig('Participante ' + k, q('&papel=guest&uid=p' + k + '&nome=Participante%20' + k), ''));
   quadros.forEach((i, k) => i.addEventListener('load', () => {
@@ -52,7 +52,7 @@ function mestreAuto(w) {
       const L = w.LoopSala; if (!L?.room) return;
       const e = L.room.etapa, v = L.room.volta;
       if (L.room.fase === 'sala') { w.document.getElementById('mbComecar')?.click(); return; }
-      const ativos = L.players.filter(p => !p.mestre && !p.expulso);
+      const ativos = L.players.filter(p => !p.expulso && (!p.mestre || !!p.amb || !!p.resp));   // o Curador conta quando joga
       if (e === 'choose') {
         if (v !== ultimaVolta) { ultimaVolta = v; escolhaDesde = Date.now(); }
         const todosProntos = ativos.length > 0 && ativos.every(p => p.amb && p.ambVolta === v);

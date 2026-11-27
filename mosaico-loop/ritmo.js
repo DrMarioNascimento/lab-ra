@@ -37,12 +37,12 @@ function loopFinalTurma(respostas) {
 // Na ordem em que aconteceu. ic = miniatura 3D da sala ou do objeto onde o fato se deu (museu/icones).
 const LOOP_LINHA = [
   {id:'troca', hora:'Dias antes', ic:'V13', txt:'A peça principal sai para "limpeza" e volta no mesmo dia'},
-  {id:'motivo', hora:'Dias antes', ic:'P01', txt:'Se a peça sumir, o seguro paga o patrocinador'},
-  {id:'copia', hora:'Hoje', ic:'GAL_B', txt:'A peça da Galeria é cópia: verniz novo, peso e escrita errados'},
+  {id:'motivo', hora:'Dias antes', ic:'P01_B', txt:'Se a peça sumir, o seguro paga o patrocinador'},
+  {id:'copia', hora:'Hoje', ic:'GAL_B_testa', txt:'A peça da Galeria é cópia: verniz novo, peso e escrita errados'},
   {id:'entrada', hora:'Hoje', ic:'DESC_B', txt:'O do patrocínio assina a entrada à tarde e volta de noite pela porta de serviço'},
   {id:'teo', hora:'Antes de 0:00', ic:'D10', txt:'O Téo confronta quem trocou a peça e é empurrado'},
   {id:'raio', hora:'Apagão', ic:'Q01', txt:'O raio atinge o Pátio e a luz apaga'},
-  {id:'passagem', hora:'4:00', ic:'S01', txt:'Alguém de paletó volta e vai para o Subsolo'},
+  {id:'passagem', hora:'4:00', ic:'S01_B', txt:'Alguém de paletó volta e vai para o Subsolo'},
   {id:'cracha', hora:'4:00', ic:'L08', txt:'A mão no crachá do Braga é a do Lenz'},
   {id:'engano', hora:'4:10', ic:'T01', txt:'Ele liga a Câmara achando que ela apaga cinco minutos. Ela só repete'}
 ];

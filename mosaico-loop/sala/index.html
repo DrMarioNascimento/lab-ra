@@ -6,14 +6,14 @@
 <meta name="theme-color" content="#080e19">
 <link rel="icon" type="image/webp" href="../museu/icones/T01.webp"><title>Mosaico Loop · Sala</title>
 <meta name="robots" content="noindex">
-<link rel="stylesheet" href="../style.css?v=28">
-<link rel="stylesheet" href="sala.css?v=7">
+<link rel="stylesheet" href="../style.css?v=29">
+<link rel="stylesheet" href="sala.css?v=8">
 <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.1.0/model-viewer.min.js"></script>
 </head>
 <body>
 <main id="app">
-<header class="mast"><a class="back" href="../index.html">Voltar</a><span class="mast-label">Mosaico <span>Loop</span></span><button class="text-button coop-shortcut hidden" id="coopShortcut" data-coop type="button">Jogar em grupo</button><button class="text-button info" id="helpOpen" type="button" aria-label="Como jogar">i</button></header>
-<div id="mestreBar" class="mestre-bar hidden" aria-label="Controles do Professor"></div>
+<header class="mast"><a class="back" href="../index.html">Voltar</a><span class="mast-label">Mosaico <span>Loop</span></span><button class="text-button coop-shortcut hidden" id="coopShortcut" data-coop type="button">Jogar em grupo</button><button class="text-button sala-btn hidden" id="salaBtn" type="button" data-dragon-sala-host aria-haspopup="dialog" aria-label="Sala: gerenciar a turma, QR, telão e voltas"><span class="ic3d sm" aria-hidden="true"><img src="../museu/icones/ui/conduzir.webp" alt=""></span>Sala</button><button class="text-button info" id="helpOpen" type="button" aria-label="Como jogar">i</button></header>
+<div id="mestreBar" class="mestre-bar hidden" aria-label="Controles do Curador da sala"></div>
 <aside id="coopBar" class="coop-bar hidden" aria-label="Sala cooperativa">
   <span id="coopBarText" role="status"></span>
   <button class="text-button" id="coopControls" type="button">Sala e convite</button>
@@ -61,14 +61,14 @@
 (function () {
   if (/[?&]falsa=1/.test(location.search)) return;
   var s = document.createElement('script');
-  s.type = 'module'; s.src = 'firebase-room.js?v=4';
+  s.type = 'module'; s.src = 'firebase-room.js?v=5';
   s.dataset.project = 'loop'; s.dataset.root = 'mosaico'; s.dataset.case = 'loop'; s.dataset.title = 'Mosaico Loop';
   s.dataset.readyEvent = 'mosaico-loop-sala-ready'; s.dataset.telao = 'telao/index.html';
   s.dataset.papelCamada = 'nao'; s.dataset.retomar = 'sim';
   document.head.appendChild(s);
 })();
 </script>
-<script src="../ritmo.js?v=11"></script><script src="../noites.js?v=1"></script><script src="../loop-central-dados.js?v=39"></script><script src="../loop-central.js?v=44"></script><script src="../noites-motor.js?v=19"></script><script src="../game.js?v=52"></script>
-<script type="module" src="sala-mestre.mjs?v=14"></script>
+<script src="../ritmo.js?v=12"></script><script src="../noites.js?v=1"></script><script src="../loop-central-dados.js?v=41"></script><script src="../loop-central.js?v=46"></script><script src="../noites-motor.js?v=19"></script><script src="../game.js?v=54"></script>
+<script type="module" src="sala-mestre.mjs?v=15"></script>
 </body>
 </html>

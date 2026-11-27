@@ -1,5 +1,5 @@
 {
- "versao": "v4 revisão 16 (26/11/2026)",
+ "versao": "v4 revisão 17 (26/11/2026) · lotes 14 e 15",
  "noite": "v4",
  "causa_sorteada": "B_potencia",
  "causas_possiveis": [
@@ -140,7 +140,8 @@
     }
    ]
   },
-  "glifos": "campo glifos da pista (tabua | copia | verdadeira): a tela desenha, junto do texto, a tábua de 12 símbolos ou a inscrição de 6 símbolos (sprite glifos.svg). O texto da pista continua valendo sozinho para leitor de tela e para o simulador de texto."
+  "glifos": "campo glifos da pista (tabua | copia | verdadeira): a tela desenha, junto do texto, a tábua de 12 símbolos ou a inscrição de 6 símbolos (sprite glifos.svg). O texto da pista continua valendo sozinho para leitor de tela e para o simulador de texto.",
+  "achar": "pontos escondidos (revisão 17, decisão do autor): ao entrar na sala nada fica aceso e a lista da sala começa vazia. Um ponto aparece quando a câmera aproximou (vista no alvo < 60% da inicial), está perto dele (vista na profundidade do ponto < 45% da inicial) e apontada para ele (círculo central de 30% do lado menor, de frente e sem nada da peça na frente). Achar põe o rótulo na lista; examinar custa como antes. Caderno e achados de voltas anteriores aparecem achados. Mesmos lugares (vagaDoPonto) e mesma regra nas 5 causas."
  },
  "estados_do_grupo": {
   "diagnostico_anexado": "o dossiê aceitou a causa (no jogo, um por aparelho; ver regras.diagnostico_anexado)",
@@ -2227,7 +2228,7 @@
   {
    "id": "man_3",
    "sala": "prototipo",
-   "texto": "Pelo interfone do Subsolo, a Dra. Sato pede: \"Me conta o que você viu com os seus olhos.\" Ela só comenta o que você contar.",
+   "texto": "Pelo interfone do Subsolo, a Dra. Sato pede: \"Me conta o que você viu com os seus olhos.\"",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -4349,7 +4350,7 @@
   {
    "id": "traj_2",
    "sala": "limpeza",
-   "texto": "Seu Dirceu aponta com o esfregão: \"Passou um agora, de sapato social, com pressa, rumo à escada do Subsolo. Nem boa-noite.\"",
+   "texto": "Seu Dirceu aponta com o esfregão: \"Passou um agora, de sapato social, com pressa, rumo à escada do Subsolo. Nem boa-noite. A Ivone, não: desde o fim da tarde, passou uma vez só, até a cafeteira e de volta.\"",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 245,
@@ -5294,7 +5295,7 @@
   {
    "id": "nico_0",
    "sala": "limpeza",
-   "texto": "Nico, guia do museu, repara em você antes de você chegar perto: \"Você tá com cara de quem não jantou. Tem bolacha na copa, pega lá. E a Ivone hoje tá brava, mas não é com você. Desculpa... eu já te disse isso?\"",
+   "texto": "Nico, guia do museu, repara em você antes de você chegar perto: \"Você tá com cara de quem não jantou. Tem bolacha perto da cafeteira, pega lá. E a Ivone hoje tá brava, mas não é com você. Desculpa... eu já te disse isso?\"",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -5743,7 +5744,7 @@
   {
    "id": "coop_catraca_ok",
    "sala": "recepcao",
-   "texto": "Comparando as duas listas: o entregador e a fotógrafa passaram pela roleta da saída. O do patrocínio, não. Se saiu, foi por outra porta.",
+   "texto": "Comparando as duas listas: o entregador e a fotógrafa passaram pela roleta da saída. O do patrocínio, não.",
    "volta_min": 2,
    "volta_max": 5,
    "segundo_min": 0,
@@ -5776,7 +5777,7 @@
   {
    "id": "catraca_solo",
    "sala": "seguranca",
-   "texto": "Com o livro de visitas no caderno, você confere nome por nome: o entregador e a fotógrafa saíram pela roleta. O do patrocínio, não. Se saiu, foi por outra porta.",
+   "texto": "Com o livro de visitas no caderno, você confere nome por nome: o entregador e a fotógrafa saíram pela roleta. O do patrocínio, não.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
@@ -8477,7 +8478,7 @@
   {
    "id": "empurra_2",
    "sala": "deposito",
-   "texto": "Na prateleira atrás do Téo, na altura do ombro, o pó foi arrastado por uma mão espalmada. Mais abaixo, outra marca, de dedos abertos, descendo: alguém tentou segurar quem caía.",
+   "texto": "Na prateleira atrás do Téo, na altura do ombro, o pó foi arrastado por uma mão espalmada. Mais abaixo, outra marca, de dedos abertos, descendo.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,

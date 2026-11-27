@@ -13,8 +13,10 @@ export function pilotar(win, { acerto = 0.6 } = {}) {
         const bs = [...d.querySelectorAll('#roomGrid button:not([disabled])')];
         if (bs.length && sorte(0.5)) bs[Math.floor(Math.random() * bs.length)].click();
       } else if (e === 'playing') {
-        const bs = [...d.querySelectorAll('#roomPanel button.clue:not([disabled])')];
-        if (bs.length && sorte(0.35)) bs[Math.floor(Math.random() * bs.length)].click();
+        // revisão 17: os detalhes da peça ficam escondidos; quem procura acha um de cada vez (acharAoAcaso) e só examina o que já achou
+        const bs = [...d.querySelectorAll('#roomPanel button.clue:not([disabled]):not([hidden])')];
+        if ((!bs.length || sorte(0.3)) && win.acharAoAcaso) win.acharAoAcaso();
+        else if (bs.length && sorte(0.35)) bs[Math.floor(Math.random() * bs.length)].click();
       } else if (e === 'final' && !L.players.find((p) => p.id === L.T.uid)?.resp && sorte(0.3)) {
         d.getElementById('answerForm').requestSubmit();
       }

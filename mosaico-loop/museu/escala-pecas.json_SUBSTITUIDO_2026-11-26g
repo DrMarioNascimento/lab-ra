@@ -1,0 +1,361 @@
+{
+ "pessoa_referencia_m": 1.75,
+ "escala": "1 m do prédio = 1 m real; maquete = 1:40",
+ "circulacao_publica_m": {
+  "lateral_min": 0.9,
+  "frente_fundo_min": 1.2
+ },
+ "salas": {
+  "D01": {
+   "peca": "D01",
+   "nome": "Sala dos gigantes",
+   "uso": "visitação pública",
+   "real": "esqueleto de ~18 m, réplica reduzida",
+   "largura_m": 3.4,
+   "profundidade_m": 0.32,
+   "altura_m": 0.84,
+   "base_m": 0.25
+  },
+  "D02": {
+   "peca": "D02",
+   "nome": "Sala dos predadores",
+   "uso": "visitação pública",
+   "real": "esqueleto de ~6 m, réplica reduzida",
+   "largura_m": 3.2,
+   "profundidade_m": 0.84,
+   "altura_m": 1.83,
+   "base_m": 0.25
+  },
+  "N14": {
+   "peca": "N14",
+   "nome": "Sala dos veículos",
+   "uso": "visitação pública",
+   "real": "caminhão de ~4,6 m, réplica reduzida",
+   "largura_m": 3.14,
+   "profundidade_m": 1.8,
+   "altura_m": 1.67,
+   "base_m": 0.12
+  },
+  "N01": {
+   "peca": "N01",
+   "nome": "Sala da porcelana",
+   "uso": "visitação pública",
+   "real": "xícara de ~0,12 m, ampliada",
+   "largura_m": 0.77,
+   "profundidade_m": 0.8,
+   "altura_m": 0.37,
+   "base_m": 1
+  },
+  "N15": {
+   "peca": "N15",
+   "nome": "Sala dos jogos",
+   "uso": "visitação pública",
+   "real": "tabuleiro de ~0,5 m, ampliado",
+   "largura_m": 1.3,
+   "profundidade_m": 1.3,
+   "altura_m": 0.31,
+   "base_m": 0.8
+  },
+  "CERA": {
+   "peca": "CERA",
+   "nome": "Sala de cera",
+   "uso": "visitação pública",
+   "real": "figuras de 1,75 m, tamanho real",
+   "largura_m": 3.02,
+   "profundidade_m": 1.99,
+   "altura_m": 2.2,
+   "base_m": 0
+  },
+  "N02": {
+   "peca": "N02",
+   "nome": "Sala da mobília",
+   "uso": "visitação pública",
+   "real": "cadeira de ~1,0 m, tamanho real",
+   "largura_m": 1.1,
+   "profundidade_m": 0.76,
+   "altura_m": 0.91,
+   "base_m": 0.3
+  },
+  "F01": {
+   "peca": "F01",
+   "nome": "Galeria especial",
+   "uso": "visitação pública",
+   "real": "esqueleto de ~8 m, réplica reduzida",
+   "largura_m": 2.6,
+   "profundidade_m": 0.73,
+   "altura_m": 1.24,
+   "base_m": 0.25
+  },
+  "C01": {
+   "peca": "C01",
+   "nome": "Auditório",
+   "uso": "visitação pública",
+   "real": "painel de programa, ~2 m",
+   "largura_m": 2.2,
+   "profundidade_m": 0.32,
+   "altura_m": 1.06,
+   "base_m": 0.3
+  },
+  "D08": {
+   "peca": "D08",
+   "nome": "Mezanino das asas",
+   "uso": "visitação pública",
+   "real": "asa de planador de ~8 m, réplica reduzida",
+   "largura_m": 3.4,
+   "profundidade_m": 1.51,
+   "altura_m": 1.21,
+   "base_m": 0.25
+  },
+  "F02": {
+   "peca": "F02",
+   "nome": "Sala dos fósseis",
+   "uso": "visitação pública",
+   "real": "placa de fóssil de ~0,6 m, ampliada",
+   "largura_m": 1.6,
+   "profundidade_m": 0.09,
+   "altura_m": 0.51,
+   "base_m": 0.9
+  },
+  "N03": {
+   "peca": "N03",
+   "nome": "Sala dos relógios",
+   "uso": "visitação pública",
+   "real": "relógio de pulso de ~0,05 m, muito ampliado",
+   "largura_m": 0.7,
+   "profundidade_m": 0.5,
+   "altura_m": 0.66,
+   "base_m": 1
+  },
+  "N04": {
+   "peca": "N04",
+   "nome": "Sala das proteções",
+   "uso": "visitação pública",
+   "real": "capacete de ~0,3 m, ampliado",
+   "largura_m": 0.76,
+   "profundidade_m": 0.8,
+   "altura_m": 0.72,
+   "base_m": 1
+  },
+  "N05": {
+   "peca": "N05",
+   "nome": "Sala da fotografia",
+   "uso": "visitação pública",
+   "real": "câmera com tripé de ~1,4 m, tamanho real",
+   "largura_m": 0.71,
+   "profundidade_m": 0.54,
+   "altura_m": 1.5,
+   "base_m": 0.15
+  },
+  "D09": {
+   "peca": "D09",
+   "nome": "Galeria do tempo",
+   "uso": "visitação pública",
+   "real": "trenó de ~2 m, tamanho real",
+   "largura_m": 2,
+   "profundidade_m": 1.04,
+   "altura_m": 1.32,
+   "base_m": 0.25
+  },
+  "B09": {
+   "peca": "B09",
+   "nome": "Laboratório de formas",
+   "uso": "visitação pública",
+   "real": "besouro de ~0,05 m, muito ampliado",
+   "largura_m": 1.2,
+   "profundidade_m": 1.05,
+   "altura_m": 0.3,
+   "base_m": 1
+  },
+  "B02": {
+   "peca": "B02",
+   "nome": "Sala das coleções",
+   "uso": "visitação pública",
+   "real": "placa de frascos de ~0,6 m, ampliada",
+   "largura_m": 1.6,
+   "profundidade_m": 0.05,
+   "altura_m": 0.47,
+   "base_m": 0.9
+  },
+  "N06": {
+   "peca": "N06",
+   "nome": "Sala dos vidros",
+   "uso": "visitação pública",
+   "real": "porta-velas de ~0,35 m, ampliado",
+   "largura_m": 0.56,
+   "profundidade_m": 0.56,
+   "altura_m": 0.9,
+   "base_m": 1
+  },
+  "N12": {
+   "peca": "N12",
+   "nome": "Sala do mar",
+   "uso": "visitação pública",
+   "real": "peixe de ~0,7 m, ampliado",
+   "largura_m": 1.2,
+   "profundidade_m": 0.27,
+   "altura_m": 0.54,
+   "base_m": 1
+  },
+  "N07": {
+   "peca": "N07",
+   "nome": "Sala dos sons",
+   "uso": "visitação pública",
+   "real": "rádio de ~0,5 m, ampliado",
+   "largura_m": 0.89,
+   "profundidade_m": 0.9,
+   "altura_m": 0.87,
+   "base_m": 1
+  },
+  "N11": {
+   "peca": "N11",
+   "nome": "Sala do âmbar",
+   "uso": "visitação pública",
+   "real": "âmbar de ~0,08 m, muito ampliado",
+   "largura_m": 0.59,
+   "profundidade_m": 0.53,
+   "altura_m": 0.6,
+   "base_m": 1
+  },
+  "N09": {
+   "peca": "N09",
+   "nome": "Sala dos brinquedos",
+   "uso": "visitação pública",
+   "real": "carrinho de ~0,15 m, muito ampliado",
+   "largura_m": 0.89,
+   "profundidade_m": 0.9,
+   "altura_m": 0.35,
+   "base_m": 1
+  },
+  "L01": {
+   "peca": "L01",
+   "nome": "Ateliê de descobertas",
+   "uso": "serviço do museu",
+   "real": "bancada de ensaios (microscópio de ~0,4 m, ampliado) ",
+   "largura_m": 1.5,
+   "profundidade_m": 0.43,
+   "altura_m": 0.07,
+   "base_m": 0.85
+  },
+  "L02": {
+   "peca": "L02",
+   "nome": "Área de descanso",
+   "uso": "serviço do museu",
+   "real": "armários de equipe, tamanho de uso",
+   "largura_m": 1.8,
+   "profundidade_m": 1.02,
+   "altura_m": 1.16,
+   "base_m": 0
+  },
+  "B01": {
+   "peca": "P01",
+   "nome": "Recepção",
+   "uso": "serviço do museu",
+   "real": "balcão de recepção de ~1,9 m, tamanho real",
+   "largura_m": 1.9,
+   "profundidade_m": 1.12,
+   "altura_m": 1.67,
+   "base_m": 0
+  },
+  "S01": {
+   "peca": "S01",
+   "nome": "Central de monitoramento",
+   "uso": "serviço do museu",
+   "real": "central de comando de ~2,0 m, tamanho de uso",
+   "largura_m": 2,
+   "profundidade_m": 2,
+   "altura_m": 0.95,
+   "base_m": 0.12
+  },
+  "L03": {
+   "peca": "L03",
+   "nome": "Base da limpeza",
+   "uso": "serviço do museu",
+   "real": "esfregão com balde de ~1,4 m, tamanho real",
+   "largura_m": 0.73,
+   "profundidade_m": 0.5,
+   "altura_m": 1.5,
+   "base_m": 0
+  },
+  "B04": {
+   "peca": "B04",
+   "nome": "Sala dos espécimes",
+   "uso": "visitação pública",
+   "real": "mesa de espécimes de ~1,5 m",
+   "largura_m": 1.8,
+   "profundidade_m": 0.71,
+   "altura_m": 0.24,
+   "base_m": 0.9
+  },
+  "M01": {
+   "peca": "M01",
+   "nome": "Oficina técnica",
+   "uso": "serviço do museu",
+   "real": "caixa de ferramentas de ~0,6 m sobre bancada",
+   "largura_m": 0.7,
+   "profundidade_m": 0.48,
+   "altura_m": 0.64,
+   "base_m": 0.9
+  },
+  "B05": {
+   "peca": "B05",
+   "nome": "Pátio de luz",
+   "uso": "visitação pública",
+   "real": "canteiro do pátio de ~2,4 m, tamanho real",
+   "largura_m": 2.13,
+   "profundidade_m": 1.8,
+   "altura_m": 1.39,
+   "base_m": 0.15
+  }
+ },
+ "tamanho_real_ra": {
+  "nota": "Tamanho real das peças das salas do Mosaico Loop para o \"Ver no ambiente\" (RA). maior_m = maior medida da peça, em metros; giro_y_graus = giro para a frente da cena ficar de frente. Quem aplica no GLB é museu/escala-real.mjs (nó \"escala_real\"; pode rodar de novo). GAL_B é montada por pecas-compostas.mjs (base GAL_B_base + máscara V11) e já sai em metros.",
+  "pecas": {
+   "Q01": {
+    "maior_m": 2.3,
+    "real": "pilar de tijolo com quadro de energia fechado a cadeado, mostrador e para-raios, ~2,3 m de altura"
+   },
+   "D10": {
+    "maior_m": 2.1,
+    "real": "estante de aço com caixas etiquetadas, caixote de lâmpadas, tubo de banner e poça de tinta, ~2,1 m de altura"
+   },
+   "L08": {
+    "maior_m": 1.6,
+    "real": "carrinho de limpeza com balde e esfregão, ~1,6 m de largura"
+   },
+   "N18": {
+    "maior_m": 3.2,
+    "giro_y_graus": 45,
+    "real": "canto de sala com câmera de fole no tripé (~1,5 m), parede de ~2,4 m"
+   },
+   "N17": {
+    "maior_m": 1.9,
+    "real": "mesa com gravador de rolo e rádio de válvulas, ~1,6 m de largura"
+   },
+   "DESC_B": {
+    "maior_m": 3.3,
+    "giro_y_graus": 40,
+    "real": "canto com porta de serviço (~2,1 m), mural e cafeteira, parede de ~2,5 m"
+   },
+   "REL_B": {
+    "maior_m": 3.6,
+    "real": "parede de relógios com relógio de caixa alta (~1,9 m)"
+   },
+   "GAL_B_base": {
+    "maior_m": 2.3,
+    "real": "base de madeira (~1,0 m de altura) com a redoma de vidro ao lado e parede com quadro"
+   },
+   "N07": {
+    "maior_m": 0.5,
+    "real": "rádio de ~0,5 m"
+   },
+   "N05": {
+    "maior_m": 1.5,
+    "real": "câmera com tripé, ~1,5 m de altura"
+   },
+   "E02": {
+    "maior_m": 1.5,
+    "real": "sala inteira da oficina (15 m de lado): na RA entra como maquete de mesa, 1:10"
+   }
+  }
+ }
+}
