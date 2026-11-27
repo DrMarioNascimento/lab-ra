@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Simulador · Limiar Ético</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../estilo.css?v=2.3">
+<link rel="stylesheet" href="sim.css?v=1">
+</head>
+<body class="simulador">
+<header class="sim-topo">
+  <span class="selo">LE</span>
+  <div class="sim-tit"><b>Limiar Ético · Simulador de aula</b><span>Telão em cima, turma embaixo. Você conduz pelo celular ao lado.</span></div>
+  <label class="sim-ctl">Participantes <input id="nAl" type="range" min="2" max="40" value="20"><b id="nAlV">20</b></label>
+  <label class="sim-ctl">Ritmo <select id="ritmo"><option value="1800">calmo</option><option value="900" selected>normal</option><option value="350">rápido</option></select></label>
+  <button class="sim-btn on" id="auto">Participantes automáticos: ligados</button>
+  <button class="sim-btn" id="reset">Recomeçar</button>
+</header>
+<div class="sim">
+  <section>
+    <div class="sim-telao" id="telao"><button class="sim-btn fsbtn" id="fs">⛶ Tela cheia</button><iframe id="fTelao" title="Telão da sala"></iframe></div>
+    <p class="sim-nota">Assim fica o telão numa TV vista de longe. Toque nele para ver um aluno que enviou ou a turma.</p>
+  </section>
+  <aside class="sim-prof"><h3>Seu celular <small>(quem conduz)</small></h3><div class="ph-frame"><iframe id="fProf" title="Celular de quem conduz"></iframe></div></aside>
+  <section class="sim-turma"><div class="sim-turma-cab"><h3>Turma</h3><span id="nota"></span></div><div class="phones" id="phones"></div></section>
+</div>
+<script type="module" src="sim.js?v=1"></script>
+</body>
+</html>

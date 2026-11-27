@@ -545,8 +545,11 @@ function mantendoRolagem(f) {
 
 /* ---------- Sala ao vivo (aluno) ---------- */
 const EMOJIS = ['⚖️', '🤝', '🧭', '🕊️', '🛡️', '🌱', '🔎', '⚽', '🏐', '🏃', '🥇', '🤸', '🏫', '🎽'];
-const lerJSON = k => { try { return JSON.parse(sessionStorage.getItem(k)); } catch (e) { return null; } };
-const gravarJSON = (k, v) => { try { if (v == null) sessionStorage.removeItem(k); else sessionStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* sem armazenamento */ } };
+// No /simulador várias telas dividem a mesma aba; cada uma guarda o que é seu com um prefixo próprio (?sim=<id>).
+const SIM = new URLSearchParams(location.search).get('sim') || '';
+const PREF = SIM ? 'sim_' + SIM + '_' : '';
+const lerJSON = k => { try { return JSON.parse(sessionStorage.getItem(PREF + k)); } catch (e) { return null; } };
+const gravarJSON = (k, v) => { try { if (v == null) sessionStorage.removeItem(PREF + k); else sessionStorage.setItem(PREF + k, JSON.stringify(v)); } catch (e) { /* sem armazenamento */ } };
 let sala = lerJSON('le_sala');        // { codigo, alunoId, nome, avatar } quando o aluno entrou numa sala
 let emojiEscolhido = sala?.avatar || '';
 
@@ -679,7 +682,7 @@ function telaProfessor() {
       <p class="rotulo">Limiar Ético</p><h1>Módulo do professor</h1>
       <p>Crie uma sala para a turma, acompanhe em tempo real quem está jogando, veja a revelação de cada aluno que enviou e a estatística da turma.</p>
       <p id="erro-prof" class="erro" role="alert">${esc(P.erro)}</p>
-      <div class="acoes"><button class="btn principal" data-acao="prof-entrar">Entrar com a conta Google</button><button class="btn secundario" data-acao="prof-sair">Voltar à atividade</button></div>
+      <div class="acoes"><button class="btn principal" data-acao="prof-entrar">Entrar com a conta Google</button><a class="btn secundario" href="simulador/">Simulador da aula</a><button class="btn secundario" data-acao="prof-sair">Voltar à atividade</button></div>
     </section></div>`;
     foco(); return;
   }
@@ -692,7 +695,7 @@ function telaProfessor() {
         ${ORDEM_DIAS.map(k => `<button class="btn modo" data-acao="prof-modo" data-modo="${k}" aria-pressed="${P.modoNovo === k}"><strong>${esc(DIAS[k].nome)}</strong><small>Todos entram direto nesta história.</small></button>`).join('')}
       </div>
       <p id="erro-prof" class="erro" role="alert">${esc(P.erro)}</p>
-      <div class="acoes"><button class="btn principal" data-acao="prof-criar">Criar sala</button><button class="btn secundario" data-acao="prof-sair">Voltar à atividade</button></div>
+      <div class="acoes"><button class="btn principal" data-acao="prof-criar">Criar sala</button><a class="btn secundario" href="simulador/">Simulador da aula</a><button class="btn secundario" data-acao="prof-sair">Voltar à atividade</button></div>
     </section></div>`;
     foco(); return;
   }
@@ -977,7 +980,7 @@ document.addEventListener('keydown', e => {
 // Link direto para um dia: ?dia=escola ou ?dia=bairro (útil para QR code e palestras).
 const params = new URLSearchParams(location.search);
 const diaDoLink = params.get('dia');
-if (params.has('professor')) telaProfessor();
+if (params.has('professor')) { telaProfessor(); if (SIM) profEntrar().then(() => { if (params.has('telao')) alternarTelao(true); }); }
 else if (params.get('sala')) { telaEntrarSala(limparCodigo(params.get('sala'))); abrirManual(); }
 else if (diaDoLink && DIAS[diaDoLink] && !sala?.diaFixo) { dia = diaDoLink; telaAbertura(); abrirManual(); }
 else { irParaInicio(); abrirManual(); }

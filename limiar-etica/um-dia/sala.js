@@ -18,6 +18,8 @@ export async function conectar() {
   if (api) return api;
   // Gancho de teste: permite simular a sala sem rede.
   if (typeof window !== 'undefined' && window.__LIMIAR_SALA_FALSA) return (api = window.__LIMIAR_SALA_FALSA);
+  // /simulador: cada tela simulada é um iframe com ?sim=<id>; a sala falsa mora na página do simulador.
+  try { if (typeof window !== 'undefined' && new URLSearchParams(location.search).get('sim') && window.parent !== window && window.parent.__LIMIAR_SIM_API) return (api = window.parent.__LIMIAR_SIM_API); } catch (e) { /* outro domínio */ }
   const base = `https://www.gstatic.com/firebasejs/${VERSAO_FIREBASE}`;
   const [{ initializeApp }, fs, au] = await Promise.all([
     import(`${base}/firebase-app.js`), import(`${base}/firebase-firestore.js`), import(`${base}/firebase-auth.js`)

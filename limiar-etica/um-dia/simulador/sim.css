@@ -1,0 +1,38 @@
+/* Limiar Ético · /simulador: telão em cima, turma embaixo, celular de quem conduz ao lado. */
+body.simulador { min-height: 100dvh; background: linear-gradient(180deg, var(--papel), var(--papel-2)); color: var(--tinta); font-family: var(--texto); margin: 0; }
+.sim-topo { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; padding: 12px 16px; max-width: 1800px; margin: 0 auto; width: 100%; }
+.selo { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 14px; background: linear-gradient(var(--sol), var(--sol-2)); color: var(--sol-tinta); font: 700 18px var(--titulo); box-shadow: inset 0 1px #fff8, 0 4px 0 var(--sol-base); }
+.sim-tit { flex: 1; min-width: 220px; display: flex; flex-direction: column; }
+.sim-tit b { font: 700 20px var(--titulo); color: var(--tinta); }
+.sim-tit span { font-size: 13px; color: var(--tinta-3); }
+.sim-ctl { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--tinta-2); }
+.sim-ctl input { width: 130px; accent-color: var(--petroleo); }
+.sim-ctl b { min-width: 2.2ch; text-align: right; font-variant-numeric: tabular-nums; }
+.sim-ctl select { font: inherit; padding: 4px 6px; border-radius: 10px; border: 1px solid var(--borda); background: var(--papel); }
+.sim-btn { font: 600 14px var(--texto); padding: 7px 12px; font-size: 14px; border-radius: 12px; background: var(--papel); border: 1px solid var(--borda); box-shadow: inset 0 1px #fff, 0 4px 0 var(--base); color: var(--tinta); cursor: pointer; }
+.sim-btn:active { transform: translateY(3px); box-shadow: inset 0 1px #fff, 0 1px 0 var(--base); }
+.sim-btn.on { background: linear-gradient(#2a7570, var(--petroleo)); color: #fff; border-color: var(--petroleo-escuro); box-shadow: inset 0 1px #ffffff40, 0 4px 0 var(--petroleo-escuro); }
+.sim { width: 100%; max-width: 1800px; margin: 0 auto; padding: 0 16px 24px; display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr) 300px; align-items: start; }
+.sim-telao { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 16px; overflow: hidden; background: var(--noite-2); border: 3px solid var(--noite); box-shadow: 0 6px 0 var(--noite-2), 0 20px 36px -14px #10183599; }
+.sim-telao iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: var(--papel); }
+.sim-telao:fullscreen { width: 100vw; height: 100vh; aspect-ratio: auto; border-radius: 0; border: 0; }
+.sim-telao.cheio { position: fixed; inset: 0; z-index: 99; width: 100vw; height: 100dvh; aspect-ratio: auto; border-radius: 0; border: 0; }
+.fsbtn { position: absolute; top: 10px; right: 10px; z-index: 5; opacity: .25; transition: opacity .25s; }
+.sim-telao:hover .fsbtn, .fsbtn:focus-visible { opacity: 1; }
+.sim-nota { margin: 8px 2px 0; font-size: 13px; color: var(--tinta-3); }
+.sim-prof h3, .sim-turma h3 { margin: 0 0 8px; font: 700 17px var(--titulo); color: var(--tinta); }
+.sim-prof small { font: 500 12px var(--texto); color: var(--tinta-3); }
+.sim-turma { grid-column: 1 / -1; }
+.sim-turma-cab { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.sim-turma-cab span { font-size: 13px; color: var(--tinta-3); }
+.phones { display: grid; grid-template-columns: repeat(auto-fill, minmax(252px, 1fr)); gap: 14px; }
+.ph-wrap { display: flex; flex-direction: column; gap: 6px; }
+.ph-cap { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--tinta-2); }
+.ph-cap b { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ph-cap .sim-btn { padding: 3px 9px; font-size: 12px; box-shadow: inset 0 1px #fff, 0 3px 0 var(--base); }
+/* o celular: tela de 390×780 reduzida para caber na grade */
+.ph-frame { position: relative; width: 252px; height: 504px; border: 4px solid var(--tinta); border-radius: 26px; overflow: hidden; background: var(--papel); box-shadow: 0 5px 0 #0d1220, 0 16px 28px -12px #10183599; }
+.ph-frame iframe { position: absolute; left: 0; top: 0; width: 390px; height: 780px; border: 0; transform: scale(.6462); transform-origin: 0 0; }
+.sim-prof .ph-frame { width: 292px; height: 584px; }
+.sim-prof .ph-frame iframe { transform: scale(.7487); }
+@media (max-width: 980px) { .sim { grid-template-columns: 1fr; } .sim-prof .ph-frame { margin: 0 auto; } }
