@@ -122,6 +122,16 @@
         <button class="btn sec sm" type="button" id="exportar">Baixar indicadores diários</button>
       </div>
       <div id="resultados" class="duas-rotinas"></div>
+      <details id="conta-glicemia" hidden>
+        <summary>Ver a conta do efeito glicêmico</summary>
+        <table>
+          <caption id="conta-glicemia-dia"></caption>
+          <thead><tr><th scope="col">Medida</th><th scope="col">Rotina A</th><th scope="col">Rotina B</th></tr></thead>
+          <tbody id="conta-glicemia-valores"></tbody>
+        </table>
+        <p>A vigília e o horário dos carboidratos entram como parcelas no modelo. A retenção indica quanto do estado anterior passa para o dia seguinte. Uma madrugada inteira de sono reduz esse estado à metade antes da atualização do dia.</p>
+        <p>As parcelas são hipóteses de cálculo. A Tabela 3 de Centofanti e colegas mede a mudança total do primeiro ao quarto plantão. <a href="../conferencia/glicemia-rotinas/">Conferir com os dados publicados</a></p>
+      </details>
     </section>
 
     <section class="painel" id="painel-aclima" hidden>
@@ -186,6 +196,6 @@
       <button type="button" id="fechar-observacao" class="btn sec sm">Fechar</button>
     </form>
   </dialog>
-  <script src="./trajetoria.js?v=8" type="module"></script>
+  <script src="./trajetoria.js?v=9" type="module"></script>
 </body>
 </html>

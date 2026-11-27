@@ -1,4 +1,4 @@
-import { agruparTrajetoria, HORIZONTES, PERFIS_TRAJETORIA, simularTrajetoria } from '../motor/trajetoria.js?v=8';
+import { agruparTrajetoria, HORIZONTES, PERFIS_TRAJETORIA, simularTrajetoria } from '../motor/trajetoria.js?v=9';
 import { PASSO_INTEGRADO } from '../motor/bancada-hidrica.js?v=6';
 import { desenharSerie, indiceNaSerie } from '../hidratacao/grafico.js?v=3';
 import { criarEditor } from './editor.js?v=4';
@@ -103,11 +103,43 @@ for (const [input, dados] of [[indicador, medidas], [variavel, medidasDia]]) {
 indicador.value = 'minPlasma';
 variavel.value = 'fc';
 
+const camposContaGlicemia = {
+  vigiliaMin: ['Vigília entre 00h e 06h', 'min', 0],
+  carboMadrugadaG: ['Carboidrato entre 00h e 06h', 'g', 1],
+  carbo24hG: ['Carboidrato nas 24 h anteriores às 06h30', 'g', 1],
+  carboMadrugadaPct: ['Fração consumida na madrugada', '%', 1],
+  retencaoPct: ['Estado anterior retido', '%', 1],
+  deltaVigilia: ['Parcela da vigília em relação ao dia 1', 'mmol/L × min', 2],
+  deltaAlimentacao: ['Parcela da alimentação em relação ao dia 1', 'mmol/L × min', 2],
+  deltaDiaAnterior: ['Mudança desde o dia anterior', 'mmol/L × min', 2],
+};
+const fmtComSinal = (v, casas) => (v > 0 ? '+' : '') + fmt(v, casas);
+
+function mostrarContaGlicemia(diaFinal) {
+  const painel = el('conta-glicemia');
+  painel.hidden = indicador.value !== 'deltaAucCafe';
+  if (painel.hidden) return;
+  el('conta-glicemia-dia').textContent = `Dia ${diaFinal} · café padronizado às 06h30`;
+  const valores = resultados.map((r) => r.dias[diaFinal - 1]);
+  const linhas = Object.entries(camposContaGlicemia).map(([k, [nome, unidade, casas]]) => {
+    const formatar = k.startsWith('delta') ? fmtComSinal : fmt;
+    const celulas = valores.map(({ contaGlicemia }) => {
+      const v = contaGlicemia[k];
+      return `<td>${v === null ? '—' : `${formatar(v, casas)} ${unidade}`}</td>`;
+    });
+    return `<tr><th scope="row">${nome}</th>${celulas.join('')}</tr>`;
+  });
+  const total = valores.map((d) => `<td><strong>${fmtComSinal(d.deltaAucCafe, 2)} mmol/L × min</strong></td>`);
+  el('conta-glicemia-valores').innerHTML = linhas.join('')
+    + `<tr><th scope="row">Variação total em relação ao dia 1</th>${total.join('')}</tr>`;
+}
+
 function mostrarPeriodo() {
   const i = Number(periodo.value);
   const p = agregados[0][i];
   const [nome, unidade, casas] = medidas[indicador.value];
   el('leitura-glicemia-acumulada').hidden = indicador.value !== 'deltaAucCafe';
+  mostrarContaGlicemia(p.fim);
   const intervalo = p.inicio === p.fim ? '' : ` · dias ${p.inicio} a ${p.fim}`;
   el('periodo-rotulo').value = p.nome + intervalo + (p.parcial ? ' · parcial' : '');
   periodo.setAttribute('aria-valuetext', el('periodo-rotulo').value);
@@ -399,6 +431,7 @@ el('atalho-lanche').addEventListener('click', () => {
   passoGrafico.value = 'dias';
   el('fase-circadiana').value = 'padrao';
   indicador.value = 'deltaAucCafe';
+  el('conta-glicemia').open = true;
   variavel.value = 'glicemia';
   instante.value = 78;
   ajustarControles();
@@ -435,9 +468,14 @@ painelDia.addEventListener('click', (evento) => {
 });
 el('exportar').addEventListener('click', () => {
   const chaves = Object.keys(medidas);
-  const linhas = [['rotina', 'cenario', 'dia', ...chaves].join(';')];
+  const camposConta = Object.keys(camposContaGlicemia);
+  const linhas = [['rotina', 'cenario', 'dia', ...chaves, ...camposConta.map((k) => `glicemia_${k}`)].join(';')];
+  const csv = (v) => v?.toFixed(4).replace('.', ',') ?? '';
   for (const [i, { dias }] of resultados.entries()) {
-    for (const p of dias) linhas.push([i ? 'B' : 'A', rotinas[i], p.dia, ...chaves.map((k) => p[k]?.toFixed(4).replace('.', ',') ?? '')].join(';'));
+    for (const p of dias) linhas.push([
+      i ? 'B' : 'A', rotinas[i], p.dia, ...chaves.map((k) => csv(p[k])),
+      ...camposConta.map((k) => csv(p.contaGlicemia[k])),
+    ].join(';'));
   }
   const url = URL.createObjectURL(new Blob(['\ufeff', linhas.join('\r\n')], { type: 'text/csv;charset=utf-8' }));
   const a = document.createElement('a');

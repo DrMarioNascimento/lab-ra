@@ -141,3 +141,23 @@ test('estado tem histórico independente do horizonte escolhido e fica limitado 
   assert.ok(longa.estadoFinal.glicemiaAcumulada.alimentacao <= 4);
   assert.equal(agruparTrajetoria(longa.dias).at(-1).deltaAucCafe, longa.dias.at(-1).deltaAucCafe);
 });
+
+test('a conta glicêmica abre as parcelas e mostra perda de estado na recuperação', () => {
+  const { dias } = simularTrajetoria('carboAs0030', 5);
+  assert.equal(dias[0].contaGlicemia.retencaoPct, null);
+  assert.equal(dias[0].contaGlicemia.deltaDiaAnterior, null);
+  const noite4 = dias[3].contaGlicemia;
+  assert.equal(noite4.vigiliaMin, 360);
+  assert.equal(noite4.carboMadrugadaG, 20);
+  assert.equal(noite4.carbo24hG, 200);
+  assert.equal(noite4.carboMadrugadaPct, 10);
+  assert.equal(noite4.retencaoPct, 100);
+  const recuperacao = dias[4].contaGlicemia;
+  assert.equal(recuperacao.vigiliaMin, 0);
+  assert.equal(recuperacao.carboMadrugadaG, 0);
+  assert.equal(recuperacao.retencaoPct, 50);
+  assert.ok(recuperacao.deltaDiaAnterior < 0);
+  for (const { contaGlicemia, deltaAucCafe } of dias) {
+    assert.ok(Math.abs(contaGlicemia.deltaVigilia + contaGlicemia.deltaAlimentacao - deltaAucCafe) < 1e-12);
+  }
+});

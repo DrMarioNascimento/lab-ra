@@ -10,7 +10,7 @@ import { agendaComPausa, agendaEscala, agendaLuzPlantao, agendaInicial, preparar
 import { emNoiteBiologica, faseEmPerfil, faseNoMinuto, passoFaseCircadiana, perfilDeFaseComLuz } from './fase-circadiana.js?v=2';
 
 import { ESTADO_GLICEMICO_INICIAL, FIM_MADRUGADA_GLICEMIA, HORA_CAFE_GLICEMIA,
-  agendaCompararLanche, aucCafeEstimado, passoGlicemiaAcumulada } from './glicemia-rotinas.js?v=2';
+  agendaCompararLanche, aucCafeEstimado, parcelasAucCafe, passoGlicemiaAcumulada, retencaoGlicemiaAcumulada } from './glicemia-rotinas.js?v=3';
 
 export const HORIZONTES = [1, 2, 5, 7, 12, 28, 56, 90, 180, 365];
 export const PERFIS_TRAJETORIA = Object.freeze({
@@ -121,7 +121,7 @@ function ajustarFCBasal(pontos, queda) {
   });
 }
 
-function fracaoCarboMadrugada(anteriores, atuais) {
+function carboidratoAntesDoCafe(anteriores, atuais) {
   let carboTotal = 0, carboMadrugada = 0;
   for (const refeicao of anteriores) {
     if (refeicao.hora * 60 >= HORA_CAFE_GLICEMIA) carboTotal += refeicao.carboG;
@@ -131,7 +131,7 @@ function fracaoCarboMadrugada(anteriores, atuais) {
     if (min < HORA_CAFE_GLICEMIA) carboTotal += refeicao.carboG;
     if (min < FIM_MADRUGADA_GLICEMIA) carboMadrugada += refeicao.carboG;
   }
-  return carboTotal ? carboMadrugada / carboTotal : 0;
+  return { carboTotal, carboMadrugada, fracao: carboTotal ? carboMadrugada / carboTotal : 0 };
 }
 
 /** O mesmo horizonte compartilha o mesmo estado inicial, independentemente do número de dias exibido. */
@@ -151,7 +151,7 @@ export function simularTrajetoria(perfilId, dias, { detalharDia = -1, frequencia
   const saldosSono = [];
   let refeicoesAnteriores = calendario?.dia(-1).refeicoes ?? REFEICOES;
   let sonoNaNoiteMin = 0;
-  let glicemiaAcumulada = ESTADO_GLICEMICO_INICIAL, aucCafeInicial;
+  let glicemiaAcumulada = ESTADO_GLICEMICO_INICIAL, aucCafeInicial, parcelasIniciais;
 
   for (let dia = 0; dia < dias; dia++) {
     const agendaLivre = calendario?.dia(dia);
@@ -241,15 +241,28 @@ export function simularTrajetoria(perfilId, dias, { detalharDia = -1, frequencia
     for (let min = 0; min < FIM_MADRUGADA_GLICEMIA; min += PASSO_INTEGRADO) {
       if (!cardio[min].dormindo) minutosAcordado += PASSO_INTEGRADO;
     }
-    glicemiaAcumulada = passoGlicemiaAcumulada(glicemiaAcumulada, minutosAcordado, fracaoCarboMadrugada(refeicoesAnteriores, refeicoes));
+    const carbo = carboidratoAntesDoCafe(refeicoesAnteriores, refeicoes);
+    glicemiaAcumulada = passoGlicemiaAcumulada(glicemiaAcumulada, minutosAcordado, carbo.fracao);
     const aucCafe = aucCafeEstimado(glicemiaAcumulada);
     aucCafeInicial ??= aucCafe;
     const deltaAucCafe = aucCafe - aucCafeInicial;
+    const parcelas = parcelasAucCafe(glicemiaAcumulada);
+    parcelasIniciais ??= parcelas;
+    const contaGlicemia = {
+      vigiliaMin: minutosAcordado,
+      carboMadrugadaG: carbo.carboMadrugada,
+      carbo24hG: carbo.carboTotal,
+      carboMadrugadaPct: carbo.fracao * 100,
+      retencaoPct: dia > 0 ? retencaoGlicemiaAcumulada(minutosAcordado) * 100 : null,
+      deltaVigilia: parcelas.vigilia - parcelasIniciais.vigilia,
+      deltaAlimentacao: parcelas.alimentacao - parcelasIniciais.alimentacao,
+      deltaDiaAnterior: dia > 0 ? deltaAucCafe - saida[dia - 1].deltaAucCafe : null,
+    };
     const horasSono = sonoMin / 60;
     saldosSono.push(24 - horasSono - P.dividaSono.vigiliaCriticaH.valor);
     const saldoSono7d = Math.max(0, saldosSono.slice(-7).reduce((a, b) => a + b, 0));
     saida.push({
-      dia: dia + 1, horasSono, saldoSono7d, pressaoAoAcordar, quedaFC, picoGlicemia, deltaAucCafe, mediaCortisol,
+      dia: dia + 1, horasSono, saldoSono7d, pressaoAoAcordar, quedaFC, picoGlicemia, deltaAucCafe, contaGlicemia, mediaCortisol,
       vigiliaMaxH: vigiliaMaxMin / 60, atividadeNoturnaH: atividadeNoturnaMin / 60,
       sonoDiurnoH: sonoDiurnoMin / 60, trabalhoNoturnoH: trabalhoNoturnoMin / 60, trabalhoH: trabalhoMin / 60, noitesEmClaro,
       faseCircadianaH: faseFinalH, sonoForaFaseH: sonoForaFaseMin / 60, pausaMin, biofeedbackMin, luzLuxH: luzLuxMin / 60,

@@ -51,9 +51,13 @@ function agenda(rotina, dia, horizonte, porcao, horasSono) {
 
 export const ESTADO_GLICEMICO_INICIAL = Object.freeze({ vigilia: 0, alimentacao: 0 });
 
+export function retencaoGlicemiaAcumulada(minutosAcordado) {
+  return FATOR_RECUPERACAO ** (1 - minutosAcordado / FIM_MADRUGADA_GLICEMIA);
+}
+
 export function passoGlicemiaAcumulada(estado, minutosAcordado, fracaoCarboMadrugada) {
   const exposicao = minutosAcordado / FIM_MADRUGADA_GLICEMIA;
-  const retencao = FATOR_RECUPERACAO ** (1 - exposicao);
+  const retencao = retencaoGlicemiaAcumulada(minutosAcordado);
   const exposicaoAlimentar = Math.min(1, fracaoCarboMadrugada / 0.30);
   return {
     vigilia: Math.min(NOITES_PROTOCOLO, estado.vigilia * retencao + exposicao),
@@ -61,8 +65,21 @@ export function passoGlicemiaAcumulada(estado, minutosAcordado, fracaoCarboMadru
   };
 }
 
-export function aucCafeEstimado({ vigilia, alimentacao }) {
-  return (tabela3[0].media * vigilia + (tabela3[30].media - tabela3[0].media) * alimentacao) / (NOITES_PROTOCOLO - 1);
+function termosCafe({ vigilia, alimentacao }) {
+  return {
+    vigilia: tabela3[0].media * vigilia,
+    alimentacao: (tabela3[30].media - tabela3[0].media) * alimentacao,
+  };
+}
+
+export function parcelasAucCafe(estado) {
+  const { vigilia, alimentacao } = termosCafe(estado);
+  return { vigilia: vigilia / (NOITES_PROTOCOLO - 1), alimentacao: alimentacao / (NOITES_PROTOCOLO - 1) };
+}
+
+export function aucCafeEstimado(estado) {
+  const { vigilia, alimentacao } = termosCafe(estado);
+  return (vigilia + alimentacao) / (NOITES_PROTOCOLO - 1);
 }
 
 function atualizarEstado(estado, plano) {
