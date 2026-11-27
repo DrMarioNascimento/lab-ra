@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Refeições e glicemia no plantão · Mosaico Alostase</title>
+  <link rel="stylesheet" href="../../jogo/estilo.css?v=9">
+  <link rel="stylesheet" href="../../cardiovascular/bancada.css">
+  <link rel="stylesheet" href="../../turno-calor/calor.css">
+  <style>.bancada select { max-width: 100%; }</style>
+</head>
+<body>
+  <main class="bancada">
+    <nav class="calor-nav"><a href="../">← Tabelas fisiológicas</a><a href="../../trajetoria/">Trajetórias fisiológicas</a></nav>
+    <header class="abertura">
+      <h1>Refeições e glicemia no plantão</h1>
+      <p>Compare como a mesma energia diária é distribuída em três rotinas inspiradas no ensaio de Centofanti e colegas. A intervenção durou quatro plantões simulados em 52 adultos saudáveis que concluíram o estudo, com sono diurno e uma noite de recuperação antes do segundo teste oral de tolerância à glicose.</p>
+    </header>
+    <section class="painel">
+      <h2>Horários das refeições</h2>
+      <div class="controle-hora">
+        <label>Rotina principal <select id="condicao"></select></label>
+        <label>Comparar com <select id="comparar"></select></label>
+        <label>Curva <select id="modo"><option value="plantao">Estimativa durante o plantão</option><option value="teste">Diferença após a carga de 75 g</option></select></label>
+      </div>
+      <p id="unidade"></p>
+      <canvas id="curva" class="calor-curva" aria-hidden="true"></canvas>
+      <p class="calor-legenda"><span>Contínua · rotina principal</span><span>Tracejada · comparação</span></p>
+      <div class="controle-hora">
+        <label for="tempo">Posição na curva <output id="hora"></output></label>
+        <input type="range" id="tempo" min="0" max="1440" value="450">
+      </div>
+      <p id="leitura"></p>
+      <table>
+        <caption>Refeições da rotina principal</caption>
+        <thead><tr><th scope="col">Horário</th><th scope="col">Energia diária</th><th scope="col">Carboidrato no exemplo</th></tr></thead>
+        <tbody id="refeicoes"></tbody>
+      </table>
+    </section>
+    <section class="painel">
+      <h2>Conferência com o teste de 75 g de glicose</h2>
+      <p>A tabela mostra quanto a glicemia medida duas horas após a carga de glicose mudou em relação ao teste antes dos plantões. O segundo teste foi na manhã após a noite de recuperação. Os valores estão em mmol/L.</p>
+      <table>
+        <thead><tr><th scope="col">Às 00:30</th><th scope="col">Estudo<br>IC de 95%</th><th scope="col">Motor</th><th scope="col">Motor − estudo</th></tr></thead>
+        <tbody id="conferencia"></tbody>
+      </table>
+      <p>† Refeição de madrugada usada para calibrar o efeito. Lanche e ausência de refeição foram reservados para conferência. No grupo sem refeição, o intervalo de confiança do estudo inclui zero.</p>
+      <p><a href="https://pubmed.ncbi.nlm.nih.gov/39422718/">Centofanti e colegas, 2025 · tabela 2</a></p>
+    </section>
+    <details class="painel">
+      <summary>Como o cálculo foi feito</summary>
+      <p>No exemplo, os três esquemas têm 200 g de carboidrato por dia, distribuídos proporcionalmente à energia de cada refeição. As curvas do plantão usam o modelo de resposta às refeições já existente, com repetição diária e o mesmo perfil basal. São estimativas de glicemia intersticial. A tabela do teste de 75 g compara glicose plasmática.</p>
+      <p>A curva do teste representa o acréscimo em relação ao teste basal. O modelo interpola linearmente pela proporção da energia ingerida às 00:30. A forma do acréscimo ao longo dos minutos é uma hipótese. A comparação quantitativa com o estudo é somente aos 120 minutos.</p>
+    </details>
+  </main>
+  <script type="module" src="./refeicoes.js"></script>
+</body>
+</html>
