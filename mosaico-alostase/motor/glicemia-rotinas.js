@@ -16,7 +16,8 @@ export const ROTINAS = Object.freeze({
 
 const CARBO_DIA_G = 200;
 export const FIM_MADRUGADA_GLICEMIA = 6 * 60;
-const FATOR_RECUPERACAO = 0.5; // Hipótese didática: meia-vida de um dia.
+export const MEIA_VIDA_GLICEMIA_H = 24; // Hipótese didática.
+const FATOR_RECUPERACAO = 0.5;
 export const HORA_CAFE_GLICEMIA = 390;
 const CAFE = HORA_CAFE_GLICEMIA;
 const CAFE_PCT = 30;
@@ -51,13 +52,13 @@ function agenda(rotina, dia, horizonte, porcao, horasSono) {
 
 export const ESTADO_GLICEMICO_INICIAL = Object.freeze({ vigilia: 0, alimentacao: 0 });
 
-export function retencaoGlicemiaAcumulada(minutosAcordado) {
-  return FATOR_RECUPERACAO ** (1 - minutosAcordado / FIM_MADRUGADA_GLICEMIA);
+export function retencaoGlicemiaAcumulada(minutosAcordado, meiaVidaH = MEIA_VIDA_GLICEMIA_H) {
+  return FATOR_RECUPERACAO ** ((MEIA_VIDA_GLICEMIA_H / meiaVidaH) * (1 - minutosAcordado / FIM_MADRUGADA_GLICEMIA));
 }
 
-export function passoGlicemiaAcumulada(estado, minutosAcordado, fracaoCarboMadrugada) {
+export function passoGlicemiaAcumulada(estado, minutosAcordado, fracaoCarboMadrugada, meiaVidaH = MEIA_VIDA_GLICEMIA_H) {
   const exposicao = minutosAcordado / FIM_MADRUGADA_GLICEMIA;
-  const retencao = retencaoGlicemiaAcumulada(minutosAcordado);
+  const retencao = retencaoGlicemiaAcumulada(minutosAcordado, meiaVidaH);
   const exposicaoAlimentar = Math.min(1, fracaoCarboMadrugada / 0.30);
   return {
     vigilia: Math.min(NOITES_PROTOCOLO, estado.vigilia * retencao + exposicao),
@@ -155,6 +156,18 @@ export function conferirGlicemiaRotinas() {
 /** A semana editável replica os cinco dias da bancada e inclui duas rotinas diurnas. */
 export function agendaCompararLanche(porcao) {
   if (!PORCOES.includes(porcao)) throw new RangeError('Escolha uma porção da bancada.');
+  return montarAgendaSemanal((dia) => agenda(dia < 5 ? ROTINAS.trabalhoNoite : ROTINAS.trabalhoDia, dia, 5, porcao, 8));
+}
+
+export function agendaEscalaGlicemica(distribuida) {
+  const noites = distribuida ? [0, 1, 3, 5] : [0, 1, 2, 3];
+  return montarAgendaSemanal((dia) => {
+    const plano = agenda(noites.includes(dia) ? ROTINAS.trabalhoNoite : ROTINAS.trabalhoDia, dia, 7, 10, 8);
+    return [4, 6].includes(dia) ? { ...plano, atividade: null } : plano;
+  });
+}
+
+function montarAgendaSemanal(planoDoDia) {
   const eventos = new Map();
   function adicionar(dia, min, dados) {
     const absoluto = (dia - 1) * JANELA_MIN + INICIO_MIN + min;
@@ -166,8 +179,7 @@ export function agendaCompararLanche(porcao) {
     eventos.get(chave).dias.push(diaSemana);
   }
   for (let dia = 0; dia < 7; dia++) {
-    const rotina = dia < 5 ? ROTINAS.trabalhoNoite : ROTINAS.trabalhoDia;
-    const plano = agenda(rotina, dia, 5, porcao, 8);
+    const plano = planoDoDia(dia);
     for (const [tipo, faixa] of [['dormir', plano.sono], ['trabalho', plano.atividade]]) {
       if (faixa) adicionar(dia, faixa[0], { tipo, fim: (INICIO_MIN + faixa[1]) % JANELA_MIN });
     }

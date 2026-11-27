@@ -1,6 +1,6 @@
 import { agendaEscala, agendaInicial, agendaLuzPlantao, DIAS_AGENDA, relogio, TIPOS_AGENDA, TODOS_DIAS, tipoIntervalo } from '../motor/agenda.js?v=3';
 
-import { agendaCompararLanche } from '../motor/glicemia-rotinas.js?v=2';
+import { agendaCompararLanche, agendaEscalaGlicemica } from '../motor/glicemia-rotinas.js?v=4';
 
 const lerHora = (v) => {
   if (!v) return NaN;
@@ -106,6 +106,8 @@ export function criarEditor(container, copiar) {
     const modelos = {
       luzSuave: () => agendaLuzPlantao(100),
       luzIntensa: () => agendaLuzPlantao(2500),
+      glicemiaBloco: () => agendaEscalaGlicemica(false),
+      glicemiaDistribuida: () => agendaEscalaGlicemica(true),
       carboAs19: () => agendaCompararLanche(0),
       carboAs0030: () => agendaCompararLanche(10),
     };

@@ -1,7 +1,7 @@
-import { agruparTrajetoria, HORIZONTES, PERFIS_TRAJETORIA, simularTrajetoria } from '../motor/trajetoria.js?v=9';
+import { agruparTrajetoria, HORIZONTES, PERFIS_TRAJETORIA, simularTrajetoria } from '../motor/trajetoria.js?v=10';
 import { PASSO_INTEGRADO } from '../motor/bancada-hidrica.js?v=6';
 import { desenharSerie, indiceNaSerie } from '../hidratacao/grafico.js?v=3';
-import { criarEditor } from './editor.js?v=4';
+import { criarEditor } from './editor.js?v=5';
 import { DIAS_AGENDA } from '../motor/agenda.js?v=3';
 
 const el = (id) => document.getElementById(id);
@@ -119,6 +119,7 @@ function mostrarContaGlicemia(diaFinal) {
   const painel = el('conta-glicemia');
   painel.hidden = indicador.value !== 'deltaAucCafe';
   if (painel.hidden) return;
+  el('meia-vida-aplicada').textContent = `${configuracoes[0].meiaVidaGlicemiaH} h`;
   el('conta-glicemia-dia').textContent = `Dia ${diaFinal} · café padronizado às 06h30`;
   const valores = resultados.map((r) => r.dias[diaFinal - 1]);
   const linhas = Object.entries(camposContaGlicemia).map(([k, [nome, unidade, casas]]) => {
@@ -282,6 +283,7 @@ function recalcular({ comparacaoPausa = false } = {}) {
     frequenciaNoturna: el('frequencia-noturna').value,
     sonoDiurno: el('sono-diurno').value === 'sim',
     eventos: id === 'personalizada' ? editores[i].ler() : null,
+    meiaVidaGlicemiaH: Number(el('recuperacao-glicemia').value),
     modoFase: escolhaFase === 'padrao' ? null : escolhaFase,
   }));
   const erro = el('erro-agenda');
@@ -313,6 +315,7 @@ function recalcular({ comparacaoPausa = false } = {}) {
   dia.value = n > 1 && novas.some((id) => PERFIS_TRAJETORIA[id].noite) ? 2 : 1;
   el('resumo-luz').hidden = !(novas.includes('luzSuave') && novas.includes('luzIntensa'));
   el('resumo-pausa').hidden = !comparacaoPausa;
+  el('resumo-glicemia-escalas').hidden = !(novas.includes('glicemiaBloco') && novas.includes('glicemiaDistribuida'));
   el('resumo-lanche').hidden = !(n === 5 && novas.includes('carboAs19') && novas.includes('carboAs0030'));
   el('resumo-escala').hidden = !novas.every((id) => id.startsWith('escala'));
   el('situacao').textContent = `${n} ${n === 1 ? 'dia calculado' : 'dias calculados'} por rotina.`;
@@ -423,11 +426,15 @@ el('atalho-escalas').addEventListener('click', () => {
   ajustarControles();
   recalcular();
 });
-el('atalho-lanche').addEventListener('click', () => {
+el('atalho-glicemia-escalas').addEventListener('click', () => compararRotinasGlicemicas('glicemiaBloco', 'glicemiaDistribuida', 28, 7));
+el('atalho-lanche').addEventListener('click', () => compararRotinasGlicemicas('carboAs19', 'carboAs0030', 5, 4));
+
+function compararRotinasGlicemicas(perfilA, perfilB, dias, diaSelecionado) {
   usarDiaInteiro();
-  perfis[0].value = 'carboAs19';
-  perfis[1].value = 'carboAs0030';
-  horizonte.value = '5';
+  perfis[0].value = perfilA;
+  perfis[1].value = perfilB;
+  horizonte.value = dias;
+  el('recuperacao-glicemia').value = '24';
   passoGrafico.value = 'dias';
   el('fase-circadiana').value = 'padrao';
   indicador.value = 'deltaAucCafe';
@@ -436,10 +443,10 @@ el('atalho-lanche').addEventListener('click', () => {
   instante.value = 78;
   ajustarControles();
   recalcular();
-  dia.value = '4';
-  prepararGrafico(4);
+  dia.value = diaSelecionado;
+  prepararGrafico(diaSelecionado);
   mostrarDia();
-});
+}
 el('atalho-noite').addEventListener('click', () => compararTurno('plantao', '2'));
 el('atalho-turno').addEventListener('click', () => compararTurno('turno', '365'));
 
@@ -469,12 +476,12 @@ painelDia.addEventListener('click', (evento) => {
 el('exportar').addEventListener('click', () => {
   const chaves = Object.keys(medidas);
   const camposConta = Object.keys(camposContaGlicemia);
-  const linhas = [['rotina', 'cenario', 'dia', ...chaves, ...camposConta.map((k) => `glicemia_${k}`)].join(';')];
+  const linhas = [['rotina', 'cenario', 'dia', ...chaves, 'glicemia_meiaVidaH', ...camposConta.map((k) => `glicemia_${k}`)].join(';')];
   const csv = (v) => v?.toFixed(4).replace('.', ',') ?? '';
   for (const [i, { dias }] of resultados.entries()) {
     for (const p of dias) linhas.push([
       i ? 'B' : 'A', rotinas[i], p.dia, ...chaves.map((k) => csv(p[k])),
-      ...camposConta.map((k) => csv(p.contaGlicemia[k])),
+      configuracoes[i].meiaVidaGlicemiaH, ...camposConta.map((k) => csv(p.contaGlicemia[k])),
     ].join(';'));
   }
   const url = URL.createObjectURL(new Blob(['\ufeff', linhas.join('\r\n')], { type: 'text/csv;charset=utf-8' }));

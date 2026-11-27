@@ -161,3 +161,33 @@ test('a conta glicêmica abre as parcelas e mostra perda de estado na recuperaç
     assert.ok(Math.abs(contaGlicemia.deltaVigilia + contaGlicemia.deltaAlimentacao - deltaAucCafe) < 1e-12);
   }
 });
+
+test('28 dias em escalas diferentes igualam a exposição semanal e a ingestão', () => {
+  const bloco = simularTrajetoria('glicemiaBloco', 28).dias;
+  const distribuida = simularTrajetoria('glicemiaDistribuida', 28).dias;
+  const somar = (dias, ler) => dias.reduce((total, d) => total + ler(d), 0);
+  for (let inicio = 0; inicio < 28; inicio += 7) {
+    for (const escala of [bloco, distribuida]) {
+      const semana = escala.slice(inicio, inicio + 7);
+      assert.equal(somar(semana, (d) => d.contaGlicemia.vigiliaMin), 4 * 360);
+      assert.equal(somar(semana, (d) => d.contaGlicemia.carboMadrugadaG), 80);
+      assert.equal(somar(semana, (d) => d.contaGlicemia.carbo24hG), 1400);
+      assert.equal(somar(semana, (d) => d.horasSono), 56);
+      assert.equal(somar(semana, (d) => d.trabalhoH), 30);
+      assert.equal(somar(semana, (d) => d.trabalhoNoturnoH), 24);
+    }
+  }
+  assert.notDeepEqual(bloco.map((d) => d.deltaAucCafe), distribuida.map((d) => d.deltaAucCafe));
+});
+
+test('a hipótese de meia-vida altera a recuperação, preservando as curvas diárias', () => {
+  const simular = (meiaVidaGlicemiaH) => simularTrajetoria('glicemiaBloco', 7, { meiaVidaGlicemiaH, detalharDia: 4 });
+  const rapida = simular(12), padrao = simular(24), lenta = simular(48);
+  assert.equal(rapida.dias[4].contaGlicemia.retencaoPct, 25);
+  assert.equal(padrao.dias[4].contaGlicemia.retencaoPct, 50);
+  assert.ok(Math.abs(lenta.dias[4].contaGlicemia.retencaoPct - 70.710678) < 1e-6);
+  assert.equal(rapida.dias[3].deltaAucCafe, lenta.dias[3].deltaAucCafe);
+  assert.ok(rapida.dias[4].deltaAucCafe < lenta.dias[4].deltaAucCafe);
+  assert.deepEqual(rapida.leitura, lenta.leitura);
+  assert.throws(() => simular(0), RangeError);
+});

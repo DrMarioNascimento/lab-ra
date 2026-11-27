@@ -58,7 +58,7 @@
           <p>Esta agenda se repete a cada semana, começando na segunda-feira. Marque os dias em que a atividade começa. Um fim anterior ao início atravessa a meia-noite.</p>
           <div class="agenda-opcoes"><button type="button" data-modelo="diurno" class="btn sec sm">Modelo diurno</button><button type="button" data-modelo="noturno" class="btn sec sm">Modelo noturno</button><button type="button" data-copiar class="btn sec sm">Copiar agenda A para B</button></div>
           <div class="agenda-opcoes">
-            <label>Modelo de escala <select data-escala><option value="diurno">Diurna</option><option value="noturno">Noturna fixa</option><option value="folgas">Noturna com retorno nas folgas</option><option value="luzSuave">Plantão com 100 lux</option><option value="luzIntensa">Plantão com 2.500 lux</option><option value="carboAs19">Quatro plantões · lanche às 19h</option><option value="carboAs0030">Quatro plantões · lanche às 00h30</option></select></label>
+            <label>Modelo de escala <select data-escala><option value="diurno">Diurna</option><option value="noturno">Noturna fixa</option><option value="folgas">Noturna com retorno nas folgas</option><option value="luzSuave">Plantão com 100 lux</option><option value="luzIntensa">Plantão com 2.500 lux</option><option value="glicemiaBloco">Quatro plantões seguidos por semana</option><option value="glicemiaDistribuida">Quatro plantões distribuídos na semana</option><option value="carboAs19">Quatro plantões · lanche às 19h</option><option value="carboAs0030">Quatro plantões · lanche às 00h30</option></select></label>
             <button type="button" data-carregar-escala class="btn sec sm">Carregar escala</button>
             <label>Tipo de pausa <select data-tipo-pausa><option value="meditacao">Meditação</option><option value="oracao">Oração</option><option value="biofeedback">Biofeedback respiratório</option></select></label>
             <button type="button" data-pausa class="btn sec sm">Adicionar pausa</button>
@@ -70,7 +70,7 @@
           <p>Esta agenda se repete a cada semana, começando na segunda-feira. Marque os dias em que a atividade começa. Um fim anterior ao início atravessa a meia-noite.</p>
           <div class="agenda-opcoes"><button type="button" data-modelo="diurno" class="btn sec sm">Modelo diurno</button><button type="button" data-modelo="noturno" class="btn sec sm">Modelo noturno</button><button type="button" data-copiar class="btn sec sm">Copiar agenda B para A</button></div>
           <div class="agenda-opcoes">
-            <label>Modelo de escala <select data-escala><option value="diurno">Diurna</option><option value="noturno">Noturna fixa</option><option value="folgas">Noturna com retorno nas folgas</option><option value="luzSuave">Plantão com 100 lux</option><option value="luzIntensa">Plantão com 2.500 lux</option><option value="carboAs19">Quatro plantões · lanche às 19h</option><option value="carboAs0030">Quatro plantões · lanche às 00h30</option></select></label>
+            <label>Modelo de escala <select data-escala><option value="diurno">Diurna</option><option value="noturno">Noturna fixa</option><option value="folgas">Noturna com retorno nas folgas</option><option value="luzSuave">Plantão com 100 lux</option><option value="luzIntensa">Plantão com 2.500 lux</option><option value="glicemiaBloco">Quatro plantões seguidos por semana</option><option value="glicemiaDistribuida">Quatro plantões distribuídos na semana</option><option value="carboAs19">Quatro plantões · lanche às 19h</option><option value="carboAs0030">Quatro plantões · lanche às 00h30</option></select></label>
             <button type="button" data-carregar-escala class="btn sec sm">Carregar escala</button>
             <label>Tipo de pausa <select data-tipo-pausa><option value="meditacao">Meditação</option><option value="oracao">Oração</option><option value="biofeedback">Biofeedback respiratório</option></select></label>
             <button type="button" data-pausa class="btn sec sm">Adicionar pausa</button>
@@ -85,6 +85,9 @@
           <select id="fase-circadiana"><option value="padrao">Usar o padrão da escala</option><option value="fixa">Manter fase de referência</option><option value="parcial">Simular ajuste parcial pelo sono</option><option value="luz">Calcular pela luz programada</option></select>
         </label>
         <label>Tempo simulado <select id="horizonte"></select></label>
+        <label>Meia-vida do efeito glicêmico
+          <select id="recuperacao-glicemia"><option value="12">12 h</option><option value="24" selected>24 h · padrão</option><option value="48">48 h</option></select>
+        </label>
         <button type="submit" class="btn ok">Calcular trajetórias</button>
         <div class="agenda-opcoes">
           <button type="button" class="btn sec sm" id="atalho-noite">Comparar uma noite em claro</button>
@@ -92,6 +95,7 @@
           <button type="button" class="btn sec sm" id="atalho-termico">Comparar caminhada no ar seco e úmido</button>
           <button type="button" class="btn sec sm" id="atalho-luz">Comparar luz em cinco plantões</button>
           <button type="button" class="btn sec sm" id="atalho-escalas">Comparar folgas em 8 semanas</button>
+          <button type="button" class="btn sec sm" id="atalho-glicemia-escalas">Comparar plantões seguidos e distribuídos em 28 dias</button>
           <button type="button" class="btn sec sm" id="atalho-lanche">Comparar o mesmo lanche às 19h e às 00h30</button>
           <button type="button" class="btn sec sm" id="atalho-turno">Comparar trabalho noturno em um ano</button>
         </div>
@@ -106,6 +110,7 @@
       <p id="resumo-termico" hidden>Mesma caminhada das 17h30 às 18h15, a 31 °C, a 40% do VO₂máx, com 300 mL de água ao terminar em ambas as rotinas. Muda apenas a umidade (25% ou 75%). As duas rotinas descansam por uma hora a 24 °C e 45% de umidade.</p>
       <p id="resumo-luz" hidden>Os dois cenários têm a mesma escala, as mesmas refeições e o mesmo sono. Muda apenas a luz das 0h às 2h durante os cinco plantões. Você pode carregar os dois modelos no editor para mudar outros horários, inclusive a volta para casa.</p>
       <p id="resumo-pausa" hidden>As duas rotinas têm a mesma escala. A rotina B recebe uma pausa na terça-feira, das 3h às 3h10.</p>
+      <p id="resumo-glicemia-escalas" hidden>As duas escalas têm quatro plantões, uma jornada diurna e duas folgas por semana, com o mesmo total de sono, trabalho, carboidrato e água. Na escala em bloco, os plantões são de segunda a quinta. Na distribuída, são segunda, terça, quinta e sábado. Os dias se referem à madrugada do plantão. A leitura de um dia depende de quanto tempo passou desde o último plantão. Os resultados de 28 dias são projeções. A referência experimental cobre quatro plantões e uma noite de recuperação. <a href="../conferencia/glicemia-rotinas/">Ver protocolo de referência</a></p>
       <p id="resumo-lanche" hidden>Quatro plantões e uma noite de recuperação. As rotinas têm o mesmo sono, trabalho e ingestão de carboidrato e água. A rotina B desloca 20 g de carboidrato das 19h para as 00h30.</p>
       <p id="resumo-escala" hidden>Nos três modelos de escala, estão programadas 40 h de trabalho e 56 h de sono por semana.</p>
     </section>
@@ -129,7 +134,7 @@
           <thead><tr><th scope="col">Medida</th><th scope="col">Rotina A</th><th scope="col">Rotina B</th></tr></thead>
           <tbody id="conta-glicemia-valores"></tbody>
         </table>
-        <p>A vigília e o horário dos carboidratos entram como parcelas no modelo. A retenção indica quanto do estado anterior passa para o dia seguinte. Uma madrugada inteira de sono reduz esse estado à metade antes da atualização do dia.</p>
+        <p>A vigília e o horário dos carboidratos entram como parcelas no modelo. A retenção indica quanto do estado anterior passa para o dia seguinte. O modelo usa uma meia-vida de recuperação de <strong id="meia-vida-aplicada"></strong>. Com uma madrugada inteira de sono, a fração retida é de cerca de 25%, 50% ou 71% para meias-vidas de 12, 24 ou 48 h, respectivamente.</p>
         <p>As parcelas são hipóteses de cálculo. A Tabela 3 de Centofanti e colegas mede a mudança total do primeiro ao quarto plantão. <a href="../conferencia/glicemia-rotinas/">Conferir com os dados publicados</a></p>
       </details>
     </section>
@@ -196,6 +201,6 @@
       <button type="button" id="fechar-observacao" class="btn sec sm">Fechar</button>
     </form>
   </dialog>
-  <script src="./trajetoria.js?v=9" type="module"></script>
+  <script src="./trajetoria.js?v=10" type="module"></script>
 </body>
 </html>

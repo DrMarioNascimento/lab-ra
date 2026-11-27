@@ -10,7 +10,7 @@ import { agendaComPausa, agendaEscala, agendaLuzPlantao, agendaInicial, preparar
 import { emNoiteBiologica, faseEmPerfil, faseNoMinuto, passoFaseCircadiana, perfilDeFaseComLuz } from './fase-circadiana.js?v=2';
 
 import { ESTADO_GLICEMICO_INICIAL, FIM_MADRUGADA_GLICEMIA, HORA_CAFE_GLICEMIA,
-  agendaCompararLanche, aucCafeEstimado, parcelasAucCafe, passoGlicemiaAcumulada, retencaoGlicemiaAcumulada } from './glicemia-rotinas.js?v=3';
+  MEIA_VIDA_GLICEMIA_H, agendaCompararLanche, agendaEscalaGlicemica, aucCafeEstimado, parcelasAucCafe, passoGlicemiaAcumulada, retencaoGlicemiaAcumulada } from './glicemia-rotinas.js?v=4';
 
 export const HORIZONTES = [1, 2, 5, 7, 12, 28, 56, 90, 180, 365];
 export const PERFIS_TRAJETORIA = Object.freeze({
@@ -37,6 +37,8 @@ export const PERFIS_TRAJETORIA = Object.freeze({
   arUmido: { nome: 'Caminhada a 31 °C · ar úmido (75%)', treino: true, ambiente: 'arUmido', termico: true },
   carboAs19: { nome: 'Quatro plantões · lanche às 19h', agenda: agendaCompararLanche(0), ambiente: 'fresco' },
   carboAs0030: { nome: 'Quatro plantões · lanche às 00h30', agenda: agendaCompararLanche(10), ambiente: 'fresco' },
+  glicemiaBloco: { nome: 'Quatro plantões seguidos por semana', agenda: agendaEscalaGlicemica(false), ambiente: 'fresco' },
+  glicemiaDistribuida: { nome: 'Quatro plantões distribuídos na semana', agenda: agendaEscalaGlicemica(true), ambiente: 'fresco' },
   personalizada: { nome: 'Agenda personalizada', ambiente: 'fresco' },
 });
 const REFEICOES = Object.freeze([7.5, 13, 20].map((hora) => ({ hora, carboG: 50 })));
@@ -135,7 +137,8 @@ function carboidratoAntesDoCafe(anteriores, atuais) {
 }
 
 /** O mesmo horizonte compartilha o mesmo estado inicial, independentemente do número de dias exibido. */
-export function simularTrajetoria(perfilId, dias, { detalharDia = -1, frequenciaNoturna = 'uma', sonoDiurno = false, eventos = null, faseParcial = null, modoFase = null } = {}) {
+export function simularTrajetoria(perfilId, dias, { detalharDia = -1, frequenciaNoturna = 'uma', sonoDiurno = false, eventos = null, faseParcial = null, modoFase = null, meiaVidaGlicemiaH = MEIA_VIDA_GLICEMIA_H } = {}) {
+  if (![12, MEIA_VIDA_GLICEMIA_H, 48].includes(meiaVidaGlicemiaH)) throw new RangeError('Escolha uma meia-vida glicêmica de 12, 24 ou 48 h.');
   if (!Object.hasOwn(PERFIS_TRAJETORIA, perfilId) || !Number.isInteger(dias) || dias < 1 || dias > 365) throw new RangeError('Escolha um cenário e um horizonte de 1 a 365 dias.');
   const perfil = PERFIS_TRAJETORIA[perfilId];
   const calendario = perfilId === 'personalizada' || perfil.agenda ? prepararAgenda(eventos ?? perfil.agenda ?? agendaInicial()) : null;
@@ -242,7 +245,7 @@ export function simularTrajetoria(perfilId, dias, { detalharDia = -1, frequencia
       if (!cardio[min].dormindo) minutosAcordado += PASSO_INTEGRADO;
     }
     const carbo = carboidratoAntesDoCafe(refeicoesAnteriores, refeicoes);
-    glicemiaAcumulada = passoGlicemiaAcumulada(glicemiaAcumulada, minutosAcordado, carbo.fracao);
+    glicemiaAcumulada = passoGlicemiaAcumulada(glicemiaAcumulada, minutosAcordado, carbo.fracao, meiaVidaGlicemiaH);
     const aucCafe = aucCafeEstimado(glicemiaAcumulada);
     aucCafeInicial ??= aucCafe;
     const deltaAucCafe = aucCafe - aucCafeInicial;
@@ -253,7 +256,7 @@ export function simularTrajetoria(perfilId, dias, { detalharDia = -1, frequencia
       carboMadrugadaG: carbo.carboMadrugada,
       carbo24hG: carbo.carboTotal,
       carboMadrugadaPct: carbo.fracao * 100,
-      retencaoPct: dia > 0 ? retencaoGlicemiaAcumulada(minutosAcordado) * 100 : null,
+      retencaoPct: dia > 0 ? retencaoGlicemiaAcumulada(minutosAcordado, meiaVidaGlicemiaH) * 100 : null,
       deltaVigilia: parcelas.vigilia - parcelasIniciais.vigilia,
       deltaAlimentacao: parcelas.alimentacao - parcelasIniciais.alimentacao,
       deltaDiaAnterior: dia > 0 ? deltaAucCafe - saida[dia - 1].deltaAucCafe : null,
