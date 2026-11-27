@@ -34,6 +34,7 @@ body.loop #cartao span{color:var(--ouro)}
 /* revisão 11: o título fica numa plaqueta escura, para a parede da sala (ferramentas, quadros) não passar por cima dele */
 body.loop #titulo{padding:6px 10px 7px;border-radius:12px;border:1px solid #5b6b7899;background:linear-gradient(160deg,#172633f0,#0d1720e6);box-shadow:inset 0 1px 0 #ffffff22,0 4px 0 #05090d}
 body.loop #cartao p{margin:4px 0 8px;font-size:14px;line-height:1.35;color:#d9d2c0}
+body.embed #hud{display:none}
 #carr{position:fixed;inset:0;z-index:4;display:flex;align-items:center;justify-content:center;background:var(--fundo);font:600 14px system-ui;color:var(--ouro)}
 </style></head>
 <body>
@@ -60,6 +61,9 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 const $ = id => document.getElementById(id);
 // Aberto a partir do Mosaico Loop (?loop=1): só as 15 salas da história, nos andares da história (salas-loop.json, gerado de LOOP_SALAS em game.js).
 const LOOP = new URLSearchParams(location.search).get('loop') === '1';
+// Dentro do prólogo do Mosaico Loop (?embed=1): sem botões; a página do jogo diz para onde a câmera vai (postMessage {loop:'ir', alvo}).
+const EMBED = new URLSearchParams(location.search).get('embed') === '1';
+if (EMBED) document.body.classList.add('embed');
 const LS = LOOP ? await (await fetch('salas-loop.json?v=20261126g')).json() : null;
 let NOMES_ANDAR = LOOP ? LS.andares : ['Térreo', '1º andar', '2º andar', '3º andar', '4º andar'];
 const SALAS = await (await fetch(((new URLSearchParams(location.search).get('versao') || 'A').toUpperCase().replace(/[^BC]/g, '') ? 'salas-' + (new URLSearchParams(location.search).get('versao')).toUpperCase().replace(/[^BC]/g, '') : 'salas') + '.json?v=20261123k')).json();
@@ -80,7 +84,7 @@ const chao = new THREE.Mesh(new THREE.CircleGeometry(1.6, 64), new THREE.MeshSta
 const dr = new DRACOLoader(); dr.setDecoderPath('./vendor/draco/');
 const gl = new GLTFLoader(); gl.setDRACOLoader(dr);
 let andar = [], pos0 = [], alvoZ = [0, 0, 0, 0, 0], atualZ = [0, 0, 0, 0, 0];
-let torre = null, fachadaOn = true, aberto = -1, dentro = null;
+let torre = null, fachadaOn = true, aberto = -1, dentro = null, pronto = false, pedido = null;
 document.getElementById('bVers').textContent = 'Peças: ' + (new URLSearchParams(location.search).get('versao') || 'A').toUpperCase();
 document.getElementById('bVers').onclick = e => { e.preventDefault(); const a = (new URLSearchParams(location.search).get('versao') || 'A').toUpperCase(); location.search = '?versao=' + ({A:'B',B:'C',C:'A'}[a] || 'B'); };
 const SLIDE = 11;                                     // metros do prédio (a torre tem escala 0,025)
@@ -91,6 +95,7 @@ gl.load((VERS === 'A' ? 'torre.glb' : 'torre-' + VERS + '.glb') + '?v=20261123k'
   for (let k = 0; k < 5; k++) { andar[k] = torre.getObjectByName('andar_' + k); pos0[k] = andar[k].position.z; }
   if (LOOP) montaLoop();
   montaAndares(); $('carr').style.display = 'none';
+  pronto = true; if (EMBED) { if (pedido) ir(pedido); try { parent.postMessage({loop: 'maquete-pronta'}, location.origin); } catch (e) {} }
 }, undefined, e => { $('carr').textContent = 'Não consegui abrir o museu.'; console.error(e); });
 
 function nomeSala(no) { if (LOOP && no.userData.loop) return no.userData.loop; return SALAS[no.name.replace('sala_', '')] || {nome: no.name, sub: '', texto: ''}; }
@@ -122,6 +127,7 @@ function montaLoop() {
 let faltam = 0;   // peças do Loop que ainda não entraram
 function trocaPecas(salas) {
   const fila = Object.entries(salas).filter(([id, n]) => LS.salas[id].peca && !n.getObjectByName('peca_' + LS.salas[id].peca));
+  fila.sort((x, y) => (y[0] === 'galeria') - (x[0] === 'galeria'));   // a Galeria primeiro: é a primeira cena do prólogo
   faltam = fila.length;
   const prox = () => {
     faltam = fila.length;
@@ -136,6 +142,7 @@ function trocaPecas(salas) {
         nova.position.set(-cn.x, -bn.min.y, -cn.z); caixa.add(nova); caixa.scale.setScalar(e); caixa.position.set((a.x + b.x) / 2, Math.min(a.y, b.y), (a.z + b.z) / 2); caixa.name = 'peca_' + LS.salas[id].peca;
         nova.traverse(o => { if (o.isLight) o.visible = false; if (/^teto/.test(o.name)) o.visible = false; });   // revisão 17: peça de sala com teto (E02) mostra o interior no museu
         no.add(caixa); for (const c of no.children.filter(c => c.name.startsWith('peca_') && c !== caixa)) no.remove(c);   // na sala do Loop fica só a peça do Loop
+        if (dentro === no) enquadra(no, aberto, 400);   // a peça nova chegou com a câmera já na sala
       } catch (err) { console.warn('peça do Loop', id, err); }
       prox();
     }, undefined, () => prox());
@@ -176,7 +183,7 @@ function entra(no, k) {
 // Mosaico Loop: a gaveta do andar termina de abrir na hora, a câmera mira a peça da sala (não o meio da sala)
 // e centra a peça na parte da tela que o cartão não cobre.
 const pecaDe = no => (no.userData.loop && no.userData.loop.peca && no.children.find(c => c.name === 'peca_' + no.userData.loop.peca)) || no.children.find(c => c.name.startsWith('peca_')) || no;
-function areaLivre() { const c = $('cartao'); return c.style.display === 'block' ? Math.max(120, Math.round(c.getBoundingClientRect().top) - 8) : innerHeight; }
+function areaLivre() { if (EMBED) return innerHeight; const c = $('cartao'); return c.style.display === 'block' ? Math.max(120, Math.round(c.getBoundingClientRect().top) - 8) : innerHeight; }
 function miraLivre() {   // o centro da imagem sobe para o meio da área livre (acima do cartão)
   const cob = dentro && LOOP ? innerHeight - areaLivre() : 0;
   if (cob > 0) cam.setViewOffset(innerWidth, innerHeight + cob, 0, cob, innerWidth, innerHeight); else cam.clearViewOffset();
@@ -234,4 +241,17 @@ window.__t = {cam, OC, abre, entra: (id) => { const n = torre.getObjectByName('s
     for (const x of [bx.min.x, bx.max.x]) for (const y of [bx.min.y, bx.max.y]) for (const z of [bx.min.z, bx.max.z]) { const v = new THREE.Vector3(x, y, z).project(cam); xs.push((v.x + 1) / 2 * innerWidth); ys.push((1 - v.y) / 2 * innerHeight); }
     const c = bx.getCenter(new THREE.Vector3()).project(cam);
     return {peca: pecaDe(dentro).name, temPeca: pecaDe(dentro) !== dentro, x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys), cx: (c.x + 1) / 2 * innerWidth, cy: (1 - c.y) / 2 * innerHeight, livre: areaLivre(), voando: !!voo, larg: innerWidth}; }};
+// prólogo: 'vista' (o prédio todo), 'andar:k' (abre a gaveta do andar k) ou 'sala:id' (entra na sala e mira a peça)
+let viagem = 0;   // cada pedido novo cancela a viagem anterior
+function ir(alvo) {
+  pedido = alvo; if (!pronto) return;
+  const [tipo, v] = String(alvo).split(':'), eu = ++viagem, depois = (ms, f) => setTimeout(() => { if (eu === viagem) f(); }, ms);
+  if (dentro) sai(true);
+  if (tipo !== 'sala') { abre(tipo === 'andar' ? +v : -1); return; }
+  // a câmera viaja: o prédio todo, depois a gaveta do andar abre, depois entra na sala
+  let n = null; if (LOOP && LS.salas[v]) torre.traverse(o => { if (!n && o.userData.loop === LS.salas[v]) n = o; }); if (!n) n = torre.getObjectByName('sala_' + v); const k = andar.findIndex(a => a.children.includes(n)); if (!n || k < 0) return;
+  abre(-1); depois(900, () => { abre(k); depois(1100, () => entra(n, k)); });
+}
+window.__ir = ir;
+if (EMBED) addEventListener('message', e => { if (e.origin === location.origin && e.data && e.data.loop === 'ir') ir(e.data.alvo); });
 </script></body></html>

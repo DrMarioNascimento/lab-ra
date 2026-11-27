@@ -1559,31 +1559,42 @@ $('answerFields').addEventListener('click', e => {
 });
 // Apresentação das telas (21/11/2026): passo a passo visual dentro do manual. Sem códigos fixos nem nomes de escala.
 const TV_SALA = (id, on) => '<span class="tv-room'+(on?' on':'')+'"><img src="'+ICONE_URL(LOOP_SALAS[id][2])+'" alt="">'+((typeof LC_CURTO !== 'undefined' && LC_CURTO[id]) || LOOP_SALAS[id][0].split(' · ').pop())+'</span>';
+// O prólogo passa pela maquete 3D (museu/torre): cada cena leva a câmera a um andar ou sala. O iframe só nasce quando o prólogo aparece na tela.
+const MAQUETE_URL = new URL('../torre/?loop=1', PECAS_URL).href;
+let maqFrame = null, maqAlvo = 'vista';
+function maqueteIr(alvo){ maqAlvo = alvo; if (maqFrame && maqFrame.contentWindow) maqFrame.contentWindow.postMessage({loop:'ir', alvo}, location.origin); }
+function maqueteNascer(box){
+ if (maqFrame) return;
+ maqFrame = document.createElement('iframe'); maqFrame.title = 'Maquete 3D do museu'; maqFrame.loading = 'lazy';
+ maqFrame.src = MAQUETE_URL + '&embed=1'; box.prepend(maqFrame);
+}
+addEventListener('message', e => { if (e.origin === location.origin && e.data && e.data.loop === 'maquete-pronta') { const b = maqFrame && maqFrame.parentNode; if (b) b.classList.add('pronta'); maqueteIr(maqAlvo); } });
 const TOUR = [
- {c:'Noite de véspera no museu. Amanhã abre a maior exposição da casa. Na Galeria, o curador Aurélio não tira o olho da peça principal: "Está linda, não está?" Ele não parece ter certeza.',t:'Escolha uma sala', d:'Toda volta começa no Saguão. Toque numa sala para ir até lá.',
-  v:()=>'<div class="tv-planta" aria-hidden="true"><div class="tvp-orelhas"><i class="on">2º andar</i><i>1º</i><i>Térreo</i><i>Subsolo</i></div><div class="tvp-folha"><span class="tvp-esc"></span><span class="tvp-sag"><img src="'+ICONE_URL('ui/saguao')+'" alt=""><b>Saguão superior</b><i class="tvp-pino"></i></span><span class="tvp-gal"><img src="'+ICONE_URL(LOOP_SALAS.galeria[2])+'" alt=""><b>Galeria</b></span></div></div><p class="tv-floor">Saguão superior · você começa aqui</p>'},
- {c:'Cada sala guarda um objeto. Gire, chegue perto. O que importa quase nunca está de frente.',t:LC_ACHAR?'Gire e chegue perto':'Gire a peça', d:LC_ACHAR?'Nada fica aceso. Gire, toque num lugar e aproxime: de perto, um brilho aparece. Toque nele para examinar.':'Toque nos pontos que brilham. Cada um guarda uma pista. Eles aparecem com o tempo.',
+ {c:'Noite de véspera no museu. Amanhã abre a maior exposição da casa. Na Galeria, o curador Aurélio não tira o olho da peça principal: "Está linda, não está?" Ele não parece ter certeza.',m:'sala:galeria',mr:'Galeria especial · a máscara',t:LC_ACHAR?'Gire e chegue perto':'Gire a peça', d:LC_ACHAR?'Nada fica aceso. Gire, toque num lugar e aproxime: de perto, um brilho aparece. Toque nele para examinar.':'Toque nos pontos que brilham. Cada um guarda uma pista. Eles aparecem com o tempo.',
   v:()=>'<div class="tv-piece"><img class="tv-obj3d" src="'+ICONE_URL('V11')+'" alt="">'+(LC_ACHAR?'<b class="tv-lupa"></b><b class="tv-dot d2 tv-cresce"></b></div><p class="tv-floor">Arraste para girar · pinça ou + para chegar perto</p>':'<b class="tv-dot d1"></b><b class="tv-dot d2"></b><b class="tv-dot d3"></b></div><p class="tv-floor">Arraste para girar · toque no brilho</p>')},
- {c:'Na Central, o Braga empurra uma xícara: "Chuva feia, hein? Pega um café." Daqui a cinco minutos ele vai dizer isso de novo, sem lembrar que já disse.',t:'O tempo corre', d:'Cada volta tem 5 minutos. Quando acaba, o tempo volta. O museu esquece. Você lembra.',
+ {c:'Na Central, o Braga empurra uma xícara: "Chuva feia, hein? Pega um café." Daqui a cinco minutos ele vai dizer isso de novo, sem lembrar que já disse.',m:'sala:seguranca',mr:'Central de monitoramento',t:'O tempo corre', d:'Cada volta tem 5 minutos. Quando acaba, o tempo volta. O museu esquece. Você lembra.',
   v:()=>'<div class="tv-clock"><span>VOLTA 2 DE 5</span><strong>04:12</strong><small>Minuto da volta · 0:48</small></div><div class="tv-bar"><i></i></div>'},
- {c:'O museu esquece. O caderno lembra. O chão guarda. O que você anota volta com você. O que você deixa no chão fica lá.',t:'Seu caderno', d:'Tudo que você acha vai para o caderno. O que alguém conta nem sempre é fato.',
+ {c:'O museu esquece. O caderno lembra. O chão guarda. O que você anota volta com você. O que você deixa no chão fica lá.',m:'sala:conservacao',mr:'Sala de conservação',t:'Seu caderno', d:'Tudo que você acha vai para o caderno. O que alguém conta nem sempre é fato.',
   v:()=>'<div class="tv-dossie"><p><span class="tv-chip obs">Observação</span> O que você viu</p><p><span class="tv-chip rel">Relato</span> O que alguém contou</p><p><span class="tv-chip reg">Registro</span> O que está escrito</p></div>'},
- {c:'Cinco minutos depois, o museu inteiro recomeça. No Subsolo, uma máquina ligada que ninguém consegue desligar.',t:'A Máquina', d:'Descubra por que a máquina travou. Na 5ª volta, o conserto vale.',
+ {c:'Cinco minutos depois, o museu inteiro recomeça. No Subsolo, uma máquina ligada que ninguém consegue desligar.',m:'sala:prototipo',mr:'Subsolo · Câmara do tempo',t:'A Máquina', d:'Descubra por que a máquina travou. Na 5ª volta, o conserto vale.',
   v:()=>'<div class="tv-panel"><b><img class="tv-mini" src="'+ICONE_URL('T01')+'" alt="">A Máquina</b><span class="tv-select">2 sinais + 1 leitura normal</span><span class="tv-btn">Escolher o defeito</span></div><p class="tv-floor">1 tentativa por volta</p>'},
- {c:'Na última volta, o telão da Recepção espera. Para fechar a noite, você precisa de provas, não de palpite.',t:'Revelar', d:'Na última volta, com 3 provas no caderno, vá à Recepção e diga o nome. É uma tentativa só.',
-  v:()=>'<div class="tv-rooms">'+TV_SALA('galeria')+TV_SALA('seguranca')+TV_SALA('limpeza')+TV_SALA('recepcao',1)+'</div><p class="tv-floor">3 provas · 1 nome · 1 tentativa</p>'}
+ {c:'Na última volta, o telão da Recepção espera. Para fechar a noite, você precisa de provas, não de palpite.',m:'sala:recepcao',mr:'Térreo · Recepção',t:'Revelar', d:'Na última volta, com 3 provas no caderno, vá à Recepção e diga o nome. É uma tentativa só.',
+  v:()=>'<div class="tv-rooms">'+TV_SALA('galeria')+TV_SALA('seguranca')+TV_SALA('limpeza')+TV_SALA('recepcao',1)+'</div><p class="tv-floor">3 provas · 1 nome · 1 tentativa</p>'},
+ {c:'Toda volta recomeça no Saguão. São 15 salas em 4 andares, e cada uma guarda um objeto. O que importa quase nunca está de frente.',m:'vista',mr:'O museu inteiro',t:'Escolha uma sala', d:'Toda volta começa no Saguão. Toque numa sala para ir até lá.',
+  v:()=>'<div class="tv-planta" aria-hidden="true"><div class="tvp-orelhas"><i class="on">2º andar</i><i>1º</i><i>Térreo</i><i>Subsolo</i></div><div class="tvp-folha"><span class="tvp-esc"></span><span class="tvp-sag"><img src="'+ICONE_URL('ui/saguao')+'" alt=""><b>Saguão superior</b><i class="tvp-pino"></i></span><span class="tvp-gal"><img src="'+ICONE_URL(LOOP_SALAS.galeria[2])+'" alt=""><b>Galeria</b></span></div></div><p class="tv-floor">Saguão superior · você começa aqui</p>'}
 ];
 function montarTour(){
  const host = $('tour');
  if (!host) return;
  let i = 0;
- host.innerHTML = '<div class="tour-card"><p class="tour-step" aria-live="polite"></p><div class="tour-visual" aria-hidden="true"></div><h3 class="tour-title"></h3><p class="tour-text"></p><p class="tour-cena"></p></div>'+
+ host.innerHTML = '<div class="tour-card"><p class="tour-step" aria-live="polite"></p><div class="tour-maquete"><span class="tm-espera">Montando o museu…</span><span class="tm-rotulo"></span><a class="tm-abrir" target="_blank" rel="noopener" href="'+MAQUETE_URL+'">Tela cheia</a></div><div class="tour-visual" aria-hidden="true"></div><h3 class="tour-title"></h3><p class="tour-text"></p><p class="tour-cena"></p></div>'+
   '<div class="tour-nav"><button class="btn secondary tour-prev" type="button">Voltar</button><span class="tour-dots" aria-hidden="true"></span><button class="btn primary tour-next" type="button">Próximo</button></div>';
  const q = sel => host.querySelector(sel);
  function draw(){
   const s = TOUR[i];
   q('.tour-step').textContent = 'Como jogar · '+(i+1)+' de '+TOUR.length;
   q('.tour-cena').textContent = s.c;
+  q('.tm-rotulo').textContent = s.mr; maqueteIr(s.m);
   q('.tour-visual').innerHTML = typeof s.v === 'function' ? s.v() : s.v;
   q('.tour-title').textContent = s.t;
   q('.tour-text').textContent = s.d;
@@ -1597,6 +1608,8 @@ function montarTour(){
   if (e.key === 'ArrowRight') { q('.tour-next').click(); e.preventDefault(); }
   if (e.key === 'ArrowLeft') { q('.tour-prev').click(); e.preventDefault(); }
  });
+ const caixa = host.querySelector('.tour-maquete');
+ if ('IntersectionObserver' in window) { const io = new IntersectionObserver(es => { if (es.some(x => x.isIntersecting)) { maqueteNascer(caixa); io.disconnect(); } }); io.observe(caixa); } else maqueteNascer(caixa);
  const dlg = host.closest('dialog');
  if (dlg) dlg.addEventListener('close', () => { i = 0; draw(); });
  draw();
