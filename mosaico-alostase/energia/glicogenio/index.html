@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Glicogênio hepático · Mosaico Alostase</title>
+  <link rel="stylesheet" href="../../jogo/estilo.css?v=9">
+  <link rel="stylesheet" href="../../cardiovascular/bancada.css">
+  <link rel="stylesheet" href="../../turno-calor/calor.css">
+</head>
+<body>
+  <main class="bancada">
+    <nav class="calor-nav"><a href="../">← Motor de energia</a><a href="../../conferencia/">Tabelas fisiológicas</a></nav>
+    <header class="abertura">
+      <h1>Glicogênio hepático</h1>
+      <p>Acompanhe a reserva de carboidrato no fígado depois de uma refeição mista e durante o jejum noturno. Os dois protocolos usaram espectroscopia por ressonância magnética com carbono-13.</p>
+    </header>
+    <section class="painel">
+      <h2>Reserva no fígado</h2>
+      <label>Protocolo
+        <select id="protocolo"><option value="refeicao">Depois da refeição</option><option value="jejum">Jejum noturno</option></select>
+      </label>
+      <p id="unidade"></p>
+      <canvas id="curva" class="calor-curva" aria-hidden="true"></canvas>
+      <p>Círculos indicam as referências usadas da publicação. A linha estima os valores entre os pontos.</p>
+      <label for="tempo">Tempo <output id="hora"></output></label>
+      <input type="range" id="tempo" min="0" max="360" step="1" value="318">
+      <p id="leitura"></p>
+    </section>
+    <section class="painel">
+      <h2>Conferir com os estudos</h2>
+      <table>
+        <caption id="legenda"></caption>
+        <thead><tr><th scope="col">Momento</th><th scope="col">Estudo</th><th scope="col">Motor</th></tr></thead>
+        <tbody id="referencias"></tbody>
+      </table>
+      <p id="metodo"></p>
+      <p><a id="fonte" href="https://doi.org/10.1172/JCI118379">Taylor e colegas, 1996</a></p>
+      <p>A concentração de glicogênio é expressa por litro de tecido hepático. As curvas atuais de glicose e hormônios usam outra refeição e outro estudo. <a href="../">Ver glicose, insulina e glucagon</a></p>
+    </section>
+  </main>
+  <script type="module" src="./glicogenio.js"></script>
+</body>
+</html>
