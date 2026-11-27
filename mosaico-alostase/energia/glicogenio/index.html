@@ -39,7 +39,29 @@
         <tbody id="referencias-fluxo"></tbody>
       </table>
       <p id="conferencia-120"></p>
-      <p>Taylor e colegas mediram a reserva e a produção de glicose em etapas distintas do estudo com a mesma refeição. A saída de glicose caiu logo após comer e voltou a subir quando a razão glucagon/insulina aumentou. A bancada sincroniza as duas curvas e integra a saída minuto a minuto. A produção inclui glicogenólise e gliconeogênese. O cálculo ainda usa pontos experimentais para cada curva, com regulação hormonal apresentada como interpretação da Figura 3. <a href="https://doi.org/10.1172/JCI118379">Taylor e colegas, 1996 · Figura 3</a></p>
+      <p>Taylor e colegas mediram a reserva e a produção de glicose em etapas distintas do estudo com a mesma refeição. A saída de glicose caiu logo após comer e voltou a subir quando a razão glucagon/insulina aumentou. A bancada sincroniza as duas curvas e integra a saída minuto a minuto. A produção inclui glicogenólise e gliconeogênese. Abaixo, você também pode testar como a razão hormonal altera o fluxo calculado. <a href="https://doi.org/10.1172/JCI118379">Taylor e colegas, 1996 · Figura 3</a></p>
+    </section>
+    <section class="painel" id="regulacao-hepatica" aria-labelledby="titulo-regulacao">
+      <h2 id="titulo-regulacao">Insulina, glucagon e produção hepática</h2>
+      <p>Altere um sinal por vez e acompanhe a mesma refeição. Os percentuais escalam os sinais do protocolo em todos os minutos.</p>
+      <div class="controle-hora">
+        <label>Sinal de insulina <select id="sinal-insulina">
+          <option value="0.8">80%</option><option value="1" selected>100%</option><option value="1.2">120%</option>
+        </select></label>
+        <label>Sinal de glucagon <select id="sinal-glucagon">
+          <option value="0.8">80%</option><option value="1" selected>100%</option><option value="1.2">120%</option>
+        </select></label>
+      </div>
+      <canvas id="curva-regulacao" class="calor-curva" aria-hidden="true"></canvas>
+      <p class="calor-legenda"><span>Contínua · curva de referência</span><span>Tracejada · cálculo pelo sinal hormonal</span></p>
+      <p id="leitura-regulacao"></p>
+      <table>
+        <caption>Conferência com os dois sinais em 100% (mg/kg/min)</caption>
+        <thead><tr><th scope="col">Tempo</th><th scope="col">Estudo</th><th scope="col">Cálculo hormonal</th></tr></thead>
+        <tbody id="conferencia-regulacao"></tbody>
+      </table>
+      <p>A entrada é a razão glucagon/insulina, lida aproximadamente da Figura 3 e dividida pelo valor de jejum. O cálculo aumenta com essa razão e tem como teto a produção de jejum. O basal e os 60 min calibram a resposta. Os outros tempos conferem o ajuste. Perto de 30 min, o cálculo mantém produção residual, enquanto o estudo relata supressão próxima de zero.</p>
+      <p>Os controles são hipóteses didáticas. Nesta etapa, o sinal altera a produção hepática. As concentrações no sangue e a reserva de glicogênio seguem suas curvas de referência. <a href="https://doi.org/10.1172/JCI118379">Taylor e colegas, 1996 · Figura 3</a></p>
     </section>
     <section class="painel">
       <h2>Conferir com os estudos</h2>
@@ -53,6 +75,6 @@
       <p>A concentração de glicogênio é expressa por litro de tecido hepático. As curvas atuais de glicose e hormônios usam outra refeição e outro estudo. <a href="../">Ver glicose, insulina e glucagon</a></p>
     </section>
   </main>
-  <script type="module" src="./glicogenio.js?v=2"></script>
+  <script type="module" src="./glicogenio.js?v=3"></script>
 </body>
 </html>

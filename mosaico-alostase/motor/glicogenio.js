@@ -53,3 +53,32 @@ export function simularFluxoHepatico() {
 }
 
 export const CONFERENCIA_GLICOGENIO_120 = { minuto: 120, variacao: 42 };
+
+// Leituras aproximadas do painel inferior da Figura 3 (Taylor et al.).
+// São coordenadas arredondadas da figura, não concentrações de cada hormônio.
+export const RAZAO_HORMONAL_TAYLOR = [
+  [0, 26], [10, 14], [30, 7], [60, 4], [120, 5], [180, 5],
+  [240, 6], [255, 8], [270, 11], [300, 25], [330, 27], [360, 36],
+];
+const FLUXO_BASAL = FLUXO_HEPATICO[0].taxa;
+const RAZAO_BASAL = RAZAO_HORMONAL_TAYLOR[0][1];
+// O basal e os 60 min fixam o ganho do modelo. Os demais valores de fluxo ficam para conferência.
+const EXPOENTE_HORMONAL = Math.log(0.31 / FLUXO_BASAL) / Math.log(4 / RAZAO_BASAL);
+
+function razaoDoProtocolo(minuto) {
+  if (minuto === 0) return RAZAO_BASAL;
+  const i = RAZAO_HORMONAL_TAYLOR.findIndex(([tempo]) => tempo >= minuto);
+  const [esquerda, r0] = RAZAO_HORMONAL_TAYLOR[i - 1], [direita, r1] = RAZAO_HORMONAL_TAYLOR[i];
+  return r0 + (r1 - r0) * (minuto - esquerda) / (direita - esquerda);
+}
+
+export function simularRegulacaoHepatica(insulina = 1, glucagon = 1) {
+  if (![0.8, 1, 1.2].includes(insulina) || ![0.8, 1, 1.2].includes(glucagon)) {
+    throw new RangeError('Escolha 80%, 100% ou 120% para cada sinal.');
+  }
+  return Array.from({ length: REFEICAO_GLICOGENIO.fim + 1 }, (_, minuto) => {
+    const razaoRelativa = razaoDoProtocolo(minuto) / RAZAO_BASAL * glucagon / insulina;
+    const taxa = FLUXO_BASAL * Math.min(1, razaoRelativa ** EXPOENTE_HORMONAL);
+    return { razaoRelativa, taxa };
+  });
+}

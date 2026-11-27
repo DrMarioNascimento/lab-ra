@@ -1,4 +1,4 @@
-import { REFEICAO_GLICOGENIO as refeicao, JEJUM_GLICOGENIO as jejum, glicogenioAposRefeicao, variacaoGlicogenioEmJejum, FLUXO_HEPATICO, CONFERENCIA_GLICOGENIO_120, simularFluxoHepatico } from '../../motor/glicogenio.js?v=2';
+import { REFEICAO_GLICOGENIO as refeicao, JEJUM_GLICOGENIO as jejum, glicogenioAposRefeicao, variacaoGlicogenioEmJejum, FLUXO_HEPATICO, CONFERENCIA_GLICOGENIO_120, simularFluxoHepatico, simularRegulacaoHepatica } from '../../motor/glicogenio.js?v=3';
 import { desenharSerie, indiceNaSerie } from '../../hidratacao/grafico.js?v=4';
 
 const el = (id) => document.getElementById(id);
@@ -37,6 +37,14 @@ el('referencias-fluxo').innerHTML = pontosFluxo.map((p) => {
 const check = CONFERENCIA_GLICOGENIO_120;
 el('conferencia-120').textContent = `Aos ${check.minuto} min, o glicogênio subiu ${fmt(check.variacao)} mmol/L no estudo. A curva, ajustada pelo basal e pelo pico, estima ${fmt(glicogenioAposRefeicao(check.minuto) - refeicao.inicial)} mmol/L de aumento nesse ponto.`;
 
+const regulacaoOriginal = simularRegulacaoHepatica();
+el('conferencia-regulacao').innerHTML = pontosFluxo.map((p) => {
+  const papel = p.minuto === 0 || p.minuto === 60 ? ' · calibração' : '';
+  const observado = p.aproximado ? '≈ 0' : fmt(p.taxa);
+  return `<tr><th scope="row">${p.minuto} min${papel}</th><td>${observado}</td><td>${fmt(regulacaoOriginal[p.minuto].taxa)}</td></tr>`;
+}).join('');
+let regulacao = regulacaoOriginal;
+let taxaRegulada = regulacao.map((p) => p.taxa);
 let protocolo, curva;
 function desenhar() {
   const min = Number(el('tempo').value);
@@ -49,12 +57,16 @@ function desenhar() {
   if (!el('fluxo-hepatico').hidden) {
     el('leitura-fluxo').textContent = `${fmt(taxa[min])} mg/kg/min aos ${min} min · ${fmt(fluxo[min].liberadoMgKg)} mg/kg liberados desde a refeição.`;
     desenharSerie(el('curva-fluxo'), [taxa], taxa.length, min, protocolo.hora, 1, marcadoresFluxo);
+    const resposta = regulacao[min];
+    el('leitura-regulacao').textContent = `Aos ${min} min · razão hormonal ${fmt(resposta.razaoRelativa * 100)}% do jejum · produção calculada de ${fmt(resposta.taxa)} mg/kg/min.`;
+    desenharSerie(el('curva-regulacao'), [taxa, taxaRegulada], taxa.length, min, protocolo.hora, 1, marcadoresFluxo);
   }
 }
 
 function atualizar() {
   protocolo = protocolos[el('protocolo').value];
   el('fluxo-hepatico').hidden = protocolo !== protocolos.refeicao;
+  el('regulacao-hepatica').hidden = el('fluxo-hepatico').hidden;
   curva = Array.from({ length: protocolo.fim + 1 }, (_, min) => protocolo.calcular(min));
   el('tempo').max = protocolo.fim;
   el('tempo').value = protocolo.minutoInicial;
@@ -75,11 +87,22 @@ el('curva').addEventListener('click', (e) => {
   el('tempo').value = indiceNaSerie(el('curva'), e.clientX, curva.length);
   desenhar();
 });
-el('curva-fluxo').addEventListener('click', (e) => {
-  el('tempo').value = indiceNaSerie(el('curva-fluxo'), e.clientX, taxa.length);
+for (const id of ['curva-fluxo', 'curva-regulacao']) {
+  el(id).addEventListener('click', (e) => {
+    el('tempo').value = indiceNaSerie(el(id), e.clientX, taxa.length);
+    desenhar();
+  });
+}
+function atualizarSinais() {
+  regulacao = simularRegulacaoHepatica(Number(el('sinal-insulina').value), Number(el('sinal-glucagon').value));
+  taxaRegulada = regulacao.map((p) => p.taxa);
   desenhar();
-});
+}
+el('sinal-insulina').addEventListener('change', atualizarSinais);
+el('sinal-glucagon').addEventListener('change', atualizarSinais);
 atualizar();
 const observer = new ResizeObserver(desenhar);
 observer.observe(el('curva'));
 observer.observe(el('curva-fluxo'));
+
+observer.observe(el('curva-regulacao'));

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { glicogenioAposRefeicao, variacaoGlicogenioEmJejum, fluxoHepaticoAposRefeicao, simularFluxoHepatico, CONFERENCIA_GLICOGENIO_120 } from './glicogenio.js';
+import { glicogenioAposRefeicao, variacaoGlicogenioEmJejum, fluxoHepaticoAposRefeicao, simularFluxoHepatico, simularRegulacaoHepatica, CONFERENCIA_GLICOGENIO_120 } from './glicogenio.js';
 
 test('a curva pós-prandial reproduz a concentração inicial e o pico publicado', () => {
   assert.equal(glicogenioAposRefeicao(0), 207);
@@ -32,4 +32,19 @@ test('a liberação acumulada integra a taxa, mesmo enquanto o estoque sobe', ()
   assert.ok(pontos.every((p, i) => i === 0 || p.liberadoMgKg >= pontos[i - 1].liberadoMgKg));
   const { minuto, variacao } = CONFERENCIA_GLICOGENIO_120;
   assert.ok(Math.abs(glicogenioAposRefeicao(minuto) - glicogenioAposRefeicao(0) - variacao) < 1);
+});
+
+test('regulação hormonal usa as duas âncoras e responde à perturbação dos sinais', () => {
+  const base = simularRegulacaoHepatica();
+  const maisInsulina = simularRegulacaoHepatica(1.2, 1);
+  const maisGlucagon = simularRegulacaoHepatica(1, 1.2);
+  assert.equal(base.length, 361);
+  assert.equal(base[0].taxa, 1.9);
+  assert.ok(Math.abs(base[60].taxa - 0.31) < 1e-12);
+  assert.ok(maisInsulina[60].taxa < base[60].taxa && maisGlucagon[60].taxa > base[60].taxa);
+  assert.ok(base[30].taxa > fluxoHepaticoAposRefeicao(30));
+  for (const serie of [base, maisInsulina, maisGlucagon]) {
+    assert.ok(serie.every(({ taxa }) => taxa >= 0 && taxa <= 1.9));
+  }
+  assert.throws(() => simularRegulacaoHepatica(0), RangeError);
 });
