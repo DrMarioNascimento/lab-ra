@@ -10,7 +10,7 @@ import { agendaComPausa, agendaEscala, agendaLuzPlantao, agendaInicial, preparar
 import { emNoiteBiologica, faseEmPerfil, faseNoMinuto, passoFaseCircadiana, perfilDeFaseComLuz } from './fase-circadiana.js?v=2';
 
 import { ESTADO_GLICEMICO_INICIAL, FIM_MADRUGADA_GLICEMIA, HORA_CAFE_GLICEMIA,
-  MEIA_VIDA_GLICEMIA_H, agendaCompararLanche, agendaEscalaGlicemica, aucCafeEstimado, parcelasAucCafe, passoGlicemiaAcumulada, retencaoGlicemiaAcumulada } from './glicemia-rotinas.js?v=4';
+  MEIA_VIDA_GLICEMIA_H, MEIAS_VIDAS_GLICEMIA_H, agendaCompararLanche, agendaEscalaGlicemica, aucCafeEstimado, parcelasAucCafe, passoGlicemiaAcumulada, retencaoGlicemiaAcumulada } from './glicemia-rotinas.js?v=5';
 
 export const HORIZONTES = [1, 2, 5, 7, 12, 28, 56, 90, 180, 365];
 export const PERFIS_TRAJETORIA = Object.freeze({
@@ -138,7 +138,7 @@ function carboidratoAntesDoCafe(anteriores, atuais) {
 
 /** O mesmo horizonte compartilha o mesmo estado inicial, independentemente do número de dias exibido. */
 export function simularTrajetoria(perfilId, dias, { detalharDia = -1, frequenciaNoturna = 'uma', sonoDiurno = false, eventos = null, faseParcial = null, modoFase = null, meiaVidaGlicemiaH = MEIA_VIDA_GLICEMIA_H } = {}) {
-  if (![12, MEIA_VIDA_GLICEMIA_H, 48].includes(meiaVidaGlicemiaH)) throw new RangeError('Escolha uma meia-vida glicêmica de 12, 24 ou 48 h.');
+  if (!MEIAS_VIDAS_GLICEMIA_H.includes(meiaVidaGlicemiaH)) throw new RangeError('Escolha uma meia-vida glicêmica de 12, 24 ou 48 h.');
   if (!Object.hasOwn(PERFIS_TRAJETORIA, perfilId) || !Number.isInteger(dias) || dias < 1 || dias > 365) throw new RangeError('Escolha um cenário e um horizonte de 1 a 365 dias.');
   const perfil = PERFIS_TRAJETORIA[perfilId];
   const calendario = perfilId === 'personalizada' || perfil.agenda ? prepararAgenda(eventos ?? perfil.agenda ?? agendaInicial()) : null;

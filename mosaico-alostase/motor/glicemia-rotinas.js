@@ -17,6 +17,7 @@ export const ROTINAS = Object.freeze({
 const CARBO_DIA_G = 200;
 export const FIM_MADRUGADA_GLICEMIA = 6 * 60;
 export const MEIA_VIDA_GLICEMIA_H = 24; // Hipótese didática.
+export const MEIAS_VIDAS_GLICEMIA_H = Object.freeze([12, MEIA_VIDA_GLICEMIA_H, 48]);
 const FATOR_RECUPERACAO = 0.5;
 export const HORA_CAFE_GLICEMIA = 390;
 const CAFE = HORA_CAFE_GLICEMIA;
@@ -81,6 +82,30 @@ export function parcelasAucCafe(estado) {
 export function aucCafeEstimado(estado) {
   const { vigilia, alimentacao } = termosCafe(estado);
   return (vigilia + alimentacao) / (NOITES_PROTOCOLO - 1);
+}
+
+/** Recalcula apenas a memória glicêmica para as exposições já apuradas na agenda. */
+export function resumirSensibilidadeGlicemica(dias) {
+  if (!dias.length) return [];
+  return MEIAS_VIDAS_GLICEMIA_H.map((meiaVidaH) => {
+    let estado = ESTADO_GLICEMICO_INICIAL;
+    let aucInicial;
+    let soma = 0, pico = -Infinity, diaPico = 1, final = 0;
+    for (const { dia, contaGlicemia } of dias) {
+      const { vigiliaMin, carboMadrugadaG, carbo24hG } = contaGlicemia;
+      const fracao = carbo24hG ? carboMadrugadaG / carbo24hG : 0;
+      estado = passoGlicemiaAcumulada(estado, vigiliaMin, fracao, meiaVidaH);
+      const auc = aucCafeEstimado(estado);
+      aucInicial ??= auc;
+      final = auc - aucInicial;
+      soma += final;
+      if (final > pico) {
+        pico = final;
+        diaPico = dia;
+      }
+    }
+    return { meiaVidaH, media: soma / dias.length, pico, diaPico, final };
+  });
 }
 
 function atualizarEstado(estado, plano) {

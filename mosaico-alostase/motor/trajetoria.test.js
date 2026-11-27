@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { agendaCompararLanche, conferirGlicemiaRotinas, PORCOES, simularGlicemiaRotina } from './glicemia-rotinas.js';
+import { agendaCompararLanche, conferirGlicemiaRotinas, PORCOES, resumirSensibilidadeGlicemica, simularGlicemiaRotina } from './glicemia-rotinas.js';
 import { agruparTrajetoria, PERFIS_TRAJETORIA, simularTrajetoria } from './trajetoria.js';
 
 test('24 h e sete dias têm o mesmo primeiro dia; água e sono passam à meia-noite', () => {
@@ -190,4 +190,18 @@ test('a hipótese de meia-vida altera a recuperação, preservando as curvas di�
   assert.ok(rapida.dias[4].deltaAucCafe < lenta.dias[4].deltaAucCafe);
   assert.deepEqual(rapida.leitura, lenta.leitura);
   assert.throws(() => simular(0), RangeError);
+});
+
+test('o painel de sensibilidade reproduz o cálculo diário completo nas três hipóteses', () => {
+  for (const perfil of ['glicemiaBloco', 'glicemiaDistribuida', 'escalaDia']) {
+    const { dias } = simularTrajetoria(perfil, 28);
+    for (const linha of resumirSensibilidadeGlicemica(dias)) {
+      const referencia = simularTrajetoria(perfil, 28, { meiaVidaGlicemiaH: linha.meiaVidaH });
+      const valores = referencia.dias.map((d) => d.deltaAucCafe);
+      assert.equal(linha.final, valores.at(-1));
+      assert.equal(linha.media, valores.reduce((soma, x) => soma + x, 0) / valores.length);
+      assert.equal(linha.pico, Math.max(...valores));
+      assert.equal(linha.diaPico, valores.indexOf(linha.pico) + 1);
+    }
+  }
 });

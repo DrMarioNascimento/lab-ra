@@ -127,6 +127,12 @@
         <button class="btn sec sm" type="button" id="exportar">Baixar indicadores diários</button>
       </div>
       <div id="resultados" class="duas-rotinas"></div>
+      <details id="sensibilidade-glicemia" hidden>
+        <summary>Comparar as três hipóteses de recuperação</summary>
+        <p id="sensibilidade-glicemia-legenda"></p>
+        <div id="sensibilidade-glicemia-tabelas"></div>
+        <p>Os valores expressam a mudança na resposta ao mesmo café da manhã em relação ao primeiro dia. A média inclui plantões e folgas. O pico indica o primeiro dia com a maior estimativa. O último dia é uma leitura pontual que depende de quando ocorreu o último plantão. As meias-vidas são hipóteses do modelo.</p>
+      </details>
       <details id="conta-glicemia" hidden>
         <summary>Ver a conta do efeito glicêmico</summary>
         <table>
@@ -201,6 +207,6 @@
       <button type="button" id="fechar-observacao" class="btn sec sm">Fechar</button>
     </form>
   </dialog>
-  <script src="./trajetoria.js?v=10" type="module"></script>
+  <script src="./trajetoria.js?v=11" type="module"></script>
 </body>
 </html>

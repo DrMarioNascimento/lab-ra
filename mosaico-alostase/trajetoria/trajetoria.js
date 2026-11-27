@@ -1,4 +1,5 @@
-import { agruparTrajetoria, HORIZONTES, PERFIS_TRAJETORIA, simularTrajetoria } from '../motor/trajetoria.js?v=10';
+import { resumirSensibilidadeGlicemica } from '../motor/glicemia-rotinas.js?v=5';
+import { agruparTrajetoria, HORIZONTES, PERFIS_TRAJETORIA, simularTrajetoria } from '../motor/trajetoria.js?v=11';
 import { PASSO_INTEGRADO } from '../motor/bancada-hidrica.js?v=6';
 import { desenharSerie, indiceNaSerie } from '../hidratacao/grafico.js?v=3';
 import { criarEditor } from './editor.js?v=5';
@@ -140,6 +141,7 @@ function mostrarPeriodo() {
   const p = agregados[0][i];
   const [nome, unidade, casas] = medidas[indicador.value];
   el('leitura-glicemia-acumulada').hidden = indicador.value !== 'deltaAucCafe';
+  el('sensibilidade-glicemia').hidden = indicador.value !== 'deltaAucCafe';
   mostrarContaGlicemia(p.fim);
   const intervalo = p.inicio === p.fim ? '' : ` · dias ${p.inicio} a ${p.fim}`;
   el('periodo-rotulo').value = p.nome + intervalo + (p.parcial ? ' · parcial' : '');
@@ -275,6 +277,26 @@ function mostrarAclimatacao() {
     `<tr><th scope="row">${rotulo}</th>${exibidos.map((p) => `<td>${Number.isFinite(p[chave]) ? fmt(p[chave], casas) + ' ' + unidade : '—'}</td>`).join('')}</tr>`).join('');
 }
 
+function mostrarSensibilidadeGlicemica() {
+  const [rotinaA, rotinaB] = resultados.map((r) => resumirSensibilidadeGlicemica(r.dias));
+  const unidade = 'mmol/L × min';
+  el('sensibilidade-glicemia-legenda').textContent = `${resultados[0].dias.length} dias simulados.`;
+  el('sensibilidade-glicemia-tabelas').innerHTML = rotinaA.map((a, i) => {
+    const b = rotinaB[i];
+    const linha = (rotulo, campo) => `<tr><th scope="row">${rotulo}</th>${[a, b].map((r) => {
+      const dia = campo === 'pico' ? ` · dia ${r.diaPico}` : '';
+      return `<td>${fmtComSinal(r[campo], 2)}${dia}</td>`;
+    }).join('')}</tr>`;
+    return `<table><caption>Meia-vida de ${a.meiaVidaH} h · ${unidade}</caption>
+      <thead><tr><th scope="col">Indicador</th><th scope="col">Rotina A</th><th scope="col">Rotina B</th></tr></thead>
+      <tbody>
+        ${linha('Média diária', 'media')}
+        ${linha('Pico', 'pico')}
+        ${linha('Último dia', 'final')}
+      </tbody></table>`;
+  }).join('');
+}
+
 function recalcular({ comparacaoPausa = false } = {}) {
   const n = Number(horizonte.value);
   const novas = perfis.map((s) => s.value);
@@ -307,6 +329,7 @@ function recalcular({ comparacaoPausa = false } = {}) {
   rotinas = novas;
   configuracoes = opcoes;
   resultados = novosResultados;
+  mostrarSensibilidadeGlicemica();
   observacoes.clear();
   ativarIndicadoresTermicos(novas.every((id) => PERFIS_TRAJETORIA[id].termico),
     novas.every((id) => PERFIS_TRAJETORIA[id].aclimatacao));
@@ -439,6 +462,7 @@ function compararRotinasGlicemicas(perfilA, perfilB, dias, diaSelecionado) {
   el('fase-circadiana').value = 'padrao';
   indicador.value = 'deltaAucCafe';
   el('conta-glicemia').open = true;
+  el('sensibilidade-glicemia').open = dias === 28;
   variavel.value = 'glicemia';
   instante.value = 78;
   ajustarControles();
