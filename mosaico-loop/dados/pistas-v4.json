@@ -1,5 +1,5 @@
 {
- "versao": "v4 revisão 17 (26/11/2026) · lotes 14 e 15",
+ "versao": "v4 revisão 18 (27/11/2026) · só travas físicas (decisão do autor)",
  "noite": "v4",
  "causa_sorteada": "B_potencia",
  "causas_possiveis": [
@@ -80,7 +80,7 @@
   "custo_clima": 0,
   "objetos_no_chao_por_jogador": 1,
   "diagnostico": "2 sinais da máquina que apontam a mesma causa, de tipos (grupoFonte) diferentes, + 1 pista que descarta outra causa. Falsa honesta e pista sem grupoFonte não contam como sinal. Na noite de dois defeitos: 1 sinal de número + 1 sinal de força + 1 descarte. Uma pista com diagnosticoCompleto (leitura completa do painel, etiqueta LEITURA COMPLETA) vale sozinha no Anexar: pode ir sem as outras duas.",
-  "precisaDe": "confere o caderno de cada aparelho: quem não tem no próprio caderno a pista pedida vê a pista travada; ao tocar nela, aparece a frase do campo porque e a sala onde olhar (só salas de pistas que existem na noite). Passar pista na pausa resolve. Em nico_1, cracha_3 e lenz_2, a frase diz o motivo no mundo (o que a pessoa precisa trazer); o piso de volta da escada continua.",
+  "precisaDe": "Revisão 18: só trava física (porta com cadeado, pendrive com senha, rádio sem pendrive, escrita que pede a tábua, caixa fechada com a peça dentro, material de comparação, estado da máquina). Confere o caderno de cada aparelho: a pista pedida é o objeto ou o código. O objeto ou código em si nunca é travado. O ponto travado pode ser achado; ao tocar, aparece a frase do campo porque e não gasta energia. Passar pista na pausa resolve.",
   "quemPodeVer": "todos | portador_<id> (quem tem a pista no próprio caderno) | portador_grupo_<g1>|<g2> (quem tem no próprio caderno alguma fonte de um desses grupos)",
   "soNaCausa": "a pista só existe quando a causa sorteada está na lista; sem o campo, existe sempre",
   "essencialPara": "causas ou finais para os quais o grupoFonte é necessário",
@@ -110,7 +110,7 @@
   "E_volta_min_meio": 3,
   "central": "A Central é um papel falado: quem fica na Central de monitoramento confirma em voz alta quem está onde e se os valores batem. O aparelho não tem comando próprio para isso e nenhuma tentativa errada devolve energia. (O simulador de texto tem o comando central só para ler em voz alta onde cada pessoa está.)",
   "objeto": "pista de objeto que já está no caderno pode ser pega de novo na sala dela, sem gastar energia: o objeto volta para a mão (botão \"pegar de novo · grátis\").",
-  "escada": "volta_min: 2 = laudo, molde, peça verdadeira, inscrição da máscara, comparação da foto sem ajuda, páginas anteriores do diário, carta da seguradora; 3 = nome (Braga admite, mostrar o bilhete, Acusação e Defesa), livro da Central, Aurélio e o diário, gravação do telefonema; 4 = ata, guardanapo, pendrive, voz do Téo, fala na escada. Toda pista com volta_min > 1 tem porque escrito como frase do mundo; a tela mostra a frase (no toque da pista travada) quando ela está travada por precisaDe, e a aba Atividades mostra a do produto enquanto a atividade não abre.",
+  "escada": "Revisão 18 (decisão do autor): não há mais escada de voltas. Toda pista tem volta_min 1: o que a pessoa acha, leva. O limite é o tempo (5 min), a energia (5 por volta), andar (10 s), achar no 3D e as travas físicas (precisaDe). Ficam as regras de ação e de fim: diagnóstico da volta 2 em diante, ensaio das voltas 2 a 4, eco da volta 3, primeiro conserto da noite E da volta 3, conserto e Revelar só na volta 5.",
   "energia_por_volta": 5,
   "aparelho": "O jogo roda em cada aparelho, sem dossiê compartilhado. Cada aparelho tem o próprio caderno, o próprio diagnóstico e a própria tentativa de Revelar. Para abrir uma atividade, o aparelho precisa das fontes de entrada no próprio caderno; só os consertos pedem também o diagnóstico anexado. Nos consertos em dupla, só o aparelho de quem está no Subsolo registra ensaio, meio conserto e conserto; quem está na outra sala diz a palavra da dupla e não gasta energia.",
   "tipoTela": "ícone da pista na lista quando ele precisa ser igual ao do par de mesmo rótulo (hoje só em c_anc_1).",
@@ -141,7 +141,7 @@
    ]
   },
   "glifos": "campo glifos da pista (tabua | copia | verdadeira): a tela desenha, junto do texto, a tábua de 12 símbolos ou a inscrição de 6 símbolos (sprite glifos.svg). O texto da pista continua valendo sozinho para leitor de tela e para o simulador de texto.",
-  "achar": "pontos escondidos (revisão 17, decisão do autor): ao entrar na sala nada fica aceso e a lista da sala começa vazia. Um ponto aparece quando a câmera aproximou (vista no alvo < 60% da inicial), está perto dele (vista na profundidade do ponto < 45% da inicial) e apontada para ele (círculo central de 30% do lado menor, de frente e sem nada da peça na frente). Achar põe o rótulo na lista; examinar custa como antes. Caderno e achados de voltas anteriores aparecem achados. Mesmos lugares (vagaDoPonto) e mesma regra nas 5 causas."
+  "achar": "pontos escondidos (revisão 17, decisão do autor): ao entrar na sala nada fica aceso e a lista da sala começa vazia. Um ponto aparece quando a câmera aproximou (vista no alvo < 60% da inicial), está perto dele (vista na profundidade do ponto < 45% da inicial) e apontada para ele (círculo central de 30% do lado menor, de frente e sem nada da peça na frente). Achar põe o rótulo na lista; examinar custa como antes. Caderno e achados de voltas anteriores aparecem achados. Mesmos lugares (vagaDoPonto) e mesma regra nas 5 causas. Revisão 18: o ponto travado por precisaDe também pode ser achado; ao tocar, mostra a frase da trava e não gasta energia."
  },
  "estados_do_grupo": {
   "diagnostico_anexado": "o dossiê aceitou a causa (no jogo, um por aparelho; ver regras.diagnostico_anexado)",
@@ -229,7 +229,7 @@
    "pergunta": "A peça é cópia?",
    "chaves": {
     "solo": {
-     "como": "Laudo ou molde (falsa_2, falsa_3, da volta 2, depois do cheiro de verniz), a peça verdadeira na mão (c_peca, da volta 2), foto_solo (da volta 2) ou a inscrição da máscara conferida com a tábua (insc_copia, da volta 2). O cheiro de verniz sozinho não é prova.",
+     "como": "Laudo ou molde (falsa_2, falsa_3), a peça verdadeira na mão (c_peca), a foto comparada sem ajuda (foto_solo, com a foto grande no caderno) ou a inscrição da máscara conferida com a tábua (insc_copia, com a tábua no caderno). O cheiro de verniz sozinho não é prova.",
      "custo_energia": "0 a 2",
      "grupos": [
       "prova_falsa"
@@ -251,7 +251,7 @@
    "pergunta": "Por onde passou quem trocou a peça?",
    "chaves": {
     "solo": {
-     "como": "traj_4 (marca de sola na porta de serviço, 1 de energia, sem trava de tempo), catraca_solo ou pegadas_solo (2 de energia cada), traj_1/2/3 depois que o paletó passa, as duas metades juntas (assim_par) ou o caderno de rondas no cofre do Braga (cofre_ronda).",
+     "como": "traj_4 (marca de sola na porta de serviço, 1 de energia), catraca_solo (com as duas listas no caderno) ou pegadas_solo (logo depois do apagão), 2 de energia cada; traj_1/2/3 quando o paletó passa; as duas metades juntas (assim_par); ou o caderno de rondas no cofre do Braga (cofre_ronda, senha: o registro de trás para a frente).",
      "custo_energia": 1,
      "grupos": [
       "trajeto"
@@ -273,7 +273,7 @@
    "pergunta": "De quem era a mão no crachá?",
    "chaves": {
     "solo": {
-     "como": "Da volta 3: mostrar a escala e o bilhete ao Braga (com prova da cópia), ou mostrar o bilhete a quem passa pela porta de serviço.",
+     "como": "Braga, de novo (cracha_3), na Central; ou parar na frente de quem passa pela porta de serviço às 4:02 (lenz_2): o crachá dele tem a foto do Braga e ele atende o telefone.",
      "custo_energia": 1,
      "grupos": [
       "cracha"
@@ -337,7 +337,7 @@
    "pergunta": "Como segurar a chave {ch} sem choque?",
    "chaves": {
     "solo": {
-     "como": "Luvas: iso_1 (armário da Oficina técnica, que só solta quando a luz cai), iso_2 (Oficina elétrica) ou iso_3 (carrinho de limpeza).",
+     "como": "Luvas: iso_1 (armário da Oficina técnica, cuja trava solta quando a luz cai), iso_2 (Oficina elétrica) ou iso_3 (carrinho de limpeza).",
      "custo_energia": 1,
      "grupos": [
       "isolante"
@@ -355,7 +355,7 @@
    "pergunta": "Como mandar o raio para a máquina?",
    "chaves": {
     "solo": {
-     "como": "Eco: grava a chave {ch} no Pátio numa volta e baixa a alavanca no Subsolo em outra.",
+     "como": "Eco: grava a chave {ch} no Pátio numa volta (da 3 em diante, regra do conserto) e baixa a alavanca no Subsolo em outra.",
      "custo_energia": "2 + 2 e uma volta a mais",
      "atividade": "coop_raio"
     },
@@ -438,7 +438,7 @@
    ],
    "chaves": {
     "solo": {
-     "como": "Qualquer pista do esconderijo (caixa pesada, guia de retirada, gravação do dia {dia}) libera abrir a caixa.",
+     "como": "A caixa de \"banners\" da estante da Sala das coleções: quem abre acha a peça. As pistas do esconderijo (caixa pesada, guia de retirada, gravação do dia {dia}) dizem qual das caixas é.",
      "custo_energia": 2,
      "grupos": [
       "esconderijo_peca",
@@ -446,7 +446,7 @@
      ]
     },
     "dupla": {
-     "como": "Quem acha a pista do esconderijo avisa; quem está na Sala das coleções abre a caixa.",
+     "como": "Quem acha a pista do esconderijo avisa qual caixa é; quem está na Sala das coleções abre.",
      "custo_energia": "1 de cada"
     },
     "troca_dossie": {
@@ -492,7 +492,7 @@
    ],
    "chaves": {
     "solo": {
-     "como": "Gaveta lacrada da Oficina elétrica (2 de energia), ou seguir o recado do Téo até a Galeria.",
+     "como": "Gaveta lacrada da Oficina elétrica (2 de energia), ou levantar a base da peça na Galeria (o recado do Téo diz onde ele escondeu).",
      "custo_energia": 2,
      "grupos": [
       "fusivel_mestre"
@@ -2261,7 +2261,7 @@
    ],
    "textoPorSintoma": {
     "sint_carga": "Você conta da carga baixa. Ela responde: \"Carga baixa pode ser duas coisas. Não me pergunta qual: me diz como estão as luzes do museu e a luz da peça.\"",
-    "sint_luz": "Você conta da luz fraca. Ela responde: \"Luz caindo a cada tentativa? Ou tem coisa puxando, ou tem coisa faltando. Vai até a caixa de fusíveis e me conta o que tem lá.\"",
+    "sint_luz": "Você conta da luz fraca. Ela responde: \"Luz caindo a cada tentativa? Então a força não está chegando inteira. Vai até a caixa de fusíveis e me conta o que tem lá.\"",
     "sint_pisca": "Você conta dos mostradores piscando. Ela responde: \"Sem ritmo? Do jeito que eu deixei, eles não piscam. Então ela não sabe onde está. Olha a caixa de fusíveis. Depois me liga.\"",
     "sint_relogios": "Você conta dos relógios tremendo. Ela responde: \"Relógio tremendo é ela perdida no tempo. Por quê, eu não sei daqui. Como está a luz da peça?\"",
     "sint_ancora": "Você conta da base apitando e piscando amarelo. Ela responde: \"Amarelo é ela procurando 300 anos. O que ela achou aí em cima, quem tem olho é você. Como está a peça?\"",
@@ -2680,14 +2680,12 @@
    "id": "chao_peca",
    "sala": "prototipo",
    "texto": "A peça verdadeira está no chão do Subsolo, do lado do apoio, exatamente onde foi deixada.",
-   "volta_min": 2,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "c_peca"
-    ],
+    "todas": [],
     "umaDe": []
    },
    "revela": {
@@ -2706,8 +2704,7 @@
      "objeto": "peca_verdadeira"
     }
    },
-   "grupoFonte": "peca_verdadeira",
-   "porque": "Ao lado do apoio, só o chão frio."
+   "grupoFonte": "peca_verdadeira"
   },
   {
    "id": "man_pot_2",
@@ -3619,14 +3616,12 @@
    "id": "chao_manopla",
    "sala": "patio",
    "texto": "A luva isolante está no chão do Pátio, ao lado do Quadro externo, bem onde foi deixada.",
-   "volta_min": 2,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "iso_1"
-    ],
+    "todas": [],
     "umaDe": []
    },
    "revela": {
@@ -3692,11 +3687,7 @@
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "d_teo_1",
-     "d_teo_2",
-     "teo_radio_2d"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -3714,8 +3705,7 @@
    "grupoFonte": "fusivel_mestre",
    "essencialPara": [
     "D_fusivel"
-   ],
-   "porque": "A peça está no lugar. Você não tem motivo para mexer nela. Ainda."
+   ]
   },
   {
    "id": "fh_base_perto",
@@ -3727,13 +3717,7 @@
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "fh_dobrada",
-     "dirceu_0",
-     "c_anc_3",
-     "teo_radio_2x",
-     "teo_radio_2c"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -3751,21 +3735,18 @@
     "C_ancora",
     "E_dois"
    ],
-   "parDe": "d_f2_1",
-   "porque": "A peça está no lugar. Você não tem motivo para mexer nela. Ainda."
+   "parDe": "d_f2_1"
   },
   {
    "id": "falsa_2",
    "sala": "conservacao",
    "texto": "Laudo do curador Aurélio, com a tinta ainda fresca: \"Verniz novo. Mais leve que no registro. Esta não é a nossa peça.\"",
-   "volta_min": 2,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "falsa_1"
-    ],
+    "todas": [],
     "umaDe": []
    },
    "revela": {
@@ -3787,21 +3768,18 @@
     "final_revelar"
    ],
    "previa": "Laudo do curador",
-   "custo": 0,
-   "porque": "Na mesa do curador, papéis virados para baixo. Você não sabe qual virar."
+   "custo": 0
   },
   {
    "id": "falsa_3",
    "sala": "deposito",
    "texto": "No fundo de uma caixa, raspas de gesso e um molde com o formato da peça principal. A testa do molde é lisa. Presa na tampa, uma folha com a foto do catálogo, impressa ao contrário.",
-   "volta_min": 2,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "falsa_1"
-    ],
+    "todas": [],
     "umaDe": []
    },
    "revela": {
@@ -3817,8 +3795,7 @@
     "final_revelar"
    ],
    "previa": "Fundo de uma caixa",
-   "custo": 0,
-   "porque": "Caixas e mais caixas na estante. Você não sabe em qual mexer."
+   "custo": 0
   },
   {
    "id": "data_1",
@@ -3926,12 +3903,7 @@
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "d_fus_1",
-     "d_fus_2",
-     "d_fus_3",
-     "d_fus_4"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -3949,8 +3921,7 @@
    "soNaCausa": [
     "D_fusivel"
    ],
-   "grupoFonte": "bilhete_teo",
-   "porque": "O diário tem meia dúzia de páginas dobradas. Você não sabe qual abrir."
+   "grupoFonte": "bilhete_teo"
   },
   {
    "id": "fh_dobrada",
@@ -3962,13 +3933,7 @@
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "fus_ok_1",
-     "fh_varal",
-     "fh_vidro",
-     "b_carga_3",
-     "fh_zumbido_a"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -3989,8 +3954,7 @@
     "C_ancora",
     "E_dois"
    ],
-   "parDe": "d_teo_1",
-   "porque": "O diário tem meia dúzia de páginas dobradas. Você não sabe qual abrir."
+   "parDe": "d_teo_1"
   },
   {
    "id": "tombo_1",
@@ -4145,19 +4109,13 @@
    "id": "c_peca",
    "sala": "deposito",
    "texto": "Dentro da caixa de \"banners\", embrulhada numa manta: a peça verdadeira. Cheira a pó, não a verniz. Embaixo da base, o número gravado. Você tira da caixa com as duas mãos.",
-   "volta_min": 2,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "falsa_1"
-    ],
-    "umaDe": [
-     "c_esc_1",
-     "c_esc_2",
-     "c_esc_3"
-    ]
+    "todas": [],
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -4180,13 +4138,12 @@
     "C_ancora",
     "final_revelar"
    ],
-   "porque": "A caixa diz NÃO ABRIR. Você precisa de um motivo.",
    "gruposExtras": [
     "prova_falsa"
    ]
   },
   {
-   "volta_min": 2,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
@@ -4255,12 +4212,7 @@
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "d_fus_1",
-     "d_fus_2",
-     "d_fus_3",
-     "d_fus_4"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -4278,8 +4230,7 @@
    "grupoFonte": "ordem_circuito",
    "essencialPara": [
     "D_fusivel"
-   ],
-   "porque": "A mão do Téo está fechada. Você não quer mexer nele sem motivo."
+   ]
   },
   {
    "id": "fh_papel_teo",
@@ -4291,13 +4242,7 @@
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "fus_ok_1",
-     "fh_varal",
-     "fh_vidro",
-     "b_carga_3",
-     "fh_zumbido_a"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -4315,8 +4260,7 @@
     "C_ancora",
     "E_dois"
    ],
-   "parDe": "d_ord_1",
-   "porque": "A mão do Téo está fechada. Você não quer mexer nele sem motivo."
+   "parDe": "d_ord_1"
   },
   {
    "id": "traj_1",
@@ -4350,7 +4294,7 @@
   {
    "id": "traj_2",
    "sala": "limpeza",
-   "texto": "Seu Dirceu aponta com o esfregão: \"Passou um agora, de sapato social, com pressa, rumo à escada do Subsolo. Nem boa-noite. A Ivone, não: desde o fim da tarde, passou uma vez só, até a cafeteira e de volta.\"",
+   "texto": "Seu Dirceu aponta com o esfregão: \"Passou um agora, de sapato social, com pressa, rumo à escada do Subsolo. Nem boa-noite. A Ivone? No fim da tarde, uma vez só: foi até a cafeteira e voltou. Depois eu fui passar pano na Recepção, um tempão.\"",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 245,
@@ -4646,23 +4590,14 @@
   {
    "id": "cracha_3",
    "sala": "seguranca",
-   "texto": "Braga olha a escala e o bilhete e coça a nuca: \"Tá. O crachá é meu. Só que não tá comigo desde ontem. O Lenz, do patrocínio, ficou rondando o armário da equipe, ali do lado da limpeza, falando 'rapidinho'. Quando eu voltei, tinha o bilhete no lugar do crachá. E eu... eu deixei quieto. Quer um café?\"",
-   "volta_min": 3,
+   "texto": "Braga pega você olhando o cinto vazio dele. Fala da chuva, do cunhado, e desiste: \"Tá. O crachá é meu. Não tá comigo desde ontem. O Lenz, do patrocínio, ficou rondando o armário da equipe, falando 'rapidinho'. Quando eu voltei, tinha um bilhete no lugar do crachá. E eu... deixei quieto. Café?\"",
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "cracha_1",
-     "cracha_2"
-    ],
-    "umaDe": [
-     "falsa_2",
-     "coop_copia_ok",
-     "foto_solo",
-     "c_peca",
-     "insc_copia"
-    ]
+    "todas": [],
+    "umaDe": []
    },
    "revela": {
     "aponta": [
@@ -4684,8 +4619,7 @@
    ],
    "explica": "cracha_1",
    "previa": "Braga, de novo",
-   "custo": 0,
-   "porque": "Braga desconversa e oferece café. Para ele, é só um crachá emprestado. Ele só fala quando vir no seu caderno a escala, o bilhete e a prova de que a peça foi trocada."
+   "custo": 0
   },
   {
    "id": "cracha_4",
@@ -4807,16 +4741,14 @@
   {
    "id": "ivone_1x",
    "sala": "atelie",
-   "texto": "Ivone nem levanta a cabeça. Vira o caderno para você: \"Pote 7, vermelho. Estava aqui no fim da tarde. Agora, não. Eu não perco pote. E é tinta de marcação: no escuro ela brilha.\"",
+   "texto": "Ivone nem levanta a cabeça quando você chega. Vira o caderno para você: \"Pote 7, vermelho. Estava aqui no fim da tarde. Agora, não. Eu não perco pote. E é tinta de marcação: no escuro ela brilha.\"",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "ivone_1"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -4830,8 +4762,7 @@
    "camada": "historia",
    "explica": "ivone_1",
    "custo": 0,
-   "previa": "Caderno de materiais da Ivone",
-   "porque": "Ivone está de costas, debruçada na bancada. Você ainda não achou motivo para interromper."
+   "previa": "Caderno de materiais da Ivone"
   },
   {
    "id": "braga_1",
@@ -4864,7 +4795,7 @@
    "texto": "Etiqueta na câmera 4: \"Desliga em toda queda de luz. Trocar a bateria.\"",
    "volta_min": 1,
    "volta_max": 5,
-   "segundo_min": 75,
+   "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
@@ -5268,17 +5199,14 @@
   {
    "id": "aurelio_1",
    "sala": "galeria",
-   "texto": "Aurélio baixa a voz: \"Você também sentiu? Peça de acervo não cheira a novo. O Téo me avisou no dia {dia}. Eu demorei para acreditar. Na testa dela tem uma frase; eu sei de cor, nunca mais li.\"",
+   "texto": "Aurélio baixa a voz: \"Sente esse cheiro? Peça de acervo não cheira a novo. O Téo me avisou no dia {dia}. Eu demorei para acreditar. Na testa dela tem uma frase; eu sei de cor, nunca mais li.\"",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "falsa_1",
-     "falsa_2"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -5289,8 +5217,7 @@
    "tipo": "comum",
    "camada": "historia",
    "previa": "Aurélio, de lado",
-   "custo": 1,
-   "porque": "Aurélio olha para a peça, não para você. Ele não puxa assunto com quem não estranhou nada."
+   "custo": 1
   },
   {
    "id": "nico_0",
@@ -5323,14 +5250,12 @@
    "sala": "limpeza",
    "texto": "Nico começa a explicar a Galeria e perde o fio: \"A peça principal tem trezentos anos e... onde eu tava? O Braga hoje não parou de pôr a mão no cinto, você reparou? Desculpa, eu já te disse isso?\"",
    "previa": "Nico explica a Galeria",
-   "volta_min": 2,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "nico_0"
-    ],
+    "todas": [],
     "umaDe": []
    },
    "revela": {
@@ -5342,23 +5267,18 @@
    "tipo": "clima",
    "camada": "clima",
    "custo": 0,
-   "grupoFonte": null,
-   "porque": "Nico está no meio de uma conversa com o Seu Dirceu. Você não quer cortar."
+   "grupoFonte": null
   },
   {
    "id": "nico_1",
    "sala": "limpeza",
    "texto": "Você diz o número. Nico pisca, como quem acorda. Pela primeira vez ele não pede desculpa: \"{reg}. É isso. O Téo falou: só para quem souber o que está gravado embaixo da verdadeira.\" E põe o pendrive na sua mão.",
-   "volta_min": 4,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "nico_0",
-     "teo_1",
-     "falsa_2"
-    ],
+    "todas": [],
     "umaDe": [
      "tombo_1",
      "tombo_2",
@@ -5377,13 +5297,13 @@
    "camada": "historia",
    "previa": "Nico, de novo",
    "custo": 1,
-   "porque": "Nico aperta alguma coisa no bolso do colete: \"É do Téo. Ele pediu... espera. Só entrego se ele não aparecer. E só para quem souber o número certo. E... o laudo! Só depois do laudo no papel. Desculpa.\""
+   "porque": "Nico aperta alguma coisa no bolso do colete: \"É do Téo. Só entrego para quem souber o número certo. Desculpa.\""
   },
   {
    "id": "teo_radio",
    "sala": "sons",
    "texto": "Com o pendrive no rádio, a voz do Téo: \"Você achou o número. Então escuta: a da Galeria é cópia. Ontem o do patrocínio me estendeu um envelope pra eu 'não ter carregado nada'. Eu não peguei. Hoje eu falo com ele, cara a cara. Se eu não aparecer, não deixa a noite acabar sem prova.\"",
-   "volta_min": 4,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
@@ -5417,13 +5337,13 @@
    "id": "teo_radio_2c",
    "sala": "sons",
    "texto": "A gravação continua, com a voz do Téo: \"A doutora prendeu a máquina na peça da base. E a da base é mentira. A verdadeira eu ainda não achei, mas do prédio ela não saiu: nada daquele tamanho passou pela porta. Procura o que pesa mais do que devia.\"",
-   "volta_min": 4,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [
-     "teo_radio"
+     "nico_1"
     ],
     "umaDe": []
    },
@@ -5439,7 +5359,7 @@
    "camada": "historia",
    "previa": "A gravação continua",
    "custo": 0,
-   "porque": "A gravação parou num chiado. Ainda tem fita.",
+   "porque": "O rádio tem uma entrada vazia. Falta alguma coisa para encaixar ali.",
    "soNaCausa": [
     "C_ancora"
    ]
@@ -5448,13 +5368,13 @@
    "id": "teo_radio_2d",
    "sala": "sons",
    "texto": "A gravação continua, com a voz do Téo: \"Fui eu que desliguei. Tirei o fusível-mestre pra ela não apagar a noite. Escondi embaixo da mentira. Só religa depois de ter as provas na mão.\"",
-   "volta_min": 4,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [
-     "teo_radio"
+     "nico_1"
     ],
     "umaDe": []
    },
@@ -5470,7 +5390,7 @@
    "camada": "historia",
    "previa": "A gravação continua",
    "custo": 0,
-   "porque": "A gravação parou num chiado. Ainda tem fita.",
+   "porque": "O rádio tem uma entrada vazia. Falta alguma coisa para encaixar ali.",
    "soNaCausa": [
     "D_fusivel"
    ],
@@ -5480,13 +5400,13 @@
    "id": "teo_radio_2x",
    "sala": "sons",
    "texto": "A gravação continua: passos, uma porta, e a voz do Téo mais longe: \"Se der tempo eu gravo o resto.\" Depois, só chiado.",
-   "volta_min": 4,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [
-     "teo_radio"
+     "nico_1"
     ],
     "umaDe": []
    },
@@ -5502,7 +5422,7 @@
    "camada": "clima",
    "previa": "A gravação continua",
    "custo": 0,
-   "porque": "A gravação parou num chiado. Ainda tem fita.",
+   "porque": "O rádio tem uma entrada vazia. Falta alguma coisa para encaixar ali.",
    "soNaCausa": [
     "A_calibrar",
     "B_potencia",
@@ -5540,17 +5460,13 @@
    "id": "pose",
    "sala": "corredor",
    "texto": "Pela porta de vidro da Sala das esculturas, em reforma, a escultura de bronze. Você não tinha reparado: o braço aponta para a escada do Subsolo.",
-   "volta_min": 2,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "traj_1",
-     "traj_2",
-     "traj_3"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -5561,8 +5477,7 @@
    "tipo": "clima",
    "camada": "clima",
    "previa": "A escultura de bronze",
-   "custo": 0,
-   "porque": "Da primeira vez, você passa pela porta de vidro sem olhar para dentro."
+   "custo": 0
   },
   {
    "id": "ceu",
@@ -5617,14 +5532,12 @@
    "id": "coop_copia_ok",
    "sala": "galeria",
    "texto": "Vocês acham 3 diferenças: o lado da rachadura, a cor e o desgaste nas bordas, que a peça exposta não tem.",
-   "volta_min": 2,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "par_foto"
-    ],
+    "todas": [],
     "umaDe": []
    },
    "revela": {
@@ -5651,7 +5564,7 @@
    "id": "foto_solo",
    "sala": "galeria",
    "texto": "Com a foto do catálogo anotada no caderno, você compara sem ajuda, indo e voltando com o olho: a rachadura está do outro lado e as bordas, gastas na foto, aqui estão inteiras, sem desgaste nenhum.",
-   "volta_min": 2,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
@@ -5681,13 +5594,12 @@
    "porque": "Sem a foto grande do catálogo, você não tem com o que comparar."
   },
   {
-   "volta_min": 2,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [
-     "falsa_1",
      "insc_tabua"
     ],
     "umaDe": []
@@ -5713,7 +5625,7 @@
    ],
    "previa": "Inscrição na máscara",
    "custo": 1,
-   "porque": "Na testa da máscara há uma fileira de símbolos. Sem estranhar a peça e sem a tábua para ler, é só enfeite."
+   "porque": "Na testa da máscara há uma fileira de símbolos. Sem a tábua da escrita antiga, você não lê."
   },
   {
    "id": "par_catraca",
@@ -5745,14 +5657,12 @@
    "id": "coop_catraca_ok",
    "sala": "recepcao",
    "texto": "Comparando as duas listas: o entregador e a fotógrafa passaram pela roleta da saída. O do patrocínio, não.",
-   "volta_min": 2,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "par_catraca"
-    ],
+    "todas": [],
     "umaDe": []
    },
    "revela": {
@@ -5837,14 +5747,12 @@
    "id": "coop_pegadas",
    "sala": "corredor",
    "texto": "No escuro, pegadas brilham no chão: saem da Sala das coleções, cruzam a Área de descanso e somem na porta de serviço. Sola lisa, de sapato social.",
-   "volta_min": 2,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "par_tinta"
-    ],
+    "todas": [],
     "umaDe": []
    },
    "revela": {
@@ -5875,9 +5783,7 @@
    "segundo_min": 71,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "par_tinta"
-    ],
+    "todas": [],
     "umaDe": []
    },
    "revela": {
@@ -5895,24 +5801,19 @@
    "essencialPara": [
     "final_revelar"
    ],
-   "previa": "O chão da Área de descanso",
-   "porque": "O chão parece limpo. Você ainda não sabe onde olhar quando a luz cair."
+   "previa": "O chão da Área de descanso"
   },
   {
    "id": "coop_painel_B",
    "sala": "prototipo",
    "texto": "Leitura completa do painel: números parados, luz da peça verde, fusíveis no lugar. Só a carga está baixa.",
-   "volta_min": 2,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "man_1",
-     "man_2",
-     "man_3"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [
@@ -5943,17 +5844,13 @@
    "id": "coop_painel_A",
    "sala": "prototipo",
    "texto": "Leitura completa do painel: carga cheia, luz da peça verde, fusíveis no lugar. Os 3 mostradores estão fora do ponto.",
-   "volta_min": 2,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "man_1",
-     "man_2",
-     "man_3"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [
@@ -5984,17 +5881,13 @@
    "id": "coop_painel_C",
    "sala": "prototipo",
    "texto": "Leitura completa do painel: números parados, fusíveis no lugar. A carga cai e a luz da peça está amarela.",
-   "volta_min": 2,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "man_1",
-     "man_2",
-     "man_3"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [
@@ -6025,17 +5918,13 @@
    "id": "coop_painel_D",
    "sala": "prototipo",
    "texto": "Leitura completa do painel: tem força chegando e a luz da peça está verde. Os mostradores piscam, a luz cai, e o encaixe do fusível-mestre está vazio.",
-   "volta_min": 2,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "man_1",
-     "man_2",
-     "man_3"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [
@@ -6066,17 +5955,13 @@
    "id": "coop_painel_E",
    "sala": "prototipo",
    "texto": "Leitura completa do painel: luz da peça verde, fusíveis no lugar. Mostradores fora do ponto E carga baixa.",
-   "volta_min": 2,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "man_1",
-     "man_2",
-     "man_3"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [
@@ -6105,15 +5990,12 @@
    "id": "coop_veredito",
    "sala": "seguranca",
    "texto": "A escala diz de quem é o crachá. O bilhete diz \"peguei emprestado\" numa letra corrida, deitada para a direita. Na própria escala, o visto de quem conferiu os crachás pelo patrocínio deita igual. Na Central, Braga espia a escala e engole seco: \"Tá. Essa rubrica é do Lenz, do patrocínio. Ele assina tudo assim.\"",
-   "volta_min": 3,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "cracha_1",
-     "cracha_2"
-    ],
+    "todas": [],
     "umaDe": []
    },
    "revela": {
@@ -6141,17 +6023,13 @@
    "id": "coop_raio_ensaio",
    "sala": "prototipo",
    "texto": "Ensaio feito: a chave {ch} fechou no clarão e o ponteiro de carga pulou. A máquina reage.",
-   "volta_min": 2,
+   "volta_min": 1,
    "volta_max": 4,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "man_pot_1",
-     "man_pot_2",
-     "man_pot_3"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -6176,17 +6054,13 @@
    "id": "eco_chave",
    "sala": "patio",
    "texto": "Eco gravado: a Câmara guardou a sua mão fechando a chave {ch} no clarão. Nas próximas voltas ela repete o gesto sem você. Falta só a alavanca, lá no Subsolo.",
-   "volta_min": 3,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "man_pot_1",
-     "man_pot_2",
-     "man_pot_3"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -6209,17 +6083,13 @@
    "id": "conserto_B",
    "sala": "prototipo",
    "texto": "A chave {ch} fecha no clarão, a alavanca desce e o ponteiro de carga vai até o fim. Agora o botão \"Loop Reset\" responde.",
-   "volta_min": 5,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "man_pot_1",
-     "man_pot_2",
-     "man_pot_3"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -6242,17 +6112,13 @@
    "id": "coop_calibrar_ensaio",
    "sala": "prototipo",
    "texto": "Ensaio feito: dia {dia}, hora {hora}, registro {reg}. Os 3 mostradores param de piscar por um instante. A máquina reage.",
-   "volta_min": 2,
+   "volta_min": 1,
    "volta_max": 4,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "man_cal_1",
-     "man_cal_2",
-     "man_cal_3"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -6277,17 +6143,13 @@
    "id": "conserto_A",
    "sala": "prototipo",
    "texto": "Dia {dia}, hora {hora}, registro {reg}. Os 3 mostradores param de piscar, um por um, e ficam verdes. Agora o botão \"Loop Reset\" responde.",
-   "volta_min": 5,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "man_cal_1",
-     "man_cal_2",
-     "man_cal_3"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -6310,17 +6172,13 @@
    "id": "coop_ancora_ensaio",
    "sala": "prototipo",
    "texto": "Ensaio feito: a peça verdadeira encosta no apoio e você digita registro {reg}, dia {dia}. A luz da peça passa de amarelo para verde por um instante. A máquina reage.",
-   "volta_min": 2,
+   "volta_min": 1,
    "volta_max": 4,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "man_anc_1",
-     "man_anc_2",
-     "man_anc_3"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -6344,17 +6202,13 @@
    "id": "conserto_C",
    "sala": "prototipo",
    "texto": "A peça de 300 anos deita no apoio. Registro {reg}, trocada no dia {dia}. A máquina para de puxar. A luz da peça fica verde e não pisca mais. Lá em cima, a base para de apitar. Agora o botão \"Loop Reset\" responde.",
-   "volta_min": 5,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "man_anc_1",
-     "man_anc_2",
-     "man_anc_3"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -6376,17 +6230,13 @@
    "id": "coop_circuito_ensaio",
    "sala": "prototipo",
    "texto": "Ensaio feito: F2 no encaixe, pontos {ordem}, disjuntor armado. Os mostradores param de piscar por um instante. A máquina reage.",
-   "volta_min": 2,
+   "volta_min": 1,
    "volta_max": 4,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "man_circ_3",
-     "man_circ_1",
-     "man_circ_2"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -6410,17 +6260,13 @@
    "id": "conserto_D",
    "sala": "prototipo",
    "texto": "F2 no encaixe. Os três pontos: {ordem_txt}. O disjuntor arma com um estalo e a luz do museu firma. Agora o botão \"Loop Reset\" responde.",
-   "volta_min": 5,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "man_circ_3",
-     "man_circ_1",
-     "man_circ_2"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -6442,17 +6288,13 @@
    "id": "e_meio_A",
    "sala": "prototipo",
    "texto": "Os 3 mostradores ficam verdes e a Câmara guarda. O aviso muda de lugar: agora quem pisca é o ponteiro de carga. Mudou, não sumiu. Falta força, em outra volta.",
-   "volta_min": 3,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "man_cal_1",
-     "man_cal_2",
-     "man_cal_3"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -6476,17 +6318,13 @@
    "id": "e_meio_B",
    "sala": "prototipo",
    "texto": "O ponteiro de carga vai até o fim e a Câmara guarda. O aviso muda de lugar: agora quem pisca são os 3 mostradores. Mudou, não sumiu. Falta ajustar, em outra volta.",
-   "volta_min": 3,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "man_pot_1",
-     "man_pot_2",
-     "man_pot_3"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -7465,14 +7303,12 @@
    "id": "lenz_mot_2",
    "sala": "conservacao",
    "texto": "Carta da seguradora para o patrocinador: o seguro só paga se a peça principal for dada como perdida. Quem assinou pelo patrocínio: uma rubrica apressada, quase um risco.",
-   "volta_min": 2,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "motivo_1"
-    ],
+    "todas": [],
     "umaDe": []
    },
    "revela": {
@@ -7488,21 +7324,18 @@
    "camada": "historia",
    "previa": "Carta da seguradora",
    "custo": 1,
-   "grupoFonte": "motivo_lenz",
-   "porque": "Um maço de cartas presas com clipe. Sem saber de quem são, você não mexe."
+   "grupoFonte": "motivo_lenz"
   },
   {
    "id": "lenz_mot_3",
    "sala": "sons",
    "texto": "Alguém esqueceu o rádio da equipe ligado na escada, e o gravador da Sala dos sons pegou: \"Não, não, escuta. Fim do mês. O seguro cai até o fim do mês ou eu não tenho mais empresa pra te pagar.\" A voz tem pressa e engole o fim das frases.",
-   "volta_min": 3,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "motivo_1"
-    ],
+    "todas": [],
     "umaDe": []
    },
    "revela": {
@@ -7515,8 +7348,7 @@
    "camada": "historia",
    "previa": "Gravação no gravador",
    "custo": 1,
-   "grupoFonte": "motivo_lenz",
-   "porque": "No gravador, uma fita sem etiqueta. Você não tem por que escutar a conversa de ninguém."
+   "grupoFonte": "motivo_lenz"
   },
   {
    "id": "lenz_meio_1",
@@ -7665,18 +7497,14 @@
   {
    "id": "ivone_red",
    "sala": "atelie",
-   "texto": "Você fala da mancha. Ivone aponta a porta de vidro sem olhar: \"Dá para a Área de descanso inteira. Pergunta ao Seu Dirceu quantas vezes eu passei por ela desde o fim da tarde. Uma: fui colar um bilhete na cafeteira e voltei. O pote saiu daqui. Eu, não.\"",
+   "texto": "Ivone vê você olhando a tinta da bancada e aponta a porta de vidro sem olhar: \"Dá para a Área de descanso inteira. Pergunta ao Seu Dirceu quantas vezes eu passei por ela desde o fim da tarde. Uma: fui colar um bilhete na cafeteira e voltei. O pote saiu daqui. Eu, não.\"",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "mancha",
-     "teo_1",
-     "ivone_1"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -7688,8 +7516,7 @@
    "camada": "historia",
    "previa": "Mancha x tinta da Ivone",
    "custo": 1,
-   "grupoFonte": "contra_ivone",
-   "porque": "Ivone trabalha de costas, debruçada na bancada. Você ainda não tem o que perguntar."
+   "grupoFonte": "contra_ivone"
   },
   {
    "id": "braga_ali",
@@ -7743,14 +7570,12 @@
    "id": "teo_d1",
    "sala": "conservacao",
    "texto": "Diário do acervo, dia {dia_a}, com a letra do Téo: \"O do patrocínio pediu pra ficar sozinho com a peça. Sozinho pra quê? Ele nem olhou pra ela. Olhou pra base. — T.\"",
-   "volta_min": 2,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "data_3"
-    ],
+    "todas": [],
     "umaDe": []
    },
    "revela": {
@@ -7763,21 +7588,18 @@
    "camada": "historia",
    "previa": "Diário do acervo, páginas antes",
    "custo": 1,
-   "grupoFonte": "diario_teo",
-   "porque": "O diário do acervo está fechado com elástico. Você ainda não achou a página que importa."
+   "grupoFonte": "diario_teo"
   },
   {
    "id": "teo_d2",
    "sala": "fotografia",
    "texto": "Página arrancada do diário do acervo, usada de marcador num álbum, com a letra do Téo: \"Dia {dia_b}. O do patrocínio no telefone, na escada: 'some e eles pagam'. Quando me viu, perguntou do tempo. — T.\"",
-   "volta_min": 2,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "data_3"
-    ],
+    "todas": [],
     "umaDe": []
    },
    "revela": {
@@ -7790,8 +7612,7 @@
    "camada": "historia",
    "previa": "Álbum com marcador",
    "custo": 1,
-   "grupoFonte": "diario_teo",
-   "porque": "Um álbum grosso, com um papel dobrado servindo de marcador. Parece só um marcador."
+   "grupoFonte": "diario_teo"
   },
   {
    "id": "teo_d3",
@@ -7802,9 +7623,7 @@
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "teo_1"
-    ],
+    "todas": [],
     "umaDe": []
    },
    "revela": {
@@ -7817,8 +7636,7 @@
    "camada": "historia",
    "previa": "Uma folha no bolso do Téo",
    "custo": 1,
-   "grupoFonte": "diario_teo",
-   "porque": "Tem alguém caído ali. Antes de mexer em bolso, você precisa ver quem é."
+   "grupoFonte": "diario_teo"
   },
   {
    "id": "dis_telefone",
@@ -7944,16 +7762,13 @@
    "id": "dis_musica",
    "sala": "sons",
    "texto": "A música de elevador toca sempre a mesma. O violino entra, some e entra de novo no mesmo ponto.",
-   "volta_min": 2,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "hora_4",
-     "dis_radio"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -7965,8 +7780,7 @@
    "camada": "clima",
    "previa": "Música de elevador",
    "custo": 0,
-   "grupoFonte": null,
-   "porque": "A música toca baixo. Você ainda não prestou atenção nela."
+   "grupoFonte": null
   },
   {
    "id": "abre_1",
@@ -7995,15 +7809,12 @@
    "id": "rev_3",
    "sala": "conservacao",
    "texto": "Ata da reunião de patrocinadores. Uma frase da Dra. Sato está sublinhada duas vezes: \"A Câmara guarda um ambiente do jeito que ele estava cinco minutos atrás.\" Na margem, outra letra: \"então apaga?\"",
-   "volta_min": 4,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "lenz_mot_2",
-     "traj_3"
-    ],
+    "todas": [],
     "umaDe": []
    },
    "revela": {
@@ -8016,8 +7827,7 @@
    "camada": "historia",
    "previa": "Ata da reunião",
    "custo": 1,
-   "grupoFonte": "motivo_lenz",
-   "porque": "Uma pasta grossa de atas. Sem saber o que procurar, é só papel."
+   "grupoFonte": "motivo_lenz"
   },
   {
    "id": "assim_foto",
@@ -8108,7 +7918,7 @@
    "id": "v4_camara",
    "sala": "prototipo",
    "texto": "O painel da Câmara guarda o que você ensaiou: uma luz verde para cada parte que respondeu. O que ficou apagado ainda não respondeu.",
-   "volta_min": 4,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
@@ -8145,10 +7955,7 @@
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "teo_cadeira",
-     "data_3"
-    ],
+    "todas": [],
     "umaDe": []
    },
    "revela": {
@@ -8161,21 +7968,18 @@
    "camada": "historia",
    "previa": "Bilhete atrás do quadro",
    "custo": 0,
-   "grupoFonte": null,
-   "porque": "O quadro de avisos está cheio de papel velho. Nada ali chama a sua atenção."
+   "grupoFonte": null
   },
   {
    "id": "v4_braga",
    "sala": "seguranca",
-   "texto": "No livro da Central, com a letra do Braga, riscado duas vezes e ainda legível: \"Ontem o Lenz levou meu crachá e deixou bilhete. Eu devia ter registrado. Não registrei. Tive medo de perder o emprego por causa de um crachá.\"",
-   "volta_min": 3,
+   "texto": "Braga levanta para pegar café e deixa o livro da Central aberto. Na última página, com a letra dele, riscado duas vezes e ainda legível: \"Ontem o Lenz levou meu crachá e deixou bilhete. Eu devia ter registrado. Não registrei. Tive medo de perder o emprego por causa de um crachá.\"",
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "cracha_3"
-    ],
+    "todas": [],
     "umaDe": []
    },
    "revela": {
@@ -8188,8 +7992,7 @@
    "camada": "historia",
    "previa": "O livro da Central, última página",
    "custo": 0,
-   "grupoFonte": null,
-   "porque": "O livro da Central está debaixo do cotovelo do Braga. Ele não tira o braço."
+   "grupoFonte": null
   },
   {
    "id": "v5_ivone",
@@ -8200,9 +8003,7 @@
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "ivone_2"
-    ],
+    "todas": [],
     "umaDe": []
    },
    "revela": {
@@ -8215,21 +8016,18 @@
    "camada": "historia",
    "previa": "Recado da Ivone",
    "custo": 0,
-   "grupoFonte": null,
-   "porque": "Na bancada da Ivone, papéis em pilhas retas. Ela não gosta que mexam."
+   "grupoFonte": null
   },
   {
    "id": "v5_lenz",
    "sala": "recepcao",
    "texto": "No bolso de um paletó reserva, pendurado na chapelaria da Recepção, um guardanapo com uma conta feita a caneta: \"Seguro: 9. Dívida: 7. Peça por fora: +?\" E embaixo, sublinhado duas vezes: \"ninguém confere a base\".",
-   "volta_min": 4,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "lenz_mot_2"
-    ],
+    "todas": [],
     "umaDe": []
    },
    "revela": {
@@ -8242,21 +8040,18 @@
    "camada": "historia",
    "previa": "Um paletó na chapelaria",
    "custo": 0,
-   "grupoFonte": null,
-   "porque": "Um paletó reserva pendurado na chapelaria. Você não tem por que mexer em bolso de ninguém."
+   "grupoFonte": null
   },
   {
    "id": "ivone_2",
    "sala": "atelie",
-   "texto": "Você mostra o recibo. Ivone bate o dedo na linha: \"Limpeza. Numa peça que eu limpei mês passado. Eu fiz o que pediram. Devia ter perguntado por quê.\"",
+   "texto": "Ivone vê você olhando o recibo do restauro e bate o dedo na linha: \"Limpeza. Numa peça que eu limpei mês passado. Eu fiz o que pediram. Devia ter perguntado por quê.\"",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "data_1"
-    ],
+    "todas": [],
     "umaDe": []
    },
    "revela": {
@@ -8271,8 +8066,7 @@
    "camada": "historia",
    "previa": "Ivone olha o recibo",
    "custo": 0,
-   "grupoFonte": null,
-   "porque": "Ivone trabalha sem levantar a cabeça. Sem papel na frente dela, ela não comenta."
+   "grupoFonte": null
   },
   {
    "id": "aurelio_0",
@@ -8301,16 +8095,13 @@
   {
    "id": "aurelio_2",
    "sala": "galeria",
-   "texto": "Você mostra o diário. Ele tira os óculos. \"Dia {dia}. Eu li isso no dia {dia}. Disse a mim mesmo que era cansaço dele. Era medo meu.\"",
-   "volta_min": 3,
+   "texto": "Aurélio tira os óculos e fala para a peça, não para você: \"O Téo me mostrou o diário no dia {dia}. Eu li. Disse a mim mesmo que era cansaço dele. Era medo meu.\"",
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "data_3",
-     "falsa_2"
-    ],
+    "todas": [],
     "umaDe": []
    },
    "revela": {
@@ -8323,8 +8114,7 @@
    "camada": "historia",
    "previa": "Aurélio lê o diário",
    "custo": 0,
-   "grupoFonte": null,
-   "porque": "Aurélio ajeita a luva e muda de assunto. Sem papel na frente dele, ele não conta."
+   "grupoFonte": null
   },
   {
    "id": "lenz_0",
@@ -8355,22 +8145,14 @@
   {
    "id": "lenz_1",
    "sala": "prototipo",
-   "texto": "Você diz, alto, que a peça da Galeria é cópia. Na escada, ele para um segundo e ajeita o punho da camisa: \"Olha, amanhã isso aqui tá cheio de câmera e de gente importante. Ninguém quer confusão hoje. Nem você.\"",
-   "volta_min": 4,
+   "texto": "Já saindo, de costas, ele para um segundo na escada e ajeita o punho da camisa, sem virar: \"Olha, amanhã isso aqui tá cheio de câmera e de gente importante. Ninguém quer confusão hoje. Nem você.\"",
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 250,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "traj_3"
-    ],
-    "umaDe": [
-     "falsa_2",
-     "coop_copia_ok",
-     "foto_solo",
-     "c_peca",
-     "insc_copia"
-    ]
+    "todas": [],
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -8382,23 +8164,18 @@
    "camada": "historia",
    "previa": "Na escada",
    "custo": 0,
-   "grupoFonte": null,
-   "porque": "Ele passa direto. Não tem por que parar para você."
+   "grupoFonte": null
   },
   {
    "id": "lenz_2",
    "sala": "corredor",
-   "texto": "Você estende o bilhete quando ele passa. Ele nem para, sorri sem os olhos: \"Emprestado. Tá escrito aí: emprestado. Eu devolvo tudo que eu pego.\" No crachá na cintura dele, a foto é do Braga. O telefone dele toca. \"Lenz. Agora não.\"",
-   "volta_min": 3,
+   "texto": "Você para na frente dele quando ele passa. Ele nem diminui o passo, sorri sem os olhos: \"Licencinha, rapidinho.\" No crachá na cintura dele, a foto é do Braga. O telefone dele toca. \"Lenz. Agora não.\"",
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 242,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "cracha_2",
-     "cracha_4",
-     "lenz_0"
-    ],
+    "todas": [],
     "umaDe": []
    },
    "revela": {
@@ -8416,7 +8193,6 @@
    "previa": "Esperar perto da porta de serviço",
    "custo": 1,
    "grupoFonte": "cracha",
-   "porque": "Ele passa sem diminuir o passo. Para parar na frente dele na hora certa, você precisa já ter visto ele passar e ter o bilhete e o livro de visitas na mão.",
    "essencialPara": [
     "final_revelar"
    ]
@@ -8425,14 +8201,12 @@
    "id": "mancha_2",
    "sala": "deposito",
    "texto": "Você mede a mancha com o pé: a tinta escorre até a mesma tábua e para. Ainda molhada, como se tivesse acabado de cair.",
-   "volta_min": 2,
+   "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "mancha"
-    ],
+    "todas": [],
     "umaDe": []
    },
    "revela": {
@@ -8445,8 +8219,7 @@
    "camada": "historia",
    "previa": "A mancha, medida com o pé",
    "custo": 0,
-   "grupoFonte": null,
-   "porque": "Por enquanto é só uma mancha. Você ainda não tem com o que comparar."
+   "grupoFonte": null
   },
   {
    "id": "empurra_1",
@@ -8457,9 +8230,7 @@
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "teo_1"
-    ],
+    "todas": [],
     "umaDe": []
    },
    "revela": {
@@ -8472,8 +8243,7 @@
    "camada": "historia",
    "previa": "Um botão no chão",
    "custo": 1,
-   "grupoFonte": null,
-   "porque": "O chão da sala é caixa e sombra. Você não sabe onde olhar."
+   "grupoFonte": null
   },
   {
    "id": "empurra_2",
@@ -8484,9 +8254,7 @@
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "teo_1"
-    ],
+    "todas": [],
     "umaDe": []
    },
    "revela": {
@@ -8499,8 +8267,7 @@
    "camada": "historia",
    "previa": "A prateleira atrás do Téo",
    "custo": 1,
-   "grupoFonte": null,
-   "porque": "Prateleiras e mais prateleiras de pó. Nenhuma chama a sua atenção."
+   "grupoFonte": null
   },
   {
    "id": "lenz_3",
@@ -8511,13 +8278,8 @@
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "teo_1"
-    ],
-    "umaDe": [
-     "coop_pegadas",
-     "pegadas_solo"
-    ]
+    "todas": [],
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -8529,21 +8291,18 @@
    "camada": "historia",
    "previa": "A primeira pegada",
    "custo": 0,
-   "grupoFonte": null,
-   "porque": "A tinta no chão é uma mancha só. Você não vê onde alguma coisa começa."
+   "grupoFonte": null
   },
   {
    "id": "sato_teo",
    "sala": "prototipo",
-   "texto": "Você conta do Téo pelo interfone. A Dra. Sato demora: \"Enquanto ela girar, quem está aí dentro não piora. Nem melhora. Fica guardado, igual a uma peça numa vitrine. Para ele acordar, a noite tem que andar. Estou com o resgate da estrada no rádio. Peço socorro agora: só chega se a noite andar.\"",
+   "texto": "Pelo interfone, a Dra. Sato pergunta: \"O Téo, da montagem, não responde o rádio. Alguém viu?\" Ela demora: \"Enquanto ela girar, quem está aí dentro não piora. Nem melhora. Fica guardado, igual a uma peça numa vitrine. Para ele acordar, a noite tem que andar. Peço socorro ao resgate da estrada agora: só chega se a noite andar.\"",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "teo_1"
-    ],
+    "todas": [],
     "umaDe": []
    },
    "revela": {
@@ -8556,8 +8315,7 @@
    "camada": "historia",
    "previa": "Interfone: contar do Téo",
    "custo": 0,
-   "grupoFonte": null,
-   "porque": "O interfone chia, esperando. Você ainda não tem o que contar."
+   "grupoFonte": null
   },
   {
    "id": "a_hist_1",
@@ -8569,12 +8327,7 @@
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "a_pisca_1",
-     "a_pisca_2",
-     "a_pisca_3",
-     "a_pisca_4"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -8593,8 +8346,7 @@
    "soNaCausa": [
     "A_calibrar",
     "E_dois"
-   ],
-   "porque": "Uma pilha de fichas de ensaio, todas parecidas. Você não sabe qual ler."
+   ]
   },
   {
    "id": "fh_ficha_bc",
@@ -8606,12 +8358,7 @@
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "b_verde_1",
-     "b_verde_4",
-     "fh_cam_most_bc",
-     "fh_bipes_bc"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -8630,8 +8377,7 @@
     "B_potencia",
     "C_ancora"
    ],
-   "parDe": "a_hist_1",
-   "porque": "Uma pilha de fichas de ensaio, todas parecidas. Você não sabe qual ler."
+   "parDe": "a_hist_1"
   },
   {
    "id": "fh_ficha_d",
@@ -8643,12 +8389,7 @@
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "a_pisca_1",
-     "a_pisca_2",
-     "a_pisca_3",
-     "a_pisca_4"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -8665,8 +8406,7 @@
    "soNaCausa": [
     "D_fusivel"
    ],
-   "parDe": "a_hist_1",
-   "porque": "Uma pilha de fichas de ensaio, todas parecidas. Você não sabe qual ler."
+   "parDe": "a_hist_1"
   },
   {
    "id": "a_hist_2",
@@ -8679,12 +8419,7 @@
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "a_pisca_1",
-     "a_pisca_2",
-     "a_pisca_3",
-     "a_pisca_4"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -8702,8 +8437,7 @@
    "soNaCausa": [
     "A_calibrar",
     "E_dois"
-   ],
-   "porque": "Um pedaço de fita adesiva no painel. Parece resto de obra."
+   ]
   },
   {
    "id": "fh_fita_bc",
@@ -8715,12 +8449,7 @@
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "b_verde_1",
-     "b_verde_4",
-     "fh_cam_most_bc",
-     "fh_bipes_bc"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -8739,8 +8468,7 @@
     "B_potencia",
     "C_ancora"
    ],
-   "parDe": "a_hist_2",
-   "porque": "Um pedaço de fita adesiva no painel. Parece resto de obra."
+   "parDe": "a_hist_2"
   },
   {
    "id": "fh_fita_d",
@@ -8752,12 +8480,7 @@
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "a_pisca_1",
-     "a_pisca_2",
-     "a_pisca_3",
-     "a_pisca_4"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -8774,8 +8497,7 @@
    "soNaCausa": [
     "D_fusivel"
    ],
-   "parDe": "a_hist_2",
-   "porque": "Um pedaço de fita adesiva no painel. Parece resto de obra."
+   "parDe": "a_hist_2"
   },
   {
    "id": "b_hist_1",
@@ -8787,16 +8509,7 @@
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "b_carga_1",
-     "b_carga_2",
-     "b_carga_3",
-     "b_carga_4",
-     "b_luz_1",
-     "b_luz_2",
-     "b_luz_3",
-     "b_luz_4"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -8815,8 +8528,7 @@
    "soNaCausa": [
     "B_potencia",
     "E_dois"
-   ],
-   "porque": "O gerador ronca baixo, cheio de papel colado. Nenhum chama a sua atenção."
+   ]
   },
   {
    "id": "fh_os_cd",
@@ -8828,24 +8540,7 @@
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "b_carga_1",
-     "b_carga_2",
-     "b_carga_3",
-     "b_carga_4",
-     "b_luz_1",
-     "b_luz_2",
-     "b_luz_3",
-     "b_luz_4",
-     "fh_pont_d",
-     "fh_cam_agulha_d",
-     "d_fus_4",
-     "fh_consumo",
-     "fh_lamp_of",
-     "fh_luz_desc",
-     "fh_lamp_limp",
-     "fh_lamp_lab"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -8863,8 +8558,7 @@
     "C_ancora",
     "D_fusivel"
    ],
-   "parDe": "b_hist_1",
-   "porque": "O gerador ronca baixo, cheio de papel colado. Nenhum chama a sua atenção."
+   "parDe": "b_hist_1"
   },
   {
    "id": "fh_os_a",
@@ -8876,16 +8570,7 @@
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "a_cheia_1",
-     "a_cheia_3",
-     "fh_zumbido_a",
-     "fh_consumo",
-     "fh_lamp_of",
-     "fh_luz_desc",
-     "fh_lamp_limp",
-     "fh_lamp_lab"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -8902,8 +8587,7 @@
    "soNaCausa": [
     "A_calibrar"
    ],
-   "parDe": "b_hist_1",
-   "porque": "O gerador ronca baixo, cheio de papel colado. Nenhum chama a sua atenção."
+   "parDe": "b_hist_1"
   },
   {
    "id": "b_hist_2",
@@ -8916,16 +8600,7 @@
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "b_carga_1",
-     "b_carga_2",
-     "b_carga_3",
-     "b_carga_4",
-     "b_luz_1",
-     "b_luz_2",
-     "b_luz_3",
-     "b_luz_4"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -8940,8 +8615,7 @@
    "soNaCausa": [
     "B_potencia",
     "E_dois"
-   ],
-   "porque": "Uma pilha de papel impresso na mesa da administração. Nada ali parece ser com você."
+   ]
   },
   {
    "id": "fh_email_cd",
@@ -8953,24 +8627,7 @@
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "b_carga_1",
-     "b_carga_2",
-     "b_carga_3",
-     "b_carga_4",
-     "b_luz_1",
-     "b_luz_2",
-     "b_luz_3",
-     "b_luz_4",
-     "fh_pont_d",
-     "fh_cam_agulha_d",
-     "d_fus_4",
-     "fh_consumo",
-     "fh_lamp_of",
-     "fh_luz_desc",
-     "fh_lamp_limp",
-     "fh_lamp_lab"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -8986,8 +8643,7 @@
     "C_ancora",
     "D_fusivel"
    ],
-   "parDe": "b_hist_2",
-   "porque": "Uma pilha de papel impresso na mesa da administração. Nada ali parece ser com você."
+   "parDe": "b_hist_2"
   },
   {
    "id": "fh_email_a",
@@ -8999,16 +8655,7 @@
    "quemPodeVer": "todos",
    "precisaDe": {
     "todas": [],
-    "umaDe": [
-     "a_cheia_1",
-     "a_cheia_3",
-     "fh_zumbido_a",
-     "fh_consumo",
-     "fh_lamp_of",
-     "fh_luz_desc",
-     "fh_lamp_limp",
-     "fh_lamp_lab"
-    ]
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -9023,26 +8670,20 @@
    "soNaCausa": [
     "A_calibrar"
    ],
-   "parDe": "b_hist_2",
-   "porque": "Uma pilha de papel impresso na mesa da administração. Nada ali parece ser com você."
+   "parDe": "b_hist_2"
   },
   {
    "id": "e_hist_1",
    "sala": "eletrica",
-   "texto": "No verso da ordem de serviço do gerador, a letra da Dra. Sato: \"Zerada E sem força? Então ninguém liga isto sem mim. Ninguém.\"",
+   "texto": "No verso da ordem de serviço do gerador, embaixo da dobra, a letra da Dra. Sato: \"Zerada E sem força? Então ninguém liga isto sem mim. Ninguém.\"",
    "previa": "Verso da ordem de serviço",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "b_hist_1"
-    ],
-    "umaDe": [
-     "a_hist_1",
-     "a_hist_2"
-    ]
+    "todas": [],
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -9056,8 +8697,7 @@
    "grupoFonte": null,
    "soNaCausa": [
     "E_dois"
-   ],
-   "porque": "A ordem de serviço está colada no gerador. Você ainda não pensou em descolar."
+   ]
   },
   {
    "id": "fh_verso_b",
@@ -9068,13 +8708,8 @@
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "b_hist_1"
-    ],
-    "umaDe": [
-     "fh_ficha_bc",
-     "fh_fita_bc"
-    ]
+    "todas": [],
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -9089,8 +8724,7 @@
    "soNaCausa": [
     "B_potencia"
    ],
-   "parDe": "e_hist_1",
-   "porque": "A ordem de serviço está colada no gerador. Você ainda não pensou em descolar."
+   "parDe": "e_hist_1"
   },
   {
    "id": "fh_verso_cd",
@@ -9101,15 +8735,8 @@
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "fh_os_cd"
-    ],
-    "umaDe": [
-     "fh_ficha_bc",
-     "fh_fita_bc",
-     "fh_ficha_d",
-     "fh_fita_d"
-    ]
+    "todas": [],
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -9125,8 +8752,7 @@
     "C_ancora",
     "D_fusivel"
    ],
-   "parDe": "e_hist_1",
-   "porque": "A ordem de serviço está colada no gerador. Você ainda não pensou em descolar."
+   "parDe": "e_hist_1"
   },
   {
    "id": "fh_verso_a",
@@ -9137,13 +8763,8 @@
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "fh_os_a"
-    ],
-    "umaDe": [
-     "a_hist_1",
-     "a_hist_2"
-    ]
+    "todas": [],
+    "umaDe": []
    },
    "revela": {
     "aponta": [],
@@ -9158,8 +8779,7 @@
    "soNaCausa": [
     "A_calibrar"
    ],
-   "parDe": "e_hist_1",
-   "porque": "A ordem de serviço está colada no gerador. Você ainda não pensou em descolar."
+   "parDe": "e_hist_1"
   },
   {
    "id": "d_despiste",
@@ -9190,16 +8810,13 @@
   {
    "id": "d_fus_2b",
    "sala": "patio",
-   "texto": "Você volta ao cadeado amarelo sabendo o que procurar. Por baixo da tinta escorrida, a letra é a do diário: \"Não religar. Fui eu. — T.\"",
+   "texto": "Você olha de perto o cadeado amarelo, pela fresta. Por baixo da tinta escorrida, dá para ler a letra: \"Não religar. Fui eu. — T.\"",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "d_fus_2",
-     "d_teo_1"
-    ],
+    "todas": [],
     "umaDe": []
    },
    "revela": {
@@ -9215,22 +8832,18 @@
    "grupoFonte": null,
    "soNaCausa": [
     "D_fusivel"
-   ],
-   "porque": "A fresta, a chuva, as chaves lá dentro. Sem saber o que procurar, você não vê nada de novo."
+   ]
   },
   {
    "id": "fh_quadro2",
    "sala": "patio",
-   "texto": "Você volta à fresta do Quadro externo. A chuva continua respingando lá dentro. Nada de novo.",
+   "texto": "Você olha de perto pela fresta do Quadro externo. A chuva respinga lá dentro. Só as chaves, no escuro.",
    "volta_min": 1,
    "volta_max": 5,
    "segundo_min": 0,
    "quemPodeVer": "todos",
    "precisaDe": {
-    "todas": [
-     "fh_vidro",
-     "fh_dobrada"
-    ],
+    "todas": [],
     "umaDe": []
    },
    "revela": {
@@ -9249,8 +8862,7 @@
     "C_ancora",
     "E_dois"
    ],
-   "parDe": "d_fus_2b",
-   "porque": "A fresta, a chuva, as chaves lá dentro. Sem saber o que procurar, você não vê nada de novo."
+   "parDe": "d_fus_2b"
   }
  ],
  "grupos_fonte": {
@@ -9776,7 +9388,7 @@
     "fotografia"
    ],
    "simultaneo": true,
-   "volta_min": 2,
+   "volta_min": 1,
    "duracao_s": 75,
    "papelA": "Na Galeria especial, a sua tela lista 3 coisas da peça exposta. Você lê em voz alta.",
    "papelB": "Na Sala da fotografia, a sua tela lista 3 coisas da foto do catálogo. Você lê em voz alta e a dupla diz o que não bate.",
@@ -9838,7 +9450,7 @@
     "seguranca"
    ],
    "simultaneo": true,
-   "volta_min": 2,
+   "volta_min": 1,
    "duracao_s": 60,
    "papelA": "Na Recepção, você lê o livro de visitas em voz alta: quem entrou. Depois cada pessoa responde à mesma pergunta.",
    "papelB": "Na Central de monitoramento, você lê o registro da roleta da saída: quem saiu. Depois cada pessoa responde à mesma pergunta.",
@@ -9897,7 +9509,7 @@
     "corredor"
    ],
    "simultaneo": true,
-   "volta_min": 2,
+   "volta_min": 1,
    "duracao_s": 60,
    "papelA": "No Pátio, você segura a chave geral do térreo, do lado de fora da porta do Quadro externo. Enquanto você segura, a sua tela mostra a palavra: diga em voz alta. Soltou, a luz volta.",
    "papelB": "Na Área de descanso, no escuro, você escuta a palavra de quem segura a chave e segue as pegadas que brilham.",
@@ -9939,7 +9551,7 @@
     "atelie"
    ],
    "simultaneo": true,
-   "volta_min": 2,
+   "volta_min": 1,
    "duracao_s": 90,
    "papelA": "No Subsolo, você olha o painel (1 de energia): a sua tela mostra os 3 símbolos e como cada um está. Você descreve em voz alta. Você não sabe o que eles querem dizer.",
    "papelB": "No Ateliê de descobertas, a sua tela mostra a legenda dos símbolos. Você escuta, traduz e marca como está cada parte. Você não vê o painel.",
@@ -10071,7 +9683,7 @@
     "patio"
    ],
    "simultaneo": false,
-   "volta_min": 2,
+   "volta_min": 1,
    "duracao_s": 40,
    "papelA": "Depois do apagão, você pega a luva isolante no armário da Oficina técnica, leva até o Pátio e deixa no chão, perto do Quadro externo.",
    "papelB": "Na volta seguinte, antes do raio, você acha a luva no chão do Pátio (sem gastar energia) e já fica com a mão pronta para a chave {ch}.",
@@ -10119,7 +9731,7 @@
     "limpeza"
    ],
    "simultaneo": true,
-   "volta_min": 3,
+   "volta_min": 1,
    "duracao_s": 60,
    "papelA": "Na Central de monitoramento, a sua tela mostra a escala de crachás. Você lê em voz alta.",
    "papelB": "Na Base da limpeza, a sua tela mostra o bilhete do armário. Você lê em voz alta e cada pessoa responde à mesma pergunta.",

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-# Validador automatico do Loop v4 revisao 14 (5 causas). Uso: python3 validar.py [n_bots] [-v] [--semente N] [--so-otimo]
+# Validador automatico do Loop v4 revisao 18 (5 causas; so travas fisicas, todas as pistas desde a volta 1). Uso: python3 validar.py [n_bots] [-v] [--semente N] [--so-otimo]
 # Dados: LOOP_DATA (padrao: pistas-v4.json ao lado deste arquivo, senao /tmp/roda/v4_pistas.json).
 # (a) ids e entradas alcancaveis  (b) otimo com 1, 2 e 3 pessoas  (c) bot aleatorio  (d) essenciais sem 2 caminhos  (f) papeis, formatos e tamanho  (g) previas iguais nas 5 causas, no conjunto e na SEQUENCIA  (h) frases condicionais dos finais
+# Revisao 18 (27/11/2026, decisao do autor): precisaDe so para travas fisicas e volta_min 1 em todas as pistas; (i) trava: nenhuma pista com volta_min > 1 e precisaDe so nas fisicas; (j) jogador otimo sozinho na volta 1 (informacao para o autor, nao reprova).
 # Revisao 3 (25/11/2026): os valores do conserto (dia, hora, registro, ordem, chave) sao SORTEADOS como no jogo, nao os de exemplo;
 # a semente sai no relatorio e outras sementes repetem o jogador otimo; energia 5 por volta para todo mundo; aviso de previa que muda com a causa.
 import sys, os, io, random, itertools, contextlib, subprocess, time
@@ -477,9 +478,9 @@ def caminhos(c, R):
     ess = [(g, 'diagnostico (aponta)') for g in apg] + [(g, 'entrada de ' + A['id']) for A in As for g in A['entrada'].get('grupos', [])] + [(g, 'Revelar') for g in E.PROVAS]
     def livre(i, vmax=2): x = P[i]; return x.get('segundo_min', 0) <= 100 and not x.get('daAtividade') and x['volta_min'] <= vmax and len(x['precisaDe']['todas']) <= 2
     for g, para in ess:
-        fs = [i for i in GF[g]['fontes'] if i in R]; salas = set(P[i]['sala'] for i in fs); lv = [i for i in fs if livre(i, 3 if para == 'Revelar' else 2)]  # revisao 2: o nome do culpado so sai da volta 3
+        fs = [i for i in GF[g]['fontes'] if i in R]; salas = set(P[i]['sala'] for i in fs); lv = [i for i in fs if livre(i, 1)]  # revisao 18: tudo desde a volta 1 (antes: ate a volta 2, 3 nas provas do Revelar)
         if len(fs) < 2 or len(salas) < 2: out.append(f'{g} ({para}): so {len(fs)} fonte(s) em {len(salas)} sala(s)')
-        elif not lv: out.append(f'{g} ({para}): nenhuma fonte sem trava de tempo / ate a volta 2 (3 nas provas do Revelar)')
+        elif not lv: out.append(f'{g} ({para}): nenhuma fonte sem trava de tempo na volta 1')
     lados = D.get('diagnostico_por_causa', {}).get(c, {}).get('lados')
     if lados:
         for k, lado in enumerate(lados):
@@ -583,10 +584,38 @@ def checar_final_frases():
         if 'sirene' in sobra or 'socorro' in sobra: bad.append(f'final com sirene ou socorro fora das frases condicionais: {t[:60]}...')
     return bad, len(ff)
 
+
+# ------------------------------------------------------------------ (i) revisao 18: so travas fisicas, nada por volta
+FISICAS = {'quadro_aberto', 'insc_verdadeira', 'insc_copia', 'nico_1', 'teo_radio', 'teo_radio_2c', 'teo_radio_2d', 'teo_radio_2x', 'foto_solo', 'catraca_solo', 'assim_par', 'v4_camara'}
+def checar_travas():
+    bad = []
+    for x in D['pistas']:
+        if x['volta_min'] != 1: bad.append(f'{x["id"]}: volta_min {x["volta_min"]} (desde a revisao 18 toda pista e da volta 1)')
+        tem = bool(x['precisaDe']['todas'] or x['precisaDe']['umaDe'])
+        if tem and x['id'] not in FISICAS: bad.append(f'{x["id"]}: precisaDe sem ser trava fisica')
+        if x['id'] in FISICAS and not tem: bad.append(f'{x["id"]}: trava fisica sem precisaDe')
+        if tem and not x.get('porque'): bad.append(f'{x["id"]}: trava fisica sem frase do mundo (porque)')
+        for i in x['precisaDe']['todas'] + x['precisaDe']['umaDe']:
+            y = P.get(i)
+            if y and (y['precisaDe']['todas'] or y['precisaDe']['umaDe']) and i not in ('c_peca', 'nico_1') and not y.get('daAtividade'): bad.append(f'{x["id"]}: o objeto/codigo {i} tambem esta travado')
+    for A in D['atividades_coop']:
+        if not A.get('conserto') and A.get('volta_min', 1) != 1: bad.append(f'{A["id"]}: atividade sem conserto com volta_min {A["volta_min"]}')
+    return bad
+
+# ------------------------------------------------------------------ (j) revisao 18: o que um jogador otimo sozinho fecha na volta 1
+def volta1(c):
+    out = {}
+    for prio in ('provas', 'diagnostico'):
+        o = Otimo(c, 1); reqs = (o.req_prova + o.req_diag + o.req_acao) if prio == 'provas' else (o.req_diag + o.req_acao + o.req_prova)
+        o.buscar(0, reqs, limite=290); s = o.s(); j = s['jog'][0]
+        pv = [g for g in E.PROVAS if E.tem_grupo(j['caderno'], g)]; dg = all(o.ok(r) for r in o.req_diag); ac = [r[0] for r in o.req_acao if o.ok(r)]
+        out[prio] = dict(provas=pv, diag=dg, acao=f'{len(ac)}/{len(o.req_acao)}', energia=ENERGIA - j['cargas'], relogio=E.mmss(j['seg']), pistas=len(j['caderno']), nome='cracha' in pv)
+    return out
+
 # ------------------------------------------------------------------ relatorio
 def main():
     v = D['valores']; print(f'VALORES SORTEADOS (semente {SEMENTE}): dia {v["dia_da_troca"]}, raio em {v["hora_do_apagao"]} (janela {E.mmss(E.JANELA[0])} a {E.mmss(E.JANELA[1])}), registro {v["tombo"]}, ordem {v["ordem_circuito"]}, chave {v["chave_do_raio"]}, cofre {E.VAL["reg_inv"]}')
-    print(f'VALIDADOR LOOP v4 revisão 14 | dados: {E.DATA} | {len(D["pistas"])} pistas, {len(AT)} atividades, {len(D["salas"])} salas abertas (+{len(D.get("salas_em_reforma", []))} em reforma) | causas: {", ".join(CAUSAS_OK)}')
+    print(f'VALIDADOR LOOP v4 revisão 18 | dados: {E.DATA} | {len(D["pistas"])} pistas, {len(AT)} atividades, {len(D["salas"])} salas abertas (+{len(D.get("salas_em_reforma", []))} em reforma) | causas: {", ".join(CAUSAS_OK)}')
     bad = checar_ids(); ERROS.extend(bad)
     print(f'(a) ids referenciados: {"OK, todos existem" if not bad else "FALHA"}')
     for b in bad: print('   -', b)
@@ -598,6 +627,9 @@ def main():
     print(f'(g2) sequência das prévias igual nas 5 causas, por sala e por volta ({on} combinações): {"OK" if not oe and not oa else ("FALHA" if oe else "AVISO")} ({len(oe)} com ordem diferente na tela, {len(oa)} aviso(s) de ordem crua)')
     for b in oe: print('   - ERRO:', b)
     for b in oa[:12]: print('   - AVISO:', b)
+    tb = checar_travas(); ERROS.extend(tb)
+    print(f'(i) revisao 18, so travas fisicas ({len(FISICAS)}) e volta 1 em todas as pistas: {"OK" if not tb else "FALHA"}')
+    for b in tb: print('   - ERRO:', b)
     fe, fn = checar_final_frases(); ERROS.extend(fe)
     print(f'(h) frases dos finais que dependem do caderno ({fn}): {"OK" if not fe else "FALHA"}')
     for b in fe: print('   - ERRO:', b)
@@ -631,6 +663,8 @@ def main():
         if tx >= 2: ERROS.append(f'{c}: bot aleatorio com {tx:.2f}% de Ouro/Desligar')
         print(f'(c) bot aleatorio, {NBOTS} partidas: Ouro/Desligar = {tx:.2f}% ({"OK, abaixo de 2%" if tx < 2 else "FALHA"}) | finais: {dict(sorted(cont.items()))} | diagnostico anexado no chute: {100 * diag / NBOTS:.1f}%')
         if '-e' in sys.argv: print(f'(e) estimativa, plano certo com desperdicio de cargas (120 partidas cada): 37% -> solo {distraidos(c, 1, p=0.37)}, dupla {distraidos(c, 2, p=0.37)} | 50% -> solo {distraidos(c, 1, p=0.5)}, dupla {distraidos(c, 2, p=0.5)}')
+        if '--so-otimo' not in sys.argv:
+            for prio, r in volta1(c).items(): print(f'(j) otimo SOZINHO so na volta 1, prioridade {prio}: provas {r["provas"]} ({len(r["provas"])} de 3; nome no caderno: {"sim" if r["nome"] else "nao"}) | diagnostico pronto: {"sim" if r["diag"] else "nao"} | entradas do conserto {r["acao"]} | {r["pistas"]} pistas, {r["energia"]} de {ENERGIA} de energia, relogio {r["relogio"]}')
         out, vd, vc, soz = caminhos(c, R)
         print(f'(d) essenciais sem 2 caminhos: {out or "nenhuma"} | diagnostico por: {vd} | conserto por: {vc}')
         print(f'    endurecimento: salas que fecham o diagnostico sozinhas: {soz or "nenhuma"}')

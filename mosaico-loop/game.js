@@ -937,7 +937,7 @@ function renderClues(){
   if (button.getAttribute('aria-label') !== aria) button.setAttribute('aria-label', aria);
   if (button.lastElementChild.textContent !== label) button.lastElementChild.textContent = label;
   button.lastElementChild.toggleAttribute('data-en', comEn);
-  if (hs) { hs.classList.toggle('on', wait <= 0 && !bl); hs.classList.toggle('ok', registered); hs.disabled = registered && !repega; if (clue.lcp) hs.classList.toggle('tocado', tocouJa(clue)); }
+  if (hs) { hs.classList.toggle('on', wait <= 0);   /* revisão 18: o ponto travado por trava física também se acha; ao tocar, mostra a frase da trava e não gasta energia */ hs.classList.toggle('ok', registered); hs.disabled = registered && !repega; if (clue.lcp) hs.classList.toggle('tocado', tocouJa(clue)); }
   const achado = achouJa(clue); if (button.hidden === achado) button.hidden = !achado;
   const fx = panel.querySelector('[data-faixa="'+clue.id+'"]');
    if (fx && fx.hidden === achado) fx.hidden = !achado;

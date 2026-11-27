@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Mestre-motor da simulacao teorica do Loop (v4 revisao 14: 5 causas; engine sem mudança de regra desde a revisao 3). Uso: python3 engine.py <comando> <grupo> [args]
+# Mestre-motor da simulacao teorica do Loop (v4 revisao 18: 5 causas; so travas fisicas e todas as pistas desde a volta 1, tudo pelos dados; regras de acao iguais desde a revisao 3). Uso: python3 engine.py <comando> <grupo> [args]
 # Dados: variavel de ambiente LOOP_DATA (padrao: pistas-v4.json ao lado deste arquivo, senao /tmp/roda/v4_pistas.json). Estados: LOOP_ESTADOS.
 # Valores do conserto: os de valores_padrao, ou sorteados como o jogo faz quando LOOP_SEMENTE tem um numero
 # (dia 9 a 25; raio em 1:00, 1:05, 1:10, 1:15 ou 1:20; registro 105 a 994; ordem dos 3 pontos; chave do para-raios; cofre = registro de tras para a frente).
@@ -164,7 +164,7 @@ def cmd_olhar(g, j):
         tag = ''
         if not liberada(x, s, jj):
             pd = x['precisaDe']; falta = [k for k in pd['todas'] if k not in jj['caderno']] or pd['umaDe']
-            tag = f' [TRAVADA: {x.get("porque") or "falta achar algo antes"} (em {nome_sala(P[falta[0]]["sala"])})]'
+            tag = f' [TRAVADA: {x.get("porque") or "falta um objeto ou um código"} (em {nome_sala(P[falta[0]]["sala"])})]'
         gr = ' [o grupo já tem; na pausa dá para usar trocar]' if x['id'] in u else ''
         c = custo(x)
         if x['id'] in jj['caderno']: c = 0; gr = ' [já está no seu caderno: pegar o objeto de novo não gasta energia]'
@@ -184,7 +184,7 @@ def cmd_coletar(g, j, idx, *resp):
         if x['tipo'] == 'objeto' and x.get('objeto') and visivel(x, s, jj):
             agir(s); jj['mao'] = x['objeto']; jj['seg'] += 10; save(g, s); print(f'Você pega de novo: "{x["objeto"]}" está na sua mão (sem gastar energia). O que está na mão some no reinício; o que fica no chão, não.'); return
         print('Você já tem essa pista.'); return
-    if not visivel(x, s, jj): print('Essa pista ainda não está disponível (o museu muda com o tempo e com o que você já sabe).'); return
+    if not visivel(x, s, jj): print('Essa pista ainda não está disponível (o museu muda com o tempo da volta).'); return
     c = custo(x)
     en = x.get('enigma')
     if en:
@@ -194,7 +194,7 @@ def cmd_coletar(g, j, idx, *resp):
     if jj['cargas'] < c: print(f'Falta energia: esta pista gasta {c} e você tem {jj["cargas"]}.'); return
     if not liberada(x, s, jj):
         pd = x['precisaDe']; falta = [k for k in pd['todas'] if k not in jj['caderno']] or pd['umaDe']
-        print(f'Travada: {x.get("porque") or "falta achar algo antes"} Falta no SEU caderno uma pista de {nome_sala(P[falta[0]]["sala"])} ("{P[falta[0]]["previa"]}"). Outra pessoa pode passar na pausa.'); return
+        print(f'Travada: {x.get("porque") or "falta um objeto ou um código"} Não gastou energia. Falta no SEU caderno o objeto ou código de {nome_sala(P[falta[0]]["sala"])} ("{P[falta[0]]["previa"]}"). Outra pessoa pode passar na pausa.'); return
     agir(s); jj['cargas'] -= c; jj['seg'] += 10; jj['caderno'].append(x['id'])
     if x['tipo'] == 'objeto' and x.get('objeto'): jj['mao'] = x['objeto']
     s['log'].append((s['volta'], jj['id'], x['id']))

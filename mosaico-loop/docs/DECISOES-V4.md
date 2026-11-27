@@ -1,9 +1,9 @@
 # Loop v4 (25/11/2026) — decisões aplicadas nos dados e no código
-Fonte da verdade do enredo: docs/ROTEIRO-LOOP.md. Dados: mosaico-loop/dados/pistas-v4.json (278 pistas da revisão 3 à 9, 281 desde a revisão 10; as seções "Revisão 2" a "Revisão 12", no fim, valem sobre o que estiver acima, e a mais nova vale sobre as anteriores) → loop-central-dados.js.
+Fonte da verdade do enredo: docs/ROTEIRO-LOOP.md. Dados: mosaico-loop/dados/pistas-v4.json (278 pistas da revisão 3 à 9, 281 desde a revisão 10; as seções "Revisão 2" a "Revisão 18", no fim, valem sobre o que estiver acima, e a mais nova vale sobre as anteriores) → loop-central-dados.js.
 
 ## Mundo
 - Uma versão só para o Téo: confrontou o Lenz na Sala das coleções uns trinta segundos antes de 0:00, foi empurrado, caiu ao lado do pote de tinta. Enquanto a Câmara gira ele "não piora nem melhora, fica guardado igual a uma peça numa vitrine" (pista sato_teo). Saíram as frases "encostou na Câmara / ficou preso entre as voltas".
-- Regra de memória: ninguém do museu lembra das voltas. Lembram: o caderno de quem joga, o chão (objeto deixado), a Câmara (meio conserto, eco). Uma pessoa só muda de fala quando quem joga MOSTRA algo do caderno (campo precisaDe + porque).
+- Regra de memória: ninguém do museu lembra das voltas. Lembram: o caderno de quem joga, o chão (objeto deixado), a Câmara (meio conserto, eco). (Revisão 18: saiu a regra de "mostrar algo do caderno"; as falas não dependem do que você traz, e `precisaDe` ficou só para trava física.)
 - O reinício é às 5:00 (não na queda de luz).
 - Sem hora do dia nos textos (saíram 21h40, 21h58, 18h): só minuto da volta, "fim da tarde", "ontem", "dia da troca".
 - Vigia = Braga. Zelador = Seu Dirceu (figurante da limpeza).
@@ -14,9 +14,10 @@ Fonte da verdade do enredo: docs/ROTEIRO-LOOP.md. Dados: mosaico-loop/dados/pist
 - A caixa de "banners" com a peça verdadeira existe em TODAS as noites (é fato do crime); na noite C ela também é ferramenta do conserto.
 - Manual: páginas 1 a 6 existem em todas as noites (a lista de pistas não denuncia mais a causa).
 - Noites A e B (e E) ganharam cena própria: a_hist_1 (Dra. Sato zerou os mostradores como "tranca") e b_hist_1 (gerador no mínimo "a pedido do patrocínio").
-- Noite D: a assinatura "Fui eu. — T." no cadeado só aparece para quem leu a página dobrada do diário (d_fus_2b); há um despiste (d_despiste).
+- Noite D: a assinatura "Fui eu. — T." no cadeado amarelo, olhando de perto pela fresta (d_fus_2b; até a revisão 17, só para quem tinha lido a página dobrada do diário); há um despiste (d_despiste).
 
 ## Escada de revelações
+(Revisão 18: a escada de voltas acabou. Toda pista vale desde a volta 1; o que trava é só objeto ou código. O texto abaixo é histórico.)
 - Volta 1: sinais da máquina, Téo caído, cheiro de verniz, recibo, registro, raio e hora, manual, bilhete do crachá SEM assinatura.
 - A partir da volta 2 (ou de quem já viu a pista anterior): laudo do Aurélio, molde, páginas anteriores do diário, carta da seguradora, gravação, mancha maior, escultura. (Mudou na revisão 2: ver o fim.)
 - Nome do culpado: só com prova da cópia + escala + bilhete (cracha_3), ou mostrando o bilhete ao homem de paletó perto das 4:00 (lenz_2), ou na atividade Acusação e Defesa. Não há mais como chegar ao nome na volta 1.
@@ -534,7 +535,7 @@ Onde esta seção contradiz o que está acima, vale esta. Origem: relatórios da
 
 ### Retoques de baixo risco
 - **Luz de lado.** A posição certa é sorteada entre 2, 4 e 5 (só de lado; a 3 é a do meio, de frente). A dica "Luz de frente esconde" fica.
-- **`traj_2`** responde à Ivone: "A Ivone, não: desde o fim da tarde, passou uma vez só, até a cafeteira e de volta." Não é pista nova nem essencial nova; o álibi dela continua com as mesmas fontes.
+- **`traj_2`** responde à Ivone. (Revisão 18, correção a1 da história final: "A Ivone? No fim da tarde, uma vez só: foi até a cafeteira e voltou. Depois eu fui passar pano na Recepção, um tempão." Antes: "A Ivone, não: desde o fim da tarde, passou uma vez só...", que punha o Seu Dirceu vigiando a Área de descanso.) Não é pista nova nem essencial nova; o álibi dela continua com as mesmas fontes.
 - **Foto ao contrário** (correção da revisão 16, acima): explica só a rachadura do outro lado; o quinto símbolo virado é erro de quem riscou com pressa (ROTEIRO, parte 1).
 - **Chuva.** Dica da fita: "Lá fora chove desde ontem."
 - **"Copa"** → `nico_0`: "Tem bolacha perto da cafeteira, pega lá."; ficha do Nico: "a Área de descanso".
@@ -576,3 +577,33 @@ Onde esta parte contradiz o que está acima, vale esta. Nenhuma pista, texto de 
 ### Ficou para decidir (nenhum bloqueia)
 - Os limites de achar (45% de perto, 60% de zoom, círculo de 30%) podem ser apertados (mais difícil) ou soltos (mais fácil) mexendo só em `ACHAR`.
 - O toque que mira e aproxima ajuda quem joga no celular; se o autor quiser a investigação mais dura, basta tirar esse toque (ficam arrastar, pinça e os botões).
+
+## Revisão 18 (27/11/2026) · só travas físicas (decisão do autor)
+
+Onde esta seção contradiz o que está acima, vale esta. Origem: decisão do autor, nas palavras dele: "o jogador tem todas as pistas que acha; se tiver que abrir uma porta com código, aí não abre se não tiver o código. Mas mesmo que ainda não chegou à porta, se chegou ao código, pega o código mesmo, nem sabendo para que seria." E, confirmando: "Toda pista é livre, não depende de rodada; o que trava é porta física, abertura de cofre etc." Sobre as voltas, o autor escolheu tirar também as travas por volta. Arquivo por arquivo: `LOOP-CENTRAL.md`, "Revisão 18". Tabela completa da classificação: `/tmp/roda/esc/r18/classificacao.md`.
+
+### Decisões do autor (27/11/2026)
+- **Só travas físicas.** Das 88 pistas que tinham `precisaDe`, 12 continuam travadas, e a trava agora é só o objeto ou o código no caderno: a porta do Quadro externo (a chavinha), o pendrive do Nico (a senha é o número de registro), o rádio da Sala dos sons (o pendrive, nas 4 faixas), a escrita da máscara e a da peça verdadeira (a tábua; e a caixa aberta, que é onde a peça verdadeira fica), os fechamentos sem dupla que comparam material (a foto grande do catálogo; as duas listas; a foto e a legenda) e o painel depois do ensaio (a luz só existe depois de um ensaio). O cofre do Braga continua com a senha (o registro de trás para a frente, no minijogo). 73 travas eram de "ainda não tem motivo" e saíram; 3 cenas são acontecimentos da volta (4:02, 4:10 e logo depois do apagão) e seguem no minuto delas, sem `precisaDe`.
+- **O código ou objeto nunca é travado.** Chavinhas, números de registro, foto grande, listas, foto e legenda, tábua e caixa: tudo se pega quando se acha, mesmo sem saber para que serve.
+- **Sem travas por volta.** Toda pista tem `volta_min` 1 (antes: 232 / 27 / 9 / 9 / 4). Nenhuma exceção: o que só existe depois de uma volta já é físico (o objeto no chão aparece na volta seguinte à que foi deixado; o eco, o meio conserto e os ensaios nascem de uma ação). As 6 atividades que só dão pistas (Lado a Lado, As Duas Listas, Apagão Combinado, Painel e Manual, Correio do Loop, Acusação e Defesa) também abrem na volta 1.
+- **O que ficou (regras de ação e de fim, não travas de pista).** Diagnóstico da volta 2 em diante, uma tentativa por volta; ensaio das voltas 2 a 4 e conserto só na volta 5 (o botão "Loop Reset" só responde depois de quatro voltas completas); eco do Raio da volta 3; na noite E, o primeiro conserto da volta 3 e um conserto por volta; Revelar só na volta 5, na Recepção; passar pista só na pausa; a metade da foto e da legenda que outra pessoa já viu (`excl`, em sala).
+- **A regra "uma pessoa só muda de fala quando quem joga mostra algo do caderno" saiu.** As falas que dependiam disso foram reescritas para fazer sentido sem nada antes: `cracha_3` (o Braga pega você olhando o cinto vazio), `v4_braga` (ele levanta para pegar café e deixa o livro aberto), `aurelio_1` ("Sente esse cheiro?"), `aurelio_2` (o Téo mostrou o diário a ele), `ivone_2` e `ivone_red` (ela vê você olhando o recibo e a tinta), `ivone_1x`, `lenz_1` (na escada, já saindo, ele para um segundo, de costas: não desmente `traj_3`, "sai sem olhar para você"), `lenz_2` (você para na frente dele: "Licencinha, rapidinho."), `sato_teo` (a Dra. Sato pergunta do Téo), `d_fus_2b` e o par `fh_quadro2` (olhar de perto pela fresta). O nome "Lenz" deixa de esperar a volta 3: pode sair na volta 1 (`cracha_3`, `lenz_2`, `v4_braga`, Acusação e Defesa). Nenhuma pista desmente outra por isso.
+
+### Escolhas feitas ao aplicar
+- **Achar o ponto travado.** Em `game.js`, o ponto acende mesmo com trava física (antes `on` exigia "sem trava"). Ao tocar, aparece a frase do mundo (`porque` + a sala onde olhar) e não gasta energia; com o objeto ou o código no caderno, abre. A frase "ainda não…" de trava lógica não existe mais: as 73 pistas que saíram perderam o `porque` (os produtos de atividade guardam o deles, que a aba Atividades mostra enquanto a atividade não abre).
+- **Textos de trava física.** `insc_copia`: "Sem a tábua da escrita antiga, você não lê."; `nico_1`: "Só entrego para quem souber o número certo."; continuação da gravação: "O rádio tem uma entrada vazia."
+- **`braga_1x`** (etiqueta na câmera 4) aparece desde 0:00: é uma etiqueta parada, não um acontecimento.
+- **Minijogo da caixa** sem "Agora você tem motivo." Trancas (`d.trancas`) reescritas sem "da volta N" nem "depois de saber"; `regras.escada`, `regras.precisaDe` e `regras.achar` atualizados.
+- **Obrigatória da história final (a1).** `traj_2`: "A Ivone? No fim da tarde, uma vez só: foi até a cafeteira e voltou. Depois eu fui passar pano na Recepção, um tempão." Assim o Seu Dirceu não vigiou a Área de descanso e não podia ter visto o Lenz nem o Téo.
+- **Opcionais aplicados.** `man_3`, resposta ao sinal de luz fraca sem "ou isto, ou aquilo" ("Então a força não está chegando inteira."); `e_hist_1` com "embaixo da dobra" (o verso da E02_B mostra a dobra); ROTEIRO 3, "O que a lista mostra".
+- **Validador.** Novo (i): toda pista na volta 1 e `precisaDe` só nas 12 físicas; novo (j): o que um jogador ótimo sozinho fecha na volta 1. Teste novo: `/tmp/roda/r18/fisica.mjs`.
+
+### Não aplicado, e por quê
+- **"Laudo do curador" → "Laudo do Aurélio"**: a prévia decide o lugar do ponto na peça; trocar muda o ponto de lugar. O "porque" com "Na mesa do curador" saiu junto com a trava.
+- **Prévias com "de novo"** ("Braga, de novo", "Nico, de novo", "O quadro, olhando de novo"): ficaram, pelo mesmo motivo. Elas ainda fazem sentido (é a segunda coisa do Braga, do Nico e do quadro na mesma sala).
+- **Cenas das 4:00 às 4:10 com aviso na faixa da sala**: mecânica nova, fora deste lote.
+
+### Ficou para decidir (para o autor)
+- **Ficou mais fácil.** Um jogador ótimo sozinho fecha na volta 1 as 3 provas do Revelar (o laudo, `cracha_3` e a câmera das 4:00 não gastam energia) e o diagnóstico, com 5 de energia. O bot aleatório continua em 0 a 0,05% de Ouro/Desligar, mas chega ao "Revelar" em 3 a 4% das partidas (era 0,2 a 0,3%) e ao "Parcial" em 24 a 29% (era 11 a 13%). Ajustes possíveis, sem mudar a regra nova: dar custo 1 ao laudo (`falsa_2`) e ao Braga (`cracha_3`).
+- **Regras de ação por volta que ficaram** (lista acima): o autor confirma se quer mantê-las.
+- **`excl`** (quem viu uma metade não vê a outra, em sala) é regra de dupla; fica.

@@ -155,9 +155,9 @@ function lcBloqueio(q){
  if (p.excl && lcTem(p.excl) && !/individual/.test(location.pathname)) return 'Você já viu a outra metade desta pista. Peça à outra pessoa que veja esta e descreva em voz alta.';
  const pd = p.precisaDe || {}, falta = (pd.todas || []).find(i => !lcTem(i));
  if (falta && p.porque) return p.porque + ' (em ' + lcNomeSala(LC_PID[falta].sala) + ')';
- if (falta) return 'Falta achar algo antes, em ' + lcNomeSala(LC_PID[falta].sala) + '.';
+ if (falta) return 'Falta um objeto ou um código, em ' + lcNomeSala(LC_PID[falta].sala) + '.';
  if ((pd.umaDe || []).length && !pd.umaDe.some(lcTem) && p.porque) return p.porque + ' (veja em ' + lcSalasDe(pd.umaDe).join(' ou ') + ')';
- if ((pd.umaDe || []).length && !pd.umaDe.some(lcTem)) return 'Falta achar algo antes, em ' + lcSalasDe(pd.umaDe).join(' ou ') + '.';
+ if ((pd.umaDe || []).length && !pd.umaDe.some(lcTem)) return 'Falta um objeto ou um código, em ' + lcSalasDe(pd.umaDe).join(' ou ') + '.';
  return '';
 }
 function lcTextoClue(q){ const p = LC_PID[q.lcp]; return p ? lcTexto(p) : q.text; }
@@ -697,7 +697,7 @@ const LC_MG = {
   dicas:['Repare no que pinga no tapete.','Lá fora chove desde ontem.']},
  insc_copia:{ativ:'glifos', resp:0, nome:'Ler a inscrição da máscara', texto:'Confira cada símbolo da máscara com a tábua do livro de registro. Um deles não bate. Qual?', insc:['rosto','pedra','ver','noite','guardar-esp','tempo'], opcoes:['5','4','3','2'],
   dicas:['Ponha a tábua ao lado e confira símbolo por símbolo, da esquerda para a direita.','Não olhe só o desenho: olhe para que lado ele abre.']},
- c_peca:{ativ:'livro', resp:0, img:['D10'], nome:'Abrir uma caixa da estante', texto:'Agora você tem motivo. Na estante, quatro caixas iguais, cada uma com a sua etiqueta. Pelo que o seu caderno diz da caixa do patrocínio, qual você abre?', opcoes:['BANNERS – NÃO ABRIR','MOLDURAS – FRÁGIL','LÂMPADAS – NÃO EMPILHAR','CATÁLOGOS – NÃO MOLHAR'],
+ c_peca:{ativ:'livro', resp:0, img:['D10'], nome:'Abrir uma caixa da estante', texto:'Na estante, quatro caixas iguais, cada uma com a sua etiqueta. Pelo que o seu caderno diz da caixa do patrocínio, qual você abre?', opcoes:['BANNERS – NÃO ABRIR','MOLDURAS – FRÁGIL','LÂMPADAS – NÃO EMPILHAR','CATÁLOGOS – NÃO MOLHAR'],
   dicas:['No caderno, procure o que se diz de uma caixa do patrocínio.','A caixa certa entrou leve e agora pesa demais para o que a etiqueta diz.']}
 };
 // A ordem das opções (e a posição certa da luz) muda com a semente: nada para decorar entre partidas.
