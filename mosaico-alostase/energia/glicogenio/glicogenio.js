@@ -1,8 +1,8 @@
-import { REFEICAO_GLICOGENIO as refeicao, JEJUM_GLICOGENIO as jejum, glicogenioAposRefeicao, variacaoGlicogenioEmJejum } from '../../motor/glicogenio.js';
+import { REFEICAO_GLICOGENIO as refeicao, JEJUM_GLICOGENIO as jejum, glicogenioAposRefeicao, variacaoGlicogenioEmJejum, FLUXO_HEPATICO, CONFERENCIA_GLICOGENIO_120, simularFluxoHepatico } from '../../motor/glicogenio.js?v=2';
 import { desenharSerie, indiceNaSerie } from '../../hidratacao/grafico.js?v=4';
 
 const el = (id) => document.getElementById(id);
-const fmt = (v) => v.toLocaleString('pt-BR', { maximumFractionDigits: 1 });
+const fmt = (v) => v.toLocaleString('pt-BR', { maximumFractionDigits: 2 });
 const protocolos = {
   refeicao: {
     nome: 'Concentração hepática estimada', fim: refeicao.fim, minutoInicial: refeicao.minutoPico,
@@ -26,6 +26,17 @@ const protocolos = {
   },
 };
 
+const fluxo = simularFluxoHepatico();
+const taxa = fluxo.map((ponto) => ponto.taxa);
+const pontosFluxo = FLUXO_HEPATICO.filter((p) => p.minuto <= refeicao.fim);
+const marcadoresFluxo = pontosFluxo.map(({ minuto, taxa }) => ({ indice: minuto, valor: taxa, serie: 0 }));
+el('referencias-fluxo').innerHTML = pontosFluxo.map((p) => {
+  const valor = p.aproximado ? 'Próximo de zero' : p.derivado ? 'Queda de 67% do basal' : `${fmt(p.taxa)} ± ${fmt(p.ep)}`;
+  return `<tr><th scope="row">${p.minuto} min</th><td>${valor}</td><td>${fmt(taxa[p.minuto])}</td></tr>`;
+}).join('');
+const check = CONFERENCIA_GLICOGENIO_120;
+el('conferencia-120').textContent = `Aos ${check.minuto} min, o glicogênio subiu ${fmt(check.variacao)} mmol/L no estudo. A curva, ajustada pelo basal e pelo pico, estima ${fmt(glicogenioAposRefeicao(check.minuto) - refeicao.inicial)} mmol/L de aumento nesse ponto.`;
+
 let protocolo, curva;
 function desenhar() {
   const min = Number(el('tempo').value);
@@ -35,10 +46,15 @@ function desenhar() {
   el('leitura').textContent = `${protocolo.nome} de ${fmt(curva[min])} mmol/L de tecido hepático.`;
   const marcadores = protocolo.pontos.map(([indice, valor]) => ({ indice, valor, serie: 0 }));
   desenharSerie(el('curva'), [curva], curva.length, min, protocolo.hora, 0, marcadores);
+  if (!el('fluxo-hepatico').hidden) {
+    el('leitura-fluxo').textContent = `${fmt(taxa[min])} mg/kg/min aos ${min} min · ${fmt(fluxo[min].liberadoMgKg)} mg/kg liberados desde a refeição.`;
+    desenharSerie(el('curva-fluxo'), [taxa], taxa.length, min, protocolo.hora, 1, marcadoresFluxo);
+  }
 }
 
 function atualizar() {
   protocolo = protocolos[el('protocolo').value];
+  el('fluxo-hepatico').hidden = protocolo !== protocolos.refeicao;
   curva = Array.from({ length: protocolo.fim + 1 }, (_, min) => protocolo.calcular(min));
   el('tempo').max = protocolo.fim;
   el('tempo').value = protocolo.minutoInicial;
@@ -59,5 +75,11 @@ el('curva').addEventListener('click', (e) => {
   el('tempo').value = indiceNaSerie(el('curva'), e.clientX, curva.length);
   desenhar();
 });
+el('curva-fluxo').addEventListener('click', (e) => {
+  el('tempo').value = indiceNaSerie(el('curva-fluxo'), e.clientX, taxa.length);
+  desenhar();
+});
 atualizar();
-new ResizeObserver(desenhar).observe(el('curva'));
+const observer = new ResizeObserver(desenhar);
+observer.observe(el('curva'));
+observer.observe(el('curva-fluxo'));

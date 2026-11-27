@@ -28,6 +28,19 @@
       <input type="range" id="tempo" min="0" max="360" step="1" value="318">
       <p id="leitura"></p>
     </section>
+    <section class="painel" id="fluxo-hepatico" aria-labelledby="titulo-fluxo">
+      <h2 id="titulo-fluxo">Produção de glicose pelo fígado</h2>
+      <p>Use o mesmo controle de tempo da reserva. Aqui, a unidade é quantidade de glicose liberada por quilograma de massa corporal por minuto (mg/kg/min).</p>
+      <canvas id="curva-fluxo" class="calor-curva" aria-hidden="true"></canvas>
+      <p id="leitura-fluxo"></p>
+      <table>
+        <caption>Referências da produção hepática (mg/kg/min)</caption>
+        <thead><tr><th scope="col">Após a refeição</th><th scope="col">Estudo</th><th scope="col">Motor</th></tr></thead>
+        <tbody id="referencias-fluxo"></tbody>
+      </table>
+      <p id="conferencia-120"></p>
+      <p>Taylor e colegas mediram a reserva e a produção de glicose em etapas distintas do estudo com a mesma refeição. A saída de glicose caiu logo após comer e voltou a subir quando a razão glucagon/insulina aumentou. A bancada sincroniza as duas curvas e integra a saída minuto a minuto. A produção inclui glicogenólise e gliconeogênese. O cálculo ainda usa pontos experimentais para cada curva, com regulação hormonal apresentada como interpretação da Figura 3. <a href="https://doi.org/10.1172/JCI118379">Taylor e colegas, 1996 · Figura 3</a></p>
+    </section>
     <section class="painel">
       <h2>Conferir com os estudos</h2>
       <table>
@@ -40,6 +53,6 @@
       <p>A concentração de glicogênio é expressa por litro de tecido hepático. As curvas atuais de glicose e hormônios usam outra refeição e outro estudo. <a href="../">Ver glicose, insulina e glucagon</a></p>
     </section>
   </main>
-  <script type="module" src="./glicogenio.js"></script>
+  <script type="module" src="./glicogenio.js?v=2"></script>
 </body>
 </html>
