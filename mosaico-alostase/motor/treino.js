@@ -26,3 +26,15 @@ export function frequenciaNoEsforco({ idade, grupo = 'geral', fcRepouso = P.trei
   const valor = fcRepouso + f * (max - fcRepouso);
   return { fcMax: +max.toFixed(1), valor: +valor.toFixed(1), faixa: [+(valor - f * dp).toFixed(1), +(valor + f * dp).toFixed(1)] };
 }
+
+// Banister: exemplo de ajuste em ciclistas (parâmetros publicados, arXiv:2505.20859).
+// A unidade de carga abaixo é didática e difere da métrica do estudo.
+const RETENCAO_APTIDAO = Math.exp(-1 / 38);
+const RETENCAO_FADIGA = Math.exp(-1 / 1.9);
+
+export function atualizarTreino({ aptidaoTreino, fadigaTreino }, sessoes) {
+  const carga = sessoes.reduce((total, sessao) => total + (sessao.duracao / 30) * (sessao.intensidade / 40), 0);
+  const aptidao = aptidaoTreino * RETENCAO_APTIDAO + 0.048 * carga;
+  const fadiga = fadigaTreino * RETENCAO_FADIGA + 0.117 * carga;
+  return { aptidaoTreino: aptidao, fadigaTreino: fadiga, saldoTreino: aptidao - fadiga };
+}

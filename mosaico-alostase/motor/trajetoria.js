@@ -1,3 +1,4 @@
+import { atualizarTreino } from './treino.js?v=2';
 // Motor contínuo da bancada integrada. Estado hídrico, excreção e pressão de sono atravessam a meia-noite.
 import { BEBIDAS_BASE, CENARIOS_HIDRICOS, PASSO_INTEGRADO, SESSAO, simularHidratacao } from './bancada-hidrica.js?v=6';
 import { INICIAL_ACLIMATACAO, atualizarAclimatacao } from './aclimatacao.js?v=2';
@@ -149,6 +150,7 @@ export function simularTrajetoria(perfilId, dias, { detalharDia = -1, frequencia
   const saida = [];
   const baseCardio = new Map();
   let agua = hidratar(), temperatura, estadoAclima = INICIAL_ACLIMATACAO;
+  let estadoTreino = { aptidaoTreino: 0, fadigaTreino: 0 };
   let pressaoSono = 0.5, quedaFC = 0, sessoesAnteriores = calendario?.dia(-1).sessoes ?? [], vigiliaMin = 0, faseH = 0;
   let leitura = [];
   const saldosSono = [];
@@ -264,7 +266,9 @@ export function simularTrajetoria(perfilId, dias, { detalharDia = -1, frequencia
     const horasSono = sonoMin / 60;
     saldosSono.push(24 - horasSono - P.dividaSono.vigiliaCriticaH.valor);
     const saldoSono7d = Math.max(0, saldosSono.slice(-7).reduce((a, b) => a + b, 0));
+    estadoTreino = atualizarTreino(estadoTreino, sessoes);
     saida.push({
+      ...estadoTreino,
       dia: dia + 1, horasSono, saldoSono7d, pressaoAoAcordar, quedaFC, picoGlicemia, deltaAucCafe, contaGlicemia, mediaCortisol,
       vigiliaMaxH: vigiliaMaxMin / 60, atividadeNoturnaH: atividadeNoturnaMin / 60,
       sonoDiurnoH: sonoDiurnoMin / 60, trabalhoNoturnoH: trabalhoNoturnoMin / 60, trabalhoH: trabalhoMin / 60, noitesEmClaro,

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Treino, recuperação e estresse · Mosaico Alostase</title>
+  <link rel="stylesheet" href="../jogo/estilo.css?v=9">
+  <link rel="stylesheet" href="../cardiovascular/bancada.css">
+  <link rel="stylesheet" href="../turno-calor/calor.css">
+</head>
+<body>
+  <main class="bancada">
+    <nav class="calor-nav"><a href="../">← Mosaico Alostase</a><a href="../trajetoria/">Trajetórias fisiológicas</a></nav>
+    <header class="abertura">
+      <h1>Treino, recuperação e estresse</h1>
+      <p>Explore dois protocolos experimentais e observe como o momento da medição muda a leitura da resposta.</p>
+    </header>
+    <section class="painel">
+      <label>Protocolo
+        <select id="protocolo">
+          <option value="treino">Recuperação cardíaca após exercício</option>
+          <option value="estresse">Cortisol salivar após estresse social</option>
+        </select>
+      </label>
+      <h2 id="titulo"></h2>
+      <p id="descricao"></p>
+      <p id="legenda"></p>
+      <canvas id="curva" class="calor-curva" aria-hidden="true"></canvas>
+      <label for="tempo">Tempo <output id="hora"></output></label>
+      <input type="range" id="tempo" min="0" value="0" step="1">
+      <p id="leitura"></p>
+      <table>
+        <caption id="caption"></caption>
+        <thead><tr><th scope="col">Momento</th><th scope="col">Referência do protocolo</th></tr></thead>
+        <tbody id="referencias"></tbody>
+      </table>
+      <p id="interpretacao"></p>
+      <p><a id="fonte"></a></p>
+    </section>
+  </main>
+  <script type="module" src="./respostas.js"></script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 import { resumirSensibilidadeGlicemica } from '../motor/glicemia-rotinas.js?v=5';
-import { agruparTrajetoria, HORIZONTES, PERFIS_TRAJETORIA, simularTrajetoria } from '../motor/trajetoria.js?v=11';
+import { agruparTrajetoria, HORIZONTES, PERFIS_TRAJETORIA, simularTrajetoria } from '../motor/trajetoria.js?v=12';
 import { PASSO_INTEGRADO } from '../motor/bancada-hidrica.js?v=6';
 import { desenharSerie, indiceNaSerie } from '../hidratacao/grafico.js?v=3';
 import { criarEditor } from './editor.js?v=5';
@@ -37,6 +37,9 @@ const medidas = {
   noitesEmClaro: ['Noites das 23h às 07h sem dormir', 'noites', 0],
   picoGlicemia: ['Pico de glicemia', 'mg/dL', 1],
   deltaAucCafe: ['Efeito acumulado no café padronizado', 'mmol/L × min', 2], mediaCortisol: ['Cortisol médio', 'µg/dL', 2],
+  aptidaoTreino: ['Aptidão acumulada no fim do período', 'índice didático', 3],
+  fadigaTreino: ['Fadiga residual no fim do período', 'índice didático', 3],
+  saldoTreino: ['Aptidão menos fadiga no fim do período', 'índice didático', 3],
   treinoMin: ['Minutos de exercício no período', 'min', 0],
 };
 const medidasDia = {
