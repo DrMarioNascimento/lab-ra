@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Fluxos de glicose no exercício · Mosaico Alostase</title>
+  <link rel="stylesheet" href="../../jogo/estilo.css?v=9">
+  <link rel="stylesheet" href="../../cardiovascular/bancada.css">
+  <link rel="stylesheet" href="../../turno-calor/calor.css">
+  <style>
+    .exercicio table { table-layout: fixed; }
+    .exercicio th, .exercicio td { overflow-wrap: anywhere; padding: .55rem .35rem; }
+  </style>
+</head>
+<body>
+  <main class="bancada exercicio">
+    <nav class="calor-nav"><a href="../">← Motor de energia</a><a href="../glicogenio/#balanco-glicose">Produção hepática e glicemia</a></nav>
+    <header class="abertura">
+      <h1>Fluxos de glicose no exercício</h1>
+      <p>Acompanhe a glicose que chega ao sangue e a que é retirada pelos tecidos durante a primeira hora de uma sessão após a refeição.</p>
+    </header>
+    <section class="painel">
+      <h2>Entradas e retirada de glicose</h2>
+      <p>O exercício começa 120 minutos após o café da manhã. O gráfico segue até 180 minutos após o café, 15 minutos antes do fim da sessão.</p>
+      <canvas id="curva" class="calor-curva" aria-hidden="true"></canvas>
+      <p class="calor-legenda"><span>Contínua · entrada total</span><span>Tracejada · retirada</span></p>
+      <label for="tempo">Tempo após a refeição <output id="hora"></output></label>
+      <input id="tempo" type="range" min="0" max="60" value="0">
+      <table>
+        <caption>Fluxos no instante selecionado (µmol/kg/min)</caption>
+        <tbody id="balanco"></tbody>
+      </table>
+      <p id="acumulado"></p>
+    </section>
+    <section class="painel">
+      <h2>Conferir com o estudo</h2>
+      <p>Schiavon e colegas estudaram 12 adultos saudáveis que se exercitaram a 50% do VO₂máx, duas horas após uma refeição mista. Os traçadores permitiram estimar as entradas e a retirada de glicose.</p>
+      <table>
+        <caption>Referências extraídas do artigo (média ± erro-padrão, µmol/kg/min)</caption>
+        <thead><tr><th scope="col">Tempo</th><th scope="col">Refeição</th><th scope="col">Produção endógena</th><th scope="col">Retirada</th></tr></thead>
+        <tbody id="referencias"></tbody>
+      </table>
+      <p>No mesmo protocolo, a glicemia média observada foi de 6,3 mmol/L aos 120 min, atingiu 4,0 mmol/L aos 140 min e chegou a 4,3 mmol/L ao fim do exercício, aos 195 min. <a href="https://doi.org/10.1152/ajpendo.00182.2013">Schiavon e colegas, 2013 · Figuras 1 e 3</a></p>
+    </section>
+    <details class="painel">
+      <summary>Como o balanço é calculado</summary>
+      <p>A entrada total soma a glicose da refeição que aparece na circulação e a produção endógena. O saldo instantâneo subtrai a retirada da entrada. Entre as referências, o modelo interpola cada fluxo e integra o saldo desde o começo do exercício.</p>
+      <p>A tabela mantém a normalização por kg da Figura 3. O saldo acumulado é uma quantidade por kg. A glicemia em mmol/L aparece como observação do estudo. A retirada representa o corpo todo, incluindo músculo e outros tecidos.</p>
+    </details>
+  </main>
+  <script type="module" src="./exercicio.js"></script>
+</body>
+</html>
