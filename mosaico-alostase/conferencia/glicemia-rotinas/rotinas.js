@@ -78,6 +78,59 @@ el('conferencia').innerHTML = [
       `${fmt(dado.modelo)}<small>${calibrado ? 'Calibração' : 'Conferência'}</small>`,
     ])).join('')}</tbody></table>`).join('');
 
+// Centofanti et al., Tabela 3. Diferença entre o quarto e o primeiro plantão.
+const medidasCafe = {
+  isi: {
+    titulo: 'Índice de sensibilidade à insulina',
+    unidade: 'unidades arbitrárias',
+    dados: [[-9.9, -15.3, -4.6], [-8.5, -14.9, -2.2], [-7.4, -13.5, -1.3]],
+    leitura: 'O índice de sensibilidade diminuiu nos três grupos. O estudo identificou um efeito do dia (p < 0,001).',
+  },
+  insulina: {
+    titulo: 'Área sob a curva de insulina',
+    unidade: 'pmol/L × min',
+    dados: [[109.0, -2.8, 220.2], [20.1, -111.1, 151.4], [116.0, -10.4, 242.4]],
+    leitura: 'A análise identificou um aumento geral entre os dias (p = 0,025). Os três intervalos de confiança por grupo incluem zero. A insulina circulante depende da secreção e da remoção da insulina pelo organismo.',
+  },
+  glicose: {
+    titulo: 'Área sob a curva de glicose',
+    unidade: 'mmol/L × min',
+    dados: estudos.map(({ cafe }) => [cafe.media, ...cafe.ic]),
+    casas: 2,
+    leitura: 'A resposta glicêmica ao café aumentou nos três grupos. As comparações pós-hoc entre grupos para essa mudança ficaram sem diferença estatisticamente significativa.',
+  },
+  igi: {
+    titulo: 'Índice insulinogênico',
+    unidade: 'unidades arbitrárias',
+    dados: [[-4.3, -20.9, 12.3], [-17.7, -37.3, 1.8], [-4.9, -24.0, 14.3]],
+    leitura: 'O índice estima a resposta inicial de insulina à elevação da glicose. Os três intervalos de confiança para a mudança entre os dias incluem zero.',
+  },
+  di: {
+    titulo: 'Índice de disposição',
+    unidade: 'unidades arbitrárias',
+    dados: [[-671, -1584, 242], [-1191, -2266, 117], [-588, -1643, 467]],
+    casas: 0,
+    leitura: 'O índice relaciona a resposta de insulina à sensibilidade à insulina. Os três intervalos de confiança por grupo para a mudança entre os dias incluem zero.',
+  },
+};
+
+function mostrarMedidasCafe() {
+  const { titulo, unidade, dados, casas = 1, leitura } = medidasCafe[el('medida-insulina').value];
+  const formato = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: casas, maximumFractionDigits: casas });
+  const estimativa = (n) => `${n > 0 ? '+' : ''}${formato.format(n)}`;
+  el('legenda-insulina').textContent = `${titulo} · ${unidade}`;
+  el('dados-insulina').innerHTML = estudos.map(({ porcao }, i) => {
+    const [media, minimo, maximo] = dados[i];
+    return linha(`${porcao}% da energia`, [
+      `<strong>${estimativa(media)}</strong><small>${formato.format(minimo)} a ${formato.format(maximo)}</small>`,
+    ]);
+  }).join('');
+  el('leitura-insulina').textContent = leitura;
+}
+
+el('medida-insulina').addEventListener('change', mostrarMedidasCafe);
+mostrarMedidasCafe();
+
 for (const id of ['principal', 'referencia', 'porcao', 'porcao-ref', 'sono', 'horizonte']) {
   el(id).addEventListener('change', atualizar);
 }

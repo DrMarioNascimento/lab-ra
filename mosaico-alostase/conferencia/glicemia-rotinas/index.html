@@ -71,6 +71,26 @@
       <p>O ensaio de Chellappa e colegas, em outro protocolo de trabalho noturno simulado, também encontrou pior tolerância à glicose ao incluir refeições noturnas. A concordância é qualitativa.</p>
       <p><a href="https://doi.org/10.1007/s00125-024-06279-1">Centofanti e colegas, 2025 · tabelas 2 e 3</a> · <a href="https://pubmed.ncbi.nlm.nih.gov/34860550/">Chellappa e colegas, 2021</a> · <a href="../refeicoes-plantao/">Reprodução dos horários das refeições do plantão</a></p>
     </section>
+    <section class="painel" id="insulina-plantao" aria-labelledby="titulo-insulina">
+      <h2 id="titulo-insulina">Insulina e sensibilidade após o café</h2>
+      <p>A Tabela 3 compara a manhã após o quarto plantão com a manhã após o primeiro. O café da manhã foi igual nas duas coletas. Os resultados abaixo são estimativas do estudo para cada grupo.</p>
+      <label>Medida do estudo
+        <select id="medida-insulina">
+          <option value="isi">Índice de sensibilidade à insulina (ISI)</option>
+          <option value="insulina">Área sob a curva de insulina</option>
+          <option value="glicose">Área sob a curva de glicose</option>
+          <option value="igi">Índice insulinogênico (IGI)</option>
+          <option value="di">Índice de disposição (DI)</option>
+        </select>
+      </label>
+      <table>
+        <caption id="legenda-insulina"></caption>
+        <thead><tr><th scope="col">Condição às 00h30</th><th scope="col">Mudança estimada e IC de 95%</th></tr></thead>
+        <tbody id="dados-insulina"></tbody>
+      </table>
+      <p id="leitura-insulina" aria-live="polite"></p>
+      <p>A glicose é o desfecho que o motor calcula nessa comparação. Os indicadores de insulina documentam o experimento e a incerteza das estimativas. <a href="https://doi.org/10.1007/s00125-024-06279-1">Centofanti e colegas, 2025 · Tabela 3</a></p>
+    </section>
     <details class="painel">
       <summary>Como o motor calcula</summary>
       <p>A cada janela de 24 h, o cálculo acumula a fração acordada entre 00h e 06h e a fração de energia consumida às 00:30 em relação a 30%. A vigília noturna e a energia armazenam estados separados. O limite de quatro exposições equivalentes e a redução à metade em um dia de recuperação completa são hipóteses didáticas.</p>
@@ -78,6 +98,6 @@
       <p>Os horários são exemplos de sala com 200 g diários de carboidrato, dos quais 60 g são consumidos às 06:30. A madrugada desloca uma fração da refeição das 19h. O ensaio usou horários e composições específicos de cada grupo. A estimação do teste oral é exibida na recuperação do cenário de quatro exposições noturnas e oito horas de sono programado. Os períodos de 7 e 28 dias são extrapolações didáticas.</p>
     </details>
   </main>
-  <script type="module" src="./rotinas.js"></script>
+  <script type="module" src="./rotinas.js?v=2"></script>
 </body>
 </html>
