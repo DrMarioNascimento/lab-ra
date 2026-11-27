@@ -192,11 +192,11 @@ async function avancar(para) {
 // ---------------------------------------------------------------- barra do Professor
 const hh = (t) => String(t ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const entradaLiberada = () => room?.entradaLiberada !== false;
-/** Botões de poder do Professor, os mesmos do Vila e do Comitê: turma (expulsar), entrada, encerrar a aula e sair. */
+/** Botões de poder do Professor, os mesmos do Vila e do Comitê: turma (expulsar), entrada, encerrar a sala e sair. */
 function poderes(cls = '') {
   const b = (mb, rot, c = 'secondary') => `<button class="btn ${c} ${cls}" data-mb="${mb}" type="button">${rot}</button>`;
   return b('turma', 'Turma') + b('lib', entradaLiberada() ? 'Entrada liberada' : 'Entrada fechada', entradaLiberada() ? 'secondary' : 'warn')
-    + (room?.aulaEncerrada ? b('fim', 'Reabrir a aula') : b('fim', 'Encerrar a aula', 'danger')) + b('sair', 'Sair');
+    + (room?.aulaEncerrada ? b('fim', 'Reabrir sala') : b('fim', 'Encerrar sala', 'danger')) + b('sair', 'Sair');
 }
 // Revisão 17 (pedido do autor): quem abre a sala é o Curador da sala e JOGA como todo mundo. A tela principal é o jogo; o botão "Sala",
 // no alto da tela e só no aparelho do Curador, abre por cima o gerenciamento inteiro (situação e ação da volta, QR e código, telão, turma,
@@ -210,7 +210,7 @@ function situacao() {
   const total = turma.length, noAmb = total - esperando.length, mandaram = turma.filter(p => p.resp).length;
   const e = room.etapa, v = room.volta;
   let info = '', acao = null;
-  if (room.aulaEncerrada) info = 'Aula encerrada para todos. Os dados ficam guardados.';
+  if (room.aulaEncerrada) info = 'Sala encerrada para todos. Os dados ficam guardados.';
   else if (!ETAPAS.includes(e)) info = `Sala aberta · ${players.filter(p => !p.expulso).length} na sala`;
   else if (e === 'choose') { info = `Volta ${v} de 5 · ${noAmb} de ${total} escolheram sala`; acao = ['mbIniciar', 'Iniciar o relógio da volta', 'playing']; }
   else if (e === 'playing') { info = `Volta ${v} de 5 em andamento · ${fmt(restante())}`; if (room.seg === 30) acao = ['mbEncerrar', 'Encerrar a volta', 'between', 'secondary']; }
@@ -253,7 +253,7 @@ function desenharSala(st = situacao()) {
     <section class="sala-bloco sala-convite"><div class="sala-qr" aria-label="QR code para a turma entrar">${qr}</div><div><p class="kicker">PARA A TURMA ENTRAR</p><div class="sala-cod">${hh(T.codigo)}</div><p class="muted">Apontem a câmera para o QR ou digitem o código na entrada do Mosaico Loop.</p><a class="btn secondary" href="${hh(telaoUrl())}" target="_blank" rel="noopener"><span class="ic3d sm" aria-hidden="true"><img src="../museu/icones/ui/telao.webp" alt=""></span>Abrir telão</a></div></section>
     <section class="sala-bloco"><p class="kicker">TURMA · ${gente.filter(p => !p.expulso).length} NA SALA</p><ul class="turma-lista">${gente.map((p) => `<li class="${p.expulso ? 'fora' : ''}"><span>${hh(p.nome || 'Participante')}${p.expulso ? ' · fora da sala' : hh(posicao(p))}</span>
       <button class="btn ${p.expulso ? 'secondary' : 'danger'} sm" data-exp="${hh(p.id)}" data-val="${p.expulso ? 0 : 1}" type="button">${p.expulso ? 'Readmitir' : 'Expulsar'}</button></li>`).join('') || '<li><span>Ninguém entrou ainda.</span></li>'}</ul></section>
-    <section class="sala-bloco sala-poderes">${b('lib', entradaLiberada() ? 'Entrada liberada' : 'Entrada fechada', entradaLiberada() ? 'secondary' : 'warn') + (room.aulaEncerrada ? b('fim', 'Reabrir a aula') : b('fim', 'Encerrar a aula', 'danger')) + b('sair', 'Sair')}</section>`;
+    <section class="sala-bloco sala-poderes">${b('lib', entradaLiberada() ? 'Entrada liberada' : 'Entrada fechada', entradaLiberada() ? 'secondary' : 'warn') + (room.aulaEncerrada ? b('fim', 'Reabrir sala') : b('fim', 'Encerrar sala', 'danger')) + b('sair', 'Sair')}</section>`;
   d.querySelectorAll('[data-para]').forEach((x) => { x.onclick = () => avancar(x.dataset.para); });
 }
 function abrirSala() {
@@ -265,7 +265,7 @@ function abrirSala() {
 }
 document.getElementById('salaBtn')?.addEventListener('click', () => { if (eMestre()) abrirSala(); });
 
-// ---------------------------------------------------------------- poderes do Professor (turma, entrada, encerrar a aula, sair)
+// ---------------------------------------------------------------- poderes do Professor (turma, entrada, encerrar a sala, sair)
 const desenharTurma = () => desenharSala();   // a turma agora mora no painel da Sala
 document.addEventListener('click', async (ev) => {
   const x = ev.target.closest('[data-exp],[data-fechar],[data-mb]');
@@ -282,18 +282,18 @@ document.addEventListener('click', async (ev) => {
   else if (mb === 'lib') { if (!(await T.atualizarSala({ entradaLiberada: !entradaLiberada() }))) toast('Não consegui mudar a entrada. Tente de novo.'); }
   else if (mb === 'fim') {
     if (room.aulaEncerrada) { await T.atualizarSala({ aulaEncerrada: false }); return; }
-    if (!confirm('Encerrar a aula para todos? O telão e os celulares mostram “Aula encerrada”. Os dados ficam guardados e você pode reabrir depois.')) return;
+    if (!confirm('Encerrar a sala para todos? O telão e os celulares mostram “Sala encerrada”. Os dados ficam guardados e você pode reabrir depois.')) return;
     if (!(await T.atualizarSala({ aulaEncerrada: true, entradaLiberada: false }))) toast('Não consegui encerrar. Tente de novo.');
   } else if (mb === 'sair') {
-    if (!room?.aulaEncerrada && !confirm('Sair sem encerrar a aula? Os celulares e o telão ficam sem o Curador da sala até você voltar.')) return;
+    if (!room?.aulaEncerrada && !confirm('Sair sem encerrar a sala? Os celulares e o telão ficam sem o Curador da sala até você voltar.')) return;
     location.href = '../../bancadas.html';
   }
 });
 
-/** Para quem não é Professor: tela cheia quando a aula foi encerrada ou quando foi retirado da sala. */
+/** Para quem não é Professor: tela cheia quando a sala foi encerrada ou quando foi retirado da sala. */
 function avisoDeSaida() {
   let el = document.getElementById('salaFim');
-  const msg = eMestre() ? null : (euJogador().expulso ? ['VOCÊ SAIU DA SALA', 'O Curador da sala retirou você desta sala.'] : room?.aulaEncerrada ? ['AULA ENCERRADA', 'O Curador da sala encerrou a aula. Obrigado por participar!'] : null);
+  const msg = eMestre() ? null : (euJogador().expulso ? ['VOCÊ SAIU DA SALA', 'O Curador da sala retirou você desta sala.'] : room?.aulaEncerrada ? ['SALA ENCERRADA', 'O Curador encerrou a sala. Obrigado por participar!'] : null);
   if (!msg) { if (el) el.remove(); return; }
   if (!el) { el = document.createElement('div'); el.id = 'salaFim'; el.className = 'sala-espera sala-fim'; document.body.appendChild(el); }
   el.innerHTML = `<div class="card"><p class="kicker">${msg[0]}</p><h2>${msg[1]}</h2></div>`;

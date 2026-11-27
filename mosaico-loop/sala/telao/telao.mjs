@@ -206,7 +206,7 @@ addEventListener('resize', () => { if (room) { caber(); caberFita(); } });
 
 function desenhar() {
   if (!room) { app.innerHTML = `<div class="tl-raiz">${cabeca()}<div class="tl-meio"><div class="tl-card tl-largo tl-relogio"><h1 class="tl-titulo">Sala não encontrada</h1><p class="tl-texto">Confira o código e abra de novo.</p></div></div></div>`; return; }
-  if (room.aulaEncerrada) { app.innerHTML = `<div class="tl-raiz">${cabeca()}<div class="tl-meio"><div class="tl-card tl-largo tl-relogio"><p class="tl-volta">AULA ENCERRADA</p><h1 class="tl-titulo">Obrigado por participar!</h1><p class="tl-texto">O Curador da sala encerrou a aula.</p></div></div></div>`; chaveTela = ''; return; }
+  if (room.aulaEncerrada) { app.innerHTML = `<div class="tl-raiz">${cabeca()}<div class="tl-meio"><div class="tl-card tl-largo tl-relogio"><p class="tl-volta">SALA ENCERRADA</p><h1 class="tl-titulo">Obrigado por participar!</h1><p class="tl-texto">O Curador encerrou a sala.</p></div></div></div>`; chaveTela = ''; return; }
   const pags = paginasDaEtapa();
   if (pag >= pags.length) pag = 0;
   const g = gente();

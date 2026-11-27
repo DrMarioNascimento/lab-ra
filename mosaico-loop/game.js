@@ -806,7 +806,7 @@ function separarPontos(mv){
 // continua como antes (energia, tranca, prévia, minijogo). O que já está no caderno, ou foi achado numa volta anterior, aparece achado: a pessoa lembra.
 // A regra é a mesma para todas as salas e as 5 causas: depende só do lugar do ponto (vagaDoPonto) e da câmera.
 const ACHAR = { perto: 0.45, zoom: 0.6, folga: 1.18, raio: 0.30, folgaRaio: 1.2, bate: 0.06 };
-const LC_ACHAR = false;   // chave dos pontos escondidos (revisão 17, lote 15). false: a sala funciona como antes (pontos acesos, lista cheia)
+const LC_ACHAR = true;   // chave dos pontos escondidos (revisão 17, lote 15, decisão do autor). false volta à sala antiga (pontos acesos, lista cheia)
 const noAchar = () => LC_ACHAR && !!state && state.caseRules === 2;
 const chaveAchado = (salaId, clue) => salaId + '|' + ((clue.lcp && typeof LC_PID !== 'undefined' && LC_PID[clue.lcp] && LC_PID[clue.lcp].previa) || clue.lcp || clue.id);
 const noCaderno = clue => state.clues.some(x => x.id === clue.id);
@@ -946,6 +946,7 @@ function renderClues(){
  if (room.livro || room.livroLoop) atualizarLivro(clues, elapsed);
  { const vazia = panel.querySelector('.lista-vazia'); if (vazia) { const nada = !panel.querySelector('.clue-list [data-clue]:not([hidden])'); if (vazia.hidden === nada) vazia.hidden = !nada; } }
  { const mv = panel.querySelector('model-viewer.achar'); if (mv && mv.loaded) revelarPontos(mv); }
+ { const dc = panel.querySelector('model-viewer.achar') && panel.querySelector('.dica'); if (dc) { const t = state.achados && Object.keys(state.achados).length ? 'Gire e chegue perto. Toque no que achar para examinar.' : 'Gire e chegue perto: os detalhes só aparecem de perto.'; if (dc.textContent !== t) dc.textContent = t; } }
  renderNoitePanel();
  const reserva = lcReservaDaSala();
  let lembrete = panel.querySelector('.loop-reserva');

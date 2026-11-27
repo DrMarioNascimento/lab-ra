@@ -372,7 +372,7 @@ async function entrar(asMaster=false){
     const jaTem=asMaster?null:await getDoc(playerRef(code,u.uid)).catch(()=>null);
     if(jaTem&&jaTem.exists()&&jaTem.data().expulso===true)return formEntrar('Você foi retirado desta sala pelo Curador da sala.',false);
     if(!asMaster&&!(jaTem&&jaTem.exists())){
-      if(snap.data().aulaEncerrada===true)return formEntrar('Esta aula foi encerrada pelo Curador da sala.',false);
+      if(snap.data().aulaEncerrada===true)return formEntrar('Esta sala foi encerrada pelo Curador.',false);
       if(snap.data().entradaLiberada===false)return formEntrar('A entrada ainda não foi liberada pelo Curador da sala.',false);
     }
     if(jaTem&&jaTem.exists()){

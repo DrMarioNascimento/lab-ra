@@ -552,4 +552,5 @@ Vale sobre o que estiver escrito acima. Nada do enredo mudou: nenhuma pista, tex
 
 - **Procurar de verdade.** Os detalhes da peça ficam escondidos (parte 3, "Procurar na peça"). Nada brilha ao entrar; gire e chegue perto. Tocar num lugar da peça mira e aproxima; a pinça e o botão + também aproximam. Ao se afastar, o detalhe que você não tocou some de novo, mas continua na lista. Não existe contador de quantos detalhes a sala tem.
 - **Curador da sala.** Neste jogo, quem abre a sala é o Curador da sala (não "Professor"). Ele entra com nome e joga como todo mundo; o botão Sala, no alto da tela dele, traz QR e código, turma, telão, voltas e encerrar. O personagem do museu continua "o curador Aurélio".
+- **Encerrar sala.** Quando o Curador fecha a partida, o botão diz "Encerrar sala", e o telão e os celulares mostram "Sala encerrada".
 - **Entrada pelo QR** igual à dos outros Mosaicos: código, seu nome, "Como o jogo deve receber você?" (Bem-vindo, Bem-vinda ou Tanto faz) e Entrar. O manual abre logo depois, com "Entendi"; o "i" reabre.
