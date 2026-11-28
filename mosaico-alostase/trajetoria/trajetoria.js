@@ -1,5 +1,5 @@
 import { resumirSensibilidadeGlicemica } from '../motor/glicemia-rotinas.js?v=5';
-import { agruparTrajetoria, HORIZONTES, PERFIS_TRAJETORIA, simularTrajetoria } from '../motor/trajetoria.js?v=12';
+import { agruparTrajetoria, HORIZONTES, PERFIS_TRAJETORIA, simularTrajetoria } from '../motor/trajetoria.js?v=13';
 import { PASSO_INTEGRADO } from '../motor/bancada-hidrica.js?v=6';
 import { desenharSerie, indiceNaSerie } from '../hidratacao/grafico.js?v=3';
 import { criarEditor } from './editor.js?v=5';
@@ -53,7 +53,7 @@ const medidasDia = {
   faseCircadianaH: ['Deslocamento da fase (+ atraso, − avanço)', 'h', 2],
   luzLux: ['Luz programada', 'lux', 0],
   ritmoOrientado: ['Ritmo respiratório programado (0 fora da pausa)', 'ciclos/min', 0],
-  pressaoSono: ['Pressão de sono', '0 a 1', 3], vigiliaContinua: ['Vigília contínua', 'h', 1], cortisol: ['Cortisol', 'µg/dL', 2], glicemia: ['Glicemia', 'mg/dL', 1],
+  pressaoSono: ['Pressão de sono', '0 a 1', 3], vigiliaContinua: ['Vigília contínua', 'h', 1], cortisol: ['Cortisol total', 'µg/dL', 2], cortisolBasal: ['Cortisol pelo ritmo diário', 'µg/dL', 2], cortisolExercicio: ['Cortisol acrescentado pelo exercício', 'µg/dL', 2], glicemia: ['Glicemia', 'mg/dL', 1],
 };
 const termicasPeriodo = {
   picoCentralC: ['Pico de temperatura central estimada', '°C', 2],

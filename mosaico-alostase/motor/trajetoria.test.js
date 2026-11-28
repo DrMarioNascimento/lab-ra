@@ -205,3 +205,14 @@ test('o painel de sensibilidade reproduz o cálculo diário completo nas três h
     }
   }
 });
+
+test('a trajetória mostra o cortisol do relógio e a contribuição do esforço separadamente', () => {
+  const eventos = [{ tipo: 'dormir', inicio: 1380, fim: 420 }, { tipo: 'exercicio', inicio: 900, duracao: 30, intensidade: 60, dias: [0] }];
+  const { leitura } = simularTrajetoria('personalizada', 1, { eventos, detalharDia: 0 });
+  const antes = leitura.find((p) => p.min === 900);
+  const fim = leitura.find((p) => p.min === 930);
+  assert.equal(antes.cortisolExercicio, 0);
+  assert.ok(fim.cortisolExercicio > 0);
+  assert.ok(Math.abs(fim.cortisol / fim.cortisolBasal - 1.28) < 1e-12);
+  assert.ok(leitura.every((p) => p.cortisol === p.cortisolBasal + p.cortisolExercicio));
+});

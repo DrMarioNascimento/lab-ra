@@ -226,13 +226,14 @@ export function simularTrajetoria(perfilId, dias, { detalharDia = -1, frequencia
       const subida = refeicoes.reduce((soma, m) => soma + refeicao(hora, m, false), 0)
         + refeicoesAnteriores.reduce((soma, m) => soma + refeicao(hora, m, true), 0);
       const glicemia = P.glicemia.base.valor + Math.min(subida, P.glicemia.subidaMax.valor);
-      const cortisol = cortisolBase(hora - faseAtual)
-        + sessoes.reduce((soma, j) => soma + pulsoCortisol(hora, j, false, faseAtual), 0)
+      const cortisolBasal = cortisolBase(hora - faseAtual);
+      const cortisolExercicio = sessoes.reduce((soma, j) => soma + pulsoCortisol(hora, j, false, faseAtual), 0)
         + sessoesAnteriores.reduce((soma, j) => soma + pulsoCortisol(hora, j, true, faseAtual), 0);
+      const cortisol = cortisolBasal + cortisolExercicio;
       picoGlicemia = Math.max(picoGlicemia, glicemia);
       mediaCortisol += cortisol / PASSOS_DIA;
       if (dia === detalharDia) leitura.push({
-        ...faseHidrica.pontos[i], glicemia, cortisol, pressaoSono, dormindo, atividade, vigiliaContinua: vigiliaMin / 60,
+        ...faseHidrica.pontos[i], glicemia, cortisol, cortisolBasal, cortisolExercicio, pressaoSono, dormindo, atividade, vigiliaContinua: vigiliaMin / 60,
         faseCircadianaH: faseAtual, luzLux, ritmoOrientado: pausa?.tipo === 'biofeedback' ? pausa.ritmo ?? 6 : 0,
       });
       if (!dormindo) vigiliaMin += PASSO_INTEGRADO;

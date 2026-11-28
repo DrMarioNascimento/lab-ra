@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Cortisol durante e após o exercício · Mosaico Alostase</title>
+  <link rel="stylesheet" href="../../jogo/estilo.css?v=9">
+  <link rel="stylesheet" href="../../cardiovascular/bancada.css">
+  <link rel="stylesheet" href="../../turno-calor/calor.css">
+  <style>.esforco table { table-layout: fixed; } .esforco th, .esforco td { overflow-wrap: anywhere; padding: .55rem .35rem; }</style>
+</head>
+<body>
+  <main class="bancada esforco">
+    <nav class="calor-nav"><a href="../../">← Mosaico Alostase</a><a href="../?protocolo=estresse">Estresse social</a><a href="../../trajetoria/">Trajetórias fisiológicas</a></nav>
+    <header class="abertura">
+      <h1>Cortisol durante e após o exercício</h1>
+      <p>Compare uma sessão de 30 minutos com repouso no mesmo horário. Acompanhe quanto da curva vem do ritmo diário e quanto o motor atribui ao esforço.</p>
+    </header>
+    <section class="painel">
+      <h2>Resposta ao esforço físico</h2>
+      <div class="controle-hora">
+        <label>Início do exercício
+          <select id="inicio"><option value="8">08h</option><option value="15" selected>15h</option><option value="18">18h</option></select>
+        </label>
+        <label>Intensidade
+          <select id="intensidade"><option value="40">40% do VO₂máx</option><option value="60" selected>60% do VO₂máx</option><option value="80">80% do VO₂máx</option></select>
+        </label>
+      </div>
+      <canvas id="curva" class="calor-curva" aria-hidden="true"></canvas>
+      <p class="calor-legenda"><span>Contínua · cortisol com exercício</span><span>Tracejada · repouso no mesmo horário</span></p>
+      <label for="tempo">Tempo desde o início <output id="hora"></output></label>
+      <input id="tempo" type="range" min="0" max="150" value="30">
+      <p id="leitura"></p>
+    </section>
+    <section class="painel">
+      <h2>Conferir com o protocolo</h2>
+      <p>Hill e colegas compararam quatro sessões de 30 minutos em 12 homens ativos. Os valores do estudo são mudanças do início ao fim de cada sessão. A coluna do motor usa a mesma definição no horário escolhido acima.</p>
+      <table>
+        <caption>Variação percentual do cortisol em 30 min</caption>
+        <thead><tr><th scope="col">Sessão</th><th scope="col">Estudo (média ± DP)</th><th scope="col">Motor</th></tr></thead>
+        <tbody id="conferencia"></tbody>
+      </table>
+      <p>Esses estudos orientaram os parâmetros. A comparação acima mostra a diferença entre as referências e a resposta calculada. O período após a sessão inclui uma recuperação didática, com meia-vida de 60 min após o platô do modelo. A escolha do horário usa o ritmo diário do Alostase, com o mesmo fator de esforço. <a href="https://pubmed.ncbi.nlm.nih.gov/18787373/">Hill e colegas, 2008</a> · <a href="https://pubmed.ncbi.nlm.nih.gov/21911864/">VanBruggen e colegas, 2011</a></p>
+      <p>Aqui a unidade é µg/dL de cortisol sérico total no modelo. A bancada de estresse social usa cortisol salivar, com outro protocolo e outra unidade. <a href="../?protocolo=estresse">Ver estresse social</a></p>
+    </section>
+  </main>
+  <script type="module" src="./esforco.js"></script>
+</body>
+</html>
